@@ -23,9 +23,14 @@ namespace View3D.Commands.Bone
         private Matrix _oldTransform = Matrix.Identity;
 
         ISelectionState _oldSelectionState;
+        private SelectionManager _selectionManager;
 
+        public TransformBoneCommand(SelectionManager selectionManager)
+        {
+            _selectionManager = selectionManager;
+        }
 
-        public TransformBoneCommand(List<int> selectedBones, BoneSelectionState state)
+        public void Configure(List<int> selectedBones, BoneSelectionState state)
         {
             _selectedBones = selectedBones;
             _boneSelectionState = state;

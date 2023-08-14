@@ -1,13 +1,16 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
 using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Commands;
+using View3D.Commands.Bone;
 using View3D.Commands.Vertex;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
+using View3D.SceneNodes;
 
 namespace View3D.Components.Gizmo
 {
@@ -24,9 +27,10 @@ namespace View3D.Components.Gizmo
         Quaternion _orientation = Quaternion.Identity;
         public Quaternion Orientation { get => _orientation; set { _orientation = value; } }
 
-        TransformVertexCommand _activeCommand;
+        ICommand _activeCommand;
 
         List<MeshObject> _effectedObjects;
+        List<int> _selectedBones;
         private readonly CommandFactory _commandFactory;
         ISelectionState _selectionState;
 
@@ -58,52 +62,163 @@ namespace View3D.Components.Gizmo
             }
         }
 
-        public void Start(CommandExecutor commandManager)
+        public TransformGizmoWrapper(CommandFactory commandFactory, List<int> selectedBones, BoneSelectionState boneSelectionState)
         {
-            if (_activeCommand != null)
+            _commandFactory = commandFactory;
+            _selectionState = boneSelectionState;
+            _selectedBones = selectedBones;
+
+            _effectedObjects = new List<MeshObject> { boneSelectionState.RenderObject.Geometry };
+
+            var sceneNode = boneSelectionState.RenderObject as Rmv2MeshNode;
+            var animPlayer = sceneNode.AnimationPlayer;
+            var currentFrame = animPlayer.GetCurrentAnimationFrame();
+            var skeleton = boneSelectionState.Skeleton;
+
+            if (currentFrame == null) return;
+
+            var bones = boneSelectionState.SelectedBones;
+            var totalBones = bones.Count;
+            var rotations = new List<Quaternion>();
+            foreach (var boneIdx in bones)
             {
-                //   MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
-                _activeCommand.InvertWindingOrder = _invertedWindingOrder;
-                _activeCommand.Transform = _totalGizomTransform;
-                _activeCommand.PivotPoint = Position;
-                commandManager.ExecuteCommand(_activeCommand);
-                _activeCommand = null;
+                var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
+                bone.Decompose(out var scale, out var rot, out var trans);
+                Position += trans;
+                Scale += scale;
+                rotations.Add(rot);
+
             }
 
-            _totalGizomTransform = Matrix.Identity;
-            _activeCommand = _commandFactory.Create<TransformVertexCommand>().Configure(x => x.Configure(_effectedObjects, Position)).Build();
+            Orientation = AverageOrientation(rotations);
+            Position = (Position / totalBones);
+            Scale = (Scale / totalBones);
+        }
+
+        private Quaternion AverageOrientation(List<Quaternion> orientations)
+        {
+            Quaternion average = orientations[0];
+            for (int i = 1; i < orientations.Count; i++)
+            {
+                average = Quaternion.Slerp(average, orientations[i], 1.0f / (i + 1));
+            }
+            return average;
+        }
+
+        public void Start(CommandExecutor commandManager)
+        {
+            if(_activeCommand is TransformVertexCommand transformVertexCommand)
+            {
+                //   MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
+                transformVertexCommand.InvertWindingOrder = _invertedWindingOrder;
+                transformVertexCommand.Transform = _totalGizomTransform;
+                transformVertexCommand.PivotPoint = Position;
+                commandManager.ExecuteCommand(_activeCommand);
+                _activeCommand = null;
+
+                _totalGizomTransform = Matrix.Identity;
+                _activeCommand = _commandFactory.Create<TransformVertexCommand>().Configure(x => x.Configure(_effectedObjects, Position)).Build();
+                return;
+            }
+
+            if(_activeCommand is TransformBoneCommand transformBoneCommand)
+            {
+                var matrix = _totalGizomTransform;
+                matrix.Translation = Position;
+                transformBoneCommand.Transform = matrix;
+                commandManager.ExecuteCommand(_activeCommand);
+                _activeCommand = null;
+                _totalGizomTransform = Matrix.Identity;
+                _activeCommand = _commandFactory.Create<TransformBoneCommand>().Configure(x => x.Configure(_selectedBones, (BoneSelectionState) _selectionState)).Build();
+                return;
+            }
         }
 
         public void Stop(CommandExecutor commandManager)
         {
-            if (_activeCommand != null)
+            if (_activeCommand is TransformVertexCommand transformVertexCommand)
             {
-                _activeCommand.InvertWindingOrder = _invertedWindingOrder;
-                _activeCommand.Transform = _totalGizomTransform;
-                _activeCommand.PivotPoint = Position;
+                transformVertexCommand.InvertWindingOrder = _invertedWindingOrder;
+                transformVertexCommand.Transform = _totalGizomTransform;
+                transformVertexCommand.PivotPoint = Position;
                 commandManager.ExecuteCommand(_activeCommand);
                 _activeCommand = null;
+                return;
             }
+
+            if (_activeCommand is TransformBoneCommand transformBoneCommand)
+            {
+                var matrix = _totalGizomTransform;
+                matrix.Translation = Position;
+                transformBoneCommand.Transform = matrix;
+                commandManager.ExecuteCommand(_activeCommand);
+                _activeCommand = null;
+                return;
+            }
+        }
+
+        Vector3 ToEulerAngles(Quaternion quaternion)
+        {
+            Vector3 eulerAngles;
+
+            // Extract the pitch (x-axis rotation)
+            float sinPitch = 2.0f * (quaternion.W * quaternion.X + quaternion.Y * quaternion.Z);
+            float cosPitch = 1.0f - 2.0f * (quaternion.X * quaternion.X + quaternion.Y * quaternion.Y);
+            eulerAngles.X = (float)Math.Atan2(sinPitch, cosPitch);
+
+            // Extract the yaw (y-axis rotation)
+            float sinYaw = 2.0f * (quaternion.W * quaternion.Y - quaternion.Z * quaternion.X);
+            if (Math.Abs(sinYaw) >= 1)
+                eulerAngles.Y = (float)Math.CopySign(Math.PI / 2, sinYaw); // Use 90 degrees if out of range
+            else
+                eulerAngles.Y = (float)Math.Asin(sinYaw);
+
+            // Extract the roll (z-axis rotation)
+            float sinRoll = 2.0f * (quaternion.W * quaternion.Z + quaternion.X * quaternion.Y);
+            float cosRoll = 1.0f - 2.0f * (quaternion.Y * quaternion.Y + quaternion.Z * quaternion.Z);
+            eulerAngles.Z = (float)Math.Atan2(sinRoll, cosRoll);
+
+            return eulerAngles;
+        }
+
+        Matrix FixRotationAxis(Matrix transform)
+        {
+            Vector3 scale;
+            Quaternion rotation;
+            Vector3 translation;
+            transform.Decompose(out scale, out rotation, out translation);
+
+            // Swap the X and Y rotations
+            Vector3 euler = ToEulerAngles(rotation);
+            rotation = Quaternion.CreateFromYawPitchRoll(euler.Y, euler.X, euler.Z);
+
+            // Recompose the transform with the fixed rotation
+            Matrix fixedTransform = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(rotation) * Matrix.CreateTranslation(translation);
+            return fixedTransform;
         }
 
         public void GizmoTranslateEvent(Vector3 translation, PivotType pivot)
         {
-            ApplyTransform(Matrix.CreateTranslation(translation), pivot);
+            ApplyTransform(Matrix.CreateTranslation(translation), pivot, GizmoMode.Translate);
             Position += translation;
             _totalGizomTransform *= Matrix.CreateTranslation(translation);
         }
 
         public void GizmoRotateEvent(Matrix rotation, PivotType pivot)
         {
-            ApplyTransform(rotation, pivot);
+            ApplyTransform(rotation, pivot, GizmoMode.Rotate);
             _totalGizomTransform *= rotation;
+
+            var fixedTransform = FixRotationAxis(_totalGizomTransform);
+            fixedTransform.Decompose(out var _, out var quat, out var _);
+            Orientation = quat;
         }
 
         public void GizmoScaleEvent(Vector3 scale, PivotType pivot)
         {
             var realScale = scale + Vector3.One;
             var scaleMatrix = Matrix.CreateScale(scale + Vector3.One);
-            ApplyTransform(scaleMatrix, pivot);
+            ApplyTransform(scaleMatrix, pivot, GizmoMode.UniformScale);
 
             Scale += scale;
 
@@ -137,9 +252,19 @@ namespace View3D.Components.Gizmo
             return result;
         }
 
-        void ApplyTransform(Matrix transform, PivotType pivotType)
+        void ApplyTransform(Matrix transform, PivotType pivotType, GizmoMode gizmoMode)
         {
             transform.Decompose(out var scale, out var rot, out var trans);
+
+            if (_selectionState is BoneSelectionState boneSelectionState)
+            {
+                var objCenter = Vector3.Zero;
+                if (pivotType == PivotType.ObjectCenter)
+                    objCenter = Position;
+
+                TransformBone(Matrix.CreateScale(Scale) * Matrix.CreateFromQuaternion(rot) * Matrix.CreateTranslation(Position), objCenter, gizmoMode);
+                return;
+            }
 
             foreach (var geo in _effectedObjects)
             {
@@ -174,6 +299,15 @@ namespace View3D.Components.Gizmo
             }
         }
 
+        void TransformBone(Matrix transform, Vector3 objCenter, GizmoMode gizmoMode)
+        {
+            if (_activeCommand is TransformBoneCommand transformBoneCommand)
+            {
+                var m = Matrix.CreateTranslation(-objCenter) * transform * Matrix.CreateTranslation(objCenter);
+                transformBoneCommand.ApplyTransformation(m, gizmoMode);
+            }
+        }
+
         void TransformVertex(Matrix transform, MeshObject geo, Vector3 objCenter, int index)
         {
             var m = Matrix.CreateTranslation(-objCenter) * transform * Matrix.CreateTranslation(objCenter);
@@ -197,6 +331,11 @@ namespace View3D.Components.Gizmo
             {
                 if (vertexSelectionState.SelectedVertices.Count != 0)
                     return new TransformGizmoWrapper(commandFactory, new List<MeshObject>() { vertexSelectionState.RenderObject.Geometry }, vertexSelectionState);
+            }
+            else if (state is BoneSelectionState boneSelectionState)
+            {
+                if (boneSelectionState.SelectedBones.Count != 0)
+                    return new TransformGizmoWrapper(commandFactory, boneSelectionState.SelectedBones, boneSelectionState);
             }
             return null;
         }

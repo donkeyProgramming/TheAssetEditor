@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
@@ -7,9 +8,14 @@ using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using Microsoft.Xna.Framework;
 using View3D.Animation;
+using View3D.Commands;
+using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
+using View3D.Components.Gizmo;
+using View3D.SceneNodes;
 using SkeletonBoneNode = AnimationEditor.Common.ReferenceModel.SkeletonBoneNode;
 
 namespace AnimationEditor.AnimationKeyframeEditor
@@ -22,8 +28,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private PackFileService _pfs;
         private ApplicationSettingsService _applicationSettings;
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private SelectionManager _selectionManager;
+        private SelectionComponent _selectionComponent;
+        private GizmoComponent _gizmoComponent;
 
+        private CommandFactory _commandFactory;
+        private SelectionManager _selectionManager;
+        private TransformToolViewModel _transformToolViewModel;
         AnimationToolInput _inputRiderData;
         AnimationToolInput _inputMountData;
         private SceneObject _newAnimation;
@@ -35,11 +45,15 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public AnimationKeyframeEditorViewModel(PackFileService pfs,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
-            SelectionManager selectionManager,
+            SelectionComponent selectionComponent,
             ApplicationSettingsService applicationSettings,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
-            SceneObjectBuilder sceneObjectBuilder)
+            SceneObjectBuilder sceneObjectBuilder,
+            CommandFactory commandFactory,
+            SelectionManager selectionManager,
+            TransformToolViewModel transformToolViewModel,
+            GizmoComponent gizmoComponent)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
             _animationPlayerViewModel = animationPlayerViewModel;
@@ -49,7 +63,13 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _applicationSettings = applicationSettings;
 
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _selectionComponent = selectionComponent;
+            _commandFactory = commandFactory;
             _selectionManager = selectionManager;
+
+            _gizmoComponent = gizmoComponent;
+
+            _transformToolViewModel = transformToolViewModel;
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
 
@@ -141,6 +161,72 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             MountLinkController.ReloadFragments(true, false);
             UpdateCanSaveAndPreviewStates();
+        }
+
+        public void InsertNewFrame()
+        {
+            System.Windows.Forms.MessageBox.Show("insert new frame");
+        }
+
+        public void DuplicateFrame()
+        {
+            System.Windows.Forms.MessageBox.Show("DuplicateFrame");
+        }
+
+        private ISelectable FindSelectableObject(ISceneNode node)
+        {
+            if (node is ISelectable selectableNode) return selectableNode;
+            foreach (var slot in node.Children)
+            {
+                return FindSelectableObject(slot);
+            }
+            return null;
+        }
+
+        public void EnterSelectMode()
+        {
+            if (_rider.MainNode.Children.Count == 0) return;
+
+            var variantMeshRoot = _rider.MainNode.Children[1];
+            if (variantMeshRoot.Children.Count == 0) return;
+            var selectableNode = FindSelectableObject(variantMeshRoot);
+
+            if (selectableNode != null)
+            {
+                _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>() { selectableNode }, false, false)).BuildAndExecute();
+                _selectionComponent.SetBoneSelectionMode();
+                _rider.Player.Pause();
+                _rider.Player.CurrentFrame++;
+                if (_rider.Player.CurrentFrame + 1 == _rider.Player.FrameCount()) return;
+                _rider.Player.CurrentFrame--;
+
+            }
+        }
+
+        public void EnterMoveMode()
+        {
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;            
+            _gizmoComponent.ResetScale();
+            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Translate);
+            _gizmoComponent.SetGizmoMode(GizmoMode.Translate);
+
+        }
+
+        public void EnterRotateMode()
+        {
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
+            _gizmoComponent.ResetScale();
+            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Rotate);
+            _gizmoComponent.SetGizmoMode(GizmoMode.Rotate);
+
+        }
+
+        public void EnterScaleMode()
+        {
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
+            _gizmoComponent.ResetScale();
+            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Scale);
+            _gizmoComponent.SetGizmoMode(GizmoMode.NonUniformScale);
         }
 
     }
