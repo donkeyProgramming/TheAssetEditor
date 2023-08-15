@@ -29,8 +29,8 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public XMFLOAT2 Uv;
         public XMFLOAT4 Color;
 
-        [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = 4)]
-        public ExtVertexInfluence[] influences; // fixed array length 4        
+        //[MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = 4)]
+        //public ExtVertexInfluence[] influences; // fixed array length 4        
 
         public int weightCount;
     };
@@ -43,5 +43,4 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public int vertexIndex;
         public float vertexWeight;
     }
-
 }

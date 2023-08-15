@@ -7,8 +7,8 @@ namespace AssetManagement.MeshHandling
 {
     public class AssetManagementFactory : IAssetManagementFactory
     {
-        private readonly IEnumerable<IAssetImporter> _importers;
-
+        private readonly IEnumerable<IAssetImporter> _importers;     
+        
         public AssetManagementFactory(IEnumerable<IAssetImporter> importers)
         {
             _importers = importers;

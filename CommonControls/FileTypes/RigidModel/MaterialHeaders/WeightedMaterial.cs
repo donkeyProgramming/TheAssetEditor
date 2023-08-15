@@ -210,7 +210,7 @@ namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
         {
             var material = new WeightedMaterial()
             {
-                MaterialId = materialId, // before this was always said to "weighted" no matter the params
+                MaterialId = materialId, 
                 BinaryVertexFormat = vertexFormat,
                 ModelName = "mesh1",
                 TextureDirectory = "variantmeshes\\mesh1",

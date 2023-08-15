@@ -11,7 +11,7 @@ namespace wrapdll
 		virtual ~FBXImporterService()
 		{			
 			m_pSDKManager->Destroy();
-			log_info("FBX SDK Manager object deallocated corretcly.");
+			LogInfo("FBX SDK Manager object deallocated corretcly.");
 		};
 
 		/// <summary>
@@ -22,34 +22,33 @@ namespace wrapdll
 		/// <summary>
 		/// Makes and fills the FBXSceneContainer
 		/// </summary>		
-
 		FBXSCeneContainer* ProcessAndFillScene();
 
+        /// <summary>
+        /// Fille the scene containter file info structure, from the FBX scene/sdk manager
+        /// </summary>
         void FillFileInfo();
 
-		void FillBoneNames(const std::vector<std::string>& boneNames)
-		{
-			m_animFileBoneNames = boneNames;
-		}
-        // TODO: remove?
-		/*const char* GetSkeletonNameFromSceneNodes()
-		{			
-			m_skeletonName = FBXNodeSearcher::FetchSkeletonNameFromScene(m_pFbxScene);
-			return m_skeletonName.c_str();
-		}*/
+        // TODO: find out if you can remove
 
-		std::vector<std::string>& GetBoneNames()
-		{
-			return m_animFileBoneNames;
-		}
+        // TODO: find out if you can remove
+		//std::vector<std::string>& GetBoneNames()
+		//{
+		//	return m_animFileBoneNames;
+		//}
 
+		/// <summary>
+		/// Get reference to scene containter object
+		/// </summary>
+		/// <returns>Internal SceneContainer instance</returns>
 		FBXSCeneContainer& GetSceneContainer()
 		{
 			return m_sceneContainer;
 		}
 
 	private:
-		std::vector<std::string> m_animFileBoneNames; // ordered as the .ANIM file, so can be used for bonename -> index lookups
+        // TODO: find out, if you can remove
+		//std::vector<std::string> m_animFileBoneNames; // ordered as the .ANIM file, so can be used for bonename -> index lookups
 		
 		FBXSCeneContainer m_sceneContainer; // the container of mesh, anim, etc, that is copied to/from C#, stored here, so no extra pointer cleanup needed
 

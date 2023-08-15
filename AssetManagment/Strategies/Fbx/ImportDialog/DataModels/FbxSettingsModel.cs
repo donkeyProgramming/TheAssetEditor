@@ -1,7 +1,7 @@
 ﻿using CommonControls.FileTypes.Animation;
 using AssetManagement.GenericFormats.Managed;
 
-namespace AssetManagement.Strategies.Fbx.Models
+namespace AssetManagement.Strategies.Fbx.ImportDialog.DataModels
 {
     public class FbxSettingsModel
     {

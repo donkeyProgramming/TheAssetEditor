@@ -39,10 +39,10 @@ namespace CommonControls.Events.UiCommands
                     return;
 
                 // TODO: RE-ENABLE!!!
-                //try
+               //try
                 {
                     var extension = Path.GetExtension(filename);
-                    var importer = _assetManagementFactory.GetImporter(extension);  // Add some validation here! 
+                    var importer = _assetManagementFactory.GetImporter(extension);  // TODO: What if no importer is found?
                     var packFile = importer.ImportAsset(filename);
 
                     if (packFile == null)

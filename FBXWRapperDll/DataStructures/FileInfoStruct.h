@@ -13,6 +13,5 @@ struct FileInfoStruct
     int materialCount = 0;    
     int animationsCount = 0;
     int boneCount = 0;
-
 };
 

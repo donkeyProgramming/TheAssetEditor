@@ -3,7 +3,7 @@ using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Interfaces.AssetManagement;
 using System.IO;
-using AssetManagement.Strategies.Fbx.Models;
+using AssetManagement.Strategies.Fbx.ImportDialog.DataModels;
 using CommonControls.Services;
 using AssetManagement.Strategies.Fbx.ImportDialog.ViewModels;
 

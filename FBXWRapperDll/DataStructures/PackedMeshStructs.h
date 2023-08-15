@@ -18,27 +18,52 @@ public:
 
     VertexInfluence(const VertexInfluence& v)
     {
-        strcpy_s<255>(boneName, v.boneName);
-        boneIndex = v.boneIndex;
-        weight = v.weight;
+        *this = v.Clone();
     }
+
+    void Set(const std::string& boneName, uint32_t boneIndex, float Weight)
+    {        
+        strcpy_s<255>(this->boneName, boneName.c_str());
+        this->boneIndex = boneIndex;
+        this->weight = weight;
+    }
+
+    VertexInfluence Clone() const
+    {
+        VertexInfluence v;
+        strcpy_s<255>(v.boneName, boneName);
+        v.boneIndex = boneIndex;
+        v.weight = weight;
+
+        return v;
+    }    
 
     char boneName[255] = "";
 	uint32_t boneIndex = 0;
 	float weight = 0.0f;
 };
 
-struct VertexInfluenceExt
-{
-	std::string boneName = "";
-	uint32_t boneIndex = 0;
-	float weight = 0.0f;
+struct VertexWeight
+{    
+    char boneName[255] = "";
+    int vertexIndex = 0;
+    float vertexWeight = 0.0f;
 };
 
 
-struct ControlPointInfluenceExt
+
+
+//struct VertexInfluenceExt
+//{
+//	std::string boneName = "";
+//	uint32_t boneIndex = 0;
+//	float weight = 0.0f;
+//};
+//
+
+struct ControlPointInfluence
 {	
-	VertexInfluenceExt influences[4];
+	VertexInfluence influences[4];
 	int weightCount = 0;
 };
 
@@ -57,23 +82,13 @@ struct PackedCommonVertex
 	DirectX::XMFLOAT3 tangent = { 0, 0, 0 };
 	DirectX::XMFLOAT2 uv = { 0, 0 };
 	DirectX::XMFLOAT4 color = { 1, 0, 0, 1 };
-	VertexInfluence influences[4];
+	/*VertexInfluence influences[4];*/
 	int weightCount = 0;
 };
 
-struct VertexWeight
-{
-	// TODO: REMOVE DEBUG VALUE(S):
-	char boneName[255] = "Unnamed_BONE\0";
-	int vertexIndex = 0;
-	float vertexWeight = 0.0f;
-};
 
 struct PackedMesh
 {
-
-
-
 	std::string meshName = "Unnamed_Mesh\0";
 	std::vector<PackedCommonVertex> vertices;
 	std::vector<uint16_t> indices;

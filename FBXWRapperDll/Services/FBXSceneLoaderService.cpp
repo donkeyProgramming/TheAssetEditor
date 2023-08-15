@@ -15,7 +15,7 @@ wrapdll::FBXImporterService* wrapdll::FBXImporterService::CreateFromDiskFile(con
 
     if (!pInstance->m_pFbxScene)
     {
-        log_action_error("Scene Creation Failed!!");
+        LogActionError("Scene Creation Failed!!");
         return nullptr;
     }
 
@@ -38,15 +38,15 @@ wrapdll::FBXSCeneContainer* wrapdll::FBXImporterService::ProcessAndFillScene()
     destPackedMeshes.resize(fbxMeshList.size());
     for (size_t meshIndex = 0; meshIndex < fbxMeshList.size(); meshIndex++)
     {
-        std::vector<ControlPointInfluenceExt> vertexToControlPoint;
-        FBXSkinProcessorService::ProcessSkin(fbxMeshList[meshIndex], destPackedMeshes[meshIndex], m_animFileBoneNames, vertexToControlPoint);
+        std::vector<ControlPointInfluence> vertexToControlPoint;
+        FBXSkinProcessorService::ProcessSkin(fbxMeshList[meshIndex], vertexToControlPoint);
 
         FBXMeshCreator::MakeUnindexPackedMesh(m_pFbxScene, fbxMeshList[meshIndex], destPackedMeshes[meshIndex], vertexToControlPoint);
 
         tools::SystemClock clock;        
-        log_action_color("Doing Tangents/Indexing");
+        LogActionColor("Doing Tangents/Indexing");
         MeshProcessor::DoFinalMeshProcessing(destPackedMeshes[meshIndex]);        
-        log_action_color("Done Tangents/Indexing. Time: " + std::to_string(clock.GetLocalTime()) + " seconds.");
+        LogActionColor("Done Tangents/Indexing. Time: " + std::to_string(clock.GetLocalTime()) + " seconds.");
     }
 
     return &m_sceneContainer;

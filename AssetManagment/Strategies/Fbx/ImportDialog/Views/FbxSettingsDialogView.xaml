@@ -4,17 +4,19 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"     
     xmlns:s="http://schemas.singulink.com/xaml"                  
-    xmlns:local="clr-namespace:AssetManagement.Strategies.Fbx.ImportDialog.Views.FBXImportSettingsDialogView"      
-    x:Class="AssetManagement.Strategies.Fbx.ImportDialog.Views.FBXImportSettingsDialogView.FBXSetttingsView"                        
-      mc:Ignorable="d" d:DesignWidth="380"   
+    xmlns:file="clr-namespace:AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews.FBXFileInfoView"        
+    xmlns:anim="clr-namespace:AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews.FBXAnimView"        
+    x:Class="AssetManagement.Strategies.Fbx.ImportDialog.Views.FbxSettingsDialogView"                        
+     mc:Ignorable="d" d:DesignWidth="380"   
    ResizeMode="NoResize"
     Width="400"
        >
     <Grid>
         <!--<DockPanel>-->
         <DockPanel>
-        <local:FileInfoView Grid.Row="0" DockPanel.Dock="Top"   />
-        <local:FBXAnimationSettingsPanel  Grid.Row="1" DockPanel.Dock="Top"/>
+            
+         <file:FbxFileInfoPanelView Grid.Row="0" DockPanel.Dock="Top"/>         
+         <anim:FBXAnimationPanelView  Grid.Row="1" DockPanel.Dock="Top"/>
 
 
 

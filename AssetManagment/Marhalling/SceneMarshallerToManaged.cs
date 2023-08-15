@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 namespace AssetManagement.Strategies.Fbx
 {
     public class SceneMarshallerToManaged
-    {        
+    {
         public static SceneContainer ToManaged(IntPtr ptrFbxSceneContainer)
         {
             var fileInfo = FBXSCeneContainerGetterDll.GetFileInfo(ptrFbxSceneContainer);
@@ -20,7 +20,7 @@ namespace AssetManagement.Strategies.Fbx
             newScene.FileInfoData.FillFromStruct(in fileInfoStruct);
             newScene.Meshes = GetAllPackedMeshes(ptrFbxSceneContainer);
             newScene.SkeletonName = GetSkeletonNameFromSceneContainer(ptrFbxSceneContainer);
-            
+
             return newScene;
             /*
             - destScene.Bones = GetAllBones();
@@ -76,9 +76,9 @@ namespace AssetManagement.Strategies.Fbx
             var vertices = GetPackedVertices(fbxContainer, meshIndex);
 
             IntPtr namePtr = FBXSCeneContainerGetterDll.GetMeshName(fbxContainer, meshIndex);
-            var tempName = Marshal.PtrToStringUTF8(namePtr);
+            var meshName = Marshal.PtrToStringUTF8(namePtr);
 
-            if (vertices == null || indices == null || tempName == null)
+            if (vertices == null || indices == null || meshName == null)
                 throw new Exception("Params/Input Data Invalid: Vertices, Indices or Name == null");
 
             PackedMesh packedMesh = new PackedMesh();
@@ -86,7 +86,7 @@ namespace AssetManagement.Strategies.Fbx
             packedMesh.Indices = new List<ushort>();
             packedMesh.Vertices.AddRange(vertices);
             packedMesh.Indices.AddRange(indices);
-            packedMesh.Name = tempName;
+            packedMesh.Name = meshName;
             packedMesh.VertexWeights = GetVertexWeights(fbxContainer, meshIndex).ToList();
 
             return packedMesh;

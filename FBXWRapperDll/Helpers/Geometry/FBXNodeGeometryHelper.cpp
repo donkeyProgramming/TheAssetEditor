@@ -42,7 +42,7 @@ FbxAMatrix FBXNodeGeometryHelper::GetNodeWorldTransform(FbxNode* pNode)
 	return matrixL2W;
 }
 
-FbxAMatrix FBXNodeGeometryHelper::GetNodeWorldTransform_Normals(FbxNode* pNode)
+FbxAMatrix FBXNodeGeometryHelper::GetNodeWorldTransformNormals(FbxNode* pNode)
 {
 	FbxAMatrix matrixL2W;
 	matrixL2W.SetIdentity();

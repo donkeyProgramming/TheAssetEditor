@@ -63,30 +63,39 @@ namespace AssetManagement.GenericFormats
             return outputFile;
         }
 
-        private static void CopyMeshWeights(RmvMesh rmv2DestMesh, PackedMesh srcMesh, AnimationFile skeletonFile)
+        private static void ProcessMeshWeights(RmvMesh rmv2DestMesh, PackedMesh srcMesh, AnimationFile skeletonFile)
         {
             if (skeletonFile == null)
-                return;
+            { return; }
 
-            for (int vertexIndex = 0; vertexIndex < srcMesh.Vertices.Count; vertexIndex++)
+
+            for (int vertexWeightIndex = 0; vertexWeightIndex < srcMesh.VertexWeights.Count; vertexWeightIndex++)
             {
-                foreach (var influence in srcMesh.Vertices[vertexIndex].influences)
-                {
-                    CommonWeightProcessor.AddWeightToVertexByBoneName(skeletonFile, rmv2DestMesh.VertexList[vertexIndex], influence.boneName, influence.weight);
-                }
+                CommonWeightProcessor.AddWeightToVertexByBoneName(
+                    skeletonFile,
+                    rmv2DestMesh.VertexList[srcMesh.VertexWeights[vertexWeightIndex].vertexIndex],
+                    srcMesh.VertexWeights[vertexWeightIndex].boneName,
+                    srcMesh.VertexWeights[vertexWeightIndex].vertexWeight);
+            }
+
+            foreach (var vertex in rmv2DestMesh.VertexList)
+            {
+                CommonWeightProcessor.SortVertexWeightsByWeightValue(vertex);
+                CommonWeightProcessor.NormalizeVertexWeights(vertex);
             }
         }
+
 
         private static RmvModel ConvertPackedMeshToRmvModel(MaterialFactory materialFactory, RmvFile outputFile, PackedMesh packMesh, AnimationFile skeletonFile)
         {
             var currentMesh = new RmvModel();
 
             var materialCreator = new WeighterMaterialCreator();
-            
+
             currentMesh.Material = materialCreator.CreateEmpty(
-                skeletonFile != null ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,         
-                outputFile.Header.Version,                
-                skeletonFile != null ? VertexFormat.Cinematic : VertexFormat.Static); 
+                skeletonFile != null ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,
+                outputFile.Header.Version,
+                skeletonFile != null ? VertexFormat.Cinematic : VertexFormat.Static);
 
             currentMesh.Material.ModelName = packMesh.Name;
             currentMesh.Mesh = ConvertPackedMeshToRmvMesh(materialFactory, currentMesh.Material.BinaryVertexFormat, packMesh, skeletonFile);
@@ -117,8 +126,21 @@ namespace AssetManagement.GenericFormats
             rmv2Mesh.VertexList = originalVerticesPacked.ToArray();
             rmv2Mesh.IndexList = packedInputMesh.Indices.ToArray();
 
-            CopyMeshWeights(rmv2Mesh, packedInputMesh, skeletonFile);
+            ProcessMeshWeights(rmv2Mesh, packedInputMesh, skeletonFile);
 
+            // TODO: this a very clumsy way to do it, maybe the "weightCount" thing should be changed
+            if (skeletonFile != null)
+            {
+                foreach (var vertex in rmv2Mesh.VertexList)
+                {
+                    if (vertex.WeightCount == 0 || vertex.WeightCount > 4)
+                    {
+                        throw new System.Exception("weight count incorrect!!");
+                    }
+
+                    vertex.WeightCount = 4;
+                }
+            }
             return rmv2Mesh;
         }
 
@@ -142,26 +164,27 @@ namespace AssetManagement.GenericFormats
 
             return vertices;
         }
+        // TODO: remove?
 
-        private static void MakeVertexWeights(VertexFormat vertexFormat, ExtPackedCommonVertex packedInputVertex, CommonVertex outVertex)
-        {
-            if (vertexFormat == VertexFormat.Static)
-            {
-                outVertex.WeightCount = 0;
-                outVertex.BoneIndex = new byte[0];
-                outVertex.BoneWeight = new float[0];
-                return;
-            }
+        //private static void MakeVertexWeights(VertexFormat vertexFormat, ExtPackedCommonVertex packedInputVertex, CommonVertex outVertex)
+        //{
+        //    if (vertexFormat == VertexFormat.Static)
+        //    {
+        //        outVertex.WeightCount = 0;
+        //        outVertex.BoneIndex = new byte[0];
+        //        outVertex.BoneWeight = new float[0];
+        //        return;
+        //    }
 
-            for (int influenceIndex = 0; influenceIndex < 4; influenceIndex++)
-            {
-                outVertex.BoneIndex[influenceIndex] = (byte)packedInputVertex.influences[influenceIndex].boneIndex;
-                outVertex.BoneWeight[influenceIndex] = packedInputVertex.influences[influenceIndex].weight;
-            }
+        //    for (int influenceIndex = 0; influenceIndex < 4; influenceIndex++)
+        //    {
+        //        outVertex.BoneIndex[influenceIndex] = (byte)packedInputVertex.influences[influenceIndex].boneIndex;
+        //        outVertex.BoneWeight[influenceIndex] = packedInputVertex.influences[influenceIndex].weight;
+        //    }
 
-            CommonWeightProcessor.SortVertexWeights(outVertex);
-            CommonWeightProcessor.NormalizeVertexWeights(outVertex);
-        }
+        //    CommonWeightProcessor.SortVertexWeightsByWeightValue(outVertex);
+        //    CommonWeightProcessor.NormalizeVertexWeights(outVertex);
+        //}
 
         private static CommonVertex MakePackedVertex(
             XMFLOAT4 position,

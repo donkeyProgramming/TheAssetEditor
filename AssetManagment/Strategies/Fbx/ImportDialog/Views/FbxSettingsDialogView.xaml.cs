@@ -1,13 +1,13 @@
 ﻿using System.Windows;
 
-namespace AssetManagement.Strategies.Fbx.ImportDialog.Views.FBXImportSettingsDialogView
+namespace AssetManagement.Strategies.Fbx.ImportDialog.Views
 {
     /// <summary>
     /// Interaction logic for d.xaml
     /// </summary>
-    public partial class FBXSetttingsView : Window
+    public partial class FbxSettingsDialogView : Window
     {
-        public FBXSetttingsView()
+        public FbxSettingsDialogView()
         {
             InitializeComponent();
             

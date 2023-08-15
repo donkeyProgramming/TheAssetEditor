@@ -16,6 +16,8 @@ namespace AssetManagement.MeshHandling
         {
             if (vertex.WeightCount == 4)
             {
+                return;
+                // TODO: renable exception, when VertexWeight remapping works
                 throw new Exception("Error. Trying to add more than 4 weights");
             }
 
@@ -23,17 +25,13 @@ namespace AssetManagement.MeshHandling
             vertex.BoneIndex[vertex.WeightCount - 1] = (byte)boneIndex;
             vertex.BoneWeight[vertex.WeightCount - 1] = weight;
         }
-        public static void AddWeightToVertexByBoneName(AnimationFile skeletonFile,  CommonVertex vertex, string boneName, float weight)
+        public static void AddWeightToVertexByBoneName(AnimationFile skeletonFile, CommonVertex vertex, string boneName, float weight)
         {
             if (boneName.Any()) // don't add empty influences (boneName == "")
             {
                 int boneIndex = skeletonFile.GetIdFromBoneName(boneName);
                 CommonWeightProcessor.AddWeightToVertex(vertex, boneIndex, weight);
-            }
-            else // add empty influences, so the influece count for "cinematic" vertex will be 4, line Vanilla
-            {
-                CommonWeightProcessor.AddWeightToVertex(vertex, 0, 0.0f);                
-            }
+            }            
         }
 
         /// <summary>
@@ -56,10 +54,9 @@ namespace AssetManagement.MeshHandling
                 throw new Exception("Weighted Error: Sum of vertex weights != 1.0. User rigging error, or import fail.");
             }
         }
-
         /// <summary>
-        /// Sorts the weights-influences {weight, index} byte weight, so byte ascending weight
-        /// </summary>        
+        /// Normalizes the weights, so SUM = 1.0f
+        /// </summary>              
         public static void NormalizeVertexWeights(CommonVertex vertex)
         {
             var weightSum = 0.0f;
@@ -81,10 +78,11 @@ namespace AssetManagement.MeshHandling
             public int index = 0;
             public float weight = 0.0f;
         };
+
         /// <summary>
-        /// Normalizes the weights, so SUM = 1.0f
+        /// Sorts the weights-influences {weight, index} byte weight, by descending weight value
         /// </summary>        
-        public static void SortVertexWeights(CommonVertex vertex)
+        public static void SortVertexWeightsByWeightValue(CommonVertex vertex)
         {
             var influences = new List<VertexInfluence>(4)
                 {

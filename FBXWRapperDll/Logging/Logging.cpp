@@ -8,32 +8,32 @@
 class WinConcole
 {
 public:
-	static void Print(const std::wstring& str, WORD Color = ConsoleBackground::BLACK | ConsoleForeground::WHITE)
+	static void Print(const std::wstring& str, WORD wColorFlags = FG_BLACK | BG_WHITE)
 	{
 		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);		
 		/*
 		 * Set the new color information
 		 */
-		SetConsoleTextAttribute(h, Color);
+		SetConsoleTextAttribute(h, wColorFlags);
 		DWORD dwChars = 0;
 		WriteConsole(h, str.data(), (DWORD)str.size(), &dwChars, NULL);
 		
 		/*
 		* Set default color info
 		*/
-		SetConsoleTextAttribute(h, ConsoleBackground::BLACK | ConsoleForeground::WHITE);
+		SetConsoleTextAttribute(h, BG_BLACK | FG_WHITE);
 		
 	}
 
-	static void PrintLn(const std::wstring& str, WORD color = ConsoleBackground::BLACK | ConsoleForeground::WHITE)
+	static void PrintLn(const std::wstring& str, WORD color = BG_BLACK | FG_WHITE)
 	{
 		Print(str + L"\n", color);
 	}
 };
 
-void logfunc::impl_log_action(const std::string& _strMsg)
+void ImplLog::LogActionInfo(const std::string& _strMsg)
 {
-	WinConcole::Print(L"FBX SDK ACTION:", ConsoleBackground::DARKBLUE | ConsoleForeground::WHITE);
+	WinConcole::Print(L"FBX SDK ACTION:", BG_DARKBLUE | FG_WHITE);
 	WinConcole::Print(L" ");
 	WinConcole::Print(WidenStr(_strMsg));
 	WinConcole::Print(L"\r\n");
@@ -44,9 +44,9 @@ void logfunc::impl_log_action(const std::string& _strMsg)
 	WriteToLogFile(logString.str());
 }
 
-void logfunc::impl_log_action_color(const std::string& _strMsg)
+void ImplLog::LogActionConcoleColor(const std::string& _strMsg, WORD wColorFlags)
 {
-	WinConcole::Print(L"FBX SDK ACTION:", ConsoleBackground::MAGENTA | ConsoleForeground::WHITE);
+	WinConcole::Print(L"FBX SDK ACTION:", wColorFlags);
 	WinConcole::Print(L" ");
 	WinConcole::Print(WidenStr(_strMsg));
 	WinConcole::Print(L"\r\n");
@@ -57,25 +57,13 @@ void logfunc::impl_log_action_color(const std::string& _strMsg)
 	WriteToLogFile(logString.str());
 }
 
-void logfunc::LogInfo(const std::string& _strMsg)
+
+void ImplLog::LogAction_success(const std::string& _strMsg)
 {	
-	WinConcole::Print(L"FBX SDK INFO:", ConsoleBackground::DARKCYAN | ConsoleForeground::WHITE);
+	WinConcole::Print(L"FBX SDK ACTION: SUCCESS:", BG_DARKGREEN | FG_WHITE);
 	WinConcole::Print(L" ");
 	WinConcole::Print(WidenStr(_strMsg));
-	WinConcole::Print(L"\r\n");
-
-	std::stringstream logString;
-	logString << std::endl << "ACTION: " << (_strMsg).c_str();
-
-	WriteToLogFile(logString.str());
-}
-
-void logfunc::impl_log_action_success(const std::string& _strMsg)
-{	
-	WinConcole::Print(L"FBX SDK ACTION: SUCCESS:", ConsoleBackground::DARKGREEN | ConsoleForeground::WHITE);
-	WinConcole::Print(L" ");
-	WinConcole::Print(WidenStr(_strMsg));
-	//WinConcole::Print(L"Success.", ConsoleBackground::BLUE | ConsoleForeground::WHITE);
+	//WinConcole::Print(L"Success.", BG_BLUE | FG_WHITE);
 	WinConcole::Print(L"\r\n");
 
 	std::stringstream logString;
@@ -84,9 +72,9 @@ void logfunc::impl_log_action_success(const std::string& _strMsg)
 	WriteToLogFile(logString.str());	
 }
 
-bool logfunc::impllog_action_error(const std::string& _strMsg)
+bool ImplLog::LogActionErrorFalse(const std::string& _strMsg)
 {	
-	WinConcole::Print(L"FBX SDK ERROR:", ConsoleBackground::RED | ConsoleForeground::YELLOW);
+	WinConcole::Print(L"FBX SDK ERROR:", BG_RED | FG_YELLOW);
 	WinConcole::Print(L" ");
 	WinConcole::Print(WidenStr(_strMsg));
 	WinConcole::Print(L"\r\n");
@@ -99,9 +87,9 @@ bool logfunc::impllog_action_error(const std::string& _strMsg)
 	return false;
 }
 
-bool logfunc::impl_log_action_warning(const std::string& _strMsg)
+bool ImplLog::LogAction_warning(const std::string& _strMsg)
 {
-	WinConcole::Print(L"FBX SDK WARNING:", ConsoleBackground::MAGENTA | ConsoleForeground::WHITE);
+	WinConcole::Print(L"FBX SDK WARNING:", BG_MAGENTA | FG_WHITE);
 	WinConcole::Print(L" ");
 	WinConcole::Print(WidenStr(_strMsg));
 	WinConcole::Print(L"\r\n");
@@ -114,12 +102,14 @@ bool logfunc::impl_log_action_warning(const std::string& _strMsg)
 	return false;
 }
 
-//bool logfunc::impl_log_action_warning(const std::wstring& _wstrMsg)
-//{
-//	return logfunc::impl_log_action_warning(NarrowStr(_wstrMsg));
-//}
-
-void logfunc::impl_log_write(const std::string& _strMsg)
+void ImplLog::LogWrite(const std::string& _strMsg)
 {
 	WriteToLogFile(_strMsg);
+}
+
+void ImplLog::WriteToLogFile(const std::string& logString)
+{
+    std::ofstream oOutFile(L"fbxsdk.log.txt", std::ios::app);
+    oOutFile << logString;
+    oOutFile.close();
 }

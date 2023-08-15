@@ -1,16 +1,14 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
-
-namespace AssetManagement.Strategies.Fbx.ImportDialog.Views.FBXImportSettingsDialogView
+namespace AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews.FBXFileInfoView
 {
     /// <summary>
     /// Interaction logic for FileInfoView.xaml
     /// </summary>
     
-    public partial class FileInfoView : UserControl
+    public partial class FbxFileInfoPanelView : UserControl
     {
-        public FileInfoView()
+        public FbxFileInfoPanelView()
         {
             InitializeComponent();
             UpdateLayout();

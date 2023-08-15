@@ -12,7 +12,7 @@ public:
 	{
 		if (!poFbxScene)
 		{
-			log_action_error("Passed FbxScene == nullptr. Returning stardard factor");
+			LogActionError("Passed FbxScene == nullptr. Returning stardard factor");
 			return 1.0;
 		}
 
@@ -23,7 +23,7 @@ public:
 	{
 		if (!poFbxScene)
 		{
-			log_action_error("Passed FbxScene == nullptr. Returning stardard empty string");
+			LogActionError("Passed FbxScene == nullptr. Returning stardard empty string");
 			return "";
 		}		
 

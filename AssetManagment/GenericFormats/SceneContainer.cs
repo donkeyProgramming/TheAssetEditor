@@ -3,10 +3,8 @@ using Matrix = Microsoft.Xna.Framework.Matrix;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
 using System;
-
 using AssetManagement.GenericFormats.Managed;
 using AssetManagement.GenericFormats.Unmanaged;
-using System.Security.Cryptography.X509Certificates;
 
 namespace AssetManagement.GenericFormats
 {
