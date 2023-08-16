@@ -27,7 +27,7 @@
                     <Label>:</Label>
                     <CheckBox                         
                         Grid.Row="0" Grid.Column="1"
-                        IsChecked="True"  
+                        IsChecked="{Binding Path=ApplyRigging, Mode=TwoWay}"
                         HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Center">
                     </CheckBox>
                 </StackPanel>
@@ -40,13 +40,9 @@
                     <!--PreviewKeyDown="SkeletonComboxBox_OnPreviewKeyDown"-->
                     <ComboBox 
                         Width="150"                        
-                        IsEditable="True" 
-                        IsTextSearchEnabled="False"      
-                        SelectionChanged="SkeletonComboxBox_OnSelectionChanged"
-                        TextBoxBase.TextChanged="SkeletonComboxBox_TextChanged"
-                        StaysOpenOnEdit="True"                        
-                        DisplayMemberPath="Name"                         
-                        PreviewTextInput="SkeletonComboxBox_OnPreviewTextInput"                                                          
+                        IsEditable="False" 
+                        IsTextSearchEnabled="False"                                                                      
+                        DisplayMemberPath="Name"                                                 
                         x:Name="SkeletonComboxBox"
                         ItemsSource="{Binding BSkeketonComboBoxContent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"    
                         SelectedItem="{Binding BSkeletonComboxSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"

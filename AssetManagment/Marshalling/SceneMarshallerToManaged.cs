@@ -1,6 +1,6 @@
 ﻿using AssetManagement.GenericFormats;
-using AssetManagement.GenericFormats.Managed;
-using AssetManagement.GenericFormats.Unmanaged;
+using AssetManagement.GenericFormats.DataStructures.Managed;
+using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,7 @@ namespace AssetManagement.Strategies.Fbx
 
             return newScene;
             /*
+            TODO: to come:
             - destScene.Bones = GetAllBones();
             - destScene.Animations = GetAllBones();
             - etc, comming soon
@@ -87,30 +88,59 @@ namespace AssetManagement.Strategies.Fbx
             packedMesh.Vertices.AddRange(vertices);
             packedMesh.Indices.AddRange(indices);
             packedMesh.Name = meshName;
-            packedMesh.VertexWeights = GetVertexWeights(fbxContainer, meshIndex).ToList();
+            packedMesh.VertexWeights = GetExtVertexWeights(fbxContainer, meshIndex).ToList();
 
             return packedMesh;
         }
 
-        public static VertexWeight[] GetVertexWeights(IntPtr fbxContainer, int meshIndex)
-        {
-            FBXSCeneContainerGetterDll.GetVertexWeights(fbxContainer, meshIndex, out var vertexWeightsPtr, out var length);
+        public delegate void GetArrayDelegate(IntPtr ptrSceneContainer, int meshIndex, out IntPtr ptrArray, out int itemCount);
 
-            if (vertexWeightsPtr == IntPtr.Zero || length == 0)
+        public static T[] GetArray<T>(
+        IntPtr fbxContainer, 
+        int meshIndex,
+        GetArrayDelegate getArrayDelegate)
+        {
+            getArrayDelegate(fbxContainer, meshIndex, out var ptrArray, out var length);
+
+            if (ptrArray == IntPtr.Zero || length == 0)
             {
-                return new VertexWeight[0];
+                return new T[0];
             }
 
-            VertexWeight[] data = new VertexWeight[length];
-            for (int weightIndex = 0; weightIndex < length; weightIndex++)
+            T[] data = new T[length];
+            for (int arrayIndex = 0; arrayIndex < length; arrayIndex++)
             {
-                var ptr = Marshal.PtrToStructure(vertexWeightsPtr + weightIndex * Marshal.SizeOf(typeof(VertexWeight)), typeof(VertexWeight));
+                var ptr = Marshal.PtrToStructure(ptrArray + arrayIndex * Marshal.SizeOf(typeof(T)), typeof(T));
 
                 if (ptr == null)
                 {
                     throw new Exception("Fatal Error: ptr == null");
                 }
-                data[weightIndex] = (VertexWeight)ptr;
+                data[arrayIndex] = (T)ptr;
+            }
+
+            return data;
+        }
+
+        public static ExtVertexWeight[] GetExtVertexWeights(IntPtr fbxContainer, int meshIndex)
+        {
+            FBXSCeneContainerGetterDll.GetVertexWeights(fbxContainer, meshIndex, out var ExtVertexWeightsPtr, out var length);
+
+            if (ExtVertexWeightsPtr == IntPtr.Zero || length == 0)
+            {
+                return new ExtVertexWeight[0];
+            }
+
+            ExtVertexWeight[] data = new ExtVertexWeight[length];
+            for (int weightIndex = 0; weightIndex < length; weightIndex++)
+            {
+                var ptr = Marshal.PtrToStructure(ExtVertexWeightsPtr + weightIndex * Marshal.SizeOf(typeof(ExtVertexWeight)), typeof(ExtVertexWeight));
+
+                if (ptr == null)
+                {
+                    throw new Exception("Fatal Error: ptr == null");
+                }
+                data[weightIndex] = (ExtVertexWeight)ptr;
             }
 
             return data;

@@ -1,5 +1,5 @@
 ﻿using CommonControls.FileTypes.Animation;
-using AssetManagement.GenericFormats.Managed;
+using AssetManagement.GenericFormats.DataStructures.Managed;
 
 namespace AssetManagement.Strategies.Fbx.ImportDialog.DataModels
 {
@@ -9,7 +9,7 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.DataModels
         public AnimationFile SkeletonFile { get; set; } = null;
         public string SkeletonFileName { get; set; } = "";
         public string SkeletonName { get; set; } = "";
-        public bool UseAutoRigging { get; set; } = true;
+        public bool ApplyRigging { get; set; } = true;
 
     }
 }

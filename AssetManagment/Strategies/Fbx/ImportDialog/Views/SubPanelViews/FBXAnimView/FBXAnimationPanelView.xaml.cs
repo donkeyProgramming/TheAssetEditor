@@ -1,7 +1,4 @@
-﻿
-using System.Linq;
-using System.Windows.Controls;
-using System.Windows.Input;
+﻿using System.Windows.Controls;
 
 namespace AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews.FBXAnimView
 {
@@ -17,43 +14,43 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews.FBXAni
         }
 
         // TODO: remove?
-        private void SkeletonComboxBox_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            SkeletonComboxBox.IsDropDownOpen = true;
-            //SkeletonComboxBox.Focus();
+        //private void SkeletonComboxBox_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
+        //{
+        //    SkeletonComboxBox.IsDropDownOpen = true;
+        //    //SkeletonComboxBox.Focus();
 
 
-        }
-        internal bool HandlingSelectionChange = false;
-        private void SkeletonComboxBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (HandlingSelectionChange)
-            {
-                return;
-            }
+        //}
+        //internal bool HandlingSelectionChange = false;
+        //private void SkeletonComboxBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    if (HandlingSelectionChange)
+        //    {
+        //        return;
+        //    }
             
-            HandlingSelectionChange = true;
+        //    HandlingSelectionChange = true;
 
-            var cb = sender as ComboBox;
+        //    var cb = sender as ComboBox;
 
-            if (cb.Text == "click me")
-            {
-                cb.Text = "";
-                e.Handled = true;
-            }
+        //    if (cb.Text == "click me")
+        //    {
+        //        cb.Text = "";
+        //        e.Handled = true;
+        //    }
 
-            HandlingSelectionChange = false;
-        }
+        //    HandlingSelectionChange = false;
+        //}
 
-        private void SkeletonComboxBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            SkeletonComboxBox.IsDropDownOpen = true;
-            if (!SkeletonComboxBox.Text.Any())
-            {
-                SkeletonComboxBox.IsDropDownOpen = false;
-            }
+        //private void SkeletonComboxBox_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    SkeletonComboxBox.IsDropDownOpen = true;
+        //    if (!SkeletonComboxBox.Text.Any())
+        //    {
+        //        SkeletonComboxBox.IsDropDownOpen = false;
+        //    }
 
-        }
+        //}
 
         //private void SkeletonComboxBox_OnPreviewKeyDown(object sender, KeyEventArgs e)
         //{

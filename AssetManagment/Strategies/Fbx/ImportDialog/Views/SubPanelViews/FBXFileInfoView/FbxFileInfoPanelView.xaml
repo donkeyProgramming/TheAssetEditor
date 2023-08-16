@@ -30,7 +30,7 @@
                 </Grid.ColumnDefinitions>-->
                 
             
-            <DockPanel LastChildFill="False">
+            <DockPanel LastChildFill="true">
                 
                 <!--File Name-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -96,11 +96,21 @@
                 </StackPanel>
 
                 <!--Bone Count-->
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Height="20">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Label Content="Bone Count" Width ="100" DockPanel.Dock="Left" />
                     <Label>:</Label>
                         <TextBlock   VerticalAlignment="Center" FontWeight="Bold"
                            Text="{Binding BoneCount, UpdateSourceTrigger=PropertyChanged}">               
+                    </TextBlock>                                              
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" 
+                            IsEnabled="{Binding IsEnabled}"
+                            >
+                    <Label Content="Derformation Data" Width ="100" DockPanel.Dock="Left" />
+                    <Label>:</Label>
+                        <TextBlock   VerticalAlignment="Center" FontWeight="Bold"
+                           Text="{Binding DeformationData, UpdateSourceTrigger=PropertyChanged}">               
                     </TextBlock>                                              
                 </StackPanel>
                 

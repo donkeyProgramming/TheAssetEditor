@@ -1,7 +1,6 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace AssetManagement.GenericFormats.Unmanaged
+namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
 {
     /// <summary>
     /// bit-compatible with DirectX::XMFLOAT4 the derived SimpleMath::Vector4
@@ -46,5 +45,4 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public float x;
         public float y;
     }
-
 }

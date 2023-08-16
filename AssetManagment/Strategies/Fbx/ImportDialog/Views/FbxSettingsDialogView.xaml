@@ -8,15 +8,15 @@
     xmlns:anim="clr-namespace:AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews.FBXAnimView"        
     x:Class="AssetManagement.Strategies.Fbx.ImportDialog.Views.FbxSettingsDialogView"                        
      mc:Ignorable="d" d:DesignWidth="380"   
-   ResizeMode="NoResize"
+   ResizeMode="CanResize"
     Width="400"
        >
     <Grid>
         <!--<DockPanel>-->
         <DockPanel>
             
-         <file:FbxFileInfoPanelView Grid.Row="0" DockPanel.Dock="Top"/>         
-         <anim:FBXAnimationPanelView  Grid.Row="1" DockPanel.Dock="Top"/>
+         <file:FbxFileInfoPanelView DockPanel.Dock="Top"/>         
+         <anim:FBXAnimationPanelView DockPanel.Dock="Top"/>
 
 
 

@@ -109,7 +109,7 @@ namespace wrapdll
 
                             strcpy_s<255>(newVertexWeight.boneName, i.boneName);
                             newVertexWeight.vertexIndex = vertexIndex;
-                            newVertexWeight.vertexWeight = i.weight;
+                            newVertexWeight.weight = i.weight;
 
                             destMesh.vertexWeights.push_back(newVertexWeight);
                         }

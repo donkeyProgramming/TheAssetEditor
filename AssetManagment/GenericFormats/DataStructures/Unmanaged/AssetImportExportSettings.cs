@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace AssetManagement.GenericFormats.Unmanaged
+namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct FBXSDKVersion
@@ -9,7 +9,6 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public int y;
         public int z;
     }
-    
 
     [StructLayout(LayoutKind.Sequential)]
     public struct FBXUnitFileInfo
@@ -27,7 +26,6 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public float animTiem;
         public int animFrame;
     }
-     
 
     [StructLayout(LayoutKind.Sequential)]
     public struct ExtFileInfoStruct
@@ -36,10 +34,10 @@ namespace AssetManagement.GenericFormats.Unmanaged
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
         public string fileName;
-        
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
         public string skeletonName;
-        
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
         public string units;
 
@@ -51,13 +49,11 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public int boneCount;
     };
 
-
     [StructLayout(LayoutKind.Sequential)]
-    public struct FBXImportExportSettings
+    public struct AssetImportExportSettings
     {
         public ExtFileInfoStruct fileinfo;
         public FBXUnitFileInfo unitInfo;
         public FBXAnimInfo animTimingINfo;
     }
-
 }

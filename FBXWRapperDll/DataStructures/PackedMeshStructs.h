@@ -46,8 +46,9 @@ public:
 struct VertexWeight
 {    
     char boneName[255] = "";
+    int boneIndex = 0;
     int vertexIndex = 0;
-    float vertexWeight = 0.0f;
+    float weight = 0.0f;
 };
 
 

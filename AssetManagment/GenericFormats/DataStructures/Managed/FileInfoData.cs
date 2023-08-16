@@ -1,7 +1,7 @@
-﻿using AssetManagement.Marhalling;
-using AssetManagement.GenericFormats.Unmanaged;
+﻿using AssetManagement.Marshalling;
+using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 
-namespace AssetManagement.GenericFormats.Managed
+namespace AssetManagement.GenericFormats.DataStructures.Managed
 {
     public class VersionStruct
     {
@@ -26,7 +26,7 @@ namespace AssetManagement.GenericFormats.Managed
         public int MaterialCount { set; get; }
         public int AnimationsCount { set; get; }
 
-        public void FillStruct(out ExtFileInfoStruct destStruct)
+        override public void FillStruct(out ExtFileInfoStruct destStruct)
         {
             destStruct.sdkVersionUsed.x = SdkVersionUsed.X;
             destStruct.sdkVersionUsed.y = SdkVersionUsed.Y;
@@ -41,8 +41,7 @@ namespace AssetManagement.GenericFormats.Managed
             destStruct.animationsCount = AnimationsCount;
             destStruct.boneCount = BoneCount;
         }
-
-        public void FillFromStruct(in ExtFileInfoStruct srcStruct)
+        override public void FillFromStruct(in ExtFileInfoStruct srcStruct)
         {
             SdkVersionUsed.X = srcStruct.sdkVersionUsed.x;
             SdkVersionUsed.Y = srcStruct.sdkVersionUsed.y;
@@ -58,4 +57,4 @@ namespace AssetManagement.GenericFormats.Managed
             BoneCount = srcStruct.boneCount;
         }
     }
- }
+}

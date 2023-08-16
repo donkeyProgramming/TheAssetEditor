@@ -8,7 +8,7 @@
 class WinConcole
 {
 public:
-	static void Print(const std::wstring& str, WORD wColorFlags = FG_BLACK | BG_WHITE)
+	static void Print(const std::wstring& str, WORD wColorFlags = BG_BLACK | FG_WHITE)
 	{
 		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);		
 		/*

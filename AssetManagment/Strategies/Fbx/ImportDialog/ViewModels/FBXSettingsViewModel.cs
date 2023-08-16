@@ -9,6 +9,7 @@ using System.Linq;
 using CommonControls.FileTypes.Animation;
 using AssetManagement.Strategies.Fbx.ImportDialog.DataModels;
 using AssetManagement.Strategies.Fbx.ImportDialog.Views;
+
 // TODO: clean "using"s (EVERYWHERE, not just here)
 
 
@@ -67,50 +68,39 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
     public class FBXSettingsViewModel : NotifyPropertyChangedImpl
     {
         private readonly PackFileService _packFileService;
-        private FbxSettingsModel _fbxSettings; // Maybe "FileInfoDat" should store only, and FBXSettings is for "get info from dialog", not something that already contains data, or not?
+        private readonly FbxSettingsModel _inputFbxSettings; // Maybe "FileInfoDat" should store only, and FBXSettings is for "get info from dialog", not something that already contains data, or not?        
 
-        // TODO: not needed anymore, when the DataGrid is not longer used
-        //public ObservableCollection<FileInfoItem> FileInfoGridSource { get; set; } = new ObservableCollection<FileInfoItem>();
+        public FBXSettingsViewModel(PackFileService packFileSericcee, FbxSettingsModel fbxSettings)
+        {
+            _packFileService = packFileSericcee;
+            _inputFbxSettings = fbxSettings; // TODO: is this system you want to keep, it probably is?
+            FillFileInfoPanel();
+            UpdateViewData();
+        }
 
-        // TODO: REMOVE if any of it not needed?
-        //public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>();
-
-        //private string _filename = "test Binding...";
-        //public string FileName { get { return _filename; } set { _filename = value; NotifyPropertyChanged(); } }
-
-
-
-        public string FileName { get { return _fbxSettings.FileInfoData.FileName; } set { _fbxSettings.FileInfoData.FileName = value; NotifyPropertyChanged(); } }
+        // -- Asset File Info Panel (maybe should have its own ViewModel?)
+        public string FileName { get { return _inputFbxSettings.FileInfoData.FileName; } set { _inputFbxSettings.FileInfoData.FileName = value; NotifyPropertyChanged(); } }
         public string SdkVersion
         {
-            get { return $"{_fbxSettings.FileInfoData.SdkVersionUsed.X}.{_fbxSettings.FileInfoData.SdkVersionUsed.Y}.{_fbxSettings.FileInfoData.SdkVersionUsed.Z}"; }
+            get { return $"{_inputFbxSettings.FileInfoData.SdkVersionUsed.X}.{_inputFbxSettings.FileInfoData.SdkVersionUsed.Y}.{_inputFbxSettings.FileInfoData.SdkVersionUsed.Z}"; }
             set {; }
         }
-        public string SkeletonNodeName { get { return _fbxSettings.FileInfoData.SkeletonName; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
-        public string Units { get { return _fbxSettings.FileInfoData.Units; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
-        public string MeshCount { get { return $"{_fbxSettings.FileInfoData.MeshCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
-        public string NodeCount { get { return $"{_fbxSettings.FileInfoData.ElementCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
-        public string MaterialCount { get { return $"{_fbxSettings.FileInfoData.MaterialCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
-        public string AnimationCount { get { return $"Num{_fbxSettings.FileInfoData.AnimationsCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
-        public string BoneCount { get { return $"Num{_fbxSettings.FileInfoData.BoneCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string SkeletonNodeName { get { return _inputFbxSettings.FileInfoData.SkeletonName; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string Units { get { return _inputFbxSettings.FileInfoData.Units; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string MeshCount { get { return $"{_inputFbxSettings.FileInfoData.MeshCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string NodeCount { get { return $"{_inputFbxSettings.FileInfoData.ElementCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string MaterialCount { get { return $"{_inputFbxSettings.FileInfoData.MaterialCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string AnimationCount { get { return $"Num{_inputFbxSettings.FileInfoData.AnimationsCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string BoneCount { get { return $"Num{_inputFbxSettings.FileInfoData.BoneCount}"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
+        public string DerformationData { get { return "Correct: 2221 Vertex Influences Found"; } set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; } }
 
-        // TODO: remove?
-        //public bool AnySkeletonSelected { get; set; } = false;   
-
+        // -- Asset Animations Info  (maybe should have its own ViewModel?)
         public NotifyAttr<string> SkeletonFileName { get; set; } = new NotifyAttr<string>();
-        public NotifyAttr<bool> UseAutoRigging { get; set; } = new NotifyAttr<bool>();
 
-        // -- skeleton combox box
-        public NotifyAttr<bool> ComboOpen { get; set; } = new NotifyAttr<bool>();
-
-        private readonly ObservableCollection<SkeletonElement> _actualSkeletonList = new ObservableCollection<SkeletonElement>();
-
-        //private ObservableCollection<SkeletonElement> _filteredSkeletonList = new ObservableCollection<SkeletonElement>();
-
-
-
+        // TODO: change to "use/apply rigging", as there is no "auto-riggin"
+        public NotifyAttr<bool> ApplyRigging { get; set; } = new NotifyAttr<bool>(true);
+        
         private ObservableCollection<SkeletonElement> _skeketonComboBoxContent = new ObservableCollection<SkeletonElement>();
-
         public ObservableCollection<SkeletonElement> BSkeketonComboBoxContent
         {
             get
@@ -124,73 +114,7 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
                 SetAndNotify(ref _skeketonComboBoxContent, value);
             }
         }
-
-        ObservableCollection<SkeletonElement> GetFilteredComboBoxContent(string filterString)
-        {
-            if (BSkeletonComboxSearchText == null || BSkeletonComboxSearchText == "") // where no string entered show the whole lists
-            {
-                return _actualSkeletonList;
-            }
-
-
-            var queryFilteredContent = _actualSkeletonList
-                        .Where(x => x.Name.Contains(filterString, StringComparison.InvariantCultureIgnoreCase));
-
-            // TODO: remove debugging code:
-            var testList = queryFilteredContent.ToList();
-
-            return new ObservableCollection<SkeletonElement>(queryFilteredContent);
-        }
-
-        private string _skeletonComboxSearchText;
-        public string BSkeletonComboxSearchText
-        {
-            get { return _skeletonComboxSearchText; }
-            set
-            {
-                if (value != null)
-                {
-                    _skeletonComboxSearchText = value;
-                    NotifyPropertyChanged(nameof(BSkeletonComboxSearchText));
-
-                    if (BSkeletonComboxSearchText != null && BSkeletonComboxSearchText.Any())
-                    {
-                        BSkeketonComboBoxContent = GetFilteredComboBoxContent(_skeletonComboxSearchText);
-                        NotifyPropertyChanged(nameof(BSkeketonComboBoxContent));
-                    }
-                    else
-                    {
-                        BSkeketonComboBoxContent = _actualSkeletonList;
-                        NotifyPropertyChanged(nameof(BSkeketonComboBoxContent));
-                    }
-                }
-            }
-        }
-
-
-
-        //private string _skeletonComboxSearchText;
-        //public NotifyAttr<string> BSkeletonComboxSearchText
-        //{
-        //    get
-        //    {
-        //        return new NotifyAttr<string>(_skeletonComboxSearchText);
-        //    }
-
-        //    set
-        //    {
-        //        _skeletonComboxSearchText = value.Value;
-        //    }
-        //    //{
-
-        //    //    //_filteredSkeletonList = GetFilteredComboBoxContent(BSkeletonComboxSearchText);
-        //    //    //BSkeketonComboBoxContent = new ObservableCollection<SkeletonElement>();
-        //    //    //BSkeketonComboBoxContent = _filteredSkeletonList;
-        //    //    _skeletonComboxSearchText = value;
-        //    //    //SetAndNotify(ref _skeletonComboxSearchText, value);
-        //    //}
-        //}
-
+        
         private SkeletonElement _selectedBone;
         public SkeletonElement BSkeletonComboxSelected // TODO: cleanup
         {
@@ -198,33 +122,7 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
             set { SetAndNotify(ref _selectedBone, value);/* AnySkeletonSelected = true;*/ }
         }
 
-        //private List<SkeletonElement> _shops;
-
-        //protected void FilterShops()
-        //{
-        //    ComboOpen.Value = true;
-        //    if (!string.IsNullOrEmpty(SearchText))
-        //    {
-        //        Shops.UpdateSource(_shops.Where(s => s.NameExtended.ToLower().Contains(SearchText.ToLower())));
-        //    }
-        //    else
-        //    {
-        //        Shops.UpdateSource(_shops);
-        //    }
-        //    OnPropertyChanged("Shops");
-        //}
-
-
-
-        public FBXSettingsViewModel(PackFileService packFileSericcee, FbxSettingsModel fbxSettings)
-        {
-            _packFileService = packFileSericcee;
-            _fbxSettings = fbxSettings; // TODO: is this system you want to keep, it probably is?
-            FillFileInfoPanel();
-            UpdateViewData();
-        }
-
-        // TODO: MAYBE not needed anymore, when the DataGrid is not longer used
+        
         private void FillFileInfoPanel()
         {
 
@@ -237,7 +135,7 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
         }
 
         public void ImportButtonClicked()
-        {
+        {            
             // not needed anymore...?            
         }
         public void BrowseButtonClicked()
@@ -266,13 +164,7 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
         /// moves data from storeage class into UI controls
         /// </summary>
         private void UpdateViewData(/*FbxSettingsModel inSettingsModel*/) // TODO: Param needed, better to store from constructor? Or should FileInfoData be input, FbxSettigs output, DECIDE!!
-        {
-            // // TODO: needed?
-            //SkeletonFileName.Value = inSettingsModel.SkeletonFileName;
-            //SkeletonName.Value = inSettingsModel.SkeletonName;
-            //UseAutoRigging.Value = inSettingsModel.UseAutoRigging;
-
-
+        {          
 
             const string skeletonFolder = @"animations\skeletons\";
             const string animExtension = ".anim";
@@ -281,22 +173,20 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
             if (searchResult == null)
             { throw new Exception("Anim file search, 0 results!"); };
 
-            _actualSkeletonList.Add(SkeletonElement.GetNoSkeletonElement());
+            BSkeketonComboBoxContent.Add(SkeletonElement.GetNoSkeletonElement());
 
             foreach (var animFile in searchResult)
             {
                 if (Path.GetExtension(animFile.Name) == animExtension)
                 {
-                    _actualSkeletonList.Add(new SkeletonElement() { SkeletonPackFile = animFile });
+                    BSkeketonComboBoxContent.Add(new SkeletonElement() { SkeletonPackFile = animFile });
                 }
             }
 
             BSkeletonComboxSelected = new SkeletonElement();
 
-            if (_fbxSettings.FileInfoData.SkeletonName.Any())
-                SetSkeletonFromName(_fbxSettings.FileInfoData.SkeletonName);
-
-            BSkeketonComboBoxContent = _actualSkeletonList;
+            if (_inputFbxSettings.FileInfoData.SkeletonName.Any())
+                SetSkeletonFromName(_inputFbxSettings.FileInfoData.SkeletonName);
         }
 
         /// <summary>
@@ -304,15 +194,20 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
         /// </summary>
         private void GetViewData(FbxSettingsModel outSettingsModel)
         {
-            outSettingsModel.SkeletonFileName = BSkeletonComboxSearchText;
-            outSettingsModel.SkeletonName = SkeletonFileName.Value;
-            outSettingsModel.UseAutoRigging = UseAutoRigging.Value;
+            outSettingsModel.SkeletonFileName = (BSkeletonComboxSelected.SkeletonPackFile == null) ? "" : BSkeletonComboxSelected.Name;
+            outSettingsModel.SkeletonName = (BSkeletonComboxSelected.SkeletonPackFile == null) ? "" : _inputFbxSettings.SkeletonName;
+            outSettingsModel.ApplyRigging = ApplyRigging.Value;
             outSettingsModel.SkeletonFile = GetSkeletonFileFromView();
         }
-
+        
+        /// <summary>
+        /// Tries to select the skeleton in the combox that matches the string
+        /// if none found, select "Empty Skeleton" = ("no skeleton")
+        /// </summary>
+        /// <param name="skeletonName">search string</param>
         private void SetSkeletonFromName(string skeletonName)
         {
-            foreach (var skeleton in _actualSkeletonList)
+            foreach (var skeleton in BSkeketonComboBoxContent)
             {
                 var fileSkeletonName = Path.GetFileNameWithoutExtension(skeleton.Name);
                 if (fileSkeletonName.Equals(skeletonName, StringComparison.OrdinalIgnoreCase))
@@ -350,7 +245,8 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
             dialog.DataContext = modelView;
 
             var result = dialog.ShowDialog().Value;
-            modelView.GetViewData(fbxImportSettingsModel);
+            if (result)
+                modelView.GetViewData(fbxImportSettingsModel);
 
             return result;
         }

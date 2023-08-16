@@ -3,20 +3,21 @@ using Matrix = Microsoft.Xna.Framework.Matrix;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
 using System;
-using AssetManagement.GenericFormats.Managed;
-using AssetManagement.GenericFormats.Unmanaged;
+using AssetManagement.GenericFormats.DataStructures.Managed;
+using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 
 namespace AssetManagement.GenericFormats
 {
-public class SceneContainer
-{
-    public List<PackedMesh> Meshes { get; set; } = new List<PackedMesh>();
-    public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
-    public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
-    public Node RootNode { get; set; }
-    public String SkeletonName { get; set; } // TODO: don't use NULL srings for skeleton name
-    public FileInfoData FileInfoData { get; set; } = new FileInfoData();
-}
+    public class SceneContainer
+    {
+        public List<PackedMesh> Meshes { get; set; } = new List<PackedMesh>();
+        public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
+        public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
+        public Node RootNode { get; set; }
+        public String SkeletonName { get; set; } // TODO: don't use NULL srings for skeleton name
+        public FileInfoData FileInfoData { get; set; } = new FileInfoData();
+    }
+
 
     public class Node
     {

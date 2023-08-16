@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using CommonControls.FileTypes.Animation;
+using AssetManagement.GenericFormats.DataStructures.Managed;
 
 namespace AssetManagement.MeshHandling
 {
@@ -73,37 +74,38 @@ namespace AssetManagement.MeshHandling
             }
         }
 
-        class VertexInfluence
-        {
-            public int index = 0;
-            public float weight = 0.0f;
-        };
+        // TODO: remove??
+        //class VertexInfluence
+        //{
+        //    public int index = 0;
+        //    public float weight = 0.0f;
+        //};
 
         /// <summary>
         /// Sorts the weights-influences {weight, index} byte weight, by descending weight value
         /// </summary>        
         public static void SortVertexWeightsByWeightValue(CommonVertex vertex)
         {
-            var influences = new List<VertexInfluence>(4)
+            var influences = new List<VertexWeight>(4)
                 {
-                    new VertexInfluence(),
-                    new VertexInfluence(),
-                    new VertexInfluence(),
-                    new VertexInfluence(),
+                    new VertexWeight(),
+                    new VertexWeight(),
+                    new VertexWeight(),
+                    new VertexWeight(),
                 };
 
             for (var weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
             {
-                influences[weightIndex].index = vertex.BoneIndex[weightIndex];
-                influences[weightIndex].weight = vertex.BoneWeight[weightIndex];
+                influences[weightIndex].BoneIndex = vertex.BoneIndex[weightIndex];
+                influences[weightIndex].Weight = vertex.BoneWeight[weightIndex];
             }
 
-            influences = influences.OrderByDescending(influence => influence.weight).ToList();
+            influences = influences.OrderByDescending(influence => influence.Weight).ToList();
 
             for (var weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)
             {
-                vertex.BoneIndex[weightIndex] = (byte)influences[weightIndex].index;
-                vertex.BoneWeight[weightIndex] = influences[weightIndex].weight;
+                vertex.BoneIndex[weightIndex] = (byte)influences[weightIndex].BoneIndex;
+                vertex.BoneWeight[weightIndex] = influences[weightIndex].BoneIndex;
             }
         }
     }

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AssetManagement.GenericFormats.Managed;
-using AssetManagement.GenericFormats.Unmanaged;
+using AssetManagement.GenericFormats.DataStructures.Managed;
+using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.MeshHandling;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.RigidModel;
@@ -75,7 +75,7 @@ namespace AssetManagement.GenericFormats
                     skeletonFile,
                     rmv2DestMesh.VertexList[srcMesh.VertexWeights[vertexWeightIndex].vertexIndex],
                     srcMesh.VertexWeights[vertexWeightIndex].boneName,
-                    srcMesh.VertexWeights[vertexWeightIndex].vertexWeight);
+                    srcMesh.VertexWeights[vertexWeightIndex].weight);
             }
 
             foreach (var vertex in rmv2DestMesh.VertexList)

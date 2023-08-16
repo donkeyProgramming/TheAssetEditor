@@ -1,16 +1,16 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace AssetManagement.GenericFormats.Unmanaged
+namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
 {
-    [StructLayout(LayoutKind.Sequential, Size = 32)]
-    public struct BoneKey
+    [StructLayout(LayoutKind.Sequential)]
+    public struct BoneAnimCurveKey
     {
         public XMFLOAT3 translation;
         public XMFLOAT4 quaternion;
-        public double timeStampe;
+        public double timeStamp;
     };
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Size = 263)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct ExtVertexInfluence
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
@@ -27,20 +27,17 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public XMFLOAT3 BiNormal;
         public XMFLOAT3 Tangent;
         public XMFLOAT2 Uv;
-        public XMFLOAT4 Color;
-
-        //[MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = 4)]
-        //public ExtVertexInfluence[] influences; // fixed array length 4        
-
+        public XMFLOAT4 Color;        
         public int weightCount;
     };
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct VertexWeight
+    public struct ExtVertexWeight
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
         public string boneName;
+        public int boneIndex;
         public int vertexIndex;
-        public float vertexWeight;
+        public float weight;
     }
 }
