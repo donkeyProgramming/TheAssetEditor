@@ -69,7 +69,12 @@ namespace View3D.Components.Component.Selection
         {
             return new BoneSelectionState(RenderObject)
             {
-                SelectedBones = new List<int>(SelectedBones)
+                SelectedBones = new List<int>(SelectedBones),
+                Skeleton = Skeleton,
+                CurrentAnimation = CurrentAnimation,
+                SelectionChanged = SelectionChanged,
+                CurrentFrame = CurrentFrame,
+                RenderObject = RenderObject
             };
         }
 

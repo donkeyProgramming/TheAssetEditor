@@ -5,6 +5,7 @@ using View3D.Animation;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 using View3D.SceneNodes;
+using static View3D.Animation.AnimationClip;
 
 namespace View3D.Commands.Bone
 {
@@ -35,12 +36,12 @@ namespace View3D.Commands.Bone
             _selectedBones = selectedBones;
             _boneSelectionState = state;
             _currentFrame = state.CurrentFrame;
-            _oldFrame = state.CurrentAnimation.DynamicFrames[_currentFrame].Copy();
+            _oldFrame = _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Clone();
         }
 
         public void ApplyTransformation(Matrix newPosition, GizmoMode gizmoMode)
         {
-            if(_oldTransform ==  Matrix.Identity)
+            if (_oldTransform ==  Matrix.Identity)
             {
                 _oldTransform = newPosition;
                 return;
@@ -80,16 +81,28 @@ namespace View3D.Commands.Bone
             }
         }
 
+        public static void CompareKeyFrames(KeyFrame A, KeyFrame B)
+        {
+            for (int j = 0; j < A.Position.Count; j++)
+            {
+                var posDiff = A.Position[j] - B.Position[j];
+                var rotDiff = A.Rotation[j].ToVector4() - B.Rotation[j].ToVector4();
+                var scaleDiff = A.Scale[j] - B.Scale[j];
+                if(posDiff != new Vector3(0) || rotDiff != new Vector4(0) || scaleDiff != new Vector3(0))
+                    Console.WriteLine($"Bone {j}: Position difference: {posDiff}, Rotation difference: {rotDiff}, Scale difference: {scaleDiff}");
+            }
+        }
+
         public void Undo()
         {
-            var selectionState = _oldSelectionState as BoneSelectionState;
-            selectionState.CurrentAnimation.DynamicFrames[_currentFrame] = _oldFrame;
+            if (_oldFrame == null) return;
+            CompareKeyFrames(_oldFrame, _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame]);
+            _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame] = _oldFrame;
         }
 
         public void Execute()
         {
             _oldSelectionState = _boneSelectionState;
-            _oldFrame = _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Copy();
         }
     }
 }

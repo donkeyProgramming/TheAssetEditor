@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using View3D.Animation;
 using View3D.Commands;
 using View3D.Commands.Object;
+using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 using View3D.SceneNodes;
@@ -34,12 +35,13 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private CommandFactory _commandFactory;
         private SelectionManager _selectionManager;
         private TransformToolViewModel _transformToolViewModel;
+        private CommandExecutor _commandExecutor;
         AnimationToolInput _inputRiderData;
         AnimationToolInput _inputMountData;
         private SceneObject _newAnimation;
         private SceneObject _mount;
         private SceneObject _rider;
-
+        private ICommand _command;
         public NotifyAttr<bool> AllowToSelectAnimRoot { get; set; } = new NotifyAttr<bool>(false);
 
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
@@ -56,7 +58,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
             CommandFactory commandFactory,
             SelectionManager selectionManager,
             TransformToolViewModel transformToolViewModel,
-            GizmoComponent gizmoComponent)
+            GizmoComponent gizmoComponent,
+            CommandExecutor commandExecutor)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
             _animationPlayerViewModel = animationPlayerViewModel;
@@ -71,8 +74,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _selectionManager = selectionManager;
 
             _gizmoComponent = gizmoComponent;
-
             _transformToolViewModel = transformToolViewModel;
+            _commandExecutor = commandExecutor;
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
 
@@ -217,6 +220,10 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _selectionManager.GetState().SelectionChanged += OnSelectionChanged;
         }
 
+        public void UndoPose()
+        {
+            _commandExecutor.Undo();
+        }
         public void EnterMoveMode()
         {
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;            
