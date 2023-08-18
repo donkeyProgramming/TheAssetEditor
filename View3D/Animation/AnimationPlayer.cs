@@ -48,9 +48,13 @@ namespace View3D.Animation
 
         public Matrix GetSkeletonAnimatedBoneFromWorld(GameSkeleton gameSkeleton, int boneIndex, Matrix objectInWorldTransform)
         {
-            var parentIndex = BoneTransforms[boneIndex].ParentBoneIndex;
             Matrix output = objectInWorldTransform * Matrix.Invert(GetSkeletonAnimatedWorld(gameSkeleton, boneIndex));
             return output;
+        }
+
+        public int GetParentBoneIndex(GameSkeleton gameSkeleton, int boneIndex)
+        {
+            return BoneTransforms[boneIndex].ParentBoneIndex;
         }
     }
 

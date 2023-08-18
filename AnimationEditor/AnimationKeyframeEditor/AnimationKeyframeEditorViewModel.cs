@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.ViewModels;
@@ -41,8 +42,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private SceneObject _newAnimation;
         private SceneObject _mount;
         private SceneObject _rider;
-        private ICommand _command;
         public NotifyAttr<bool> AllowToSelectAnimRoot { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> EnableInverseKinematics { get; set; } = new NotifyAttr<bool>(false);
+
+        public FilterCollection<SkeletonBoneNode> ModelBoneListForIKEndBone { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
+
 
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
@@ -93,6 +97,27 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 if (!AllowToSelectAnimRoot.Value)
                 {
                     boneSelectionState.DeselectAnimRootNode();
+                }
+
+                boneSelectionState.EnableInverseKinematics = EnableInverseKinematics.Value;
+                boneSelectionState.InverseKinematicsEndBoneIndex = ModelBoneListForIKEndBone.SelectedItem.BoneIndex;
+
+                if(boneSelectionState.EnableInverseKinematics)
+                {
+                    if(boneSelectionState.SelectedBones.Count > 1)
+                    {
+                        MessageBox.Show("when in IK mode is enabled, pick only only 1 bone. deselected the rest of the bones.", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        var firstSelection = boneSelectionState.SelectedBones[0];
+                        boneSelectionState.SelectedBones.Clear();
+                        boneSelectionState.SelectedBones.Add(firstSelection);
+                        return;
+                    }
+
+                    if(boneSelectionState.SelectedBones.Count == 1 && boneSelectionState.InverseKinematicsEndBoneIndex == boneSelectionState.SelectedBones[0])
+                    {
+                        MessageBox.Show("head bone chain == tail bone chain. why even enable IK mode?", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        boneSelectionState.SelectedBones.Clear();
+                    }
                 }
             }
         }
@@ -156,6 +181,16 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         private void RiderSkeletonChanges(GameSkeleton newValue)
         {
+            if (newValue == null)
+            {
+                ModelBoneListForIKEndBone.UpdatePossibleValues(null);
+            }
+            else
+            {
+                ModelBoneListForIKEndBone.UpdatePossibleValues(SkeletonBoneNodeHelper.CreateFlatSkeletonList(newValue));
+                ModelBoneListForIKEndBone.SelectedItem = ModelBoneListForIKEndBone.PossibleValues.FirstOrDefault(x => x.BoneName.ToLower() == "animroot");
+            }
+
             if (newValue == null)
             {
                 // ActiveOutputFragment.UpdatePossibleValues(null);
@@ -224,6 +259,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         {
             _commandExecutor.Undo();
         }
+
         public void EnterMoveMode()
         {
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;            
@@ -244,6 +280,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public void EnterScaleMode()
         {
+            if(EnableInverseKinematics.Value)
+            {
+                MessageBox.Show("cannot use scale mode when IK is enabled!", "error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
             _gizmoComponent.ResetScale();
             _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Scale);

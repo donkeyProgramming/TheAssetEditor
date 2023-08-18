@@ -13,7 +13,8 @@ namespace View3D.Components.Component.Selection
         public GameSkeleton Skeleton { get; set; }
         public ISelectable RenderObject { get; set; }
         public List<int> SelectedBones { get; set; } = new List<int>();
-
+        public bool EnableInverseKinematics { get; set; }
+        public int InverseKinematicsEndBoneIndex { get; set; }
         public int CurrentFrame { get; set; }
 
         public BoneSelectionState(ISelectable renderObj)
@@ -74,7 +75,9 @@ namespace View3D.Components.Component.Selection
                 CurrentAnimation = CurrentAnimation,
                 SelectionChanged = SelectionChanged,
                 CurrentFrame = CurrentFrame,
-                RenderObject = RenderObject
+                RenderObject = RenderObject,
+                EnableInverseKinematics = EnableInverseKinematics,
+                InverseKinematicsEndBoneIndex =  InverseKinematicsEndBoneIndex,
             };
         }
 

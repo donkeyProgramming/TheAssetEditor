@@ -41,6 +41,14 @@ namespace View3D.Commands.Bone
 
         public void ApplyTransformation(Matrix newPosition, GizmoMode gizmoMode)
         {
+            if (_selectedBones.Count == 0) return;
+
+            //TODO: FIX ME
+            //if(_boneSelectionState.EnableInverseKinematics)
+            //{
+            //    ApplyTransformationInverseKinematic(newPosition, _selectedBones[0], _boneSelectionState.InverseKinematicsEndBoneIndex);
+            //    return;
+            //}
             if (_oldTransform ==  Matrix.Identity)
             {
                 _oldTransform = newPosition;
@@ -79,6 +87,117 @@ namespace View3D.Commands.Bone
                         throw new InvalidOperationException("unknown gizmo mode");
                 }
             }
+        }
+
+        //TODO: FIX ME
+        void ApplyTransformationInverseKinematic(Matrix newPosition, int startBone, int endBone)
+        {
+            var node = _boneSelectionState.RenderObject as Rmv2MeshNode;
+            var animationPlayer = node.AnimationPlayer;
+            var currentAnimFrame = animationPlayer.GetCurrentAnimationFrame();
+
+            // Get the chain of bones from startBone to endBone
+            int boneCount = 1;
+            int boneIndex = startBone;
+            while (boneIndex != endBone)
+            {
+                boneIndex = currentAnimFrame.GetParentBoneIndex(_boneSelectionState.Skeleton, boneIndex);
+                boneCount++;
+            }
+            boneIndex = startBone;
+            Vector3[] positions = new Vector3[boneCount];
+            Quaternion[] rotations = new Quaternion[boneCount];
+            float[] boneLengths = new float[boneCount - 1];
+            int[] boneIndices = new int[boneCount];
+            float totalLength = 0;
+
+
+            for (int i = 0; i < boneCount; i++)
+            {
+                var transform = Matrix.CreateScale(1);
+                // Get the current bone world transform
+                var currentBoneWorldTransform = currentAnimFrame.GetSkeletonAnimatedWorld(_boneSelectionState.Skeleton, boneIndex);
+
+                // Store the position and rotation of the current bone
+                positions[i] = currentBoneWorldTransform.Translation;
+                currentBoneWorldTransform.Decompose(out _, out var rotation, out _);
+                rotations[i] =  rotation;
+                boneIndices[i] = boneIndex;
+
+                // Calculate the length of the bone and add it to the total length
+                if (i < boneCount - 1)
+                {
+                    boneLengths[i] = Vector3.Distance(positions[i], positions[i + 1]);
+                    totalLength += boneLengths[i];
+                }
+
+                // Move to the next bone in the chain
+                boneIndex = currentAnimFrame.GetParentBoneIndex(_boneSelectionState.Skeleton, boneIndex);
+            }
+
+            // Check if the target is reachable
+            if (Vector3.Distance(newPosition.Translation, positions[0]) > totalLength)
+            {
+                // The target is unreachable, move the end effector towards the target
+                for (int i = boneCount - 2; i >= 0; i--)
+                {
+                    positions[i + 1] = newPosition.Translation;
+                    Vector3 direction = Vector3.Normalize(positions[i] - positions[i + 1]);
+                    positions[i] = positions[i + 1] + direction * boneLengths[i];
+                }
+            }
+            else
+            {
+                // The target is reachable, apply the FABRIK algorithm
+                Vector3 rootPosition = positions[0];
+                float tolerance = 0.01f;
+                while (Vector3.Distance(newPosition.Translation, positions[boneCount - 1]) > tolerance)
+                {
+                    // Stage 1: Forward reaching
+                    ForwardReaching(positions, boneLengths, newPosition.Translation, boneCount - 2);
+
+                    // Stage 2: Backward reaching
+                    BackwardReaching(positions, boneLengths, rootPosition, 0);
+                }
+
+                // Update the position and rotation of each bone in the chain
+                for (int i = 0; i < boneCount - 1; i++)
+                {
+                    _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[boneIndices[i]] = positions[i];
+                    continue;
+                    if (i < boneCount - 1)
+                    {
+                        Vector3 direction = Vector3.Normalize(positions[i + 1] - positions[i]);
+                        Quaternion rotation = Quaternion.CreateFromAxisAngle(Vector3.Cross(Vector3.UnitX, direction), (float)Math.Acos(Vector3.Dot(Vector3.UnitX, direction)));
+                        _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Rotation[boneIndices[i]] = rotation;
+                    }
+                }
+            }
+
+        }
+
+        //TODO: FIX ME
+        private void ForwardReaching(Vector3[] positions, float[] boneLengths, Vector3 targetPosition, int index)
+        {
+            if (index < 0) return;
+
+            positions[index + 1] = targetPosition;
+            Vector3 direction = Vector3.Normalize(positions[index] - positions[index + 1]);
+            positions[index] = positions[index + 1] + direction * boneLengths[index];
+
+            ForwardReaching(positions, boneLengths, positions[index], index - 1);
+        }
+
+        //TODO: FIX ME
+        private void BackwardReaching(Vector3[] positions, float[] boneLengths, Vector3 rootPosition, int index)
+        {
+            if (index >= positions.Length - 1) return;
+
+            positions[index] = rootPosition;
+            Vector3 direction = Vector3.Normalize(positions[index + 1] - positions[index]);
+            positions[index + 1] = positions[index] + direction * boneLengths[index];
+
+            BackwardReaching(positions, boneLengths, positions[index + 1], index + 1);
         }
 
         public static void CompareKeyFrames(KeyFrame A, KeyFrame B)

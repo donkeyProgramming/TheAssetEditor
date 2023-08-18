@@ -13,12 +13,25 @@
         <Label  DockPanel.Dock="Top" Content="Animation Key Frame Editor" FontSize="18" FontWeight="Bold"/>
         <Label  DockPanel.Dock="Top" ContentStringFormat="You are currently editing frame Nr: {0}"  Content="{Binding CurrentFrameNumber, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="18" FontWeight="Bold"/>
 
-        <Grid DockPanel.Dock="Top" Margin="5,0,5,0">
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <CheckBox DockPanel.Dock="Top" Content="Allow to select animroot node" IsChecked="{Binding AllowToSelectAnimRoot.Value, UpdateSourceTrigger=PropertyChanged}"  />
+            <DockPanel>
+                <CheckBox DockPanel.Dock="Top" Content="Allow to select animroot node" IsChecked="{Binding AllowToSelectAnimRoot.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Enable Inverse Kinematics (currently not completed, help needed!)" IsChecked="{Binding EnableInverseKinematics.Value, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="false"  />
+                <Label>Last end of the bones chain (for IK):</Label>
+                <ComboBox  
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="BoneName"
+                          Text="{Binding ModelBoneListForIKEndBone.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding ModelBoneListForIKEndBone.Values}" 
+                          IsEnabled="false" 
+                          SelectedItem="{Binding ModelBoneListForIKEndBone.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <!-- "{Binding EnableInverseKinematics.Value}" -->
+            </DockPanel>
         </Grid>
 
         <Grid DockPanel.Dock="Top" Margin="5,0,5,0">
