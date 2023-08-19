@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
@@ -13,6 +14,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using Microsoft.Xna.Framework;
 using View3D.Animation;
 using View3D.Commands;
+using View3D.Commands.Bone;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -42,6 +44,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private SceneObject _newAnimation;
         private SceneObject _mount;
         private SceneObject _rider;
+        private AnimationClip _originalClip;
+
         public NotifyAttr<bool> AllowToSelectAnimRoot { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> EnableInverseKinematics { get; set; } = new NotifyAttr<bool>(false);
 
@@ -88,6 +92,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             ActiveFragmentSlot = new FilterCollection<AnimationBinEntryGenericFormat>(null, (x) => UpdateCanSaveAndPreviewStates());
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
+
         }
 
         private void OnSelectionChanged(ISelectionState state, bool sendEvent)
@@ -118,6 +123,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
                         MessageBox.Show("head bone chain == tail bone chain. why even enable IK mode?", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         boneSelectionState.SelectedBones.Clear();
                     }
+                }
+
+                if(boneSelectionState.SelectedBones.Count == 0)
+                {
+                    _gizmoComponent.Disable();
                 }
             }
         }
@@ -164,6 +174,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
+
         }
 
         private void MountSkeletonChanged(GameSkeleton newValue)
@@ -176,6 +187,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
             UpdateCanSaveAndPreviewStates();
             if (_newAnimation != null)
                 _sceneObjectBuilder.SetAnimation(_newAnimation, null);
+
+            if(newValue != null)
+            {
+                _originalClip = newValue.Clone();
+            }
             
         }
 
@@ -260,11 +276,31 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _commandExecutor.Undo();
         }
 
+        public void ResetPose()
+        {
+            var currentFrame = _rider.Player.CurrentFrame;
+            if(_rider.AnimationClip == null || _originalClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var maximumFramesOriginal = _originalClip.DynamicFrames.Count;
+
+            if(currentFrame > maximumFramesOriginal - 1)
+            {
+                MessageBox.Show("cannot reset the frame as this is a new frame!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _rider.Player.Pause();
+            var command = _commandFactory.Create<ResetTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, _originalClip, currentFrame)).Build();
+            command.ResetCurrentFrame();
+        }
+
         public void EnterMoveMode()
         {
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;            
             _gizmoComponent.ResetScale();
-            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Translate);
             _gizmoComponent.SetGizmoMode(GizmoMode.Translate);
 
         }
@@ -273,7 +309,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
         {
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
             _gizmoComponent.ResetScale();
-            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Rotate);
             _gizmoComponent.SetGizmoMode(GizmoMode.Rotate);
 
         }
@@ -287,7 +322,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
             _gizmoComponent.ResetScale();
-            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Scale);
             _gizmoComponent.SetGizmoMode(GizmoMode.NonUniformScale);
         }
 

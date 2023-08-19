@@ -99,6 +99,8 @@ namespace View3D
             serviceCollection.AddTransient<RemapBoneIndexesCommand>();
             serviceCollection.AddTransient<BoneSelectionCommand>();
             serviceCollection.AddTransient<TransformBoneCommand>();
+            serviceCollection.AddTransient<ResetTransformBoneCommand>();
+
         }
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {
