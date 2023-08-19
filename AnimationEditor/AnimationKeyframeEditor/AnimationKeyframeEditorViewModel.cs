@@ -46,6 +46,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private SceneObject _rider;
         private AnimationClip _originalClip;
 
+        private List<int> _previousSelectedBones;
+
         public NotifyAttr<bool> AllowToSelectAnimRoot { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> EnableInverseKinematics { get; set; } = new NotifyAttr<bool>(false);
 
@@ -99,6 +101,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
         {
             if (state is BoneSelectionState boneSelectionState)
             {
+                if(_previousSelectedBones == null && boneSelectionState.SelectedBones.Count > 0)
+                {
+                    _previousSelectedBones = new List<int>(boneSelectionState.SelectedBones);
+                }
+
                 if (!AllowToSelectAnimRoot.Value)
                 {
                     boneSelectionState.DeselectAnimRootNode();
@@ -232,12 +239,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public void InsertNewFrame()
         {
-            System.Windows.Forms.MessageBox.Show("insert new frame");
+            System.Windows.Forms.MessageBox.Show("insert new frame not implemented yet");
         }
 
         public void DuplicateFrame()
         {
-            System.Windows.Forms.MessageBox.Show("DuplicateFrame");
+            System.Windows.Forms.MessageBox.Show("DuplicateFrame not implemented yet");
         }
 
         private ISelectable FindSelectableObject(ISceneNode node)
@@ -269,6 +276,22 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             _selectionManager.GetState().SelectionChanged += OnSelectionChanged;
+        }
+
+        public void SelectPreviousBones()
+        {
+            if (_rider.AnimationClip == null || _originalClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if(_previousSelectedBones == null)
+            {
+                MessageBox.Show("select a bone first!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _commandFactory.Create<BoneSelectionCommand>().Configure(x => x.Configure(_previousSelectedBones, true, false)).BuildAndExecute();
         }
 
         public void UndoPose()
