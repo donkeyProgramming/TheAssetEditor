@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows.Forms;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
@@ -51,6 +50,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public NotifyAttr<bool> AllowToSelectAnimRoot { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> EnableInverseKinematics { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> IncrementFrameAfterCopyOperation { get; set; } = new NotifyAttr<bool>(false);
 
         public FilterCollection<SkeletonBoneNode> ModelBoneListForIKEndBone { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
 
@@ -258,6 +258,15 @@ namespace AnimationEditor.AnimationKeyframeEditor
             return null;
         }
 
+        private void EnsureTheObjectsAreNotSelectable(ISceneNode node)
+        {
+            foreach (var slot in node.Children)
+            {
+                slot.IsEditable = false;
+                EnsureTheObjectsAreNotSelectable(slot);
+            }
+        }
+
         public void EnterSelectMode()
         {
             if (_rider.MainNode.Children.Count == 0) return;
@@ -265,6 +274,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             var variantMeshRoot = _rider.MainNode.Children[1];
             if (variantMeshRoot.Children.Count == 0) return;
             var selectableNode = FindSelectableObject(variantMeshRoot);
+            EnsureTheObjectsAreNotSelectable(selectableNode);
 
             if (selectableNode != null)
             {
@@ -357,8 +367,13 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
             _rider.Player.Pause();
             _frameNrToCopy = _rider.Player.CurrentFrame;
+            if(IncrementFrameAfterCopyOperation.Value)
+            {
+                _rider.Player.CurrentFrame++;
+            }
         }
 
         public void PasteIntoCurrentFrame()
@@ -369,10 +384,39 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
             _rider.Player.Pause();
             var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy], _rider.AnimationClip, currentFrame)).Build();
             command.PasteWholeFrame();
             _commandExecutor.ExecuteCommand(command);
+        }
+
+
+        public void PasteIntoSelectedCurrentNode()
+        {
+            var currentFrame = _rider.Player.CurrentFrame;
+            if (_rider.AnimationClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if(_previousSelectedBones == null || _previousSelectedBones.Count() == 0)
+            {
+                MessageBox.Show("no bones were selected", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+
+            _rider.Player.Pause();
+            var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy], _rider.AnimationClip, currentFrame, _previousSelectedBones)).Build();
+            command.PasteIntoSelectedBones();
+            _commandExecutor.ExecuteCommand(command);
+        }
+
+        public void CopyAndPastePreviousEditedNodesIntoCurrentPose()
+        {
+
         }
     }
 }
