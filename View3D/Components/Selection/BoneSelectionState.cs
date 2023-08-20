@@ -5,6 +5,8 @@ using View3D.SceneNodes;
 
 namespace View3D.Components.Component.Selection
 {
+    public delegate void BoneModifiedEvent(BoneSelectionState state);
+
     public class BoneSelectionState : ISelectionState
     {
         public GeometrySelectionMode Mode => GeometrySelectionMode.Bone;
@@ -16,6 +18,8 @@ namespace View3D.Components.Component.Selection
         public bool EnableInverseKinematics { get; set; }
         public int InverseKinematicsEndBoneIndex { get; set; }
         public int CurrentFrame { get; set; }
+        public event BoneModifiedEvent BoneModifiedEvent;
+        public List<int> ModifiedBones { get; set; } = new List<int>();
 
         public BoneSelectionState(ISelectable renderObj)
         {
@@ -94,6 +98,12 @@ namespace View3D.Components.Component.Selection
         public List<ISelectable> SelectedObjects()
         {
             return new List<ISelectable>() { RenderObject };
+        }
+
+        public void TriggerModifiedBoneEvent(List<int> modifiedBones)
+        {
+            ModifiedBones = modifiedBones;
+            BoneModifiedEvent.Invoke(this);
         }
     }
 }

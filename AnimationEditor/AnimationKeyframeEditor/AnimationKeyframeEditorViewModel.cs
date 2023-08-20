@@ -47,6 +47,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private int _frameNrToCopy;
 
         private List<int> _previousSelectedBones;
+        private List<int> _modifiedBones = new();
+        private int _modifiedFrameNr = 0;
 
         public NotifyAttr<bool> AllowToSelectAnimRoot { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> EnableInverseKinematics { get; set; } = new NotifyAttr<bool>(false);
@@ -138,6 +140,20 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     _gizmoComponent.Disable();
                 }
             }
+        }
+
+        private void OnModifiedBonesEvent(BoneSelectionState state)
+        {
+            if(_modifiedFrameNr == state.CurrentFrame)
+            {
+                _modifiedBones = _modifiedBones.Union(state.ModifiedBones).ToList();
+            }
+            else
+            {
+                _modifiedBones = state.ModifiedBones;
+            }
+
+            _modifiedFrameNr = state.CurrentFrame;
         }
 
         private void UpdateCanSaveAndPreviewStates()
@@ -287,6 +303,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             _selectionManager.GetState().SelectionChanged += OnSelectionChanged;
+
+            if(_selectionManager.GetState() is BoneSelectionState state)
+            {
+                state.BoneModifiedEvent += OnModifiedBonesEvent;
+            }
         }
 
         public void SelectPreviousBones()
@@ -414,9 +435,30 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _commandExecutor.ExecuteCommand(command);
         }
 
-        public void CopyAndPastePreviousEditedNodesIntoCurrentPose()
+        public void PastePreviousEditedNodesIntoCurrentPose()
         {
+            var currentFrame = _rider.Player.CurrentFrame;
+            if (_rider.AnimationClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
+            if (_modifiedBones == null || _modifiedBones.Count() == 0)
+            {
+                MessageBox.Show("no bones were modified", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _rider.Player.Pause();
+            var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_modifiedFrameNr], _rider.AnimationClip, currentFrame, _modifiedBones)).Build();
+            command.PasteIntoSelectedBones();
+            _commandExecutor.ExecuteCommand(command);
+
+            if (IncrementFrameAfterCopyOperation.Value)
+            {
+                _rider.Player.CurrentFrame++;
+            }
         }
     }
 }

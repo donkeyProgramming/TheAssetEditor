@@ -75,8 +75,8 @@
 
             <Button Grid.Column="0" Content="Copy Pose"  Click="{s:MethodBinding CopyCurrentPose}" Margin="2,0,0,0"/>
             <Button Grid.Column="1" Content="Paste Pose"  Click="{s:MethodBinding PasteIntoCurrentFrame}" Margin="2,0,0,0" />
-            <Button Grid.Column="2" Content="Paste Pose but only from previously selected nodes"  Click="{s:MethodBinding PasteIntoSelectedCurrentNode}" Margin="2,0,0,0" />
-            <Button Grid.Column="3" Content="Copy n paste previous edited nodes"  Click="{s:MethodBinding CopyAndPastePreviousEditedNodesIntoCurrentPose}" Margin="2,0,0,0" />
+            <Button Grid.Column="2" Content="Paste Pose from previously selected nodes"  Click="{s:MethodBinding PasteIntoSelectedCurrentNode}" Margin="2,0,0,0" />
+            <Button Grid.Column="3" Content="Copy n paste previous edited nodes"  Click="{s:MethodBinding PastePreviousEditedNodesIntoCurrentPose}" Margin="2,0,0,0" />
         </Grid>
 
         <Button DockPanel.Dock="Top" Margin="5" Content="Save" Click="{s:MethodBinding SaveSkeletonAction}"/>

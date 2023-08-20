@@ -87,6 +87,8 @@ namespace View3D.Commands.Bone
                         throw new InvalidOperationException("unknown gizmo mode");
                 }
             }
+
+            _boneSelectionState.TriggerModifiedBoneEvent(_selectedBones);
         }
 
         //TODO: FIX ME
@@ -217,6 +219,7 @@ namespace View3D.Commands.Bone
             if (_oldFrame == null) return;
             CompareKeyFrames(_oldFrame, _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame]);
             _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame] = _oldFrame;
+            _boneSelectionState.TriggerModifiedBoneEvent(_selectedBones);
         }
 
         public void Execute()
