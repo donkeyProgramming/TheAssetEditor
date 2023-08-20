@@ -45,6 +45,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private SceneObject _mount;
         private SceneObject _rider;
         private AnimationClip _originalClip;
+        private int _frameNrToCopy;
 
         private List<int> _previousSelectedBones;
 
@@ -318,6 +319,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _rider.Player.Pause();
             var command = _commandFactory.Create<ResetTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, _originalClip, currentFrame)).Build();
             command.ResetCurrentFrame();
+            _commandExecutor.ExecuteCommand(command);
         }
 
         public void EnterMoveMode()
@@ -348,5 +350,29 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _gizmoComponent.SetGizmoMode(GizmoMode.NonUniformScale);
         }
 
+        public void CopyCurrentPose()
+        {
+            if (_rider.AnimationClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            _rider.Player.Pause();
+            _frameNrToCopy = _rider.Player.CurrentFrame;
+        }
+
+        public void PasteIntoCurrentFrame()
+        {
+            var currentFrame = _rider.Player.CurrentFrame;
+            if (_rider.AnimationClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            _rider.Player.Pause();
+            var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy], _rider.AnimationClip, currentFrame)).Build();
+            command.PasteWholeFrame();
+            _commandExecutor.ExecuteCommand(command);
+        }
     }
 }

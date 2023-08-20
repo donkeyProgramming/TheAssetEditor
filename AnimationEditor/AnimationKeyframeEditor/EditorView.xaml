@@ -11,13 +11,14 @@
     
     <DockPanel LastChildFill="False">
         <Label  DockPanel.Dock="Top" Content="Animation Key Frame Editor" FontSize="18" FontWeight="Bold"/>
+        <Label  DockPanel.Dock="Top" FontSize="10">&lt;-- Drag the border to reveal the buttons text</Label>
         <Label  DockPanel.Dock="Top" ContentStringFormat="You are currently editing frame Nr: {0}"  Content="{Binding CurrentFrameNumber, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="18" FontWeight="Bold"/>
 
+        
         <Grid DockPanel.Dock="Top" Margin="5,5,5,5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-
             <DockPanel>
                 <CheckBox DockPanel.Dock="Top" Content="Allow to select animroot node" IsChecked="{Binding AllowToSelectAnimRoot.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="Enable Inverse Kinematics (currently not completed, help needed!)" IsChecked="{Binding EnableInverseKinematics.Value, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="false"  />
@@ -74,7 +75,7 @@
 
             <Button Grid.Column="0" Content="Copy Pose"  Click="{s:MethodBinding CopyCurrentPose}" Margin="2,0,0,0"/>
             <Button Grid.Column="1" Content="Copy selected node"  Click="{s:MethodBinding CopySelectedNode}" Margin="2,0,0,0" />
-            <Button Grid.Column="2" Content="Paste Pose"  Click="{s:MethodBinding PasteIntoCurrentPose}" Margin="2,0,0,0" />
+            <Button Grid.Column="2" Content="Paste Pose"  Click="{s:MethodBinding PasteIntoCurrentFrame}" Margin="2,0,0,0" />
             <Button Grid.Column="3" Content="Paste into selected node"  Click="{s:MethodBinding PasteIntoSelectedCurrentNode}" Margin="2,0,0,0" />
             <Button Grid.Column="4" Content="Copy n paste previous edited nodes"  Click="{s:MethodBinding CopyAndPastePreviousEditedNodesIntoCurrentPose}" Margin="2,0,0,0" />
         </Grid>

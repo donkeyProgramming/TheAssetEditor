@@ -100,6 +100,7 @@ namespace View3D
             serviceCollection.AddTransient<BoneSelectionCommand>();
             serviceCollection.AddTransient<TransformBoneCommand>();
             serviceCollection.AddTransient<ResetTransformBoneCommand>();
+            serviceCollection.AddTransient<PasteTransformBoneCommand>();
 
         }
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
