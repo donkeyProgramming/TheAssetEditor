@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AssetManagement.MeshHandling
+namespace AssetManagement.AssetHandling
 {
     public class AssetManagementFactory : IAssetManagementFactory
     {
-        private readonly IEnumerable<IAssetImporter> _importers;     
-        
+        private readonly IEnumerable<IAssetImporter> _importers;
+
         public AssetManagementFactory(IEnumerable<IAssetImporter> importers)
         {
             _importers = importers;
@@ -24,7 +24,7 @@ namespace AssetManagement.MeshHandling
         public IAssetImporter GetImporter(string format)
         {
             var importer = _importers.Where(x => IsValid(format, x)).FirstOrDefault();
-            if(importer == null) 
+            if (importer == null)
                 throw new Exception($"No importer found for {format}");
             return importer;
         }

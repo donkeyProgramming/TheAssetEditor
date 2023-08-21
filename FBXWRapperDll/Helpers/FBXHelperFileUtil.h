@@ -66,9 +66,7 @@ namespace wrapdll
 		static void TransFormScene(fbxsdk::FbxManager* m_pSdkManager, fbxsdk::FbxScene* pfbxScene)
 		{
 			auto unitPlural = FBXUnitHelper::GetUnitAsString(pfbxScene);
-			LogInfo("File Uses Units: " + unitPlural);
-
-			LogActionColor("Importing scene failed. Fatal Error. Stopping!");
+			LogInfo("File Uses Units: " + unitPlural);			
 
 			fbxsdk::FbxGeometryConverter geometryConverter(m_pSdkManager);
 

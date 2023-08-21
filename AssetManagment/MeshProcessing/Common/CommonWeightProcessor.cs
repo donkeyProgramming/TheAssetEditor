@@ -5,7 +5,7 @@ using CommonControls.FileTypes.RigidModel.Vertex;
 using CommonControls.FileTypes.Animation;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 
-namespace AssetManagement.MeshHandling
+namespace AssetManagement.MeshProcessing.Common
 {
     public class CommonWeightProcessor
     {
@@ -15,10 +15,8 @@ namespace AssetManagement.MeshHandling
         /// <exception cref="Exception">If vertex already has 4 weights</exception>
         public static void AddWeightToVertex(CommonVertex vertex, int boneIndex, float weight)
         {
-            if (vertex.WeightCount == 4)
-            {
-                return;
-                // TODO: renable exception, when VertexWeight remapping works
+            if (vertex.WeightCount == 4)       
+            {                              
                 throw new Exception("Error. Trying to add more than 4 weights");
             }
 
@@ -30,9 +28,9 @@ namespace AssetManagement.MeshHandling
         {
             if (boneName.Any()) // don't add empty influences (boneName == "")
             {
-                int boneIndex = skeletonFile.GetIdFromBoneName(boneName);
-                CommonWeightProcessor.AddWeightToVertex(vertex, boneIndex, weight);
-            }            
+                var boneIndex = skeletonFile.GetIdFromBoneName(boneName);
+                AddWeightToVertex(vertex, boneIndex, weight);
+            }
         }
 
         /// <summary>

@@ -1,5 +1,4 @@
-﻿using AssetManagement.GenericFormats;
-using AssetManagement.GenericFormats.DataStructures.Managed;
+﻿using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
 using System;
@@ -9,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace AssetManagement.Strategies.Fbx
 {
-    public class SceneMarshallerToManaged
+    public class SceneMarshaller
     {
         public static SceneContainer ToManaged(IntPtr ptrFbxSceneContainer)
         {

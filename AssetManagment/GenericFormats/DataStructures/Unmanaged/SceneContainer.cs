@@ -4,9 +4,8 @@ using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
 using System;
 using AssetManagement.GenericFormats.DataStructures.Managed;
-using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 
-namespace AssetManagement.GenericFormats
+namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
 {
     public class SceneContainer
     {
@@ -14,7 +13,7 @@ namespace AssetManagement.GenericFormats
         public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
         public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
         public Node RootNode { get; set; }
-        public String SkeletonName { get; set; } // TODO: don't use NULL srings for skeleton name
+        public string SkeletonName { get; set; } // TODO: don't use NULL srings for skeleton name
         public FileInfoData FileInfoData { get; set; } = new FileInfoData();
     }
 
@@ -24,7 +23,7 @@ namespace AssetManagement.GenericFormats
         public string Name { get; set; }
         public List<Node> Children { get; set; }
         public Node Parent { get; set; }
-        public Matrix Transform { get; set; }        
+        public Matrix Transform { get; set; }
     }
 
     public class BoneInfo
@@ -60,7 +59,7 @@ namespace AssetManagement.GenericFormats
             get { return _framesPerSecond; }
             set
             {
-                FramesPerSecond = value;                
+                FramesPerSecond = value;
             }
         }
     }

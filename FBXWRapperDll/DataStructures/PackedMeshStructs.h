@@ -38,7 +38,7 @@ public:
         return v;
     }    
 
-    char boneName[255] = "";
+    char boneName[255] = ""; // fixed length for simpler interop
 	uint32_t boneIndex = 0;
 	float weight = 0.0f;
 };

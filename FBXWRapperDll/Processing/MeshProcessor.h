@@ -29,159 +29,28 @@
 namespace wrapdll
 {
     class MeshProcessor
-    {
-        struct BoneName4
-        {
-            std::string n1, n2, n3, n4;
-        };
+    {     
+    private:
+        static constexpr int VERTEX_DISCARDED = -1;
 
-    public:
-        static void DoFinalMeshProcessing(PackedMesh& mesh)
-        {
-            ComputeTangentBasisUnindexed(mesh.vertices);
-            DoMeshIndexingWithTangentSmoothing(mesh);
-        }
+    public: 
+        static void DoFinalMeshProcessing(PackedMesh& mesh);
 
-        static void DoTangentAndIndexing(PackedMesh& destMesh) {
+        static void DoTangentBasisAndIndexing(PackedMesh& destMesh);
 
-            using namespace std;
-            using namespace DirectX;
-
-            // -- input
-            vector<DirectX::SimpleMath::Vector3> vertices;
-            vector<DirectX::SimpleMath::Vector2> uvs;
-            vector<DirectX::SimpleMath::Vector3> normals;
-            vector<DirectX::SimpleMath::Vector3> tangents;
-            vector<DirectX::SimpleMath::Vector3> bitangents;
-            
-            /*vector<XMFLOAT4> bone_weights;
-            vector<XMUINT4> bone_indices;
-            vector<BoneName4> bone_names;*/
-
-            // -- output
-            vector<DirectX::SimpleMath::Vector3> out_vertices;
-            vector<DirectX::SimpleMath::Vector2> out_uvs;
-            vector<DirectX::SimpleMath::Vector3> out_normals;
-            vector<DirectX::SimpleMath::Vector3> out_tangents;
-            vector<DirectX::SimpleMath::Vector3> out_bitangents;
-
-            /*vector<DirectX::XMFLOAT4> out_bone_weights;
-            vector<DirectX::XMUINT4> out_bone_indices;
-            vector<BoneName4> out_bone_names;*/
-
-            vector<uint16_t> out_indices;
-
-            // fill the UN-INDEXED vertex data into vectors
-            for (auto& v : destMesh.vertices)
-            {
-                //vertices.push_back(v.position);
-                vertices.push_back({ v.position.x, v.position.y,v.position.z });
-                uvs.push_back(v.uv);
-                normals.push_back(v.normal);
-
-                //bone_indices.push_back({ v.influences[0].boneIndex, v.influences[1].boneIndex, v.influences[2].boneIndex, v.influences[3].boneIndex });
-                //bone_weights.push_back({ v.influences[0].weight, v.influences[1].weight, v.influences[2].weight, v.influences[3].weight });
-                //bone_names.push_back({ v.influences[0].boneName, v.influences[1].boneName, v.influences[2].boneName, v.influences[3].boneName });
-            };
-
-            ComputeTangentBasisForUnindexedMesh(
-                // inputs
-                vertices, uvs, normals,
-
-                // outputs	
-                tangents, bitangents
-            );
-
-            // do indexing (clean up mesh), and average tangents
-            indexVBO_TBN_Slow(
-                vertices, uvs, normals, tangents, bitangents, 
-
-                // TODO: remove
-                //bone_weights, bone_indices, bone_names,
-
-                out_indices,
-                out_vertices,
-                out_uvs,
-                out_normals,
-                out_tangents,
-                out_bitangents
-
-                // TODO: remove
-                //out_bone_weights,  out_bone_indices, out_bone_names
-            );
-
-            destMesh.vertices.clear();
-            destMesh.vertices.resize(out_vertices.size());
-
-            // copy the processed mesh data back into the mesh
-            for (size_t i = 0; i < out_vertices.size(); i++)
-            {
-                auto& v = destMesh.vertices[i];
-                auto& v_src = destMesh.vertices[i];
-                //v.position = out_vertices[i];
-                v.position = XMFLOAT4(out_vertices[i].x, out_vertices[i].y, out_vertices[i].z, 0);
-
-                out_normals[i].Normalize();
-                v.normal = out_normals[i];
-
-                out_tangents[i].Normalize();
-                out_bitangents[i].Normalize();
-
-                v.tangent = out_tangents[i];
-                v.bitangent = out_bitangents[i];
-
-                v.uv = out_uvs[i];
-
-                // TODO: remove
-                //v.influences[0].boneIndex = out_bone_indices[i].x;
-                //v.influences[1].boneIndex = out_bone_indices[i].y;
-                //v.influences[2].boneIndex = out_bone_indices[i].z;
-                //v.influences[3].boneIndex = out_bone_indices[i].w;
-
-                //v.influences[0].weight = out_bone_weights[i].x;
-                //v.influences[1].weight = out_bone_weights[i].y;
-                //v.influences[2].weight = out_bone_weights[i].z;
-                //v.influences[3].weight = out_bone_weights[i].w;
-
-                //strcpy_s<255>(v.influences[0].boneName, out_bone_names[i].n1.c_str());
-                //strcpy_s<255>(v.influences[1].boneName, out_bone_names[i].n2.c_str());
-                //strcpy_s<255>(v.influences[2].boneName, out_bone_names[i].n3.c_str());
-                //strcpy_s<255>(v.influences[3].boneName, out_bone_names[i].n4.c_str());
-            }
-
-            destMesh.indices = out_indices;
-        }        
-        
-
-        static void RemapVertexWeights(const std::vector<VertexWeight>& inVertexWeights, std::vector<VertexWeight>& outVertexWeights, const std::vector<int>& outVertexIndexRemap)
-        {
-            for (size_t i = 0; i < inVertexWeights.size(); i++) // run through all old vertexweights
-            {
-                // TODO: if the vertex pointed to still exist in the buffer ( indicted remap[index] != -), continue, remap and include in output
-                if (outVertexIndexRemap[inVertexWeights[i].vertexIndex] != -1)
-                {
-                    auto tempVertexWeight = inVertexWeights[i];
-
-                    // remap the index, 
-                    tempVertexWeight.vertexIndex = outVertexIndexRemap[inVertexWeights[i].vertexIndex];
-
-                    outVertexWeights.push_back(tempVertexWeight);
-                }
-            }
-        }
-
+        static void RemapVertexWeights(const std::vector<VertexWeight>& inVertexWeights, std::vector<VertexWeight>& outVertexWeights, const std::vector<int>& outVertexIndexRemap);
         // TODO: make make the result the RETURN VALUE, and the input "srcMesh"?
         static void DoMeshIndexingWithTangentSmoothing(PackedMesh& destMesh)
-        {           
-            
-            std::vector<PackedCommonVertex> outVertices;            
-            std::vector<uint16_t> outIndices;            
+        {
+
+            std::vector<PackedCommonVertex> outVertices;
+            std::vector<uint16_t> outIndices;
             std::vector<int> outVertexIndexRemap; // index = old index, value = new value            
 
-            // TODO: maybe use the faster version??
-            indexVBO_TBN_Slow_Packed_ReMap(destMesh.vertices, outVertices, outIndices, outVertexIndexRemap);
-                      
-            
+            // TODO: Which version is ACTUALLY faster??
+            DoMeshIndexingWithTangenSmoothing_Fast(destMesh.vertices, outVertices, outIndices, outVertexIndexRemap);
+
+
 
             std::vector<VertexWeight> outVertexWeights;
 
@@ -192,7 +61,7 @@ namespace wrapdll
             //for (size_t i = 0; i < destMesh.vertexWeights.size(); i++) // run through all old vertexweights
             //{
             //    // TODO: if the vertex pointed to still exist in the buffer ( indicted remap[index] != -), continue, remap and include in output
-            //    if (outVertexIndexRemap[destMesh.vertexWeights[i].vertexIndex] != -1)
+            //    if (outVertexIndexRemap[destMesh.vertexWeights[i].vertexIndex] != VERTEX_DISCARDED)
             //    {
 
             //        auto tempVertexWeight = destMesh.vertexWeights[i];
@@ -210,7 +79,7 @@ namespace wrapdll
 
             // TODO: debuging: is there at least 1 weight for every vertex
             for (size_t i = 0; i < destMesh.vertices.size(); i++)
-            {                
+            {
                 bool bThereIsAWeight = false;
                 for (auto& v : outVertexWeights) // check all indexes, to see if there is one for "this" vertex
                 {
@@ -232,36 +101,36 @@ namespace wrapdll
 
         static void ComputeTangentBasisForUnindexedMesh(
             // inputs
-            const std::vector<DirectX::SimpleMath::Vector3>& vertices,
-            const std::vector<DirectX::SimpleMath::Vector2>& uvs,
-            const std::vector<DirectX::SimpleMath::Vector3>& normals,
+            const std::vector<sm::Vector3>& vertices,
+            const std::vector<sm::Vector2>& uvs,
+            const std::vector<sm::Vector3>& normals,
             // outputs
-            std::vector<DirectX::SimpleMath::Vector3>& tangents,
-            std::vector<DirectX::SimpleMath::Vector3>& bitangents
-        ) 
+            std::vector<sm::Vector3>& tangents,
+            std::vector<sm::Vector3>& bitangents
+        )
         {
             for (unsigned int i = 0; i < vertices.size(); i += 3) {
                 // Shortcuts for vertices
-                const DirectX::SimpleMath::Vector3& v0 = vertices[i + 0];
-                const DirectX::SimpleMath::Vector3& v1 = vertices[i + 1];
-                const DirectX::SimpleMath::Vector3& v2 = vertices[i + 2];
+                const sm::Vector3& v0 = vertices[i + 0];
+                const sm::Vector3& v1 = vertices[i + 1];
+                const sm::Vector3& v2 = vertices[i + 2];
 
                 // Shortcuts for UVs
-                const DirectX::SimpleMath::Vector2& uv0 = uvs[i + 0];
-                const DirectX::SimpleMath::Vector2& uv1 = uvs[i + 1];
-                const DirectX::SimpleMath::Vector2& uv2 = uvs[i + 2];
+                const sm::Vector2& uv0 = uvs[i + 0];
+                const sm::Vector2& uv1 = uvs[i + 1];
+                const sm::Vector2& uv2 = uvs[i + 2];
 
                 // Edges of the triangle : postion delta
-                DirectX::SimpleMath::Vector3 deltaPos1 = v1 - v0;
-                DirectX::SimpleMath::Vector3 deltaPos2 = v2 - v0;
+                sm::Vector3 deltaPos1 = v1 - v0;
+                sm::Vector3 deltaPos2 = v2 - v0;
 
                 // UV delta
-                DirectX::SimpleMath::Vector2 deltaUV1 = uv1 - uv0;
-                DirectX::SimpleMath::Vector2 deltaUV2 = uv2 - uv0;
+                sm::Vector2 deltaUV1 = uv1 - uv0;
+                sm::Vector2 deltaUV2 = uv2 - uv0;
 
                 float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
-                DirectX::SimpleMath::Vector3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
-                DirectX::SimpleMath::Vector3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
+                sm::Vector3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
+                sm::Vector3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
 
                 // tangent/bitangent will be averages during indexing
                 tangents.push_back(tangent);
@@ -279,29 +148,29 @@ namespace wrapdll
         // TODO: CLEAN UP
         static void ComputeTangentBasisUnindexed(std::vector<PackedCommonVertex>& vertices)
         {
-            for (size_t i = 0; i < vertices.size(); i += 3) 
+            for (size_t i = 0; i < vertices.size(); i += 3)
             {
                 // Shortcuts for vertices
-                const DirectX::SimpleMath::Vector3& v0 = convert::ConvertToVec3(vertices[i + 0u].position);
-                const DirectX::SimpleMath::Vector3& v1 = convert::ConvertToVec3(vertices[i + 1u].position);
-                const DirectX::SimpleMath::Vector3& v2 = convert::ConvertToVec3(vertices[i + 2u].position);
+                const sm::Vector3& v0 = convert::ConvertToVec3(vertices[i + 0u].position);
+                const sm::Vector3& v1 = convert::ConvertToVec3(vertices[i + 1u].position);
+                const sm::Vector3& v2 = convert::ConvertToVec3(vertices[i + 2u].position);
 
                 // Shortcuts for UVs
-                const DirectX::SimpleMath::Vector2& uv0 = vertices[i + 0u].uv;
-                const DirectX::SimpleMath::Vector2& uv1 = vertices[i + 1u].uv;
-                const DirectX::SimpleMath::Vector2& uv2 = vertices[i + 2u].uv;
+                const sm::Vector2& uv0 = vertices[i + 0u].uv;
+                const sm::Vector2& uv1 = vertices[i + 1u].uv;
+                const sm::Vector2& uv2 = vertices[i + 2u].uv;
 
                 // Edges of the triangle : postion delta
-                DirectX::SimpleMath::Vector3 deltaPos1 = v1 - v0;
-                DirectX::SimpleMath::Vector3 deltaPos2 = v2 - v0;
+                sm::Vector3 deltaPos1 = v1 - v0;
+                sm::Vector3 deltaPos2 = v2 - v0;
 
                 // UV delta
-                DirectX::SimpleMath::Vector2 deltaUV1 = uv1 - uv0;
-                DirectX::SimpleMath::Vector2 deltaUV2 = uv2 - uv0;
+                sm::Vector2 deltaUV1 = uv1 - uv0;
+                sm::Vector2 deltaUV2 = uv2 - uv0;
 
                 float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
-                DirectX::SimpleMath::Vector3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
-                DirectX::SimpleMath::Vector3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
+                sm::Vector3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
+                sm::Vector3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
 
                 vertices[i + 0u].tangent = tangent;
                 vertices[i + 1u].tangent = tangent;
@@ -309,41 +178,41 @@ namespace wrapdll
 
                 vertices[i + 0u].bitangent = bitangent;
                 vertices[i + 1u].bitangent = bitangent;
-                vertices[i + 2u].bitangent = bitangent;                
-            }            
+                vertices[i + 2u].bitangent = bitangent;
+            }
         };
 
         // TODO: FINISH
         static void ComputeTangentBasisIndexed(std::vector<PackedCommonVertex>& vertices, const std::vector<uint16_t>& indices)
-        {         
+        {
             // iterate over triangles
             for (size_t faceIndex = 0; faceIndex < indices.size(); faceIndex += 3)
-            {                
+            {
                 // Corner index-to-vertices of triangle N
                 const auto& cornerIndex0 = indices[faceIndex + 0U];
                 const auto& cornerIndex1 = indices[faceIndex + 1U];
                 const auto& cornerIndex2 = indices[faceIndex + 2U];
 
-                const DirectX::SimpleMath::Vector3& v0 = convert::ConvertToVec3(vertices[cornerIndex0].position);
-                const DirectX::SimpleMath::Vector3& v1 = convert::ConvertToVec3(vertices[cornerIndex1].position);
-                const DirectX::SimpleMath::Vector3& v2 = convert::ConvertToVec3(vertices[cornerIndex2].position);
+                const sm::Vector3& v0 = convert::ConvertToVec3(vertices[cornerIndex0].position);
+                const sm::Vector3& v1 = convert::ConvertToVec3(vertices[cornerIndex1].position);
+                const sm::Vector3& v2 = convert::ConvertToVec3(vertices[cornerIndex2].position);
 
                 // Shortcuts for UVs
-                const DirectX::SimpleMath::Vector2& uv0 = vertices[cornerIndex0].uv;
-                const DirectX::SimpleMath::Vector2& uv1 = vertices[cornerIndex1].uv;
-                const DirectX::SimpleMath::Vector2& uv2 = vertices[cornerIndex2].uv;
+                const sm::Vector2& uv0 = vertices[cornerIndex0].uv;
+                const sm::Vector2& uv1 = vertices[cornerIndex1].uv;
+                const sm::Vector2& uv2 = vertices[cornerIndex2].uv;
 
                 // Edges of the triangle : postion delta
-                DirectX::SimpleMath::Vector3 deltaPos1 = v1 - v0;
-                DirectX::SimpleMath::Vector3 deltaPos2 = v2 - v0;
+                sm::Vector3 deltaPos1 = v1 - v0;
+                sm::Vector3 deltaPos2 = v2 - v0;
 
                 // UV delta
-                DirectX::SimpleMath::Vector2 deltaUV1 = uv1 - uv0;
-                DirectX::SimpleMath::Vector2 deltaUV2 = uv2 - uv0;
+                sm::Vector2 deltaUV1 = uv1 - uv0;
+                sm::Vector2 deltaUV2 = uv2 - uv0;
 
                 float r = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV1.y * deltaUV2.x);
-                DirectX::SimpleMath::Vector3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
-                DirectX::SimpleMath::Vector3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
+                sm::Vector3 tangent = (deltaPos1 * deltaUV2.y - deltaPos2 * deltaUV1.y) * r;
+                sm::Vector3 bitangent = (deltaPos2 * deltaUV1.x - deltaPos1 * deltaUV2.x) * r;
 
                 vertices[cornerIndex0].tangent = tangent;
                 vertices[cornerIndex1].tangent = tangent;
@@ -355,62 +224,52 @@ namespace wrapdll
             }
         }
 
-        static inline void indexVBO_TBN_Slow(
-            const std::vector<DirectX::SimpleMath::Vector3>& in_vertices,
-            const std::vector<DirectX::SimpleMath::Vector2>& in_uvs,
-            const std::vector<DirectX::SimpleMath::Vector3>& in_normals,
-            const std::vector<DirectX::SimpleMath::Vector3>& in_tangents,
-            const std::vector<DirectX::SimpleMath::Vector3>& in_bitangents,
+        static inline void DoIndexingAndAverageTangents_Slow(
+            const std::vector<sm::Vector3>& inVertices,
+            const std::vector<sm::Vector2>& inUVs,
+            const std::vector<sm::Vector3>& inNormals,
+            const std::vector<sm::Vector3>& inTangents,
+            const std::vector<sm::Vector3>& inBitangents,
 
-            // TODO: remove
-            //const std::vector<DirectX::XMFLOAT4>& in_bone_weights,
-            //const std::vector<DirectX::XMUINT4>& in_bone_indices,
-            //const std::vector<BoneName4>& in_bone_names,
-
-            //std::vector<uint16_t>& out_vertex_remap,
+            
             std::vector<uint16_t>& out_indices,
-            std::vector<DirectX::SimpleMath::Vector3>& out_vertices,
-            std::vector<DirectX::SimpleMath::Vector2>& out_uvs,
-            std::vector<DirectX::SimpleMath::Vector3>& out_normals,
-            std::vector<DirectX::SimpleMath::Vector3>& out_tangents,
-            std::vector<DirectX::SimpleMath::Vector3>& out_bitangents
-
-            // TODO: remove
-            //std::vector<DirectX::XMFLOAT4>& out_bone_weights,
-            //std::vector<DirectX::XMUINT4>& out_bone_indices,
-            //std::vector<BoneName4>& out_bone_names
+            std::vector<sm::Vector3>& out_vertices,
+            std::vector<sm::Vector2>& out_uvs,
+            std::vector<sm::Vector3>& out_normals,
+            std::vector<sm::Vector3>& out_tangents,
+            std::vector<sm::Vector3>& out_bitangents
         ) {
             //std::map<PackedCommonVertex, unsigned short> VertexToOutIndex;
 
-            std::vector<int> avg_count/*(in_vertices.size(), 1)*/;
+            std::vector<int> avg_count/*(inVertices.size(), 1)*/;
             // For each input vertex
-            for (unsigned int i = 0; i < in_vertices.size(); i++) {
+            for (unsigned int i = 0; i < inVertices.size(); i++) {
                 PackedCommonVertex packed;
-                packed.position = convert::ConvertToVec3(in_vertices[i]);
-                packed.uv = in_uvs[i];
-                packed.normal = in_normals[i];
+                packed.position = convert::ConvertToVec3(inVertices[i]);
+                packed.uv = inUVs[i];
+                packed.normal = inNormals[i];
 
                 // Try to find a similar vertex in out_XXXX
                 uint16_t index;
 
                 //bool found = getSimilarVertexIndex(packed, VertexToOutIndex, index);
-                bool found = getSimilarVertexIndex(in_vertices[i], in_uvs[i], in_normals[i], out_vertices, out_uvs, out_normals, index);
+                bool found = getSimilarVertexIndex(inVertices[i], inUVs[i], inNormals[i], out_vertices, out_uvs, out_normals, index);
 
                 if (found) { // A similar vertex is already in the VBO, use it instead !
                     out_indices.push_back(index);
 
                     // Average the tangents and the bitangents
-                    out_tangents[index] += in_tangents[i];
-                    out_bitangents[index] += in_bitangents[i];
+                    out_tangents[index] += inTangents[i];
+                    out_bitangents[index] += inBitangents[i];
 
                     //avg_count[index]++;
                 }
                 else { // If not, it needs to be added in the output data.
-                    out_vertices.push_back(in_vertices[i]);
-                    out_uvs.push_back(in_uvs[i]);
-                    out_normals.push_back(in_normals[i]);
-                    out_tangents.push_back(in_tangents[i]);
-                    out_bitangents.push_back(in_bitangents[i]);
+                    out_vertices.push_back(inVertices[i]);
+                    out_uvs.push_back(inUVs[i]);
+                    out_normals.push_back(inNormals[i]);
+                    out_tangents.push_back(inTangents[i]);
+                    out_bitangents.push_back(inBitangents[i]);
 
                     // TODO: remove?
                     /*out_bone_weights.push_back(in_bone_weights[i]);
@@ -429,58 +288,96 @@ namespace wrapdll
             }
         }
 
-        // TODO: rename method, to something better
-        // TODO: ret rig of all "snake_case_name"
-        static inline void indexVBO_TBN_Slow_Packed_ReMap(
-            // input
-            const std::vector<PackedCommonVertex>& inVertices,                      
+        /// <summary>
+        /// Makes an unindex mesh into an indexed one, by discarding indentical/very similar vertices.
+        /// Makes an index buffer for the new index mesh
+        /// Makes a "vertex remap", 
+        /// newIndex =  remap[oldIndex], -1 for discarded vertices
+        /// uses for vertex influence remapping,
+        /// (could be use later, to split the DoIndexing..() method up into discrete methods)
+        /// </summary>
+        /// <param name="inVertices">Unindexed vertex input buffer</param>
+        /// <param name="outVertices">Indexed vertex output buffer </param>
+        /// <param name="outIndices">Index buffer</param>
+        /// <param name="outVertexRemap">vertex remap</param>
+        static inline void DoMeshIndexingWithTangenSmoothing_Slow(
+            const std::vector<PackedCommonVertex>& inVertices,
+            std::vector<PackedCommonVertex>& outVertices,
+            std::vector<uint16_t>& outIndices,
+            std::vector<int>& outVertexRemap)
+        {
+            outVertexRemap.clear(); // can never be too sure?:)        
 
-            // output
-            std::vector<PackedCommonVertex>& outVertices,       
-
-            std::vector<uint16_t>& outIndices, 
-            std::vector<int>& outVertexRemap
-
-        ) {            
-            outVertexRemap.clear();
-
-            //std::map<PackedCommonVertex, unsigned short> VertexToOutIndex;
-
-            std::vector<int> avg_count/*(in_vertices.size(), 1)*/;
             // For each input vertex
             for (unsigned int inVertexIndex = 0; inVertexIndex < inVertices.size(); inVertexIndex++) {
-                /*PackedCommonVertex packed;
-                packed.position = convert::ConvertToVec3(inVertices[inVertexIndex].position);
-                packed.uv = inVertices[inVertexIndex].uv;
-                packed.normal = inVertices[inVertexIndex].normal;*/
 
                 // Try to find a similar vertex in out_XXXX
                 uint16_t indexToMatchingVertex;
 
-                //bool found = getSimilarVertexIndex(packed, VertexToOutIndex, index);
-                bool matchingVertexFound = getSimilarPackedVertexIndex_Slow(convert::ConvertToVec3(inVertices[inVertexIndex].position), inVertices[inVertexIndex].uv, inVertices[inVertexIndex].normal, outVertices, indexToMatchingVertex);
+                bool matchingVertexFound = GetSimilarPackedVertexIndex_Slow(convert::ConvertToVec3(inVertices[inVertexIndex].position), inVertices[inVertexIndex].uv, inVertices[inVertexIndex].normal, outVertices, indexToMatchingVertex);
 
                 if (matchingVertexFound) // A similar vertex is already in the new OUTPUT Vertex buffer, use that!
-                { 
+                {
                     outIndices.push_back(indexToMatchingVertex); // refer to existing vertex+vertexweight
 
                     // Average the tangents and the bitangents
                     outVertices[indexToMatchingVertex].tangent = sm::Vector3(outVertices[indexToMatchingVertex].tangent) + sm::Vector3(inVertices[inVertexIndex].tangent);
-                    outVertices[indexToMatchingVertex].bitangent = sm::Vector3(outVertices[indexToMatchingVertex].bitangent) + sm::Vector3(inVertices[inVertexIndex].bitangent);                    
+                    outVertices[indexToMatchingVertex].bitangent = sm::Vector3(outVertices[indexToMatchingVertex].bitangent) + sm::Vector3(inVertices[inVertexIndex].bitangent);
 
-                    outVertexRemap.push_back(-1); // this a duplicate
-                    // TODO: clean up....
-                    //outVertexRemap.push_back(indexToMatchingVertex); // this a duplicate
+                    outVertexRemap.push_back(VERTEX_DISCARDED); // this a duplicate                    
                 }
                 else // No matching vertex found, add a vertex from the INPUT vertex buffer
                 {
                     outVertices.push_back(inVertices[inVertexIndex]);
-                    
+
                     uint16_t newVertexIndex = (uint16_t)outVertices.size() - 1;
-                    outIndices.push_back(newVertexIndex);                    
+                    outIndices.push_back(newVertexIndex);
 
                     outVertexRemap.push_back(newVertexIndex);
-               }
+                }
+            }
+        }
+
+        static inline void DoMeshIndexingWithTangenSmoothing_Fast(
+            const std::vector<PackedCommonVertex>& inVertices,
+            std::vector<PackedCommonVertex>& outVertices,
+            std::vector<uint16_t>& outIndices,
+            std::vector<int>& outVertexRemap)
+        {
+            outVertexRemap.clear(); // can never be too sure?:)        
+            std::map<PackedVertex, unsigned short> VertexToOutIndex;
+            // For each input vertex
+            for (unsigned int inVertexIndex = 0; inVertexIndex < inVertices.size(); inVertexIndex++) 
+            {
+                PackedVertex packedVertex;
+                packedVertex.position = convert::ConvertToVec3(inVertices[inVertexIndex].position);
+                packedVertex.uv = inVertices[inVertexIndex].uv;
+                packedVertex.normal = inVertices[inVertexIndex].normal;
+                
+                uint16_t indexToMatchingVertex;                
+                bool found = GetSimilarVertexIndex_Fast(packedVertex, VertexToOutIndex, indexToMatchingVertex);                
+
+                bool matchingVertexFound = GetSimilarPackedVertexIndex_Slow(convert::ConvertToVec3(inVertices[inVertexIndex].position), inVertices[inVertexIndex].uv, inVertices[inVertexIndex].normal, outVertices, indexToMatchingVertex);
+
+                if (matchingVertexFound) // A similar vertex is already in the new OUTPUT Vertex buffer, use that!
+                {
+                    outIndices.push_back(indexToMatchingVertex); // refer to existing vertex+vertexweight
+
+                    // Average the tangents and the bitangents
+                    outVertices[indexToMatchingVertex].tangent = sm::Vector3(outVertices[indexToMatchingVertex].tangent) + sm::Vector3(inVertices[inVertexIndex].tangent);
+                    outVertices[indexToMatchingVertex].bitangent = sm::Vector3(outVertices[indexToMatchingVertex].bitangent) + sm::Vector3(inVertices[inVertexIndex].bitangent);
+
+                    outVertexRemap.push_back(VERTEX_DISCARDED); // this a duplicate                    
+                }
+                else // No matching vertex found, add a vertex from the INPUT vertex buffer
+                {
+                    outVertices.push_back(inVertices[inVertexIndex]);
+
+                    uint16_t newVertexIndex = (uint16_t)outVertices.size() - 1;
+                    outIndices.push_back(newVertexIndex);
+
+                    outVertexRemap.push_back(newVertexIndex);
+                }
             }
         }
 
@@ -493,7 +390,7 @@ namespace wrapdll
             };
         };
 
-        static bool getSimilarVertexIndex_fast(
+        static bool GetSimilarVertexIndex_Fast(
             PackedVertex& packed,
             std::map<PackedVertex, unsigned short>& VertexToOutIndex,
             unsigned short& result
@@ -507,38 +404,40 @@ namespace wrapdll
                 return true;
             }
         }
+
+
         static inline void indexVBO_TBN_Fast_Packed(
-            const std::vector<PackedCommonVertex>& in_vertices,            
+            const std::vector<PackedCommonVertex>& inVertices,
             std::vector<uint16_t>& out_indices,
             std::vector<PackedCommonVertex>& out_vertices
-        ) {            
+        ) {
             std::map<PackedVertex, unsigned short> VertexToOutIndex;
-                       
+
             // For each input vertex
-            for (unsigned int i = 0; i < in_vertices.size(); i++) 
+            for (unsigned int i = 0; i < inVertices.size(); i++)
             {
                 PackedVertex packedVertex;
-                packedVertex.position = convert::ConvertToVec3(in_vertices[i].position);
-                packedVertex.uv = in_vertices[i].uv;
-                packedVertex.normal = in_vertices[i].normal;
+                packedVertex.position = convert::ConvertToVec3(inVertices[i].position);
+                packedVertex.uv = inVertices[i].uv;
+                packedVertex.normal = inVertices[i].normal;
 
                 // Try to find a similar vertex in out_XXXX
                 uint16_t index;
 
                 //bool found = getSimilarVertexIndex(packed, VertexToOutIndex, index);
                 //bool found = getSimilarVertexIndex(packed, VertexToOutIndex, index);
-                bool found = getSimilarVertexIndex_fast(packedVertex, VertexToOutIndex, index);
+                bool found = GetSimilarVertexIndex_Fast(packedVertex, VertexToOutIndex, index);
 
                 if (found) { // A similar vertex is already in the VBO, use it instead !
                     out_indices.push_back(index);
 
                     // Average the tangents and the bitangents
-                    out_vertices[index].tangent = sm::Vector3(out_vertices[index].tangent) + sm::Vector3(in_vertices[i].tangent);
-                    out_vertices[index].bitangent = sm::Vector3(out_vertices[index].bitangent) + sm::Vector3(in_vertices[i].bitangent);
+                    out_vertices[index].tangent = sm::Vector3(out_vertices[index].tangent) + sm::Vector3(inVertices[i].tangent);
+                    out_vertices[index].bitangent = sm::Vector3(out_vertices[index].bitangent) + sm::Vector3(inVertices[i].bitangent);
                 }
-                else 
+                else
                 { // If not, it needs to be added in the output data.
-                    out_vertices.push_back(in_vertices[i]);
+                    out_vertices.push_back(inVertices[i]);
 
                     uint16_t newindex = (uint16_t)out_vertices.size() - 1;
 
@@ -548,34 +447,40 @@ namespace wrapdll
             }
         }
 
-
-        static inline bool is_near(float v1, float v2) {
+        /// <summary>
+        /// Compare two floats within some tolerance
+        /// Used for "slow vertex search"
+        /// </summary>        
+        static inline bool IsNear(float v1, float v2) {
             return fabs(v1 - v2) < 0.00001f;
         }
 
-        // Searches through all already-exported vertices
-        // for a similar one.
-        // Similar = same position + same UVs + same normal
+        /// <summary>
+        /// Searches through all the so-far picked vertices
+        /// for a similar vertex 
+        /// Similar = similar position && similar UVs && similar normal
+        /// within some abritary tolerance
+        /// </summary>        
         static inline bool getSimilarVertexIndex(
-            const DirectX::SimpleMath::Vector3& in_vertex,
-            const DirectX::SimpleMath::Vector2& in_uv,
-            const DirectX::SimpleMath::Vector3& in_normal,
-            std::vector<DirectX::SimpleMath::Vector3>& out_vertices,
-            std::vector<DirectX::SimpleMath::Vector2>& out_uvs,
-            std::vector<DirectX::SimpleMath::Vector3>& out_normals,
+            const sm::Vector3& in_vertex,
+            const sm::Vector2& in_uv,
+            const sm::Vector3& in_normal,
+            std::vector<sm::Vector3>& out_vertices,
+            std::vector<sm::Vector2>& out_uvs,
+            std::vector<sm::Vector3>& out_normals,
             uint16_t& result
         ) {
             // Lame linear search
             for (unsigned int i = 0; i < out_vertices.size(); i++) {
                 if (
-                    is_near(in_vertex.x, out_vertices[i].x) &&
-                    is_near(in_vertex.y, out_vertices[i].y) &&
-                    is_near(in_vertex.z, out_vertices[i].z) &&
-                    is_near(in_uv.x, out_uvs[i].x) &&
-                    is_near(in_uv.y, out_uvs[i].y) &&
-                    is_near(in_normal.x, out_normals[i].x) &&
-                    is_near(in_normal.y, out_normals[i].y) &&
-                    is_near(in_normal.z, out_normals[i].z)
+                    IsNear(in_vertex.x, out_vertices[i].x) &&
+                    IsNear(in_vertex.y, out_vertices[i].y) &&
+                    IsNear(in_vertex.z, out_vertices[i].z) &&
+                    IsNear(in_uv.x, out_uvs[i].x) &&
+                    IsNear(in_uv.y, out_uvs[i].y) &&
+                    IsNear(in_normal.x, out_normals[i].x) &&
+                    IsNear(in_normal.y, out_normals[i].y) &&
+                    IsNear(in_normal.z, out_normals[i].z)
                     ) {
                     result = i;
                     return true;
@@ -586,10 +491,17 @@ namespace wrapdll
             return false;
         }
 
-        static inline bool getSimilarPackedVertexIndex_Slow(
-            const DirectX::SimpleMath::Vector3& in_vertex,
-            const DirectX::SimpleMath::Vector2& in_uv,
-            const DirectX::SimpleMath::Vector3& in_normal,
+        /// <summary>
+        /// A lot of code/help from http://www.opengl-tutorial.org/download/
+        /// Searches through all the so-far picked vertices
+        /// for a similar vertex 
+        /// Similar = similar position && similar UVs && similar normal
+        /// within some abritary tolerance
+        /// </summary>        
+        static inline bool GetSimilarPackedVertexIndex_Slow(
+            const sm::Vector3& in_vertex,
+            const sm::Vector2& in_uv,
+            const sm::Vector3& in_normal,
             std::vector<PackedCommonVertex>& out_vertices,
 
             uint16_t& result
@@ -597,14 +509,14 @@ namespace wrapdll
             // Lame linear search
             for (unsigned int i = 0; i < out_vertices.size(); i++) {
                 if (
-                    is_near(in_vertex.x, out_vertices[i].position.x) &&
-                    is_near(in_vertex.y, out_vertices[i].position.y) &&
-                    is_near(in_vertex.z, out_vertices[i].position.z) &&
-                    is_near(in_uv.x, out_vertices[i].uv.x) &&
-                    is_near(in_uv.y, out_vertices[i].uv.y) &&
-                    is_near(in_normal.x, out_vertices[i].normal.x) &&
-                    is_near(in_normal.y, out_vertices[i].normal.y) &&
-                    is_near(in_normal.z, out_vertices[i].normal.z)
+                    IsNear(in_vertex.x, out_vertices[i].position.x) &&
+                    IsNear(in_vertex.y, out_vertices[i].position.y) &&
+                    IsNear(in_vertex.z, out_vertices[i].position.z) &&
+                    IsNear(in_uv.x, out_vertices[i].uv.x) &&
+                    IsNear(in_uv.y, out_vertices[i].uv.y) &&
+                    IsNear(in_normal.x, out_vertices[i].normal.x) &&
+                    IsNear(in_normal.y, out_vertices[i].normal.y) &&
+                    IsNear(in_normal.z, out_vertices[i].normal.z)
                     ) {
                     result = i;
                     return true;
@@ -616,49 +528,9 @@ namespace wrapdll
         }
 
 
-    public:
-
-        void indexVBO_TBN(
-            std::vector<sm::Vector3>& in_vertices,
-            std::vector<sm::Vector2>& in_uvs,
-            std::vector<sm::Vector3>& in_normals,
-            std::vector<sm::Vector3>& in_tangents,
-            std::vector<sm::Vector3>& in_bitangents,
-
-            std::vector<unsigned short>& out_indices,
-            std::vector<sm::Vector3>& out_vertices,
-            std::vector<sm::Vector2>& out_uvs,
-            std::vector<sm::Vector3>& out_normals,
-            std::vector<sm::Vector3>& out_tangents,
-            std::vector<sm::Vector3>& out_bitangents
-        ) {
-            // For each input vertex
-            for (unsigned int i = 0; i < in_vertices.size(); i++) {
-
-                // Try to find a similar vertex in out_XXXX
-                unsigned short index;
-                bool found = getSimilarVertexIndex(in_vertices[i], in_uvs[i], in_normals[i], out_vertices, out_uvs, out_normals, index);
-
-                if (found) { // A similar vertex is already in the VBO, use it instead !
-                    out_indices.push_back(index);
-
-                    // Average the tangents and the bitangents
-                    out_tangents[index] += in_tangents[i];
-                    out_bitangents[index] += in_bitangents[i];
-                }
-                else { // If not, it needs to be added in the output data.
-                    out_vertices.push_back(in_vertices[i]);
-                    out_uvs.push_back(in_uvs[i]);
-                    out_normals.push_back(in_normals[i]);
-                    out_tangents.push_back(in_tangents[i]);
-                    out_bitangents.push_back(in_bitangents[i]);
-                    out_indices.push_back((unsigned short)out_vertices.size() - 1);
-                }
-            }
-        }
-      
-
-
+        /// <summary>
+        /// For use in the "EVEN-faster simiar vertex search", which is not writting yet
+        /// </summary>
         struct PackedVertexExt {
 
         private:
@@ -699,6 +571,8 @@ namespace wrapdll
             {
                 return memcmp((void*)this, (void*)&that, sizeof(PackedVertex)) > 0;
             };
+        
+        
         };
     };
 };

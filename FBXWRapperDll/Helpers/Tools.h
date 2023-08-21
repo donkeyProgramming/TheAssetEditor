@@ -82,7 +82,7 @@ namespace tools
         /// </summary>
         void ResetLocalTime()
         {
-            m_startTime = std::chrono::steady_clock::now();
+            m_startTime = std::chrono::high_resolution_clock::now();
         }
 
 		/// <summary>
@@ -90,15 +90,18 @@ namespace tools
 		/// </summary>
 		/// <returns>"state time" - "now" </returns>
 		double GetLocalTime() 
-		{
-            std::chrono::duration<double> timeElapsed = std::chrono::steady_clock::now() - m_startTime;                       
-
-            double secondsElapsed =timeElapsed.count();
-            return secondsElapsed;
+		{            
+            auto timeElapsed = std::chrono::high_resolution_clock::now();                     
+            
+            auto value = std::chrono::duration<float, std::chrono::seconds::period>(timeElapsed-m_startTime);
+            
+            float retValue = value.count();
+                        
+            return retValue;
 		}
 
 	private:
-        std::chrono::time_point<std::chrono::steady_clock> m_startTime;		
+        std::chrono::steady_clock::time_point m_startTime;		
 	};
 
 }

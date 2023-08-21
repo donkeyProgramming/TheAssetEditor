@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
-using AssetManagement.MeshHandling;
+using AssetManagement.MeshProcessing.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.LodHeader;
@@ -11,8 +11,9 @@ using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using Microsoft.Xna.Framework;
+using View3D.SceneNodes;
 using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
-namespace AssetManagement.GenericFormats
+namespace AssetManagement.GenericFormats.AssetBuilders
 {
     public class RmvFileBuilder
     {
@@ -24,34 +25,34 @@ namespace AssetManagement.GenericFormats
         /// <returns>Internal RMV2 file class</returns>
         public static RmvFile ConvertToRmv2(List<PackedMesh> packedMeshes, AnimationFile skeletonFile)
         {
-            MaterialFactory materialFactory = MaterialFactory.Create();
+            var materialFactory = MaterialFactory.Create();
 
             var lodCount = 4; // make 4 identical LODs for compatibility reasons
 
-            RmvFile outputFile = new RmvFile()
+            var outputFile = new RmvFile()
             {
                 Header = new RmvFileHeader()
                 {
                     _fileType = Encoding.ASCII.GetBytes("RMV2"),
-                    SkeletonName = (skeletonFile != null) ? skeletonFile.Header.SkeletonName : "",
+                    SkeletonName = skeletonFile != null ? skeletonFile.Header.SkeletonName : "",
                     Version = RmvVersionEnum.RMV2_V6,
                     LodCount = (uint)lodCount,
                 },
                 LodHeaders = new RmvLodHeader[lodCount],
             };
 
-            for (int i = 0; i < lodCount; i++)
+            for (var i = 0; i < lodCount; i++)
             {
                 outputFile.LodHeaders[i] = new Rmv2LodHeader_V6() { QualityLvl = 0, LodCameraDistance = 0 };
             }
 
             outputFile.ModelList = new RmvModel[lodCount][];
 
-            for (int lodIndex = 0; lodIndex < lodCount; lodIndex++)
+            for (var lodIndex = 0; lodIndex < lodCount; lodIndex++)
             {
                 outputFile.ModelList[lodIndex] = new RmvModel[packedMeshes.Count];
 
-                for (int meshIndex = 0; meshIndex < packedMeshes.Count; meshIndex++)
+                for (var meshIndex = 0; meshIndex < packedMeshes.Count; meshIndex++)
                 {
                     var currentMesh = new RmvModel();
                     outputFile.ModelList[lodIndex][meshIndex] = ConvertPackedMeshToRmvModel(materialFactory, outputFile, packedMeshes[meshIndex], skeletonFile);
@@ -69,7 +70,7 @@ namespace AssetManagement.GenericFormats
             { return; }
 
 
-            for (int vertexWeightIndex = 0; vertexWeightIndex < srcMesh.VertexWeights.Count; vertexWeightIndex++)
+            for (var vertexWeightIndex = 0; vertexWeightIndex < srcMesh.VertexWeights.Count; vertexWeightIndex++)
             {
                 CommonWeightProcessor.AddWeightToVertexByBoneName(
                     skeletonFile,
@@ -117,76 +118,81 @@ namespace AssetManagement.GenericFormats
 
         private static RmvMesh ConvertPackedMeshToRmvMesh(MaterialFactory materialFactory, VertexFormat vertexFormat, PackedMesh packedInputMesh, AnimationFile skeletonFile)
         {
-            RmvMesh rmv2Mesh = new RmvMesh();
+            var rmv2Mesh = new RmvMesh();
             rmv2Mesh.IndexList = new ushort[packedInputMesh.Indices.Count];
-            rmv2Mesh.VertexList = new CommonVertex[packedInputMesh.Vertices.Count];
+            rmv2Mesh.VertexList = new CommonVertex[packedInputMesh.Vertices.Count];                      
 
-            var originalVerticesPacked = MakePackedVertices(vertexFormat, packedInputMesh, skeletonFile);
-
-            rmv2Mesh.VertexList = originalVerticesPacked.ToArray();
+            rmv2Mesh.VertexList = MakeCommonVertices(vertexFormat, packedInputMesh, skeletonFile).ToArray();
             rmv2Mesh.IndexList = packedInputMesh.Indices.ToArray();
+
+            if (skeletonFile == null)
+            {
+                return MakeStatic(rmv2Mesh); // no skeleton, return static mesh
+            }
 
             ProcessMeshWeights(rmv2Mesh, packedInputMesh, skeletonFile);
 
-            // TODO: this a very clumsy way to do it, maybe the "weightCount" thing should be changed
-            if (skeletonFile != null)
-            {
-                foreach (var vertex in rmv2Mesh.VertexList)
-                {
-                    if (vertex.WeightCount == 0 || vertex.WeightCount > 4)
-                    {
-                        throw new System.Exception("weight count incorrect!!");
-                    }
+            SetWeightCounter(rmv2Mesh);
 
-                    vertex.WeightCount = 4;
-                }
-            }
             return rmv2Mesh;
         }
 
-        private static List<CommonVertex> MakePackedVertices(VertexFormat vertexFormat, PackedMesh packedInputMesh, AnimationFile skeletonFile)
+        /// <summary>
+        /// Sets the weight count to 4, also checks for invalid weights
+        /// </summary>
+        /// <param name="rmv2Mesh"></param>
+        /// <exception cref="System.Exception"></exception>
+        private static void SetWeightCounter(RmvMesh rmv2Mesh)
+        {
+            foreach (var vertex in rmv2Mesh.VertexList)
+            {
+                if (vertex.WeightCount == 0 || vertex.WeightCount > 4)
+                {
+                    throw new System.Exception("weight count incorrect!!");
+                }
+
+                vertex.WeightCount = 4;
+            }
+        }
+
+        /// <summary>
+        /// Makes the mesh into a static mesh "default", 
+        /// TODO: the whole weight-count thing, should be changed?
+        /// </summary>
+        /// <param name="rmvMesh"></param>
+        /// <returns></returns>
+        private static RmvMesh MakeStatic(RmvMesh rmvMesh)
+        {
+            foreach (var v in rmvMesh.VertexList)
+            {
+                v.WeightCount = 0;
+                v.BoneWeight = new float[0];
+                v.BoneIndex = new byte[0];    
+            }
+
+            return rmvMesh;
+        }
+
+
+        private static List<CommonVertex> MakeCommonVertices(VertexFormat vertexFormat, PackedMesh packedInputMesh, AnimationFile skeletonFile)
         {
             var vertices = new CommonVertex[packedInputMesh.Vertices.Count].ToList();
 
             for (var vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++)
             {
-                vertices[vertexIndex] = MakePackedVertex(
+                vertices[vertexIndex] = MakeCommonPackedVertex(
                    packedInputMesh.Vertices[vertexIndex].Position,
                    packedInputMesh.Vertices[vertexIndex].Normal,
                    packedInputMesh.Vertices[vertexIndex].Uv,
                    packedInputMesh.Vertices[vertexIndex].Tangent,
                    packedInputMesh.Vertices[vertexIndex].BiNormal,
-                   skeletonFile);
-
-                // TODO: remove?
-                //MakeVertexWeights(vertexFormat, packedInputMesh.Vertices[vertexIndex], vertices[vertexIndex]);
+                   skeletonFile);           
             }
 
             return vertices;
         }
-        // TODO: remove?
-
-        //private static void MakeVertexWeights(VertexFormat vertexFormat, ExtPackedCommonVertex packedInputVertex, CommonVertex outVertex)
-        //{
-        //    if (vertexFormat == VertexFormat.Static)
-        //    {
-        //        outVertex.WeightCount = 0;
-        //        outVertex.BoneIndex = new byte[0];
-        //        outVertex.BoneWeight = new float[0];
-        //        return;
-        //    }
-
-        //    for (int influenceIndex = 0; influenceIndex < 4; influenceIndex++)
-        //    {
-        //        outVertex.BoneIndex[influenceIndex] = (byte)packedInputVertex.influences[influenceIndex].boneIndex;
-        //        outVertex.BoneWeight[influenceIndex] = packedInputVertex.influences[influenceIndex].weight;
-        //    }
-
-        //    CommonWeightProcessor.SortVertexWeightsByWeightValue(outVertex);
-        //    CommonWeightProcessor.NormalizeVertexWeights(outVertex);
-        //}
-
-        private static CommonVertex MakePackedVertex(
+        
+        private static CommonVertex MakeCommonPackedVertex(
             XMFLOAT4 position,
             XMFLOAT3 normal,
             XMFLOAT2 textureCoords,

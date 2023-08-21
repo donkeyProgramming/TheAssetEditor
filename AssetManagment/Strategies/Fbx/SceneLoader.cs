@@ -1,4 +1,4 @@
-﻿using AssetManagement.GenericFormats;
+﻿using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
 using System;
 
@@ -15,7 +15,7 @@ namespace AssetManagement.Strategies.Fbx
             //{
                 fbxSceneLoader = FBXSeneLoaderServiceDLL.CreateSceneFBX(fileName);
                 var ptrNativeScene = FBXSeneLoaderServiceDLL.ProcessAndFillScene(fbxSceneLoader);
-                var newSceneContainter = SceneMarshallerToManaged.ToManaged(ptrNativeScene);                  
+                var newSceneContainter = SceneMarshaller.ToManaged(ptrNativeScene);                  
 
                 return newSceneContainter;
             //}

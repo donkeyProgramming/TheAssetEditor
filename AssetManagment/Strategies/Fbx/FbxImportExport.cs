@@ -1,11 +1,11 @@
-﻿using AssetManagement.GenericFormats;
-using CommonControls.FileTypes.PackFiles.Models;
+﻿using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Interfaces.AssetManagement;
 using System.IO;
 using AssetManagement.Strategies.Fbx.ImportDialog.DataModels;
 using CommonControls.Services;
 using AssetManagement.Strategies.Fbx.ImportDialog.ViewModels;
+using AssetManagement.GenericFormats.AssetBuilders;
 
 namespace AssetManagement.Strategies.Fbx
 {
@@ -17,11 +17,11 @@ namespace AssetManagement.Strategies.Fbx
 
         public FbxImportExport(PackFileService pfs)
         {
-            _packFileService = pfs;            
+            _packFileService = pfs;
         }
 
         public PackFile ImportAsset(string diskFilePath)
-        {        
+        {
             var sceneContainer = SceneLoader.LoadScene(diskFilePath);
             if (sceneContainer == null)
                 return null;
@@ -34,8 +34,10 @@ namespace AssetManagement.Strategies.Fbx
             };
 
             if (!FBXSettingsViewModel.ShowImportDialog(_packFileService, fbxSettings))
+            {
                 return null;
-                            
+            }
+
             var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, fbxSettings.SkeletonFile);
             var factory = ModelFactory.Create();
             var buffer = factory.Save(rmv2File);

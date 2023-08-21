@@ -10,9 +10,6 @@ using CommonControls.FileTypes.Animation;
 using AssetManagement.Strategies.Fbx.ImportDialog.DataModels;
 using AssetManagement.Strategies.Fbx.ImportDialog.Views;
 
-// TODO: clean "using"s (EVERYWHERE, not just here)
-
-
 // finish "rationaliztion" this ModelView, around the concept of "FileInfoData" as input
 namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
 {

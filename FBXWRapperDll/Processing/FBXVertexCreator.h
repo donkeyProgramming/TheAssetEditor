@@ -35,10 +35,7 @@ namespace wrapdll{
 			outVertex.normal.z = static_cast<float>(vNormalVector.mData[2]);
 
 			outVertex.uv.x = static_cast<float>(UVmap1.mData[0]);
-			outVertex.uv.y = static_cast <float>(UVmap1.mData[1]);
-        
-            // TODO: remove?
-            //CopyVertexWeighting(ctrlPointInfluences, outVertex);
+			outVertex.uv.y = static_cast <float>(UVmap1.mData[1]);        
 
 			return outVertex;
         }
