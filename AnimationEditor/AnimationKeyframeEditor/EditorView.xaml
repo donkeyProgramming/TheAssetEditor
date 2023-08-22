@@ -64,6 +64,11 @@
             <Button Grid.Column="3" Content="Rotate"  Click="{s:MethodBinding EnterRotateMode}"  Margin="2,0,2,0" />
             <Button Grid.Column="4" Content="Scale"  Click="{s:MethodBinding EnterScaleMode}" Margin="2,0,0,0"/>
         </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        </Grid>
+
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
 
             <Grid.ColumnDefinitions>
@@ -75,8 +80,46 @@
 
             <Button Grid.Column="0" Content="Copy Pose"  Click="{s:MethodBinding CopyCurrentPose}" Margin="2,0,0,0"/>
             <Button Grid.Column="1" Content="Paste Pose"  Click="{s:MethodBinding PasteIntoCurrentFrame}" Margin="2,0,0,0" />
-            <Button Grid.Column="2" Content="Paste Pose from previously selected nodes"  Click="{s:MethodBinding PasteIntoSelectedCurrentNode}" Margin="2,0,0,0" />
+            <Button Grid.Column="2" Content="Paste Pose into previously selected nodes"  Click="{s:MethodBinding PasteIntoSelectedCurrentNode}" Margin="2,0,0,0" />
             <Button Grid.Column="3" Content="Copy n paste previous edited nodes"  Click="{s:MethodBinding PastePreviousEditedNodesIntoCurrentPose}" Margin="2,0,0,0" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        </Grid>
+        
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Copy Pose into global clipboard"  Click="{s:MethodBinding CopyPoseToClipboard}" Margin="2,0,0,0"/>
+            <Button Grid.Column="1" Content="Paste Pose from global clipboard"  Click="{s:MethodBinding PastePoseFromClipboard}" Margin="2,0,0,0" />
+            <Button Grid.Column="2" Content="Paste Pose into previously selected nodes from global clipboard"  Click="{s:MethodBinding PasteIntoSelectedCurrentNodeFromClipboard}" Margin="2,0,0,0" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Label>In range operation:</Label>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Copy Pose into global clipboard..."  Click="{s:MethodBinding CopyPoseInRangeToClipboard}" Margin="2,0,0,0"/>
+            <Button Grid.Column="1" Content="Paste Pose from global clipboard..."  Click="{s:MethodBinding PastePoseInRangeFromClipboard}" Margin="2,0,0,0" />
+            <Button Grid.Column="2" Content="Paste Pose into previously selected nodes from global clipboard..."  Click="{s:MethodBinding PasteIntoInRangeSelectedCurrentNodeFromClipboard}" Margin="2,0,0,0" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
         </Grid>
 
         <Button DockPanel.Dock="Top" Margin="5" Content="Save" Click="{s:MethodBinding SaveSkeletonAction}"/>
