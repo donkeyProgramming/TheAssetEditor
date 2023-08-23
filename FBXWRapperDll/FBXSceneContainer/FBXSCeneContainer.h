@@ -14,13 +14,11 @@
 #include <string.h>
 
 #include "..\Base\BaseInteropObject.h"
-
 #include "..\Logging\Logging.h"
 #include "..\DataStructures\PackedMeshStructs.h"
 #include "..\Helpers\FBXHelperFileUtil.h"
 #include "..\Helpers\Geometry\FBXNodeSearcher.h"
-#include "..\DataStructures\FileInfoStruct.h"
-
+#include "..\DataStructures\FileInfoData.h"
 #include "..\DLLDefines.h"
 
 namespace wrapdll
@@ -35,21 +33,19 @@ namespace wrapdll
 #endif // _DEBUG			
 		};
 
-		void GetVertices(int meshindex, PackedCommonVertex** ppVertices, int* itemCount)
-		{
-			*itemCount = static_cast<int>(m_packedMeshes[meshindex].vertices.size());
-			*ppVertices = m_packedMeshes[meshindex].vertices.data();
-		};
+        void GetVertices(int meshindex, PackedCommonVertex** ppVertices, int* itemCount);
 
-		void GetIndices(int meshindex, uint16_t** ppVertices, int* itemCount)
-		{
-			*itemCount = static_cast<int>(m_packedMeshes[meshindex].indices.size());
-			*ppVertices = m_packedMeshes[meshindex].indices.data();
-		};
+        void GetIndices(int meshindex, uint16_t** ppVertices, int* itemCount);
 
 		void GetVertexWeights(int meshindex, VertexWeight** ppVertices, int* itemCount)
 		{
 			*itemCount = static_cast<int>(m_packedMeshes[meshindex].vertexWeights.size());
+            if (*itemCount == 0)
+            {
+                *ppVertices = nullptr; // STL standard, empty std::vecter.data() not guaranteed to by "nullprt"?
+                return;
+            }
+
 			*ppVertices = m_packedMeshes[meshindex].vertexWeights.data();
 		};
 
@@ -63,7 +59,7 @@ namespace wrapdll
 			return m_skeletonName;
 		};
 
-		FileInfoStruct& GetFileInfo()
+		FbxFileInfoData& GetFileInfo()
 		{
             
             // TODO: file out rest and display in "GileInfoView"
@@ -73,7 +69,7 @@ namespace wrapdll
 
 	private:
         
-        FileInfoStruct m_fileInfoStruct;
+        FbxFileInfoData m_fileInfoStruct;
                 
 		std::string m_skeletonName = "";
 		std::vector<PackedMesh> m_packedMeshes;		

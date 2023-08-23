@@ -38,7 +38,7 @@ extern "C" // not really needed but block looks nice/readable:)
 	};
 
 	FBXWRAPPERDLL_API
-	extern FileInfoStruct* GetFileInfo(wrapdll::FBXSCeneContainer* pInstance)
+	extern FbxFileInfoData* GetFileInfo(wrapdll::FBXSCeneContainer* pInstance)
 	{
         return &pInstance->GetFileInfo();
 	};

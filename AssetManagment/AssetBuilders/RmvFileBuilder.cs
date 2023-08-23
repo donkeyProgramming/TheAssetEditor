@@ -13,7 +13,7 @@ using CommonControls.FileTypes.RigidModel.Vertex;
 using Microsoft.Xna.Framework;
 using View3D.SceneNodes;
 using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
-namespace AssetManagement.GenericFormats.AssetBuilders
+namespace AssetManagement.AssetBuilders
 {
     public class RmvFileBuilder
     {
@@ -120,7 +120,7 @@ namespace AssetManagement.GenericFormats.AssetBuilders
         {
             var rmv2Mesh = new RmvMesh();
             rmv2Mesh.IndexList = new ushort[packedInputMesh.Indices.Count];
-            rmv2Mesh.VertexList = new CommonVertex[packedInputMesh.Vertices.Count];                      
+            rmv2Mesh.VertexList = new CommonVertex[packedInputMesh.Vertices.Count];
 
             rmv2Mesh.VertexList = MakeCommonVertices(vertexFormat, packedInputMesh, skeletonFile).ToArray();
             rmv2Mesh.IndexList = packedInputMesh.Indices.ToArray();
@@ -167,7 +167,7 @@ namespace AssetManagement.GenericFormats.AssetBuilders
             {
                 v.WeightCount = 0;
                 v.BoneWeight = new float[0];
-                v.BoneIndex = new byte[0];    
+                v.BoneIndex = new byte[0];
             }
 
             return rmvMesh;
@@ -186,12 +186,12 @@ namespace AssetManagement.GenericFormats.AssetBuilders
                    packedInputMesh.Vertices[vertexIndex].Uv,
                    packedInputMesh.Vertices[vertexIndex].Tangent,
                    packedInputMesh.Vertices[vertexIndex].BiNormal,
-                   skeletonFile);           
+                   skeletonFile);
             }
 
             return vertices;
         }
-        
+
         private static CommonVertex MakeCommonPackedVertex(
             XMFLOAT4 position,
             XMFLOAT3 normal,

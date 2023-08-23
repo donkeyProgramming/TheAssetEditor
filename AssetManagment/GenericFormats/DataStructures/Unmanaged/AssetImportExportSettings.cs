@@ -47,6 +47,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
         public int materialCount;
         public int animationsCount;
         public int boneCount;
+        public bool containsDerformingData;
     };
 
     [StructLayout(LayoutKind.Sequential)]

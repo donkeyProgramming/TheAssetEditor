@@ -12,15 +12,15 @@ void wrapdll::MeshProcessor::DoTangentBasisAndIndexing(PackedMesh& destMesh)
     using namespace DirectX;
 
     // -- input
-    vector<SimpleMath::Vector3> inVertices;
-    vector<SimpleMath::Vector2> inUVs;
-    vector<SimpleMath::Vector3> inNormals;
+    vector<sm::Vector3> inVertices;
+    vector<sm::Vector2> inUVs;
+    vector<sm::Vector3> inNormals;
 
-    vector<DirectX::SimpleMath::Vector3> outVertices;
-    vector<DirectX::SimpleMath::Vector2> outUVs;
-    vector<DirectX::SimpleMath::Vector3> outNormals;
-    vector<DirectX::SimpleMath::Vector3> outTangents;
-    vector<DirectX::SimpleMath::Vector3> outBitangents;
+    vector<sm::Vector3> outVertices;
+    vector<sm::Vector2> outUVs;
+    vector<sm::Vector3> outNormals;
+    vector<sm::Vector3> outTangents;
+    vector<sm::Vector3> outBitangents;
 
     vector<uint16_t> outIndices;
 

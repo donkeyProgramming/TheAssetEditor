@@ -455,7 +455,7 @@
     <ClInclude Include="fbxsdk\include\libxml2\libxml\xpath.h" />
     <ClInclude Include="fbxsdk\include\libxml2\libxml\xpathInternals.h" />
     <ClInclude Include="fbxsdk\include\libxml2\libxml\xpointer.h" />
-    <ClInclude Include="DataStructures\FileInfoStruct.h" />
+    <ClInclude Include="DataStructures\FileInfoData.h" />
     <ClInclude Include="Processing\FBXMeshCreator.h" />
     <ClInclude Include="Processing\FBXVertexCreator.h" />
     <ClInclude Include="Services\FBXSceneLoaderService.h" />
@@ -474,7 +474,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="DataStructures\FileInfoStruct.cpp" />
+    <ClCompile Include="DataStructures\FileInfoData.cpp" />
     <ClCompile Include="Processing\FBXMeshCreator.cpp" />
     <ClCompile Include="Processing\FBXVertexCreator.cpp" />
     <ClCompile Include="Services\FBXSceneLoaderService.cpp" />

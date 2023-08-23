@@ -1,7 +1,7 @@
 #include "FBXMeshCreator.h"
 #include "FBXMeshCreator.h"
 
-bool wrapdll::FBXMeshCreator::MakeUnindexPackedMesh(fbxsdk::FbxScene* poFbxScene, fbxsdk::FbxMesh* poFbxMesh, PackedMesh& destMesh, const std::vector<ControlPointInfluence>& controlPointerInfluences)
+bool wrapdll::FBXMeshCreator::MakeUnindexedPackedMesh(fbxsdk::FbxScene* poFbxScene, fbxsdk::FbxMesh* poFbxMesh, PackedMesh& destMesh, const std::vector<ControlPointInfluence>& controlPointerInfluences)
 {
     if (!poFbxScene || !poFbxMesh)
         return LogActionError("Mesh processing Failed scene/mesh == nullptr!")

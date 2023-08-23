@@ -12,7 +12,7 @@ namespace wrapdll
     class FBXMeshCreator
     {
     public:
-        static bool MakeUnindexPackedMesh(
+        static bool MakeUnindexedPackedMesh (
             fbxsdk::FbxScene* poFbxScene,
             fbxsdk::FbxMesh* poFbxMesh,
             PackedMesh& destMesh,

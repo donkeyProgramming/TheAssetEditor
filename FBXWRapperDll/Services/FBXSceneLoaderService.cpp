@@ -24,15 +24,15 @@ wrapdll::FBXImporterService* wrapdll::FBXImporterService::CreateFromDiskFile(con
 
 wrapdll::FBXSCeneContainer* wrapdll::FBXImporterService::ProcessAndFillScene()
 {      
+    tools::SystemClock processingTimerClock;
+
     auto& destPackedMeshes = m_sceneContainer.GetMeshes();
 
     std::vector<fbxsdk::FbxMesh*> fbxMeshList;
     FBXNodeSearcher::FindMeshesInScene(m_pFbxScene, fbxMeshList);
 
     // TODO: check that "skeletonName" is only set once and in the proper place
-    m_sceneContainer.GetSkeletonName() = FBXNodeSearcher::FetchSkeletonNameFromScene(m_pFbxScene);
-
-    FillFileInfo();
+    m_sceneContainer.GetSkeletonName() = FBXNodeSearcher::FetchSkeletonNameFromScene(m_pFbxScene);    
 
     destPackedMeshes.clear();
     destPackedMeshes.resize(fbxMeshList.size());
@@ -41,26 +41,29 @@ wrapdll::FBXSCeneContainer* wrapdll::FBXImporterService::ProcessAndFillScene()
         std::vector<ControlPointInfluence> vertexToControlPoint;
         FBXSkinProcessorService::ProcessSkin(fbxMeshList[meshIndex], vertexToControlPoint);
 
-        FBXMeshCreator::MakeUnindexPackedMesh(m_pFbxScene, fbxMeshList[meshIndex], destPackedMeshes[meshIndex], vertexToControlPoint);
+        FBXMeshCreator::MakeUnindexedPackedMesh(m_pFbxScene, fbxMeshList[meshIndex], destPackedMeshes[meshIndex], vertexToControlPoint);
 
-        tools::SystemClock clock;        
+        tools::SystemClock tangentsClock;        
         LogActionColor("Doing Tangents/Indexing");
         MeshProcessor::DoFinalMeshProcessing(destPackedMeshes[meshIndex]);        
-        LogActionColor("Done Tangents/Indexing. Time: " + std::to_string(clock.GetLocalTime()) + " seconds.");
+        LogActionColor("Done Tangents/Indexing. Time: " + std::to_string(tangentsClock.GetLocalTime()) + " seconds.");
     }
+
+    LogActionColor("Scene Loading Done. Processing Time: " + std::to_string(processingTimerClock.GetLocalTime()) + " seconds.");
+
+    FillFileInfo();
 
     return &m_sceneContainer;
 }
 
 void wrapdll::FBXImporterService::FillFileInfo()
 {
-    auto& fileInfo = m_sceneContainer.GetFileInfo();
-    
+    auto& fileInfo = m_sceneContainer.GetFileInfo(); 
+        
     strcpy_s<255>(fileInfo.units, m_pFbxScene->GetGlobalSettings().GetSystemUnit().GetScaleFactorAsString_Plurial());    
-    strcpy_s<255>(fileInfo.skeletonName, m_sceneContainer.GetSkeletonName().c_str());    
+    strcpy_s<255>(fileInfo.skeletonName, m_sceneContainer.GetSkeletonName().c_str());        
 
-    
-	// use the recursive node search to get the count of differetn node types
+	// use the recursive node search to get the count of different node types
     std::vector<fbxsdk::FbxNode*> fbxallNodes;
     FBXNodeSearcher::FindAllNodes(m_pFbxScene->GetRootNode(), fbxallNodes);
     
@@ -84,6 +87,13 @@ void wrapdll::FBXImporterService::FillFileInfo()
 
     fileInfo.scaleFatorToMeters = static_cast<float>(m_pFbxScene->GetGlobalSettings().GetSystemUnit().GetConversionFactorTo(fbxsdk::FbxSystemUnit::m));
     fileInfo.elementCount = m_pFbxScene->GetNodeCount();
+ 
+    // set "is there any weighting(deformation) data" flag
+    // TODO: maybe to this more elegantly, during processing, maybe even test if the derformation data is valid
+    VertexWeight* pVertexWeights = nullptr;
+    int vertexWeightCount = 0; 
+    m_sceneContainer.GetVertexWeights(0, &pVertexWeights, &vertexWeightCount);
+    fileInfo.containsDerformationData = vertexWeightCount != 0;
 }
 
 // DLL exported methods

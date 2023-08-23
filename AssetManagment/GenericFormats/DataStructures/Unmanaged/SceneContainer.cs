@@ -2,7 +2,6 @@
 using Matrix = Microsoft.Xna.Framework.Matrix;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
-using System;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 
 namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
@@ -14,7 +13,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
         public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
         public Node RootNode { get; set; }
         public string SkeletonName { get; set; } // TODO: don't use NULL srings for skeleton name
-        public FileInfoData FileInfoData { get; set; } = new FileInfoData();
+        public FBXFileInfo FileInfoData { get; set; } = new FBXFileInfo();
     }
 
 

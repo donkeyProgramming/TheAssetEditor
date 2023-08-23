@@ -5,7 +5,7 @@ using System.IO;
 using AssetManagement.Strategies.Fbx.ImportDialog.DataModels;
 using CommonControls.Services;
 using AssetManagement.Strategies.Fbx.ImportDialog.ViewModels;
-using AssetManagement.GenericFormats.AssetBuilders;
+using AssetManagement.AssetBuilders;
 
 namespace AssetManagement.Strategies.Fbx
 {
@@ -38,7 +38,7 @@ namespace AssetManagement.Strategies.Fbx
                 return null;
             }
 
-            var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, fbxSettings.SkeletonFile);
+            var rmv2File = RmvFileBuilder.ConvertToRmv2(sceneContainer.Meshes, fbxSettings.SkeletonPackFile);
             var factory = ModelFactory.Create();
             var buffer = factory.Save(rmv2File);
 

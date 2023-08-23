@@ -232,12 +232,12 @@ namespace wrapdll
             const std::vector<sm::Vector3>& inBitangents,
 
             
-            std::vector<uint16_t>& out_indices,
-            std::vector<sm::Vector3>& out_vertices,
-            std::vector<sm::Vector2>& out_uvs,
-            std::vector<sm::Vector3>& out_normals,
-            std::vector<sm::Vector3>& out_tangents,
-            std::vector<sm::Vector3>& out_bitangents
+            std::vector<uint16_t>& outIndices,
+            std::vector<sm::Vector3>& outVertices,
+            std::vector<sm::Vector2>& outUVs,
+            std::vector<sm::Vector3>& outNormals,
+            std::vector<sm::Vector3>& outTangents,
+            std::vector<sm::Vector3>& outBitangents
         ) {
             //std::map<PackedCommonVertex, unsigned short> VertexToOutIndex;
 
@@ -253,37 +253,25 @@ namespace wrapdll
                 uint16_t index;
 
                 //bool found = getSimilarVertexIndex(packed, VertexToOutIndex, index);
-                bool found = getSimilarVertexIndex(inVertices[i], inUVs[i], inNormals[i], out_vertices, out_uvs, out_normals, index);
+                bool found = GetSimilarVertexIndex(inVertices[i], inUVs[i], inNormals[i], outVertices, outUVs, outNormals, index);
 
                 if (found) { // A similar vertex is already in the VBO, use it instead !
-                    out_indices.push_back(index);
+                    outIndices.push_back(index);
 
-                    // Average the tangents and the bitangents
-                    out_tangents[index] += inTangents[i];
-                    out_bitangents[index] += inBitangents[i];
-
-                    //avg_count[index]++;
+                    // Average the tangents and the bitangents, for "smoothing"
+                    outTangents[index] += inTangents[i];
+                    outBitangents[index] += inBitangents[i];                    
                 }
                 else { // If not, it needs to be added in the output data.
-                    out_vertices.push_back(inVertices[i]);
-                    out_uvs.push_back(inUVs[i]);
-                    out_normals.push_back(inNormals[i]);
-                    out_tangents.push_back(inTangents[i]);
-                    out_bitangents.push_back(inBitangents[i]);
+                    outVertices.push_back(inVertices[i]);
+                    outUVs.push_back(inUVs[i]);
+                    outNormals.push_back(inNormals[i]);
+                    outTangents.push_back(inTangents[i]);
+                    outBitangents.push_back(inBitangents[i]);
+                 
+                    uint16_t newindex = (uint16_t)outVertices.size() - 1;
 
-                    // TODO: remove?
-                    /*out_bone_weights.push_back(in_bone_weights[i]);
-                    out_bone_indices.push_back(in_bone_indices[i]);
-                    out_bone_names.push_back(in_bone_names[i]);*/
-
-                    uint16_t newindex = (uint16_t)out_vertices.size() - 1;
-
-                    out_indices.push_back(newindex);
-                    //VertexToOutIndex[packed] = newindex;
-
-                    //avg_count.push_back(1);
-                    // the index in the INPUT, for remapping
-                    //out_vertex_remap.push_back(i);
+                    outIndices.push_back(newindex);                    
                 }
             }
         }
@@ -461,7 +449,7 @@ namespace wrapdll
         /// Similar = similar position && similar UVs && similar normal
         /// within some abritary tolerance
         /// </summary>        
-        static inline bool getSimilarVertexIndex(
+        static inline bool GetSimilarVertexIndex(
             const sm::Vector3& in_vertex,
             const sm::Vector2& in_uv,
             const sm::Vector3& in_normal,

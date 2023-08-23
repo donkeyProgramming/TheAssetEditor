@@ -3,6 +3,9 @@ using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 
 namespace AssetManagement.GenericFormats.DataStructures.Managed
 {
+    /// <summary>
+    /// Storage for the X, Y, Z version data, FBX SDK uses
+    /// </summary>
     public class VersionStruct
     {
         public int X { set; get; }
@@ -11,10 +14,11 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
     }
 
     /// <summary>
+    /// "mirror" file info values, from the C++ FBX SDK side
     /// So far only class that uses the "copy from temp interop struct to proper classs" interface
     /// </summary>
-    public class FileInfoData : IMarshalable<ExtFileInfoStruct>
-    {
+    public class FBXFileInfo : IMarshalable<ExtFileInfoStruct>
+    { 
         public VersionStruct SdkVersionUsed { set; get; } = new VersionStruct();
         public string FileName { set; get; } = "this ass stuff better work"; // TODO: remove
         public string SkeletonName { set; get; }
@@ -25,6 +29,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
         public int BoneCount { set; get; }
         public int MaterialCount { set; get; }
         public int AnimationsCount { set; get; }
+        public bool ContainsDerformingData { set; get; }
 
         override public void FillStruct(out ExtFileInfoStruct destStruct)
         {
@@ -40,7 +45,9 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
             destStruct.materialCount = MaterialCount;
             destStruct.animationsCount = AnimationsCount;
             destStruct.boneCount = BoneCount;
+            destStruct.containsDerformingData = ContainsDerformingData;
         }
+
         override public void FillFromStruct(in ExtFileInfoStruct srcStruct)
         {
             SdkVersionUsed.X = srcStruct.sdkVersionUsed.x;
@@ -55,6 +62,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
             MaterialCount = srcStruct.materialCount;
             AnimationsCount = srcStruct.animationsCount;
             BoneCount = srcStruct.boneCount;
+            ContainsDerformingData = srcStruct.containsDerformingData;
         }
     }
 }
