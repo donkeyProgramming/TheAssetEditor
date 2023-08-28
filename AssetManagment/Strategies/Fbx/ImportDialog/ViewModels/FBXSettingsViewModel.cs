@@ -27,19 +27,10 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
             }
 
             set
-            {
-                // TODO: remove/edit, 
-                var DEBUG_VALUE = value;
-                // TODO: does it to be there, ? 
+            {                
                 Name = value;
             }
-        }
-
-        //// TODO: remove or not? iS it needed
-        //public override string ToString()
-        //{
-        //    return SkeletonPackFile != null ? SkeletonPackFile.Name : "{No Skeleton}";
-        //}
+        }                
 
         /// <summary>
         /// Creates a "No skeleton" element, for insertion into combobox
@@ -62,7 +53,7 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
         public FBXSettingsViewModel(PackFileService packFileSericcee, FbxSettingsModel fbxSettings)
         {
             _packFileService = packFileSericcee;
-            _inputFbxSettings = fbxSettings; // TODO: is this system you want to keep, it probably is?
+            _inputFbxSettings = fbxSettings; 
             FillFileInfoPanel();
             UpdateViewData();
         }
@@ -104,10 +95,8 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
                  return $"{actualBoneCount}";
             }
             set
-            { 
-              // TODO: test if any of this is needed for the "File Info Panel", which is readonly+write-once and if not use the simplest "get" syntax possible
-            /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/
-                ;
+            {               
+                _inputFbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged();                
             }
         }
 
@@ -117,9 +106,8 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
             {
                 return (_inputFbxSettings.FileInfoData.ContainsDerformingData) ? "Yes" : "No";
             }
-
-            // TODO: does any of this need to be there, when it is a 1 time set?
-            set { /*_fbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged()*/; }
+            
+            set { _inputFbxSettings.FileInfoData.SkeletonName = value; NotifyPropertyChanged(); }
         }
 
 
@@ -150,11 +138,12 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
             }
         }
 
-        private SkeletonElement _selectedBone;
-        public SkeletonElement BSkeletonComboxSelected // TODO: cleanup
-        {
-            get { return _selectedBone; }
-            set { SetAndNotify(ref _selectedBone, value);/* AnySkeletonSelected = true;*/ }
+        private SkeletonElement _selectedSkeleton;
+        
+        public SkeletonElement BSkeletonComboxSelected 
+        { 
+            get { return _selectedSkeleton; }
+            set { SetAndNotify(ref _selectedSkeleton, value);/*feature swichted off  AnySkeletonSelected = true;*/ }
         }
 
         private void FillFileInfoPanel()
@@ -184,24 +173,22 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                // TODO:  what is going on here??
-                //var diskFile = new SkeletonElement();
-                //diskFile.SkeletonPackFile = new PackFile(dialog.FileName, new FileSystemSource(dialog.FileName));
-
-                //BSkeketonComboBoxContent.Insert(0, diskFile);
-
-                //BSkeletonComboxSelected = diskFile;
+                // TODO:  what is going on here?? Check that is actually works
+                var diskFile = new SkeletonElement();
+                diskFile.SkeletonPackFile = new PackFile(dialog.FileName, new FileSystemSource(dialog.FileName));
+                BSkeketonComboBoxContent.Insert(0, diskFile);
+                BSkeletonComboxSelected = diskFile;
             }
         }
 
         /// <summary>
         /// moves data from storeage class into UI controls
         /// </summary>
-        private void UpdateViewData(/*FbxSettingsModel inSettingsModel*/) // TODO: Param needed, better to store from constructor? Or should FileInfoData be input, FbxSettigs output, DECIDE!!
+        private void UpdateViewData() 
         {         
-
             const string skeletonFolder = @"animations\skeletons\";
             const string animExtension = ".anim";
+
             var searchResult = _packFileService.FindAllFilesInDirectory(skeletonFolder);
 
             if (searchResult == null)
@@ -242,16 +229,6 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
                 outSettingsModel.SkeletonName = "";
                 outSettingsModel.SkeletonPackFile = null;
             }
-
-            // TODO: remove, if above is good!
-            //outSettingsModel.ApplyRigging = ApplyRigging;                  
-
-            //outSettingsModel.SkeletonFileName = 
-            //    (BSkeletonComboxSelected.SkeletonPackFile == null || !outSettingsModel.ApplyRigging) ? "" : BSkeletonComboxSelected.Name;
-
-            //outSettingsModel.SkeletonName = 
-            //    (BSkeletonComboxSelected.SkeletonPackFile == null || !outSettingsModel.ApplyRigging) ? "" : _inputFbxSettings.SkeletonName;
-
         }
 
         /// <summary>

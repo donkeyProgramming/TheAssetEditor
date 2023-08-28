@@ -12,7 +12,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
         public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
         public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
         public Node RootNode { get; set; }
-        public string SkeletonName { get; set; } // TODO: don't use NULL srings for skeleton name
+        public string SkeletonName { get; set; } = "";
         public FBXFileInfo FileInfoData { get; set; } = new FBXFileInfo();
     }
 

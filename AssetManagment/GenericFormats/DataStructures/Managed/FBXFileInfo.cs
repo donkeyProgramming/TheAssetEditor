@@ -20,7 +20,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
     public class FBXFileInfo : IMarshalable<ExtFileInfoStruct>
     { 
         public VersionStruct SdkVersionUsed { set; get; } = new VersionStruct();
-        public string FileName { set; get; } = "this ass stuff better work"; // TODO: remove
+        public string FileName { set; get; } = "";
         public string SkeletonName { set; get; }
         public string Units { set; get; }
         public float ScaleFatorToMeters { set; get; }

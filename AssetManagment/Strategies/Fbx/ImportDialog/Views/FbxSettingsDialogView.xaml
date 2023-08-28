@@ -1,12 +1,12 @@
 ﻿<Window
+    x:Class="AssetManagement.Strategies.Fbx.ImportDialog.Views.FbxSettingsDialogView"                        
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"     
-    xmlns:s="http://schemas.singulink.com/xaml"                  
-    xmlns:file="clr-namespace:AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews.FBXFileInfoView"        
-    xmlns:anim="clr-namespace:AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews.FBXAnimView"        
-    x:Class="AssetManagement.Strategies.Fbx.ImportDialog.Views.FbxSettingsDialogView"                        
+    xmlns:s="http://schemas.singulink.com/xaml"                      
+    xmlns:controls="clr-namespace:AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews"
+    
      mc:Ignorable="d" d:DesignWidth="380"   
    ResizeMode="CanResize"
     Width="400"
@@ -14,14 +14,15 @@
     <Grid>
         <!--<DockPanel>-->
         <DockPanel>
-            
-         <file:FbxFileInfoPanelView DockPanel.Dock="Top"/>         
-         <anim:FBXAnimationPanelView DockPanel.Dock="Top"/>
 
+            <!--File Info Panel (should be its own ViewMode-Mode ?-->
+            <controls:FbxFileInfoPanelView DockPanel.Dock="Top"/>
 
+            <!--Anim Info (should be its own ViewMode-Mode ?-->
+            <controls:FBXAnimationPanelView DockPanel.Dock="Top"/>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" DockPanel.Dock="Top">
-            <Button
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" DockPanel.Dock="Top">
+                <Button
                 x:Name="ImportButton"
                 Content="Import&#xA;"
                 Height="23"
@@ -32,7 +33,7 @@
                 IsDefault="True"            
                 Click="{s:MethodBinding ImportButtonClicked}"/>
 
-            <Button
+                <Button
                 x:Name="CancelButton"
                 Content="Cancel" 
                 Height="23" 
@@ -40,10 +41,10 @@
                 VerticalAlignment="Bottom"
                 Width="199" 
                 IsCancel="True" HorizontalAlignment="Left"/>
-        </StackPanel>
+            </StackPanel>
 
         </DockPanel>
-        
-        </Grid>
+
+    </Grid>
 </Window>
     

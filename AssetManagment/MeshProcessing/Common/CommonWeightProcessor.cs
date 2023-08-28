@@ -72,13 +72,6 @@ namespace AssetManagement.MeshProcessing.Common
             }
         }
 
-        // TODO: remove??
-        //class VertexInfluence
-        //{
-        //    public int index = 0;
-        //    public float weight = 0.0f;
-        //};
-
         /// <summary>
         /// Sorts the weights-influences {weight, index} byte weight, by descending weight value
         /// </summary>        

@@ -157,7 +157,7 @@ namespace AssetManagement.AssetBuilders
 
         /// <summary>
         /// Makes the mesh into a static mesh "default", 
-        /// TODO: the whole weight-count thing, should be changed?
+        /// TODO: the whole "weight-count" thing, should be changed?
         /// </summary>
         /// <param name="rmvMesh"></param>
         /// <returns></returns>
