@@ -98,10 +98,10 @@
             </Grid.ColumnDefinitions>
 
             <DockPanel>
-                <CheckBox DockPanel.Dock="Top" Content="Copy multiple frames" IsChecked="{Binding CopyMoreThanSingleFrame.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Copy/paste multiple frames" IsChecked="{Binding CopyMoreThanSingleFrame.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="Don't warn if the skeletons are different" IsChecked="{Binding DontWarnDifferentSkeletons.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="Don't warn if the incoming total frames > this animation total frames" IsChecked="{Binding DontWarnIncomingFramesBigger.Value, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="When pasting use the frame number ranges below, otherwise it will paste whole frames" IsChecked="{Binding PasteUsingFormBelow.Value, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding PasteUsingFormBelow.Value}"/>
+                <CheckBox DockPanel.Dock="Top" Content="When pasting use the frame number ranges below, otherwise it will paste whole frames" IsChecked="{Binding PasteUsingFormBelow.Value, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding CopyMoreThanSingleFrame.Value}"/>
             </DockPanel>
         </Grid>
 
