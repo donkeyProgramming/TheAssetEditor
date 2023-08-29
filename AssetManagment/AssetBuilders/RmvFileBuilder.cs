@@ -11,8 +11,6 @@ using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using Microsoft.Xna.Framework;
-using View3D.SceneNodes;
-using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
 namespace AssetManagement.AssetBuilders
 {
     public class RmvFileBuilder
@@ -89,21 +87,21 @@ namespace AssetManagement.AssetBuilders
 
         private static RmvModel ConvertPackedMeshToRmvModel(MaterialFactory materialFactory, RmvFile outputFile, PackedMesh packMesh, AnimationFile skeletonFile)
         {
-            var currentMesh = new RmvModel();
+            var outMesh = new RmvModel();
 
             var materialCreator = new WeighterMaterialCreator();
 
-            currentMesh.Material = materialCreator.CreateEmpty(
+            outMesh.Material = materialCreator.CreateEmpty(
                 skeletonFile != null ? ModelMaterialEnum.weighted : ModelMaterialEnum.default_type,
                 outputFile.Header.Version,
                 skeletonFile != null ? VertexFormat.Cinematic : VertexFormat.Static);
 
-            currentMesh.Material.ModelName = packMesh.Name;
-            currentMesh.Mesh = ConvertPackedMeshToRmvMesh(materialFactory, currentMesh.Material.BinaryVertexFormat, packMesh, skeletonFile);
+            outMesh.Material.ModelName = packMesh.Name;
+            outMesh.Mesh = ConvertPackedMeshToRmvMesh(materialFactory, outMesh.Material.BinaryVertexFormat, packMesh, skeletonFile);
 
-            SetRmvModelDefaultTextures(currentMesh);
+            SetRmvModelDefaultTextures(outMesh);
 
-            return currentMesh;
+            return outMesh;
         }
 
         private static void SetRmvModelDefaultTextures(RmvModel currentMesh)

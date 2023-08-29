@@ -27,7 +27,7 @@
                 <mathviews:Vector3View Vector3="{Binding AnimationSettings.DisplayOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
             </DockPanel>
 
-          
+
 
             <DockPanel>
                 <Label Content="Skeleton Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
@@ -92,7 +92,7 @@
                         <ComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
                           IsEditable="True"
                           IsTextSearchEnabled="false"
-                          DisplayMemberPath="SkeletonName"
+                          DisplayMemberPath="BoneName"
                           Text="{Binding ModelBoneList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding ModelBoneList.Values}" 
                           SelectedItem="{Binding ModelBoneList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
