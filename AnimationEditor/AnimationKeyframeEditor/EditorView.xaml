@@ -87,24 +87,42 @@
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
         </Grid>
-        
-        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
 
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Label>In range copy operations from other keyedframe editor window</Label>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Copy Pose into global clipboard"  Click="{s:MethodBinding CopyPoseToClipboard}" Margin="2,0,0,0"/>
-            <Button Grid.Column="1" Content="Paste Pose from global clipboard"  Click="{s:MethodBinding PastePoseFromClipboard}" Margin="2,0,0,0" />
-            <Button Grid.Column="2" Content="Paste Pose into previously selected nodes from global clipboard"  Click="{s:MethodBinding PasteIntoSelectedCurrentNodeFromClipboard}" Margin="2,0,0,0" />
+            <DockPanel>
+                <CheckBox DockPanel.Dock="Top" Content="Copy multiple frames" IsChecked="{Binding CopyMoreThanSingleFrame.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Don't warn if the skeletons are different" IsChecked="{Binding DontWarnDifferentSkeletons.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Don't warn if the incoming total frames > this animation total frames" IsChecked="{Binding DontWarnIncomingFramesBigger.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="When pasting use the frame number ranges below, otherwise it will paste whole frames" IsChecked="{Binding PasteUsingFormBelow.Value, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding PasteUsingFormBelow.Value}"/>
+            </DockPanel>
         </Grid>
 
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Label>In range operation:</Label>
-        </Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="70"/>
+            </Grid.ColumnDefinitions>
 
+            <Label Grid.Column="0">From frame nr:</Label>
+            <TextBox Grid.Column="1" PreviewTextInput="FrameNrPreviewTextInput" TextChanged="FrameNrCantBeEmpty"  IsEnabled="{Binding CopyMoreThanSingleFrame.Value}" Text="{Binding FrameNrStart}"></TextBox>
+            <Button Grid.Column="2" Content="Set 0"  Click="{s:MethodBinding SetStartFrameZero}" Margin="2,0,0,0"/>
+            <Label Grid.Column="3">To frame nr:</Label>
+            <TextBox Grid.Column="4" PreviewTextInput="FrameNrPreviewTextInput" TextChanged="FrameNrCantBeEmpty" IsEnabled="{Binding CopyMoreThanSingleFrame.Value}" Text="{Binding FrameNrEnd}"></TextBox>
+            <Button Grid.Column="5" Content="Set Max"  Click="{s:MethodBinding SetEndFrameMax}" Margin="2,0,0,0"/>
+        </Grid>
+              
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
 
             <Grid.ColumnDefinitions>

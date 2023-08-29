@@ -22,5 +22,20 @@ namespace AnimationEditor.AnimationKeyframeEditor
         {
             InitializeComponent();
         }
+
+
+        public void FrameNrPreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !int.TryParse(e.Text, out var number) || (number <  0);
+        }
+
+        public void FrameNrCantBeEmpty(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            if (string.IsNullOrEmpty(textBox.Text))
+            {
+                textBox.Text = "0";
+            }
+        }
     }
 }

@@ -15,22 +15,31 @@ namespace View3D.Commands.Bone
 
         AnimationClip.KeyFrame _fromFrame;
         AnimationClip _animation;
-        AnimationClip.KeyFrame _backupFrame;
-        int _targetFrame;
+        List<AnimationClip.KeyFrame> _backupFrames = new();
+        int _startingFrame;
+        int _endFrame;
         List<int> _selectedBones;
 
-        public void Configure(AnimationClip.KeyFrame copyFromFrame, AnimationClip animation, int targetFrame, List<int> selectedBones = null)
+        public void Configure(AnimationClip.KeyFrame copyFromFrame, AnimationClip animation, int startingFrame, int endFrame, List<int> selectedBones = null)
         {
             _fromFrame = copyFromFrame;
             _animation = animation;
-            _targetFrame = targetFrame; 
+            _startingFrame = startingFrame;
+            _endFrame = endFrame;
             _selectedBones = selectedBones;
         }
 
         public void PasteWholeFrame()
         {
-            _backupFrame = _animation.DynamicFrames[_targetFrame].Clone();
-            _animation.DynamicFrames[_targetFrame] = _fromFrame.Clone();
+            foreach (var frame in _animation.DynamicFrames)
+            {
+                _backupFrames.Add(frame.Clone());
+            }
+
+            for (int frameNr = _startingFrame; frameNr <= _endFrame; frameNr++)
+            {
+                _animation.DynamicFrames[frameNr] = _backupFrames[frameNr].Clone();
+            }
         }
 
         public void PasteIntoSelectedBones()
@@ -39,9 +48,12 @@ namespace View3D.Commands.Bone
 
             foreach (var bone in _selectedBones)
             {
-                _animation.DynamicFrames[_targetFrame].Position[bone] = _fromFrame.Position[bone];
-                _animation.DynamicFrames[_targetFrame].Rotation[bone] = _fromFrame.Rotation[bone];
-                _animation.DynamicFrames[_targetFrame].Scale[bone] = _fromFrame.Scale[bone];
+                for (int frameNr = _startingFrame; frameNr <= _endFrame; frameNr++)
+                {
+                    _animation.DynamicFrames[frameNr].Position[bone] = _fromFrame.Position[bone];
+                    _animation.DynamicFrames[frameNr].Rotation[bone] = _fromFrame.Rotation[bone];
+                    _animation.DynamicFrames[frameNr].Scale[bone] = _fromFrame.Scale[bone];
+                }
             }
         }
 
@@ -51,7 +63,7 @@ namespace View3D.Commands.Bone
         }
         public void Undo()
         {
-            _animation.DynamicFrames[_targetFrame] = _backupFrame.Clone();
+            _animation.DynamicFrames = _backupFrames;
         }
     }
 }

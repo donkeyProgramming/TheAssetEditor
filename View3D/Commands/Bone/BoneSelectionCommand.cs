@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using View3D.Components.Component.Selection;
+using View3D.SceneNodes;
 
 namespace View3D.Commands.Bone
 {
@@ -7,6 +8,8 @@ namespace View3D.Commands.Bone
     {
         SelectionManager _selectionManager;
         ISelectionState _oldState;
+
+        static BoneSelectionState  _hackOldState;
 
         bool _isAdd;
         bool _isRemove;
@@ -37,7 +40,14 @@ namespace View3D.Commands.Bone
         {
             _oldState = _selectionManager.GetStateCopy();
             var currentState = _selectionManager.GetState() as BoneSelectionState;
-            //_logger.Here().Information($"Command info - Add[{_isAdd}] Item[{currentState.RenderObject.Name}] Bones[{_selectedBones.Count}]");
+            if (currentState != null)
+            {
+                _hackOldState = (BoneSelectionState) currentState.Clone();
+            }
+            if(currentState == null && _hackOldState != null)
+            {
+                currentState = _hackOldState;
+            }
 
             if (!(_isAdd || _isRemove))
                 currentState.Clear();
