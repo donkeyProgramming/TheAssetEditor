@@ -70,7 +70,7 @@ namespace View3D.Commands.Bone
 
                 for (int i = 0; i < delta; i++)
                 {
-                    _animation.DynamicFrames.Add(lastFrame);
+                    _animation.DynamicFrames.Add(lastFrame.Clone());
                 }
             }
 
@@ -107,7 +107,7 @@ namespace View3D.Commands.Bone
 
                 for (int i = 0; i < delta; i++)
                 {
-                    _animation.DynamicFrames.Add(lastFrame);
+                    _animation.DynamicFrames.Add(lastFrame.Clone());
                 }
             }
 
@@ -148,7 +148,7 @@ namespace View3D.Commands.Bone
 
                 for (int i = 0; i < delta; i++)
                 {
-                    _animation.DynamicFrames.Add(lastFrame);
+                    _animation.DynamicFrames.Add(lastFrame.Clone());
                 }
             }
 
@@ -179,7 +179,7 @@ namespace View3D.Commands.Bone
 
                 for (int i = 0; i < delta; i++)
                 {
-                    _animation.DynamicFrames.Add(lastFrame);
+                    _animation.DynamicFrames.Add(lastFrame.Clone());
                 }
             }
 

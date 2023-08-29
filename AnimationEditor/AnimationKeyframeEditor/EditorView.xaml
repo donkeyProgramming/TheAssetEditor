@@ -89,6 +89,35 @@
         </Grid>
 
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0">Animation Duration:</Label>
+                    <TextBox Grid.Column="1" PreviewTextInput="AnimationTextInputPreview" Text="{Binding FramesDurationInSeconds, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
+                    <Label Grid.Column="2">seconds</Label>
+                    <Button Grid.Column="3"  Click="{s:MethodBinding ResetDuration}">Reset</Button>
+                    <Button Grid.Column="4" Click="{s:MethodBinding ApplyDuration}">Apply</Button>
+                </Grid>
+            </DockPanel>
+
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        </Grid>
+        
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
             <Label>In range copy operations from other keyedframe editor window</Label>
         </Grid>
 

@@ -48,6 +48,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private AnimationClip _originalClip;
         private int _frameNrToCopy;
 
+
         private List<int> _previousSelectedBones;
         private List<int> _modifiedBones = new();
         private int _modifiedFrameNr = 0;
@@ -63,6 +64,16 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public string FrameNrStart { get; set; } = "0";
         public string FrameNrEnd { get; set; } = "0";
+        public string FramesDurationInSeconds
+        {
+            get { return _txtEditDurationInSeconds; }
+            set
+            {
+                SetAndNotify(ref _txtEditDurationInSeconds, value);
+            }
+        }
+        private string _txtEditDurationInSeconds = "";
+
 
 
         public FilterCollection<SkeletonBoneNode> ModelBoneListForIKEndBone { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
@@ -231,8 +242,10 @@ namespace AnimationEditor.AnimationKeyframeEditor
             if(newValue != null)
             {
                 _originalClip = newValue.Clone();
+                FramesDurationInSeconds = _originalClip.PlayTimeInSec.ToString();
             }
-            
+
+
         }
 
         private void RiderSkeletonChanges(GameSkeleton newValue)
@@ -825,7 +838,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 }
 
                 var willCreateNewFrame = maxFrame < pastedFramesLength;
-                var confirm = MessageBox.Show($"animation skeleton ${skeleton}\n" +
+                var confirm = MessageBox.Show($"animation skeleton ${skeleton.SkeletonName}\n" +
                                               $"paste at frame {insertAtFrameNr}\n" +
                                               $"total frame length to paste {pastedFramesLength}\n" +
                                               $"{((willCreateNewFrame) ? $"this will extend the animation by {framesCount - maxFrame} frames\n" : "\n")}" +
@@ -899,6 +912,26 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 PasteIntoSelectedCurrentNodeFromClipboard();
             }
+        }
+
+        public void ResetDuration()
+        {
+            FramesDurationInSeconds = _originalClip.PlayTimeInSec.ToString();
+            _rider.AnimationClip.PlayTimeInSec = _originalClip.PlayTimeInSec;
+        }
+
+
+        public void ApplyDuration()
+        {
+            var validSeconds = float.TryParse(FramesDurationInSeconds, out var seconds);
+            if (!validSeconds)
+            {
+                MessageBox.Show("please input proper decimal number in the textbox", "err", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                FramesDurationInSeconds = _rider.AnimationClip.PlayTimeInSec.ToString();
+                return;
+            }
+
+            _rider.AnimationClip.PlayTimeInSec = seconds;
         }
     }
 }
