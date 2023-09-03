@@ -19,26 +19,37 @@ namespace View3D.Commands.Bone
         int _startingFrame;
         int _endFrame;
         List<int> _selectedBones;
+        bool _pastePosition = true;
+        bool _pasteRotation = true;
+        bool _pasteScale = true;
 
-        public void Configure(AnimationClip.KeyFrame copyFromFrame, AnimationClip animation, int startingFrame, int endFrame, List<int> selectedBones = null)
+
+        public void Configure(AnimationClip.KeyFrame copyFromFrame, AnimationClip animation, int startingFrame, int endFrame, List<int> selectedBones = null, 
+            bool pastePosition = true, bool pasteRotation = true, bool pasteScale = true)
         {
             _fromFrame = copyFromFrame;
             _animation = animation;
             _startingFrame = startingFrame;
             _endFrame = endFrame;
             _selectedBones = selectedBones;
-        }
+            _pastePosition = pastePosition;
+            _pasteRotation = pasteRotation;
+            _pasteScale = pasteScale;
 
-        public void PasteWholeFrame()
-        {
             foreach (var frame in _animation.DynamicFrames)
             {
                 _backupFrames.Add(frame.Clone());
             }
+        }
 
+        public void PasteWholeFrame()
+        {
             for (int frameNr = _startingFrame; frameNr <= _endFrame; frameNr++)
             {
-                _animation.DynamicFrames[frameNr] = _backupFrames[frameNr].Clone();
+                var clone = _backupFrames[frameNr].Clone();
+                if (_pastePosition) _animation.DynamicFrames[frameNr].Position = clone.Position;
+                if (_pasteRotation) _animation.DynamicFrames[frameNr].Rotation = clone.Rotation;
+                if (_pasteScale) _animation.DynamicFrames[frameNr].Scale = clone.Scale;
             }
         }
 
@@ -50,9 +61,9 @@ namespace View3D.Commands.Bone
             {
                 for (int frameNr = _startingFrame; frameNr <= _endFrame; frameNr++)
                 {
-                    _animation.DynamicFrames[frameNr].Position[bone] = _fromFrame.Position[bone];
-                    _animation.DynamicFrames[frameNr].Rotation[bone] = _fromFrame.Rotation[bone];
-                    _animation.DynamicFrames[frameNr].Scale[bone] = _fromFrame.Scale[bone];
+                    if (_pastePosition) _animation.DynamicFrames[frameNr].Position[bone] = _fromFrame.Position[bone];
+                    if (_pasteRotation) _animation.DynamicFrames[frameNr].Rotation[bone] = _fromFrame.Rotation[bone];
+                    if (_pasteScale) _animation.DynamicFrames[frameNr].Scale[bone] = _fromFrame.Scale[bone];
                 }
             }
         }

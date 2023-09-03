@@ -42,8 +42,12 @@ namespace View3D.Commands.Bone
         int _copyFramesLength;
         List<int> _selectedBones;
         bool _insertExcessFrames = false;
+        bool _pastePosition = false;
+        bool _pasteRotation = false;
+        bool _pasteScale = false;
 
-        public void Configure(GameSkeleton intoSkeleton, BoneTransformClipboardData copyFromFrameInClipboard, AnimationClip animation, int pasteInTargetAnimationAtFrame = 0, int copyFramesLength = 0, List<int> selectedBones = null, bool insertExcessFrame = false)
+        public void Configure(GameSkeleton intoSkeleton, BoneTransformClipboardData copyFromFrameInClipboard, AnimationClip animation, int pasteInTargetAnimationAtFrame = 0, int copyFramesLength = 0, List<int> selectedBones = null, bool insertExcessFrame = false, 
+            bool pastePosition = false, bool pasteRotation = false, bool pasteScale = false)
         {
             _intoSkeleton = intoSkeleton;
             _fromFrame = copyFromFrameInClipboard;
@@ -52,6 +56,10 @@ namespace View3D.Commands.Bone
             _copyFramesLength = copyFramesLength;
             _selectedBones = selectedBones;
             _insertExcessFrames = insertExcessFrame;
+            _pastePosition = pastePosition;
+            _pasteRotation = pasteRotation;
+            _pasteScale = pasteScale;
+
 
             foreach (var frame in _animation.DynamicFrames)
             {
@@ -78,16 +86,19 @@ namespace View3D.Commands.Bone
             {
                 foreach (var bone in _fromFrame.Frames[frame.Key].BoneIdToPosition)
                 {
+                    if (!_pastePosition) continue;
                     var boneId = _intoSkeleton.GetBoneIndexByName(bone.Key);
                     if (boneId != -1) _animation.DynamicFrames[frame.Key].Position[boneId] = bone.Value;
                 }
                 foreach (var bone in _fromFrame.Frames[frame.Key].BoneIdToQuaternion)
                 {
+                    if (!_pasteRotation) continue;
                     var boneId = _intoSkeleton.GetBoneIndexByName(bone.Key);
                     if (boneId != -1) _animation.DynamicFrames[frame.Key].Rotation[boneId] = bone.Value;
                 }
                 foreach (var bone in _fromFrame.Frames[frame.Key].BoneIdToScale)
                 {
+                    if (!_pasteScale) continue;
                     var boneId = _intoSkeleton.GetBoneIndexByName(bone.Key);
                     if (boneId != -1) _animation.DynamicFrames[frame.Key].Scale[boneId] = bone.Value;
                 }
@@ -117,16 +128,19 @@ namespace View3D.Commands.Bone
 
                 foreach (var bone in _fromFrame.Frames[frame.Key].BoneIdToPosition)
                 {
+                    if (!_pastePosition) continue;
                     var boneId = _intoSkeleton.GetBoneIndexByName(bone.Key);
                     if (boneId != -1) _animation.DynamicFrames[frameNr].Position[boneId] = bone.Value;
                 }
                 foreach (var bone in _fromFrame.Frames[frame.Key].BoneIdToQuaternion)
                 {
+                    if (!_pasteRotation) continue;
                     var boneId = _intoSkeleton.GetBoneIndexByName(bone.Key);
                     if (boneId != -1) _animation.DynamicFrames[frameNr].Rotation[boneId] = bone.Value;
                 }
                 foreach (var bone in _fromFrame.Frames[frame.Key].BoneIdToScale)
                 {
+                    if (!_pasteScale) continue;
                     var boneId = _intoSkeleton.GetBoneIndexByName(bone.Key);
                     if (boneId != -1) _animation.DynamicFrames[frameNr].Scale[boneId] = bone.Value;
                 }
@@ -159,9 +173,9 @@ namespace View3D.Commands.Bone
                     var boneId = _intoSkeleton.GetBoneNameByIndex(bone);
                     if (boneId == "") continue;
                     if (!frame.Value.BoneIdToPosition.ContainsKey(boneId)) continue;
-                    _animation.DynamicFrames[frame.Key].Position[bone] = _fromFrame.Frames[frame.Key].BoneIdToPosition[boneId];
-                    _animation.DynamicFrames[frame.Key].Rotation[bone] = _fromFrame.Frames[frame.Key].BoneIdToQuaternion[boneId];
-                    _animation.DynamicFrames[frame.Key].Scale[bone] = _fromFrame.Frames[frame.Key].BoneIdToScale[boneId];
+                    if (_pastePosition) _animation.DynamicFrames[frame.Key].Position[bone] = _fromFrame.Frames[frame.Key].BoneIdToPosition[boneId];
+                    if (_pasteRotation) _animation.DynamicFrames[frame.Key].Rotation[bone] = _fromFrame.Frames[frame.Key].BoneIdToQuaternion[boneId];
+                    if (_pasteScale) _animation.DynamicFrames[frame.Key].Scale[bone] = _fromFrame.Frames[frame.Key].BoneIdToScale[boneId];
                 }
             }
         }
@@ -192,9 +206,9 @@ namespace View3D.Commands.Bone
                     var boneId = _intoSkeleton.GetBoneNameByIndex(bone);
                     if (boneId == "") continue;
                     if (!frame.Value.BoneIdToPosition.ContainsKey(boneId)) continue;
-                    _animation.DynamicFrames[frameNr].Position[bone] = _fromFrame.Frames[frame.Key].BoneIdToPosition[boneId];
-                    _animation.DynamicFrames[frameNr].Rotation[bone] = _fromFrame.Frames[frame.Key].BoneIdToQuaternion[boneId];
-                    _animation.DynamicFrames[frameNr].Scale[bone] = _fromFrame.Frames[frame.Key].BoneIdToScale[boneId];
+                    if (_pastePosition) _animation.DynamicFrames[frameNr].Position[bone] = _fromFrame.Frames[frame.Key].BoneIdToPosition[boneId];
+                    if (_pasteRotation)_animation.DynamicFrames[frameNr].Rotation[bone] = _fromFrame.Frames[frame.Key].BoneIdToQuaternion[boneId];
+                    if (_pasteScale) _animation.DynamicFrames[frameNr].Scale[bone] = _fromFrame.Frames[frame.Key].BoneIdToScale[boneId];
                 }
 
                 frameNr++;
