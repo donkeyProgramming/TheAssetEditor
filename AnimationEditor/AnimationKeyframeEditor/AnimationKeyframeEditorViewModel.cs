@@ -20,6 +20,7 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 using View3D.SceneNodes;
+using static CommonControls.Editors.AnimationPack.Converters.AnimationBinFileToXmlConverter;
 using SkeletonBoneNode = AnimationEditor.Common.ReferenceModel.SkeletonBoneNode;
 
 namespace AnimationEditor.AnimationKeyframeEditor
@@ -314,14 +315,40 @@ namespace AnimationEditor.AnimationKeyframeEditor
             
         }
 
-        public void InsertNewFrame()
-        {
-            System.Windows.Forms.MessageBox.Show("insert new frame not implemented yet");
-        }
-
         public void DuplicateFrame()
         {
-            System.Windows.Forms.MessageBox.Show("DuplicateFrame not implemented yet");
+            if (_rider.AnimationClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _rider.Player.Pause();
+            var currentFrame = _rider.Player.CurrentFrame;
+            var command = _commandFactory.Create<DuplicateDeleteFrameBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, currentFrame)).Build();
+            command.DuplicateFrame();
+            _selectionComponent.SetBoneSelectionMode();
+            _rider.Player.CurrentFrame++;
+        }
+
+        public void RemoveFrame()
+        {
+            if (_rider.AnimationClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _rider.Player.Pause();
+            var currentFrame = _rider.Player.CurrentFrame;
+
+            var result = MessageBox.Show($"remove this frame at {currentFrame}? it is NOT recommended to remove a frame as this is a destructive operation", "warn", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.No) return;
+
+            var command = _commandFactory.Create<DuplicateDeleteFrameBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, currentFrame)).Build();
+            command.RemoveFrame();
+            _selectionComponent.SetBoneSelectionMode();
+            _rider.Player.CurrentFrame++;
         }
 
         private ISelectable FindSelectableObject(ISceneNode node)
@@ -1025,8 +1052,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
             _rider.Player.CurrentFrame = _rider.AnimationClip.DynamicFrames.Count - 1;
+            _rider.Player.Pause();
         }
 
 
