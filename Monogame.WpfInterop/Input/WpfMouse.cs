@@ -152,6 +152,7 @@ namespace MonoGame.Framework.WpfInterop.Input
                 //}, new PointHitTestParameters(pos));
 
                 var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
+                if (res == null) return;
                 HitTestResult result = VisualTreeHelper.HitTest(res, pos);
                 if (result?.VisualHit == _focusElement)
                     hit = true;
