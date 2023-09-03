@@ -7,6 +7,7 @@ using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.ViewModels;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
+using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
@@ -1066,6 +1067,47 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             FrameNrLength = (_rider.AnimationClip.DynamicFrames.Count - 1).ToString();
+        }
+
+        public void Save()
+        {
+            if (_rider.AnimationClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if(!IsDirty.Value)
+            {
+                MessageBox.Show("there is nothing to save!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var animFile = _rider.AnimationClip.ConvertToFileFormat(_rider.Skeleton);
+            var path = ActiveOutputFragment.SelectedItem.FullPath;
+            MessageBox.Show($"this will save with anim version {animFile.Header.Version}\n"+
+                            $"on this path {path}\n", "warn", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            SaveHelper.Save(_pfs, path, null, AnimationFile.ConvertToBytes(animFile), true);
+        }
+        public void SaveAs()
+        {
+            if (_rider.AnimationClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (!IsDirty.Value)
+            {
+                MessageBox.Show("there is nothing to save!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var animFile = _rider.AnimationClip.ConvertToFileFormat(_rider.Skeleton);
+
+            MessageBox.Show($"this will save with anim version {animFile.Header.Version}", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var bytes = AnimationFile.ConvertToBytes(animFile);
+            SaveHelper.SaveAs(_pfs, bytes, ".anim");
         }
     }
 }

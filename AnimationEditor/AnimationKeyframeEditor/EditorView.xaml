@@ -201,6 +201,8 @@
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
         </Grid>
 
-        <Button DockPanel.Dock="Top" Margin="5" Content="Save" Click="{s:MethodBinding SaveSkeletonAction}"/>
+        <Button DockPanel.Dock="Top" Margin="5" Content="Save" Click="{s:MethodBinding Save}"/>
+        <Button DockPanel.Dock="Top" Margin="5" Content="Save as" Click="{s:MethodBinding SaveAs}"/>
+
     </DockPanel>
 </UserControl>
