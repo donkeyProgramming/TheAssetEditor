@@ -56,20 +56,37 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public NotifyAttr<bool> EnableInverseKinematics { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> IncrementFrameAfterCopyOperation { get; set; } = new NotifyAttr<bool>(false);
 
-        public NotifyAttr<bool> CopyMoreThanSingleFrame { get; set; } = new(false);
+        public bool CopyMoreThanSingleFrame
+        {
+            get => _copyMoreThanSingleFrame;
+            set
+            {
+                SetAndNotify(ref _copyMoreThanSingleFrame, value);
+                EnableFrameNrStartTextboxOnPaste.Value = value && PasteUsingFormBelow;
+            }
+        }
+        bool _copyMoreThanSingleFrame = false;
+
         public NotifyAttr<bool> DontWarnDifferentSkeletons { get; set; } = new(false);
         public NotifyAttr<bool> DontWarnIncomingFramesBigger { get; set;  } = new(false);
-        public NotifyAttr<bool> PasteUsingFormBelow { get; set; } = new(false);
+        public bool PasteUsingFormBelow 
+        { 
+            get => _pasteUsingFormBelow; 
+            set 
+            {
+                SetAndNotify(ref _pasteUsingFormBelow, value);
+                EnableFrameNrStartTextboxOnPaste.Value = !value && CopyMoreThanSingleFrame;
+            } 
+        }
+        bool _pasteUsingFormBelow = false;
         public NotifyAttr<bool> PastePosition { get; set; } = new(true);
         public NotifyAttr<bool> PasteRotation { get; set; } = new(true);
         public NotifyAttr<bool> PasteScale { get; set; } = new(true);
+        public NotifyAttr<bool> IsDirty { get; set; } = new(false);
+        public NotifyAttr<bool> EnableFrameNrStartTextboxOnPaste { get; set; } = new(false);
 
-
-        public string FrameNrStart { get =>_txtFrameNrStart; set => SetAndNotify(ref _txtFrameNrStart, value); }
-        private string _txtFrameNrStart = "0";
-
-        public string FrameNrEnd { get => _txtFrameNrEnd; set => SetAndNotify(ref _txtFrameNrEnd, value); }
-        private string _txtFrameNrEnd = "";
+        public string FrameNrLength { get => _frameNrLength; set => SetAndNotify(ref _frameNrLength, value); }
+        private string _frameNrLength = "0";
 
         public string FramesDurationInSeconds
         {
@@ -130,6 +147,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
         }
         private void OnSelectionChanged(ISelectionState state, bool sendEvent)
         {
+            IsDirty.Value = _commandExecutor.CanUndo();
+
             if (state is BoneSelectionState boneSelectionState)
             {
                 if(_previousSelectedBones == null || boneSelectionState.SelectedBones.Count > 0)
@@ -172,7 +191,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         private void OnModifiedBonesEvent(BoneSelectionState state)
         {
-            if(_modifiedFrameNr == state.CurrentFrame)
+            IsDirty.Value = _commandExecutor.CanUndo();
+
+            if (_modifiedFrameNr == state.CurrentFrame)
             {
                 _modifiedBones = _modifiedBones.Union(state.ModifiedBones).ToList();
             }
@@ -250,10 +271,10 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 _originalClip = newValue.Clone();
                 FramesDurationInSeconds = _originalClip.PlayTimeInSec.ToString();
-                SetStartFrameZero();
-                SetEndFrameMax();
+                SetFrameLengthMax();
             }
 
+            IsDirty.Value = false;
 
         }
 
@@ -452,6 +473,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
             command.PasteWholeFrame();
             _commandExecutor.ExecuteCommand(command);
+
+            if (IncrementFrameAfterCopyOperation.Value)
+            {
+                _rider.Player.CurrentFrame++;
+            }
+            IsDirty.Value = _commandExecutor.CanUndo();
         }
 
 
@@ -477,6 +504,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
             command.PasteIntoSelectedBones();
             _commandExecutor.ExecuteCommand(command);
+
+            if (IncrementFrameAfterCopyOperation.Value)
+            {
+                _rider.Player.CurrentFrame++;
+            }
+            IsDirty.Value = _commandExecutor.CanUndo();
         }
 
         public void PastePreviousEditedNodesIntoCurrentPose()
@@ -505,6 +538,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 _rider.Player.CurrentFrame++;
             }
+            IsDirty.Value = _commandExecutor.CanUndo();
         }
 
         public PasteTransformFromClipboardBoneCommand.BoneTransformClipboardData CreateFrameClipboard(GameSkeleton skeleton, AnimationClip currentFrames, int startFrame, int endFrame)
@@ -544,7 +578,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             var currentFrame = _rider.Player.CurrentFrame;
             var skeleton = _rider.Skeleton;
             var frames = _rider.AnimationClip;
-            var jsonText = JsonConvert.SerializeObject(CreateFrameClipboard(skeleton, frames, currentFrame, currentFrame));
+            var jsonText = JsonConvert.SerializeObject(CreateFrameClipboard(skeleton, frames, currentFrame, currentFrame + 1));
             Clipboard.SetText(jsonText);
         }
 
@@ -556,39 +590,19 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            int.TryParse(FrameNrStart, out var frameNrStart);
-            int.TryParse(FrameNrEnd, out var frameNrEnd);
-
-            if(frameNrStart > frameNrEnd)
-            {
-                MessageBox.Show("invalid input frameNrStart > frameNrEnd", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if(frameNrStart < 0)
-            {
-                MessageBox.Show("frame nr start is invalid (negatif number)", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            var totalFrameNr = _rider.AnimationClip.DynamicFrames.Count;
-            if (frameNrEnd > totalFrameNr)
-            {
-                MessageBox.Show("frame nr end is invalid (bigger than total frame number)", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
             _rider.Player.Pause();
             var currentFrame = _rider.Player.CurrentFrame;
+            var endFrame = _rider.Player.AnimationClip.DynamicFrames.Count;
             var skeleton = _rider.Skeleton;
             var frames = _rider.AnimationClip;
-            var jsonText = JsonConvert.SerializeObject(CreateFrameClipboard(skeleton, frames, frameNrStart, frameNrEnd));
+            var jsonText = JsonConvert.SerializeObject(CreateFrameClipboard(skeleton, frames, currentFrame, endFrame));
             Clipboard.SetText(jsonText);
+            MessageBox.Show($"copied frame {currentFrame} up to {endFrame - 1}", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         public void CopyPoseInRangeToClipboard()
         {
-            if(CopyMoreThanSingleFrame.Value)
+            if(CopyMoreThanSingleFrame)
             {
                 CopyMultipleFramesClipboard();
             }
@@ -614,20 +628,23 @@ namespace AnimationEditor.AnimationKeyframeEditor
             try
             {
                 var parsedClipboardFrame = JsonConvert.DeserializeObject<PasteTransformFromClipboardBoneCommand.BoneTransformClipboardData>(frameInJsonFormat);
-                if ((parsedClipboardFrame.SkeletonName != skeleton.SkeletonName) && true)
+                if ((parsedClipboardFrame.SkeletonName != skeleton.SkeletonName) && !DontWarnDifferentSkeletons.Value)
                 {
                     var result = MessageBox.Show($"the clipboard skeleton is {parsedClipboardFrame.SkeletonName} but the target skeleton (which you are editing right now) is {skeleton.SkeletonName}. this will cause something to break if both skeletons are radically different.", "warn", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.No) return;
-
-                    var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip, currentFrame, 1)).Build();
-                    command.PasteIntoSelectedBonesInRanges();
-                    _commandExecutor.ExecuteCommand(command);
-
-                    if (IncrementFrameAfterCopyOperation.Value)
-                    {
-                        _rider.Player.CurrentFrame++;
-                    }
                 }
+
+                var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, 
+                    _rider.AnimationClip, currentFrame, 1, null, 
+                    false, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
+                command.PasteInRanges();
+                _commandExecutor.ExecuteCommand(command);
+
+                if (IncrementFrameAfterCopyOperation.Value)
+                {
+                    _rider.Player.CurrentFrame++;
+                }
+                IsDirty.Value = _commandExecutor.CanUndo();
             }
             catch (JsonException)
             {
@@ -644,26 +661,13 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            int.TryParse(FrameNrStart, out var insertAtFrameNr);
-            int.TryParse(FrameNrEnd, out var pastedFramesLength);
+            int.TryParse(FrameNrLength, out var pastedFramesLength);
 
             _rider.Player.Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var maxFrame = _rider.AnimationClip.DynamicFrames.Count;
             var skeleton = _rider.Skeleton;
             var frameInJsonFormat = Clipboard.GetText();
-
-            if (insertAtFrameNr < 0)
-            {
-                MessageBox.Show("frame nr insert at is invalid (negatif number)", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (insertAtFrameNr > maxFrame)
-            {
-                MessageBox.Show("frame nr insert at is invalid (bigger than total frames)", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
 
             try
             {
@@ -681,16 +685,18 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     return;
                 }
 
-                var willCreateNewFrame = maxFrame < pastedFramesLength;
+                var willCreateNewFrame = maxFrame < currentFrame + pastedFramesLength;
                 var confirm = MessageBox.Show($"animation skeleton ${skeleton.SkeletonName}\n" +
-                                              $"paste at frame {insertAtFrameNr}\n" +
+                                              $"paste at frame {currentFrame}\n" +
                                               $"total frame length to paste {pastedFramesLength}\n" +
-                                              $"{ ((willCreateNewFrame) ? $"this will extend the animation by {framesCount - maxFrame} frames\n" : "\n")  }" +
+                                              $"{ ((willCreateNewFrame) ? $"this will extend the animation by {currentFrame + framesCount - maxFrame} frames\n" : "\n")  }" +
                                               $"continue?", "confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (confirm != DialogResult.Yes) return;
 
-                var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip, insertAtFrameNr, pastedFramesLength)).Build();
+                var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, 
+                    _rider.AnimationClip, currentFrame, pastedFramesLength, null, 
+                    true, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
                 command.PasteInRanges();
                 _commandExecutor.ExecuteCommand(command);
 
@@ -698,6 +704,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 {
                     _rider.Player.CurrentFrame++;
                 }
+                IsDirty.Value = _commandExecutor.CanUndo();
             }
             catch (JsonException)
             {
@@ -721,20 +728,33 @@ namespace AnimationEditor.AnimationKeyframeEditor
             try
             {
                 var parsedClipboardFrame = JsonConvert.DeserializeObject<PasteTransformFromClipboardBoneCommand.BoneTransformClipboardData>(frameInJsonFormat);
-                if ((parsedClipboardFrame.SkeletonName != skeleton.SkeletonName) && true)
+                if ((parsedClipboardFrame.SkeletonName != skeleton.SkeletonName) && !DontWarnDifferentSkeletons.Value)
                 {
                     var result = MessageBox.Show($"the clipboard skeleton is {parsedClipboardFrame.SkeletonName} but the target skeleton (which you are editing right now) is {skeleton.SkeletonName}. this will cause something to break if both skeletons are radically different.", "warn", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.No) return;
-
-                    var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip)).Build();
-                    command.PasteIntoSelectedBones();
-                    _commandExecutor.ExecuteCommand(command);
-
-                    if (IncrementFrameAfterCopyOperation.Value)
-                    {
-                        _rider.Player.CurrentFrame++;
-                    }
                 }
+
+                var pastedFramesLength = parsedClipboardFrame.Frames.Count;
+                var maxFrame = _rider.Player.AnimationClip.DynamicFrames.Count;
+
+                var willCreateNewFrame = maxFrame < pastedFramesLength;
+                var confirm = MessageBox.Show($"animation skeleton {skeleton.SkeletonName}\n" +
+                                          $"paste at frame {0}\n" +
+                                          $"total frame length to paste {pastedFramesLength}\n" +
+                                          $"{((willCreateNewFrame) ? $"this will extend the animation by {pastedFramesLength - maxFrame} frames\n" : "\n")}" +
+                                          $"continue?", "confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (confirm != DialogResult.Yes) return;
+
+                var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip)).Build();
+                command.PasteIntoSelectedBones();
+                _commandExecutor.ExecuteCommand(command);
+
+                if (IncrementFrameAfterCopyOperation.Value)
+                {
+                    _rider.Player.CurrentFrame++;
+                }
+                IsDirty.Value = _commandExecutor.CanUndo();
             }
             catch (JsonException)
             {
@@ -745,11 +765,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public void PastePoseInRangeFromClipboard()
         {
-            if(PasteUsingFormBelow.Value)
+            if(PasteUsingFormBelow)
             {
                 PasteMultipleFramesClipboardInRanges();
             }
-            else if (!PasteUsingFormBelow.Value && CopyMoreThanSingleFrame.Value)
+            else if (!PasteUsingFormBelow && CopyMoreThanSingleFrame)
             {
                 PasteMultipleFramesClipboardWhole();
             }
@@ -791,29 +811,32 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 {
                     var result = MessageBox.Show($"the clipboard skeleton is {parsedClipboardFrame.SkeletonName} but the target skeleton (which you are editing right now) is {skeleton.SkeletonName}. this will cause something to break if both skeletons are radically different.", "warn", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.No) return;
-
-                    var pastedFramesLength = parsedClipboardFrame.Frames.Count;
-
-                    var willCreateNewFrame = maxFrame < pastedFramesLength;
-                    var confirm = MessageBox.Show($"animation skeleton ${skeleton.SkeletonName}\n" +
-                                              $"paste at frame {0}\n" +
-                                              $"total frame length to paste {pastedFramesLength}\n" +
-                                              $"{((willCreateNewFrame) ? $"this will extend the animation by {pastedFramesLength - maxFrame} frames\n" : "\n")}" +
-                                              $"continue?", "confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                    if (confirm != DialogResult.Yes) return;
-
-                    var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip, 
-                        currentFrame, pastedFramesLength, _previousSelectedBones,
-                        true, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
-                    command.PasteIntoSelectedBones();
-                    _commandExecutor.ExecuteCommand(command);
-
-                    if (IncrementFrameAfterCopyOperation.Value)
-                    {
-                        _rider.Player.CurrentFrame++;
-                    }
                 }
+
+
+                var pastedFramesLength = parsedClipboardFrame.Frames.Count;
+
+                var willCreateNewFrame = maxFrame < pastedFramesLength;
+                var confirm = MessageBox.Show($"animation skeleton {skeleton.SkeletonName}\n" +
+                                          $"paste at frame {0}\n" +
+                                          $"total frame length to paste {pastedFramesLength}\n" +
+                                          $"paste partial animation frames on selected bones\n" +
+                                          $"{((willCreateNewFrame) ? $"this will extend the animation by {pastedFramesLength - maxFrame} frames\n" : "\n")}" +
+                                          $"continue?", "confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (confirm != DialogResult.Yes) return;
+
+                var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip,
+                    currentFrame, pastedFramesLength, _previousSelectedBones,
+                    true, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
+                command.PasteIntoSelectedBones();
+                _commandExecutor.ExecuteCommand(command);
+
+                if (IncrementFrameAfterCopyOperation.Value)
+                {
+                    _rider.Player.CurrentFrame++;
+                }
+                IsDirty.Value = _commandExecutor.CanUndo();
             }
             catch (JsonException)
             {
@@ -830,26 +853,13 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            int.TryParse(FrameNrStart, out var insertAtFrameNr);
-            int.TryParse(FrameNrEnd, out var pastedFramesLength);
+            int.TryParse(FrameNrLength, out var pastedFramesLength);
 
             _rider.Player.Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var maxFrame = _rider.AnimationClip.DynamicFrames.Count;
             var skeleton = _rider.Skeleton;
             var frameInJsonFormat = Clipboard.GetText();
-
-            if (insertAtFrameNr < 0)
-            {
-                MessageBox.Show("frame nr insert at is invalid (negatif number)", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (insertAtFrameNr > maxFrame)
-            {
-                MessageBox.Show("frame nr insert at is invalid (bigger than total frames)", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
 
             try
             {
@@ -867,25 +877,27 @@ namespace AnimationEditor.AnimationKeyframeEditor
                     return;
                 }
 
-                var willCreateNewFrame = maxFrame < pastedFramesLength;
-                var confirm = MessageBox.Show($"animation skeleton ${skeleton.SkeletonName}\n" +
-                                              $"paste at frame {insertAtFrameNr}\n" +
+                var willCreateNewFrame = maxFrame < currentFrame + pastedFramesLength;
+                var confirm = MessageBox.Show($"animation skeleton {skeleton.SkeletonName}\n" +
+                                              $"paste at frame {currentFrame}\n" +
                                               $"total frame length to paste {pastedFramesLength}\n" +
-                                              $"{((willCreateNewFrame) ? $"this will extend the animation by {framesCount - maxFrame} frames\n" : "\n")}" +
+                                              $"paste partial animation frames on selected bones\n" +
+                                              $"{((willCreateNewFrame) ? $"this will extend the animation by {currentFrame + framesCount - maxFrame} frames\n" : "\n")}" +
                                               $"continue?", "confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (confirm != DialogResult.Yes) return;
 
-                var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip, 
-                    insertAtFrameNr, pastedFramesLength, _previousSelectedBones,
+                var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip,
+                    currentFrame, pastedFramesLength, _previousSelectedBones,
                     true, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
-                command.PasteInRanges();
+                command.PasteIntoSelectedBonesInRanges();
                 _commandExecutor.ExecuteCommand(command);
 
                 if (IncrementFrameAfterCopyOperation.Value)
                 {
                     _rider.Player.CurrentFrame++;
                 }
+                IsDirty.Value = _commandExecutor.CanUndo();
             }
             catch (JsonException)
             {
@@ -908,22 +920,23 @@ namespace AnimationEditor.AnimationKeyframeEditor
             try
             {
                 var parsedClipboardFrame = JsonConvert.DeserializeObject<PasteTransformFromClipboardBoneCommand.BoneTransformClipboardData>(frameInJsonFormat);
-                if ((parsedClipboardFrame.SkeletonName != skeleton.SkeletonName) && true)
+                if ((parsedClipboardFrame.SkeletonName != skeleton.SkeletonName) && !DontWarnDifferentSkeletons.Value)
                 {
                     var result = MessageBox.Show($"the clipboard skeleton is {parsedClipboardFrame.SkeletonName} but the target skeleton (which you are editing right now) is {skeleton.SkeletonName}. this will cause something to break if both skeletons are radically different.", "warn", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.No) return;
-
-                    var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip, 
-                        currentFrame, 1, _previousSelectedBones, 
-                        true, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
-                    command.PasteIntoSelectedBonesInRanges();
-                    _commandExecutor.ExecuteCommand(command);
-
-                    if (IncrementFrameAfterCopyOperation.Value)
-                    {
-                        _rider.Player.CurrentFrame++;
-                    }
                 }
+
+                var command = _commandFactory.Create<PasteTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip,
+                    currentFrame, 1, _previousSelectedBones,
+                    true, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
+                command.PasteIntoSelectedBonesInRanges();
+                _commandExecutor.ExecuteCommand(command);
+
+                if (IncrementFrameAfterCopyOperation.Value)
+                {
+                    _rider.Player.CurrentFrame++;
+                }
+                IsDirty.Value = _commandExecutor.CanUndo();
             }
             catch (JsonException)
             {
@@ -934,11 +947,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public void PasteIntoInRangeSelectedCurrentNodeFromClipboard()
         {
-            if (PasteUsingFormBelow.Value)
+            if (PasteUsingFormBelow)
             {
                 PasteIntoSelectedCurrentNodeFromClipboardInRange();
             }
-            else if (!PasteUsingFormBelow.Value && CopyMoreThanSingleFrame.Value)
+            else if (!PasteUsingFormBelow && CopyMoreThanSingleFrame)
             {
                 PasteIntoSelectedCurrentNodeFromClipboardWhole();
             }
@@ -966,6 +979,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             _rider.AnimationClip.PlayTimeInSec = seconds;
+            IsDirty.Value = true;
         }
 
         public void FirstFrame()
@@ -976,6 +990,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
+            _rider.Player.Pause();
             _rider.Player.CurrentFrame = 0;
         }
 
@@ -987,6 +1002,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
+            _rider.Player.Pause();
             _rider.Player.CurrentFrame--;
         }
         public void NextFrame()
@@ -997,6 +1013,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
+            _rider.Player.Pause();
             _rider.Player.CurrentFrame++;
         }
 
@@ -1008,10 +1025,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
+            _rider.Player.Pause();
             _rider.Player.CurrentFrame = _rider.AnimationClip.DynamicFrames.Count - 1;
         }
 
-        public void SetStartFrameZero()
+
+        public void SetFrameLengthMax()
         {
             if (_rider.AnimationClip == null)
             {
@@ -1019,18 +1038,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            FrameNrStart = "0";
-        }
-
-        public void SetEndFrameMax()
-        {
-            if (_rider.AnimationClip == null)
-            {
-                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            FrameNrEnd = (_rider.AnimationClip.DynamicFrames.Count - 1).ToString();
+            FrameNrLength = (_rider.AnimationClip.DynamicFrames.Count - 1).ToString();
         }
     }
 }

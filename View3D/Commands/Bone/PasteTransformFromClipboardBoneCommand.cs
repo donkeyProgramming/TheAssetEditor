@@ -82,25 +82,26 @@ namespace View3D.Commands.Bone
                 }
             }
 
+            var startingFrame = _fromFrame.Frames.First().Key;
             foreach (var frame in _fromFrame.Frames)
             {
                 foreach (var bone in _fromFrame.Frames[frame.Key].BoneIdToPosition)
                 {
                     if (!_pastePosition) continue;
                     var boneId = _intoSkeleton.GetBoneIndexByName(bone.Key);
-                    if (boneId != -1) _animation.DynamicFrames[frame.Key].Position[boneId] = bone.Value;
+                    if (boneId != -1) _animation.DynamicFrames[frame.Key - startingFrame].Position[boneId] = bone.Value;
                 }
                 foreach (var bone in _fromFrame.Frames[frame.Key].BoneIdToQuaternion)
                 {
                     if (!_pasteRotation) continue;
                     var boneId = _intoSkeleton.GetBoneIndexByName(bone.Key);
-                    if (boneId != -1) _animation.DynamicFrames[frame.Key].Rotation[boneId] = bone.Value;
+                    if (boneId != -1) _animation.DynamicFrames[frame.Key - startingFrame].Rotation[boneId] = bone.Value;
                 }
                 foreach (var bone in _fromFrame.Frames[frame.Key].BoneIdToScale)
                 {
                     if (!_pasteScale) continue;
                     var boneId = _intoSkeleton.GetBoneIndexByName(bone.Key);
-                    if (boneId != -1) _animation.DynamicFrames[frame.Key].Scale[boneId] = bone.Value;
+                    if (boneId != -1) _animation.DynamicFrames[frame.Key - startingFrame].Scale[boneId] = bone.Value;
                 }
             }            
         }
@@ -108,8 +109,8 @@ namespace View3D.Commands.Bone
         public void PasteInRanges()
         {
             int frameNr = _pasteInTargetAnimationAtFrame;
-
-            var isTheTargetFramesShorterThanCopiedFrames = _backupFrames.Count < _copyFramesLength;
+            var copyFramesEnds = _copyFramesLength + frameNr;
+            var isTheTargetFramesShorterThanCopiedFrames = _backupFrames.Count < copyFramesEnds;
 
             if (isTheTargetFramesShorterThanCopiedFrames)
             {
@@ -124,7 +125,7 @@ namespace View3D.Commands.Bone
 
             foreach (var frame in _fromFrame.Frames)
             {
-                if (frameNr > _copyFramesLength) break;
+                if (frameNr > copyFramesEnds) break;
 
                 foreach (var bone in _fromFrame.Frames[frame.Key].BoneIdToPosition)
                 {
@@ -142,7 +143,7 @@ namespace View3D.Commands.Bone
                 {
                     if (!_pasteScale) continue;
                     var boneId = _intoSkeleton.GetBoneIndexByName(bone.Key);
-                    if (boneId != -1) _animation.DynamicFrames[frameNr].Scale[boneId] = bone.Value;
+                    if (boneId != -1) _animation.DynamicFrames[frameNr ].Scale[boneId] = bone.Value;
                 }
                 frameNr++;
             }
@@ -151,7 +152,6 @@ namespace View3D.Commands.Bone
         public void PasteIntoSelectedBones()
         {
             if (_selectedBones == null) return;
-
 
             var isTheTargetFramesShorterThanCopiedFrames = _backupFrames.Count < _fromFrame.Frames.Count;
 
@@ -166,6 +166,7 @@ namespace View3D.Commands.Bone
                 }
             }
 
+            var startingFrame = _fromFrame.Frames.First().Key;
             foreach (var frame in _fromFrame.Frames)
             {
                 foreach (var bone in _selectedBones)
@@ -173,9 +174,9 @@ namespace View3D.Commands.Bone
                     var boneId = _intoSkeleton.GetBoneNameByIndex(bone);
                     if (boneId == "") continue;
                     if (!frame.Value.BoneIdToPosition.ContainsKey(boneId)) continue;
-                    if (_pastePosition) _animation.DynamicFrames[frame.Key].Position[bone] = _fromFrame.Frames[frame.Key].BoneIdToPosition[boneId];
-                    if (_pasteRotation) _animation.DynamicFrames[frame.Key].Rotation[bone] = _fromFrame.Frames[frame.Key].BoneIdToQuaternion[boneId];
-                    if (_pasteScale) _animation.DynamicFrames[frame.Key].Scale[bone] = _fromFrame.Frames[frame.Key].BoneIdToScale[boneId];
+                    if (_pastePosition) _animation.DynamicFrames[frame.Key - startingFrame].Position[bone] = _fromFrame.Frames[frame.Key].BoneIdToPosition[boneId];
+                    if (_pasteRotation) _animation.DynamicFrames[frame.Key - startingFrame].Rotation[bone] = _fromFrame.Frames[frame.Key].BoneIdToQuaternion[boneId];
+                    if (_pasteScale) _animation.DynamicFrames[frame.Key - startingFrame].Scale[bone] = _fromFrame.Frames[frame.Key].BoneIdToScale[boneId];
                 }
             }
         }
@@ -183,13 +184,13 @@ namespace View3D.Commands.Bone
         public void PasteIntoSelectedBonesInRanges()
         {
             int frameNr = _pasteInTargetAnimationAtFrame;
-
-            var isTheTargetFramesShorterThanCopiedFrames = _backupFrames.Count < _copyFramesLength;
+            var copyFramesEnds = _copyFramesLength + frameNr - 1;
+            var isTheTargetFramesShorterThanCopiedFrames = _backupFrames.Count <  _copyFramesLength;
 
             if (isTheTargetFramesShorterThanCopiedFrames)
             {
                 var lastFrame = _animation.DynamicFrames.Last().Clone();
-                var delta = _copyFramesLength - _backupFrames.Count;
+                var delta = copyFramesEnds - _backupFrames.Count;
 
                 for (int i = 0; i < delta; i++)
                 {
@@ -197,9 +198,10 @@ namespace View3D.Commands.Bone
                 }
             }
 
+
             foreach (var frame in _fromFrame.Frames)
             {
-                if (frameNr > _copyFramesLength) break;
+                if (frameNr > copyFramesEnds) break;
 
                 foreach (var bone in _selectedBones)
                 {

@@ -4,14 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
              mc:Ignorable="d" 
              d:DesignHeight="850" d:DesignWidth="800">
-    
-    
-    
+
+    <UserControl.Resources>
+        <controls:BooleanToVisibilityConverter x:Key="boolConv"/>
+    </UserControl.Resources>
+
     <DockPanel LastChildFill="False">
         <Label  DockPanel.Dock="Top" Content="Animation Key Frame Editor" FontSize="18" FontWeight="Bold"/>
         <Label  DockPanel.Dock="Top" FontSize="10">&lt;-- Drag the border to reveal the buttons text</Label>
+        <Label  DockPanel.Dock="Top" FontSize="20" Foreground="Red" Visibility="{Binding IsDirty.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource boolConv}}" >WARNING: Do not change the rider animation before saving, otherwise you will lose progress</Label>
         <Label  DockPanel.Dock="Top" ContentStringFormat="You are currently editing frame Nr: {0}"  Content="{Binding CurrentFrameNumber, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="18" FontWeight="Bold"/>
 
         
@@ -150,7 +154,10 @@
         </Grid>
         
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
-            <Label>In range copy operations from other keyedframe editor window</Label>
+            <StackPanel>
+                <Label>In range copy operations from other keyedframe editor window. </Label>
+                <Label>It will copy current frame  and then paste in the destination animation up to desired length</Label>
+            </StackPanel>
         </Grid>
 
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
@@ -159,29 +166,22 @@
             </Grid.ColumnDefinitions>
 
             <DockPanel>
-                <CheckBox DockPanel.Dock="Top" Content="Copy/paste multiple frames" IsChecked="{Binding CopyMoreThanSingleFrame.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Copy/paste multiple frames" IsChecked="{Binding CopyMoreThanSingleFrame, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="Don't warn if the skeletons are different" IsChecked="{Binding DontWarnDifferentSkeletons.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="Don't warn if the incoming total frames > this animation total frames" IsChecked="{Binding DontWarnIncomingFramesBigger.Value, UpdateSourceTrigger=PropertyChanged}"  />
-                <CheckBox DockPanel.Dock="Top" Content="When pasting use the frame number ranges below, otherwise it will paste whole frames" IsChecked="{Binding PasteUsingFormBelow.Value, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding CopyMoreThanSingleFrame.Value}"/>
+                <CheckBox DockPanel.Dock="Top" Content="When pasting use the frame number ranges below, otherwise it will paste whole frames" IsChecked="{Binding PasteUsingFormBelow, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding CopyMoreThanSingleFrame}"/>
             </DockPanel>
         </Grid>
 
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="70"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="170"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="70"/>
             </Grid.ColumnDefinitions>
-
-            <Label Grid.Column="0">From frame nr(copy)/At frame(paste):</Label>
-            <TextBox Grid.Column="1" PreviewTextInput="FrameNrPreviewTextInput" TextChanged="FrameNrCantBeEmpty"  IsEnabled="{Binding CopyMoreThanSingleFrame.Value}" Text="{Binding FrameNrStart}"></TextBox>
-            <Button Grid.Column="2" Content="Set 0"  Click="{s:MethodBinding SetStartFrameZero}" Margin="2,0,0,0"/>
-            <Label Grid.Column="3">To frame nr(copy)/Frame length(paste):</Label>
-            <TextBox Grid.Column="4" PreviewTextInput="FrameNrPreviewTextInput" TextChanged="FrameNrCantBeEmpty" IsEnabled="{Binding CopyMoreThanSingleFrame.Value}" Text="{Binding FrameNrEnd}"></TextBox>
-            <Button Grid.Column="5" Content="Set Max"  Click="{s:MethodBinding SetEndFrameMax}" Margin="2,0,0,0"/>
+            <Label Grid.Column="0">Paste Length:</Label>
+            <TextBox Grid.Column="1" PreviewTextInput="FrameNrPreviewTextInput" TextChanged="FrameNrCantBeEmpty" IsEnabled="{Binding CopyMoreThanSingleFrame}" Text="{Binding FrameNrLength}"></TextBox>
+            <Button Grid.Column="2" Content="Set Max"  Click="{s:MethodBinding SetFrameLengthMax}" Margin="2,0,0,0"/>
         </Grid>
               
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
