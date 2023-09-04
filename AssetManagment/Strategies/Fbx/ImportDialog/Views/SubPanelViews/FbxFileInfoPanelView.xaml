@@ -10,25 +10,7 @@
             Header="File Info" 
                       ExpandDirection="Down" 
                       IsExpanded="True">
-        <GroupBox>
-
-            <!-- TODO: remove ?-->
-            <!--<Grid>-->
-            <!--<Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>                    
-                </Grid.RowDefinitions>
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>                    
-                    <ColumnDefinition Width="*"/>                    
-                </Grid.ColumnDefinitions>-->
-
-
+        <GroupBox>            
             <DockPanel LastChildFill="true">
 
                 <!--File Name-->
@@ -113,44 +95,7 @@
                 </StackPanel>
             </DockPanel>
 
-
-
-
-
-            <!--<DataGrid                 
-                DockPanel.Dock="Top"
-                Margin="5"
-                Grid.Row="0"
-                Grid.Column="0"                    
-                HorizontalAlignment="left"
-                AutoGenerateColumns="False"
-                GridLinesVisibility="None"
-                
-                BorderThickness="0"
-                    BorderBrush="Transparent"
-                    
-                HorizontalScrollBarVisibility="Auto"
-                VerticalScrollBarVisibility="Auto"
-                   HeadersVisibility="None"
-                ItemsSource="{Binding FileInfoGridSource, UpdateSourceTrigger=PropertyChanged}">
-
-                    <DataGrid.Columns>
-                        <DataGridTextColumn                                 
-                                Header="Item"                                 
-                                IsReadOnly="True"
-                                Width="auto"
-                                Binding="{Binding Name}"/>
-
-                        <DataGridTextColumn 
-                                Header="Value" 
-                                Width="auto"
-                                IsReadOnly="true"                                    
-                                Binding="{Binding Value}"/>
-
-                    </DataGrid.Columns>
-                </DataGrid>-->
-            <!--</Grid>-->
-        </GroupBox>
+        </GroupBox>        
+        
     </Expander>
-    <!--</GroupBox>-->
 </UserControl>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include "..\FBXSceneContainer\FBXSCeneContainer.h"
+#include "..\..\SceneContainer\FBXSCeneContainer.h"
 
 namespace wrapdll
 {
@@ -27,15 +27,7 @@ namespace wrapdll
         /// <summary>
         /// Fille the scene containter file info structure, from the FBX scene/sdk manager
         /// </summary>
-        void FillFileInfo();
-
-        // TODO: find out if you can remove
-
-        // TODO: find out if you can remove
-		//std::vector<std::string>& GetBoneNames()
-		//{
-		//	return m_animFileBoneNames;
-		//}
+        void FillFileInfo();      
 
 		/// <summary>
 		/// Get reference to scene containter object
@@ -47,9 +39,6 @@ namespace wrapdll
 		}
 
 	private:
-        // TODO: find out, if you can remove
-		//std::vector<std::string> m_animFileBoneNames; // ordered as the .ANIM file, so can be used for bonename -> index lookups
-		
 		FBXSCeneContainer m_sceneContainer; // the container of mesh, anim, etc, that is copied to/from C#, stored here, so no extra pointer cleanup needed
 
 		fbxsdk::FbxScene* m_pFbxScene = nullptr;

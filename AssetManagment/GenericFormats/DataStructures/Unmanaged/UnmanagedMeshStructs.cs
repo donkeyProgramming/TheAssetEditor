@@ -31,12 +31,17 @@ namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
         public int weightCount;
     };
 
+    // TODO: CAN this be combed with "Influence", so there is only on type "VertexInfluence"
+    /// <summary>
+    /// "VertexWeight" different from influence, in that it is not stored in per-vertex array
+    /// it instead contains an index to vertex being influence    
+    /// </summary>    
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct ExtVertexWeight
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
         public string boneName;
-        public int boneIndex;
+        public int boneIndex; // TODO: should be removed, maybe, as it is not known when struct is first filled
         public int vertexIndex;
         public float weight;
     }

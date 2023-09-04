@@ -8,12 +8,12 @@ namespace wrapdll
     class FBXNodeSearcher
     {
     public:
-        static std::string FetchSkeletonNameFromScene(fbxsdk::FbxScene* pScene)
+        static std::string FetchSkeletonNameFromScene(fbxsdk::FbxScene* pScene, bool* pIsAttributeSkeleton = nullptr)
         {
             std::string tempSkeletonString = "";
             auto parent = pScene->GetRootNode();
 
-            SearchNodesForSkeletonTagRecursive(parent, tempSkeletonString);
+            SearchNodesForSkeletonTagRecursive(parent, tempSkeletonString, pIsAttributeSkeleton);
 
             return tempSkeletonString;
         }
@@ -64,8 +64,13 @@ namespace wrapdll
         }
 
     private:
-        static void SearchNodesForSkeletonTagRecursive(fbxsdk::FbxNode* parent, std::string& skeletonString)
+        static void SearchNodesForSkeletonTagRecursive(fbxsdk::FbxNode* parent, std::string& skeletonString, bool* pIsBoneAtrribute)
         {
+            if (pIsBoneAtrribute)
+            {
+                *pIsBoneAtrribute = false;
+            }
+
             if (!skeletonString.empty()) // to make sure the recursive stops when string is set
                 return;
 
@@ -79,14 +84,20 @@ namespace wrapdll
 
                 if (tolower(nodeName).find(nodeTag) == 0)
                 {
-                    skeletonString = nodeName.erase(0, nodeTag.length());
+                    skeletonString = nodeName.erase(0, nodeTag.length());                    
 
-                    auto attributeType = currentChildNode->GetNodeAttribute()->GetAttributeType();
-                    
+                    if (pIsBoneAtrribute)
+                    {
+                        auto attributeType = currentChildNode->GetNodeAttribute()->GetAttributeType();
+                        if (attributeType == fbxsdk::FbxNodeAttribute::eSkeleton)
+                        {
+                            *pIsBoneAtrribute = true;
+                        }
+                    }
                     return;
                 }
 
-                SearchNodesForSkeletonTagRecursive(currentChildNode, skeletonString);
+                SearchNodesForSkeletonTagRecursive(currentChildNode, skeletonString, pIsBoneAtrribute);
             }
         }
 

@@ -4,8 +4,7 @@
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
+  <ItemGroup>    
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>

@@ -150,13 +150,6 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
         {
 
         }
-
-        public void SkeletonFileBrowseButton()
-        {
-            var test = BSkeletonComboxSelected.Name;
-            var DEBUG_BREAK = true; // TODO: REMOVE!!
-        }
-
         public void ImportButtonClicked()
         {
             // not needed anymore...?            

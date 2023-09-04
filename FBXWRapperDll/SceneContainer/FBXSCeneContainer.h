@@ -34,43 +34,35 @@ namespace wrapdll
 		};
 
         void GetVertices(int meshindex, PackedCommonVertex** ppVertices, int* itemCount);
-
         void GetIndices(int meshindex, uint16_t** ppVertices, int* itemCount);
+        void GetVertexWeights(int meshindex, VertexWeight** pVertexWeights, int* itemCount);
 
-		void GetVertexWeights(int meshindex, VertexWeight** ppVertices, int* itemCount)
-		{
-			*itemCount = static_cast<int>(m_packedMeshes[meshindex].vertexWeights.size());
-            if (*itemCount == 0)
-            {
-                *ppVertices = nullptr; // STL standard, empty std::vecter.data() not guaranteed to by "nullprt"?
-                return;
-            }
-
-			*ppVertices = m_packedMeshes[meshindex].vertexWeights.data();
-		};
-
-		std::vector <PackedMesh>& GetMeshes()
+        void AllocateMeshes(int count);
+        void SetVertices(int meshindex, VertexWeight* pVerticess, int vertexCount);
+        void SetIndices(int meshindex, VertexWeight* pIndices, int vertexCount);
+        void SetVertexWeights(int meshindex, VertexWeight* pVertexWeights, int* weightCOunt);
+        
+        std::vector <PackedMesh>& GetMeshes()
 		{
 			return m_packedMeshes;
 		};
 
 		std::string& GetSkeletonName()
 		{
-			return m_skeletonName;
-		};
+            return m_skeletonName;
+		};        	
 
 		FbxFileInfoData& GetFileInfo()
-		{
-            
+		{            
             // TODO: file out rest and display in "GileInfoView"
 
 			return m_fileInfoStruct;
 		};
 
-	private:
-        
+	private:        
         FbxFileInfoData m_fileInfoStruct;
-                
+          
+        // TODO: remove?
 		std::string m_skeletonName = "";
 		std::vector<PackedMesh> m_packedMeshes;		
 		std::vector<std::string> m_animFileBoneNames; // ordered as the .ANIM file, so can be used for bonename -> index lookups

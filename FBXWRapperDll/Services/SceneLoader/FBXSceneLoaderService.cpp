@@ -1,17 +1,17 @@
 #include "FBXSceneLoaderService.h"
 
-#include "..\Helpers\Geometry\FBXNodeSearcher.h"
-#include "..\Processing\MeshProcessor.h"
-#include "..\Processing\FBXSkinProcessor.h"
-#include "..\Processing\FBXMeshCreator.h"
-#include "..\DLLDefines.h"
+#include "..\..\Helpers\Geometry\FBXNodeSearcher.h"
+#include "..\..\Processing\MeshProcessor.h"
+#include "..\..\Processing\FBXSkinProcessor.h"
+#include "..\..\Processing\FBXMeshCreator.h"
+#include "..\..\DLLDefines.h"
 
 wrapdll::FBXImporterService* wrapdll::FBXImporterService::CreateFromDiskFile(const std::string& path)
 {
     auto pInstance = new wrapdll::FBXImporterService();
     pInstance->m_pSDKManager = FBXHelperFileUtil::InitializeSdkManager(); // for creation/cleanup
     pInstance->m_pFbxScene = FBXHelperFileUtil::InitScene(pInstance->m_pSDKManager, path, &pInstance->m_sceneContainer.GetFileInfo().sdkVersionUsed);
-    strcpy_s<255>(pInstance->m_sceneContainer.GetFileInfo().fileName, path.c_str());
+    CopyToFixedString(pInstance->m_sceneContainer.GetFileInfo().fileName, path);
 
     if (!pInstance->m_pFbxScene)
     {
@@ -30,9 +30,8 @@ wrapdll::FBXSCeneContainer* wrapdll::FBXImporterService::ProcessAndFillScene()
 
     std::vector<fbxsdk::FbxMesh*> fbxMeshList;
     FBXNodeSearcher::FindMeshesInScene(m_pFbxScene, fbxMeshList);
-
-    // TODO: check that "skeletonName" is only set once and in the proper place
-    m_sceneContainer.GetSkeletonName() = FBXNodeSearcher::FetchSkeletonNameFromScene(m_pFbxScene);    
+    
+    m_sceneContainer.GetSkeletonName() = FBXNodeSearcher::FetchSkeletonNameFromScene(m_pFbxScene, &m_sceneContainer.GetFileInfo().isIdStringBone);
 
     destPackedMeshes.clear();
     destPackedMeshes.resize(fbxMeshList.size());
@@ -60,8 +59,8 @@ void wrapdll::FBXImporterService::FillFileInfo()
 {
     auto& fileInfo = m_sceneContainer.GetFileInfo(); 
         
-    strcpy_s<255>(fileInfo.units, m_pFbxScene->GetGlobalSettings().GetSystemUnit().GetScaleFactorAsString_Plurial());    
-    strcpy_s<255>(fileInfo.skeletonName, m_sceneContainer.GetSkeletonName().c_str());        
+    CopyToFixedString(fileInfo.units, m_pFbxScene->GetGlobalSettings().GetSystemUnit().GetScaleFactorAsString_Plurial());    
+    CopyToFixedString(fileInfo.skeletonName, m_sceneContainer.GetSkeletonName().c_str());
 
 	// use the recursive node search to get the count of different node types
     std::vector<fbxsdk::FbxNode*> fbxallNodes;

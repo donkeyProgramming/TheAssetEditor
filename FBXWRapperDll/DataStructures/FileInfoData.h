@@ -2,12 +2,28 @@
 #include <DirectXMath.h>
 #include <string>
 
-static const size_t fixedStringLength = 255;
+static const size_t fixedStringLength = 256;
 using FixedString = char[fixedStringLength];
 
-static void CopyToFixedString(FixedString& out, const std::string& input)
+static void CopyToFixedString(FixedString& output, const std::string& input)
 {
-    strcpy_s<fixedStringLength>(out, input.c_str());
+    strcpy_s<fixedStringLength>(output, input.c_str());
+}
+
+static void CopyToFixedString(FixedString& output, const char* input)
+{
+    strcpy_s<fixedStringLength>(output, input);
+}
+
+static void CopyFromFixedString(std::string& outputString, const FixedString inputFixed)
+{  
+    outputString = inputFixed;
+    outputString.resize(fixedStringLength);
+}
+
+static void CopyFixedString(FixedString& outoutFixed, const FixedString& inputFixed)
+{  
+    strcpy_s<fixedStringLength>(outoutFixed, inputFixed);
 }
 
 struct FbxFileInfoData
@@ -16,6 +32,7 @@ struct FbxFileInfoData
     FixedString fileName = "";
     FixedString skeletonName = "";
     FixedString units = "";
+    bool isIdStringBone = false;
     float scaleFatorToMeters = 0.0;
     int elementCount = 0;
     int meshCount = 0;

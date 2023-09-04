@@ -9,8 +9,6 @@ namespace AssetManagement.Strategies.Fbx
         public static SceneContainer LoadScene(string fileName)
         {
             IntPtr fbxSceneLoader = IntPtr.Zero;
-
-
             try
             {
                 fbxSceneLoader = FBXSeneLoaderServiceDLL.CreateSceneFBX(fileName);

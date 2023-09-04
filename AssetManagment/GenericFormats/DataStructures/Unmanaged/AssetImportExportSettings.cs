@@ -25,22 +25,23 @@ namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
         public float animFPS;
         public float animTiem;
         public int animFrame;
-    }
+    }    
 
     [StructLayout(LayoutKind.Sequential)]
     public struct ExtFileInfoStruct
     {
         public XMINT3 sdkVersionUsed;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
         public string fileName;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
         public string skeletonName;
 
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
         public string units;
 
+        public bool isIdSkeletonStringBone;
         public float scaleFatorToMeters;
         public int elementCount;
         public int meshCount;

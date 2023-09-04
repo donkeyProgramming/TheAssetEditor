@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <vector>
 #include <string>
+#include "FileInfoData.h"
 
 struct BoneAnimKey
 {
@@ -23,7 +24,8 @@ public:
 
     void Set(const std::string& boneName, uint32_t boneIndex, float Weight)
     {        
-        strcpy_s<255>(this->boneName, boneName.c_str());
+        CopyToFixedString(this->boneName, boneName);
+
         this->boneIndex = boneIndex;
         this->weight = weight;
     }
@@ -31,14 +33,14 @@ public:
     VertexInfluence Clone() const
     {
         VertexInfluence v;
-        strcpy_s<255>(v.boneName, boneName);
+        CopyFixedString(v.boneName, boneName);
         v.boneIndex = boneIndex;
         v.weight = weight;
 
         return v;
     }    
 
-    char boneName[255] = ""; // fixed length for simpler interop
+    FixedString boneName = ""; // fixed length for simpler interop
 	uint32_t boneIndex = 0;
 	float weight = 0.0f;
 };

@@ -4,11 +4,15 @@ using System.Linq;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using CommonControls.FileTypes.Animation;
 using AssetManagement.GenericFormats.DataStructures.Managed;
+using CommonControls.Common;
+using Serilog;
 
 namespace AssetManagement.MeshProcessing.Common
 {
     public class CommonWeightProcessor
-    {
+    {    
+        static private readonly ILogger _logger = Logging.Create<CommonWeightProcessor>();
+
         /// <summary>
         /// Add 1 weight to the vertex, does "boundary" check
         /// </summary>        
@@ -29,9 +33,17 @@ namespace AssetManagement.MeshProcessing.Common
             if (boneName.Any()) // don't add empty influences (boneName == "")
             {
                 var boneIndex = skeletonFile.GetIdFromBoneName(boneName);
+
+                if (boneIndex == AnimationFile.InvalidBoneIndex)
+                {
+                    _logger.Warning($"Mesh Vertex Weights, refer to a bone {boneName}, that is not in the selected skeleton.");
+                    return;
+                }
+
                 AddWeightToVertex(vertex, boneIndex, weight);
+
             }
-        }
+        }        
 
         /// <summary>
         /// Check the vertex weights have the SUM = 1.0 within a certain tolerance

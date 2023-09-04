@@ -12,9 +12,6 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews
         {
             InitializeComponent();
             UpdateLayout();
-
-            //Anywhere you plan to bind the list in my case FruitList
-            //GetData() creates a collection of Customer data from a database
         }
     }
 }

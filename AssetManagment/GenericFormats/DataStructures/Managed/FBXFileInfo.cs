@@ -30,7 +30,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
         public int MaterialCount { set; get; }
         public int AnimationsCount { set; get; }
         public bool ContainsDerformingData { set; get; }
-
+        public bool IsSkeletonIdStringBone { set; get; }
         override public void FillStruct(out ExtFileInfoStruct destStruct)
         {
             destStruct.sdkVersionUsed.x = SdkVersionUsed.X;
@@ -46,6 +46,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
             destStruct.animationsCount = AnimationsCount;
             destStruct.boneCount = BoneCount;
             destStruct.containsDerformingData = ContainsDerformingData;
+            destStruct.isIdSkeletonStringBone = IsSkeletonIdStringBone;
         }
 
         override public void FillFromStruct(in ExtFileInfoStruct srcStruct)
@@ -63,6 +64,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
             AnimationsCount = srcStruct.animationsCount;
             BoneCount = srcStruct.boneCount;
             ContainsDerformingData = srcStruct.containsDerformingData;
+            IsSkeletonIdStringBone = srcStruct.isIdSkeletonStringBone;
         }
     }
 }

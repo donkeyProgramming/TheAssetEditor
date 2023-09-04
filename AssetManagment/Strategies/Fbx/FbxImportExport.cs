@@ -25,8 +25,7 @@ namespace AssetManagement.Strategies.Fbx
             var sceneContainer = SceneLoader.LoadScene(diskFilePath);
             if (sceneContainer == null)
                 return null;
-
-            // TODO: check in th C++ that "skeletonName" is only set once and in the proper place
+                           
             var fbxSettings = new FbxSettingsModel()
             {
                 SkeletonName = sceneContainer.SkeletonName,
