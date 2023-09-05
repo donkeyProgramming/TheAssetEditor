@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using CommonControls.FileTypes.PackFiles.Models;
@@ -37,9 +38,8 @@ namespace CommonControls.Events.UiCommands
                 var filename = dialog.FileNames.FirstOrDefault();
                 if (string.IsNullOrWhiteSpace(filename))
                     return;
-
-                // TODO: RE-ENABLE!!!
-               //try
+                
+               try
                 {
                     var extension = Path.GetExtension(filename);
                     var importer = _assetManagementFactory.GetImporter(extension);  // TODO: What if no importer is found?
@@ -50,10 +50,10 @@ namespace CommonControls.Events.UiCommands
 
                     _packFileService.AddFileToPack(container, parentPath, packFile);
                 }
-                //catch (Exception e)
-                //{
-                //    MessageBox.Show($"Failed to import model/scene file {filename}. Error : {e.Message}", "Error");
-                //}
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Failed to import model/scene file {filename}. Error : {e.Message}", "Error");
+                }
             }
         }
     }

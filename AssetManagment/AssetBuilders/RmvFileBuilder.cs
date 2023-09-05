@@ -65,7 +65,7 @@ namespace AssetManagement.AssetBuilders
         private static void ProcessMeshWeights(RmvMesh rmv2DestMesh, PackedMesh srcMesh, AnimationFile skeletonFile)
         {
             if (skeletonFile == null)
-            { return; }
+                return;
 
 
             for (var vertexWeightIndex = 0; vertexWeightIndex < srcMesh.VertexWeights.Count; vertexWeightIndex++)
