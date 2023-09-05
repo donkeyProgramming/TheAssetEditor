@@ -1084,7 +1084,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             var animFile = _rider.AnimationClip.ConvertToFileFormat(_rider.Skeleton);
-            var path = ActiveOutputFragment.SelectedItem.FullPath;
+            var path = _rider.AnimationName.Value.AnimationFile;
             MessageBox.Show($"this will save with anim version {animFile.Header.Version}\n"+
                             $"on this path {path}\n", "warn", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SaveHelper.Save(_pfs, path, null, AnimationFile.ConvertToBytes(animFile), true);
