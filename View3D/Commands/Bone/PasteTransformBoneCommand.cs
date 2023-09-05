@@ -46,7 +46,7 @@ namespace View3D.Commands.Bone
         {
             for (int frameNr = _startingFrame; frameNr <= _endFrame; frameNr++)
             {
-                var clone = _backupFrames[frameNr].Clone();
+                var clone = _fromFrame.Clone();
                 if (_pastePosition) _animation.DynamicFrames[frameNr].Position = clone.Position;
                 if (_pasteRotation) _animation.DynamicFrames[frameNr].Rotation = clone.Rotation;
                 if (_pasteScale) _animation.DynamicFrames[frameNr].Scale = clone.Scale;
@@ -59,11 +59,12 @@ namespace View3D.Commands.Bone
 
             foreach (var bone in _selectedBones)
             {
+                var clone = _fromFrame.Clone();
                 for (int frameNr = _startingFrame; frameNr <= _endFrame; frameNr++)
                 {
-                    if (_pastePosition) _animation.DynamicFrames[frameNr].Position[bone] = _fromFrame.Position[bone];
-                    if (_pasteRotation) _animation.DynamicFrames[frameNr].Rotation[bone] = _fromFrame.Rotation[bone];
-                    if (_pasteScale) _animation.DynamicFrames[frameNr].Scale[bone] = _fromFrame.Scale[bone];
+                    if (_pastePosition) _animation.DynamicFrames[frameNr].Position[bone] = clone.Position[bone];
+                    if (_pasteRotation) _animation.DynamicFrames[frameNr].Rotation[bone] = clone.Rotation[bone];
+                    if (_pasteScale) _animation.DynamicFrames[frameNr].Scale[bone] = clone.Scale[bone];
                 }
             }
         }

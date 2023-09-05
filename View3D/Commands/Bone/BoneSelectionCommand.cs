@@ -9,7 +9,7 @@ namespace View3D.Commands.Bone
         SelectionManager _selectionManager;
         ISelectionState _oldState;
 
-        static BoneSelectionState  _hackOldState;
+         BoneSelectionState  _hackOldState;
 
         bool _isAdd;
         bool _isRemove;
