@@ -45,6 +45,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private SceneObject _rider;
         private AnimationClip _originalClip;
         private int _frameNrToCopy;
+        private GameSkeleton _skeleton;
 
 
         private List<int> _previousSelectedBones;
@@ -201,7 +202,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             _modifiedFrameNr = state.CurrentFrame;
-            SelectPreviousBones();
+            //SelectPreviousBones();
         }
 
         private void UpdateCanSaveAndPreviewStates()
@@ -313,7 +314,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             MountLinkController.ReloadFragments(true, false);
             UpdateCanSaveAndPreviewStates();
-            
+            _skeleton = newValue;
         }
 
         public void DuplicateFrame()
@@ -395,7 +396,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 if (selection != null)
                 {
                     selection.CurrentAnimation = _rider.Player.AnimationClip;
-                    selection.Skeleton = _rider.Player.Skeleton;
+                    selection.Skeleton = _skeleton;
                     selection.CurrentFrame = _rider.Player.CurrentFrame;
                     selection.SelectedBones.Clear();
                 }
