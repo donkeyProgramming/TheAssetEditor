@@ -10,7 +10,6 @@ using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using View3D.Animation;
@@ -38,7 +37,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         private CommandFactory _commandFactory;
         private SelectionManager _selectionManager;
-        private TransformToolViewModel _transformToolViewModel;
         private CommandExecutor _commandExecutor;
         AnimationToolInput _inputRiderData;
         AnimationToolInput _inputMountData;
@@ -118,7 +116,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             SceneObjectBuilder sceneObjectBuilder,
             CommandFactory commandFactory,
             SelectionManager selectionManager,
-            TransformToolViewModel transformToolViewModel,
             GizmoComponent gizmoComponent,
             CommandExecutor commandExecutor)
         {
@@ -135,7 +132,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _selectionManager = selectionManager;
 
             _gizmoComponent = gizmoComponent;
-            _transformToolViewModel = transformToolViewModel;
             _commandExecutor = commandExecutor;
 
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
