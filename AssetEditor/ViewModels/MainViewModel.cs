@@ -196,8 +196,6 @@ namespace AssetEditor.ViewModels
             SelectedEditorIndex = CurrentEditorsList.IndexOf(node);
             return true;
         }
-
-
     }
 
     public class EditorCreator : IEditorCreator
@@ -245,5 +243,4 @@ namespace AssetEditor.ViewModels
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;
         }
     }
-
 }
