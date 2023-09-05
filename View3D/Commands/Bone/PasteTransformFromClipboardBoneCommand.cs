@@ -109,13 +109,13 @@ namespace View3D.Commands.Bone
         public void PasteInRanges()
         {
             int frameNr = _pasteInTargetAnimationAtFrame;
-            var copyFramesEnds = _copyFramesLength + frameNr;
+            var copyFramesEnds = _copyFramesLength + frameNr - 1;
             var isTheTargetFramesShorterThanCopiedFrames = _backupFrames.Count < copyFramesEnds;
 
             if (isTheTargetFramesShorterThanCopiedFrames)
             {
                 var lastFrame = _animation.DynamicFrames.Last().Clone();
-                var delta = _copyFramesLength - _backupFrames.Count;
+                var delta = System.Math.Abs(frameNr - copyFramesEnds);
 
                 for (int i = 0; i < delta; i++)
                 {
@@ -190,7 +190,7 @@ namespace View3D.Commands.Bone
             if (isTheTargetFramesShorterThanCopiedFrames)
             {
                 var lastFrame = _animation.DynamicFrames.Last().Clone();
-                var delta = copyFramesEnds - _backupFrames.Count;
+                var delta = System.Math.Abs(frameNr - copyFramesEnds);
 
                 for (int i = 0; i < delta; i++)
                 {
