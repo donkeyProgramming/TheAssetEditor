@@ -59,22 +59,6 @@ namespace AnimationEditor.Common.ReferenceModel
             instance.SkeletonSceneNode = skeletonSceneNode;
             instance.Description = description;
 
-            if(description == "Rider")
-            {
-                animationPlayer.OnFrameChanged += (currentFrame) =>
-                {
-                    var selection = _selectionManager.GetState<BoneSelectionState>();
-                    if (selection != null && description == "Rider")
-                    {
-                        selection.CurrentAnimation = animationPlayer.AnimationClip;
-                        selection.Skeleton = animationPlayer.Skeleton;
-                        selection.CurrentFrame = currentFrame;
-                        selection.SelectedBones.Clear();
-                    }
-
-                };
-            }
-
             return _mainScene.AddComponent(instance);
         }
 

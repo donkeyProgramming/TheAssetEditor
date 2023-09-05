@@ -26,6 +26,7 @@
             <DockPanel>
                 <CheckBox DockPanel.Dock="Top" Content="Allow to select animroot node" IsChecked="{Binding AllowToSelectAnimRoot.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="Increment the frame after copy operation" IsChecked="{Binding IncrementFrameAfterCopyOperation.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Select previous bones when frame changed" IsChecked="{Binding AutoSelectPreviousBonesOnFrameChange.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="Enable Inverse Kinematics (currently not completed, help needed!)" IsChecked="{Binding EnableInverseKinematics.Value, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="false"  />
                 <Label>Last end of the bones chain (for IK):</Label>
                 <ComboBox  

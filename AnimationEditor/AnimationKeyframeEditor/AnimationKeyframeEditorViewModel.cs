@@ -21,7 +21,6 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Gizmo;
 using View3D.SceneNodes;
-using static CommonControls.Editors.AnimationPack.Converters.AnimationBinFileToXmlConverter;
 using SkeletonBoneNode = AnimationEditor.Common.ReferenceModel.SkeletonBoneNode;
 
 namespace AnimationEditor.AnimationKeyframeEditor
@@ -86,6 +85,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public NotifyAttr<bool> PasteScale { get; set; } = new(true);
         public NotifyAttr<bool> IsDirty { get; set; } = new(false);
         public NotifyAttr<bool> EnableFrameNrStartTextboxOnPaste { get; set; } = new(false);
+        public NotifyAttr<bool> AutoSelectPreviousBonesOnFrameChange { get; set; } = new(false);
 
         public string FrameNrLength { get => _frameNrLength; set => SetAndNotify(ref _frameNrLength, value); }
         private string _frameNrLength = "0";
@@ -205,6 +205,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             _modifiedFrameNr = state.CurrentFrame;
+            SelectPreviousBones();
         }
 
         private void UpdateCanSaveAndPreviewStates()
@@ -255,7 +256,10 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         private void RiderOnFrameChanged(int currentFrame)
         {
-
+            if(AutoSelectPreviousBonesOnFrameChange.Value)
+            {
+                SelectPreviousBones();
+            }
         }
 
         private void MountSkeletonChanged(GameSkeleton newValue)
@@ -324,7 +328,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var command = _commandFactory.Create<DuplicateDeleteFrameBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, currentFrame)).Build();
             command.DuplicateFrame();
@@ -340,7 +344,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             var currentFrame = _rider.Player.CurrentFrame;
 
             var result = MessageBox.Show($"remove this frame at {currentFrame}? it is NOT recommended to remove a frame as this is a destructive operation", "warn", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -360,6 +364,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return FindSelectableObject(slot);
             }
             return null;
+        }
+
+        public void Pause()
+        {
+            _rider.Player.Pause();
+            _mount.Player.Pause();
         }
 
         private void EnsureTheObjectsAreNotSelectable(ISceneNode node)
@@ -384,10 +394,15 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>() { selectableNode }, false, false)).BuildAndExecute();
                 _selectionComponent.SetBoneSelectionMode();
-                _rider.Player.Pause();
-                _rider.Player.CurrentFrame++;
-                if (_rider.Player.CurrentFrame + 1 == _rider.Player.FrameCount()) return;
-                _rider.Player.CurrentFrame--;
+                Pause();
+                var selection = _selectionManager.GetState<BoneSelectionState>();
+                if (selection != null)
+                {
+                    selection.CurrentAnimation = _rider.Player.AnimationClip;
+                    selection.Skeleton = _rider.Player.Skeleton;
+                    selection.CurrentFrame = _rider.Player.CurrentFrame;
+                    selection.SelectedBones.Clear();
+                }
             }
 
             _selectionManager.GetState().SelectionChanged += OnSelectionChanged;
@@ -417,6 +432,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public void UndoPose()
         {
+            Pause();
             _commandExecutor.Undo();
         }
 
@@ -436,7 +452,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             var command = _commandFactory.Create<ResetTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, _originalClip, currentFrame)).Build();
             command.ResetCurrentFrame();
             _commandExecutor.ExecuteCommand(command);
@@ -478,7 +494,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             _frameNrToCopy = _rider.Player.CurrentFrame;
             if(IncrementFrameAfterCopyOperation.Value)
             {
@@ -495,7 +511,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy], 
                 _rider.AnimationClip, currentFrame, currentFrame, null, 
                 PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
@@ -526,8 +542,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
 
-            _rider.Player.Pause();
-            var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy],
+            Pause();
+            var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy].Clone(),
                 _rider.AnimationClip, currentFrame, currentFrame, _previousSelectedBones,
                 PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
             command.PasteIntoSelectedBones();
@@ -555,8 +571,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
-            var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_modifiedFrameNr],
+            Pause();
+            var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_modifiedFrameNr].Clone(),
                 _rider.AnimationClip, currentFrame, currentFrame, _modifiedBones,
                 PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
             command.PasteIntoSelectedBones();
@@ -602,7 +618,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var skeleton = _rider.Skeleton;
             var frames = _rider.AnimationClip;
@@ -618,7 +634,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var endFrame = _rider.Player.AnimationClip.DynamicFrames.Count;
             var skeleton = _rider.Skeleton;
@@ -649,7 +665,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var skeleton = _rider.Skeleton;
             var frameInJsonFormat = Clipboard.GetText();
@@ -691,7 +707,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             int.TryParse(FrameNrLength, out var pastedFramesLength);
 
-            _rider.Player.Pause();
+            Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var maxFrame = _rider.AnimationClip.DynamicFrames.Count;
             var skeleton = _rider.Skeleton;
@@ -707,7 +723,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 }
 
                 var framesCount = parsedClipboardFrame.Frames.Keys.Count;
-                if (framesCount > pastedFramesLength)
+                if (pastedFramesLength > framesCount)
                 {
                     var result = MessageBox.Show($"it is too long {pastedFramesLength} frames, the animation frames length is {framesCount}.", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -717,7 +733,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 var confirm = MessageBox.Show($"animation skeleton ${skeleton.SkeletonName}\n" +
                                               $"paste at frame {currentFrame}\n" +
                                               $"total frame length to paste {pastedFramesLength}\n" +
-                                              $"{ ((willCreateNewFrame) ? $"this will extend the animation by {currentFrame + framesCount - maxFrame} frames\n" : "\n")  }" +
+                                              $"{ ((willCreateNewFrame) ? $"this will extend the animation by {(currentFrame + pastedFramesLength) - maxFrame} frames\n" : "\n")  }" +
                                               $"continue?", "confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                 if (confirm != DialogResult.Yes) return;
@@ -749,7 +765,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var skeleton = _rider.Skeleton;
             var frameInJsonFormat = Clipboard.GetText();
@@ -822,7 +838,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var skeleton = _rider.Skeleton;
             var frameInJsonFormat = Clipboard.GetText();
@@ -883,7 +899,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             int.TryParse(FrameNrLength, out var pastedFramesLength);
 
-            _rider.Player.Pause();
+            Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var maxFrame = _rider.AnimationClip.DynamicFrames.Count;
             var skeleton = _rider.Skeleton;
@@ -941,7 +957,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var skeleton = _rider.Skeleton;
             var frameInJsonFormat = Clipboard.GetText();
@@ -1018,8 +1034,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             _rider.Player.CurrentFrame = 0;
+            if (_mount.AnimationClip != null) _mount.Player.CurrentFrame = 0;
         }
 
         public void PrevFrame()
@@ -1030,8 +1047,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             _rider.Player.CurrentFrame--;
+            if (_mount.AnimationClip != null) _mount.Player.CurrentFrame--;
         }
         public void NextFrame()
         {
@@ -1041,8 +1059,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.Pause();
+            Pause();
             _rider.Player.CurrentFrame++;
+            if (_mount.AnimationClip != null) _mount.Player.CurrentFrame++;
         }
 
         public void LastFrame()
@@ -1054,7 +1073,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             _rider.Player.CurrentFrame = _rider.AnimationClip.DynamicFrames.Count - 1;
-            _rider.Player.Pause();
+            if (_mount.AnimationClip != null) _mount.Player.CurrentFrame = _mount.AnimationClip.DynamicFrames.Count - 1;
+            Pause();
         }
 
 
@@ -1082,12 +1102,13 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 MessageBox.Show("there is nothing to save!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-
+            
             var animFile = _rider.AnimationClip.ConvertToFileFormat(_rider.Skeleton);
             var path = _rider.AnimationName.Value.AnimationFile;
             MessageBox.Show($"this will save with anim version {animFile.Header.Version}\n"+
                             $"on this path {path}\n", "warn", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SaveHelper.Save(_pfs, path, null, AnimationFile.ConvertToBytes(animFile), true);
+            IsDirty.Value = false;
         }
         public void SaveAs()
         {
@@ -1108,6 +1129,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             MessageBox.Show($"this will save with anim version {animFile.Header.Version}", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             var bytes = AnimationFile.ConvertToBytes(animFile);
             SaveHelper.SaveAs(_pfs, bytes, ".anim");
+            IsDirty.Value = false;
         }
     }
 }

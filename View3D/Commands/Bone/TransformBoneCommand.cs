@@ -71,21 +71,24 @@ namespace View3D.Commands.Bone
                 Console.WriteLine(_boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone]);
                 newBoneTransform.Decompose(out var scale, out var rot, out var trans);
                 newPosition.Decompose(out var newScale, out var rot2, out var trans2);
+                var modifiedTransform = _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Clone();
                 switch (gizmoMode)
                 {
                     case GizmoMode.Translate:
-                        _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone] += trans;
+                        modifiedTransform.Position[selectedBone] += trans;
                         break;
                     case GizmoMode.Rotate:
-                        _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Rotation[selectedBone] *= rot2;
+                        modifiedTransform.Rotation[selectedBone] *= rot2;
                         break;
                     case GizmoMode.NonUniformScale:
                     case GizmoMode.UniformScale:
-                        _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Scale[selectedBone] = scale;
+                        modifiedTransform.Scale[selectedBone] = scale;
                         break;
                     default:
                         throw new InvalidOperationException("unknown gizmo mode");
                 }
+
+                _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame] = modifiedTransform;
             }
 
             _boneSelectionState.TriggerModifiedBoneEvent(_selectedBones);
@@ -218,7 +221,7 @@ namespace View3D.Commands.Bone
         {
             if (_oldFrame == null) return;
             CompareKeyFrames(_oldFrame, _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame]);
-            _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame] = _oldFrame;
+            _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame] = _oldFrame.Clone();
             _boneSelectionState.TriggerModifiedBoneEvent(_selectedBones);
         }
 
