@@ -166,7 +166,6 @@ namespace AssetEditor.ViewModels
 
         public bool AllowDrop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default) => true;
 
-
         public bool Drop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default)
         {
             var nodeIndex = CurrentEditorsList.IndexOf(node);
