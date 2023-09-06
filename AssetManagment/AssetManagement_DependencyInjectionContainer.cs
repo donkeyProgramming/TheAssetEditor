@@ -1,4 +1,4 @@
-﻿using AssetManagement.MeshHandling;
+﻿using AssetManagement.AssetHandling;
 using AssetManagement.Strategies.Fbx;
 using CommonControls;
 using CommonControls.Interfaces.AssetManagement;

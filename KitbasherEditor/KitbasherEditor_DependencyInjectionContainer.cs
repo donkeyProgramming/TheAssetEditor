@@ -13,9 +13,6 @@ using KitbasherEditor.Views;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
-using System.Reflection;
-using View3D;
 using View3D.Services;
 
 namespace KitbasherEditor

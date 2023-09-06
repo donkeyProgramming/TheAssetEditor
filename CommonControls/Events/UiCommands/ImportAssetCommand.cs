@@ -38,11 +38,11 @@ namespace CommonControls.Events.UiCommands
                 var filename = dialog.FileNames.FirstOrDefault();
                 if (string.IsNullOrWhiteSpace(filename))
                     return;
-
-                try
+                
+               try
                 {
                     var extension = Path.GetExtension(filename);
-                    var importer = _assetManagementFactory.GetImporter(extension);  // Add some validation here! 
+                    var importer = _assetManagementFactory.GetImporter(extension);  // TODO: What if no importer is found?
                     var packFile = importer.ImportAsset(filename);
 
                     if (packFile == null)

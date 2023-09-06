@@ -9,7 +9,7 @@ namespace wrapdll
 	class FBXHelperFileUtil
 	{
 	public:
-		static fbxsdk::FbxScene* InitScene(fbxsdk::FbxManager* pSdkManager, const std::string path)
+        static fbxsdk::FbxScene* InitScene(fbxsdk::FbxManager* pSdkManager, const std::string path, DirectX::XMINT3* pFileSdkVersion = nullptr)
 		{			
 			// create an empty scene
 			auto pfbxScene = fbxsdk::FbxScene::Create(pSdkManager, "");
@@ -30,22 +30,29 @@ namespace wrapdll
 			ios->SetBoolProp(IMP_FBX_GLOBAL_SETTINGS, true);
 
 			// Initialize the importer by providing a filename and the IOSettings to use
-			log_action("Loading File: \"" + path + "\"");
+			LogAction("Loading File: \"" + path + "\"");
 			auto fileInitResult = poImporter->Initialize(path.c_str(), -1, ios);
 			if (!fileInitResult)
 			{
-				log_action("Error Loading File : \"" + path + " \". Stopping!");
+				LogAction("Error Loading File : \"" + path + " \". Stopping!");
 				return nullptr;
 			}
 
+            
 			int x=0, y=0, z=0;
 			poImporter->GetFileVersion(x, y, z);
-			log_action("File uses FBX Version " + std::to_string(x) + "." + std::to_string(y) + "." + std::to_string(z));
+
+            if (pFileSdkVersion)
+            {
+                *pFileSdkVersion = { x,y,z };
+            }
+
+			LogAction("File uses FBX Version " + std::to_string(x) + "." + std::to_string(y) + "." + std::to_string(z));
 
 			// -- imports the loaded file into the scene!!
 			if (!poImporter->Import(pfbxScene))
 			{
-				log_action_error("Importing scene failed. Fatal Error. Stopping!");
+				LogActionError("Importing scene failed. Fatal Error. Stopping!");
 				return nullptr;
 			}			
 
@@ -59,24 +66,22 @@ namespace wrapdll
 		static void TransFormScene(fbxsdk::FbxManager* m_pSdkManager, fbxsdk::FbxScene* pfbxScene)
 		{
 			auto unitPlural = FBXUnitHelper::GetUnitAsString(pfbxScene);
-			log_info("File Uses Units: " + unitPlural);
-
-			log_write("Importing scene failed. Fatal Error. Stopping!");
+			LogInfo("File Uses Units: " + unitPlural);			
 
 			fbxsdk::FbxGeometryConverter geometryConverter(m_pSdkManager);
 
-			log_action("Triangulating....");
+			LogAction("Triangulating....");
 
 			bool bTriangulateResult = geometryConverter.Triangulate(pfbxScene, true, true);
 
 			if (!bTriangulateResult)
 			{
-				log_action_error("Triangulating Failed! Fatal. Stopping");
+				LogActionError("Triangulating Failed! Fatal. Stopping");
 				return;
 			}
 
 			// perform "deep convert" of everything (including animations), to a certain coord system, that fits our needs
-			log_action_success("Performing Deep Conversion of scene to 'DirectX' coord system...");
+			LogActionSuccess("Performing Deep Conversion of scene to 'DirectX' coord system...");
 			fbxsdk::FbxAxisSystem oAxis(fbxsdk::FbxAxisSystem::DirectX);
 			oAxis.DeepConvertScene(pfbxScene);
 		}
@@ -84,7 +89,7 @@ namespace wrapdll
 		// Creates an instance of the SDK manager.
 		static fbxsdk::FbxManager* InitializeSdkManager()
 		{					
-			log_action("Initializing FBX SDK importer...");
+			LogAction("Initializing FBX SDK importer...");
 
 			// Create the FBX SDK memory manager object.
 			// The SDK Manager allocates and frees memory
@@ -92,11 +97,11 @@ namespace wrapdll
 			auto pSdkManager = fbxsdk::FbxManager::Create();
 			if (!pSdkManager)
 			{
-				log_action_error("Initializing FBX SDK importer...");
+				LogActionError("Initializing FBX SDK importer...");
 				return nullptr;
 			}
 
-			log_action_success("Iinitializing FBX SDK importer...");
+			LogActionSuccess("Iinitializing FBX SDK importer...");
 
 			return pSdkManager;
 		}

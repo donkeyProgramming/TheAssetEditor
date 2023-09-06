@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews.FBXAnimationPanelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:s="http://schemas.singulink.com/xaml"                                            
+             mc:Ignorable="d"
+             d:DesignHeight="650" d:DesignWidth="500">
+
+
+
+    <Expander  x:Name="myExpander"    
+                Header="Animations Info" 
+                ExpandDirection="Down" 
+                IsExpanded="True">
+
+        <GroupBox x:Name="AnimationPanleView" Visibility="{Binding AnimationPanelVisibility}">
+            <!--CheckBox for ""Apply Weighting"-->
+            <DockPanel LastChildFill="False">            
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+                    <Label Width ="100" DockPanel.Dock="Left" Content="Apply Weighting" x:Name="label"/>
+                    <Label>:</Label>
+                    <CheckBox                         
+                        Grid.Row="0" Grid.Column="1"
+                        IsChecked="{Binding BSkeletonApplyRigging.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Center">
+                    </CheckBox>
+                </StackPanel>
+
+                <!--ComboxBox For skeletoton-->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+                    <Label Width ="100" DockPanel.Dock="Left" Content="Skeleton"/>
+                    <Label>:</Label>
+
+                    <!--PreviewKeyDown="SkeletonComboxBox_OnPreviewKeyDown"-->
+                    <ComboBox 
+                        Width="150"                        
+                        IsEditable="False" 
+                        IsTextSearchEnabled="False"                                                                      
+                        DisplayMemberPath="Name"                                                 
+                        x:Name="SkeletonComboxBox"
+                        ItemsSource="{Binding BSkeketonComboBoxContent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"    
+                        SelectedItem="{Binding BSkeletonComboxSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        Text="{Binding BSkeletonComboxSearchText}">                        
+                    </ComboBox>
+
+                </StackPanel>
+
+                <!--buton for broswing for disk file-->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+                    <Label Width ="100" DockPanel.Dock="Left" Content="Skeleton"/>
+                    <Label>:</Label>
+                    <Button x:Name="SkeletonBrowseButton" 
+                        Grid.Row="2" Grid.Column="1"
+                        Content="Browse..." 
+                        Width="150" 
+                        Click="{s:MethodBinding SkeletonFileBrowseButton}">
+                    </Button>
+                </StackPanel>
+
+            </DockPanel>
+
+
+        </GroupBox>
+
+    </Expander>
+
+
+</UserControl>
