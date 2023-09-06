@@ -83,7 +83,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetName>FBXWrapperNative</TargetName>
-    <OutDir>$(SolutionDir)AssetEditor\bin\Release\net6.0-windows</OutDir>
+    <OutDir>$(SolutionDir)AssetEditor\bin\Release\net6.0-windows\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -145,7 +145,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;FBXWRAPPERDLL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FBXSDK_SHARED;NDEBUG;FBXWRAPPERDLL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>H:\Coding\FBX SDK\2020.1;H:\Coding\FBX SDK\2020.1\include</AdditionalIncludeDirectories>
@@ -156,7 +156,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)fbxsdk\bin_dll\Releasing\libfbxsdk.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)fbxsdk\bin_dll\Releasing\libfbxsdk.lib;$(ProjectDir)fbxsdk\bin_dll\Releasing\libxml2-md.lib;$(ProjectDir)fbxsdk\bin_dll\Releasing\zlib-md.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -478,7 +478,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="DataStructures\FileInfoData.cpp" />
     <ClCompile Include="Processing\FBXMeshCreator.cpp" />
-    <ClCompile Include="Processing\FBXVertexCreator.cpp" />    
+    <ClCompile Include="Processing\FBXVertexCreator.cpp" />
     <ClCompile Include="Helpers\Geometry\FBXMeshGeometryHelper.cpp" />
     <ClCompile Include="SceneContainer\FBXSCeneContainer.cpp" />
     <ClCompile Include="Processing\MeshProcessor.cpp" />

@@ -965,9 +965,6 @@
     <ClCompile Include="Helpers\Geometry\FBXNodeSearcher.h">
       <Filter>Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="Services\FBXSceneLoaderService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Processing\FBXVertexCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
