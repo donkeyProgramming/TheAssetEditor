@@ -27,18 +27,14 @@ namespace View3D.Commands.Bone
 
         }
 
-        public void ResetCurrentFrame()
+        public void Execute()
         {
             _currentAnimationClip.DynamicFrames[_currentFrame] = _originalAnimationClip.DynamicFrames[_currentFrame].Clone();
         }
 
-        public void Execute()
-        {
-        }
-
         public void Undo()
         {
-            _currentAnimationClip.DynamicFrames[_currentFrame] = _oldFrame;
+            _currentAnimationClip.DynamicFrames[_currentFrame] = _oldFrame.Clone();
         }
     }
 }

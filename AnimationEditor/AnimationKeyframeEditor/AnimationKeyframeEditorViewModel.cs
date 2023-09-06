@@ -470,7 +470,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             Pause();
             var command = _commandFactory.Create<ResetTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, _originalClip, currentFrame)).Build();
-            command.ResetCurrentFrame();
             _commandExecutor.ExecuteCommand(command);
         }
 
