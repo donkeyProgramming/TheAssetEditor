@@ -7,7 +7,7 @@ using View3D.Animation;
 
 namespace View3D.Commands.Bone
 {
-    public class PasteTransformBoneCommand : ICommand
+    public class PasteIntoSelectedBonesTransformBoneCommand : ICommand
     {
         public string HintText => "Copy/paste bone transform";
 
@@ -42,18 +42,7 @@ namespace View3D.Commands.Bone
             }
         }
 
-        public void PasteWholeFrame()
-        {
-            for (int frameNr = _startingFrame; frameNr <= _endFrame; frameNr++)
-            {
-                var clone = _fromFrame.Clone();
-                if (_pastePosition) _animation.DynamicFrames[frameNr].Position = clone.Position;
-                if (_pasteRotation) _animation.DynamicFrames[frameNr].Rotation = clone.Rotation;
-                if (_pasteScale) _animation.DynamicFrames[frameNr].Scale = clone.Scale;
-            }
-        }
-
-        public void PasteIntoSelectedBones()
+        public void Execute()
         {
             if (_selectedBones == null) return;
 
@@ -67,11 +56,6 @@ namespace View3D.Commands.Bone
                     if (_pasteScale) _animation.DynamicFrames[frameNr].Scale[bone] = clone.Scale[bone];
                 }
             }
-        }
-
-        public void Execute()
-        {
-            
         }
         public void Undo()
         {

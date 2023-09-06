@@ -100,7 +100,8 @@ namespace View3D
             serviceCollection.AddTransient<BoneSelectionCommand>();
             serviceCollection.AddTransient<TransformBoneCommand>();
             serviceCollection.AddTransient<ResetTransformBoneCommand>();
-            serviceCollection.AddTransient<PasteTransformBoneCommand>();
+            serviceCollection.AddTransient<PasteWholeTransformBoneCommand>();
+            serviceCollection.AddTransient<PasteIntoSelectedBonesTransformBoneCommand>();
             serviceCollection.AddTransient<PasteTransformFromClipboardBoneCommand>();
             serviceCollection.AddTransient<DuplicateFrameBoneCommand>();
             serviceCollection.AddTransient<DeleteFrameBoneCommand>();

@@ -526,11 +526,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             Pause();
-            var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy], 
-                _rider.AnimationClip, currentFrame, currentFrame, null, 
-                PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
-            command.PasteWholeFrame();
-            _commandExecutor.ExecuteCommand(command);
+            _commandFactory.Create<PasteWholeTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy], 
+                _rider.AnimationClip, currentFrame, currentFrame, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
 
             if (IncrementFrameAfterCopyOperation.Value)
             {
@@ -557,11 +554,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
 
             Pause();
-            var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy].Clone(),
+            _commandFactory.Create<PasteIntoSelectedBonesTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy].Clone(),
                 _rider.AnimationClip, currentFrame, currentFrame, _previousSelectedBones,
-                PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
-            command.PasteIntoSelectedBones();
-            _commandExecutor.ExecuteCommand(command);
+                PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
 
             if (IncrementFrameAfterCopyOperation.Value)
             {
@@ -586,11 +581,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             Pause();
-            var command = _commandFactory.Create<PasteTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_modifiedFrameNr].Clone(),
+            _commandFactory.Create<PasteIntoSelectedBonesTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_modifiedFrameNr].Clone(),
                 _rider.AnimationClip, currentFrame, currentFrame, _modifiedBones,
-                PastePosition.Value, PasteRotation.Value, PasteScale.Value)).Build();
-            command.PasteIntoSelectedBones();
-            _commandExecutor.ExecuteCommand(command);
+                PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
 
             if (IncrementFrameAfterCopyOperation.Value)
             {
