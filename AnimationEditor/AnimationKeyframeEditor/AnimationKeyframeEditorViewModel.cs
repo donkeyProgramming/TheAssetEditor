@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
@@ -34,6 +36,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private SelectionComponent _selectionComponent;
         private GizmoComponent _gizmoComponent;
+        private GizmoMode _lastGizmoTool = GizmoMode.Translate;
 
         private CommandFactory _commandFactory;
         private SelectionManager _selectionManager;
@@ -85,6 +88,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public NotifyAttr<bool> IsDirty { get; set; } = new(false);
         public NotifyAttr<bool> EnableFrameNrStartTextboxOnPaste { get; set; } = new(false);
         public NotifyAttr<bool> AutoSelectPreviousBonesOnFrameChange { get; set; } = new(false);
+        public NotifyAttr<string> CurrentFrameNumber { get; set; } = new("");
+        public NotifyAttr<string> TotalFrameNumber { get; set; } = new("");
+
 
         public string FrameNrLength { get => _frameNrLength; set => SetAndNotify(ref _frameNrLength, value); }
         private string _frameNrLength = "0";
@@ -98,8 +104,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
         }
         private string _txtEditDurationInSeconds = "";
-
-
 
         public FilterCollection<SkeletonBoneNode> ModelBoneListForIKEndBone { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
 
@@ -202,7 +206,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             _modifiedFrameNr = state.CurrentFrame;
-            //SelectPreviousBones();
         }
 
         private void UpdateCanSaveAndPreviewStates()
@@ -252,10 +255,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
         }
 
         private void RiderOnFrameChanged(int currentFrame)
-        {
-            if(AutoSelectPreviousBonesOnFrameChange.Value)
+        {            
+            if(_rider.Player.AnimationClip != null)
             {
-                SelectPreviousBones();
+                CurrentFrameNumber.Value = _rider.Player.CurrentFrame.ToString();
+                TotalFrameNumber.Value = _rider.Player.AnimationClip.DynamicFrames.Count.ToString();
             }
         }
 
@@ -410,7 +414,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
         }
 
-        public void SelectPreviousBones()
+        public async void SelectPreviousBones()
         {
             if (_rider.AnimationClip == null || _originalClip == null)
             {
@@ -425,6 +429,21 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             EnterSelectMode();
             _commandFactory.Create<BoneSelectionCommand>().Configure(x => x.Configure(_previousSelectedBones, true, false)).BuildAndExecute();
+            switch (_lastGizmoTool)
+            {
+                case GizmoMode.Translate:
+                    EnterMoveMode();
+                    break;
+                case GizmoMode.Rotate:
+                    EnterRotateMode();
+                    break;
+                case GizmoMode.NonUniformScale:
+                case GizmoMode.UniformScale:
+                    EnterScaleMode();
+                    break;
+                default:
+                    break;
+            }
         }
 
         public void UndoPose()
@@ -460,7 +479,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;            
             _gizmoComponent.ResetScale();
             _gizmoComponent.SetGizmoMode(GizmoMode.Translate);
-
+            _lastGizmoTool = GizmoMode.Translate;
         }
 
         public void EnterRotateMode()
@@ -468,7 +487,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
             _gizmoComponent.ResetScale();
             _gizmoComponent.SetGizmoMode(GizmoMode.Rotate);
-
+            _lastGizmoTool = GizmoMode.Rotate;
         }
 
         public void EnterScaleMode()
@@ -481,6 +500,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
             _gizmoComponent.ResetScale();
             _gizmoComponent.SetGizmoMode(GizmoMode.NonUniformScale);
+            _lastGizmoTool = GizmoMode.NonUniformScale;
         }
 
         public void CopyCurrentPose()
@@ -1034,6 +1054,10 @@ namespace AnimationEditor.AnimationKeyframeEditor
             Pause();
             _rider.Player.CurrentFrame = 0;
             if (_mount.AnimationClip != null) _mount.Player.CurrentFrame = 0;
+            if (AutoSelectPreviousBonesOnFrameChange.Value)
+            {
+                SelectPreviousBones();
+            }
         }
 
         public void PrevFrame()
@@ -1047,6 +1071,10 @@ namespace AnimationEditor.AnimationKeyframeEditor
             Pause();
             _rider.Player.CurrentFrame--;
             if (_mount.AnimationClip != null) _mount.Player.CurrentFrame--;
+            if (AutoSelectPreviousBonesOnFrameChange.Value)
+            {
+                SelectPreviousBones();
+            }
         }
         public void NextFrame()
         {
@@ -1059,6 +1087,10 @@ namespace AnimationEditor.AnimationKeyframeEditor
             Pause();
             _rider.Player.CurrentFrame++;
             if (_mount.AnimationClip != null) _mount.Player.CurrentFrame++;
+            if (AutoSelectPreviousBonesOnFrameChange.Value)
+            {
+                SelectPreviousBones();
+            }
         }
 
         public void LastFrame()
@@ -1069,9 +1101,18 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _rider.Player.CurrentFrame = _rider.AnimationClip.DynamicFrames.Count - 1;
-            if (_mount.AnimationClip != null) _mount.Player.CurrentFrame = _mount.AnimationClip.DynamicFrames.Count - 1;
+            _rider.Player.CurrentFrame = _rider.AnimationClip.DynamicFrames.Count - 2;
+            _rider.Player.CurrentFrame++;
+            if (_mount.AnimationClip != null)
+            {
+                _mount.Player.CurrentFrame = _mount.AnimationClip.DynamicFrames.Count - 2;
+                _mount.Player.CurrentFrame++;
+            }
             Pause();
+            if (AutoSelectPreviousBonesOnFrameChange.Value)
+            {
+                SelectPreviousBones();
+            }
         }
 
 
