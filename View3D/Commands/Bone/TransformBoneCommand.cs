@@ -66,7 +66,7 @@ namespace View3D.Commands.Bone
                 var currentAnimFrame = animationPlayer.GetCurrentAnimationFrame();
                 var currentBoneWorldTransform = currentAnimFrame.GetSkeletonAnimatedWorld(_boneSelectionState.Skeleton, selectedBone);
                 currentBoneWorldTransform.Translation += matrixDelta.Translation;
-                var newBoneTransform = currentAnimFrame.GetSkeletonAnimatedBoneFromWorld(_boneSelectionState.Skeleton, selectedBone, currentBoneWorldTransform);
+                var newBoneTransform = GetSkeletonAnimatedBoneFromWorld(currentAnimFrame, _boneSelectionState.Skeleton, selectedBone, currentBoneWorldTransform);
 
                 Console.WriteLine(_boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[selectedBone]);
                 newBoneTransform.Decompose(out var scale, out var rot, out var trans);
@@ -92,6 +92,12 @@ namespace View3D.Commands.Bone
             }
 
             _boneSelectionState.TriggerModifiedBoneEvent(_selectedBones);
+        }
+
+        public Matrix GetSkeletonAnimatedBoneFromWorld(AnimationFrame frame, GameSkeleton gameSkeleton, int boneIndex, Matrix objectInWorldTransform)
+        {
+            Matrix output = objectInWorldTransform * Matrix.Invert(frame.GetSkeletonAnimatedWorld(gameSkeleton, boneIndex));
+            return output;
         }
 
         //TODO: FIX ME
