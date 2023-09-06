@@ -331,8 +331,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             Pause();
             var currentFrame = _rider.Player.CurrentFrame;
-            var command = _commandFactory.Create<DuplicateDeleteFrameBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, currentFrame)).Build();
-            command.DuplicateFrame();
+             _commandFactory.Create<DuplicateFrameBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, currentFrame)).BuildAndExecute();
             _selectionComponent.SetBoneSelectionMode();
             _rider.Player.CurrentFrame++;
         }
@@ -351,8 +350,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             var result = MessageBox.Show($"remove this frame at {currentFrame}? it is NOT recommended to remove a frame as this is a destructive operation", "warn", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (result == DialogResult.No) return;
 
-            var command = _commandFactory.Create<DuplicateDeleteFrameBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, currentFrame)).Build();
-            command.RemoveFrame();
+            _commandFactory.Create<DeleteFrameBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, currentFrame)).BuildAndExecute();
             _selectionComponent.SetBoneSelectionMode();
             _rider.Player.CurrentFrame++;
         }

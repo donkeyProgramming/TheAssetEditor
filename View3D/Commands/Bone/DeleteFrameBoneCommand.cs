@@ -9,7 +9,7 @@ using View3D.Animation;
 
 namespace View3D.Commands.Bone
 {
-    public class DuplicateDeleteFrameBoneCommand : ICommand
+    public class DeleteFrameBoneCommand : ICommand
     {
         public string HintText => "duplicate/add frame";
 
@@ -30,20 +30,9 @@ namespace View3D.Commands.Bone
             }
         }
 
-        public void RemoveFrame()
-        {
-            _animation.DynamicFrames.RemoveAt(_frameToInsert);
-        }
-
-        public void DuplicateFrame()
-        {
-            var clone = _animation.DynamicFrames[_frameToInsert].Clone();
-            _animation.DynamicFrames.Insert(_frameToInsert, clone);
-        }
-
         public void Execute()
         {
-            
+            _animation.DynamicFrames.RemoveAt(_frameToInsert);
         }
 
         public void Undo()
