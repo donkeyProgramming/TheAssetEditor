@@ -36,6 +36,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private ApplicationSettingsService _applicationSettings;
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private GizmoToolbox _gizmoToolbox;
+        private CopyPastePose _copyPastePose;
 
         public SelectionComponent SelectionComponent { get => _selectionComponent; private set { _selectionComponent = value; } }
         private SelectionComponent _selectionComponent;
@@ -157,6 +158,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
             
             _gizmoToolbox = new(this);
+            _copyPastePose = new(this);
         }        
 
         private void UpdateCanSaveAndPreviewStates()
@@ -272,6 +274,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _skeleton = newValue;
         }
 
+        public List<int> GetSelectedBones() => _gizmoToolbox.PreviousSelectedBones;
+        
+        public List<int> GetModifiedBones() => _gizmoToolbox.ModifiedBones;
+        
+        public int GetModifiedFrameNr() => _gizmoToolbox.ModifiedFrameNr;
+
         public void DuplicateFrame()
         {
             if (_rider.AnimationClip == null)
@@ -366,94 +374,22 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public void CopyCurrentPose()
         {
-            if (_rider.AnimationClip == null)
-            {
-                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            Pause();
-            _frameNrToCopy = _rider.Player.CurrentFrame;
-            if(IncrementFrameAfterCopyOperation.Value)
-            {
-                _rider.Player.CurrentFrame++;
-            }
+            _copyPastePose.CopyCurrentPose();
         }
 
         public void PasteIntoCurrentFrame()
         {
-            var currentFrame = _rider.Player.CurrentFrame;
-            if (_rider.AnimationClip == null)
-            {
-                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            Pause();
-            _commandFactory.Create<PasteWholeTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy], 
-                _rider.AnimationClip, currentFrame, currentFrame, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
-
-            if (IncrementFrameAfterCopyOperation.Value)
-            {
-                _rider.Player.CurrentFrame++;
-            }
-            IsDirty.Value = _commandExecutor.CanUndo();
+            _copyPastePose.PasteIntoCurrentFrame();
         }
-
 
         public void PasteIntoSelectedCurrentNode()
         {
-            var currentFrame = _rider.Player.CurrentFrame;
-            if (_rider.AnimationClip == null)
-            {
-                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if(_gizmoToolbox.PreviousSelectedBones == null || _gizmoToolbox.PreviousSelectedBones.Count == 0)
-            {
-                MessageBox.Show("no bones were selected", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-
-            Pause();
-            _commandFactory.Create<PasteIntoSelectedBonesTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy].Clone(),
-                _rider.AnimationClip, currentFrame, currentFrame, _gizmoToolbox.PreviousSelectedBones,
-                PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
-
-            if (IncrementFrameAfterCopyOperation.Value)
-            {
-                _rider.Player.CurrentFrame++;
-            }
-            IsDirty.Value = _commandExecutor.CanUndo();
+            _copyPastePose.PasteIntoSelectedCurrentNode();
         }
 
         public void PastePreviousEditedNodesIntoCurrentPose()
         {
-            var currentFrame = _rider.Player.CurrentFrame;
-            if (_rider.AnimationClip == null)
-            {
-                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (_gizmoToolbox.ModifiedBones == null || _gizmoToolbox.ModifiedBones.Count == 0)
-            {
-                MessageBox.Show("no bones were modified", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            Pause();
-            _commandFactory.Create<PasteIntoSelectedBonesTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_gizmoToolbox.ModifiedFrameNr].Clone(),
-                _rider.AnimationClip, currentFrame, currentFrame, _gizmoToolbox.ModifiedBones,
-                PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
-
-            if (IncrementFrameAfterCopyOperation.Value)
-            {
-                _rider.Player.CurrentFrame++;
-            }
-            IsDirty.Value = _commandExecutor.CanUndo();
+            _copyPastePose.PastePreviousEditedNodesIntoCurrentPose();
         }       
         private void CopyASingleFrameClipboard()
         {

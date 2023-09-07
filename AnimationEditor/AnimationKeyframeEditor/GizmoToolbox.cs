@@ -104,6 +104,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
             return null;
         }
+
         private void EnsureTheObjectsAreNotSelectable(ISceneNode node)
         {
             foreach (var slot in node.Children)

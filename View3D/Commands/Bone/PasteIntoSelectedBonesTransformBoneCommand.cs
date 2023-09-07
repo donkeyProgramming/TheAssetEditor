@@ -17,20 +17,18 @@ namespace View3D.Commands.Bone
         AnimationClip _animation;
         List<AnimationClip.KeyFrame> _backupFrames = new();
         int _startingFrame;
-        int _endFrame;
         List<int> _selectedBones;
         bool _pastePosition = true;
         bool _pasteRotation = true;
         bool _pasteScale = true;
 
 
-        public void Configure(AnimationClip.KeyFrame copyFromFrame, AnimationClip animation, int startingFrame, int endFrame, List<int> selectedBones = null, 
+        public void Configure(AnimationClip.KeyFrame copyFromFrame, AnimationClip animation, int startingFrame, List<int> selectedBones = null, 
             bool pastePosition = true, bool pasteRotation = true, bool pasteScale = true)
         {
             _fromFrame = copyFromFrame;
             _animation = animation;
             _startingFrame = startingFrame;
-            _endFrame = endFrame;
             _selectedBones = selectedBones;
             _pastePosition = pastePosition;
             _pasteRotation = pasteRotation;
@@ -49,12 +47,9 @@ namespace View3D.Commands.Bone
             foreach (var bone in _selectedBones)
             {
                 var clone = _fromFrame.Clone();
-                for (int frameNr = _startingFrame; frameNr <= _endFrame; frameNr++)
-                {
-                    if (_pastePosition) _animation.DynamicFrames[frameNr].Position[bone] = clone.Position[bone];
-                    if (_pasteRotation) _animation.DynamicFrames[frameNr].Rotation[bone] = clone.Rotation[bone];
-                    if (_pasteScale) _animation.DynamicFrames[frameNr].Scale[bone] = clone.Scale[bone];
-                }
+                if (_pastePosition) _animation.DynamicFrames[_startingFrame].Position[bone] = clone.Position[bone];
+                if (_pasteRotation) _animation.DynamicFrames[_startingFrame].Rotation[bone] = clone.Rotation[bone];
+                if (_pasteScale) _animation.DynamicFrames[_startingFrame].Scale[bone] = clone.Scale[bone];
             }
         }
         public void Undo()

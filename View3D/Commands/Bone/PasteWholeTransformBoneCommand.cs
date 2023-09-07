@@ -17,19 +17,17 @@ namespace View3D.Commands.Bone
         AnimationClip _animation;
         List<AnimationClip.KeyFrame> _backupFrames = new();
         int _startingFrame;
-        int _endFrame;
         bool _pastePosition = true;
         bool _pasteRotation = true;
         bool _pasteScale = true;
 
 
-        public void Configure(AnimationClip.KeyFrame copyFromFrame, AnimationClip animation, int startingFrame, int endFrame, 
+        public void Configure(AnimationClip.KeyFrame copyFromFrame, AnimationClip animation, int startingFrame, 
             bool pastePosition = true, bool pasteRotation = true, bool pasteScale = true)
         {
             _fromFrame = copyFromFrame;
             _animation = animation;
             _startingFrame = startingFrame;
-            _endFrame = endFrame;
             _pastePosition = pastePosition;
             _pasteRotation = pasteRotation;
             _pasteScale = pasteScale;
@@ -41,13 +39,10 @@ namespace View3D.Commands.Bone
         }
         public void Execute()
         {
-            for (int frameNr = _startingFrame; frameNr <= _endFrame; frameNr++)
-            {
-                var clone = _fromFrame.Clone();
-                if (_pastePosition) _animation.DynamicFrames[frameNr].Position = clone.Position;
-                if (_pasteRotation) _animation.DynamicFrames[frameNr].Rotation = clone.Rotation;
-                if (_pasteScale) _animation.DynamicFrames[frameNr].Scale = clone.Scale;
-            }
+            var clone = _fromFrame.Clone();
+            if (_pastePosition) _animation.DynamicFrames[_startingFrame].Position = clone.Position;
+            if (_pasteRotation) _animation.DynamicFrames[_startingFrame].Rotation = clone.Rotation;
+            if (_pasteScale) _animation.DynamicFrames[_startingFrame].Scale = clone.Scale;
         }
         public void Undo()
         {
