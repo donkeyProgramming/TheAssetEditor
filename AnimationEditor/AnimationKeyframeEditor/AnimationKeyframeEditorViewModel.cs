@@ -35,26 +35,34 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private PackFileService _pfs;
         private ApplicationSettingsService _applicationSettings;
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private SelectionComponent _selectionComponent;
-        private GizmoComponent _gizmoComponent;
-        private GizmoMode _lastGizmoTool = GizmoMode.Translate;
+        private GizmoToolbox _gizmoToolbox;
 
+        public SelectionComponent SelectionComponent { get => _selectionComponent; private set { _selectionComponent = value; } }
+        private SelectionComponent _selectionComponent;
+
+        public GizmoComponent GizmoComponent { get => _gizmoComponent; private set { _gizmoComponent = value; } }
+        private GizmoComponent _gizmoComponent;
+
+        public CommandFactory CommandFactory { get => _commandFactory; private set { _commandFactory = value; } }
         private CommandFactory _commandFactory;
+        public SelectionManager SelectionManager { get => _selectionManager; private set { _selectionManager = value; } }
         private SelectionManager _selectionManager;
+
+        public CommandExecutor CommandExecutor { get => _commandExecutor; private set { _commandExecutor = value; } }
         private CommandExecutor _commandExecutor;
+
         AnimationToolInput _inputRiderData;
         AnimationToolInput _inputMountData;
         private SceneObject _newAnimation;
+        public SceneObject Mount { get => _mount; private set { _mount = value; } }
         private SceneObject _mount;
+        public SceneObject Rider { get => _rider; private set { _rider = value; } }
         private SceneObject _rider;
         private AnimationClip _originalClip;
         private int _frameNrToCopy;
+
+        public GameSkeleton Skeleton { get => _skeleton; private set { _skeleton = value; } }
         private GameSkeleton _skeleton;
-
-
-        private List<int> _previousSelectedBones;
-        private List<int> _modifiedBones = new();
-        private int _modifiedFrameNr = 0;
 
         public NotifyAttr<bool> AllowToSelectAnimRoot { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> EnableInverseKinematics { get; set; } = new NotifyAttr<bool>(false);
@@ -147,67 +155,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             ActiveFragmentSlot = new FilterCollection<AnimationBinEntryGenericFormat>(null, (x) => UpdateCanSaveAndPreviewStates());
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
-
-        }
-        private void OnSelectionChanged(ISelectionState state, bool sendEvent)
-        {
-            IsDirty.Value = _commandExecutor.CanUndo();
-
-            if (state is BoneSelectionState boneSelectionState)
-            {
-                if(_previousSelectedBones == null || boneSelectionState.SelectedBones.Count > 0)
-                {
-                    _previousSelectedBones = new List<int>(boneSelectionState.SelectedBones);
-                }
-
-                if (!AllowToSelectAnimRoot.Value)
-                {
-                    boneSelectionState.DeselectAnimRootNode();
-                }
-
-                boneSelectionState.EnableInverseKinematics = EnableInverseKinematics.Value;
-                boneSelectionState.InverseKinematicsEndBoneIndex = ModelBoneListForIKEndBone.SelectedItem.BoneIndex;
-
-                if(boneSelectionState.EnableInverseKinematics)
-                {
-                    if(boneSelectionState.SelectedBones.Count > 1)
-                    {
-                        MessageBox.Show("when in IK mode is enabled, pick only only 1 bone. deselected the rest of the bones.", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        var firstSelection = boneSelectionState.SelectedBones[0];
-                        boneSelectionState.SelectedBones.Clear();
-                        boneSelectionState.SelectedBones.Add(firstSelection);
-                        return;
-                    }
-
-                    if(boneSelectionState.SelectedBones.Count == 1 && boneSelectionState.InverseKinematicsEndBoneIndex == boneSelectionState.SelectedBones[0])
-                    {
-                        MessageBox.Show("head bone chain == tail bone chain. why even enable IK mode?", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        boneSelectionState.SelectedBones.Clear();
-                    }
-                }
-
-                if(boneSelectionState.SelectedBones.Count == 0)
-                {
-                    _gizmoComponent.Disable();
-                }
-            }
-        }
-
-        private void OnModifiedBonesEvent(BoneSelectionState state)
-        {
-            IsDirty.Value = _commandExecutor.CanUndo();
-
-            if (_modifiedFrameNr == state.CurrentFrame)
-            {
-                _modifiedBones = _modifiedBones.Union(state.ModifiedBones).ToList();
-            }
-            else
-            {
-                _modifiedBones = state.ModifiedBones;
-            }
-
-            _modifiedFrameNr = state.CurrentFrame;
-        }
+            
+            _gizmoToolbox = new(this);
+        }        
 
         private void UpdateCanSaveAndPreviewStates()
         {
@@ -356,93 +306,35 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _rider.Player.CurrentFrame++;
         }
 
-        private ISelectable FindSelectableObject(ISceneNode node)
-        {
-            if (node is ISelectable selectableNode) return selectableNode;
-            foreach (var slot in node.Children)
-            {
-                return FindSelectableObject(slot);
-            }
-            return null;
-        }
-
         public void Pause()
         {
             _rider.Player.Pause();
             _mount.Player.Pause();
         }
 
-        private void EnsureTheObjectsAreNotSelectable(ISceneNode node)
-        {
-            foreach (var slot in node.Children)
-            {
-                slot.IsEditable = false;
-                EnsureTheObjectsAreNotSelectable(slot);
-            }
-        }
-
         public void EnterSelectMode()
         {
-            if (_rider.MainNode.Children.Count <= 1) return;
-
-            var variantMeshRoot = _rider.MainNode.Children[1];
-            if (variantMeshRoot.Children.Count == 0) return;
-            var selectableNode = FindSelectableObject(variantMeshRoot);
-            EnsureTheObjectsAreNotSelectable(selectableNode);
-
-            if (selectableNode != null)
-            {
-                _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>() { selectableNode }, false, false)).BuildAndExecute();
-                _selectionComponent.SetBoneSelectionMode();
-                Pause();
-                var selection = _selectionManager.GetState<BoneSelectionState>();
-                if (selection != null)
-                {
-                    selection.CurrentAnimation = _rider.Player.AnimationClip;
-                    selection.Skeleton = _skeleton;
-                    selection.CurrentFrame = _rider.Player.CurrentFrame;
-                    selection.SelectedBones.Clear();
-                }
-            }
-
-            _selectionManager.GetState().SelectionChanged += OnSelectionChanged;
-
-            if(_selectionManager.GetState() is BoneSelectionState state)
-            {
-                state.BoneModifiedEvent += OnModifiedBonesEvent;
-            }
+            _gizmoToolbox.SelectMode();
         }
 
         public void SelectPreviousBones()
         {
-            if (_rider.AnimationClip == null || _originalClip == null)
-            {
-                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            if(_previousSelectedBones == null)
-            {
-                MessageBox.Show("select a bone first!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            _gizmoToolbox.SelectPreviousBones();
+        }
 
-            EnterSelectMode();
-            _commandFactory.Create<BoneSelectionCommand>().Configure(x => x.Configure(_previousSelectedBones, true, false)).BuildAndExecute();
-            switch (_lastGizmoTool)
-            {
-                case GizmoMode.Translate:
-                    EnterMoveMode();
-                    break;
-                case GizmoMode.Rotate:
-                    EnterRotateMode();
-                    break;
-                case GizmoMode.NonUniformScale:
-                case GizmoMode.UniformScale:
-                    EnterScaleMode();
-                    break;
-                default:
-                    break;
-            }
+        public void EnterMoveMode()
+        {
+            _gizmoToolbox.MoveMode();
+        }
+
+        public void EnterRotateMode()
+        {
+            _gizmoToolbox.RotateMode();
+        }
+
+        public void EnterScaleMode()
+        {
+            _gizmoToolbox.ScaleMode();
         }
 
         public void UndoPose()
@@ -470,35 +362,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             Pause();
             var command = _commandFactory.Create<ResetTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, _originalClip, currentFrame)).Build();
             _commandExecutor.ExecuteCommand(command);
-        }
-
-        public void EnterMoveMode()
-        {
-            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;            
-            _gizmoComponent.ResetScale();
-            _gizmoComponent.SetGizmoMode(GizmoMode.Translate);
-            _lastGizmoTool = GizmoMode.Translate;
-        }
-
-        public void EnterRotateMode()
-        {
-            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
-            _gizmoComponent.ResetScale();
-            _gizmoComponent.SetGizmoMode(GizmoMode.Rotate);
-            _lastGizmoTool = GizmoMode.Rotate;
-        }
-
-        public void EnterScaleMode()
-        {
-            if(EnableInverseKinematics.Value)
-            {
-                MessageBox.Show("cannot use scale mode when IK is enabled!", "error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone) return;
-            _gizmoComponent.ResetScale();
-            _gizmoComponent.SetGizmoMode(GizmoMode.NonUniformScale);
-            _lastGizmoTool = GizmoMode.NonUniformScale;
         }
 
         public void CopyCurrentPose()
@@ -547,7 +410,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            if(_previousSelectedBones == null || _previousSelectedBones.Count() == 0)
+            if(_gizmoToolbox.PreviousSelectedBones == null || _gizmoToolbox.PreviousSelectedBones.Count == 0)
             {
                 MessageBox.Show("no bones were selected", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -556,7 +419,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             Pause();
             _commandFactory.Create<PasteIntoSelectedBonesTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_frameNrToCopy].Clone(),
-                _rider.AnimationClip, currentFrame, currentFrame, _previousSelectedBones,
+                _rider.AnimationClip, currentFrame, currentFrame, _gizmoToolbox.PreviousSelectedBones,
                 PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
 
             if (IncrementFrameAfterCopyOperation.Value)
@@ -575,15 +438,15 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            if (_modifiedBones == null || _modifiedBones.Count() == 0)
+            if (_gizmoToolbox.ModifiedBones == null || _gizmoToolbox.ModifiedBones.Count == 0)
             {
                 MessageBox.Show("no bones were modified", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             Pause();
-            _commandFactory.Create<PasteIntoSelectedBonesTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_modifiedFrameNr].Clone(),
-                _rider.AnimationClip, currentFrame, currentFrame, _modifiedBones,
+            _commandFactory.Create<PasteIntoSelectedBonesTransformBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip.DynamicFrames[_gizmoToolbox.ModifiedFrameNr].Clone(),
+                _rider.AnimationClip, currentFrame, currentFrame, _gizmoToolbox.ModifiedBones,
                 PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
 
             if (IncrementFrameAfterCopyOperation.Value)
@@ -807,7 +670,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            if(_previousSelectedBones == null || _previousSelectedBones.Count == 0)
+            if(_gizmoToolbox.PreviousSelectedBones == null || _gizmoToolbox.PreviousSelectedBones.Count == 0)
             {
                 MessageBox.Show("no bones were selected!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -846,7 +709,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 if (confirm != DialogResult.Yes) return;
 
                 _commandFactory.Create<PasteIntoSelectedBonesTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip,
-                    _previousSelectedBones, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
+                    _gizmoToolbox.PreviousSelectedBones, PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
 
                 if (IncrementFrameAfterCopyOperation.Value)
                 {
@@ -866,6 +729,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
             if (_rider.AnimationClip == null)
             {
                 MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (_gizmoToolbox.PreviousSelectedBones == null || _gizmoToolbox.PreviousSelectedBones.Count == 0)
+            {
+                MessageBox.Show("no bones were selected!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -904,7 +773,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 if (confirm != DialogResult.Yes) return;
 
                 _commandFactory.Create<PasteIntoSelectedBonesInRangeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip,
-                    currentFrame, pastedFramesLength, _previousSelectedBones,PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();                
+                    currentFrame, pastedFramesLength, _gizmoToolbox.PreviousSelectedBones,PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();                
 
                 if (IncrementFrameAfterCopyOperation.Value)
                 {
@@ -926,6 +795,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
+            if (_gizmoToolbox.PreviousSelectedBones == null || _gizmoToolbox.PreviousSelectedBones.Count == 0)
+            {
+                MessageBox.Show("no bones were selected!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             Pause();
             var currentFrame = _rider.Player.CurrentFrame;
             var skeleton = _rider.Skeleton;
@@ -940,7 +815,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 }
 
                 _commandFactory.Create<PasteIntoSelectedBonesInRangeTransformFromClipboardBoneCommand>().Configure(x => x.Configure(skeleton, parsedClipboardFrame, _rider.AnimationClip,
-                    currentFrame, 1, _previousSelectedBones,
+                    currentFrame, 1, _gizmoToolbox.PreviousSelectedBones,
                     PastePosition.Value, PasteRotation.Value, PasteScale.Value)).BuildAndExecute();
 
                 if (IncrementFrameAfterCopyOperation.Value)
