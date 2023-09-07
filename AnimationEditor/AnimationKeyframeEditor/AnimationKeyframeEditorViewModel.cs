@@ -591,33 +591,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 _rider.Player.CurrentFrame++;
             }
             IsDirty.Value = _commandExecutor.CanUndo();
-        }
-
-        public BoneTransformClipboardData CreateFrameClipboard(GameSkeleton skeleton, AnimationClip currentFrames, int startFrame, int endFrame)
-        {
-            var output = new BoneTransformClipboardData();
-
-            output.SkeletonName = skeleton.SkeletonName;
-
-            for (int frameNr = startFrame; frameNr < endFrame; frameNr++)
-            {
-
-                var frames = new BoneTransformClipboardData.Frame();
-                for (int boneId = 0; boneId < currentFrames.DynamicFrames[frameNr].Position.Count; boneId++)
-                {
-                    var transform = currentFrames.DynamicFrames[frameNr];
-                    var boneName = skeleton.GetBoneNameByIndex(boneId);
-
-                    frames.BoneIdToPosition.Add  (boneName, transform.Position[boneId]);
-                    frames.BoneIdToQuaternion.Add(boneName, transform.Rotation[boneId]);
-                    frames.BoneIdToScale.Add     (boneName, transform.Scale[boneId]);
-                }                
-                output.Frames.Add(frameNr, frames);
-            }
-
-            return output;
-        }
-
+        }       
         private void CopyASingleFrameClipboard()
         {
             if (_rider.AnimationClip == null)
@@ -630,7 +604,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             var currentFrame = _rider.Player.CurrentFrame;
             var skeleton = _rider.Skeleton;
             var frames = _rider.AnimationClip;
-            var jsonText = JsonConvert.SerializeObject(CreateFrameClipboard(skeleton, frames, currentFrame, currentFrame + 1));
+            var jsonText = JsonConvert.SerializeObject(AnimationCliboardCreator.CreateFrameClipboard(skeleton, frames, currentFrame, currentFrame + 1));
             Clipboard.SetText(jsonText);
         }
 
@@ -647,7 +621,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             var endFrame = _rider.Player.AnimationClip.DynamicFrames.Count;
             var skeleton = _rider.Skeleton;
             var frames = _rider.AnimationClip;
-            var jsonText = JsonConvert.SerializeObject(CreateFrameClipboard(skeleton, frames, currentFrame, endFrame));
+            var jsonText = JsonConvert.SerializeObject(AnimationCliboardCreator.CreateFrameClipboard(skeleton, frames, currentFrame, endFrame));
             Clipboard.SetText(jsonText);
             MessageBox.Show($"copied frame {currentFrame} up to {endFrame - 1}", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
