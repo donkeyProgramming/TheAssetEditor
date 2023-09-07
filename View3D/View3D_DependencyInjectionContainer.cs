@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using View3D.Commands;
 using View3D.Commands.Bone;
+using View3D.Commands.Bone.Clipboard;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Commands.Vertex;
@@ -102,7 +103,10 @@ namespace View3D
             serviceCollection.AddTransient<ResetTransformBoneCommand>();
             serviceCollection.AddTransient<PasteWholeTransformBoneCommand>();
             serviceCollection.AddTransient<PasteIntoSelectedBonesTransformBoneCommand>();
-            serviceCollection.AddTransient<PasteTransformFromClipboardBoneCommand>();
+            serviceCollection.AddTransient<PasteIntoSelectedBonesInRangeTransformFromClipboardBoneCommand>();
+            serviceCollection.AddTransient<PasteIntoSelectedBonesTransformFromClipboardBoneCommand>();
+            serviceCollection.AddTransient<PasteWholeInRangeTransformFromClipboardBoneCommand>();
+            serviceCollection.AddTransient<PasteWholeTransformFromClipboardBoneCommand>();
             serviceCollection.AddTransient<DuplicateFrameBoneCommand>();
             serviceCollection.AddTransient<DeleteFrameBoneCommand>();
 
