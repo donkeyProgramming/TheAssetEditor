@@ -76,7 +76,7 @@
                 <MenuItem Header="Animation Transfer Tool" Command="{Binding MenuBar.OpenAnimationTransferToolCommand}" />
                 <MenuItem Header="Super view" Command="{Binding MenuBar.OpenSuperViewToolCommand}" />
                 <MenuItem Header="Skeleton Editor" Command="{Binding MenuBar.OpenTechSkeletonEditorCommand}" />
-                <MenuItem Header="Animation Keyframe Editor (experimental)" Command="{Binding MenuBar.OpenAnimationKeyframeCommand}" />
+                <MenuItem Header="Animation Keyframe Editor" Command="{Binding MenuBar.OpenAnimationKeyframeCommand}" />
                 <Separator/>
                 <MenuItem Header="Animation File Batch converter" Command="{Binding MenuBar.OpenAnimationBatchExporterCommand}" />
                 <MenuItem Header="Warhammer 2 Animpack Updater" Command="{Binding MenuBar.OpenWh2AnimpackUpdaterCommand}" Visibility="Collapsed"  />
