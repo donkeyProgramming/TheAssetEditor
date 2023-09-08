@@ -581,6 +581,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
             FrameNrLength = (_rider.AnimationClip.DynamicFrames.Count - 1).ToString();
         }
 
+        public void SetFrameLengthFromClipboard()
+        {
+            FrameNrLength = _copyPasteClipboardPose.GetClipboardFramesLength().ToString();
+        }
+
         public void Save()
         {
             if (_rider.AnimationClip == null)

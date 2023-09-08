@@ -2,11 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Windows.Controls;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using View3D.Commands.Bone.Clipboard;
-using View3D.Components.Component;
 
 namespace AnimationEditor.AnimationKeyframeEditor
 {
@@ -17,6 +15,21 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public CopyPasteFromClipboardPose(AnimationKeyframeEditorViewModel parent)
         {
             _parent = parent;
+        }
+
+        public int GetClipboardFramesLength()
+        {
+            var frameInJsonFormat = Clipboard.GetText();
+            try
+            {
+                var parsedClipboardFrame = JsonConvert.DeserializeObject<BoneTransformClipboardData>(frameInJsonFormat);
+                return parsedClipboardFrame.Frames.Count;
+            }
+            catch (JsonException)
+            {
+                MessageBox.Show("cannot parse the clipboard. it is not in asset editor frame format.", "error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return 0;
+            }
         }
 
         public void  CopyCurrentFrameUpToEndFrame()
