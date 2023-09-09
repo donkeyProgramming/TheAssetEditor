@@ -550,6 +550,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 SelectPreviousBones();
             }
+            ResetInterpolationSlider();
         }
 
         public void PrevFrame()
@@ -567,6 +568,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 SelectPreviousBones();
             }
+            ResetInterpolationSlider();
         }
         public void NextFrame()
         {
@@ -583,6 +585,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 SelectPreviousBones();
             }
+            ResetInterpolationSlider();
         }
 
         public void LastFrame()
@@ -605,6 +608,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 SelectPreviousBones();
             }
+            ResetInterpolationSlider();
         }
 
 
@@ -651,6 +655,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public void ResetInterpolationSlider()
         {
+            PreviewInterpolation = false;
             InterpolationValue = 0;
         }
 

@@ -1,4 +1,5 @@
-﻿using CommonControls;
+﻿using System.Net.Security;
+using CommonControls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
@@ -110,6 +111,7 @@ namespace View3D
             serviceCollection.AddTransient<DuplicateFrameBoneCommand>();
             serviceCollection.AddTransient<DeleteFrameBoneCommand>();
             serviceCollection.AddTransient<InterpolateFramesBoneCommand>();
+            serviceCollection.AddTransient<InterpolateFramesSelectedBonesBoneCommand>();
 
         }
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent

@@ -122,6 +122,17 @@ namespace AnimationEditor.AnimationKeyframeEditor
             if (!CheckForBones()) return;
             if (!Check()) return;
 
+            _parent.CommandFactory.Create<InterpolateFramesSelectedBonesBoneCommand>().Configure(x => x.Configure(
+            _parent.Rider.AnimationClip,
+            _parent.Rider.Player.CurrentFrame,
+            _keyframeNrA,
+            _keyframeNrB,
+            _parent.Skeleton,
+            _parent.InterpolationValue,
+            _parent.GetSelectedBones(),
+            _parent.PastePosition.Value,
+            _parent.PasteRotation.Value,
+            _parent.PasteScale.Value)).BuildAndExecute();
         }
 
         private void ApplyAcrossFrames()
