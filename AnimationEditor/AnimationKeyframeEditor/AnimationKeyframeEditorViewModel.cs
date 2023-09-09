@@ -32,6 +32,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private GizmoToolbox _gizmoToolbox;
         private CopyPastePose _copyPastePose;
         private CopyPasteFromClipboardPose _copyPasteClipboardPose;
+        private InterpolateBetweenPose _interpolateBetweenPose;
 
         public SelectionComponent SelectionComponent { get => _selectionComponent; private set { _selectionComponent = value; } }
         private SelectionComponent _selectionComponent;
@@ -94,25 +95,61 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public NotifyAttr<bool> PastePosition { get; set; } = new(true);
         public NotifyAttr<bool> PasteRotation { get; set; } = new(true);
         public NotifyAttr<bool> PasteScale { get; set; } = new(true);
+
         public NotifyAttr<bool> IsDirty { get; set; } = new(false);
+
         public NotifyAttr<bool> EnableFrameNrStartTextboxOnPaste { get; set; } = new(false);
         public NotifyAttr<bool> AutoSelectPreviousBonesOnFrameChange { get; set; } = new(false);
+
         public NotifyAttr<string> CurrentFrameNumber { get; set; } = new("");
         public NotifyAttr<string> TotalFrameNumber { get; set; } = new("");
-
 
         public string FrameNrLength { get => _frameNrLength; set => SetAndNotify(ref _frameNrLength, value); }
         private string _frameNrLength = "0";
 
         public string FramesDurationInSeconds
         {
-            get { return _txtEditDurationInSeconds; }
+            get => _txtEditDurationInSeconds;
             set
             {
                 SetAndNotify(ref _txtEditDurationInSeconds, value);
             }
         }
         private string _txtEditDurationInSeconds = "";
+
+        public NotifyAttr<string> SelectedFrameAInterpolation { get; set; } = new("Not set");
+        public NotifyAttr<string> SelectedFrameBInterpolation { get; set; } = new("Not set");
+
+        public bool PreviewInterpolation { 
+            get => _previewInterpolation; 
+            set 
+            {
+                SetAndNotify(ref _previewInterpolation, value);                
+            }
+        }
+        private bool _previewInterpolation;
+
+        public bool InterpolationOnlyOnSelectedBones
+        {
+            get => _interpolationOnlyOnSelectedBones;
+            set
+            {
+                SetAndNotify(ref _interpolationOnlyOnSelectedBones, value);                
+            }
+        }
+        private bool _interpolationOnlyOnSelectedBones;
+
+        public float InterpolationValue
+        {
+            get => _interpolationValue;
+            set
+            {
+                SetAndNotify(ref _interpolationValue, value);
+                ApplyInterpolationOnCurrentFrame();
+            }
+        }
+        private float _interpolationValue;
+
 
         public FilterCollection<SkeletonBoneNode> ModelBoneListForIKEndBone { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
@@ -182,6 +219,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _gizmoToolbox = new(this);
             _copyPastePose = new(this);
             _copyPasteClipboardPose = new(this);
+            _interpolateBetweenPose = new(this);
         }
 
         internal void Create(SceneObject rider, SceneObject mount, SceneObject newAnimation)
@@ -199,7 +237,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
-            _rider.Player.OnFrameChanged += RiderOnFrameChanged;
+            _rider.Player.OnFrameChanged += RiderOnFrameChanged;            
         }
 
         private void UpdateCanSaveAndPreviewStates()
@@ -584,6 +622,41 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public void SetFrameLengthFromClipboard()
         {
             FrameNrLength = _copyPasteClipboardPose.GetClipboardFramesLength().ToString();
+        }
+
+        public void SelectFrameAInterpolation()
+        {
+            if (_rider.AnimationClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var frameNr = _rider.Player.CurrentFrame;
+            SelectedFrameAInterpolation.Value = frameNr.ToString();
+            _interpolateBetweenPose.SelectFrameA(frameNr);
+        }
+
+        public void SelectFrameBInterpolation()
+        {
+            if (_rider.AnimationClip == null)
+            {
+                MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var frameNr = _rider.Player.CurrentFrame;
+            SelectedFrameBInterpolation.Value = frameNr.ToString();
+            _interpolateBetweenPose.SelectFrameB(frameNr);
+        }
+
+        public void ResetInterpolationSlider()
+        {
+            InterpolationValue = 0;
+        }
+
+        public void ApplyInterpolationOnCurrentFrame()
+        {
+            _interpolateBetweenPose.ApplySingleFrame();
         }
 
         public void Save()

@@ -6,7 +6,7 @@
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
              mc:Ignorable="d" 
-             d:DesignHeight="850" d:DesignWidth="800">
+             d:DesignHeight="1200" d:DesignWidth="800">
 
     <UserControl.Resources>
         <controls:BooleanToVisibilityConverter x:Key="boolConv"/>
@@ -105,7 +105,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <DockPanel>
-                <Label>on paste operations:</Label>
+                <Label>on paste or interpolation operations:</Label>
                 <CheckBox DockPanel.Dock="Top" Content="Paste position" IsChecked="{Binding PastePosition.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="Paste rotation" IsChecked="{Binding PasteRotation.Value, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="Paste scale" IsChecked="{Binding PasteScale.Value, UpdateSourceTrigger=PropertyChanged}"  />
@@ -196,7 +196,7 @@
             <Button Grid.Column="2" Content="Set Max"  Click="{s:MethodBinding SetFrameLengthMax}" Margin="2,0,0,0"/>
             <Button Grid.Column="3" Content="From clipboard"  Click="{s:MethodBinding SetFrameLengthFromClipboard}" Margin="2,0,0,0"/>
         </Grid>
-              
+
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
 
             <Grid.ColumnDefinitions>
@@ -204,10 +204,67 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-
             <Button Grid.Column="0" Content="Copy Pose into global clipboard..."  Click="{s:MethodBinding CopyPoseInRangeToClipboard}" Margin="2,0,0,0"/>
             <Button Grid.Column="1" Content="Paste Pose from global clipboard..."  Click="{s:MethodBinding PastePoseInRangeFromClipboard}" Margin="2,0,0,0" />
             <Button Grid.Column="2" Content="Paste Pose into previously selected nodes from global clipboard..."  Click="{s:MethodBinding PasteIntoInRangeSelectedCurrentNodeFromClipboard}" Margin="2,0,0,0" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <StackPanel>
+                <Label>Interpolate between frame</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Selected Frame A:</Label>
+                    <Label Content="{Binding SelectedFrameAInterpolation.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Selected Frame B:</Label>
+                    <Label Content="{Binding SelectedFrameBInterpolation.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Label>
+                </StackPanel>
+                <StackPanel>
+                    <Label>Drag the slider to manipulate the blending between frames,</Label>
+                    <Label>to apply to the current frame, click apply interpolation on current frame.</Label>
+                    <Label>To enable preview you need to select frame A and B.</Label>
+                    <Label>It is recommended to use this tool in new tab as it will overwrite the current frame.</Label>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Select frame A"  Click="{s:MethodBinding SelectFrameAInterpolation}" Margin="2,0,0,0"/>
+            <Button Grid.Column="1" Content="Select frame B"  Click="{s:MethodBinding SelectFrameBInterpolation}" Margin="2,0,0,0" />
+            <Button Grid.Column="2" Content="Apply interpolation on current frame"  Click="{s:MethodBinding ApplyInterpolationOnCurrentFrame}" Margin="2,0,0,0" />
+            <Button Grid.Column="3" Content="Apply interpolation across frame A to B"  Click="{s:MethodBinding ApplyInterpolationAcrossFrames}" Margin="2,0,0,0" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <DockPanel>
+                <CheckBox DockPanel.Dock="Top" Content="Live preview interpolation" IsChecked="{Binding PreviewInterpolation, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Interpolation only on previously selected bones" IsChecked="{Binding InterpolationOnlyOnSelectedBones, UpdateSourceTrigger=PropertyChanged}"  />
+            </DockPanel>
+        </Grid>
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Reset"  Click="{s:MethodBinding ResetInterpolationSlider}" Margin="2,0,0,0"/>
+            <Slider Grid.Column="1" Minimum="-1" Maximum="1" TickFrequency="0.1" Value="{Binding InterpolationValue, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
 
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">

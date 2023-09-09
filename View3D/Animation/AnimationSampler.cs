@@ -72,6 +72,70 @@ namespace View3D.Animation
             }
         }
 
+        public static AnimationFrame SampleBetween2Frames(int frameIndexA, int frameIndexB, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip, List<IAnimationChangeRule> animationChangeRules = null)
+        {
+            try
+            {
+                frameIterpolation = MathUtil.EnsureRange(frameIterpolation, -1, 1);
+                if (skeleton == null)
+                    return null;
+
+                var currentFrame = skeleton.ConvertToAnimationFrame();
+
+                // Apply the animation to the skeleton frame
+                if (animationClip != null)
+                {
+                    if (animationClip.DynamicFrames.Count > frameIndexA && animationClip.DynamicFrames.Count > frameIndexB)
+                    {
+                        var currentFrameKeys = GetKeyFrameFromIndex(animationClip.DynamicFrames, frameIndexA);
+                        var nextFrameKeys = GetKeyFrameFromIndex(animationClip.DynamicFrames, frameIndexB);
+                        InterpolateFrame(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame, false);
+                    }
+                }
+
+                // Compute the worldspace values
+                for (int boneIndex = 0; boneIndex < currentFrame.BoneTransforms.Count(); boneIndex++)
+                {
+                    currentFrame.BoneTransforms[boneIndex].ComputeWorldMatrixFromComponents();
+                    if (animationChangeRules != null)
+                    {
+                        foreach (var rule in animationChangeRules.OfType<ILocalSpaceAnimationRule>())
+                            rule.TransformFrameLocalSpace(currentFrame, boneIndex, animationClip.PlayTimeInSec);
+                    }
+
+                    var parentindex = currentFrame.BoneTransforms[boneIndex].ParentBoneIndex;
+                    if (parentindex == -1)
+                        continue;
+
+                    currentFrame.BoneTransforms[boneIndex].WorldTransform = currentFrame.BoneTransforms[boneIndex].WorldTransform * currentFrame.BoneTransforms[parentindex].WorldTransform;
+                }
+
+                // Apply animation rules
+                if (animationChangeRules != null)
+                {
+                    foreach (var rule in animationChangeRules.OfType<IWorldSpaceAnimationRule>())
+                        rule.TransformFrameWorldSpace(currentFrame, animationClip.PlayTimeInSec);
+                }
+
+                // Remove the skeleten info from the world transform.
+                // This is applied again in the animation shader.
+                for (int boneIndex = 0; boneIndex < skeleton.BoneCount; boneIndex++)
+                {
+                    var inv = Matrix.Invert(skeleton.GetWorldTransform(boneIndex));
+                    currentFrame.BoneTransforms[boneIndex].WorldTransform = Matrix.Multiply(inv, currentFrame.BoneTransforms[boneIndex].WorldTransform);
+                }
+
+                return currentFrame;
+            }
+            catch (Exception e)
+            {
+                ILogger logger = Logging.Create<AnimationSampler>();
+                logger.Error(e.Message);
+                throw;
+            }
+        }
+
+
         public static AnimationFrame Sample(float t_between_0_and_1, GameSkeleton skeleton, AnimationClip animationClip, List<IAnimationChangeRule> animationChangeRules = null, bool freezeFrame = false)
         {
             try
