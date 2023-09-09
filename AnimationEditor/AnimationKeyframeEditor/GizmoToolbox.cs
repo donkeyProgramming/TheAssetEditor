@@ -63,6 +63,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             _modifiedFrameNr = state.CurrentFrame;
+            _parent.ResetInterpolationTool();
         }
 
         private void OnSelectionChanged(ISelectionState state, bool sendEvent)

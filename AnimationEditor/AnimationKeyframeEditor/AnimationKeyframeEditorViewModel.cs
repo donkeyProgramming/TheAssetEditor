@@ -550,7 +550,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 SelectPreviousBones();
             }
-            ResetInterpolationSlider();
         }
 
         public void PrevFrame()
@@ -568,7 +567,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 SelectPreviousBones();
             }
-            ResetInterpolationSlider();
+            EnableInterpolationSliderWithinRange();
         }
         public void NextFrame()
         {
@@ -585,7 +584,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 SelectPreviousBones();
             }
-            ResetInterpolationSlider();
+            EnableInterpolationSliderWithinRange();
         }
 
         public void LastFrame()
@@ -653,6 +652,21 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _interpolateBetweenPose.SelectFrameB(frameNr);
         }
 
+        private void EnableInterpolationSliderWithinRange()
+        {
+            if (!(_rider.Player.CurrentFrame > _interpolateBetweenPose.KeyFrameNrA && _rider.Player.CurrentFrame < _interpolateBetweenPose.KeyFrameNrB))
+                ResetInterpolationSlider();
+            else
+                PreviewInterpolation = true;
+        }
+
+        public void ResetInterpolationTool()
+        {
+            ResetInterpolationSlider();
+            InterpolationOnlyOnSelectedBones = false;
+            _interpolateBetweenPose.Reset();
+        }
+
         public void ResetInterpolationSlider()
         {
             PreviewInterpolation = false;
@@ -662,6 +676,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public void ApplyInterpolationOnCurrentFrame()
         {
             _interpolateBetweenPose.ApplySingleFrame();
+        }
+
+        public void ApplyInterpolationAcrossFrames()
+        {
+            MessageBox.Show("not available yet, in the meantime you can do it manually using the slider");
         }
 
         public void Save()

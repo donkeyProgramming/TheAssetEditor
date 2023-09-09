@@ -228,7 +228,6 @@
                     <Label>Drag the slider to manipulate the blending between frames,</Label>
                     <Label>to apply to the current frame, click apply interpolation on current frame.</Label>
                     <Label>To enable preview you need to select frame A and B.</Label>
-                    <Label>It is recommended to use this tool in new tab as it will overwrite the current frame.</Label>
                 </StackPanel>
             </StackPanel>
         </Grid>
@@ -268,7 +267,7 @@
             </Grid.ColumnDefinitions>
 
             <DockPanel>
-                <CheckBox DockPanel.Dock="Top" Content="Live preview interpolation" IsChecked="{Binding PreviewInterpolation, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Live preview interpolation (automatically applies interpolation)" IsChecked="{Binding PreviewInterpolation, UpdateSourceTrigger=PropertyChanged}"  />
                 <CheckBox DockPanel.Dock="Top" Content="Interpolation only on previously selected bones" IsChecked="{Binding InterpolationOnlyOnSelectedBones, UpdateSourceTrigger=PropertyChanged}"  />
             </DockPanel>
         </Grid>
@@ -278,7 +277,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="Reset"  Click="{s:MethodBinding ResetInterpolationSlider}" Margin="2,0,0,0"/>
-            <Slider Grid.Column="1" Minimum="-1" Maximum="1" TickFrequency="0.1" Value="{Binding InterpolationValue, UpdateSourceTrigger=PropertyChanged}" IsSnapToTickEnabled="true" TickPlacement="BottomRight" >
+            <Slider Grid.Column="1" Minimum="-1" Maximum="1" TickFrequency="0.05" Value="{Binding InterpolationValue, UpdateSourceTrigger=PropertyChanged}" IsSnapToTickEnabled="true" TickPlacement="BottomRight" >
                 <Slider.LayoutTransform>
                     <ScaleTransform ScaleX="2" ScaleY="2"/>
                 </Slider.LayoutTransform>
