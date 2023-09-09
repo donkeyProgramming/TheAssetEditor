@@ -162,7 +162,7 @@ namespace View3D.Animation
                 long animationLengthUs = GetAnimationLengthUs();
                 if (animationLengthUs != 0)
                     sampleT = (float)_timeSinceStart.TotalMicrosecondsAsLong / animationLengthUs;
-                _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules);
+                _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules, !IsPlaying);
                 _skeleton?.Update();
             }
             catch

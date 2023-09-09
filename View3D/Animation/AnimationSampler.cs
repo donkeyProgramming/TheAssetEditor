@@ -10,7 +10,7 @@ namespace View3D.Animation
 {
     public class AnimationSampler
     {
-        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip, List<IAnimationChangeRule> animationChangeRules = null)
+        public static AnimationFrame Sample(int frameIndex, float frameIterpolation, GameSkeleton skeleton, AnimationClip animationClip, List<IAnimationChangeRule> animationChangeRules = null, bool freezeFrame = false)
         {
             try
             {
@@ -26,7 +26,7 @@ namespace View3D.Animation
                     {
                         var currentFrameKeys = GetKeyFrameFromIndex(animationClip.DynamicFrames, frameIndex);
                         var nextFrameKeys = GetKeyFrameFromIndex(animationClip.DynamicFrames, frameIndex + 1);
-                        InterpolateFrame(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame);
+                        InterpolateFrame(currentFrameKeys, nextFrameKeys, frameIterpolation, currentFrame, freezeFrame);
                     }
                 }
 
@@ -72,7 +72,7 @@ namespace View3D.Animation
             }
         }
 
-        public static AnimationFrame Sample(float t_between_0_and_1, GameSkeleton skeleton, AnimationClip animationClip, List<IAnimationChangeRule> animationChangeRules = null)
+        public static AnimationFrame Sample(float t_between_0_and_1, GameSkeleton skeleton, AnimationClip animationClip, List<IAnimationChangeRule> animationChangeRules = null, bool freezeFrame = false)
         {
             try
             {
@@ -86,13 +86,12 @@ namespace View3D.Animation
                     if (maxFrames < 0)
                         maxFrames = 0;
                     float frameWithLeftover = maxFrames * clampedT;
-                    float clampedFrame = (float)Math.Floor(frameWithLeftover);
+                    float clampedFrame = (float)Math.Round(frameWithLeftover);
 
                     frameIndex = (int)(clampedFrame);
                     frameIterpolation = frameWithLeftover - clampedFrame;
                 }
-
-                return Sample(frameIndex, frameIterpolation, skeleton, animationClip, animationChangeRules);
+                return Sample(frameIndex, frameIterpolation, skeleton, animationClip, animationChangeRules, freezeFrame);
             }
             catch (Exception e)
             {
@@ -138,7 +137,7 @@ namespace View3D.Animation
             return animationValueCurrentFrame;
         }
 
-        static void InterpolateFrame(AnimationClip.KeyFrame currentFrame, AnimationClip.KeyFrame nextFrame, float animationInterpolation, AnimationFrame finalAnimationFrame)
+        static void InterpolateFrame(AnimationClip.KeyFrame currentFrame, AnimationClip.KeyFrame nextFrame, float animationInterpolation, AnimationFrame finalAnimationFrame, bool freezeFrame = false)
         {
             if (currentFrame == null)
                 return;
@@ -146,6 +145,11 @@ namespace View3D.Animation
             var skeletonBoneCount = finalAnimationFrame.BoneTransforms.Count();
             var animBoneCount = currentFrame.GetBoneCountFromFrame();
             var boneCount = Math.Min(skeletonBoneCount, animBoneCount);
+            if(freezeFrame)
+            {
+                if (animationInterpolation < 0) animationInterpolation = 0;
+                if (animationInterpolation > 0) animationInterpolation = 1;
+            }
             for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
             {
                 finalAnimationFrame.BoneTransforms[boneIndex].Translation = ComputeTranslationCurrentFrame(boneIndex, currentFrame, nextFrame, animationInterpolation);
