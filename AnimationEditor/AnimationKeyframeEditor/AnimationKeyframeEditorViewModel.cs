@@ -145,7 +145,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             set
             {
                 SetAndNotify(ref _interpolationValue, value);
-                ApplyInterpolationOnCurrentFrame();
+                if(PreviewInterpolation) ApplyInterpolationOnCurrentFrame();
             }
         }
         private float _interpolationValue;
@@ -272,7 +272,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             IsDirty.Value = false;
-
+            _interpolateBetweenPose.Reset();
         }
 
         private void RiderSkeletonChanges(GameSkeleton newValue)

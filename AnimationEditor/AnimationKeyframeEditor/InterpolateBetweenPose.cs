@@ -9,14 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using View3D.Animation;
+using View3D.Commands.Bone;
 
 namespace AnimationEditor.AnimationKeyframeEditor
 {
     internal class InterpolateBetweenPose
     {
         private readonly AnimationKeyframeEditorViewModel _parent;
-        private AnimationClip.KeyFrame _keyframeA;
-        private AnimationClip.KeyFrame _keyframeB;
         
         public int KeyFrameNrA {
             get => _keyframeNrA;
@@ -37,21 +36,25 @@ namespace AnimationEditor.AnimationKeyframeEditor
         }
         private int _keyframeNrB;
 
-
-        private int _currentFrameNr;
-
         public InterpolateBetweenPose(AnimationKeyframeEditorViewModel parent) 
         {
             _parent = parent;
-            _currentFrameNr = -1;
+        }
+
+        public void Reset()
+        {
+            _keyframeNrA = -1;
+            _keyframeNrB = -1;
+            _parent.SelectedFrameAInterpolation.Value = "Not set";
+            _parent.SelectedFrameBInterpolation.Value = "Not set";
         }
 
         private bool Check()
         {
             var noKeyframeSelected = false;
 
-            if (_keyframeA == null) noKeyframeSelected = true;
-            if (_keyframeB == null) noKeyframeSelected = true;
+            if (_keyframeNrA == -1) noKeyframeSelected = true;
+            if (_keyframeNrB == -1) noKeyframeSelected = true;
             
             if(noKeyframeSelected)
             {
@@ -102,8 +105,16 @@ namespace AnimationEditor.AnimationKeyframeEditor
         private void ApplyOnCurrentFrame()
         {
             if (!Check()) return;
-            Console.WriteLine("interpolation preview goes here, slider value " + _parent.InterpolationValue);
-
+            _parent.CommandFactory.Create<InterpolateFramesBoneCommand>().Configure(x => x.Configure(
+                _parent.Rider.AnimationClip,
+                _parent.Rider.Player.CurrentFrame,
+                _keyframeNrA,
+                _keyframeNrB,
+                _parent.Skeleton,
+                _parent.InterpolationValue,
+                _parent.PastePosition.Value,
+                _parent.PasteRotation.Value,
+                _parent.PasteScale.Value)).BuildAndExecute();
         }
 
         private void ApplyOnCurrentFrameSelectedBones()
@@ -134,7 +145,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _keyframeA = _parent.Rider.AnimationClip.DynamicFrames[frameNrA].Clone();
             _keyframeNrA = frameNrA;
         }
 
@@ -146,7 +156,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            _keyframeB = _parent.Rider.AnimationClip.DynamicFrames[frameNrB].Clone();
             _keyframeNrB = frameNrB;
         }        
 

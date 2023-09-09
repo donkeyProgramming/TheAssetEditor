@@ -234,6 +234,20 @@
         </Grid>
 
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="First frame"  Click="{s:MethodBinding FirstFrame}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="Prev frame"  Click="{s:MethodBinding PrevFrame}"   Margin="2,0,2,0"/>
+            <Button Grid.Column="2" Content="Next frame"  Click="{s:MethodBinding NextFrame}"   Margin="2,0,0,0"/>
+            <Button Grid.Column="3" Content="Last frame"  Click="{s:MethodBinding LastFrame}"   Margin="2,0,0,0"/>
+        </Grid>
+        
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -242,10 +256,10 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="Select frame A"  Click="{s:MethodBinding SelectFrameAInterpolation}" Margin="2,0,0,0"/>
-            <Button Grid.Column="1" Content="Select frame B"  Click="{s:MethodBinding SelectFrameBInterpolation}" Margin="2,0,0,0" />
-            <Button Grid.Column="2" Content="Apply interpolation on current frame"  Click="{s:MethodBinding ApplyInterpolationOnCurrentFrame}" Margin="2,0,0,0" />
-            <Button Grid.Column="3" Content="Apply interpolation across frame A to B"  Click="{s:MethodBinding ApplyInterpolationAcrossFrames}" Margin="2,0,0,0" />
+            <Button Grid.Column="0" Content="Select frame A"  Click="{s:MethodBinding SelectFrameAInterpolation}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="Select frame B"  Click="{s:MethodBinding SelectFrameBInterpolation}" Margin="2,0,2,0"/>
+            <Button Grid.Column="2" Content="Apply interpolation on current frame"  Click="{s:MethodBinding ApplyInterpolationOnCurrentFrame}" Margin="2,0,0,0"/>
+            <Button Grid.Column="3" Content="Apply interpolation across frame A to B"  Click="{s:MethodBinding ApplyInterpolationAcrossFrames}" Margin="2,0,0,0"/>
         </Grid>
 
         <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
