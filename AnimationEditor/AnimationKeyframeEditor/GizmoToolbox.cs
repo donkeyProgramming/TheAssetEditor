@@ -29,10 +29,24 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         private GizmoMode _lastGizmoTool = GizmoMode.Translate;
 
+        private int _lastFrame = 0;
+
 
         public GizmoToolbox(AnimationKeyframeEditorViewModel parent)
         {
             _parent = parent;
+
+            _parent.Rider.Player.OnFrameChanged += (frameNr) =>
+            {
+                var selection = _parent.SelectionManager.GetState<BoneSelectionState>();
+                if (selection != null)
+                {
+                    selection.CurrentAnimation = _parent.Rider.Player.AnimationClip;
+                    selection.Skeleton = _parent.Skeleton;
+                    selection.CurrentFrame = _parent.Rider.Player.CurrentFrame;
+                    selection.SelectedBones.Clear();
+                }
+            };
         }
 
         private void OnModifiedBonesEvent(BoneSelectionState state)
@@ -123,19 +137,22 @@ namespace AnimationEditor.AnimationKeyframeEditor
             var selectableNode = FindSelectableObject(variantMeshRoot);
             EnsureTheObjectsAreNotSelectable(selectableNode);
 
+            _lastFrame = _parent.Rider.Player.CurrentFrame;
+
             if (selectableNode != null)
             {
                 _parent.CommandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure(new List<ISelectable>() { selectableNode }, false, false)).BuildAndExecute();
                 _parent.SelectionComponent.SetBoneSelectionMode();
                 _parent.Pause();
-                var selection = _parent.SelectionManager.GetState<BoneSelectionState>();
-                if (selection != null)
-                {
-                    selection.CurrentAnimation = _parent.Rider.Player.AnimationClip;
-                    selection.Skeleton = _parent.Skeleton;
-                    selection.CurrentFrame = _parent.Rider.Player.CurrentFrame;
-                    selection.SelectedBones.Clear();
-                }
+            }
+
+            var selection = _parent.SelectionManager.GetState<BoneSelectionState>();
+            if (selection != null)
+            {
+                selection.CurrentAnimation = _parent.Rider.Player.AnimationClip;
+                selection.Skeleton = _parent.Skeleton;
+                selection.CurrentFrame = _parent.Rider.Player.CurrentFrame;
+                selection.SelectedBones.Clear();
             }
 
             _parent.SelectionManager.GetState().SelectionChanged += OnSelectionChanged;
@@ -160,6 +177,14 @@ namespace AnimationEditor.AnimationKeyframeEditor
             }
 
             SelectMode();
+            var selection = _parent.SelectionManager.GetState<BoneSelectionState>();
+            if (selection != null)
+            {
+                selection.CurrentAnimation = _parent.Rider.Player.AnimationClip;
+                selection.Skeleton = _parent.Skeleton;
+                selection.CurrentFrame = _parent.Rider.Player.CurrentFrame;
+                selection.SelectedBones.Clear();
+            }
             _parent.CommandFactory.Create<BoneSelectionCommand>().Configure(x => x.Configure(_previousSelectedBones, true, false)).BuildAndExecute();
             switch (_lastGizmoTool)
             {

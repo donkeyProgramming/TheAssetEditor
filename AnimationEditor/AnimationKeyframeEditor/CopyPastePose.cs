@@ -43,7 +43,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             _parent.Pause();
             _parent.CommandFactory.Create<PasteWholeTransformBoneCommand>().Configure(x => x.Configure(
-                _parent.Rider.AnimationClip.DynamicFrames[_frameNrToCopy],
+                _parent.Rider.AnimationClip.DynamicFrames[_frameNrToCopy].Clone(),
                 _parent.Rider.AnimationClip, currentFrame,
                 _parent.PastePosition.Value, _parent.PasteRotation.Value, _parent.PasteScale.Value)).BuildAndExecute();
 

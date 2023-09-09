@@ -40,9 +40,12 @@ namespace View3D.Commands.Bone
         public void Execute()
         {
             var clone = _fromFrame.Clone();
-            if (_pastePosition) _animation.DynamicFrames[_startingFrame].Position = clone.Position;
-            if (_pasteRotation) _animation.DynamicFrames[_startingFrame].Rotation = clone.Rotation;
-            if (_pasteScale) _animation.DynamicFrames[_startingFrame].Scale = clone.Scale;
+            var replace = _animation.DynamicFrames[_startingFrame].Clone();
+            if (_pastePosition) replace.Position = clone.Position;
+            if (_pasteRotation) replace.Rotation = clone.Rotation;
+            if (_pasteScale) replace.Scale = clone.Scale;
+
+            _animation.DynamicFrames[_startingFrame] = replace;
         }
         public void Undo()
         {

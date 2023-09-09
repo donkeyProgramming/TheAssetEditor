@@ -154,9 +154,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             ActiveFragmentSlot = new FilterCollection<AnimationBinEntryGenericFormat>(null, (x) => UpdateCanSaveAndPreviewStates());
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
             
-            _gizmoToolbox = new(this);
-            _copyPastePose = new(this);
-            _copyPasteClipboardPose = new(this);
         }
 
         private void OutputAnimationSetSelected(IAnimationBinGenericFormat newValue)
@@ -181,6 +178,10 @@ namespace AnimationEditor.AnimationKeyframeEditor
             Create(riderItem.Data, mountItem.Data, propAsset);
             owner.SceneObjects.Add(riderItem);
             owner.SceneObjects.Add(mountItem);
+
+            _gizmoToolbox = new(this);
+            _copyPastePose = new(this);
+            _copyPasteClipboardPose = new(this);
         }
 
         internal void Create(SceneObject rider, SceneObject mount, SceneObject newAnimation)
@@ -199,7 +200,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
             _rider.Player.OnFrameChanged += RiderOnFrameChanged;
-
         }
 
         private void UpdateCanSaveAndPreviewStates()

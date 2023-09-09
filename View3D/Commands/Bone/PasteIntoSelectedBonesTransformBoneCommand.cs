@@ -44,13 +44,15 @@ namespace View3D.Commands.Bone
         {
             if (_selectedBones == null) return;
 
+            var clone = _fromFrame.Clone();
+            var replace = _animation.DynamicFrames[_startingFrame].Clone();
             foreach (var bone in _selectedBones)
             {
-                var clone = _fromFrame.Clone();
-                if (_pastePosition) _animation.DynamicFrames[_startingFrame].Position[bone] = clone.Position[bone];
-                if (_pasteRotation) _animation.DynamicFrames[_startingFrame].Rotation[bone] = clone.Rotation[bone];
-                if (_pasteScale) _animation.DynamicFrames[_startingFrame].Scale[bone] = clone.Scale[bone];
+                if (_pastePosition) replace.Position[bone] = clone.Position[bone];
+                if (_pasteRotation) replace.Rotation[bone] = clone.Rotation[bone];
+                if (_pasteScale) replace.Scale[bone] = clone.Scale[bone];
             }
+            _animation.DynamicFrames[_startingFrame] = replace;
         }
         public void Undo()
         {
