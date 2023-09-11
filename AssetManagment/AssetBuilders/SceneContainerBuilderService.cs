@@ -17,14 +17,14 @@ namespace AssetManagement.AssetBuilders
     public class SceneContainerBuilderService
     {
         private readonly RmvFile _inRMV2File;
-        private readonly AnimationFile _skeletonFile;
-        private readonly AnimationFile _animationFile;
+        private readonly AnimationFile _inputSkeletonFile;
+        private readonly AnimationFile _inputAnimationFile;
 
         public SceneContainerBuilderService(RmvFile inRMV2File, AnimationFile skeleton, AnimationFile animation = null)
         {
             _inRMV2File = inRMV2File;
-            _skeletonFile = skeleton;
-            _animationFile = animation;
+            _inputSkeletonFile = skeleton;
+            _inputAnimationFile = animation;
         }
 
         public SceneContainer BuildScene()
