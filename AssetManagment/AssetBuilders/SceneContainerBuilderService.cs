@@ -14,13 +14,24 @@ namespace AssetManagement.AssetBuilders
     /// Builds a "SceneContainer" from an RMV2 + ANIM skeleton + ANIM animations
     ///
     /// </summary>
-    public class SceneContainerBuilder
+    public class SceneContainerBuilderService
     {
-        public static SceneContainer RmvToSceneContainer(RmvFile inRMV2File, AnimationFile skeleton, AnimationFile animation = null)
+        private readonly RmvFile _inRMV2File;
+        private readonly AnimationFile _skeletonFile;
+        private readonly AnimationFile _animationFile;
+
+        public SceneContainerBuilderService(RmvFile inRMV2File, AnimationFile skeleton, AnimationFile animation = null)
+        {
+            _inRMV2File = inRMV2File;
+            _skeletonFile = skeleton;
+            _animationFile = animation;
+        }
+
+        public SceneContainer BuildScene()
         {
             var newScene = new SceneContainer();
 
-            var meshBuilderService = new SceneMeshBuilderService(inRMV2File);
+            var meshBuilderService = new SceneMeshBuilderService(_inRMV2File);
             newScene.Meshes = meshBuilderService.BuildMeshes();
 
             return newScene;
@@ -29,10 +40,10 @@ namespace AssetManagement.AssetBuilders
 
     public class SceneMeshBuilderService
     {
-        private readonly RmvFile _inputRMV2File;        
+        private readonly RmvFile _inputRMV2File;
         public SceneMeshBuilderService(RmvFile inputRMV2File)
         {
-            _inputRMV2File = inputRMV2File;            
+            _inputRMV2File = inputRMV2File;
         }
 
         public List<PackedMesh> BuildMeshes()
@@ -97,4 +108,8 @@ namespace AssetManagement.AssetBuilders
             return outVertex;
         }
     }
+
+    // TODO:
+    // public class SceneWeightingBuilderService
+    // public class SceneAnimationBuilderService
 }
