@@ -19,6 +19,9 @@ namespace CommonControls.FileTypes.Animation
     [DebuggerDisplay("AnimationFile - {Header.SkeletonName}[{DynamicFrames.Count}]")]
     public class AnimationFile
     {
+        public const int InvalidBoneIndex = -1;
+        public const int BoneIndexNoParent = InvalidBoneIndex;
+
         #region Sub classes
         public class BoneInfo
         {
@@ -178,11 +181,8 @@ namespace CommonControls.FileTypes.Animation
             var boneInfo = Bones
                 .Where(x => string.Compare(x.Name, name, StringComparison.InvariantCultureIgnoreCase) == 0)
                 .FirstOrDefault();
-
-            if (boneInfo == null)
-                return -1;
-
-            return boneInfo.Id;
+                            
+            return (boneInfo == null) ? -1 : boneInfo.Id;
         }
 
         public static AnimationFile Create(PackFile file)

@@ -11,36 +11,28 @@ namespace wrapdll
 	{
 	public:
 		/// <summary>
-		/// Process 
+		/// Process the weighting of an FBXMesh
+        /// Retrives the FBXSkin (if any)
+        /// Stored the weights per "control point" (="FBX SDK slang" for mathematical vertex {x,y,z,w})
 		/// </summary>
-		/// <param name="_poSourceFbxMesh"></param>
-		/// <param name="destPackedMesh"></param>
-		/// <param name="boneTable"></param>
-		/// <param name="controlPointInfluences"></param>
-		/// <returns></returns>
+		/// <param name="_poSourceFbxMesh">FBXMesh* to get FBXSkin* from</param>		
+		/// <param name="controlPointInfluences">per "control point" weighting</param>
+		/// <returns>true on sucess, false on fatal error</returns>
 		static bool ProcessSkin(
-			FbxMesh* _poSourceFbxMesh,
-			PackedMesh& destPackedMesh,
-			const std::vector < std::string >& boneTable,
-			std::vector<ControlPointInfluenceExt>& controlPointInfluences);
-		
-		/// <summary>
-		/// Process each FBXMesh's SKIN, and store rigging data in mesh structure
-		/// </summary>
-		/// <param name="_poSourceFbxMesh"></param>
-		/// <param name="destPackedMesh"></param>
-		/// <returns></returns>
-		static bool ProcessSkin(
-			FbxMesh* _poSourceFbxMesh,
-			PackedMesh& destPackedMesh);
-
+			FbxMesh* poFbxNode,			
+			std::vector<ControlPointInfluence>& controlPointInfluences);        
 	private:
+		/// <summary>
+		/// Helper method that retrieves the weighting information, from an FBXSkin*
+		/// </summary>
+		/// <param name="poSkin">FBXSkin* source</param>
+		/// <param name="poFbxMeshNode">FbxMesh* "owner" os the FXBSkin </param>
+		/// <param name="controlPointInfluences">per "control point" weighting</param>
+        /// <returns>true on sucess, false on fatal error</returns>
 		static bool GetInfluencesFromSkin(
 			fbxsdk::FbxSkin* poSkin,
 			fbxsdk::FbxMesh* poFbxMeshNode,
-			PackedMesh& destPackedMesh,
-			const std::vector<std::string>& boneTable,
-			std::vector<ControlPointInfluenceExt>& controlPointInfluences);
+			std::vector<ControlPointInfluence>& controlPointInfluences);
 	};
 
 }

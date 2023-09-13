@@ -10,6 +10,6 @@ namespace wrapdll
 	public:
 		static fbxsdk::FbxAMatrix GetNodeGeometryTransform(fbxsdk::FbxNode* pNode);
 		static fbxsdk::FbxAMatrix GetNodeWorldTransform(fbxsdk::FbxNode* pNode);
-		static fbxsdk::FbxAMatrix GetNodeWorldTransform_Normals(fbxsdk::FbxNode* pNode);
+		static fbxsdk::FbxAMatrix GetNodeWorldTransformNormals(fbxsdk::FbxNode* pNode);
 	};
 }

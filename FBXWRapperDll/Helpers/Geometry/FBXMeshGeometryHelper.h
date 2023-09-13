@@ -18,15 +18,36 @@ namespace wrapdll
 		/// <summary>
 		/// Gets normal vectors, supports all possible "FbxGeomtryElementNormal" storeage types/indexing types 		
 		/// </summary>
-		/// <param name="poMesh"></param>
-		/// <param name="poMappingMode"></param>
-		/// <returns></returns>
-		static std::vector<FbxVector4> GetNormals(fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode = nullptr);
-		static std::vector<FbxVector4> GetBitangents(fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode = nullptr);
-		static std::vector<FbxVector4> GetTangents(fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode = nullptr);
+		/// <param name="poMesh">Source FbxMesh object</param>
+		/// <param name="poMappingMode">fbxsdk mapping mode for vectors</param>
+		/// <returns>an std::vector of FbxVector4, or an empty container on error</returns>
+		static std::vector<FbxVector4> GetNormals(const fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode = nullptr);
+		        
+        /// <summary>
+        /// Gets bitangent vectors, supports all possible "FbxGeomtryElementNormal" storeage types/indexing types 		
+        /// </summary>
+        /// <param name="poMesh">Source FbxMesh object</param>
+        /// <param name="poMappingMode">fbxsdk mapping mode for vectors</param>
+        /// <returns>an std::vector of FbxVector4, or an empty container on error</returns>
+        static std::vector<FbxVector4> GetBitangents(const fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode = nullptr);
+		
+        /// <summary>
+        /// Gets tangent vectors , supports all possible "FbxGeomtryElementNormal" storeage types/indexing types 		
+        /// </summary>
+        /// <param name="poMesh">Source FbxMesh object</param>
+        /// <param name="poMappingMode">fbxsdk mapping mode for vectors</param>
+        /// <returns>an std::vector of FbxVector4, or an empty container on error</returns>
+        static std::vector<FbxVector4> GetTangents(const fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode = nullptr);
 
 	private:
-		static std::vector<FbxVector4> FetchVectors(fbxsdk::FbxMesh* poMesh, fbxsdk::FbxLayerElementTemplate<fbxsdk::FbxVector4>* lNormalElement);
+		/// <summary>
+		/// Helper method that fecthes the vectors, and return a "EMappingMode*"                
+		/// </summary>
+		/// <param name="poMesh">source mesh</param>
+		/// <param name="lNormalElement">EMappingMode enum value</param>
+		/// <returns></returns>
+
+		static std::vector<FbxVector4> FetchVectors(const fbxsdk::FbxMesh* poMesh, const FbxLayerElementTemplate<FbxVector4>* poNormalElement);
 
 
 	};

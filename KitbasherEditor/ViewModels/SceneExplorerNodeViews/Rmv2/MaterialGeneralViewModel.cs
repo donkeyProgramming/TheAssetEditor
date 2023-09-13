@@ -3,7 +3,6 @@ using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

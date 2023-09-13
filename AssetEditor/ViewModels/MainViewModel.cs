@@ -164,10 +164,7 @@ namespace AssetEditor.ViewModels
             }
         }
 
-
-
         public bool AllowDrop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default) => true;
-
 
         public bool Drop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default)
         {
@@ -196,8 +193,6 @@ namespace AssetEditor.ViewModels
             SelectedEditorIndex = CurrentEditorsList.IndexOf(node);
             return true;
         }
-
-
     }
 
     public class EditorCreator : IEditorCreator
@@ -245,5 +240,4 @@ namespace AssetEditor.ViewModels
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;
         }
     }
-
 }

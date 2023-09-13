@@ -1,11 +1,13 @@
 /*
- * tools.h
- *
- * Various tool functions
- *
- * phazer, 2023 
- *
+  file: tools.h
+ 
+  Various tool functions
+ 
+  Authored:
+  phazer, 2020-2023 
+ 
  */
+
 #pragma once
 
 #include <vector>
@@ -15,7 +17,8 @@
 #include <codecvt>
 
 /// <summary>
-/// Overloads std::tolower()/toupper() to std::string (only works single char in STL)
+/// Overloads std::tolower()/toupper() to work for std::string (only works single-byte char in STL)
+/// 
 /// </summary>
 namespace std
 {
@@ -51,21 +54,7 @@ static std::wstring WidenStr(const std::string& str)
 /// </summary>
 namespace tools
 {
-	
-
-
-	/*template <typename T>
-	static int GetIndexOf(const T& value, const std::vector<T>& items)
-	{
-		for (int itemIndex = 0; itemIndex < items.size(); itemIndex++)
-		{
-			if (items[itemIndex] == value)
-				return itemIndex;
-		}
-	}
-
-	template<>*/
-	static int GetIndexOf(const std::string& value, const std::vector<std::string>& items)
+	static int GetIndexOfStringInVector(const std::string& value, const std::vector<std::string>& items)
 	{
 		for (int itemIndex = 0; itemIndex < items.size(); itemIndex++)
 		{
@@ -76,30 +65,43 @@ namespace tools
 		return -1;
 	}
 
+	/// <summary>
+	/// Uses the CPUs high resolution clock, to count time intervals
+	/// </summary>
 	class SystemClock
 	{
+        typedef std::chrono::high_resolution_clock Time;        
 	public:
-		double GetSeconds()
-		{
-			typedef std::chrono::high_resolution_clock Time;
-			typedef std::chrono::duration<float> fsec;
-			
-			double ticks = static_cast<double>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-			double period = std::chrono::high_resolution_clock::period::den;
+        SystemClock()
+        {
+            ResetLocalTime(); 
+        }		
 
-			double seconds = ticks / period;			
+        /// <summary>
+        /// Resets the local timer to "now"
+        /// </summary>
+        void ResetLocalTime()
+        {
+            m_startTime = std::chrono::high_resolution_clock::now();
+        }
 
-			return seconds;			
-		}
-
+		/// <summary>
+		///  Get "local" time, 
+		/// </summary>
+		/// <returns>"state time" - "now" </returns>
 		double GetLocalTime() 
-		{
-			double timeElapsed = GetSeconds() - m_startTime; // +m_start_at;
-			return timeElapsed;
+		{            
+            auto timeElapsed = std::chrono::high_resolution_clock::now();                     
+            
+            auto value = std::chrono::duration<float, std::chrono::seconds::period>(timeElapsed-m_startTime);
+            
+            float retValue = value.count();
+                        
+            return retValue;
 		}
 
 	private:
-		double m_startTime = 0;
+        std::chrono::steady_clock::time_point m_startTime;		
 	};
 
 }
