@@ -44,6 +44,8 @@ namespace View3D.Commands.Object
                 (newSelectionState as FaceSelectionState).RenderObject = _selectedItem;
             else if (newSelectionState.Mode == GeometrySelectionMode.Vertex)
                 (newSelectionState as VertexSelectionState).RenderObject = _selectedItem;
+            else if (newSelectionState.Mode == GeometrySelectionMode.Bone)
+                (newSelectionState as BoneSelectionState).RenderObject = _selectedItem;
         }
 
         public void Undo()

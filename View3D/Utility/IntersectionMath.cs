@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
+using View3D.Animation;
 using View3D.Rendering.Geometry;
+using View3D.SceneNodes;
 
 namespace View3D.Utility
 {
@@ -205,6 +207,32 @@ namespace View3D.Utility
                 distance = null;
                 return false;
             }
+        }
+
+        public static bool IntersectBones(BoundingFrustum boundingFrustum, Rmv2MeshNode sceneNode, GameSkeleton skeleton, Matrix matrix, out List<int> bones)
+        {
+            bones = new List<int>();
+
+            if (sceneNode.AnimationPlayer == null) return false;
+
+            var animPlayer = sceneNode.AnimationPlayer;
+            var currentFrame = animPlayer.GetCurrentAnimationFrame();
+
+            if (currentFrame == null) return false;
+            var totalBones = currentFrame.BoneTransforms.Count;
+
+            for (int boneIdx = 0; boneIdx < totalBones; boneIdx++)
+            {
+                var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
+                bone.Decompose(out var _, out var _, out var trans);
+                if (boundingFrustum.Contains(Vector3.Transform(trans, matrix)) != ContainmentType.Disjoint)
+                    bones.Add(boneIdx);
+            }
+
+            bones = bones.Distinct().ToList();
+            if (bones.Count() == 0)
+                bones = null;
+            return bones != null;
         }
     }
 }

@@ -1,8 +1,11 @@
-﻿using CommonControls;
+﻿using System.Net.Security;
+using CommonControls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using View3D.Commands;
+using View3D.Commands.Bone;
+using View3D.Commands.Bone.Clipboard;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Commands.Vertex;
@@ -96,6 +99,20 @@ namespace View3D
             serviceCollection.AddTransient<ObjectSelectionModeCommand>();
             serviceCollection.AddTransient<PinMeshToVertexCommand>();
             serviceCollection.AddTransient<RemapBoneIndexesCommand>();
+            serviceCollection.AddTransient<BoneSelectionCommand>();
+            serviceCollection.AddTransient<TransformBoneCommand>();
+            serviceCollection.AddTransient<ResetTransformBoneCommand>();
+            serviceCollection.AddTransient<PasteWholeTransformBoneCommand>();
+            serviceCollection.AddTransient<PasteIntoSelectedBonesTransformBoneCommand>();
+            serviceCollection.AddTransient<PasteIntoSelectedBonesInRangeTransformFromClipboardBoneCommand>();
+            serviceCollection.AddTransient<PasteIntoSelectedBonesTransformFromClipboardBoneCommand>();
+            serviceCollection.AddTransient<PasteWholeInRangeTransformFromClipboardBoneCommand>();
+            serviceCollection.AddTransient<PasteWholeTransformFromClipboardBoneCommand>();
+            serviceCollection.AddTransient<DuplicateFrameBoneCommand>();
+            serviceCollection.AddTransient<DeleteFrameBoneCommand>();
+            serviceCollection.AddTransient<InterpolateFramesBoneCommand>();
+            serviceCollection.AddTransient<InterpolateFramesSelectedBonesBoneCommand>();
+
         }
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {

@@ -45,6 +45,11 @@ namespace View3D.Animation
 
             return bone1Transform * Matrix.Invert(bone0Transform);
         }
+
+        public int GetParentBoneIndex(GameSkeleton gameSkeleton, int boneIndex)
+        {
+            return BoneTransforms[boneIndex].ParentBoneIndex;
+        }
     }
 
 
@@ -57,6 +62,8 @@ namespace View3D.Animation
         TimeSpanExtension _timeSinceStart;
         AnimationFrame _currentAnimFrame;
         AnimationClip _animationClip;
+        GameSkeleton Skeleton { get { return _skeleton; } }
+        public AnimationClip AnimationClip { get { return _animationClip; } }
 
         public bool IsPlaying { get; private set; } = true;
         public bool IsEnabled { get; set; } = false;
@@ -155,7 +162,7 @@ namespace View3D.Animation
                 long animationLengthUs = GetAnimationLengthUs();
                 if (animationLengthUs != 0)
                     sampleT = (float)_timeSinceStart.TotalMicrosecondsAsLong / animationLengthUs;
-                _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules);
+                _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules, !IsPlaying);
                 _skeleton?.Update();
             }
             catch

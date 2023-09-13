@@ -7,7 +7,8 @@ namespace View3D.Components.Component.Selection
     {
         Object,
         Face,
-        Vertex
+        Vertex,
+        Bone
     };
 
 

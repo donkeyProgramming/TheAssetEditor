@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Serilog;
 using View3D.Animation;
 using View3D.Components.Component;
+using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
@@ -25,10 +26,11 @@ namespace AnimationEditor.Common.ReferenceModel
         private readonly PackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly ComplexMeshLoader _complexMeshLoader;
+        private readonly SelectionManager _selectionManager;
 
         public SceneObjectBuilder(GameWorld mainScene,
             IServiceProvider serviceProvider, ResourceLibary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
-            AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader )
+            AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader, SelectionManager selectionManager)
         {
             _mainScene = mainScene;
             _serviceProvider = serviceProvider;
@@ -37,6 +39,7 @@ namespace AnimationEditor.Common.ReferenceModel
             _packFileService = packFileService;
             _animationsContainerComponent = animationsContainerComponent;
             _complexMeshLoader = complexMeshLoader;
+            _selectionManager = selectionManager;
         }
 
         public SceneObject CreateAsset(string description, Color skeletonColour)

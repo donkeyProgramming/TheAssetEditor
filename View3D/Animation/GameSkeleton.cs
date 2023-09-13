@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace View3D.Animation
 {
@@ -110,6 +111,13 @@ namespace View3D.Animation
         public void SetAnimationFrame(AnimationFrame frame)
         {
             _frame = frame;
+        }
+
+        public string GetBoneNameByIndex(int index)
+        {
+            if (index < 0 || index >= BoneCount) return "";
+
+            return BoneNames[index];
         }
 
         public int GetBoneIndexByName(string name)
