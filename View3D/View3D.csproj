@@ -10,7 +10,20 @@
     <PackageReference Include="Pfim" Version="0.10.3" />
   </ItemGroup>
 
-  <ItemGroup>
+    <ItemGroup>
+        <None Remove="Content\Game\MaterialTemplate_wh2.xml.material" />
+        <None Remove="Content\Game\MaterialTemplate_wh3.xml.material" />
+        <None Remove="Content\Game\texconv.exe" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Content\Game\MaterialTemplate_wh2.xml.material" />
+        <EmbeddedResource Include="Content\Game\MaterialTemplate_wh3.xml.material" />
+        <EmbeddedResource Include="Content\Game\texconv.exe" />
+    </ItemGroup>
+
+
+    <ItemGroup>
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
     <ProjectReference Include="..\ContentProject\ContentProject.csproj" />
     <ProjectReference Include="..\MeshDecimator\MeshDecimator.csproj" />
