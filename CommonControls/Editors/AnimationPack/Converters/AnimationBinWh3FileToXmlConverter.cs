@@ -219,7 +219,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             var theFile = pfs.FindFile(file);
             var data = theFile.DataSource.ReadData(20);
-            bool headerIsReallyAnimFile = (data[0] == 0x06) || (data[0] == 0x07) || (data[0] == 0x08); //check if version is not 6 7 8 (or just check if it's 2)
+            bool headerIsReallyAnimFile = (data[0] == 0x05) || (data[0] == 0x06) || (data[0] == 0x07) || (data[0] == 0x08); //check if version is not 6 7 8 (or just check if it's 2) and as 10/09/2023 i found anim v5
             return endsWithAnim && headerIsReallyAnimFile;
         }
         private bool IsAnimMetaFile(string file, PackFileService pfs)
