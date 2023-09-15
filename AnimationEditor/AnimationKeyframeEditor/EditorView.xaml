@@ -277,7 +277,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="Reset"  Click="{s:MethodBinding ResetInterpolationSlider}" Margin="2,0,0,0"/>
-            <Slider Grid.Column="1" Minimum="-1" Maximum="1" TickFrequency="0.05" Value="{Binding InterpolationValue, UpdateSourceTrigger=PropertyChanged}" IsSnapToTickEnabled="true" TickPlacement="BottomRight" >
+            <Slider Grid.Column="1" Minimum="0" Maximum="1" TickFrequency="0.05" Value="{Binding InterpolationValue, UpdateSourceTrigger=PropertyChanged}" IsSnapToTickEnabled="true" TickPlacement="BottomRight" >
                 <Slider.LayoutTransform>
                     <ScaleTransform ScaleX="2" ScaleY="2"/>
                 </Slider.LayoutTransform>
