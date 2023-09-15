@@ -712,12 +712,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            if (!IsDirty.Value)
-            {
-                MessageBox.Show("there is nothing to save!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
             var animFile = _rider.AnimationClip.ConvertToFileFormat(_rider.Skeleton);
 
             MessageBox.Show($"this will save with anim version {animFile.Header.Version}", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
