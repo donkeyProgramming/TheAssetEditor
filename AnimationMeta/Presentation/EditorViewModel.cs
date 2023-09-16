@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -258,21 +259,19 @@ namespace AnimationMeta.Presentation
 
         }
 
-        public bool SaveAction()
+        private byte[] GenerateMetaDataBinaries()
         {
-            var path = _pf.GetFullPath(_file);
-
             foreach (var tag in Tags)
             {
                 var currentErrorMessage = tag.HasError();
                 if (string.IsNullOrWhiteSpace(currentErrorMessage) == false)
                 {
                     MessageBox.Show($"Unable to save : {currentErrorMessage}");
-                    return false;
+                    return Array.Empty<byte>();
                 }
             }
 
-            _logger.Here().Information("Creating metadata file. TagCount=" + Tags.Count + " " + path);
+            _logger.Here().Information("Creating metadata file. TagCount=" + Tags.Count);
             var tagDataItems = new List<MetaDataTagItem>();
 
             foreach (var tag in Tags)
@@ -285,7 +284,30 @@ namespace AnimationMeta.Presentation
 
             MetaDataFileParser parser = new MetaDataFileParser();
             var bytes = parser.GenerateBytes(_metaDataFile.Version, tagDataItems);
+            return bytes;
+        }
+
+        public void SaveAsAction()
+        {
+            var bytes = GenerateMetaDataBinaries();
+            var res = SaveHelper.SaveAs(_pf, bytes, ".anm.meta");
+            if (res != null)
+            {
+                _file = res;
+                DisplayName.Value = _file.Name;
+                EditorSavedEvent?.Invoke(_file);
+            }            
+            _logger.Here().Information("Creating metadata file complete");
+        }
+
+        public bool SaveAction()
+        {
+            var path = _pf.GetFullPath(_file);
+
             _logger.Here().Information("Saving");
+            var bytes = GenerateMetaDataBinaries();
+            if (bytes.Length == 0) return false;
+
             var res = SaveHelper.Save(_pf, path, null, bytes);
             if (res != null)
             {

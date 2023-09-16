@@ -20,6 +20,7 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
             <Button Grid.Row="1" Grid.Column="0" Content="Up"  Margin="5,5,5,0"  Click="{s:MethodBinding MoveUpAction}"/>
@@ -35,6 +36,7 @@
             <Button Grid.Row="0" Grid.Column="1" Content="Delete"  Margin="5,5,5,0"  Click="{s:MethodBinding DeleteAction}"/>
             
             <Button Grid.Row="4" Grid.ColumnSpan="2" Content="Save"  Margin="5,5,5,0"  Click="{s:MethodBinding SaveAction}"/>
+            <Button Grid.Row="5" Grid.ColumnSpan="2" Content="Save as"  Margin="5,5,5,0"  Click="{s:MethodBinding SaveAsAction}"/>
         </Grid>
 
         <ListView DockPanel.Dock="Bottom"
