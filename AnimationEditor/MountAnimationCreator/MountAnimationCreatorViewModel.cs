@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using AnimationEditor.AnimationKeyframeEditor;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.Services;
@@ -13,6 +14,7 @@ using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using View3D.Animation;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
@@ -292,6 +294,21 @@ namespace AnimationEditor.MountAnimationCreator
         {
             var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), new BatchProcessOptions { SavePrefix = SavePrefixText.Value }, SelectedAnimationOutputFormat.Value);
             service.SaveSingleAnim(_mount.AnimationClip, _rider.AnimationClip, _rider.AnimationName.Value.AnimationFile);
+        }
+
+        public void CopyCurrentAnimationAction()
+        {
+            if(_newAnimation.AnimationClip == null)
+            {
+                MessageBox.Show("generate an animation first", "warn", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var length = _newAnimation.AnimationClip.DynamicFrames.Count;
+
+            var json = AnimationCliboardCreator.CreateFrameClipboard(_rider.Skeleton, _newAnimation.AnimationClip, 0, length);
+            Clipboard.SetText(JsonConvert.SerializeObject(json));
+            MessageBox.Show($"copied {length} frames", "info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         public void BatchProcessUsingFragmentsAction()

@@ -57,11 +57,13 @@
                         <ColumnDefinition Width="0.5*"/>
                         <ColumnDefinition Width="0.5*"/>
                         <ColumnDefinition Width="0.5*"/>
+                        <ColumnDefinition Width="0.5*"/>
                     </Grid.ColumnDefinitions>
 
                     <Button  Grid.Column="0" Click="{s:MethodBinding SaveCurrentAnimationAction}" Content="Save current" IsEnabled="{Binding CanSave.Value, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,1,0"/>
                     <Button  Grid.Column="1" Click="{s:MethodBinding BatchProcessUsingTableAction}" Content="Batch save using table" IsEnabled="false" Margin="1,0,1,0" />
                     <Button  Grid.Column="2" Click="{s:MethodBinding BatchProcessUsingFragmentsAction}" Content="Batch save using Mount/Rider fragment" IsEnabled="{Binding CanBatchProcess.Value, UpdateSourceTrigger=PropertyChanged}" Margin="1,0,0,0"/>
+                    <Button  Grid.Column="3" Click="{s:MethodBinding CopyCurrentAnimationAction}" Content="Copy to clipboard" IsEnabled="{Binding CanSave.Value, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,1,0"/>
                 </Grid>
 
                 <DockPanel  Grid.Row="5" Margin="10,5,10,0">

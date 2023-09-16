@@ -14,7 +14,7 @@ using View3D.Commands.Bone.Clipboard;
 
 namespace AnimationEditor.AnimationKeyframeEditor
 {
-    internal class AnimationCliboardCreator
+    public class AnimationCliboardCreator
     {
         public static BoneTransformClipboardData CreateFrameClipboard(GameSkeleton skeleton, AnimationClip currentFrames, int startFrame, int endFrame)
         {
