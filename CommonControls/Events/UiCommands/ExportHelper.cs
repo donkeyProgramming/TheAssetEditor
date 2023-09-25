@@ -12,6 +12,9 @@ using CommonControls.Services;
 
 namespace CommonControls.Events.UiCommands
 {
+    /// <summary>
+    ///  Helper class to fetch WSMODEL/RMV2/ANIM files, and extract data
+    /// </summary>
     public class ExportHelper
     {
         static public string GetLastExtension(string path)
