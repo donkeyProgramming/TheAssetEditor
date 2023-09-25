@@ -1,10 +1,12 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows.Forms;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using View3D.Commands;
+using View3D.Commands.Bone;
 using View3D.Commands.Face;
 using View3D.Commands.Object;
 using View3D.Commands.Vertex;
@@ -12,6 +14,8 @@ using View3D.Components.Input;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
 using View3D.Utility;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
+using MouseButton = View3D.Components.Input.MouseButton;
 
 namespace View3D.Components.Component.Selection
 {
@@ -129,6 +133,29 @@ namespace View3D.Components.Component.Selection
                     return;
                 }
             }
+            else if (currentState.Mode == GeometrySelectionMode.Bone && currentState is BoneSelectionState boneState)
+            {
+                if (boneState.RenderObject == null)
+                {
+                    System.Windows.Forms.MessageBox.Show("no object was selected. select an object first then you can select the bone", "no object", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (boneState.CurrentAnimation == null)
+                {
+                    System.Windows.Forms.MessageBox.Show("no animation was played. select a frame by scrubbing the animation using the control below", "no animation", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                var vertexObject = boneState.RenderObject as Rmv2MeshNode;
+                if (IntersectionMath.IntersectBones(unprojectedSelectionRect, vertexObject, boneState.Skeleton, vertexObject.RenderMatrix, out var bones))
+                {
+                    foreach (var bone in bones)
+                    {
+                        Console.WriteLine($"bone id: {bone}");
+                    }
+                    _commandFactory.Create<BoneSelectionCommand>().Configure(x => x.Configure(bones, isSelectionModification, removeSelection)).BuildAndExecute();
+                    return;
+                }
+            }
 
             var selectedObjects = _sceneManger.SelectObjects(unprojectedSelectionRect);
             if (selectedObjects.Count() == 0 && isSelectionModification == false)
@@ -221,6 +248,22 @@ namespace View3D.Components.Component.Selection
             return false;
         }
 
+        public bool SetBoneSelectionMode()
+        {
+            var selectionState = _selectionManager.GetState();
+            if (_selectionManager.GetState().Mode != GeometrySelectionMode.Bone)
+            {
+                var selectedObject = selectionState.GetSingleSelectedObject();
+                if (selectedObject != null)
+                {
+                    _commandFactory.Create<ObjectSelectionModeCommand>().Configure(x => x.Configure(selectedObject, GeometrySelectionMode.Bone)).BuildAndExecute();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         bool ChangeSelectionMode()
         {
             if (_keyboardComponent.IsKeyReleased(Keys.F1))
@@ -238,6 +281,12 @@ namespace View3D.Components.Component.Selection
             else if (_keyboardComponent.IsKeyReleased(Keys.F3))
             {
                 if (SetVertexSelectionMode())
+                    return true;
+            }
+
+            else if (_keyboardComponent.IsKeyReleased(Keys.F9))
+            {
+                if (SetBoneSelectionMode())
                     return true;
             }
 

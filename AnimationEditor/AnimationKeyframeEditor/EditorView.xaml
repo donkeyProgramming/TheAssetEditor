@@ -1,0 +1,295 @@
+﻿<UserControl x:Class="AnimationEditor.AnimationKeyframeEditor.EditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:controls="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
+             mc:Ignorable="d" 
+             d:DesignHeight="1200" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <controls:BooleanToVisibilityConverter x:Key="boolConv"/>
+    </UserControl.Resources>
+
+    <DockPanel LastChildFill="False">
+        <Label  DockPanel.Dock="Top" Content="Animation Key Frame Editor" FontSize="18" FontWeight="Bold"/>
+        <Label  DockPanel.Dock="Top" FontSize="10">&lt;-- Drag the border to reveal the buttons text</Label>
+        <Label  DockPanel.Dock="Top" FontSize="20" Foreground="Red" Visibility="{Binding IsDirty.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource boolConv}}" >WARNING: Do not change the rider animation before saving, otherwise you will lose progress</Label>
+        <Grid  DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0"  Content="You are currently editing frame Nr:" FontSize="18" FontWeight="Bold"/>
+            <Label Grid.Column="1" Content="{Binding CurrentFrameNumber.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="18" FontWeight="Bold"/>
+            <Label Grid.Column="2" Content="/" FontSize="18" FontWeight="Bold"/>
+            <Label Grid.Column="3" Content="{Binding TotalFrameNumber.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" FontSize="18" FontWeight="Bold"/>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel>
+                <CheckBox DockPanel.Dock="Top" Content="Allow to select animroot node" IsChecked="{Binding AllowToSelectAnimRoot.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Increment the frame after copy operation" IsChecked="{Binding IncrementFrameAfterCopyOperation.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Select previous bones when frame changed" IsChecked="{Binding AutoSelectPreviousBonesOnFrameChange.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Enable Inverse Kinematics (currently not completed, help needed!)" IsChecked="{Binding EnableInverseKinematics.Value, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="false"  />
+                <Label>Last end of the bones chain (for IK):</Label>
+                <ComboBox  
+                          IsEditable="True"
+                          IsTextSearchEnabled="false"
+                          DisplayMemberPath="BoneName"
+                          Text="{Binding ModelBoneListForIKEndBone.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding ModelBoneListForIKEndBone.Values}" 
+                          IsEnabled="false" 
+                          SelectedItem="{Binding ModelBoneListForIKEndBone.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <!-- "{Binding EnableInverseKinematics.Value}" -->
+            </DockPanel>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="First frame"  Click="{s:MethodBinding FirstFrame}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="Prev frame"  Click="{s:MethodBinding PrevFrame}"  Margin="2,0,2,0"/>
+            <Button Grid.Column="2" Content="Next frame"  Click="{s:MethodBinding NextFrame}" Margin="2,0,0,0"/>
+            <Button Grid.Column="3" Content="Last frame"  Click="{s:MethodBinding LastFrame}" Margin="2,0,0,0"/>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Duplicate frame"  Click="{s:MethodBinding DuplicateFrame}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="Remove frame"  Click="{s:MethodBinding RemoveFrame}"  Margin="2,0,2,0"/>
+            <Button Grid.Column="2" Content="Reset pose"  Click="{s:MethodBinding ResetPose}" Margin="2,0,0,0"/>
+            <Button Grid.Column="3" Content="Undo pose"  Click="{s:MethodBinding UndoPose}" Margin="2,0,0,0"/>
+        </Grid>
+
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Select"  Click="{s:MethodBinding EnterSelectMode}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="Select previous bones"  Click="{s:MethodBinding SelectPreviousBones}" Margin="0,0,2,0"/>
+            <Button Grid.Column="2" Content="Move"  Click="{s:MethodBinding EnterMoveMode}" Margin="0,0,2,0"/>
+            <Button Grid.Column="3" Content="Rotate"  Click="{s:MethodBinding EnterRotateMode}"  Margin="2,0,2,0" />
+            <Button Grid.Column="4" Content="Scale"  Click="{s:MethodBinding EnterScaleMode}" Margin="2,0,0,0"/>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel>
+                <Label>on paste or interpolation operations:</Label>
+                <CheckBox DockPanel.Dock="Top" Content="Paste position" IsChecked="{Binding PastePosition.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Paste rotation" IsChecked="{Binding PasteRotation.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Paste scale" IsChecked="{Binding PasteScale.Value, UpdateSourceTrigger=PropertyChanged}"  />
+            </DockPanel>
+        </Grid>
+        
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Copy Pose"  Click="{s:MethodBinding CopyCurrentPose}" Margin="2,0,0,0"/>
+            <Button Grid.Column="1" Content="Paste Pose"  Click="{s:MethodBinding PasteIntoCurrentFrame}" Margin="2,0,0,0" />
+            <Button Grid.Column="2" Content="Paste Pose into previously selected nodes"  Click="{s:MethodBinding PasteIntoSelectedCurrentNode}" Margin="2,0,0,0" />
+            <Button Grid.Column="3" Content="Copy n paste previous edited nodes"  Click="{s:MethodBinding PastePreviousEditedNodesIntoCurrentPose}" Margin="2,0,0,0" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <DockPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
+
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0">Animation Duration:</Label>
+                    <TextBox Grid.Column="1" PreviewTextInput="AnimationTextInputPreview" Text="{Binding FramesDurationInSeconds, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
+                    <Label Grid.Column="2">seconds</Label>
+                    <Button Grid.Column="3"  Click="{s:MethodBinding ResetDuration}">Reset</Button>
+                    <Button Grid.Column="4" Click="{s:MethodBinding ApplyDuration}">Apply</Button>
+                </Grid>
+            </DockPanel>
+
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        </Grid>
+        
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <StackPanel>
+                <Label>In range copy operations from other keyedframe editor window. </Label>
+                <Label>It will copy current frame  and then paste in the destination animation up to desired length</Label>
+            </StackPanel>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <DockPanel>
+                <CheckBox DockPanel.Dock="Top" Content="Copy/paste multiple frames" IsChecked="{Binding CopyMoreThanSingleFrame, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Don't warn if the skeletons are different" IsChecked="{Binding DontWarnDifferentSkeletons.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Don't warn if the incoming total frames > this animation total frames" IsChecked="{Binding DontWarnIncomingFramesBigger.Value, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="When pasting use the frame number ranges below, otherwise it will paste whole frames" IsChecked="{Binding PasteUsingFormBelow, UpdateSourceTrigger=PropertyChanged}"  IsEnabled="{Binding CopyMoreThanSingleFrame}"/>
+            </DockPanel>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0">Paste Length:</Label>
+            <TextBox Grid.Column="1" PreviewTextInput="FrameNrPreviewTextInput" TextChanged="FrameNrCantBeEmpty" IsEnabled="{Binding CopyMoreThanSingleFrame}" Text="{Binding FrameNrLength}"></TextBox>
+            <Button Grid.Column="2" Content="Set Max"  Click="{s:MethodBinding SetFrameLengthMax}" Margin="2,0,0,0"/>
+            <Button Grid.Column="3" Content="From clipboard"  Click="{s:MethodBinding SetFrameLengthFromClipboard}" Margin="2,0,0,0"/>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Copy Pose into global clipboard..."  Click="{s:MethodBinding CopyPoseInRangeToClipboard}" Margin="2,0,0,0"/>
+            <Button Grid.Column="1" Content="Paste Pose from global clipboard..."  Click="{s:MethodBinding PastePoseInRangeFromClipboard}" Margin="2,0,0,0" />
+            <Button Grid.Column="2" Content="Paste Pose into previously selected nodes from global clipboard..."  Click="{s:MethodBinding PasteIntoInRangeSelectedCurrentNodeFromClipboard}" Margin="2,0,0,0" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <StackPanel>
+                <Label>Interpolate between frame</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Selected Frame A:</Label>
+                    <Label Content="{Binding SelectedFrameAInterpolation.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Label>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label>Selected Frame B:</Label>
+                    <Label Content="{Binding SelectedFrameBInterpolation.Value, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Label>
+                </StackPanel>
+                <StackPanel>
+                    <Label>Drag the slider to manipulate the blending between frames,</Label>
+                    <Label>to apply to the current frame, click apply interpolation on current frame.</Label>
+                    <Label>To enable preview you need to select frame A and B.</Label>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="First frame"  Click="{s:MethodBinding FirstFrame}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="Prev frame"  Click="{s:MethodBinding PrevFrame}"   Margin="2,0,2,0"/>
+            <Button Grid.Column="2" Content="Next frame"  Click="{s:MethodBinding NextFrame}"   Margin="2,0,0,0"/>
+            <Button Grid.Column="3" Content="Last frame"  Click="{s:MethodBinding LastFrame}"   Margin="2,0,0,0"/>
+        </Grid>
+        
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="Select frame A"  Click="{s:MethodBinding SelectFrameAInterpolation}" Margin="0,0,2,0"/>
+            <Button Grid.Column="1" Content="Select frame B"  Click="{s:MethodBinding SelectFrameBInterpolation}" Margin="2,0,2,0"/>
+            <Button Grid.Column="2" Content="Apply interpolation on current frame"  Click="{s:MethodBinding ApplyInterpolationOnCurrentFrame}" Margin="2,0,0,0"/>
+            <Button Grid.Column="3" Content="Apply interpolation across frame A to B"  Click="{s:MethodBinding ApplyInterpolationAcrossFrames}" Margin="2,0,0,0"/>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <DockPanel>
+                <CheckBox DockPanel.Dock="Top" Content="Live preview interpolation (automatically applies interpolation)" IsChecked="{Binding PreviewInterpolation, UpdateSourceTrigger=PropertyChanged}"  />
+                <CheckBox DockPanel.Dock="Top" Content="Interpolation only on previously selected bones" IsChecked="{Binding InterpolationOnlyOnSelectedBones, UpdateSourceTrigger=PropertyChanged}"  />
+            </DockPanel>
+        </Grid>
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Reset"  Click="{s:MethodBinding ResetInterpolationSlider}" Margin="2,0,0,0"/>
+            <Slider Grid.Column="1" Minimum="-1" Maximum="1" TickFrequency="0.05" Value="{Binding InterpolationValue, UpdateSourceTrigger=PropertyChanged}" IsSnapToTickEnabled="true" TickPlacement="BottomRight" >
+                <Slider.LayoutTransform>
+                    <ScaleTransform ScaleX="2" ScaleY="2"/>
+                </Slider.LayoutTransform>
+            </Slider>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top" Margin="5,5,5,0">
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+        </Grid>
+
+        <Button DockPanel.Dock="Top" Margin="5" Content="Save" Click="{s:MethodBinding Save}"/>
+        <Button DockPanel.Dock="Top" Margin="5" Content="Save as" Click="{s:MethodBinding SaveAs}"/>
+
+    </DockPanel>
+</UserControl>
