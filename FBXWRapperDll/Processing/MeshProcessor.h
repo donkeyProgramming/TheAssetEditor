@@ -43,7 +43,7 @@ namespace wrapdll
         static void DoMeshIndexingWithTangentSmoothing(PackedMesh& destMesh)
         {
 
-            std::vector<PackedCommonVertex> outVertices;
+            std::vector<ExtPackedCommonVertex> outVertices;
             std::vector<uint16_t> outIndices;
             std::vector<int> outVertexIndexRemap; // index = old index, value = new value            
 
@@ -146,7 +146,7 @@ namespace wrapdll
         };
 
         // TODO: CLEAN UP
-        static void ComputeTangentBasisUnindexed(std::vector<PackedCommonVertex>& vertices)
+        static void ComputeTangentBasisUnindexed(std::vector<ExtPackedCommonVertex>& vertices)
         {
             for (size_t i = 0; i < vertices.size(); i += 3)
             {
@@ -183,7 +183,7 @@ namespace wrapdll
         };
 
         // TODO: FINISH
-        static void ComputeTangentBasisIndexed(std::vector<PackedCommonVertex>& vertices, const std::vector<uint16_t>& indices)
+        static void ComputeTangentBasisIndexed(std::vector<ExtPackedCommonVertex>& vertices, const std::vector<uint16_t>& indices)
         {
             // iterate over triangles
             for (size_t faceIndex = 0; faceIndex < indices.size(); faceIndex += 3)
@@ -239,12 +239,12 @@ namespace wrapdll
             std::vector<sm::Vector3>& outTangents,
             std::vector<sm::Vector3>& outBitangents
         ) {
-            //std::map<PackedCommonVertex, unsigned short> VertexToOutIndex;
+            //std::map<ExtPackedCommonVertex, unsigned short> VertexToOutIndex;
 
             std::vector<int> avg_count/*(inVertices.size(), 1)*/;
             // For each input vertex
             for (unsigned int i = 0; i < inVertices.size(); i++) {
-                PackedCommonVertex packed;
+                ExtPackedCommonVertex packed;
                 packed.position = convert::ConvertToVec3(inVertices[i]);
                 packed.uv = inUVs[i];
                 packed.normal = inNormals[i];
@@ -289,8 +289,8 @@ namespace wrapdll
         /// <param name="outIndices">Index buffer</param>
         /// <param name="outVertexRemap">vertex remap</param>
         static inline void DoMeshIndexingWithTangenSmoothing_Slow(
-            const std::vector<PackedCommonVertex>& inVertices,
-            std::vector<PackedCommonVertex>& outVertices,
+            const std::vector<ExtPackedCommonVertex>& inVertices,
+            std::vector<ExtPackedCommonVertex>& outVertices,
             std::vector<uint16_t>& outIndices,
             std::vector<int>& outVertexRemap)
         {
@@ -327,8 +327,8 @@ namespace wrapdll
         }
 
         static inline void DoMeshIndexingWithTangenSmoothing_Fast(
-            const std::vector<PackedCommonVertex>& inVertices,
-            std::vector<PackedCommonVertex>& outVertices,
+            const std::vector<ExtPackedCommonVertex>& inVertices,
+            std::vector<ExtPackedCommonVertex>& outVertices,
             std::vector<uint16_t>& outIndices,
             std::vector<int>& outVertexRemap)
         {
@@ -395,9 +395,9 @@ namespace wrapdll
 
 
         static inline void indexVBO_TBN_Fast_Packed(
-            const std::vector<PackedCommonVertex>& inVertices,
+            const std::vector<ExtPackedCommonVertex>& inVertices,
             std::vector<uint16_t>& out_indices,
-            std::vector<PackedCommonVertex>& out_vertices
+            std::vector<ExtPackedCommonVertex>& out_vertices
         ) {
             std::map<PackedVertex, unsigned short> VertexToOutIndex;
 
@@ -490,7 +490,7 @@ namespace wrapdll
             const sm::Vector3& in_vertex,
             const sm::Vector2& in_uv,
             const sm::Vector3& in_normal,
-            std::vector<PackedCommonVertex>& out_vertices,
+            std::vector<ExtPackedCommonVertex>& out_vertices,
 
             uint16_t& result
         ) {

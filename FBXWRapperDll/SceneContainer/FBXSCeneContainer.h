@@ -33,7 +33,7 @@ namespace wrapdll
 #endif // _DEBUG			
 		};
 
-        void GetVertices(int meshindex, PackedCommonVertex** ppVertices, int* itemCount);
+        void GetVertices(int meshindex, ExtPackedCommonVertex** ppVertices, int* itemCount);
         void GetIndices(int meshindex, uint16_t** ppVertices, int* itemCount);
         void GetVertexWeights(int meshindex, VertexWeight** pVertexWeights, int* itemCount);
 

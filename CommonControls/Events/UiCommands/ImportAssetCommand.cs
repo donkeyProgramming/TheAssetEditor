@@ -19,42 +19,42 @@ namespace CommonControls.Events.UiCommands
             _assetManagementFactory = assetManagementFactory;
         }
 
-        public void Execute(PackFileContainer container, string parentPath)
+    public void Execute(PackFileContainer container, string parentPath)
+    {
+        if (container.IsCaPackFile)
         {
-            if (container.IsCaPackFile)
-            {
-                MessageBox.Show("Unable to edit CA packfile");
+            MessageBox.Show("Unable to edit CA packfile");
+            return;
+        }
+
+        var dialog = new OpenFileDialog
+        {
+            Filter = "FBX Files (*.fbx)|*.fbx|All files (*.*)|*.*\\",   // Clean this up so its correct based on the assetManagementFactory data
+            Multiselect = false
+        };
+
+        if (dialog.ShowDialog() == DialogResult.OK)
+        {
+            var filename = dialog.FileNames.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(filename))
                 return;
-            }
-
-            var dialog = new OpenFileDialog
-            {
-                Filter = "FBX Files (*.fbx)|*.fbx|All files (*.*)|*.*\\",   // Clean this up so its correct based on the assetManagementFactory data
-                Multiselect = false
-            };
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                var filename = dialog.FileNames.FirstOrDefault();
-                if (string.IsNullOrWhiteSpace(filename))
-                    return;
                 
-               try
-                {
-                    var extension = Path.GetExtension(filename);
-                    var importer = _assetManagementFactory.GetImporter(extension);  // TODO: What if no importer is found?
-                    var packFile = importer.ImportAsset(filename);
+            try
+            {
+                var extension = Path.GetExtension(filename);
+                var importer = _assetManagementFactory.GetImporter(extension);  // TODO: What if no importer is found?
+                var packFile = importer.ImportAsset(filename);
 
-                    if (packFile == null)
-                        return;
+                if (packFile == null)
+                    return;
 
-                    _packFileService.AddFileToPack(container, parentPath, packFile);
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show($"Failed to import model/scene file {filename}. Error : {e.Message}", "Error");
-                }
+                _packFileService.AddFileToPack(container, parentPath, packFile);
             }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Failed to import model/scene file {filename}. Error : {e.Message}", "Error");
+            }
+        }
         }
     }
 }

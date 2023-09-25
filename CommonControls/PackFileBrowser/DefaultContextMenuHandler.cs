@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.ObjectModel;
+using System.IO;
 using CommonControls.Events.UiCommands;
 using CommonControls.Services;
 using CommonControls.Services.ToolCreation;
@@ -114,7 +115,13 @@ namespace CommonControls.PackFileBrowser
                 Additem(ContextItems.OpenWithNodePadPluss, openFolder);
             }
 
-            Items = newContextMenu;
+            // TODO: phazer added here, for testing, maybe not best place
+            FileInfo fi = new FileInfo(node.Item.Name);
+            if (fi.Extension.ToLower() == "rigid_model_v2")
+            {
+                Additem(ContextItems.ExportGeomtry, newContextMenu);
+            }
+
         }
     }
 }

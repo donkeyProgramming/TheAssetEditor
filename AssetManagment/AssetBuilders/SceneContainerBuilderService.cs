@@ -1,68 +1,62 @@
-﻿using System.Collections.Generic;
+﻿
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using CommonControls.FileTypes.RigidModel;
-using System.Linq;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using CommonControls.FileTypes.Animation;
+using System.Collections.Generic;
+using AssetManagement.GenericFormats;
 
 namespace AssetManagement.AssetBuilders
 {
-    // TODO: finish this class (export)
-
-    /// <summary>
-    /// Builds a "SceneContainer" from an RMV2 + ANIM skeleton + ANIM animations
-    ///
-    /// </summary>
-    public class SceneContainerBuilderService
+    public class SceneContainerBuilder
     {
-        private readonly RmvFile _inRMV2File;
-        private readonly AnimationFile _inputSkeletonFile;
-        private readonly AnimationFile _inputAnimationFile;
+        private AnimationFile _skeletonFile;
+        private AnimationFile _animationFile;
+        private readonly SceneContainer _sceneContainer;
+        private readonly SceneMeshBuilderHelper _meshBuilderHelper;
 
-        public SceneContainerBuilderService(RmvFile inRMV2File, AnimationFile skeleton, AnimationFile animation = null)
+        public SceneContainerBuilder()
         {
-            _inRMV2File = inRMV2File;
-            _inputSkeletonFile = skeleton;
-            _inputAnimationFile = animation;
+            _sceneContainer = new SceneContainer();
+            SceneMeshBuilderHelper _meshBuilderHelper = new SceneMeshBuilderHelper();
         }
 
-        public SceneContainer BuildScene()
+        public void AddMesh(RmvModel inputRMV2Mesh)
         {
-            var newScene = new SceneContainer();
+            var mesh = _meshBuilderHelper.BuildMesh(inputRMV2Mesh);
 
-            var meshBuilderService = new SceneMeshBuilderService(_inRMV2File);
-            newScene.Meshes = meshBuilderService.BuildMeshes();
-
-            return newScene;
+            _sceneContainer.Meshes.Add(mesh);
         }
+
+        /// <summary>
+        /// Add the contents of 1 RMV2 file to scene
+        /// Will be usefule "right click export file" and when export VMDs
+        /// </summary>    
+        public void AddMeshes(RmvFile inputRMV2File)
+        {
+            var meshList = _meshBuilderHelper.BuildMeshes(inputRMV2File);
+
+            _sceneContainer.Meshes.AddRange(meshList);
+        }
+
+        public void SetSkeleton(AnimationFile skeletonFile)
+        {
+            _skeletonFile = skeletonFile;
+            ///....
+        }
+
+        public void SetAnimation(AnimationFile animationFile)
+        {
+            _animationFile = animationFile;
+            ///....
+        }
+
     }
 
-    public class SceneMeshBuilderService
+    public class SceneMeshBuilderHelper
     {
-        private readonly RmvFile _inputRMV2File;
-        public SceneMeshBuilderService(RmvFile inputRMV2File)
-        {
-            _inputRMV2File = inputRMV2File;
-        }
-
-        public List<PackedMesh> BuildMeshes()
-        {
-            if (!_inputRMV2File.ModelList.Any())
-                return null;
-
-            var meshList = new List<PackedMesh>();
-
-            foreach (var model in _inputRMV2File.ModelList[0]) // use only LOD 0, for now
-            {
-                var outMesh = MakeUnindexedMesh(model);
-                meshList.Add(outMesh);
-            }
-
-            return meshList;
-        }
-
-        private static PackedMesh MakeUnindexedMesh(RmvModel model)
+        public PackedMesh BuildMesh(RmvModel model)
         {
             var outMesh = new PackedMesh();
 
@@ -74,22 +68,35 @@ namespace AssetManagement.AssetBuilders
             return outMesh;
         }
 
-        private static void MakeTriangle(RmvModel model, PackedMesh outMesh, int triangleIndex)
+        public List<PackedMesh> BuildMeshes(RmvFile file)
+        {
+            var meshList = new List<PackedMesh>();
+
+            foreach (var model in file.ModelList[0])
+            {
+                var mesh = BuildMesh(model);
+                meshList.Add(mesh);
+            }
+
+            return meshList;
+        }
+
+        private void MakeTriangle(RmvModel model, PackedMesh outMesh, int triangleIndex)
         {
             var faceCornerIndex1 = model.Mesh.IndexList[triangleIndex * 3 + 0];
             var faceCornerIndex2 = model.Mesh.IndexList[triangleIndex * 3 + 1];
             var faceCornerIndex3 = model.Mesh.IndexList[triangleIndex * 3 + 2];
 
-            var cornerVertex1 = GetPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex1]);
-            var cornerVertex2 = GetPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex2]);
-            var cornerVertex3 = GetPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex3]);
+            var cornerVertex1 = GetExtPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex1]);
+            var cornerVertex2 = GetExtPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex2]);
+            var cornerVertex3 = GetExtPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex3]);
 
             outMesh.Vertices.Add(cornerVertex1);
             outMesh.Vertices.Add(cornerVertex2);
             outMesh.Vertices.Add(cornerVertex3);
         }
 
-        private static ExtPackedCommonVertex GetPackedCommonVertex(CommonVertex inVertex)
+        private static ExtPackedCommonVertex GetExtPackedCommonVertex(CommonVertex inVertex)
         {
             var outVertex = new ExtPackedCommonVertex();
 
@@ -108,6 +115,8 @@ namespace AssetManagement.AssetBuilders
             return outVertex;
         }
     }
+
+//    public class SceneSkeletonBuilder
 
     // TODO:
     // public class SceneWeightingBuilderService

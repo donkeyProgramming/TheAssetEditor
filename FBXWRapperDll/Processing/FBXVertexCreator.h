@@ -17,14 +17,14 @@ namespace wrapdll{
 		/// <param name="ctrlPointInfluences">Data from the FBXSkin processing</param>
 		/// <param name="scaleFactor"></param>
 		/// <returns></returns>
-		static PackedCommonVertex MakePackedVertex(
+		static ExtPackedCommonVertex MakePackedVertex(
 			const FbxVector4& vControlPoint,
 			const FbxVector4& vNormalVector,
 			const FbxVector2& UVmap1,
 			const ControlPointInfluence* ctrlPointInfluences,
 			double scaleFactor)
 		{
-			PackedCommonVertex outVertex;
+			ExtPackedCommonVertex outVertex;
 
 			outVertex.position.x = static_cast<float>(vControlPoint.mData[0] * scaleFactor);
 			outVertex.position.y = static_cast<float>(vControlPoint.mData[1] * scaleFactor);
@@ -43,7 +43,7 @@ namespace wrapdll{
     private:
         // TODO: remove?
         
-        //static void CopyVertexWeighting(const ControlPointInfluence* ctrlPointInfluences, PackedCommonVertex& outVertex)
+        //static void CopyVertexWeighting(const ControlPointInfluence* ctrlPointInfluences, ExtPackedCommonVertex& outVertex)
         //{
         //    if (ctrlPointInfluences)
         //    {

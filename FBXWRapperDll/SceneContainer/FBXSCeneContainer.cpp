@@ -7,7 +7,7 @@
 #include "..\Helpers\Geometry\FBXNodeSearcher.h"
 
 
-void wrapdll::FBXSCeneContainer::GetVertices(int meshindex, PackedCommonVertex** ppVertices, int* itemCount)
+void wrapdll::FBXSCeneContainer::GetVertices(int meshindex, ExtPackedCommonVertex** ppVertices, int* itemCount)
 {
     *itemCount = static_cast<int>(m_packedMeshes[meshindex].vertices.size());
     *ppVertices = m_packedMeshes[meshindex].vertices.data();

@@ -2,10 +2,13 @@
 using Matrix = Microsoft.Xna.Framework.Matrix;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
+using AssetManagement.GenericFormats.DataStructures.Managed;
 using System;
-using System.Runtime.InteropServices;
-using AssetManagement.GenericFormats.Managed;
-using AssetManagement.GenericFormats.Unmanaged;
+using SharpDX.Direct2D1.Effects;
+using System.Numerics;
+using System.Transactions;
+using System.Windows.Media.Imaging;
+using CommonControls.Common;
 
 namespace AssetManagement.GenericFormats
 {
@@ -14,21 +17,58 @@ namespace AssetManagement.GenericFormats
         public List<PackedMesh> Meshes { get; set; } = new List<PackedMesh>();
         public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
         public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
-        public Node RootNode { get; set; }
-        public String SkeletonName { get; set; }
+        public SceneNode RootNode { get; set; }
+        public string SkeletonName { get; set; }
+        public FBXFileInfo FileInfoData { get; set; } = new FBXFileInfo();
     }
 
-    public class Node
+    public class TransformData
+    {
+        public Vector3 RotationEuler
+        {// TODO: test that this actually works
+            get { return MathUtil.QuaternionToEuler(Rotation); }
+            set { Rotation = MathUtil.EulerToQuaternions(value.X, value.Y, value.Z); }
+        }
+
+        public Quaternion Rotation { get; set; }
+        public Vector3 Translation { get; set; }
+        public Vector3 Scale { get; set; }
+
+        public Matrix Transform
+        {
+            // TODO: test that this actually works
+            get { return CalculateMatrix(); }
+            set { SetTranformValues(value); }
+        }
+
+        private void SetTranformValues(Matrix value)
+        {
+            value.Decompose(out var scale, out var rotation, out var translation);
+            Scale = scale;
+            Rotation = rotation;
+            Scale = translation;
+        }
+
+        private Matrix CalculateMatrix()
+        {
+            Matrix translationMatrix = Matrix.CreateTranslation(Translation);
+            Matrix scaleMatrix = Matrix.CreateScale(Scale);
+            Matrix rotationMatrix = Matrix.CreateFromQuaternion(Rotation);
+            Matrix transformationMatrix = scaleMatrix * rotationMatrix * translationMatrix;
+
+            return transformationMatrix;
+        }
+    }
+    public class SceneNode
     {
         public string Name { get; set; }
-        public List<Node> Children { get; set; }
-        public Node Parent { get; set; }
-        public Matrix Transform { get; set; }        
+        public TransformData TransForm { get; set; }
+        public SceneNode Parent { get; set; } = null;
+        public List<SceneNode> Children { get; set; }
     }
 
     public class BoneInfo
     {
-        public List<VertexWeight> VertexWeights { get; set; }
         public string Name { get; set; }
         public int Id { get; set; }
         public int ParentId { get; set; }
@@ -59,7 +99,7 @@ namespace AssetManagement.GenericFormats
             get { return _framesPerSecond; }
             set
             {
-                FramesPerSecond = value;                
+                FramesPerSecond = value;
             }
         }
     }

@@ -11,7 +11,7 @@ namespace AssetManagement.GenericFormats.Unmanaged
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct FBXFileInfo
+    public struct ExtFBXFileInfo
     {
         public FBXSDKVersion sdkVersion; // SDK version file is saved with;
         public bool isASCII; // FBX can be saves as binary or json/xml like ASCII text
@@ -37,7 +37,7 @@ namespace AssetManagement.GenericFormats.Unmanaged
     [StructLayout(LayoutKind.Sequential)]
     public struct FBXImportExportSettings    
     {     
-        public FBXFileInfo fileinfo;
+        public ExtFBXFileInfo fileinfo;
         public FBXUnitFileInfo unitInfo;
         public FBXAnimInfo animTimingINfo;
     }

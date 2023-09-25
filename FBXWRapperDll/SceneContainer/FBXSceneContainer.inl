@@ -2,7 +2,7 @@
 extern "C" // not really needed but block looks nice/readable:)
 {
 	FBXWRAPPERDLL_API
-		void GetPackedVertices(wrapdll::FBXSCeneContainer* pInstance, int meshindex, PackedCommonVertex** ppVertices, int* itemCount)
+		void GetPackedVertices(wrapdll::FBXSCeneContainer* pInstance, int meshindex, ExtPackedCommonVertex** ppVertices, int* itemCount)
 	{
 		pInstance->GetVertices(meshindex, ppVertices, itemCount);
 	};

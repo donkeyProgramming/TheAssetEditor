@@ -23,7 +23,8 @@ namespace AnimationEditor.SkeletonEditor
                 {
                     var parentTransform = Skeleton.GetWorldTransform(parentIndex);
 
-                    var rotationWorld = MathUtil.EulerDegreesToQuaternion(rotation);
+                    var rotationWorld = MathUtil.
+                    EulerDegreesToQuaternion(rotation);
                     var translationWorld = translationValue;
                     var currentMatrixWorld = Matrix.CreateFromQuaternion(rotationWorld) * Matrix.CreateTranslation(translationWorld);
 
