@@ -1,17 +1,15 @@
-﻿using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.FileTypes.RigidModel;
-using CommonControls.FileTypes.WsModel;
-
-
-namespace CommonControls.Interfaces.AssetManagement
-{
-    /// <summary>
-    /// Asset Export Data - including all the data types the exporter might use          
-   
+﻿namespace CommonControls.Interfaces.AssetManagement
+{    
     public interface IAssetExporter
     {
+        /// <summary>
+        /// Exports an asset to binary data
+        /// TODO:       Ole: what if the FBX SDK only can save directly to disk? (I can't recall)        
+        /// </summary>
+        /// <param name="inputData">Container for all data an export op might need</param>
+        /// <returns></returns>
         byte[] ExportAsset(AssetParamData inputData);
+                
         string[] Formats { get; }
     }
 }
