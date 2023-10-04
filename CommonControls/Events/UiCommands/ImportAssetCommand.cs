@@ -42,7 +42,7 @@ namespace CommonControls.Events.UiCommands
                try
                 {
                     var extension = Path.GetExtension(filename);
-                    var importer = _assetImport Provider.GetImporter(extension);  // TODO: What if no importer is found?
+                    var importer = _assetImportProvider.GetImporter(extension);  // TODO: What if no importer is found?
                     var packFile = importer.ImportAsset(filename);
 
                     if (packFile == null)
