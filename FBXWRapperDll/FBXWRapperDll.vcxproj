@@ -72,7 +72,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>FBXWrapperNative</TargetName>
+    <TargetName>FbxWrapperNative</TargetName>
     <OutDir>$(SolutionDir)AssetEditor\bin\Debug\net6.0-windows\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -82,7 +82,7 @@
     <TargetName>FBXWRapperDll</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>FBXWrapperNative</TargetName>
+    <TargetName>FbxWrapperNative</TargetName>
     <OutDir>$(SolutionDir)AssetEditor\bin\Release\net6.0-windows\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -11,12 +11,12 @@ namespace CommonControls.Events.UiCommands
     public class ImportAssetCommand : IUiCommand
     {
         private readonly PackFileService _packFileService;
-        private readonly IAssetManagementFactory _assetManagementFactory;
+        private readonly IAssetImporterProvider _assetImportProvider;
 
-        public ImportAssetCommand(PackFileService packFileService, IAssetManagementFactory assetManagementFactory)
+        public ImportAssetCommand(PackFileService packFileService, IAssetImporterProvider assetManagementFactory)
         {
             _packFileService = packFileService;
-            _assetManagementFactory = assetManagementFactory;
+            _assetImportProvider = assetManagementFactory;
         }
 
         public void Execute(PackFileContainer container, string parentPath)
@@ -42,7 +42,7 @@ namespace CommonControls.Events.UiCommands
                try
                 {
                     var extension = Path.GetExtension(filename);
-                    var importer = _assetManagementFactory.GetImporter(extension);  // TODO: What if no importer is found?
+                    var importer = _assetImportProvider.GetImporter(extension);  // TODO: What if no importer is found?
                     var packFile = importer.ImportAsset(filename);
 
                     if (packFile == null)

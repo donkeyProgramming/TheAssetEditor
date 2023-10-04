@@ -1,5 +1,4 @@
-﻿using AssetManagement.GenericFormats;
-using AssetManagement.GenericFormats.Managed;
+﻿using AssetManagement.GenericFormats.Managed;
 using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
 using System;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CommonControls.FileTypes.RigidModel.Vertex;
 
-namespace AssetManagement.Strategies.Fbx
+namespace AssetManagement.MeshProcessing.Packed
 {
     public class VertexWeightProcessor
     {
@@ -28,7 +28,7 @@ namespace AssetManagement.Strategies.Fbx
         /// </summary>
         /// <exception cref="Exception">Throw on invalid weight sum</exception>
         public static void CheckVertexWeights(CommonVertex vertex, float errorTolerance = 1e-1f)
-        {            
+        {
             vertex.WeightCount = 4;
             const double weightErrorTolerance = 0.1;
 

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace AssetManagement.Strategies.Fbx.DllDefinitions
 {    
     public class FBXSeneLoaderServiceDLL
-    {
+    {        
         const String dllFileName = "FBXWrapperNative.dll";
 
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]

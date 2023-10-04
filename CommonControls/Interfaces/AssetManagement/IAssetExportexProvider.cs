@@ -2,13 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using CommonControls.FileTypes.PackFiles.Models;
+using System.Collections.Generic;
 
 namespace CommonControls.Interfaces.AssetManagement
 {
-    public interface IAssetImporter
+    public interface IAssetExporterProvider
     {
-        PackFile ImportAsset(string diskFilePath);
-        string[] Formats { get; }
+        List<IAssetExporter> GetAllExporters();
+        T GetExporter<T>() where T : IAssetExporter;
+        IAssetExporter GetExporter(string format);
     }
 }

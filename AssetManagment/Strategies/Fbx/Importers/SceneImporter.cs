@@ -2,18 +2,19 @@
 using AssetManagement.Strategies.Fbx.DllDefinitions;
 using System;
 
-namespace AssetManagement.Strategies.Fbx
+namespace AssetManagement.Strategies.Fbx.Importers
 {
-    public class SceneLoader
+    public class SceneImporter
     {
         public static SceneContainer LoadScene(string fileName)
         {
-            IntPtr fbxSceneLoader = IntPtr.Zero;
+            var fbxSceneLoader = IntPtr.Zero;
+
             try
             {
                 fbxSceneLoader = FBXSeneLoaderServiceDLL.CreateSceneFBX(fileName);
                 var ptrNativeScene = FBXSeneLoaderServiceDLL.ProcessAndFillScene(fbxSceneLoader);
-                var newSceneContainter = SceneMarshaller.ToManaged(ptrNativeScene);                  
+                var newSceneContainter = SceneMarshaller.ToManaged(ptrNativeScene);
 
                 return newSceneContainter;
             }
@@ -22,6 +23,6 @@ namespace AssetManagement.Strategies.Fbx
                 if (fbxSceneLoader != IntPtr.Zero)
                     FBXSeneLoaderServiceDLL.DeleteBaseObj(fbxSceneLoader);
             }
-        }   
+        }
     }
 }

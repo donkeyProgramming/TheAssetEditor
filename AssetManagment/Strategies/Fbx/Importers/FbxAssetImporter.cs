@@ -7,25 +7,25 @@ using CommonControls.Services;
 using AssetManagement.Strategies.Fbx.ImportDialog.ViewModels;
 using AssetManagement.AssetBuilders;
 
-namespace AssetManagement.Strategies.Fbx
+namespace AssetManagement.Strategies.Fbx.Importers
 {
-    public class FbxImportExport : IAssetImporter
+    public class FbxAssetImporter : IAssetImporter
     {
         public string[] Formats => new string[] { ".fbx" };
 
         private readonly PackFileService _packFileService;
 
-        public FbxImportExport(PackFileService pfs)
+        public FbxAssetImporter(PackFileService pfs)
         {
             _packFileService = pfs;
         }
 
         public PackFile ImportAsset(string diskFilePath)
         {
-            var sceneContainer = SceneLoader.LoadScene(diskFilePath);
+            var sceneContainer = SceneImporter.LoadScene(diskFilePath);
             if (sceneContainer == null)
                 return null;
-                           
+
             var fbxSettings = new FbxSettingsModel()
             {
                 SkeletonName = sceneContainer.SkeletonName,

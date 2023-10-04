@@ -2,7 +2,7 @@
 
 namespace CommonControls.Interfaces.AssetManagement
 {
-    public interface IAssetManagementFactory
+    public interface IAssetImporterProvider
     {
         List<IAssetImporter> GetAllImporters();
         T GetImporter<T>() where T : IAssetImporter;
