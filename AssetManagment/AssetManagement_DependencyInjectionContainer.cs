@@ -10,7 +10,7 @@ namespace AssetManagement
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<IAssetImporterProvider, GeomtryImporterProvider>();
+            serviceCollection.AddScoped<IAssetImporterProvider, AssetImporterProvider>();
             serviceCollection.AddTransient<IAssetImporter, FbxAssetImporter>();
         }
     }
