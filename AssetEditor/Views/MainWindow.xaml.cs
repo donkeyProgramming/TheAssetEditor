@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -18,10 +19,11 @@ namespace AssetEditor.Views
         {
             InitializeComponent();
 
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-
-            Title = $"AssetEditor v{fvi.FileMajorPart}.{fvi.FileMinorPart}";
+            //System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+            
+           Title = $"{fvi.ProductName} - {fvi.FileVersion}";
+            
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)

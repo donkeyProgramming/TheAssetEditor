@@ -4,7 +4,7 @@
         <TargetFramework>net6.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
         <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
-        <AssemblyName>AssetEditor v0.45</AssemblyName>
+        <AssemblyName>PhAssetEditor45</AssemblyName>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
     </PropertyGroup>
@@ -53,13 +53,13 @@
         <DebugType>embedded</DebugType>
         <Authors>AssetEdCommunity</Authors>
         <Company>Private</Company>
-        <Product>AssetEditor</Product>
+        <Product>PhAssetEditor45</Product>
         <PackageProjectUrl>https://github.com/donkeyProgramming/TheAssetEditor</PackageProjectUrl>
         <RepositoryUrl>https://github.com/donkeyProgramming/TheAssetEditor</RepositoryUrl>
         <RepositoryType>GIT</RepositoryType>
-        <AssemblyVersion>0.45.0.0</AssemblyVersion>
-        <FileVersion>0.45.0.0</FileVersion>
-        <PackageId>AssetEditor v0.45</PackageId>
+        <AssemblyVersion>0.1.0.0</AssemblyVersion>
+        <FileVersion>0.1.0.0</FileVersion>
+        <PackageId>PhAssetEditor45</PackageId>
     </PropertyGroup>
 
     <ItemGroup>

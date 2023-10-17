@@ -17,14 +17,14 @@ namespace wrapdll{
 		/// <param name="ctrlPointInfluences">Data from the FBXSkin processing</param>
 		/// <param name="scaleFactor"></param>
 		/// <returns></returns>
-		static ExtPackedCommonVertex MakePackedVertex(
+		static PackedCommonVertex MakePackedVertex(
 			const FbxVector4& vControlPoint,
 			const FbxVector4& vNormalVector,
 			const FbxVector2& UVmap1,
 			const ControlPointInfluence* ctrlPointInfluences,
 			double scaleFactor)
 		{
-			ExtPackedCommonVertex outVertex;
+			PackedCommonVertex outVertex;
 
 			outVertex.position.x = static_cast<float>(vControlPoint.mData[0] * scaleFactor);
 			outVertex.position.y = static_cast<float>(vControlPoint.mData[1] * scaleFactor);
@@ -40,6 +40,21 @@ namespace wrapdll{
 			return outVertex;
         }
     
+        FbxVector4 GetFbxVector(const DirectX::XMFLOAT4& input)
+        {
+            return FbxVector4(input.x, input.y, input.z, input.w);
+        }
+
+        FbxVector4 GetFbxVector(const DirectX::XMFLOAT3& input)
+        {
+            return FbxVector4(input.x, input.y, input.z);
+        }
+
+        FbxVector2 GetFbxVector(const DirectX::XMFLOAT2& input)
+        {
+            return FbxVector2(input.x, input.y);
+        }        
+
     private:
         // TODO: remove?
         

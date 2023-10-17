@@ -18,19 +18,29 @@
 #include "..\Helpers\Tools.h"
 
 #define FULL_FUNC_INFO(message) std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + message
-#define LogActionError(msg) ImplLog::LogActionErrorFalse( FULL_FUNC_INFO(msg) );
 
-#define LogInfo(msg) ImplLog::LogActionInfo( FULL_FUNC_INFO(msg) );
+// TODO: Re-enable is not the cause of issue
 
-#define LogAction(message)  ImplLog::LogActionInfo( \
-	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + message);\
+//#define LogActionError(msg) ImplLog::LogActionErrorFalse( FULL_FUNC_INFO(msg) );
 
-#define LogActionColor(message)  ImplLog::LogActionConcoleColor( \
-	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + message);\
+//#define LogInfo(msg) ImplLog::LogActionInfo( FULL_FUNC_INFO(msg) );
+//
+//#define LogAction(message)  ImplLog::LogActionInfo( \
+//	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + message);\
+//
+//#define LogActionColor(message)  ImplLog::LogActionConcoleColor( \
+//	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + message);\
+//
+//#define LogActionSuccess(message) ImplLog::LogAction_success(message);
+//
+//#define LogActionWarning(message) ImplLog::LogAction_warning(message);
 
-#define LogActionSuccess(message) ImplLog::LogAction_success(message);
-
-#define LogActionWarning(message) ImplLog::LogAction_warning(message);
+#define LogActionColor(message) ;
+#define LogActionError(msg) false;
+#define LogInfo(msg) ;
+#define LogAction(message) ;
+#define LogActionWarning(message) false ;
+#define LogActionSuccess(message) ;
 
 enum ConsoleColorFG
 {

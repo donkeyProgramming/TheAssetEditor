@@ -181,8 +181,18 @@ namespace CommonControls.FileTypes.Animation
             var boneInfo = Bones
                 .Where(x => string.Compare(x.Name, name, StringComparison.InvariantCultureIgnoreCase) == 0)
                 .FirstOrDefault();
-                            
+
             return (boneInfo == null) ? -1 : boneInfo.Id;
+        }
+
+        public string GetBoneNameFromId(int id)
+        {
+            if (id >= Bones.Length)
+            {
+                return "";
+            }
+
+            return Bones[id].Name;
         }
 
         public static AnimationFile Create(PackFile file)

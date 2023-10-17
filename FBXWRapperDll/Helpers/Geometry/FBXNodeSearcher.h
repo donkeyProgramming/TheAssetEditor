@@ -82,7 +82,7 @@ namespace wrapdll
 
                 std::string nodeName = currentChildNode->GetName();
 
-                if (tolower(nodeName).find(nodeTag) == 0)
+                if (tools::toLower(nodeName).find(tools::toLower(nodeTag)) == 0)
                 {
                     skeletonString = nodeName.erase(0, nodeTag.length());                    
 

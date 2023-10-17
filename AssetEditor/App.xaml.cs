@@ -58,11 +58,19 @@ namespace AssetEditor
                     var loadRes = packfileService.LoadAllCaFiles(gamePath, gameName);
                     if (!loadRes)
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
+                    // TODO: Remove
+
+                    // DEBUGGINg CODE: BEGIN
+                    packfileService.Load(@"C:\temp\TestCustomPackFile.pack", true);
+                    // DEBUGGINg CODE: END
+
                 }
             }
 
             devConfigManager?.CreateTestPackFiles();
             devConfigManager?.OpenFileOnLoad();
+
+           
 
             ShowMainWindow();
         }

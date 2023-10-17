@@ -151,6 +151,10 @@ std::vector<FbxVector4> FBXMeshGeometryHelper::GetTangents(const fbxsdk::FbxMesh
     return FetchVectors(poMesh, pVectorElement);
 }
 
+
+
+
+
 std::vector<FbxVector4> FBXMeshGeometryHelper::GetBitangents(const fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode)
 {
     std::vector<FbxVector4> vecBinormals;

@@ -2,6 +2,7 @@
 #include <fbxsdk.h>
 #include <vector>
 #include <map>
+#include "..\..\DataStructures\PackedMeshStructs.h"
 
 namespace wrapdll
 {

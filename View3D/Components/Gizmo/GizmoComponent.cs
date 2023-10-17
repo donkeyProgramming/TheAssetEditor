@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Monogame.WpfInterop.Common;
 using System;
@@ -8,7 +7,6 @@ using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
-using View3D.Services;
 using View3D.Utility;
 
 namespace View3D.Components.Gizmo

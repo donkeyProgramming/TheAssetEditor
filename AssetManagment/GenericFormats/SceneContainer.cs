@@ -3,11 +3,7 @@ using Matrix = Microsoft.Xna.Framework.Matrix;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
 using AssetManagement.GenericFormats.DataStructures.Managed;
-using System;
-using SharpDX.Direct2D1.Effects;
-using System.Numerics;
-using System.Transactions;
-using System.Windows.Media.Imaging;
+using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using CommonControls.Common;
 
 namespace AssetManagement.GenericFormats
@@ -15,7 +11,7 @@ namespace AssetManagement.GenericFormats
     public class SceneContainer
     {
         public List<PackedMesh> Meshes { get; set; } = new List<PackedMesh>();
-        public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
+        public List<ExtBoneInfo> Bones { get; set; } = new List<ExtBoneInfo>();
         public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
         public SceneNode RootNode { get; set; }
         public string SkeletonName { get; set; }

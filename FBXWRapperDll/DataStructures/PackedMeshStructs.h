@@ -5,6 +5,16 @@
 #include <string>
 #include "FileInfoData.h"
 
+struct BoneInfo
+{
+    int id;
+    int parentId;
+    FixedString name;
+    
+    DirectX::XMFLOAT4 localRotation;
+    DirectX::XMFLOAT3 localTranslation;
+};
+
 struct BoneAnimKey
 {
 	DirectX::XMFLOAT3 translation = { 0,0,0 };
@@ -70,7 +80,7 @@ struct ControlPointInfluence
 	int weightCount = 0;
 };
 
-struct ExtPackedCommonVertex
+struct PackedCommonVertex
 {
 	DirectX::XMFLOAT4 position = { 0, 0, 0, 0 };
 	DirectX::XMFLOAT3 normal = { 0, 0, 0 };
@@ -84,7 +94,7 @@ struct ExtPackedCommonVertex
 struct PackedMesh
 {
 	std::string meshName = "Unnamed_Mesh\0";
-	std::vector<ExtPackedCommonVertex> vertices;
+	std::vector<PackedCommonVertex> vertices;
 	std::vector<uint16_t> indices;
 	std::vector<VertexWeight> vertexWeights;
 };

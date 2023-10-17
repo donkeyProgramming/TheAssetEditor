@@ -37,7 +37,7 @@ namespace AssetManagement.GenericFormats.Unmanaged
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct ExtVertexWeight
     {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
         public string boneName;
         public int vertexIndex;
         public float vertexWeight;

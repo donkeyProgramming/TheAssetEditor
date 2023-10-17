@@ -1,18 +1,14 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using Filetypes.ByteParsing;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using CommonControls.FileTypes.PackFiles.Models;
 
 namespace CommonControls.Interfaces.AssetManagement
 {
     public interface IAssetImporter
     {
         PackFile ImportAsset(string diskFilePath);
-        string[] Formats { get; }
-    }
-
-    public interface IAssetExporter
-    {
-        byte[] ExportAsset(PackFile packFile);
         string[] Formats { get; }
     }
 }

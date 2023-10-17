@@ -20,9 +20,9 @@
 /// Overloads std::tolower()/toupper() to work for std::string (only works single-byte char in STL)
 /// 
 /// </summary>
-namespace std
+namespace tools
 {
-	static std::string tolower(const std::string& _strInput)
+	static std::string toLower(const std::string& _strInput)
 	{
 		std::string strOut = _strInput;
 
@@ -31,7 +31,7 @@ namespace std
 		return strOut;
 	}
 
-	static std::string toupper(const std::string& _strInput)
+	static std::string toUpper(const std::string& _strInput)
 	{
 		std::string strOut = _strInput;
 
@@ -58,7 +58,7 @@ namespace tools
 	{
 		for (int itemIndex = 0; itemIndex < items.size(); itemIndex++)
 		{
-			if (tolower(items[itemIndex]) == tolower(value))
+			if (toLower(items[itemIndex]) == toLower(value))
 				return itemIndex;
 		}
 

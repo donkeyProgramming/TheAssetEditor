@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using AssetManagement.Strategies.Fbx.ImportDialog._TESTING_;
 
 namespace AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews
 {
@@ -10,7 +11,7 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews
     {
         public FbxFileInfoPanelView()
         {
-            InitializeComponent();
+            InitializeComponent();            
             UpdateLayout();
         }
     }

@@ -9,9 +9,9 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
     public class PackedMesh
     {
         public string Name { set; get; }
-        public List<ExtPackedCommonVertex> Vertices { set; get; }
-        public List<ushort> Indices { set; get; }
-        public List<ExtVertexWeight> VertexWeights { set; get; }
+        virtual public List<ExtPackedCommonVertex> Vertices { set; get; } = new List<ExtPackedCommonVertex>();
+        public List<ushort> Indices { set; get; } = new List<ushort>();
+        public List<ExtVertexWeight> VertexWeights { set; get; } = new List<ExtVertexWeight>();
     }
 
     public class PackCommonVertex : IMarshalable<ExtPackedCommonVertex>
@@ -36,12 +36,12 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
 
         public override void FillStruct(out ExtPackedCommonVertex destStruct)
         {
-            destStruct.Position = ToNativeHelpers.GetFloat(Position);
-            destStruct.Normal = ToNativeHelpers.GetFloat(Normal);
-            destStruct.Tangent = ToNativeHelpers.GetFloat(Tangent);
-            destStruct.Bitangent = ToNativeHelpers.GetFloat(Bitangent);
-            destStruct.Uv = ToNativeHelpers.GetFloat(Uv);
-            destStruct.Color = ToNativeHelpers.GetFloat(Color);
+            destStruct.Position = XMFloatHelper.GetXMFloat(Position);
+            destStruct.Normal = XMFloatHelper.GetXMFloat(Normal);
+            destStruct.Tangent = XMFloatHelper.GetXMFloat(Tangent);
+            destStruct.Bitangent = XMFloatHelper.GetXMFloat(Bitangent);
+            destStruct.Uv = XMFloatHelper.GetXMFloat(Uv);
+            destStruct.Color = XMFloatHelper.GetXMFloat(Color);
         }
     }
 

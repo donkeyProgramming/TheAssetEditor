@@ -9,7 +9,7 @@ namespace wrapdll
 	class FBXHelperFileUtil
 	{
 	public:
-        static fbxsdk::FbxScene* InitScene(fbxsdk::FbxManager* pSdkManager, const std::string path, DirectX::XMINT3* pFileSdkVersion = nullptr)
+        static fbxsdk::FbxScene* InitSceneFromFile(fbxsdk::FbxManager* pSdkManager, const std::string path, DirectX::XMINT3* pFileSdkVersion = nullptr)
 		{			
 			// create an empty scene
 			auto pfbxScene = fbxsdk::FbxScene::Create(pSdkManager, "");
@@ -63,6 +63,14 @@ namespace wrapdll
 			return pfbxScene;
 		}
 
+        static fbxsdk::FbxScene* InitEmptyScene(fbxsdk::FbxManager* pSdkManager)
+        {
+            // create an empty scene
+            auto pfbxScene = fbxsdk::FbxScene::Create(pSdkManager, "ExportScene");
+
+            return pfbxScene;
+        }
+
 		static void TransFormScene(fbxsdk::FbxManager* m_pSdkManager, fbxsdk::FbxScene* pfbxScene)
 		{
 			auto unitPlural = FBXUnitHelper::GetUnitAsString(pfbxScene);
@@ -91,6 +99,8 @@ namespace wrapdll
 		{					
 			LogAction("Initializing FBX SDK importer...");
 
+
+            
 			// Create the FBX SDK memory manager object.
 			// The SDK Manager allocates and frees memory
 			// for almost all the classes in the SDK.

@@ -1,5 +1,13 @@
 #include "MeshProcessor.h"
 
+
+//TODO: use meshopt, and add VertexRemapper variant of their code, that takes "CommonPackedVertex*"
+// And processes the the tangents like in "DoMeshIndexingWithTangentSmoothing"
+// Their hashing method is proper 10% faster, and it it MIT license 
+
+
+// TODO: maybe also use this code, for meshes before Saving them as FBX?
+
 void wrapdll::MeshProcessor::DoFinalMeshProcessing(PackedMesh& mesh)
 {
     ComputeTangentBasisUnindexed(mesh.vertices);

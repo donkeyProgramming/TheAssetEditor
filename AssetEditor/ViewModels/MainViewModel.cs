@@ -13,6 +13,7 @@ using CommonControls.Services.ToolCreation;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
 
+
 namespace AssetEditor.ViewModels
 {
     public class MainViewModel : NotifyPropertyChangedImpl, IDropTarget<IEditorViewModel, bool>
@@ -48,7 +49,7 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
-        public MainViewModel( MenuBarViewModel menuViewModel,
+        public MainViewModel(MenuBarViewModel menuViewModel,
             PackFileService packfileService,
             IToolFactory toolFactory,
             IUiCommandFactory uiCommandFactory)
@@ -70,6 +71,8 @@ namespace AssetEditor.ViewModels
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;
+
+            
         }
 
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);

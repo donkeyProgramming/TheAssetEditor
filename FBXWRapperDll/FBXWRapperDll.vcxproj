@@ -161,18 +161,29 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
-    <None Include="SceneContainer\FBXSceneContainer.inl" />
+    <None Include="FBXServices\SceneExporter\FBXSceneExporterService.inl" />
+    <None Include="FBXServices\SceneImporter\FBXImporterService.inl" />
+    <None Include="DataStructures\SceneContainer\SceneContainer.inl" />
     <None Include="fbxsdk\bin\vs2019\x64\release\libfbxsdk.zip" />
     <None Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.zip" />
     <None Include="Services\FbxSceneLoaderService.inl" />
     <None Include="Helpers\MS_SimpleMath\SimpleMath.inl" />
-    <None Include="Services\SceneLoader\FbxSceneLoaderService.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DLLDefines.h" />
     <ClInclude Include="Base\BaseInteropObject.h" />
+    <ClInclude Include="Builders\FBXMeshBuilder.h" />
+    <ClInclude Include="Builders\FbxSceneBuilder.h" />
+    <ClInclude Include="fbxsdk\common\AnimationUtility.h" />
+    <ClInclude Include="fbxsdk\common\GeometryUtility.h" />
+    <ClInclude Include="Builders\FBXSkeletonBuilder.h" />
+    <ClInclude Include="Processing\FbxMeshCreator.h" />
+    <ClInclude Include="fbxsdk\common\Common.h" />
+    <ClInclude Include="FBXServices\SceneImporter\FBXImporterService.h" />
+    <ClInclude Include="Helpers\FBXHelpers\FBXHelper.h" />
+    <ClInclude Include="FBXServices\SceneExporter\FBXSceneExporterService.h" />
     <ClInclude Include="fbxsdk\include\fbxsdk.h" />
     <ClInclude Include="fbxsdk\include\fbxsdk\core\arch\fbxalloc.h" />
     <ClInclude Include="fbxsdk\include\fbxsdk\core\arch\fbxarch.h" />
@@ -457,13 +468,13 @@
     <ClInclude Include="fbxsdk\include\libxml2\libxml\xpathInternals.h" />
     <ClInclude Include="fbxsdk\include\libxml2\libxml\xpointer.h" />
     <ClInclude Include="DataStructures\FileInfoData.h" />
-    <ClInclude Include="Processing\FBXMeshCreator.h" />
+    <ClInclude Include="Processing\PackedMeshCreator.h" />
     <ClInclude Include="Processing\FBXVertexCreator.h" />
     <ClInclude Include="Services\FBXSceneLoaderService.h" />
     <ClInclude Include="Helpers\Geometry\FBXMeshGeometryHelper.h" />
     <ClInclude Include="Processing\MeshProcessor.h" />
     <ClInclude Include="Helpers\Geometry\FBXNodeGeometryHelper.h" />
-    <ClInclude Include="SceneContainer\FBXSCeneContainer.h" />
+    <ClInclude Include="DataStructures\SceneContainer\SceneContainer.h" />
     <ClInclude Include="Processing\FBXSkinProcessor.h" />
     <ClInclude Include="Helpers\VectorConverter.h" />
     <ClInclude Include="Helpers\FBXHelperFileUtil.h" />
@@ -472,22 +483,30 @@
     <ClInclude Include="Logging\Logging.h" />
     <ClInclude Include="Helpers\FBXUnitHelper.h" />
     <ClInclude Include="DataStructures\PackedMeshStructs.h" />
-    <ClInclude Include="Services\SceneLoader\FBXSceneLoaderService.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="DataStructures\FileInfoData.cpp" />
-    <ClCompile Include="Processing\FBXMeshCreator.cpp" />
+    <ClCompile Include="Builders\FBXMeshBuilder.cpp" />
+    <ClCompile Include="Builders\FbxSceneBuilder.cpp" />
+    <ClCompile Include="fbxsdk\common\AnimationUtility.cxx" />
+    <ClCompile Include="fbxsdk\common\GeometryUtility.cxx" />
+    <ClCompile Include="Builders\FBXSkeletonBuilder.cpp" />
+    <ClCompile Include="Processing\FbxMeshCreator.cpp" />
+    <ClCompile Include="fbxsdk\common\Common.cxx" />
+    <ClCompile Include="FBXServices\SceneImporter\FBXImporterService.cpp" />
+    <ClCompile Include="Helpers\FBXHelpers\FBXHelper.cpp" />
+    <ClCompile Include="FBXServices\SceneExporter\FBXSceneExporterService.cpp" />
+    <ClCompile Include="Processing\PackedMeshCreator.cpp" />
     <ClCompile Include="Processing\FBXVertexCreator.cpp" />
     <ClCompile Include="Helpers\Geometry\FBXMeshGeometryHelper.cpp" />
-    <ClCompile Include="SceneContainer\FBXSCeneContainer.cpp" />
+    <ClCompile Include="DataStructures\SceneContainer\SceneContainer.cpp" />
     <ClCompile Include="Processing\MeshProcessor.cpp" />
     <ClCompile Include="Helpers\Geometry\FBXNodeSearcher.h" />
     <ClCompile Include="Processing\FBXSkinProcessor.cpp" />
     <ClCompile Include="Logging\Logging.cpp" />
     <ClCompile Include="DataStructures\PackedMeshStructs.cpp" />
     <ClCompile Include="Helpers\Geometry\FBXNodeGeometryHelper.cpp" />
-    <ClCompile Include="Services\SceneLoader\FBXSceneLoaderService.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

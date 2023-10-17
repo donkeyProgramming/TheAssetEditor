@@ -142,14 +142,13 @@ namespace CommonControls.PackFileBrowser
             }
         }
         void OnImport3DModelCommand()
-        {
-
+        { 
             _uiCommandFactory.Create<ImportAssetCommand>().Execute(_selectedNode.FileOwner, _selectedNode.GetFullPath());
         }
 
         void OnGeometryExportCommand()
         {        
-            _uiCommandFactory.Create<ExportAssetFromFileCommand>().Execute(_selectedNode.FileOwner, _selectedNode.GetFullPath(), null);
+            _uiCommandFactory.Create<ExportAssetCommand>().Execute(_selectedNode.FileOwner, _selectedNode.GetFullPath(), null);
         }
 
         void OnAddFilesFromDirectory()
@@ -402,7 +401,7 @@ namespace CommonControls.PackFileBrowser
 
         protected ContextMenuItem Additem(ContextItems type, ObservableCollection<ContextMenuItem> parent)
         {
-            var item = GetItem(type);
+            var item = GetItem(type);            
             parent.Add(item);
             return item;
         }
@@ -422,7 +421,7 @@ namespace CommonControls.PackFileBrowser
                     return new ContextMenuItem() { Name = "Import" };
                 case ContextItems.Import3DModel:
                     return new ContextMenuItem() { Name = "Import 3D Model File (Experimental)", Command = Import3DFileCommand };
-                case ContextItems.ExportGeomtry:
+                 case ContextItems.ExportGeomtry:
                     return new ContextMenuItem() { Name = "Export Geometry (Experimental)", Command = ExportGeometryCommand };
                 case ContextItems.Create:
                     return new ContextMenuItem() { Name = "Create" };

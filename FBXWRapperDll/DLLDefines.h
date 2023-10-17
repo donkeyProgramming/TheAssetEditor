@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef FBXWRAPPERDLL_EXPORTS
-#define FBXWRAPPERDLL_API __declspec(dllexport)
+#define FBX_DLL __declspec(dllexport)
 #else
 #define FBXWRAPPERDLL_API __declspec(dllimport)
 #endif
