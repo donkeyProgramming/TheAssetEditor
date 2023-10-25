@@ -1,10 +1,13 @@
 #include "FBXImporterService.h"
 
-#include "..\..\Helpers\Geometry\FBXNodeSearcher.h"
+
+#include "..\..\HelperUtils\Geometry\FBXNodeSearcher.h"
+#include "..\..\HelperUtils\FBXHelperFileUtil.h"
 #include "..\..\Processing\MeshProcessor.h"
 #include "..\..\Processing\FBXSkinProcessor.h"
 #include "..\..\Processing\PackedMeshCreator.h"
-#include "..\..\DLLDefines.h"
+// TODO: fully remove?
+//#include "..\..\DLLDefines.h"
 
 wrapdll::FBXImporterService* wrapdll::FBXImporterService::CreateFromDiskFile(const std::string& path)
 {
@@ -48,7 +51,8 @@ wrapdll::SceneContainer* wrapdll::FBXImporterService::ProcessAndFillScene()
         LogActionColor("Done Tangents/Indexing. Time: " + std::to_string(tangentsClock.GetLocalTime()) + " seconds.");
     }
 
-    LogActionColor("Scene Loading Done. Processing Time: " + std::to_string(processingTimerClock.GetLocalTime()) + " seconds.");
+    LogActionColor("Scene Loading Done. ");
+    ImplLog::LogAction_success("Processing Time : " + std::to_string(processingTimerClock.GetLocalTime()) + " seconds.");
 
     FillFileInfo();
 

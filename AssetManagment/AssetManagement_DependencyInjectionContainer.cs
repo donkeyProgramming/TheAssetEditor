@@ -13,9 +13,8 @@ namespace AssetManagement
         {
             serviceCollection.AddScoped<IAssetImporterProvider, AssetImporterProvider>();
             serviceCollection.AddTransient<IAssetImporter, FbxAssetImporter>();
-
-            
-            serviceCollection.AddScoped<IAssetExporterProvider, AssetExporterProvider>();
+                                    
+            serviceCollection.AddScoped<IAssetExporterProvider, AssetExporterProvider>();            
             serviceCollection.AddTransient<IAssetExporter, FbxAssetExporter>();
         }
     }

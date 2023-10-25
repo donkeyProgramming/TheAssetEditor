@@ -11,8 +11,7 @@
 	</ItemGroup>
 
   <ItemGroup>    
-    <ProjectReference Include="..\CommonControls\CommonControls.csproj" />    
-    <ProjectReference Include="..\FBXWRapperDll\FBXWRapperDll.vcxproj" />
+    <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>
 

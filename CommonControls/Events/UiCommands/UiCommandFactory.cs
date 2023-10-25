@@ -28,6 +28,10 @@ namespace CommonControls.Events.UiCommands
 
         public T Create<T>(Action<T> configure = null) where T : IUiCommand
         {
+            // TODO: REMOVE
+            //Console.WriteLine("UICommandFactory.Create<T>");
+            //Console.WriteLine($"Calling _serviceProvider.GetRequiredService<{typeof(T)}>()");
+            //Console.WriteLine($"_serviceprovide = {_serviceProvider} ");
             var instance = _serviceProvider.GetRequiredService<T>();
             configure?.Invoke(instance);
 

@@ -185,14 +185,9 @@ namespace CommonControls.FileTypes.Animation
             return (boneInfo == null) ? -1 : boneInfo.Id;
         }
 
-        public string GetBoneNameFromId(int id)
+        public string GetBoneNameFromIndex(int boneIndex)
         {
-            if (id >= Bones.Length)
-            {
-                return "";
-            }
-
-            return Bones[id].Name;
+            return (boneIndex >= Bones.Length) ? "" : Bones[boneIndex].Name;                      
         }
 
         public static AnimationFile Create(PackFile file)

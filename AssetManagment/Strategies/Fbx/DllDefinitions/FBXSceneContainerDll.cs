@@ -59,7 +59,7 @@ namespace AssetManagement.Strategies.Fbx.DllDefinitions
 
 
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void SetIndices(IntPtr ptrSceneContainer, int meshIndex, ushort[] ppIndices, int indexCount);
+        public static extern void SetIndices(IntPtr ptrSceneContainer, int meshIndex, uint[] ppIndices, int indexCount);
 
 
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
@@ -68,5 +68,8 @@ namespace AssetManagement.Strategies.Fbx.DllDefinitions
 
         [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void SetSkeletonName(IntPtr ptrExporter, string path);
+        
+        [DllImport(dllFileName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void SetMeshName(IntPtr ptrExporter, int meshIndex, string name);
     }
 }

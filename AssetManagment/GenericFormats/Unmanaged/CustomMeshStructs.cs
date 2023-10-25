@@ -34,13 +34,13 @@ namespace AssetManagement.GenericFormats.Unmanaged
     //    public int WeightCount;
     //};
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct ExtVertexWeight
-    {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
-        public string boneName;
-        public int vertexIndex;
-        public float vertexWeight;
-    }
+    //[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    //public struct ExtVertexWeight
+    //{
+    //    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+    //    public string boneName;
+    //    public int vertexIndex;
+    //    public float vertexWeight;
+    //}
 
 }

@@ -1,5 +1,4 @@
-﻿using System.Windows.Controls;
-using System.Windows;
+﻿using System.Windows;
 
 
 namespace AssetManagement.Strategies.Fbx.Views.FBXSettings

@@ -8,6 +8,7 @@ using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+using KitbasherEditor.ViewModels.UiCommands;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
@@ -21,6 +22,63 @@ namespace KitbasherEditor
     {
         public override void Register(IServiceCollection serviceCollection)
         {
+            // TODO: DEBUGGING BEGIN
+            serviceCollection.AddTransient<SaveCommand>();
+            serviceCollection.AddTransient<SaveAsCommand>();
+
+            serviceCollection.AddTransient<GenerateWh2WsModelCommand>();
+            serviceCollection.AddTransient<GenerateWh3WsModelCommand>();
+
+            serviceCollection.AddTransient<BrowseForReferenceCommand>();
+            serviceCollection.AddTransient<ImportPaladinReferenceCommand>();
+            serviceCollection.AddTransient<ImportGoblinReferenceCommand>();
+            serviceCollection.AddTransient<ImportSlayerReferenceCommand>();
+
+            serviceCollection.AddTransient<DeleteLodsCommand>();
+            serviceCollection.AddTransient<ClearConsoleCommand>();
+            serviceCollection.AddTransient<UndoCommand>();
+            serviceCollection.AddTransient<SortMeshesCommand>();
+
+            serviceCollection.AddTransient<GroupItemsCommand>();
+            serviceCollection.AddTransient<ScaleGizmoUpCommand>();
+            serviceCollection.AddTransient<ScaleGizmoDownCommand>();
+            serviceCollection.AddTransient<SelectGizmoModeCommand>();
+            serviceCollection.AddTransient<MoveGizmoModeCommand>();
+            serviceCollection.AddTransient<RotateGizmoModeCommand>();
+            serviceCollection.AddTransient<ScaleGizmoModeCommand>();
+
+            serviceCollection.AddTransient<ObjectSelectionModeCommand>();
+            serviceCollection.AddTransient<FaceSelectionModeCommand>();
+            serviceCollection.AddTransient<VertexSelectionModeCommand>();
+
+            serviceCollection.AddTransient<ToggleViewSelectedCommand>();
+            serviceCollection.AddTransient<ResetCameraCommand>();
+            serviceCollection.AddTransient<FocusCameraCommand>();
+            serviceCollection.AddTransient<ToggleBackFaceRenderingCommand>();
+            serviceCollection.AddTransient<ToggleLargeSceneRenderingCommand>();
+
+            serviceCollection.AddTransient<DivideSubMeshCommand>();
+            serviceCollection.AddTransient<MergeObjectsCommand>();
+            serviceCollection.AddTransient<DuplicateObjectCommand>();
+            serviceCollection.AddTransient<DeleteObjectCommand>();
+            serviceCollection.AddTransient<CreateStaticMeshCommand>();
+
+            serviceCollection.AddTransient<ReduceMeshCommand>();
+            serviceCollection.AddTransient<CreateLodCommand>();
+            serviceCollection.AddTransient<OpenBmiToolCommand>();
+            serviceCollection.AddTransient<OpenSkeletonReshaperToolCommand>();
+            serviceCollection.AddTransient<OpenReriggingToolCommand>();
+            serviceCollection.AddTransient<OpenPinToolCommand>();
+            serviceCollection.AddTransient<CopyRootLodCommand>();
+            //CreateActionItem<UpdateWh2TexturesCommand>(x => x.Technique = View3D.Services.Rmv2UpdaterService.BaseColourGenerationTechniqueEnum.AdditiveBlending);
+            //CreateActionItem<UpdateWh2TexturesCommand>(x => x.Technique = View3D.Services.Rmv2UpdaterService.BaseColourGenerationTechniqueEnum.ComparativeBlending);
+
+            serviceCollection.AddTransient<ExpandFaceSelectionCommand>();
+            serviceCollection.AddTransient<ConvertFaceToVertexCommand>();
+            serviceCollection.AddTransient<OpenVertexDebuggerCommand>();
+
+            // TODO: DEBUGGIN END
+
             // Creators
             serviceCollection.AddScoped<KitbashSceneCreator>();
             serviceCollection.AddScoped<SceneNodeViewFactory>();
@@ -60,7 +118,7 @@ namespace KitbasherEditor
 
         public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtensionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2", ".wsmodel.rigid_model_v2" }/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
+            factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtensionToTool(EditorEnums.Kitbash_Editor, new[] { ".rigid_model_v2"/*, ".wsmodel.rigid_model_v2" */}/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
     }
 

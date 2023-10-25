@@ -2,7 +2,6 @@
 
 #include <fbxsdk.h>
 #include "..\DataStructures\PackedMeshStructs.h"
-#include "..\Helpers\tools.h"
 #include "..\Logging\Logging.h"
 
 namespace wrapdll

@@ -7,7 +7,7 @@ namespace AssetManagement.GenericFormats.Managed
     //    {
     //        public string Name { set; get; }
     //        public List<ExtPackedCommonVertex> Vertices { set; get; }
-    //        public List<ushort> Indices { set; get; }
+    //        public List<uint> Indices { set; get; }
     //        public List<VertexWeight> VertexWeights { set; get; }
     //    }
 };

@@ -3,8 +3,8 @@
 #include "..\..\DataStructures\PackedMeshStructs.h"
 #include "..\..\Processing\MeshProcessor.h"
 #include "..\..\Processing\FBXSkinProcessor.h"
-#include "..\..\Helpers\FBXHelperFileUtil.h"
-#include "..\..\Helpers\Geometry\FBXNodeSearcher.h"
+#include "..\..\HelperUtils\FBXHelperFileUtil.h"
+#include "..\..\HelperUtils\Geometry\FBXNodeSearcher.h"
 
 PackedCommonVertex* wrapdll::SceneContainer::GetVertices(int meshindex, int* itemCount)
 {
@@ -14,7 +14,7 @@ PackedCommonVertex* wrapdll::SceneContainer::GetVertices(int meshindex, int* ite
     return m_packedMeshes[meshindex].vertices.data();
 }
 
-uint16_t* wrapdll::SceneContainer::GetIndices(int meshindex, int* itemCount)
+uint32_t* wrapdll::SceneContainer::GetIndices(int meshindex, int* itemCount)
 {
     if (!MeshIndexErrorCheckAndLog(meshindex)) { return nullptr; }
 
@@ -42,10 +42,10 @@ void wrapdll::SceneContainer::GetVertexWeights(int meshindex, VertexWeight** ppV
 
 BoneInfo* wrapdll::SceneContainer::AllocateBones(int boneCount)
 {
-    m_bones.clear();
-    m_bones.resize(boneCount);
+    m_skeletonInfo.m_bones.clear();
+    m_skeletonInfo.m_bones.resize(boneCount);
 
-    return m_bones.data();
+    return m_skeletonInfo.m_bones.data();
 }
 
 void wrapdll::SceneContainer::AllocateMeshes(int meshCount)
@@ -74,7 +74,7 @@ PackedCommonVertex* wrapdll::SceneContainer::AllocateVertices(int meshIndex, int
     return m_packedMeshes[meshIndex].vertices.data();
 }
 
-uint16_t* wrapdll::SceneContainer::AllocateIndices(int meshIndex, int indexCount)
+uint32_t* wrapdll::SceneContainer::AllocateIndices(int meshIndex, int indexCount)
 {
     if (!MeshIndexErrorCheckAndLog(meshIndex)) { return nullptr; }
 
@@ -84,7 +84,7 @@ uint16_t* wrapdll::SceneContainer::AllocateIndices(int meshIndex, int indexCount
     return m_packedMeshes[meshIndex].indices.data();
 }
 
-void wrapdll::SceneContainer::SetIndices(int meshIndex, uint16_t* ppIndices, int indexCount)
+void wrapdll::SceneContainer::SetIndices(int meshIndex, uint32_t* ppIndices, int indexCount)
 {
     if (!MeshIndexErrorCheckAndLog(meshIndex)) { return; }
 
@@ -109,7 +109,7 @@ bool wrapdll::SceneContainer::MeshIndexErrorCheckAndLog(int meshIndex)
 {
     if (m_packedMeshes.size() < meshIndex)
     {
-        LogActionError("Invalid Index, mesh count: " + std::to_string(m_packedMeshes.size()) + ", index: " + std::to_string(meshindex));
+        LogActionError("Invalid Index, mesh count: " + std::to_string(m_packedMeshes.size()) + ", index: " + std::to_string(meshIndex));
         return false;
     }
 

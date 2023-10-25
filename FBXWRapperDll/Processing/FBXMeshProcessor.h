@@ -12,7 +12,7 @@
 //#include "..\Helpers\Geometry\FBXMeshGeometryHelper.h"
 //#include "..\Helpers\MS_SimpleMath\SimpleMath.h"
 //#include "..\Helpers\VectorConverter.h"
-//#include "FBXVertexCreator.h"
+//#include "PackedVertexCreator.h"
 //#include "FBXMeshCreator.h"
 //
 //namespace wrapdll

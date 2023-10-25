@@ -19,10 +19,16 @@ namespace AssetEditor
 
             serviceCollection.AddTransient<OpenEditorCommand>();
             serviceCollection.AddTransient<OpenFileInEditorCommand>();
+            serviceCollection.AddTransient<OpenEditorCommand>();
+            serviceCollection.AddTransient<OpenFileInEditorCommand>();
 
             serviceCollection.AddScoped<SettingsWindow>();
             serviceCollection.AddScoped<SettingsViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
+
+         
+
+
 
             serviceCollection.AddTransient<DevelopmentConfigurationManager>();
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Scoped);

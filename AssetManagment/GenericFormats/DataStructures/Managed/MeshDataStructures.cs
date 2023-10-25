@@ -10,7 +10,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
     {
         public string Name { set; get; }
         virtual public List<ExtPackedCommonVertex> Vertices { set; get; } = new List<ExtPackedCommonVertex>();
-        public List<ushort> Indices { set; get; } = new List<ushort>();
+        public List<uint> Indices { set; get; } = new List<uint>();
         public List<ExtVertexWeight> VertexWeights { set; get; } = new List<ExtVertexWeight>();
     }
 
@@ -51,7 +51,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Managed
     //{
     //    public string Name { get; set; }
     //    public List<ExtPackedCommonVertex> Vertices { get; set; }
-    //    public List<ushort> Indices { get; set; }
+    //    public List<uint> Indices { get; set; }
     //    public List<ExtVertexWeight> VertexWeights { get; set; }
     //}
 

@@ -24,15 +24,11 @@ namespace AssetManagment.Strategies.Fbx.FbxAssetHandling
         // TODO: what todo about return value not sure if the FBX SDK CAN return a binary FBX file in memory
         public byte[] ExportAsset(AssetManagerData inputData)
         {
-
-            
             var sceneBuilder = new SceneContainerBuilder();
-            sceneBuilder.AddMeshList(inputData.RigidModelFile, inputData.skeletonFile);            
             sceneBuilder.SetSkeleton(inputData.skeletonFile);
-
-            SceneExporter.ExportScene(sceneBuilder.CurrentSceneContainer, inputData.DestinationPath);
-
+            sceneBuilder.AddMeshList(inputData.RigidModelFile, inputData.skeletonFile);          
             
+            SceneExporter.ExportScene(sceneBuilder.CurrentSceneContainer, inputData.DestinationPath);
 
             return null; // TODO: Do I need to return FBX as binary data ALSO, when "SaveScene()" stored it on disk?            
         }

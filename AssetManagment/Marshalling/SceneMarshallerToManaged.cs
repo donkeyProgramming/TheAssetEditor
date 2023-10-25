@@ -47,7 +47,7 @@ namespace AssetManagement.Strategies.Fbx
             return data;
         }
 
-        public static ushort[] GetIndices(IntPtr fbxContainer, int meshIndex)
+        public static uint[] GetIndices(IntPtr fbxContainer, int meshIndex)
         {
             IntPtr pIndices = IntPtr.Zero;
             int length = 0;
@@ -56,11 +56,11 @@ namespace AssetManagement.Strategies.Fbx
             if (pIndices == IntPtr.Zero || length == 0)
                 return null;
 
-            var indexArray = new ushort[length];
+            var indexArray = new uint[length];
 
             for (int indicesIndex = 0; indicesIndex < length; indicesIndex++)
             {
-                indexArray[indicesIndex] = (ushort)Marshal.PtrToStructure(pIndices + indicesIndex * Marshal.SizeOf(typeof(ushort)), typeof(ushort));
+                indexArray[indicesIndex] = (uint)Marshal.PtrToStructure(pIndices + indicesIndex * Marshal.SizeOf(typeof(uint)), typeof(uint));
             }
             return indexArray;
         }
@@ -78,7 +78,7 @@ namespace AssetManagement.Strategies.Fbx
 
             PackedMesh packedMesh = new PackedMesh();
             packedMesh.Vertices = new List<ExtPackedCommonVertex>();
-            packedMesh.Indices = new List<ushort>();
+            packedMesh.Indices = new List<uint>();
             packedMesh.Vertices.AddRange(vertices);
             packedMesh.Indices.AddRange(indices);
             packedMesh.Name = tempName;

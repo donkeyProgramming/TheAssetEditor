@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Interfaces.AssetManagement;
@@ -24,10 +25,16 @@ namespace CommonControls.Events.UiCommands
         public void Execute(PackFileContainer fileOwner, string pathModel, string pathAnimationClip = "")
         {
             var exportData = ExportHelper.FetchParsedInputFiles(_packFileService, pathModel);
+            var fileName = Path.GetFileNameWithoutExtension(pathModel) +
+            (exportData.skeletonFile != null ?
+             $"__{exportData.skeletonFile.Header.SkeletonName}"
+             : "");
 
-            exportData.DestinationPath = GetPickFile();
-            if (!exportData.DestinationPath.Any()) { 
-                return; 
+            exportData.DestinationPath = GetOpenSaveFile(fileName);
+
+            if (!exportData.DestinationPath.Any())
+            {
+                return;
             }
 
             var exporter = _assetManagementFactory.GetExporter(".fbx");
@@ -35,20 +42,21 @@ namespace CommonControls.Events.UiCommands
             var binaryFileData = exporter.ExportAsset(exportData);
         }
 
-        private string GetPickFile()
+        private string GetOpenSaveFile(string initialPath = "")
         {
             var fileContent = string.Empty;
             var filePath = string.Empty;
 
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
             {
-                saveFileDialog.InitialDirectory = "";
+                saveFileDialog.InitialDirectory = initialPath;
                 saveFileDialog.Filter = "FBX Files (*.fbx)|*.fbx|All files (*.*)|*.*";
                 saveFileDialog.FilterIndex = 1;
                 saveFileDialog.RestoreDirectory = true;
-
+                saveFileDialog.FileName = initialPath;
+                
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                {                    
+                {
                     filePath = saveFileDialog.FileName;
 
                     return filePath;
@@ -59,4 +67,8 @@ namespace CommonControls.Events.UiCommands
         }
     }
 
+
 }
+
+
+

@@ -21,13 +21,11 @@ namespace AssetManagement.AssetBuilders
             CurrentSceneContainer = new SceneContainer();
         }
 
-        public void AddMesh(RmvModel inputRMV2Mesh)
+        public void AddMesh(RmvModel inputRMV2Mesh, AnimationFile skeletonFile)
         {
-            var mesh = PackedMeshBuilderHelper.MakePackedMesh(inputRMV2Mesh);
+            var mesh = PackedMeshCreator.CreatePackedMesh(inputRMV2Mesh, skeletonFile);
 
             CurrentSceneContainer.Meshes.Add(mesh);
-
-
         }
 
         /// <summary>
@@ -36,7 +34,7 @@ namespace AssetManagement.AssetBuilders
         /// </summary>    
         public void AddMeshList(RmvFile inputRMV2File, AnimationFile skeletonFile)
         {
-            var meshList = PackedMeshBuilderHelper.MakePackedMeshList(inputRMV2File, skeletonFile);
+            var meshList = PackedMeshCreator.MakePackedMeshList(inputRMV2File, skeletonFile);            
 
             CurrentSceneContainer.Meshes.AddRange(meshList);
             CurrentSceneContainer.SkeletonName = inputRMV2File.Header.SkeletonName;
@@ -58,6 +56,7 @@ namespace AssetManagement.AssetBuilders
             ///....
             ///
         }
+
         /// <summary>
         /// To be a proper skeleton, frame 0 has to have geomtric info all bones
         /// </summary>
@@ -74,16 +73,12 @@ namespace AssetManagement.AssetBuilders
 
             var frame0 = skeletonFile.AnimationParts[0].DynamicFrames[0];
 
-            var frame0QuatsCounts = frame0.Quaternion.Count;
-            var frame0QTranslationCounts = frame0.Transforms.Count;
-
-
-            if (frame0QuatsCounts != frame0QTranslationCounts || boneCount != frame0QuatsCounts || boneCount != frame0QTranslationCounts)
+            if (frame0.Quaternion.Count == frame0.Transforms.Count && boneCount == frame0.Quaternion.Count)
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         private void CopyBones(AnimationFile skeletonFile)
@@ -104,7 +99,7 @@ namespace AssetManagement.AssetBuilders
                     name = skeletonFile.Bones[boneIndex].Name,
                     localTranslation = SceneContainerBuilderHelpers.GetBoneTranslation(skeletonFile, boneIndex),
                     localRotation = SceneContainerBuilderHelpers.GetBoneRotation(skeletonFile, boneIndex),
-                };                
+                };
 
                 CurrentSceneContainer.Bones.Add(newBone);
             };
@@ -121,41 +116,84 @@ namespace AssetManagement.AssetBuilders
 
     }
 
-    public class PackedMeshBuilderHelper
+    public class PackedMeshCreator
     {
-        static public PackedMesh MakePackedMesh(RmvModel model)
+        static public PackedMesh CreatePackedMesh(RmvModel model, AnimationFile skeletonFile)
         {
             var outMesh = new PackedMesh();
-
-            MakeUnindexedPackedMesh(model, outMesh);
-
             outMesh.Name = model.Material.ModelName;
 
-            // TODO: finish iml of vertex weights
-            //for (int vertexIndex = 0; vertexIndex < model.Mesh.VertexList.Length; vertexIndex++)
-            //{
+            CreateBasicPackedMesh(model, outMesh);
 
-            //    for (int v = 0; v < model.Mesh.VertexList[vertexIndex].WeightCount; v++)
-            //    {
-            //        var boneIndex = model.Mesh.VertexList[vertexIndex].BoneIndex[v]
-
-
-            //    }
-
-
-            //}
-
-
-
+            if (skeletonFile != null)
+            {
+                AddMeshVertexWeights(model, outMesh, skeletonFile);
+                
+                // TODO: WAY TOO SLOw, if you have to check for  1.0 < weight < 1.0, find another way
+                //      CheckForNullWeightedVertices(outMesh); 
+            }
 
             return outMesh;
         }
-
-        private static void MakeUnindexedPackedMesh(RmvModel model, PackedMesh outMesh)
+        /// <summary>
+        /// Converts the mesh to unindexed, so that no vertex is use more than once
+        /// It means there will be 3 times as many vertices, the indices will be sequential and not really needed
+        /// </summary>        
+        private static void CreateBasicPackedMesh(RmvModel model, PackedMesh outMesh)
         {
             for (var triangleIndex = 0; triangleIndex < model.Mesh.IndexList.Length / 3; triangleIndex++)
             {
                 MakeTriangle(model, outMesh, triangleIndex);
+            }
+            outMesh.Name = model.Material.ModelName;
+
+            // TODO: is MEGA slow, if needed check for null weights another way
+            //CheckForNullWeightedVertices(outMesh);
+        }
+
+        private static void AddMeshVertexWeights(RmvModel model, PackedMesh outMesh, AnimationFile skeletonFile)
+        {
+            int currentVertexIndex = 0;
+            for (var triangleIndex = 0; triangleIndex < model.Mesh.IndexList.Length / 3; triangleIndex++)
+            {
+                for (int faceCorner = 0; faceCorner < 3; faceCorner++, currentVertexIndex++)
+                {
+                    var faceCornerIndex = model.Mesh.IndexList[triangleIndex * 3 + faceCorner];
+                    var cornerVertex = GetExtPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex]);
+
+                    // adds 1-4 weights from the RMVModel vertex
+                    AddCornerWeights(model.Mesh.VertexList[faceCornerIndex], outMesh, skeletonFile, currentVertexIndex);                    
+                }
+            }
+            outMesh.Name = model.Material.ModelName;
+
+            // TODO: is MEGA slow, if needed check for null weights another way
+            //CheckForNullWeightedVertices(outMesh);
+        }
+
+        private static bool AlmostEualtoOne(float weight)
+        {
+            return (weight > 0.95f && weight < 1.05f) ? true : false;
+        }
+
+        private static void CheckForNullWeightedVertices(PackedMesh outMesh)
+        {
+            for (int testVertex = 0; testVertex < outMesh.Vertices.Count; testVertex++)
+            {
+                float testWeight = 0.0f;
+
+                foreach (var vertexWeight in outMesh.VertexWeights)
+                {
+                    if (vertexWeight.vertexIndex == testVertex)
+                    {
+                        testWeight += vertexWeight.weight;
+                    }
+                }
+
+                if (!AlmostEualtoOne(testWeight))
+                {
+                    throw new System.Exception("vertex is null-weighted");
+                }
             }
         }
 
@@ -165,12 +203,7 @@ namespace AssetManagement.AssetBuilders
 
             foreach (var model in file.ModelList[0])
             {
-                var mesh = MakePackedMesh(model);
-                
-                // TODO: test if this method works right
-                FillVertexWeights(model, mesh, skeletonFile);
-
-
+                var mesh = CreatePackedMesh(model, skeletonFile);
                 meshList.Add(mesh);
             }
 
@@ -179,46 +212,29 @@ namespace AssetManagement.AssetBuilders
 
         static private void MakeTriangle(RmvModel model, PackedMesh outMesh, int triangleIndex)
         {
-            for (int corneIndex = 0; corneIndex < 3; corneIndex++)
+            for (int faceCorner = 0; faceCorner < 3; faceCorner++)
             {
-                var faceCornerIndex = model.Mesh.IndexList[triangleIndex * 3 + corneIndex];
-                var cornerVertex = GetExtPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex]);                
-                
-                outMesh.Vertices.Add(cornerVertex);                
-                outMesh.Indices.Add((ushort)outMesh.Indices.Count);
+                var faceCornerIndex = model.Mesh.IndexList[triangleIndex * 3 + faceCorner];
+                var cornerVertex = GetExtPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex]);
+
+                var currentVertexIndex = (uint)outMesh.Indices.Count;
+
+                outMesh.Vertices.Add(cornerVertex);
+                outMesh.Indices.Add(currentVertexIndex);
             }
-
-
-            //var faceCornerIndex1 = model.Mesh.IndexList[triangleIndex * 3 + 0];
-            //var faceCornerIndex2 = model.Mesh.IndexList[triangleIndex * 3 + 1];
-            //var faceCornerIndex3 = model.Mesh.IndexList[triangleIndex * 3 + 2];
-
-            //var cornerVertex1 = GetExtPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex1]);
-            //var cornerVertex2 = GetExtPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex2]);
-            //var cornerVertex3 = GetExtPackedCommonVertex(model.Mesh.VertexList[faceCornerIndex3]);
-
-
-            //outMesh.Vertices.Add(cornerVertex1);
-            //outMesh.Vertices.Add(cornerVertex2);
-            //outMesh.Vertices.Add(cornerVertex3);
-
-            //// add unindex indicies 0,1,2....
-            
-            //outMesh.Indices.Add((ushort)outMesh.Indices.Count);            
-            //outMesh.Indices.Add((ushort)outMesh.Indices.Count);            
-            //outMesh.Indices.Add((ushort)outMesh.Indices.Count);
         }
 
         static private void FillVertexWeights(RmvModel model, PackedMesh outMesh, AnimationFile skeletonFile)
         {
             var vertexIndex = 0;
-            for (var triangleIndex = 0; triangleIndex < model.Mesh.IndexList.Length / 3; triangleIndex++, vertexIndex++)
+
+            for (var triangleIndex = 0; triangleIndex < model.Mesh.IndexList.Length / 3; triangleIndex++)
             {
 
                 for (int cornerIndex = 0; cornerIndex < 3; cornerIndex++)
                 {
-                    var faceCornerIndex1 = model.Mesh.IndexList[triangleIndex * 3 + cornerIndex];
-                    AddCornerWeights(model, outMesh, skeletonFile, faceCornerIndex1, vertexIndex);
+                    var faceCornerIndex = model.Mesh.IndexList[triangleIndex * 3 + cornerIndex];
+                    AddCornerWeights(model.Mesh.VertexList[faceCornerIndex], outMesh, skeletonFile, vertexIndex++);
                 }
 
 
@@ -233,22 +249,31 @@ namespace AssetManagement.AssetBuilders
 
             }
 
+
         }
 
-        private static void AddCornerWeights(RmvModel model, PackedMesh outMesh, AnimationFile skeletonFile, ushort faceCornerIndex1, int vertexIndex)
+        /// <summary>
+        /// Adds the weights from 1 RmvModel vertex to the unindexed PackedMesh
+        /// </summary>        
+        private static void AddCornerWeights(CommonVertex inVertex, PackedMesh outMesh, AnimationFile skeletonFile, int newVertexIndex)
         {
-            for (int weightIndex = 0; weightIndex < model.Mesh.VertexList[faceCornerIndex1].WeightCount; weightIndex++)
+            // add as many weights as is stored in the RMVmodel vertex, 
+            for (int weightIndex = 0; weightIndex < inVertex.WeightCount; weightIndex++)
             {
                 var vertexWeight = new ExtVertexWeight()
                 {
-                    vertexIndex = vertexIndex,
-                    boneName = skeletonFile.GetBoneNameFromId(model.Mesh.VertexList[faceCornerIndex1].BoneIndex[weightIndex]),
-                    boneIndex = model.Mesh.VertexList[faceCornerIndex1].BoneIndex[weightIndex],
-                    weight = model.Mesh.VertexList[faceCornerIndex1].BoneWeight[weightIndex],
+                    vertexIndex = newVertexIndex,
+                    boneName = skeletonFile.GetBoneNameFromIndex(inVertex.BoneIndex[weightIndex]),
+                    boneIndex = inVertex.BoneIndex[weightIndex],
+                    weight = inVertex.BoneWeight[weightIndex],
                 };
 
                 outMesh.VertexWeights.Add(vertexWeight);
             };
+                        
+            // TODO: Checker VERY SLOW easier to simply add the weights together for each RMV vertex and check?
+            //  for checking that weights are assigned correct, if any vertex has weight sum != 1.0,      
+            //CheckForNullWeightedVertices(outMesh);
         }
 
         private static ExtPackedCommonVertex GetExtPackedCommonVertex(CommonVertex inVertex)

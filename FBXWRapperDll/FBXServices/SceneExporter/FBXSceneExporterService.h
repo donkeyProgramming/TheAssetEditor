@@ -1,12 +1,15 @@
 #pragma once
 
 #include <algorithm>
-#include "..\..\DataStructures\SceneContainer\SceneContainer.h"
-#include "..\..\fbxsdk\common\Common.h"
-#include "..\..\DLLDefines.h"
-#include "..\..\Processing\FbxMeshCreator.h"
-#include "..\..\Processing\FbxMeshCreator.h"
-#include "..\..\Builders\FBXSkeletonBuilder.h"
+#include <fbxsdk.h>
+
+#include "../../DataStructures\SceneContainer\SceneContainer.h"
+#include "../../fbxsdk\common\Common.h"
+#include "../../Dll/DLLDefines.h"
+#include "../../Processing\FBXMeshProcessor.h"
+#include "../../FbxObjectCreators/FBXSkeletonFactory.h"
+#include "../../FbxObjectCreators/FbxSceneCreator.h"
+
 
 namespace wrapdll
 {
@@ -15,8 +18,8 @@ namespace wrapdll
     public:
         virtual ~FBXSceneExporterService()
         {
-            //m_pSDKManager->Destroy();
-            //LogInfo("FBX SDK Manager object deallocated correctly.");
+            m_poSDKManager->Destroy();
+            LogActionSuccess("FBX SDK Manager object deallocated correctly.");
         };
 
 
@@ -34,58 +37,62 @@ namespace wrapdll
 
         bool SaveToDisk(const char* szDiskPath)
         {
-            using namespace fbxsdk;                        
+            using namespace fbxsdk;                                   
             
-            InitializeSdkObjects(m_poSDKManager, m_poFbxScene);
+            // TODO:change a bit, so FbxScene::Create happens in FbxSceneCreator, 
+            //      and FbxSceneCreator::CreateFromSceneContainer take a FbxManager as params, 
+            //      and returns the FbxScene*
+            InitializeSDKManager(m_poSDKManager);
 
-            FBXUnitHelper::SetFbxSystmedUnit(m_poFbxScene, fbxsdk::FbxSystemUnit::Inch);
-            
-            auto vertexScaleFactor = FBXUnitHelper::GetVertexDataScaleFactor(m_poFbxScene);
-
-            AddMeshes(vertexScaleFactor);
-
-            FBXSkeletonBuilder::FillSkeleton(m_poFbxScene, m_sceneContainer.m_bones);         
-
-
-
+            FbxSceneCreator sceneCreator;
+            auto m_poFbxScene = sceneCreator.CreateFbxScene(m_poSDKManager, m_sceneContainer);
 
             auto lResult = SaveScene(m_poSDKManager, m_poFbxScene, szDiskPath);
+
             if (lResult == false)
             {
                 FBXSDK_printf("\n\nAn error occurred while saving the scene...\n");
                 DestroySdkObjects(m_poSDKManager, lResult);
-                return true;
+                return false;
             }
-            return false;
-        }
 
-        void AddMeshes(double vertexScaleFactor)
-        {
-            for (auto& inPackedMesh : m_sceneContainer.m_packedMeshes)
-            {
-                auto poMesh = FbxMeshCreator::CreateFbxUnindexedMesh(m_poFbxScene, inPackedMesh, vertexScaleFactor);
-                auto poMeshNode = fbxsdk::FbxNode::Create(m_poFbxScene, inPackedMesh.meshName.c_str());
-                poMeshNode->SetNodeAttribute(poMesh);
-
-                m_poFbxScene->GetRootNode()->AddChild(poMeshNode);
-            }
-        }
-        ;
-
-        /// <summary>
-        /// Get reference to scene containter object
-        /// </summary>
-        /// <returns>Internal SceneContainer instance</returns>
+            return true;
+        }        
+                
         SceneContainer& GetScene()
         {
             return m_sceneContainer;
+        }         
+
+
+        static void InitializeSDKManager(FbxManager*& pManager)
+        {
+            //The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
+            pManager = FbxManager::Create();
+            if (!pManager)
+            {
+                FBXSDK_printf("Error: Unable to create FBX Manager!\n");
+                exit(1);
+            }
+            else FBXSDK_printf("Autodesk FBX SDK version %s\n", pManager->GetVersion());
+
+            //Create an IOSettings object. This object holds all import/export settings.
+            FbxIOSettings* ios = FbxIOSettings::Create(pManager, IOSROOT);
+            pManager->SetIOSettings(ios);
+
+            //Load plugins from the executable directory (optional)
+            FbxString lPath = FbxGetApplicationDirectory();
+            pManager->LoadPluginsDirectory(lPath.Buffer());
         }
-    
-    
-    
-        SceneContainer m_sceneContainer = SceneContainer();
+
+
+        
     private:
+        SceneContainer m_sceneContainer = SceneContainer();
         fbxsdk::FbxManager* m_poSDKManager = nullptr;
         fbxsdk::FbxScene* m_poFbxScene = nullptr;
     };
+
+
+
 }

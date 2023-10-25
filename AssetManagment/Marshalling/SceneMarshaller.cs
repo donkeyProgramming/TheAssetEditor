@@ -24,12 +24,7 @@ namespace AssetManagement.Marshalling
             newScene.SkeletonName = GetSkeletonNameFromSceneContainer(ptrFbxSceneContainer);
 
             return newScene;
-            /*
-            TODO: to come:
-            - destScene.Bones = GetAllBones();
-            - destScene.Animations = GetAllBones();
-            - etc, comming soon
-            */
+          
         }
 
 
@@ -79,26 +74,28 @@ namespace AssetManagement.Marshalling
             return newVertexlIST;
         }
 
-        //public static void SetIndices(IntPtr fbxContainer, int meshIndex, ushort[] indices)
+        //public static void SetIndices(IntPtr fbxContainer, int meshIndex, uint[] indices)
         //{            
         //    FBXSceneContainerDll.SetIndices(fbxContainer, meshIndex, indices, indices.Length);
         //}       
 
-        public static ushort[] GetIndices(IntPtr fbxContainer, int meshIndex)
+        public static uint[] GetIndices(IntPtr fbxContainer, int meshIndex)
         {
             var pIndices = FBXSceneContainerDll.GetIndices(fbxContainer, meshIndex, out var indexCount);
-            var newIndexList = MarshalUtil.CopyArrayFromUnmanaged<ushort>(pIndices, indexCount);
+            var newIndexList = MarshalUtil.CopyArrayFromUnmanaged<uint>(pIndices, indexCount);
 
             return newIndexList;
         }
+               
 
         public static void SetPackedMesh(IntPtr ptrFbxContainer, int meshIndex, PackedMesh packedMesh)
         {
             var ptrIndices = FBXSceneContainerDll.AllocateIndices(ptrFbxContainer, meshIndex, packedMesh.Indices.Count);
             var ptrVertices = FBXSceneContainerDll.AllocateVertices(ptrFbxContainer, meshIndex, packedMesh.Vertices.Count);            
             var ptrWeights = FBXSceneContainerDll.AllocateVertexWeights(ptrFbxContainer, meshIndex, packedMesh.VertexWeights.Count);
+            FBXSceneContainerDll.SetMeshName(ptrFbxContainer, meshIndex, packedMesh.Name);
 
-            MarshalUtil.CopyArrayToUnmanaged<ushort>(packedMesh.Indices.ToArray(), ptrIndices, packedMesh.Indices.Count);
+            MarshalUtil.CopyArrayToUnmanaged<uint>(packedMesh.Indices.ToArray(), ptrIndices, packedMesh.Indices.Count);
             MarshalUtil.CopyArrayToUnmanaged<ExtPackedCommonVertex>(packedMesh.Vertices.ToArray(), ptrVertices, packedMesh.Vertices.Count);            
             MarshalUtil.CopyArrayToUnmanaged<ExtVertexWeight>(packedMesh.VertexWeights.ToArray(), ptrWeights, packedMesh.VertexWeights.Count);
         }
@@ -137,7 +134,7 @@ namespace AssetManagement.Marshalling
 
             var packedMesh = new PackedMesh();
             packedMesh.Vertices = new List<ExtPackedCommonVertex>();
-            packedMesh.Indices = new List<ushort>();
+            packedMesh.Indices = new List<uint>();
             packedMesh.Vertices.AddRange(vertices);
             packedMesh.Indices.AddRange(indices);
             packedMesh.Name = meshName;
@@ -160,25 +157,25 @@ namespace AssetManagement.Marshalling
 
             return newWeightList;
 
+            // TODO: remove?
+            //if (ptrVertexWeights == IntPtr.Zero || weightCount == 0)
+            //{
+            //    return new ExtVertexWeight[0];
+            //}
 
-            if (ptrVertexWeights == IntPtr.Zero || weightCount == 0)
-            {
-                return new ExtVertexWeight[0];
-            }
+            //var data = new ExtVertexWeight[weightCount];
+            //for (var weightIndex = 0; weightIndex < weightCount; weightIndex++)
+            //{
+            //    var ptr = Marshal.PtrToStructure(ptrVertexWeights + weightIndex * Marshal.SizeOf(typeof(ExtVertexWeight)), typeof(ExtVertexWeight));
 
-            var data = new ExtVertexWeight[weightCount];
-            for (var weightIndex = 0; weightIndex < weightCount; weightIndex++)
-            {
-                var ptr = Marshal.PtrToStructure(ptrVertexWeights + weightIndex * Marshal.SizeOf(typeof(ExtVertexWeight)), typeof(ExtVertexWeight));
+            //    if (ptr == null)
+            //    {
+            //        throw new Exception("Fatal Error: ptr == null");
+            //    }
+            //    data[weightIndex] = (ExtVertexWeight)ptr;
+            //}
 
-                if (ptr == null)
-                {
-                    throw new Exception("Fatal Error: ptr == null");
-                }
-                data[weightIndex] = (ExtVertexWeight)ptr;
-            }
-
-            return data;
+            //return data;
         }
 
         static public List<PackedMesh> GetAllPackedMeshes(IntPtr fbxSceneContainer)

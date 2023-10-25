@@ -57,8 +57,8 @@ public:
 
 struct VertexWeight
 {    
-    char boneName[255] = "";
-    int boneIndex = 0;
+    char boneName[256] = "";    
+    int boneIndex; // TODO: should be removed, maybe, as it is not known when struct is first filled
     int vertexIndex = 0;
     float weight = 0.0f;
 };
@@ -95,7 +95,7 @@ struct PackedMesh
 {
 	std::string meshName = "Unnamed_Mesh\0";
 	std::vector<PackedCommonVertex> vertices;
-	std::vector<uint16_t> indices;
+	std::vector<uint32_t> indices;
 	std::vector<VertexWeight> vertexWeights;
 };
 

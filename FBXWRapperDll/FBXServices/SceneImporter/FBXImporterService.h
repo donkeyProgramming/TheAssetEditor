@@ -1,6 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <fbxsdk.h>
+
 #include "..\..\DataStructures\SceneContainer\SceneContainer.h"
 
 namespace wrapdll

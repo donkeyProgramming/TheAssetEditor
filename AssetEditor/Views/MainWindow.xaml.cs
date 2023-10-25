@@ -21,9 +21,9 @@ namespace AssetEditor.Views
 
             //System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
-            
-           Title = $"{fvi.ProductName} - {fvi.FileVersion}";
-            
+
+            Title = $"{fvi.ProductName} - {fvi.FileVersion}";
+
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)

@@ -1,11 +1,13 @@
 #pragma once
 
 #include "..\DataStructures\PackedMeshStructs.h"
-#include "..\Helpers\FBXUnitHelper.h"
+#include "..\HelperUtils\FBXUnitHelper.h"
 #include "..\Logging\Logging.h"
-#include "..\Helpers\Geometry\FBXNodeGeometryHelper.h"
-#include "..\Helpers\Geometry\FBXMeshGeometryHelper.h"
-#include "FBXVertexCreator.h"
+
+#include "..\HelperUtils\Geometry\FBXNodeGeometryHelper.h"
+#include "..\HelperUtils\Geometry\FBXMeshGeometryHelper.h"
+
+#include "PackedVertexCreator.h"
 
 namespace wrapdll
 {
@@ -22,18 +24,18 @@ namespace wrapdll
             PackedMesh& destMesh,
             const std::vector<ControlPointInfluence>& controlPointerInfluences);
 
-        // TODO: implement
-        /// <summary>
-        /// Make an (unindexed) "FbxMesh*" from "PackedMesh"
-        /// </summary>
-        /// <param name="sourcePackedMesh"></param>
-        /// <param name="poFbxScene"></param>
-        /// <param name="poDestFbxMesh"></param>
-        /// <returns></returns>
-        static bool MakeUnindexedFbxMesh(
-            PackedMesh& sourcePackedMesh,
-            fbxsdk::FbxScene* poFbxScene,
-            fbxsdk::FbxMesh* poDestFbxMesh);
+        // TODO: implement/remove/ 
+        ///// <summary>
+        ///// Make an (unindexed) "FbxMesh*" from "PackedMesh"
+        ///// </summary>
+        ///// <param name="sourcePackedMesh"></param>
+        ///// <param name="poFbxScene"></param>
+        ///// <param name="poDestFbxMesh"></param>
+        ///// <returns></returns>
+        //static bool MakeUnindexedFbxMesh(
+        //    PackedMesh& sourcePackedMesh,
+        //    fbxsdk::FbxScene* poFbxScene,
+        //    fbxsdk::FbxMesh* poDestFbxMesh);
 
     private:
         static FbxVector4 GetFbxTransformedNormal(

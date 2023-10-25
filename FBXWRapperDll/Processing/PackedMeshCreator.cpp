@@ -90,7 +90,7 @@ bool wrapdll::PackedMeshCreator::MakeUnindexedPackedMesh(fbxsdk::FbxScene* poFbx
                 {
                     VertexWeight newVertexWeight;
 
-                    strcpy_s<255>(newVertexWeight.boneName, i.boneName); // fixed length for interop
+                    strcpy_s<256>(newVertexWeight.boneName, i.boneName); // fixed length for interop
                     newVertexWeight.vertexIndex = vertexIndex;
                     newVertexWeight.weight = i.weight;
 
@@ -102,8 +102,8 @@ bool wrapdll::PackedMeshCreator::MakeUnindexedPackedMesh(fbxsdk::FbxScene* poFbx
                 LogActionWarning("Control point influence map SIZE != number of mesh control points");
             }
 
-            destMesh.vertices[vertexIndex] = FBXVertexhCreator::MakePackedVertex(v4ControlPoint, vNormalVector, uvMap1, pControlPointInfluences, factorToMeters);
-            destMesh.indices[vertexIndex] = static_cast<uint16_t>(vertexIndex);
+            destMesh.vertices[vertexIndex] = PackedVertexCreator::MakePackedVertex(v4ControlPoint, vNormalVector, uvMap1, pControlPointInfluences, factorToMeters);
+            destMesh.indices[vertexIndex] = static_cast<uint32_t>(vertexIndex);
         }
     }
 

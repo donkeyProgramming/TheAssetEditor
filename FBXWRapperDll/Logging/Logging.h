@@ -15,32 +15,32 @@
 #include <fstream>
 #include <locale>
 #include <codecvt>
-#include "..\Helpers\Tools.h"
+#include "..\HelperUtils\Tools.h"
 
 #define FULL_FUNC_INFO(message) std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + message
 
-// TODO: Re-enable is not the cause of issue
+//#define LogActionColor(message) ;
+//#define LogActionError(msg) false;
+//#define LogInfo(msg) ;
+//#define LogAction(message) ;
+//#define LogActionWarning(message) false ;
+//#define LogActionSuccess(message) ;
 
-//#define LogActionError(msg) ImplLog::LogActionErrorFalse( FULL_FUNC_INFO(msg) );
 
-//#define LogInfo(msg) ImplLog::LogActionInfo( FULL_FUNC_INFO(msg) );
-//
-//#define LogAction(message)  ImplLog::LogActionInfo( \
-//	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + message);\
-//
-//#define LogActionColor(message)  ImplLog::LogActionConcoleColor( \
-//	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + message);\
-//
-//#define LogActionSuccess(message) ImplLog::LogAction_success(message);
-//
-//#define LogActionWarning(message) ImplLog::LogAction_warning(message);
 
-#define LogActionColor(message) ;
-#define LogActionError(msg) false;
-#define LogInfo(msg) ;
-#define LogAction(message) ;
-#define LogActionWarning(message) false ;
-#define LogActionSuccess(message) ;
+#define LogActionError(msg) ImplLog::LogActionErrorFalse( FULL_FUNC_INFO(msg) );
+
+#define LogInfo(msg) ImplLog::LogActionInfo( FULL_FUNC_INFO(msg) );
+
+#define LogAction(message)  ImplLog::LogActionInfo( \
+	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + message);\
+
+#define LogActionColor(message)  ImplLog::LogSimpleWithColor( \
+	std::string(__func__) +  std::string(": Line: ") + std::to_string(__LINE__) + ": " + message);\
+
+#define LogActionSuccess(message) ImplLog::LogAction_success(message);
+
+#define LogActionWarning(message) ImplLog::LogAction_warning(message);
 
 enum ConsoleColorFG
 {
@@ -82,18 +82,83 @@ enum ConsoleColorBG
     BG_WHITE = BACKGROUND_INTENSITY | BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE,
 };
 
+class WinConcole
+{
+public:
+    static void Print(const std::wstring& str, WORD wColorFlags = BG_BLACK | FG_WHITE);
+    static void PrintLn(const std::wstring& str, WORD color = BG_BLACK | FG_WHITE);
+};
+
+// TODO: finish making this into a neat singleton
 class ImplLog
 {
 public:
     static void LogActionInfo(const std::string& _strMsg);
-    static void LogActionConcoleColor(const std::string& _strMsg, WORD wColorFlags = BG_MAGENTA | FG_WHITE);
+    static void LogSimpleWithColor(const std::string& _strMsg, WORD wColorFlags = BG_BLACK | FG_WHITE);
     static void LogAction_success(const std::string& _strMsg);
     static bool LogActionErrorFalse(const std::string& _strMsg);
     static bool LogAction_warning(const std::string& _strMsg);
     static void LogWrite(const std::string& _strMsg);
-
     static void WriteToLogFile(const std::string& logString);
+
+    static void LogActionTimedBegin(const std::string& _strMsg);
+    static void LogActionTimedEnd(const std::string& _strMsg);
+
+    
+    static ImplLog& GetInstance() { 
+        if (!m_poInstance) 
+        {
+            m_poInstance = std::make_unique<ImplLog>();
+        }
+        else 
+        {
+            return *m_poInstance;
+        }
+    };   
+
+    static tools::SystemClock m_globalClock;
+
+private:
+    static std::unique_ptr<ImplLog> m_poInstance;
 };
+
+class TimeLogAction
+{
+public:
+    static TimeLogAction MakeObject() { return TimeLogAction(); };
+
+
+    TimeLogAction() { m_clock.ResetLocalTime(); };
+
+    static TimeLogAction PrintStart(const std::string& _strMsg)
+    {         
+        TimeLogAction newInstance;
+        newInstance.m_message = _strMsg;
+        ImplLog::LogSimpleWithColor(prefix + newInstance.m_message + "\n", BG_BLACK | FG_WHITE);
+        
+        return newInstance;
+    };
+
+    void PrintDone(const std::string& _strMsg = "")
+    {
+        auto messageToShow = _strMsg.empty() ? m_message + ": Done." : _strMsg;
+        ImplLog::LogSimpleWithColor(prefix +  messageToShow + "\n", BG_BLACK | FG_WHITE);
+        auto timeElapsedMessageString = "Time Elapsed: " + std::to_string(m_clock.GetLocalTime()) + " seconds\n";
+
+        ImplLog::LogSimpleWithColor(timeElapsedMessageString + "\n", BG_BLACK | FG_GREEN);
+    };
+
+    tools::SystemClock & GetClock() { return m_clock; };
+    double GetLocalTime() { return m_clock.GetLocalTime(); };
+
+private:
+    tools::SystemClock m_clock;
+    static constexpr char prefix[] = "[FBX SDK wrapper dll:] ";
+    std::string m_message = "";
+
+};
+
+
 
 //namespace ConsoleForeground
 //{
