@@ -1,18 +1,21 @@
-﻿using AssetManagement.GenericFormats.DataStructures.Managed;
+﻿using AssetManagement.GenericFormats;
+using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
+using CommonControls.FileTypes.Animation;
+//using CommonControls.FileTypes.Animation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace AssetManagement.Strategies.Fbx
+namespace AssetManagement.Marshalling
 {
     public class SceneMarshaller
     {
-        public static SceneContainer ToManaged(IntPtr ptrFbxSceneContainer)
+        public static SceneContainer CopyToManaged(IntPtr ptrFbxSceneContainer)
         {
-            var fileInfo = FBXSCeneContainerGetterDll.GetFileInfo(ptrFbxSceneContainer);
+            var fileInfo = FBXSceneContainerDll.GetFileInfo(ptrFbxSceneContainer);
             var fileInfoStruct = Marshal.PtrToStructure<ExtFileInfoStruct>(fileInfo);
 
             var newScene = new SceneContainer();
@@ -21,150 +24,195 @@ namespace AssetManagement.Strategies.Fbx
             newScene.SkeletonName = GetSkeletonNameFromSceneContainer(ptrFbxSceneContainer);
 
             return newScene;
-            /*
-            TODO: to come:
-            - destScene.Bones = GetAllBones();
-            - destScene.Animations = GetAllBones();
-            - etc, comming soon
-            */
+          
         }
 
-        public static ExtPackedCommonVertex[] GetPackedVertices(IntPtr fbxContainer, int meshIndex)
+
+
+        //public static void SetVertices(IntPtr fbxContainer, int meshIndex, ExtPackedCommonVertex[] vertices)
+        //{
+        //    //FBXSceneContainerDll.SetVertices(fbxContainer, meshIndex, vertices, vertices.Length);
+        //    FBXSceneContainerDll.AllocateIndices(meshIndex, vertices);
+
+        //    var ptrVertives = FBXSceneContainerDll.GetVertices(fbxContainer, meshIndex, out var indexCount);
+
+        //}
+        static public void CopyToNative(IntPtr ptrNativeceneContainer, SceneContainer sceneContainer, AnimationFile skeletonFile = null)
         {
-            IntPtr pVerticesPtr = IntPtr.Zero;
-            int length = 0;
-            FBXSCeneContainerGetterDll.GetPackedVertices(fbxContainer, meshIndex, out pVerticesPtr, out length);
+            CopyPackedMeshesToNative(ptrNativeceneContainer, sceneContainer.Meshes);
+            SetBones(ptrNativeceneContainer, sceneContainer.Bones);
 
-            if (pVerticesPtr == IntPtr.Zero || length == 0)
+            if (sceneContainer.SkeletonName != null && sceneContainer.SkeletonName != "")
             {
-                return null;
+                FBXSceneContainerDll.SetSkeletonName(ptrNativeceneContainer, sceneContainer.SkeletonName);
             }
-
-            ExtPackedCommonVertex[] data = new ExtPackedCommonVertex[length];
-            for (int vertexIndex = 0; vertexIndex < length; vertexIndex++)
+            else
             {
-                var ptr = Marshal.PtrToStructure(pVerticesPtr + vertexIndex * Marshal.SizeOf(typeof(ExtPackedCommonVertex)), typeof(ExtPackedCommonVertex));
-
-                if (ptr != null)                
-                    data[vertexIndex] = (ExtPackedCommonVertex)ptr;                                    
+                FBXSceneContainerDll.SetSkeletonName(ptrNativeceneContainer, "");
             }
-
-            return data;
+            // TODO: add:
+            // - weights
+            // - animations
+            // - etc
         }
 
-        public static ushort[] GetIndices(IntPtr fbxContainer, int meshIndex)
+        private static void CopyPackedMeshesToNative(IntPtr ptrNativeceneContainer, List<PackedMesh> packedMeshes)
         {
-            IntPtr pIndices = IntPtr.Zero;
-            int length = 0;
-            FBXSCeneContainerGetterDll.GetIndices(fbxContainer, meshIndex, out pIndices, out length);
+            FBXSceneContainerDll.AllocateMeshes(ptrNativeceneContainer, packedMeshes.Count);                      
 
-            if (pIndices == IntPtr.Zero || length == 0)
-                return null;
-
-            var indexArray = new ushort[length];
-
-            for (int indicesIndex = 0; indicesIndex < length; indicesIndex++)
+            for (int meshIndex = 0; meshIndex < packedMeshes.Count; meshIndex++) 
             {
-                indexArray[indicesIndex] = (ushort)Marshal.PtrToStructure(pIndices + indicesIndex * Marshal.SizeOf(typeof(ushort)), typeof(ushort));
+                SetPackedMesh(ptrNativeceneContainer, meshIndex, packedMeshes[meshIndex]);
             }
-            return indexArray;
         }
+
+        public static ExtPackedCommonVertex[] GetVertices(IntPtr fbxContainer, int meshIndex)
+        {
+            var ptrVertives = FBXSceneContainerDll.GetVertices(fbxContainer, meshIndex, out var indexCount);
+            var newVertexlIST = MarshalUtil.CopyArrayFromUnmanaged<ExtPackedCommonVertex>(ptrVertives, indexCount);
+
+            return newVertexlIST;
+        }
+
+        //public static void SetIndices(IntPtr fbxContainer, int meshIndex, uint[] indices)
+        //{            
+        //    FBXSceneContainerDll.SetIndices(fbxContainer, meshIndex, indices, indices.Length);
+        //}       
+
+        public static uint[] GetIndices(IntPtr fbxContainer, int meshIndex)
+        {
+            var pIndices = FBXSceneContainerDll.GetIndices(fbxContainer, meshIndex, out var indexCount);
+            var newIndexList = MarshalUtil.CopyArrayFromUnmanaged<uint>(pIndices, indexCount);
+
+            return newIndexList;
+        }
+               
+
+        public static void SetPackedMesh(IntPtr ptrFbxContainer, int meshIndex, PackedMesh packedMesh)
+        {
+            var ptrIndices = FBXSceneContainerDll.AllocateIndices(ptrFbxContainer, meshIndex, packedMesh.Indices.Count);
+            var ptrVertices = FBXSceneContainerDll.AllocateVertices(ptrFbxContainer, meshIndex, packedMesh.Vertices.Count);            
+            var ptrWeights = FBXSceneContainerDll.AllocateVertexWeights(ptrFbxContainer, meshIndex, packedMesh.VertexWeights.Count);
+            FBXSceneContainerDll.SetMeshName(ptrFbxContainer, meshIndex, packedMesh.Name);
+
+            MarshalUtil.CopyArrayToUnmanaged<uint>(packedMesh.Indices.ToArray(), ptrIndices, packedMesh.Indices.Count);
+            MarshalUtil.CopyArrayToUnmanaged<ExtPackedCommonVertex>(packedMesh.Vertices.ToArray(), ptrVertices, packedMesh.Vertices.Count);            
+            MarshalUtil.CopyArrayToUnmanaged<ExtVertexWeight>(packedMesh.VertexWeights.ToArray(), ptrWeights, packedMesh.VertexWeights.Count);
+        }
+
+        // TODO: finish this and clean up
+        public static void SetBones(IntPtr ptrFbxContainer, List<ExtBoneInfo> bones)
+        {
+            var ptrBoneArrayAddress = FBXSceneContainerDll.AllocateBones(ptrFbxContainer, bones.Count);
+
+            for (int boneIndex = 0; boneIndex < bones.Count; boneIndex++)
+            {
+                ExtBoneInfo boneToCopy = new ExtBoneInfo()
+                {
+                    id = bones[boneIndex].id,
+                    parentId = bones[boneIndex].parentId,
+                    name = bones[boneIndex].name,                    
+                    localRotation = bones[boneIndex].localRotation,
+                    localTranslation = bones[boneIndex].localTranslation,
+                };
+
+                Marshal.StructureToPtr<ExtBoneInfo>(boneToCopy, ptrBoneArrayAddress + boneIndex * Marshal.SizeOf(typeof(ExtBoneInfo)), false);
+            }
+        }
+
 
         public static PackedMesh GetPackedMesh(IntPtr fbxContainer, int meshIndex)
         {
             var indices = GetIndices(fbxContainer, meshIndex);
-            var vertices = GetPackedVertices(fbxContainer, meshIndex);
+            var vertices = GetVertices(fbxContainer, meshIndex);
 
-            IntPtr namePtr = FBXSCeneContainerGetterDll.GetMeshName(fbxContainer, meshIndex);
+            var namePtr = FBXSceneContainerDll.GetMeshName(fbxContainer, meshIndex);
             var meshName = Marshal.PtrToStringUTF8(namePtr);
 
             if (vertices == null || indices == null || meshName == null)
                 throw new Exception("Params/Input Data Invalid: Vertices, Indices or Name == null");
 
-            PackedMesh packedMesh = new PackedMesh();
+            var packedMesh = new PackedMesh();
             packedMesh.Vertices = new List<ExtPackedCommonVertex>();
-            packedMesh.Indices = new List<ushort>();
+            packedMesh.Indices = new List<uint>();
             packedMesh.Vertices.AddRange(vertices);
             packedMesh.Indices.AddRange(indices);
             packedMesh.Name = meshName;
-            packedMesh.VertexWeights = GetExtVertexWeights(fbxContainer, meshIndex).ToList();
+
+            var tempWeights = GetExtVertexWeights(fbxContainer, meshIndex);
+            packedMesh.VertexWeights = (tempWeights != null) ? tempWeights.ToList() : null;
 
             return packedMesh;
         }
 
-        public delegate void GetArrayDelegate(IntPtr ptrSceneContainer, int meshIndex, out IntPtr ptrArray, out int itemCount);
-
-        public static T[] GetArray<T>(
-        IntPtr fbxContainer, 
-        int meshIndex,
-        GetArrayDelegate getArrayDelegate)
-        {
-            getArrayDelegate(fbxContainer, meshIndex, out var ptrArray, out var length);
-
-            if (ptrArray == IntPtr.Zero || length == 0)
-            {
-                return new T[0];
-            }
-
-            T[] data = new T[length];
-            for (int arrayIndex = 0; arrayIndex < length; arrayIndex++)
-            {
-                var ptr = Marshal.PtrToStructure(ptrArray + arrayIndex * Marshal.SizeOf(typeof(T)), typeof(T));
-
-                if (ptr == null)
-                {
-                    throw new Exception("Fatal Error: ptr == null");
-                }
-                data[arrayIndex] = (T)ptr;
-            }
-
-            return data;
-        }
+        
 
         public static ExtVertexWeight[] GetExtVertexWeights(IntPtr fbxContainer, int meshIndex)
         {
-            FBXSCeneContainerGetterDll.GetVertexWeights(fbxContainer, meshIndex, out var ExtVertexWeightsPtr, out var length);
+            FBXSceneContainerDll.GetVertexWeights(fbxContainer, meshIndex, out var ptrVertexWeights, out var weightCount);
 
-            if (ExtVertexWeightsPtr == IntPtr.Zero || length == 0)
-            {
-                return new ExtVertexWeight[0];
-            }
+            if (weightCount == 0) { return null; };
 
-            ExtVertexWeight[] data = new ExtVertexWeight[length];
-            for (int weightIndex = 0; weightIndex < length; weightIndex++)
-            {
-                var ptr = Marshal.PtrToStructure(ExtVertexWeightsPtr + weightIndex * Marshal.SizeOf(typeof(ExtVertexWeight)), typeof(ExtVertexWeight));
+            var newWeightList = MarshalUtil.CopyArrayFromUnmanaged<ExtVertexWeight>(ptrVertexWeights, weightCount);
 
-                if (ptr == null)
-                {
-                    throw new Exception("Fatal Error: ptr == null");
-                }
-                data[weightIndex] = (ExtVertexWeight)ptr;
-            }
+            return newWeightList;
 
-            return data;
+            // TODO: remove?
+            //if (ptrVertexWeights == IntPtr.Zero || weightCount == 0)
+            //{
+            //    return new ExtVertexWeight[0];
+            //}
+
+            //var data = new ExtVertexWeight[weightCount];
+            //for (var weightIndex = 0; weightIndex < weightCount; weightIndex++)
+            //{
+            //    var ptr = Marshal.PtrToStructure(ptrVertexWeights + weightIndex * Marshal.SizeOf(typeof(ExtVertexWeight)), typeof(ExtVertexWeight));
+
+            //    if (ptr == null)
+            //    {
+            //        throw new Exception("Fatal Error: ptr == null");
+            //    }
+            //    data[weightIndex] = (ExtVertexWeight)ptr;
+            //}
+
+            //return data;
         }
 
         static public List<PackedMesh> GetAllPackedMeshes(IntPtr fbxSceneContainer)
         {
-            List<PackedMesh> meshList = new List<PackedMesh>();
-            var meshCount = FBXSCeneContainerGetterDll.GetMeshCount(fbxSceneContainer);
+            var meshList = new List<PackedMesh>();
+            var meshCount = FBXSceneContainerDll.GetMeshCount(fbxSceneContainer);
 
-            for (int i = 0; i < meshCount; i++)
+            for (var i = 0; i < meshCount; i++)
             {
                 meshList.Add(GetPackedMesh(fbxSceneContainer, i));
             }
             return meshList;
+
+
         }
 
         static public string GetSkeletonNameFromSceneContainer(IntPtr ptrFbxSceneContainer)
         {
-            var skeletonNamePtr = FBXSCeneContainerGetterDll.GetSkeletonName(ptrFbxSceneContainer);
+            var skeletonNamePtr = FBXSceneContainerDll.GetSkeletonName(ptrFbxSceneContainer);
 
             if (skeletonNamePtr == IntPtr.Zero)
                 return "";
 
-            string skeletonName = Marshal.PtrToStringUTF8(skeletonNamePtr);
+            var skeletonName = Marshal.PtrToStringUTF8(skeletonNamePtr);
+
+            if (skeletonName == null)
+                return "";
+
+            return skeletonName;
+        }
+
+        static public string GetString(IntPtr ptrString, int length)
+        {
+            if (ptrString == IntPtr.Zero)
+                return "";
+
+            var skeletonName = Marshal.PtrToStringUTF8(ptrString);
 
             if (skeletonName == null)
                 return "";

@@ -58,11 +58,25 @@ namespace AssetEditor
                     var loadRes = packfileService.LoadAllCaFiles(gamePath, gameName);
                     if (!loadRes)
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
+
+
+                    //// DEBUGGINg CODE: BEGIN
+                    //var pathModel = @"variantmeshes/wh_variantmodels/hu1/emp/emp_karl_franz/emp_karl_franz.rigid_model_v2";
+                    //var packFile = packfileService.FindFile(pathModel);
+                    //var packFileContainer = packfileService.GetPackFileContainer(packFile);
+
+                    //var exporterCommandFactory = _rootScope.ServiceProvider.GetService<IUiCommandFactory>();
+                    //exporterCommandFactory.Create<ExportAssetCommand>().Execute(packFileContainer, pathModel);
+                    // DEBUGGINg CODE: END
+                    // TODO: enable for local debuggin
+//                    packfileService.Load(@"C:\temp\TestCustomPackFile.pack");
                 }
             }
 
             devConfigManager?.CreateTestPackFiles();
             devConfigManager?.OpenFileOnLoad();
+
+           
 
             ShowMainWindow();
         }

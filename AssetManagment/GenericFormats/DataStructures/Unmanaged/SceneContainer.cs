@@ -6,15 +6,17 @@ using AssetManagement.GenericFormats.DataStructures.Managed;
 
 namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
 {
-    public class SceneContainer
-    {
-        public List<PackedMesh> Meshes { get; set; } = new List<PackedMesh>();
-        public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
-        public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
-        public Node RootNode { get; set; }
-        public string SkeletonName { get; set; } = "";
-        public FBXFileInfo FileInfoData { get; set; } = new FBXFileInfo();
-    }
+    //public class SceneContainer
+    //{
+    //    public List<PackedMesh> Meshes { get; set; } = new List<PackedMesh>();
+    //    public List<BoneInfo> Bones { get; set; } = new List<BoneInfo>();
+    //    public List<AnimationClip> Animations { get; set; } = new List<AnimationClip>();
+    //    public Node RootNode { get; set; }
+    //    public string SkeletonName { get; set; } = "";
+    //    public FBXFileInfo FileInfoData { get; set; } = new FBXFileInfo();
+    //}
+
+
 
 
     public class Node

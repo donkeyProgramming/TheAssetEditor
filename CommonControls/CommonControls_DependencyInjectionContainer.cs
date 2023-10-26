@@ -50,6 +50,7 @@ namespace CommonControls
             services.AddScoped<EventHub>();
 
             services.AddTransient<ImportAssetCommand>();
+            services.AddTransient<ExportAssetCommand>(); // TODO: phazed added, ask ole is ok?
 
             // Editors that should be moved into their own projects
             TextEditor_DependencyInjectionContainer.Register(services);

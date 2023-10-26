@@ -11,7 +11,7 @@
                       ExpandDirection="Down" 
                       IsExpanded="True">
         <GroupBox>            
-            <DockPanel LastChildFill="true">
+            <DockPanel Name="DockPanel" LastChildFill="true">
 
                 <!--File Name-->
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">

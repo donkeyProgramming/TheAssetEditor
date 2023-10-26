@@ -31,6 +31,7 @@ namespace CommonControls.PackFileBrowser
         public ICommand AddFilesFromDirectory { get; set; }
         public ICommand AddFilesCommand { get; set; }
         public ICommand Import3DFileCommand { get; set; }
+        public ICommand ExportGeometryCommand { get; set; }
         public ICommand CloseNodeCommand { get; set; }
         public ICommand DeleteCommand { get; set; }
         public ICommand SavePackFileCommand { get; set; }
@@ -61,6 +62,7 @@ namespace CommonControls.PackFileBrowser
             RenameNodeCommand = new RelayCommand(OnRenameNode);
             AddFilesCommand = new RelayCommand(OnAddFilesCommand);
             Import3DFileCommand = new RelayCommand(OnImport3DModelCommand);
+            ExportGeometryCommand = new RelayCommand(OnGeometryExportCommand);
             AddFilesFromDirectory = new RelayCommand(OnAddFilesFromDirectory);
             DuplicateCommand = new RelayCommand(DuplicateNode);
             CreateFolderCommand = new RelayCommand(CreateFolder);
@@ -140,9 +142,13 @@ namespace CommonControls.PackFileBrowser
             }
         }
         void OnImport3DModelCommand()
-        {
-        
+        { 
             _uiCommandFactory.Create<ImportAssetCommand>().Execute(_selectedNode.FileOwner, _selectedNode.GetFullPath());
+        }
+
+        void OnGeometryExportCommand()
+        {        
+            _uiCommandFactory.Create<ExportAssetCommand>().Execute(_selectedNode.FileOwner, _selectedNode.GetFullPath(), null);
         }
 
         void OnAddFilesFromDirectory()
@@ -395,7 +401,7 @@ namespace CommonControls.PackFileBrowser
 
         protected ContextMenuItem Additem(ContextItems type, ObservableCollection<ContextMenuItem> parent)
         {
-            var item = GetItem(type);
+            var item = GetItem(type);            
             parent.Add(item);
             return item;
         }
@@ -414,7 +420,9 @@ namespace CommonControls.PackFileBrowser
                 case ContextItems.Import:
                     return new ContextMenuItem() { Name = "Import" };
                 case ContextItems.Import3DModel:
-                    return new ContextMenuItem() { Name = "Import 3D Model File (Experimental)", Command = Import3DFileCommand };
+                    return new ContextMenuItem() { Name = "Import FBX Model File (Experimental)", Command = Import3DFileCommand };
+                 case ContextItems.ExportGeomtry:
+                    return new ContextMenuItem() { Name = "Export Model to FBX (Experimental)", Command = ExportGeometryCommand };
                 case ContextItems.Create:
                     return new ContextMenuItem() { Name = "Create" };
                 case ContextItems.AddFiles:
@@ -464,6 +472,7 @@ namespace CommonControls.PackFileBrowser
             Import,
             AddFiles,
             Import3DModel,
+            ExportGeomtry,
             AddDirectory,
             CopyToEditablePack,
             Duplicate,

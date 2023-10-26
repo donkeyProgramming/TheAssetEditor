@@ -47,7 +47,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         void RegisterActions()
         {
             RegisterUiCommand<SaveCommand>();
-            RegisterUiCommand<SaveAsCommand>();
+            RegisterUiCommand<SaveAsCommand>();                      
 
             RegisterUiCommand<GenerateWh2WsModelCommand>();
             RegisterUiCommand<GenerateWh3WsModelCommand>();
@@ -194,6 +194,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             if (_uiCommands.ContainsKey(typeof(T)))
                 throw new Exception($"Ui Action of type {typeof(T)} already added");
             _uiCommands[typeof(T)] = new KitbasherMenuItem<T>(_uiCommandFactory);
+
+            
         }
 
         void RegisterHotkeys()

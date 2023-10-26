@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.ObjectModel;
+using System.IO;
 using CommonControls.Events.UiCommands;
 using CommonControls.Services;
 using CommonControls.Services.ToolCreation;
@@ -112,9 +113,23 @@ namespace CommonControls.PackFileBrowser
                 var openFolder = Additem(ContextItems.Open, newContextMenu);
                 Additem(ContextItems.OpenWithHxD, openFolder);
                 Additem(ContextItems.OpenWithNodePadPluss, openFolder);
-            }
 
+                // TODO: phazer added here, for testing, maybe not best place
+
+                if (node != null)
+                {
+                    //FileInfo fi = new FileInfo(node.Item.Name);
+                    var fileExtension = Path.GetExtension(node.Item.Name);
+                    //if (fi.Extension.ToLower() == "rigid_model_v2")
+                    if (fileExtension == ".rigid_model_v2")
+                    {
+                        AddSeperator(newContextMenu);
+                        var menuItem = Additem(ContextItems.ExportGeomtry, newContextMenu);                        
+                    }
+                }
+            }
             Items = newContextMenu;
+
         }
     }
 }

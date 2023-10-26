@@ -3,6 +3,12 @@
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="AssetManagement\IAssetExporter.cs" />
+	  <Compile Remove="AssetManagement\IAssetExportexProvider.cs" />
+	  <Compile Remove="AssetManagement\IAssetImporter.cs" />
+	  <Compile Remove="AssetManagement\___IAssetImporterProvider.cs" />
+	</ItemGroup>
 
   <ItemGroup>    
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />

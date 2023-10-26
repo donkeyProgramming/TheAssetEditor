@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AssetManagement.GenericFormats.DataStructures.Managed;
@@ -121,7 +122,7 @@ namespace AssetManagement.AssetBuilders
             rmv2Mesh.VertexList = new CommonVertex[packedInputMesh.Vertices.Count];
 
             rmv2Mesh.VertexList = MakeCommonVertices(vertexFormat, packedInputMesh, skeletonFile).ToArray();
-            rmv2Mesh.IndexList = packedInputMesh.Indices.ToArray();
+            rmv2Mesh.IndexList = Array.ConvertAll(packedInputMesh.Indices.ToArray(), input => (ushort)input);
 
             if (skeletonFile == null)
             {
@@ -183,7 +184,7 @@ namespace AssetManagement.AssetBuilders
                    packedInputMesh.Vertices[vertexIndex].Normal,
                    packedInputMesh.Vertices[vertexIndex].Uv,
                    packedInputMesh.Vertices[vertexIndex].Tangent,
-                   packedInputMesh.Vertices[vertexIndex].BiNormal,
+                   packedInputMesh.Vertices[vertexIndex].Bitangent,
                    skeletonFile);
             }
 

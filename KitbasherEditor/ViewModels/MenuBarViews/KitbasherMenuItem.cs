@@ -21,8 +21,12 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public KitbasherMenuItem(IUiCommandFactory uiCommandFactory, Action<T> function = null) : base()
         {
+            // TODO: remove
+            // Console.WriteLine("KitBasherMenuItem");
             _uiCommandFactory = uiCommandFactory;
             _instance = _uiCommandFactory.Create(function);
+
+
 
             Hotkey = _instance.HotKey;
             ToolTip = _instance.ToolTip;

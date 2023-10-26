@@ -13,6 +13,7 @@ using CommonControls.Services.ToolCreation;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
 
+
 namespace AssetEditor.ViewModels
 {
     public class MainViewModel : NotifyPropertyChangedImpl, IDropTarget<IEditorViewModel, bool>
@@ -48,7 +49,7 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
-        public MainViewModel( MenuBarViewModel menuViewModel,
+        public MainViewModel(MenuBarViewModel menuViewModel,
             PackFileService packfileService,
             IToolFactory toolFactory,
             IUiCommandFactory uiCommandFactory)
@@ -70,8 +71,8 @@ namespace AssetEditor.ViewModels
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;
-        }
 
+        }
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
 
         private void Closing(IEditorViewModel editor)
@@ -204,6 +205,8 @@ namespace AssetEditor.ViewModels
 
         public EditorCreator(MainViewModel mainEditorWindow, PackFileService packFileService, IToolFactory toolFactory)
         {
+            // TODO: remove this line, debuggin code
+            //Console.WriteLine("EditorCreator");
             _mainViewModel = mainEditorWindow;
             _packFileService = packFileService;
             _toolFactory = toolFactory;
@@ -217,6 +220,9 @@ namespace AssetEditor.ViewModels
 
         public void OpenFile(PackFile file)
         {
+            // TODO: remove this line, debuggin code
+            //Console.WriteLine("EditorCreator.OpenFile-------------------------------------------------");
+
             if (file == null)
             {
                 _logger.Here().Error($"Attempting to open file, but file is NULL");
@@ -231,8 +237,16 @@ namespace AssetEditor.ViewModels
                 return;
             }
 
+
             var fullFileName = _packFileService.GetFullPath(file);
+
+            // TODO: remove this line, debuggin code
+            //Console.WriteLine($"EditorCreator.OpenFile: Calling  _ToolFactory.create(string): {fullFileName} ");
+
             var editorViewModel = _toolFactory.Create(fullFileName);
+
+            // TODO: remove this line, debuggin code
+            // Console.WriteLine($"EditorCreator.OpenFile: AFTER call to _ToolFactory.create(string): {fullFileName} "); 
 
             _logger.Here().Information($"Opening {file.Name} with {editorViewModel.GetType().Name}");
             editorViewModel.MainFile = file;

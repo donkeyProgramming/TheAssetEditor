@@ -54,11 +54,16 @@ namespace CommonControls.Services.ToolCreation
 
         public ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel
         {
+            // TODO: REMOVE DEGUGGIN
+            //Console.WriteLine("ToolFactory.Create<ViewModel>()--------------------");
             return (ViewModel)CreateEditorInternal(typeof(ViewModel));
         }
 
         public IEditorViewModel Create(string fullFileName, bool useDefaultTool = false)
         {
+            // TODO: REMOVE DEGUGGIN
+            //Console.WriteLine("ToolFactory.Create(string, bool)--------------------");
+
             var allEditors = GetAllPossibleEditors(fullFileName);
 
             if (allEditors.Count == 0)
@@ -85,15 +90,28 @@ namespace CommonControls.Services.ToolCreation
 
         IEditorViewModel CreateEditorInternal(Type editorType)
         {
+            // TODO: REMOVE
+            //Console.WriteLine("ToolFactory.CreateEditorInternal(Type)--------------------");
+
+            // TODO: REMOVE
+            //Console.WriteLine("About to call CreateScope()");
             var scope = _rootProvider.CreateScope();
+
+            // TODO: REMOVE
+            //Console.WriteLine($"About to call GetRequiredService({editorType})");
             var instance = scope.ServiceProvider.GetRequiredService(editorType) as IEditorViewModel;
 
+            // TODO: REMOVE
+            //Console.WriteLine($"Resolverhint stuff-----");
             var scopeResolverHint = instance as IEditorScopeResolverHint;
             if (scopeResolverHint != null)
             {
                 var solver = scope.ServiceProvider.GetRequiredService(scopeResolverHint.GetScopeResolverType) as IScopeHelper;
                 solver.ResolveGlobalServices(scope.ServiceProvider);
             }
+
+            // TODO: REMOVE
+            //Console.WriteLine("About to call   _scopeRepository.Add()");
 
             _scopeRepository.Add(instance, scope);
             return instance;

@@ -1,7 +1,7 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Monogame.WpfInterop.Common;
+using System;
 using View3D.Commands;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -115,17 +115,8 @@ namespace View3D.Components.Gizmo
 
         public override void Update(GameTime gameTime)
         {
-            var selectionMode = _selectionManager.GetState().Mode;
-            switch (selectionMode)
-            {
-                case GeometrySelectionMode.Object:
-                case GeometrySelectionMode.Face:
-                case GeometrySelectionMode.Vertex:
-                case GeometrySelectionMode.Bone:
-                    break;
-                default:
-                    return;
-            }
+            if (!(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex))
+                return;
 
             if (!_isEnabled)
                 return;
@@ -162,19 +153,8 @@ namespace View3D.Components.Gizmo
 
         public override void Draw(GameTime gameTime)
         {
-            var selectionMode = _selectionManager.GetState().Mode;
-
-            switch (selectionMode)
-            {
-                case GeometrySelectionMode.Object:
-                case GeometrySelectionMode.Face:
-                case GeometrySelectionMode.Vertex:
-                case GeometrySelectionMode.Bone:
-                    break;
-                default:
-                    return;
-            }
-
+            if (!(_selectionManager.GetState().Mode == GeometrySelectionMode.Object || _selectionManager.GetState().Mode == GeometrySelectionMode.Vertex))
+                return;
             if (!_isEnabled)
                 return;
 

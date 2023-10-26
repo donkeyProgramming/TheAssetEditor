@@ -1,5 +1,4 @@
 ﻿using CommonControls.Common.MenuSystem;
-using CommonControls.Events.UiCommands;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using System.Windows.Input;
 using View3D.Services;

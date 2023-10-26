@@ -9,8 +9,8 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews
     public partial class FbxFileInfoPanelView : UserControl
     {
         public FbxFileInfoPanelView()
-        {
-            InitializeComponent();
+        {           
+            InitializeComponent();            
             UpdateLayout();
         }
     }
