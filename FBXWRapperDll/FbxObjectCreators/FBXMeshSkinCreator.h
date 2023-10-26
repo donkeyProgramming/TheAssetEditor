@@ -96,22 +96,24 @@ namespace wrapdll
         static void AddWeghts(const PackedMesh& inMesh, std::vector<BoneInfo>& bones, std::vector<fbxsdk::FbxCluster*>& meshClusters)
         {     
 
-            std::map<std::string, int> boneNameMap;
+std::map<std::string, int> boneNameMap;
             
-            for (int i = 0; i < bones.size(); i++)
-            {
-                boneNameMap[bones[i].name] = bones[i].id;
-            }           
+for (int i = 0; i < bones.size(); i++)
+{
+    boneNameMap[bones[i].name] = bones[i].id;
+}           
 
 ;           for (size_t i = 0; i < inMesh.vertexWeights.size(); i++)
-            {
-                float weight = inMesh.vertexWeights[i].weight;
-                int vertexIndex = inMesh.vertexWeights[i].vertexIndex;
-                //int bondeIndex = FBXSkinHelperUtil::IndexOfBoneName(bones, inMesh.vertexWeights[i].boneName);
-                int bondeIndex = boneNameMap[inMesh.vertexWeights[i].boneName];
+{
+    float weight = inMesh.vertexWeights[i].weight;
+    int vertexIndex = inMesh.vertexWeights[i].vertexIndex;                
+    int bondeIndex = boneNameMap[inMesh.vertexWeights[i].boneName];
 
-                meshClusters[bondeIndex]->AddControlPointIndex(vertexIndex, weight);
-            }
+    // the old way of getting Bone Index
+    //int bondeIndex = FBXSkinHelperUtil::IndexOfBoneName(bones, inMesh.vertexWeights[i].boneName);
+
+    meshClusters[bondeIndex]->AddControlPointIndex(vertexIndex, weight);
+}
         }
 
         static void InitClusters(std::vector<fbxsdk::FbxCluster*>& meshClusters, std::vector<BoneInfo>& bones, fbxsdk::FbxScene* poFbxScene, const PackedMesh& inMesh, std::vector<fbxsdk::FbxNode*>& boneNodes)
