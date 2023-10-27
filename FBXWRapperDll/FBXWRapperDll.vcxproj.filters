@@ -120,6 +120,9 @@
     <ClInclude Include="libs\meshopt\meshoptimizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FbxObjectCreators\FbxMaterialCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dll\dllmain.cpp">
@@ -228,6 +231,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="libs\meshopt\stripifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FbxObjectCreators\FbxMaterialCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

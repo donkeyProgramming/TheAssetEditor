@@ -10,7 +10,20 @@
 
 namespace wrapdll
 {
-    
+
+    class IFbxSkinCreator
+    {
+        static bool CreateFbxSkin(
+            fbxsdk::FbxScene* poFbxScene,
+            fbxsdk::FbxNode* pFbxNodeMesh,
+            const PackedMesh& inMesh,
+            SceneContainer& sceneContainer)
+        {
+
+
+        };
+    };
+
     class FBXMeshSkinCreator
     {
     public:
@@ -21,9 +34,8 @@ namespace wrapdll
             SceneContainer& sceneContainer)
         {
             using namespace fbxsdk;
-                        
-            auto timerLogger = TimeLogAction::PrintStart("Making Skinning for mesh: " + inMesh.meshName);
-			//ImplLog::LogActionTimedBegin("Doing FbxSkin...");
+
+            auto timedLogger = TimeLogAction::PrintStart("Making Skinning for mesh: " + inMesh.meshName);
 
             if (!ErrorChecking::CheckParamsAndLog(poFbxScene, pFbxNodeMesh))
             {
@@ -32,11 +44,9 @@ namespace wrapdll
 
             auto& bones = sceneContainer.GetBones();
             auto& boneNodes = sceneContainer.GetFbxBoneNodes();
-            
-            auto pMesh = pFbxNodeMesh->GetMesh();
+            auto poMesh = pFbxNodeMesh->GetMesh();
 
             std::vector<fbxsdk::FbxCluster*> meshClusters;
-
             InitClusters(meshClusters, bones, poFbxScene, inMesh, boneNodes);
 
             // run trough all vertices
@@ -44,28 +54,27 @@ namespace wrapdll
 
             // asign global matrices to clusters (cluster = bone)
             AssignGeomtry(pFbxNodeMesh, meshClusters, boneNodes);
-                        
-            auto pSkin = fbxsdk::FbxSkin::Create(poFbxScene, ("Skin--"+inMesh.meshName).c_str());
-            FillFbxSkin(meshClusters, pSkin, inMesh);            
+
+            auto pSkin = fbxsdk::FbxSkin::Create(poFbxScene, ("Skin--" + inMesh.meshName).c_str());
+            FillFbxSkin(meshClusters, pSkin, inMesh);
 
             fbxsdk::FbxGeometry* lPatchAttribute = (fbxsdk::FbxGeometry*)pFbxNodeMesh->GetNodeAttribute();
-            
+
             // add this set of influences to that mesh
-            auto indexOfAddedDeformer = pMesh->AddDeformer(pSkin);
-            auto indexOfAddedDeformer2 = pMesh->AddDeformer(nullptr);            
-            
-            timerLogger.PrintDone();
+            auto indexOfAddedDeformer = poMesh->AddDeformer(pSkin);
+
+            timedLogger.PrintDone();
 
             return true;
         }
 
 
 
-       
+
 
 
         static bool FillFbxSkin(std::vector<fbxsdk::FbxCluster*>& meshClusters, fbxsdk::FbxSkin* pSkin, const PackedMesh& inMesh)
-        {                   
+        {
             for (size_t clusterIndex = 0; clusterIndex < meshClusters.size(); clusterIndex++)
             {
                 auto bAddClusterResult = pSkin->AddCluster(meshClusters[clusterIndex]);
@@ -74,13 +83,13 @@ namespace wrapdll
                 {
                     return LogActionError("Adding clust failed for mesh: " + inMesh.meshName);
                 }
-            }    
+            }
 
-			return true;
+            return true;
         }
 
         static void AssignGeomtry(fbxsdk::FbxNode* pMeshNode, std::vector<fbxsdk::FbxCluster*>& meshClusters, std::vector<fbxsdk::FbxNode*>& boneNodes)
-        {                   
+        {
 
             FbxAMatrix lXMatrixStatic = pMeshNode->EvaluateGlobalTransform();
             auto DEBUG__EMPTY_CLUSTERS = 0; // TODO: remove
@@ -94,31 +103,29 @@ namespace wrapdll
         }
 
         static void AddWeghts(const PackedMesh& inMesh, std::vector<BoneInfo>& bones, std::vector<fbxsdk::FbxCluster*>& meshClusters)
-        {     
+        {
+            auto timedLoggerMsg = TimeLogAction::PrintStart("Adding weights to mesh: " + inMesh.meshName);                      
 
-std::map<std::string, int> boneNameMap;
-            
-for (int i = 0; i < bones.size(); i++)
-{
-    boneNameMap[bones[i].name] = bones[i].id;
-}           
+            std::map<std::string, int> boneNameMap;
+            for (int boneIndex = 0; boneIndex < bones.size(); boneIndex++)
+            {
+                boneNameMap[tools::toLower(bones[boneIndex].name)] = bones[boneIndex].id;                
+            }
 
-;           for (size_t i = 0; i < inMesh.vertexWeights.size(); i++)
-{
-    float weight = inMesh.vertexWeights[i].weight;
-    int vertexIndex = inMesh.vertexWeights[i].vertexIndex;                
-    int bondeIndex = boneNameMap[inMesh.vertexWeights[i].boneName];
+            for (size_t vertexWeightIndex = 0; vertexWeightIndex < inMesh.vertexWeights.size(); vertexWeightIndex++)
+            {
+                float weight = inMesh.vertexWeights[vertexWeightIndex].weight;
+                int vertexIndex = inMesh.vertexWeights[vertexWeightIndex].vertexIndex;
+                int bondeIndex = boneNameMap[tools::toLower(inMesh.vertexWeights[vertexWeightIndex].boneName)];
 
-    // the old way of getting Bone Index
-    //int bondeIndex = FBXSkinHelperUtil::IndexOfBoneName(bones, inMesh.vertexWeights[i].boneName);
+                meshClusters[bondeIndex]->AddControlPointIndex(vertexIndex, weight);
+            }
 
-    meshClusters[bondeIndex]->AddControlPointIndex(vertexIndex, weight);
-}
+            timedLoggerMsg.PrintDone();
         }
 
         static void InitClusters(std::vector<fbxsdk::FbxCluster*>& meshClusters, std::vector<BoneInfo>& bones, fbxsdk::FbxScene* poFbxScene, const PackedMesh& inMesh, std::vector<fbxsdk::FbxNode*>& boneNodes)
-        {     
-
+        {
             meshClusters.resize(bones.size());
             for (size_t clusterIndex = 0; clusterIndex < bones.size(); clusterIndex++)
             {

@@ -5,6 +5,7 @@
 #include "..\FbxObjectCreators\FbxMeshCreator.h"
 #include "..\FbxObjectCreators\FBXSkeletonFactory.h"
 #include "..\FbxObjectCreators\FBXMeshSkinCreator.h"
+#include "..\FbxObjectCreators\FbxMaterialCreator.h"
 #include "..\HelperUtils\FBXHelperFileUtil.h"
 
 #pragma once
@@ -15,12 +16,10 @@ namespace wrapdll
     public:
         virtual fbxsdk::FbxScene* CreateFbxScene(fbxsdk::FbxManager* poSdkManager, SceneContainer& sceneContainer) = 0;
 
-    public:
-        fbxsdk::FbxScene* GetScene() { return m_poFbxScene; };
+    
     protected:
-        fbxsdk::FbxScene* m_poFbxScene = nullptr;;
+        fbxsdk::FbxScene* m_poFbxScene = nullptr;
     };
-
 
     class FbxSceneCreator : public IFbxSceneCreator
     {
@@ -28,15 +27,16 @@ namespace wrapdll
         fbxsdk::FbxScene* CreateFbxScene(fbxsdk::FbxManager* poSdkManager, SceneContainer& sceneContainer) override
         {
             auto timerLogger = TimeLogAction::PrintStart("Making Scene");
+
             m_poFbxScene = FBXHelperFileUtil::CreateFbxScene(poSdkManager);
             SetUnits(sceneContainer);
 
             if (sceneContainer.HasSkeleton()) {
                 FBXSkeletonFactory::CreateSkeleton(m_poFbxScene, sceneContainer);
+                AddSkeletonIdNode(sceneContainer);
             }
 
             AddMeshes(sceneContainer);
-
             FBXSkinHelperUtil::StoreBindPose_ChildrenOfRootNode(m_poFbxScene);
 
             timerLogger.PrintDone();
@@ -52,29 +52,41 @@ namespace wrapdll
         }
 
         void AddMeshes(SceneContainer& sceneContainer)
-        {
-            FbxMeshCreatorUnindexed fbxMeshCreator;
+        {            
+            FbxMaterialPhongCreator materialCreator;
+            FbxMeshUnindexedCreator unindexedMeshCreator;
 
             for (auto& inPackedMesh : sceneContainer.GetMeshes())
             {
-                // create unindex mesh from the input meshes in the SceneContainer
+                // create unindexed mesh from the input meshes in the SceneContainer
+                auto poFbxMesh = unindexedMeshCreator.Create(m_poFbxScene, inPackedMesh, sceneContainer);
 
-                auto poFbxMesh = FbxMeshCreatorUnindexed().Create(m_poFbxScene, inPackedMesh, sceneContainer);
-                auto poFbxNode_Mesh = fbxsdk::FbxNode::Create(m_poFbxScene, inPackedMesh.meshName.c_str());
-                poFbxNode_Mesh->SetNodeAttribute(poFbxMesh);
+                auto poFbxNode = fbxsdk::FbxNode::Create(m_poFbxScene, inPackedMesh.meshName.c_str());                
+                poFbxNode->SetNodeAttribute(poFbxMesh);
 
-                // TODO: REMOVE
-                auto DEBUG_beforePoseCount = m_poFbxScene->GetPoseCount();
-
-                if (sceneContainer.HasSkeleton())
-                {
-                    FBXMeshSkinCreator::AddAddSkinningToFbxMesh(m_poFbxScene, poFbxNode_Mesh, inPackedMesh, sceneContainer);
+                auto poFbxMaterial = materialCreator.CreateMaterial(m_poFbxScene, inPackedMesh.meshName);                                             
+                poFbxNode->AddMaterial(poFbxMaterial);
+                                
+                if (sceneContainer.HasSkeleton())  {
+                    FBXMeshSkinCreator::AddAddSkinningToFbxMesh(m_poFbxScene, poFbxNode, inPackedMesh, sceneContainer);
                 }
-
-                auto DEBUG_afterPoseCount = m_poFbxScene->GetPoseCount();
-                // add MeshNode to root node
-                m_poFbxScene->GetRootNode()->AddChild(poFbxNode_Mesh);
+                
+                m_poFbxScene->GetRootNode()->AddChild(poFbxNode);
             }
+        }
+
+        void AddSkeletonIdNode(const SceneContainer& sceneContainer)
+        {
+            if (!sceneContainer.HasSkeleton()) {
+                return;
+            }
+
+            const std::string nodePrefix = "skeleton//";
+            auto poFbxNode = fbxsdk::FbxNode::Create(m_poFbxScene, (nodePrefix + sceneContainer.GetSkeletonName()).c_str());
+            auto poFbxSkeleton = fbxsdk::FbxSkeleton::Create(m_poFbxScene, "");
+            poFbxNode->SetNodeAttribute(poFbxSkeleton);
+
+            m_poFbxScene->GetRootNode()->AddChild(poFbxNode);
         }
 
         // TODO: remove?

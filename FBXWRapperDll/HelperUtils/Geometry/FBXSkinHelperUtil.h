@@ -103,6 +103,7 @@ namespace wrapdll
                     }
                 }
             }
+
             // Now create a bind pose with the link list
             if (lClusteredFbxNodes.GetCount())
             {

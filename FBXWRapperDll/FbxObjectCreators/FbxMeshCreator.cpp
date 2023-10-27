@@ -3,7 +3,7 @@
 using namespace wrapdll;
 using namespace fbxsdk;
 
-fbxsdk::FbxMesh* FbxMeshCreatorUnindexed::Create(
+fbxsdk::FbxMesh* FbxMeshUnindexedCreator::Create(
     fbxsdk::FbxScene* poFbxScene,
     const PackedMesh& inMesh,
     SceneContainer& sceneContainer)
@@ -18,7 +18,7 @@ fbxsdk::FbxMesh* FbxMeshCreatorUnindexed::Create(
     return m_poFbxMesh;
 }
 
-bool FbxMeshCreatorUnindexed::InitFbxMesh(fbxsdk::FbxScene* poFbxScene, const PackedMesh& inMesh)
+bool FbxMeshUnindexedCreator::InitFbxMesh(fbxsdk::FbxScene* poFbxScene, const PackedMesh& inMesh)
 {
     auto localPrinter = TimeLogAction::PrintStart("Creating FbxMesh: " + inMesh.meshName);
     m_poFbxMesh = fbxsdk::FbxMesh::Create(poFbxScene, inMesh.meshName.c_str());
@@ -34,7 +34,7 @@ bool FbxMeshCreatorUnindexed::InitFbxMesh(fbxsdk::FbxScene* poFbxScene, const Pa
     return true;
 }
 
-bool FbxMeshCreatorUnindexed::SetControlPoints(const PackedMesh& inMesh, double scaleFactor)
+bool FbxMeshUnindexedCreator::SetControlPoints(const PackedMesh& inMesh, double scaleFactor)
 {
     m_poFbxMesh->InitControlPoints(static_cast<int>(inMesh.vertices.size()));
     FbxVector4* pControlPointArray = m_poFbxMesh->GetControlPoints();
@@ -51,7 +51,7 @@ bool FbxMeshCreatorUnindexed::SetControlPoints(const PackedMesh& inMesh, double 
     return true;
 }
 
-bool FbxMeshCreatorUnindexed::SetNormalVectors(const PackedMesh& inMesh)
+bool FbxMeshUnindexedCreator::SetNormalVectors(const PackedMesh& inMesh)
 {
     fbxsdk::FbxGeometryElementNormal* pGeometryElementNormal = m_poFbxMesh->CreateElementNormal();
     if (!pGeometryElementNormal)
@@ -83,7 +83,7 @@ bool FbxMeshCreatorUnindexed::SetNormalVectors(const PackedMesh& inMesh)
     return true;
 }
 
-bool FbxMeshCreatorUnindexed::SetTextureCoords(const PackedMesh& inMesh)
+bool FbxMeshUnindexedCreator::SetTextureCoords(const PackedMesh& inMesh)
 {
     // Create UV map 0 storagae element element, 
     // TODO: look into, is string name significant?    
@@ -111,7 +111,7 @@ bool FbxMeshCreatorUnindexed::SetTextureCoords(const PackedMesh& inMesh)
     return true;
 }
 
-bool FbxMeshCreatorUnindexed::SetPolygonFaces(const PackedMesh& inMesh)
+bool FbxMeshUnindexedCreator::SetPolygonFaces(const PackedMesh& inMesh)
 {
     for (int i = 0; i < inMesh.indices.size() / 3; i++)
     {

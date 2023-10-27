@@ -7,11 +7,7 @@ using CommonControls.Services;
 using AssetManagement.Strategies.Fbx.ImportDialog.ViewModels;
 using AssetManagement.AssetBuilders;
 
-<<<<<<<< HEAD:AssetManagment/Strategies/Fbx/Importers/FbxAssetImporter.cs
-namespace AssetManagement.Strategies.Fbx.Importers
-========
 namespace AssetManagement.Strategies.Fbx.AssetHandling
->>>>>>>> Working-on-Export-Stuff:AssetManagment/Strategies/Fbx/FbxAssetHandling/FbxAssetImporter.cs
 {
     public class FbxAssetImporter : IAssetImporter
     {
@@ -26,7 +22,7 @@ namespace AssetManagement.Strategies.Fbx.AssetHandling
 
         public PackFile ImportAsset(string diskFilePath)
         {
-            var sceneContainer = SceneImporter.LoadScene(diskFilePath);
+            var sceneContainer = SceneLoader.LoadScene(diskFilePath);
             if (sceneContainer == null)
                 return null;
 

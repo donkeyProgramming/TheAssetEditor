@@ -37,48 +37,29 @@ namespace wrapdll
         // TODO: make make the result the RETURN VALUE, and the input "srcMesh"?
         static void DoMeshIndexingWithTangentSmoothing(PackedMesh& destMesh)
         {
-
             std::vector<PackedCommonVertex> outVertices;
             std::vector<uint32_t> outIndices;
             std::vector<int> outVertexIndexRemap; // index = old index, value = new value            
 
-            // TODO: Which version is ACTUALLY faster??
-            DoMeshIndexingWithTangenSmoothing_Fast(destMesh.vertices, outVertices, outIndices, outVertexIndexRemap);
-
-
+            // TODO: Decide Which version is ACTUALLY faster??
+            // TODO: Bade Name! Sacrifice speed: Split this up in several methods(loops)?
+            DoMeshIndexingWithTangenSmoothing_OutPutRemap_Fast(destMesh.vertices, outVertices, outIndices, outVertexIndexRemap);
 
             std::vector<VertexWeight> outVertexWeights;
-
             RemapVertexWeights(destMesh.vertexWeights, outVertexWeights, outVertexIndexRemap);
-
-            // TODO: place it its own method
-            // remap vertex weights, so they match the new indexed Mesh
-            //for (size_t i = 0; i < destMesh.vertexWeights.size(); i++) // run through all old vertexweights
-            //{
-            //    // TODO: if the vertex pointed to still exist in the buffer ( indicted remap[index] != -), continue, remap and include in output
-            //    if (outVertexIndexRemap[destMesh.vertexWeights[i].vertexIndex] != VERTEX_DISCARDED)
-            //    {
-
-            //        auto tempVertexWeight = destMesh.vertexWeights[i];
-
-            //        // remap the index, 
-            //        tempVertexWeight.vertexIndex = outVertexIndexRemap[destMesh.vertexWeights[i].vertexIndex]; 
-            //        
-            //        outVertexWeights.push_back(tempVertexWeight);
-            //    }
-            //}
 
             destMesh.vertices = outVertices;
             destMesh.indices = outIndices;
             destMesh.vertexWeights = outVertexWeights;
 
-            // TODO: debuging: is there at least 1 weight for every vertex
-            for (size_t i = 0; i < destMesh.vertices.size(); i++)
+            // TODO: debuging: decide if this check needed, to say in forever? 
+            // -- Is there at least 1 weight for every vertex
+            for (size_t vertexIndex = 0; vertexIndex < destMesh.vertices.size(); vertexIndex++)
             {
                 bool bThereIsAWeight = false;
-                for (auto& v : outVertexWeights) // check all indexes, to see if there is one for "this" vertex
+                for (auto& vertexWeight : outVertexWeights) // check all weighs, check is there is a weight for the current vertex
                 {
-                    if (v.vertexIndex == i)
+                    if (vertexWeight.vertexIndex == vertexIndex)
                     {
                         bThereIsAWeight = true;
                     }
@@ -87,11 +68,9 @@ namespace wrapdll
                 if (!bThereIsAWeight)
                 {
                     auto DEBUG_BREAK = 1;
-                    LogActionError("Invalid Vertex Weights for mesh: " + destMesh.meshName + ", weights for 1 or vertex are missing!");
+                    LogActionError("Invalid Vertex Weights for mesh: " + destMesh.meshName + "a vertex has not weight");
                 }
             }
-
-            auto DEBUG_BREAK = 1;
         }
 
         static void ComputeTangentBasisForUnindexedMesh(
@@ -101,8 +80,7 @@ namespace wrapdll
             const std::vector<sm::Vector3>& normals,
             // outputs
             std::vector<sm::Vector3>& tangents,
-            std::vector<sm::Vector3>& bitangents
-        )
+            std::vector<sm::Vector3>& bitangents)
         {
             for (unsigned int i = 0; i < vertices.size(); i += 3) {
                 // Shortcuts for vertices
@@ -321,7 +299,7 @@ namespace wrapdll
             }
         }
 
-        static inline void DoMeshIndexingWithTangenSmoothing_Fast(
+        static inline void DoMeshIndexingWithTangenSmoothing_OutPutRemap_Fast(
             const std::vector<PackedCommonVertex>& inVertices,
             std::vector<PackedCommonVertex>& outVertices,
             std::vector<uint32_t>& outIndices,

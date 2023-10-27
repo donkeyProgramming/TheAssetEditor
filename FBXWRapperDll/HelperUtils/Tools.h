@@ -33,11 +33,25 @@ namespace std
 
 namespace tools
 {    
+    static bool CompareCharsNoCase(char a, char b)
+    {
+        return std::tolower(static_cast<unsigned char>(a)) ==
+            std::tolower(static_cast<unsigned char>(b));
+    }
+
+    static bool CompareStringNoCase(const std::string& a, const std::string& b)
+    {
+        return 
+            a.size() == b.size() &&
+            std::equal(a.begin(), a.end(), b.begin(), CompareCharsNoCase);
+    }
+
+
 	static std::string toLower(const std::string& _strInput)
 	{
-		std::string strOut = _strInput;
+		std::string strOut(_strInput.size(), ' ');
 
-		std::transform(strOut.begin(), strOut.end(), strOut.begin(), ::tolower);
+		std::transform(_strInput.begin(), _strInput.end(), strOut.begin(), ::tolower);
 
 		return strOut;
 	}

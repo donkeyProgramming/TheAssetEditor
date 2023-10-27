@@ -13,7 +13,7 @@
 class IVadlidator
 {
 public:
-    virtual bool IsValid() = 0;
+    virtual bool IsValid() const = 0;
 };
 
 namespace wrapdll
@@ -25,7 +25,7 @@ namespace wrapdll
         std::vector <BoneInfo> m_bones;
         std::vector<fbxsdk::FbxNode*> m_fbxBoneNodes;
 
-        bool IsValid() override
+        bool IsValid() const override
         {
             return m_skeletonName != "" && m_bones.size();
         }
@@ -68,10 +68,8 @@ namespace wrapdll
         std::vector<fbxsdk::FbxNode*>& GetFbxBoneNodes() { return m_skeletonInfo.m_fbxBoneNodes; };
         const std::vector<fbxsdk::FbxNode*>& GetFbxBoneNodes() const { return m_skeletonInfo.m_fbxBoneNodes; };
 
-        std::string& GetSkeletonName()
-        {
-            return m_skeletonInfo.m_skeletonName;
-        };
+        std::string& GetSkeletonName() { return m_skeletonInfo.m_skeletonName; };
+        const std::string& GetSkeletonName() const { return m_skeletonInfo.m_skeletonName; };
 
         void SetSkeletonName(const std::string& skeletonName)
         {
@@ -93,11 +91,13 @@ namespace wrapdll
             m_processingDistanceScaleFactory = value;
         };
         
-        bool IsValid() override { 
+        bool IsValid() const override { 
             return m_packedMeshes.size() > 0; 
         }        
 
-        bool HasSkeleton() { return m_skeletonInfo.IsValid(); };
+        bool HasSkeleton() const { 
+            return m_skeletonInfo.IsValid(); 
+        };
 
     private:
         bool MeshIndexErrorCheckAndLog(int meshIndex);

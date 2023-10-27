@@ -175,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ErrorCkecking\ErrorChecking.h" />
+    <ClInclude Include="FbxObjectCreators\FbxMaterialCreator.h" />
     <ClInclude Include="FBXServices\SceneExporter\FBXSceneExporterService.h" />
     <ClInclude Include="HelperUtils\Geometry\FBXSkinHelperUtil.h" />
     <ClInclude Include="Dll\DLLDefines.h" />
@@ -208,6 +209,7 @@
   <ItemGroup>
     <ClCompile Include="Dll\dllmain.cpp" />
     <ClCompile Include="DataStructures\FileInfoData.cpp" />
+    <ClCompile Include="FbxObjectCreators\FbxMaterialCreator.cpp" />
     <ClCompile Include="FBXServices\SceneExporter\FBXSceneExporterService.cpp" />
     <ClCompile Include="HelperUtils\Geometry\FBXSkinHelperUtil.cpp" />
     <ClCompile Include="FbxObjectCreators\FbxSceneCreator.cpp" />

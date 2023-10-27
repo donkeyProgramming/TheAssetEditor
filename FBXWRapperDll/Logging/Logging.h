@@ -133,8 +133,8 @@ public:
     static TimeLogAction PrintStart(const std::string& _strMsg)
     {         
         TimeLogAction newInstance;
-        newInstance.m_message = _strMsg;
-        ImplLog::LogSimpleWithColor(prefix + newInstance.m_message + "\n", BG_BLACK | FG_WHITE);
+        newInstance.m_message = _strMsg + "...";
+        ImplLog::LogSimpleWithColor(prefix + newInstance.m_message, BG_BLACK | FG_WHITE);
         
         return newInstance;
     };
@@ -142,10 +142,10 @@ public:
     void PrintDone(const std::string& _strMsg = "")
     {
         auto messageToShow = _strMsg.empty() ? m_message + ": Done." : _strMsg;
-        ImplLog::LogSimpleWithColor(prefix +  messageToShow + "\n", BG_BLACK | FG_WHITE);
+        ImplLog::LogSimpleWithColor(prefix +  messageToShow, BG_BLACK | FG_WHITE);
         auto timeElapsedMessageString = "Time Elapsed: " + std::to_string(m_clock.GetLocalTime()) + " seconds\n";
 
-        ImplLog::LogSimpleWithColor(timeElapsedMessageString + "\n", BG_BLACK | FG_GREEN);
+        ImplLog::LogSimpleWithColor(timeElapsedMessageString, BG_BLACK | FG_GREEN);
     };
 
     tools::SystemClock & GetClock() { return m_clock; };
@@ -155,7 +155,6 @@ private:
     tools::SystemClock m_clock;
     static constexpr char prefix[] = "[FBX SDK wrapper dll:] ";
     std::string m_message = "";
-
 };
 
 

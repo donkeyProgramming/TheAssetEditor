@@ -25,7 +25,7 @@ namespace wrapdll
          fbxsdk::FbxMesh* m_poFbxMesh;
     };
     
-    class FbxMeshCreatorUnindexed : public IFbxMeshCreator    
+    class FbxMeshUnindexedCreator : public IFbxMeshCreator    
     {
     public:
          fbxsdk::FbxMesh* Create(
