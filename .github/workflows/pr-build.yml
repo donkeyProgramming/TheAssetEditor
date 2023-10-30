@@ -1,29 +1,18 @@
+name: Compile Spark
+
 on:
-    pull_request:
-        branches:
-            - master
-   
+  workflow_dispatch:
+
 jobs:
-  build:
+  windows:
+    name: run on windows
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '3.1.x'
-
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
-
-      - name: Build
-        shell: pwsh
-        run: |
-          dotnet restore
-          MSBuild.exe AssetEditor.sln
-
-    
-
-
-
-
-              
+    - uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1.4.1
+    - name: compile
+      run: |
+        MSUILD "..\..\FBXWRapperDll\FBXWRapperDll.vcxproj\FBXWRapperDll\FBXWRapperDll.vcxproj"
+        
+        
+          
