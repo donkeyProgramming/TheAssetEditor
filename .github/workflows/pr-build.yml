@@ -1,16 +1,47 @@
-name: C/C++ CI
+name: Compile Spark
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
-  wind-build:
+  windows:
+    name: run on windows
     runs-on: windows-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2.0.0
-    - name: Build project
-      uses: nicledomaS/cmake_build_action@v1.4
+    - uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1.4.1
+    - name: compile
+      run: | 
+        cl main.cpp /Fe:spark /std:c++latest
+    - name: run
+      run: |
+        spark.exe test.spark
+      shell: cmd
+    - name: upload executable
+      uses: actions/upload-artifact@v2
       with:
-        submodule_update: ON
-        run_tests: ON
-        unit_test_build: -Dtest=ON
+        name: windows
+        path: |
+          spark.exe
+  mac-and-ubuntu:
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    name: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v2
+      - name: compile
+        run: |
+          g++ -std=c++17 main.cpp -o spark
+      - name: run
+        run: |
+          ./spark test.spark
+        shell: bash
+      - name: upload executable
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{matrix.os}}
+          path: |
+            spark
+          
