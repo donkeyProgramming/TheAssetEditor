@@ -1,18 +1,16 @@
-name: Compile Spark
+name: C/C++ CI
 
-on:
-  workflow_dispatch:
+on: [push]
 
 jobs:
-  windows:
-    name: run on windows
+  wind-build:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: ilammy/msvc-dev-cmd@v1.4.1
-    - name: compile
-      run: |
-        MSBUILD "..\..\FBXWRapperDll\FBXWRapperDll.vcxproj\FBXWRapperDll\FBXWRapperDll.vcxproj"
-        
-        
-          
+    - name: Checkout
+      uses: actions/checkout@v2.0.0
+    - name: Build project
+      uses: nicledomaS/cmake_build_action@v1.4
+      with:
+        submodule_update: ON
+        run_tests: ON
+        unit_test_build: -Dtest=ON
