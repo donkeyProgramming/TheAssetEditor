@@ -60,7 +60,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KitbasherTests", "Testing\K
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssetManagement", "AssetManagment\AssetManagement.csproj", "{F821EDE4-1B37-44C5-A2A2-779E7E206BC3}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{12992538-0EC3-42AE-94AB-560FAEBE2DF4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github Actions Workflow", "Github Actions Workflow", "{12992538-0EC3-42AE-94AB-560FAEBE2DF4}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\pr-build.yml = .github\workflows\pr-build.yml
 		.github\workflows\pr-test.yml = .github\workflows\pr-test.yml
