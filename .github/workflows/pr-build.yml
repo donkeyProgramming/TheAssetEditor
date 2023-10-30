@@ -3,7 +3,7 @@ on:
         branches:
             - master
 jobs:
-    build:
+    build_cpp:
         name: Build Application
         runs-on: windows-latest
         steps:
@@ -11,6 +11,7 @@ jobs:
               uses: microsoft/setup-msbuild@v1.1
 
             - name: Build app for release
-              run: msbuild ExternalProjects\FBXWRapperDll\FBXWRapperDll.vcxproj -t:rebuild -verbosity:diag -property:Configuration=Release
+              run: msbuild "..\FBXWRapperDll\FBXWRapperDll.vcxproj" -t:rebuild -verbosity:diag -property:Configuration=Release
 
+  
               
