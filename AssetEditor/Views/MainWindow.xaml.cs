@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AssetManagement.Strategies.Fbx.ExportDIalog;
 
 namespace AssetEditor.Views
 {
@@ -15,9 +16,13 @@ namespace AssetEditor.Views
         Point _lastMouseDown;
         IEditorViewModel draggedItem;
 
+
+
         public MainWindow()
         {
             InitializeComponent();
+
+            
 
             //System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);

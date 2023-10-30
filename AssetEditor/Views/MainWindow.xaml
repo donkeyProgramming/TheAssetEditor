@@ -167,5 +167,6 @@
             </StatusBarItem>
         </StatusBar>
   
-    </Grid>
+    </Grid>   
+    
 </Window>

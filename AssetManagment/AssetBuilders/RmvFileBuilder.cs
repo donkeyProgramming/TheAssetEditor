@@ -24,6 +24,10 @@ namespace AssetManagement.AssetBuilders
         /// <returns>Internal RMV2 file class</returns>
         public static RmvFile ConvertToRmv2(List<PackedMesh> packedMeshes, AnimationFile skeletonFile)
         {
+
+          
+
+
             var materialFactory = MaterialFactory.Create();
 
             var lodCount = 4; // make 4 identical LODs for compatibility reasons

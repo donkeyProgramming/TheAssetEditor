@@ -7,8 +7,10 @@ jobs:
         name: Build Application
         runs-on: windows-latest
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-dotnet@v3
-              with:
-                dotnet-version: '3.1.x'
-            - run: dotnet build
+            - name: Add msbuild to PATH
+              uses: microsoft/setup-msbuild@v1.1
+
+            - name: Build app for release
+              run: msbuild FBXWRapperDll\FBXWRapperDll.vcxproj -t:rebuild -verbosity:diag -property:Configuration=Release
+
+              

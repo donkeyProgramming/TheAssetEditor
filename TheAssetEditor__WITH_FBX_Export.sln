@@ -26,6 +26,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ECAC322F-8FA4-4F98-98D5-5E18464025C7}"
 	ProjectSection(SolutionItems) = preProject
 		ActiveTodoList.txt = ActiveTodoList.txt
+		.github\workflows\pr-build.yml = .github\workflows\pr-build.yml
+		.github\workflows\pr-test.yml = .github\workflows\pr-test.yml
 		ReleaseNotes.txt = ReleaseNotes.txt
 	EndProjectSection
 EndProject
@@ -57,6 +59,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KitbasherTests", "Testing\KitbasherTests\KitbasherTests.csproj", "{4BC797DB-8731-453F-9932-84E3FDE83CA7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssetManagement", "AssetManagment\AssetManagement.csproj", "{F821EDE4-1B37-44C5-A2A2-779E7E206BC3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{12992538-0EC3-42AE-94AB-560FAEBE2DF4}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\pr-build.yml = .github\workflows\pr-build.yml
+		.github\workflows\pr-test.yml = .github\workflows\pr-test.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -152,7 +160,7 @@ Global
 		{ECAC322F-8FA4-4F98-98D5-5E18464025C7} = {FF70C4FA-A9A7-4DEC-87A3-4BF5F23EF336}
 		{70708A4D-A71A-487A-87DE-47E526F2E142} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 		{0FCB6133-32A4-4115-BD53-474C703E7B34} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
-		{F002EA23-09A0-42AE-9C5E-ADA6C1E95CC5} = {FF70C4FA-A9A7-4DEC-87A3-4BF5F23EF336}
+		{F002EA23-09A0-42AE-9C5E-ADA6C1E95CC5} = {C174C249-D109-49BE-8BC5-42A0D5DEDBDA}
 		{B9488B52-AC74-4AFC-B376-DBD1096585E4} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 		{07D79931-CE1A-4092-AA6F-634282D31DC8} = {C174C249-D109-49BE-8BC5-42A0D5DEDBDA}
 		{15AAE76D-0B83-45A2-B8AB-FD7BF38BDDC3} = {C174C249-D109-49BE-8BC5-42A0D5DEDBDA}

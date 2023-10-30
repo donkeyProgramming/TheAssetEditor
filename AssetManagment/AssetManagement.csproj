@@ -9,6 +9,12 @@
 	  <Compile Remove="AssetManagement\IAssetImporter.cs" />
 	  <Compile Remove="AssetManagement\___IAssetImporterProvider.cs" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Strategies\Fbx\ExportDIalog\UserControls\ExportInfoPanel" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Include="Strategies\Fbx\ExportDIalog\UserControls\ExportInfoPanel" />
+	</ItemGroup>
 
   <ItemGroup>    
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />

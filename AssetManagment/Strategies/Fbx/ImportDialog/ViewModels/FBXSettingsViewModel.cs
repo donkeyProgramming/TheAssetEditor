@@ -50,9 +50,9 @@ namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
         private readonly PackFileService _packFileService;
         private readonly FbxSettingsModel _inputFbxSettings; // Maybe "FileInfoDat" should store only, and FBXSettings is for "get info from dialog", not something that already contains data, or not?        
 
-        public FBXSettingsViewModel(PackFileService packFileSericcee, FbxSettingsModel fbxSettings)
+        public FBXSettingsViewModel(PackFileService packFileServicee, FbxSettingsModel fbxSettings)
         {
-            _packFileService = packFileSericcee;
+            _packFileService = packFileServicee;
             _inputFbxSettings = fbxSettings; 
             FillFileInfoPanel();
             UpdateViewData();

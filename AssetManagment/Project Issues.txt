@@ -1,0 +1,7 @@
+﻿Project Issues
+
+- Rigging issue
+almost imperticlbe "jaggednes" when RMV2 -> FBX -> RMV2 are loaded into AE an animated
+Possible reasons:
+# Weighting not assigned properly, assinged correctly between vertex and bone, but perhaps that actual weighted values are slightly off
+# The above could when the 1-4 weights PER RMV2 vertex are rolled out into 1-4x longer LINER vertex weight array on EXPORT, and then rolled back into 1-4 weight per RMV2 vertex
