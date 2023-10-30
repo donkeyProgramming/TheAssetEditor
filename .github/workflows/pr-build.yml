@@ -11,7 +11,7 @@ jobs:
               uses: microsoft/setup-msbuild@v1.1
 
             - name: Build app for release
-              run: msbuild "..\FBXWRapperDll\FBXWRapperDll.vcxproj" -t:rebuild -verbosity:diag -property:Configuration=Release
+              run: msbuild ..\..\FBXWRapperDll\FBXWRapperDll.vcxproj" -t:rebuild -verbosity:diag -property:Configuration=Release
 
   
               
