@@ -17,5 +17,4 @@
             </DockPanel>
         </Expander>
     </Grid>
-
 </UserControl>
