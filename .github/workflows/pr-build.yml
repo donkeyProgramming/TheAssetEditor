@@ -12,7 +12,7 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1.4.1
     - name: compile
       run: |
-        MSUILD "..\..\FBXWRapperDll\FBXWRapperDll.vcxproj\FBXWRapperDll\FBXWRapperDll.vcxproj"
+        MSBUILD "..\..\FBXWRapperDll\FBXWRapperDll.vcxproj\FBXWRapperDll\FBXWRapperDll.vcxproj"
         
         
           
