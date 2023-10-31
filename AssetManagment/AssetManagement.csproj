@@ -8,10 +8,6 @@
 	  <Compile Remove="AssetManagement\IAssetExportexProvider.cs" />
 	  <Compile Remove="AssetManagement\IAssetImporter.cs" />
 	  <Compile Remove="AssetManagement\___IAssetImporterProvider.cs" />
-	  <Compile Remove="Strategies\Fbx\ExportDIalog\UserControls\ExportInfoPanel.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Page Include="Strategies\Fbx\ExportDIalog\UserControls\ExportInfoPanel.cs" />
 	</ItemGroup>
 
   <ItemGroup>    

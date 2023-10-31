@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using AssetManagement.Strategies.Fbx.ExportDIalog;
+//using AssetManagement.Strategies.Fbx.ExportDIalog;
 
 namespace AssetEditor.Views
 {
@@ -16,19 +16,11 @@ namespace AssetEditor.Views
         Point _lastMouseDown;
         IEditorViewModel draggedItem;
 
-
-
         public MainWindow()
         {
-            InitializeComponent();
-
-            
-
-            //System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            InitializeComponent();                       
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
-
             Title = $"{fvi.ProductName} - {fvi.FileVersion}";
-
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)
@@ -50,6 +42,7 @@ namespace AssetEditor.Views
             }
             catch
             {
+                // TODO: huh?
             }
         }
 
