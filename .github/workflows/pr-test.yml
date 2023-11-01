@@ -3,12 +3,12 @@ on:
         branches:
             - master
 jobs:
-    test:
-        name: Test Build Application
+    pr_test:
+        name: PR Test Build DotNet Main App
         runs-on: windows-latest
         steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-dotnet@v3
-              with:
-                dotnet-version: '6.0.x'
-            - run: dotnet test
+        - uses: actions/checkout@v3
+        - uses: actions/setup-dotnet@v3
+          with:
+            dotnet-version: '6.0.x'
+        - run: dotnet
