@@ -20,6 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-dotnet@v3
+    - uses: ilammy/msvc-dev-cmd@v1.4.1    
       with:
         dotnet-version: '6.0.x'
     - run: msbuild AssetEditor\AssetEditor.csproj
