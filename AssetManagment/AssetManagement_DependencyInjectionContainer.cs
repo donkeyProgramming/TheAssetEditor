@@ -16,8 +16,8 @@ namespace AssetManagement
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<IAssetManagementFactory, AssetManagementFactory>();
-            serviceCollection.AddTransient<IAssetImporter, FbxImportExport>();
+            serviceCollection.AddScoped<IAssetImporterProvider, AssetManagementFactory>();
+            serviceCollection.AddTransient<IAssetImporter, FbxAssetImporter>();
         }
     }
 }

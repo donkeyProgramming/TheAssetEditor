@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AssetManagement.AssetHandling
 {
-    public class AssetManagementFactory : IAssetManagementFactory
+    public class AssetManagementFactory : IAssetImporterProvider
     {
         private readonly IEnumerable<IAssetImporter> _importers;
 
