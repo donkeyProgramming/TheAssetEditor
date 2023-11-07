@@ -152,6 +152,7 @@ namespace MonoGame.Framework.WpfInterop.Input
                 //}, new PointHitTestParameters(pos));
 
                 var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
+                //if (res == null) return; <-- please see: https://github.com/donkeyProgramming/TheAssetEditor/pull/90#:~:text=Monogame.WpfInterop/Input/WpfMouse.cs
                 HitTestResult result = VisualTreeHelper.HitTest(res, pos);
                 if (result?.VisualHit == _focusElement)
                     hit = true;

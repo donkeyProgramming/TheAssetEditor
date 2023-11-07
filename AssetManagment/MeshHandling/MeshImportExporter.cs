@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AssetManagement.MeshHandling
 {
-    public class AssetManagementFactory : IAssetManagementFactory
+    public class AssetManagementFactory : IAssetImporterProvider
     {
         private readonly IEnumerable<IAssetImporter> _importers;
 

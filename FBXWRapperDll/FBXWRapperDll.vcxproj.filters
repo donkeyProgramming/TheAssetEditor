@@ -57,10 +57,10 @@
     <ClInclude Include="Helpers\MS_SimpleMath\SimpleMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Processing\FBXMeshProcessor.h">
+    <ClInclude Include="Processing\MeshProcessor.h">
       <Filter>Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="FBXScene\FBXSCeneContainer.h">
+    <ClInclude Include="SceneContainer\FBXSCeneContainer.h">
       <Filter>FBXSceneContainer</Filter>
     </ClInclude>
     <ClInclude Include="Helpers\VectorConverter.h">
@@ -69,7 +69,7 @@
     <ClInclude Include="Helpers\FBXHelperFileUtil.h">
       <Filter>Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="FBXServices\FBXSceneLoaderService.h">
+    <ClInclude Include="Services\FBXSceneLoaderService.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Processing\FBXVertexCreator.h">
@@ -930,6 +930,12 @@
     <ClInclude Include="fbxsdk\include\fbxsdk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DataStructures\FileInfoData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Services\SceneLoader\FBXSceneLoaderService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -950,22 +956,25 @@
     <ClCompile Include="Logging\Logging.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
-    <ClCompile Include="FBXScene\FBXSCeneContainer.cpp">
+    <ClCompile Include="SceneContainer\FBXSCeneContainer.cpp">
       <Filter>FBXSceneContainer</Filter>
     </ClCompile>
-    <ClCompile Include="Processing\FBXMeshProcessor.cpp">
+    <ClCompile Include="Processing\MeshProcessor.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
     <ClCompile Include="Helpers\Geometry\FBXNodeSearcher.h">
       <Filter>Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="FBXServices\FBXSceneLoaderService.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Processing\FBXVertexCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Processing\FBXMeshCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataStructures\FileInfoData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Services\SceneLoader\FBXSceneLoaderService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -980,10 +989,13 @@
     <None Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.zip" />
-    <None Include="FBXScene\FBXSceneContainerGetters.inl">
+    <None Include="SceneContainer\FBXSceneContainer.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="FBXServices\FbxSceneLoaderService.inl">
+    <None Include="Services\FbxSceneLoaderService.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Services\SceneLoader\FbxSceneLoaderService.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

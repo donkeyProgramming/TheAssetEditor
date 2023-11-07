@@ -10,6 +10,7 @@
              xmlns:animationtransfertool="clr-namespace:AnimationEditor.AnimationTransferTool"
              xmlns:superview="clr-namespace:AnimationEditor.SuperView"
              xmlns:skeletoneditor="clr-namespace:AnimationEditor.SkeletonEditor"
+             xmlns:animationkeyframeeditor="clr-namespace:AnimationEditor.AnimationKeyframeEditor"
              mc:Ignorable="d" >
     <Grid>
         <Grid.ColumnDefinitions>
@@ -96,7 +97,10 @@
                             <DataTemplate DataType="{ x:Type superview:SuperViewViewModel}">
                                 <superview:EditorView />
                             </DataTemplate>
-
+                            
+                            <DataTemplate DataType="{ x:Type animationkeyframeeditor:AnimationKeyframeEditorViewModel}">
+                                <animationkeyframeeditor:EditorView  />
+                            </DataTemplate>
                         </ContentControl.Resources>
                     </ContentControl>
                 </DockPanel>

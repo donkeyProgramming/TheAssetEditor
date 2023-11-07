@@ -1,3 +1,17 @@
+PHAZER: Add support for decalling: (used for random bump, shield patterns, dirt, etc)
+    [For Older Games]
+    - Let the user switch to the desired decal RigigMaterial
+    - Let the user fiddle with the decal params
+      - The decal params in older games are in the "extra material params" (already in UI), 
+        I know how that works, so only minor changes
+      - If the user picks, says, "DecalDirtmap", some of the extra params simply change names.
+    - In the shader list there is a "Rome2/Attila" preset, which is just a copy of the qtRME one, which supports decalling
+    - that way, they user can see the decalling change in render view with each param change without any changes to UI
+
+    [For Newer Game Games]
+        Only the decal param data source (xml.material system) is different.
+
+
 [![name](https://user-images.githubusercontent.com/54080240/126827425-c6c49064-0cb7-459d-b6c2-47544f4013cd.png)](https://www.patreon.com/TheAssetEditor)
 ImageMagick
 https://github.com/dlemstra/Magick.NET
@@ -34,6 +48,13 @@ Major ideas:
 	Search window 
 
 Bugs:
+    PHAZER: .pack corruption too easy from UI .pack "empty folder". 
+    Empty folders ofc cannot exist in the .pack format, (only in the UI), but something should prevent the corruption, 
+    Solution Suggestions
+      - like RPFM, remove a folder when its last file is removed
+      - not allow user to save a .pack with empty folders, display Box "folder {name} empty, not allowed, delete or place file in folder."
+      - put a dummy (like "empty.txt") file in any empty folders, if .pack is being saved with "empty folders".
+
 	corruption detector - 	File changed outside of ass
 
 

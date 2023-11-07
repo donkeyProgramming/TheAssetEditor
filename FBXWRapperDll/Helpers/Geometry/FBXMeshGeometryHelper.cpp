@@ -1,248 +1,267 @@
 #include "FBXMeshGeometryHelper.h"
 
+#include "..\..\Logging\Logging.h"
+
+
 using namespace wrapdll;
 
 std::map<std::string, std::vector<fbxsdk::FbxVector2>> FBXMeshGeometryHelper::LoadUVInformation(FbxMesh* pMesh)
 {
-	std::map<std::string, std::vector<fbxsdk::FbxVector2>> uvMap;
+    std::map<std::string, std::vector<fbxsdk::FbxVector2>> uvMap;
 
-	std::map<int, int> test;
+    std::map<int, int> test;
 
-	//get all UV set names
-	FbxStringList uvSetNameList;
-	pMesh->GetUVSetNames(uvSetNameList);
-	auto count = pMesh->GetElementUVCount();
+    //get all UV set names
+    FbxStringList uvSetNameList;
+    pMesh->GetUVSetNames(uvSetNameList);
+    auto count = pMesh->GetElementUVCount();
 
-	//iterating over all uv sets
-	for (int uvSetIndex = 0; uvSetIndex < uvSetNameList.GetCount(); uvSetIndex++)
-	{
-		//get lUVSetIndex-th uv set
-		const char* lUVSetName = uvSetNameList.GetStringAt(uvSetIndex);
-		const FbxGeometryElementUV* pUVElement = pMesh->GetElementUV(lUVSetName);
+    //iterating over all uv sets
+    for (int uvSetIndex = 0; uvSetIndex < uvSetNameList.GetCount(); uvSetIndex++)
+    {
+        //get lUVSetIndex-th uv set
+        const char* lUVSetName = uvSetNameList.GetStringAt(uvSetIndex);
+        const FbxGeometryElementUV* pUVElement = pMesh->GetElementUV(lUVSetName);
 
-		// init map vector, string -> UV list
-		uvMap[lUVSetName] = std::vector<FbxVector2>();
+        // init map vector, string -> UV list
+        uvMap[lUVSetName] = std::vector<FbxVector2>();
 
-		if (!pUVElement)
-			continue;
+        if (!pUVElement)
+            continue;
 
-		// only support mapping mode eByPolygonVertex and eByControlPoint
-		if (pUVElement->GetMappingMode() != FbxGeometryElement::eByPolygonVertex &&
-			pUVElement->GetMappingMode() != FbxGeometryElement::eByControlPoint)
-		{
-			continue;
-		}
+        // only support mapping mode eByPolygonVertex and eByControlPoint
+        if (pUVElement->GetMappingMode() != FbxGeometryElement::eByPolygonVertex &&
+            pUVElement->GetMappingMode() != FbxGeometryElement::eByControlPoint)
+        {
+            continue;
+        }
 
-		//index array, where holds the index referenced to the uv data
-		const bool bUseIndex = pUVElement->GetReferenceMode() != FbxGeometryElement::eDirect;
-		const int indexCount = (bUseIndex) ? pUVElement->GetIndexArray().GetCount() : 0;
+        //index array, where holds the index referenced to the uv data
+        const bool bUseIndex = pUVElement->GetReferenceMode() != FbxGeometryElement::eDirect;
+        const int indexCount = (bUseIndex) ? pUVElement->GetIndexArray().GetCount() : 0;
 
-		//iterating through the data by polygon
-		const int polygonCount = pMesh->GetPolygonCount();
+        //iterating through the data by polygon
+        const int polygonCount = pMesh->GetPolygonCount();
 
-		if (pUVElement->GetMappingMode() == FbxGeometryElement::eByControlPoint)
-		{
-			for (int lPolyIndex = 0; lPolyIndex < polygonCount; ++lPolyIndex)
-			{
-				// build the max index array that we need to pass into MakePoly
-				const int lPolySize = pMesh->GetPolygonSize(lPolyIndex);
-				for (int lVertIndex = 0; lVertIndex < lPolySize; ++lVertIndex)
-				{
-					FbxVector2 vUValue;
+        if (pUVElement->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+        {
+            for (int lPolyIndex = 0; lPolyIndex < polygonCount; ++lPolyIndex)
+            {
+                // build the max index array that we need to pass into MakePoly
+                const int lPolySize = pMesh->GetPolygonSize(lPolyIndex);
+                for (int lVertIndex = 0; lVertIndex < lPolySize; ++lVertIndex)
+                {
+                    FbxVector2 vUValue;
 
-					//get the index of the current vertex in control points array
-					int polygonVertex = pMesh->GetPolygonVertex(lPolyIndex, lVertIndex);
+                    //get the index of the current vertex in control points array
+                    int polygonVertex = pMesh->GetPolygonVertex(lPolyIndex, lVertIndex);
 
-					//the UV index depends on the reference mode
-					int lUVIndex = bUseIndex ? pUVElement->GetIndexArray().GetAt(polygonVertex) : polygonVertex;
+                    //the UV index depends on the reference mode
+                    int lUVIndex = bUseIndex ? pUVElement->GetIndexArray().GetAt(polygonVertex) : polygonVertex;
 
-					vUValue = pUVElement->GetDirectArray().GetAt(lUVIndex);
+                    vUValue = pUVElement->GetDirectArray().GetAt(lUVIndex);
 
-					// store
-					uvMap[lUVSetName].push_back(vUValue);
-				}
-			}
-		}
-		else if (pUVElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
-		{
-			int polygonIndexCounter = 0;
-			for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
-			{
-				// build the max index array that we need to pass into MakePoly
-				const int polygonSize = pMesh->GetPolygonSize(polygonIndex);
-				for (int vertexIndex = 0; vertexIndex < polygonSize; ++vertexIndex)
-				{
-					if (polygonIndexCounter < indexCount)
-					{
-						FbxVector2 vUVValue;
+                    // store
+                    uvMap[lUVSetName].push_back(vUValue);
+                }
+            }
+        }
+        else if (pUVElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+        {
+            int polygonIndexCounter = 0;
+            for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
+            {
+                // build the max index array that we need to pass into MakePoly
+                const int polygonSize = pMesh->GetPolygonSize(polygonIndex);
+                for (int vertexIndex = 0; vertexIndex < polygonSize; ++vertexIndex)
+                {
+                    if (polygonIndexCounter < indexCount)
+                    {
+                        FbxVector2 vUVValue;
 
-						//the UV index depends on the reference mode
-						int uvIndex = bUseIndex ? pUVElement->GetIndexArray().GetAt(polygonIndexCounter) : polygonIndexCounter;
+                        //the UV index depends on the reference mode
+                        int uvIndex = bUseIndex ? pUVElement->GetIndexArray().GetAt(polygonIndexCounter) : polygonIndexCounter;
 
-						vUVValue = pUVElement->GetDirectArray().GetAt(uvIndex);
+                        vUVValue = pUVElement->GetDirectArray().GetAt(uvIndex);
 
-						// store
-						uvMap[lUVSetName].push_back(vUVValue);
+                        // store
+                        uvMap[lUVSetName].push_back(vUVValue);
 
-						polygonIndexCounter++;
-					}
-				}
-			}
-		}
-	}
+                        polygonIndexCounter++;
+                    }
+                }
+            }
+        }
+    }
 
-	return uvMap;
+    return uvMap;
 }
 //get mesh normals info
-std::vector<FbxVector4> FBXMeshGeometryHelper::GetNormals(fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode)
+std::vector<FbxVector4> FBXMeshGeometryHelper::GetNormals(const fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode)
 {
-	std::vector<FbxVector4> vecNormals;
-	
-	if (poMesh)
-	{
-		//get the normal element
-		fbxsdk::FbxGeometryElementNormal* poNormalElement = poMesh->GetElementNormal();
+    std::vector<FbxVector4> fbxNormals;
 
-		if (poNormalElement)
-		{
-			if (poMappingMode)
-			{
-				*poMappingMode = poNormalElement->GetMappingMode();
-			}
+    if (!poMesh)
+    {
+        LogActionError("FbxMesh* == NULL");
+        return std::vector<FbxVector4>();
+    }
 
-			return FetchVectors(poMesh, poNormalElement);
-		}
-	}
+    //get the tangent element
+    const auto* pVectorElement = poMesh->GetElementNormal();
 
-	return vecNormals;
+    if (!pVectorElement)
+    {
+        LogActionError("FbxGeometryElementTangent* == NULL");
+        return std::vector<FbxVector4>();
+    }
+
+    if (poMappingMode)
+    {
+        *poMappingMode = pVectorElement->GetMappingMode();
+    }
+
+    return FetchVectors(poMesh, pVectorElement);
 }
 
-std::vector<FbxVector4> FBXMeshGeometryHelper::GetTangents(fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode)
+std::vector<FbxVector4> FBXMeshGeometryHelper::GetTangents(const fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode)
 {
-	std::vector<FbxVector4> vecTangents;
+    std::vector<FbxVector4> vecTangents;
 
-	if (poMesh)
-	{
-		//get the normal element
-		fbxsdk::FbxGeometryElementTangent* pVectorElement = poMesh->GetElementTangent();
+    if (!poMesh)
+    {
+        LogActionError("FbxMesh* == NULL");
+        return std::vector<FbxVector4>();
+    }
 
-		if (pVectorElement)
-		{
-			if (poMappingMode)
-			{
-				*poMappingMode = pVectorElement->GetMappingMode();
-			}
+    //get the tangent element
+    const fbxsdk::FbxGeometryElementTangent* pVectorElement = poMesh->GetElementTangent();
 
-			return FetchVectors(poMesh, pVectorElement);
-		}
-	}
+    if (!pVectorElement)
+    {
+        LogActionError("FbxGeometryElementTangent* == NULL");
+        return std::vector<FbxVector4>();
+    }
 
-	return std::vector<FbxVector4>();
+    if (poMappingMode)
+    {
+        *poMappingMode = pVectorElement->GetMappingMode();
+    }
+
+    return FetchVectors(poMesh, pVectorElement);
 }
 
-std::vector<FbxVector4> FBXMeshGeometryHelper::GetBitangents(fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode)
+std::vector<FbxVector4> FBXMeshGeometryHelper::GetBitangents(const fbxsdk::FbxMesh* poMesh, fbxsdk::FbxGeometryElementNormal::EMappingMode* poMappingMode)
 {
-	std::vector<FbxVector4> vecBinormals;
+    std::vector<FbxVector4> vecBinormals;
 
-	if (poMesh)
-	{
-		//get the normal element
-		fbxsdk::FbxGeometryElementBinormal* pVectorElement = poMesh->GetElementBinormal();
+    if (poMesh)
+    {
+        //get the normal element
+        auto* pVectorElement = poMesh->GetElementBinormal();
 
-		if (pVectorElement)
-		{
-			if (poMappingMode)
-			{
-				*poMappingMode = pVectorElement->GetMappingMode();
-			}
+        if (pVectorElement)
+        {
+            if (poMappingMode)
+            {
+                *poMappingMode = pVectorElement->GetMappingMode();
+            }
 
-			return FetchVectors(poMesh, pVectorElement);
-		}
-	}
+            return FetchVectors(poMesh, pVectorElement);
+        }
+    }
 
-	return std::vector<FbxVector4>(); // return empty vector on errors
+    return std::vector<FbxVector4>(); // return empty vector on errors
 }
 
-std::vector<FbxVector4> FBXMeshGeometryHelper::FetchVectors(fbxsdk::FbxMesh* poMesh, FbxLayerElementTemplate<FbxVector4>* poNormalElement)
+std::vector<FbxVector4> FBXMeshGeometryHelper::FetchVectors(const fbxsdk::FbxMesh* poMesh, const FbxLayerElementTemplate<FbxVector4>* poNormalElement)
 {
-	std::vector<FbxVector4> vecNormals;
+    std::vector<FbxVector4> fbxVectors;
 
-	if (poMesh)
-	{
-		if (poNormalElement)
-		{
-			// Mapping mode is by Control Points. "The mesh should be smooth and soft."?
-			// We can get normals by retrieving each control point
-			if (poNormalElement->GetMappingMode() == fbxsdk::FbxGeometryElement::eByControlPoint)
-			{
-				int controlPointCount = poMesh->GetControlPointsCount();
-				vecNormals.resize(controlPointCount);
+    if (!poMesh || !poNormalElement)
+    {
+        return std::vector<FbxVector4>();
+        LogActionError("Mesh or NormalElement == NULL");
+    }
 
-				//Let's get normals of each vertex, since the mapping mode of normal element is by control point
-				for (int vertexIndex = 0; vertexIndex < poMesh->GetControlPointsCount(); vertexIndex++)
-				{
-					int lNormalIndex = 0;
+    // Mapping mode is by Control Points. "The mesh should be smooth and soft."?
+    // We can get normals by retrieving each control point
+    if (poNormalElement->GetMappingMode() == fbxsdk::FbxGeometryElement::eByControlPoint)
+    {
+        int controlPointCount = poMesh->GetControlPointsCount();
+        fbxVectors.resize(controlPointCount);
 
-					// -- Reference mode is direct, the normal index is same as vertex index.
-					// get normals by the index of control vertex
-					if (poNormalElement->GetReferenceMode() == fbxsdk::FbxGeometryElement::eDirect)
-						lNormalIndex = vertexIndex;
+        //Let's get normals of each vertex, since the mapping mode of normal element is by control point
+        for (int vertexIndex = 0; vertexIndex < poMesh->GetControlPointsCount(); vertexIndex++)
+        {
+            int lNormalIndex = 0;
 
-					// -- Reference mode is index-to-direct, get normals by the index-to-direct
-					if (poNormalElement->GetReferenceMode() == fbxsdk::FbxGeometryElement::eIndexToDirect)
-						lNormalIndex = poNormalElement->GetIndexArray().GetAt(vertexIndex);
+            // -- Reference mode is direct, the normal index is same as vertex index.
+            // get normals by the index of control vertex
+            if (poNormalElement->GetReferenceMode() == fbxsdk::FbxGeometryElement::eDirect)
+                lNormalIndex = vertexIndex;
 
-					// -- Get Normal using the obtained index
-					FbxVector4 lNormal = poNormalElement->GetDirectArray().GetAt(lNormalIndex);
-					vecNormals[vertexIndex] = lNormal;
-				}
+            // -- Reference mode is index-to-direct, get normals by the index-to-direct
+            if (poNormalElement->GetReferenceMode() == fbxsdk::FbxGeometryElement::eIndexToDirect)
+                lNormalIndex = poNormalElement->GetIndexArray().GetAt(vertexIndex);
 
-			} // End: Vector ByControlPoint
+            // -- Get Normal using the obtained index
+            FbxVector4 lNormal = poNormalElement->GetDirectArray().GetAt(lNormalIndex);
+            fbxVectors[vertexIndex] = lNormal;
+        }
 
-			// Mapping mode is by polygon-vertex.
-			// We can get normals by retrieving polygon-vertex.
-			else if (poNormalElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
-			{
-				int lIndexByPolygonVertex = 0;
-				int polygon_count = poMesh->GetPolygonCount();
-				vecNormals.clear();
-				//Let's get normals of each polygon, since the mapping mode of normal element is by polygon-vertex.
-				for (int lPolygonIndex = 0; lPolygonIndex < polygon_count; lPolygonIndex++)
-				{
-					//get polygon size, you know how many vertices in current polygon.
-					int lPolygonSize = poMesh->GetPolygonSize(lPolygonIndex);
-					//retrieve each vertex of current polygon.
-					for (int i = 0; i < lPolygonSize; i++)
-					{
-						int lNormalIndex = 0;
-						// Reference mode is direct, the normal index is same as lIndexByPolygonVertex.
-						if (poNormalElement->GetReferenceMode() == FbxGeometryElement::eDirect)
-							lNormalIndex = lIndexByPolygonVertex;
+        return fbxVectors;
 
-						// Reference mode is index-to-direct, get normals by the index-to-direct
-						if (poNormalElement->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
-							lNormalIndex = poNormalElement->GetIndexArray().GetAt(lIndexByPolygonVertex);
+    } // End: Vector ByControlPoint
 
-						// Got normals of each polygon-vertex.
-						FbxVector4 lNormal = poNormalElement->GetDirectArray().GetAt(lNormalIndex);
-						lIndexByPolygonVertex++;
+    // Mapping mode is by polygon-vertex.
+    // We can get normals by retrieving polygon-vertex.
+    if (poNormalElement->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+    {
+        int indexByPolygonVertex = 0;
+        int polygon_count = poMesh->GetPolygonCount();
+        fbxVectors.clear();
+        //Let's get normals of each polygon, since the mapping mode of normal element is by polygon-vertex.
+        for (int lPolygonIndex = 0; lPolygonIndex < polygon_count; lPolygonIndex++)
+        {
+            //get polygon size, you know how many vertices in current polygon, 
+            int polygonSize = poMesh->GetPolygonSize(lPolygonIndex);
 
-						vecNormals.push_back(lNormal); // TODO: check that index actually match as  like it does in the bellow out-commented code
+            if (polygonSize != 3)
+            {
+                LogActionError("polygonSize != 3, triangles expected..");
+                return std::vector<FbxVector4>();
+            }
 
-						//vecNormals.resize(lIndexByPolygonVertex); // TODO: maybe just use push_back(), if the index will still match
-						//vecNormals[lIndexByPolygonVertex - 1L] = lNormal;
+            //retrieve each vertex of current polygon.
+            for (int i = 0; i < polygonSize; i++)
+            {
+                int normalIndex = 0;
+                // Reference mode is direct, the normal index is same as lIndexByPolygonVertex.
+                if (poNormalElement->GetReferenceMode() == FbxGeometryElement::eDirect)
+                    normalIndex = indexByPolygonVertex;
 
-					} // for i -> lPolygonSize
+                // Reference mode is index-to-direct, get normals by the index-to-direct
+                if (poNormalElement->GetReferenceMode() == FbxGeometryElement::eIndexToDirect)
+                    normalIndex = poNormalElement->GetIndexArray().GetAt(indexByPolygonVertex);
 
-				} // lPolygonIndex -> PolygonCount
+                // Got normals of each polygon-vertex.
+                FbxVector4 fbxVector4 = poNormalElement->GetDirectArray().GetAt(normalIndex);
+                indexByPolygonVertex++;
 
-			} // end eByPolygonVertex
+                fbxVectors.push_back(fbxVector4); // TODO: check that index actually match as  like it does in the bellow out-commented code
 
-		} // end if lNormalElement
+                //vecNormals.resize(lIndexByPolygonVertex); // TODO: maybe just use push_back(), if the index will still match
+                //vecNormals[lIndexByPolygonVertex - 1L] = lNormal;
 
-	} // end if lMesh
+            } // for i -> lPolygonSize
 
-	return vecNormals;
+        } // lPolygonIndex -> PolygonCount
+
+    } // end eByPolygonVertex
+
+
+    return fbxVectors;
 }
 
 

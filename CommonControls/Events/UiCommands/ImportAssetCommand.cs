@@ -11,9 +11,9 @@ namespace CommonControls.Events.UiCommands
     public class ImportAssetCommand : IUiCommand
     {
         private readonly PackFileService _packFileService;
-        private readonly IAssetManagementFactory _assetManagementFactory;
+        private readonly IAssetImporterProvider _assetManagementFactory;
 
-        public ImportAssetCommand(PackFileService packFileService, IAssetManagementFactory assetManagementFactory)
+        public ImportAssetCommand(PackFileService packFileService, IAssetImporterProvider assetManagementFactory)
         {
             _packFileService = packFileService;
             _assetManagementFactory = assetManagementFactory;
@@ -38,11 +38,11 @@ namespace CommonControls.Events.UiCommands
                 var filename = dialog.FileNames.FirstOrDefault();
                 if (string.IsNullOrWhiteSpace(filename))
                     return;
-
-                try
+                
+               try
                 {
                     var extension = Path.GetExtension(filename);
-                    var importer = _assetManagementFactory.GetImporter(extension);  // Add some validation here! 
+                    var importer = _assetManagementFactory.GetImporter(extension);  // TODO: What if no importer is found?
                     var packFile = importer.ImportAsset(filename);
 
                     if (packFile == null)

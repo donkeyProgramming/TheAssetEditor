@@ -2,186 +2,98 @@
 
 using namespace wrapdll;
 
-/// <summary>
-/// Processes FBXSkin, 
-/// convert the riging to simple {boneIndex, weight}
-/// add store for per "control point"
-/// </summary>
-/// <param name="_poSourceFbxMesh"></param>
-/// <param name="destPackedMesh"></param>
-/// <param name="boneTable"></param>
-/// <param name="controlPointInfluences"></param>
-/// <returns></returns>
 bool FBXSkinProcessorService::ProcessSkin(
-	FbxMesh* _poSourceFbxMesh,
-	PackedMesh& destPackedMesh,
-	const std::vector <std::string>& boneTable,
-	std::vector<ControlPointInfluenceExt>& controlPointInfluences)
+    FbxMesh* _poSourceFbxMesh,
+    std::vector<ControlPointInfluence>& controlPointInfluences)
 {
-	log_action("Processing Skin for mesh: " + std::string(_poSourceFbxMesh->GetName()));
+    LogAction("Processing Skin for mesh: " + std::string(_poSourceFbxMesh->GetName()));
 
-	int deformerCount = _poSourceFbxMesh->GetDeformerCount();
+    int deformerCount = _poSourceFbxMesh->GetDeformerCount();    
+    if (deformerCount < 1) // -- no weighting data in mesh
+    {
+        LogActionWarning(std::string(_poSourceFbxMesh->GetName()) + ": no deformer/skin modifier found. No Rigging Will Be Added.");
+        return true; 
+    }
 
-	// Error checking,
-	if (deformerCount < 1)
-	{
-		return log_action_warning(std::string(_poSourceFbxMesh->GetName()) + ": no deformer/skin modifier found. No Rigging Will Be Added.");
-	}
+    // -- get skin 0, if there is more than one skin modifier (FbxSkin object), 
+    // -- it is the users resposibility to make sure "skin 0" is the corect one, using their 3d modelling program
+    fbxsdk::FbxSkin* pSkin = (FbxSkin*)_poSourceFbxMesh->GetDeformer(0);
+    if (!pSkin) // no skin found
+    {
+        LogActionWarning(std::string(_poSourceFbxMesh->GetName()) + ":pSkin == NULL ");
+        return true;
+    }
 
-	// get skin 0, if there are more than one skin modifier, it is the users resposibility to make sure that skin 0 is the  "mesh skin"
-	fbxsdk::FbxSkin* pSkin = (FbxSkin*)_poSourceFbxMesh->GetDeformer(0);
-	if (!pSkin)
-	{
-		return log_action_warning(std::string(_poSourceFbxMesh->GetName()) + ":pSkin == NULL ");
-	}
-
-	return GetInfluencesFromSkin(pSkin, _poSourceFbxMesh, destPackedMesh, boneTable, controlPointInfluences);
-}
-
-bool wrapdll::FBXSkinProcessorService::ProcessSkin(FbxMesh* _poSourceFbxMesh, PackedMesh& destPackedMesh)
-{
-	log_action("Processing Skin for mesh: " + std::string(_poSourceFbxMesh->GetName()));
-
-	int deformerCount = _poSourceFbxMesh->GetDeformerCount();
-
-	// Error checking,
-	if (deformerCount < 1)
-	{
-		return log_action_warning(std::string(_poSourceFbxMesh->GetName()) + ": no deformer/skin modifier found. No Rigging Will Be Added.");
-	}
-
-	// get skin 0, if there are more than one skin modifier, it is the users resposibility to make sure that skin 0 is the  "mesh skin"
-	fbxsdk::FbxSkin* poSkin = (FbxSkin*)_poSourceFbxMesh->GetDeformer(0);
-	if (!poSkin)
-	{
-		return log_action_warning(std::string(_poSourceFbxMesh->GetName()) + ":pSkin == NULL ");
-	}
-	log_action("Skin Name: " + std::string(poSkin->GetName()));
-
-	int cluster_count = poSkin->GetClusterCount();
-
-	// check if there is no rigging data for this skin
-	if (cluster_count < 1)
-	{
-		return log_action_warning(std::string(_poSourceFbxMesh->GetName()) + ": no weighting data found for skin: " + std::string(poSkin->GetName()) + " !");
-	}
-
-	// -- Rund through all clusters (1 cluster = 1 bone, kinda)
-	log_action("Processing: " + std::to_string(cluster_count) + " Skin Clusters...");
-
-	for (int clusterIndex = 0; clusterIndex < cluster_count; clusterIndex++)
-	{
-		// Get the collection of clusters {vertex, weight}
-		fbxsdk::FbxCluster* pCluster = poSkin->GetCluster(clusterIndex);
-
-		// Get the "bone = the node which is affecting this FbxCluster
-		fbxsdk::FbxNode* pBoneNode = pCluster->GetLink();
-
-		// get the bone ID for this bone name
-		std::string strBoneName = tolower(std::string(pBoneNode->GetName()));		
-
-		// get the number of control point that this "bone" is affecting
-		int controlPointIndexCount = pCluster->GetControlPointIndicesCount();
-
-		if (controlPointIndexCount < 1)
-		{
-			//log_action_warning("No Influences for bone: "+ strBoneName+ "");
-			continue;
-		}
-
-		// get the indices and weights the current cluster (bone)
-		int* pControlPointIndices = pCluster->GetControlPointIndices();
-		double* pControlPointWeights = pCluster->GetControlPointWeights();
-
-		if (!pControlPointIndices || !pControlPointWeights)
-		{
-			log_action_error("NULL pointer for weight/indices");
-			continue;
-		}
-
-		for (int influenceIndex = 0; influenceIndex < controlPointIndexCount; influenceIndex++)
-		{
-			// get control point 
-			int controlPointIndex = pControlPointIndices[influenceIndex];
-
-			// get weight associated with vertex
-			double boneWeight = pControlPointWeights[influenceIndex];
-		};
-	}
-
-	return true;
+    return GetInfluencesFromSkin(pSkin, _poSourceFbxMesh, controlPointInfluences);
 }
 
 bool FBXSkinProcessorService::GetInfluencesFromSkin(
-	fbxsdk::FbxSkin*
-	poSkin, fbxsdk::FbxMesh* poFbxMesh,
-	PackedMesh& destPackedMesh,
-	const std::vector<std::string>& boneTable,
-	std::vector<ControlPointInfluenceExt>& controlPointInfluences
-)
+    fbxsdk::FbxSkin*
+    poSkin, fbxsdk::FbxMesh* poFbxMesh,    
+    std::vector<ControlPointInfluence>& controlPointInfluences)
 {
-	// -- reset the control point influence container
-	auto controlPointCount = poFbxMesh->GetControlPointsCount();
-	controlPointInfluences.clear();
-	controlPointInfluences.resize(controlPointCount);
+    // -- reset the control point influence container
+    auto controlPointCount = poFbxMesh->GetControlPointsCount();
+    controlPointInfluences.clear();
+    controlPointInfluences.resize(controlPointCount);
 
+    LogAction("Skin Name: " + std::string(poSkin->GetName()));
 
-	log_action("Skin Name: " + std::string(poSkin->GetName()));
+    int cluster_count = poSkin->GetClusterCount();
 
-	int cluster_count = poSkin->GetClusterCount();
+    // check if there is no rigging data for this skin
+    if (cluster_count < 1)
+    {
+        return LogActionWarning(std::string(poFbxMesh->GetName()) + ": no weighting data found for skin: " + std::string(poSkin->GetName()) + " !");
+    }
 
-	// check if there is no rigging data for this skin
-	if (cluster_count < 1)
-	{
-		return log_action_warning(std::string(poFbxMesh->GetName()) + ": no weighting data found for skin: " + std::string(poSkin->GetName()) + " !");
-	}
+    // -- Rund through all clusters (1 cluster = 1 bone, kinda)
+    LogAction("Processing: " + std::to_string(cluster_count) + " Skin Clusters...");
 
-	// -- Rund through all clusters (1 cluster = 1 bone, kinda)
-	log_action("Processing: " + std::to_string(cluster_count) + " Skin Clusters...")
-		for (int clusterIndex = 0; clusterIndex < cluster_count; clusterIndex++)
-		{
-			// Get the collection of clusters {vertex, weight}
-			fbxsdk::FbxCluster* pCluster = poSkin->GetCluster(clusterIndex);
+    for (int clusterIndex = 0; clusterIndex < cluster_count; clusterIndex++)
+    {
+        // Get the collection of clusters {vertex, weight}
+        fbxsdk::FbxCluster* pCluster = poSkin->GetCluster(clusterIndex);
 
-			// Get the "bone = the node which is affecting this FbxCluster
-			fbxsdk::FbxNode* pBoneNode = pCluster->GetLink();
-			std::string boneName = pBoneNode->GetName();							
-			
-			int controlPointIndexCount = pCluster->GetControlPointIndicesCount();
+        // Get the "bone = the node which is affecting this FbxCluster
+        fbxsdk::FbxNode* pBoneNode = pCluster->GetLink();
+        std::string boneName = pBoneNode->GetName();
 
-			if (controlPointIndexCount < 1)
-			{
-				//log_action_warning("No Influences for bone: "+ strBoneName+ "");
-				continue;
-			}
+        int controlPointIndexCount = pCluster->GetControlPointIndicesCount();
 
-			// get the indices and weights the current cluster (bone)
-			int* pControlPointIndices = pCluster->GetControlPointIndices();
-			double* pControlPointWeights = pCluster->GetControlPointWeights();
+        if (controlPointIndexCount < 1)
+        {
+            //log_action_warning("No Influences for bone: "+ strBoneName+ "");
+            continue;
+        }
 
-			if (!pControlPointIndices || !pControlPointWeights)
-			{
-				log_action_error("NULL pointer for weight/indices");
-				continue;
-			}
+        // get the indices and weights the current cluster (bone)
+        int* pControlPointIndices = pCluster->GetControlPointIndices();
+        double* pControlPointWeights = pCluster->GetControlPointWeights();
 
-			for (int influenceIndex = 0; influenceIndex < controlPointIndexCount; influenceIndex++)
-			{
-				// get control point 
-				int controlPointIndex = pControlPointIndices[influenceIndex];
+        if (!pControlPointIndices || !pControlPointWeights)
+        {
+            LogActionError("NULL pointer for weight/indices");
+            continue;
+        }
 
-				// get weight associated with vertex
-				double boneWeight = pControlPointWeights[influenceIndex];
+        for (int influenceIndex = 0; influenceIndex < controlPointIndexCount; influenceIndex++)
+        {
+            // get control point 
+            int controlPointIndex = pControlPointIndices[influenceIndex];
 
-				controlPointInfluences[controlPointIndex].weightCount++;
-				auto currentWeightIndex = controlPointInfluences[controlPointIndex].weightCount;
+            // get weight associated with vertex
+            double boneWeight = pControlPointWeights[influenceIndex];
 
-				controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].boneName = boneName;
-				controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].boneIndex = clusterIndex;
-				controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].weight = static_cast<float>(boneWeight);			
-			};
-		}
+            controlPointInfluences[controlPointIndex].weightCount++;
+            auto currentWeightIndex = controlPointInfluences[controlPointIndex].weightCount;
 
-	return true;
+            // set info, associated with the control point, that the MeshCreator can use to assign weighting to all vertices
+            CopyToFixedString(controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].boneName, boneName);
+            controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].boneIndex = clusterIndex;
+            controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].weight = static_cast<float>(boneWeight);
+        };
+    }
+
+    return true;
 }
-

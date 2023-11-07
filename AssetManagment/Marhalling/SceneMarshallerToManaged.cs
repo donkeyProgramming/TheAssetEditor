@@ -123,20 +123,6 @@ namespace AssetManagement.Strategies.Fbx
             return meshList;
         }
 
-        static public string GetSkeletonNameFromSceneLoader(IntPtr ptrFbxScenLoader)
-        {
-            var skeletonNamePtr = FBXSeneLoaderServiceDLL.GetSkeletonNameFromSceneLoader(ptrFbxScenLoader);
-
-            if (skeletonNamePtr == IntPtr.Zero)
-                return "";
-
-            string skeletonName = Marshal.PtrToStringUTF8(skeletonNamePtr);
-
-            if (skeletonName == null)
-                return "";
-
-            return skeletonName;
-        }
         static public string GetSkeletonNameFromSceneContainer(IntPtr ptrFbxSceneContainer)
         {
             var skeletonNamePtr = FBXSCeneContainerGetterDll.GetSkeletonName(ptrFbxSceneContainer);

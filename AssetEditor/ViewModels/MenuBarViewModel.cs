@@ -1,4 +1,5 @@
-﻿using AnimationEditor.AnimationTransferTool;
+﻿using AnimationEditor.AnimationKeyframeEditor;
+using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
@@ -91,6 +92,7 @@ namespace AssetEditor.ViewModels
         public ICommand GenerateMetaDataJsonsReportCommand { get; set; }
         public ICommand CreateAnimPackWarhammer3Command { get; set; }
         public ICommand CreateAnimPack3kCommand { get; set; }
+        public ICommand OpenAnimationKeyframeCommand { get; set; }
 
         // Tutorials
         public ICommand OpenAnimatedPropTutorialCommand { get; set; }
@@ -133,6 +135,7 @@ namespace AssetEditor.ViewModels
             OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
             CompileAudioProjectsCommand = new RelayCommand(CompileAudioProjects);
             CreateExampleAudioProjectCommand = new RelayCommand(CreateExampleAudioProject);
+            OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframe);
 
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
             GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
@@ -248,6 +251,7 @@ namespace AssetEditor.ViewModels
             Process.Start("explorer.exe", path);
         }
 
+        void OpenAnimationKeyframe() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationKeyframeEditorViewModel>>();
         void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<MountAnimationCreatorViewModel>>();
         void OpenCampaignAnimCreatorEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<CampaignAnimationCreatorViewModel>>();
         void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationTransferToolViewModel>>();
