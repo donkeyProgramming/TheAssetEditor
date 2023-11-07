@@ -11,9 +11,9 @@ namespace CommonControls.Events.UiCommands
     public class ImportAssetCommand : IUiCommand
     {
         private readonly PackFileService _packFileService;
-        private readonly IAssetManagementFactory _assetManagementFactory;
+        private readonly IAssetImporterProvider _assetManagementFactory;
 
-        public ImportAssetCommand(PackFileService packFileService, IAssetManagementFactory assetManagementFactory)
+        public ImportAssetCommand(PackFileService packFileService, IAssetImporterProvider assetManagementFactory)
         {
             _packFileService = packFileService;
             _assetManagementFactory = assetManagementFactory;

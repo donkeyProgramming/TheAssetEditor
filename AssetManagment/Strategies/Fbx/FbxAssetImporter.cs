@@ -9,18 +9,18 @@ using AssetManagement.AssetBuilders;
 
 namespace AssetManagement.Strategies.Fbx
 {
-    public class FbxImportExport : IAssetImporter
+    public class FbxAssetImporter : IAssetImporter
     {
         public string[] Formats => new string[] { ".fbx" };
 
         private readonly PackFileService _packFileService;
 
-        public FbxImportExport(PackFileService pfs)
+        public FbxAssetImporter(PackFileService pfs)
         {
             _packFileService = pfs;
         }
 
-        public PackFile ImportAsset(string diskFilePath)
+        public PackFile ImportAsset(string diskFilePath, AssetConfigData config=null)
         {
             var sceneContainer = SceneLoader.LoadScene(diskFilePath);
             if (sceneContainer == null)
