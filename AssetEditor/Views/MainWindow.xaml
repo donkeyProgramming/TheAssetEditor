@@ -56,7 +56,7 @@
             </TabControl.Resources>
 
             <TabControl.ItemContainerStyle>
-                <Style TargetType="TabItem" BasedOn="{StaticResource DarkModeTabItem}">
+                <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
                     <EventSetter Event="Drop" Handler="tabItem_Drop"/>
                     <EventSetter Event="PreviewMouseMove" Handler="tabItem_MouseMove"/>
                     <EventSetter Event="PreviewMouseDown" Handler="tabItem_MouseDown"/>

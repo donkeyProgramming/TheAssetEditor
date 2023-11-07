@@ -46,8 +46,12 @@
                         </ControlTemplate>
                     </ContextMenu.Resources>
 
+                    <ContextMenu.Style>
+                        <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}"  />
+                    </ContextMenu.Style>
+
                     <ContextMenu.ItemContainerStyle>
-                        <Style TargetType="MenuItem">
+                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}"  >
                             <Setter Property="Command" Value="{Binding Command}"/>
                             <Setter Property="ItemsSource" Value="{Binding ContextMenu}"/>
                             <Style.Triggers>
@@ -60,13 +64,12 @@
                 </ContextMenu>
             </TreeView.Resources>
 
-
             <e1:Interaction.Behaviors>
                 <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
             </e1:Interaction.Behaviors>
 
             <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}" >
+                <Style TargetType="{x:Type TreeViewItem}">
                     <EventSetter Event="TreeViewItem.MouseMove" Handler="treeView_MouseMove"/>
                     <EventSetter Event="TreeViewItem.Drop" Handler="treeView_Drop"/>
                     <EventSetter Event="TreeViewItem.PreviewMouseLeftButtonDown" Handler="TreeView_MouseDown"/>

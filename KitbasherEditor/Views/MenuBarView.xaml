@@ -71,7 +71,7 @@
     <DockPanel>
         <Menu ItemsSource="{Binding MenuItems}"  DockPanel.Dock="Top">
             <Menu.Resources>
-                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource DarkModeMenuItem}">
+                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
                     <Setter Property="Header" Value="{Binding NameAttribute.Value}" />
                     <Setter Property="Command" Value="{Binding Action.Command}" />
                     <Style.Triggers>

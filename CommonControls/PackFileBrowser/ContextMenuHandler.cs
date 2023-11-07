@@ -499,5 +499,10 @@ namespace CommonControls.PackFileBrowser
             Name = name;
             Command = command;
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

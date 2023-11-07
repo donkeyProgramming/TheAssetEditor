@@ -2973,7 +2973,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type TabItem}" x:Key="DarkModeTabItem">
+    <Style TargetType="{x:Type TabItem}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
         <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}"/>
         <Setter Property="Background" Value="{DynamicResource TabItem.Static.Background}"/>
@@ -3646,7 +3646,7 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <Style TargetType="{x:Type MenuItem}" x:Key="DarkModeMenuItem">
+    <Style TargetType="{x:Type MenuItem}">
         <Style.Triggers>
             <Trigger Property="IsCheckable" Value="True">
                 <Setter Property="StaysOpenOnClick" Value="True"/>
