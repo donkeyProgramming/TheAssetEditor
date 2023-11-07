@@ -30,6 +30,13 @@ namespace KitbasherEditor.Views
 
     public class MultiSelectTreeView : TreeView
     {
+        private SolidColorBrush _selectedBackgroundBrush { get; } = new SolidColorBrush(Color.FromRgb(58, 58, 58));
+        private SolidColorBrush _selectedForegroundBrush { get; } = new SolidColorBrush(Color.FromRgb(255, 0, 0));
+
+        private SolidColorBrush _notSelectedBackgroundBrush { get; }  = new SolidColorBrush(Color.FromRgb(36, 36, 36));
+        private SolidColorBrush _notSelectedForegroundBrush { get; } = new SolidColorBrush(Color.FromRgb(0, 255, 0));
+
+
         public ObservableCollection<ISceneNode> SelectedObjects
         {
             get { return (ObservableCollection<ISceneNode>)GetValue(SelectedObjectsProperty); }
@@ -80,8 +87,8 @@ namespace KitbasherEditor.Views
         {
             if (treeViewItem != null)
             {
-                treeViewItem.Background = Brushes.White;
-                treeViewItem.Foreground = Brushes.Black;
+                treeViewItem.Background = _notSelectedBackgroundBrush;
+                treeViewItem.Foreground = _notSelectedForegroundBrush;
             }
             SelectedObjects.Remove(node);
         }
@@ -90,8 +97,8 @@ namespace KitbasherEditor.Views
         {
             if (!SelectedObjects.Contains(node))
             {
-                treeViewItem.Background = Brushes.LightBlue;
-                treeViewItem.Foreground = Brushes.Black;
+                treeViewItem.Background = _selectedBackgroundBrush;
+                treeViewItem.Foreground = _selectedForegroundBrush;
                 SelectedObjects.Add(node);
             }
             else
@@ -162,8 +169,8 @@ namespace KitbasherEditor.Views
                         var treeViewItem = ItemContainerGenerator.ContainerFromItemRecursive(item);
                         if (treeViewItem != null)
                         {
-                            treeViewItem.Background = Brushes.LightBlue;
-                            treeViewItem.Foreground = Brushes.Black;
+                            treeViewItem.Background = _selectedBackgroundBrush;
+                            treeViewItem.Foreground = _selectedForegroundBrush;
                             treeViewItem.IsSelected = false;
                             treeViewItem.Focus();
                         }
@@ -176,8 +183,8 @@ namespace KitbasherEditor.Views
                         var treeViewItem = ItemContainerGenerator.ContainerFromItemRecursive(item);
                         if (treeViewItem != null)
                         {
-                            treeViewItem.Background = Brushes.White;
-                            treeViewItem.Foreground = Brushes.Black;
+                            treeViewItem.Background = _notSelectedBackgroundBrush;
+                            treeViewItem.Foreground = _notSelectedForegroundBrush;
                             treeViewItem.IsSelected = false;
                         }
                     }

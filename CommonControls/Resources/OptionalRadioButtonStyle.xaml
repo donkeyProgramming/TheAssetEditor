@@ -4,7 +4,7 @@
                     xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Royale" 
                     xmlns:simple="clr-namespace:CommonControls.BaseDialogs" >
 
-    <Style x:Key="OptionalRadioButtonStyle" TargetType="{x:Type RadioButton}">
+    <Style x:Key="OptionalRadioButtonStyle" TargetType="{x:Type RadioButton}" BasedOn="{StaticResource {x:Type RadioButton}}">
         <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
         <Setter Property="Background">
             <Setter.Value>
