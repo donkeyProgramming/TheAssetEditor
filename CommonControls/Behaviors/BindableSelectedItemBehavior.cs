@@ -42,6 +42,7 @@ namespace CommonControls.Behaviors
 
         private static void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
+            return;
             var item = e.NewValue as TreeViewItem;
 
             if (item != null)

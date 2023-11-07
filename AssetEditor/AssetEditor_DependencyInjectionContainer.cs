@@ -20,7 +20,7 @@ namespace AssetEditor
             serviceCollection.AddTransient<OpenEditorCommand>();
             serviceCollection.AddTransient<OpenFileInEditorCommand>();
 
-            serviceCollection.AddScoped<SettingsWindow>();
+            serviceCollection.AddTransient<SettingsWindow>();
             serviceCollection.AddScoped<SettingsViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
 

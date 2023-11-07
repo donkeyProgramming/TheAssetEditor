@@ -4,7 +4,13 @@
              xmlns:valueconverters="clr-namespace:CommonControls.ValueConverters;assembly=CommonControls">
 
     <Application.Resources >
+
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/ColourDictionaries/SoftDark.xaml"/>
+                <ResourceDictionary Source="Themes/ControlColours.xaml"/>
+                <ResourceDictionary Source="Themes/Controls.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
             <!--Value converters-->
             <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />

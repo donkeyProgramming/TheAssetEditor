@@ -47,8 +47,4 @@ namespace KitbasherEditor.ViewModels.UiCommands
             _gameFormat = CommonControls.Services.GameTypeEnum.Warhammer2;
         }
     }
-
-
-
-
 }

@@ -1,20 +1,18 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
-using System.Windows.Threading;
 using CommonControls.Common;
 
 namespace CommonControls.PackFileBrowser
 {
-    public class PackFileFilter : NotifyPropertyChangedImpl
+    public class PackFileFilter : NotifyPropertyChangedImpl, IDataErrorInfo
     {
-        ObservableCollection<TreeNode> _nodeCollection;
-        DispatcherTimer _filterTimer;
+        public string Error { get; set; } = string.Empty;
+        public string this[string columnName] => Filter(FilterText);
+
+        private readonly ObservableCollection<TreeNode> _nodeCollection;
 
         string _filterText = "";
         public string FilterText
@@ -23,18 +21,6 @@ namespace CommonControls.PackFileBrowser
             set
             {
                 SetAndNotify(ref _filterText, value);
-                StartFilterTimer();
-            }
-        }
-
-
-        bool _hasRegExError = false;
-        public bool HasRegExError
-        {
-            get => _hasRegExError;
-            set
-            {
-                SetAndNotify(ref _hasRegExError, value);
             }
         }
 
@@ -46,37 +32,16 @@ namespace CommonControls.PackFileBrowser
             _nodeCollection = nodes;
         }
 
-        private void StartFilterTimer()
-        {
-            if (_filterTimer != null)
-                _filterTimer.Stop();
-            _filterTimer = new DispatcherTimer();
-            _filterTimer.Interval = TimeSpan.FromMilliseconds(250);
-            _filterTimer.IsEnabled = true;
-            _filterTimer.Tick += FilterTimerTrigger;
-        }
-
-        private void FilterTimerTrigger(object sender, EventArgs e)
-        {
-            Filter(FilterText);
-            _filterTimer.Stop();
-            _filterTimer.Tick -= FilterTimerTrigger;
-            _filterTimer = null;
-        }
-
-
-        void Filter(string text)
+        string Filter(string text)
         {
             Regex expression = null;
             try
             {
                 expression = new Regex(text, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                HasRegExError = false;
             }
-            catch
+            catch(Exception e)
             {
-                HasRegExError = true;
-                return;
+                return e.Message;
             }
 
             foreach (var item in _nodeCollection)
@@ -94,6 +59,8 @@ namespace CommonControls.PackFileBrowser
                         item.ExpandIfVisible();
                 }
             }
+
+            return "";
         }
 
         int CountVisibleNodes(TreeNode file)

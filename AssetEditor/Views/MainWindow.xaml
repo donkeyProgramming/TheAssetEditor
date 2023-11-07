@@ -12,6 +12,7 @@
         behaviors:WindowCancellableClosingBehavior.Closing="{Binding ClosingCommand}"
         behaviors:WindowCancellableClosingBehavior.IsClosingWithoutPrompt="{Binding IsClosingWithoutPrompt}"
         mc:Ignorable="d"
+          Style="{StaticResource CustomWindowStyle}"
         Title="AssetEditor v0.26" Height="1024" Width="2000">
     <Window.Resources>
         <viewFacotry:EditorTemplateSelector x:Key="EditorSelector" />
@@ -55,7 +56,7 @@
             </TabControl.Resources>
 
             <TabControl.ItemContainerStyle>
-                <Style TargetType="TabItem">
+                <Style TargetType="TabItem" BasedOn="{StaticResource DarkModeTabItem}">
                     <EventSetter Event="Drop" Handler="tabItem_Drop"/>
                     <EventSetter Event="PreviewMouseMove" Handler="tabItem_MouseMove"/>
                     <EventSetter Event="PreviewMouseDown" Handler="tabItem_MouseDown"/>

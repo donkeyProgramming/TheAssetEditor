@@ -10,6 +10,10 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top">
+            <Menu.Resources>
+                <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource DarkModeMenuItem}"/>
+            </Menu.Resources>
+
             <MenuItem Header="_File">
                 <MenuItem Header="Open" Command="{Binding MenuBar.OpenPackFileCommand}"/>
                 <MenuItem Header="Create">
@@ -20,7 +24,7 @@
                 </MenuItem>
                 <MenuItem Header="Recent Files" ItemsSource="{Binding MenuBar.RecentPackFiles}">
                     <MenuItem.Style>
-                        <Style TargetType="{x:Type MenuItem}">
+                        <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource DarkModeMenuItem}">
                             <Style.Triggers>
                                 <Trigger Property="HasItems" Value="False">
                                     <Setter Property="IsEnabled" Value="False" />
@@ -29,7 +33,7 @@
                         </Style>
                     </MenuItem.Style>
                     <MenuItem.ItemContainerStyle>
-                        <Style TargetType="{x:Type MenuItem}">
+                        <Style TargetType="{x:Type MenuItem}"  BasedOn="{StaticResource DarkModeMenuItem}">
                             <Setter Property="Command" Value="{Binding Command}" />
                         </Style>
                     </MenuItem.ItemContainerStyle>

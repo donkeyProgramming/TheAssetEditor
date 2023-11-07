@@ -20,21 +20,12 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox x:Name="FilterTextBoxItem" KeyboardNavigation.TabIndex="0" KeyboardNavigation.IsTabStop="True"  Grid.Column="1" Grid.Row="0" Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}" behaviors:TextBoxExtensions.Watermark="Search filter">
-            <TextBox.Resources>
-                <Style TargetType="{x:Type TextBox}">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Filter.HasRegExError}" Value="true">
-                            <Setter Property="Background" Value="Red" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBox.Resources>
+        <TextBox x:Name="FilterTextBoxItem" KeyboardNavigation.TabIndex="0" FontSize="16" KeyboardNavigation.IsTabStop="True"  Grid.Column="1" Grid.Row="0" 
+                 Margin="2"
+                 Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350, ValidatesOnDataErrors=True}"
+                 behaviors:TextBoxExtensions.Watermark="Search filter">
         </TextBox>
-        <Button Click="ClearButtonClick" Command="{Binding ClearTextCommand}" Padding="4,0" HorizontalAlignment="Right" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0">
-            <Button.Content>
-                Clear
-            </Button.Content>
+        <Button Click="ClearButtonClick" Content="Clear" FontSize="16" Margin="2" Command="{Binding ClearTextCommand}" Padding="4,0" HorizontalAlignment="Right" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0">
         </Button>
 
         <TreeView  x:Name="tvParameters"
@@ -75,35 +66,96 @@
             </e1:Interaction.Behaviors>
 
             <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}">
+                <Style TargetType="{x:Type TreeViewItem}" >
                     <EventSetter Event="TreeViewItem.MouseMove" Handler="treeView_MouseMove"/>
                     <EventSetter Event="TreeViewItem.Drop" Handler="treeView_Drop"/>
                     <EventSetter Event="TreeViewItem.PreviewMouseLeftButtonDown" Handler="TreeView_MouseDown"/>
                     <EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
                     <Setter Property="behaviors:MouseDoubleClick.Command" Value="{Binding DataContext.DoubleClickCommand,  RelativeSource={RelativeSource FindAncestor, AncestorType=TreeView}, Mode=OneTime}"/>
-                    <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                     <Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/>
-                    <Setter Property="Visibility" Value="Visible" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsVisible}" Value="False">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
+                    <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                        <DataTrigger Binding="{Binding IsMainEditabelPack, UpdateSourceTrigger=PropertyChanged}" Value="True">
-                            <Setter Property="FontWeight" Value="Bold" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding IsMainEditabelPack, UpdateSourceTrigger=PropertyChanged}" Value="False">
-                            <Setter Property="FontWeight" Value="Normal" />
-                        </DataTrigger>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition MinWidth="19" Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
 
-                        <DataTrigger Binding="{Binding UnsavedChanged, UpdateSourceTrigger=PropertyChanged}" Value="True">
-                            <Setter Property="Foreground" Value="Red"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding UnsavedChanged, UpdateSourceTrigger=PropertyChanged}" Value="False">
-                            <Setter Property="Foreground" Value="Black"/>
-                        </DataTrigger>
+                                    <Rectangle x:Name="HorLn" Margin="9,1,0,0" Height="1" Stroke="{DynamicResource ABrush.Tone7.Border.Static}" StrokeDashCap="Square" StrokeDashArray="0,3" StrokeDashOffset="1" SnapsToDevicePixels="True"/>
+                                    <Rectangle x:Name="VerLn" Width="1" Stroke="{DynamicResource ABrush.Tone7.Border.Static}" StrokeDashCap="Square" StrokeDashArray="0,3" Margin="0,0,1,0" Grid.RowSpan="2" SnapsToDevicePixels="true" Fill="{DynamicResource ABrush.Tone7.Border.Static}"/>
 
-                    </Style.Triggers>
+                                    <ToggleButton x:Name="Expander" ClickMode="Press"
+                                      IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                      Style="{StaticResource ExpandCollapseToggleStyle}"/>
+                                    <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}" Grid.Column="1"
+                                Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                        <ContentPresenter x:Name="PART_Header" ContentSource="Header"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                    </Border>
+                                    <ItemsPresenter x:Name="ItemsHost" Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1"/>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsExpanded" Value="false">
+                                        <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
+                                    </Trigger>
+                                    <Trigger Property="HasItems" Value="false">
+                                        <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+                                        <Setter Property="Visibility" TargetName="HorLn" Value="Visible"/>
+                                        <Setter Property="Grid.RowSpan" TargetName="VerLn" Value="2"/>
+                                        <Setter Property="Grid.Row" TargetName="VerLn" Value="0"/>
+                                    </Trigger>
+                                    <Trigger Property="HasItems" Value="true">
+                                        <Setter Property="Visibility" TargetName="Expander" Value="Visible"/>
+                                        <Setter Property="Visibility" TargetName="HorLn" Value="Hidden"/>
+                                        <Setter Property="Grid.RowSpan" TargetName="VerLn" Value="1"/>
+                                        <Setter Property="Grid.Row" TargetName="VerLn" Value="2"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="true">
+                                        <Setter Property="Background" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
+                                        <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Border}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Deeper}"/>
+                                    </Trigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsSelected" Value="true"/>
+                                            <Condition Property="IsSelectionActive" Value="false"/>
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Background" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Inactive.Background}"/>
+                                        <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Inactive.Border}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Disabled}"/>
+                                    </MultiTrigger>
+                                    <Trigger Property="IsEnabled" Value="false">
+                                        <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Disabled}"/>
+                                    </Trigger>
+                                    <DataTrigger Binding="{Binding IsMainEditabelPack, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsMainEditabelPack, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                        <Setter Property="FontWeight" Value="Normal" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding UnsavedChanged, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                        <Setter Property="Foreground" Value="Red"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding UnsavedChanged, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                        <Setter Property="Foreground" Value="Black"/>
+                                    </DataTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+
                 </Style>
             </TreeView.ItemContainerStyle>
 
@@ -121,6 +173,9 @@
                     </Grid>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
+
+
+
         </TreeView>
     </Grid>
 </UserControl>

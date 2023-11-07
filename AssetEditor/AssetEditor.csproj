@@ -60,7 +60,7 @@
         <AssemblyVersion>0.45.0.0</AssemblyVersion>
         <FileVersion>0.45.0.0</FileVersion>
         <PackageId>AssetEditor v0.45</PackageId>
-        <AnalysisLevel>latest-recommended</AnalysisLevel>
+        <AnalysisLevel>6.0</AnalysisLevel>
     </PropertyGroup>
 
     <ItemGroup>
