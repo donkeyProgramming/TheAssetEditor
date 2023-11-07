@@ -1,12 +1,12 @@
-﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using View3D.Components.Rendering;
 
 namespace View3D.SceneNodes
 {
     public class SimpleDrawableNode : GroupNode, IDrawableItem
     {
-        Dictionary<RenderBuckedId, List<IRenderItem>> _renderList = new Dictionary<RenderBuckedId, List<IRenderItem>>();
+        readonly Dictionary<RenderBuckedId, List<IRenderItem>> _renderList = new();
 
         public SimpleDrawableNode(string name)
         {

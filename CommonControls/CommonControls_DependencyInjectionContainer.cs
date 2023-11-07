@@ -98,7 +98,10 @@ namespace CommonControls
                 .ToList();
 
             foreach (var implementation in implementations)
+            {
                 serviceCollection.Add(new ServiceDescriptor(typeof(T), implementation, ServiceLifetime.Transient));
+                //serviceCollection.Add(new ServiceDescriptor(implementation, ServiceLifetime.Transient));
+            }
         }
     }
 }

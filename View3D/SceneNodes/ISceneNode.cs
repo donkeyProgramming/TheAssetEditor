@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using View3D.Components.Component;
+using View3D.Components.Rendering;
+using View3D.Rendering.Geometry;
 
 namespace View3D.SceneNodes
 {
@@ -26,6 +28,22 @@ namespace View3D.SceneNodes
 
         ISceneNode CreateCopyInstance();
         void CopyInto(ISceneNode target);
+    }
+
+    public interface IEditableGeometry : ISceneNode
+    {
+        MeshObject Geometry { get; set; }
+    }
+
+    public interface IDrawableItem : ISceneNode
+    {
+        void Render(RenderEngineComponent renderEngine, Matrix parentWorld);
+    }
+
+    public interface ISelectable : ISceneNode
+    {
+        MeshObject Geometry { get; set; }
+        bool IsSelectable { get; set; }
     }
 
 }

@@ -164,9 +164,6 @@ namespace View3D.Components.Component
         {
             if (root.IsVisible)
             {
-                if (root is SceneNodes.IUpdateable updatableNode)
-                    updatableNode.Update(gameTime);
-
                 foreach (var child in root.Children)
                     UpdateSceneHirarchy(child, gameTime);
             }

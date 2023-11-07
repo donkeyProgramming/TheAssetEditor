@@ -1,13 +1,13 @@
-﻿using CommonControls.Common;
+﻿using System;
+using System.IO;
+using System.Linq;
+using CommonControls.Common;
 using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.WsModel;
 using CommonControls.Services;
 using Serilog;
-using System;
-using System.IO;
-using System.Linq;
 using View3D.Animation;
 using View3D.SceneNodes;
 using static CommonControls.FileTypes.Vmd.VariantMeshDefinition;
@@ -16,7 +16,7 @@ namespace View3D.Services
 {
     public class ComplexMeshLoader
     {
-        ILogger _logger = Logging.Create<ComplexMeshLoader>();
+        private readonly ILogger _logger = Logging.Create<ComplexMeshLoader>();
         private readonly PackFileService _packFileService;
         private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
         private readonly ApplicationSettingsService _applicationSettingsService;

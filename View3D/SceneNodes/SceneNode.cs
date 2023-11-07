@@ -8,27 +8,6 @@ using View3D.Rendering.Geometry;
 
 namespace View3D.SceneNodes
 {
-    public interface IEditableGeometry : ISceneNode
-    {
-        MeshObject Geometry { get; set; }
-    }
-
-    public interface IDrawableItem : ISceneNode
-    {
-        void Render(RenderEngineComponent renderEngine, Matrix parentWorld);
-    }
-
-    public interface ISelectable : ISceneNode
-    {
-        MeshObject Geometry { get; set; }
-        bool IsSelectable { get; set; }
-    }
-
-    public interface IUpdateable : ISceneNode
-    {
-        void Update(GameTime time);
-    }
-
 
 
     public abstract class SceneNode : NotifyPropertyChangedImpl, ISceneNode
@@ -36,7 +15,7 @@ namespace View3D.SceneNodes
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public SceneManager SceneManager { get; set; }
 
-        List<ISceneNode> _children = new List<ISceneNode>();
+        readonly List<ISceneNode> _children = new();
 
         public List<ISceneNode> Children { get { return _children; } }
 

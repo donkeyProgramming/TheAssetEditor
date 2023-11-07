@@ -21,7 +21,7 @@ namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
         }
 
         public string[] MachineNames => DonkeyMachineNameProvider.MachineNames;
-        public bool IsEnabled => true;
+        public bool IsEnabled => false;
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;

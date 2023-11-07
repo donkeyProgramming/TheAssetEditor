@@ -4,7 +4,6 @@ using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.FileTypes.RigidModel.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +17,7 @@ using View3D.Utility;
 
 namespace View3D.SceneNodes
 {
-    public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IUpdateable, IDrawableItem
+    public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IDrawableItem
     {
         public IMaterial Material { get; set; }
         public MeshObject Geometry { get; set; }
@@ -28,7 +27,6 @@ namespace View3D.SceneNodes
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
         ResourceLibary _resourceLib;
-        IComponentManager _componentManager;
 
         public string OriginalFilePath { get; set; }
         public int OriginalPartIndex { get; internal set; }
@@ -83,10 +81,6 @@ namespace View3D.SceneNodes
             Orientation = Quaternion.Identity;
 
             Effect = shader;
-            if (_renderEngineComponent == null)
-            {
-
-            }
         }
 
         public void Initialize(ResourceLibary resourceLib)
@@ -127,8 +121,6 @@ namespace View3D.SceneNodes
             return _resourceLib.LoadTexture(texture.Value.Path, forceRefreshTexture);
 
         }
-
-        public void Update(GameTime time) { }
 
         public Rmv2ModelNode GetParentModel()
         {
@@ -218,7 +210,6 @@ namespace View3D.SceneNodes
             typedTarget.Material = Material.Clone();
             typedTarget.Geometry = Geometry.Clone();
             typedTarget._resourceLib = _resourceLib;
-            typedTarget._componentManager = _componentManager;
             typedTarget._renderEngineComponent = _renderEngineComponent;
             //warhammer 2 compat
             if (typedTarget.Effect != null)
@@ -240,7 +231,7 @@ namespace View3D.SceneNodes
         public Dictionary<TextureType, string> GetTextures()
         {
             var enumCollection = Enum.GetValues(typeof(TextureType));
-            Dictionary<TextureType, string> output = new Dictionary<TextureType, string>();
+            var output = new Dictionary<TextureType, string>();
 
             foreach (var enumValue in enumCollection)
             {
