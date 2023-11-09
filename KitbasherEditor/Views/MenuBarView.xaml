@@ -29,7 +29,7 @@
             <Setter Property="Height" Value="32"/>
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.15"></Setter>
+                    <Setter Property="Opacity" Value="0.05"></Setter>
                 </Trigger>
             </Style.Triggers>
         </Style>

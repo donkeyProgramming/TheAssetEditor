@@ -54,33 +54,33 @@
 
             <Grid Grid.Row="0" Grid.Column="1" 
                   Visibility="{Binding MenuBar.TransformTool.IsVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
-                <DockPanel HorizontalAlignment="Right" VerticalAlignment="Top">
-                    <Border BorderThickness="2" BorderBrush="DarkGray" Background="LightGray">
-                        <StackPanel Orientation="Vertical">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding MenuBar.TransformTool.Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                                <mathviews:Vector3View Width="200" Vector3="{Binding MenuBar.TransformTool.Vector3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                                <Button Content="Apply"
-                                        Command="{Binding MenuBar.TransformTool.ApplyCommand}"
-                                        IsEnabled="{Binding MenuBar.TransformTool.ButtonEnabled, UpdateSourceTrigger=PropertyChanged}"/> 
-                            </StackPanel>
+                <DockPanel HorizontalAlignment="Right" VerticalAlignment="Top" >
+                    <Rectangle Fill="{DynamicResource ToolBarTrayBackground}" DockPanel.Dock="Left" Width="2"/>
+                    <Rectangle Fill="{DynamicResource ToolBarTrayBackground}" DockPanel.Dock="Bottom" Height="2"/>
 
-                            <DockPanel Margin="2" Visibility="{Binding MenuBar.TransformTool.ShowVertexFalloff.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
-                                <TextBlock Text="Vertex Fall-of:" DockPanel.Dock="Left" Margin="0,0,4,0"/>
-                                <TextBox  DockPanel.Dock="Right"
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding MenuBar.TransformTool.Text, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2,0,2,0"/>
+                            <mathviews:Vector3View Width="200" Vector3="{Binding MenuBar.TransformTool.Vector3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <Button Content="Apply"
+                                    Width="50"
+                                    Command="{Binding MenuBar.TransformTool.ApplyCommand}"
+                                    IsEnabled="{Binding MenuBar.TransformTool.ButtonEnabled, UpdateSourceTrigger=PropertyChanged}"/> 
+                        </StackPanel>
+
+                        <DockPanel Margin="2" Visibility="{Binding MenuBar.TransformTool.ShowVertexFalloff.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
+                            <TextBlock Text="Vertex Fall-of:" DockPanel.Dock="Left" Margin="0,0,4,0"/>
+                            <TextBox  DockPanel.Dock="Right"
                                          Text="{Binding MenuBar.TransformTool.VertexMovementFalloff.Value.TextValue, 
                                          UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" 
                                          ToolTip="Fall of distance for selected vertexes">
-                                    <b:Interaction.Behaviors>
-                                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                                    </b:Interaction.Behaviors>
-                                </TextBox>
-                            </DockPanel>
+                                <b:Interaction.Behaviors>
+                                    <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                                </b:Interaction.Behaviors>
+                            </TextBox>
+                        </DockPanel>
+                    </StackPanel>
 
-
-
-                        </StackPanel>
-                    </Border>
                 </DockPanel>
             </Grid>
         </Grid>
