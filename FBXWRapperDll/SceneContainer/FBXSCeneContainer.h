@@ -34,12 +34,12 @@ namespace wrapdll
 		};
 
         void GetVertices(int meshindex, PackedCommonVertex** ppVertices, int* itemCount);
-        void GetIndices(int meshindex, uint16_t** ppVertices, int* itemCount);
+        void GetIndices(int meshindex, uint32_t** ppVertices, int* itemCount);
         void GetVertexWeights(int meshindex, VertexWeight** pVertexWeights, int* itemCount);
 
         void AllocateMeshes(int count);
         void SetVertices(int meshindex, VertexWeight* pVerticess, int vertexCount);
-        void SetIndices(int meshindex, VertexWeight* pIndices, int vertexCount);
+        void SetIndices(int meshindex, uint32_t* pIndices, int vertexCount);
         void SetVertexWeights(int meshindex, VertexWeight* pVertexWeights, int* weightCOunt);
         
         std::vector <PackedMesh>& GetMeshes()

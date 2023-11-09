@@ -22,7 +22,7 @@ void wrapdll::MeshProcessor::DoTangentBasisAndIndexing(PackedMesh& destMesh)
     vector<sm::Vector3> outTangents;
     vector<sm::Vector3> outBitangents;
 
-    vector<uint16_t> outIndices;
+    vector<uint32_t> outIndices;
 
     for (auto& v : destMesh.vertices)  // fill the UN-INDEXED vertex data into vectors
     {

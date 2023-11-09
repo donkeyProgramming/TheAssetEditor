@@ -16,22 +16,7 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public uint boneIndex;
         public float weight;
     };
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct PackedCommonVertex
-    {
-        public XMFLOAT4 Position;
-        public XMFLOAT3 Normal;
-        public XMFLOAT3 BiNormal;
-        public XMFLOAT3 Tangent;
-        public XMFLOAT2 Uv;
-        public XMFLOAT4 Color;
-
-        [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = 4)]
-        public VertexInfluence[]? influences; // fixed array length 4        
-
-        public int WeightCount;
-    };
+     
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct VertexWeight

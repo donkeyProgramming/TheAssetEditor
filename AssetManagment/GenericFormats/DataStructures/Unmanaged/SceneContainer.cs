@@ -27,7 +27,7 @@ namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
 
     public class BoneInfo
     {
-        public List<VertexWeight> VertexWeights { get; set; }
+        public List<ExtVertexWeight> VertexWeights { get; set; }
         public string Name { get; set; }
         public int Id { get; set; }
         public int ParentId { get; set; }
