@@ -9,8 +9,9 @@ using Microsoft.Xna.Framework;
 using AssetManagement.GenericFormats.Unmanaged;
 using CommonControls.FileTypes.RigidModel.Types;
 using AssetManagement.Strategies.Fbx;
-using AssetManagement.GenericFormats.Managed;
 using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
+using AssetManagement.GenericFormats.DataStructures.Managed;
+using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 
 namespace AssetManagement.GenericFormats
 {
@@ -98,11 +99,15 @@ namespace AssetManagement.GenericFormats
             var originalVerticesPacked = MakePackedVertices(vertexFormat, packedInputMesh, skeletonName);
 
             unindexesMesh.VertexList = originalVerticesPacked.ToArray();
-            unindexesMesh.IndexList = packedInputMesh.Indices.ToArray();
+          
+            for (int i = 0; i < packedInputMesh.Indices.Count; i++)
+            {
+                unindexesMesh.IndexList[i] = (ushort)packedInputMesh.Indices[i];
+            }
 
             return unindexesMesh;
         }
-
+             
         private static List<CommonVertex> MakePackedVertices(VertexFormat vertexFormat, PackedMesh packedInputMesh, string skeletonName)
         {
             var vertices = new CommonVertex[packedInputMesh.Vertices.Count].ToList();
@@ -115,32 +120,10 @@ namespace AssetManagement.GenericFormats
                    packedInputMesh.Vertices[vertexIndex].Uv,
                    packedInputMesh.Vertices[vertexIndex].Tangent,
                    packedInputMesh.Vertices[vertexIndex].BiNormal,
-                   skeletonName);
-
-                MakeVertexWeights(vertexFormat, packedInputMesh.Vertices[vertexIndex], vertices[vertexIndex]);
+                   skeletonName);            
             }
 
             return vertices;
-        }
-
-        private static void MakeVertexWeights(VertexFormat vertexFormat, PackedCommonVertex packedInputVertex, CommonVertex outVertex)
-        {
-            if (vertexFormat == VertexFormat.Static)
-            {
-                outVertex.WeightCount = 0;
-                outVertex.BoneIndex = new byte[0];
-                outVertex.BoneWeight = new float[0];
-                return;
-            }
-
-            for (int influenceIndex = 0; influenceIndex < 4; influenceIndex++)
-            {
-                outVertex.BoneIndex[influenceIndex] = (byte)packedInputVertex.influences[influenceIndex].boneIndex;
-                outVertex.BoneWeight[influenceIndex] = packedInputVertex.influences[influenceIndex].weight;
-            }
-
-            VertexWeightProcessor.SortVertexWeights(outVertex);
-            VertexWeightProcessor.NormalizeVertexWeights(outVertex);
         }
 
         private static CommonVertex MakePackedVertex(

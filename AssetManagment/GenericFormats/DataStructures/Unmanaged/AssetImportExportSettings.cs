@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using AssetManagement.GenericFormats.Unmanaged;
 
 namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
 {
