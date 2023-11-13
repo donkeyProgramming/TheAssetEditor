@@ -181,8 +181,16 @@ namespace CommonControls.FileTypes.Animation
             var boneInfo = Bones
                 .Where(x => string.Compare(x.Name, name, StringComparison.InvariantCultureIgnoreCase) == 0)
                 .FirstOrDefault();
-                            
+
             return (boneInfo == null) ? -1 : boneInfo.Id;
+        }
+
+        /// <summary>
+        /// Safe method for looking up bones, as opposed to using the bone index directly
+        /// </summary>
+        public string GetBoneNameFromIndex(int boneIndex)
+        {
+            return (boneIndex >= Bones.Length) ? "" : Bones[boneIndex].Name;
         }
 
         public static AnimationFile Create(PackFile file)
