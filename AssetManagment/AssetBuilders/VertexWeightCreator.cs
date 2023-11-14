@@ -8,6 +8,7 @@ using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using CommonControls.FileTypes.RigidModel;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
+using AssetManagement.AnimationProcessor;
 
 namespace AssetManagement.AssetBuilders
 {
@@ -62,7 +63,7 @@ namespace AssetManagement.AssetBuilders
                 var vertexWeight = new ExtVertexWeight()
                 {
                     vertexIndex = newVertexIndex,
-                    boneName = _skeletonFile.GetBoneNameFromIndex(inVertex.BoneIndex[weightIndex]),
+                    boneName = SkeletonHelper.GetBoneNameFromId(_skeletonFile, inVertex.BoneIndex[weightIndex]),                    
                     boneIndex = inVertex.BoneIndex[weightIndex],
                     weight = inVertex.BoneWeight[weightIndex],
                 };
