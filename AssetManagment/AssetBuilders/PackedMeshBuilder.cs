@@ -1,117 +1,88 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.RigidModel.Vertex;
 using CommonControls.FileTypes.RigidModel;
-using AssetManagement.GenericFormats.DataStructures.Unmanaged;
+using System.Collections.Generic;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 
 namespace AssetManagement.AssetBuilders
 {
     public interface IPackedMeshBuilder
     {
-        public PackedMesh Create(RmvModel model, AnimationFile skeletonFile);
-        public List<PackedMesh> CreateList(RmvFile file, AnimationFile skeletonFile);
+        public PackedMesh CreateMesh(RmvModel model);
+        public List<PackedMesh> CreateMeshList(RmvFile file, AnimationFile skeletonFile);
     }
 
-    public class IndexedPackedMeshBuilder : IPackedMeshBuilder
+    internal class IndexedPackedMeshBuilder : IPackedMeshBuilder
     {
-        public PackedMesh Create(RmvModel model, AnimationFile skeletonFile)
+        public virtual PackedMesh CreateMesh(RmvModel model)
         {
-            var outMesh = new PackedMesh() { Name = model.Material.ModelName };
+            return Rmv2ModelToPackedMesh(model);
+        }
 
-            AddMesh(model, outMesh, skeletonFile);
-
-            if (skeletonFile != null)
+        public virtual List<PackedMesh> CreateMeshList(RmvFile file, AnimationFile skeletonFile)
+        {
+            var outPackedMeshes = new List<PackedMesh>();
+            foreach (var model in file.ModelList[0])
             {
-                AddVertexWeights(model, outMesh, skeletonFile);
+                outPackedMeshes.Add(CreateMesh(model));
             }
+            return outPackedMeshes;
+        }
+
+        public PackedMesh Rmv2ModelToPackedMesh(RmvModel inMmodel)
+        {
+            var outMesh = new PackedMesh() { Name = inMmodel.Material.ModelName, };
+
+            // TODO: remove linq if it is to slow, and restor original
+            //outMesh.Vertices = new ExtPackedCommonVertex[inMmodel.Mesh.VertexList.Length].ToList();
+            //outMesh.Indices = new uint[inMmodel.Mesh.IndexList.Length].ToList();
+
+            outMesh.Vertices = inMmodel.Mesh.VertexList.Select(vertex => PackedVertexHelper.CreateExtPackedVertex(vertex)).ToList();
+            outMesh.Indices = inMmodel.Mesh.IndexList.Select(index => (uint)index).ToList();
+
+            return outMesh;
+        }
+    }
+
+    internal class WeightedIndexedPackedMeshBuilder : IndexedPackedMeshBuilder
+    {
+        readonly AnimationFile _skeletonFile;
+
+        public WeightedIndexedPackedMeshBuilder(AnimationFile skeletonFile)
+        {
+            _skeletonFile = skeletonFile;
+        }
+
+        override public PackedMesh CreateMesh(RmvModel InModel)
+        {
+            var outMesh = Rmv2ModelToPackedMesh(InModel);
+
+            AddVertexWeights(InModel, outMesh);
 
             return outMesh;
         }
 
-        public List<PackedMesh> CreateList(RmvFile file, AnimationFile skeletonFile)
+        public void AddVertexWeights(RmvModel inModel, PackedMesh outMesh)
         {
-            var meshList = new List<PackedMesh>();
-
-            foreach (var model in file.ModelList[0])
-            {
-                var packedMesh = Create(model, skeletonFile);
-                meshList.Add(packedMesh);
-            }
-
-            return meshList;
+            var weightcreator = new VertexWeightCreator(inModel, _skeletonFile);
+            outMesh.VertexWeights = weightcreator.CreateVertexWeigts();
         }
 
-        private void AddMesh(RmvModel inMmodel, PackedMesh outMesh, AnimationFile skeletonFile)
-        {
-            outMesh.Vertices = new ExtPackedCommonVertex[inMmodel.Mesh.VertexList.Length].ToList();
-            outMesh.Indices = new uint[inMmodel.Mesh.IndexList.Length].ToList();
+    }
 
-            for (var indexBufferIndex = 0; indexBufferIndex < inMmodel.Mesh.IndexList.Length; indexBufferIndex++)
+    public class PackedMeshBuilderFactory
+    {
+        public static IPackedMeshBuilder GetBuilder(AnimationFile skeletonFile)
+        {
+            if (skeletonFile == null)
             {
-                outMesh.Indices[indexBufferIndex] = (uint)inMmodel.Mesh.IndexList[indexBufferIndex];
+                return new IndexedPackedMeshBuilder();
             }
-
-            for (var vertexBufferIndex = 0; vertexBufferIndex < inMmodel.Mesh.VertexList.Length; vertexBufferIndex++)
+            else
             {
-                outMesh.Vertices[vertexBufferIndex] = CreateExtPackedVertex(inMmodel.Mesh.VertexList[vertexBufferIndex]);
-                AddCornerWeights(inMmodel.Mesh.VertexList[vertexBufferIndex], outMesh, skeletonFile, (uint)vertexBufferIndex);
+                return new WeightedIndexedPackedMeshBuilder(skeletonFile); ;
+
             }
-        }
-
-        private void AddVertexWeights(RmvModel inModel, PackedMesh outMesh, AnimationFile skeletonFile)
-        {
-            for (var vertexBufferIndex = 0; vertexBufferIndex < inModel.Mesh.VertexList.Length; vertexBufferIndex++)
-            {
-                AddCornerWeights(inModel.Mesh.VertexList[vertexBufferIndex], outMesh, skeletonFile, (uint)vertexBufferIndex);
-            }
-        }
-
-        private static void AddCornerWeights(CommonVertex inVertex, PackedMesh outMesh, AnimationFile skeletonFile, uint newVertexIndex)
-        {
-            // add as many weights as is stored in the RMVmodel vertex, 
-            for (uint weightIndex = 0; weightIndex < inVertex.WeightCount; weightIndex++)
-            {
-                // CA Rule: Duplicate bone indices are "illegal", and are used as "terminators" to indicate weight count                               
-                if (weightIndex > 0 && inVertex.BoneIndex[0] == inVertex.BoneIndex[weightIndex])
-                {
-                    continue; // skip null weights, causes issue with the FBX SDK
-                }
-
-                var vertexWeight = new ExtVertexWeight()
-                {
-                    vertexIndex = newVertexIndex, 
-                    boneName = skeletonFile.Bones[inVertex.BoneIndex[weightIndex]].Name, // TODO: add a GetBoneNameFromIndex() to AnimationFile for safety
-                    boneIndex = inVertex.BoneIndex[weightIndex],
-                    weight = inVertex.BoneWeight[weightIndex],
-                };
-
-                outMesh.VertexWeights.Add(vertexWeight);
-            };
-        }
-
-        private static ExtPackedCommonVertex CreateExtPackedVertex(CommonVertex inVertex)
-        {
-            var outVertex = new ExtPackedCommonVertex();
-
-            outVertex.Position.x = inVertex.Position.X;
-            outVertex.Position.y = inVertex.Position.Y;
-            outVertex.Position.z = inVertex.Position.Z;
-            outVertex.Position.w = inVertex.Position.W;
-
-            outVertex.Uv.x = inVertex.Uv.X;
-            outVertex.Uv.y = inVertex.Uv.Y;
-
-            outVertex.Normal.x = inVertex.Normal.X;
-            outVertex.Normal.y = inVertex.Normal.Y;
-            outVertex.Normal.z = inVertex.Normal.Z;
-
-            return outVertex;
         }
     }
 }

@@ -6,6 +6,7 @@ using System;
 using CommonControls.FileTypes.Animation;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using System.Linq;
+using AssetManagement.AnimationProcessor;
 
 namespace AssetManagement.MeshProcessing.Packed
 {
@@ -21,7 +22,7 @@ namespace AssetManagement.MeshProcessing.Packed
         public static bool CompareMeshVertexWeigtBonesToSkeleton(PackedMesh mesh, AnimationFile animationFile)
         {
             // TODO: TEST THIS
-            if (mesh.VertexWeights.Any(weight => animationFile.GetIdFromBoneName(weight.boneName) == -1))
+            if (mesh.VertexWeights.Any(weight => SkeletonHelper.GetIdFromBoneName(animationFile, weight.boneName) == -1))
                 return false;
 
             return true;

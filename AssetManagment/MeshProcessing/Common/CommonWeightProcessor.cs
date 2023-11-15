@@ -6,6 +6,7 @@ using CommonControls.FileTypes.Animation;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using CommonControls.Common;
 using Serilog;
+using AssetManagement.AnimationProcessor;
 
 namespace AssetManagement.MeshProcessing.Common
 {
@@ -33,7 +34,7 @@ namespace AssetManagement.MeshProcessing.Common
         {
             if (boneName.Any()) // don't add empty influences (boneName == "")
             {
-                var boneIndex = skeletonFile.GetIdFromBoneName(boneName);
+                var boneIndex = SkeletonHelper.GetIdFromBoneName(skeletonFile, boneName);
 
                 if (boneIndex == AnimationFile.InvalidBoneIndex)
                 {
