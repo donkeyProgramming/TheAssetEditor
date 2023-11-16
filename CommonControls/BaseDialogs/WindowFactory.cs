@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Xna.Framework;
+using MonoGame.Framework.WpfInterop;
 
 namespace CommonControls.BaseDialogs
 {
+
+    // Repalces SubToolWindowCreator
     public interface IWindowFactory
     {
         ITypedAssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight) where TViewModel : class;
@@ -12,10 +16,12 @@ namespace CommonControls.BaseDialogs
     public class WindowFactory : IWindowFactory
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly WpfGame _wpfGame;
 
-        public WindowFactory(IServiceProvider serviceProvider)
+        public WindowFactory(IServiceProvider serviceProvider, WpfGame wpfGame)
         {
             _serviceProvider = serviceProvider;
+            _wpfGame = wpfGame;
         }
 
         public ITypedAssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight)
@@ -33,7 +39,18 @@ namespace CommonControls.BaseDialogs
                 Content = view
             };
 
+            if (viewModel is IGameComponent component)
+            {
+                _wpfGame.AddComponent(component);
+                containingWindow.Closed += (x, y) => OnComponentRemoved(component);
+            }
+
             return containingWindow;
+        }
+
+        void OnComponentRemoved(IGameComponent component)
+        {
+            _wpfGame.RemoveComponent(component);
         }
     }
 
@@ -67,20 +84,15 @@ namespace CommonControls.BaseDialogs
             Closing += AssetEditorWindow_Closing;
             Deactivated += AssetEditorWindow_Deactivated;
         }
+
         private void AssetEditorWindow_Deactivated(object sender, EventArgs e)
         {
-            if (AlwaysOnTop)
-            {
-                Window window = (Window)sender;
-                window.Topmost = true;
-            }
+           //if (AlwaysOnTop)
+           //{
+           //    Window window = (Window)sender;
+           //    window.Topmost = true;
+           //}
         }
-
-
-
-
-
-
 
         private void AssetEditorWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

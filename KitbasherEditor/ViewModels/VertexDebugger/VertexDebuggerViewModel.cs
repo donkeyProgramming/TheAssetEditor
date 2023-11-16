@@ -60,10 +60,8 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
             _lineRenderer = new LineMeshRender(_resourceLibary);
 
             Refresh();
-
             base.Initialize();
         }
-
 
         public void Refresh()
         {

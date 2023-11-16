@@ -40,7 +40,6 @@ namespace View3D
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
             serviceCollection.AddScoped<Rmv2ModelNodeLoader>();
-            serviceCollection.AddScoped<SubToolWindowCreator>(); // Try to get this into common or remove the need for it
 
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());

@@ -140,7 +140,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         ObservableCollection<MenuBarButton> CreateButtons()
         {
-            ButtonBuilder builder = new ButtonBuilder(_uiCommands);
+            var builder = new ButtonBuilder(_uiCommands);
 
             // General
             builder.CreateButton<SaveCommand>(ResourceController.SaveFileIcon);
@@ -171,7 +171,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateButtonSeparator();
             builder.CreateButton<ReduceMeshCommand>(ResourceController.ReduceMeshIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<CreateLodCommand>(ResourceController.CreateLodIcon, ButtonVisibilityRule.ObjectMode);
-            builder.CreateButton<OpenBmiToolCommand>(ResourceController.BmiToolIcon, ButtonVisibilityRule.ObjectMode);
+            //builder.CreateButton<OpenBmiToolCommand>(ResourceController.BmiToolIcon, ButtonVisibilityRule.ObjectMode);    <-- Disabled to see if anyone complains. Plan is to delete it
             builder.CreateButton<OpenSkeletonReshaperToolCommand>(ResourceController.SkeletonReshaperIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<OpenReriggingToolCommand>(ResourceController.ReRiggingIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<OpenPinToolCommand>(ResourceController.PinIcon, ButtonVisibilityRule.ObjectMode);
