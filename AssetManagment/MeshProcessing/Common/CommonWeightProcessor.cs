@@ -6,6 +6,7 @@ using CommonControls.FileTypes.Animation;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using CommonControls.Common;
 using Serilog;
+using AssetManagement.AnimationProcessor;
 
 namespace AssetManagement.MeshProcessing.Common
 {
@@ -28,11 +29,12 @@ namespace AssetManagement.MeshProcessing.Common
             vertex.BoneIndex[vertex.WeightCount - 1] = (byte)boneIndex;
             vertex.BoneWeight[vertex.WeightCount - 1] = weight;
         }
+
         public static void AddWeightToVertexByBoneName(AnimationFile skeletonFile, CommonVertex vertex, string boneName, float weight)
         {
             if (boneName.Any()) // don't add empty influences (boneName == "")
             {
-                var boneIndex = skeletonFile.GetIdFromBoneName(boneName);
+                var boneIndex = SkeletonHelper.GetIdFromBoneName(skeletonFile, boneName);
 
                 if (boneIndex == AnimationFile.InvalidBoneIndex)
                 {
@@ -41,7 +43,6 @@ namespace AssetManagement.MeshProcessing.Common
                 }
 
                 AddWeightToVertex(vertex, boneIndex, weight);
-
             }
         }        
 
@@ -84,17 +85,24 @@ namespace AssetManagement.MeshProcessing.Common
             }
         }
 
+        // JUST for sorting in the below method, maybe do something else
+        private class TempWeight
+        {
+            public int BoneIndex { get; set; }
+            public float Weight { get; set; }
+        }
+
         /// <summary>
         /// Sorts the weights-influences {weight, index} byte weight, by descending weight value
         /// </summary>        
         public static void SortVertexWeightsByWeightValue(CommonVertex vertex)
         {
-            var influences = new List<VertexWeight>(4)
+            var influences = new List<TempWeight>(4)
                 {
-                    new VertexWeight(),
-                    new VertexWeight(),
-                    new VertexWeight(),
-                    new VertexWeight(),
+                    new TempWeight(),
+                    new TempWeight(),
+                    new TempWeight(),
+                    new TempWeight(),
                 };
 
             for (var weightIndex = 0; weightIndex < vertex.WeightCount; weightIndex++)

@@ -24,12 +24,13 @@ namespace Audio.BnkCompiler
 
         void SaveToPackFile(CompileResult compileResult, CompilerData compilerData, CompilerSettings settings)
         {
-            var ouputPath = "audio\\wwise";
+            var bnkOutputPath = "audio\\wwise";
+            var datOutputPath = "audio\\wwise";
             if (string.IsNullOrWhiteSpace(compilerData.ProjectSettings.Language) == false)
-                ouputPath += $"\\{compilerData.ProjectSettings.Language}";
+                bnkOutputPath += $"\\{compilerData.ProjectSettings.Language}";
 
-            SaveHelper.SavePackFile(_pfs, ouputPath, compileResult.OutputBnkFile, false);
-            SaveHelper.SavePackFile(_pfs, ouputPath, compileResult.OutputDatFile, false);
+            SaveHelper.SavePackFile(_pfs, bnkOutputPath, compileResult.OutputBnkFile, false);
+            SaveHelper.SavePackFile(_pfs, datOutputPath, compileResult.OutputDatFile, false);
         }
 
         void ExportToDirectory(CompileResult result, CompilerSettings settings)

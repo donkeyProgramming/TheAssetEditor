@@ -3,6 +3,9 @@
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="GenericFormats\Managed\MeshDataStructures.cs" />
+	</ItemGroup>
 
   <ItemGroup>    
     <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
@@ -22,6 +25,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GenericFormats\Managed\" />
   </ItemGroup>
 
 </Project>

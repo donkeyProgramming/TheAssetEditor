@@ -35,4 +35,15 @@ namespace AssetManagement.GenericFormats.Unmanaged
         public float y;
     }
 
+    /// <summary>
+    /// bit-compatible with DirectX::XMFLOAT3 the derived SimpleMath::Vector3
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, Size = 12)]
+    public struct XMINT3
+    {
+        public int x;
+        public int y;
+        public int z;
+    }
+
 }

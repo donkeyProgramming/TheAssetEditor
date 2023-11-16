@@ -29,11 +29,11 @@
 namespace wrapdll
 {
     class MeshProcessor
-    {     
+    {
     private:
         static constexpr int VERTEX_DISCARDED = -1;
 
-    public: 
+    public:
         static void DoFinalMeshProcessing(PackedMesh& mesh);
 
         static void DoTangentBasisAndIndexing(PackedMesh& destMesh);
@@ -44,7 +44,7 @@ namespace wrapdll
         {
 
             std::vector<PackedCommonVertex> outVertices;
-            std::vector<uint16_t> outIndices;
+            std::vector<uint32_t> outIndices;
             std::vector<int> outVertexIndexRemap; // index = old index, value = new value            
 
             // TODO: Which version is ACTUALLY faster??
@@ -183,7 +183,7 @@ namespace wrapdll
         };
 
         // TODO: FINISH
-        static void ComputeTangentBasisIndexed(std::vector<PackedCommonVertex>& vertices, const std::vector<uint16_t>& indices)
+        static void ComputeTangentBasisIndexed(std::vector<PackedCommonVertex>& vertices, const std::vector<uint32_t>& indices)
         {
             // iterate over triangles
             for (size_t faceIndex = 0; faceIndex < indices.size(); faceIndex += 3)
@@ -231,8 +231,8 @@ namespace wrapdll
             const std::vector<sm::Vector3>& inTangents,
             const std::vector<sm::Vector3>& inBitangents,
 
-            
-            std::vector<uint16_t>& outIndices,
+
+            std::vector<uint32_t>& outIndices,
             std::vector<sm::Vector3>& outVertices,
             std::vector<sm::Vector2>& outUVs,
             std::vector<sm::Vector3>& outNormals,
@@ -250,7 +250,7 @@ namespace wrapdll
                 packed.normal = inNormals[i];
 
                 // Try to find a similar vertex in out_XXXX
-                uint16_t index;
+                uint32_t index;
 
                 //bool found = getSimilarVertexIndex(packed, VertexToOutIndex, index);
                 bool found = GetSimilarVertexIndex(inVertices[i], inUVs[i], inNormals[i], outVertices, outUVs, outNormals, index);
@@ -260,7 +260,7 @@ namespace wrapdll
 
                     // Average the tangents and the bitangents, for "smoothing"
                     outTangents[index] += inTangents[i];
-                    outBitangents[index] += inBitangents[i];                    
+                    outBitangents[index] += inBitangents[i];
                 }
                 else { // If not, it needs to be added in the output data.
                     outVertices.push_back(inVertices[i]);
@@ -268,10 +268,10 @@ namespace wrapdll
                     outNormals.push_back(inNormals[i]);
                     outTangents.push_back(inTangents[i]);
                     outBitangents.push_back(inBitangents[i]);
-                 
-                    uint16_t newindex = (uint16_t)outVertices.size() - 1;
 
-                    outIndices.push_back(newindex);                    
+                    uint32_t newindex = (uint32_t)outVertices.size() - 1;
+
+                    outIndices.push_back(newindex);
                 }
             }
         }
@@ -291,7 +291,7 @@ namespace wrapdll
         static inline void DoMeshIndexingWithTangenSmoothing_Slow(
             const std::vector<PackedCommonVertex>& inVertices,
             std::vector<PackedCommonVertex>& outVertices,
-            std::vector<uint16_t>& outIndices,
+            std::vector<uint32_t>& outIndices,
             std::vector<int>& outVertexRemap)
         {
             outVertexRemap.clear(); // can never be too sure?:)        
@@ -300,7 +300,7 @@ namespace wrapdll
             for (unsigned int inVertexIndex = 0; inVertexIndex < inVertices.size(); inVertexIndex++) {
 
                 // Try to find a similar vertex in out_XXXX
-                uint16_t indexToMatchingVertex;
+                uint32_t indexToMatchingVertex;
 
                 bool matchingVertexFound = GetSimilarPackedVertexIndex_Slow(convert::ConvertToVec3(inVertices[inVertexIndex].position), inVertices[inVertexIndex].uv, inVertices[inVertexIndex].normal, outVertices, indexToMatchingVertex);
 
@@ -318,7 +318,7 @@ namespace wrapdll
                 {
                     outVertices.push_back(inVertices[inVertexIndex]);
 
-                    uint16_t newVertexIndex = (uint16_t)outVertices.size() - 1;
+                    uint32_t newVertexIndex = (uint32_t)outVertices.size() - 1;
                     outIndices.push_back(newVertexIndex);
 
                     outVertexRemap.push_back(newVertexIndex);
@@ -329,23 +329,26 @@ namespace wrapdll
         static inline void DoMeshIndexingWithTangenSmoothing_Fast(
             const std::vector<PackedCommonVertex>& inVertices,
             std::vector<PackedCommonVertex>& outVertices,
-            std::vector<uint16_t>& outIndices,
+            std::vector<uint32_t>& outIndices,
             std::vector<int>& outVertexRemap)
         {
             outVertexRemap.clear(); // can never be too sure?:)        
             std::map<PackedVertex, unsigned short> VertexToOutIndex;
             // For each input vertex
-            for (unsigned int inVertexIndex = 0; inVertexIndex < inVertices.size(); inVertexIndex++) 
+            for (unsigned int inVertexIndex = 0; inVertexIndex < inVertices.size(); inVertexIndex++)
             {
+                uint32_t indexToMatchingVertex;
+                bool matchingVertexFound = GetSimilarPackedVertexIndex_Slow(convert::ConvertToVec3(inVertices[inVertexIndex].position), inVertices[inVertexIndex].uv, inVertices[inVertexIndex].normal, outVertices, indexToMatchingVertex);
+
+                // TODO re-enable the faster version, once everything works, maybe
+                /*
                 PackedVertex packedVertex;
                 packedVertex.position = convert::ConvertToVec3(inVertices[inVertexIndex].position);
                 packedVertex.uv = inVertices[inVertexIndex].uv;
                 packedVertex.normal = inVertices[inVertexIndex].normal;
-                
-                uint16_t indexToMatchingVertex;                
-                bool found = GetSimilarVertexIndex_Fast(packedVertex, VertexToOutIndex, indexToMatchingVertex);                
-
-                bool matchingVertexFound = GetSimilarPackedVertexIndex_Slow(convert::ConvertToVec3(inVertices[inVertexIndex].position), inVertices[inVertexIndex].uv, inVertices[inVertexIndex].normal, outVertices, indexToMatchingVertex);
+                uint32_t indexToMatchingVertex;
+                bool found = GetSimilarVertexIndex_Fast(packedVertex, VertexToOutIndex, indexToMatchingVertex);
+                */
 
                 if (matchingVertexFound) // A similar vertex is already in the new OUTPUT Vertex buffer, use that!
                 {
@@ -361,7 +364,7 @@ namespace wrapdll
                 {
                     outVertices.push_back(inVertices[inVertexIndex]);
 
-                    uint16_t newVertexIndex = (uint16_t)outVertices.size() - 1;
+                    uint32_t newVertexIndex = (uint32_t)outVertices.size() - 1;
                     outIndices.push_back(newVertexIndex);
 
                     outVertexRemap.push_back(newVertexIndex);
@@ -381,7 +384,7 @@ namespace wrapdll
         static bool GetSimilarVertexIndex_Fast(
             PackedVertex& packed,
             std::map<PackedVertex, unsigned short>& VertexToOutIndex,
-            unsigned short& result
+            uint32_t& result
         ) {
             std::map<PackedVertex, unsigned short>::iterator it = VertexToOutIndex.find(packed);
             if (it == VertexToOutIndex.end()) {
@@ -396,7 +399,7 @@ namespace wrapdll
 
         static inline void indexVBO_TBN_Fast_Packed(
             const std::vector<PackedCommonVertex>& inVertices,
-            std::vector<uint16_t>& out_indices,
+            std::vector<uint32_t>& out_indices,
             std::vector<PackedCommonVertex>& out_vertices
         ) {
             std::map<PackedVertex, unsigned short> VertexToOutIndex;
@@ -410,7 +413,7 @@ namespace wrapdll
                 packedVertex.normal = inVertices[i].normal;
 
                 // Try to find a similar vertex in out_XXXX
-                uint16_t index;
+                uint32_t index;
 
                 //bool found = getSimilarVertexIndex(packed, VertexToOutIndex, index);
                 //bool found = getSimilarVertexIndex(packed, VertexToOutIndex, index);
@@ -427,7 +430,7 @@ namespace wrapdll
                 { // If not, it needs to be added in the output data.
                     out_vertices.push_back(inVertices[i]);
 
-                    uint16_t newindex = (uint16_t)out_vertices.size() - 1;
+                    uint32_t newindex = (uint32_t)out_vertices.size() - 1;
 
                     out_indices.push_back(newindex);
                     VertexToOutIndex[packedVertex] = newindex;
@@ -456,7 +459,7 @@ namespace wrapdll
             std::vector<sm::Vector3>& out_vertices,
             std::vector<sm::Vector2>& out_uvs,
             std::vector<sm::Vector3>& out_normals,
-            uint16_t& result
+            uint32_t& result
         ) {
             // Lame linear search
             for (unsigned int i = 0; i < out_vertices.size(); i++) {
@@ -492,7 +495,7 @@ namespace wrapdll
             const sm::Vector3& in_normal,
             std::vector<PackedCommonVertex>& out_vertices,
 
-            uint16_t& result
+            uint32_t& result
         ) {
             // Lame linear search
             for (unsigned int i = 0; i < out_vertices.size(); i++) {
@@ -559,8 +562,8 @@ namespace wrapdll
             {
                 return memcmp((void*)this, (void*)&that, sizeof(PackedVertex)) > 0;
             };
-        
-        
+
+
         };
     };
 };

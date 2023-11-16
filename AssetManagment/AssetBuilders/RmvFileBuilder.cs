@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
+using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.MeshProcessing.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.RigidModel;
@@ -67,7 +68,6 @@ namespace AssetManagement.AssetBuilders
             if (skeletonFile == null)
                 return;
 
-
             for (var vertexWeightIndex = 0; vertexWeightIndex < srcMesh.VertexWeights.Count; vertexWeightIndex++)
             {
                 CommonWeightProcessor.AddWeightToVertexByBoneName(
@@ -119,9 +119,12 @@ namespace AssetManagement.AssetBuilders
             var rmv2Mesh = new RmvMesh();
             rmv2Mesh.IndexList = new ushort[packedInputMesh.Indices.Count];
             rmv2Mesh.VertexList = new CommonVertex[packedInputMesh.Vertices.Count];
+            rmv2Mesh.VertexList = MakeCommonVertices(vertexFormat, packedInputMesh, skeletonFile).ToArray();            
 
-            rmv2Mesh.VertexList = MakeCommonVertices(vertexFormat, packedInputMesh, skeletonFile).ToArray();
-            rmv2Mesh.IndexList = packedInputMesh.Indices.ToArray();
+            for (var indexBufferIndex = 0; indexBufferIndex < rmv2Mesh.IndexList.Length; indexBufferIndex++)
+            {
+                rmv2Mesh.IndexList[indexBufferIndex] = (ushort)packedInputMesh.Indices[indexBufferIndex];
+            }
 
             if (skeletonFile == null)
             {

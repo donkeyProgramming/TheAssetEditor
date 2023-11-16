@@ -8,7 +8,7 @@ extern "C" // not really needed but block looks nice/readable:)
 	};
 
 	FBXWRAPPERDLL_API
-		extern void GetIndices(wrapdll::FBXSCeneContainer* pInstance, int meshindex, uint16_t** ppVertices, int* itemCount)
+		extern void GetIndices(wrapdll::FBXSCeneContainer* pInstance, int meshindex, uint32_t** ppVertices, int* itemCount)
 	{
 		pInstance->GetIndices(meshindex, ppVertices, itemCount);
 	};
