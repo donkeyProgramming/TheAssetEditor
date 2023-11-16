@@ -1,10 +1,8 @@
-﻿using CommonControls.BaseDialogs;
-using CommonControls.Common;
-using KitbasherEditor.Views.EditorViews.PinTool;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using CommonControls.Common;
 using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
@@ -17,14 +15,11 @@ namespace KitbasherEditor.ViewModels.PinTool
         private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
 
-        public NotifyAttr<bool> IsPintToPointMode { get; set; } = new NotifyAttr<bool>(true);
-        public NotifyAttr<bool> IsSkinwrapMode { get; set; } = new NotifyAttr<bool>(false);
-
         public ObservableCollection<Rmv2MeshNode> AffectedMeshCollection { get; set; } = new ObservableCollection<Rmv2MeshNode>();
         public ObservableCollection<Rmv2MeshNode> SourceMeshCollection { get; set; } = new ObservableCollection<Rmv2MeshNode>();
 
         Rmv2MeshNode _selectedVertexMesh;
-        List<int> _selectedVertexList = new List<int>();
+        List<int> _selectedVertexList = new();
 
         public NotifyAttr<string> SelectedForStaticMeshName { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<string> SelectedForStaticDescription { get; set; } = new NotifyAttr<string>($"Selected vertex count : ");
@@ -65,7 +60,6 @@ namespace KitbasherEditor.ViewModels.PinTool
             }
         }
 
-
         void AddSelectionToList(ObservableCollection<Rmv2MeshNode> itemList)
         {
             var selectionState = _selectionManager.GetState<ObjectSelectionState>();
@@ -101,10 +95,8 @@ namespace KitbasherEditor.ViewModels.PinTool
                 return;
             }
 
-            if (IsPintToPointMode.Value == true)
-                ApplyPintToPoint();
-            else
-                ApplySkinWrapRigging();
+           
+            ApplyPintToPoint();
         }
 
         void ApplyPintToPoint()
@@ -122,51 +114,6 @@ namespace KitbasherEditor.ViewModels.PinTool
             }
 
             _commandFactory.Create<PinMeshToVertexCommand>().Configure(x => x.Configure(AffectedMeshCollection, _selectedVertexMesh, _selectedVertexList.First())).BuildAndExecute();
-        }
-
-        void ApplySkinWrapRigging()
-        {
-            if (SourceMeshCollection.Count == 0 || AffectedMeshCollection.Count == 0)
-                return;
-
-            var numSkeletons = SourceMeshCollection.Select(x => x.Geometry.ParentSkeletonName).Distinct().Count();
-            var numVertexFormats = SourceMeshCollection.Select(x => x.Geometry.VertexFormat).Distinct().Count();
-
-            if (numSkeletons != 1)
-            {
-                MessageBox.Show("Multiple skeletons found in the selected source objects, only one type is valid", "Error");
-                return;
-            }
-
-            if (numVertexFormats != 1)
-            {
-                MessageBox.Show("Multiple vertex formats found in the selected source objects, only one type is valid", "Error");
-                return;
-            }
-
-            foreach (var mesh in AffectedMeshCollection)
-            {
-                if (SourceMeshCollection.Count(x => x == mesh) != 0)
-                {
-                    MessageBox.Show("Source mesh is also in the list of target meshes", "Error");
-                    return;
-                }
-            }
-
-            _commandFactory.Create<SkinWrapRiggingCommand>().Configure(x => x.Configure(AffectedMeshCollection, SourceMeshCollection)).BuildAndExecute();
-        }
-
-        public static void ShowWindow(SelectionManager selectionManager, CommandFactory commandFactory)
-        {
-            var window = new ControllerHostWindow(true)
-            {
-                DataContext = new PinToolViewModel(selectionManager, commandFactory),
-                Title = "Pin tool",
-                Content = new PinToolView(),
-                Width = 360,
-                Height = 415,
-            };
-            window.Show();
         }
     }
 }

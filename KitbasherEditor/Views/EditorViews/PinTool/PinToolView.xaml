@@ -8,12 +8,7 @@
              d:DesignHeight="600" d:DesignWidth="400">
 
     <StackPanel Orientation="Vertical">
-        <GroupBox Header="Transfer method:">
-            <StackPanel Orientation="Horizontal" Margin="5">
-                <RadioButton Content="Pin to vertex (Static)" VerticalContentAlignment="Center" GroupName="TransferMethodGroup" IsChecked="{Binding IsPintToPointMode.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <RadioButton Content="Skinwrap (Animated)" VerticalContentAlignment="Center" Margin="20,0,0,0" GroupName="TransferMethodGroup" IsChecked="{Binding IsSkinwrapMode.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            </StackPanel>
-        </GroupBox>
+
         <GroupBox Header="Meshes to copy animation to:" Margin="0,5,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -25,33 +20,21 @@
                     <RowDefinition Height="100"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-
-                <ListView Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{Binding AffectedMeshCollection, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
+                
+                <ListView Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{Binding AffectedMeshCollection, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" >
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Height" Value="30"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+                
                 <Button Content="Add selected meshes" Grid.Row="1" Grid.Column="0" Margin="2,2,2,0" Click="{s:MethodBinding AddSelectionToAffectMeshCollection}" />
                 <Button Content="Remove all" Grid.Row="1" Grid.Column="1" Margin="2,2,2,0" Click="{s:MethodBinding ClearAffectedMeshCollection}" />
             </Grid>
         </GroupBox>
 
-
-        <GroupBox Header="Meshes to take animation from:" Margin="0,5,0,0" Visibility="{Binding IsSkinwrapMode.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
-            <Grid >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.5*"/>
-                    <ColumnDefinition Width="0.5*"/>
-                </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="100"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-
-                <ListView Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{Binding SourceMeshCollection, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name"/>
-                <Button Content="Add selected meshes" Grid.Row="1" Grid.Column="0" Margin="2,2,2,0" Click="{s:MethodBinding AddSelectionToSourceMeshCollection}" />
-                <Button Content="Remove all" Grid.Row="1" Grid.Column="1" Margin="2,2,2,0" Click="{s:MethodBinding ClearSourcedMeshCollection}" />
-            </Grid>
-        </GroupBox>
-
-        <GroupBox Header="Mesh to take animation from:" Margin="0,5,0,0" Visibility="{Binding IsPintToPointMode.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
+        <GroupBox Header="Mesh to take animation from:" Margin="0,5,0,0">
             <Grid >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>

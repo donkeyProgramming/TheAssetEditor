@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors" 
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -104,7 +105,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
     </UserControl.Resources>
 
     <Grid>
@@ -115,11 +115,12 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Column="0" Grid.Row="1">
+        <Grid Grid.Column="0" Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -227,7 +228,7 @@
 
         </Grid>
 
-        <Grid Grid.Column="2" Grid.Row="1">
+        <Grid Grid.Column="2" Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -237,7 +238,6 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
-
 
             <StackPanel  Grid.Row="0" Orientation="Horizontal">
                 <TextBlock  Text="Target Model Bones - " FontWeight="Bold" FontSize="16" TextDecorations="Underline"/>
@@ -267,6 +267,78 @@
                 </TreeView.ItemTemplate>
             </TreeView>
         </Grid>
+
+        <Grid Grid.Row="1" Grid.ColumnSpan="3"  Visibility="{Binding ShowTransformSection.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="6"/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Row="0" Grid.ColumnSpan="4" Background="Gray" BorderThickness="2" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Root scale"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text=":"/>
+            <TextBox Grid.Row="1" Grid.Column="2"  Width="116" Text="{Binding ScaleFactor.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="2" >
+                <b:Interaction.Behaviors>
+                    <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Only move selected bone "/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text=":"/>
+            <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding OnlyMOveSelectedBone.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="False"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Relative Scale:"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text=":"/>
+            <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding RelativeScale.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Display offset"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text=":"/>
+            <mathviews:Vector3View Grid.Row="4" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding SkeletonDisplayOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left"/>
+
+            <Border Grid.Row="5" Grid.ColumnSpan="3" Background="Gray" BorderThickness="2"/>
+
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Pos offset"/>
+            <TextBlock Grid.Row="6" Grid.Column="1" Text=":"/>
+            <mathviews:Vector3View Grid.Row="6" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding BonePositionOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Rot offset"/>
+            <TextBlock Grid.Row="7" Grid.Column="1" Text=":"/>
+            <mathviews:Vector3View Grid.Row="7" Grid.Column="2" Width="350" VerticalContentAlignment="Center" Vector3="{Binding BoneRotationOffset, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2" HorizontalAlignment="Left" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Text="Scale"/>
+            <TextBlock Grid.Row="8" Grid.Column="1" Text=":"/>
+            <TextBox Grid.Row="8" Grid.Column="2"  Width="116" Text="{Binding BoneScaleFactor.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" HorizontalAlignment="Left" Margin="2" IsEnabled="{Binding IsBoneSelected.Value, UpdateSourceTrigger=PropertyChanged}">
+                <b:Interaction.Behaviors>
+                    <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <Button Grid.Row="8" Grid.Column="3" HorizontalAlignment="Left" Content="Copy to children"  Click="{s:MethodBinding CopyScaleToChildren}"/>
+
+            <Button Grid.Row="9" Grid.Column="2" Content="Reset offsets" Margin="2" Click="{s:MethodBinding ResetOffsetTransforms}"/>
+        </Grid>
+
+        <DockPanel Grid.Row="2" Grid.ColumnSpan="3" DockPanel.Dock="Right" LastChildFill="False">
+            <Button x:Name="ApplyButtonHandle" DockPanel.Dock="Right" Width="50" Click="{s:MethodBinding OnApplyButton}" Visibility="{Binding ShowApplyButton.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">Apply</Button>
+            <Button DockPanel.Dock="Right" Width="50" Margin="5,0,5,0" Click="{s:MethodBinding OnOkButton}">Ok</Button>
+            <Button DockPanel.Dock="Right" Width="50" Click="{s:MethodBinding OnCancelButton}">Cancel</Button>
+        </DockPanel>
 
     </Grid>
 </UserControl>

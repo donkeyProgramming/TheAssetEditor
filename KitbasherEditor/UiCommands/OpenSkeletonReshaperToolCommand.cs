@@ -4,10 +4,10 @@ using System.Windows;
 using CommonControls.BaseDialogs;
 using CommonControls.Common.MenuSystem;
 using CommonControls.Editors.BoneMapping;
+using CommonControls.Editors.BoneMapping.View;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
-using KitbasherEditor.Views.EditorViews.MeshFitter;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
@@ -79,8 +79,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
             config.MeshSkeletonName = currentSkeletonName;
             config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes);
 
-            var window = _windowFactory.Create<MeshFitterViewModel, MeshFitterView>("MeshFitter", 1200, 1100);
-            window.TypedContext.Initialise(window, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile);
+            var window = _windowFactory.Create<MeshFitterViewModel, BoneMappingView>("MeshFitter", 1200, 600);
+            window.TypedContext.Initialize(window, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile);
             window.ShowWindow();
         }
     }

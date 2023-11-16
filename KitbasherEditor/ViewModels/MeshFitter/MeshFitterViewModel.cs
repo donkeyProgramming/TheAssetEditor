@@ -18,8 +18,6 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 {
     public class MeshFitterViewModel : BoneMappingViewModel, IDisposable
     {
-        IAssetEditorWindow<MeshFitterViewModel> _parentWindow;
-
         private readonly CommandFactory _commandFactory;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly ResourceLibary _resourceLibary;
@@ -51,10 +49,11 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _sceneManager = sceneManager;
         }
 
-        public void Initialise(IAssetEditorWindow<MeshFitterViewModel> ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile)
+        public void Initialize(IAssetEditorWindow ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile)
         {
-            _parentWindow = ownerWindow;
-            BaseInitialize(configuration);
+            ShowApplyButton.Value = false;
+            ShowTransformSection.Value = true;
+            Initialize(ownerWindow, configuration);
 
             _meshNodes = meshNodes;
             _targetSkeleton = targetSkeleton;
@@ -93,26 +92,17 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 mesh.AnimationPlayer = _animationPlayer;
         }
 
+        protected override void MappingUpdated()
+        {
+            if (_targetSkeleton == null)
+                return;
+
+            ApplyMeshFittingTransforms();
+        }
+
         private void SkeletonDisplayOffsetUpdated(Vector3ViewModel viewModel)
         {
             _currentSkeletonNode.ModelMatrix = Matrix.CreateTranslation((float)viewModel.X.Value, (float)viewModel.Y.Value, (float)viewModel.Z.Value);
-        }
-
-        public override void AutoMapSelfAndChildrenByName()
-        {
-            base.AutoMapSelfAndChildrenByName();
-            ApplyMeshFittingTransforms();
-        }
-
-        public override void AutoMapSelfAndChildrenByHierarchy()
-        {
-            base.AutoMapSelfAndChildrenByHierarchy();
-            ApplyMeshFittingTransforms();
-        }
-        public override void ClearBindingSelfAndChildren()
-        {
-            base.ClearBindingSelfAndChildren();
-            ApplyMeshFittingTransforms();
         }
 
         void OnBoneSelected()
@@ -193,7 +183,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
                 var fromBoneIndex = i;
                 var fromParentBoneIndex = _fromSkeleton.GetParentBoneIndex(fromBoneIndex);
-                Matrix desiredBonePosWorld = Matrix.Identity;
+                var desiredBonePosWorld = Matrix.Identity;
 
                 // Get the world position where we want to move the bone to
                 if (mappedIndex != null)
@@ -234,7 +224,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 }
 
                 // Compute scaling
-                float scale = boneValuesObject.BoneScaleOffset * relativeScale;
+                var scale = boneValuesObject.BoneScaleOffset * relativeScale;
 
                 // To stop the calculations from exploding with NAN values
                 if (scale <= 0 || float.IsNaN(scale))
@@ -261,14 +251,6 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
                 _animationPlayer.Refresh();
             }
-        }
-
-        public override void OnMappingCreated(int humanoid01BoneIndex, int dwarfBoneIndex)
-        {
-            if (_targetSkeleton == null)
-                return;
-
-            ApplyMeshFittingTransforms();
         }
 
         public void ResetOffsetTransforms()
@@ -311,11 +293,11 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _sceneManager.RootNode.RemoveObject(_currentSkeletonNode);
         }
 
-        public void OnSaveAndClose()
+
+        protected override void ApplyChanges()
         {
             var frame = AnimationSampler.Sample(0, _fromSkeleton, _animationClip);
             _commandFactory.Create<CreateAnimatedMeshPoseCommand>().Configure(x => x.Configure(_meshNodes, frame)).BuildAndExecute();
-            _parentWindow.CloseWindow();
         }
     }
 }

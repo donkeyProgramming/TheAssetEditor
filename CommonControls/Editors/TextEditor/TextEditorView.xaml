@@ -23,13 +23,14 @@
                 <Image Source="../../Resources/Icons/Save.png" Height="16"/>
             </Button>
             <Separator/>
-            <CheckBox IsChecked="{Binding ElementName=textEditor,Path=ShowLineNumbers}">
-                <TextBlock Width="16" TextAlignment="Center">#</TextBlock>
-            </CheckBox>
-            <ComboBox Name="highlightingComboBox"
+            <ComboBox Name="highlightingComboBox"   
+                      Width="200"
+                      Background="{DynamicResource ComboBox.Static.Background}"
+                      BorderBrush="{DynamicResource ComboBox.Static.Border}"
 				SelectedItem="{Binding SyntaxHighlighting, ElementName=textEditor}"
 				ItemsSource="{Binding Source={x:Static avalonEdit:HighlightingManager.Instance}, Path=HighlightingDefinitions}"
-                SelectionChanged="HighlightingComboBox_SelectionChanged"/>
+                SelectionChanged="HighlightingComboBox_SelectionChanged"
+                Template="{StaticResource ComboBoxTemplate}"/>
         </ToolBar>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -40,6 +41,17 @@
 				FontFamily="Consolas"
 				FontSize="10pt"
 				SyntaxHighlighting="XML">
+                
+                <avalonEdit:TextEditor.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
+                </avalonEdit:TextEditor.BorderBrush>
+                <avalonEdit:TextEditor.Foreground>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlTextColorKey}}"/>
+                </avalonEdit:TextEditor.Foreground>
+                <avalonEdit:TextEditor.Background>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.AppWorkspaceColorKey}}"/>
+                </avalonEdit:TextEditor.Background>
+                
                 <i:Interaction.Behaviors>
                     <local:AvalonEditBehaviour GiveMeTheText="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </i:Interaction.Behaviors>

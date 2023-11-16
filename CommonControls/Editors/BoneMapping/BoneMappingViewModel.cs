@@ -1,12 +1,14 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using CommonControls.BaseDialogs;
 using CommonControls.Common;
 
 namespace CommonControls.Editors.BoneMapping
 {
     public class BoneMappingViewModel : NotifyPropertyChangedImpl
     {
+        protected IAssetEditorWindow _parentWindow;
         protected RemappedAnimatedBoneConfiguration _configuration;
 
         public FilterCollection<AnimatedBone> MeshBones { get; set; }
@@ -15,7 +17,9 @@ namespace CommonControls.Editors.BoneMapping
         public NotifyAttr<bool> OnlyShowUsedBones { get; set; }
         public NotifyAttr<string> MeshSkeletonName { get; set; }
         public NotifyAttr<string> ParentSkeletonName { get; set; }
-
+        public NotifyAttr<bool> ShowTransformSection { get; set; } = new NotifyAttr<bool>(false);
+        public NotifyAttr<bool> ShowApplyButton { get; set; } = new NotifyAttr<bool>(false);
+        
         public BoneMappingViewModel()
         {
             MeshBones = new FilterCollection<AnimatedBone>(null, OnBoneSelected);
@@ -23,8 +27,9 @@ namespace CommonControls.Editors.BoneMapping
             OnlyShowUsedBones = new NotifyAttr<bool>(true, (x) => MeshBones.RefreshFilter());
         }
 
-        public void BaseInitialize(RemappedAnimatedBoneConfiguration configuration)
+        public void Initialize(IAssetEditorWindow parentWindow, RemappedAnimatedBoneConfiguration configuration)
         {
+            _parentWindow = parentWindow;
             _configuration = configuration;
             CreateFromConfiguration(_configuration);
 
@@ -64,6 +69,7 @@ namespace CommonControls.Editors.BoneMapping
             }
 
             MeshBones.SelectedItem.ClearMapping();
+            MappingUpdated();
         }
 
         public virtual void AutoMapSelfAndChildrenByName()
@@ -75,6 +81,7 @@ namespace CommonControls.Editors.BoneMapping
             }
 
             BoneMappingHelper.AutomapDirectBoneLinksBasedOnNames(MeshBones.SelectedItem, ParentModelBones.PossibleValues);
+            MappingUpdated();
         }
 
         public virtual void AutoMapSelfAndChildrenByHierarchy()
@@ -91,6 +98,7 @@ namespace CommonControls.Editors.BoneMapping
             }
 
             BoneMappingHelper.AutomapDirectBoneLinksBasedOnHierarchy(MeshBones.SelectedItem, ParentModelBones.SelectedItem);
+            MappingUpdated();
         }
 
         public virtual void ClearBindingSelf()
@@ -102,6 +110,7 @@ namespace CommonControls.Editors.BoneMapping
             }
 
             MeshBones.SelectedItem.ClearMapping(false);
+            MappingUpdated();
         }
 
         public virtual void CopyMappingToAllChildren()
@@ -113,6 +122,7 @@ namespace CommonControls.Editors.BoneMapping
             }
 
             MeshBones.SelectedItem.ApplySelfToChildren();
+            MappingUpdated();
         }
 
         private void OnParentBoneSelected(AnimatedBone bone)
@@ -123,10 +133,9 @@ namespace CommonControls.Editors.BoneMapping
             MeshBones.SelectedItem.MappedBoneIndex.Value = bone.BoneIndex.Value;
             MeshBones.SelectedItem.MappedBoneName.Value = bone.Name.Value;
 
-            OnMappingCreated(MeshBones.SelectedItem.BoneIndex.Value, MeshBones.SelectedItem.MappedBoneIndex.Value);
-
             if (_configuration.SkeletonBoneHighlighter != null)
                 _configuration.SkeletonBoneHighlighter.SelectTargetSkeletonBone(bone.BoneIndex.Value);
+            MappingUpdated();
         }
 
         private void OnBoneSelected(AnimatedBone bone)
@@ -144,21 +153,41 @@ namespace CommonControls.Editors.BoneMapping
             }
         }
 
-        public virtual void OnMappingCreated(int originalBoneIndex, int newBoneIndex)
+        protected virtual void MappingUpdated()
         { }
+
+        public void OnApplyButton() 
+        {
+            ApplyChanges();
+        }
+
+        public void OnOkButton()
+        {
+            var res = Validate(out string errorText);
+            if (res == false)
+            {
+                var messageBoxResult = MessageBox.Show("Are you sure you want to do this?\n\n" + errorText + "\n\nContinue?", "Error", MessageBoxButton.OKCancel);
+                if (messageBoxResult == MessageBoxResult.Cancel)
+                    return;
+            }
+
+            ApplyChanges();
+            _parentWindow.CloseWindow();
+        }
+
+        public void OnCancelButton()
+        {
+            _parentWindow.CloseWindow();
+        }
+
+        protected virtual void ApplyChanges()
+        { 
+        }
 
         public virtual bool Validate(out string errorText)
         {
-            var usedBonesCount = AnimatedBoneHelper.GetUsedBonesCount(MeshBones.PossibleValues.First());
-            var mapping = AnimatedBoneHelper.BuildRemappingList(MeshBones.PossibleValues.First());
-            var numMappings = mapping.Count(x => x.IsUsedByModel);
-            if (usedBonesCount != numMappings)
-            {
-                errorText = "Not all bones mapped. This will not work as you expect and will case problems later!\nOnly do this if your REALLY know what you are doing";
-                return false;
-            }
             errorText = "";
-            return true;
+            return true;        
         }
     }
 }

@@ -6,7 +6,7 @@ namespace CommonControls.BaseDialogs
 {
     public interface IWindowFactory
     {
-        IAssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight) where TViewModel : class;
+        ITypedAssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight) where TViewModel : class;
     }
 
     public class WindowFactory : IWindowFactory
@@ -18,7 +18,7 @@ namespace CommonControls.BaseDialogs
             _serviceProvider = serviceProvider;
         }
 
-        public IAssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight)
+        public ITypedAssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight)
             where TViewModel : class
         {
             var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
@@ -37,17 +37,24 @@ namespace CommonControls.BaseDialogs
         }
     }
 
-    public interface IAssetEditorWindow<TViewModel> where TViewModel : class
-    { 
+    public interface IAssetEditorWindow
+    {
+        public bool AlwaysOnTop { get; set; }
         public void CloseWindow();
         public void ShowWindow();
+    }
+
+    public interface ITypedAssetEditorWindow<TViewModel> 
+        : IAssetEditorWindow where TViewModel : class
+    {
 
         public TViewModel TypedContext { get; }
     }
 
     public class AssetEditorWindow<TViewModel>
-        : Window, IAssetEditorWindow<TViewModel> where TViewModel : class
+        : Window, ITypedAssetEditorWindow<TViewModel> where TViewModel : class
     {
+        public bool AlwaysOnTop { get; set; } = false;
         public TViewModel TypedContext
         {
             get => DataContext as TViewModel;
@@ -58,7 +65,22 @@ namespace CommonControls.BaseDialogs
         {
             Style = (Style)FindResource("CustomWindowStyle");
             Closing += AssetEditorWindow_Closing;
+            Deactivated += AssetEditorWindow_Deactivated;
         }
+        private void AssetEditorWindow_Deactivated(object sender, EventArgs e)
+        {
+            if (AlwaysOnTop)
+            {
+                Window window = (Window)sender;
+                window.Topmost = true;
+            }
+        }
+
+
+
+
+
+
 
         private void AssetEditorWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

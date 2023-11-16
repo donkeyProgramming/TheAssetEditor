@@ -1,5 +1,5 @@
-﻿using CommonControls;
-using CommonControls.BaseDialogs;
+﻿using System;
+using CommonControls;
 using CommonControls.Common;
 using CommonControls.Common.MenuSystem;
 using CommonControls.Services;
@@ -9,13 +9,13 @@ using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
+using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
-using KitbasherEditor.Views.EditorViews.MeshFitter;
+using KitbasherEditor.Views.EditorViews.PinTool;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using View3D.Services;
 
 namespace KitbasherEditor
@@ -36,10 +36,13 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<AnimationControllerViewModel>();
 
             // Sub tools
-            serviceCollection.AddTransient<VertexDebuggerViewModel>();
-            serviceCollection.AddTransient<VertexDebuggerView>();
-            serviceCollection.AddTransient<MeshFitterViewModel>();
-            serviceCollection.AddTransient<MeshFitterView>();
+            serviceCollection.AddScoped<VertexDebuggerViewModel>();
+            serviceCollection.AddScoped<VertexDebuggerView>();
+            serviceCollection.AddScoped<MeshFitterViewModel>();
+            serviceCollection.AddScoped<ReRiggingViewModel>();
+            serviceCollection.AddScoped<PinToolView>();
+            serviceCollection.AddScoped<PinToolViewModel>();
+            
 
 
             // Menubar 

@@ -1,21 +1,15 @@
-﻿using CommonControls.BaseDialogs;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using CommonControls.BaseDialogs;
 using CommonControls.Common.MenuSystem;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
-using CommonControls.Events.UiCommands;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
-using KitbasherEditor.Views.EditorViews.MeshFitter;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
-using System.Windows.Input;
-using View3D.Commands;
-using View3D.Commands.Object;
-using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using MessageBox = System.Windows.MessageBox;
@@ -30,29 +24,25 @@ namespace KitbasherEditor.ViewModels.UiCommands
 
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly SelectionManager _selectionManager;
-        private readonly CommandFactory _commandFactory;
+   
         private readonly PackFileService _packFileService;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IWindowFactory _windowFactory;
 
-        public OpenReriggingToolCommand(KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, CommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, IWindowFactory windowFactory)
+        public OpenReriggingToolCommand(KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, IWindowFactory windowFactory)
         {
             _kitbasherRootScene = kitbasherRootScene;
             _selectionManager = selectionManager;
-            _commandFactory = commandFactory;
+    
             _packFileService = packFileService;
             _skeletonHelper = skeletonHelper;
             _windowFactory = windowFactory;
         }
-
         public void Execute()
         {
-            var skeletonName = _kitbasherRootScene.Skeleton.SkeletonName;
-            Remap(_selectionManager.GetState<ObjectSelectionState>(), skeletonName);
-        }
+            var targetSkeletonName = _kitbasherRootScene.Skeleton.SkeletonName;
+            var state = _selectionManager.GetState<ObjectSelectionState>();
 
-        public void Remap(ObjectSelectionState state, string targetSkeletonName)
-        {
             var existingSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, targetSkeletonName);
             if (existingSkeletonFile == null)
                 throw new Exception("TargetSkeleton not found -" + targetSkeletonName);
@@ -113,24 +103,9 @@ namespace KitbasherEditor.ViewModels.UiCommands
             if (targetSkeletonName == selectedMeshSkeleton)
                 MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
 
-
-
-            var window = _windowFactory.Create<BoneMappingViewModel, BoneMappingView>("Re-rigging", 1200, 1100);
-            window.TypedContext.BaseInitialize(config);
+            var window = _windowFactory.Create<ReRiggingViewModel, BoneMappingView>("Re-rigging", 1200, 1100);
+            window.TypedContext.Initialize(selectedMeshses, window, config);
             window.ShowWindow();
-
-
-
-            
-
-            var window = new BoneMappingWindow(new BoneMappingViewModel(config), false);
-            window.ShowDialog();
-
-            if (window.Result == true)
-            {
-                var remapping = AnimatedBoneHelper.BuildRemappingList(config.MeshBones.First());
-                _commandFactory.Create<RemapBoneIndexesCommand>().Configure(x => x.Configure(selectedMeshses, remapping, config.ParnetModelSkeletonName)).BuildAndExecute();
-            }*/
         }
     }
 }

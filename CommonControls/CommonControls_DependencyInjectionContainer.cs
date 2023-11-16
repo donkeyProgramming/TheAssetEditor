@@ -4,6 +4,8 @@ using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
+using CommonControls.Editors.BoneMapping;
+using CommonControls.Editors.BoneMapping.View;
 using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
@@ -53,8 +55,8 @@ namespace CommonControls
             services.AddTransient<ImportAssetCommand>();
 
             services.AddTransient<IWindowFactory, WindowFactory>();
-
-            
+            services.AddScoped<BoneMappingView>();
+            services.AddScoped<BoneMappingViewModel>();
 
             // Editors that should be moved into their own projects
             TextEditor_DependencyInjectionContainer.Register(services);

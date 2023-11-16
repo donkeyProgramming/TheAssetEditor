@@ -7,6 +7,7 @@ using View3D.Utility;
 
 namespace View3D.Commands.Object
 {
+    // TODO: THis is delete and not used
     public class SkinWrapRiggingCommand : ICommand
     {
         ISelectionState _selectionOldState;
