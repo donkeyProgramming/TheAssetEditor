@@ -77,7 +77,7 @@
             <Button Grid.Row="8" Grid.Column="3" HorizontalAlignment="Left" Content="Copy to children"  Click="{s:MethodBinding CopyScaleToChildren}"/>
 
             <Button Grid.Row="9" Grid.Column="2" Content="Reset offsets" Margin="2" Click="{s:MethodBinding ResetOffsetTransforms}"/>
-            <Button Grid.Row="10" Grid.Column="3" HorizontalAlignment="Right" Content="Save" FontSize="20" Margin="5" Click="{s:MethodBinding SaveAndClose}" />
+            <Button Grid.Row="10" Grid.Column="3" HorizontalAlignment="Right" Content="Save" FontSize="20" Margin="5" Click="{s:MethodBinding OnSaveAndClose}" />
         </Grid>
 
         <boneMapping:BoneMappingView/>

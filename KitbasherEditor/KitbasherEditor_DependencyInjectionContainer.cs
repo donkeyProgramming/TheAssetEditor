@@ -1,4 +1,5 @@
 ﻿using CommonControls;
+using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.Common.MenuSystem;
 using CommonControls.Services;
@@ -7,9 +8,11 @@ using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
+using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
+using KitbasherEditor.Views.EditorViews.MeshFitter;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -33,8 +36,11 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<AnimationControllerViewModel>();
 
             // Sub tools
-            serviceCollection.AddScoped<VertexDebuggerViewModel>();
-            serviceCollection.AddScoped<VertexDebuggerView>();
+            serviceCollection.AddTransient<VertexDebuggerViewModel>();
+            serviceCollection.AddTransient<VertexDebuggerView>();
+            serviceCollection.AddTransient<MeshFitterViewModel>();
+            serviceCollection.AddTransient<MeshFitterView>();
+
 
             // Menubar 
             serviceCollection.AddScoped<TransformToolViewModel>();

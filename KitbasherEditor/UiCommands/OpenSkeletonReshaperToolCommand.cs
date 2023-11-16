@@ -1,40 +1,87 @@
-﻿using CommonControls.Common.MenuSystem;
-using CommonControls.Events.UiCommands;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using CommonControls.BaseDialogs;
+using CommonControls.Common.MenuSystem;
+using CommonControls.Editors.BoneMapping;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
-using MonoGame.Framework.WpfInterop;
-using View3D.Commands;
+using KitbasherEditor.Views.EditorViews.MeshFitter;
+using View3D.Components.Component;
 using View3D.Components.Component.Selection;
-using View3D.Utility;
+using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
     public class OpenSkeletonReshaperToolCommand : IKitbasherUiCommand
     {
-        public string ToolTip { get; set; } = "Open the skeleton modeling tool";
+        public string ToolTip { get; set; } = "Open the skeleton modelling tool";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
         public Hotkey HotKey { get; } = null;
 
-        IComponentManager _componentManager;
-        SelectionManager _selectionManager;
-        private readonly CommandFactory _commandFactory;
-        SkeletonAnimationLookUpHelper _skeletonHelper;
-        PackFileService _packFileService;
+        private readonly SelectionManager _selectionManager;
+        private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
+        private readonly PackFileService _pfs;
+        private readonly IWindowFactory _windowFactory;
+        private readonly SceneManager _sceneManager;
 
-        public OpenSkeletonReshaperToolCommand(ComponentManagerResolver componentManagerResolver, SelectionManager selectionManager, CommandFactory commandFactory, SkeletonAnimationLookUpHelper skeletonHelper, PackFileService packFileService)
+        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, PackFileService pfs, IWindowFactory windowFactory, SceneManager sceneManager)
         {
-            _componentManager = componentManagerResolver.ComponentManager;
             _selectionManager = selectionManager;
-            _commandFactory = commandFactory;
             _skeletonHelper = skeletonHelper;
-            _packFileService = packFileService;
+            _pfs = pfs;
+            _windowFactory = windowFactory;
+            _sceneManager = sceneManager;
         }
 
         public void Execute()
         {
             var state = _selectionManager.GetState<ObjectSelectionState>();
-            MeshFitterViewModel.ShowView(state.CurrentSelection(), _componentManager, _skeletonHelper, _packFileService, _commandFactory);
+            Create(state.CurrentSelection());
+        }
+
+        void Create(List<ISelectable> meshesToFit)
+        {
+            var meshNodes = meshesToFit
+                .Where(x => x is Rmv2MeshNode)
+                .Select(x => x as Rmv2MeshNode)
+                .ToList();
+
+            var allSkeltonNames = meshNodes
+                .Select(x => x.Geometry.ParentSkeletonName)
+                .Distinct();
+
+            if (allSkeltonNames.Count() != 1)
+            {
+                var commaList = string.Join(",", allSkeltonNames);
+                MessageBox.Show($"Unexpected number of skeletons - {commaList}. This tool only works for one skeleton");
+                return;
+            }
+
+            var currentSkeletonName = allSkeltonNames.First();
+            var currentSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_pfs, currentSkeletonName);
+
+            var usedBoneIndexes = meshNodes
+                .SelectMany(x => x.Geometry.GetUniqeBlendIndices())
+                .Distinct()
+                .Select(x => (int)x)
+                .ToList();
+
+            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            var targetSkeleton = rootNode.SkeletonNode;
+            var targetSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_pfs, targetSkeleton.Name);
+
+            var config = new RemappedAnimatedBoneConfiguration();
+            config.ParnetModelSkeletonName = targetSkeleton.Name;
+            config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(targetSkeletonFile);
+
+            config.MeshSkeletonName = currentSkeletonName;
+            config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes);
+
+            var window = _windowFactory.Create<MeshFitterViewModel, MeshFitterView>("MeshFitter", 1200, 1100);
+            window.TypedContext.Initialise(window, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile);
+            window.ShowWindow();
         }
     }
 }

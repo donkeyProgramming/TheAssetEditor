@@ -119,15 +119,6 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="0" Grid.Column="0" Margin="0,3,0,3">
-            <TextBlock Text="Config:" VerticalAlignment="Center" />
-            <Button Click="{s:MethodBinding Load}" DockPanel.Dock="Right" Width="50">Load</Button>
-            <Button Click="{s:MethodBinding Save}" DockPanel.Dock="Right" Width="50">Save</Button>
-            <ComboBox ItemsSource="{Binding AllConfigPaths, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedItem="{Binding CurrentConfigPath.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                      DockPanel.Dock="Right" Margin="5,0,2,0"/>
-        </DockPanel>
-
         <Grid Grid.Column="0" Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>

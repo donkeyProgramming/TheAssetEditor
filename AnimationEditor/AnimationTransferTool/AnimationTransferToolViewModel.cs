@@ -188,10 +188,11 @@ namespace AnimationEditor.AnimationTransferTool
                 _config.SkeletonBoneHighlighter = new SkeletonBoneHighlighter(Generated, _copyFrom);
             }
 
-            _activeBoneMappingWindow = new BoneMappingWindow(new BoneMappingViewModel(_config), false);
+            // TODO
+           /* _activeBoneMappingWindow = new BoneMappingWindow(new BoneMappingViewModel(_config), false);
             _activeBoneMappingWindow.Show();
             _activeBoneMappingWindow.ApplySettings += BoneMappingWindow_Apply;
-            _activeBoneMappingWindow.Closed += BoneMappingWindow_Closed;
+            _activeBoneMappingWindow.Closed += BoneMappingWindow_Closed;*/
         }
 
         private void BoneMappingWindow_Apply(object sender, EventArgs e)

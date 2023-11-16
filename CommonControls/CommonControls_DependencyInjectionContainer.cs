@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Reflection;
+using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
@@ -50,6 +51,10 @@ namespace CommonControls
             services.AddScoped<EventHub>();
 
             services.AddTransient<ImportAssetCommand>();
+
+            services.AddTransient<IWindowFactory, WindowFactory>();
+
+            
 
             // Editors that should be moved into their own projects
             TextEditor_DependencyInjectionContainer.Register(services);

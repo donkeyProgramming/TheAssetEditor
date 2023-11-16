@@ -1,10 +1,13 @@
-﻿using CommonControls.Common.MenuSystem;
+﻿using CommonControls.BaseDialogs;
+using CommonControls.Common.MenuSystem;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
 using CommonControls.Events.UiCommands;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
+using KitbasherEditor.ViewModels.MeshFitter;
+using KitbasherEditor.Views.EditorViews.MeshFitter;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,14 +33,16 @@ namespace KitbasherEditor.ViewModels.UiCommands
         private readonly CommandFactory _commandFactory;
         private readonly PackFileService _packFileService;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
+        private readonly IWindowFactory _windowFactory;
 
-        public OpenReriggingToolCommand(KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, CommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper)
+        public OpenReriggingToolCommand(KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, CommandFactory commandFactory, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, IWindowFactory windowFactory)
         {
             _kitbasherRootScene = kitbasherRootScene;
             _selectionManager = selectionManager;
             _commandFactory = commandFactory;
             _packFileService = packFileService;
             _skeletonHelper = skeletonHelper;
+            _windowFactory = windowFactory;
         }
 
         public void Execute()
@@ -108,6 +113,16 @@ namespace KitbasherEditor.ViewModels.UiCommands
             if (targetSkeletonName == selectedMeshSkeleton)
                 MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
 
+
+
+            var window = _windowFactory.Create<BoneMappingViewModel, BoneMappingView>("Re-rigging", 1200, 1100);
+            window.TypedContext.BaseInitialize(config);
+            window.ShowWindow();
+
+
+
+            
+
             var window = new BoneMappingWindow(new BoneMappingViewModel(config), false);
             window.ShowDialog();
 
@@ -115,7 +130,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
             {
                 var remapping = AnimatedBoneHelper.BuildRemappingList(config.MeshBones.First());
                 _commandFactory.Create<RemapBoneIndexesCommand>().Configure(x => x.Configure(selectedMeshses, remapping, config.ParnetModelSkeletonName)).BuildAndExecute();
-            }
+            }*/
         }
     }
 }
