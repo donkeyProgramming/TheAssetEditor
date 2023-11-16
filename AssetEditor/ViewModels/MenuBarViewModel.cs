@@ -276,7 +276,8 @@ namespace AssetEditor.ViewModels
 
 
 
-        void OpenAnimationBatchExporter() => AnimationBatchExportViewModel.ShowWindow(_packfileService, _skeletonAnimationLookUpHelper);
+        void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();
+
 
         void OpenWh2AnimpackUpdater()
         {

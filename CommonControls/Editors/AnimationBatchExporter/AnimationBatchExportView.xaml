@@ -17,6 +17,12 @@
 
         <GroupBox Grid.Row="0" Header="Packfiles to convert:">
             <ListView  ItemsSource="{Binding PackfileList, UpdateSourceTrigger=PropertyChanged}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Height" Value="30"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">

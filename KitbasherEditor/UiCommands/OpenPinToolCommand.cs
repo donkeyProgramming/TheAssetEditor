@@ -30,22 +30,5 @@ namespace KitbasherEditor.ViewModels.UiCommands
             window.AlwaysOnTop = true;
             window.ShowWindow();
         }
-
-        public void ShowWindow()
-        {
-
-        
-
-
-            //var window = new ControllerHostWindow(true)
-            //{
-            //    DataContext = new PinToolViewModel(selectionManager, commandFactory),
-            //    Title = "Pin tool",
-            //    Content = new PinToolView(),
-            //    Width = 360,
-            //    Height = 415,
-            //};
-            //window.Show();
-        }
     }
 }

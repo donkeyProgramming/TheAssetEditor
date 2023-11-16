@@ -11,6 +11,8 @@ using System.Windows;
 using CommonControls.BaseDialogs;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Common;
+using CommonControls.Editors.AnimationFilePreviewEditor;
+using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
@@ -116,18 +118,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
             return output;
         }
 
-        public static void ShowWindow(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
-        {
-            var window = new ControllerHostWindow(true)
-            {
-                DataContext = new AnimationBatchExportViewModel(pfs, skeletonAnimationLookUpHelper),
-                Title = "Animation batch converter",
-                Content = new AnimationBatchExportView(),
-                Width = 400,
-                Height = 300,
-            };
-            window.Show();
-        }
+
 
         public class PackFileListItem
         {
@@ -141,7 +132,6 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
             public NotifyAttr<bool> Process { get; set; } = new NotifyAttr<bool>(true);
             public NotifyAttr<string> Name { get; set; } = new NotifyAttr<string>("");
-
         }
 
     }

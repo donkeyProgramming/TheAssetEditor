@@ -2,6 +2,7 @@
 using System.Reflection;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
+using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.BoneMapping;
@@ -64,6 +65,7 @@ namespace CommonControls
             CampaignAnimBin_DependencyInjectionContainer.Register(services);
             VariantMeshDefinition_DependencyInjectionContainer.Register(services);
             AnimationFilePreviewEditor_DependencyInjectionContainer.Register(services);
+            AnimationBatchExporter_DependencyInjectionContainer.Register(services);
             TwUi_DependencyInjectionContainer.Register(services);
         }
 
@@ -74,6 +76,7 @@ namespace CommonControls
             CampaignAnimBin_DependencyInjectionContainer.RegisterTools(factory);
             VariantMeshDefinition_DependencyInjectionContainer.RegisterTools(factory);
             AnimationFilePreviewEditor_DependencyInjectionContainer.RegisterTools(factory);
+            AnimationBatchExporter_DependencyInjectionContainer.RegisterTools(factory);
             TwUi_DependencyInjectionContainer.RegisterTools(factory);
         }
     }
