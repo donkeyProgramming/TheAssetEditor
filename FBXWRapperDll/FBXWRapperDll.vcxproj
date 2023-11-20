@@ -72,8 +72,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>FBXWrapperNative</TargetName>
+    <TargetName>FbxWrapperNative</TargetName>
     <OutDir>$(SolutionDir)AssetEditor\bin\Debug\net6.0-windows\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)libs\fbxsdk\include;$(ProjectDir)libs\MS_SimpleMath</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>FBXWRapperDll</TargetName>
@@ -82,8 +83,9 @@
     <TargetName>FBXWRapperDll</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>FBXWrapperNative</TargetName>
+    <TargetName>FbxWrapperNative</TargetName>
     <OutDir>$(SolutionDir)AssetEditor\bin\Release\net6.0-windows\</OutDir>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)libs\fbxsdk\include;$(ProjectDir)libs\MS_SimpleMath</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -136,8 +138,16 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)fbxsdk\bin_dll\Debugging\libfbxsdk.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)libs\fbxsdk\bin_dll\Debugging\libfbxsdk.lib</AdditionalDependencies>
     </Link>
+    <CustomBuildStep />
+    <CustomBuildStep />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PostBuildEvent>
+      <Command>xcopy /Y /R "$(ProjectDir)\libs\fbxsdk\bin_dll\Debugging\" "$(SolutionDir)AssetEditor\bin\Debug\net6.0-windows\"		</Command>
+      <Message>Copying FBX DLL Dependencies</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -148,7 +158,7 @@
       <PreprocessorDefinitions>FBXSDK_SHARED;NDEBUG;FBXWRAPPERDLL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>H:\Coding\FBX SDK\2020.1;H:\Coding\FBX SDK\2020.1\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>fbxsdk\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -156,338 +166,95 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)fbxsdk\bin_dll\Releasing\libfbxsdk.lib;$(ProjectDir)fbxsdk\bin_dll\Releasing\libxml2-md.lib;$(ProjectDir)fbxsdk\bin_dll\Releasing\zlib-md.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(ProjectDir)libs\fbxsdk\bin_dll\Releasing\libfbxsdk.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
-    <None Include="SceneContainer\FBXSceneContainer.inl" />
+    <None Include="FBXServices\SceneExporter\FBXSceneExporterService.inl" />
+    <None Include="FBXServices\SceneImporter\FBXImporterService.inl" />
+    <None Include="DataStructures\SceneContainer\SceneContainer.inl" />
     <None Include="fbxsdk\bin\vs2019\x64\release\libfbxsdk.zip" />
     <None Include="fbxsdk\lib\vs2019\x64\debug\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.dll" />
     <None Include="fbxsdk\lib\vs2019\x64\release\libfbxsdk.zip" />
     <None Include="Services\FbxSceneLoaderService.inl" />
-    <None Include="Helpers\MS_SimpleMath\SimpleMath.inl" />
-    <None Include="Services\SceneLoader\FbxSceneLoaderService.inl" />
+    <None Include="libs\MS_SimpleMath\SimpleMath.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DLLDefines.h" />
+    <ClInclude Include="ErrorCkecking\ErrorChecking.h" />
+    <ClInclude Include="FbxObjectCreators\FbxMaterialCreator.h" />
+    <ClInclude Include="FBXServices\SceneExporter\FBXSceneExporterService.h" />
+    <ClInclude Include="HelperUtils\Geometry\FBXSkinHelperUtil.h" />
+    <ClInclude Include="Dll\DLLDefines.h" />
     <ClInclude Include="Base\BaseInteropObject.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\arch\fbxalloc.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\arch\fbxarch.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\arch\fbxdebug.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\arch\fbxnew.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\arch\fbxstdcompliant.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\arch\fbxtypes.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxarray.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxbitset.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxcharptrset.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxcontainerallocators.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxdynamicarray.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxfile.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxfolder.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxhashmap.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxintrusivelist.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxmap.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxmemorypool.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxmultimap.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxpair.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxredblacktree.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxset.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxstatus.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxstring.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxstringlist.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxtime.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxtimecode.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\base\fbxutils.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxclassid.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxconnectionpoint.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxdatatypes.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxemitter.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxevent.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxeventhandler.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxlistener.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxloadingstrategy.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxmanager.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxmodule.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxobject.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxperipheral.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxplugin.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxplugincontainer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxproperty.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxpropertydef.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxpropertyhandle.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxpropertypage.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxpropertytypes.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxquery.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxqueryevent.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxscopedloadingdirectory.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxscopedloadingfilename.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxstream.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxsymbol.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxsystemunit.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\fbxxref.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\math\fbxaffinematrix.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\math\fbxdualquaternion.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\math\fbxmath.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\math\fbxmatrix.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\math\fbxquaternion.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\math\fbxtransforms.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\math\fbxvector2.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\math\fbxvector4.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\sync\fbxatomic.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\sync\fbxclock.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\sync\fbxsync.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\core\sync\fbxthread.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fbxsdk_def.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fbxsdk_nsbegin.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fbxsdk_nsend.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fbxsdk_version.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\collada\fbxcolladaanimationelement.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\collada\fbxcolladaelement.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\collada\fbxcolladaiostream.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\collada\fbxcolladanamespace.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\collada\fbxcolladatokens.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\collada\fbxcolladautils.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\collada\fbxreadercollada14.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\collada\fbxwritercollada14.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxbase64coder.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxcallbacks.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxexporter.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxexternaldocreflistener.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxfiletokens.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxglobalcamerasettings.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxgloballightsettings.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxglobalsettings.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxgobo.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbximporter.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxiobase.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxiopluginregistry.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxiosettings.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxiosettingspath.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxprogress.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxreader.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxstatistics.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxstatisticsfbx.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbxwriter.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbx\fbxio.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbx\fbxreaderfbx5.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbx\fbxreaderfbx6.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbx\fbxreaderfbx7.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbx\fbxwriterfbx5.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbx\fbxwriterfbx6.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\fileio\fbx\fbxwriterfbx7.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\animation\fbxanimcurve.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\animation\fbxanimcurvebase.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\animation\fbxanimcurvefilters.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\animation\fbxanimcurvenode.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\animation\fbxanimevalclassic.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\animation\fbxanimevalstate.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\animation\fbxanimevaluator.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\animation\fbxanimlayer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\animation\fbxanimstack.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\animation\fbxanimutilities.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxcharacter.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxcharacternodename.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxcharacterpose.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxconstraint.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxconstraintaim.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxconstraintcustom.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxconstraintparent.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxconstraintposition.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxconstraintrotation.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxconstraintscale.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxconstraintsinglechainik.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxconstraintutils.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxcontrolset.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\constraint\fbxhik2fbxcharacter.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxaudio.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxaudiolayer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxaxissystem.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxcollection.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxcollectionexclusive.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxcontainer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxcontainertemplate.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxdisplaylayer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxdocument.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxdocumentinfo.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxenvironment.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxgroupname.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxlibrary.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxmediaclip.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxobjectfilter.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxobjectmetadata.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxobjectscontainer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxpose.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxreference.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxscene.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxselectionnode.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxselectionset.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxtakeinfo.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxthumbnail.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\fbxvideo.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxblendshape.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxblendshapechannel.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxcache.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxcachedeffect.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxcamera.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxcamerastereo.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxcameraswitcher.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxcluster.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxdeformer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxgenericnode.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxgeometry.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxgeometrybase.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxgeometryweightedmap.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxlayer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxlayercontainer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxlight.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxlimitsutilities.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxline.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxlodgroup.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxmarker.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxmesh.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxnode.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxnodeattribute.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxnull.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxnurbs.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxnurbscurve.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxnurbssurface.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxopticalreference.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxpatch.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxproceduralgeometry.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxshape.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxskeleton.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxskin.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxsubdeformer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxsubdiv.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxtrimnurbssurface.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxvertexcachedeformer.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\geometry\fbxweightedmapping.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxbindingoperator.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxbindingsentryview.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxbindingtable.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxbindingtablebase.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxbindingtableentry.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxconstantentryview.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxentryview.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxfiletexture.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbximplementation.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbximplementationfilter.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbximplementationutils.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxlayeredtexture.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxlayerentryview.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxoperatorentryview.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxproceduraltexture.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxpropertyentryview.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxsemanticentryview.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxshadingconventions.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxsurfacelambert.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxsurfacematerial.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxsurfacematerialutils.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxsurfacephong.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\scene\shading\fbxtexture.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxclonemanager.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxdeformationsevaluator.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxembeddedfilesaccumulator.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxgeometryconverter.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxmanipulators.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxmaterialconverter.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxnamehandler.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxprocessor.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxprocessorshaderdependency.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxprocessorxref.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxprocessorxrefuserlib.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxrenamingstrategy.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxrenamingstrategybase.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxrenamingstrategyfbx5.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxrenamingstrategyfbx6.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxrenamingstrategyfbx7.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxrenamingstrategyutilities.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxrootnodeutility.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxscenecheckutility.h" />
-    <ClInclude Include="fbxsdk\include\fbxsdk\utils\fbxusernotification.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\c14n.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\catalog.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\chvalid.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\debugXML.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\dict.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\DOCBparser.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\encoding.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\entities.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\globals.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\hash.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\HTMLparser.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\HTMLtree.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\list.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\nanoftp.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\nanohttp.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\parser.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\parserInternals.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\pattern.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\relaxng.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\SAX.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\SAX2.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\schemasInternals.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\schematron.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\threads.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\tree.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\uri.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\valid.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xinclude.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xlink.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlautomata.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlerror.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlexports.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlIO.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlmemory.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlmodule.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlreader.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlregexp.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlsave.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlschemas.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlschemastypes.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlstring.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlunicode.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlversion.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlwin32version.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xmlwriter.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xpath.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xpathInternals.h" />
-    <ClInclude Include="fbxsdk\include\libxml2\libxml\xpointer.h" />
+    <ClInclude Include="FbxObjectCreators\FBXMeshSkinCreator.h" />
+    <ClInclude Include="FbxObjectCreators\FbxSceneCreator.h" />
+    <ClInclude Include="FbxObjectCreators\FBXSkeletonFactory.h" />
+    <ClInclude Include="FbxObjectCreators\FbxMeshCreator.h" />
+    <ClInclude Include="FBXServices\SceneImporter\FBXImporterService.h" />
     <ClInclude Include="DataStructures\FileInfoData.h" />
-    <ClInclude Include="Processing\FBXMeshCreator.h" />
-    <ClInclude Include="Processing\FBXVertexCreator.h" />
+    <ClInclude Include="libs\fbxsdk\common\AnimationUtility.h" />
+    <ClInclude Include="libs\fbxsdk\common\Common.h" />
+    <ClInclude Include="libs\fbxsdk\common\GeometryUtility.h" />
+    <ClInclude Include="libs\meshopt\meshoptimizer.h" />
+    <ClInclude Include="Processing\MeshProcessingHelpers.h" />
+    <ClInclude Include="Processing\PackedMeshCreator.h" />
+    <ClInclude Include="Processing\PackedVertexCreator.h" />
     <ClInclude Include="Services\FBXSceneLoaderService.h" />
-    <ClInclude Include="Helpers\Geometry\FBXMeshGeometryHelper.h" />
-    <ClInclude Include="Processing\MeshProcessor.h" />
-    <ClInclude Include="Helpers\Geometry\FBXNodeGeometryHelper.h" />
-    <ClInclude Include="SceneContainer\FBXSCeneContainer.h" />
+    <ClInclude Include="HelperUtils\Geometry\FBXMeshGeometryHelper.h" />
+    <ClInclude Include="Processing\MeshProcessorService.h" />
+    <ClInclude Include="HelperUtils\Geometry\FBXNodeGeometryHelper.h" />
+    <ClInclude Include="DataStructures\SceneContainer\SceneContainer.h" />
     <ClInclude Include="Processing\FBXSkinProcessor.h" />
-    <ClInclude Include="Helpers\VectorConverter.h" />
-    <ClInclude Include="Helpers\FBXHelperFileUtil.h" />
-    <ClInclude Include="Helpers\MS_SimpleMath\SimpleMath.h" />
-    <ClInclude Include="Helpers\Tools.h" />
+    <ClInclude Include="HelperUtils\VectorConverter.h" />
+    <ClInclude Include="HelperUtils\FBXHelperFileUtil.h" />
+    <ClInclude Include="libs\MS_SimpleMath\SimpleMath.h" />
+    <ClInclude Include="HelperUtils\Tools.h" />
     <ClInclude Include="Logging\Logging.h" />
-    <ClInclude Include="Helpers\FBXUnitHelper.h" />
+    <ClInclude Include="HelperUtils\FBXUnitHelper.h" />
     <ClInclude Include="DataStructures\PackedMeshStructs.h" />
-    <ClInclude Include="Services\SceneLoader\FBXSceneLoaderService.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Dll\dllmain.cpp" />
     <ClCompile Include="DataStructures\FileInfoData.cpp" />
-    <ClCompile Include="Processing\FBXMeshCreator.cpp" />
-    <ClCompile Include="Processing\FBXVertexCreator.cpp" />
-    <ClCompile Include="Helpers\Geometry\FBXMeshGeometryHelper.cpp" />
-    <ClCompile Include="SceneContainer\FBXSCeneContainer.cpp" />
-    <ClCompile Include="Processing\MeshProcessor.cpp" />
-    <ClCompile Include="Helpers\Geometry\FBXNodeSearcher.h" />
+    <ClCompile Include="FbxObjectCreators\FbxMaterialCreator.cpp" />
+    <ClCompile Include="FbxObjectCreators\FBXMeshSkinCreator.cpp" />
+    <ClCompile Include="FBXServices\SceneExporter\FBXSceneExporterService.cpp" />
+    <ClCompile Include="HelperUtils\Geometry\FBXSkinHelperUtil.cpp" />
+    <ClCompile Include="FbxObjectCreators\FbxSceneCreator.cpp" />
+    <ClCompile Include="FbxObjectCreators\FBXSkeletonFactory.cpp" />
+    <ClCompile Include="FbxObjectCreators\FbxMeshCreator.cpp" />
+    <ClCompile Include="FBXServices\SceneImporter\FBXImporterService.cpp" />
+    <ClCompile Include="libs\fbxsdk\common\AnimationUtility.cxx" />
+    <ClCompile Include="libs\fbxsdk\common\Common.cxx" />
+    <ClCompile Include="libs\fbxsdk\common\GeometryUtility.cxx" />
+    <ClCompile Include="libs\meshopt\clusterizer.cpp" />
+    <ClCompile Include="libs\meshopt\indexcodec.cpp" />
+    <ClCompile Include="libs\meshopt\indexgenerator.cpp" />
+    <ClCompile Include="libs\meshopt\overdrawanalyzer.cpp" />
+    <ClCompile Include="libs\meshopt\overdrawoptimizer.cpp" />
+    <ClCompile Include="libs\meshopt\quantization.cpp" />
+    <ClCompile Include="libs\meshopt\simplifier.cpp" />
+    <ClCompile Include="libs\meshopt\spatialorder.cpp" />
+    <ClCompile Include="libs\meshopt\stripifier.cpp" />
+    <ClCompile Include="libs\meshopt\vcacheanalyzer.cpp" />
+    <ClCompile Include="libs\meshopt\vcacheoptimizer.cpp" />
+    <ClCompile Include="libs\meshopt\vertexcodec.cpp" />
+    <ClCompile Include="libs\meshopt\vertexfilter.cpp" />
+    <ClCompile Include="libs\meshopt\vfetchanalyzer.cpp" />
+    <ClCompile Include="libs\meshopt\vfetchoptimizer.cpp" />
+    <ClCompile Include="Processing\MeshProcessingHelpers.cpp" />
+    <ClCompile Include="Processing\PackedMeshCreator.cpp" />
+    <ClCompile Include="Processing\PackVertexCreator.cpp" />
+    <ClCompile Include="HelperUtils\Geometry\FBXMeshGeometryHelper.cpp" />
+    <ClCompile Include="DataStructures\SceneContainer\SceneContainer.cpp" />
+    <ClCompile Include="Processing\MeshProcessorService.cpp" />
+    <ClCompile Include="HelperUtils\Geometry\FBXNodeSearcherHelper.h" />
     <ClCompile Include="Processing\FBXSkinProcessor.cpp" />
     <ClCompile Include="Logging\Logging.cpp" />
     <ClCompile Include="DataStructures\PackedMeshStructs.cpp" />
-    <ClCompile Include="Helpers\Geometry\FBXNodeGeometryHelper.cpp" />
-    <ClCompile Include="Services\SceneLoader\FBXSceneLoaderService.cpp" />
+    <ClCompile Include="HelperUtils\Geometry\FBXNodeGeometryHelper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
