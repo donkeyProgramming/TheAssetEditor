@@ -6,7 +6,6 @@
 #include "../../DataStructures\SceneContainer\SceneContainer.h"
 #include "../../fbxsdk\common\Common.h"
 #include "../../Dll/DLLDefines.h"
-#include "../../Processing\FBXMeshProcessor.h"
 #include "../../FbxObjectCreators/FBXSkeletonFactory.h"
 #include "../../FbxObjectCreators/FbxSceneCreator.h"
 
