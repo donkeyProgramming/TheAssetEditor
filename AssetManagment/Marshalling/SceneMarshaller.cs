@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
+using AssetManagement.Geometry.DataStructures.Unmanaged;
 
 namespace AssetManagement.Geometry.Marshalling
 {

@@ -3,9 +3,11 @@ using Matrix = Microsoft.Xna.Framework.Matrix;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
 using CommonControls.Common;
+using View3D.Animation;
 using AssetManagement.GenericFormats.DataStructures.Managed;
+using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 
-namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
+namespace AssetManagement.Geometry.DataStructures.Unmanaged
 {
     public class SceneContainer
     {
