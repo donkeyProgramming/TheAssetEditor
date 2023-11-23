@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
-using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.MeshProcessing.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.RigidModel;

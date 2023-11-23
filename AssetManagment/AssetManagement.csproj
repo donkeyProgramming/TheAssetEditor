@@ -4,7 +4,8 @@
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Compile Remove="GenericFormats\Managed\MeshDataStructures.cs" />
+	  <Compile Remove="GenericFormats\RmvFileBuilder.cs" />
+	  <Compile Remove="GenericFormats\SceneContainer.cs" />
 	</ItemGroup>
 
   <ItemGroup>    
@@ -25,10 +26,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="GenericFormats\Managed\" />
   </ItemGroup>
 
 </Project>
