@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
+using AssetManagement.Geometry.DataStructures.Unmanaged;
 using CommonControls.FileTypes.RigidModel.Vertex;
 
 namespace AssetManagement.AssetBuilders

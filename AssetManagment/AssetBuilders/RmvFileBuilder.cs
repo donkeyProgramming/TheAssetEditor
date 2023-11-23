@@ -186,7 +186,7 @@ namespace AssetManagement.AssetBuilders
                    packedInputMesh.Vertices[vertexIndex].Normal,
                    packedInputMesh.Vertices[vertexIndex].Uv,
                    packedInputMesh.Vertices[vertexIndex].Tangent,
-                   packedInputMesh.Vertices[vertexIndex].BiNormal,
+                   packedInputMesh.Vertices[vertexIndex].Bitangent,
                    skeletonFile);
             }
 

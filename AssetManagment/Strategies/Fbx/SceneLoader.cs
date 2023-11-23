@@ -1,4 +1,6 @@
-﻿using AssetManagement.GenericFormats.DataStructures.Unmanaged;
+﻿using AssetManagement.GenericFormats;
+using AssetManagement.GenericFormats.DataStructures.Unmanaged;
+using AssetManagement.Geometry.DataStructures.Unmanaged;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
 using System;
 

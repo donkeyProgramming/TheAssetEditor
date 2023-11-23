@@ -9,6 +9,7 @@ using CommonControls.FileTypes.RigidModel.Vertex;
 using CommonControls.FileTypes.RigidModel;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.AnimationProcessor;
+using AssetManagement.Geometry.DataStructures.Unmanaged;
 
 namespace AssetManagement.AssetBuilders
 {

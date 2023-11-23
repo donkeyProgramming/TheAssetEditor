@@ -1,4 +1,5 @@
 ﻿using AssetManagement.GenericFormats.DataStructures.Unmanaged;
+using AssetManagement.Geometry.DataStructures.Unmanaged;
 using System;
 using System.Collections.Generic;
 
