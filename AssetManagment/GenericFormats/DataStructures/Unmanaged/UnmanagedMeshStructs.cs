@@ -28,10 +28,10 @@ namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
         public XMFLOAT3 BiNormal;
         public XMFLOAT3 Tangent;
         public XMFLOAT2 Uv;
-        public XMFLOAT4 Color;        
+        public XMFLOAT4 Color;
         //public int weightCount;
     };
-    
+
     /// <summary>
     /// "VertexWeight" associates 1 vertex with 1 influencec {bone, weight}
     /// </summary>    
@@ -44,4 +44,20 @@ namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
         public uint vertexIndex;
         public float weight;
     }
+
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ExtBoneInfo
+    {
+        public int id;
+        public int parentId;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+        public string name;
+
+        public XMFLOAT4 localRotation;
+        public XMFLOAT3 localTranslation;
+
+    };
+
 }

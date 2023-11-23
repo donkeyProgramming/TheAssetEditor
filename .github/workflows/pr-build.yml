@@ -1,14 +1,24 @@
 on:
-    pull_request:
-        branches:
-            - master
+  pull_request
+
 jobs:
-    build:
-        name: Build Application
-        runs-on: windows-latest
-        steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-dotnet@v3
-              with:
-                dotnet-version: '3.1.x'
-            - run: dotnet build
+  windows_cpp:
+    name: Build C++ Dll
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1.4.1
+    - name: Compile C++ Dlll with MSBuild
+      shell: cmd 
+      run: ${{ '"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat" && msbuild' }}
+      working-directory: FBXWRapperDll  
+  windows_dotnet:
+    name: Build C# Main App
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+    - run: dotnet build AssetEditor\AssetEditor.csproj
+      

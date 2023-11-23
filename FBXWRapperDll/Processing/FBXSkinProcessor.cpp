@@ -1,8 +1,11 @@
 #include "FBXSkinProcessor.h"
+#include "..\Logging\Logging.h"
+#include "..\DataStructures\PackedMeshStructs.h"
+
 
 using namespace wrapdll;
 
-bool FBXSkinProcessorService::ProcessSkin(
+bool FBXSkinProcessorService::GetInfluencesFromNode(
     FbxMesh* _poSourceFbxMesh,
     std::vector<ControlPointInfluence>& controlPointInfluences)
 {
@@ -17,19 +20,19 @@ bool FBXSkinProcessorService::ProcessSkin(
 
     // -- get skin 0, if there is more than one skin modifier (FbxSkin object), 
     // -- it is the users resposibility to make sure "skin 0" is the corect one, using their 3d modelling program
-    fbxsdk::FbxSkin* pSkin = (FbxSkin*)_poSourceFbxMesh->GetDeformer(0);
-    if (!pSkin) // no skin found
+    fbxsdk::FbxSkin* pFbxSkin = (FbxSkin*)_poSourceFbxMesh->GetDeformer(0);
+    if (!pFbxSkin) 
     {
-        LogActionWarning(std::string(_poSourceFbxMesh->GetName()) + ":pSkin == NULL ");
+        LogActionWarning(std::string(_poSourceFbxMesh->GetName()) + "pFbxSkin == NULL, no Skin found!");
         return true;
     }
 
-    return GetInfluencesFromSkin(pSkin, _poSourceFbxMesh, controlPointInfluences);
+    return GetInfluencesFromSkin(pFbxSkin, _poSourceFbxMesh, controlPointInfluences);
 }
 
 bool FBXSkinProcessorService::GetInfluencesFromSkin(
-    fbxsdk::FbxSkin*
-    poSkin, fbxsdk::FbxMesh* poFbxMesh,    
+    fbxsdk::FbxSkin* poSkin, 
+    fbxsdk::FbxMesh* poFbxMesh,    
     std::vector<ControlPointInfluence>& controlPointInfluences)
 {
     // -- reset the control point influence container
@@ -73,7 +76,7 @@ bool FBXSkinProcessorService::GetInfluencesFromSkin(
 
         if (!pControlPointIndices || !pControlPointWeights)
         {
-            LogActionError("NULL pointer for weight/indices");
+            LogActionError("NULL pointer for weight or indices");
             continue;
         }
 
@@ -83,16 +86,66 @@ bool FBXSkinProcessorService::GetInfluencesFromSkin(
             int controlPointIndex = pControlPointIndices[influenceIndex];
 
             // get weight associated with vertex
-            double boneWeight = pControlPointWeights[influenceIndex];
+            double boneWeight = static_cast<float>(pControlPointWeights[influenceIndex]);            
 
-            controlPointInfluences[controlPointIndex].weightCount++;
-            auto currentWeightIndex = controlPointInfluences[controlPointIndex].weightCount;
+            // TODO: clean-up once it works
+            
+            //auto currentWeightIndex = controlPointInfluences[controlPointIndex].weightCount;
 
             // set info, associated with the control point, that the MeshCreator can use to assign weighting to all vertices
-            CopyToFixedString(controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].boneName, boneName);
-            controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].boneIndex = clusterIndex;
-            controlPointInfluences[controlPointIndex].influences[currentWeightIndex - 1].weight = static_cast<float>(boneWeight);
-        };
+            //FillVertexInfluence(controlPointInfluences[controlPointIndex].influences[currentWeightIndex], boneName, clusterIndex, boneWeight);
+
+            //controlPointInfluences[controlPointIndex].weightCount++;
+
+            AddControlPointInfluence(controlPointInfluences[controlPointIndex], boneName, clusterIndex, boneWeight);
+
+            if (controlPointInfluences[controlPointIndex].influences.size() > 4)
+            {
+                __debugbreak();
+                return false;
+            }
+        };        
+    }
+
+    CheckForErrorWeights(controlPointInfluences);
+
+    return true;
+}
+
+// TOOD: remove?
+//void wrapdll::FBXSkinProcessorService::FillVertexInfluence(VertexInfluence& influence, std::string& boneName, int clusterIndex, double boneWeight)
+//{
+//    CopyToFixedString(influence.boneName, boneName);
+//    influence.boneIndex = clusterIndex;
+//    influence.weight = static_cast<float>(boneWeight);    
+//}
+
+void wrapdll::FBXSkinProcessorService::AddControlPointInfluence(ControlPointInfluence& controlPointInfluence, std::string& boneName, int clusterIndex, double boneWeight)
+{
+    VertexInfluence newInfluence;
+
+    CopyToFixedString(newInfluence.boneName, boneName);
+    newInfluence.boneIndex = clusterIndex;    
+    newInfluence.weight = static_cast<float>(boneWeight);
+
+    controlPointInfluence.influences.push_back(newInfluence);    
+}
+
+bool wrapdll::FBXSkinProcessorService::CheckForErrorWeights(const std::vector<ControlPointInfluence>& controlPointInfluences)
+{
+    for (auto& controlPointInfluence : controlPointInfluences)
+    {
+        float totalWeight = 0.0f;
+        for (auto& influence : controlPointInfluence.influences)
+        {
+            totalWeight += influence.weight;
+        }
+
+        if (totalWeight > 1.05f || totalWeight < 0.95f)
+        {
+            LogActionError("Weight sum NOT 1.0 for control point(vertex)!");
+            return false;
+        }
     }
 
     return true;
