@@ -57,7 +57,7 @@ namespace View3D.Utility
             }
 
             if (newFileFound == false)
-                _logger.Here().Error($"Failed to create texture as PNG for unkown reason");
+                _logger.Here().Error($"Failed to create texture as PNG for unknown reason");
             return newFileFound;
         }
 
@@ -97,7 +97,7 @@ namespace View3D.Utility
                 TextureType.MaterialMap => "-f BC1_UNORM_SRGB",
                 TextureType.Normal => "-f BC3_UNORM",
                 TextureType.Mask => "-f BC3_UNORM",
-                _ => throw new Exception("Unkown texture type"),
+                _ => throw new Exception("Unknown texture type"),
             };
 
             if (File.Exists(systemFilePath) == false)

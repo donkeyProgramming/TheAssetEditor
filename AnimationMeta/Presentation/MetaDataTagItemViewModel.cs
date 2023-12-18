@@ -85,7 +85,7 @@ namespace AnimationMeta.Presentation
                     else if (value is Vector4 quaternion)
                         editableItem = new OrientationEditableTagItem(parser as Vector4Parser, quaternion);
                     else
-                        throw new Exception("Unkown item");
+                        throw new Exception("Unknown item");
                 }
                 else
                 {

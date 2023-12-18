@@ -41,7 +41,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 AkBankSourceData = new AkBankSourceData()
                 {
                     PluginId = 0x00040001,  // [VORBIS]
-                    StreamType = SourceType.Straming,
+                    StreamType = SourceType.Streaming,
                     akMediaInformation = new AkMediaInformation()
                     {
                         SourceId = soundId,

@@ -314,7 +314,7 @@ namespace AnimationMeta.FileTypes.Parsing
         public static BaseMetaEntry CreateDefault(string itemName)
         {
             if (_typeTable.ContainsKey(itemName) == false)
-                throw new Exception("Unkown metadata item " + itemName);
+                throw new Exception("Unknown metadata item " + itemName);
 
             var type = _typeTable[itemName].First();
             var instance = Activator.CreateInstance(type) as BaseMetaEntry;

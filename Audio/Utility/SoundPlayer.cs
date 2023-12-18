@@ -4,6 +4,7 @@ using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Serilog;
+using System;
 using System.Diagnostics;
 
 namespace Audio.Utility
@@ -24,21 +25,23 @@ namespace Audio.Utility
             _vgStreamWrapper = vgStreamWrapper;
         }
 
-        public bool PlaySound(ICAkSound wwiseSound, uint parentEventId)
+        public bool PlaySound(string sourceID, uint parentEventId)
         {
-            if (wwiseSound == null)
+            if (sourceID == null)
             {
                 _logger.Here().Warning("Input is not a valid wwise sound");
                 return false;
             }
 
-            var outputName = _audioRepository.GetNameFromHash(parentEventId) + "-" + wwiseSound.GetSourceId();
-            return PlaySound(wwiseSound.GetSourceId(), outputName);
+            _logger.Here().Information($"User selected {sourceID}.wem to be played");
+            var outputName = _audioRepository.GetNameFromHash(parentEventId) + "-" + sourceID;
+            return PlaySound(sourceID, outputName);
         }
 
-        public bool PlaySound(uint id, string outputName)
+        public bool PlaySound(string id, string outputName)
         {
-            var audioFile = FindSoundFile(_language, id);
+            var sourceIDConverted = Convert.ToUInt32(id);
+            var audioFile = FindSoundFile(_language, sourceIDConverted);
             if (audioFile == null)
             {
                 _logger.Here().Error("Unable to find sound");

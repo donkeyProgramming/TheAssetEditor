@@ -3,6 +3,7 @@ using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
+using System;
 using System.Linq;
 
 namespace Audio.AudioEditor
@@ -113,7 +114,7 @@ namespace Audio.AudioEditor
             parent.Children.Add(actorMixerNode);
 
             ProcessNext(actorMixer.GetChildren(), actorMixerNode);
-        }
+        } 
 
         void ProcessSwitchControl(HircItem item, HircTreeItem parent)
         {
@@ -154,12 +155,13 @@ namespace Audio.AudioEditor
 
         private void ProcessMusicTrack(HircItem item, HircTreeItem parent)
         {
-            var hirc = GetAsType<ICAkMusicTrack>(item);
-            var node = new HircTreeItem() { DisplayName = $"Music Track", Item = item };
-            parent.Children.Add(node);
+            var musicTrackHirc = GetAsType<ICAkMusicTrack>(item);
 
-            foreach (var sourceItem in hirc.GetChildren())
-                ProcessNext(sourceItem, node);
+            foreach (var sourceItem in musicTrackHirc.GetChildren())
+            {
+                var musicTrackTreeNode = new HircTreeItem() { DisplayName = $"Music Track {sourceItem}.wem", Item = item };
+                parent.Children.Add(musicTrackTreeNode);
+            }
         }
 
         private void ProcessMusicSegment(HircItem item, HircTreeItem parent)

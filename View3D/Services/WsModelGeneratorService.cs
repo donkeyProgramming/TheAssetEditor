@@ -63,7 +63,7 @@ namespace View3D.Services
                 {
                     GameTypeEnum.Warhammer3 => LoadMaterialTemplate("View3D.Content.Game.MaterialTemplate_wh3.xml.material"),
                     GameTypeEnum.Warhammer2 => LoadMaterialTemplate("View3D.Content.Game.MaterialTemplate_wh2.xml.material"),
-                    _ => throw new Exception("Unkown game - unable to generate ws model")
+                    _ => throw new Exception("Unknown game - unable to generate ws model")
                 };
 
                 var wsModelData = CreateWsModel(mainNode, game, modelFilePath, materialTemplate);

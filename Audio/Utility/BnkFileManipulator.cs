@@ -37,7 +37,7 @@ namespace Audio.Utility
             //
             //        for (uint itemIndex = 0; itemIndex < hirchHeader.NumHircItems; itemIndex++)
             //        {
-            //            // Read as unkown, we only care about size and ID
+            //            // Read as unknown, we only care about size and ID
             //            var item = new ByteHirc();
             //            item.Parse(wholeBnkChunk);
             //

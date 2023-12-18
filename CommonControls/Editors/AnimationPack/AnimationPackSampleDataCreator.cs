@@ -74,7 +74,7 @@ namespace CommonControls.Editors.AnimationPack
                 TableVersion = 4,
                 TableSubVersion = 3,
                 Name = binName,
-                Unkown = "",
+                Unknown = "",
                 MountBin = "",
                 SkeletonName = "humanoid01",
                 LocomotionGraph = "animations/locomotion_graphs/entity_locomotion_graph.xml",

@@ -35,7 +35,7 @@ namespace CommonControls.FileTypes.AnimationPack
             public List<TransitionEntry> Transitions { get; set; }
             public List<ActionEntry> Action { get; set; }
             public List<MissingType> Unk1 { get; set; }
-            public List<UnknownEntry> Unkown { get; set; }
+            public List<UnknownEntry> Unknown { get; set; }
             public List<MissingType> Unk3 { get; set; }
             public List<LocomotionEntry> Locomotion { get; set; }
         }
@@ -366,12 +366,12 @@ namespace CommonControls.FileTypes.AnimationPack
         {
             public static MissingType FromChunck(ByteChunk byteChunk, string[] stringTable)
             {
-                throw new Exception("Unkown datatype");
+                throw new Exception("Unknown datatype");
             }
 
             public byte[] ToBytes(ref List<string> stringTable)
             {
-                throw new Exception("Unkown datatype");
+                throw new Exception("Unknown datatype");
             }
         }
     }
@@ -464,7 +464,7 @@ namespace CommonControls.FileTypes.AnimationPack
                 currentStatus.Transitions = LoadSlots(data, strTable, CampaignAnimationBin.TransitionEntry.FromChunck);
                 currentStatus.Action = LoadSlots(data, strTable, CampaignAnimationBin.ActionEntry.FromChunck);
                 currentStatus.Unk1 = LoadSlots(data, strTable, CampaignAnimationBin.MissingType.FromChunck);    // Always zero
-                currentStatus.Unkown = LoadSlots(data, strTable, CampaignAnimationBin.UnknownEntry.FromChunck); // What is this?
+                currentStatus.Unknown = LoadSlots(data, strTable, CampaignAnimationBin.UnknownEntry.FromChunck); // What is this?
                 currentStatus.Unk3 = LoadSlots(data, strTable, CampaignAnimationBin.MissingType.FromChunck);    // Always zero
                 currentStatus.Locomotion = LoadSlots(data, strTable, CampaignAnimationBin.LocomotionEntry.FromChunck);
             }
@@ -506,7 +506,7 @@ namespace CommonControls.FileTypes.AnimationPack
                 WriteSlot(statusItem.Transitions, writer, ref stringTable);
                 WriteSlot(statusItem.Action, writer, ref stringTable);
                 WriteSlot(statusItem.Unk1, writer, ref stringTable);
-                WriteSlot(statusItem.Unkown, writer, ref stringTable);
+                WriteSlot(statusItem.Unknown, writer, ref stringTable);
                 WriteSlot(statusItem.Unk3, writer, ref stringTable);
                 WriteSlot(statusItem.Locomotion, writer, ref stringTable);
             }
@@ -582,7 +582,7 @@ namespace CommonControls.FileTypes.AnimationPack
             var x2 = loadErrors.Where(x => x.Contains("Metadata error")).ToList();
             var x3 = loadErrors.Where(x => x.Contains("Sequence contains no elements")).ToList();
             var x4 = loadErrors.Where(x => x.Contains("Version error")).ToList();   // 1
-            var x5 = loadErrors.Where(x => x.Contains("Unkown datatype")).ToList();   // 1
+            var x5 = loadErrors.Where(x => x.Contains("Unknown datatype")).ToList();   // 1
 
             var eTotal = x0.Count + x1.Count + x2.Count + x3.Count + x4.Count + x5.Count;     // 53 
             return;
