@@ -38,10 +38,9 @@ namespace Audio.Utility
             return PlaySound(sourceID, outputName);
         }
 
-        public bool PlaySound(string id, string outputName)
+        public bool PlaySound(string sourceID, string outputName)
         {
-            var sourceIDConverted = Convert.ToUInt32(id);
-            var audioFile = FindSoundFile(_language, sourceIDConverted);
+            var audioFile = FindSoundFile(_language, sourceID);
             if (audioFile == null)
             {
                 _logger.Here().Error("Unable to find sound");
@@ -68,7 +67,7 @@ namespace Audio.Utility
             return result.IsSuccess;
         }
 
-        PackFile FindSoundFile(string language, uint soundId)
+        PackFile FindSoundFile(string language, string soundId)
         {
             var audioFile = _pfs.FindFile($"audio\\wwise\\{soundId}.wem");
             if (audioFile == null)

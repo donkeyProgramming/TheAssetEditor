@@ -53,7 +53,7 @@ namespace CommonControls.FileTypes.PackFiles.Models
 
                 // If larger then int.max throw error
                 if (output.Header.FileCount > int.MaxValue)
-                    throw new Exception("To many files in packfile!");
+                    throw new Exception("Too many files in packfile!");
 
                 output.FileList = new Dictionary<string, PackFile>((int)output.Header.FileCount);
 
