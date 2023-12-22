@@ -65,7 +65,6 @@ namespace KitbasherEditor.Services
                     lodNode.CameraDistance = rmv.LodHeaders[i].LodCameraDistance;
             }
 
-            _kitbasherRootScene.SelectedOutputFormat = rmv.Header.Version;
             _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
         }
 

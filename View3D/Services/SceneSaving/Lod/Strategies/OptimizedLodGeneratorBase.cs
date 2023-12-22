@@ -5,23 +5,13 @@ using System.Linq;
 using View3D.SceneNodes;
 using View3D.Utility;
 
-namespace View3D.Services
+namespace View3D.Services.SceneSaving.Lod.Strategies
 {
-    public class LodGenerationService
+
+
+    public abstract class OptimizedLodGeneratorBase
     {
-        private readonly ObjectEditor _objectEditor;
-
-        public class Settings
-        {
-            public float LodRectionFactor { get; set; }
-            public bool OptimizeAlpha { get; set; }
-            public bool OptimizeVertex { get; set; }
-        }
-
-        public LodGenerationService(ObjectEditor objectEditor)
-        {
-            _objectEditor = objectEditor;
-        }
+        protected abstract void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio);
 
         private void DeleteAllLods(List<Rmv2LodNode> lodRootNodes)
         {
@@ -36,7 +26,7 @@ namespace View3D.Services
             }
         }
 
-        public void CreateLodsForRootNode(Rmv2ModelNode rootNode)
+        public void CreateLodsForRootNode(Rmv2ModelNode rootNode, LodGenerationSettings[] lodGenerationSettings)
         {
             var lods = rootNode.GetLodNodes();
             var firtLod = lods.First();
@@ -45,8 +35,8 @@ namespace View3D.Services
                 .Take(rootNode.Children.Count - 1)
                 .ToList();
 
-            var lodGenerationSettings = lodRootNodes
-                .Select(x => new Settings() { LodRectionFactor = x.LodReductionFactor, OptimizeAlpha = x.OptimizeLod_Alpha, OptimizeVertex = x.OptimizeLod_Vertex })
+            var lodGenerationSettingsOld_remove = lodRootNodes
+                .Select(x => new LodGenerationSettings() { LodRectionFactor = x.LodReductionFactor, OptimizeAlpha = x.OptimizeLod_Alpha, OptimizeVertex = x.OptimizeLod_Vertex })
                 .ToArray();
 
             // Delete all the lods
@@ -55,17 +45,17 @@ namespace View3D.Services
             var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
             var generatedLod = CreateLods(meshList, lodGenerationSettings);
 
-            for (int i = 0; i < lodRootNodes.Count; i++)
+            for (var i = 0; i < lodRootNodes.Count; i++)
             {
                 foreach (var mesh in generatedLod[i])
                     lodRootNodes[i].AddObject(mesh);
             }
         }
 
-        public List<Rmv2MeshNode[]> CreateLods(List<Rmv2MeshNode> originalModel, Settings[] settings)
+        List<Rmv2MeshNode[]> CreateLods(List<Rmv2MeshNode> originalModel, LodGenerationSettings[] settings)
         {
             var output = new List<Rmv2MeshNode[]>();
-            for (int lodIndex = 0; lodIndex < settings.Length; lodIndex++)
+            for (var lodIndex = 0; lodIndex < settings.Length; lodIndex++)
             {
                 var deductionRatio = settings[lodIndex].LodRectionFactor;
                 var optimize = settings[lodIndex].OptimizeAlpha || settings[lodIndex].OptimizeVertex;
@@ -97,7 +87,7 @@ namespace View3D.Services
                 foreach (var mesh in originalMeshClone)
                 {
                     if (mesh.ReduceMeshOnLodGeneration && settings[lodIndex].LodRectionFactor != 1)
-                        _objectEditor.ReduceMesh(mesh, deductionRatio, false);
+                        ReduceMesh(mesh, deductionRatio/*, false*/);
                 }
 
                 output.Add(originalMeshClone.ToArray());
@@ -105,7 +95,5 @@ namespace View3D.Services
 
             return output;
         }
-
-
     }
 }

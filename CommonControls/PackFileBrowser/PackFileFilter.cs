@@ -21,11 +21,12 @@ namespace CommonControls.PackFileBrowser
             set
             {
                 SetAndNotify(ref _filterText, value);
+                Filter(_filterText);
             }
         }
 
         List<string> _extentionFilter;
-        public int AutoExapandResultsAfterLimitedCount { get; set; } = -1;
+        public int AutoExapandResultsAfterLimitedCount { get; set; } = 50;
 
         public PackFileFilter(ObservableCollection<TreeNode> nodes)
         {

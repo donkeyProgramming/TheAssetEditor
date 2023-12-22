@@ -26,20 +26,21 @@ namespace KitbasherEditor.ViewModels.UiCommands
 
         public void Execute()
         {
-            var res = MessageBox.Show("Are you sure to copy lod 0 to every lod slots? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (res != MessageBoxResult.Yes) return;
-
-            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            var lodGenerationService = new LodGenerationService(_objectEditor);
-
-            rootNode.GetLodNodes().ForEach(x =>
-            {
-                x.LodReductionFactor = 1;
-                x.OptimizeLod_Alpha = false;
-                x.OptimizeLod_Vertex = false;
-            });
-
-            lodGenerationService.CreateLodsForRootNode(rootNode);
+            //remove
+           //var res = MessageBox.Show("Are you sure to copy lod 0 to every lod slots? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+           //if (res != MessageBoxResult.Yes) return;
+           //
+           //var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+           //var lodGenerationService = new LodGenerationService(_objectEditor);
+           //
+           //rootNode.GetLodNodes().ForEach(x =>
+           //{
+           //    x.LodReductionFactor = 1;
+           //    x.OptimizeLod_Alpha = false;
+           //    x.OptimizeLod_Vertex = false;
+           //});
+           //
+           //lodGenerationService.CreateLodsForRootNode(rootNode);
         }
     }
 }

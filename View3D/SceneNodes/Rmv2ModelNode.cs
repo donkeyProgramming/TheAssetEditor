@@ -1,6 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
+using Microsoft.Xna.Framework;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,6 @@ namespace View3D.SceneNodes
                 {
                     var cameraDistance = model.LodHeaders[lodIndex]?.LodCameraDistance;
                     outputNode.AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex, cameraDistance));
-                    outputNode.UpdateDefaultLodValues();
                 }
 
                 var lodNode = outputNode.Children[lodIndex];
@@ -92,8 +92,6 @@ namespace View3D.SceneNodes
                 };
                 AddObject(lodNode);
             }
-
-            UpdateDefaultLodValues();
         }
 
         public List<Rmv2LodNode> GetLodNodes()
@@ -148,17 +146,6 @@ namespace View3D.SceneNodes
             var typedTarget = tartet as Rmv2ModelNode;
             typedTarget.Model = Model;
             base.CopyInto(tartet);
-        }
-
-
-        public void UpdateDefaultLodValues()
-        {
-            var lodNodes = GetLodNodes();
-            if (lodNodes.Count(x => x.LodReductionFactor == -1) != 0)
-            {
-                for (int i = 0; i < lodNodes.Count; i++)
-                    lodNodes[i].LodReductionFactor = SceneSaverService.GetDefaultLodReductionValue(lodNodes.Count(), i);
-            }
         }
     }
 }

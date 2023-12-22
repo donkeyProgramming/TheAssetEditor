@@ -2,7 +2,7 @@
 using KitbasherEditor.ViewModels.MenuBarViews;
 using View3D.Components.Component;
 using View3D.SceneNodes;
-using View3D.Services;
+using View3D.Services.SceneSaving.Material.Strategies;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
@@ -25,8 +25,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
 
         public void Execute()
         {
-            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            _wsModelGeneratorService.GenerateWsModel(mainNode, _gameFormat);
+            //var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            //_wsModelGeneratorService.GenerateWsModel(mainNode, _gameFormat);
         }
     }
 

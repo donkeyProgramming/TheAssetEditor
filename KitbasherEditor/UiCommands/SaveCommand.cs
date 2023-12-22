@@ -1,6 +1,11 @@
-﻿using CommonControls.Common.MenuSystem;
+﻿using CommonControls.BaseDialogs;
+using CommonControls.Common.MenuSystem;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using View3D.Services;
+using KitbasherEditor.ViewModels.SaveDialog;
+using KitbasherEditor.Views.EditorViews;
+using View3D.Components.Component;
+using View3D.SceneNodes;
+using View3D.Services.SceneSaving.Geometry;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
@@ -12,13 +17,22 @@ namespace KitbasherEditor.ViewModels.UiCommands
 
         private readonly SceneSaverService _sceneSaverService;
         private readonly KitbasherRootScene _kitbasherRootScene;
+        private readonly IWindowFactory _windowFactory;
+        private readonly SceneManager _sceneManager;
 
-        public SaveCommand(SceneSaverService sceneSaverService, KitbasherRootScene kitbasherRootScene)
+        public SaveCommand(SceneSaverService sceneSaverService, KitbasherRootScene kitbasherRootScene, IWindowFactory windowFactory, SceneManager sceneManager)
         {
             _sceneSaverService = sceneSaverService;
             _kitbasherRootScene = kitbasherRootScene;
+            _windowFactory = windowFactory;
+            _sceneManager = sceneManager;
         }
 
-        public void Execute() => _sceneSaverService.Save(_kitbasherRootScene.SelectedOutputFormat);
+        public void Execute()
+        {
+            var window = _windowFactory.Create<SaveDialogViewModel, SaveDialogView>("Save", 600, 350);
+            window.TypedContext.Initialise(window);
+            window.ShowWindow();
+        }
     }
 }

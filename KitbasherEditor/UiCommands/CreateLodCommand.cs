@@ -23,9 +23,10 @@ namespace KitbasherEditor.ViewModels.UiCommands
 
         public void Execute()
         {
-            var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            var lodGenerationService = new LodGenerationService(_objectEditor);
-            lodGenerationService.CreateLodsForRootNode(rootNode);
+            // remove
+            //var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            //var lodGenerationService = new LodGenerationService(_objectEditor);
+            //lodGenerationService.CreateLodsForRootNode(rootNode);
         }
     }
 }
