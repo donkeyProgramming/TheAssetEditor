@@ -1,0 +1,27 @@
+{
+  "Settings": {
+    "BnkName": "global_movies__test", // Must start with global_movies__ anything after can be custom.
+    "Language": "english(uk)"
+  },
+
+  "Project": [
+    {
+      "ActorMixer": "573597124",
+      "AudioBus": "3602921883",
+      "StatePropNum_Priority": "100",
+      "Event": "Play_Movie_warhammer3_emp_custom_movie_test", // Must start with Play_Movie followed by the path of the movie file in the game files e.g. pro_int.ca_vp8.
+      "Sounds": [
+        "C:\\Users\\georg\\Documents\\Modding\\Work In Progress\\Jacob Wulfhart\\Cinematics\\Jacob Wulfhart Intro\\jacob_wulfhart_intro_1.wav"
+      ]
+    },
+    {
+      "ActorMixer": "573597124",
+      "AudioBus": "3602921883",
+      "StatePropNum_Priority": "100",
+      "Event": "Play_Movie_warhammer3_emp_custom_movie_testing",
+      "Sounds": [
+        "C:\\Users\\georg\\Documents\\Modding\\Work In Progress\\Jacob Wulfhart\\Cinematics\\Jacob Wulfhart Intro\\jacob_wulfhart_intro_2.wav"
+      ]
+    }
+  ]
+}

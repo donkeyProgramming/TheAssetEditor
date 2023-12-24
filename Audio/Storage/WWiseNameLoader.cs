@@ -1,4 +1,5 @@
 ﻿using Audio.FileFormats.Dat;
+using Audio.FileFormats.WWise;
 using Audio.Utility;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Documents;
 
 namespace Audio.Storage
 {
@@ -51,6 +53,13 @@ namespace Audio.Storage
                 AddNames(filecontent);
             }
 
+            // Load all from sound test
+            if (File.Exists(@"C:\Users\georg\Desktop\potential_strings.txt"))
+            {
+                var filecontent = File.ReadAllLines(@"C:\Users\georg\Desktop\potential_strings.txt");
+                AddNames(filecontent);
+            }
+
             // Load all from game db tables
             if (Directory.Exists(@"C:\Users\ole_k\Desktop\Wh3 sounds\DbTables"))
             {
@@ -75,21 +84,37 @@ namespace Audio.Storage
                 AddNames(splitData);
             }
 
+            /*
+            // Output CSV of known IDs matched with strings
+            using (var file = File.CreateText("C:\\Users\\georg\\Desktop\\id_name_matches.csv"))
+                foreach (var item in _nameLookUp)
+                {
+                    var id = item;
+                    file.WriteLine(string.Join(",", id));
+                }
+            */
+
             return _nameLookUp;
         }
+
 
         SoundDatFile LoadDatFiles(PackFileService pfs, out List<string> failedFiles)
         {
             var datFiles = pfs.FindAllWithExtention(".dat");
             datFiles = PackFileUtil.FilterUnvantedFiles(pfs, datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat" }, out var removedFiles);
 
+            
             var failedDatParsing = new List<(string, string)>();
             var masterDat = new SoundDatFile();
+
             foreach (var datFile in datFiles)
             {
+                // Commented out what would output dat dumps of dat files.
+                //var outputDat = $"C:\\Users\\georg\\AssetEditor\\Temp\\dat_dump_{datFile}.txt";
                 try
                 {
                     var parsedFile = LoadDatFile(datFile);
+                    //parsedFile.DumpToFile(outputDat);
                     masterDat.Merge(parsedFile);
                 }
                 catch (Exception e)

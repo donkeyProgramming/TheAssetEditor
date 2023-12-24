@@ -1,9 +1,11 @@
-﻿using Audio.FileFormats.WWise;
+﻿using Audio.BnkCompiler;
+using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace Audio.AudioEditor
@@ -53,6 +55,18 @@ namespace Audio.AudioEditor
 
             var actions = actionHirc.GetActionIds();
             ProcessNext(actions, actionTreeNode);
+
+            /*
+            // Generate CSV of strings (triggered when an event is searched)
+            var lines = File.ReadLines("C:\\Users\\georg\\Desktop\\hirc_ids.csv");
+            using (var file = File.CreateText("C:\\Users\\georg\\Desktop\\hirc_names.csv"))
+            foreach (var line in lines)
+            {
+                var name = _repository.GetNameFromHash(Convert.ToUInt32(line));
+                file.WriteLine(string.Join(",", name));
+            }
+            */
+            
         }
 
         void ProcessAction(HircItem item, HircTreeItem parent)
@@ -107,7 +121,7 @@ namespace Audio.AudioEditor
             parent.Children.Add(soundTreeNode);
         }
 
-        private void ProcessActorMixer(HircItem item, HircTreeItem parent)
+        public void ProcessActorMixer(HircItem item, HircTreeItem parent)
         {
             var actorMixer = GetAsType<ICAkActorMixer>(item);
             var actorMixerNode = new HircTreeItem() { DisplayName = $"ActorMixer {_repository.GetNameFromHash(item.Id)}", Item = item };

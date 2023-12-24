@@ -10,7 +10,6 @@ namespace Audio.BnkCompiler
     {
         public string Name { get; set; }
         public uint OverrideId { get; set; } = 0;
-
         [JsonIgnore]
         public uint SerializationId { get; set; }
     }
@@ -29,11 +28,18 @@ namespace Audio.BnkCompiler
     public class GameSound : IAudioProjectHircItem
     {
         public string Path { get; set; }
+        public string StatePropNum_Priority { get; set; } = null;
+        public string UserAuxSendVolume0 { get; set; } = null;
+        public string InitialDelay { get; set; } = null;
     }
 
     public class ActorMixer : IAudioProjectHircItem
     {
-        public string RootParentId { get; set; } = null;
+        public string DirectParentId { get; set; } = null;
+        public string OverrideBusId { get; set; } = null;
+        public string StatePropNum_Priority { get; set; } = null;
+        public string UserAuxSendVolume0 { get; set; } = null;
+        public string InitialDelay { get; set; } = null;
         public List<string> Sounds { get; set; } = new List<string>();
         public List<string> ActorMixerChildren { get; set; } = new List<string>();
     }
