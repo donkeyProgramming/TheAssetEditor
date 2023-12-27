@@ -52,8 +52,32 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public override uint GetParentId() => NodeBaseParams.DirectParentID;
         public override List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
 
-        public override void UpdateSize() => throw new NotImplementedException();
-        public override byte[] GetAsByteArray() => throw new NotImplementedException();
+        public override void UpdateSize()
+        {
+            var akPlaylistCount = Convert.ToUInt32(AkPlaylist.Count());
+            Size = HircHeaderSize + Children.GetSize() + NodeBaseParams.GetSize() + 4 * akPlaylistCount;
+        }
+
+        public override byte[] GetAsByteArray()
+        {
+            using var memStream = WriteHeader();
+            memStream.Write(Children.GetAsByteArray());
+            memStream.Write(NodeBaseParams.GetAsByteArray());
+            var byteArray = memStream.ToArray();
+
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)AkPlaylist.Count(), out _));
+            foreach (var akPlaylistItem in AkPlaylist)
+            {
+                memStream.Write(ByteParsers.UInt32.EncodeValue(akPlaylistItem.PlayId, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(Convert.ToUInt32(akPlaylistItem.Weight), out _));
+            }
+            
+            // Reload the object to ensure sanity
+            var copyInstance = new CAkRanSeqCntr_v136();
+            copyInstance.Parse(new ByteChunk(byteArray));
+
+            return byteArray;
+        }
     }
 
 
