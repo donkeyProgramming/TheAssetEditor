@@ -44,7 +44,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
             output.PluginId_type = (ushort)(output.PluginId >> 0 & 0x000F);
             output.PluginId_company = (ushort)(output.PluginId >> 4 & 0x03FF);
 
-            if (output.StreamType != SourceType.Straming)
+            if (output.StreamType != SourceType.Streaming)
             {
                 //   throw new Exception();
             }

@@ -9,7 +9,7 @@ namespace Audio.BnkCompiler.Validation
         public CompilerInputProjectValidation()
         {
             RuleFor(x => x).NotNull().WithMessage("Input project is null");
-            RuleFor(x => x.Events).NotNull().WithMessage("No input events found");
+            RuleFor(x => x.Project).NotNull().WithMessage("No input events found");
             RuleFor(x => x.Settings).NotNull().WithMessage("Input project is missing Settings");
 
             RuleFor(x => x.Settings.BnkName)
@@ -19,14 +19,11 @@ namespace Audio.BnkCompiler.Validation
             RuleFor(x => x.Settings.Language)
                 .Custom((projectFile, context) => { });
 
-            RuleFor(x => x.Settings.RootAudioMixer)
-              .NotEmpty().WithMessage("RootAudioMixer is missing");
-
-            RuleFor(x => x.Events).ForEach(x => x.SetValidator(new InputEventValidation()));
+            RuleFor(x => x.Project).ForEach(x => x.SetValidator(new InputEventValidation()));
         }
     }
 
-    public class InputEventValidation : AbstractValidator<CompilerInputProject.Event>
+    public class InputEventValidation : AbstractValidator<CompilerInputProject.ProjectContents>
     {
         public InputEventValidation()
         {

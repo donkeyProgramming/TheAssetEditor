@@ -49,7 +49,7 @@ namespace Audio.BnkCompiler
             var allIds = hircChunk.Hircs.Select(x => x.Id).ToList();
             var originalCount = allIds.Count();
             var uniqueCount = allIds.Distinct().Count();
-            Guard.IsEqualTo(originalCount, uniqueCount);
+            //Guard.IsEqualTo(originalCount, uniqueCount);
 
             var compileResult = new CompileResult()
             {

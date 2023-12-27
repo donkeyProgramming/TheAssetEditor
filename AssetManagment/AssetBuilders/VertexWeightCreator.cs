@@ -52,7 +52,7 @@ namespace AssetManagement.AssetBuilders
                 // CA Rule: Duplicate bone indices are "illegal", and are used as "terminators" to indicate weight count                               
                 if (weightIndex > 0 && inVertex.BoneIndex[0] == inVertex.BoneIndex[weightIndex])
                 {
-                    continue; // skip these as they will cause problems in the SKD, as the add duplicate bones/vertex
+                    continue; // skip these as they will cause problems in the SKD, as they add duplicate bones/vertex
                 }
 
                 if (inVertex.BoneIndex[weightIndex] == 0.0f)

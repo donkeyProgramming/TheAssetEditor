@@ -67,7 +67,6 @@ namespace AssetManagement.AssetBuilders
             var weightcreator = new VertexWeightCreator(inModel, _skeletonFile);
             outMesh.VertexWeights = weightcreator.CreateVertexWeigts();
         }
-
     }
 
     public class PackedMeshBuilderFactory

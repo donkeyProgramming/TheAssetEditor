@@ -45,7 +45,7 @@ namespace CommonControls.FileTypes.Animation
             public uint FlagCount { get; set; } = 0;
             public List<string> FlagVariables { get; set; } = new List<string>();
             public float AnimationTotalPlayTimeInSec { get; set; }
-            public uint UnkownValue_v8 { get; set; } = 0;
+            public uint UnknownValue_v8 { get; set; } = 0;
         }
 
         public enum AnimationBoneMappingType
@@ -207,7 +207,7 @@ namespace CommonControls.FileTypes.Animation
 
             if (output.Header.Version == 8)
             {
-                output.Header.UnkownValue_v8 = chunk.ReadUInt32();
+                output.Header.UnknownValue_v8 = chunk.ReadUInt32();
                 output.AnimationParts = LoadAnimationParts_v8(chunk, boneCount);
             }
             else

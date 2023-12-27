@@ -1,19 +1,38 @@
 {
   "Settings": {
-    "BnkName": "campaign_diplomacy__example",
-    "RootAudioMixer": "54848735",
-    "Language": "English(uk)"
+    "BnkName": "global_movies__test", // The name of your bank should take the same name as the vanilla bank for everything before the "__", everything after can be custom.
+    "Language": "english(uk)" // This is the location your wem files will be output.
   },
 
-  "Events": [
+  "Project": [
     {
-      "Name": "Play_Diplo_01",
-      "Sound": "Audio\\WWise\\1000175847.wem"
+      "ActorMixer": "573597124",
+      "AudioBus": "3602921883",
+      "AuxBus0": "",
+      "AuxBus1": "",
+      "AuxBus2": "",
+      "AuxBus3": "",
+      "AuxBus4": "",
+      "StatePropNum_Priority": "",
+      "UserAuxSendVolume0": "",
+      "InitialDelay": ""
     },
     {
-      "Name": "Play_Diplo_02",
-      "Sound": "C:\\Users\\username\\soundLib\\wet-fart-6139.mp3"
+      "Event": "Play_example_event_name", // Must start with Play_
+      "Type": "Default", // Default or none = normal event. Music = music event. Not sure if this works or not though. Might need to be a whole different object
+      "SoundContainerType": "Rand", // Default or none = just one sound, Seq = SequenceCntr,
+      "Sounds": [ // Sounds can either be located in a packfile or on your computer
+        "Audio\\WWise\\1000175847.wem",
+        "C:\\Users\\username\\soundLib\\wet-fart-6139.mp3"
+      ]
+    },
+    {
+      "Event": "Play_example_event_name_2",
+      "Type": "Default",
+      "SoundContainerType": "Default",
+      "Sounds": [
+        "Audio\\WWise\\1000175847.wem"
+      ]
     }
   ]
 }
-

@@ -1,6 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommunityToolkit.Diagnostics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Serilog;
 using System;
 using System.IO;

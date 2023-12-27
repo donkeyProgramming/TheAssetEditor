@@ -43,7 +43,7 @@ namespace AudioResearch
             var compiler = application.GetService<CompilerService>();
             var compilerSettings = new CompilerSettings()
             {
-                UserOerrideIdForActions = useActionIdFromBnk,
+                UserOverrideIdForActions = useActionIdFromBnk,
                 UseOverrideIdForSounds = useSoundIdFromBnk,
                 UseOverrideIdForMixers = useMixerIdFromBnk,
                 ConvertResultToXml = true,
@@ -73,7 +73,7 @@ namespace AudioResearch
             var ids = hircs.Select(x => $"{x.Id}-{x.Type}").ToList();
 
             var projectExporter = new AudioProjectExporterSimple();
-            projectExporter.CreateFromRepositoryToFile(audioRepo, "campaign_diplomacy__ovn", path);
+            //projectExporter.CreateFromRepositoryToFile(audioRepo, "campaign_diplomacy__ovn", path);
         }
     }
 }

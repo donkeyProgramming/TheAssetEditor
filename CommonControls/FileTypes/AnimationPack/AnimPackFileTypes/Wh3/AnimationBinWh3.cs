@@ -22,7 +22,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
         public uint TableSubVersion { get; set; } = 3;
         public string Name { get; set; } = "";
         public string MountBin { get; set; } = "";
-        public string Unkown { get; set; } = "";    // Name of the rider bin
+        public string Unknown { get; set; } = "";    // Name of the rider bin
         public string SkeletonName { get; set; } = "";
         public string LocomotionGraph { get; set; } = "";
         public short UnknownValue1 { get; set; } = 0;   // bool 2x, IsSimpleFlight and IsLarge
@@ -44,7 +44,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
 
             memStream.Write(ByteParsers.String.WriteCaString(Name.ToLower()));
             memStream.Write(ByteParsers.String.WriteCaString(MountBin.ToLower()));
-            memStream.Write(ByteParsers.String.WriteCaString(Unkown.ToLower()));
+            memStream.Write(ByteParsers.String.WriteCaString(Unknown.ToLower()));
             memStream.Write(ByteParsers.String.WriteCaString(SkeletonName.ToLower()));
             if (TableVersion == 4)
                 memStream.Write(ByteParsers.String.WriteCaString(LocomotionGraph.ToLower()));
@@ -93,7 +93,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
             TableSubVersion = 0;
             Name = chunk.ReadString();
             MountBin = chunk.ReadString();
-            Unkown = chunk.ReadString();
+            Unknown = chunk.ReadString();
             SkeletonName = chunk.ReadString();
 
             UnknownValue1 = chunk.ReadShort();  // Two bools? IsSimpleFlight and IsLarge
@@ -110,7 +110,7 @@ namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3
 
             Name = chunk.ReadString();
             MountBin = chunk.ReadString();
-            Unkown = chunk.ReadString(); // Always empty, could be a short
+            Unknown = chunk.ReadString(); // Always empty, could be a short
             SkeletonName = chunk.ReadString();
             LocomotionGraph = chunk.ReadString();
             UnknownValue1 = chunk.ReadShort();

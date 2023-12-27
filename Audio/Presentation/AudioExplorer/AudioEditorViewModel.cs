@@ -6,6 +6,8 @@ using Audio.Utility;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
+using Filetypes.ByteParsing;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
@@ -16,6 +18,7 @@ namespace Audio.Presentation.AudioExplorer
 {
     public class AudioEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
+
         public EventSelectionFilter EventFilter { get; set; }
 
         private readonly IAudioRepository _audioRepository;
@@ -89,7 +92,7 @@ namespace Audio.Presentation.AudioExplorer
 
         void OnNodeSelected(HircTreeItem selectedNode)
         {
-            IsPlaySoundButtonEnabled.Value = _selectedNode?.Item is ICAkSound;
+            IsPlaySoundButtonEnabled.Value = _selectedNode?.Item is ICAkSound or ICAkMusicTrack;
             CanExportCurrrentDialogEventAsCsvAction.Value = _selectedNode?.Item is CAkDialogueEvent_v136;
 
             SelectedNodeText.Value = "";
@@ -117,7 +120,19 @@ namespace Audio.Presentation.AudioExplorer
             }
         }
 
-        public void PlaySelectedSoundAction() => _soundPlayer.PlaySound(_selectedNode.Item as ICAkSound, TreeList.First().Item.Id);
+        public void PlaySelectedSoundAction()
+        {
+            var hircAsString = JsonSerializer.Serialize((object)_selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(_audioRepository) }, WriteIndented = true });
+            var hircInitialSubstring = hircAsString.Substring(0, hircAsString.IndexOf("\"uInMemoryMediaSize\""));
+            var substringFrom = "\"SourceId\": \"";
+            var substringTo = "\",";
+            var substringStart = hircInitialSubstring.IndexOf(substringFrom) + substringFrom.Length;
+            var substringEnd = hircInitialSubstring.LastIndexOf(substringTo);
+            var sourceID = hircInitialSubstring.Substring(substringStart, substringEnd - substringStart);
+
+            _soundPlayer.PlaySound(sourceID, TreeList.First().Item.Id);
+        }
+
         public void ExportCurrrentDialogEventAsCsvAction() => _audioResearchHelper.ExportDialogEventsToFile(_selectedNode.Item as CAkDialogueEvent_v136, true);
         public void ExportIdListAction() => _audioResearchHelper.ExportNamesToFile("c:\\temp\\wwiseIds.txt", true);
         public void LoadHircFromIdAction()

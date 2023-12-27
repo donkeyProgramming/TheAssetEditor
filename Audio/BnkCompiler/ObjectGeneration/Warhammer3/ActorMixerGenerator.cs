@@ -31,25 +31,33 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             var wwiseActorMixer = new CAkActorMixer_v136();
             wwiseActorMixer.Id = project.GetHircItemIdFromName(actorMixer.Name);
             wwiseActorMixer.Type = HircType.ActorMixer;
-            wwiseActorMixer.NodeBaseParams = NodeBaseParams.CreateDefault();
+
+            var statePropNum_Priority = actorMixer.StatePropNum_Priority;
+            var userAuxSendVolume0 = actorMixer.UserAuxSendVolume0;
+            var initialDelay = actorMixer.InitialDelay;
+
+            if (statePropNum_Priority != null || userAuxSendVolume0 != null || initialDelay != null)
+                wwiseActorMixer.NodeBaseParams = NodeBaseParams.CreateCustomMixerParams(actorMixer);
+            else
+                wwiseActorMixer.NodeBaseParams = NodeBaseParams.CreateDefault();
 
             wwiseActorMixer.Children = new Children()
             {
                 ChildIdList = allChildIds
             };
 
-            if (string.IsNullOrEmpty(actorMixer.RootParentId))
+            if (string.IsNullOrEmpty(actorMixer.OverrideBusId))
             {
                 var mixer = project.GetActionMixerParentForActorMixer(actorMixer.Name);
                 if (mixer != null)
-                    wwiseActorMixer.NodeBaseParams.DirectParentID = project.GetHircItemIdFromName(mixer.Name);
+                    wwiseActorMixer.NodeBaseParams.OverrideBusId = project.GetHircItemIdFromName(mixer.Name);
 
                 // If there is a parent, tell the vector to overrwirte it
                 wwiseActorMixer.NodeBaseParams.byBitVector = mixer != null ? (byte)0x01 : (byte)0x0;
             }
             else
             {
-                wwiseActorMixer.NodeBaseParams.DirectParentID = uint.Parse(actorMixer.RootParentId);
+                wwiseActorMixer.NodeBaseParams.OverrideBusId = uint.Parse(actorMixer.OverrideBusId);
             }
 
             wwiseActorMixer.UpdateSize();
