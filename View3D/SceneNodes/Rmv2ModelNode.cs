@@ -40,8 +40,7 @@ namespace View3D.SceneNodes
             {
                 if (lodIndex >= outputNode.Children.Count)
                 {
-                    var cameraDistance = model.LodHeaders[lodIndex]?.LodCameraDistance;
-                    outputNode.AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex, cameraDistance));
+                    outputNode.AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex));
                 }
 
                 var lodNode = outputNode.Children[lodIndex];

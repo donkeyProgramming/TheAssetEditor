@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Controls;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using View3D.Components.Component;
@@ -10,7 +9,6 @@ using View3D.Services.SceneSaving;
 using View3D.Services.SceneSaving.Geometry;
 using View3D.Services.SceneSaving.Lod;
 using View3D.Services.SceneSaving.WsModel;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.SaveDialog
 {
@@ -18,7 +16,6 @@ namespace KitbasherEditor.ViewModels.SaveDialog
     {
         private readonly SaveSettings _settings;
         private readonly SceneManager _sceneManager;
-        private readonly ComponentManagerResolver _componentManagerResolver;
         private readonly SaveService _saveService;
         private IAssetEditorWindow _parentWindow;
 
@@ -33,11 +30,10 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         public NotifyAttr<ComboBoxItem<LodStrategy>> SelectedLodStrategy { get; set; } = new NotifyAttr<ComboBoxItem<LodStrategy>>();
         public NotifyAttr<bool> OnlySaveVisible { get; set; } = new NotifyAttr<bool>(false);
 
-        public SaveDialogViewModel(SaveSettings settings, SceneManager sceneManager, ComponentManagerResolver componentManagerResolver, SaveService saveService)
+        public SaveDialogViewModel(SaveSettings settings, SceneManager sceneManager, SaveService saveService)
         {
             _settings = settings;
             _sceneManager = sceneManager;
-            _componentManagerResolver = componentManagerResolver;
             _saveService = saveService;
 
             MeshStrategies = _saveService.GetGeometryStrategies().Select(x => new ComboBoxItem<GeometryStrategy>(x.StrategyId, x.Name, x.Description)).ToList();
@@ -65,7 +61,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             LodNodes.Clear();
             foreach (var lodNode in mainNode.GetLodNodes())
-                LodNodes.Add(new LodGroupNodeViewModel(lodNode, _componentManagerResolver.ComponentManager));
+                LodNodes.Add(new LodGroupNodeViewModel(lodNode, _settings));
         }
 
         public void HandleApply()

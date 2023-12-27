@@ -32,13 +32,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                     return new MeshEditorViewModel(_kitbasherRootScene, m, _packFileService, _skeletonAnimationLookUpHelper, _componentManagerResolver.ComponentManager, _applicationSettingsService);
                 case SkeletonNode s:
                     return new SkeletonSceneNodeViewModel(s, _packFileService, _skeletonAnimationLookUpHelper);
-                case Rmv2LodNode n:
-                    {
-                        if (n.IsEditable && n.Parent != null)
-                            return new LodGroupNodeViewModel(n, _componentManagerResolver.ComponentManager);
-
-                        return null;
-                    }
                 case GroupNode n:
                     {
                         if (n.IsEditable && n.Parent != null)

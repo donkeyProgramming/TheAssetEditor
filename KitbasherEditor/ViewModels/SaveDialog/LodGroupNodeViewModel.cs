@@ -1,75 +1,88 @@
-﻿using CommonControls.Common;
-using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using MonoGame.Framework.WpfInterop;
-using System.Linq;
-using View3D.Components.Component;
+﻿using System.Linq;
+using CommonControls.Common;
 using View3D.SceneNodes;
+using View3D.Services.SceneSaving;
 
 namespace KitbasherEditor.ViewModels.SaveDialog
 {
-    public class LodGroupNodeViewModel : NotifyPropertyChangedImpl// GroupNodeViewModel
+    public class LodGroupNodeViewModel : NotifyPropertyChangedImpl
     {
         private readonly Rmv2LodNode _node;
-        private readonly IComponentManager _componentManager;
+        private readonly SaveSettings _saveSettings;
+        private readonly int _lodIndex;
 
-        public LodGroupNodeViewModel(Rmv2LodNode node, IComponentManager componentManager) //: base(node)
+        public LodGroupNodeViewModel(Rmv2LodNode node,  SaveSettings saveSettings)
         {
             _node = node;
-            _componentManager = componentManager;
+            _saveSettings = saveSettings;
+            _lodIndex = _node.LodValue;
+
+            Compute();
         }
 
-        public float? CameraDistance
+        void Compute()
         {
-            get => _node.CameraDistance;
+            PolygonCount.Value = _node.GetAllModels(_saveSettings.OnlySaveVisible).Sum(x => x.Geometry.VertexCount() / 3);
+            TextureCount.Value = _node.GetAllModels(_saveSettings.OnlySaveVisible).SelectMany(x => x.Material.GetAllTextures().Select(x => x.Path)).Distinct().Count();
+            MeshCount.Value = _node.GetAllModels(_saveSettings.OnlySaveVisible).Count();
+        }
+
+        public float CameraDistance
+        {
+            get => _saveSettings.LodSettingsPerLod[_lodIndex].CameraDistance;
             set
             {
-                _node.CameraDistance = value;
+                _saveSettings.LodSettingsPerLod[_lodIndex].CameraDistance = value;
                 NotifyPropertyChanged();
-
-                if (value.HasValue)
-                {
-                    var sceneManager = _componentManager.GetComponent<SceneManager>();
-                    var root = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-                    var lodHeaders = root.Model.LodHeaders;
-                    lodHeaders[_node.LodValue].LodCameraDistance = value.Value;
-                }
             }
         }
 
         public byte QualityLvl
         {
-            get
-            {
-                var sceneManager = _componentManager.GetComponent<SceneManager>();
-                var root = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-                var lodHeaders = root.Model.LodHeaders;
-                return lodHeaders[_node.LodValue].QualityLvl;
-            }
+            get => _saveSettings.LodSettingsPerLod[_lodIndex].QualityLvl;
             set
             {
-                var sceneManager = _componentManager.GetComponent<SceneManager>();
-                var root = sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-                var lodHeaders = root.Model.LodHeaders; ;
-                lodHeaders[_node.LodValue].QualityLvl = value;
+                _saveSettings.LodSettingsPerLod[_lodIndex].QualityLvl = value;
                 NotifyPropertyChanged();
             }
         }
 
         public float LodReductionFactor
         {
-            get => _node.LodReductionFactor;
+            get => _saveSettings.LodSettingsPerLod[_lodIndex].LodRectionFactor;
             set
             {
-                _node.LodReductionFactor = value;
+                _saveSettings.LodSettingsPerLod[_lodIndex].LodRectionFactor = value;
+                Compute();
                 NotifyPropertyChanged();
             }
         }
 
-        public int LodIndex { get => _node.LodValue; }
-        public bool OptimizeLod_Alpha { get => _node.OptimizeLod_Alpha; set => _node.OptimizeLod_Alpha = value; }
-        public bool OptimizeLod_Vertex { get => _node.OptimizeLod_Vertex; set => _node.OptimizeLod_Vertex = value; }
-        public int PolygonCount { get => _node.GetAllModels(false).Sum(x => x.Geometry.VertexCount() / 3); }
-        public int TextureCount { get => _node.GetAllModels(false).SelectMany(x => x.Material.GetAllTextures().Select(x => x.Path)).Distinct().Count(); }
-        public int MeshCount { get => _node.GetAllModels(false).Count(); }
+        public int LodIndex { get => _lodIndex; }
+        public bool OptimizeLod_Alpha
+        {
+            get => _saveSettings.LodSettingsPerLod[_lodIndex].OptimizeAlpha;
+            set
+            {
+                _saveSettings.LodSettingsPerLod[_lodIndex].OptimizeAlpha = value;
+                Compute();
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool OptimizeLod_Vertex 
+        {
+            get => _saveSettings.LodSettingsPerLod[_lodIndex].OptimizeVertex;
+            set
+            {
+                _saveSettings.LodSettingsPerLod[_lodIndex].OptimizeVertex = value;
+                Compute();
+                NotifyPropertyChanged();
+            }
+        }
+
+        public NotifyAttr<int> PolygonCount { get; set; } = new NotifyAttr<int>(0);
+        public NotifyAttr<int> TextureCount { get; set; } = new NotifyAttr<int>(0);
+        public NotifyAttr<int> MeshCount { get; set; } = new NotifyAttr<int>(0);
     }
 }

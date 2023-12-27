@@ -3,9 +3,6 @@ using CommonControls.Common.MenuSystem;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.Views.EditorViews;
-using View3D.Components.Component;
-using View3D.SceneNodes;
-using View3D.Services.SceneSaving.Geometry;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
@@ -15,17 +12,11 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        private readonly SceneSaverService _sceneSaverService;
-        private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly IWindowFactory _windowFactory;
-        private readonly SceneManager _sceneManager;
 
-        public SaveCommand(SceneSaverService sceneSaverService, KitbasherRootScene kitbasherRootScene, IWindowFactory windowFactory, SceneManager sceneManager)
+        public SaveCommand(IWindowFactory windowFactory)
         {
-            _sceneSaverService = sceneSaverService;
-            _kitbasherRootScene = kitbasherRootScene;
             _windowFactory = windowFactory;
-            _sceneManager = sceneManager;
         }
 
         public void Execute()

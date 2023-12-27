@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Documents;
 using CommonControls.Common;
 using CommonControls.Services;
 using KitbasherEditor.Services;
@@ -83,13 +82,17 @@ namespace KitbasherEditor.EventHandlers
             _saveSettings.GeometryOutputType = GeometryStrategy.Rmv7;  //   _kitbasherRootScene.SelectedOutputFormat = rmv.Header.Version;
 
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            var numLods = mainNode.GetLodNodes().Count;
+            var numLods = mainNode.Model.LodHeaders.Count();
             var lodValues = new List<LodGenerationSettings>();
 
             for(int i = 0; i <  numLods; i++) 
             {
+                var lodHeader = mainNode.Model.LodHeaders[i];
+
                 var setting = new LodGenerationSettings()
                 {
+                    CameraDistance = lodHeader.LodCameraDistance,
+                    QualityLvl = lodHeader.QualityLvl,
                     LodRectionFactor = GetDefaultLodReductionValue(numLods, i),
                     OptimizeAlpha = i >= 2 ? true : false,
                     OptimizeVertex = i >= 2 ? true : false,

@@ -21,12 +21,12 @@ namespace View3D.Services.SceneSaving.Lod.Strategies
             //var res = MessageBox.Show("Are you sure to copy lod 0 to every lod slots? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             //if (res != MessageBoxResult.Yes) return;
             //
-            mainNode.GetLodNodes().ForEach(x =>
-            {
-                x.LodReductionFactor = 1;
-                x.OptimizeLod_Alpha = false;
-                x.OptimizeLod_Vertex = false;
-            });
+            //mainNode.GetLodNodes().ForEach(x =>
+            //{
+            //    x.LodReductionFactor = 1;
+            //    x.OptimizeLod_Alpha = false;
+            //    x.OptimizeLod_Vertex = false;
+            //});
             //
             //_lodGenerationService.CreateLodsForRootNode(mainNode);
         }

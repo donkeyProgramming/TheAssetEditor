@@ -87,7 +87,8 @@ namespace KitbasherEditor.ViewModels
                             for (int i = min; i < max; i++)
                             {
                                 var element = newItem.Parent.Children.ElementAt(i);
-                                SelectedObjects.Add(element);
+                                if(SelectedObjects.Contains(element) == false)
+                                    SelectedObjects.Add(element);
                             }
                         }
                     }

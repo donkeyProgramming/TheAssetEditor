@@ -30,10 +30,10 @@ namespace KitbasherEditor.Views
 
     public class MultiSelectTreeView : TreeView
     {
-        private SolidColorBrush _selectedBackgroundBrush { get; } = new SolidColorBrush(Color.FromRgb(58, 58, 58));
+        private SolidColorBrush _selectedBackgroundBrush { get; } = new SolidColorBrush(Color.FromRgb(255, 0, 0));//= new SolidColorBrush(Color.FromRgb(58, 58, 58));
         private SolidColorBrush _selectedForegroundBrush { get; } = new SolidColorBrush(Color.FromRgb(255, 0, 0));
 
-        private SolidColorBrush _notSelectedBackgroundBrush { get; }  = new SolidColorBrush(Color.FromRgb(36, 36, 36));
+        private SolidColorBrush _notSelectedBackgroundBrush { get; } = new SolidColorBrush(Color.FromRgb(36, 36, 36));
         private SolidColorBrush _notSelectedForegroundBrush { get; } = new SolidColorBrush(Color.FromRgb(0, 255, 0));
 
 
@@ -57,6 +57,9 @@ namespace KitbasherEditor.Views
 
         public MultiSelectTreeView()
         {
+            _selectedBackgroundBrush = (SolidColorBrush)FindResource("TreeViewItem.Selected.Background");
+            _notSelectedBackgroundBrush = (SolidColorBrush)FindResource("TreeView.Static.Background");
+
             SelectedItemChanged += MyTreeView_SelectedItemChanged;
             Focusable = true;
             PreviewMouseDoubleClick += MultiSelectTreeView_PreviewMouseDoubleClick;
@@ -171,7 +174,7 @@ namespace KitbasherEditor.Views
                         {
                             treeViewItem.Background = _selectedBackgroundBrush;
                             treeViewItem.Foreground = _selectedForegroundBrush;
-                            treeViewItem.IsSelected = false;
+                            treeViewItem.IsSelected = true;
                             treeViewItem.Focus();
                         }
                     }

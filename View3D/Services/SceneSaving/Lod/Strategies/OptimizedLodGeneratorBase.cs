@@ -7,8 +7,6 @@ using View3D.Utility;
 
 namespace View3D.Services.SceneSaving.Lod.Strategies
 {
-
-
     public abstract class OptimizedLodGeneratorBase
     {
         protected abstract void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio);
@@ -34,10 +32,6 @@ namespace View3D.Services.SceneSaving.Lod.Strategies
                 .Skip(1)
                 .Take(rootNode.Children.Count - 1)
                 .ToList();
-
-            var lodGenerationSettingsOld_remove = lodRootNodes
-                .Select(x => new LodGenerationSettings() { LodRectionFactor = x.LodReductionFactor, OptimizeAlpha = x.OptimizeLod_Alpha, OptimizeVertex = x.OptimizeLod_Vertex })
-                .ToArray();
 
             // Delete all the lods
             DeleteAllLods(lodRootNodes);

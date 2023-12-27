@@ -20,5 +20,7 @@ namespace View3D.Services.SceneSaving
         public float LodRectionFactor { get; set; }
         public bool OptimizeAlpha { get; set; }
         public bool OptimizeVertex { get; set; }
+        public byte QualityLvl { get; set; }
+        public float CameraDistance { get; set; }
     }
 }

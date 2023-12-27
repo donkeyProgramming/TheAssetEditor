@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using CommonControls.Services;
 using View3D.SceneNodes;
@@ -41,6 +42,14 @@ namespace View3D.Services.SceneSaving
             var outputPath = settings.OutputName;
             var onlyVisibleNodes = settings.OnlySaveVisible;
 
+            // Update lod values
+            var model = mainNode.Model;
+            for (int i = 0; i < model.LodHeaders.Count(); i++)
+            { 
+                model.LodHeaders[i].LodCameraDistance = settings.LodSettingsPerLod[i].CameraDistance;
+                model.LodHeaders[i].QualityLvl = settings.LodSettingsPerLod[i].QualityLvl;
+            }
+            
             _lodStrategyProvider.GetStrategy(settings.LodGenerationMethod).Generate(mainNode, settings.LodSettingsPerLod);
             _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, onlyVisibleNodes);
             _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, outputPath, onlyVisibleNodes);
