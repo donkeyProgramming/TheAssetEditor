@@ -1,7 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
-using System.Collections.Generic;
-using View3D.Utility;
 
 namespace View3D.Components
 {

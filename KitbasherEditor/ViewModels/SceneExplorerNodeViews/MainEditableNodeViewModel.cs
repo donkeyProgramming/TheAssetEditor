@@ -18,7 +18,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         MainEditableNode _mainNode;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly PackFileService _pfs;
-        private readonly IComponentManager _componentManager;
+        private readonly RenderEngineComponent _renderEngineComponent;
 
         public ObservableCollection<string> SkeletonNameList { get; set; }
 
@@ -29,18 +29,18 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         public ObservableCollection<RenderFormats> PossibleRenderFormats { get; set; } = new ObservableCollection<RenderFormats>() { RenderFormats.MetalRoughness, RenderFormats.SpecGloss };
 
         RenderFormats _selectedRenderFormat;
-        public RenderFormats SelectedRenderFormat { get => _selectedRenderFormat; set { SetAndNotify(ref _selectedRenderFormat, value); _componentManager.GetComponent<RenderEngineComponent>().MainRenderFormat = _selectedRenderFormat; } }
+        public RenderFormats SelectedRenderFormat { get => _selectedRenderFormat; set { SetAndNotify(ref _selectedRenderFormat, value); _renderEngineComponent.MainRenderFormat = _selectedRenderFormat; } }
 
         public TextureFileEditorServiceViewModel TextureFileEditorServiceViewModel { get; set; }
 
-        public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene, MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pfs, IComponentManager componentManager)
+        public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene, MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pfs, RenderEngineComponent renderEngineComponent)
         {
             _kitbasherRootScene = kitbasherRootScene;
             _mainNode = mainNode;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _pfs = pfs;
-            _componentManager = componentManager;
-            _selectedRenderFormat = _componentManager.GetComponent<RenderEngineComponent>().MainRenderFormat;
+            _renderEngineComponent = renderEngineComponent;
+            _selectedRenderFormat = _renderEngineComponent.MainRenderFormat;
 
             SkeletonNameList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
             if (_mainNode.Model != null)

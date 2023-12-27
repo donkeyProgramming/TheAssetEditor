@@ -1,7 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.Services;
-using MonoGame.Framework.WpfInterop;
+using View3D.Components.Component;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
@@ -13,9 +13,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public MaterialGeneralViewModel MaterialGeneral { get; set; }
         public WeightedMaterialViewModel Material { get; set; }
 
-        public MeshEditorViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, IComponentManager componentManager, ApplicationSettingsService applicationSettings)
+        public MeshEditorViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, SceneManager sceneManager, ApplicationSettingsService applicationSettings)
         {
-            Mesh = new MeshViewModel(node, componentManager);
+            Mesh = new MeshViewModel(node, sceneManager);
             Animation = new AnimationViewModel(kitbasherRootScene, node, pfs, animLookUp);
             MaterialGeneral = new MaterialGeneralViewModel(kitbasherRootScene, node, pfs, applicationSettings);
 

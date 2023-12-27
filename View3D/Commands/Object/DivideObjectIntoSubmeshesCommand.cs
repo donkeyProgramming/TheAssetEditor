@@ -1,7 +1,7 @@
-﻿using CommonControls.Common;
-using Serilog;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using CommonControls.Common;
+using Serilog;
 using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;
@@ -19,19 +19,17 @@ namespace View3D.Commands.Object
         IEditableGeometry _objectToSplit;
         bool _combineOverlappingVertexes;
 
-        List<GroupNode> _newGroupNodes = new List<GroupNode>();
-        private readonly ComponentManagerResolver _componentManagerResolver;
-        SelectionManager _selectionManager;
+        private readonly List<GroupNode> _newGroupNodes = new List<GroupNode>();
+        private readonly SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
-        ResourceLibary _resourceLib;
+        private readonly ResourceLibary _resourceLib;
         private readonly RenderEngineComponent _renderEngineComponent;
 
         public string HintText { get => "Divide Object"; }
         public bool IsMutation { get => true; }
 
-        public DivideObjectIntoSubmeshesCommand(ComponentManagerResolver componentManagerResolver, SelectionManager selectionManager, ResourceLibary resourceLibary, RenderEngineComponent renderEngineComponent)
+        public DivideObjectIntoSubmeshesCommand( SelectionManager selectionManager, ResourceLibary resourceLibary, RenderEngineComponent renderEngineComponent)
         {
-            _componentManagerResolver = componentManagerResolver;
             _selectionManager = selectionManager;
             _resourceLib = resourceLibary;
             _renderEngineComponent = renderEngineComponent;

@@ -16,6 +16,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
     public class MeshViewModel : NotifyPropertyChangedImpl
     {
         Rmv2MeshNode _meshNode;
+        private readonly SceneManager _sceneManager;
         IComponentManager _componentManager;
 
         public string ModelName { get { return _meshNode.Material.ModelName; } set { _meshNode.Material.ModelName = value; NotifyPropertyChanged(); } }
@@ -35,11 +36,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
         public ICommand CopyPivotToAllMeshesCommand { get; set; }
 
-        public MeshViewModel(Rmv2MeshNode node, IComponentManager componentManager)
+        public MeshViewModel(Rmv2MeshNode node, SceneManager sceneManager)
         {
             _meshNode = node;
+            _sceneManager = sceneManager;
             _meshNode.Name = _meshNode.Material.ModelName;
-            _componentManager = componentManager;
 
             PossibleMaterialTypes = MaterialFactory.Create().GetSupportedMaterials();
 
@@ -57,9 +58,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         void CopyPivotToAllMeshes()
         {
             var newPiv = new Vector3((float)Pivot.X.Value, (float)Pivot.Y.Value, (float)Pivot.Z.Value);
-
-            var scenaManager = _componentManager.GetComponent<SceneManager>();
-            var root = scenaManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            var root = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var allMeshes = root.GetMeshesInLod(0, false);
             foreach (var mesh in allMeshes)
                 mesh.UpdatePivotPoint(newPiv);

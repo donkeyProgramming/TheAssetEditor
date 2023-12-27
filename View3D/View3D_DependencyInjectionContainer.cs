@@ -17,14 +17,14 @@ using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.SceneNodes;
 using View3D.Services;
-using View3D.Services.SceneSaving.Material.Strategies;
-using View3D.Services.SceneSaving.Geometry;
-using View3D.Utility;
 using View3D.Services.SceneSaving;
-using View3D.Services.SceneSaving.Lod;
-using View3D.Services.SceneSaving.WsModel;
+using View3D.Services.SceneSaving.Geometry;
 using View3D.Services.SceneSaving.Geometry.Strategies;
+using View3D.Services.SceneSaving.Lod;
 using View3D.Services.SceneSaving.Lod.Strategies;
+using View3D.Services.SceneSaving.Material.Strategies;
+using View3D.Services.SceneSaving.WsModel;
+using View3D.Utility;
 
 namespace View3D
 {
@@ -68,7 +68,6 @@ namespace View3D
 
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
-            serviceCollection.AddScoped<ComponentManagerResolver>();
 
             // Components
             RegisterComponents(serviceCollection);
