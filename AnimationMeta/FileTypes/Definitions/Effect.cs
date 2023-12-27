@@ -19,7 +19,7 @@ namespace AnimationMeta.FileTypes.Definitions
         public string VfxName { get; set; } = "";
 
         [MetaDataTag(4, "True, false or empty.")]
-        public string BoolUnkown { get; set; } = "";
+        public string BoolUnknown { get; set; } = "";
 
         [MetaDataTag(5)]
         public Vector3 Position { get; set; } = Vector3.Zero;
@@ -38,7 +38,7 @@ namespace AnimationMeta.FileTypes.Definitions
         public string VfxName { get; set; } = "";
 
         [MetaDataTag(5, "True, false or empty.")]
-        public string BoolUnkown { get; set; } = "";
+        public string BoolUnknown { get; set; } = "";
 
         [MetaDataTag(6)]
         public Vector3 Position { get; set; } = Vector3.Zero;

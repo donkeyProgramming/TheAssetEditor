@@ -45,12 +45,14 @@ namespace Audio.BnkCompiler.ObjectGeneration
 
             // Find the root
             var roots = mixers.Where(x => HasReferences(x, mixers) == false).ToList();
-            Guard.IsEqualTo(roots.Count(), 1);
-            var root = roots.First();
-            output.Add(root);
-
-            var children = root.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Name == childId)).ToList();
-            ProcessChildren(children, output, project);
+            //Guard.IsEqualTo(roots.Count(), 1);
+            
+            foreach (var mixer in roots)
+            {
+                var children = mixer.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Name == childId)).ToList();
+                output.Add(mixer);
+                ProcessChildren(children, output, project);
+            }
 
             output.Reverse();
 

@@ -34,6 +34,15 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             var soundIdStr = Path.GetFileNameWithoutExtension(inputSound.Path).Trim();
             var soundId = uint.Parse(soundIdStr);
 
+            var nodeBaseParams = NodeBaseParams.CreateDefault();
+
+            var statePropNum_Priority = inputSound.StatePropNum_Priority;
+            var userAuxSendVolume0 = inputSound.UserAuxSendVolume0;
+            var initialDelay = inputSound.InitialDelay;
+
+            if (statePropNum_Priority != null || userAuxSendVolume0 != null || initialDelay != null)
+                nodeBaseParams = NodeBaseParams.CreateCustomSoundParams(inputSound);
+
             var wwiseSound = new CAkSound_v136()
             {
                 Id = project.GetHircItemIdFromName(inputSound.Name),
@@ -41,7 +50,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 AkBankSourceData = new AkBankSourceData()
                 {
                     PluginId = 0x00040001,  // [VORBIS]
-                    StreamType = SourceType.Straming,
+                    StreamType = SourceType.Streaming,
                     akMediaInformation = new AkMediaInformation()
                     {
                         SourceId = soundId,
@@ -49,7 +58,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                         uSourceBits = 0x01,
                     }
                 },
-                NodeBaseParams = NodeBaseParams.CreateDefault()
+                NodeBaseParams = nodeBaseParams
             };
 
             var mixer = project.GetActionMixerForSound(inputSound.Name);

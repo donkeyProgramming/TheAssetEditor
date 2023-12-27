@@ -117,7 +117,7 @@ namespace Audio.FileFormats.Dat
                 output.AppendLine($"\t{item.EventName}[{item.Value}]");
 
             output.AppendLine();
-            output.AppendLine($"Unkown (count:{VoiceEvents.Count}):");
+            output.AppendLine($"Unknown (count:{VoiceEvents.Count}):");
             foreach (var item in VoiceEvents)
                 output.AppendLine($"\t{item.EventName} [{string.Join(", ", item.Values.Select(x => audioRepository.GetNameFromHash(x)))}]");
 

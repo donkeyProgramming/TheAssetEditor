@@ -109,13 +109,13 @@ namespace AnimationMeta.FileTypes.Definitions
         public override string Description { get; } = "_TroyOnly";
 
         [MetaDataTag(8)]
-        public byte UnkownByte0 { get; set; }
+        public byte UnknownByte0 { get; set; }
 
         [MetaDataTag(9)]
-        public byte UnkownByte1 { get; set; }
+        public byte UnknownByte1 { get; set; }
 
         [MetaDataTag(10)]
-        public byte UnkownByte4 { get; set; }
+        public byte UnknownByte4 { get; set; }
 
         [MetaDataTag(11)]
         public float UnknownFloat0 { get; set; }
@@ -182,13 +182,13 @@ namespace AnimationMeta.FileTypes.Definitions
         public override string Description { get; } = "_TroyOnly";
 
         [MetaDataTag(8)]
-        public byte UnkownByte0 { get; set; }
+        public byte UnknownByte0 { get; set; }
 
         [MetaDataTag(9)]
-        public byte UnkownByte1 { get; set; }
+        public byte UnknownByte1 { get; set; }
 
         [MetaDataTag(10)]
-        public byte UnkownByte4 { get; set; }
+        public byte UnknownByte4 { get; set; }
 
         [MetaDataTag(11)]
         public float UnknownFloat0 { get; set; }
@@ -238,13 +238,13 @@ namespace AnimationMeta.FileTypes.Definitions
         public override string Description { get; } = "_TroyOnly";
 
         [MetaDataTag(8)]
-        public byte UnkownByte0 { get; set; }
+        public byte UnknownByte0 { get; set; }
 
         [MetaDataTag(9)]
-        public byte UnkownByte1 { get; set; }
+        public byte UnknownByte1 { get; set; }
 
         [MetaDataTag(10)]
-        public byte UnkownByte4 { get; set; }
+        public byte UnknownByte4 { get; set; }
 
         [MetaDataTag(11)]
         public float UnknownFloat0 { get; set; }
@@ -300,13 +300,13 @@ namespace AnimationMeta.FileTypes.Definitions
         public override string Description { get; } = "_TroyOnly";
 
         [MetaDataTag(8)]
-        public byte UnkownByte0 { get; set; }
+        public byte UnknownByte0 { get; set; }
 
         [MetaDataTag(9)]
-        public byte UnkownByte1 { get; set; }
+        public byte UnknownByte1 { get; set; }
 
         [MetaDataTag(10)]
-        public byte UnkownByte4 { get; set; }
+        public byte UnknownByte4 { get; set; }
 
         [MetaDataTag(11)]
         public float UnknownFloat0 { get; set; }
@@ -363,13 +363,13 @@ namespace AnimationMeta.FileTypes.Definitions
         public override string Description { get; } = "_TroyOnly";
 
         [MetaDataTag(8)]
-        public byte UnkownByte0 { get; set; }
+        public byte UnknownByte0 { get; set; }
 
         [MetaDataTag(9)]
-        public byte UnkownByte1 { get; set; }
+        public byte UnknownByte1 { get; set; }
 
         [MetaDataTag(10)]
-        public byte UnkownByte4 { get; set; }
+        public byte UnknownByte4 { get; set; }
 
         [MetaDataTag(11)]
         public float UnknownFloat0 { get; set; }
@@ -535,13 +535,13 @@ namespace AnimationMeta.FileTypes.Definitions
         public override string Description { get; } = "_TroyOnly";
 
         [MetaDataTag(8)]
-        public byte UnkownByte0 { get; set; }
+        public byte UnknownByte0 { get; set; }
 
         [MetaDataTag(9)]
-        public byte UnkownByte1 { get; set; }
+        public byte UnknownByte1 { get; set; }
 
         [MetaDataTag(10)]
-        public byte UnkownByte4 { get; set; }
+        public byte UnknownByte4 { get; set; }
 
         [MetaDataTag(11)]
         public float UnknownFloat0 { get; set; }

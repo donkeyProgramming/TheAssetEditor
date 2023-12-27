@@ -94,7 +94,7 @@ namespace CommonControls.Editors.VariantMeshDefinition
 
             object result = null;
             if (strict)
-                result = xmlserializer.Deserialize(reader, new UnkownXmlDataThrower().EventHandler);
+                result = xmlserializer.Deserialize(reader, new UnknownXmlDataThrower().EventHandler);
             else
                 result = xmlserializer.Deserialize(reader);
 

@@ -11,7 +11,7 @@ namespace Audio.Utility
 {
     public class AudioProjectExporterSimple
     {
-
+        /*
         public AudioProjectExporterSimple()
         {
         }
@@ -43,7 +43,7 @@ namespace Audio.Utility
             var projectEvent = new CompilerInputProject.Event()
             {
                 Name = eventName,
-                Sound = $"Audio\\WWise\\{wwiseSoundInstance.AkBankSourceData.akMediaInformation.SourceId}.wem",
+                Sounsds = $"Audio\\WWise\\{wwiseSoundInstance.AkBankSourceData.akMediaInformation.SourceId}.wem",
             };
 
             project.Events.Add(projectEvent);
@@ -68,6 +68,7 @@ namespace Audio.Utility
             DirectoryHelper.EnsureCreated(path);
             File.WriteAllText(path, json);
         }
+        */
     }
 }
 

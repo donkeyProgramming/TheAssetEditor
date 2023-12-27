@@ -68,8 +68,8 @@ namespace Audio.AudioEditor
             }
             else
             {
-                var unkownNode = new HircTreeItem() { DisplayName = $"Unkown node type {item.Type} for Id {item.Id} in {item.OwnerFile}", Item = item };
-                parent.Children.Add(unkownNode);
+                var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.Type} for Id {item.Id} in {item.OwnerFile}", Item = item };
+                parent.Children.Add(unknownNode);
             }
         }
 

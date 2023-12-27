@@ -69,7 +69,7 @@ namespace AnimationMeta.FileTypes.Definitions
     public class AnimatedProp_v4 : AnimatedProp_v3
     {
         [MetaDataTag(10)]
-        public int UnkownInt0_v4 { get; set; }
+        public int UnknownInt0_v4 { get; set; }
     }
 
 

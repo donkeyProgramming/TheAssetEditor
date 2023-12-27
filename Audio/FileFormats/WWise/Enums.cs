@@ -152,7 +152,7 @@
     {
         Data_BNK = 0x00,
         PrefetchStreaming = 0x01,
-        Straming = 0x02,
+        Streaming = 0x02,
     }
 
     public enum AkPropBundleType : byte

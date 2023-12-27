@@ -95,7 +95,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             binFile.SkeletonName = xmlBin.Data.SkeletonName;
             binFile.LocomotionGraph = xmlBin.Data.LocomotionGraph;
             binFile.UnknownValue1 = xmlBin.Data.UnknownValue1_RelatedToFlight;
-            binFile.Unkown = "";
+            binFile.Unknown = "";
 
             var slotHelper = binFile.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();
 

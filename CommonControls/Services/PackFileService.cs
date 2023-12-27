@@ -168,7 +168,7 @@ namespace CommonControls.Services
                           {
                               var pfc = PackFileSerializer.Load(packFilePath, reader, null, null, new CaPackDuplicatePackFileResolver());
 
-                              _logger.Here().Information($"Seraching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
+                              _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
 
                               foreach (var packFile in pfc.FileList.Values)
                               {

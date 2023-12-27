@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Didx;
 using Audio.FileFormats.WWise.Hirc;
@@ -10,11 +11,26 @@ using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Serilog;
+using System.Globalization;
+using System.IO;
+using Audio.BnkCompiler;
+using Audio.FileFormats.WWise.Hirc.V136;
+using CommunityToolkit.Diagnostics;
+using Audio.AudioEditor;
+using Filetypes.ByteParsing;
+using Audio.FileFormats.Dat;
+using System.Windows.Shapes;
+
 
 namespace Audio.Storage
 {
+
     public class WWiseBnkLoader
     {
+        protected readonly IAudioRepository _repository;
+        public NodeBaseParams NodeBaseParams { get; set; }
+        public Children Children { get; set; }
+
         public class LoadResult
         {
             public Dictionary<uint, List<HircItem>> HircList { get; internal set; } = new();
@@ -77,6 +93,23 @@ namespace Audio.Storage
             });
 
             var output = new LoadResult();
+
+            /*
+            // Generate CSV of IDs
+            using (var file = File.CreateText("C:\\Users\\georg\\Desktop\\hirc_ids.csv"))
+            foreach (var parsedBnk in parsedBnkList)
+            {
+                    foreach (var item in parsedBnk.HircChuck.Hircs)
+                {
+                    
+                    if (item.Type == HircType.ActorMixer)                             
+                    {
+                        var id = item.Id;
+                        file.WriteLine(string.Join(",", id));
+                    }
+                }
+            }
+            */
 
             // Combine the data
             foreach (var parsedBnk in parsedBnkList)

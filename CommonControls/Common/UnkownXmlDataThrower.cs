@@ -7,10 +7,10 @@ using System.Xml.Serialization;
 
 namespace CommonControls.Common
 {
-    public class UnkownXmlDataThrower
+    public class UnknownXmlDataThrower
     {
         public XmlDeserializationEvents EventHandler { get; set; }
-        public UnkownXmlDataThrower()
+        public UnknownXmlDataThrower()
         {
             EventHandler = new XmlDeserializationEvents()
             {

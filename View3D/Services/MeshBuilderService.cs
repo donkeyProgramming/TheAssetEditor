@@ -42,7 +42,7 @@ namespace View3D.Services
                     output.VertexArray[i].BlendWeights = new Vector4(vertex.BoneWeight[0], vertex.BoneWeight[1], vertex.BoneWeight[2], vertex.BoneWeight[3]);
                 }
                 else
-                    throw new Exception("Unkown vertex format");
+                    throw new Exception("Unknown vertex format");
             }
 
             output.RebuildVertexBuffer();

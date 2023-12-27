@@ -102,7 +102,7 @@ namespace Audio.Utility
                 var outputMixer = new ActorMixer
                 {
                     Name = mixerNames[mixer.Id],
-                    RootParentId = "Master",
+                    DirectParentId = "Master",
                     OverrideId = mixer.Id,
                     Sounds = audioChildren.Select(x => project.GameSounds.First(sound => sound.OverrideId == x.Id).Name).ToList(), // we have to match on this
                     ActorMixerChildren = mixerChildren.Select(x => mixerNames[x.Id]).ToList(),

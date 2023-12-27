@@ -23,6 +23,7 @@
 
     <ItemGroup>
         <None Remove="Resources\AudioCompilerExample.json" />
+        <None Remove="Resources\Custom Movie.json" />
         <None Remove="Resources\Schemas\ExampleAudioProject.xml" />
     </ItemGroup>
 

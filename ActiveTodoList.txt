@@ -498,7 +498,7 @@ Fixed 0.26
 
 	Improved meta editor improve animbin editor 
 		List over types
-		Check if unkown is always the same 
+		Check if unknown is always the same 
 		Copy to new pack?
 		Validation of skeleton
 		
