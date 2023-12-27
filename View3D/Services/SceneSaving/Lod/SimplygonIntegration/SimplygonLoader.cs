@@ -1,11 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation. 
-// Licensed under the MIT license. 
-
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Simplygon;
 
-namespace Simplygon
+namespace View3D.Services.SceneSaving.Lod.SimplygonIntegration
 {
     public class Loader
     {
@@ -48,15 +46,13 @@ namespace Simplygon
                 ISimplygon simplygon = null;
                 if (!string.IsNullOrWhiteSpace(licenseDataText))
                 {
-
-                    simplygon = Simplygon.InitializeSimplygon(sdkPath, licenseDataText);
-
+                    simplygon = Simplygon.Simplygon.InitializeSimplygon(sdkPath, licenseDataText);
                 }
                 else
                 {
-                    simplygon = Simplygon.InitializeSimplygon(sdkPath);
+                    simplygon = Simplygon.Simplygon.InitializeSimplygon(sdkPath);
                 }
-                errorCode = Simplygon.GetLastInitializationError();
+                errorCode = Simplygon.Simplygon.GetLastInitializationError();
                 if (errorCode != EErrorCodes.NoError)
                 {
                     throw new Exception(string.Format("Failed to load Simplygon from {0}\nErrorCode: {1}", sdkPath, errorCode));
@@ -70,14 +66,14 @@ namespace Simplygon
             {
                 errorCode = EErrorCodes.AlreadyInitialized;
 
-                string exceptionMessage = string.Format($"Failed to load Simplygon from {sdkPath}\nErrorCode: {errorCode}\nMessage: {ex.Message}");
+                var exceptionMessage = string.Format($"Failed to load Simplygon from {sdkPath}\nErrorCode: {errorCode}\nMessage: {ex.Message}");
                 Console.Error.WriteLine(exceptionMessage);
 
                 errorMessage = exceptionMessage;
             }
             catch (SEHException ex)
             {
-                string exceptionMessage = string.Format($"Failed to load Simplygon from {sdkPath}\nErrorCode: {errorCode}\nMessage: {ex.Message}");
+                var exceptionMessage = string.Format($"Failed to load Simplygon from {sdkPath}\nErrorCode: {errorCode}\nMessage: {ex.Message}");
                 Console.Error.WriteLine(exceptionMessage);
 
                 errorCode = EErrorCodes.DLLOrDependenciesNotFound;
@@ -93,7 +89,7 @@ namespace Simplygon
             {
                 if (errorCode != 0)
                 {
-                    string errorMessageEx = string.Format("Failed to load Simplygon from {0}\nErrorCode: {1}", sdkPath, errorCode);
+                    var errorMessageEx = string.Format("Failed to load Simplygon from {0}\nErrorCode: {1}", sdkPath, errorCode);
                     Console.Error.WriteLine(errorMessageEx);
                 }
             }
@@ -102,7 +98,7 @@ namespace Simplygon
 
         private static string GetSDKPath()
         {
-            string simplygon10Path = Environment.GetEnvironmentVariable("SIMPLYGON_10_PATH");
+            var simplygon10Path = Environment.GetEnvironmentVariable("SIMPLYGON_10_PATH");
 
             if (string.IsNullOrWhiteSpace(simplygon10Path))
             {
@@ -113,8 +109,7 @@ namespace Simplygon
 
             SetDllDirectory(simplygon10Path);
 
-            string simplygonDLLPath = Path.Combine(simplygon10Path, "Simplygon.dll");
-
+            var simplygonDLLPath = Path.Combine(simplygon10Path, "Simplygon.dll");
             return simplygonDLLPath;
         }
     }

@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -23,13 +19,13 @@ namespace CommonControls.PackFileBrowser
         public PackFileContainer FileOwner { get; set; }
         public PackFile Item { get; set; }
 
-        bool _isExpanded = false;
+        bool _isNodeExpanded = false;
         public bool IsNodeExpanded
         {
-            get => _isExpanded;
+            get => _isNodeExpanded;
             set
             {
-                SetAndNotify(ref _isExpanded, value);
+                SetAndNotify(ref _isNodeExpanded, value);
             }
         }
 

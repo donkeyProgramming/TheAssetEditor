@@ -1,5 +1,7 @@
 ﻿using CommonControls.Services;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
+using View3D.Components.Component;
+using View3D.Components.Rendering;
 using View3D.SceneNodes;
 using View3D.Utility;
 
@@ -7,19 +9,26 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
     public class SceneNodeViewFactory
     {
+        private readonly SceneManager _sceneManager;
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly PackFileService _packFileService;
-        private readonly ComponentManagerResolver _componentManagerResolver;
         private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly RenderEngineComponent _renderEngineComponent;
 
-        public SceneNodeViewFactory(KitbasherRootScene kitbasherRootScene, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService packFileService, ComponentManagerResolver componentManagerResolver, ApplicationSettingsService applicationSettingsService)
+        public SceneNodeViewFactory(SceneManager sceneManager,
+            KitbasherRootScene kitbasherRootScene, 
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            PackFileService packFileService, 
+            ApplicationSettingsService applicationSettingsService,
+            RenderEngineComponent renderEngineComponent)
         {
+            _sceneManager = sceneManager;
             _kitbasherRootScene = kitbasherRootScene;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _packFileService = packFileService;
-            _componentManagerResolver = componentManagerResolver;
             _applicationSettingsService = applicationSettingsService;
+            _renderEngineComponent = renderEngineComponent;
         }
 
         public ISceneNodeViewModel CreateEditorView(ISceneNode node)
@@ -27,18 +36,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             switch (node)
             {
                 case MainEditableNode mainNode:
-                    return new MainEditableNodeViewModel(_kitbasherRootScene, mainNode, _skeletonAnimationLookUpHelper, _packFileService, _componentManagerResolver.ComponentManager);
+                    return new MainEditableNodeViewModel(_kitbasherRootScene, mainNode, _skeletonAnimationLookUpHelper, _packFileService, _renderEngineComponent);
                 case Rmv2MeshNode m:
-                    return new MeshEditorViewModel(_kitbasherRootScene, m, _packFileService, _skeletonAnimationLookUpHelper, _componentManagerResolver.ComponentManager, _applicationSettingsService);
+                    return new MeshEditorViewModel(_kitbasherRootScene, m, _packFileService, _skeletonAnimationLookUpHelper, _sceneManager, _applicationSettingsService);
                 case SkeletonNode s:
                     return new SkeletonSceneNodeViewModel(s, _packFileService, _skeletonAnimationLookUpHelper);
-                case Rmv2LodNode n:
-                    {
-                        if (n.IsEditable && n.Parent != null)
-                            return new LodGroupNodeViewModel(n, _componentManagerResolver.ComponentManager);
-
-                        return null;
-                    }
                 case GroupNode n:
                     {
                         if (n.IsEditable && n.Parent != null)

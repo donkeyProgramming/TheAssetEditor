@@ -171,35 +171,35 @@
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
                                 <TextBlock  
                                             Text="{Binding Name.Value}"
-                                            Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
+                                            Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_gray}}"/>
                                 <TextBlock  
                                         Text="["
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_gray}}"/>
 
                                 <TextBlock  
                                         Text="{Binding BoneIndex.Value}"
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_gray}}"/>
 
                                 <TextBlock  
                                         Text="]"
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_gray}}"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                 <TextBlock  
                                             Text="{Binding MappedBoneName.Value}"
-                                            Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
+                                            Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_gray}}"/>
                                 <TextBlock  
                                         Text="["
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_gray}}"/>
 
                                 <TextBlock  
                                         Text="{Binding MappedBoneIndex.Value}"
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_gray}}"/>
 
                                 <TextBlock  
                                         Text="]"
-                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_black_gray}}"/>
+                                        Foreground="{Binding IsUsedByCurrentModel.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_gray}}"/>
                             </StackPanel>
                         </Grid>
                     </HierarchicalDataTemplate>

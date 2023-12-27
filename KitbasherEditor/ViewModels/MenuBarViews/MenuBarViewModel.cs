@@ -49,9 +49,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             RegisterUiCommand<SaveCommand>();
             RegisterUiCommand<SaveAsCommand>();
 
-            RegisterUiCommand<GenerateWh2WsModelCommand>();
-            RegisterUiCommand<GenerateWh3WsModelCommand>();
-
             RegisterUiCommand<BrowseForReferenceCommand>();
             RegisterUiCommand<ImportPaladinReferenceCommand>();
             RegisterUiCommand<ImportGoblinReferenceCommand>();
@@ -87,14 +84,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             RegisterUiCommand<CreateStaticMeshCommand>();
 
             RegisterUiCommand<ReduceMeshCommand>();
-            RegisterUiCommand<CreateLodCommand>();
             RegisterUiCommand<OpenBmiToolCommand>();
             RegisterUiCommand<OpenSkeletonReshaperToolCommand>();
             RegisterUiCommand<OpenReriggingToolCommand>();
             RegisterUiCommand<OpenPinToolCommand>();
-            RegisterUiCommand<CopyRootLodCommand>();
-            //CreateActionItem<UpdateWh2TexturesCommand>(x => x.Technique = View3D.Services.Rmv2UpdaterService.BaseColourGenerationTechniqueEnum.AdditiveBlending);
-            //CreateActionItem<UpdateWh2TexturesCommand>(x => x.Technique = View3D.Services.Rmv2UpdaterService.BaseColourGenerationTechniqueEnum.ComparativeBlending);
 
             RegisterUiCommand<ExpandFaceSelectionCommand>();
             RegisterUiCommand<ConvertFaceToVertexCommand>();
@@ -122,11 +115,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateToolBarItem<GroupItemsCommand>(toolsToolbar, "(Un)Group selection");
             builder.CreateToolBarItem<ReduceMeshCommand>(toolsToolbar, "\"Reduce mesh by 10%\"");
             builder.CreateToolBarItem<SortMeshesCommand>(toolsToolbar, "Sort models by name");
-            builder.CreateToolBarSeparator(toolsToolbar);
-            builder.CreateToolBarItem<GenerateWh3WsModelCommand>(toolsToolbar, "Generate WSMODEL (WH3)");
-            builder.CreateToolBarItem<GenerateWh2WsModelCommand>(toolsToolbar, "Generate WSMODEL (WH2)");
-            builder.CreateToolBarSeparator(toolsToolbar);
-            builder.CreateToolBarItem<CopyRootLodCommand>(toolsToolbar, "Copy lod 0 to every lod slot");
 
             var renderingToolbar = builder.CreateRootToolBar("Rendering");
             builder.CreateToolBarItem<FocusCameraCommand>(renderingToolbar, "Focus camera");
@@ -170,7 +158,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateButton<CreateStaticMeshCommand>(ResourceController.FreezeAnimationIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButtonSeparator();
             builder.CreateButton<ReduceMeshCommand>(ResourceController.ReduceMeshIcon, ButtonVisibilityRule.ObjectMode);
-            builder.CreateButton<CreateLodCommand>(ResourceController.CreateLodIcon, ButtonVisibilityRule.ObjectMode);
             //builder.CreateButton<OpenBmiToolCommand>(ResourceController.BmiToolIcon, ButtonVisibilityRule.ObjectMode);    <-- Disabled to see if anyone complains. Plan is to delete it
             builder.CreateButton<OpenSkeletonReshaperToolCommand>(ResourceController.SkeletonReshaperIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButton<OpenReriggingToolCommand>(ResourceController.ReRiggingIcon, ButtonVisibilityRule.ObjectMode);

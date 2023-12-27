@@ -38,12 +38,6 @@
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" Content="Output format"/>
-                    <Label>:</Label>
-                    <ComboBox ItemsSource="{Binding PossibleOutputFormats}" SelectedItem="{Binding SelectedOutputFormat}" VerticalAlignment="Center"/>
-                </DockPanel>
-
-                <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" Content="Shading Model"/>
                     <Label>:</Label>
                     <ComboBox ItemsSource="{Binding PossibleRenderFormats}" SelectedItem="{Binding SelectedRenderFormat}" VerticalAlignment="Center"/>
@@ -65,32 +59,7 @@
             </DockPanel>
         </Expander>
 
-        <DockPanel DockPanel.Dock="Top" Margin="0,15,0,0">
-            <Expander Header="Lod Settings" IsExpanded="True">
 
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" Content="" />
-                    <Label>:</Label>
-                    <DataGrid ItemsSource="{Binding LodNodes, UpdateSourceTrigger=PropertyChanged}" 
-                                  AutoGenerateColumns="False" CanUserAddRows="False" ToolTipService.ShowOnDisabled="True" DockPanel.Dock="Top">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Index" Binding="{Binding LodIndex, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
-                            <common:DataGridNumericColumn Header="Distance" Binding="{Binding CameraDistance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            <common:DataGridNumericColumn Header="Qlt Level" Binding="{Binding QualityLvl, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            <common:DataGridNumericColumn Header="Reduction Factor" Binding="{Binding LodReductionFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                            <DataGridCheckBoxColumn Header="Merge Alpha" Binding="{Binding OptimizeLod_Alpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            <DataGridCheckBoxColumn Header="Merge Vertex" Binding="{Binding OptimizeLod_Vertex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            
-                            <common:DataGridNumericColumn Header="Polygons" Binding="{Binding PolygonCount}" IsReadOnly="True" />
-                            <common:DataGridNumericColumn Header="Meshes" Binding="{Binding MeshCount}" IsReadOnly="True" />
-                            <common:DataGridNumericColumn Header="Textures" Binding="{Binding TextureCount}" IsReadOnly="True" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                    <Button DockPanel.Dock="Bottom" Click="{s:MethodBinding UpdateLodInformationAction}">Refresh</Button>
-                </DockPanel>
-
-            </Expander>
-        </DockPanel>
 
         <DockPanel DockPanel.Dock="Top" Margin="0,15,0,0">
             <Expander IsExpanded="True" Header="File based texture editing">

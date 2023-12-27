@@ -4,24 +4,11 @@ namespace View3D.SceneNodes
 {
     public class Rmv2LodNode : GroupNode
     {
-        public float? CameraDistance { get; set; }
-        public float LodReductionFactor { get; set; } = -1;
-        public bool AllowCombiningOfModelsForLodGeneration { get; set; } = false;
         public int LodValue { get; set; }
-        public bool OptimizeLod_Alpha { get; set; } = false;
-        public bool OptimizeLod_Vertex { get; set; } = false;
 
-        public Rmv2LodNode(string name, int lodIndex, float? cameraDistance = null) : base(name)
+        public Rmv2LodNode(string name, int lodIndex) : base(name)
         {
             LodValue = lodIndex;
-            CameraDistance = cameraDistance;
-            AllowCombiningOfModelsForLodGeneration = false;
-
-            if (lodIndex >= 2)
-            {
-                OptimizeLod_Alpha = true;
-                OptimizeLod_Vertex = true;
-            }
         }
 
         public List<Rmv2MeshNode> GetAllModels(bool onlyVisible)
@@ -104,6 +91,4 @@ namespace View3D.SceneNodes
             base.CopyInto(target);
         }
     }
-
-
 }

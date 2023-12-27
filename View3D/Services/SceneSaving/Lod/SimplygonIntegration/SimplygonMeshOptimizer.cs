@@ -4,7 +4,7 @@ using View3D.Rendering;
 using View3D.Rendering.Geometry;
 
 
-namespace View3D.Services.MeshOptimization
+namespace View3D.Services.SceneSaving.Lod.SimplygonIntegration
 {
     public class SimplygonMeshOptimizer
     {
@@ -37,7 +37,7 @@ namespace View3D.Services.MeshOptimization
         }
         private static void FillGeometryVertices(spGeometryData geometryDataSG, MeshObject originalMesh)
         {
-            for (int vertexIndex = 0; vertexIndex < originalMesh.VertexArray.Length; vertexIndex++)
+            for (var vertexIndex = 0; vertexIndex < originalMesh.VertexArray.Length; vertexIndex++)
             {
                 ref var sourceVertex = ref originalMesh.VertexArray[vertexIndex];
 
@@ -60,9 +60,9 @@ namespace View3D.Services.MeshOptimization
         private static void FillGeometryTriangles(spGeometryData geometryDataSG, MeshObject originalMesh)
         {
             // -- construct triangles, and add values for polygon corners
-            for (int cornerIndex = 0; cornerIndex < originalMesh.IndexArray.Length; cornerIndex++)
+            for (var cornerIndex = 0; cornerIndex < originalMesh.IndexArray.Length; cornerIndex++)
             {
-                ushort vertexIndex = originalMesh.IndexArray[cornerIndex];
+                var vertexIndex = originalMesh.IndexArray[cornerIndex];
 
                 // set vertex index for the triangle corner
                 geometryDataSG.GetVertexIds().SetItem(cornerIndex, vertexIndex);
@@ -109,7 +109,7 @@ namespace View3D.Services.MeshOptimization
             {
                 reductionProcessor.SetScene(sgScene);
 
-                spReductionSettings reductionSettings = reductionProcessor.GetReductionSettings();
+                var reductionSettings = reductionProcessor.GetReductionSettings();
 
                 // -- Set reduction stop condition and reduction ratio
                 reductionSettings.SetReductionTargets(EStopCondition.All, true, false, false, false);
@@ -138,7 +138,7 @@ namespace View3D.Services.MeshOptimization
             var sourceIndices = packedGeometryData.GetVertexIds();
             var destIndices = new ushort[sourceIndices.GetItemCount()];
 
-            for (int cornerIndex = 0; cornerIndex < sourceIndices.GetItemCount(); cornerIndex++)
+            for (var cornerIndex = 0; cornerIndex < sourceIndices.GetItemCount(); cornerIndex++)
             {
                 destIndices[cornerIndex] = (ushort)sourceIndices.GetItem(cornerIndex);
             }
@@ -150,7 +150,7 @@ namespace View3D.Services.MeshOptimization
             var sourceVertices = packedGeomtryDataSG.GetVertices();
             var destVertices = new VertexPositionNormalTextureCustom[packedGeomtryDataSG.GetVertexCount()];
 
-            for (int vertexIndex = 0; vertexIndex < packedGeomtryDataSG.GetVertexCount(); vertexIndex++)
+            for (var vertexIndex = 0; vertexIndex < packedGeomtryDataSG.GetVertexCount(); vertexIndex++)
             {
                 ref var detVertex = ref destVertices[vertexIndex];
 

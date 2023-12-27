@@ -7,9 +7,9 @@ using CommonControls;
 using CommonControls.Services.ToolCreation;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using TextureEditor;
 using View3D;
-
 
 namespace AssetEditor
 {
@@ -40,12 +40,19 @@ namespace AssetEditor
 
         public IServiceProvider Build()
         {
-            var serviceCollection = new ServiceCollection();
-            ConfigureServices(serviceCollection);
+            var host = Host.CreateDefaultBuilder()
+                .ConfigureServices(ConfigureServices)
+                .UseDefaultServiceProvider(ConfigureServiceOptions)
+                .Build();
 
-            var serviceProvider = serviceCollection.BuildServiceProvider(validateScopes: true);
-            RegisterTools(serviceProvider.GetService<IToolFactory>());
-            return serviceProvider;
+            RegisterTools(host.Services.GetService<IToolFactory>());
+            return host.Services;
+        }
+
+        void ConfigureServiceOptions(ServiceProviderOptions options)
+        {
+            options.ValidateOnBuild = true;
+            options.ValidateScopes = true;
         }
 
         private void ConfigureServices(IServiceCollection services)

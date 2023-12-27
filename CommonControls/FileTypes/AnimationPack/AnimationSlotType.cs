@@ -51,7 +51,7 @@ namespace CommonControls.FileTypes.AnimationPack
                     break;
 
                 case GameTypeEnum.Warhammer3:
-                    Load("CommonControls.Resources.AnimationSlots.Warhammer3AnimationSlots_dlc23.txt");
+                    Load("CommonControls.Resources.AnimationSlots.Warhammer3AnimationSlots_dlc24.txt");
                     break;
 
                 case GameTypeEnum.Troy:

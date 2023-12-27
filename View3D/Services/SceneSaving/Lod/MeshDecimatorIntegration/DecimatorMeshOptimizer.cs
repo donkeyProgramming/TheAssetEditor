@@ -6,7 +6,7 @@ using View3D.Rendering;
 using View3D.Rendering.Geometry;
 
 
-namespace View3D.Services.MeshOptimization
+namespace View3D.Services.SceneSaving.Lod.MeshDecimatorIntegration
 {
     public class DecimatorMeshOptimizer
     {
@@ -40,8 +40,8 @@ namespace View3D.Services.MeshOptimization
                       0, 0, 0, 0)).ToArray();
             }
 
-            int currentTriangleCount = sourceSubMeshIndices.Length / 3;
-            int targetTriangleCount = (int)Math.Ceiling(currentTriangleCount * quality);
+            var currentTriangleCount = sourceSubMeshIndices.Length / 3;
+            var targetTriangleCount = (int)Math.Ceiling(currentTriangleCount * quality);
 
             var algorithm = MeshDecimation.CreateAlgorithm(Algorithm.Default);
             algorithm.Verbose = true;
@@ -53,7 +53,7 @@ namespace View3D.Services.MeshOptimization
 
             var outputVerts = new VertexPositionNormalTextureCustom[destVertices.Length];
 
-            for (int i = 0; i < outputVerts.Length; i++)
+            for (var i = 0; i < outputVerts.Length; i++)
             {
                 var pos = destMesh.Vertices[i];
                 var norm = destMesh.Normals[i];
@@ -61,8 +61,8 @@ namespace View3D.Services.MeshOptimization
                 var uv = destMesh.UV1[i];
                 var boneWeight = destMesh.BoneWeights[i];
 
-                Vector3 normal = new Vector3(norm.x, norm.y, norm.z);
-                Vector3 tangent = new Vector3(tangents.x, tangents.y, tangents.z);
+                var normal = new Vector3(norm.x, norm.y, norm.z);
+                var tangent = new Vector3(tangents.x, tangents.y, tangents.z);
                 var binormal = Vector3.Normalize(Vector3.Cross(normal, tangent));// * sign
 
                 var vert = new VertexPositionNormalTextureCustom();

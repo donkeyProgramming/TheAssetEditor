@@ -21,9 +21,6 @@
         <DataTemplate DataType="{ x:Type nodeViewModels:SkeletonSceneNodeViewModel}">
             <generic:SkeletonView/>
         </DataTemplate>
-        <DataTemplate DataType="{ x:Type nodeViewModels:LodGroupNodeViewModel}">
-            <generic:LodGroupView/>
-        </DataTemplate>
         <DataTemplate DataType="{ x:Type nodeViewModels:GroupNodeViewModel}">
             <generic:GroupView/>
         </DataTemplate>
