@@ -44,8 +44,6 @@ namespace CommonControls.PackFileBrowser
 
         public ContextMenuHandler ContextMenu { get; set; }
 
-
-
         public PackFileBrowserViewModel(PackFileService packFileService, bool ignoreCaFiles = false)
         {
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
@@ -100,7 +98,6 @@ namespace CommonControls.PackFileBrowser
                 var node = GetNodeFromPackFile(container, file, false);
                 node.Parent.Children.Remove(node);
             }
-
         }
 
         private void Database_PackFilesAdded(PackFileContainer container, List<PackFile> files)

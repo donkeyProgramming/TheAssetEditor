@@ -1,11 +1,10 @@
-﻿using CommonControls.Common;
+﻿using System.Collections.Generic;
+using CommonControls.Common;
 using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels;
 using Serilog;
-using System;
-using System.Collections.Generic;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -15,7 +14,7 @@ namespace KitbasherEditor.Services
 {
     public class KitbashSceneCreator
     {
-        ILogger _logger = Logging.Create<KitbashSceneCreator>();
+        private readonly ILogger _logger = Logging.Create<KitbashSceneCreator>();
 
         private MainEditableNode MainNode { get; set; }
         public ISceneNode ReferenceMeshNode { get; private set; }
@@ -56,16 +55,6 @@ namespace KitbasherEditor.Services
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
             _rmv2ModelNodeLoader.CreateModelNodesFromFile(MainNode, rmv, _kitbasherRootScene.Player, modelFullPath);
-            
-
-            int meshCount = Math.Min(MainNode.Children.Count, rmv.LodHeaders.Length);
-            for (int i = 0; i < meshCount; i++)
-            {
-                if (MainNode.Children[i] is Rmv2LodNode lodNode)
-                    lodNode.CameraDistance = rmv.LodHeaders[i].LodCameraDistance;
-            }
-
-            _kitbasherRootScene.SelectedOutputFormat = rmv.Header.Version;
             _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
         }
 
@@ -120,5 +109,4 @@ namespace KitbasherEditor.Services
             return loadedNode;
         }
     }
-
 }

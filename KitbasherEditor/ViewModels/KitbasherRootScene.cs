@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using KitbasherEditor.Events;
@@ -18,7 +17,7 @@ namespace KitbasherEditor.ViewModels
         private readonly PackFileService _packFileService;
         private readonly EventHub _eventHub;
 
-        public KitbasherRootScene(AnimationsContainerComponent animationsContainerComponent, PackFileService packFileService, EventHub eventHub )
+        public KitbasherRootScene(AnimationsContainerComponent animationsContainerComponent, PackFileService packFileService, EventHub eventHub)
         {
             _animationsContainerComponent = animationsContainerComponent;
             _packFileService = packFileService;
@@ -27,7 +26,7 @@ namespace KitbasherEditor.ViewModels
         }
 
         public GameSkeleton Skeleton { get; private set; }
-        public RmvVersionEnum SelectedOutputFormat { get; set; }
+        public RmvVersionEnum SelectedOutputFormat { get; set; }    // TODO:Remoev this
         public AnimationPlayer Player { get; private set; }
 
         public void SetSkeletonFromName(string skeletonName)
@@ -47,9 +46,5 @@ namespace KitbasherEditor.ViewModels
 
             _eventHub.Publish(new KitbasherSkeletonChangedEvent() { Skeleton = Skeleton, SkeletonName = skeletonName });
         }
-
-        public string ActiveFileName { get; set; }
-        public PackFile Get() => _packFileService.FindFile(ActiveFileName);
-        
     }
 }

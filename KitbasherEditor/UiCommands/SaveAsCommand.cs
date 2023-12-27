@@ -1,6 +1,6 @@
 ﻿using CommonControls.Common.MenuSystem;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using View3D.Services;
+using View3D.Services.SceneSaving.Geometry;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
@@ -21,7 +21,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
 
         public void Execute()
         {
-            _sceneSaverService.SaveAs(_kitbasherRootScene.SelectedOutputFormat);
+            throw new System.Exception();
+            //_sceneSaverService.SaveAs(_kitbasherRootScene.SelectedOutputFormat);
         }
     }
 }

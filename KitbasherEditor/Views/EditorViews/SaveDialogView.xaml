@@ -1,0 +1,85 @@
+﻿<UserControl x:Class="KitbasherEditor.Views.EditorViews.SaveDialogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews"
+             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:common="clr-namespace:CommonControls.Common;assembly=CommonControls"
+             mc:Ignorable="d" Height="300" Width="600">
+    <Grid Margin="2">
+        <DockPanel LastChildFill="true">
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0">Path:</Label>
+                <DockPanel Grid.Row="0" Grid.Column="1" LastChildFill="True">
+                    <Button DockPanel.Dock="Right">Browse</Button>
+                    <TextBox DockPanel.Dock="Left" Text="{Binding OutputPath.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
+                </DockPanel>
+
+                <Label Grid.Row="1" Grid.Column="0">Mesh Format:</Label>
+                <ComboBox Grid.Row="1" Grid.Column="1" Width="200" HorizontalAlignment="Right" Margin="0,1,0,1"
+                        ItemsSource="{Binding MeshStrategies}" 
+                        DisplayMemberPath="DisplayName" 
+                        SelectedItem="{Binding SelectedMeshStrategy.Value}"
+                        ToolTip="{Binding Path=SelectedItem.Description, RelativeSource={RelativeSource Self}}"/>
+
+                <Label Grid.Row="2" Grid.Column="0">WS model Format:</Label>
+                <ComboBox Grid.Row="2" Grid.Column="1" Width="200" HorizontalAlignment="Right" Margin="0,1,0,1"
+                           ItemsSource="{Binding WsStrategies}" 
+                            DisplayMemberPath="DisplayName" 
+                            SelectedItem="{Binding SelectedWsModelStrategy.Value}"
+                            ToolTip="{Binding Path=SelectedItem.Description, RelativeSource={RelativeSource Self}}"/>
+
+                <Label Grid.Row="3" Grid.Column="0">Lod Stategy:</Label>
+                <ComboBox Grid.Row="3" Grid.Column="1" Width="200" HorizontalAlignment="Right" Margin="0,1,0,1" 
+                          ItemsSource="{Binding LodStrategies}" 
+                          DisplayMemberPath="DisplayName" 
+                          SelectedItem="{Binding SelectedLodStrategy.Value}"
+                          ToolTip="{Binding Path=SelectedItem.Description, RelativeSource={RelativeSource Self}}"/>
+            </Grid>
+
+            <Label DockPanel.Dock="top"  Margin="2,10,2,0">Lod Info:</Label>
+            <DockPanel DockPanel.Dock="top" Margin="2,0,2,15">
+                <DockPanel DockPanel.Dock="Top">
+                    <DataGrid 
+                        ItemsSource="{Binding LodNodes, UpdateSourceTrigger=PropertyChanged}" 
+                        AutoGenerateColumns="False" CanUserAddRows="False" ToolTipService.ShowOnDisabled="True" DockPanel.Dock="Top">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Index" Binding="{Binding LodIndex, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
+                            <common:DataGridNumericColumn Header="Distance" Binding="{Binding CameraDistance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <common:DataGridNumericColumn Header="Qlt Level" Binding="{Binding QualityLvl, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <common:DataGridNumericColumn Header="Reduction Factor" Binding="{Binding LodReductionFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            <DataGridCheckBoxColumn Header="Merge Alpha" Binding="{Binding OptimizeLod_Alpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <DataGridCheckBoxColumn Header="Merge Vertex" Binding="{Binding OptimizeLod_Vertex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                            <common:DataGridNumericColumn Header="Polygons" Binding="{Binding PolygonCount.Value}" IsReadOnly="True" />
+                            <common:DataGridNumericColumn Header="Meshes" Binding="{Binding MeshCount.Value}" IsReadOnly="True" />
+                            <common:DataGridNumericColumn Header="Textures" Binding="{Binding TextureCount.Value}" IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </DockPanel>
+
+
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                <Button Width="100" Margin="0,0,2,0" Click="{s:MethodBinding HandleCancel}">Cancel</Button>
+                <Button Width="100" Margin="0,0,2,0" Click="{s:MethodBinding HandleSave}">Save</Button>
+                <Button Width="100" Margin="0,0,2,0" Click="{s:MethodBinding HandleApply}">Apply</Button>
+            </StackPanel>
+
+            <CheckBox  DockPanel.Dock="Bottom" FlowDirection="RightToLeft" IsChecked="{Binding OnlySaveVisible.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Only save visible nodes</CheckBox>
+        </DockPanel>
+    </Grid>
+</UserControl>

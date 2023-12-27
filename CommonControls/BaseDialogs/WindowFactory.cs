@@ -6,8 +6,7 @@ using MonoGame.Framework.WpfInterop;
 
 namespace CommonControls.BaseDialogs
 {
-
-    // Repalces SubToolWindowCreator
+    // TODO: Replaces SubToolWindowCreator
     public interface IWindowFactory
     {
         ITypedAssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight) where TViewModel : class;
@@ -36,7 +35,8 @@ namespace CommonControls.BaseDialogs
                 Width = initialWidth,
                 Height = initialHeight,
                 DataContext = viewModel,
-                Content = view
+                Content = view,
+                AlwaysOnTop = true,  
             };
 
             if (viewModel is IGameComponent component)
@@ -58,7 +58,7 @@ namespace CommonControls.BaseDialogs
     {
         public bool AlwaysOnTop { get; set; }
         public void CloseWindow();
-        public void ShowWindow();
+        public void ShowWindow(bool modal = false);
     }
 
     public interface ITypedAssetEditorWindow<TViewModel> 
@@ -83,15 +83,19 @@ namespace CommonControls.BaseDialogs
             Style = (Style)FindResource("CustomWindowStyle");
             Closing += AssetEditorWindow_Closing;
             Deactivated += AssetEditorWindow_Deactivated;
+
+            HorizontalContentAlignment = HorizontalAlignment.Stretch;
+            VerticalContentAlignment = VerticalAlignment.Stretch;
+            SizeToContent = SizeToContent.WidthAndHeight;
         }
 
         private void AssetEditorWindow_Deactivated(object sender, EventArgs e)
         {
-           //if (AlwaysOnTop)
-           //{
-           //    Window window = (Window)sender;
-           //    window.Topmost = true;
-           //}
+           if (AlwaysOnTop)
+           {
+               Window window = (Window)sender;
+               window.Topmost = true;
+           }
         }
 
         private void AssetEditorWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -105,9 +109,13 @@ namespace CommonControls.BaseDialogs
             Close();
         }
 
-        public void ShowWindow()
+        public void ShowWindow(bool modal = false)
         {
-            Show();
+
+            if (modal)
+                ShowDialog();
+            else
+                Show();
         }
     }
 }

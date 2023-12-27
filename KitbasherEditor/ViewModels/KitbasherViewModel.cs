@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using View3D.Components.Component;
 using View3D.Services;
+using View3D.Services.SceneSaving;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -17,6 +18,7 @@ namespace KitbasherEditor.ViewModels
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly KitbashViewDropHandler _dropHandler;
+        private readonly SaveSettings _saveSettings;
 
         public Type GetScopeResolverType { get => typeof(IScopeHelper<KitbasherViewModel>); }
 
@@ -37,11 +39,12 @@ namespace KitbasherEditor.ViewModels
             MenuBarViewModel menuBarViewModel,
             AnimationControllerViewModel animationControllerViewModel,
             SceneExplorerViewModel sceneExplorerViewModel,
-            KitbashViewDropHandler dropHandler)
+            KitbashViewDropHandler dropHandler,
+            SaveSettings saveSettings)
         {
             _kitbasherRootScene = kitbasherRootScene;
             _dropHandler = dropHandler;
-
+            _saveSettings = saveSettings;
             Scene = gameWorld;
             Animation = animationControllerViewModel;
             SceneExplorer = sceneExplorerViewModel;
@@ -71,7 +74,7 @@ namespace KitbasherEditor.ViewModels
         void OnFileSaved(FileSavedEvent notification)
         {
             HasUnsavedChanges = false;
-            DisplayName.Value = Path.GetFileName(_kitbasherRootScene.ActiveFileName);
+            DisplayName.Value = Path.GetFileName(_saveSettings.OutputName);
         }
 
         void OnCommandStackChanged(CommandStackChangedEvent notification)
