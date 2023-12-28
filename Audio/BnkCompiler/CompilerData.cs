@@ -19,6 +19,14 @@ namespace Audio.BnkCompiler
         public List<string> Actions { get; set; }
     }
 
+    public class RandomContainer : IAudioProjectHircItem
+    {
+        public List<string> Children { get; set; }
+        public string StatePropNum_Priority { get; set; } = null;
+        public string UserAuxSendVolume0 { get; set; } = null;
+        public string InitialDelay { get; set; } = null;
+    }
+
     public class Action : IAudioProjectHircItem
     {
         public string ChildId { get; set; }
@@ -40,7 +48,7 @@ namespace Audio.BnkCompiler
         public string StatePropNum_Priority { get; set; } = null;
         public string UserAuxSendVolume0 { get; set; } = null;
         public string InitialDelay { get; set; } = null;
-        public List<string> Sounds { get; set; } = new List<string>();
+        public List<string> Children { get; set; } = new List<string>();
         public List<string> ActorMixerChildren { get; set; } = new List<string>();
     }
 
@@ -62,6 +70,7 @@ namespace Audio.BnkCompiler
         public List<Action> Actions { get; set; } = new List<Action>();
         public List<GameSound> GameSounds { get; set; } = new List<GameSound>();
         public List<ActorMixer> ActorMixers { get; set; } = new List<ActorMixer>();
+        public List<RandomContainer> RandomContainers { get; set; } = new List<RandomContainer>();
 
         public void PreperForCompile(bool allowOverrideIdForActions, bool allowOverrideIdForMixers, bool allowOverrideIdForSounds)
         {
@@ -69,12 +78,14 @@ namespace Audio.BnkCompiler
             _allProjectItems.AddRange(Actions);
             _allProjectItems.AddRange(GameSounds);
             _allProjectItems.AddRange(ActorMixers);
+            _allProjectItems.AddRange(RandomContainers);
 
             // Compute the write ids
             Events.ForEach(x => Process(x, false, WWiseHash.Compute));
             Actions.ForEach(x => Process(x, allowOverrideIdForActions, WWiseHash.Compute));
-            ActorMixers.ForEach(x => Process(x, allowOverrideIdForMixers, WWiseHash.Compute30));
             GameSounds.ForEach(x => Process(x, allowOverrideIdForSounds, WWiseHash.Compute30));
+            ActorMixers.ForEach(x => Process(x, allowOverrideIdForMixers, WWiseHash.Compute30));
+            RandomContainers.ForEach(x => Process(x, false, WWiseHash.Compute));
         }
 
         public uint GetHircItemIdFromName(string name)
@@ -85,7 +96,7 @@ namespace Audio.BnkCompiler
         public IAudioProjectHircItem GetActionMixerForSound(string soundName)
         {
             var mixers = _allProjectItems.Where(x => x is ActorMixer).Cast<ActorMixer>().ToList();
-            var mixer = mixers.Where(x => x.Sounds.Contains(soundName)).ToList();
+            var mixer = mixers.Where(x => x.Children.Contains(soundName)).ToList();
             return mixer.FirstOrDefault();
         }
 
