@@ -18,14 +18,6 @@ namespace Audio.BnkCompiler
             public string SoundContainerType { get; set; }
             public string ActorMixer { get; set; }
             public string AudioBus { get; set; }
-            public string AuxBus0 { get; set; }
-            public string AuxBus1 { get; set; }
-            public string AuxBus2 { get; set; }
-            public string AuxBus3 { get; set; }
-            public string AuxBus4 { get; set; }
-            public string StatePropNum_Priority { get; set; }
-            public string UserAuxSendVolume0 { get; set; }
-            public string InitialDelay { get; set; }
             public List<string> Sounds { get; set; }
         }
 

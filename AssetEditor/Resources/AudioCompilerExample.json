@@ -6,9 +6,9 @@
 
   "Project": [
     {
-      "Event": "Play_example_event_name", // Must start with Play_
+      "Event": "Play_example_event_name", //// Names of events should be unique and start with 'Play_'.
       "Type": "Default", // Default or none = normal event. Music = music event. Not sure if this works or not though. Might need to be a whole different object
-      "SoundContainerType": "Rand", // Default or none = just one sound, Seq = SequenceCntr,
+      "SoundContainerType": "Rand", // Delete this setting when using just one sound, when using multiple sounds use "Rand" for a random container or "Seq" for a sequence container.
       "Sounds": [ // Sounds can either be located in a packfile or on your computer
         "Audio\\WWise\\1000175847.wem",
         "C:\\Users\\username\\soundLib\\wet-fart-6139.mp3"
@@ -25,10 +25,10 @@
       "InitialDelay": ""
     },
     {
-      "Event": "Play_example_event_name", 
-      "Type": "Default", 
-      "SoundContainerType": "Rand", 
-      "Sounds": [ 
+      "Event": "Play_example_event_name",
+      "Type": "Default",
+      "SoundContainerType": "Rand",
+      "Sounds": [
         "Audio\\WWise\\1000175847.wem",
         "C:\\Users\\username\\soundLib\\wet-fart-6139.mp3"
       ],

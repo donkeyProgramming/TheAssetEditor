@@ -36,18 +36,11 @@ namespace Audio.BnkCompiler
     public class GameSound : IAudioProjectHircItem
     {
         public string Path { get; set; }
-        public string StatePropNum_Priority { get; set; } = null;
-        public string UserAuxSendVolume0 { get; set; } = null;
-        public string InitialDelay { get; set; } = null;
     }
 
     public class ActorMixer : IAudioProjectHircItem
     {
         public string DirectParentId { get; set; } = null;
-        public string OverrideBusId { get; set; } = null;
-        public string StatePropNum_Priority { get; set; } = null;
-        public string UserAuxSendVolume0 { get; set; } = null;
-        public string InitialDelay { get; set; } = null;
         public List<string> Children { get; set; } = new List<string>();
         public List<string> ActorMixerChildren { get; set; } = new List<string>();
     }
@@ -84,7 +77,7 @@ namespace Audio.BnkCompiler
             Events.ForEach(x => Process(x, false, WWiseHash.Compute));
             Actions.ForEach(x => Process(x, allowOverrideIdForActions, WWiseHash.Compute));
             GameSounds.ForEach(x => Process(x, allowOverrideIdForSounds, WWiseHash.Compute30));
-            ActorMixers.ForEach(x => Process(x, allowOverrideIdForMixers, WWiseHash.Compute30));
+            ActorMixers.ForEach(x => Process(x, allowOverrideIdForMixers, WWiseHash.Compute));
             RandomContainers.ForEach(x => Process(x, false, WWiseHash.Compute));
         }
 
@@ -93,10 +86,10 @@ namespace Audio.BnkCompiler
             return _allProjectItems.First(x => x.Name == name).SerializationId;
         }
 
-        public IAudioProjectHircItem GetActionMixerForSound(string soundName)
+        public IAudioProjectHircItem GetActionMixerForObject(string objectName)
         {
             var mixers = _allProjectItems.Where(x => x is ActorMixer).Cast<ActorMixer>().ToList();
-            var mixer = mixers.Where(x => x.Children.Contains(soundName)).ToList();
+            var mixer = mixers.Where(x => x.Children.Contains(objectName)).ToList();
             return mixer.FirstOrDefault();
         }
 

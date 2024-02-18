@@ -55,7 +55,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public override void UpdateSize()
         {
             var akPlaylistCount = Convert.ToUInt32(AkPlaylist.Count());
-            Size = HircHeaderSize + Children.GetSize() + NodeBaseParams.GetSize() + 4 * akPlaylistCount;
+            Size = HircHeaderSize + Children.GetSize() + NodeBaseParams.GetSize() + (akPlaylistCount * 2);
         }
 
         public override byte[] GetAsByteArray()
@@ -79,7 +79,6 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             return byteArray;
         }
     }
-
 
     public class AkPlaylistItem
     {

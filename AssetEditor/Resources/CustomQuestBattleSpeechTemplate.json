@@ -1,0 +1,25 @@
+{
+  "Settings": {
+    "BnkName": "global_movies__test", // The name of your bank should take the same name as the vanilla bank for everything before the "__", everything after can be custom.
+    "Language": "english(uk)" // The location your wem files will be output.
+  },
+
+  "Project": [
+    {
+      "Event": "Play_example_event_name", // Names of events should be unique and start with 'Play_'.
+      "Sounds": [ // The path to the sound file either in your pack or a location on your PC.
+        "Audio\\WWise\\1000175847.wem",
+        "C:\\Users\\username\\soundLib\\wet-fart-6139.mp3"
+      ],
+      "ActorMixer": "" // The top level ActorMixer.
+    },
+    {
+      "Event": "Play_example_event_name_2", // Names of events should be unique and start with 'Play_'.
+      "Sounds": [ // The path to the sound file either in your pack or a location on your PC.
+        "Audio\\WWise\\1000175847.wem",
+        "C:\\Users\\username\\soundLib\\wet-fart-6139.mp3"
+      ],
+      "ActorMixer": "" // The top level ActorMixer.
+    }
+  ]
+}

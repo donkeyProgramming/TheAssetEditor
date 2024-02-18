@@ -141,9 +141,9 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 {
                     Values = new List<AkPropBundle.AkPropBundleInstance>()
                     {
-                        new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.StatePropNum_Priority, Value = 100},
-                        new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.UserAuxSendVolume0, Value = -96},
-                        new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.InitialDelay, Value = 0.5199999809265137f},
+                        //new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.StatePropNum_Priority, Value = 100},
+                        //new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.UserAuxSendVolume0, Value = -96},
+                        //new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.InitialDelay, Value = 0.5199999809265137f},
                     }
                 },
                 AkPropBundle1 = new AkPropBundleMinMax()
@@ -151,154 +151,6 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                     Values = new List<AkPropBundleMinMax.AkPropBundleInstance>()
                 }
             };
-
-            instance.PositioningParams = new PositioningParams()
-            {
-                uBitsPositioning = 0x03,
-                uBits3d = 0x08
-            };
-            instance.AuxParams = new AuxParams()
-            {
-                byBitVector = 0,
-                reflectionsAuxBus = 0
-            };
-            instance.AdvSettingsParams = new AdvSettingsParams()
-            {
-                byBitVector = 0x00,
-                eVirtualQueueBehavior = 0x01,   // [FromElapsedTime]
-                u16MaxNumInstance = 0,
-                eBelowThresholdBehavior = 0,
-                byBitVector2 = 0
-            };
-            instance.StateChunk = new StateChunk();
-            instance.InitialRTPC = new InitialRTPC();
-            return instance;
-        }
-
-        public static NodeBaseParams CreateCustomMixerParams(ActorMixer initialParams)
-        {
-            var statePropNum_Priority = initialParams.StatePropNum_Priority;
-            var userAuxSendVolume0 = initialParams.UserAuxSendVolume0;
-            var initialDelay = initialParams.InitialDelay;
-            
-            // add the other params
-
-            NodeBaseParams instance = new NodeBaseParams();
-            instance.NodeInitialFxParams = new NodeInitialFxParams()
-            {
-                bIsOverrideParentFX = 0,
-                FxList = new List<FXChunk>(),
-                bitsFXBypass = 0,
-            };
-            instance.bOverrideAttachmentParams = 0;
-            instance.OverrideBusId = 0;    // "Master Audio Bus"
-            instance.DirectParentID = 0;
-            instance.byBitVector = 0;
-            instance.NodeInitialParams = new NodeInitialParams()
-            {
-                AkPropBundle0 = new AkPropBundle()
-                {
-                    Values = new List<AkPropBundle.AkPropBundleInstance>()
-
-                },
-                AkPropBundle1 = new AkPropBundleMinMax()
-                {
-                    Values = new List<AkPropBundleMinMax.AkPropBundleInstance>()
-                }
-            };
-
-            // add them in reverse order
-            if (initialDelay != null)
-            {
-                var addStateInitialDelay = new AkPropBundle.AkPropBundleInstance() { Type = AkPropBundleType.InitialDelay, Value = float.Parse(initialParams.InitialDelay) };
-                instance.NodeInitialParams.AkPropBundle0.Values.Add(addStateInitialDelay);
-            }
-
-            if (userAuxSendVolume0 != null)
-            {
-                var adduserAuxSendVolume0 = new AkPropBundle.AkPropBundleInstance() { Type = AkPropBundleType.UserAuxSendVolume0, Value = float.Parse(initialParams.UserAuxSendVolume0) };
-                instance.NodeInitialParams.AkPropBundle0.Values.Add(adduserAuxSendVolume0);
-            }
-
-            if (statePropNum_Priority != null)
-            {
-                var addstatePropNum_Priority = new AkPropBundle.AkPropBundleInstance() { Type = AkPropBundleType.StatePropNum_Priority, Value = float.Parse(initialParams.StatePropNum_Priority) };
-                instance.NodeInitialParams.AkPropBundle0.Values.Add(addstatePropNum_Priority);
-            }
-
-            instance.PositioningParams = new PositioningParams()
-            {
-                uBitsPositioning = 0x03,
-                uBits3d = 0x08
-            };
-            instance.AuxParams = new AuxParams()
-            {
-                byBitVector = 0,
-                reflectionsAuxBus = 0
-            };
-            instance.AdvSettingsParams = new AdvSettingsParams()
-            {
-                byBitVector = 0x00,
-                eVirtualQueueBehavior = 0x01,   // [FromElapsedTime]
-                u16MaxNumInstance = 0,
-                eBelowThresholdBehavior = 0,
-                byBitVector2 = 0
-            };
-            instance.StateChunk = new StateChunk();
-            instance.InitialRTPC = new InitialRTPC();
-            return instance;
-        }
-
-        public static NodeBaseParams CreateCustomSoundParams(GameSound initialParams)
-        {
-            var statePropNum_Priority = initialParams.StatePropNum_Priority;
-            var userAuxSendVolume0 = initialParams.UserAuxSendVolume0;
-            var initialDelay = initialParams.InitialDelay;
-
-            // add the other params
-
-            NodeBaseParams instance = new NodeBaseParams();
-            instance.NodeInitialFxParams = new NodeInitialFxParams()
-            {
-                bIsOverrideParentFX = 0,
-                FxList = new List<FXChunk>(),
-                bitsFXBypass = 0,
-            };
-            instance.bOverrideAttachmentParams = 0;
-            instance.OverrideBusId = 0;    // "Master Audio Bus"
-            instance.DirectParentID = 0;
-            instance.byBitVector = 0;
-            instance.NodeInitialParams = new NodeInitialParams()
-            {
-                AkPropBundle0 = new AkPropBundle()
-                {
-                    Values = new List<AkPropBundle.AkPropBundleInstance>()
-
-                },
-                AkPropBundle1 = new AkPropBundleMinMax()
-                {
-                    Values = new List<AkPropBundleMinMax.AkPropBundleInstance>()
-                }
-            };
-
-            // add them in reverse order
-            if (initialDelay != null)
-            {
-                var addStateInitialDelay = new AkPropBundle.AkPropBundleInstance() { Type = AkPropBundleType.InitialDelay, Value = float.Parse(initialParams.InitialDelay) };
-                instance.NodeInitialParams.AkPropBundle0.Values.Add(addStateInitialDelay);
-            }
-
-            if (userAuxSendVolume0 != null)
-            {
-                var adduserAuxSendVolume0 = new AkPropBundle.AkPropBundleInstance() { Type = AkPropBundleType.UserAuxSendVolume0, Value = float.Parse(initialParams.UserAuxSendVolume0) };
-                instance.NodeInitialParams.AkPropBundle0.Values.Add(adduserAuxSendVolume0);
-            }
-
-            if (statePropNum_Priority != null)
-            {
-                var addstatePropNum_Priority = new AkPropBundle.AkPropBundleInstance() { Type = AkPropBundleType.StatePropNum_Priority, Value = float.Parse(initialParams.StatePropNum_Priority) };
-                instance.NodeInitialParams.AkPropBundle0.Values.Add(addstatePropNum_Priority);
-            }
 
             instance.PositioningParams = new PositioningParams()
             {
@@ -716,10 +568,10 @@ namespace Audio.FileFormats.WWise.Hirc.V136
     public class AuxParams
     {
         public byte byBitVector { get; set; }
-        public uint auxID0 { get; set; }
-        public uint auxID1 { get; set; }
-        public uint auxID2 { get; set; }
-        public uint auxID3 { get; set; }
+        public uint auxBus0 { get; set; }
+        public uint auxBus1 { get; set; }
+        public uint auxBus2 { get; set; }
+        public uint auxBus3 { get; set; }
         public uint reflectionsAuxBus { get; set; }
 
         public static AuxParams Create(ByteChunk chunk)
@@ -729,10 +581,10 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
             if ((instance.byBitVector >> 3 & 1) == 1)
             {
-                instance.auxID0 = chunk.ReadUInt32();
-                instance.auxID1 = chunk.ReadUInt32();
-                instance.auxID2 = chunk.ReadUInt32();
-                instance.auxID3 = chunk.ReadUInt32();
+                instance.auxBus0 = chunk.ReadUInt32();
+                instance.auxBus1 = chunk.ReadUInt32();
+                instance.auxBus2 = chunk.ReadUInt32();
+                instance.auxBus3 = chunk.ReadUInt32();
             }
 
             instance.reflectionsAuxBus = chunk.ReadUInt32();

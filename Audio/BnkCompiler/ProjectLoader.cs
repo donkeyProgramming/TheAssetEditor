@@ -90,7 +90,6 @@ namespace Audio.BnkCompiler
                 return Result<bool>.FromError("BnkCompiler-Validation", result);
 
             // Validate for name collisions and uniqe ids
-
             return Result<bool>.FromOk(true);
         }
 
@@ -117,12 +116,13 @@ namespace Audio.BnkCompiler
             // Add mixers to compilerData first so they can be individually referenced later
             foreach (var item in input.Project)
             {
-                var mixerId = Convert.ToUInt32(item.ActorMixer);
+                var mixerId = $"{item.Event}_mixer";
+                var mixerParent = item.ActorMixer;
                 var isMixerAdded = false;
 
                 foreach (var mixerItem in mixers)
                 {
-                    if (mixerItem.OverrideId == mixerId)
+                    if (mixerItem.Name == mixerId)
                     {
                         isMixerAdded = true;
                         break;
@@ -130,15 +130,11 @@ namespace Audio.BnkCompiler
                 }
 
                 if (isMixerAdded == false)
-                { 
+                {
                     var mixer = new ActorMixer()
                     {
-                        Name = mixerId.ToString(),
-                        OverrideId = mixerId,
-                        OverrideBusId = item.AudioBus,
-                        StatePropNum_Priority = item.StatePropNum_Priority,
-                        UserAuxSendVolume0 = item.UserAuxSendVolume0,
-                        InitialDelay = item.InitialDelay
+                        Name = mixerId,
+                        DirectParentId = mixerParent
                     };
 
                     mixers.Add(mixer);
@@ -151,13 +147,13 @@ namespace Audio.BnkCompiler
             {
                 currentItem = currentItem + 1;
                 var eventId = item.Event;
-                var mixerId = Convert.ToUInt32(item.ActorMixer);
+                var mixerId = $"{item.Event}_mixer";
                 var defaultSound = new GameSound();
                 var currentMixer = new ActorMixer();
 
                 foreach (var mixerItem in mixers)
                 {
-                    if (mixerItem.OverrideId == mixerId)
+                    if (mixerItem.Name == mixerId)
                     {
                         currentMixer = mixerItem;
                         break;
@@ -166,7 +162,7 @@ namespace Audio.BnkCompiler
 
                 if (item.SoundContainerType != null)
                 {
-                    if (item.SoundContainerType == "Random")
+                    if (item.SoundContainerType == "Random") // if there's a random container
                     {
                         foreach (var sound in item.Sounds)
                         {
@@ -180,9 +176,6 @@ namespace Audio.BnkCompiler
                             {
                                 Name = soundId,
                                 Path = sound,
-                                StatePropNum_Priority = item.StatePropNum_Priority,
-                                UserAuxSendVolume0 = item.UserAuxSendVolume0,
-                                InitialDelay = item.InitialDelay
                             };
 
                             compilerData.GameSounds.Add(defaultSound);
@@ -206,7 +199,7 @@ namespace Audio.BnkCompiler
                                 };
 
                                 compilerData.RandomContainers.Add(defaultRandomContainer);
-                                currentMixer.Children.Add(defaultRandomContainer.Name);
+                                currentMixer.Children.Add(containerId);
 
                                 var defaultEvent = new Event()
                                 {
@@ -221,7 +214,7 @@ namespace Audio.BnkCompiler
                         }
                     }
                 }
-                else
+                else // if there's no container
                 {
                     foreach (var sound in item.Sounds)
                     {
@@ -234,12 +227,9 @@ namespace Audio.BnkCompiler
                         {
                             Name = soundId,
                             Path = sound,
-                            StatePropNum_Priority = item.StatePropNum_Priority,
-                            UserAuxSendVolume0 = item.UserAuxSendVolume0,
-                            InitialDelay = item.InitialDelay
                         };
 
-                        currentMixer.Children.Add(defaultSound.Name);
+                        currentMixer.Children.Add(soundId);
                         compilerData.GameSounds.Add(defaultSound);
 
                         var defaultAction = new Action()
