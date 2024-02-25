@@ -5,15 +5,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
-using Audio.BnkCompiler;
 using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
-using SharpDX.MediaFoundation.DirectX;
-using static CommonControls.Editors.AnimationPack.Converters.AnimationBinFileToXmlConverter;
 
 namespace Audio.Utility
 {
@@ -72,7 +66,7 @@ namespace Audio.Utility
         {
 
             // Define the root path to Wwise and the specific WwiseCLI executable
-            var wwiseCliPath = @"C:\Program Files (x86)\Audiokinetic\Wwise 2019.2.15.7667\Authoring\x64\Release\bin\WwiseCLI.exe"; //_settingsService.CurrentSettings.WwisePath;
+            var wwiseCliPath = _settingsService.CurrentSettings.WwisePath;
 
             // Path to the parent directory of the current directory
             var tempFolderPath = $"{DirectoryHelper.Temp}";
@@ -197,16 +191,16 @@ namespace Audio.Utility
             else
             {
                 // Construct the full namespace for the embedded resource
-                var reexcessFolderPath = $"{resourceRootNamespace}.WavToWemWwiseProject.WavToWemWwiseProject.zip";
+                var resourceFolderPath = $"{resourceRootNamespace}.WavToWemWwiseProject.WavToWemWwiseProject.zip";
 
                 // Use a temporary file path to save the embedded zip before extracting
                 var tempZipPath = Path.Combine(Path.GetTempPath(), "WavToWemWwiseProject.zip");
 
                 // Extract the embedded resource and write it to the temporary file
-                using (var resourceStream = assembly.GetManifestResourceStream(reexcessFolderPath))
+                using (var resourceStream = assembly.GetManifestResourceStream(resourceFolderPath))
                 {
                     if (resourceStream == null)
-                        throw new InvalidOperationException($"Resource {reexcessFolderPath} not found. Make sure the resource exists and is set to 'Embedded Resource'.");
+                        throw new InvalidOperationException($"Resource {resourceFolderPath} not found. Make sure the resource exists and is set to 'Embedded Resource'.");
 
                     using var fileStream = new FileStream(tempZipPath, FileMode.Create, FileAccess.Write);
                     resourceStream.CopyTo(fileStream);

@@ -75,8 +75,6 @@ namespace Audio.BnkCompiler
 
             // Compute hash
             var hashName = WWiseHash.Compute30(newFileName);
-            Console.WriteLine("################################ newFileName: " + newFileName.ToString());
-            Console.WriteLine("################################ hashName: " + hashName.ToString());
 
             // Load
             var createdFiles = PackFileUtil.LoadFilesFromDisk(_pfs, new PackFileUtil.FileRef(wemPath, GetExpectedFolder(compilerData), $"{hashName}.wem"));
@@ -126,8 +124,6 @@ namespace Audio.BnkCompiler
             return basePath;
         }
 
-
-
         enum SoundFileImportType
         {
             None,
@@ -135,6 +131,5 @@ namespace Audio.BnkCompiler
             Disk,
             PackFile
         }
-
     }
 }

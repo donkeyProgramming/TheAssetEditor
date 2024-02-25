@@ -12,8 +12,19 @@ namespace Audio.BnkCompiler.ObjectGeneration
             {
                 // Sort
                 var sortedProjectItems = new List<IAudioProjectHircItem>();
+                
+                // Add random containers and sounds
+                var sortedRandomContainers = project.RandomContainers.OrderBy(x => GetSortingId(x)).ToList();
+                foreach (var currentRandomContainer in sortedRandomContainers)
+                {
+                    var randomContainerChildren = currentRandomContainer.Children.Select(x => project.GameSounds.First(gameSound => gameSound.Name == x)).ToList();
+                    var sortedrandomContainerChildren = randomContainerChildren.OrderBy(x => GetSortingId(x)).ToList();
 
-                // Add mixers and random containers
+                    sortedProjectItems.AddRange(sortedrandomContainerChildren);
+                    sortedProjectItems.Add(currentRandomContainer);
+                }
+
+                // Add mixers
                 var mixers = SortActorMixerList(project);
                 foreach (var mixer in mixers)
                 {
@@ -33,17 +44,6 @@ namespace Audio.BnkCompiler.ObjectGeneration
 
                     sortedProjectItems.AddRange(sortedActions);
                     sortedProjectItems.Add(currentEvent);
-                }
-
-                // Add random containers and sounds
-                var sortedRandomContainers = project.RandomContainers.OrderBy(x => GetSortingId(x)).ToList();
-                foreach (var currentRandomContainer in sortedRandomContainers)
-                {
-                    var randomContainerChildren = currentRandomContainer.Children.Select(x => project.GameSounds.First(gameSound => gameSound.Name == x)).ToList();
-                    var sortedrandomContainerChildren = randomContainerChildren.OrderBy(x => GetSortingId(x)).ToList();
-
-                    sortedProjectItems.AddRange(sortedrandomContainerChildren); 
-                    sortedProjectItems.Add(currentRandomContainer); 
                 }
 
                 return sortedProjectItems;

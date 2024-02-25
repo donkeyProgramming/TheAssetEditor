@@ -1,0 +1,25 @@
+{
+  "Settings": {
+    "BnkName": "global_movies__template", // This should be the first part of the name of the vanilla bnk e.g. "global_movies__" anything after can be custom.
+    "Language": "english(uk)" // The language folder within the Wwise folder that the project is output to.
+  },
+
+  "Project": [
+    {
+      "Event": "Play_Movie_warhammer3_emp_template_1", // The Event name should start with "Play_Movie_" followed by the path of the movie file in the pack after the movies folder e.g. warhammer3/emp/your_movie.ca_vp8.
+      "Sounds": [
+        "C:\\path\\to\\your_wav_1.wav" // The path to your wav file on your computer.
+      ],
+      "ActorMixer": "573597124" // The top level actor mixer as seen in the Audio Explorer.
+    },
+    {
+      "Event": "Play_Movie_warhammer3_emp_template_2",
+      "Sounds": [
+        "C:\\path\\to\\your_wav_2.wav"
+      ],
+      "ActorMixer": "573597222"
+    }
+  ]
+}
+
+// Example Event: Play_Movie_warhammer3_prologue_pro_int

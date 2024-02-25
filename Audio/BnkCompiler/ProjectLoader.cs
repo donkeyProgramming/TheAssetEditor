@@ -160,14 +160,15 @@ namespace Audio.BnkCompiler
                     }
                 }
 
-                if (item.SoundContainerType != null)
+                var soundsCount = item.Sounds.Count();
+
+                if (item.SoundContainerType != null || (soundsCount > 1 && item.SoundContainerType == null))
                 {
-                    if (item.SoundContainerType == "Random") // if there's a random container
+                    if (item.SoundContainerType == "Random" || (soundsCount > 1 && item.SoundContainerType == null)) // if there's a random container
                     {
                         foreach (var sound in item.Sounds)
                         {
                             currentSound = currentSound + 1;
-                            var soundsCount = item.Sounds.Count();
                             var soundId = $"{eventId}_{currentSound}_sound";
                             var actionId = $"{eventId}_action";
                             var containerId = $"{eventId}_random_container";
@@ -219,7 +220,6 @@ namespace Audio.BnkCompiler
                     foreach (var sound in item.Sounds)
                     {
                         currentSound = currentSound + 1;
-                        var soundsCount = item.Sounds.Count();
                         var soundId = $"{eventId}_{currentSound}_sound";
                         var actionId = $"{eventId}_{currentSound}_action";
 

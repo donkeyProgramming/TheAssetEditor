@@ -43,11 +43,9 @@ namespace CommonControls.Services
             WwisePath = Environment.GetEnvironmentVariable("WWISEROOT") ?? "";
             if (!string.IsNullOrEmpty(WwisePath))
             {
-                WwisePath = Path.Combine(WwisePath, "Authoring", "x64", "Release", "bin", "WwiseConsole.exe");
+                WwisePath = Path.Combine(WwisePath, "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
             }
         }
-
-
     }
 
     public class ApplicationSettingsService
