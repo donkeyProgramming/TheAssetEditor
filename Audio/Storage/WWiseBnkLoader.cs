@@ -96,7 +96,7 @@ namespace Audio.Storage
 
             /*
             // Generate CSV of IDs
-            using (var file = File.CreateText("C:\\Users\\georg\\Desktop\\hirc_ids.csv"))
+            using (var file = File.CreateText("C:\\Users\\george\\Desktop\\hirc_ids.csv"))
             foreach (var parsedBnk in parsedBnkList)
             {
                     foreach (var item in parsedBnk.HircChuck.Hircs)

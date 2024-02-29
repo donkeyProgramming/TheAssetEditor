@@ -85,10 +85,19 @@
                 <MenuItem Header="Animation File Batch converter" Command="{Binding MenuBar.OpenAnimationBatchExporterCommand}" />
                 <MenuItem Header="Warhammer 2 Animpack Updater" Command="{Binding MenuBar.OpenWh2AnimpackUpdaterCommand}" Visibility="Collapsed"  />
                 <Separator/>
-                <MenuItem Header="Audio (work in progress)">
+                <MenuItem Header="Audio">
                     <MenuItem Header="Audio Explorer" Command="{Binding MenuBar.OpenAudioEditorCommand}"/>
                     <MenuItem Header="Compile Audio Projects" Command="{Binding MenuBar.CompileAudioProjectsCommand}"/>
-                    <MenuItem Header="Create Example Audio Project" Command="{Binding MenuBar.CreateExampleAudioProjectCommand}"/>
+                    <MenuItem Header="Audio Project Templates">
+                        <MenuItem Header="Default Template" Command="{Binding MenuBar.CreateTemplateAudioProjectCommand}"/>
+                        <MenuItem Header="Movie Template" Command="{Binding MenuBar.CreateTemplateMovieProjectCommand}"/>
+                        <MenuItem Header="Quest Battle Speech Template" Command="{Binding MenuBar.CreateTemplateQuestBattleProjectCommand}"/>
+                        <MenuItem Header="IND Magic / Ability Template" Command="{Binding MenuBar.CreateTemplateIndMagicAbilityProjectCommand}"/>
+                        <MenuItem Header="UI Template" Command="{Binding MenuBar.CreateTemplateUIProjectCommand}"/>
+                        <MenuItem Header="Diplomacy Line Template" Command="{Binding MenuBar.CreateTemplateDiplomacyProjectCommand}"/>
+                        <MenuItem Header="Dilemma / Incident Narration Template" Command="{Binding MenuBar.CreateTemplateDilemmaNarrationProjectCommand}"/>
+                        <MenuItem Header="Battle Individual Vocalisation Template" Command="{Binding MenuBar.CreateTemplateBattleIndividualVocalisationProjectCommand}"/>
+                    </MenuItem>
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Import/Export to FBX (RME download)" Command="{Binding MenuBar.DownloadRmeCommand}" />

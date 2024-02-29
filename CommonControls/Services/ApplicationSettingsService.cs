@@ -2,13 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using CommonControls.Common;
 using Newtonsoft.Json;
 using Serilog;
+
 
 namespace CommonControls.Services
 {
@@ -33,8 +36,16 @@ namespace CommonControls.Services
         public bool IsFirstTimeStartingApplication { get; set; } = true;
         public bool IsDeveloperRun { get; set; } = false;
         public bool HideWh2TextureSelectors { get; set; } = false;
+        public string WwisePath { get; set; }
 
-
+        public ApplicationSettings()
+        {
+            WwisePath = Environment.GetEnvironmentVariable("WWISEROOT") ?? "";
+            if (!string.IsNullOrEmpty(WwisePath))
+            {
+                WwisePath = Path.Combine(WwisePath, "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
+            }
+        }
     }
 
     public class ApplicationSettingsService

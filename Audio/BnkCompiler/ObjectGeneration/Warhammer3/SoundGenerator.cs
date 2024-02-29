@@ -36,13 +36,6 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
             var nodeBaseParams = NodeBaseParams.CreateDefault();
 
-            var statePropNum_Priority = inputSound.StatePropNum_Priority;
-            var userAuxSendVolume0 = inputSound.UserAuxSendVolume0;
-            var initialDelay = inputSound.InitialDelay;
-
-            if (statePropNum_Priority != null || userAuxSendVolume0 != null || initialDelay != null)
-                nodeBaseParams = NodeBaseParams.CreateCustomSoundParams(inputSound);
-
             var wwiseSound = new CAkSound_v136()
             {
                 Id = project.GetHircItemIdFromName(inputSound.Name),
@@ -61,7 +54,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 NodeBaseParams = nodeBaseParams
             };
 
-            var mixer = project.GetActionMixerForSound(inputSound.Name);
+            var mixer = project.GetActionMixerForObject(inputSound.Name);
             if (mixer != null)
                 wwiseSound.NodeBaseParams.DirectParentID = project.GetHircItemIdFromName(mixer.Name);
 

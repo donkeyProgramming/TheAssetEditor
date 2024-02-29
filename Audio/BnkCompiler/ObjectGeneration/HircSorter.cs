@@ -8,31 +8,76 @@ namespace Audio.BnkCompiler.ObjectGeneration
     {
         public List<IAudioProjectHircItem> Sort(CompilerData project)
         {
-            // Sort
-            var sortedProjectItems = new List<IAudioProjectHircItem>();
-            var mixers = SortActorMixerList(project);
-            foreach (var mixer in mixers)
+            if (project.RandomContainers.Count() != 0)
             {
-                var audioChildren = mixer.Sounds.Select(x => project.GameSounds.First(gameSound => gameSound.Name == x)).ToList();
-                var sortedAudioChildren = audioChildren.OrderBy(x => GetSortingId(x)).ToList();
+                // Sort
+                var sortedProjectItems = new List<IAudioProjectHircItem>();
+                
+                // Add random containers and sounds
+                var sortedRandomContainers = project.RandomContainers.OrderBy(x => GetSortingId(x)).ToList();
+                foreach (var currentRandomContainer in sortedRandomContainers)
+                {
+                    var randomContainerChildren = currentRandomContainer.Children.Select(x => project.GameSounds.First(gameSound => gameSound.Name == x)).ToList();
+                    var sortedrandomContainerChildren = randomContainerChildren.OrderBy(x => GetSortingId(x)).ToList();
 
-                sortedProjectItems.AddRange(sortedAudioChildren);
-                sortedProjectItems.Add(mixer);
+                    sortedProjectItems.AddRange(sortedrandomContainerChildren);
+                    sortedProjectItems.Add(currentRandomContainer);
+                }
+
+                // Add mixers
+                var mixers = SortActorMixerList(project);
+                foreach (var mixer in mixers)
+                {
+                    //var mixerChildren = mixer.Children.Select(x => project.RandomContainers.First(randomContainer => randomContainer.Name == x)).ToList();
+                    //var sortedMixerChildren = mixerChildren.OrderBy(x => GetSortingId(x)).ToList();
+
+                    //sortedProjectItems.AddRange(sortedMixerChildren);
+                    sortedProjectItems.Add(mixer);
+                }
+
+                // Add Events and actions
+                var sortedEvents = project.Events.OrderBy(x => GetSortingId(x)).ToList();
+                foreach (var currentEvent in sortedEvents)
+                {
+                    var actions = currentEvent.Actions.Select(x => project.Actions.First(action => action.Name == x)).ToList();
+                    var sortedActions = actions.OrderBy(x => GetSortingId(x)).ToList();
+
+                    sortedProjectItems.AddRange(sortedActions);
+                    sortedProjectItems.Add(currentEvent);
+                }
+
+                return sortedProjectItems;
             }
-
-            // Add Events
-            var sortedEvents = project.Events.OrderBy(x => GetSortingId(x)).ToList();
-            foreach (var currentEvent in sortedEvents)
+            else
             {
-                var actions = currentEvent.Actions.Select(x => project.Actions.First(action => action.Name == x)).ToList();
-                var sortedActions = actions.OrderBy(x => GetSortingId(x)).ToList();
+                // Sort
+                var sortedProjectItems = new List<IAudioProjectHircItem>();
 
-                sortedProjectItems.AddRange(sortedActions);
-                sortedProjectItems.Add(currentEvent);
+                // Add mixers and sounds
+                var mixers = SortActorMixerList(project);
+                foreach (var mixer in mixers)
+                {
+                    var mixerChildren = mixer.Children.Select(x => project.GameSounds.First(gameSound => gameSound.Name == x)).ToList();
+                    var sortedMixerChildren = mixerChildren.OrderBy(x => GetSortingId(x)).ToList();
+
+                    sortedProjectItems.AddRange(sortedMixerChildren);
+                    sortedProjectItems.Add(mixer);
+                }
+
+                // Add Events and actions
+                var sortedEvents = project.Events.OrderBy(x => GetSortingId(x)).ToList();
+                foreach (var currentEvent in sortedEvents)
+                {
+                    var actions = currentEvent.Actions.Select(x => project.Actions.First(action => action.Name == x)).ToList();
+                    var sortedActions = actions.OrderBy(x => GetSortingId(x)).ToList();
+
+                    sortedProjectItems.AddRange(sortedActions);
+                    sortedProjectItems.Add(currentEvent);
+                }
+
+                //var sortedIds = sortedProjectItems.Select(x => $"{GetSortingId(x)}-{x.GetType().Name}").ToList();
+                return sortedProjectItems;
             }
-
-            //var sortedIds = sortedProjectItems.Select(x => $"{GetSortingId(x)}-{x.GetType().Name}").ToList();
-            return sortedProjectItems;
         }
 
         uint GetSortingId(IAudioProjectHircItem item) => item.SerializationId;

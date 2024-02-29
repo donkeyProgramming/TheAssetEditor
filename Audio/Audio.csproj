@@ -6,6 +6,94 @@
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
 
+
+	<ItemGroup>
+	  <Compile Remove="Resources\WavToWemWwiseProject\Actor-Mixer Hierarchy\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Attenuations\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Audio Devices\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Control Surface Sessions\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Conversion Settings\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Dynamic Dialogue\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Effects\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Events\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Game Parameters\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Interactive Music Hierarchy\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Master-Mixer Hierarchy\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Mixing Sessions\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Modulators\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Presets\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Queries\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\SoundBanks\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Soundcaster Sessions\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\States\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Switches\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Triggers\**" />
+	  <Compile Remove="Resources\WavToWemWwiseProject\Virtual Acoustics\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Actor-Mixer Hierarchy\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Attenuations\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Audio Devices\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Control Surface Sessions\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Conversion Settings\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Dynamic Dialogue\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Effects\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Events\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Game Parameters\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Interactive Music Hierarchy\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Master-Mixer Hierarchy\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Mixing Sessions\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Modulators\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Presets\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Queries\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\SoundBanks\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Soundcaster Sessions\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\States\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Switches\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Triggers\**" />
+	  <EmbeddedResource Remove="Resources\WavToWemWwiseProject\Virtual Acoustics\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Actor-Mixer Hierarchy\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Attenuations\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Audio Devices\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Control Surface Sessions\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Conversion Settings\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Dynamic Dialogue\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Effects\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Events\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Game Parameters\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Interactive Music Hierarchy\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Master-Mixer Hierarchy\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Mixing Sessions\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Modulators\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Presets\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Queries\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\SoundBanks\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Soundcaster Sessions\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\States\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Switches\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Triggers\**" />
+	  <None Remove="Resources\WavToWemWwiseProject\Virtual Acoustics\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Actor-Mixer Hierarchy\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Attenuations\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Audio Devices\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Control Surface Sessions\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Conversion Settings\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Dynamic Dialogue\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Effects\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Events\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Game Parameters\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Interactive Music Hierarchy\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Master-Mixer Hierarchy\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Mixing Sessions\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Modulators\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Presets\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Queries\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\SoundBanks\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Soundcaster Sessions\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\States\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Switches\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Triggers\**" />
+	  <Page Remove="Resources\WavToWemWwiseProject\Virtual Acoustics\**" />
+	</ItemGroup>
+
   <ItemGroup>
     <None Remove="Resources\vgstream\avcodec-vgmstream-58.dll" />
     <None Remove="Resources\vgstream\avformat-vgmstream-58.dll" />
@@ -25,6 +113,7 @@
     <None Remove="Resources\vgstream\USAGE.md" />
     <None Remove="Resources\vgstream\vgstream.exe" />
     <None Remove="Resources\vgstream\xmp-vgmstream.dll" />
+    <None Remove="Resources\WavToWemWwiseProject\WavToWemWwiseProject.zip" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +135,7 @@
     <EmbeddedResource Include="Resources\vgstream\USAGE.md" />
     <EmbeddedResource Include="Resources\vgstream\vgstream.exe" />
     <EmbeddedResource Include="Resources\vgstream\xmp-vgmstream.dll" />
+    <EmbeddedResource Include="Resources\WavToWemWwiseProject\WavToWemWwiseProject.zip" />
   </ItemGroup>
 
   <ItemGroup>

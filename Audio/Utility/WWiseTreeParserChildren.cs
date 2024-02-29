@@ -10,6 +10,59 @@ using System.Linq;
 
 namespace Audio.AudioEditor
 {
+
+    public class DialogEventInfoPrinter
+    {
+        private readonly IAudioRepository _repository;
+
+        public DialogEventInfoPrinter(IAudioRepository repository)
+        {
+            _repository = repository;
+        }
+
+        public void PrintDialogEventInfos()
+        {
+            // Retrieve all HircItem instances from the repository.
+            var allHircItems = _repository.GetAllOfType<HircItem>();
+
+            // Filter those that are ICADialogEvent.
+            var dialogEvents = allHircItems.OfType<ICADialogEvent>();
+
+            foreach (var dialogEvent in dialogEvents)
+            {
+                PrintDialogEventInfo(dialogEvent);
+            }
+        }
+
+        private void PrintDialogEventInfo(ICADialogEvent dialogEvent)
+        {
+            var hircItem = dialogEvent as HircItem; // Assuming HircItem is the base type with an Id
+            if (hircItem == null)
+            {
+                throw new InvalidCastException("dialogEvent is not a HircItem.");
+            }
+
+            DecisionPathHelper helper = new DecisionPathHelper(_repository);
+            var paths = helper.GetDecisionPaths(dialogEvent);
+
+            // Splitting the string by '.' and enclosing each part in quotes
+            var splitPaths = paths.Header.GetAsString().Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)
+                              .Select(part => $"\"{part}\"")
+                              .ToArray();
+
+            // Joining the quoted strings with a comma and a space, and enclosing the result in brackets
+            var formattedPaths = "[" + string.Join(", ", splitPaths) + "]";
+
+            // Format the information with quotes around the dialog event and the modified path string
+            var info = $"\"{_repository.GetNameFromHash(hircItem.Id)}\" : {formattedPaths}";
+
+            Console.WriteLine(info);
+            var filePath = @"C:\Users\george\Desktop\dialogue_events_state_groups.txt";
+            File.AppendAllText(filePath, info + Environment.NewLine);
+
+        }
+    }
+
     public class WWiseTreeParserChildren : WWiseTreeParserBase
     {
         public WWiseTreeParserChildren(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
@@ -31,6 +84,11 @@ namespace Audio.AudioEditor
 
         private void ProcessDialogEvent(HircItem item, HircTreeItem parent)
         {
+
+            // Get all the dialogue event info
+            //var printer = new DialogEventInfoPrinter(_repository);
+            //printer.PrintDialogEventInfos();
+
             var hirc = GetAsType<ICADialogEvent>(item);
 
             DecisionPathHelper helper = new DecisionPathHelper(_repository);
@@ -58,8 +116,8 @@ namespace Audio.AudioEditor
 
             /*
             // Generate CSV of strings (triggered when an event is searched)
-            var lines = File.ReadLines("C:\\Users\\georg\\Desktop\\hirc_ids.csv");
-            using (var file = File.CreateText("C:\\Users\\georg\\Desktop\\hirc_names.csv"))
+            var lines = File.ReadLines("C:\\Users\\george\\Desktop\\hirc_ids.csv");
+            using (var file = File.CreateText("C:\\Users\\george\\Desktop\\hirc_names.csv"))
             foreach (var line in lines)
             {
                 var name = _repository.GetNameFromHash(Convert.ToUInt32(line));

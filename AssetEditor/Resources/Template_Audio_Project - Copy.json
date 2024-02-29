@@ -1,0 +1,27 @@
+{
+  "Settings": {
+    "BnkName": "global_movies__template", // The name of your bank should take the same name as the vanilla bank for everything before the "__", everything after can be custom.
+    "Language": "english(uk)" // The language folder within the Wwise folder that the project is output to.
+  },
+
+  "Project": [
+    {
+      "Event": "Play_example_event_name", // Names of events should be unique and start with 'Play_'.
+      "Type": "Default", // Default or none = normal event. Music = music event. Not sure if this works or not though. Might need to be a whole different object
+      "SoundContainerType": "Random", // Delete this setting when using just one sound, when using multiple sounds use "Random" for a random container or "Sequence" for a sequence container.
+      "Sounds": [ 
+        "C:\\path\\to\\wet-fart-6139.wav" 
+      ],
+      "ActorMixer": "123456789"
+    },
+    {
+      "Event": "Play_example_event_name",
+      "Type": "Default",
+      "SoundContainerType": "Random",
+      "Sounds": [
+        "C:\\path\\to\\wet-fart-6139.wav"
+      ],
+      "ActorMixer": "123456789"
+    }
+  ]
+}
