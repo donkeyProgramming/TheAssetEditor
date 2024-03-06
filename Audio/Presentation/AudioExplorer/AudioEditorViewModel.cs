@@ -127,7 +127,7 @@ namespace Audio.Presentation.AudioExplorer
             var substringFrom = "\"SourceId\": \"";
             var substringTo = "\",";
             var substringStart = hircInitialSubstring.IndexOf(substringFrom) + substringFrom.Length;
-            var substringEnd = hircInitialSubstring.LastIndexOf(substringTo);
+            var substringEnd = hircInitialSubstring.IndexOf(substringTo, substringStart);
             var sourceID = hircInitialSubstring.Substring(substringStart, substringEnd - substringStart);
 
             _soundPlayer.PlaySound(sourceID, TreeList.First().Item.Id);

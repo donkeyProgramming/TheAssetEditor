@@ -21,18 +21,18 @@ namespace Audio.AudioEditor
 
         private void FindParentLayerContainer(HircItem item, HircTreeItem parent)
         {
-            var layerContainer = GetAsType<CAkLayerCntr_v136>(item);
-            var layerNode = new HircTreeItem() { DisplayName = $"Layer Container {GetDisplayId(item.Id, item.OwnerFile, false)} {GetParentInfo(layerContainer.NodeBaseParams.DirectParentID)}", Item = item };
+            var layerContainer = GetAsType<ICAkLayerCntr>(item);
+            var layerNode = new HircTreeItem() { DisplayName = $"Layer Container {GetDisplayId(item.Id, item.OwnerFile, false)} {GetParentInfo(layerContainer.GetDirectParentId())}", Item = item };
             parent.Children.Add(layerNode);
-            ProcessNext(layerContainer.NodeBaseParams.DirectParentID, layerNode);
+            ProcessNext(layerContainer.GetDirectParentId(), layerNode);
         }
 
         private void FindParentSwitchControl(HircItem item, HircTreeItem parent)
         {
-            var wwiseObject = GetAsType<CAkSwitchCntr_v136>(item);
-            var switchNode = new HircTreeItem() { DisplayName = $"Switch Container {GetDisplayId(item.Id, item.OwnerFile, false)} {GetParentInfo(wwiseObject.NodeBaseParams.DirectParentID)}", Item = item };
+            var wwiseObject = GetAsType<ICAkSwitchCntr>(item);
+            var switchNode = new HircTreeItem() { DisplayName = $"Switch Container {GetDisplayId(item.Id, item.OwnerFile, false)} {GetParentInfo(wwiseObject.GetDirectParentId())}", Item = item };
             parent.Children.Add(switchNode);
-            ProcessNext(wwiseObject.NodeBaseParams.DirectParentID, switchNode);
+            ProcessNext(wwiseObject.GetDirectParentId(), switchNode);
         }
 
         private void FindParentRandContainer(HircItem item, HircTreeItem parent)
@@ -45,10 +45,10 @@ namespace Audio.AudioEditor
 
         private void FindParentActorMixer(HircItem item, HircTreeItem parent)
         {
-            var actorMixer = GetAsType<CAkActorMixer_v136>(item);
-            var node = new HircTreeItem() { DisplayName = $"Actor Mixer {GetDisplayId(item.Id, item.OwnerFile, false)} {GetParentInfo(actorMixer.NodeBaseParams.DirectParentID)}", Item = item };
+            var actorMixer = GetAsType<ICAkActorMixer>(item);
+            var node = new HircTreeItem() { DisplayName = $"Actor Mixer {GetDisplayId(item.Id, item.OwnerFile, false)} {GetParentInfo(actorMixer.GetDirectParentId())}", Item = item };
             parent.Children.Add(node);
-            ProcessNext(actorMixer.NodeBaseParams.DirectParentID, node);
+            ProcessNext(actorMixer.GetDirectParentId(), node);
         }
 
 

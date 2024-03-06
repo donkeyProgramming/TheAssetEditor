@@ -40,5 +40,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public uint GroupId { get => ulGroupID; }
         public uint DefaultSwitch { get => ulDefaultSwitch; }
+
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
     }
 }
