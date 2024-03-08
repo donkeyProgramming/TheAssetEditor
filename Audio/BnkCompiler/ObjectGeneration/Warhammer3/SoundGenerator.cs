@@ -54,9 +54,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 NodeBaseParams = nodeBaseParams
             };
 
-            var mixer = project.GetActionMixerForObject(inputSound.Name);
-            if (mixer != null)
-                wwiseSound.NodeBaseParams.DirectParentID = project.GetHircItemIdFromName(mixer.Name);
+            wwiseSound.NodeBaseParams.DirectParentID = project.GetHircItemIdFromName(inputSound.DirectParentID);
 
             wwiseSound.UpdateSize();
             return wwiseSound;
