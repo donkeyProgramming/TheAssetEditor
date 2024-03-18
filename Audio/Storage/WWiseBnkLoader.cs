@@ -58,7 +58,7 @@ namespace Audio.Storage
         public LoadResult LoadBnkFiles(bool onlyEnglish = true)
         {
             var bankFiles = _pfs.FindAllWithExtentionIncludePaths(".bnk");
-            var bankFilesAsDictionary = bankFiles.ToDictionary(x => x.FileName, x => x.Pack);
+            var bankFilesAsDictionary = bankFiles.GroupBy(f => f.FileName).ToDictionary(g => g.Key, g => g.Last().Pack);
             var removeFilter = new List<string>() { "media", "init.bnk", "animation_blood_data.bnk" };
             if (onlyEnglish)
                 removeFilter.AddRange(new List<string>() { "chinese", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" });

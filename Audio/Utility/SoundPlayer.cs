@@ -72,6 +72,8 @@ namespace Audio.Utility
             var audioFile = _pfs.FindFile($"audio\\wwise\\{soundId}.wem");
             if (audioFile == null)
                 audioFile = _pfs.FindFile($"audio\\wwise\\{language}\\{soundId}.wem");
+            if (audioFile == null) // Attila
+                audioFile = _pfs.FindFile($"audio\\{soundId}.wem");
             return audioFile;
         }
     }

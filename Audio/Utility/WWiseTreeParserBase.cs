@@ -112,7 +112,7 @@ namespace Audio.AudioEditor
         {
             var wanted = instance as Wanted;
             if (wanted == null)
-                throw new Exception();
+                throw new Exception($"HircItem with ID {instance.Id} is of type {instance.GetType().Name} and cannot be converted to {typeof(Wanted).Name}.");
             return wanted;
         }
     }

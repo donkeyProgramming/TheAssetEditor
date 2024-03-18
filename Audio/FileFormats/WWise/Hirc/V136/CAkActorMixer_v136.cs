@@ -34,6 +34,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         }
 
         public List<uint> GetChildren() => Children.ChildIdList;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
     }
 }
 

@@ -31,10 +31,12 @@ namespace Audio.FileFormats.WWise.Hirc
     public interface ICAkActorMixer
     {
         public List<uint> GetChildren();
+        public uint GetDirectParentId();
     }
 
     public interface ICAkSwitchCntr
     {
+        public uint GetDirectParentId();
         public List<ICAkSwitchPackage> SwitchList { get; }
 
         uint GroupId { get; }
@@ -55,6 +57,7 @@ namespace Audio.FileFormats.WWise.Hirc
     public interface ICAkLayerCntr
     {
         public List<uint> GetChildren();
+        public uint GetDirectParentId();
     }
 
 

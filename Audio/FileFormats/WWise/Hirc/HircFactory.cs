@@ -52,6 +52,7 @@ namespace Audio.FileFormats.WWise.Hirc
         static HircFactory CreateFactory_v112()
         {
             var instance = new HircFactory();
+            instance.RegisterHirc(HircType.ActorMixer, () => new V112.CAkActorMixer_v112());
             instance.RegisterHirc(HircType.Sound, () => new V112.CAkSound_V112());
             instance.RegisterHirc(HircType.Event, () => new V112.CAkEvent_v112());
             instance.RegisterHirc(HircType.Action, () => new V112.CAkAction_v112());
