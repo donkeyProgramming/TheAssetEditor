@@ -36,6 +36,7 @@ namespace Audio.BnkCompiler
     public class GameSound : IAudioProjectHircItem
     {
         public string Path { get; set; }
+        public string DirectParentID { get; set; } = null;
     }
 
     public class ActorMixer : IAudioProjectHircItem
@@ -76,7 +77,7 @@ namespace Audio.BnkCompiler
             // Compute the write ids
             Events.ForEach(x => Process(x, false, WWiseHash.Compute));
             Actions.ForEach(x => Process(x, allowOverrideIdForActions, WWiseHash.Compute));
-            GameSounds.ForEach(x => Process(x, allowOverrideIdForSounds, WWiseHash.Compute30));
+            GameSounds.ForEach(x => Process(x, allowOverrideIdForSounds, WWiseHash.Compute));
             ActorMixers.ForEach(x => Process(x, allowOverrideIdForMixers, WWiseHash.Compute));
             RandomContainers.ForEach(x => Process(x, false, WWiseHash.Compute));
         }

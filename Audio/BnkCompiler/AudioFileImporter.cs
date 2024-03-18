@@ -74,7 +74,7 @@ namespace Audio.BnkCompiler
             var wemPath = $"{audioFolderPath}\\{newFileName}";
 
             // Compute hash
-            var hashName = WWiseHash.Compute30(newFileName);
+            var hashName = WWiseHash.Compute(newFileName);
 
             // Load
             var createdFiles = PackFileUtil.LoadFilesFromDisk(_pfs, new PackFileUtil.FileRef(wemPath, GetExpectedFolder(compilerData), $"{hashName}.wem"));

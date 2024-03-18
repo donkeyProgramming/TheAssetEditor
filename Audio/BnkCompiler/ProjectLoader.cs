@@ -122,7 +122,7 @@ namespace Audio.BnkCompiler
 
                 foreach (var mixerItem in mixers)
                 {
-                    if (mixerItem.Name == mixerId)
+                    if (mixerItem.DirectParentId == mixerParent)
                     {
                         isMixerAdded = true;
                         break;
@@ -148,12 +148,13 @@ namespace Audio.BnkCompiler
                 currentItem = currentItem + 1;
                 var eventId = item.Event;
                 var mixerId = $"{item.Event}_mixer";
+                var mixerParent = item.ActorMixer;
                 var defaultSound = new GameSound();
                 var currentMixer = new ActorMixer();
 
                 foreach (var mixerItem in mixers)
                 {
-                    if (mixerItem.Name == mixerId)
+                    if (mixerItem.DirectParentId == mixerParent)
                     {
                         currentMixer = mixerItem;
                         break;
@@ -169,14 +170,15 @@ namespace Audio.BnkCompiler
                         foreach (var sound in item.Sounds)
                         {
                             currentSound = currentSound + 1;
-                            var soundId = $"{eventId}_{currentSound}_sound";
-                            var actionId = $"{eventId}_action";
+                            var soundId = $"{eventId}_sound_{currentSound}";
+                            var actionId = $"{eventId}_action_{currentSound}";
                             var containerId = $"{eventId}_random_container";
 
                             defaultSound = new GameSound()
                             {
                                 Name = soundId,
                                 Path = sound,
+                                DirectParentID = containerId
                             };
 
                             compilerData.GameSounds.Add(defaultSound);
@@ -220,13 +222,14 @@ namespace Audio.BnkCompiler
                     foreach (var sound in item.Sounds)
                     {
                         currentSound = currentSound + 1;
-                        var soundId = $"{eventId}_{currentSound}_sound";
-                        var actionId = $"{eventId}_{currentSound}_action";
+                        var soundId = $"{eventId}_sound_{currentSound}";
+                        var actionId = $"{eventId}_action_{currentSound}";
 
                         defaultSound = new GameSound()
                         {
                             Name = soundId,
                             Path = sound,
+                            DirectParentID = mixerId
                         };
 
                         currentMixer.Children.Add(soundId);

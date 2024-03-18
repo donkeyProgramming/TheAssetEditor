@@ -45,11 +45,13 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 ChildIdList = allChildIds
             };
 
-            var akPlaylistItem = new AkPlaylistItem();
             foreach (var childId in allChildIds)
             {
-                akPlaylistItem.PlayId = childId;
-                akPlaylistItem.Weight = 50000;
+                var akPlaylistItem = new AkPlaylistItem
+                {
+                    PlayId = childId,
+                    Weight = 50000
+                };
                 wwiseRandomContainer.AkPlaylist.Add(akPlaylistItem);
             }
 
