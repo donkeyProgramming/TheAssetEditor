@@ -177,6 +177,55 @@ namespace AnimationMeta.FileTypes.Definitions
         [MetaDataTag(17)]
         public float BlendOutTime { get; set; }
     }
+    
+    [MetaData("PROP", 15)]
+    public class Prop_v15 : DecodedMetaEntryBase
+    {
+        // new field
+        [MetaDataTag(5, "")]
+        public bool Unknownbool_v15 { get; set; }
+
+        // the rest from previous versions
+        [MetaDataTag(6, "")]
+        public bool Unknownbool { get; set; }
+        
+        [MetaDataTag(7)]
+        public bool DistanceCulled { get; set; }
+
+        [MetaDataTag(8)]
+        public string ModelName { get; set; } = "";
+
+        [MetaDataTag(9)]
+        public string AnimationName { get; set; } = "";
+
+        [MetaDataTag(10)]
+        public string MetaData { get; set; } = "";
+
+        [MetaDataTag(11)]
+        public Vector3 Position { get; set; }
+
+        [MetaDataTag(12, "", MetaDataTagAttribute.DisplayType.EulerVector)]
+        public Vector4 Orientation { get; set; } = new Vector4(0, 0, 0, 1);
+
+        [MetaDataTag(13)]
+        public float Scale { get; set; } = 1;
+
+        [MetaDataTag(14)]
+        public int BoneId { get; set; }
+
+        [MetaDataTag(15, "bind_pose (1), animation (2), zeroed (3), skinned (4)")]
+        public int AttachMethod { get; set; }
+
+        [MetaDataTag(16, "projectile (1) ,weapon_1 (2) ,weapon_2 (3) ,weapon_3 (4) ,weapon_4 (5) ,weapon_5 (6),weapon_6 (7)")]
+        public int OverrideProp { get; set; }
+
+        [MetaDataTag(17)]
+        public float BlendInTime { get; set; }
+
+        [MetaDataTag(18)]
+        public float BlendOutTime { get; set; }
+    }
+
 
 
     // YOBANNYI VROT ETO KASINO
