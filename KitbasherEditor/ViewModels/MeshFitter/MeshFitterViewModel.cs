@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommonControls.BaseDialogs;
-using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.MathViews;
 using GameFiles.Animation;

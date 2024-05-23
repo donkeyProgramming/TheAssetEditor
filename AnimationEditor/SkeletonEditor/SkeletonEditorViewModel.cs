@@ -4,7 +4,6 @@ using System.IO;
 using System.Windows;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
-using CommonControls.Common;
 using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
 using GameFiles.Animation;

@@ -1,11 +1,6 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
+﻿using Microsoft.Xna.Framework;
 
-using System;
-using Microsoft.Xna.Framework;
-
-namespace CommonControls.Common
+namespace SharedCore.Misc
 {
     public class MathUtil
     {
@@ -25,7 +20,7 @@ namespace CommonControls.Common
 
         public static Vector3 GetCenter(BoundingBox box)
         {
-            Vector3 finalPos = Vector3.Zero;
+            var finalPos = Vector3.Zero;
             var corners = box.GetCorners();
             foreach (var corner in corners)
                 finalPos += corner;
@@ -65,7 +60,7 @@ namespace CommonControls.Common
             length = v.X * v.X + v.Y * v.Y + v.Z * v.Z;
             if (length != 0)
             {
-                float isqrt = 1.0f / (float)Math.Sqrt(length);
+                var isqrt = 1.0f / (float)Math.Sqrt(length);
                 length *= isqrt;
                 v.X *= isqrt;
                 v.Y *= isqrt;
@@ -121,8 +116,8 @@ namespace CommonControls.Common
             //Modified to return 0,0,0 when it would have returned NaN
             //due to divide by zero.
             angle = (float)Math.Acos(q.W);
-            float sa = (float)Math.Sin(angle);
-            float ooScale = 0f;
+            var sa = (float)Math.Sin(angle);
+            var ooScale = 0f;
             if (sa != 0)
                 ooScale = 1.0f / sa;
             angle *= 2.0f;
@@ -169,7 +164,7 @@ namespace CommonControls.Common
                     new Vector3(0, 0, 1),
                 };
             }
-            Matrix rotationM = new Matrix(
+            var rotationM = new Matrix(
                 Vector3.Dot(basis[0], vectors[0]), Vector3.Dot(basis[1], vectors[0]), Vector3.Dot(basis[2], vectors[0]), 0,
                 Vector3.Dot(basis[0], vectors[1]), Vector3.Dot(basis[1], vectors[1]), Vector3.Dot(basis[2], vectors[1]), 0,
                 Vector3.Dot(basis[0], vectors[2]), Vector3.Dot(basis[1], vectors[2]), Vector3.Dot(basis[2], vectors[2]), 0,
@@ -194,15 +189,15 @@ namespace CommonControls.Common
 
         public static void Barycentric(Vector3 a, Vector3 b, Vector3 c, Vector3 p, out float u, out float v, out float w)
         {
-            Vector3 v0 = b - a;
-            Vector3 v1 = c - a;
-            Vector3 v2 = p - a;
-            float d00 = Vector3.Dot(v0, v0);
-            float d01 = Vector3.Dot(v0, v1);
-            float d11 = Vector3.Dot(v1, v1);
-            float d20 = Vector3.Dot(v2, v0);
-            float d21 = Vector3.Dot(v2, v1);
-            float denom = d00 * d11 - d01 * d01;
+            var v0 = b - a;
+            var v1 = c - a;
+            var v2 = p - a;
+            var d00 = Vector3.Dot(v0, v0);
+            var d01 = Vector3.Dot(v0, v1);
+            var d11 = Vector3.Dot(v1, v1);
+            var d20 = Vector3.Dot(v2, v0);
+            var d21 = Vector3.Dot(v2, v1);
+            var denom = d00 * d11 - d01 * d01;
             v = (d11 * d20 - d01 * d21) / denom;
             w = (d00 * d21 - d01 * d20) / denom;
             u = 1.0f - v - w;
@@ -211,43 +206,43 @@ namespace CommonControls.Common
         public static Vector3 ClosestPtPointTriangle(Vector3 p, Vector3 a, Vector3 b, Vector3 c)
         {
             //http://www.r-5.org/files/books/computers/algo-list/realtime-3d/Christer_Ericson-Real-Time_Collision_Detection-EN.pdf
-            Vector3 ab = b - a;
-            Vector3 ac = c - a;
-            Vector3 bc = c - b;
+            var ab = b - a;
+            var ac = c - a;
+            var bc = c - b;
             // Compute parametric position s for projection P’ of P on AB,
             // P’ = A + s*AB, s = snom/(snom+sdenom)
 
-            float snom = Vector3.Dot(p - a, ab);
-            float sdenom = Vector3.Dot(p - b, a - b);
+            var snom = Vector3.Dot(p - a, ab);
+            var sdenom = Vector3.Dot(p - b, a - b);
 
             // Compute parametric position t for projection P’ of P on AC,
             // P’ = A + t*AC, s = tnom/(tnom+tdenom)
 
-            float tnom = Vector3.Dot(p - a, ac);
-            float tdenom = Vector3.Dot(p - c, a - c);
+            var tnom = Vector3.Dot(p - a, ac);
+            var tdenom = Vector3.Dot(p - c, a - c);
             if (snom <= 0.0f && tnom <= 0.0f) return a; // Vertex region early out
                                                         // Compute parametric position u for projection P’ of P on BC,
                                                         // P’ = B + u*BC, u = unom/(unom+udenom)
-            float unom = Vector3.Dot(p - b, bc);
-            float udenom = Vector3.Dot(p - c, b - c);
+            var unom = Vector3.Dot(p - b, bc);
+            var udenom = Vector3.Dot(p - c, b - c);
             if (sdenom <= 0.0f && unom <= 0.0f) return b; // Vertex region early out
             if (tdenom <= 0.0f && udenom <= 0.0f) return c; // Vertex region early out
                                                             // P is outside (or on) AB if the triple scalar product [N PA PB] <= 0
-            Vector3 n = Vector3.Cross(b - a, c - a);
+            var n = Vector3.Cross(b - a, c - a);
 
-            float vc = Vector3.Dot(n, Vector3.Cross(a - p, b - p));
+            var vc = Vector3.Dot(n, Vector3.Cross(a - p, b - p));
             // If P outside AB and within feature region of AB,
             // return projection of P onto AB
             if (vc <= 0.0f && snom >= 0.0f && sdenom >= 0.0f)
                 return a + snom / (snom + sdenom) * ab;
             // P is outside (or on) BC if the triple scalar product [N PB PC] <= 0
-            float va = Vector3.Dot(n, Vector3.Cross(b - p, c - p));
+            var va = Vector3.Dot(n, Vector3.Cross(b - p, c - p));
             // If P outside BC and within feature region of BC,
             // return projection of P onto BC
             if (va <= 0.0f && unom >= 0.0f && udenom >= 0.0f)
                 return b + unom / (unom + udenom) * bc;
             // P is outside (or on) CA if the triple scalar product [N PC PA] <= 0
-            float vb = Vector3.Dot(n, Vector3.Cross(c - p, a - p));
+            var vb = Vector3.Dot(n, Vector3.Cross(c - p, a - p));
 
             // If P outside CA and within feature region of CA,
             // return projection of P onto CA
@@ -255,9 +250,9 @@ namespace CommonControls.Common
                 return a + tnom / (tnom + tdenom) * ac;
 
             // P must project inside face region. Compute Q using barycentric coordinates
-            float u = va / (va + vb + vc);
-            float v = vb / (va + vb + vc);
-            float w = 1.0f - u - v; // = vc / (va + vb + vc)
+            var u = va / (va + vb + vc);
+            var v = vb / (va + vb + vc);
+            var w = 1.0f - u - v; // = vc / (va + vb + vc)
 
             return u * a + v * b + w * c;
         }
@@ -302,17 +297,17 @@ namespace CommonControls.Common
         public static Quaternion EulerToQuaternions(double heading, double attitude, double bank)
         {
             // Assuming the angles are in radians.
-            double c1 = Math.Cos(heading);
-            double s1 = Math.Sin(heading);
-            double c2 = Math.Cos(attitude);
-            double s2 = Math.Sin(attitude);
-            double c3 = Math.Cos(bank);
-            double s3 = Math.Sin(bank);
-            double w = Math.Sqrt(1.0 + c1 * c2 + c1 * c3 - s1 * s2 * s3 + c2 * c3) / 2.0;
-            double w4 = (4.0 * w);
-            double x = (c2 * s3 + c1 * s3 + s1 * s2 * c3) / w4;
-            double y = (s1 * c2 + s1 * c3 + c1 * s2 * s3) / w4;
-            double z = (-s1 * s3 + c1 * s2 * c3 + s2) / w4;
+            var c1 = Math.Cos(heading);
+            var s1 = Math.Sin(heading);
+            var c2 = Math.Cos(attitude);
+            var s2 = Math.Sin(attitude);
+            var c3 = Math.Cos(bank);
+            var s3 = Math.Sin(bank);
+            var w = Math.Sqrt(1.0 + c1 * c2 + c1 * c3 - s1 * s2 * s3 + c2 * c3) / 2.0;
+            var w4 = 4.0 * w;
+            var x = (c2 * s3 + c1 * s3 + s1 * s2 * c3) / w4;
+            var y = (s1 * c2 + s1 * c3 + c1 * s2 * s3) / w4;
+            var z = (-s1 * s3 + c1 * s2 * c3 + s2) / w4;
 
             return new Quaternion((float)x, (float)y, (float)z, (float)w);
         }

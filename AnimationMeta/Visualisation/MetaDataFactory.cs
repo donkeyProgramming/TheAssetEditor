@@ -2,13 +2,13 @@
 using AnimationMeta.FileTypes.Parsing;
 using AnimationMeta.Visualisation.Instances;
 using AnimationMeta.Visualisation.Rules;
-using CommonControls.Common;
 using CommonControls.Services;
 using GameFiles.Animation;
 using GameFiles.AnimationPack;
 using Microsoft.Xna.Framework;
 using Serilog;
 using SharedCore;
+using SharedCore.Misc;
 using SharedCore.PackFiles;
 using System;
 using System.Collections.Generic;

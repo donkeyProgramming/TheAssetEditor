@@ -1,6 +1,6 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
-using CommonControls.Common;
 using Microsoft.Xna.Framework;
+using SharedCore.Misc;
 using View3D.Animation;
 
 namespace AnimationEditor.SkeletonEditor

@@ -2,8 +2,8 @@
 using Matrix = Microsoft.Xna.Framework.Matrix;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
-using CommonControls.Common;
 using AssetManagement.GenericFormats.DataStructures.Managed;
+using SharedCore.Misc;
 
 namespace AssetManagement.GenericFormats.DataStructures.Unmanaged
 {

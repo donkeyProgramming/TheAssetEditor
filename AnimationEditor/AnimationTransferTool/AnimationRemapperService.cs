@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
-using CommonControls.Editors.BoneMapping;
+﻿using CommonControls.Editors.BoneMapping;
 using Microsoft.Xna.Framework;
+using SharedCore.Misc;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Animation;

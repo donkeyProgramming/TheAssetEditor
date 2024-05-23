@@ -7,6 +7,7 @@ using CommonControls;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SharedCore.Misc;
 using SharedCore.ToolCreation;
 using TextureEditor;
 using View3D;

@@ -1,5 +1,5 @@
-﻿using CommonControls;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SharedCore.Misc;
 using SharedCore.ToolCreation;
 using TextureEditor.ViewModels;
 using TextureEditor.Views;
