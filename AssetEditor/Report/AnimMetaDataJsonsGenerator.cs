@@ -1,4 +1,7 @@
-﻿using AnimationMeta.FileTypes.Parsing;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
 using CommonControls.Editors.AnimationPack.Converters;
 using CommonControls.Services;
 using GameFiles.Animation;
@@ -6,23 +9,20 @@ using GameFiles.AnimationPack;
 using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;
 using Newtonsoft.Json;
 using Serilog;
+using Shared.GameFiles.AnimationMeta.Parsing;
 using SharedCore;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
 
 namespace AssetEditor.Report
 {
     class AnimMetaDataJsonsGenerator
     {
-        ILogger _logger = Logging.Create<AnimMetaDataJsonsGenerator>();
-        PackFileService _pfs;
-        ApplicationSettingsService _settingsService;
+        private readonly ILogger _logger = Logging.Create<AnimMetaDataJsonsGenerator>();
+        private readonly PackFileService _pfs;
+        private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
-        JsonSerializerSettings _jsonOptions;
+        private readonly JsonSerializerSettings _jsonOptions;
 
         public AnimMetaDataJsonsGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {

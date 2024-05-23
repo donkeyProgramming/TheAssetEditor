@@ -3,13 +3,13 @@
 // See the LICENSE file in the project root for more information.
 
 using Shared.GameFiles.AnimationMeta.Parsing;
-using SharedCore.Misc;
 
-namespace AnimationMeta.Presentation
+namespace Shared.GameFiles.AnimationMeta.Definitions
 {
-    public class MetaDataTagCopyItem : ICopyPastItem
+    [MetaData("ALPHA", 10)]
+    public class Alpha_v10 : DecodedMetaEntryBase
     {
-        public string Description { get; set; } = "Copy object for MetaDataTag";
-        public UnknownMetaEntry Data { get; set; }
+        [MetaDataTag(5, "This might be a %, 0 = invisible and 1 = visible.")]
+        public float DesiredAlpha { get; set; }
     }
 }

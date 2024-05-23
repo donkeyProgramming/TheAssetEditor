@@ -3,13 +3,13 @@
 // See the LICENSE file in the project root for more information.
 
 using Shared.GameFiles.AnimationMeta.Parsing;
-using SharedCore.Misc;
 
-namespace AnimationMeta.Presentation
+namespace Shared.GameFiles.AnimationMeta.Definitions
 {
-    public class MetaDataTagCopyItem : ICopyPastItem
+    [MetaData("CAMERA_SHAKE_SCALE", 10)]
+    public class CameraShakeScale : DecodedMetaEntryBase
     {
-        public string Description { get; set; } = "Copy object for MetaDataTag";
-        public UnknownMetaEntry Data { get; set; }
+        [MetaDataTag(5)]
+        public float Value { get; set; }
     }
 }

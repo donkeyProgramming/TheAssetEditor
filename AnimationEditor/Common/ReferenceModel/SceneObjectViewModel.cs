@@ -1,6 +1,6 @@
-﻿using AnimationMeta.FileTypes.Parsing;
-using AnimationMeta.Visualisation;
+﻿using AnimationMeta.Visualisation;
 using CommonControls.Services;
+using Shared.GameFiles.AnimationMeta.Parsing;
 using SharedCore;
 using SharedCore.Misc;
 using SharedCore.PackFiles;

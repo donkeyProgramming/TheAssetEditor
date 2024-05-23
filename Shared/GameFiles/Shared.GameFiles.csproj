@@ -10,4 +10,8 @@
     <ProjectReference Include="..\SharedCore\Shared.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AnimationMeta\" />
+  </ItemGroup>
+
 </Project>

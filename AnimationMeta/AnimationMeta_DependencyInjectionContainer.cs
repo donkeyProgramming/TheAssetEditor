@@ -1,8 +1,8 @@
-﻿using AnimationMeta.FileTypes.Parsing;
-using AnimationMeta.Presentation;
+﻿using AnimationMeta.Presentation;
 using AnimationMeta.Presentation.View;
 using AnimationMeta.Visualisation;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.GameFiles.AnimationMeta.Parsing;
 using SharedCore.Misc;
 using SharedCore.ToolCreation;
 

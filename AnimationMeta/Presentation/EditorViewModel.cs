@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using AnimationMeta.FileTypes.Parsing;
 using AnimationMeta.Presentation.View;
 using Serilog;
+using Shared.GameFiles.AnimationMeta.Parsing;
 using SharedCore;
 using SharedCore.Misc;
 using SharedCore.PackFiles;

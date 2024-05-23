@@ -1,10 +1,10 @@
-﻿using AnimationMeta.FileTypes.Definitions;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Serilog;
-using System;
+using Shared.GameFiles.AnimationMeta.Definitions;
+using SharedCore;
 using View3D.Animation;
 using View3D.Animation.AnimationChange;
-using SharedCore;
 
 namespace AnimationMeta.Visualisation.Rules
 {

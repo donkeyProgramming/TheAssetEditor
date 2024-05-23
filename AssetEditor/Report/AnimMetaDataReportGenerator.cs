@@ -1,21 +1,21 @@
-﻿using AnimationMeta.FileTypes.Parsing;
-using CsvHelper;
-using Serilog;
-using SharedCore;
-using SharedCore.PackFiles;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using CsvHelper;
+using Serilog;
+using Shared.GameFiles.AnimationMeta.Parsing;
+using SharedCore;
+using SharedCore.PackFiles;
 
 namespace AssetEditor.Report
 {
     class AnimMetaDataReportGenerator
     {
-        ILogger _logger = Logging.Create<AnimMetaDataReportGenerator>();
+        private readonly ILogger _logger = Logging.Create<AnimMetaDataReportGenerator>();
 
         class FileReport
         {
@@ -25,8 +25,8 @@ namespace AssetEditor.Report
             public List<string> Headers { get; set; } = new List<string>() { "FileName", "Error" };
         }
 
-        PackFileService _pfs;
-        ApplicationSettingsService _settingsService;
+        private readonly PackFileService _pfs;
+        private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
         public AnimMetaDataReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
