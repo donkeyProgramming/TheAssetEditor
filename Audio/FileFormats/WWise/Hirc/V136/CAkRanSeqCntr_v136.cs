@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 namespace Audio.FileFormats.WWise.Hirc.V136
 {
     public class CAkRanSeqCntr_v136 : CAkRanSeqCnt, INodeBaseParamsAccessor
@@ -52,10 +53,53 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public override uint GetParentId() => NodeBaseParams.DirectParentID;
         public override List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
 
-        public override void UpdateSize() => throw new NotImplementedException();
-        public override byte[] GetAsByteArray() => throw new NotImplementedException();
-    }
+        public override void UpdateSize()
+        {
+            var nodeBaseParams = NodeBaseParams.GetSize();
+            var children = Children.GetSize();
+            var akPlaylistCount = Convert.ToUInt32(AkPlaylist.Count());
 
+            Size = BnkChunkHeader.HeaderByteSize + nodeBaseParams + 2 + 2 + 2 + 4 + 4 + 4 + 2 + 1 + 1 + 1 + 1 + children + 2 + (akPlaylistCount * 8) - 4;
+        }
+
+        public override byte[] GetAsByteArray()
+        {
+            using var memStream = WriteHeader();
+            memStream.Write(NodeBaseParams.GetAsByteArray());
+
+            memStream.Write(ByteParsers.UShort.EncodeValue((ushort)sLoopCount, out _));
+            memStream.Write(ByteParsers.UShort.EncodeValue((ushort)sLoopModMin, out _));
+            memStream.Write(ByteParsers.UShort.EncodeValue((ushort)sLoopModMax, out _));
+
+            memStream.Write(ByteParsers.Single.EncodeValue(fTransitionTime, out _));
+            memStream.Write(ByteParsers.Single.EncodeValue(fTransitionTimeModMin, out _));
+            memStream.Write(ByteParsers.Single.EncodeValue(fTransitionTimeModMax, out _));
+
+            memStream.Write(ByteParsers.UShort.EncodeValue((ushort)wAvoidRepeatCount, out _));
+
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)eTransitionMode, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)eRandomMode, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)eMode, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)byBitVector, out _));
+
+            memStream.Write(Children.GetAsByteArray());
+
+            memStream.Write(ByteParsers.UShort.EncodeValue((ushort)AkPlaylist.Count(), out _));
+            foreach (var akPlaylistItem in AkPlaylist)
+            {
+                memStream.Write(ByteParsers.UInt32.EncodeValue(akPlaylistItem.PlayId, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(Convert.ToUInt32(akPlaylistItem.Weight), out _));
+            }
+            
+            var byteArray = memStream.ToArray();
+
+            // Reload the object to ensure sanity
+            var copyInstance = new CAkRanSeqCntr_v136();
+            copyInstance.Parse(new ByteChunk(byteArray));
+
+            return byteArray;
+        }
+    }
 
     public class AkPlaylistItem
     {

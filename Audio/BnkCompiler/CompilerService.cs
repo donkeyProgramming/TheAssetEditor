@@ -7,7 +7,7 @@ namespace Audio.BnkCompiler
     public class CompilerSettings
     {
         public bool UserOverrideIdForActions { get; set; } = false;
-        public bool UseOverrideIdForMixers { get; set; } = true;
+        public bool UseOverrideIdForMixers { get; set; } = false;
         public bool UseOverrideIdForSounds { get; set; } = false;
         public bool SaveGeneratedCompilerInput { get; set; } = true;
 

@@ -24,6 +24,16 @@ namespace SharedCore
         public bool IsFirstTimeStartingApplication { get; set; } = true;
         public bool IsDeveloperRun { get; set; } = false;
         public bool HideWh2TextureSelectors { get; set; } = false;
+        public string WwisePath { get; set; }
+
+        public ApplicationSettings()
+        {
+            WwisePath = Environment.GetEnvironmentVariable("WWISEROOT") ?? "";
+            if (!string.IsNullOrEmpty(WwisePath))
+            {
+                WwisePath = Path.Combine(WwisePath, "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
+            }
+        }
     }
 
     public class ApplicationSettingsService

@@ -1,0 +1,25 @@
+{
+  "Settings": {
+    "BnkName": "vanilla_bnk_name__template",
+    "Language": "english(uk)"
+  },
+
+  "Project": [
+    {
+      "Event": "Play_template_event_1",
+      "Sounds": [ 
+        "C:\\path\\to\\wet-fart-6139.wav"
+      ],
+      "ActorMixer": "123456789"
+    },
+    {
+      "Event": "Play_template_event_2",
+      "SoundContainerType": "Random",
+      "Sounds": [
+        "C:\\path\\to\\wet-fart-6139.wav",
+        "C:\\path\\to\\wet-fart-6140.wav"
+      ],
+      "ActorMixer": "123456789"
+    }
+  ]
+}

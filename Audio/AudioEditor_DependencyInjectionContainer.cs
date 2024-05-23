@@ -41,6 +41,7 @@ namespace Audio
             serviceCollection.AddScoped<IWWiseHircGenerator, EventGenerator>();
             serviceCollection.AddScoped<IWWiseHircGenerator, SoundGenerator>();
             serviceCollection.AddScoped<IWWiseHircGenerator, ActorMixerGenerator>();
+            serviceCollection.AddScoped<IWWiseHircGenerator, RandomContainerGenerator>();
             serviceCollection.AddScoped<HichBuilder>();
             serviceCollection.AddScoped<BnkHeaderBuilder>();
             serviceCollection.AddScoped<CompilerService>();

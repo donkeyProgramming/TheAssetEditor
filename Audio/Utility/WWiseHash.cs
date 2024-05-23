@@ -22,10 +22,6 @@ namespace Audio.Utility
             return hashValue;
         }
 
-
-
-
-
         public static uint Compute30(string name)
         {
             //v

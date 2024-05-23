@@ -34,8 +34,12 @@ namespace AssetEditor.ViewModels
         bool _hideWh2TextureSelectors;
         public bool HideWh2TextureSelectors { get => _hideWh2TextureSelectors; set => SetAndNotify(ref _hideWh2TextureSelectors, value); }
 
+        string _wwisepath;
+        public string WwisePath { get => _wwisepath; set => SetAndNotify(ref _wwisepath, value); }
+
 
         public ICommand SaveCommand { get; set; }
+        public ICommand BrowseCommand { get; set; }
 
         private readonly ApplicationSettingsService _settingsService;
 
@@ -61,8 +65,10 @@ namespace AssetEditor.ViewModels
             AutoResolveMissingTextures = _settingsService.CurrentSettings.AutoResolveMissingTextures;
             SkipLoadingWemFiles = _settingsService.CurrentSettings.SkipLoadingWemFiles;
             HideWh2TextureSelectors = _settingsService.CurrentSettings.HideWh2TextureSelectors;
+            WwisePath = _settingsService.CurrentSettings.WwisePath;
 
             SaveCommand = new RelayCommand(OnSave);
+            BrowseCommand = new RelayCommand(OnBrowse);
         }
 
         void OnSave()
@@ -74,12 +80,24 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.AutoResolveMissingTextures = AutoResolveMissingTextures;
             _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes = AutoGenerateAttachmentPointsFromMeshes;
             _settingsService.CurrentSettings.HideWh2TextureSelectors = HideWh2TextureSelectors;
+            _settingsService.CurrentSettings.WwisePath = WwisePath;
 
             _settingsService.CurrentSettings.GameDirectories.Clear();
             foreach (var item in GameDirectores)
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair() { Game = item.GameType, Path = item.Path });
 
             _settingsService.Save();
+        }
+
+        void OnBrowse()
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Filter = "Executable files (*.exe)|*.exe";
+            dialog.Multiselect = false;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                WwisePath = dialog.FileName;
+            }
         }
     }
 

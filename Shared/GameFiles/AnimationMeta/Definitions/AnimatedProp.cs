@@ -100,6 +100,11 @@ namespace Shared.GameFiles.AnimationMeta.Definitions
     public class AnimatedProp_v14 : Prop_v14, IAnimatedPropMeta
     {
     }
+    
+    [MetaData("ANIMATED_PROP", 15)]
+    public class AnimatedProp_v15 : Prop_v15, IAnimatedPropMeta
+    {
+    }
 
 
     [MetaData("ANIMATED_PROP", 12, MetaDataAttributePriority.Low)]

@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Audio.FileFormats.WWise.Hirc.ICAkSwitchCntr;
 
 namespace Audio.FileFormats.WWise.Hirc.V112
 {
 
-    public class CAkSwitchCntr_V112 : CAkSwitchCntr
+    public class CAkSwitchCntr_V112 : CAkSwitchCntr, ICAkSwitchCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public AkGroupType eGroupType { get; set; }
@@ -14,7 +15,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
         public uint ulDefaultSwitch { get; set; }    // Default value name
         public byte bIsContinuousValidation { get; set; }
         public Children Children { get; set; }
-        public List<CAkSwitchPackage> SwitchList { get; set; } = new List<CAkSwitchPackage>();
+        public List<ICAkSwitchPackage> SwitchList { get; set; } = new List<ICAkSwitchPackage>();
         public List<AkSwitchNodeParams> Parameters { get; set; } = new List<AkSwitchNodeParams>();
 
         protected override void CreateSpecificData(ByteChunk chunk)
@@ -46,6 +47,8 @@ namespace Audio.FileFormats.WWise.Hirc.V112
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
+
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
     }
 
     public class Children
@@ -63,12 +66,12 @@ namespace Audio.FileFormats.WWise.Hirc.V112
         }
     }
 
-    public class CAkSwitchPackage
+    public class CAkSwitchPackage : ICAkSwitchPackage
     {
         public uint SwitchId { get; set; }  // ID/Name of the switch case
         public List<uint> NodeIdList { get; set; } = new List<uint>(); // Probably the name of something, or at least a reference to something interesting
 
-        public static CAkSwitchPackage Create(ByteChunk chunk)
+        public static ICAkSwitchPackage Create(ByteChunk chunk)
         {
             var instance = new CAkSwitchPackage();
             instance.SwitchId = chunk.ReadUInt32();

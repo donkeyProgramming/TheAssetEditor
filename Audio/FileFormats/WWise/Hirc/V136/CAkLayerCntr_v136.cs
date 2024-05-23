@@ -27,6 +27,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
 
         public List<uint> GetChildren() => Children.ChildIdList;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
     }
 
     public class CAkLayer

@@ -1,12 +1,16 @@
 ﻿using Audio.Utility;
 using CommunityToolkit.Diagnostics;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles;
+using SharpDX.MediaFoundation.DirectX;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace Audio.BnkCompiler
 {
+    using Audio.Utility;
+    using static Audio.Utility.WWiseWavToWem;
+
     public class AudioFileImporter
     {
         private readonly PackFileService _pfs;
@@ -20,6 +24,20 @@ namespace Audio.BnkCompiler
 
         public Result<bool> ImportAudio(CompilerData compilerData)
         {
+            List<string> wavFiles = new List<string>();
+            List<string> wavFilePaths = new List<string>();
+
+            foreach (var gameSound in compilerData.GameSounds)
+            {
+                var wavFile = Path.GetFileName(gameSound.Path);
+                wavFiles.Add(wavFile);
+                wavFilePaths.Add(gameSound.Path);
+            }
+
+            var wavToWem = new WWiseWavToWem();
+            wavToWem.InitialiseWwiseProject();
+            wavToWem.WavToWem(wavFiles, wavFilePaths);
+
             foreach (var gameSound in compilerData.GameSounds)
             {
                 var importType = DetermineImportType(compilerData, gameSound);
@@ -37,43 +55,7 @@ namespace Audio.BnkCompiler
                     if (converterResult.IsSuccess == false)
                         return converterResult;
                 }
-                else if (importType == SoundFileImportType.PackFile)
-                {
-                    var converterResult = ImportFromPackFile(compilerData, gameSound);
-                    if (converterResult.IsSuccess == false)
-                        return converterResult;
-                }
             }
-
-            // Sanity check
-            foreach (var gameSound in compilerData.GameSounds)
-            {
-                Guard.IsNotNullOrWhiteSpace(gameSound.Path);
-                Guard.IsNotNull(_pfs.FindFile(gameSound.Path));
-            }
-
-            return Result<bool>.FromOk(true);
-        }
-
-        private Result<bool> ImportFromPackFile(CompilerData compilerData, GameSound gameSound)
-        {
-            var file = _pfs.FindFile(gameSound.Path);
-            if (file == null)
-                return Result<bool>.FromError("Audio converter", $"Importing from packfile: Unable to find file '{gameSound.Path}' for item '{gameSound.Name}' on disk");
-
-            // Convert file
-            var wemPath = _vgStreamWrapper.ConvertToWem(file);
-            if (wemPath.Failed)
-                return Result<bool>.FromError(wemPath.LogItems);
-
-            // Compute hash
-            var fileName = Path.GetFileName(wemPath.Item);
-            var hashName = WWiseHash.Compute30(fileName);
-
-            // Load
-            var createdFiles = PackFileUtil.LoadFilesFromDisk(_pfs, new PackFileUtil.FileRef(wemPath.Item, GetExpectedFolder(compilerData), $"{hashName}.wem"));
-            gameSound.Path = _pfs.GetFullPath(createdFiles.First());
-
             return Result<bool>.FromOk(true);
         }
 
@@ -83,16 +65,17 @@ namespace Audio.BnkCompiler
                 return Result<bool>.FromError("Audio converter", $"Importing from disk: Unable to find file '{gameSound.Path}' for item '{gameSound.Name}' on disk");
 
             // Convert file
-            var wemPath = _vgStreamWrapper.ConvertToWem(gameSound.Path);
-            if (wemPath.Failed)
-                return Result<bool>.FromError(wemPath.LogItems);
+            var tempFolderPath = $"{DirectoryHelper.Temp}";
+            var audioFolderPath = $"{tempFolderPath}\\Audio";
+            var fileName = Path.GetFileName(gameSound.Path);
+            var newFileName = fileName.Replace(".wav", ".wem");
+            var wemPath = $"{audioFolderPath}\\{newFileName}";
 
             // Compute hash
-            var fileName = Path.GetFileName(wemPath.Item);
-            var hashName = WWiseHash.Compute30(fileName);
+            var hashName = WWiseHash.Compute(newFileName);
 
             // Load
-            var createdFiles = PackFileUtil.LoadFilesFromDisk(_pfs, new PackFileUtil.FileRef(wemPath.Item, GetExpectedFolder(compilerData), $"{hashName}.wem"));
+            var createdFiles = PackFileUtil.LoadFilesFromDisk(_pfs, new PackFileUtil.FileRef(wemPath, GetExpectedFolder(compilerData), $"{hashName}.wem"));
             gameSound.Path = _pfs.GetFullPath(createdFiles.First());
 
             return Result<bool>.FromOk(true);
@@ -139,8 +122,6 @@ namespace Audio.BnkCompiler
             return basePath;
         }
 
-
-
         enum SoundFileImportType
         {
             None,
@@ -148,6 +129,5 @@ namespace Audio.BnkCompiler
             Disk,
             PackFile
         }
-
     }
 }

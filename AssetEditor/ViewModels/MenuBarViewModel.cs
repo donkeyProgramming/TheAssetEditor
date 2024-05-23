@@ -67,8 +67,14 @@ namespace AssetEditor.ViewModels
         public ICommand OpenWh2AnimpackUpdaterCommand { get; set; }
         public ICommand OpenAudioEditorCommand { get; set; }
         public ICommand CompileAudioProjectsCommand { get; set; }
-        public ICommand CreateExampleAudioProjectCommand { get; set; }
-
+        public ICommand CreateTemplateAudioProjectCommand { get; set; }
+        public ICommand CreateTemplateMovieProjectCommand { get; set; }
+        public ICommand CreateTemplateQuestBattleProjectCommand { get; set; }
+        public ICommand CreateTemplateIndMagicAbilityProjectCommand { get; set; }
+        public ICommand CreateTemplateUIProjectCommand { get; set; }
+        public ICommand CreateTemplateDiplomacyProjectCommand { get; set; }
+        public ICommand CreateTemplateDilemmaNarrationProjectCommand { get; set; }
+        public ICommand CreateTemplateBattleIndividualVocalisationProjectCommand { get; set; }
         public ICommand SearchCommand { get; set; }
         public ICommand OpenRome2RePacksCommand { get; set; }
         public ICommand OpenThreeKingdomsPacksCommand { get; set; }
@@ -136,7 +142,14 @@ namespace AssetEditor.ViewModels
             OpenWh2AnimpackUpdaterCommand = new RelayCommand(OpenWh2AnimpackUpdater);
             OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
             CompileAudioProjectsCommand = new RelayCommand(CompileAudioProjects);
-            CreateExampleAudioProjectCommand = new RelayCommand(CreateExampleAudioProject);
+            CreateTemplateAudioProjectCommand = new RelayCommand(CreateTemplateAudioProject);
+            CreateTemplateMovieProjectCommand = new RelayCommand(CreateTemplateMovieProject);
+            CreateTemplateQuestBattleProjectCommand = new RelayCommand(CreateTemplateQuestBattleProject);
+            CreateTemplateIndMagicAbilityProjectCommand = new RelayCommand(CreateTemplateIndMagicAbilityProject);
+            CreateTemplateUIProjectCommand = new RelayCommand(CreateTemplateUIProject);
+            CreateTemplateDiplomacyProjectCommand = new RelayCommand(CreateTemplateDiplomacyProject);
+            CreateTemplateDilemmaNarrationProjectCommand = new RelayCommand(CreateTemplateDilemmaNarrationProject);
+            CreateTemplateBattleIndividualVocalisationProjectCommand = new RelayCommand(CreateTemplateBattleIndividualVocalisationProject);
             OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframe);
 
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
@@ -262,22 +275,115 @@ namespace AssetEditor.ViewModels
         void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
         void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SkeletonEditorViewModel>>();
 
-        private void CreateExampleAudioProject()
+        private void CreateTemplateAudioProject()
         {
             if (_packfileService.HasEditablePackFile() == false)
                 return;
 
             var pack = _packfileService.GetEditablePack();
-            var resourcePath = "AssetEditor.Resources.AudioCompilerExample.json";
+            var resourcePath = "AssetEditor.Resources.Template_Audio_Project.json";
             using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
             using StreamReader reader = new StreamReader(stream);
             var text = reader.ReadToEnd();
             var byteArray = Encoding.ASCII.GetBytes(text);
-            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("AudioCompilerExample.json", new MemorySource(byteArray)));
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("Template_Audio_Project.json", new MemorySource(byteArray)));
         }
 
+        private void CreateTemplateMovieProject()
+        {
+            if (_packfileService.HasEditablePackFile() == false)
+                return;
 
+            var pack = _packfileService.GetEditablePack();
+            var resourcePath = "AssetEditor.Resources.Template_Movie_Project.json";
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+            using StreamReader reader = new StreamReader(stream);
+            var text = reader.ReadToEnd();
+            var byteArray = Encoding.ASCII.GetBytes(text);
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("Template_Movie_Project.json", new MemorySource(byteArray)));
+        }
+        private void CreateTemplateQuestBattleProject()
+        {
+            if (_packfileService.HasEditablePackFile() == false)
+                return;
 
+            var pack = _packfileService.GetEditablePack();
+            var resourcePath = "AssetEditor.Resources.Template_Quest_Battle_Speech_Project.json";
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+            using StreamReader reader = new StreamReader(stream);
+            var text = reader.ReadToEnd();
+            var byteArray = Encoding.ASCII.GetBytes(text);
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("Template_Quest_Battle_Speech_Project.json", new MemorySource(byteArray)));
+        }
+        private void CreateTemplateIndMagicAbilityProject()
+        {
+            if (_packfileService.HasEditablePackFile() == false)
+                return;
+
+            var pack = _packfileService.GetEditablePack();
+            var resourcePath = "AssetEditor.Resources.Template_IND_Magic_&_Ability.json";
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+            using StreamReader reader = new StreamReader(stream);
+            var text = reader.ReadToEnd();
+            var byteArray = Encoding.ASCII.GetBytes(text);
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("Template_IND_Magic_&_Ability.json", new MemorySource(byteArray)));
+        }
+
+        private void CreateTemplateUIProject()
+        {
+            if (_packfileService.HasEditablePackFile() == false)
+                return;
+
+            var pack = _packfileService.GetEditablePack();
+            var resourcePath = "AssetEditor.Resources.Template_UI_Project.json";
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+            using StreamReader reader = new StreamReader(stream);
+            var text = reader.ReadToEnd();
+            var byteArray = Encoding.ASCII.GetBytes(text);
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("Template_UI_Project.json", new MemorySource(byteArray)));
+        }
+
+        private void CreateTemplateDiplomacyProject()
+        {
+            if (_packfileService.HasEditablePackFile() == false)
+                return;
+
+            var pack = _packfileService.GetEditablePack();
+            var resourcePath = "AssetEditor.Resources.Template_Diplomacy_Line.json";
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+            using StreamReader reader = new StreamReader(stream);
+            var text = reader.ReadToEnd();
+            var byteArray = Encoding.ASCII.GetBytes(text);
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("Template_Diplomacy_Line.json", new MemorySource(byteArray)));
+        }
+
+        private void CreateTemplateDilemmaNarrationProject()
+        {
+            if (_packfileService.HasEditablePackFile() == false)
+                return;
+
+            var pack = _packfileService.GetEditablePack();
+            var resourcePath = "AssetEditor.Resources.Template_Dilemma_&_Incident_Narration.json";
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+            using StreamReader reader = new StreamReader(stream);
+            var text = reader.ReadToEnd();
+            var byteArray = Encoding.ASCII.GetBytes(text);
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("Template_Dilemma_&_Incident_Narration.json", new MemorySource(byteArray)));
+        }
+
+        private void CreateTemplateBattleIndividualVocalisationProject()
+        {
+            if (_packfileService.HasEditablePackFile() == false)
+                return;
+
+            var pack = _packfileService.GetEditablePack();
+            var resourcePath = "AssetEditor.Resources.Template_Battle_Individual_Vocalisation.json";
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+            using StreamReader reader = new StreamReader(stream);
+            var text = reader.ReadToEnd();
+            var byteArray = Encoding.ASCII.GetBytes(text);
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile("Template_Battle_Individual_Vocalisation.json", new MemorySource(byteArray)));
+        }
         void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();
 
 

@@ -48,27 +48,6 @@ namespace Audio.Utility
             return ConvertFileUsingVgSteam(wemName, wavName);
         }
 
-        public Result<string> ConvertToWem(PackFile packFile)
-        {
-            var filename = $"{AudioFolderName}\\{packFile.Name}";
-            DirectoryHelper.EnsureFileFolderCreated(filename);
-            File.WriteAllBytes(filename, packFile.DataSource.ReadData());
-
-            return ConvertToWem(filename);
-        }
-
-        public Result<string> ConvertToWem(string systemPath)
-        {
-            Guard.IsNotNullOrEmpty(systemPath);
-
-            if (File.Exists(systemPath) == false)
-                return Result<string>.FromError("VgSteam", $"File not found '{systemPath}'");
-
-            var fileNameWithoutExtention = Path.GetFileNameWithoutExtension(systemPath);
-            var wemName = $"{AudioFolderName}\\{fileNameWithoutExtention}.wem";
-            return ConvertFileUsingVgSteam(systemPath, wemName);
-        }
-
         /// <summary>
         ///  VgSteam CLI converts files automatically depending on extentions
         /// </summary>
