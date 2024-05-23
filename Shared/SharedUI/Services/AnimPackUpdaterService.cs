@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using CommonControls.Editors.AnimationPack;
 using GameFiles.AnimationPack;
 using GameFiles.AnimationPack.AnimPackFileTypes;
 using SharedCore;
@@ -69,8 +68,8 @@ namespace CommonControls.Services
                 }
 
                 var animPackPathWithoutExtentions = Path.GetFileNameWithoutExtension(animPack.FileName);
-                var outputAnimPackName = AnimationPackSampleDataCreator.GenerateWh3AnimPackName(animPackPathWithoutExtentions + "_wh3");
-                SaveHelper.Save(_pfs, outputAnimPackName, null, AnimationPackSerializer.ConvertToBytes(outputWh3AnimPack), false);
+               // var outputAnimPackName = AnimationPackSampleDataCreator.GenerateWh3AnimPackName(animPackPathWithoutExtentions + "_wh3");
+               // SaveHelper.Save(_pfs, outputAnimPackName, null, AnimationPackSerializer.ConvertToBytes(outputWh3AnimPack), false);
             }
         }
 

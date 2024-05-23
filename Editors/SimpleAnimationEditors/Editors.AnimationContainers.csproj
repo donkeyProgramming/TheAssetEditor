@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+      <TargetFramework>net6.0-windows</TargetFramework>
+      <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\GameFiles\Shared.GameFiles.csproj" />
+    <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
+    <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui.csproj" />
+  </ItemGroup>
+</Project>

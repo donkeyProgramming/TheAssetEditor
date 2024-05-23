@@ -1,14 +1,14 @@
-﻿using CommonControls.Common;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using CommonControls.Common;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Services;
 using GameFiles.AnimationPack;
 using SharedCore;
 using SharedCore.Misc;
 using SharedCore.PackFiles;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Windows;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

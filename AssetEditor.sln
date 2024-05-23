@@ -64,9 +64,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GameWorld", "GameWorld", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{17E1BB4D-00DF-4323-80C7-B8A8EDF2A5AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editors.Shared.Core", "Editors\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj", "{C130109A-1D52-4F5E-A760-24AEF648CE93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.Shared.Core", "Editors\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj", "{C130109A-1D52-4F5E-A760-24AEF648CE93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleAnimationEditors", "Editors\SimpleAnimationEditors\SimpleAnimationEditors.csproj", "{CAEB33BF-48DF-4388-BE6B-7D7ABBB9414B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.AnimationContainers", "Editors\SimpleAnimationEditors\Editors.AnimationContainers.csproj", "{CAEB33BF-48DF-4388-BE6B-7D7ABBB9414B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
