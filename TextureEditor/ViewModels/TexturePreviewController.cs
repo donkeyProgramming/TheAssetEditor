@@ -78,7 +78,6 @@ namespace TextureEditor.ViewModels
         string _imagePath;
         TexturePreviewViewModel _viewModel;
         GameWorld _scene;
-        MeshObject _mesh;
 
         public class ViewModelWrapper : NotifyPropertyChangedImpl
         {
@@ -92,12 +91,12 @@ namespace TextureEditor.ViewModels
             public void ShowTextureDetailsInfo() => ViewModel.ShowTextureDetailsInfo();
         }
 
-        public static void CreateWindow(string imagePath, PackFileService packFileService, MeshObject meshObject)
+        public static void CreateWindow(string imagePath, PackFileService packFileService)
         {
             TexturePreviewViewModel viewModel = new TexturePreviewViewModel();
             viewModel.ImagePath.Value = imagePath;
 
-            using (var controller = new TexturePreviewController(imagePath, viewModel, packFileService, meshObject))
+            using (var controller = new TexturePreviewController(imagePath, viewModel, packFileService))
             {
                 var containingWindow = new ControllerHostWindow(false, ResizeMode.CanResize);
                 containingWindow.Title = "Texture Preview Window";
@@ -106,13 +105,11 @@ namespace TextureEditor.ViewModels
             }
         }
 
-        public TexturePreviewController(string imagePath, TexturePreviewViewModel viewModel, PackFileService packFileService, MeshObject meshObject = null)
+        public TexturePreviewController(string imagePath, TexturePreviewViewModel viewModel, PackFileService packFileService)
         {
             _imagePath = imagePath;
             _viewModel = viewModel;
             _packFileService = packFileService;
-
-            _mesh = meshObject;
 
             _scene = new GameWorld(null, null);
             _scene.Components.Add(new ResourceLibary(_scene, packFileService));

@@ -61,7 +61,7 @@ namespace Filetypes.ByteParsing
 
         T Read<T>(SpesificByteParser<T> parser)
         {
-            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out T value, out int bytesRead, out string error))
+            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out T value, out int bytesRead, out string? error))
                 throw new Exception("Unable to parse :" + error);
 
             CurrentIndex += bytesRead;

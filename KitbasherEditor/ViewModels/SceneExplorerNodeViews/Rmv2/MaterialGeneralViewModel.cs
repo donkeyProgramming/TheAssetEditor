@@ -16,13 +16,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
     public partial class MaterialGeneralViewModel : NotifyPropertyChangedImpl
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
-        Rmv2MeshNode _meshNode;
-        PackFileService _pfs;
-        ApplicationSettingsService _applicationSettingsService;
+        private readonly Rmv2MeshNode _meshNode;
+        private readonly PackFileService _pfs;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
         public ICommand ResolveTexturesCommand { get; set; }
         public ICommand DeleteMissingTexturesCommand { get; set; }
-
 
         public bool UseAlpha
         {
@@ -52,7 +51,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             set { SetAndNotify(ref _onlyShowUsedTextures, value); UpdateTextureListVisibility(_onlyShowUsedTextures); }
         }
 
-
         public UiVertexFormat VertexType { get { return _meshNode.Geometry.VertexFormat; } set { ChangeVertexType(value); } }
         public IEnumerable<UiVertexFormat> PossibleVertexTypes { get; set; }
 
@@ -65,7 +63,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             PossibleVertexTypes = new UiVertexFormat[] { UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic };
             ResolveTexturesCommand = new RelayCommand(ResolveMissingTextures);
             DeleteMissingTexturesCommand = new RelayCommand(DeleteMissingTextures);
-
 
             CreateTextureList();
         }
@@ -80,7 +77,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             TextureList.Clear();
             foreach (var enumValue in distinctEnumList)
             {
-                var textureView = new TextureViewModel(_meshNode, _pfs, enumValue, _applicationSettingsService);
+                var textureView = new TextureViewModel(_meshNode, _pfs, enumValue);
                 TextureList.Add(textureView);
             }
 
@@ -118,13 +115,13 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
         private void ResolveMissingTextures()
         {
-            MissingTextureResolver resolver = new MissingTextureResolver();
+            var resolver = new MissingTextureResolver();
             resolver.ResolveMissingTextures(_meshNode, _pfs);
         }
 
         private void DeleteMissingTextures()
         {
-            MissingTextureResolver resolver = new MissingTextureResolver();
+            var resolver = new MissingTextureResolver();
             resolver.DeleteMissingTextures(_meshNode, _pfs);
             CreateTextureList();
         }

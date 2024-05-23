@@ -352,6 +352,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
+    <ProjectReference Include="..\Shared\SharedCore\SharedCore.csproj" />
   </ItemGroup>
 
 </Project>

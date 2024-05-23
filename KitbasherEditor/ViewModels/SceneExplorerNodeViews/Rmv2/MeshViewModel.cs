@@ -17,7 +17,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
     {
         Rmv2MeshNode _meshNode;
         private readonly SceneManager _sceneManager;
-        IComponentManager _componentManager;
 
         public string ModelName { get { return _meshNode.Material.ModelName; } set { _meshNode.Material.ModelName = value; NotifyPropertyChanged(); } }
         public string ShaderName { get => _meshNode.CommonHeader.ShaderParams.ShaderName; }

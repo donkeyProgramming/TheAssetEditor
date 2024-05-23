@@ -18,7 +18,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public class TextureViewModel : NotifyPropertyChangedImpl, INotifyDataErrorInfo
         {
             PackFileService _packfileService;
-            ApplicationSettingsService _appSettingsService;
             Rmv2MeshNode _meshNode;
             public TextureType TexureType { get; private set; }
 
@@ -47,7 +46,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             private readonly Dictionary<string, List<string>> _errorsByPropertyName = new Dictionary<string, List<string>>();
             private string _path = "";
 
-            public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TextureType texureType, ApplicationSettingsService appSettingsService)
+            public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TextureType texureType)
             {
                 _packfileService = packfileService;
                 _meshNode = meshNode;
@@ -55,8 +54,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 TextureTypeStr = TexureType.ToString();
                 _path = _meshNode.Material.GetTexture(texureType)?.Path;
                 ValidateTexturePath();
-                _appSettingsService = appSettingsService;
             }
+
             public void Paste()
             {
                 var path = Clipboard.GetText();
@@ -69,7 +68,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 UpdateTexturePath(path);
 
             }
-            public void Preview() => TexturePreviewController.CreateWindow(Path, _packfileService, _meshNode.Geometry);
+            public void Preview() => TexturePreviewController.CreateWindow(Path, _packfileService);
 
             public void Browse()
             {

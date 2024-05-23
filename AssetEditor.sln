@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		ActiveTodoList.txt = ActiveTodoList.txt
 		ReleaseNotes.txt = ReleaseNotes.txt
+		Shared\SharedCore\SharedCore.csproj = Shared\SharedCore\SharedCore.csproj
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextureEditor", "TextureEditor\TextureEditor.csproj", "{70708A4D-A71A-487A-87DE-47E526F2E142}"
@@ -63,6 +64,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Action WorkFlow", "G
 		.github\workflows\pr-build.yml = .github\workflows\pr-build.yml
 		.github\workflows\pr-test.yml = .github\workflows\pr-test.yml
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{7070A990-1A62-46A9-ABDF-BE030E3A4336}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedCore", "Shared\SharedCore\SharedCore.csproj", "{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -302,6 +307,18 @@ Global
 		{15AAE76D-0B83-45A2-B8AB-FD7BF38BDDC3}.Release|x64.Build.0 = Release|x64
 		{15AAE76D-0B83-45A2-B8AB-FD7BF38BDDC3}.Release|x86.ActiveCfg = Release|Win32
 		{15AAE76D-0B83-45A2-B8AB-FD7BF38BDDC3}.Release|x86.Build.0 = Release|Win32
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Debug|x64.Build.0 = Debug|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Debug|x86.Build.0 = Debug|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Release|x64.ActiveCfg = Release|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Release|x64.Build.0 = Release|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Release|x86.ActiveCfg = Release|Any CPU
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -324,6 +341,7 @@ Global
 		{0458A8D6-AC95-42FB-A89C-3AC06C893895} = {18424B6A-CB8A-4CE1-935C-72459F31521B}
 		{4BC797DB-8731-453F-9932-84E3FDE83CA7} = {18424B6A-CB8A-4CE1-935C-72459F31521B}
 		{15AAE76D-0B83-45A2-B8AB-FD7BF38BDDC3} = {C174C249-D109-49BE-8BC5-42A0D5DEDBDA}
+		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132} = {7070A990-1A62-46A9-ABDF-BE030E3A4336}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}
