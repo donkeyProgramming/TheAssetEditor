@@ -8,7 +8,6 @@ using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Editors.Wtui;
 using CommonControls.Events.UiCommands;
 using CommonControls.Resources;
-using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.Events;
 using SharedCore;
@@ -19,13 +18,13 @@ using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
 using SharedCore.ToolCreation;
 
-namespace CommonControls
+namespace Shared.Ui
 {
-    public class CommonControls_DependencyInjectionContainer : DependencyContainer
+    public class DependencyInjectionContainer : DependencyContainer
     {
         private readonly bool _loadResource;
 
-        public CommonControls_DependencyInjectionContainer(bool loadResource = true)
+        public DependencyInjectionContainer(bool loadResource = true)
         {
             _loadResource = loadResource;
         }
@@ -33,8 +32,8 @@ namespace CommonControls
         public override void Register(IServiceCollection services)
         {
             Logging.Configure(Serilog.Events.LogEventLevel.Information);
-            if (_loadResource) 
-            { 
+            if (_loadResource)
+            {
                 ResourceController.Load();
                 DirectoryHelper.EnsureCreated();
             }
@@ -42,8 +41,7 @@ namespace CommonControls
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<IToolFactory, ToolFactory>();
             services.AddSingleton<PackFileDataBase>();
-            services.AddSingleton<IAnimationFileDiscovered, SkeletonAnimationLookUpHelper>();
-            services.AddSingleton<SkeletonAnimationLookUpHelper >((x) => x.GetService<IAnimationFileDiscovered>() as SkeletonAnimationLookUpHelper);
+
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
             services.AddSingleton<PackFileService>();
@@ -61,9 +59,9 @@ namespace CommonControls
 
             services.AddTransient<IPackFileUiProvider, PackFileUiProvider>();
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
-   
+
             // Editors that should be moved into their own projects
-            TextEditor_DependencyInjectionContainer.Register(services); 
+            TextEditor_DependencyInjectionContainer.Register(services);
             VariantMeshDefinition_DependencyInjectionContainer.Register(services);
             TwUi_DependencyInjectionContainer.Register(services);
         }

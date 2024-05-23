@@ -12,7 +12,7 @@ namespace TestCommon.Utility
     {
         DependencyContainer[] _dependencyContainers = new DependencyContainer[]
         {
-            new CommonControls_DependencyInjectionContainer(false),
+            //new DependencyInjectionContainer(false),
             new View3D_DependencyContainer(),
             new Test_DependencyContainer(),
         };

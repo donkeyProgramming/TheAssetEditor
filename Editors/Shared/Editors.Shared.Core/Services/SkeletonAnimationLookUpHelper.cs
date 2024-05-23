@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using GameFiles.Animation;
 using Serilog;
 using SharedCore;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
 
-namespace CommonControls.Services
+namespace Editors.Shared.Core.Services
 {
     public class SkeletonAnimationLookUpHelper : IAnimationFileDiscovered
     {
@@ -72,7 +68,7 @@ namespace CommonControls.Services
         {
             lock (_threadLock)
             {
-                int itemsRemoved = 0;
+                var itemsRemoved = 0;
                 var s = _skeletonNameToAnimationMap
                     .Select(skeleton =>
                         new
@@ -91,14 +87,6 @@ namespace CommonControls.Services
                         itemsRemoved++;
                     }
                 }
-            }
-        }
-
-        public List<string> GetAllSkeletonNames()
-        {
-            lock (_threadLock)
-            {
-                return SkeletonFileNames.Select(x => Path.GetFileNameWithoutExtension(x)).ToList();
             }
         }
 
@@ -152,7 +140,7 @@ namespace CommonControls.Services
                 {
                     foreach (var s in entry)
                     {
-                        var res = String.Compare(s.AnimationFile, fullPath, StringComparison.InvariantCultureIgnoreCase);
+                        var res = string.Compare(s.AnimationFile, fullPath, StringComparison.InvariantCultureIgnoreCase);
                         if (res == 0)
                             return s;
                     }
@@ -169,11 +157,7 @@ namespace CommonControls.Services
         }
 
 
-
-
-
-
-        // Delete this pice of shit
+        // Delete this piece of shit
 
         public class AnimationReference
         {

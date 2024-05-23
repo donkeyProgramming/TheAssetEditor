@@ -1,5 +1,5 @@
 ﻿using AnimationMeta.Visualisation;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using Shared.GameFiles.AnimationMeta.Parsing;
 using SharedCore;
 using SharedCore.Misc;

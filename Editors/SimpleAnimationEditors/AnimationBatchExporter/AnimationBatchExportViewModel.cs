@@ -13,7 +13,7 @@ using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.TextEditor;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using GameFiles.Animation;
 using Serilog;
 using SharedCore;

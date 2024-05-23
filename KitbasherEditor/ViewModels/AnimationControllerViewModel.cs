@@ -1,5 +1,5 @@
-﻿using CommonControls.Services;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using Editors.Shared.Core.Services;
 using GameFiles.Animation;
 using KitbasherEditor.Events;
 using SharedCore.Events;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Windows.Input;
 using View3D.Animation;
 using static CommonControls.FilterDialog.FilterUserControl;
-using static CommonControls.Services.SkeletonAnimationLookUpHelper;
+using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace KitbasherEditor.ViewModels
 {

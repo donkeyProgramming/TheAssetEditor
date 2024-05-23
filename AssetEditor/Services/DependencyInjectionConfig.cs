@@ -3,7 +3,6 @@ using AnimationEditor;
 using AnimationMeta;
 using AssetManagement;
 using Audio;
-using CommonControls;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,11 +21,17 @@ namespace AssetEditor.Services
         {
             _dependencyContainers = new DependencyContainer[]
             {
-                // Core
-                new CommonControls_DependencyInjectionContainer(loadResources),
+                // Shared
+                new Shared.Core.DependencyInjectionContainer(loadResources),
+                new Shared.Ui.DependencyInjectionContainer(loadResources),
+                new Shared.GameFiles.DependencyInjectionContainer(loadResources),
+                new Shared.EmbeddedResources.DependencyInjectionContainer(loadResources),
                 new View3D_DependencyContainer(),
-
-                // Editors
+               
+                // Domains
+                new Editors.Shared.Core.DependencyInjectionContainer(),
+                new Editors.AnimationContainers.DependencyInjectionContainer(),
+                new Editors.Reports.DependencyInjectionContainer(),
                 new KitbasherEditor_DependencyInjectionContainer(),
                 new AssetManagement_DependencyInjectionContainer(),
                 new AnimationMeta_DependencyInjectionContainer(),

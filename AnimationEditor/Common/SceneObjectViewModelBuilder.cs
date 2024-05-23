@@ -2,7 +2,7 @@
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationMeta.Visualisation;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using SharedCore;
 using SharedCore.PackFiles;

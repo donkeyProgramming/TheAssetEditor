@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationPack;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using GameFiles.AnimationPack;
 using SharedCore;
 using SharedCore.Misc;

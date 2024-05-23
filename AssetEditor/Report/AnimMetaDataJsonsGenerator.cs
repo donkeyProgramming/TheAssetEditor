@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using CommonControls.Editors.AnimationPack.Converters;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using GameFiles.Animation;
 using GameFiles.AnimationPack;
 using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;

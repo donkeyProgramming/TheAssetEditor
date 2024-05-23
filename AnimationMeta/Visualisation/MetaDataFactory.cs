@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using AnimationMeta.Visualisation.Instances;
 using AnimationMeta.Visualisation.Rules;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using GameFiles.Animation;
 using GameFiles.AnimationPack;
 using Microsoft.Xna.Framework;

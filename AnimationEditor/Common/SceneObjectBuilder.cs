@@ -12,7 +12,7 @@ using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using View3D.Services;
 using View3D.Utility;
-using static CommonControls.Services.SkeletonAnimationLookUpHelper;
+using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

@@ -11,7 +11,7 @@ using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
 using CommonControls.SelectionListDialog;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using GameFiles.Animation;
 using Microsoft.Xna.Framework;
 using Serilog;

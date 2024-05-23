@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using View3D.Animation;
 using View3D.Components;
 using View3D.SceneNodes;
-using static CommonControls.Services.SkeletonAnimationLookUpHelper;
+using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

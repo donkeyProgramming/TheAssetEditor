@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Editors.Shared.Core.Services;
+using Microsoft.Extensions.DependencyInjection;
 using SharedCore.Misc;
+using SharedCore.PackFiles.Models;
 using SharedCore.ToolCreation;
 
 namespace Editors.Shared.Core
@@ -8,9 +10,12 @@ namespace Editors.Shared.Core
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-           //serviceCollection.AddTransient<TexturePreviewView>();
-           //serviceCollection.AddTransient<TextureEditorViewModel>();
-           //serviceCollection.AddTransient<IEditorViewModel, TextureEditorViewModel>();
+            //serviceCollection.AddTransient<TexturePreviewView>();
+            //serviceCollection.AddTransient<TextureEditorViewModel>();
+            //serviceCollection.AddTransient<IEditorViewModel, TextureEditorViewModel>();
+
+            serviceCollection.AddSingleton<IAnimationFileDiscovered, SkeletonAnimationLookUpHelper>();
+            serviceCollection.AddSingleton<SkeletonAnimationLookUpHelper>((x) => x.GetService<IAnimationFileDiscovered>() as SkeletonAnimationLookUpHelper);
         }
 
         public override void RegisterTools(IToolFactory factory)

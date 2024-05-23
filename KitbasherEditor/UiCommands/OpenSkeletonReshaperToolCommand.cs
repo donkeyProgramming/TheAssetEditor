@@ -5,7 +5,7 @@ using CommonControls.BaseDialogs;
 using CommonControls.Common.MenuSystem;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using SharedCore.PackFiles;

@@ -1,10 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using SharedCore.Misc;
 using SharedCore.PackFiles;
 using static CommonControls.FilterDialog.FilterUserControl;
-using static CommonControls.Services.SkeletonAnimationLookUpHelper;
+using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

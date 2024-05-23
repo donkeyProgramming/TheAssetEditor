@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using GameFiles.Animation;
 using GameFiles.AnimationPack;
 using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;

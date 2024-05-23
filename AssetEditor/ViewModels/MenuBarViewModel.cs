@@ -16,6 +16,7 @@ using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Shared.Core.Events;

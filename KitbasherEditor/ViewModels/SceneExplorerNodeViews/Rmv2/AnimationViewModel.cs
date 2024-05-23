@@ -1,6 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
-using CommonControls.Services;
+using Editors.Shared.Core.Services;
 using SharedCore.Misc;
 using SharedCore.PackFiles;
 using System.Collections.Generic;
