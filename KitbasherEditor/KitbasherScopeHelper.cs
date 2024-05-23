@@ -1,7 +1,7 @@
-﻿using CommonControls.Services.ToolCreation;
-using KitbasherEditor.EventHandlers;
+﻿using KitbasherEditor.EventHandlers;
 using KitbasherEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using SharedCore.ToolCreation;
 using System;
 using View3D.Components;
 

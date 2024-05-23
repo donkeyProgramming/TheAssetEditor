@@ -4,9 +4,9 @@ using System.Linq;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using CommonControls.FileTypes.Animation;
 using AssetManagement.GenericFormats.DataStructures.Managed;
-using CommonControls.Common;
 using Serilog;
 using AssetManagement.AnimationProcessor;
+using SharedCore;
 
 namespace AssetManagement.MeshProcessing.Common
 {

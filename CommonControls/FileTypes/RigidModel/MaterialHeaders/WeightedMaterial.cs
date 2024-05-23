@@ -10,8 +10,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using CommonControls.FileTypes.RigidModel.Transforms;
 using CommonControls.FileTypes.RigidModel.Types;
-using Filetypes.ByteParsing;
 using Microsoft.Xna.Framework;
+using SharedCore.ByteParsing;
+using SharedCore.Misc;
 
 namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {

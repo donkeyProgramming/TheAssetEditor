@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Reflection;
 using CommonControls.BaseDialogs;
-using CommonControls.Common;
+using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
@@ -11,14 +11,18 @@ using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Editors.Wtui;
-using CommonControls.Events.Global;
 using CommonControls.Events.UiCommands;
-using CommonControls.FileTypes.PackFiles.Models;
+using CommonControls.PackFileBrowser;
 using CommonControls.Resources;
 using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
-using Monogame.WpfInterop.Common;
+using SharedCore;
+using SharedCore.Events;
+using SharedCore.Events.Global;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
+using SharedCore.ToolCreation;
 
 namespace CommonControls
 {
@@ -59,6 +63,9 @@ namespace CommonControls
             services.AddScoped<BoneMappingView>();
             services.AddScoped<BoneMappingViewModel>();
 
+            services.AddTransient<IPackFileUiProvider, PackFileUiProvider>();
+            services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
+   
             // Editors that should be moved into their own projects
             TextEditor_DependencyInjectionContainer.Register(services);
             AnimationPack_DependencyInjectionContainer.Register(services);

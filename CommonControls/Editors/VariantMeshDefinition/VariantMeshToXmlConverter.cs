@@ -10,8 +10,9 @@ using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
+using SharedCore.ErrorHandling;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 using static CommonControls.FileTypes.Vmd.VariantMeshDefinition;
 
 namespace CommonControls.Editors.VariantMeshDefinition

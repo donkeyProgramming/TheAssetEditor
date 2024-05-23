@@ -1,18 +1,16 @@
-﻿using Audio.AudioEditor;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Windows;
+using Audio.AudioEditor;
 using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.BaseDialogs;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using Filetypes.ByteParsing;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Windows;
+using SharedCore.Misc;
+using SharedCore.PackFiles.Models;
 
 namespace Audio.Presentation.AudioExplorer
 {

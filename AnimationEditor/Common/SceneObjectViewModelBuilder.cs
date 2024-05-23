@@ -3,8 +3,10 @@ using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationMeta.Visualisation;
 using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
 using Microsoft.Xna.Framework;
+using SharedCore;
+using SharedCore.PackFiles;
+using SharedCore.ToolCreation;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

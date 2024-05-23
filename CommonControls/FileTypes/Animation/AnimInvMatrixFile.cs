@@ -4,8 +4,8 @@
 
 using System;
 using System.IO;
-using Filetypes.ByteParsing;
 using Microsoft.Xna.Framework;
+using SharedCore.ByteParsing;
 
 namespace CommonControls.FileTypes.Animation
 {

@@ -7,7 +7,8 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using CommonControls.FileTypes.RigidModel.Transforms;
-using Filetypes.ByteParsing;
+using SharedCore.ByteParsing;
+using SharedCore.Misc;
 
 namespace CommonControls.FileTypes.RigidModel.Types
 {

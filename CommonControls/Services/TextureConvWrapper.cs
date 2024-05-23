@@ -4,9 +4,9 @@
 
 using System.IO;
 using System.Reflection;
-using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel.Types;
 using Serilog;
+using SharedCore;
 
 namespace CommonControls.Services
 {

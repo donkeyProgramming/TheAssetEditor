@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.RigidModel;
-using CommonControls.Services;
 using KitbasherEditor.Events;
-using Monogame.WpfInterop.Common;
+using SharedCore.Events;
+using SharedCore.PackFiles;
 using View3D.Animation;
 using View3D.Components.Component;
 using View3D.SceneNodes;

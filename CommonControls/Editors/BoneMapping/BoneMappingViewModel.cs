@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
+using SharedCore.Misc;
 
 namespace CommonControls.Editors.BoneMapping
 {

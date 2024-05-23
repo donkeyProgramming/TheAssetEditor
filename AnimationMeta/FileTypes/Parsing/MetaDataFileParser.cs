@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using Filetypes.ByteParsing;
 using Serilog;
+using SharedCore;
+using SharedCore.ByteParsing;
+using SharedCore.PackFiles.Models;
 
 namespace AnimationMeta.FileTypes.Parsing
 {

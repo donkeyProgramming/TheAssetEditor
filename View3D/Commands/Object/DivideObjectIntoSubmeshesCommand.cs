@@ -2,6 +2,7 @@
 using System.Linq;
 using CommonControls.Common;
 using Serilog;
+using SharedCore;
 using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;

@@ -5,8 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonControls.FileTypes.PackFiles.Models;
-using Filetypes.ByteParsing;
+using SharedCore.ByteParsing;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.FileTypes.AnimationPack
 {

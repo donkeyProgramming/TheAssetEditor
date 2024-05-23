@@ -1,10 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Collections.Generic;
-
-namespace Filetypes.ByteParsing
+﻿namespace SharedCore.ByteParsing
 {
     public class ChuckWriter
     {
@@ -21,7 +15,7 @@ namespace Filetypes.ByteParsing
             if (string.IsNullOrEmpty(str))
                 str = "";
             str = str.ToLower().Trim();
-            int writeIndex = stringTable.IndexOf(str);
+            var writeIndex = stringTable.IndexOf(str);
             if (writeIndex == -1)
             {
                 stringTable.Add(str);

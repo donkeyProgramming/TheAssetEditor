@@ -1,5 +1,6 @@
 ﻿using CommonControls.Common;
 using CommonControls.MathViews;
+using SharedCore.Misc;
 
 namespace AnimationEditor.AnimationTransferTool
 {

@@ -1,9 +1,11 @@
 ﻿using AnimationMeta.FileTypes.Parsing;
 using AnimationMeta.Visualisation;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
+using SharedCore.ToolCreation;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
-using Monogame.WpfInterop.Common;
-using Serilog;
+﻿using Serilog;
+using SharedCore;
+using SharedCore.Events;
 using System;
 using System.Collections.Generic;
 using View3D.Commands;

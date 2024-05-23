@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonControls.Common;
 using Microsoft.Xna.Framework;
 using Serilog;
+using SharedCore;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;

@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -13,7 +9,9 @@ using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.DB;
 using CommonControls.Services;
-using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
+using SharedCore;
+using SharedCore.ErrorHandling;
+using SharedCore.PackFiles;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {

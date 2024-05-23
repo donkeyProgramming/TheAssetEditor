@@ -1,6 +1,6 @@
 ﻿using CommonControls.FileTypes.Animation;
 using AssetManagement.GenericFormats.DataStructures.Managed;
-using CommonControls.Common;
+using SharedCore.Misc;
 
 namespace AssetManagement.Strategies.Fbx.ImportDialog.DataModels
 {

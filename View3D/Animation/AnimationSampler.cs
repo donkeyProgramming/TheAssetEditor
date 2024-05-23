@@ -1,6 +1,7 @@
 ﻿using CommonControls.Common;
 using Microsoft.Xna.Framework;
 using Serilog;
+using SharedCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

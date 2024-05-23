@@ -5,6 +5,7 @@
 using System.Linq;
 using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.FileTypes.RigidModel.Vertex;
+using SharedCore.ByteParsing;
 
 namespace CommonControls.FileTypes.RigidModel
 {

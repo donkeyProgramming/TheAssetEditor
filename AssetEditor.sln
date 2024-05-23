@@ -27,7 +27,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		ActiveTodoList.txt = ActiveTodoList.txt
 		ReleaseNotes.txt = ReleaseNotes.txt
-		Shared\SharedCore\SharedCore.csproj = Shared\SharedCore\SharedCore.csproj
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextureEditor", "TextureEditor\TextureEditor.csproj", "{70708A4D-A71A-487A-87DE-47E526F2E142}"

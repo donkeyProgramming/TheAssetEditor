@@ -1,8 +1,9 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommunityToolkit.Diagnostics;
+﻿using CommunityToolkit.Diagnostics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Serilog;
+using SharedCore;
+using SharedCore.ErrorHandling;
+using SharedCore.PackFiles.Models;
 using System;
 using System.IO;
 using System.Linq;

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using CommonControls.Common;
-using CommonControls.Events.Scoped;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.LodHeader;
-using CommonControls.Services;
 using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.Common;
 using Serilog;
+using SharedCore;
+using SharedCore.Events;
+using SharedCore.Events.Scoped;
+using SharedCore.PackFiles;
 using View3D.Animation;
 using View3D.SceneNodes;
 

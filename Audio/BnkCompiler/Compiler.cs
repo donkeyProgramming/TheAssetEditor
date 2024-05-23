@@ -3,9 +3,9 @@ using Audio.FileFormats.Dat;
 using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommunityToolkit.Diagnostics;
+using SharedCore.ErrorHandling;
+using SharedCore.PackFiles.Models;
 using System.IO;
 using System.Linq;
 

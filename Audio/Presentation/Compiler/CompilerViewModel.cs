@@ -1,12 +1,12 @@
-﻿using Audio.BnkCompiler;
-using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.PackFileBrowser;
-using CommonControls.Services;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
-using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
+using Audio.BnkCompiler;
+using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.PackFileBrowser;
+using SharedCore.ErrorHandling;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace Audio.Presentation.Compiler
 {

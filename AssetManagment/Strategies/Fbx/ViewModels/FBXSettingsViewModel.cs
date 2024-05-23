@@ -1,7 +1,7 @@
 ﻿using AssetManagement.Strategies.Fbx.Views.FBXSettings;
-using CommonControls.Common;
 using AssetManagement.Strategies.Fbx.Models;
 using System.Windows.Forms;
+using SharedCore.Misc;
 
 namespace AssetManagement.Strategies.Fbx.ViewModels
 {

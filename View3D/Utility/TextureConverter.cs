@@ -1,8 +1,8 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.FileTypes.RigidModel.Types;
-using CommonControls.Services;
+﻿using CommonControls.FileTypes.RigidModel.Types;
 using Serilog;
+using SharedCore;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 using System;
 using System.IO;
 using System.Reflection;

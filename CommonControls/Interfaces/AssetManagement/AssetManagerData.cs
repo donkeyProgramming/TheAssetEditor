@@ -4,9 +4,9 @@
 
 
 using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.WsModel;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.Interfaces.AssetManagement
 {

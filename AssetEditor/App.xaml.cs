@@ -1,16 +1,14 @@
-﻿using AssetEditor.DevelopmentConfiguration;
+﻿using System;
+using System.Windows;
+using System.Windows.Threading;
+using AssetEditor.DevelopmentConfiguration;
 using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
-using CommonControls.Common;
-using CommonControls.FileTypes.FastBin;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Windows;
-using System.Windows.Threading;
+using SharedCore;
+using SharedCore.PackFiles;
 
 namespace AssetEditor
 {

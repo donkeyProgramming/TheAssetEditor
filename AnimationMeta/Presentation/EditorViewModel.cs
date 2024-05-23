@@ -4,10 +4,11 @@ using System.Linq;
 using System.Windows;
 using AnimationMeta.FileTypes.Parsing;
 using AnimationMeta.Presentation.View;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
 using Serilog;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace AnimationMeta.Presentation
 {

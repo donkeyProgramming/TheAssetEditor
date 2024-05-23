@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Xml.Serialization;
-using CommonControls.Services;
+using SharedCore.PackFiles;
 
 namespace CommonControls.Editors.TextEditor
 {

@@ -3,7 +3,7 @@ using CommonControls.Events.UiCommands;
 using CommonControls.Resources;
 using KitbasherEditor.ViewModels.MenuBarViews.Helpers;
 using KitbasherEditor.ViewModels.UiCommands;
-using Monogame.WpfInterop.Common;
+using SharedCore.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

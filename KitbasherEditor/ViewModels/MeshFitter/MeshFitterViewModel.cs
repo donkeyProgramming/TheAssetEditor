@@ -7,6 +7,7 @@ using CommonControls.Editors.BoneMapping;
 using CommonControls.FileTypes.Animation;
 using CommonControls.MathViews;
 using Microsoft.Xna.Framework;
+using SharedCore.Misc;
 using View3D.Animation;
 using View3D.Commands;
 using View3D.Commands.Object;

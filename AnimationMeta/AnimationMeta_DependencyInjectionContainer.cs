@@ -3,9 +3,8 @@ using AnimationMeta.Presentation;
 using AnimationMeta.Presentation.View;
 using AnimationMeta.Visualisation;
 using CommonControls;
-using CommonControls.Common;
-using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
+using SharedCore.ToolCreation;
 
 namespace AnimationMeta
 {

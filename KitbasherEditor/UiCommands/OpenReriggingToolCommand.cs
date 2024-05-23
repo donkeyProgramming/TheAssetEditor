@@ -10,6 +10,7 @@ using CommonControls.FileTypes.RigidModel;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
+using SharedCore.PackFiles;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using MessageBox = System.Windows.MessageBox;

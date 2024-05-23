@@ -1,13 +1,14 @@
 ﻿using AnimationMeta.FileTypes.Parsing;
-using CommonControls.Common;
 using CommonControls.Editors.AnimationPack.Converters;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Newtonsoft.Json;
 using Serilog;
+using SharedCore;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 using System;
 using System.Diagnostics;
 using System.IO;

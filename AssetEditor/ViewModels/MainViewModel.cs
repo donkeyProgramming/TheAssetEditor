@@ -6,12 +6,14 @@ using System.Windows.Input;
 using AssetEditor.UiCommands;
 using CommonControls.Common;
 using CommonControls.Events.UiCommands;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.PackFileBrowser;
-using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
+using SharedCore.ToolCreation;
 
 namespace AssetEditor.ViewModels
 {

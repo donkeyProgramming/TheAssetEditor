@@ -1,4 +1,5 @@
 ﻿using CommonControls.Common;
+using SharedCore.Misc;
 using System;
 using System.Windows;
 using System.Windows.Controls;

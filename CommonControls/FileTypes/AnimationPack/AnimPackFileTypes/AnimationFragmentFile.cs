@@ -8,10 +8,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using CommonControls.Common;
 using CommonControls.FileTypes.DB;
-using CommonControls.Services;
-using Filetypes.ByteParsing;
+using SharedCore;
+using SharedCore.ByteParsing;
+using SharedCore.Misc;
 
 namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 {

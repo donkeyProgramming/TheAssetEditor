@@ -1,7 +1,7 @@
 ﻿using CommonControls.MathViews;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Monogame.WpfInterop.Common;
+using SharedCore.Events;
 using System;
 using System.Collections.ObjectModel;
 using View3D.Components;

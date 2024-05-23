@@ -1,5 +1,6 @@
 ﻿using CommonControls.FileTypes.FastBin;
-using CommonControls.Services;
+using SharedCore;
+using SharedCore.PackFiles;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 {

@@ -2,9 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using CommonControls.Common;
-using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
+using SharedCore.ToolCreation;
 
 namespace CommonControls.Editors.TextEditor
 {

@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
-using CommonControls.Events.UiCommands;
-using CommonControls.Services.ToolCreation;
+﻿using CommonControls.Events.UiCommands;
+using SharedCore.Misc;
+using SharedCore.ToolCreation;
 
 namespace AssetEditor.UiCommands
 {

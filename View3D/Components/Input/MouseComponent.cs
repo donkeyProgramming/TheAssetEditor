@@ -1,8 +1,8 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop.Input;
 using Serilog;
+using SharedCore;
 using System;
 using View3D.Services;
 

@@ -8,6 +8,8 @@ using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using Serilog;
+using SharedCore;
+using SharedCore.PackFiles;
 using System;
 using System.Collections.Generic;
 using System.Data;

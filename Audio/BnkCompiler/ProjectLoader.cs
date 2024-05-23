@@ -1,9 +1,9 @@
 ﻿using Audio.BnkCompiler.Validation;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
 using Microsoft.Xna.Framework.Media;
 using Newtonsoft.Json;
+using SharedCore.ErrorHandling;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;

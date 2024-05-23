@@ -2,6 +2,9 @@
 using CommonControls.Editors.AnimationPack;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

@@ -1,8 +1,8 @@
 ﻿using CommonControls.BaseDialogs;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
 using Microsoft.Xna.Framework.Graphics;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;

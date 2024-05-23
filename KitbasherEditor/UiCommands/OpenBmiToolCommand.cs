@@ -5,6 +5,7 @@ using CommonControls.Services;
 using KitbasherEditor.ViewModels.BmiEditor;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.Views.EditorViews;
+using SharedCore.PackFiles;
 using System.Windows;
 using View3D.Animation;
 using View3D.Commands;

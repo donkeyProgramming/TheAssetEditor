@@ -166,6 +166,7 @@ dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:sil
 dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:silent
 dotnet_style_parentheses_in_other_operators = never_if_unnecessary:silent
 dotnet_diagnostic.CA1823.severity = error
+dotnet_diagnostic.CA1416.severity = silent
 
 # CSharp code style settings:
 [*.cs]

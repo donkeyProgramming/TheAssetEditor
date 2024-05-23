@@ -1,7 +1,7 @@
 ﻿using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.FileTypes.WsModel;
-using CommonControls.Services;
+using SharedCore.PackFiles;
 using System;
 using System.IO;
 using System.Linq;

@@ -4,10 +4,10 @@
 
 using System.Windows;
 using System.Windows.Input;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.Editors.TextEditor
 {

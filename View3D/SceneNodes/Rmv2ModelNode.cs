@@ -1,8 +1,8 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel;
-using CommonControls.Services;
+﻿using CommonControls.FileTypes.RigidModel;
 using Microsoft.Xna.Framework;
 using Serilog;
+using SharedCore;
+using SharedCore.PackFiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;

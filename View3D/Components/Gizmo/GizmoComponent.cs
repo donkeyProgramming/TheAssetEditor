@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using Monogame.WpfInterop.Common;
+using SharedCore.Events;
 using View3D.Commands;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;

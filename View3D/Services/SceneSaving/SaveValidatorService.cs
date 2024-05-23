@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.FileTypes.RigidModel;
+using SharedCore.ErrorHandling;
 using View3D.SceneNodes;
 using View3D.Utility;
 
@@ -8,9 +9,9 @@ namespace View3D.Services.SceneSaving
 {
     public class SaveValidatorService
     {
-        ErrorListViewModel.ErrorList Validate(MainEditableNode mainNode)
+        ErrorList Validate(MainEditableNode mainNode)
         {
-            var errorList = new ErrorListViewModel.ErrorList();
+            var errorList = new ErrorList();
 
             var skeleton = mainNode.SkeletonNode.Skeleton;
             var meshes = mainNode.GetMeshNodes(0);

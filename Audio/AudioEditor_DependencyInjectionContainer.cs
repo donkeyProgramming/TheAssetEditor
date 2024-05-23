@@ -7,10 +7,9 @@ using Audio.Presentation.Compiler;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls;
-using CommonControls.Common;
-using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
+using SharedCore.PackFiles;
+using SharedCore.ToolCreation;
 using System.IO;
 using System.Linq;
 

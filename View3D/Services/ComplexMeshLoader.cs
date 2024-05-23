@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using CommonControls.Common;
 using CommonControls.Editors.VariantMeshDefinition;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.WsModel;
-using CommonControls.Services;
 using Serilog;
+using SharedCore;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 using View3D.Animation;
 using View3D.SceneNodes;
 using static CommonControls.FileTypes.Vmd.VariantMeshDefinition;

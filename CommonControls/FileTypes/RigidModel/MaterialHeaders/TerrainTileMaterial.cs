@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using CommonControls.FileTypes.RigidModel.Types;
 using Microsoft.Xna.Framework;
+using SharedCore.ByteParsing;
 
 namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {

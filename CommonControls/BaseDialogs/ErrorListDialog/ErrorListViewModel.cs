@@ -2,65 +2,19 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using SharedCore.ErrorHandling;
 
 namespace CommonControls.BaseDialogs.ErrorListDialog
 {
 
-    public class ErrorListViewModel
+    public partial class ErrorListViewModel
     {
         public ObservableCollection<ErrorListDataItem> ErrorItems { get; set; } = new ObservableCollection<ErrorListDataItem>();
         public string WindowTitle { get; set; } = "Error";
 
-        [DebuggerDisplay("{ErrorType}:{ItemName}-{Description}")]
-        public class ErrorListDataItem
-        {
-            public string ErrorType { get; set; }
-            public string ItemName { get; set; }
-            public string Description { get; set; }
-            public bool IsError { get; set; } = false;
-        }
 
-
-
-        public class ErrorList
-        {
-            public List<ErrorListDataItem> Errors { get; set; } = new List<ErrorListDataItem>();
-
-            public bool HasData { get => Errors.Count != 0; }
-
-            public ErrorListDataItem Error(string itemName, string description)
-            {
-                var item = new ErrorListDataItem() { ErrorType = "Error", ItemName = itemName, Description = description, IsError = true };
-                Errors.Add(item);
-                return item;
-            }
-
-            public ErrorListDataItem Warning(string itemName, string description)
-            {
-                var item = new ErrorListDataItem() { ErrorType = "Warning", ItemName = itemName, Description = description, IsError = true };
-                Errors.Add(item);
-                return item;
-            }
-
-            public ErrorListDataItem Ok(string itemName, string description)
-            {
-                var item = new ErrorListDataItem() { ErrorType = "Ok", ItemName = itemName, Description = description };
-                Errors.Add(item);
-                return item;
-            }
-
-            public void AddAllErrors(ErrorList instanceErrorList)
-            {
-                foreach (var error in instanceErrorList.Errors)
-                {
-                    var item = new ErrorListDataItem() { ErrorType = error.ErrorType, ItemName = error.ItemName, Description = error.Description };
-                    Errors.Add(item);
-                }
-            }
-        }
 
         /*   Dump to csv         // Entry : For each mount item:
             // Slot(id), status (OK, ERROR, MISSING IN RIDER), IsMountAnim, mount animation name, new rider animation name

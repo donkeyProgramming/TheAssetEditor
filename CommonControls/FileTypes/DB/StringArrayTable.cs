@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 using System.IO;
-using Filetypes.ByteParsing;
+using SharedCore.ByteParsing;
 
 namespace CommonControls.FileTypes.DB
 {

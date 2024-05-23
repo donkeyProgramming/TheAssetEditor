@@ -4,7 +4,7 @@
 
 using System;
 using CommonControls.FileTypes.RigidModel.Transforms;
-using Filetypes.ByteParsing;
+using SharedCore.ByteParsing;
 using Half = SharpDX.Half;
 
 namespace CommonControls.FileTypes.RigidModel.Vertex

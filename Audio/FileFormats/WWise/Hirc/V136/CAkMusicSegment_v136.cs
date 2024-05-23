@@ -1,4 +1,4 @@
-﻿using Filetypes.ByteParsing;
+﻿using SharedCore.ByteParsing;
 using System;
 using System.Collections.Generic;
 

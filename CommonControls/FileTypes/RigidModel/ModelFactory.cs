@@ -6,11 +6,12 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel.LodHeader;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.FileTypes.RigidModel.Vertex;
 using Serilog;
+using SharedCore;
+using SharedCore.ByteParsing;
 
 namespace CommonControls.FileTypes.RigidModel
 {

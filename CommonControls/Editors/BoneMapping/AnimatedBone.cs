@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
-using CommonControls.Common;
 using Microsoft.Xna.Framework;
+using SharedCore.Misc;
 
 namespace CommonControls.Editors.BoneMapping
 {

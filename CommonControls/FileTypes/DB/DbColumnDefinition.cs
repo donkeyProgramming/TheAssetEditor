@@ -4,9 +4,9 @@
 
 using System;
 using System.Diagnostics;
-using Filetypes.ByteParsing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using SharedCore.ByteParsing;
 
 namespace CommonControls.FileTypes.DB
 {

@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
-using CommonControls.Services;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using SharedCore;
+using SharedCore.Misc;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;

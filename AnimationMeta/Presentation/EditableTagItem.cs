@@ -4,9 +4,11 @@
 
 using CommonControls.Common;
 using CommonControls.MathViews;
-using Filetypes.ByteParsing;
 using Microsoft.Xna.Framework;
 using Serilog;
+using SharedCore;
+using SharedCore.ByteParsing;
+using SharedCore.Misc;
 
 namespace AnimationMeta.Presentation
 {

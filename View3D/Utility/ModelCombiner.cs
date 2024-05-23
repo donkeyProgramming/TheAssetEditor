@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using SharedCore.ErrorHandling;
 using View3D.SceneNodes;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 

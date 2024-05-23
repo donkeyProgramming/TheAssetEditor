@@ -1,10 +1,10 @@
-﻿using CommonControls.Common;
-using AnimationMeta.FileTypes.Definitions;
+﻿using AnimationMeta.FileTypes.Definitions;
 using Microsoft.Xna.Framework;
 using Serilog;
 using System;
 using View3D.Animation;
 using View3D.Animation.AnimationChange;
+using SharedCore;
 
 namespace AnimationMeta.Visualisation.Rules
 {

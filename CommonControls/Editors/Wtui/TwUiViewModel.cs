@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.ObjectModel;
-using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.PackFiles.Models;
+using SharedCore.Misc;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.Editors.Wtui
 {

@@ -7,9 +7,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using Filetypes.ByteParsing;
+using SharedCore;
+using SharedCore.ByteParsing;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.FileTypes.AnimationPack
 {

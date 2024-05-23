@@ -5,12 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows;
-using CommonControls.Common;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.FileTypes.WsModel;
-using CommonControls.Services;
 using Serilog;
+using SharedCore;
+using SharedCore.PackFiles;
 using View3D.SceneNodes;
 
 namespace View3D.Services.SceneSaving.Material.Strategies

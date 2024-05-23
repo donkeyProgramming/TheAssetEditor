@@ -1,5 +1,6 @@
-﻿using CommonControls.Services;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SharedCore;
+using SharedCore.PackFiles;
 using System;
 
 namespace AssetEditor

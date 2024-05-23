@@ -3,7 +3,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
-namespace CommonControls.Common
+namespace SharedCore
 {
     public static class LoggerExtensions
     {
@@ -52,9 +52,9 @@ namespace CommonControls.Common
 
         private static string getNextFileName(string fileName)
         {
-            string extension = Path.GetExtension(fileName);
+            var extension = Path.GetExtension(fileName);
 
-            int i = 0;
+            var i = 0;
             while (File.Exists(fileName))
             {
                 if (i == 0)

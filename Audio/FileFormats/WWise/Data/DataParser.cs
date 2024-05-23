@@ -1,4 +1,4 @@
-﻿using Filetypes.ByteParsing;
+﻿using SharedCore.ByteParsing;
 using System.Text;
 
 namespace Audio.FileFormats.WWise.Data

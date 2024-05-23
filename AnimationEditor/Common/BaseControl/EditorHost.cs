@@ -2,11 +2,11 @@
 using System.Windows.Input;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommunityToolkit.Mvvm.Input;
-using Monogame.WpfInterop.Common;
 using MonoGame.Framework.WpfInterop;
+using SharedCore.Events;
+using SharedCore.Misc;
+using SharedCore.PackFiles.Models;
 using View3D.Components;
 using View3D.Services;
 

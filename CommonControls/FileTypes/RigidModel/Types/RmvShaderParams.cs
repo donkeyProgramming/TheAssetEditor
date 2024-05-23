@@ -4,7 +4,7 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Filetypes.ByteParsing;
+using SharedCore.ByteParsing;
 
 namespace CommonControls.FileTypes.RigidModel.Types
 {

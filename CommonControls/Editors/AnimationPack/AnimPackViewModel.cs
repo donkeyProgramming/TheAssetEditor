@@ -14,9 +14,12 @@ using CommonControls.Editors.AnimationPack.Converters;
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.Editors.AnimationPack
 {

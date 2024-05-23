@@ -1,8 +1,8 @@
 ﻿using AnimationMeta.FileTypes.Parsing;
-using CommonControls.Common;
-using CommonControls.Services;
 using CsvHelper;
 using Serilog;
+using SharedCore;
+using SharedCore.PackFiles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -1,7 +1,7 @@
 ﻿using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc.V136;
-using CommonControls.Services;
 using CommunityToolkit.Diagnostics;
+using SharedCore.PackFiles;
 using System;
 using System.Collections.Generic;
 using System.IO;

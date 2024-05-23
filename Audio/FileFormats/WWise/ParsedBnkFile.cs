@@ -1,7 +1,7 @@
 ﻿using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Didx;
 using Audio.FileFormats.WWise.Hirc;
-using Filetypes.ByteParsing;
+using SharedCore.ByteParsing;
 
 namespace Audio.FileFormats.WWise
 {

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Common;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.FileTypes.PackFiles.Models;
+using SharedCore;
+using SharedCore.ErrorHandling;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.Services
 {
@@ -21,7 +22,7 @@ namespace CommonControls.Services
 
         public void Process(PackFileContainer packFileContainer, GameTypeEnum existingPackVersion = GameTypeEnum.Warhammer2, GameTypeEnum outputFormat = GameTypeEnum.Warhammer3)
         {
-            var errorList = new ErrorListViewModel.ErrorList();
+            var errorList = new ErrorList();
 
             if (outputFormat != GameTypeEnum.Warhammer3)
                 throw new Exception($"{outputFormat} selected as output, only Warhammer 3 is currently supported");

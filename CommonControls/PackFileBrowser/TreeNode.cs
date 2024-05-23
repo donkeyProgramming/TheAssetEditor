@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
+using SharedCore.Misc;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.PackFileBrowser
 {

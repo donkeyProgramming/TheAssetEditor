@@ -4,8 +4,8 @@
 
 using System.Collections.Generic;
 using System.IO;
-using CommonControls.Common;
-using Filetypes.ByteParsing;
+using SharedCore.ByteParsing;
+using SharedCore.Misc;
 
 namespace CommonControls.FileTypes.AnimationPack.AnimPackFileTypes
 {

@@ -9,8 +9,8 @@ using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
 using CommonControls;
-using CommonControls.Services.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
+using SharedCore.ToolCreation;
 
 namespace AnimationEditor
 {

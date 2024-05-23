@@ -1,4 +1,4 @@
-﻿using CommonControls.Common;
+﻿using SharedCore.Misc;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews

@@ -8,8 +8,9 @@ using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
-using CommonControls.Services;
 using Microsoft.Xna.Framework;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
 using View3D.Animation;
 using View3D.Services;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
-using CommonControls.Common;
+using SharedCore.Misc;
 
 namespace CommonControls.PackFileBrowser
 {

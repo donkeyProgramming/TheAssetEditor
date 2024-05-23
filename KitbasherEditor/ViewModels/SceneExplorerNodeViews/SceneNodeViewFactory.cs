@@ -1,5 +1,7 @@
 ﻿using CommonControls.Services;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
+using SharedCore;
+using SharedCore.PackFiles;
 using View3D.Components.Component;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;

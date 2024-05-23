@@ -1,11 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
-using System.IO;
-
-namespace CommonControls.Common
+﻿namespace SharedCore
 {
     public class DirectoryHelper
     {
@@ -17,8 +10,6 @@ namespace CommonControls.Common
         public static string Applications { get { return ApplicationDirectory + "\\Applications"; } }
         public static string Temp { get { return ApplicationDirectory + "\\Temp"; } }
         public static string AnimationIndexMappingDirectory { get { return ApplicationDirectory + "\\Animation\\BoneIndexMapping"; } }
-
-
 
         public static void EnsureCreated()
         {
@@ -69,7 +60,7 @@ namespace CommonControls.Common
 
             // combine the arguments together
             // it doesn't matter if there is a space after ','
-            string argument = "/select, \"" + filePath + "\"";
+            var argument = "/select, \"" + filePath + "\"";
 
             System.Diagnostics.Process.Start("explorer.exe", argument);
         }

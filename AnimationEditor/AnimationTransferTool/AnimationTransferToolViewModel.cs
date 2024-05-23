@@ -15,6 +15,9 @@ using CommonControls.SelectionListDialog;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
 using Serilog;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
 using View3D.Animation;
 
 namespace AnimationEditor.AnimationTransferTool

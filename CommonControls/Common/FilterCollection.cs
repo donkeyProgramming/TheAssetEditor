@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using SharedCore.Misc;
 
 namespace CommonControls.Common
 {

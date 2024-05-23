@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using AnimationEditor.Common.ReferenceModel;
-using CommonControls.Common;
+using SharedCore.Misc;
 
 namespace AnimationEditor.Common.AnimationPlayer
 {

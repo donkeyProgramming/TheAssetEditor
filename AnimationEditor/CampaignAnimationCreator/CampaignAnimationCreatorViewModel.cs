@@ -6,6 +6,8 @@ using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
 using CommonControls.Services;
 using Microsoft.Xna.Framework;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
 using View3D.Animation;
 
 namespace AnimationEditor.CampaignAnimationCreator

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommunityToolkit.Diagnostics;
-using Filetypes.ByteParsing;
 using Serilog;
-using static Filetypes.ByteParsing.ByteChunk;
+using SharedCore;
+using SharedCore.ByteParsing;
+using SharedCore.PackFiles.Models;
+using static SharedCore.ByteParsing.ByteChunk;
 
 namespace CommonControls.FileTypes.FastBin
 {

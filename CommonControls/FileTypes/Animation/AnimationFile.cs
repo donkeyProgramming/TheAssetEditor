@@ -7,12 +7,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel.Transforms;
 using CommonControls.Services;
-using Filetypes.ByteParsing;
 using Serilog;
+using SharedCore;
+using SharedCore.ByteParsing;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.FileTypes.Animation
 {

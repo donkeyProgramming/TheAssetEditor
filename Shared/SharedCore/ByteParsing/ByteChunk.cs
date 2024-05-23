@@ -1,16 +1,7 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using CommonControls.Common;
-using CommonControls.FileTypes;
+﻿using SharedCore.Misc;
 using Half = SharpDX.Half;
 
-namespace Filetypes.ByteParsing
+namespace SharedCore.ByteParsing
 {
     public class ByteChunk
     {
@@ -61,7 +52,7 @@ namespace Filetypes.ByteParsing
 
         T Read<T>(SpesificByteParser<T> parser)
         {
-            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out T value, out int bytesRead, out string? error))
+            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out var value, out var bytesRead, out var error))
                 throw new Exception("Unable to parse :" + error);
 
             CurrentIndex += bytesRead;
@@ -70,7 +61,7 @@ namespace Filetypes.ByteParsing
 
         string ReadFixedLengthString(StringParser parser, int length)
         {
-            if (!parser.TryDecodeFixedLength(_buffer, CurrentIndex, length, out var value, out int bytesRead))
+            if (!parser.TryDecodeFixedLength(_buffer, CurrentIndex, length, out var value, out var bytesRead))
                 throw new Exception("Unable to parse");
 
             CurrentIndex += bytesRead;
@@ -81,7 +72,7 @@ namespace Filetypes.ByteParsing
 
         string ReadZeroTerminatedString(StringParser parser)
         {
-            if (!parser.TryDecodeZeroTerminatedString(_buffer, CurrentIndex, out var value, out int bytesRead))
+            if (!parser.TryDecodeZeroTerminatedString(_buffer, CurrentIndex, out var value, out var bytesRead))
                 throw new Exception("Unable to parse");
 
             CurrentIndex += bytesRead;
@@ -91,7 +82,7 @@ namespace Filetypes.ByteParsing
 
         T Peak<T>(SpesificByteParser<T> parser)
         {
-            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out T value, out int bytesRead, out string error))
+            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out var value, out var bytesRead, out var error))
                 throw new Exception("Unable to parse :" + error);
 
             return value;
@@ -100,7 +91,7 @@ namespace Filetypes.ByteParsing
         public byte[] ReadBytesUntil(int index)
         {
             var length = index - CurrentIndex;
-            byte[] destination = new byte[length];
+            var destination = new byte[length];
             Array.Copy(_buffer, index, destination, 0, length);
             CurrentIndex += length;
             return destination;
@@ -123,7 +114,7 @@ namespace Filetypes.ByteParsing
 
         public byte[] GetBytesFromBuffer(int start, int count)
         {
-            byte[] destination = new byte[count];
+            var destination = new byte[count];
             Array.Copy(_buffer, start, destination, 0, count);
 
             return destination;
@@ -136,7 +127,7 @@ namespace Filetypes.ByteParsing
 
         public void Read(IByteParser parser, out string value, out string error)
         {
-            if (!parser.TryDecode(_buffer, CurrentIndex, out value, out int bytesRead, out error))
+            if (!parser.TryDecode(_buffer, CurrentIndex, out value, out var bytesRead, out error))
                 throw new Exception("Unable to parse :" + error);
 
             CurrentIndex += bytesRead;
@@ -144,7 +135,7 @@ namespace Filetypes.ByteParsing
 
         public void Read<T>(SpesificByteParser<T> parser, out T value, out string error)
         {
-            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out value, out int bytesRead, out error))
+            if (!parser.TryDecodeValue(_buffer, CurrentIndex, out value, out var bytesRead, out error))
                 throw new Exception("Unable to parse :" + error);
 
             CurrentIndex += bytesRead;
@@ -174,7 +165,7 @@ namespace Filetypes.ByteParsing
             var output = new List<UnknownParseResult.Item>();
             foreach (var parser in parsers)
             {
-                var result = parser.TryDecode(_buffer, CurrentIndex, out string value, out int bytesRead, out string error);
+                var result = parser.TryDecode(_buffer, CurrentIndex, out var value, out var bytesRead, out var error);
                 var item = new UnknownParseResult.Item()
                 {
                     Result = result,
@@ -194,7 +185,7 @@ namespace Filetypes.ByteParsing
             var index = CurrentIndex;
 
             var output = new UnknownParseResult[numBytes];
-            for (int i = 0; i < numBytes; i++)
+            for (var i = 0; i < numBytes; i++)
             {
                 output[i] = PeakUnknown();
                 ReadByte();

@@ -1,8 +1,9 @@
 ﻿using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
-using CommonControls.Common;
-using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.ToolCreation;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 {

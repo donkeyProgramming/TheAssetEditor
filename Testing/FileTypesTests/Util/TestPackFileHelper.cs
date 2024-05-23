@@ -1,4 +1,4 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
+﻿using SharedCore.PackFiles.Models;
 using System.Text;
 
 namespace FileTypesTests.Util

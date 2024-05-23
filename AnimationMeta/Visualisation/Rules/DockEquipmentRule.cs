@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Serilog;
+using SharedCore;
 using System;
 using View3D.Animation;
 using View3D.Animation.AnimationChange;

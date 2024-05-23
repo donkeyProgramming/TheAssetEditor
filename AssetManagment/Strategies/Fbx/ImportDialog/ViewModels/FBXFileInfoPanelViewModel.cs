@@ -6,8 +6,7 @@
 
 using System.Linq;
 using AssetManagement.Strategies.Fbx.ImportDialog.DataModels;
-using CommonControls.Common;
-
+using SharedCore.Misc;
 
 namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels
 {

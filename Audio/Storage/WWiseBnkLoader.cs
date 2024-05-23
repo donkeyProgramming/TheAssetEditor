@@ -3,24 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Didx;
 using Audio.FileFormats.WWise.Hirc;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using Serilog;
-using System.Globalization;
-using System.IO;
-using Audio.BnkCompiler;
 using Audio.FileFormats.WWise.Hirc.V136;
-using CommunityToolkit.Diagnostics;
-using Audio.AudioEditor;
-using Filetypes.ByteParsing;
-using Audio.FileFormats.Dat;
-using System.Windows.Shapes;
-
+using Serilog;
+using SharedCore;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace Audio.Storage
 {

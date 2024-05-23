@@ -5,7 +5,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using CommonControls.Common;
+using SharedCore.Misc;
 
 namespace CommonControls.MathViews
 {

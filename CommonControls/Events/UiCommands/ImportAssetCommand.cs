@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Interfaces.AssetManagement;
-using CommonControls.Services;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.Events.UiCommands
 {

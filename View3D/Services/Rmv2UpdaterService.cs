@@ -1,16 +1,16 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel.Types;
-using CommonControls.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.FileTypes.RigidModel.Types;
+using SharedCore;
+using SharedCore.ErrorHandling;
+using SharedCore.PackFiles;
 using View3D.SceneNodes;
 using View3D.Utility;
-
 using MS = Microsoft.Xna.Framework;
 
 namespace View3D.Services
@@ -38,14 +38,14 @@ namespace View3D.Services
             DirectoryHelper.EnsureCreated(_outputFolder);
         }
 
-        public void UpdateWh2Models(string modelPath, List<Rmv2MeshNode> models, BaseColourGenerationTechniqueEnum conversionTechnique, out ErrorListViewModel.ErrorList outputList)
+        public void UpdateWh2Models(string modelPath, List<Rmv2MeshNode> models, BaseColourGenerationTechniqueEnum conversionTechnique, out ErrorList outputList)
         {
-            outputList = new ErrorListViewModel.ErrorList();
+            outputList = new ErrorList();
             foreach (var model in models)
                 ProcessModel(modelPath, model, conversionTechnique, outputList);
         }
 
-        private void ProcessModel(string modelPath, Rmv2MeshNode model, BaseColourGenerationTechniqueEnum conversionTechnique, ErrorListViewModel.ErrorList outputList)
+        private void ProcessModel(string modelPath, Rmv2MeshNode model, BaseColourGenerationTechniqueEnum conversionTechnique, ErrorList outputList)
         {
             if (_tryMatchingTexturesByName)
             {
@@ -105,7 +105,7 @@ namespace View3D.Services
                 outputList.Error($"{modelPath}-{model.Name}", $"Failed to update to wh3 format");
         }
 
-        private bool MatchMissingTexturesByName(string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        private bool MatchMissingTexturesByName(string modelPath, Rmv2MeshNode model, ErrorList outputList)
         {
             var normalOK = UpdateTextureBasedOnName(model, TextureType.Normal, TextureType.Normal, "_normal", "_normal", modelPath, outputList);
             var materialMapOK = UpdateTextureBasedOnName(model, TextureType.Specular, TextureType.MaterialMap, "_specular", "_material_map", modelPath, outputList);
@@ -120,7 +120,7 @@ namespace View3D.Services
             return false;
         }
 
-        bool UpdateTextureBasedOnName(Rmv2MeshNode model, TextureType oldType, TextureType newType, string originalTexturePostFix, string newTexturePostFix, string modelPath, ErrorListViewModel.ErrorList outputList)
+        bool UpdateTextureBasedOnName(Rmv2MeshNode model, TextureType oldType, TextureType newType, string originalTexturePostFix, string newTexturePostFix, string modelPath, ErrorList outputList)
         {
             var textures = model.GetTextures();
             if (textures.TryGetValue(oldType, out var texturePath))
@@ -209,7 +209,7 @@ namespace View3D.Services
         }
 
 
-        private bool ConvertTextureAdditiveBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        private bool ConvertTextureAdditiveBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorList outputList)
         {
             var inputDiffuseTex = textureDictionary[TextureType.Diffuse];
             var inputSpecularTex = textureDictionary[TextureType.Specular];
@@ -282,7 +282,7 @@ namespace View3D.Services
 
         }
 
-        private bool ConvertTexturesUsingComparativeBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        private bool ConvertTexturesUsingComparativeBlending(Dictionary<TextureType, Bitmap> textureDictionary, string modelPath, Rmv2MeshNode model, ErrorList outputList)
         {
             var inputDiffuseTex = textureDictionary[TextureType.Diffuse];
             var inputSpecularTex = textureDictionary[TextureType.Specular];
@@ -348,7 +348,7 @@ namespace View3D.Services
         }
 
 
-        Bitmap ConvertTextureToByte(TextureType textureType, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        Bitmap ConvertTextureToByte(TextureType textureType, string modelPath, Rmv2MeshNode model, ErrorList outputList)
         {
             var textures = model.GetTextures();
             if (textures.TryGetValue(textureType, out var texturePath) == false)
@@ -376,7 +376,7 @@ namespace View3D.Services
             return image;
         }
 
-        bool SaveAndApplyBitmapAsModelTexture(Bitmap bitmap, string packFilePath, TextureType outputTextureType, string modelPath, Rmv2MeshNode model, ErrorListViewModel.ErrorList outputList)
+        bool SaveAndApplyBitmapAsModelTexture(Bitmap bitmap, string packFilePath, TextureType outputTextureType, string modelPath, Rmv2MeshNode model, ErrorList outputList)
         {
             try
             {

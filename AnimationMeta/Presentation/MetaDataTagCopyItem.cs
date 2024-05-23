@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using AnimationMeta.FileTypes.Parsing;
-using CommonControls.Common;
+using SharedCore.Misc;
 
 namespace AnimationMeta.Presentation
 {

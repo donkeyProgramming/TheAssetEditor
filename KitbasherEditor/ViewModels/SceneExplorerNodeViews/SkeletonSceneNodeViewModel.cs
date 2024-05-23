@@ -1,6 +1,7 @@
-﻿using CommonControls.Common;
-using CommonControls.MathViews;
+﻿using CommonControls.MathViews;
 using CommonControls.Services;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
 using System.Collections.ObjectModel;
 using View3D.Animation;
 using View3D.SceneNodes;

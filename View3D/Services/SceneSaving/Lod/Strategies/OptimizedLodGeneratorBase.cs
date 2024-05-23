@@ -1,7 +1,7 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.FileTypes.RigidModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using CommonControls.FileTypes.RigidModel;
+using SharedCore.ErrorHandling;
 using View3D.SceneNodes;
 using View3D.Utility;
 
@@ -71,7 +71,7 @@ namespace View3D.Services.SceneSaving.Lod.Strategies
                     }
 
                     // Combine if possible 
-                    var errorList = new ErrorListViewModel.ErrorList();
+                    var errorList = new ErrorList();
                     var canCombine = ModelCombiner.HasPotentialCombineMeshes(originalMeshClone, out errorList);
                     if (canCombine)
                         originalMeshClone = ModelCombiner.CombineMeshes(originalMeshClone, addPrefix: false);

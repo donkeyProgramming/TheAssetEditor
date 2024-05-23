@@ -5,7 +5,8 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using Filetypes.ByteParsing;
+using SharedCore.ByteParsing;
+using SharedCore.Misc;
 
 namespace CommonControls.FileTypes.RigidModel.Types
 {

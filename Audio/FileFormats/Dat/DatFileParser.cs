@@ -1,5 +1,5 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
-using Filetypes.ByteParsing;
+﻿using SharedCore.ByteParsing;
+using SharedCore.PackFiles.Models;
 using System.IO;
 using System.Linq;
 using System.Text;

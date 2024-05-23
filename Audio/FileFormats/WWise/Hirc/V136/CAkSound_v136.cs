@@ -1,4 +1,4 @@
-﻿using Filetypes.ByteParsing;
+﻿using SharedCore.ByteParsing;
 using System.IO;
 
 namespace Audio.FileFormats.WWise.Hirc.V136

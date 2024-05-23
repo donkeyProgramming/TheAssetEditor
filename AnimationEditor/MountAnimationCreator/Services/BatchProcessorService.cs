@@ -1,12 +1,13 @@
-﻿using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Common;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.FileTypes.Animation;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 using CommonControls.Services;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using SharedCore.ErrorHandling;
+using SharedCore.PackFiles;
 using View3D.Animation;
 using static CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
 
@@ -50,7 +51,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         public void Process(IAnimationBinGenericFormat mountFragment, IAnimationBinGenericFormat riderFragment)
         {
-            var resultInfo = new ErrorListViewModel.ErrorList();
+            var resultInfo = new ErrorList();
             _mountFragment = mountFragment;
             _riderFragment = riderFragment;
 
@@ -64,7 +65,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             ErrorListWindow.ShowDialog("Mount creation result", resultInfo, false);
         }
 
-        void CreateFragmentAndAnimations(ErrorListViewModel.ErrorList resultInfo)
+        void CreateFragmentAndAnimations(ErrorList resultInfo)
         {
             // Find all slots that can just be copied over
             foreach (var animationSlot in GetAnimationsThatRequireNoChanges())
@@ -75,7 +76,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 CreateAnimation(animationSlot.Item1, animationSlot.Item2, resultInfo);
         }
 
-        void CreateAnimation(string riderSlot, string mountSlot, ErrorListViewModel.ErrorList resultInfo)
+        void CreateAnimation(string riderSlot, string mountSlot, ErrorList resultInfo)
         {
             // Does the rider have this?
             var riderHasAnimation = _riderFragment.Entries.FirstOrDefault(x => x.SlotName == riderSlot) != null;
@@ -142,7 +143,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             return newAnimationName;
         }
 
-        void CopyAnimations(string riderSlot, ErrorListViewModel.ErrorList resultInfo)
+        void CopyAnimations(string riderSlot, ErrorList resultInfo)
         {
             var fragmentEntry = _riderFragment.Entries.First(x => x.SlotName == riderSlot);
             var newEntry = new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()

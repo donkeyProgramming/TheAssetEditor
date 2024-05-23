@@ -1,8 +1,9 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel;
+﻿using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using CommonControls.Services;
 using CsvHelper;
+using SharedCore;
+using SharedCore.ErrorHandling;
+using SharedCore.PackFiles;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -85,7 +86,7 @@ namespace AssetEditor.Report
             {
                 var fullOutputDir = outputDir + gameDirectory + "\\";
 
-                CommonControls.Common.DirectoryHelper.EnsureCreated(outputDir);
+                DirectoryHelper.EnsureCreated(outputDir);
                 Write(failedMeshRecords, outputDir + "LoadResult.csv");
                 Write(versionInfoRecords, outputDir + "VersionAndMaterialInfo.csv");
                 Write(weightedMaterialRecords, outputDir + "WeightedMaterialInfo.csv");

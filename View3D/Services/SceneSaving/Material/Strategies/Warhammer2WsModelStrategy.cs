@@ -1,4 +1,5 @@
-﻿using View3D.SceneNodes;
+﻿using SharedCore;
+using View3D.SceneNodes;
 using View3D.Services.SceneSaving.WsModel;
 
 namespace View3D.Services.SceneSaving.Material.Strategies
@@ -19,7 +20,7 @@ namespace View3D.Services.SceneSaving.Material.Strategies
 
         public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
         {
-            _wsModelGeneratorService.GenerateWsModel(outputPath, mainNode, CommonControls.Services.GameTypeEnum.Warhammer2);
+            _wsModelGeneratorService.GenerateWsModel(outputPath, mainNode, GameTypeEnum.Warhammer2);
         }
     }
 }

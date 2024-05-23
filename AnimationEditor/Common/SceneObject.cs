@@ -1,7 +1,7 @@
 ﻿using AnimationMeta.Visualisation.Instances;
-using CommonControls.Common;
-using CommonControls.FileTypes.PackFiles.Models;
 using Microsoft.Xna.Framework;
+using SharedCore.Misc;
+using SharedCore.PackFiles.Models;
 using System.Collections.Generic;
 using View3D.Animation;
 using View3D.Components;

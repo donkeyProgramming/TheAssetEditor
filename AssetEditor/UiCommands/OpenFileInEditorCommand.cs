@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
-using CommonControls.Events.UiCommands;
-using CommonControls.FileTypes.PackFiles.Models;
+﻿using CommonControls.Events.UiCommands;
+using SharedCore.Misc;
+using SharedCore.PackFiles.Models;
 
 namespace AssetEditor.UiCommands
 {

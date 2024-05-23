@@ -14,9 +14,13 @@ using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.Services;
 using Serilog;
+using SharedCore;
+using SharedCore.ErrorHandling;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.Editors.AnimationBatchExporter

@@ -1,5 +1,5 @@
 ﻿using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.PackFiles.Models;
+using SharedCore.PackFiles.Models;
 
 namespace AnimationEditor.PropCreator.ViewModels
 {

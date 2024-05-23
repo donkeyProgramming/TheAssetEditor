@@ -4,8 +4,8 @@
 
 using System.Collections.ObjectModel;
 using CommonControls.Events.UiCommands;
-using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
+using SharedCore.PackFiles;
+using SharedCore.ToolCreation;
 
 namespace CommonControls.PackFileBrowser
 {

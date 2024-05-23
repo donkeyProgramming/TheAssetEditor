@@ -2,7 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using CommonControls.FileTypes.PackFiles.Models;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.Interfaces.AssetManagement
 {

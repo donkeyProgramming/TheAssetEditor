@@ -6,8 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommonControls.Common;
 using Serilog;
+using SharedCore;
 
 namespace CommonControls.FileTypes.RigidModel.MaterialHeaders
 {

@@ -1,5 +1,6 @@
-﻿using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
+﻿using SharedCore;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

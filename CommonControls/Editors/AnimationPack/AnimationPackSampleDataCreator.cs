@@ -5,12 +5,11 @@
 using System.Collections.Generic;
 using System.Windows;
 using CommonControls.BaseDialogs;
-using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.Editors.AnimationPack
 {

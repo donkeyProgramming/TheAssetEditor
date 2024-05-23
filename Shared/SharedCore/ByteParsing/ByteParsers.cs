@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using Half = SharpDX.Half;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Vector4 = Microsoft.Xna.Framework.Vector4;
 
-namespace Filetypes.ByteParsing
+namespace SharedCore.ByteParsing
 {
     public enum DbTypesEnum
     {
@@ -74,15 +72,15 @@ namespace Filetypes.ByteParsing
 
         public virtual bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string? error)
         {
-            var result = TryDecodeValue(buffer, index, out T temp, out bytesRead, out error);
+            var result = TryDecodeValue(buffer, index, out var temp, out bytesRead, out error);
             value = temp?.ToString();
             return result;
         }
 
-        public virtual bool TryDecodeValue(byte[] buffer, int index, out T value, out int bytesRead, out string ?error)
+        public virtual bool TryDecodeValue(byte[] buffer, int index, out T value, out int bytesRead, out string? error)
         {
             value = default;
-            bool canDecode = CanDecode(buffer, index, out bytesRead, out error);
+            var canDecode = CanDecode(buffer, index, out bytesRead, out error);
             if (canDecode)
                 value = Decode(buffer, index);
             return canDecode;
@@ -90,7 +88,7 @@ namespace Filetypes.ByteParsing
 
         public object GetValueAsObject(byte[] buffer, int index, out int bytesRead)
         {
-            bool canDecode = CanDecode(buffer, index, out bytesRead, out var error);
+            var canDecode = CanDecode(buffer, index, out bytesRead, out var error);
             if (canDecode == false)
                 throw new Exception(error);
 
@@ -122,7 +120,7 @@ namespace Filetypes.ByteParsing
             return BitConverter.GetBytes(value);
         }
 
-        public override byte[] Encode(string value, out string ?error)
+        public override byte[] Encode(string value, out string? error)
         {
             if (!int.TryParse(value, out var spesificValue))
             {
@@ -146,13 +144,13 @@ namespace Filetypes.ByteParsing
             return BitConverter.ToInt64(buffer, index);
         }
 
-        public override byte[] EncodeValue(long value, out string ?error)
+        public override byte[] EncodeValue(long value, out string? error)
         {
             error = null;
             return BitConverter.GetBytes(value);
         }
 
-        public override byte[] Encode(string value, out string ?error)
+        public override byte[] Encode(string value, out string? error)
         {
             if (!long.TryParse(value, out var spesificValue))
             {
@@ -176,13 +174,13 @@ namespace Filetypes.ByteParsing
             return BitConverter.ToUInt32(buffer, index);
         }
 
-        public override byte[] EncodeValue(uint value, out string ?error)
+        public override byte[] EncodeValue(uint value, out string? error)
         {
             error = null;
             return BitConverter.GetBytes(value);
         }
 
-        public override byte[] Encode(string value, out string ?error)
+        public override byte[] Encode(string value, out string? error)
         {
             if (!uint.TryParse(value, out var spesificValue))
             {
@@ -206,13 +204,13 @@ namespace Filetypes.ByteParsing
             return buffer[index];
         }
 
-        public override byte[] EncodeValue(byte value, out string ?error)
+        public override byte[] EncodeValue(byte value, out string? error)
         {
             error = null;
             return new byte[] { value };
         }
 
-        public override byte[] Encode(string value, out string ?error)
+        public override byte[] Encode(string value, out string? error)
         {
             if (!byte.TryParse(value, out var spesificValue))
             {
@@ -225,7 +223,7 @@ namespace Filetypes.ByteParsing
 
         public byte[] ReadArray(byte[] buffer, int index, int count)
         {
-            byte[] destination = new byte[count];
+            var destination = new byte[count];
             Array.Copy(buffer, index, destination, 0, count);
             return destination;
         }
@@ -244,19 +242,19 @@ namespace Filetypes.ByteParsing
 
         public override bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string? _error)
         {
-            var result = TryDecodeValue(buffer, index, out float temp, out bytesRead, out _error);
+            var result = TryDecodeValue(buffer, index, out var temp, out bytesRead, out _error);
             value = temp.ToString("0.00000000");
             //value = temp.ToString();
             return result;
         }
 
-        public override byte[] EncodeValue(float value, out string ?error)
+        public override byte[] EncodeValue(float value, out string? error)
         {
             error = null;
             return BitConverter.GetBytes(value);
         }
 
-        public override byte[] Encode(string value, out string ?error)
+        public override byte[] Encode(string value, out string? error)
         {
             if (!float.TryParse(value, out var spesificValue))
             {
@@ -275,7 +273,7 @@ namespace Filetypes.ByteParsing
 
         public DbTypesEnum Type => DbTypesEnum.Vector3;
 
-        public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string ?error)
+        public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string? error)
         {
             return TryDecodeValue(buffer, index, out var _, out bytesRead, out error);
         }
@@ -285,7 +283,7 @@ namespace Filetypes.ByteParsing
             return "0|0|0";
         }
 
-        public byte[] Encode(string value, out string ?error)
+        public byte[] Encode(string value, out string? error)
         {
             var split = value.Split("|");
             if (split.Length != 3)
@@ -313,7 +311,7 @@ namespace Filetypes.ByteParsing
             return combined;
         }
 
-        public byte[] EncodeValue(Vector3 value, out string ?error)
+        public byte[] EncodeValue(Vector3 value, out string? error)
         {
             var x = ByteParsers.Single.EncodeValue(value.X, out error);
             if (x == null)
@@ -334,14 +332,14 @@ namespace Filetypes.ByteParsing
             return combined;
         }
 
-        public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string ?error)
+        public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string? error)
         {
             var result = TryDecodeValue(buffer, index, out var typedValue, out bytesRead, out error);
             value = $"{typedValue.X},{typedValue.Y},{typedValue.Z}";
             return result;
         }
 
-        public bool TryDecodeValue(byte[] buffer, int index, out Vector3 value, out int bytesRead, out string ?error)
+        public bool TryDecodeValue(byte[] buffer, int index, out Vector3 value, out int bytesRead, out string? error)
         {
             var x = ByteParsers.Single.TryDecodeValue(buffer, index + 0, out var xValue, out bytesRead, out error);
             var y = ByteParsers.Single.TryDecodeValue(buffer, index + 4, out var yValue, out bytesRead, out error);
@@ -353,7 +351,7 @@ namespace Filetypes.ByteParsing
 
         public object GetValueAsObject(byte[] buffer, int index, out int bytesRead)
         {
-            bool canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
+            var canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
             if (canDecode == false)
                 throw new Exception(error);
 
@@ -367,7 +365,7 @@ namespace Filetypes.ByteParsing
 
         public DbTypesEnum Type => DbTypesEnum.Vector4;
 
-        public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string ?error)
+        public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string? error)
         {
             return TryDecodeValue(buffer, index, out var _, out bytesRead, out error);
         }
@@ -377,7 +375,7 @@ namespace Filetypes.ByteParsing
             return "0|0|0|1";
         }
 
-        public byte[] Encode(string value, out string ?error)
+        public byte[] Encode(string value, out string? error)
         {
             var split = value.Split("|");
             if (split.Length != 4)
@@ -410,7 +408,7 @@ namespace Filetypes.ByteParsing
             return combined;
         }
 
-        public byte[] EncodeValue(Vector4 value, out string ?error)
+        public byte[] EncodeValue(Vector4 value, out string? error)
         {
             var x = ByteParsers.Single.EncodeValue(value.X, out error);
             if (x == null)
@@ -436,14 +434,14 @@ namespace Filetypes.ByteParsing
             return combined;
         }
 
-        public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string ?error)
+        public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string? error)
         {
             var result = TryDecodeValue(buffer, index, out var typedValue, out bytesRead, out error);
             value = $"{typedValue.X},{typedValue.Y},{typedValue.Z},{typedValue.W}";
             return result;
         }
 
-        public bool TryDecodeValue(byte[] buffer, int index, out Vector4 value, out int bytesRead, out string ?error)
+        public bool TryDecodeValue(byte[] buffer, int index, out Vector4 value, out int bytesRead, out string? error)
         {
             var x = ByteParsers.Single.TryDecodeValue(buffer, index + 0, out var xValue, out bytesRead, out error);
             var y = ByteParsers.Single.TryDecodeValue(buffer, index + 4, out var yValue, out bytesRead, out error);
@@ -456,7 +454,7 @@ namespace Filetypes.ByteParsing
 
         public object GetValueAsObject(byte[] buffer, int index, out int bytesRead)
         {
-            bool canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
+            var canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
             if (canDecode == false)
                 throw new Exception(error);
 
@@ -472,17 +470,17 @@ namespace Filetypes.ByteParsing
 
         protected override Half Decode(byte[] buffer, int index)
         {
-            var u = (BitConverter.ToUInt16(buffer, index));
+            var u = BitConverter.ToUInt16(buffer, index);
             return new Half(u);
         }
 
-        public override byte[] EncodeValue(Half value, out string ?error)
+        public override byte[] EncodeValue(Half value, out string? error)
         {
             error = null;
             return BitConverter.GetBytes(value.RawValue);
         }
 
-        public override byte[] Encode(string value, out string ?error)
+        public override byte[] Encode(string value, out string? error)
         {
 
             if (!float.TryParse(value, out var spesificValue))
@@ -522,13 +520,13 @@ namespace Filetypes.ByteParsing
             return BitConverter.ToInt16(buffer, index);
         }
 
-        public override byte[] EncodeValue(short value, out string ?error)
+        public override byte[] EncodeValue(short value, out string? error)
         {
             error = null;
             return BitConverter.GetBytes(value);
         }
 
-        public override byte[] Encode(string value, out string ?error)
+        public override byte[] Encode(string value, out string? error)
         {
             if (!short.TryParse(value, out var spesificValue))
             {
@@ -551,13 +549,13 @@ namespace Filetypes.ByteParsing
             return BitConverter.ToUInt16(buffer, index);
         }
 
-        public override byte[] EncodeValue(ushort value, out string ?error)
+        public override byte[] EncodeValue(ushort value, out string? error)
         {
             error = null;
             return BitConverter.GetBytes(value);
         }
 
-        public override byte[] Encode(string value, out string ?error)
+        public override byte[] Encode(string value, out string? error)
         {
             if (!ushort.TryParse(value, out var spesificValue))
             {
@@ -604,7 +602,7 @@ namespace Filetypes.ByteParsing
             return "false";
         }
 
-        public byte[] Encode(string value, out string ?error)
+        public byte[] Encode(string value, out string? error)
         {
             if (!bool.TryParse(value, out var _res))
             {
@@ -615,7 +613,7 @@ namespace Filetypes.ByteParsing
             return Write(_res);
         }
 
-        public byte[] EncodeValue(bool value, out string ?error)
+        public byte[] EncodeValue(bool value, out string? error)
         {
             error = null;
             return Write(value);
@@ -631,9 +629,9 @@ namespace Filetypes.ByteParsing
         public bool TryDecodeValue(byte[] buffer, int index, out bool value, out int bytesRead, out string? _error)
         {
             value = false;
-            bool canDecode = CanDecode(buffer, index, out bytesRead, out _error);
+            var canDecode = CanDecode(buffer, index, out bytesRead, out _error);
             if (canDecode)
-                value = (buffer[index] == 1);
+                value = buffer[index] == 1;
             return canDecode;
         }
 
@@ -647,7 +645,7 @@ namespace Filetypes.ByteParsing
 
         public object GetValueAsObject(byte[] buffer, int index, out int bytesRead)
         {
-            bool canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
+            var canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
             if (canDecode == false)
                 throw new Exception(error);
 
@@ -665,15 +663,15 @@ namespace Filetypes.ByteParsing
         public virtual string TypeName { get { return "String"; } }
 
         bool TryReadReadCAStringAsArray(byte[] buffer, int index, Encoding encoding, bool isOptString,
-             out string ?errorMessage, out int stringStart, out int stringLength, out int bytesInString)
+             out string? errorMessage, out int stringStart, out int stringLength, out int bytesInString)
         {
             stringStart = 0;
             stringLength = 0;
             bytesInString = 0;
             var bytesLeft = buffer.Length - index;
 
-            int offset = 0;
-            bool readTheString = true;
+            var offset = 0;
+            var readTheString = true;
             if (isOptString)
             {
                 if (bytesLeft < 1)
@@ -713,7 +711,7 @@ namespace Filetypes.ByteParsing
                 }
 
                 // Unicode is 2 bytes per character; UTF8 is variable, but the number stored is the number of bytes, so use that
-                int bytes = (encoding == Encoding.Unicode ? 2 : 1) * num;
+                var bytes = (encoding == Encoding.Unicode ? 2 : 1) * num;
                 // enough data left?
                 if (bytesLeft < bytes)
                 {
@@ -727,7 +725,7 @@ namespace Filetypes.ByteParsing
                     return false;
                 }
 
-                stringStart = (index + 2 + offset);
+                stringStart = index + 2 + offset;
                 stringLength = bytes;
                 bytesInString = bytes + 2;
             }
@@ -737,20 +735,20 @@ namespace Filetypes.ByteParsing
             return true;
         }
 
-        public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string ?error)
+        public bool CanDecode(byte[] buffer, int index, out int bytesRead, out string? error)
         {
             return TryReadReadCAStringAsArray(buffer, index, StringEncoding, IsOptStr, out error, out _, out _, out bytesRead);
         }
 
-        public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string ?error)
+        public bool TryDecode(byte[] buffer, int index, out string value, out int bytesRead, out string? error)
         {
             return TryDecodeValue(buffer, index, out value, out bytesRead, out error);
         }
 
-        public bool TryDecodeValue(byte[] buffer, int index, out string value, out int bytesRead, out string ?error)
+        public bool TryDecodeValue(byte[] buffer, int index, out string value, out int bytesRead, out string? error)
         {
             value = null;
-            var result = TryReadReadCAStringAsArray(buffer, index, StringEncoding, IsOptStr, out error, out int stringStrt, out int stringLength, out bytesRead);
+            var result = TryReadReadCAStringAsArray(buffer, index, StringEncoding, IsOptStr, out error, out var stringStrt, out var stringLength, out bytesRead);
             if (result)
             {
                 if (stringLength != 0)
@@ -788,12 +786,12 @@ namespace Filetypes.ByteParsing
                 if (IsOptStr)
                     return new byte[] { 0 };
                 else
-                    return BitConverter.GetBytes((Int16)0);
+                    return BitConverter.GetBytes((short)0);
             }
 
 
 
-            var byteLength = BitConverter.GetBytes((Int16)value.Length);
+            var byteLength = BitConverter.GetBytes((short)value.Length);
             var byteStr = StringEncoding.GetBytes(value);
 
             var stringWithCountAtFront = byteLength.Concat(byteStr).ToArray();
@@ -811,13 +809,13 @@ namespace Filetypes.ByteParsing
             }
         }
 
-        public byte[] EncodeValue(string value, out string ?error)
+        public byte[] EncodeValue(string value, out string? error)
         {
             error = null;
             return WriteCaString(value);
         }
 
-        public byte[] Encode(string value, out string ?error)
+        public byte[] Encode(string value, out string? error)
         {
             return EncodeValue(value, out error);
         }
@@ -829,7 +827,7 @@ namespace Filetypes.ByteParsing
 
         public object GetValueAsObject(byte[] buffer, int index, out int bytesRead)
         {
-            bool canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
+            var canDecode = TryDecodeValue(buffer, index, out var value, out bytesRead, out var error);
             if (canDecode == false)
                 throw new Exception(error);
 
@@ -856,12 +854,12 @@ namespace Filetypes.ByteParsing
             return Encoding.ASCII.GetString(buffer, index, FieldSize);
         }
 
-        public override byte[] EncodeValue(string value, out string ?error)
+        public override byte[] EncodeValue(string value, out string? error)
         {
             throw new NotImplementedException();
         }
 
-        public override byte[] Encode(string value, out string ?error)
+        public override byte[] Encode(string value, out string? error)
         {
             throw new NotImplementedException();
         }
@@ -876,11 +874,11 @@ namespace Filetypes.ByteParsing
                 return false;
             }
 
-            for (int i = 0; i < FieldSize; i++)
+            for (var i = 0; i < FieldSize; i++)
             {
                 var b = buffer[index + i];
                 //var t = Encoding.ASCII.GetString(buffer, index + i, 1)[0];
-                bool isAscii = b < 128;
+                var isAscii = b < 128;
                 if (!isAscii)
                 {
                     bytesRead = 0;
@@ -901,7 +899,7 @@ namespace Filetypes.ByteParsing
 
         bool FilePathHasInvalidChars(string path)
         {
-            return !string.IsNullOrEmpty(path) && path.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0;
+            return !string.IsNullOrEmpty(path) && path.IndexOfAny(Path.GetInvalidPathChars()) >= 0;
         }
     }
 
@@ -924,12 +922,12 @@ namespace Filetypes.ByteParsing
             return Encoding.Unicode.GetString(buffer, index, FieldSize);
         }
 
-        public override byte[] EncodeValue(string value, out string ?error)
+        public override byte[] EncodeValue(string value, out string? error)
         {
             throw new NotImplementedException();
         }
 
-        public override byte[] Encode(string value, out string ?error)
+        public override byte[] Encode(string value, out string? error)
         {
             throw new NotImplementedException();
         }

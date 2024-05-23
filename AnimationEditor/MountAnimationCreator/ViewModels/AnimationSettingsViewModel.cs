@@ -1,5 +1,5 @@
-﻿using CommonControls.Common;
-using CommonControls.MathViews;
+﻿using CommonControls.MathViews;
+using SharedCore.Misc;
 
 namespace AnimationEditor.MountAnimationCreator.ViewModels
 {

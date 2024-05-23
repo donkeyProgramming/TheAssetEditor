@@ -1,11 +1,11 @@
 ﻿using System;
-using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Serilog;
+using SharedCore;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 using View3D.Animation;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;

@@ -1,21 +1,17 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using CommonControls.Common;
 using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.PackFiles.Models;
 using Serilog;
+using SharedCore;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.Services
 {
-
     public class SkeletonAnimationLookUpHelper : IAnimationFileDiscovered
     {
         ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
@@ -71,7 +67,6 @@ namespace CommonControls.Services
                 }
             }
         }
-
 
         public void UnloadAnimationFromContainer(PackFileService pfs, PackFileContainer packFileContainer)
         {

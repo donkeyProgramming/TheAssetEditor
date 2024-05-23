@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using SharedCore.ErrorHandling;
 using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using View3D.Utility;
-using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace View3D.Services
 {

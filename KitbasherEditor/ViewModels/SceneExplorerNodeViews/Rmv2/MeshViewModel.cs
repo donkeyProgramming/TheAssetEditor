@@ -1,10 +1,10 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel;
+﻿using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.MathViews;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
+using SharedCore.Misc;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;

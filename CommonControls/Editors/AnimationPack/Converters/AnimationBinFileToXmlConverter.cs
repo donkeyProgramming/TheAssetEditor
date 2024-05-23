@@ -8,7 +8,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.Editors.TextEditor;
 using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
-using CommonControls.Services;
+using SharedCore.PackFiles;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {

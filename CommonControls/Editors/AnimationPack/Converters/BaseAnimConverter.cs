@@ -9,9 +9,9 @@ using System.Linq;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
-using CommonControls.Common;
 using CommonControls.Editors.TextEditor;
-using CommonControls.Services;
+using SharedCore.ErrorHandling;
+using SharedCore.PackFiles;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {

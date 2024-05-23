@@ -1,9 +1,10 @@
 ﻿using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
-using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
-using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.ToolCreation;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 {

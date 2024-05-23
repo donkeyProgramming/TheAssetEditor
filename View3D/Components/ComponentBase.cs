@@ -1,5 +1,5 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using SharedCore.Misc;
 using System;
 
 namespace View3D.Components

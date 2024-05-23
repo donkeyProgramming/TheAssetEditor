@@ -1,5 +1,5 @@
 ﻿using KitbasherEditor.Events;
-using Monogame.WpfInterop.Common;
+using SharedCore.Events;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 

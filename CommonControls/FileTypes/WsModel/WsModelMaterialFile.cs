@@ -6,9 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using CommonControls.FileTypes.PackFiles.Models;
 using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Types;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.FileTypes.WsModel
 {

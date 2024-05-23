@@ -1,8 +1,8 @@
-﻿using CommonControls.Common;
-using CommonControls.MathViews;
+﻿using CommonControls.MathViews;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.Common;
+using SharedCore.Events;
+using SharedCore.Misc;
 using System.ComponentModel;
 using View3D.Commands;
 using View3D.Components.Component;

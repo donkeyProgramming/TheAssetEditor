@@ -1,11 +1,6 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
+﻿using System.Text;
 
-using System.IO;
-using System.Text;
-
-namespace FileTypes.ByteParsing
+namespace SharedCore.ByteParsing
 {
     public class IOFunctions
     {
@@ -13,7 +8,7 @@ namespace FileTypes.ByteParsing
         public static string ReadZeroTerminatedAscii(BinaryReader reader, byte[] preAllocatedBuffer)
         {
             var index = 0;
-            byte ch2 = reader.ReadByte();
+            var ch2 = reader.ReadByte();
             while (ch2 != 0)
             {
                 preAllocatedBuffer[index++] = ch2;

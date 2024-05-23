@@ -7,6 +7,8 @@ using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
 using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
 
 namespace AnimationEditor.MountAnimationCreator.ViewModels
 {

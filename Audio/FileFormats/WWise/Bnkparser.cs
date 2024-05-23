@@ -5,8 +5,8 @@ using Audio.FileFormats.WWise.Data;
 using Audio.FileFormats.WWise.Didx;
 using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Stid;
-using CommonControls.FileTypes.PackFiles.Models;
-using Filetypes.ByteParsing;
+using SharedCore.ByteParsing;
+using SharedCore.PackFiles.Models;
 
 namespace Audio.FileFormats.WWise
 {

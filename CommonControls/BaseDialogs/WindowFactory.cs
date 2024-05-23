@@ -6,7 +6,6 @@ using MonoGame.Framework.WpfInterop;
 
 namespace CommonControls.BaseDialogs
 {
-    // TODO: Replaces SubToolWindowCreator
     public interface IWindowFactory
     {
         ITypedAssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight) where TViewModel : class;

@@ -4,7 +4,7 @@
 
 using System.IO;
 using System.Text;
-using CommonControls.Services;
+using SharedCore.PackFiles;
 
 namespace CommonControls.Editors.TextEditor
 {

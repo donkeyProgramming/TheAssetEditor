@@ -1,7 +1,7 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel.Types;
+﻿using CommonControls.FileTypes.RigidModel.Types;
 using CommonControls.PackFileBrowser;
-using CommonControls.Services;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
 using System;
 using System.Collections;
 using System.Collections.Generic;

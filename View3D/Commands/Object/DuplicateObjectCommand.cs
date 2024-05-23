@@ -1,5 +1,5 @@
-﻿using CommonControls.Common;
-using Serilog;
+﻿using Serilog;
+using SharedCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

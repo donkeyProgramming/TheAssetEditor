@@ -1,8 +1,5 @@
-﻿using CommonControls.Common;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using System.Collections.ObjectModel;
-using CommonControls.Services;
-using CommonControls.FileTypes.PackFiles.Models;
 using System;
 using System.IO;
 using System.Linq;
@@ -10,6 +7,9 @@ using CommonControls.FileTypes.Animation;
 using AssetManagement.Strategies.Fbx.ImportDialog.DataModels;
 using AssetManagement.Strategies.Fbx.ImportDialog.Views;
 using System.Windows;
+using SharedCore.Misc;
+using SharedCore.PackFiles.Models;
+using SharedCore.PackFiles;
 
 // finish "rationaliztion" this ModelView, around the concept of "FileInfoData" as input
 namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels

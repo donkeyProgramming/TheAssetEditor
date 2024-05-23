@@ -1,8 +1,9 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel;
+﻿using CommonControls.FileTypes.RigidModel;
 using CommonControls.FileTypes.RigidModel.Types;
-using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

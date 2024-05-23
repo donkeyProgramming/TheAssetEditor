@@ -1,6 +1,8 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel.MaterialHeaders;
+﻿using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommonControls.Services;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 

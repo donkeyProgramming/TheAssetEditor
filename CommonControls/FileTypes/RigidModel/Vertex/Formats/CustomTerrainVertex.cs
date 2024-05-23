@@ -5,6 +5,7 @@
 using System;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
+using SharedCore.ByteParsing;
 
 namespace CommonControls.FileTypes.RigidModel.Vertex.Formats
 {

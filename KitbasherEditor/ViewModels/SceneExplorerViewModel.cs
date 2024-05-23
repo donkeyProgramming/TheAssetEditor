@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
-using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using Monogame.WpfInterop.Common;
+﻿using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+using SharedCore.Events;
+using SharedCore.Misc;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

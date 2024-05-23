@@ -4,7 +4,7 @@
 
 using System;
 using System.Globalization;
-using CommonControls.Common;
+using SharedCore.Misc;
 
 namespace CommonControls.MathViews
 {

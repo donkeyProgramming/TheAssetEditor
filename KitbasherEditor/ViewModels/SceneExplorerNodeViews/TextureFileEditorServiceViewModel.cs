@@ -1,5 +1,5 @@
-﻿using CommonControls.Common;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using SharedCore.Misc;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
 using System.Windows.Input;

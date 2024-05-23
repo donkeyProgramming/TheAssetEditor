@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Input;
-using CommonControls.Common;
 using CommunityToolkit.Mvvm.Input;
+using SharedCore.Misc;
 
 namespace CommonControls.Table
 {

@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using CommonControls.Services;
+using SharedCore.PackFiles;
 
 namespace CommonControls.PackFileBrowser
 {

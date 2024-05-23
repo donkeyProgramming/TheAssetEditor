@@ -1,4 +1,4 @@
-﻿using CommonControls.Common;
+﻿using SharedCore;
 using System.Diagnostics;
 
 namespace Audio.Utility

@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
-using Serilog;
-
+﻿using Serilog;
+using SharedCore;
+using SharedCore.ErrorHandling;
 
 namespace Audio.BnkCompiler
 {

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using SharedCore.Misc;
 
 namespace CommonControls.Common.MenuSystem
 {
-
-
     public class MenuAction
     {
         public Hotkey Hotkey { get; set; }
@@ -34,7 +33,6 @@ namespace CommonControls.Common.MenuSystem
         }
 
         public string _toopTipText;
-
 
         public string ToolTip
         {

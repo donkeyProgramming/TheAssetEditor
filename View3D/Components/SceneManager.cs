@@ -1,7 +1,7 @@
-﻿using CommonControls.Common;
-using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.Common;
+﻿using Microsoft.Xna.Framework;
 using Serilog;
+using SharedCore;
+using SharedCore.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;

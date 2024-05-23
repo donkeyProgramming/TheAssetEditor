@@ -8,6 +8,7 @@ using CommonControls.Editors.BoneMapping.View;
 using CommonControls.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
+using SharedCore.PackFiles;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;

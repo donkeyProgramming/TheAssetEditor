@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel.MaterialHeaders;
+﻿using CommonControls.FileTypes.RigidModel.MaterialHeaders;
 using CommunityToolkit.Mvvm.Input;
+using SharedCore.Misc;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;

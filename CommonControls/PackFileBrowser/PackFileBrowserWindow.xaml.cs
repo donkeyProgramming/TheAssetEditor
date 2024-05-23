@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
 
 namespace CommonControls.PackFileBrowser
 {

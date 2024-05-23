@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using CommonControls.Common;
-using CommonControls.Services;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
 using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.Common;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
+using SharedCore;
+using SharedCore.Events;
+using SharedCore.PackFiles;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 using View3D.Services;

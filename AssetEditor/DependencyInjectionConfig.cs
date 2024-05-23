@@ -4,10 +4,10 @@ using AnimationMeta;
 using AssetManagement;
 using Audio;
 using CommonControls;
-using CommonControls.Services.ToolCreation;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SharedCore.ToolCreation;
 using TextureEditor;
 using View3D;
 

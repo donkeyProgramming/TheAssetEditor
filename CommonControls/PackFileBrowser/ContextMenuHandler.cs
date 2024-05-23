@@ -8,11 +8,13 @@ using System.Windows.Input;
 using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.Events.UiCommands;
-using CommonControls.FileTypes.PackFiles.Models;
-using CommonControls.Services;
-using CommonControls.Services.ToolCreation;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using SharedCore;
+using SharedCore.Misc;
+using SharedCore.PackFiles;
+using SharedCore.PackFiles.Models;
+using SharedCore.ToolCreation;
 using Clipboard = System.Windows.Clipboard;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
@@ -96,7 +98,9 @@ namespace CommonControls.PackFileBrowser
                         MessageBox.Show("Folder name can not be empty!");
                         return;
                     }
-                    _packFileService.RenameDirectory(_selectedNode.FileOwner, _selectedNode, window.TextValue);
+
+                    _selectedNode.Name = window.TextValue;
+                    _packFileService.RenameDirectory(_selectedNode.FileOwner, _selectedNode.GetFullPath(), window.TextValue);
                 }
             }
             else if (_selectedNode.NodeType == NodeType.File)

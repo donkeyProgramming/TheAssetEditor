@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Monogame.WpfInterop.Common;
+using SharedCore.Events;
 using View3D.Utility;
 
 namespace View3D.Components.Component
