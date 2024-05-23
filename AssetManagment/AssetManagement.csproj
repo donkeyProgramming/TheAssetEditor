@@ -7,8 +7,8 @@
 	  <Compile Remove="GenericFormats\Managed\MeshDataStructures.cs" />
 	</ItemGroup>
 
-  <ItemGroup>    
-    <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
+  <ItemGroup>
+      <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>
 

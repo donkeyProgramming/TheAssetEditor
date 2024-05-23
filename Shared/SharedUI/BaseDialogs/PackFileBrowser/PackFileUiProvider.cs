@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using CommonControls.PackFileBrowser;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
 
-namespace CommonControls.PackFileBrowser
+namespace CommonControls.BaseDialogs.PackFileBrowser
 {
     public class PackFileUiProvider : IPackFileUiProvider
     {
-        public bool DisplaySaveDialog(PackFileService pfs, List<string> extensions, out PackFile? selectedFile, out string? filePath)
+        public bool DisplaySaveDialog(PackFileService pfs, List<string> extensions, out PackFile selectedFile, out string filePath)
         {
             selectedFile = null;
             filePath = null;

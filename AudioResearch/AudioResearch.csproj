@@ -21,7 +21,7 @@
     <ItemGroup>
     <ProjectReference Include="..\AssetEditor\AssetEditor.csproj" />
     <ProjectReference Include="..\Audio\Audio.csproj" />
-    <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
+        <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
   </ItemGroup>
 
   <ItemGroup>

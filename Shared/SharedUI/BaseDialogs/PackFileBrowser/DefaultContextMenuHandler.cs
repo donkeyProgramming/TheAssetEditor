@@ -7,7 +7,7 @@ using CommonControls.Events.UiCommands;
 using SharedCore.PackFiles;
 using SharedCore.ToolCreation;
 
-namespace CommonControls.PackFileBrowser
+namespace CommonControls.BaseDialogs.PackFileBrowser
 {
     public class DefaultContextMenuHandler : ContextMenuHandler
     {

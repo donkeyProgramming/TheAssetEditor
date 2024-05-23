@@ -5,6 +5,7 @@
 using System;
 using System.ComponentModel;
 using System.Windows;
+using CommonControls.BaseDialogs.PackFileBrowser;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
 

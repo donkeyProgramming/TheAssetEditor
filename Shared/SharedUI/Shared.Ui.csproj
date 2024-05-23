@@ -129,6 +129,9 @@
     <EmbeddedResource Include="Resources\AnimationSlots\Warhammer3AnimationSlots_dlc24.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <ProjectReference Include="..\..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
+    <ProjectReference Include="..\GameFiles\Shared.GameFiles.csproj" />
+    <ProjectReference Include="..\SharedCore\Shared.Core.csproj" />
     <Resource Include="Resources\Icons\Copy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -348,12 +351,6 @@
     <Resource Include="Resources\Icons\WordWrap.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
-    <ProjectReference Include="..\Shared\GameFiles\GameFiles.csproj" />
-    <ProjectReference Include="..\Shared\SharedCore\SharedCore.csproj" />
   </ItemGroup>
 
 </Project>

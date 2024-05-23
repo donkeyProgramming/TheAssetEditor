@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:viewmodel="clr-namespace:KitbasherEditor.ViewModels.MenuBarViews"
-             xmlns:menusystem="clr-namespace:CommonControls.Common.MenuSystem;assembly=CommonControls"
+             xmlns:menusystem="clr-namespace:CommonControls.Common.MenuSystem;assembly=Shared.Ui"
              mc:Ignorable="d" Loaded="UserControl_Loaded" >
     <UserControl.Resources>
 

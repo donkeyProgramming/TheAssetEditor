@@ -1,4 +1,5 @@
-﻿using CommonControls;
+﻿
+using CommonControls;
 using Microsoft.Extensions.DependencyInjection;
 using SharedCore.Misc;
 using SharedCore.ToolCreation;

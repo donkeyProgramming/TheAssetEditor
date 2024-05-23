@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using SharedCore.Misc;
 
-namespace CommonControls.PackFileBrowser
+namespace CommonControls.BaseDialogs.PackFileBrowser
 {
     public class PackFileFilter : NotifyPropertyChangedImpl, IDataErrorInfo
     {
@@ -40,7 +40,7 @@ namespace CommonControls.PackFileBrowser
             {
                 expression = new Regex(text, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return e.Message;
             }
@@ -50,7 +50,7 @@ namespace CommonControls.PackFileBrowser
 
             if (AutoExapandResultsAfterLimitedCount != -1)
             {
-                int visibleNodes = 0;
+                var visibleNodes = 0;
                 foreach (var item in _nodeCollection)
                     visibleNodes += CountVisibleNodes(item);
 
@@ -92,7 +92,7 @@ namespace CommonControls.PackFileBrowser
 
             if (file.NodeType == NodeType.File)
             {
-                bool hasValidExtention = true;
+                var hasValidExtention = true;
                 if (_extentionFilter != null)
                 {
                     hasValidExtention = false;

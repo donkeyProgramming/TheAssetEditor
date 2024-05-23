@@ -1,4 +1,5 @@
 ﻿using CommonControls.BaseDialogs;
+using CommonControls.BaseDialogs.PackFileBrowser;
 using CommonControls.BaseDialogs.ToolSelector;
 using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationFilePreviewEditor;
@@ -10,7 +11,6 @@ using CommonControls.Editors.TextEditor;
 using CommonControls.Editors.VariantMeshDefinition;
 using CommonControls.Editors.Wtui;
 using CommonControls.Events.UiCommands;
-using CommonControls.PackFileBrowser;
 using CommonControls.Resources;
 using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;

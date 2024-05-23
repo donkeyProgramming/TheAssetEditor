@@ -1,4 +1,4 @@
-﻿using CommonControls.PackFileBrowser;
+﻿using CommonControls.BaseDialogs.PackFileBrowser;
 using CommunityToolkit.Mvvm.Input;
 using SharedCore.Misc;
 using System.Collections.Generic;

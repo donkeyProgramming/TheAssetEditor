@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using CommonControls.BaseDialogs.PackFileBrowser;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
 

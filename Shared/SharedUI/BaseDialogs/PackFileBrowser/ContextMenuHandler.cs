@@ -20,7 +20,7 @@ using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 
-namespace CommonControls.PackFileBrowser
+namespace CommonControls.BaseDialogs.PackFileBrowser
 {
     public abstract class ContextMenuHandler : NotifyPropertyChangedImpl
     {
@@ -137,7 +137,7 @@ namespace CommonControls.PackFileBrowser
                 var files = dialog.FileNames;
                 foreach (var file in files)
                 {
-                    var fileName = System.IO.Path.GetFileName(file);
+                    var fileName = Path.GetFileName(file);
                     var packFile = new PackFile(fileName, new MemorySource(File.ReadAllBytes(file)));
                     _packFileService.AddFileToPack(_selectedNode.FileOwner, parentPath, packFile);
                 }
@@ -145,7 +145,7 @@ namespace CommonControls.PackFileBrowser
         }
         void OnImport3DModelCommand()
         {
-        
+
             _uiCommandFactory.Create<ImportAssetCommand>().Execute(_selectedNode.FileOwner, _selectedNode.GetFullPath());
         }
 
@@ -168,15 +168,15 @@ namespace CommonControls.PackFileBrowser
 
         void DuplicateNode()
         {
-            var fileName = System.IO.Path.GetFileNameWithoutExtension(_selectedNode.Name);
-            var extention = System.IO.Path.GetExtension(_selectedNode.Name);
+            var fileName = Path.GetFileNameWithoutExtension(_selectedNode.Name);
+            var extention = Path.GetExtension(_selectedNode.Name);
             var newName = fileName + "_copy" + extention;
 
-            var bytes = (_selectedNode.Item).DataSource.ReadData();
+            var bytes = _selectedNode.Item.DataSource.ReadData();
             var packFile = new PackFile(newName, new MemorySource(bytes));
 
             var parentPath = _selectedNode.GetFullPath();
-            var path = System.IO.Path.GetDirectoryName(parentPath);
+            var path = Path.GetDirectoryName(parentPath);
 
             _packFileService.AddFileToPack(_selectedNode.FileOwner, path, packFile);
         }
@@ -229,7 +229,7 @@ namespace CommonControls.PackFileBrowser
             var systemPath = _selectedNode.FileOwner.SystemFilePath;
             if (string.IsNullOrWhiteSpace(systemPath))
             {
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                var saveFileDialog = new SaveFileDialog();
                 saveFileDialog.FileName = _selectedNode.FileOwner.Name;
                 saveFileDialog.Filter = "PackFile | *.pack";
                 saveFileDialog.DefaultExt = "pack";
@@ -257,7 +257,7 @@ namespace CommonControls.PackFileBrowser
 
         void SaveAsPackFile()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            var saveFileDialog = new SaveFileDialog();
             saveFileDialog.FileName = _selectedNode.FileOwner.Name;
             saveFileDialog.Filter = "PackFile | *.pack";
             saveFileDialog.DefaultExt = "pack";
@@ -316,8 +316,8 @@ namespace CommonControls.PackFileBrowser
             var dialog = new FolderBrowserDialog();
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                var nodeStartDir = System.IO.Path.GetDirectoryName(_selectedNode.GetFullPath());
-                int fileCounter = 0;
+                var nodeStartDir = Path.GetDirectoryName(_selectedNode.GetFullPath());
+                var fileCounter = 0;
                 SaveSelfAndChildren(_selectedNode, dialog.SelectedPath, nodeStartDir, ref fileCounter);
                 MessageBox.Show($"{fileCounter} files exported!");
             }
@@ -343,7 +343,7 @@ namespace CommonControls.PackFileBrowser
 
                 var fileOutputPath = outputDirectory + nodePathWithoutRoot;
 
-                var fileOutputDir = System.IO.Path.GetDirectoryName(fileOutputPath);
+                var fileOutputDir = Path.GetDirectoryName(fileOutputPath);
                 DirectoryHelper.EnsureCreated(fileOutputDir);
 
                 var packFile = node.Item;
@@ -363,7 +363,7 @@ namespace CommonControls.PackFileBrowser
                 return;
             }
 
-            var tempFolder = System.IO.Path.GetTempPath();
+            var tempFolder = Path.GetTempPath();
             var fileName = string.Format(@"{0}_", DateTime.Now.Ticks) + packFile.Name;
 
             var path = tempFolder + "\\" + fileName;

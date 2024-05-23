@@ -7,7 +7,7 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using CommonControls.Resources;
 
-namespace CommonControls.PackFileBrowser
+namespace CommonControls.BaseDialogs.PackFileBrowser
 {
     [ValueConversion(typeof(TreeNode), typeof(BitmapImage))]
     public class PackFileToImageValueConverter : IValueConverter

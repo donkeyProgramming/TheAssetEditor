@@ -5,8 +5,8 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
-             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=Shared.Ui"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="850" d:DesignWidth="800">
     <DockPanel LastChildFill="False">

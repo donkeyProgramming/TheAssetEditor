@@ -5,7 +5,7 @@
 using System;
 using System.Windows.Data;
 
-namespace CommonControls.ValueConverters
+namespace CommonControls.Common.ValueConverters
 {
     [ValueConversion(typeof(bool), typeof(bool))]
     public class InverseBooleanConverter : IValueConverter

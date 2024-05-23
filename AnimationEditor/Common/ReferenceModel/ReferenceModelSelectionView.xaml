@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:AnimationEditor.Common.ReferenceModel" 
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:System="clr-namespace:System;assembly=mscorlib"
-             xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls" 
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+             xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=Shared.Ui" 
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=Shared.Ui"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
              mc:Ignorable="d" d:DesignWidth="800">
 

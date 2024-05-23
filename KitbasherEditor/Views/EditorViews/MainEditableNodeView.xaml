@@ -4,11 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews"
-             xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=CommonControls" 
+             xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=Shared.Ui" 
              xmlns:System="clr-namespace:System;assembly=System.Runtime"
              xmlns:s="http://schemas.singulink.com/xaml"
                   xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" xmlns:common="clr-namespace:CommonControls.Common;assembly=CommonControls"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=Shared.Ui" 
+             xmlns:common="clr-namespace:CommonControls.Common;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>

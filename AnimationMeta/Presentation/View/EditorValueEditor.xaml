@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:tags="clr-namespace:AnimationMeta.Presentation"
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
-             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>

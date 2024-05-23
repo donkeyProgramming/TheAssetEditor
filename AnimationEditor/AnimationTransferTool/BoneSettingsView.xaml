@@ -5,9 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimationEditor.AnimationTransferTool"
              xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls"
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=Shared.Ui"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=CommonControls" xmlns:System="clr-namespace:System;assembly=System.Runtime"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
+             xmlns:System="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>

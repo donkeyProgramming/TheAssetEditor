@@ -15,7 +15,7 @@ using SharedCore.Misc;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
 
-namespace CommonControls.PackFileBrowser
+namespace CommonControls.BaseDialogs.PackFileBrowser
 {
     public delegate void FileSelectedDelegate(PackFile file);
     public delegate void NodeSelectedDelegate(TreeNode node);
@@ -65,7 +65,7 @@ namespace CommonControls.PackFileBrowser
 
             foreach (var item in _packFileService.Database.PackFiles)
             {
-                bool loadFile = true;
+                var loadFile = true;
                 if (ignoreCaFiles)
                     loadFile = !item.IsCaPackFile;
 
@@ -292,8 +292,8 @@ namespace CommonControls.PackFileBrowser
                     {
                         var currentIndexComputed = 0;
 
-                        TreeNode lastNode = root;
-                        for (int i = 0; i < numSeperators; i++)
+                        var lastNode = root;
+                        for (var i = 0; i < numSeperators; i++)
                         {
                             currentIndexComputed += pathParts[i].Length + 1;
                             var subDirString = fullPath.Substring(0, currentIndexComputed - 1);

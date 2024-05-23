@@ -5,7 +5,7 @@ using System.Linq;
 using SharedCore.Misc;
 using SharedCore.PackFiles.Models;
 
-namespace CommonControls.PackFileBrowser
+namespace CommonControls.BaseDialogs.PackFileBrowser
 {
     public enum NodeType
     {
@@ -88,7 +88,7 @@ namespace CommonControls.PackFileBrowser
             var nodes = new Stack<TreeNode>(new[] { this });
             while (nodes.Any())
             {
-                TreeNode node = nodes.Pop();
+                var node = nodes.Pop();
                 if (node.NodeType == NodeType.File)
                     output.Add(node);
 

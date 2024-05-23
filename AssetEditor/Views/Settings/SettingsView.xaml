@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
-             xmlns:gameinfo="clr-namespace:CommonControls.Services;assembly=CommonControls" 
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=CommonControls" 
+             xmlns:gameinfo="clr-namespace:CommonControls.Services;assembly=Shared.Ui" 
+             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=Shared.Ui" 
              mc:Ignorable="d" >
     <UserControl.Resources>
         <ObjectDataProvider x:Key="GameTypeEnums" MethodName="GetValues" ObjectType="{x:Type System:Enum}">

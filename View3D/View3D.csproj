@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CommonControls\CommonControls.csproj" />
+      <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
     <ProjectReference Include="..\ContentProject\ContentProject.csproj" />
     <ProjectReference Include="..\MeshDecimator\MeshDecimator.csproj" />
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />

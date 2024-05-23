@@ -1,5 +1,5 @@
-﻿using CommonControls.Common;
-using CommonControls.PackFileBrowser;
+﻿using CommonControls.BaseDialogs.PackFileBrowser;
+using CommonControls.Common;
 using System;
 using System.Windows;
 using System.Windows.Controls;
