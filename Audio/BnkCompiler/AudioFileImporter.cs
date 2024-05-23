@@ -1,15 +1,13 @@
-﻿using Audio.Utility;
-using CommunityToolkit.Diagnostics;
-using SharpDX.MediaFoundation.DirectX;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace Audio.BnkCompiler
 {
     using Audio.Utility;
-    using static Audio.Utility.WWiseWavToWem;
+    using SharedCore;
+    using SharedCore.ErrorHandling;
+    using SharedCore.PackFiles;
 
     public class AudioFileImporter
     {
