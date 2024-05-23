@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using CommonControls.Editors.TextEditor;
 using SharedCore.Misc;
 using SharedCore.PackFiles.Models;
+using SharedCore.ToolCreation;
 
 namespace CommonControls.Editors.Wtui
 {

@@ -1,5 +1,5 @@
 ﻿using CommonControls.Common;
-using SharedCore.Misc;
+using SharedCore.ToolCreation;
 using System;
 using System.Windows;
 using System.Windows.Controls;

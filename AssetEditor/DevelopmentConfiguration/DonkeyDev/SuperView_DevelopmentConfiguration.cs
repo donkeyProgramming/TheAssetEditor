@@ -2,7 +2,6 @@
 using AnimationEditor.SuperView;
 using CommonControls.FileTypes.AnimationPack;
 using SharedCore;
-using SharedCore.Misc;
 using SharedCore.PackFiles;
 using SharedCore.ToolCreation;
 

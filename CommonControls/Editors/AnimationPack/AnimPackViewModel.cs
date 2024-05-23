@@ -20,6 +20,7 @@ using SharedCore;
 using SharedCore.Misc;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
+using SharedCore.ToolCreation;
 
 namespace CommonControls.Editors.AnimationPack
 {

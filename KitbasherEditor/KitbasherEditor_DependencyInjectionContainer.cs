@@ -15,7 +15,6 @@ using KitbasherEditor.Views.EditorViews;
 using KitbasherEditor.Views.EditorViews.PinTool;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore.Misc;
 using SharedCore.PackFiles;
 using SharedCore.ToolCreation;
 using View3D.Services;

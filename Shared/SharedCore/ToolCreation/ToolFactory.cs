@@ -2,7 +2,6 @@
 using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using SharedCore.Misc;
 
 namespace SharedCore.ToolCreation
 {

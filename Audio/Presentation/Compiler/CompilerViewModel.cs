@@ -7,6 +7,7 @@ using SharedCore.ErrorHandling;
 using SharedCore.Misc;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
+using SharedCore.ToolCreation;
 
 namespace Audio.Presentation.Compiler
 {

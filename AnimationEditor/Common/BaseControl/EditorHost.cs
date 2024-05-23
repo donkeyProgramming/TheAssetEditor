@@ -7,6 +7,7 @@ using MonoGame.Framework.WpfInterop;
 using SharedCore.Events;
 using SharedCore.Misc;
 using SharedCore.PackFiles.Models;
+using SharedCore.ToolCreation;
 using View3D.Components;
 using View3D.Services;
 

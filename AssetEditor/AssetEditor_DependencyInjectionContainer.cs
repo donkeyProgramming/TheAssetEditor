@@ -6,7 +6,7 @@ using AssetEditor.Views.Settings;
 using CommonControls;
 using CommonControls.Editors.AnimationBatchExporter;
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore.Misc;
+using SharedCore.ToolCreation;
 
 namespace AssetEditor
 {

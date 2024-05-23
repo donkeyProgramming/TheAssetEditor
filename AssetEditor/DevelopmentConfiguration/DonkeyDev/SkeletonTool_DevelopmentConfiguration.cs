@@ -1,7 +1,6 @@
 ﻿using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
 using SharedCore;
-using SharedCore.Misc;
 using SharedCore.PackFiles;
 using SharedCore.ToolCreation;
 

@@ -11,6 +11,7 @@ using Audio.Utility;
 using CommonControls.BaseDialogs;
 using SharedCore.Misc;
 using SharedCore.PackFiles.Models;
+using SharedCore.ToolCreation;
 
 namespace Audio.Presentation.AudioExplorer
 {

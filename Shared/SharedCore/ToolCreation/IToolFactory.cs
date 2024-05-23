@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using SharedCore.Misc;
 
 namespace SharedCore.ToolCreation
 {

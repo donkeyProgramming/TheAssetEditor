@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using SharedCore.Misc;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
+using SharedCore.ToolCreation;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;

@@ -1,7 +1,6 @@
 ﻿using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.PropCreator.ViewModels;
 using SharedCore;
-using SharedCore.Misc;
 using SharedCore.PackFiles;
 using SharedCore.ToolCreation;
 
