@@ -17,6 +17,7 @@
         <PackageReference Include="FluentValidation" Version="11.5.2" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.1.0" />
+        <PackageReference Include="Octokit" Version="0.50.0" />
     </ItemGroup>
     
     <ItemGroup>

@@ -26,7 +26,7 @@ namespace AssetEditor
             //new FastBinParser2().Load(file);
 
 
-            VersionChecker.CheckVersion();
+            Shared.Core.VersionChecker.CheckVersion();
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
             _serviceProvider = new DependencyInjectionConfig().Build();

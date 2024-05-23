@@ -1,4 +1,4 @@
-using AssetEditor;
+using AssetEditor.Services;
 
 namespace AssetEditorTests
 {

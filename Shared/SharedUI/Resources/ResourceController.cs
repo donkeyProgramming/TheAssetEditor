@@ -72,7 +72,7 @@ namespace CommonControls.Resources
 
         static BitmapImage BitmapToImageSource(string path)
         {
-            string iconsFolder = @"pack://application:,,,/CommonControls;component/Resources/Icons/";
+            string iconsFolder = @"pack://application:,,,/Shared.Ui;component/Resources/Icons/";
             var totalPath = iconsFolder + path;
             var img = new BitmapImage(new Uri(totalPath));
             //if (img == null)

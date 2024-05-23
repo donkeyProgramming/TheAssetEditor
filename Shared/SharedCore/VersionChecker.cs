@@ -1,15 +1,13 @@
-﻿using Octokit;
-using System;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Octokit;
 
-namespace AssetEditor.Services
+namespace Shared.Core
 {
-    class VersionChecker
+    public class VersionChecker
     {
-        private static readonly string GitHubLink = @"https://github.com/olekristianhomelien/TheAssetEditor/releases/latest";
+        private static readonly string GitHubLink = @"https://github.com/donkeyProgramming/TheAssetEditor/releases/latest";
 
         public static void CheckVersion()
         {
@@ -18,13 +16,13 @@ namespace AssetEditor.Services
 
             try
             {
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 
                 var currentVersion = "v" + fvi.FileMajorPart + "." + fvi.FileMinorPart;
-                GitHubClient client = new GitHubClient(new ProductHeaderValue("AssetEditor_instance"));
+                var client = new GitHubClient(new ProductHeaderValue("AssetEditor_instance"));
 
-                client.Repository.Release.GetAll("olekristianhomelien", "TheAssetEditor").ContinueWith(
+                client.Repository.Release.GetAll("donkeyProgramming", "TheAssetEditor").ContinueWith(
                     task =>
                     {
                         try

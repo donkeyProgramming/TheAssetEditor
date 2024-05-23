@@ -3,7 +3,7 @@ using SharedCore;
 using SharedCore.PackFiles;
 using System;
 
-namespace AssetEditor
+namespace AssetEditor.Services
 {
     public class SimpleApplication : IDisposable
     {

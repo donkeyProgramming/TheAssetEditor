@@ -45,7 +45,8 @@ namespace CommonControls
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<IToolFactory, ToolFactory>();
             services.AddSingleton<PackFileDataBase>();
-            services.AddSingleton<SkeletonAnimationLookUpHelper>();
+            services.AddSingleton<IAnimationFileDiscovered, SkeletonAnimationLookUpHelper>();
+            services.AddSingleton<SkeletonAnimationLookUpHelper >((x) => x.GetService<IAnimationFileDiscovered>() as SkeletonAnimationLookUpHelper);
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
             services.AddSingleton<PackFileService>();

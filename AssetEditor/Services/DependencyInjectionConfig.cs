@@ -12,7 +12,7 @@ using SharedCore.ToolCreation;
 using TextureEditor;
 using View3D;
 
-namespace AssetEditor
+namespace AssetEditor.Services
 {
     public class DependencyInjectionConfig
     {

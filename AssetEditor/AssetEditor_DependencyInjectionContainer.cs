@@ -4,7 +4,6 @@ using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
-using CommonControls.Editors.AnimationBatchExporter;
 using Microsoft.Extensions.DependencyInjection;
 using SharedCore.Misc;
 using SharedCore.ToolCreation;
