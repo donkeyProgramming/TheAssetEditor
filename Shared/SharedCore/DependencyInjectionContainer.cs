@@ -1,23 +1,15 @@
 ﻿
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.Events;
-using SharedCore;
-using SharedCore.Events;
-using SharedCore.Events.Global;
 using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
 using SharedCore.ToolCreation;
 
 namespace Shared.Core
 {
     public class DependencyInjectionContainer : DependencyContainer
     {
-        private readonly bool _loadResource;
-
-        public DependencyInjectionContainer(bool loadResource = true)
+        public DependencyInjectionContainer()
         {
-            _loadResource = loadResource;
+          
         }
 
         public override void Register(IServiceCollection services)

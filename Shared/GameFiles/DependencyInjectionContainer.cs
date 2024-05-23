@@ -6,11 +6,11 @@ namespace Shared.GameFiles
 {
     public class DependencyInjectionContainer : DependencyContainer
     {
-        private readonly bool _loadResource;
 
-        public DependencyInjectionContainer(bool loadResource = true)
+
+        public DependencyInjectionContainer()
         {
-            _loadResource = loadResource;
+       
         }
 
         public override void Register(IServiceCollection services)

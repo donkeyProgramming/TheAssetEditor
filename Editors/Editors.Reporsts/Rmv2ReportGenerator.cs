@@ -1,19 +1,16 @@
-﻿using CsvHelper;
+﻿using System.Dynamic;
+using System.Globalization;
+using System.Windows;
+using CsvHelper;
 using GameFiles.RigidModel;
 using GameFiles.RigidModel.MaterialHeaders;
 using SharedCore;
 using SharedCore.ErrorHandling;
 using SharedCore.PackFiles;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Globalization;
-using System.IO;
-using System.Windows;
 
 namespace AssetEditor.Report
 {
-    class Rmv2ReportGenerator
+    public class Rmv2ReportGenerator
     {
         PackFileService _pfs;
         public Rmv2ReportGenerator(PackFileService pfs)

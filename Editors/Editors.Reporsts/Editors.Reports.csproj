@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
       <TargetFramework>net6.0-windows</TargetFramework>
@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\GameFiles\Shared.GameFiles.csproj" />
     <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
+    <ProjectReference Include="..\SimpleAnimationEditors\Editors.AnimationContainers.csproj" />
   </ItemGroup>
 
 </Project>

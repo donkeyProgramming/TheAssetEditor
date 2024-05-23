@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Windows;
 using CsvHelper;
 using Serilog;
@@ -13,7 +9,7 @@ using SharedCore.PackFiles;
 
 namespace AssetEditor.Report
 {
-    class AnimMetaDataReportGenerator
+    public class AnimMetaDataReportGenerator
     {
         private readonly ILogger _logger = Logging.Create<AnimMetaDataReportGenerator>();
 

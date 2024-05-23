@@ -22,9 +22,9 @@ namespace AssetEditor.Services
             _dependencyContainers = new DependencyContainer[]
             {
                 // Shared
-                new Shared.Core.DependencyInjectionContainer(loadResources),
-                new Shared.Ui.DependencyInjectionContainer(loadResources),
-                new Shared.GameFiles.DependencyInjectionContainer(loadResources),
+                new Shared.Core.DependencyInjectionContainer(),
+                new Shared.Ui.DependencyInjectionContainer(),
+                new Shared.GameFiles.DependencyInjectionContainer(),
                 new Shared.EmbeddedResources.DependencyInjectionContainer(loadResources),
                 new View3D_DependencyContainer(),
                

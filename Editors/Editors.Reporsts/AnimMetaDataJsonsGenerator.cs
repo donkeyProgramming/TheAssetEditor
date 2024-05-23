@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Windows;
 using CommonControls.Editors.AnimationPack.Converters;
 using Editors.Shared.Core.Services;
@@ -16,7 +14,7 @@ using SharedCore.PackFiles.Models;
 
 namespace AssetEditor.Report
 {
-    class AnimMetaDataJsonsGenerator
+    public class AnimMetaDataJsonsGenerator
     {
         private readonly ILogger _logger = Logging.Create<AnimMetaDataJsonsGenerator>();
         private readonly PackFileService _pfs;
