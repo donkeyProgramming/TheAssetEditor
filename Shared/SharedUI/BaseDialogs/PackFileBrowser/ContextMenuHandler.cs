@@ -10,6 +10,7 @@ using CommonControls.Common;
 using CommonControls.Events.UiCommands;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using Shared.Core.Events;
 using SharedCore;
 using SharedCore.Misc;
 using SharedCore.PackFiles;

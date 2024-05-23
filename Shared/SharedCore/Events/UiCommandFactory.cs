@@ -1,14 +1,13 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace CommonControls.Events.UiCommands
+namespace Shared.Core.Events
 {
     public interface IUiCommand
     {
     }
 
     public interface IExecutableUiCommand : IUiCommand
-    { 
+    {
         public void Execute();
     }
 

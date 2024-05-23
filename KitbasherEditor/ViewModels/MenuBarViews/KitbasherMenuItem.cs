@@ -1,5 +1,5 @@
 ﻿using CommonControls.Common.MenuSystem;
-using CommonControls.Events.UiCommands;
+using Shared.Core.Events;
 using System;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews

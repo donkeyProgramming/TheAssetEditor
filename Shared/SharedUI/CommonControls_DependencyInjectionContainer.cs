@@ -14,6 +14,7 @@ using CommonControls.Events.UiCommands;
 using CommonControls.Resources;
 using CommonControls.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.Events;
 using SharedCore;
 using SharedCore.Events;
 using SharedCore.Events.Global;

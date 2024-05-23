@@ -1,4 +1,4 @@
-﻿using CommonControls.Events.UiCommands;
+﻿using Shared.Core.Events;
 using SharedCore.ToolCreation;
 
 namespace AssetEditor.UiCommands

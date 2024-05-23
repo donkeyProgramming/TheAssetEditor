@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.ObjectModel;
-using CommonControls.Events.UiCommands;
+using Shared.Core.Events;
 using SharedCore.PackFiles;
 using SharedCore.ToolCreation;
 

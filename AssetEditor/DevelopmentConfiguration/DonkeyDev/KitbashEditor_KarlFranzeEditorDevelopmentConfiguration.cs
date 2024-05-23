@@ -1,5 +1,5 @@
 ﻿using AssetEditor.UiCommands;
-using CommonControls.Events.UiCommands;
+using Shared.Core.Events;
 using SharedCore.PackFiles;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev

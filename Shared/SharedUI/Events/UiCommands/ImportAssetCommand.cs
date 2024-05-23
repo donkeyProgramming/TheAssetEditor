@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using CommonControls.Interfaces.AssetManagement;
+using Shared.Core.Events;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
 
