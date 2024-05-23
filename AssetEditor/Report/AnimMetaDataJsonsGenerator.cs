@@ -1,9 +1,9 @@
 ﻿using AnimationMeta.FileTypes.Parsing;
 using CommonControls.Editors.AnimationPack.Converters;
-using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 using CommonControls.Services;
+using GameFiles.Animation;
+using GameFiles.AnimationPack;
+using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;
 using Newtonsoft.Json;
 using Serilog;
 using SharedCore;

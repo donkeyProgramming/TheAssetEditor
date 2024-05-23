@@ -12,10 +12,11 @@ using CommonControls.BaseDialogs;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationPack.Converters;
 using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
 using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using GameFiles.AnimationPack;
+using GameFiles.AnimationPack.AnimPackFileTypes;
+using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;
 using SharedCore;
 using SharedCore.Misc;
 using SharedCore.PackFiles;
@@ -140,9 +141,9 @@ namespace CommonControls.Editors.AnimationPack
             _activeConverter = null;
             if (seletedFile is AnimationFragmentFile typedFragment)
                 _activeConverter = new AnimationFragmentFileToXmlConverter(_skeletonAnimationLookUpHelper, _appSettings.CurrentSettings.CurrentGame);
-            else if (seletedFile is FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin typedBin)
+            else if (seletedFile is GameFiles.AnimationPack.AnimPackFileTypes.AnimationBin typedBin)
                 _activeConverter = new AnimationBinFileToXmlConverter();
-            else if (seletedFile is FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3 wh3Bin)
+            else if (seletedFile is AnimationBinWh3 wh3Bin)
                 _activeConverter = new AnimationBinWh3FileToXmlConverter(_skeletonAnimationLookUpHelper);
 
             if (seletedFile == null || _activeConverter == null || seletedFile.IsUnknownFile)

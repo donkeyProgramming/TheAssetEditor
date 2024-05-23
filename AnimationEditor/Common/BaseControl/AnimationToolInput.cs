@@ -1,4 +1,4 @@
-﻿using CommonControls.FileTypes.AnimationPack;
+﻿using GameFiles.AnimationPack;
 using SharedCore.PackFiles.Models;
 
 namespace AnimationEditor.PropCreator.ViewModels

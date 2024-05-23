@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
-using CommonControls.FileTypes.Animation;
+using GameFiles.Animation;
 
 namespace CommonControls.Editors.BoneMapping
 {

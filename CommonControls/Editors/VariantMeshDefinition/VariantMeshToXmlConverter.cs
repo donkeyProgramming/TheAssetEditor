@@ -13,7 +13,7 @@ using CommonControls.Editors.TextEditor;
 using SharedCore.ErrorHandling;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;
-using static CommonControls.FileTypes.Vmd.VariantMeshDefinition;
+using static GameFiles.Vmd.VariantMeshDefinition;
 
 namespace CommonControls.Editors.VariantMeshDefinition
 {

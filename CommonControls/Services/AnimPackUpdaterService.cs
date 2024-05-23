@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using CommonControls.Editors.AnimationPack;
-using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using GameFiles.AnimationPack;
+using GameFiles.AnimationPack.AnimPackFileTypes;
 using SharedCore;
 using SharedCore.ErrorHandling;
 using SharedCore.PackFiles;
@@ -53,7 +53,7 @@ namespace CommonControls.Services
 
                 foreach (var binEntry in animationBinEntries)
                 {
-                    var wh3Bin = new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3(binEntry.Name);
+                    var wh3Bin = new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3(binEntry.Name);
                     wh3Bin.SkeletonName = binEntry.SkeletonName;
                     wh3Bin.MountBin = binEntry.MountName;
                     wh3Bin.LocomotionGraph = "animations/locomotion_graphs/entity_locomotion_graph.xml";

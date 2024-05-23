@@ -1,6 +1,6 @@
-﻿using CommonControls.FileTypes.RigidModel;
-using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using CsvHelper;
+﻿using CsvHelper;
+using GameFiles.RigidModel;
+using GameFiles.RigidModel.MaterialHeaders;
 using SharedCore;
 using SharedCore.ErrorHandling;
 using SharedCore.PackFiles;

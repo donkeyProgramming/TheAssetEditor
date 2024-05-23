@@ -5,7 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.FileTypes.RigidModel.Types;
+using GameFiles.RigidModel.Types;
 using SharedCore;
 using SharedCore.ErrorHandling;
 using SharedCore.PackFiles;

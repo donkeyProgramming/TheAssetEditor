@@ -4,7 +4,7 @@
 
 using System.IO;
 using System.Reflection;
-using CommonControls.FileTypes.RigidModel.Types;
+using GameFiles.RigidModel.Types;
 using Serilog;
 using SharedCore;
 

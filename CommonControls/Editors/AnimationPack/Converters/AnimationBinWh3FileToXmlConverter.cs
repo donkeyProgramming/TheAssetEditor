@@ -6,14 +6,15 @@ using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using GameFiles.AnimationPack;
+using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;
 using SharedCore.ErrorHandling;
 using SharedCore.PackFiles;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {
-    public class AnimationBinWh3FileToXmlConverter : BaseAnimConverter<AnimationBinWh3FileToXmlConverter.XmlFormat, FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3>
+    public class AnimationBinWh3FileToXmlConverter : BaseAnimConverter<AnimationBinWh3FileToXmlConverter.XmlFormat, AnimationBinWh3>
     {
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
@@ -34,7 +35,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
         protected override XmlFormat ConvertBytesToXmlClass(byte[] bytes)
         {
 
-            var binFile = new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", bytes);
+            var binFile = new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", bytes);
             var outputBin = new XmlFormat();
 
             var slotHelper = binFile.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();
@@ -83,7 +84,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override byte[] ConvertToAnimClassBytes(XmlFormat xmlBin, string fileName)
         {
-            var binFile = new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", null);
+            var binFile = new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", null);
 
             binFile.TableVersion = xmlBin.Data.TableVersion;
             binFile.TableSubVersion = xmlBin.Data.TableSubVersion;
@@ -98,7 +99,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             foreach (var animationEntry in xmlBin.Animations)
             {
-                binFile.AnimationTableEntries.Add(new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+                binFile.AnimationTableEntries.Add(new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
                 {
                     AnimationId = (uint)slotHelper.GetfromValue(animationEntry.Slot).Id,
                     BlendIn = animationEntry.BlendId,
@@ -109,7 +110,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
                 foreach (var animationInstance in animationEntry.Ref)
                 {
-                    binFile.AnimationTableEntries.Last().AnimationRefs.Add(new FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
+                    binFile.AnimationTableEntries.Last().AnimationRefs.Add(new AnimationBinEntry.AnimationRef()
                     {
                         AnimationFile = animationInstance.File,
                         AnimationMetaFile = animationInstance.Meta,

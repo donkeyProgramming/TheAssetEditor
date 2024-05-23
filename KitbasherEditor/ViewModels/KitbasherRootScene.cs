@@ -1,6 +1,6 @@
 ﻿using System.IO;
-using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.RigidModel;
+using GameFiles.Animation;
+using GameFiles.RigidModel;
 using KitbasherEditor.Events;
 using SharedCore.Events;
 using SharedCore.PackFiles;

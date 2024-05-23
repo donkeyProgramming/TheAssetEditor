@@ -10,9 +10,9 @@ using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Common;
 using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
-using CommonControls.FileTypes.Animation;
 using CommonControls.SelectionListDialog;
 using CommonControls.Services;
+using GameFiles.Animation;
 using Microsoft.Xna.Framework;
 using Serilog;
 using SharedCore;
@@ -346,7 +346,10 @@ namespace AnimationEditor.AnimationTransferTool
                 animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
 
             if (AnimationSettings.AnimationOutputFormat.Value != 7)
-                animFile.ConvertToVersion(AnimationSettings.AnimationOutputFormat.Value, _skeletonAnimationLookUpHelper, _pfs);
+            {
+                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animFile.Header.SkeletonName);
+                animFile.ConvertToVersion(AnimationSettings.AnimationOutputFormat.Value, skeleton, _pfs);
+            }
 
             if (AnimationSettings.UseScaledSkeletonName.Value)
                 animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;

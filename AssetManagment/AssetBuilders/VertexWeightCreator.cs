@@ -4,11 +4,11 @@
 
 
 using System.Collections.Generic;
-using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.RigidModel.Vertex;
-using CommonControls.FileTypes.RigidModel;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.AnimationProcessor;
+using GameFiles.Animation;
+using GameFiles.RigidModel.Vertex;
+using GameFiles.RigidModel;
 
 namespace AssetManagement.AssetBuilders
 {

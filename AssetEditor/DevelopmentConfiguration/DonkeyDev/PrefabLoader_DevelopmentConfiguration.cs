@@ -1,4 +1,4 @@
-﻿using CommonControls.FileTypes.FastBin;
+﻿using GameFiles.FastBin;
 using SharedCore;
 using SharedCore.PackFiles;
 

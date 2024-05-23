@@ -2,14 +2,14 @@
 using System.IO;
 using System.Linq;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.AnimationPack;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3;
 using CommonControls.Services;
+using GameFiles.Animation;
+using GameFiles.AnimationPack;
+using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;
 using SharedCore.ErrorHandling;
 using SharedCore.PackFiles;
 using View3D.Animation;
-using static CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
+using static GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
 
 namespace AnimationEditor.MountAnimationCreator.Services
 {
@@ -92,7 +92,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
                 var savedAnimName = SaveSingleAnim(mountAnim, riderAnim, riderFragment.AnimationFile);
 
 
-                var newEntry = new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+                var newEntry = new AnimationBinEntry()
                 {
                     AnimationId = (uint)riderFragment.SlotIndex,
                     BlendIn = riderFragment.BlendInTime,
@@ -116,7 +116,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
             else
             {
                 // Add an empty fragment entry
-                _riderOutputBin.AnimationTableEntries.Add(new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+                _riderOutputBin.AnimationTableEntries.Add(new AnimationBinEntry()
                 {
                     AnimationId = (uint)DefaultAnimationSlotTypeHelper.GetfromValue(riderSlot).Id,
                 });
@@ -135,7 +135,10 @@ namespace AnimationEditor.MountAnimationCreator.Services
             var animFile = newAnimation.ConvertToFileFormat(_animationGenerator.GetRiderSkeleton());
 
             if (_animationOutputFormat != 7)
-                animFile.ConvertToVersion(_animationOutputFormat, _skeletonAnimationLookUpHelper, _pfs);
+            {
+                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animFile.Header.SkeletonName);
+                animFile.ConvertToVersion(_animationOutputFormat, skeleton, _pfs);
+            }
 
             var bytes = AnimationFile.ConvertToBytes(animFile);
             SaveHelper.Save(_pfs, newAnimationName, null, bytes);
@@ -146,7 +149,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         void CopyAnimations(string riderSlot, ErrorList resultInfo)
         {
             var fragmentEntry = _riderFragment.Entries.First(x => x.SlotName == riderSlot);
-            var newEntry = new CommonControls.FileTypes.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+            var newEntry = new AnimationBinEntry()
             {
                 AnimationId = (uint)fragmentEntry.SlotIndex,
                 BlendIn = fragmentEntry.BlendInTime,

@@ -1,4 +1,4 @@
-﻿using CommonControls.FileTypes.Animation;
+﻿using GameFiles.Animation;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;

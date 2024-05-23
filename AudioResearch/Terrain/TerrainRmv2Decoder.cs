@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommonControls.FileTypes.RigidModel;
-using CommonControls.FileTypes.RigidModel.Vertex;
+using GameFiles.RigidModel;
+using GameFiles.RigidModel.Vertex;
 using SharedCore.ByteParsing;
 using SharedCore.PackFiles;
 using SharedCore.PackFiles.Models;

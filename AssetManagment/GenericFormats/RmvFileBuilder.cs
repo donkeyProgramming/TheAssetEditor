@@ -1,17 +1,17 @@
-﻿using CommonControls.FileTypes.RigidModel.LodHeader;
-using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using CommonControls.FileTypes.RigidModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
-using CommonControls.FileTypes.RigidModel.Vertex;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using AssetManagement.GenericFormats.Unmanaged;
-using CommonControls.FileTypes.RigidModel.Types;
 using AssetManagement.Strategies.Fbx;
-using VertexFormat = CommonControls.FileTypes.RigidModel.VertexFormat;
+using VertexFormat = GameFiles.RigidModel.VertexFormat;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
+using GameFiles.RigidModel.LodHeader;
+using GameFiles.RigidModel.MaterialHeaders;
+using GameFiles.RigidModel.Types;
+using GameFiles.RigidModel.Vertex;
+using GameFiles.RigidModel;
 
 namespace AssetManagement.GenericFormats
 {

@@ -1,6 +1,6 @@
-﻿using CommonControls.FileTypes.Animation;
-using CommonControls.Services;
+﻿using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
+using GameFiles.Animation;
 using KitbasherEditor.Events;
 using SharedCore.Events;
 using SharedCore.Misc;

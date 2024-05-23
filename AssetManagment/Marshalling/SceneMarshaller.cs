@@ -1,5 +1,4 @@
-﻿using CommonControls.FileTypes.Animation;
-//using CommonControls.FileTypes.Animation;
+﻿//using CommonControls.FileTypes.Animation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Runtime.InteropServices;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
+using GameFiles.Animation;
 
 namespace AssetManagement.Geometry.Marshalling
 {

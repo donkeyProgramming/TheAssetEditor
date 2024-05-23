@@ -1,6 +1,6 @@
-﻿using CommonControls.FileTypes.RigidModel;
-using CommonControls.FileTypes.RigidModel.Types;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using GameFiles.RigidModel;
+using GameFiles.RigidModel.Types;
 using SharedCore;
 using SharedCore.Misc;
 using SharedCore.PackFiles;

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using CommonControls.FileTypes.RigidModel;
+using GameFiles.RigidModel;
 using KitbasherEditor.ViewModels;
 using Serilog;
 using SharedCore;

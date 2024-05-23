@@ -2,15 +2,14 @@
 using System.Linq;
 using System.Text;
 using AssetManagement.GenericFormats.DataStructures.Managed;
-using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.MeshProcessing.Common;
-using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.RigidModel;
-using CommonControls.FileTypes.RigidModel.LodHeader;
-using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using CommonControls.FileTypes.RigidModel.Types;
-using CommonControls.FileTypes.RigidModel.Vertex;
+using GameFiles.Animation;
+using GameFiles.RigidModel;
+using GameFiles.RigidModel.LodHeader;
+using GameFiles.RigidModel.MaterialHeaders;
+using GameFiles.RigidModel.Types;
+using GameFiles.RigidModel.Vertex;
 using Microsoft.Xna.Framework;
 namespace AssetManagement.AssetBuilders
 {

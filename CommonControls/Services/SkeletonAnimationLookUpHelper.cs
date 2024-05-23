@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using CommonControls.FileTypes.Animation;
+using GameFiles.Animation;
 using Serilog;
 using SharedCore;
 using SharedCore.PackFiles;

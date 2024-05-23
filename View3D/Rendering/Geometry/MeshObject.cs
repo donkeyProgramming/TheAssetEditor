@@ -1,5 +1,5 @@
 ﻿using CommonControls.Editors.BoneMapping;
-using CommonControls.FileTypes.RigidModel;
+using GameFiles.RigidModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

@@ -1,5 +1,5 @@
-﻿using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using GameFiles.RigidModel.MaterialHeaders;
 using SharedCore.Misc;
 using System;
 using System.Collections.ObjectModel;

@@ -70,6 +70,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedCore", "Shared\Shared
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameFiles", "Shared\GameFiles\GameFiles.csproj", "{E5F640D6-A970-446E-9DCD-71698B95C3AF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmbeddedResources", "Shared\EmbeddedResources\EmbeddedResources.csproj", "{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -332,6 +334,18 @@ Global
 		{E5F640D6-A970-446E-9DCD-71698B95C3AF}.Release|x64.Build.0 = Release|Any CPU
 		{E5F640D6-A970-446E-9DCD-71698B95C3AF}.Release|x86.ActiveCfg = Release|Any CPU
 		{E5F640D6-A970-446E-9DCD-71698B95C3AF}.Release|x86.Build.0 = Release|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Debug|x64.Build.0 = Debug|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Debug|x86.Build.0 = Debug|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Release|x64.ActiveCfg = Release|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Release|x64.Build.0 = Release|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Release|x86.ActiveCfg = Release|Any CPU
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -356,6 +370,7 @@ Global
 		{15AAE76D-0B83-45A2-B8AB-FD7BF38BDDC3} = {C174C249-D109-49BE-8BC5-42A0D5DEDBDA}
 		{D0F5B9E7-B545-41BF-AA8C-7E1923D35132} = {7070A990-1A62-46A9-ABDF-BE030E3A4336}
 		{E5F640D6-A970-446E-9DCD-71698B95C3AF} = {7070A990-1A62-46A9-ABDF-BE030E3A4336}
+		{D1F5CA6C-DD76-487F-AF31-22B1A71B294C} = {7070A990-1A62-46A9-ABDF-BE030E3A4336}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}

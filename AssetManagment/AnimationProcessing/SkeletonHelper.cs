@@ -4,7 +4,7 @@
 
 using System;
 using System.Linq;
-using CommonControls.FileTypes.Animation;
+using GameFiles.Animation;
 
 namespace AssetManagement.AnimationProcessor
 {

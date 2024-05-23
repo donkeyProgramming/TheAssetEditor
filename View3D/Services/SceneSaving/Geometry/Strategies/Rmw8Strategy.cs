@@ -1,4 +1,5 @@
-﻿using View3D.SceneNodes;
+﻿using GameFiles.RigidModel;
+using View3D.SceneNodes;
 
 namespace View3D.Services.SceneSaving.Geometry.Strategies
 {
@@ -18,7 +19,7 @@ namespace View3D.Services.SceneSaving.Geometry.Strategies
 
         public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
         {
-            _sceneSaverService.Save(outputPath, mainNode, CommonControls.FileTypes.RigidModel.RmvVersionEnum.RMV2_V8, onlyVisibleNodes);
+            _sceneSaverService.Save(outputPath, mainNode, RmvVersionEnum.RMV2_V8, onlyVisibleNodes);
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using CommonControls.FileTypes.RigidModel;
-using CommonControls.FileTypes.RigidModel.Vertex;
-using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Linq;
+using GameFiles.RigidModel;
+using GameFiles.RigidModel.Vertex;
+using Microsoft.Xna.Framework;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 

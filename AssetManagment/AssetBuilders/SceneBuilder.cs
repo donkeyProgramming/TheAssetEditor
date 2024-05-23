@@ -5,9 +5,9 @@ using Quaternion = Microsoft.Xna.Framework.Quaternion;
 using System;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.GenericFormats.DataStructures.Managed;
-using CommonControls.FileTypes.RigidModel;
 using System.Linq;
-using CommonControls.FileTypes.RigidModel.Vertex;
+using GameFiles.RigidModel.Vertex;
+using GameFiles.RigidModel;
 
 namespace AssetManagement.AssetBuilders
 {

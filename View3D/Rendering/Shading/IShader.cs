@@ -1,4 +1,4 @@
-﻿using CommonControls.FileTypes.RigidModel.Types;
+﻿using GameFiles.RigidModel.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

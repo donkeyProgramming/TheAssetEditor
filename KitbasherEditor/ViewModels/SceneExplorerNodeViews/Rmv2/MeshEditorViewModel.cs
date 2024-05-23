@@ -1,5 +1,5 @@
-﻿using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using CommonControls.Services;
+﻿using CommonControls.Services;
+using GameFiles.RigidModel.MaterialHeaders;
 using SharedCore;
 using SharedCore.Misc;
 using SharedCore.PackFiles;

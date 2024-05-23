@@ -1,7 +1,7 @@
 ﻿using CommonControls.Common;
 using CommonControls.Editors.AnimationPack;
-using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using GameFiles.AnimationPack;
 using SharedCore;
 using SharedCore.Misc;
 using SharedCore.PackFiles;

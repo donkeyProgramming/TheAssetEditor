@@ -1,5 +1,5 @@
 ﻿using System;
-using CommonControls.FileTypes.Animation;
+using GameFiles.Animation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Serilog;

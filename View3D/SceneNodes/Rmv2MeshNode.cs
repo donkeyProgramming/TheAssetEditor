@@ -1,7 +1,7 @@
 ﻿using CommonControls.Common;
-using CommonControls.FileTypes.RigidModel;
-using CommonControls.FileTypes.RigidModel.MaterialHeaders;
-using CommonControls.FileTypes.RigidModel.Types;
+using GameFiles.RigidModel;
+using GameFiles.RigidModel.MaterialHeaders;
+using GameFiles.RigidModel.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

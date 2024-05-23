@@ -1,4 +1,4 @@
-﻿using CommonControls.FileTypes.RigidModel;
+﻿using GameFiles.RigidModel;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using View3D.Animation;

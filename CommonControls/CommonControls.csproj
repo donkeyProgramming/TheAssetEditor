@@ -107,7 +107,7 @@
 	  <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
 	  <PackageReference Include="System.Net.Primitives" Version="4.3.0" />
 	 
-      <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.1.0" />
+ 
   </ItemGroup>
 
   <ItemGroup>
@@ -352,6 +352,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
+    <ProjectReference Include="..\Shared\GameFiles\GameFiles.csproj" />
     <ProjectReference Include="..\Shared\SharedCore\SharedCore.csproj" />
   </ItemGroup>
 

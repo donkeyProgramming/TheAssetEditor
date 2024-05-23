@@ -1,18 +1,14 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.AnimationPack.AnimPackFileTypes;
+using GameFiles.AnimationPack.AnimPackFileTypes;
 using SharedCore.PackFiles;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {
-    public class AnimationBinFileToXmlConverter : BaseAnimConverter<AnimationBinFileToXmlConverter.Bin, FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin>
+    public class AnimationBinFileToXmlConverter : BaseAnimConverter<AnimationBinFileToXmlConverter.Bin, GameFiles.AnimationPack.AnimPackFileTypes.AnimationBin>
     {
         protected override string CleanUpXml(string xmlText)
         {
@@ -23,7 +19,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override Bin ConvertBytesToXmlClass(byte[] bytes)
         {
-            FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin binFile = new FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin("", bytes);
+            GameFiles.AnimationPack.AnimPackFileTypes.AnimationBin binFile = new GameFiles.AnimationPack.AnimPackFileTypes.AnimationBin("", bytes);
             var outputBin = new Bin();
             outputBin.BinEntry = new List<BinEntry>();
 
@@ -43,7 +39,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override byte[] ConvertToAnimClassBytes(Bin bin, string fileName)
         {
-            var output = new FileTypes.AnimationPack.AnimPackFileTypes.AnimationBin(fileName);
+            var output = new GameFiles.AnimationPack.AnimPackFileTypes.AnimationBin(fileName);
             foreach (var item in bin.BinEntry)
             {
                 var entry = new AnimationBinEntry(item.Name, item.Skeleton.Value, item.MountSkeleton.Value)

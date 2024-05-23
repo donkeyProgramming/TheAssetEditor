@@ -13,8 +13,8 @@ using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Common;
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.Animation;
 using CommonControls.Services;
+using GameFiles.Animation;
 using Serilog;
 using SharedCore;
 using SharedCore.ErrorHandling;
@@ -102,7 +102,8 @@ namespace CommonControls.Editors.AnimationBatchExporter
                 try
                 {
                     var animationFile = AnimationFile.Create(file);
-                    animationFile.ConvertToVersion(outputAnimationFormat, _skeletonAnimationLookUpHelper, _pfs);
+                    var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animationFile.Header.SkeletonName);
+                    animationFile.ConvertToVersion(outputAnimationFormat, skeleton, _pfs);
 
                     var bytes = AnimationFile.ConvertToBytes(animationFile);
                     var newPackFile = new PackFile(file.Name, new MemorySource(bytes));

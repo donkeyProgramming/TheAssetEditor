@@ -3,10 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using CommonControls.FileTypes.Animation;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using System.Linq;
 using AssetManagement.AnimationProcessor;
+using GameFiles.Animation;
 
 namespace AssetManagement.MeshProcessing.Packed
 {

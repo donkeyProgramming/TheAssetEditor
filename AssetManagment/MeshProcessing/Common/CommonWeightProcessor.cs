@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonControls.FileTypes.RigidModel.Vertex;
-using CommonControls.FileTypes.Animation;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using Serilog;
 using AssetManagement.AnimationProcessor;
 using SharedCore;
+using GameFiles.Animation;
+using GameFiles.RigidModel.Vertex;
 
 namespace AssetManagement.MeshProcessing.Common
 {

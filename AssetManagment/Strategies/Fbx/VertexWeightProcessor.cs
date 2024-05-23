@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonControls.FileTypes.RigidModel.Vertex;
+using GameFiles.RigidModel.Vertex;
 
 namespace AssetManagement.Strategies.Fbx
 {

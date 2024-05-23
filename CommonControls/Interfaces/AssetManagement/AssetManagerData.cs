@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 
-using CommonControls.FileTypes.Animation;
-using CommonControls.FileTypes.RigidModel;
-using CommonControls.FileTypes.WsModel;
+using GameFiles.Animation;
+using GameFiles.RigidModel;
+using GameFiles.WsModel;
 using SharedCore.PackFiles.Models;
 
 namespace CommonControls.Interfaces.AssetManagement

@@ -6,7 +6,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.AnimationPack;
+using GameFiles.AnimationPack;
 using SharedCore.ByteParsing;
 using SharedCore.ErrorHandling;
 using SharedCore.PackFiles;

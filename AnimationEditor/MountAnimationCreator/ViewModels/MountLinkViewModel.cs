@@ -5,8 +5,8 @@ using System.Linq;
 using System.Windows;
 using AnimationEditor.Common.ReferenceModel;
 using CommonControls.Common;
-using CommonControls.FileTypes.AnimationPack;
 using CommonControls.Services;
+using GameFiles.AnimationPack;
 using SharedCore.Misc;
 using SharedCore.PackFiles;
 

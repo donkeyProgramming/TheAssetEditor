@@ -1,5 +1,5 @@
-﻿using CommonControls.FileTypes.RigidModel.Types;
-using CommonControls.PackFileBrowser;
+﻿using CommonControls.PackFileBrowser;
+using GameFiles.RigidModel.Types;
 using SharedCore.Misc;
 using SharedCore.PackFiles;
 using System;

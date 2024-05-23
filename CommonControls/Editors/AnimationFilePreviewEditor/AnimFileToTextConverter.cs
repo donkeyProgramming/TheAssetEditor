@@ -2,7 +2,7 @@
 using System.Text;
 using System.Windows;
 using CommonControls.Editors.TextEditor;
-using CommonControls.FileTypes.Animation;
+using GameFiles.Animation;
 using SharedCore.ByteParsing;
 using SharedCore.PackFiles;
 

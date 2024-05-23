@@ -1,4 +1,4 @@
-﻿using CommonControls.FileTypes.RigidModel.Types;
+﻿using GameFiles.RigidModel.Types;
 using Serilog;
 using SharedCore;
 using SharedCore.PackFiles;

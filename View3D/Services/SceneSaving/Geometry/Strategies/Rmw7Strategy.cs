@@ -1,4 +1,4 @@
-﻿using CommonControls.FileTypes.RigidModel;
+﻿using GameFiles.RigidModel;
 using View3D.SceneNodes;
 
 namespace View3D.Services.SceneSaving.Geometry.Strategies

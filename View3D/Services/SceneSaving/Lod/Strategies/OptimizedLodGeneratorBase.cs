@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CommonControls.FileTypes.RigidModel;
+using GameFiles.RigidModel;
 using SharedCore.ErrorHandling;
 using View3D.SceneNodes;
 using View3D.Utility;

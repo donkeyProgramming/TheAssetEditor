@@ -1,10 +1,10 @@
-﻿using CommonControls.FileTypes.RigidModel;
-using CommonControls.FileTypes.RigidModel.Types;
-using CommonControls.FileTypes.WsModel;
-using SharedCore.PackFiles;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using GameFiles.RigidModel;
+using GameFiles.RigidModel.Types;
+using GameFiles.WsModel;
+using SharedCore.PackFiles;
 using View3D.SceneNodes;
 
 namespace View3D.Services
