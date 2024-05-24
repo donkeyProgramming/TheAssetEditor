@@ -1,6 +1,6 @@
-﻿using GameFiles.RigidModel.Types;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.GameFormats.RigidModel.Types;
 
 namespace View3D.Rendering.Shading
 {

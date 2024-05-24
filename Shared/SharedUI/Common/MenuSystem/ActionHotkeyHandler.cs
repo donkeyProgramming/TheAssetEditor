@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 
-namespace CommonControls.Common.MenuSystem
+namespace Shared.Ui.Common.MenuSystem
 {
     public class ActionHotkeyHandler
     {
@@ -18,7 +18,7 @@ namespace CommonControls.Common.MenuSystem
 
         public bool TriggerCommand(Key key, ModifierKeys modifierKeys)
         {
-            bool isHandled = false;
+            var isHandled = false;
             foreach (var item in _actions)
             {
                 if (item.Hotkey == null)

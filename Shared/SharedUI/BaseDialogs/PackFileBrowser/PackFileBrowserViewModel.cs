@@ -9,13 +9,13 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
-using CommonControls.Common;
 using CommunityToolkit.Mvvm.Input;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Ui.Common;
 
-namespace CommonControls.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public delegate void FileSelectedDelegate(PackFile file);
     public delegate void NodeSelectedDelegate(TreeNode node);

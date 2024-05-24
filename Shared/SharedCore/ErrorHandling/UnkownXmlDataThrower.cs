@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using System.Xml.Serialization;
 
-namespace SharedCore.ErrorHandling
+namespace Shared.Core.ErrorHandling
 {
     public class UnknownXmlDataThrower
     {

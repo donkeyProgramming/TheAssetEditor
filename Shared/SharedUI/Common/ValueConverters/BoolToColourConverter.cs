@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace CommonControls.Common.ValueConverters
+namespace Shared.Ui.Common.ValueConverters
 {
     [ValueConversion(typeof(bool), typeof(SolidColorBrush))]
     public class BoolToColourConverter : IValueConverter

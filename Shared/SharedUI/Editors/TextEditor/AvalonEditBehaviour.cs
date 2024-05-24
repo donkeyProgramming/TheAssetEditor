@@ -6,7 +6,7 @@ using System;
 using System.Windows;
 using Microsoft.Xaml.Behaviors;
 
-namespace CommonControls.Editors.TextEditor
+namespace Shared.Ui.Editors.TextEditor
 {
     public sealed class AvalonEditBehaviour : Behavior<ICSharpCode.AvalonEdit.TextEditor>
     {

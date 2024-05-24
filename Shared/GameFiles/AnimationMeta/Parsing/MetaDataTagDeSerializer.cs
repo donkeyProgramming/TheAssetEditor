@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
-using SharedCore.ByteParsing;
+using Shared.Core.ByteParsing;
 
-namespace Shared.GameFiles.AnimationMeta.Parsing
+namespace Shared.GameFormats.AnimationMeta.Parsing
 {
     public class MetaDataTagDeSerializer
     {

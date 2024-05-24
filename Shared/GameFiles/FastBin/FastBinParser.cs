@@ -1,10 +1,10 @@
 ﻿using Serilog;
-using SharedCore;
-using SharedCore.ByteParsing;
-using SharedCore.PackFiles.Models;
-using static SharedCore.ByteParsing.ByteChunk;
+using Shared.Core;
+using Shared.Core.ByteParsing;
+using Shared.Core.PackFiles.Models;
+using static Shared.Core.ByteParsing.ByteChunk;
 
-namespace GameFiles.FastBin
+namespace Shared.GameFormats.FastBin
 {
     public class FasBinFile
     { }

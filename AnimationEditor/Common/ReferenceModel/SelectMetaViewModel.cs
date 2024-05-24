@@ -1,6 +1,6 @@
-﻿using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+﻿using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static CommonControls.FilterDialog.FilterUserControl;

@@ -1,12 +1,12 @@
 ﻿using System.Text;
-using GameFiles.RigidModel.LodHeader;
-using GameFiles.RigidModel.MaterialHeaders;
-using GameFiles.RigidModel.Vertex;
 using Serilog;
-using SharedCore;
-using SharedCore.ByteParsing;
+using Shared.Core;
+using Shared.Core.ByteParsing;
+using Shared.GameFormats.RigidModel.LodHeader;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
+using Shared.GameFormats.RigidModel.Vertex;
 
-namespace GameFiles.RigidModel
+namespace Shared.GameFormats.RigidModel
 {
     public class ModelFactory
     {

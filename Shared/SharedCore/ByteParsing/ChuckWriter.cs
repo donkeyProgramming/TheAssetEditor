@@ -1,4 +1,4 @@
-﻿namespace SharedCore.ByteParsing
+﻿namespace Shared.Core.ByteParsing
 {
     public class ChuckWriter
     {

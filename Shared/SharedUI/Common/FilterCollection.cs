@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.Common
+namespace Shared.Ui.Common
 {
     public class FilterCollection<T> : NotifyPropertyChangedImpl where T : class
     {
@@ -100,7 +100,7 @@ namespace CommonControls.Common
                     var newValues = new List<T>(PossibleValues.Count);
                     foreach (var item in PossibleValues)
                     {
-                        bool addItem = false;
+                        var addItem = false;
                         if (SearchFilter != null)
                             addItem = SearchFilter(item, rx);
                         else

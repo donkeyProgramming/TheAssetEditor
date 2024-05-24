@@ -1,9 +1,9 @@
 ﻿using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
-using GameFiles.AnimationPack;
-using SharedCore;
-using SharedCore.PackFiles;
-using SharedCore.ToolCreation;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.Core.ToolCreation;
+using Shared.GameFormats.AnimationPack;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 {

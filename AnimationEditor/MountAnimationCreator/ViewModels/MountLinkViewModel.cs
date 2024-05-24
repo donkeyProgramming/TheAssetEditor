@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using AnimationEditor.Common.ReferenceModel;
-using CommonControls.Common;
 using Editors.Shared.Core.Services;
-using GameFiles.AnimationPack;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.AnimationPack;
+using Shared.Ui.Common;
 
 namespace AnimationEditor.MountAnimationCreator.ViewModels
 {

@@ -4,7 +4,7 @@
 
 using System.Windows;
 
-namespace CommonControls.Common
+namespace Shared.Ui.Common
 {
     // Helper when binding inside ContextMenu
     // https://stackoverflow.com/questions/3583507/wpf-binding-a-contextmenu-to-an-mvvm-command
@@ -17,7 +17,7 @@ namespace CommonControls.Common
 
         public object Data
         {
-            get => (object)GetValue(DataProperty);
+            get => GetValue(DataProperty);
             set => SetValue(DataProperty, value);
         }
 

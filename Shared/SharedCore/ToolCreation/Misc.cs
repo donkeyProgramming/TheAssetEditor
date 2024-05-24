@@ -1,4 +1,4 @@
-﻿namespace SharedCore.ToolCreation
+﻿namespace Shared.Core.ToolCreation
 {
     class ToolInformation
     {

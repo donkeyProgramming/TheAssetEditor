@@ -1,6 +1,6 @@
-﻿using SharedCore.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 
-namespace GameFiles.DB
+namespace Shared.GameFormats.DB
 {
     public class StringArrayTable
     {

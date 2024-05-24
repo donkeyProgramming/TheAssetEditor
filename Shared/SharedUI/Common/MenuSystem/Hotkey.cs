@@ -4,7 +4,7 @@
 
 using System.Windows.Input;
 
-namespace CommonControls.Common.MenuSystem
+namespace Shared.Ui.Common.MenuSystem
 {
     public class Hotkey
     {

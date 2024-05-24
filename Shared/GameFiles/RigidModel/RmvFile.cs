@@ -1,8 +1,8 @@
-﻿using GameFiles.RigidModel.LodHeader;
-using GameFiles.RigidModel.Vertex;
-using SharedCore.ByteParsing;
+﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.RigidModel.LodHeader;
+using Shared.GameFormats.RigidModel.Vertex;
 
-namespace GameFiles.RigidModel
+namespace Shared.GameFormats.RigidModel
 {
     public enum RmvVersionEnum : uint
     {

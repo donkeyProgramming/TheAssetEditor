@@ -1,6 +1,6 @@
-﻿using CommonControls.Common;
-using CommonControls.MathViews;
-using SharedCore.Misc;
+﻿using Shared.Core.Misc;
+using Shared.Ui.BaseDialogs.MathViews;
+using Shared.Ui.Common;
 
 namespace AnimationEditor.AnimationTransferTool
 {

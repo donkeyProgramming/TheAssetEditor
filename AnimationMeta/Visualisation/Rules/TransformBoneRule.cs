@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Serilog;
-using Shared.GameFiles.AnimationMeta.Definitions;
-using SharedCore;
+using Shared.Core;
+using Shared.GameFormats.AnimationMeta.Definitions;
 using View3D.Animation;
 using View3D.Animation.AnimationChange;
 

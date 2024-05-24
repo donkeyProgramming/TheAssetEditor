@@ -1,5 +1,5 @@
 ﻿using Serilog;
-using SharedCore;
+using Shared.Core;
 using System;
 using View3D.Animation;
 using View3D.SceneNodes;

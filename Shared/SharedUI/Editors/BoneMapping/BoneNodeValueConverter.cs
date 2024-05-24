@@ -2,7 +2,7 @@
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace CommonControls.Editors.BoneMapping
+namespace Shared.Ui.Editors.BoneMapping
 {
     public class BoneNodeValueConverter : IValueConverter
     {

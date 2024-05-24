@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace SharedCore.ToolCreation
+namespace Shared.Core.ToolCreation
 {
     public class PathToTool : IPackFileToToolSelector
     {

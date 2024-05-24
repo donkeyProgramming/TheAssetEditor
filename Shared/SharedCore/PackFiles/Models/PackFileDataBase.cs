@@ -1,6 +1,6 @@
-﻿using SharedCore.Misc;
+﻿using Shared.Core.Misc;
 
-namespace SharedCore.PackFiles.Models
+namespace Shared.Core.PackFiles.Models
 {
     public delegate void ContainerUpdatedDelegate(PackFileContainer container);
     public delegate void PackFileContainerLoadedDelegate(PackFileContainer container);

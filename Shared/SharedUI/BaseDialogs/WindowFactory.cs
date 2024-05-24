@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 
-namespace CommonControls.BaseDialogs
+namespace Shared.Ui.BaseDialogs
 {
     public interface IWindowFactory
     {
@@ -35,7 +35,7 @@ namespace CommonControls.BaseDialogs
                 Height = initialHeight,
                 DataContext = viewModel,
                 Content = view,
-                AlwaysOnTop = true,  
+                AlwaysOnTop = true,
             };
 
             if (viewModel is IGameComponent component)
@@ -60,7 +60,7 @@ namespace CommonControls.BaseDialogs
         public void ShowWindow(bool modal = false);
     }
 
-    public interface ITypedAssetEditorWindow<TViewModel> 
+    public interface ITypedAssetEditorWindow<TViewModel>
         : IAssetEditorWindow where TViewModel : class
     {
 
@@ -90,11 +90,11 @@ namespace CommonControls.BaseDialogs
 
         private void AssetEditorWindow_Deactivated(object sender, EventArgs e)
         {
-           if (AlwaysOnTop)
-           {
-               Window window = (Window)sender;
-               window.Topmost = true;
-           }
+            if (AlwaysOnTop)
+            {
+                var window = (Window)sender;
+                window.Topmost = true;
+            }
         }
 
         private void AssetEditorWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

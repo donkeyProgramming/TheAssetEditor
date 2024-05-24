@@ -2,15 +2,15 @@
 using System.Windows;
 using CommonControls.Editors.AnimationPack.Converters;
 using Editors.Shared.Core.Services;
-using GameFiles.Animation;
-using GameFiles.AnimationPack;
-using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;
 using Newtonsoft.Json;
 using Serilog;
-using Shared.GameFiles.AnimationMeta.Parsing;
-using SharedCore;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Animation;
+using Shared.GameFormats.AnimationMeta.Parsing;
+using Shared.GameFormats.AnimationPack;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 
 namespace AssetEditor.Report
 {

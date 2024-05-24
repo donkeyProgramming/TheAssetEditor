@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using GameFiles.RigidModel;
-using SharedCore.ErrorHandling;
+using Shared.Core.ErrorHandling;
+using Shared.GameFormats.RigidModel;
 using View3D.SceneNodes;
 using View3D.Utility;
 

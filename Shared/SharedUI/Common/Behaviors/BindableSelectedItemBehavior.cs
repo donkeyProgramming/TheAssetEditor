@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using Microsoft.Xaml.Behaviors;
 //using System.Windows.Interactivity;
 
-namespace CommonControls.Behaviors
+namespace Shared.Ui.Common.Behaviors
 {
 
     public static class Ex
@@ -33,7 +33,7 @@ namespace CommonControls.Behaviors
     {
         public object SelectedItem
         {
-            get { return (object)GetValue(SelectedItemProperty); }
+            get { return GetValue(SelectedItemProperty); }
             set { SetValue(SelectedItemProperty, value); }
         }
 
@@ -53,14 +53,14 @@ namespace CommonControls.Behaviors
             {
                 var cast = sender as BindableSelectedItemBehavior;
 
-                TreeViewItem treeItem = cast.AssociatedObject
+                var treeItem = cast.AssociatedObject
                            .ItemContainerGenerator
                            .ContainerFromItemRecursive(e.NewValue);
                 if (treeItem != null)
                     treeItem.SetValue(TreeViewItem.IsSelectedProperty, true);
                 else
                 {
-                    TreeViewItem oldTreeItem = cast.AssociatedObject
+                    var oldTreeItem = cast.AssociatedObject
                         .ItemContainerGenerator
                         .ContainerFromItemRecursive(e.OldValue);
                     if (oldTreeItem != null)
@@ -72,22 +72,22 @@ namespace CommonControls.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
-            this.AssociatedObject.SelectedItemChanged += OnTreeViewSelectedItemChanged;
+            AssociatedObject.SelectedItemChanged += OnTreeViewSelectedItemChanged;
         }
 
         protected override void OnDetaching()
         {
             base.OnDetaching();
 
-            if (this.AssociatedObject != null)
+            if (AssociatedObject != null)
             {
-                this.AssociatedObject.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
+                AssociatedObject.SelectedItemChanged -= OnTreeViewSelectedItemChanged;
             }
         }
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            this.SelectedItem = e.NewValue;
+            SelectedItem = e.NewValue;
         }
     }
 }

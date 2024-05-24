@@ -2,12 +2,12 @@
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using CommonControls.Interfaces.AssetManagement;
 using Shared.Core.Events;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Ui.Interfaces.AssetManagement;
 
-namespace CommonControls.Events.UiCommands
+namespace Shared.Ui.Events.UiCommands
 {
     public class ImportAssetCommand : IUiCommand
     {
@@ -39,8 +39,8 @@ namespace CommonControls.Events.UiCommands
                 var filename = dialog.FileNames.FirstOrDefault();
                 if (string.IsNullOrWhiteSpace(filename))
                     return;
-                
-               try
+
+                try
                 {
                     var extension = Path.GetExtension(filename);
                     var importer = _assetManagementFactory.GetImporter(extension);  // TODO: What if no importer is found?

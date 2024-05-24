@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public class PackFileFilter : NotifyPropertyChangedImpl, IDataErrorInfo
     {

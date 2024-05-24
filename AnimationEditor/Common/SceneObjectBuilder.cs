@@ -1,11 +1,11 @@
 ﻿using System;
-using GameFiles.Animation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Serilog;
-using SharedCore;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Animation;
 using View3D.Animation;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;

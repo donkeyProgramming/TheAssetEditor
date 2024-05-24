@@ -9,9 +9,9 @@ using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.BaseDialogs;
-using SharedCore.Misc;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
 
 namespace Audio.Presentation.AudioExplorer
 {

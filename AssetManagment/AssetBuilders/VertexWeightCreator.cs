@@ -6,9 +6,9 @@
 using System.Collections.Generic;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.AnimationProcessor;
-using GameFiles.Animation;
-using GameFiles.RigidModel.Vertex;
-using GameFiles.RigidModel;
+using Shared.GameFormats.RigidModel.Vertex;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.Animation;
 
 namespace AssetManagement.AssetBuilders
 {

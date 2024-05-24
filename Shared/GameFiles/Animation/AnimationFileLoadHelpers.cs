@@ -1,6 +1,6 @@
-﻿using GameFiles.RigidModel.Transforms;
+﻿using Shared.GameFormats.RigidModel.Transforms;
 
-namespace GameFiles.Animation
+namespace Shared.GameFormats.Animation
 {
     static class AnimationFileLoadHelpers
     {

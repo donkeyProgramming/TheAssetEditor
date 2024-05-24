@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace SharedCore.Misc
+namespace Shared.Core.Misc
 {
     public class MathUtil
     {

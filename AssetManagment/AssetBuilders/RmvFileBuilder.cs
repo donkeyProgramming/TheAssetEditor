@@ -4,13 +4,14 @@ using System.Text;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.MeshProcessing.Common;
-using GameFiles.Animation;
-using GameFiles.RigidModel;
-using GameFiles.RigidModel.LodHeader;
-using GameFiles.RigidModel.MaterialHeaders;
-using GameFiles.RigidModel.Types;
-using GameFiles.RigidModel.Vertex;
 using Microsoft.Xna.Framework;
+using Shared.GameFormats.Animation;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.LodHeader;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
+using Shared.GameFormats.RigidModel.Types;
+using Shared.GameFormats.RigidModel.Vertex;
+
 namespace AssetManagement.AssetBuilders
 {
     public class RmvFileBuilder

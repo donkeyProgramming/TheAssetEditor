@@ -4,11 +4,12 @@
 
 using System.Collections.ObjectModel;
 using CommonControls.Editors.TextEditor;
-using SharedCore.Misc;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
+using Shared.Ui.Editors.TextEditor;
 
-namespace CommonControls.Editors.Wtui
+namespace Shared.Ui.Editors.Wtui
 {
     public class TwUiViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ITextEditorViewModel
     {

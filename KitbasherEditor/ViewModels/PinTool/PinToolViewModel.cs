@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;

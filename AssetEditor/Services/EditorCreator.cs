@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using AssetEditor.ViewModels;
 using Serilog;
-using SharedCore;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
 
 namespace AssetEditor.Services
 {

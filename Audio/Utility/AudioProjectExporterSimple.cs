@@ -1,13 +1,4 @@
-﻿using Audio.BnkCompiler;
-using Audio.FileFormats.WWise.Hirc.V136;
-using Audio.Storage;
-using CommonControls.Common;
-using CommunityToolkit.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-
-namespace Audio.Utility
+﻿namespace Audio.Utility
 {
     public class AudioProjectExporterSimple
     {

@@ -1,12 +1,11 @@
-﻿using CommonControls.BaseDialogs;
-using CommonControls.Common.MenuSystem;
-using CommonControls.Events.UiCommands;
+﻿using System.Windows;
+using CommonControls.BaseDialogs;
 using Editors.Shared.Core.Services;
 using KitbasherEditor.ViewModels.BmiEditor;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.Views.EditorViews;
-using SharedCore.PackFiles;
-using System.Windows;
+using Shared.Core.PackFiles;
+using Shared.Ui.Common.MenuSystem;
 using View3D.Animation;
 using View3D.Commands;
 using View3D.Components.Component.Selection;

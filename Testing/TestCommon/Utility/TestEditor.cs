@@ -1,7 +1,7 @@
-﻿using SharedCore.Events;
-using SharedCore.Misc;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+﻿using Shared.Core.Events;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
 using System;
 
 namespace BaseTests.ToolCreation

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace GameFiles.RigidModel.Transforms
+namespace Shared.GameFormats.RigidModel.Transforms
 {
     public struct RmvVector2
     {

@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using AssetManagement.GenericFormats.DataStructures.Managed;
-using GameFiles.Animation;
-using GameFiles.RigidModel;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.Animation;
 
 namespace AssetManagement.AssetBuilders
 {

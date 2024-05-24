@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
-using CommonControls.BaseDialogs.PackFileBrowser;
-using CommonControls.Common;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using SharedCore.Events;
-using SharedCore.Events.Scoped;
-using SharedCore.Misc;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core.Events;
+using Shared.Core.Events.Scoped;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.Common;
 using View3D.Components.Component;
 using View3D.Services;
 using View3D.Services.SceneSaving;
@@ -51,7 +51,7 @@ namespace KitbasherEditor.ViewModels
             SceneExplorer = sceneExplorerViewModel;
             MenuBar = menuBarViewModel;
 
-            eventHub.Register<FileSavedEvent>(OnFileSaved);
+            eventHub.Register<ScopedFileSavedEvent>(OnFileSaved);
             eventHub.Register<CommandStackChangedEvent>(OnCommandStackChanged);
         }
 
@@ -72,7 +72,7 @@ namespace KitbasherEditor.ViewModels
         public bool AllowDrop(TreeNode node, TreeNode targeNode = null) => _dropHandler.AllowDrop(node, targeNode);
         public bool Drop(TreeNode node, TreeNode targeNode = null) => _dropHandler.Drop(node, targeNode);
 
-        void OnFileSaved(FileSavedEvent notification)
+        void OnFileSaved(ScopedFileSavedEvent notification)
         {
             HasUnsavedChanges = false;
             DisplayName.Value = Path.GetFileName(_saveSettings.OutputName);

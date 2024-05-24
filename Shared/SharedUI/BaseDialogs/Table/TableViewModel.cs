@@ -8,9 +8,9 @@ using System.Data;
 using System.Linq;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.Table
+namespace Shared.Ui.BaseDialogs.Table
 {
     abstract public class TableViewModel : NotifyPropertyChangedImpl
     {
@@ -91,7 +91,7 @@ namespace CommonControls.Table
         {
             filterText = filterText.ToUpper();
             var columnNames = new List<string>();
-            for (int i = 0; i < _privateTable.Columns.Count; i++)
+            for (var i = 0; i < _privateTable.Columns.Count; i++)
                 columnNames.Add(_privateTable.Columns[i].ColumnName);
 
             var filters = columnNames.Select(x => string.Format("convert({0}, 'System.String') LIKE '%{1}%'", x, filterText));

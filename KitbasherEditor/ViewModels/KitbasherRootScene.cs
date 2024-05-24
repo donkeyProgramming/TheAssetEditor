@@ -1,9 +1,9 @@
 ﻿using System.IO;
-using GameFiles.Animation;
-using GameFiles.RigidModel;
 using KitbasherEditor.Events;
-using SharedCore.Events;
-using SharedCore.PackFiles;
+using Shared.Core.Events;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.Animation;
+using Shared.GameFormats.RigidModel;
 using View3D.Animation;
 using View3D.Components.Component;
 using View3D.SceneNodes;

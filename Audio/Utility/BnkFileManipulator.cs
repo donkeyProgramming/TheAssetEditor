@@ -1,6 +1,6 @@
 ﻿using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc;
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles.Models;
 using System.Linq;
 
 namespace Audio.Utility

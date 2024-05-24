@@ -1,7 +1,5 @@
-﻿using CommonControls.Common.MenuSystem;
-using CommonControls.Events.UiCommands;
-using KitbasherEditor.ViewModels.MenuBarViews;
-using System.Windows.Input;
+﻿using KitbasherEditor.ViewModels.MenuBarViews;
+using Shared.Ui.Common.MenuSystem;
 using View3D.Components.Rendering;
 
 namespace KitbasherEditor.ViewModels.UiCommands

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 
-namespace CommonControls.Editors.BoneMapping
+namespace Shared.Ui.Editors.BoneMapping
 {
     [Serializable]
     public class RemappedAnimatedBoneConfiguration

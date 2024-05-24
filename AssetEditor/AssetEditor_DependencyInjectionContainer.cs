@@ -5,8 +5,8 @@ using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore.Misc;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.ToolCreation;
 
 namespace AssetEditor
 {

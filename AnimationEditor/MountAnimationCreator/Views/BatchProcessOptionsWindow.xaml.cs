@@ -1,4 +1,4 @@
-﻿using SharedCore.Misc;
+﻿using Shared.Core.Misc;
 using System.Windows;
 
 namespace AnimationEditor.MountAnimationCreator

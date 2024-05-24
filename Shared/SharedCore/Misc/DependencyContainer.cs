@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore.ToolCreation;
+using Shared.Core.ToolCreation;
 
-namespace SharedCore.Misc
+namespace Shared.Core.Misc
 {
     public class DependencyContainer
     {

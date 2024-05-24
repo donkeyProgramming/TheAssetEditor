@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Windows;
 
-namespace SharedCore.ErrorHandling
+namespace Shared.Core.ErrorHandling
 {
     public class ExceptionHelper
     {

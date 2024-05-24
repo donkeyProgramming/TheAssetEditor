@@ -1,11 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Editors.Shared.Core.Services;
-using GameFiles.Animation;
 using KitbasherEditor.Events;
-using SharedCore.Events;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core.Events;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Animation;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;

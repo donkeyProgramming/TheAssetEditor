@@ -1,6 +1,6 @@
 ﻿using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using SharedCore.Events;
-using SharedCore.Misc;
+using Shared.Core.Events;
+using Shared.Core.Misc;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

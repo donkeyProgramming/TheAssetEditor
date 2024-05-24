@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.ObjectModel;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.Common.MenuSystem
+namespace Shared.Ui.Common.MenuSystem
 {
     public class ToolbarItem
     {

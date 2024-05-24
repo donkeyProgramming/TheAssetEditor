@@ -3,9 +3,9 @@ using System.Globalization;
 using System.Windows;
 using CsvHelper;
 using Serilog;
-using Shared.GameFiles.AnimationMeta.Parsing;
-using SharedCore;
-using SharedCore.PackFiles;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace AssetEditor.Report
 {

@@ -4,9 +4,9 @@
 
 using System;
 using System.Globalization;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.MathViews
+namespace Shared.Ui.BaseDialogs.MathViews
 {
     public class DoubleViewModel : NotifyPropertyChangedImpl
     {
@@ -39,7 +39,7 @@ namespace CommonControls.MathViews
         {
             get
             {
-                var valid = double.TryParse(_textvalue.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out double result);
+                var valid = double.TryParse(_textvalue.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out var result);
                 if (valid)
                     return result;
                 return 0;

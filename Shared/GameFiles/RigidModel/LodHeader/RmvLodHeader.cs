@@ -1,4 +1,4 @@
-﻿namespace GameFiles.RigidModel.LodHeader
+﻿namespace Shared.GameFormats.RigidModel.LodHeader
 {
     /*
  * FROM CA: https://discord.com/channels/373745291289034763/448884160094797834/766300715294523423

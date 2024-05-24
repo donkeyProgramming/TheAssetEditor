@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CommonControls.Editors.BoneMapping
+namespace Shared.Ui.Editors.BoneMapping
 {
     public static class BoneMappingHelper
     {
@@ -31,7 +31,7 @@ namespace CommonControls.Editors.BoneMapping
             boneToGetMapping.MappedBoneIndex.Value = otherBoneToStartFrom.BoneIndex.Value;
             boneToGetMapping.MappedBoneName.Value = otherBoneToStartFrom.Name.Value;
 
-            for (int i = 0; i < boneToGetMapping.Children.Count(); i++)
+            for (var i = 0; i < boneToGetMapping.Children.Count(); i++)
             {
                 if (i < otherBoneToStartFrom.Children.Count())
                     AutomapDirectBoneLinksBasedOnHierarchy(boneToGetMapping.Children[i], otherBoneToStartFrom.Children[i]);
@@ -169,7 +169,7 @@ namespace CommonControls.Editors.BoneMapping
             // Clean up for easier comparing 
             boneNameA = CleanUpBoneName(boneNameA);
             boneNameB = CleanUpBoneName(boneNameB);
-            for (int i = 0; i < alternativeNames.Length; i++)
+            for (var i = 0; i < alternativeNames.Length; i++)
                 alternativeNames[i] = CleanUpBoneName(alternativeNames[i]);
 
             if (boneNameA == boneNameB)
@@ -179,7 +179,7 @@ namespace CommonControls.Editors.BoneMapping
                 return true;
 
             // Swap left for right
-            for (int i = 0; i < alternativeNames.Length; i++)
+            for (var i = 0; i < alternativeNames.Length; i++)
                 alternativeNames[i] = alternativeNames[i].Replace("left", "right");
 
             if (alternativeNames.Contains(boneNameA) && alternativeNames.Contains(boneNameB))

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using GameFiles.RigidModel;
 using KitbasherEditor.ViewModels;
 using Serilog;
-using SharedCore;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.RigidModel;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 using View3D.Services;

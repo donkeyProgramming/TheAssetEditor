@@ -1,10 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using GameFiles.Animation;
 using Serilog;
-using SharedCore;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Animation;
 
 namespace Editors.Shared.Core.Services
 {

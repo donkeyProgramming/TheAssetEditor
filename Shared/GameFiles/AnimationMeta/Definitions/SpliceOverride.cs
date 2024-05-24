@@ -1,7 +1,6 @@
-﻿using Shared.GameFiles.AnimationMeta.Parsing;
-using Shared.GameFiles.AnimationMeta.Parsing;
+﻿using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace Shared.GameFiles.AnimationMeta.Definitions
+namespace Shared.GameFormats.AnimationMeta.Definitions
 {
     [MetaData("SPLICE_OVERRIDE", 11)]
     public class SpliceOverride_v11 : Splice_v11

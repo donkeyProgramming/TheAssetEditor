@@ -4,10 +4,10 @@ using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using CommunityToolkit.Mvvm.Input;
 using MonoGame.Framework.WpfInterop;
-using SharedCore.Events;
-using SharedCore.Misc;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core.Events;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
 using View3D.Components;
 using View3D.Services;
 

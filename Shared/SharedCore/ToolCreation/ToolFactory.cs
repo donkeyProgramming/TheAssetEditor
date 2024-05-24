@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace SharedCore.ToolCreation
+namespace Shared.Core.ToolCreation
 {
     public class ToolFactory : IToolFactory
     {

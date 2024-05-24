@@ -4,6 +4,7 @@
 
 using System;
 using System.Windows;
+using Shared.Ui.Editors.BoneMapping;
 
 namespace CommonControls.Editors.BoneMapping.View
 {

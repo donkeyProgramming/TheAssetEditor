@@ -1,5 +1,4 @@
 ﻿using System;
-using CommonControls.Common.MenuSystem;
 using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
@@ -14,9 +13,10 @@ using KitbasherEditor.Views.EditorViews;
 using KitbasherEditor.Views.EditorViews.PinTool;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.ToolCreation;
+using Shared.Ui.Common.MenuSystem;
 using View3D.Services;
 using View3D.Services.SceneSaving;
 

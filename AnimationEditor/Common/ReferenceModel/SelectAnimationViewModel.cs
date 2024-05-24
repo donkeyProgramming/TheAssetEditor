@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using Editors.Shared.Core.Services;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
 using static CommonControls.FilterDialog.FilterUserControl;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 

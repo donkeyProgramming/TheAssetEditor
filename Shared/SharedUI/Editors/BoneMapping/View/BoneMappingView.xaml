@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors" 
-             xmlns:mathviews="clr-namespace:CommonControls.MathViews"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews" xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>

@@ -6,7 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
-using SharedCore;
+using Shared.Core;
 
 namespace Audio.Utility
 {

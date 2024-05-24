@@ -2,11 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using CommonControls.Editors.Wtui;
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore.PackFiles;
-using SharedCore.ToolCreation;
+using Shared.Core.PackFiles;
+using Shared.Core.ToolCreation;
 
-namespace CommonControls.Editors.Wtui
+namespace Shared.Ui.Editors.Wtui
 {
     public class TwUi_DependencyInjectionContainer
     {

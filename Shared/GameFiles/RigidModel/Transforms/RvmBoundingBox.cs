@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 
-namespace GameFiles.RigidModel.Transforms
+namespace Shared.GameFormats.RigidModel.Transforms
 {
     [StructLayout(LayoutKind.Sequential, Size = 24)]
     [Serializable]

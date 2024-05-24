@@ -1,5 +1,5 @@
-﻿using CommonControls.Common.MenuSystem;
-using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using KitbasherEditor.ViewModels.MenuBarViews;
+using Shared.Ui.Common.MenuSystem;
 using View3D.Services.SceneSaving.Geometry;
 
 namespace KitbasherEditor.ViewModels.UiCommands

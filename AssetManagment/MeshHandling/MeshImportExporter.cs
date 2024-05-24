@@ -1,4 +1,4 @@
-﻿using CommonControls.Interfaces.AssetManagement;
+﻿using Shared.Ui.Interfaces.AssetManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;

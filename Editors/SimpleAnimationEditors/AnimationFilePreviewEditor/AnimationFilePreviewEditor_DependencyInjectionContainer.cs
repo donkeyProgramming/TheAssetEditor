@@ -1,6 +1,7 @@
 ﻿using CommonControls.Editors.TextEditor;
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore.ToolCreation;
+using Shared.Core.ToolCreation;
+using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.AnimationFilePreviewEditor
 {

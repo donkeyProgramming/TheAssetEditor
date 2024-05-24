@@ -1,7 +1,7 @@
-﻿using GameFiles.RigidModel.Types;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Shared.GameFormats.RigidModel.Types;
 
-namespace GameFiles.RigidModel.MaterialHeaders
+namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
     public interface IMaterial
     {

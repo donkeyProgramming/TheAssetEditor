@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using SharedCore.PackFiles;
+using Shared.Core.PackFiles;
 using View3D.SceneNodes;
 using View3D.Services.SceneSaving.Geometry;
 using View3D.Services.SceneSaving.Lod;

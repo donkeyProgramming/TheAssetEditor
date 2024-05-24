@@ -2,12 +2,12 @@
 using System.Windows;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
-using CommonControls.Common;
 using Editors.Shared.Core.Services;
-using GameFiles.Animation;
 using Microsoft.Xna.Framework;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.Animation;
+using Shared.Ui.Common;
 using View3D.Animation;
 
 namespace AnimationEditor.CampaignAnimationCreator

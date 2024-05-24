@@ -1,4 +1,4 @@
-﻿namespace SharedCore.Misc
+﻿namespace Shared.Core.Misc
 {
     public interface ICopyPastItem
     {

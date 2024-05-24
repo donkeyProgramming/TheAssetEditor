@@ -1,18 +1,17 @@
-﻿using CommonControls.BaseDialogs;
-using Microsoft.Xna.Framework.Graphics;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using CommonControls.BaseDialogs;
+using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
 using TextureEditor.Views;
-using View3D.Rendering.Geometry;
 using View3D.Services;
 using View3D.Utility;
 

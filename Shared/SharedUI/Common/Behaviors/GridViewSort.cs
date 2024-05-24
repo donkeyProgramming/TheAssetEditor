@@ -8,7 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace Wpf.Util
+namespace Shared.Ui.Common.Behaviors
 {
     public class GridViewSort
     {
@@ -34,18 +34,18 @@ namespace Wpf.Util
                     null,
                     (o, e) =>
                     {
-                        ItemsControl listView = o as ItemsControl;
+                        var listView = o as ItemsControl;
                         if (listView != null)
                         {
                             if (!GetAutoSort(listView)) // Don't change click handler if AutoSort enabled
                             {
                                 if (e.OldValue != null && e.NewValue == null)
                                 {
-                                    listView.RemoveHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
+                                    listView.RemoveHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
                                 }
                                 if (e.OldValue == null && e.NewValue != null)
                                 {
-                                    listView.AddHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
+                                    listView.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
                                 }
                             }
                         }
@@ -73,20 +73,20 @@ namespace Wpf.Util
                     false,
                     (o, e) =>
                     {
-                        ListView listView = o as ListView;
+                        var listView = o as ListView;
                         if (listView != null)
                         {
                             if (GetCommand(listView) == null) // Don't change click handler if a command is set
                             {
-                                bool oldValue = (bool)e.OldValue;
-                                bool newValue = (bool)e.NewValue;
+                                var oldValue = (bool)e.OldValue;
+                                var newValue = (bool)e.NewValue;
                                 if (oldValue && !newValue)
                                 {
-                                    listView.RemoveHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
+                                    listView.RemoveHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
                                 }
                                 if (!oldValue && newValue)
                                 {
-                                    listView.AddHandler(GridViewColumnHeader.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
+                                    listView.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler(ColumnHeader_Click));
                                 }
                             }
                         }
@@ -119,16 +119,16 @@ namespace Wpf.Util
 
         private static void ColumnHeader_Click(object sender, RoutedEventArgs e)
         {
-            GridViewColumnHeader headerClicked = e.OriginalSource as GridViewColumnHeader;
+            var headerClicked = e.OriginalSource as GridViewColumnHeader;
             if (headerClicked != null)
             {
-                string propertyName = GetPropertyName(headerClicked.Column);
+                var propertyName = GetPropertyName(headerClicked.Column);
                 if (!string.IsNullOrEmpty(propertyName))
                 {
-                    ListView listView = GetAncestor<ListView>(headerClicked);
+                    var listView = GetAncestor<ListView>(headerClicked);
                     if (listView != null)
                     {
-                        ICommand command = GetCommand(listView);
+                        var command = GetCommand(listView);
                         if (command != null)
                         {
                             if (command.CanExecute(propertyName))
@@ -151,7 +151,7 @@ namespace Wpf.Util
 
         public static T GetAncestor<T>(DependencyObject reference) where T : DependencyObject
         {
-            DependencyObject parent = VisualTreeHelper.GetParent(reference);
+            var parent = VisualTreeHelper.GetParent(reference);
             while (!(parent is T))
             {
                 parent = VisualTreeHelper.GetParent(parent);
@@ -164,10 +164,10 @@ namespace Wpf.Util
 
         public static void ApplySort(ICollectionView view, string propertyName)
         {
-            ListSortDirection direction = ListSortDirection.Ascending;
+            var direction = ListSortDirection.Ascending;
             if (view.SortDescriptions.Count > 0)
             {
-                SortDescription currentSort = view.SortDescriptions[0];
+                var currentSort = view.SortDescriptions[0];
                 if (currentSort.PropertyName == propertyName)
                 {
                     if (currentSort.Direction == ListSortDirection.Ascending)

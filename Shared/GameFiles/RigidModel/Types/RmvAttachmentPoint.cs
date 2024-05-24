@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-using GameFiles.RigidModel.Transforms;
-using SharedCore.ByteParsing;
-using SharedCore.Misc;
+using Shared.Core.ByteParsing;
+using Shared.Core.Misc;
+using Shared.GameFormats.RigidModel.Transforms;
 
-namespace GameFiles.RigidModel.Types
+namespace Shared.GameFormats.RigidModel.Types
 {
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]

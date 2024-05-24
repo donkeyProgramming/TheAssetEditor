@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace SharedCore.ToolCreation
+namespace Shared.Core.ToolCreation
 {
     public interface IToolFactory
     {

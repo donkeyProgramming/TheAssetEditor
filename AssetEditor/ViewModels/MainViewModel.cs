@@ -4,14 +4,14 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using AssetEditor.UiCommands;
-using CommonControls.BaseDialogs.PackFileBrowser;
-using CommonControls.Common;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Events;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.Common;
 
 namespace AssetEditor.ViewModels
 {

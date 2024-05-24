@@ -4,6 +4,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using Shared.Ui.BaseDialogs.MathViews;
 
 namespace CommonControls.MathViews
 {

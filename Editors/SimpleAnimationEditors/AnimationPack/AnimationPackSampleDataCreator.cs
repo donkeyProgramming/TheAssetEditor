@@ -5,11 +5,11 @@
 using System.Collections.Generic;
 using System.Windows;
 using CommonControls.BaseDialogs;
-using GameFiles.AnimationPack;
-using GameFiles.AnimationPack.AnimPackFileTypes;
-using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.AnimationPack;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 
 namespace CommonControls.Editors.AnimationPack
 {
@@ -80,7 +80,7 @@ namespace CommonControls.Editors.AnimationPack
                 UnknownValue1 = 0,
             };
 
-            outputFile.AnimationTableEntries.Add(new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+            outputFile.AnimationTableEntries.Add(new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
             {
                 AnimationId = 1, // STAND
                 BlendIn = 0.5f,
@@ -88,9 +88,9 @@ namespace CommonControls.Editors.AnimationPack
                 WeaponBools = 1,
                 Unk = false,
 
-                AnimationRefs = new List<GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef>()
+                AnimationRefs = new List<Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef>()
                 {
-                    new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
+                    new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
                     {
                         AnimationFile = @"animations/battle/humanoid01/sword_and_shield/stand/hu1_sws_stand_01.anim",
                         AnimationMetaFile = @"",
@@ -99,7 +99,7 @@ namespace CommonControls.Editors.AnimationPack
                 }
             });
 
-            outputFile.AnimationTableEntries.Add(new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+            outputFile.AnimationTableEntries.Add(new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
             {
                 AnimationId = 453,// Attack_1
                 BlendIn = 0.3f,
@@ -107,15 +107,15 @@ namespace CommonControls.Editors.AnimationPack
                 WeaponBools = 1,
                 Unk = false,
 
-                AnimationRefs = new List<GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef>()
+                AnimationRefs = new List<Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef>()
                 {
-                    new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
+                    new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
                     {
                         AnimationFile = @"animations/battle/humanoid01/sword_and_shield/attacks/hu1_sws_attack_01.anim",
                         AnimationMetaFile = @"animations/battle/humanoid01/sword_and_shield/attacks/hu1_sws_attack_01.meta",
                         AnimationSoundMetaFile = @"animations/audio/battle/humanoid01/sword_and_shield/attacks/hu1_sws_attack_01.{27tsfy}.snd.meta",
                     },
-                    new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
+                    new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry.AnimationRef()
                     {
                           AnimationFile = @"animations/battle/humanoid01/sword_and_shield/attacks/hu1_sws_attack_02.anim",
                         AnimationMetaFile = @"animations/battle/humanoid01/sword_and_shield/attacks/hu1_sws_attack_02.anm.meta",

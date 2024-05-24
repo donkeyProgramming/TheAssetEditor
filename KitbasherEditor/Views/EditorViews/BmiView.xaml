@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=Shared.Ui"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>

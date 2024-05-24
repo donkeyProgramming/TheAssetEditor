@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace SharedCore.Misc
+namespace Shared.Core.Misc
 {
     [DebuggerDisplay("NotifyAttr [{Value}]")]
     public class NotifyAttr<T> : NotifyPropertyChangedImpl

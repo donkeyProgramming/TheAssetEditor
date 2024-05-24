@@ -1,8 +1,8 @@
-﻿using CommonControls.BaseDialogs;
-using CommonControls.Common.MenuSystem;
-using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.Views.EditorViews;
+using Shared.Ui.BaseDialogs;
+using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

@@ -1,6 +1,6 @@
-﻿using SharedCore.Misc;
+﻿using Shared.Core.Misc;
 
-namespace GameFiles.AnimationPack.AnimPackFileTypes
+namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes
 {
     public class UnknownAnimFile : IAnimationPackFile
     {

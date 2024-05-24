@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace CommonControls.Behaviors
+namespace Shared.Ui.Common.Behaviors
 {
     public class MouseMiddleClick
     {
@@ -38,14 +38,14 @@ namespace CommonControls.Behaviors
 
         private static void CommandChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
         {
-            Control control = target as Control;
+            var control = target as Control;
             if (control != null)
             {
-                if ((e.NewValue != null) && (e.OldValue == null))
+                if (e.NewValue != null && e.OldValue == null)
                 {
                     control.MouseDown += OnMouseDown;
                 }
-                else if ((e.NewValue == null) && (e.OldValue != null))
+                else if (e.NewValue == null && e.OldValue != null)
                 {
                     control.MouseDoubleClick -= OnMouseDown;
                 }
@@ -54,9 +54,9 @@ namespace CommonControls.Behaviors
 
         private static void OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            Control control = sender as Control;
-            ICommand command = (ICommand)control.GetValue(CommandProperty);
-            object commandParameter = control.GetValue(CommandParameterProperty);
+            var control = sender as Control;
+            var command = (ICommand)control.GetValue(CommandProperty);
+            var commandParameter = control.GetValue(CommandParameterProperty);
 
             if (e.ChangedButton == MouseButton.Middle && e.ButtonState == MouseButtonState.Pressed)
                 command.Execute(commandParameter);

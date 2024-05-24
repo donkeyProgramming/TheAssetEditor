@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
-using SharedCore.Events;
+using Shared.Core.Events;
 
 namespace View3D.Services
 {

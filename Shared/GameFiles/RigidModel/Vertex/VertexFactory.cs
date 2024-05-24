@@ -1,7 +1,7 @@
-﻿using GameFiles.RigidModel.Vertex.Formats;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Shared.GameFormats.RigidModel.Vertex.Formats;
 
-namespace GameFiles.RigidModel.Vertex
+namespace Shared.GameFormats.RigidModel.Vertex
 {
     public interface IVertexCreator
     {

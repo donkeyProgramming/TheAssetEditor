@@ -4,12 +4,12 @@ using System.IO;
 using System.Windows;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
-using CommonControls.MathViews;
 using CommonControls.PackFileBrowser;
-using GameFiles.Animation;
 using Microsoft.Xna.Framework;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.Animation;
+using Shared.Ui.BaseDialogs.MathViews;
 using View3D.Animation;
 using View3D.Services;
 

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimationEditor.AnimationTransferTool"
              xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=Shared.Ui"
+            xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
              xmlns:System="clr-namespace:System;assembly=System.Runtime"

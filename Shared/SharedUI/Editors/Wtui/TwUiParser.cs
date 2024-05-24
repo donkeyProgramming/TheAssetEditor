@@ -7,7 +7,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace CommonControls.Editors.Wtui
+namespace Shared.Ui.Editors.Wtui
 {
     class TwUiParser
     {

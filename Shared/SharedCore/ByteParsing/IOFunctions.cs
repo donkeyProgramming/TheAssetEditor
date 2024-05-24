@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SharedCore.ByteParsing
+namespace Shared.Core.ByteParsing
 {
     public class IOFunctions
     {

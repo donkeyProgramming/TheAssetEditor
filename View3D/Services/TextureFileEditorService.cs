@@ -1,8 +1,8 @@
-﻿using GameFiles.RigidModel.Types;
-using Serilog;
-using SharedCore;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+﻿using Serilog;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.RigidModel.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

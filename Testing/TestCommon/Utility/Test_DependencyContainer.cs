@@ -1,7 +1,7 @@
 ﻿using BaseTests.ToolCreation;
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore.Misc;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.ToolCreation;
 
 namespace TestCommon.Utility
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CommonControls.BaseDialogs;
-using CommonControls.Editors.BoneMapping;
+using Shared.Ui.BaseDialogs;
+using Shared.Ui.Editors.BoneMapping;
 using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.SceneNodes;

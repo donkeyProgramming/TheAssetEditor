@@ -6,22 +6,22 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using CommonControls.BaseDialogs;
-using CommonControls.Common;
-using CommonControls.Events.UiCommands;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using Shared.Core;
 using Shared.Core.Events;
-using SharedCore;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
+using Shared.Ui.Common;
+using Shared.Ui.Events.UiCommands;
 using Clipboard = System.Windows.Clipboard;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 
-namespace CommonControls.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public abstract class ContextMenuHandler : NotifyPropertyChangedImpl
     {

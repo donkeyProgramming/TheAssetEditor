@@ -1,6 +1,6 @@
-﻿using SharedCore.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 
-namespace SharedCore.PackFiles.Models
+namespace Shared.Core.PackFiles.Models
 {
     public enum PackFileDataSourceType
     {

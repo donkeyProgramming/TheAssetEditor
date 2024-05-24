@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
-using SharedCore.ByteParsing;
+using Shared.Core.ByteParsing;
 
-namespace GameFiles.RigidModel.Types
+namespace Shared.GameFormats.RigidModel.Types
 {
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]

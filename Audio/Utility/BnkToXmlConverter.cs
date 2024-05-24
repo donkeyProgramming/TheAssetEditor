@@ -1,4 +1,4 @@
-﻿using SharedCore;
+﻿using Shared.Core;
 using System.Diagnostics;
 
 namespace Audio.Utility

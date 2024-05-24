@@ -3,13 +3,13 @@ using System.IO;
 using System.Linq;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.Shared.Core.Services;
-using GameFiles.Animation;
-using GameFiles.AnimationPack;
-using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.Animation;
+using Shared.GameFormats.AnimationPack;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 using View3D.Animation;
-using static GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
+using static Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
 
 namespace AnimationEditor.MountAnimationCreator.Services
 {

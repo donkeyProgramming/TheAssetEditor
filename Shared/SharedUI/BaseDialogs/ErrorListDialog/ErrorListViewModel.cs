@@ -4,9 +4,9 @@
 
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using SharedCore.ErrorHandling;
+using Shared.Core.ErrorHandling;
 
-namespace CommonControls.BaseDialogs.ErrorListDialog
+namespace Shared.Ui.BaseDialogs.ErrorListDialog
 {
 
     public partial class ErrorListViewModel

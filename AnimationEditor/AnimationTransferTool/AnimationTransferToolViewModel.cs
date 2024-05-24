@@ -7,17 +7,19 @@ using System.Windows;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
-using CommonControls.Common;
-using CommonControls.Editors.BoneMapping;
 using CommonControls.Editors.BoneMapping.View;
 using CommonControls.SelectionListDialog;
 using Editors.Shared.Core.Services;
-using GameFiles.Animation;
 using Microsoft.Xna.Framework;
 using Serilog;
-using SharedCore;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
+using Shared.Core;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.Animation;
+using Shared.Ui.BaseDialogs.MathViews;
+using Shared.Ui.BaseDialogs.SelectionListDialog;
+using Shared.Ui.Common;
+using Shared.Ui.Editors.BoneMapping;
 using View3D.Animation;
 
 namespace AnimationEditor.AnimationTransferTool
@@ -106,10 +108,10 @@ namespace AnimationEditor.AnimationTransferTool
             if (_copyFrom.Skeleton != null)
                 CopyFromSkeletonChanged(_copyFrom.Skeleton);
             AnimationSettings.DisplayOffset.OnValueChanged += DisplayOffset_OnValueChanged;
-            DisplayOffset_OnValueChanged(new CommonControls.MathViews.Vector3ViewModel(0, 0, 2));
+            DisplayOffset_OnValueChanged(new Vector3ViewModel(0, 0, 2));
         }
 
-        private void DisplayOffset_OnValueChanged(CommonControls.MathViews.Vector3ViewModel newValue)
+        private void DisplayOffset_OnValueChanged(Vector3ViewModel newValue)
         {
             _copyTo.Offset = Matrix.CreateTranslation(newValue.GetAsVector3() * -1);
             _copyFrom.Offset = Matrix.CreateTranslation(newValue.GetAsVector3());

@@ -9,8 +9,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using CommonControls.BaseDialogs.PackFileBrowser;
-using CommonControls.Common;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.Common;
 
 namespace CommonControls.PackFileBrowser
 {

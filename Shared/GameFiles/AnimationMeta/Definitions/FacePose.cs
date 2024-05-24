@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Xna.Framework;
-using Shared.GameFiles.AnimationMeta.Parsing;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace Shared.GameFiles.AnimationMeta.Definitions
+namespace Shared.GameFormats.AnimationMeta.Definitions
 {
     [MetaData("FACE_POSE", 2)]
     public class FacePose_v2 : DecodedMetaEntryBase_v2

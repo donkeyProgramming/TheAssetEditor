@@ -4,11 +4,11 @@
 
 using System.IO;
 using System.Reflection;
-using GameFiles.RigidModel.Types;
 using Serilog;
-using SharedCore;
+using Shared.Core;
+using Shared.GameFormats.RigidModel.Types;
 
-namespace CommonControls.Services
+namespace Shared.Ui.Services
 {
     public class TextureConvWrapper
     {

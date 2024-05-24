@@ -7,8 +7,8 @@ using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore;
-using SharedCore.PackFiles;
+using Shared.Core;
+using Shared.Core.PackFiles;
 
 namespace AssetEditor
 {

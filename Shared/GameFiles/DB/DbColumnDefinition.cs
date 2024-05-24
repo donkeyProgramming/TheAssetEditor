@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using SharedCore.ByteParsing;
+using Shared.Core.ByteParsing;
 
-namespace GameFiles.DB
+namespace Shared.GameFormats.DB
 {
     [DebuggerDisplay("{Name} - {Type}")]
     public class DbColumnDefinition : ICloneable

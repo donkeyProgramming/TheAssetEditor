@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using System.Xml;
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles.Models;
 
-namespace GameFiles.WsModel
+namespace Shared.GameFormats.WsModel
 {
     public class WsMaterial
     {

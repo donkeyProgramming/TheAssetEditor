@@ -1,7 +1,6 @@
-﻿using CommonControls.Common.MenuSystem;
-using CommonControls.Events.UiCommands;
+﻿using System.Windows.Input;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using System.Windows.Input;
+using Shared.Ui.Common.MenuSystem;
 using View3D.Components.Component.Selection;
 using View3D.Services;
 

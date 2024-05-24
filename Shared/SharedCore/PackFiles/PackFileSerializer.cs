@@ -1,8 +1,8 @@
 ﻿using Serilog;
-using SharedCore.ByteParsing;
-using SharedCore.PackFiles.Models;
+using Shared.Core.ByteParsing;
+using Shared.Core.PackFiles.Models;
 
-namespace SharedCore.PackFiles
+namespace Shared.Core.PackFiles
 {
     public static class PackFileVersionConverter
     {

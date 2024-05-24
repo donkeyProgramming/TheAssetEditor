@@ -1,6 +1,6 @@
-﻿using GameFiles.RigidModel.Types;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.GameFormats.RigidModel.Types;
 using System.Collections.Generic;
 using View3D.Utility;
 

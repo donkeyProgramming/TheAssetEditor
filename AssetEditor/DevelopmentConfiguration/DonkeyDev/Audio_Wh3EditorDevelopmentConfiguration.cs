@@ -1,7 +1,7 @@
 ﻿using AssetEditor.UiCommands;
 using Audio.Presentation.AudioExplorer;
+using Shared.Core;
 using Shared.Core.Events;
-using SharedCore;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 {

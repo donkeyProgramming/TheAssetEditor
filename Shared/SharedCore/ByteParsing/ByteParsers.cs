@@ -3,7 +3,7 @@ using Half = SharpDX.Half;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Vector4 = Microsoft.Xna.Framework.Vector4;
 
-namespace SharedCore.ByteParsing
+namespace Shared.Core.ByteParsing
 {
     public enum DbTypesEnum
     {

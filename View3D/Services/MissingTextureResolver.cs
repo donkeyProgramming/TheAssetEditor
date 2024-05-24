@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using GameFiles.RigidModel;
-using GameFiles.RigidModel.Types;
-using GameFiles.WsModel;
-using SharedCore.PackFiles;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.Types;
+using Shared.GameFormats.WsModel;
 using View3D.SceneNodes;
 
 namespace View3D.Services

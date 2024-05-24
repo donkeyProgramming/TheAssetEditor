@@ -1,7 +1,7 @@
 ﻿using Audio.Utility;
 using CommunityToolkit.Diagnostics;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
 using System.IO;
 
 namespace Audio.BnkCompiler

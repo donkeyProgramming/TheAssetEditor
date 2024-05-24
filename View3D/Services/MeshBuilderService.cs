@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using GameFiles.RigidModel;
-using GameFiles.RigidModel.Vertex;
 using Microsoft.Xna.Framework;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.Vertex;
 using View3D.Rendering;
 using View3D.Rendering.Geometry;
 

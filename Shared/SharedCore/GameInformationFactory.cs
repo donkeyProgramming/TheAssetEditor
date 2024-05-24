@@ -1,4 +1,4 @@
-﻿namespace SharedCore
+﻿namespace Shared.Core
 {
     public enum GameTypeEnum
     {

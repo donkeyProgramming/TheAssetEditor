@@ -1,5 +1,5 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
-using CommonControls.Editors.BoneMapping;
+using Shared.Ui.Editors.BoneMapping;
 
 namespace AnimationEditor.AnimationTransferTool
 {

@@ -1,5 +1,5 @@
 ﻿using KitbasherEditor.Events;
-using SharedCore.Events;
+using Shared.Core.Events;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 

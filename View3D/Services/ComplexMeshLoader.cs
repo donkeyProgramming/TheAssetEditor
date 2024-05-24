@@ -1,16 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using CommonControls.Editors.VariantMeshDefinition;
-using GameFiles.RigidModel;
-using GameFiles.WsModel;
 using Serilog;
-using SharedCore;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.WsModel;
+using Shared.Ui.Editors.VariantMeshDefinition;
 using View3D.Animation;
 using View3D.SceneNodes;
-using static GameFiles.Vmd.VariantMeshDefinition;
+using static Shared.GameFormats.Vmd.VariantMeshDefinition;
 
 namespace View3D.Services
 {

@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using System.Xml.Serialization;
 
-namespace GameFiles.Vmd
+namespace Shared.GameFormats.Vmd
 {
     public class VariantMeshDefinition
     {

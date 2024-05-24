@@ -1,7 +1,7 @@
-﻿using GameFiles.RigidModel.MaterialHeaders;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 
-namespace GameFiles.RigidModel
+namespace Shared.GameFormats.RigidModel
 {
     public class RmvModel
     {

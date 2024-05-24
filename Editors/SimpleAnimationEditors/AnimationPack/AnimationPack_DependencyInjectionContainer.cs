@@ -3,8 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore.PackFiles;
-using SharedCore.ToolCreation;
+using Shared.Core.PackFiles;
+using Shared.Core.ToolCreation;
 
 namespace CommonControls.Editors.AnimationPack
 {

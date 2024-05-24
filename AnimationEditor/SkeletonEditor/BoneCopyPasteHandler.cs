@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using AnimationEditor.Common.ReferenceModel;
 using Microsoft.Xna.Framework;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 using View3D.Animation;
 
 namespace AnimationEditor.SkeletonEditor

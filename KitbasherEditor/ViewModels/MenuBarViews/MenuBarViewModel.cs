@@ -1,9 +1,8 @@
-﻿using CommonControls.Common.MenuSystem;
-using CommonControls.Resources;
-using KitbasherEditor.ViewModels.MenuBarViews.Helpers;
+﻿using KitbasherEditor.ViewModels.MenuBarViews.Helpers;
 using KitbasherEditor.ViewModels.UiCommands;
 using Shared.Core.Events;
-using SharedCore.Events;
+using Shared.EmbeddedResources;
+using Shared.Ui.Common.MenuSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -131,47 +130,47 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var builder = new ButtonBuilder(_uiCommands);
 
             // General
-            builder.CreateButton<SaveCommand>(ResourceController.SaveFileIcon);
-            builder.CreateButton<BrowseForReferenceCommand>(ResourceController.OpenReferenceMeshIcon);
-            builder.CreateButton<UndoCommand>(ResourceController.UndoIcon);
+            builder.CreateButton<SaveCommand>(IconLibrary.SaveFileIcon);
+            builder.CreateButton<BrowseForReferenceCommand>(IconLibrary.OpenReferenceMeshIcon);
+            builder.CreateButton<UndoCommand>(IconLibrary.UndoIcon);
             builder.CreateButtonSeparator();
 
             // Gizmo buttons
-            builder.CreateGroupedButton<SelectGizmoModeCommand>("Gizmo", true, ResourceController.Gizmo_CursorIcon);
-            builder.CreateGroupedButton<MoveGizmoModeCommand>("Gizmo", false, ResourceController.Gizmo_MoveIcon);
-            builder.CreateGroupedButton<RotateGizmoModeCommand>("Gizmo", false, ResourceController.Gizmo_RotateIcon);
-            builder.CreateGroupedButton<ScaleGizmoUpCommand>("Gizmo", false, ResourceController.Gizmo_ScaleIcon);
+            builder.CreateGroupedButton<SelectGizmoModeCommand>("Gizmo", true, IconLibrary.Gizmo_CursorIcon);
+            builder.CreateGroupedButton<MoveGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_MoveIcon);
+            builder.CreateGroupedButton<RotateGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_RotateIcon);
+            builder.CreateGroupedButton<ScaleGizmoUpCommand>("Gizmo", false, IconLibrary.Gizmo_ScaleIcon);
             builder.CreateButtonSeparator();
 
             // Selection buttons
-            builder.CreateGroupedButton<ObjectSelectionModeCommand>("SelectionMode", true, ResourceController.Selection_Object_Icon);
-            builder.CreateGroupedButton<FaceSelectionModeCommand>("SelectionMode", false, ResourceController.Selection_Face_Icon);
-            builder.CreateGroupedButton<VertexSelectionModeCommand>("SelectionMode", false, ResourceController.Selection_Vertex_Icon);
-            builder.CreateButton<ToggleViewSelectedCommand>(ResourceController.ViewSelectedIcon);
+            builder.CreateGroupedButton<ObjectSelectionModeCommand>("SelectionMode", true, IconLibrary.Selection_Object_Icon);
+            builder.CreateGroupedButton<FaceSelectionModeCommand>("SelectionMode", false, IconLibrary.Selection_Face_Icon);
+            builder.CreateGroupedButton<VertexSelectionModeCommand>("SelectionMode", false, IconLibrary.Selection_Vertex_Icon);
+            builder.CreateButton<ToggleViewSelectedCommand>(IconLibrary.ViewSelectedIcon);
             builder.CreateButtonSeparator();
 
             // Object buttons
-            builder.CreateButton<DivideSubMeshCommand>(ResourceController.DivideIntoSubMeshIcon, ButtonVisibilityRule.ObjectMode);
-            builder.CreateButton<MergeObjectsCommand>(ResourceController.MergeMeshIcon, ButtonVisibilityRule.ObjectMode);
-            builder.CreateButton<DuplicateObjectCommand>(ResourceController.DuplicateIcon, ButtonVisibilityRule.ObjectMode);
-            builder.CreateButton<DeleteObjectCommand>(ResourceController.DeleteIcon, ButtonVisibilityRule.ObjectMode);
-            builder.CreateButton<CreateStaticMeshCommand>(ResourceController.FreezeAnimationIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<DivideSubMeshCommand>(IconLibrary.DivideIntoSubMeshIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<MergeObjectsCommand>(IconLibrary.MergeMeshIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<DuplicateObjectCommand>(IconLibrary.DuplicateIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<DeleteObjectCommand>(IconLibrary.DeleteIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<CreateStaticMeshCommand>(IconLibrary.FreezeAnimationIcon, ButtonVisibilityRule.ObjectMode);
             builder.CreateButtonSeparator();
-            builder.CreateButton<ReduceMeshCommand>(ResourceController.ReduceMeshIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<ReduceMeshCommand>(IconLibrary.ReduceMeshIcon, ButtonVisibilityRule.ObjectMode);
             //builder.CreateButton<OpenBmiToolCommand>(ResourceController.BmiToolIcon, ButtonVisibilityRule.ObjectMode);    <-- Disabled to see if anyone complains. Plan is to delete it
-            builder.CreateButton<OpenSkeletonReshaperToolCommand>(ResourceController.SkeletonReshaperIcon, ButtonVisibilityRule.ObjectMode);
-            builder.CreateButton<OpenReriggingToolCommand>(ResourceController.ReRiggingIcon, ButtonVisibilityRule.ObjectMode);
-            builder.CreateButton<OpenPinToolCommand>(ResourceController.PinIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<OpenSkeletonReshaperToolCommand>(IconLibrary.SkeletonReshaperIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<OpenReriggingToolCommand>(IconLibrary.ReRiggingIcon, ButtonVisibilityRule.ObjectMode);
+            builder.CreateButton<OpenPinToolCommand>(IconLibrary.PinIcon, ButtonVisibilityRule.ObjectMode);
 
             // Face buttons
-            builder.CreateButton<ConvertFaceToVertexCommand>(ResourceController.FaceToVertexIcon, ButtonVisibilityRule.FaceMode);
-            builder.CreateButton<ExpandFaceSelectionCommand>(ResourceController.GrowSelectionIcon, ButtonVisibilityRule.FaceMode);
-            builder.CreateButton<DivideSubMeshCommand>(ResourceController.DivideIntoSubMeshIcon, ButtonVisibilityRule.FaceMode);
-            builder.CreateButton<DuplicateObjectCommand>(ResourceController.DuplicateIcon, ButtonVisibilityRule.FaceMode);
-            builder.CreateButton<DeleteObjectCommand>(ResourceController.DeleteIcon, ButtonVisibilityRule.FaceMode);
+            builder.CreateButton<ConvertFaceToVertexCommand>(IconLibrary.FaceToVertexIcon, ButtonVisibilityRule.FaceMode);
+            builder.CreateButton<ExpandFaceSelectionCommand>(IconLibrary.GrowSelectionIcon, ButtonVisibilityRule.FaceMode);
+            builder.CreateButton<DivideSubMeshCommand>(IconLibrary.DivideIntoSubMeshIcon, ButtonVisibilityRule.FaceMode);
+            builder.CreateButton<DuplicateObjectCommand>(IconLibrary.DuplicateIcon, ButtonVisibilityRule.FaceMode);
+            builder.CreateButton<DeleteObjectCommand>(IconLibrary.DeleteIcon, ButtonVisibilityRule.FaceMode);
 
             // Vertex buttons
-            builder.CreateButton<OpenVertexDebuggerCommand>(ResourceController.VertexDebuggerIcon, ButtonVisibilityRule.VertexMode);
+            builder.CreateButton<OpenVertexDebuggerCommand>(IconLibrary.VertexDebuggerIcon, ButtonVisibilityRule.VertexMode);
             
             return builder.Build();
         }

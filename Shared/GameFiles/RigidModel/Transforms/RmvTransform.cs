@@ -1,4 +1,4 @@
-﻿namespace GameFiles.RigidModel.Transforms
+﻿namespace Shared.GameFormats.RigidModel.Transforms
 {
     [Serializable]
     public struct RmvTransform

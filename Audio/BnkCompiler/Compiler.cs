@@ -1,13 +1,13 @@
-﻿using Audio.BnkCompiler.ObjectGeneration;
+﻿using System.IO;
+using System.Linq;
+using Audio.BnkCompiler.ObjectGeneration;
 using Audio.FileFormats.Dat;
 using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
 using CommunityToolkit.Diagnostics;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles.Models;
-using System.IO;
-using System.Linq;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles.Models;
 
 namespace Audio.BnkCompiler
 {

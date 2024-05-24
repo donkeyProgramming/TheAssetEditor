@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Windows;
+using Shared.Ui.BaseDialogs.Table;
 
 namespace CommonControls.Table
 {

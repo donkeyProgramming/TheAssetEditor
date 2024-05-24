@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Xna.Framework;
-using Shared.GameFiles.AnimationMeta.Parsing;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace Shared.GameFiles.AnimationMeta.Definitions
+namespace Shared.GameFormats.AnimationMeta.Definitions
 {
     [MetaData("CAMERA_SHAKE_POS", 10)]
     public class CameraShakePos : DecodedMetaEntryBase

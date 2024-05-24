@@ -1,4 +1,4 @@
-﻿using SharedCore.PackFiles;
+﻿using Shared.Core.PackFiles;
 using View3D.Services;
 
 namespace View3D.SceneNodes

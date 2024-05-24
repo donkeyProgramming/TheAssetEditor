@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SharedCore.Misc;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.ToolCreation;
 using TextureEditor.ViewModels;
 using TextureEditor.Views;
 

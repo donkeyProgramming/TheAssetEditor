@@ -1,4 +1,4 @@
-﻿using SharedCore.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 using System;
 using System.IO;
 using System.Text;

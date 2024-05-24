@@ -1,11 +1,11 @@
-﻿using CommonControls.Interfaces.AssetManagement;
-using System.IO;
+﻿using System.IO;
+using AssetManagement.AssetBuilders;
 using AssetManagement.Strategies.Fbx.ImportDialog.DataModels;
 using AssetManagement.Strategies.Fbx.ImportDialog.ViewModels;
-using AssetManagement.AssetBuilders;
-using SharedCore.PackFiles.Models;
-using SharedCore.PackFiles;
-using GameFiles.RigidModel;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.RigidModel;
+using Shared.Ui.Interfaces.AssetManagement;
 
 namespace AssetManagement.Strategies.Fbx
 {

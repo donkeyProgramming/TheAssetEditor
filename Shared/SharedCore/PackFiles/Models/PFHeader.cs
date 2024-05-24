@@ -1,4 +1,6 @@
-﻿namespace SharedCore.PackFiles.Models
+﻿using Shared.Core.PackFiles;
+
+namespace Shared.Core.PackFiles.Models
 {
     public enum PackFileCAType : uint
     {

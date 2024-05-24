@@ -2,8 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pfim;
 using Serilog;
-using SharedCore;
-using SharedCore.PackFiles;
+using Shared.Core;
+using Shared.Core.PackFiles;
 using System;
 using System.Collections.Generic;
 using System.IO;

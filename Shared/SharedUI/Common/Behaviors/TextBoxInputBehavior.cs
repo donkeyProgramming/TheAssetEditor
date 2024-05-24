@@ -10,7 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Xaml.Behaviors;
 
-namespace CommonControls.Behaviors
+namespace Shared.Ui.Common.Behaviors
 {
     public class TextBoxInputBehavior : Behavior<TextBox>
     {
@@ -19,8 +19,8 @@ namespace CommonControls.Behaviors
                                                    NumberStyles.AllowLeadingSign;
         public TextBoxInputBehavior()
         {
-            this.InputMode = TextBoxInputMode.None;
-            this.JustPositivDecimalInput = false;
+            InputMode = TextBoxInputMode.None;
+            JustPositivDecimalInput = false;
         }
 
         public TextBoxInputMode InputMode { get; set; }
@@ -61,7 +61,7 @@ namespace CommonControls.Behaviors
             {
                 var pastedText = (string)e.DataObject.GetData(typeof(string));
 
-                if (!this.IsValidInput(this.GetText(pastedText)))
+                if (!IsValidInput(GetText(pastedText)))
                 {
                     System.Media.SystemSounds.Beep.Play();
                     e.CancelCommand();
@@ -78,7 +78,7 @@ namespace CommonControls.Behaviors
         {
             if (e.Key == Key.Space)
             {
-                if (!this.IsValidInput(this.GetText(" ")))
+                if (!IsValidInput(GetText(" ")))
                 {
                     System.Media.SystemSounds.Beep.Play();
                     e.Handled = true;
@@ -88,7 +88,7 @@ namespace CommonControls.Behaviors
 
         private void AssociatedObjectPreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            if (!this.IsValidInput(this.GetText(e.Text)))
+            if (!IsValidInput(GetText(e.Text)))
             {
                 System.Media.SystemSounds.Beep.Play();
                 e.Handled = true;
@@ -97,19 +97,19 @@ namespace CommonControls.Behaviors
 
         private string GetText(string input)
         {
-            var txt = this.AssociatedObject;
+            var txt = AssociatedObject;
 
-            int selectionStart = txt.SelectionStart;
+            var selectionStart = txt.SelectionStart;
             if (txt.Text.Length < selectionStart)
                 selectionStart = txt.Text.Length;
 
-            int selectionLength = txt.SelectionLength;
+            var selectionLength = txt.SelectionLength;
             if (txt.Text.Length < selectionStart + selectionLength)
                 selectionLength = txt.Text.Length - selectionStart;
 
             var realtext = txt.Text.Remove(selectionStart, selectionLength);
 
-            int caretIndex = txt.CaretIndex;
+            var caretIndex = txt.CaretIndex;
             if (realtext.Length < caretIndex)
                 caretIndex = realtext.Length;
 
@@ -157,7 +157,7 @@ namespace CommonControls.Behaviors
 
         private bool CheckIsDigit(string wert)
         {
-            return wert.ToCharArray().All(Char.IsDigit);
+            return wert.ToCharArray().All(char.IsDigit);
         }
     }
 

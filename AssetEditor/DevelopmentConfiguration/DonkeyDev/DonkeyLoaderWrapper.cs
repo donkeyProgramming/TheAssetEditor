@@ -1,4 +1,4 @@
-﻿using SharedCore;
+﻿using Shared.Core;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev;
 

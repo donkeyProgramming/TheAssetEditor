@@ -2,9 +2,9 @@
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationMeta.Presentation;
 using Microsoft.Xna.Framework;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 
 namespace AnimationEditor.SuperView
 {

@@ -1,5 +1,5 @@
 ﻿using Shared.Core.Events;
-using SharedCore.ToolCreation;
+using Shared.Core.ToolCreation;
 
 namespace AssetEditor.UiCommands
 {

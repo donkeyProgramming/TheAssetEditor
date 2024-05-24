@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GameFiles.RigidModel;
-using GameFiles.RigidModel.Vertex;
-using SharedCore.ByteParsing;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core.ByteParsing;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.Vertex;
 using static CommonControls.FormatResearch.DecoderHelper;
 
 namespace CommonControls.FormatResearch

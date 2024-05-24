@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 
-namespace CommonControls.Interfaces.AssetManagement
+namespace Shared.Ui.Interfaces.AssetManagement
 {
     public interface IAssetExporterProvider
     {

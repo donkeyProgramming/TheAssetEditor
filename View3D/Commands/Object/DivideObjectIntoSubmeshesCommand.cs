@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CommonControls.Common;
 using Serilog;
-using SharedCore;
+using Shared.Core;
+using Shared.Ui.Common;
 using View3D.Commands.Face;
 using View3D.Components.Component.Selection;
 using View3D.Components.Rendering;

@@ -1,6 +1,6 @@
 ﻿using FluentValidation.Results;
 
-namespace SharedCore.ErrorHandling
+namespace Shared.Core.ErrorHandling
 {
     public class Result<T>
     {

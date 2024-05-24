@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using SharedCore.ByteParsing;
+using Shared.Core.ByteParsing;
 
-namespace GameFiles.Animation
+namespace Shared.GameFormats.Animation
 {
     public class AnimInvMatrixFile
     {

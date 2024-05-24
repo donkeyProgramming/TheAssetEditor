@@ -1,4 +1,4 @@
-﻿using SharedCore.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 using System.IO;
 
 namespace Audio.FileFormats.WWise.Bkhd

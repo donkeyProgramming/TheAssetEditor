@@ -1,7 +1,7 @@
 ﻿using AssetEditor;
 using AssetEditor.Services;
 using Audio.Storage;
-using SharedCore.PackFiles;
+using Shared.Core.PackFiles;
 
 namespace AudioResearch
 {

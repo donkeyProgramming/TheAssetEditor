@@ -1,7 +1,7 @@
-﻿using SharedCore.ByteParsing;
-using SharedCore.Misc;
+﻿using Shared.Core.ByteParsing;
+using Shared.Core.Misc;
 
-namespace GameFiles.AnimationPack.AnimPackFileTypes.Wh3
+namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3
 {
     public class AnimationBinWh3 : IAnimationPackFile, IAnimationBinGenericFormat
     {

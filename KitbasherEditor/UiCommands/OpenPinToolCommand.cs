@@ -1,13 +1,8 @@
-﻿using CommonControls.BaseDialogs;
-using CommonControls.Common.MenuSystem;
-using CommonControls.Editors.BoneMapping.View;
-using CommonControls.Events.UiCommands;
-using KitbasherEditor.ViewModels.MenuBarViews;
-using KitbasherEditor.ViewModels.MeshFitter;
+﻿using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.Views.EditorViews.PinTool;
-using View3D.Commands;
-using View3D.Components.Component.Selection;
+using Shared.Ui.BaseDialogs;
+using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

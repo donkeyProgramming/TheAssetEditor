@@ -9,19 +9,19 @@ using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using CommonControls.BaseDialogs;
-using CommonControls.Common;
 using CommonControls.Editors.AnimationPack.Converters;
-using CommonControls.Editors.TextEditor;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Shared.Core.Services;
-using GameFiles.AnimationPack;
-using GameFiles.AnimationPack.AnimPackFileTypes;
-using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;
-using SharedCore;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
+using Shared.GameFormats.AnimationPack;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
+using Shared.Ui.Common;
+using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.AnimationPack
 {
@@ -141,7 +141,7 @@ namespace CommonControls.Editors.AnimationPack
             _activeConverter = null;
             if (seletedFile is AnimationFragmentFile typedFragment)
                 _activeConverter = new AnimationFragmentFileToXmlConverter(_skeletonAnimationLookUpHelper, _appSettings.CurrentSettings.CurrentGame);
-            else if (seletedFile is GameFiles.AnimationPack.AnimPackFileTypes.AnimationBin typedBin)
+            else if (seletedFile is Shared.GameFormats.AnimationPack.AnimPackFileTypes.AnimationBin typedBin)
                 _activeConverter = new AnimationBinFileToXmlConverter();
             else if (seletedFile is AnimationBinWh3 wh3Bin)
                 _activeConverter = new AnimationBinWh3FileToXmlConverter(_skeletonAnimationLookUpHelper);

@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Editors.TextEditor;
 using Editors.Shared.Core.Services;
-using GameFiles.AnimationPack;
-using GameFiles.AnimationPack.AnimPackFileTypes.Wh3;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.AnimationPack;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
+using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {
@@ -35,7 +32,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
         protected override XmlFormat ConvertBytesToXmlClass(byte[] bytes)
         {
 
-            var binFile = new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", bytes);
+            var binFile = new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", bytes);
             var outputBin = new XmlFormat();
 
             var slotHelper = binFile.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();
@@ -84,7 +81,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override byte[] ConvertToAnimClassBytes(XmlFormat xmlBin, string fileName)
         {
-            var binFile = new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", null);
+            var binFile = new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", null);
 
             binFile.TableVersion = xmlBin.Data.TableVersion;
             binFile.TableSubVersion = xmlBin.Data.TableSubVersion;
@@ -99,7 +96,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             foreach (var animationEntry in xmlBin.Animations)
             {
-                binFile.AnimationTableEntries.Add(new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+                binFile.AnimationTableEntries.Add(new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
                 {
                     AnimationId = (uint)slotHelper.GetfromValue(animationEntry.Slot).Id,
                     BlendIn = animationEntry.BlendId,

@@ -1,4 +1,13 @@
-﻿using AnimationEditor.AnimationKeyframeEditor;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Windows.Forms;
+using System.Windows.Input;
+using AnimationEditor.AnimationKeyframeEditor;
 using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.MountAnimationCreator;
@@ -11,27 +20,18 @@ using AssetEditor.Views.Settings;
 using Audio.Presentation.AudioExplorer;
 using Audio.Presentation.Compiler;
 using CommonControls.BaseDialogs;
-using CommonControls.Common;
 using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
-using CommonControls.Services;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Shared.Core;
 using Shared.Core.Events;
-using SharedCore;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
-using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Windows.Forms;
-using System.Windows.Input;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Ui.Common;
+using Shared.Ui.Services;
 
 namespace AssetEditor.ViewModels
 {

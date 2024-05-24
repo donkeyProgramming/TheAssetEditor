@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.Common.MenuSystem
+namespace Shared.Ui.Common.MenuSystem
 {
     public class MenuAction
     {
@@ -18,7 +18,7 @@ namespace CommonControls.Common.MenuSystem
             if (ActionTriggeredCallback != null)
                 ActionTriggeredCallback();
             TriggerInternal();
-     
+
         }
 
         public virtual void TriggerInternal()

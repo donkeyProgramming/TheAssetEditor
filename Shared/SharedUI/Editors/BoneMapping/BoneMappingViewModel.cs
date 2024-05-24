@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
-using CommonControls.BaseDialogs;
-using CommonControls.Common;
-using SharedCore.Misc;
+using Shared.Core.Misc;
+using Shared.Ui.BaseDialogs;
+using Shared.Ui.Common;
 
-namespace CommonControls.Editors.BoneMapping
+namespace Shared.Ui.Editors.BoneMapping
 {
     public class BoneMappingViewModel : NotifyPropertyChangedImpl
     {
@@ -20,7 +20,7 @@ namespace CommonControls.Editors.BoneMapping
         public NotifyAttr<string> ParentSkeletonName { get; set; }
         public NotifyAttr<bool> ShowTransformSection { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> ShowApplyButton { get; set; } = new NotifyAttr<bool>(false);
-        
+
         public BoneMappingViewModel()
         {
             MeshBones = new FilterCollection<AnimatedBone>(null, OnBoneSelected);
@@ -157,14 +157,14 @@ namespace CommonControls.Editors.BoneMapping
         protected virtual void MappingUpdated()
         { }
 
-        public void OnApplyButton() 
+        public void OnApplyButton()
         {
             ApplyChanges();
         }
 
         public void OnOkButton()
         {
-            var res = Validate(out string errorText);
+            var res = Validate(out var errorText);
             if (res == false)
             {
                 var messageBoxResult = MessageBox.Show("Are you sure you want to do this?\n\n" + errorText + "\n\nContinue?", "Error", MessageBoxButton.OKCancel);
@@ -182,13 +182,13 @@ namespace CommonControls.Editors.BoneMapping
         }
 
         protected virtual void ApplyChanges()
-        { 
+        {
         }
 
         public virtual bool Validate(out string errorText)
         {
             errorText = "";
-            return true;        
+            return true;
         }
     }
 }

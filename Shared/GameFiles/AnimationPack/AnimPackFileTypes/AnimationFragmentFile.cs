@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Diagnostics;
-using GameFiles.DB;
-using SharedCore;
-using SharedCore.ByteParsing;
-using SharedCore.Misc;
+using Shared.Core;
+using Shared.Core.ByteParsing;
+using Shared.Core.Misc;
+using Shared.GameFormats.DB;
 
-namespace GameFiles.AnimationPack.AnimPackFileTypes
+namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes
 {
     [DebuggerDisplay("AnimationFragmentFile - {FileName}")]
     public class AnimationFragmentFile : IAnimationPackFile

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using CommonControls.PackFileBrowser;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 
-namespace CommonControls.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public class PackFileUiProvider : IPackFileUiProvider
     {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SharedCore.ToolCreation;
+using Shared.Core.ToolCreation;
 
 namespace CommonControls.Editors.AnimationBatchExporter
 {

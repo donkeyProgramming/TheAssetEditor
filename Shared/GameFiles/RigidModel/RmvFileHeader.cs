@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
-using SharedCore.ByteParsing;
-using SharedCore.Misc;
+using Shared.Core.ByteParsing;
+using Shared.Core.Misc;
 
-namespace GameFiles.RigidModel
+namespace Shared.GameFormats.RigidModel
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct RmvFileHeader

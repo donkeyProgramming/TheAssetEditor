@@ -6,7 +6,7 @@ using System;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using System.Linq;
 using AssetManagement.AnimationProcessor;
-using GameFiles.Animation;
+using Shared.GameFormats.Animation;
 
 namespace AssetManagement.MeshProcessing.Packed
 {

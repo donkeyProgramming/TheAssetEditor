@@ -2,7 +2,7 @@
 using System.Text.Json;
 using Serilog;
 
-namespace SharedCore
+namespace Shared.Core
 {
     public class ApplicationSettings
     {

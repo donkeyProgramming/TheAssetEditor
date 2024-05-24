@@ -4,13 +4,14 @@
 
 using System.Windows;
 using System.Windows.Input;
+using CommonControls.Editors.TextEditor;
 using CommunityToolkit.Mvvm.Input;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
 
-namespace CommonControls.Editors.TextEditor
+namespace Shared.Ui.Editors.TextEditor
 {
     public interface ITextEditorViewModel
     {
@@ -60,10 +61,10 @@ namespace CommonControls.Editors.TextEditor
 
         void SetCurrentPackFile(PackFile packedFile)
         {
-            PackFile file = packedFile;
+            var file = packedFile;
             DisplayName.Value = file.Name;
 
-            byte[] data = file.DataSource.ReadData();
+            var data = file.DataSource.ReadData();
             Text = _converter.GetText(data);
         }
 

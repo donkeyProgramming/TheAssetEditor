@@ -4,10 +4,10 @@
 
 using System.Collections.ObjectModel;
 using Shared.Core.Events;
-using SharedCore.PackFiles;
-using SharedCore.ToolCreation;
+using Shared.Core.PackFiles;
+using Shared.Core.ToolCreation;
 
-namespace CommonControls.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public class DefaultContextMenuHandler : ContextMenuHandler
     {

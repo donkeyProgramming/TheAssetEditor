@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Xml.Serialization;
-using SharedCore.PackFiles;
+using Shared.Core.PackFiles;
 
-namespace CommonControls.Editors.TextEditor
+namespace Shared.Ui.Editors.TextEditor
 {
     public interface ITextConverter
     {

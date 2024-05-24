@@ -1,8 +1,8 @@
-﻿using CommonControls.Common;
-using CommonControls.Editors.BoneMapping;
-using Editors.Shared.Core.Services;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
+﻿using Editors.Shared.Core.Services;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Ui.Common;
+using Shared.Ui.Editors.BoneMapping;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;

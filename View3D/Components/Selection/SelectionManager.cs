@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using SharedCore.Events;
+using Shared.Core.Events;
 using System;
 using View3D.Components.Rendering;
 using View3D.Rendering;

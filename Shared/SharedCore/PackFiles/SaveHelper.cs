@@ -1,9 +1,9 @@
 ﻿using System.Windows.Forms;
 using Serilog;
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles.Models;
 using MessageBox = System.Windows.Forms.MessageBox;
 
-namespace SharedCore.PackFiles
+namespace Shared.Core.PackFiles
 {
     public static class SaveHelper
     {
@@ -186,7 +186,7 @@ namespace SharedCore.PackFiles
                 }
             }
             return null;
-            
+
         }
 
         public static void CreateFileBackup(string originalFileName)

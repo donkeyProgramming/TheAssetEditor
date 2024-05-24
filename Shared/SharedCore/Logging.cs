@@ -3,7 +3,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
-namespace SharedCore
+namespace Shared.Core
 {
     public static class LoggerExtensions
     {
@@ -24,11 +24,11 @@ namespace SharedCore
         public static ILogger Create<T>() => Log.ForContext<T>();
         public static ILogger CreateStatic(Type type) => Log.ForContext(type);
 
-        static bool IsConfigure = false;
+        static bool IsConfigured = false;
         public static string LogName { get; private set; }
         public static void Configure(LogEventLevel logEventLevel)
         {
-            if (IsConfigure)
+            if (IsConfigured)
                 return;
 
             var logDirectory = DirectoryHelper.LogDirectory;
@@ -47,7 +47,7 @@ namespace SharedCore
                         .WriteTo.Console(logEventLevel, outputTemplate, theme: AnsiConsoleTheme.Literate)
                         .CreateLogger();
 
-            IsConfigure = true;
+            IsConfigured = true;
         }
 
         private static string getNextFileName(string fileName)

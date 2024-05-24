@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace SharedCore.ToolCreation
+namespace Shared.Core.ToolCreation
 {
     public class ScopeRepository
     {

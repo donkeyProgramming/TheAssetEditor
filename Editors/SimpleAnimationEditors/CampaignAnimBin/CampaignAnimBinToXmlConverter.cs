@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Editors.TextEditor;
-using GameFiles.AnimationPack;
-using SharedCore.ByteParsing;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles;
-using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
+using Shared.Core.ByteParsing;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.AnimationPack;
+using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.CampaignAnimBin
 {

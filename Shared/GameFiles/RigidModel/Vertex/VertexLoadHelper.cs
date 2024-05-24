@@ -1,8 +1,8 @@
-﻿using GameFiles.RigidModel.Transforms;
-using SharedCore.ByteParsing;
+﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.RigidModel.Transforms;
 using Half = SharpDX.Half;
 
-namespace GameFiles.RigidModel.Vertex
+namespace Shared.GameFormats.RigidModel.Vertex
 {
     public static class VertexLoadHelper
     {

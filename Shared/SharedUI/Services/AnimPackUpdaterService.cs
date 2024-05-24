@@ -1,14 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using GameFiles.AnimationPack;
-using GameFiles.AnimationPack.AnimPackFileTypes;
-using SharedCore;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.AnimationPack;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
 
-namespace CommonControls.Services
+namespace Shared.Ui.Services
 {
     public class AnimPackUpdaterService
     {
@@ -52,7 +52,7 @@ namespace CommonControls.Services
 
                 foreach (var binEntry in animationBinEntries)
                 {
-                    var wh3Bin = new GameFiles.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3(binEntry.Name);
+                    var wh3Bin = new GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3(binEntry.Name);
                     wh3Bin.SkeletonName = binEntry.SkeletonName;
                     wh3Bin.MountBin = binEntry.MountName;
                     wh3Bin.LocomotionGraph = "animations/locomotion_graphs/entity_locomotion_graph.xml";
@@ -68,8 +68,8 @@ namespace CommonControls.Services
                 }
 
                 var animPackPathWithoutExtentions = Path.GetFileNameWithoutExtension(animPack.FileName);
-               // var outputAnimPackName = AnimationPackSampleDataCreator.GenerateWh3AnimPackName(animPackPathWithoutExtentions + "_wh3");
-               // SaveHelper.Save(_pfs, outputAnimPackName, null, AnimationPackSerializer.ConvertToBytes(outputWh3AnimPack), false);
+                // var outputAnimPackName = AnimationPackSampleDataCreator.GenerateWh3AnimPackName(animPackPathWithoutExtentions + "_wh3");
+                // SaveHelper.Save(_pfs, outputAnimPackName, null, AnimationPackSerializer.ConvertToBytes(outputWh3AnimPack), false);
             }
         }
 

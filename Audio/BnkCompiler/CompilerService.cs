@@ -1,6 +1,6 @@
 ﻿using Serilog;
-using SharedCore;
-using SharedCore.ErrorHandling;
+using Shared.Core;
+using Shared.Core.ErrorHandling;
 
 namespace Audio.BnkCompiler
 {

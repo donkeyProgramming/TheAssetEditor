@@ -1,4 +1,4 @@
-﻿namespace SharedCore.Events
+﻿namespace Shared.Core.Events
 {
     public class EventHub : IDisposable
     {

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
-using GameFiles.RigidModel.Vertex;
+using Shared.GameFormats.RigidModel.Vertex;
 
 namespace AssetManagement.AssetBuilders
 {

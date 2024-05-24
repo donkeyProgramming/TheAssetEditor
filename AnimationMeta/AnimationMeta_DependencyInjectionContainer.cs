@@ -2,9 +2,9 @@
 using AnimationMeta.Presentation.View;
 using AnimationMeta.Visualisation;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.GameFiles.AnimationMeta.Parsing;
-using SharedCore.Misc;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.ToolCreation;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace AnimationMeta
 {

@@ -4,9 +4,9 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.Common
+namespace Shared.Ui.Common
 {
     public class ComboBox<T> : NotifyPropertyChangedImpl
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CommonControls.PackFileBrowser;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

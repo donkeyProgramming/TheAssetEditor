@@ -1,6 +1,6 @@
-﻿using SharedCore.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 
-namespace GameFiles.RigidModel.LodHeader
+namespace Shared.GameFormats.RigidModel.LodHeader
 {
 
     public class Rmv2LodHeader_V6_Creator : ILodHeaderCreator

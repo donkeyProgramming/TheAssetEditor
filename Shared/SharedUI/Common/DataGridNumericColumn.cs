@@ -5,13 +5,13 @@
 using System;
 using System.Windows.Controls;
 
-namespace CommonControls.Common
+namespace Shared.Ui.Common
 {
     public class DataGridNumericColumn : DataGridTextColumn
     {
         protected override object PrepareCellForEdit(System.Windows.FrameworkElement editingElement, System.Windows.RoutedEventArgs editingEventArgs)
         {
-            TextBox edit = editingElement as TextBox;
+            var edit = editingElement as TextBox;
             edit.PreviewTextInput += OnPreviewTextInput;
 
             return base.PrepareCellForEdit(editingElement, editingEventArgs);

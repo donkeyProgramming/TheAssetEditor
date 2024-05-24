@@ -12,7 +12,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace CommonControls.Common.ValueConverters
+namespace Shared.Ui.Common.ValueConverters
 {
     public class IconToImageSourceConverter : IValueConverter
     {

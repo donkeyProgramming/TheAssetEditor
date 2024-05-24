@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using SharedCore.Misc;
-using SharedCore.PackFiles.Models;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models;
 
-namespace CommonControls.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public enum NodeType
     {

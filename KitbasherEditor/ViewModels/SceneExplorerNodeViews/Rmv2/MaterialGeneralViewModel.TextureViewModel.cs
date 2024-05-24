@@ -1,7 +1,7 @@
 ﻿using CommonControls.PackFileBrowser;
-using GameFiles.RigidModel.Types;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.RigidModel.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;

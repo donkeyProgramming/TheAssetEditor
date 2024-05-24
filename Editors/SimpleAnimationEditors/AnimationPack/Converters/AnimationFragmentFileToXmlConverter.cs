@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Editors.TextEditor;
 using Editors.Shared.Core.Services;
-using GameFiles.AnimationPack;
-using GameFiles.AnimationPack.AnimPackFileTypes;
-using GameFiles.DB;
-using SharedCore;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles;
+using Shared.Core;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.AnimationPack;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
+using Shared.GameFormats.DB;
+using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.AnimationPack.Converters
 {

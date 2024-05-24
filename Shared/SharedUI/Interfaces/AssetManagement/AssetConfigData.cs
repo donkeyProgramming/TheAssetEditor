@@ -1,4 +1,4 @@
-﻿namespace CommonControls.Interfaces.AssetManagement
+﻿namespace Shared.Ui.Interfaces.AssetManagement
 {
     public class AnimationSettingStruct
     {

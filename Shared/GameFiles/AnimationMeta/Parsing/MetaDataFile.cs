@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Shared.GameFiles.AnimationMeta.Parsing
+namespace Shared.GameFormats.AnimationMeta.Parsing
 {
     public class MetaDataFile
     {

@@ -3,8 +3,8 @@ using AssetEditor.Services;
 using Audio.BnkCompiler;
 using Audio.Storage;
 using Audio.Utility;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using System.IO;
 using System.Linq;
 

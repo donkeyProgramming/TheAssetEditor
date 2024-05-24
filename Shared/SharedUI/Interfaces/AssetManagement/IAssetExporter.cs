@@ -1,4 +1,4 @@
-﻿namespace CommonControls.Interfaces.AssetManagement
+﻿namespace Shared.Ui.Interfaces.AssetManagement
 {
     /// <summary>
     /// Asset Export Data - including all the data types the exporter might use          

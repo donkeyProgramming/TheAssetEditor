@@ -1,4 +1,4 @@
-﻿using CommonControls.Editors.BoneMapping;
+﻿using Shared.Ui.Editors.BoneMapping;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Rendering.Geometry;

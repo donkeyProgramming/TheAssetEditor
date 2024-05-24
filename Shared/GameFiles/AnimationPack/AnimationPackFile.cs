@@ -1,6 +1,6 @@
-﻿using GameFiles.AnimationPack.AnimPackFileTypes;
+﻿using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
 
-namespace GameFiles.AnimationPack
+namespace Shared.GameFormats.AnimationPack
 {
 
     public interface IAnimationBinGenericFormat

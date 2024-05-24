@@ -1,8 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
-using SharedCore.ByteParsing;
+using Shared.Core.ByteParsing;
+using Shared.GameFormats.RigidModel.Vertex;
 
-namespace GameFiles.RigidModel.Vertex.Formats
+namespace Shared.GameFormats.RigidModel.Vertex.Formats
 {
 
     public class CustomTerrainVertexCreator : IVertexCreator

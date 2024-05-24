@@ -1,4 +1,4 @@
-﻿namespace SharedCore.PackFiles.Models
+﻿namespace Shared.Core.PackFiles.Models
 {
     public class PackFileContainer
     {

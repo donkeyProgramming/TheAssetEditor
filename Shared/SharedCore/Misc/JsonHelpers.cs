@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace SharedCore.Misc
+namespace Shared.Core.Misc
 {
     public class SingleOrArrayConverter<T> : JsonConverter
     {

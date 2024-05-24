@@ -1,4 +1,4 @@
-﻿using CommonControls.Common.MenuSystem;
+﻿using Shared.Ui.Common.MenuSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

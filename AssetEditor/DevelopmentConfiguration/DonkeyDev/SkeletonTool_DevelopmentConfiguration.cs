@@ -1,8 +1,8 @@
 ﻿using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
-using SharedCore;
-using SharedCore.PackFiles;
-using SharedCore.ToolCreation;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.Core.ToolCreation;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 {

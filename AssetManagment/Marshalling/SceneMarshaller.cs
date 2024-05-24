@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
 using AssetManagement.Strategies.Fbx.DllDefinitions;
-using GameFiles.Animation;
+using Shared.GameFormats.Animation;
 
 namespace AssetManagement.Geometry.Marshalling
 {

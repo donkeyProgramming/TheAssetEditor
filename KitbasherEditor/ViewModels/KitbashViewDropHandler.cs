@@ -1,5 +1,5 @@
-﻿using CommonControls.BaseDialogs.PackFileBrowser;
-using KitbasherEditor.Services;
+﻿using KitbasherEditor.Services;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
 using System.IO;
 
 namespace KitbasherEditor.ViewModels

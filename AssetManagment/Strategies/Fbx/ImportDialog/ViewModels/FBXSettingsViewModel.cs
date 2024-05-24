@@ -1,15 +1,15 @@
-﻿using System.Windows.Forms;
+﻿using System;
 using System.Collections.ObjectModel;
-using System;
 using System.IO;
 using System.Linq;
+using System.Windows;
+using System.Windows.Forms;
 using AssetManagement.Strategies.Fbx.ImportDialog.DataModels;
 using AssetManagement.Strategies.Fbx.ImportDialog.Views;
-using System.Windows;
-using SharedCore.Misc;
-using SharedCore.PackFiles.Models;
-using SharedCore.PackFiles;
-using GameFiles.Animation;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Animation;
 
 // finish "rationaliztion" this ModelView, around the concept of "FileInfoData" as input
 namespace AssetManagement.Strategies.Fbx.ImportDialog.ViewModels

@@ -1,4 +1,4 @@
-﻿namespace GameFiles.DB
+﻿namespace Shared.GameFormats.DB
 {
     public class DbTableDefinition
     {

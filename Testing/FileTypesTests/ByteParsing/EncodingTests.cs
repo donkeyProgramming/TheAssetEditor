@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using SharedCore.ByteParsing;
+using Shared.Core.ByteParsing;
 
 namespace FileTypesTests.ByteParsing
 {

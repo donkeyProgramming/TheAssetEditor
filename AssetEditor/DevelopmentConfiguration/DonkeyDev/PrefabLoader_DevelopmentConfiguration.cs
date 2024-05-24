@@ -1,6 +1,6 @@
-﻿using GameFiles.FastBin;
-using SharedCore;
-using SharedCore.PackFiles;
+﻿using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.FastBin;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 {

@@ -1,4 +1,4 @@
-﻿using SharedCore.PackFiles;
+﻿using Shared.Core.PackFiles;
 using System.Linq;
 
 namespace KitbasherEditor.Services

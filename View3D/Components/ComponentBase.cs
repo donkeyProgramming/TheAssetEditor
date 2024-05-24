@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 using System;
 
 namespace View3D.Components

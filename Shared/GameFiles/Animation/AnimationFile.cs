@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
-using GameFiles.RigidModel.Transforms;
-using SharedCore;
-using SharedCore.ByteParsing;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core;
+using Shared.Core.ByteParsing;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.RigidModel.Transforms;
 
-namespace GameFiles.Animation
+namespace Shared.GameFormats.Animation
 {
     [DebuggerDisplay("AnimationFile - {Header.SkeletonName}[{DynamicFrames.Count}]")]
     public class AnimationFile

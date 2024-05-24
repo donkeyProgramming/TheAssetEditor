@@ -1,9 +1,9 @@
-﻿using GameFiles.RigidModel;
-using GameFiles.RigidModel.MaterialHeaders;
-using GameFiles.RigidModel.Types;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharedCore.Misc;
+using Shared.Core.Misc;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
+using Shared.GameFormats.RigidModel.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;

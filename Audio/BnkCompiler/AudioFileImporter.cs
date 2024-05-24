@@ -5,9 +5,9 @@ using System.Linq;
 namespace Audio.BnkCompiler
 {
     using Audio.Utility;
-    using SharedCore;
-    using SharedCore.ErrorHandling;
-    using SharedCore.PackFiles;
+    using Shared.Core;
+    using Shared.Core.ErrorHandling;
+    using Shared.Core.PackFiles;
 
     public class AudioFileImporter
     {

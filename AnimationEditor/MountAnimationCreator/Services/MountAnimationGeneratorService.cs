@@ -1,9 +1,9 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.ViewModels;
-using GameFiles.Animation;
 using Microsoft.Xna.Framework;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Animation;
 using System;
 using System.Collections.Generic;
 using System.IO;

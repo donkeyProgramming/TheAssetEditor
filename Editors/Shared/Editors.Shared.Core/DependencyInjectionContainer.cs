@@ -1,8 +1,8 @@
 ﻿using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
-using SharedCore.Misc;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
 
 namespace Editors.Shared.Core
 {

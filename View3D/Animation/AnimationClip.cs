@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GameFiles.Animation;
-using GameFiles.RigidModel.Transforms;
 using Microsoft.Xna.Framework;
-using static GameFiles.Animation.AnimationFile;
+using Shared.GameFormats.Animation;
+using Shared.GameFormats.RigidModel.Transforms;
+using static Shared.GameFormats.Animation.AnimationFile;
 
 
 namespace View3D.Animation

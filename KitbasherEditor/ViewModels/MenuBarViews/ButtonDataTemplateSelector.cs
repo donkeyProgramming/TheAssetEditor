@@ -1,4 +1,4 @@
-﻿using CommonControls.Common.MenuSystem;
+﻿using Shared.Ui.Common.MenuSystem;
 using System.Windows;
 using System.Windows.Controls;
 

@@ -1,6 +1,6 @@
 ﻿using Shared.Core.Events;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
 
 namespace AssetEditor.UiCommands
 {

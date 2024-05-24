@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:CommonControls.Editors.TextEditor"
              xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit" 
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:texteditor="clr-namespace:Shared.Ui.Editors.TextEditor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
@@ -53,7 +54,7 @@
                 </avalonEdit:TextEditor.Background>
                 
                 <i:Interaction.Behaviors>
-                    <local:AvalonEditBehaviour GiveMeTheText="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <texteditor:AvalonEditBehaviour GiveMeTheText="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </i:Interaction.Behaviors>
             </avalonEdit:TextEditor>
 

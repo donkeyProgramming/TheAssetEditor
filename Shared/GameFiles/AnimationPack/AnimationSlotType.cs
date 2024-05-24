@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
 using System.Text;
-using SharedCore;
-using SharedCore.PackFiles;
+using Shared.Core;
+using Shared.Core.PackFiles;
 
-namespace GameFiles.AnimationPack
+namespace Shared.GameFormats.AnimationPack
 {
     [Serializable]
     public class AnimationSlotType

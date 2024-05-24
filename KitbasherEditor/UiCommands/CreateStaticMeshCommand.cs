@@ -1,5 +1,5 @@
-﻿using CommonControls.Common.MenuSystem;
-using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using KitbasherEditor.ViewModels.MenuBarViews;
+using Shared.Ui.Common.MenuSystem;
 using System.Collections.Generic;
 using View3D.Commands;
 using View3D.Commands.Object;

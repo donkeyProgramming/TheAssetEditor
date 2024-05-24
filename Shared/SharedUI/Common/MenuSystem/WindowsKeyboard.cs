@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 
-namespace CommonControls.Common.MenuSystem
+namespace Shared.Ui.Common.MenuSystem
 {
     public interface IKeyboardHandler
     {

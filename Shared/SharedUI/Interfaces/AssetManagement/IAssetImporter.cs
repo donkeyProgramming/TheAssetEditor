@@ -2,9 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles.Models;
 
-namespace CommonControls.Interfaces.AssetManagement
+namespace Shared.Ui.Interfaces.AssetManagement
 {
     public interface IAssetImporter
     {

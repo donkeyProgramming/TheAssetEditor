@@ -5,9 +5,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
-using GameFiles.Animation;
+using Shared.GameFormats.Animation;
 
-namespace CommonControls.Editors.BoneMapping
+namespace Shared.Ui.Editors.BoneMapping
 {
     public class AnimatedBoneHelper
     {
@@ -95,7 +95,7 @@ namespace CommonControls.Editors.BoneMapping
         {
             foreach (var item in completeList)
             {
-                bool isVisible = IsBoneVisibleInFilter(item, onlySHowUsedBones, regex, true);
+                var isVisible = IsBoneVisibleInFilter(item, onlySHowUsedBones, regex, true);
                 item.IsVisible.Value = isVisible;
                 if (isVisible)
                     FilterBoneList(regex, onlySHowUsedBones, item.Children);

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
-using SharedCore.ToolCreation;
+using CommonControls.BaseDialogs.ToolSelector;
+using Shared.Core.ToolCreation;
 
-namespace CommonControls.BaseDialogs.ToolSelector
+namespace Shared.Ui.BaseDialogs.ToolSelector
 {
     public class ToolSelectorUiProvider : IToolSelectorUiProvider
     {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SharedCore.Misc;
-using SharedCore.ToolCreation;
+using Shared.Core;
+using Shared.Core.Misc;
+using Shared.Core.ToolCreation;
 
 namespace Shared.EmbeddedResources
 {
@@ -8,46 +9,18 @@ namespace Shared.EmbeddedResources
     {
         private readonly bool _loadResource;
 
-        public DependencyInjectionContainer(bool loadResource = true)
+        public DependencyInjectionContainer(bool loadResource)
         {
             _loadResource = loadResource;
         }
 
         public override void Register(IServiceCollection services)
         {
-            //Logging.Configure(Serilog.Events.LogEventLevel.Information);
-            //if (_loadResource)
-            //{
-            //    ResourceController.Load();
-            //    DirectoryHelper.EnsureCreated();
-            //}
-            //
-            //services.AddSingleton<ApplicationSettingsService>();
-            //services.AddSingleton<IToolFactory, ToolFactory>();
-            //services.AddSingleton<PackFileDataBase>();
-            //
-            //services.AddSingleton<CopyPasteManager>();
-            //services.AddSingleton<GameInformationFactory>();
-            //services.AddSingleton<PackFileService>();
-            //services.AddSingleton<GlobalEventSender>();
-            //services.AddSingleton<ScopeRepository>();
-            //
-            //services.AddScoped<IUiCommandFactory, UiCommandFactory>();
-            //services.AddScoped<EventHub>();
-            //
-            //services.AddTransient<ImportAssetCommand>();
-            //
-            //services.AddTransient<IWindowFactory, WindowFactory>();
-            //services.AddScoped<BoneMappingView>();
-            //services.AddScoped<BoneMappingViewModel>();
-            //
-            //services.AddTransient<IPackFileUiProvider, PackFileUiProvider>();
-            //services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
-            //
-            //// Editors that should be moved into their own projects
-            //TextEditor_DependencyInjectionContainer.Register(services);
-            //VariantMeshDefinition_DependencyInjectionContainer.Register(services);
-            //TwUi_DependencyInjectionContainer.Register(services);
+            if (_loadResource)
+            {
+                IconLibrary.Load();
+                DirectoryHelper.EnsureCreated();
+            }
         }
 
         public override void RegisterTools(IToolFactory factory)

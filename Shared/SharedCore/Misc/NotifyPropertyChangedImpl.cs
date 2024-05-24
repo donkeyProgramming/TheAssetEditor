@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
-namespace SharedCore.Misc
+namespace Shared.Core.Misc
 {
     public class NotifyPropertyChangedImpl : INotifyPropertyChanged
     {

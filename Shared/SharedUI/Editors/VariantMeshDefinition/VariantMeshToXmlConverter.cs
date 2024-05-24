@@ -1,21 +1,16 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
-using CommonControls.Common;
-using CommonControls.Editors.TextEditor;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
-using static GameFiles.Vmd.VariantMeshDefinition;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Ui.Editors.TextEditor;
+using static Shared.GameFormats.Vmd.VariantMeshDefinition;
 
-namespace CommonControls.Editors.VariantMeshDefinition
+namespace Shared.Ui.Editors.VariantMeshDefinition
 {
     public class VariantMeshToXmlConverter : ITextConverter
     {
@@ -87,7 +82,7 @@ namespace CommonControls.Editors.VariantMeshDefinition
 
         public static VariantMesh Load(string fileContent, bool strict = false)
         {
-            XmlRootAttribute xRoot = new XmlRootAttribute("VARIANT_MESH");
+            var xRoot = new XmlRootAttribute("VARIANT_MESH");
 
             var xmlserializer = new XmlSerializer(typeof(VariantMesh), xRoot);
             using var stringReader = new StringReader(fileContent);

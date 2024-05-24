@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using SharedCore.PackFiles;
+using Shared.Core.PackFiles;
 
-namespace CommonControls.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public class OpenFileContexMenuHandler : ContextMenuHandler
     {

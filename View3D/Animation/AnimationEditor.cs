@@ -1,5 +1,5 @@
-﻿using GameFiles.Animation;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Shared.GameFormats.Animation;
 using System;
 using System.Linq;
 using static View3D.Animation.AnimationClip;

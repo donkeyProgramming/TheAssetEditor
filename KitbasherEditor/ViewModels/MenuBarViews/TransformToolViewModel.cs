@@ -1,8 +1,8 @@
-﻿using CommonControls.MathViews;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xna.Framework;
-using SharedCore.Events;
-using SharedCore.Misc;
+using Shared.Core.Events;
+using Shared.Core.Misc;
+using Shared.Ui.BaseDialogs.MathViews;
 using System.ComponentModel;
 using View3D.Commands;
 using View3D.Components.Component;

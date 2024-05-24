@@ -1,7 +1,7 @@
-﻿using CommonControls.MathViews;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharedCore.Events;
+using Shared.Core.Events;
+using Shared.Ui.BaseDialogs.MathViews;
 using System;
 using System.Collections.ObjectModel;
 using View3D.Components;

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using SharedCore.ByteParsing;
-using SharedCore.PackFiles.Models;
+using Shared.Core.ByteParsing;
+using Shared.Core.PackFiles.Models;
 
 namespace CommonControls.FormatResearch
 {

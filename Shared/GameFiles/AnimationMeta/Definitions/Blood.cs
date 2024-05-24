@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Xna.Framework;
-using Shared.GameFiles.AnimationMeta.Parsing;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace Shared.GameFiles.AnimationMeta.Definitions
+namespace Shared.GameFormats.AnimationMeta.Definitions
 {
     [MetaData("BLOOD", 5)]
     public class Blood_v5 : DecodedMetaEntryBase_v2

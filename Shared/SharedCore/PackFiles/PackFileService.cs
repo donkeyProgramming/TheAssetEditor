@@ -1,10 +1,10 @@
 ﻿using System.Text;
 using System.Windows.Forms;
 using Serilog;
-using SharedCore.Events.Global;
-using SharedCore.PackFiles.Models;
+using Shared.Core.Events.Global;
+using Shared.Core.PackFiles.Models;
 
-namespace SharedCore.PackFiles
+namespace Shared.Core.PackFiles
 {
     public class PackFileService
     {

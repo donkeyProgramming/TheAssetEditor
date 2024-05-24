@@ -4,15 +4,15 @@
 
 using System.IO;
 using System.Text;
-using SharedCore.PackFiles;
+using Shared.Core.PackFiles;
 
-namespace CommonControls.Editors.TextEditor
+namespace Shared.Ui.Editors.TextEditor
 {
     public class DefaultTextConverter : ITextConverter
     {
         public string GetText(byte[] bytes)
         {
-            using (MemoryStream stream = new MemoryStream(bytes, 0, bytes.Length))
+            using (var stream = new MemoryStream(bytes, 0, bytes.Length))
             {
                 using (var reader = new StreamReader(stream, Encoding.ASCII))
                     return reader.ReadToEnd();

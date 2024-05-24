@@ -1,13 +1,11 @@
-﻿using CommunityToolkit.Diagnostics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Serilog;
-using SharedCore;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles.Models;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using CommunityToolkit.Diagnostics;
+using Serilog;
+using Shared.Core;
+using Shared.Core.ErrorHandling;
 
 namespace Audio.Utility
 {

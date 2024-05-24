@@ -6,8 +6,9 @@ using Audio;
 using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SharedCore.Misc;
-using SharedCore.ToolCreation;
+using Shared.Core;
+using Shared.Core.Misc;
+using Shared.Core.ToolCreation;
 using TextureEditor;
 using View3D;
 
@@ -24,7 +25,7 @@ namespace AssetEditor.Services
                 // Shared
                 new Shared.Core.DependencyInjectionContainer(),
                 new Shared.Ui.DependencyInjectionContainer(),
-                new Shared.GameFiles.DependencyInjectionContainer(),
+                new Shared.GameFormats.DependencyInjectionContainer(),
                 new Shared.EmbeddedResources.DependencyInjectionContainer(loadResources),
                 new View3D_DependencyContainer(),
                
@@ -63,6 +64,8 @@ namespace AssetEditor.Services
 
         private void ConfigureServices(IServiceCollection services)
         {
+            Logging.Configure(Serilog.Events.LogEventLevel.Information);
+
             foreach (var container in _dependencyContainers)
                 container.Register(services);
         }

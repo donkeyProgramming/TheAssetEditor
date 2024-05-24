@@ -5,10 +5,10 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Serilog;
-using Shared.GameFiles.AnimationMeta.Parsing;
-using SharedCore;
-using SharedCore.ByteParsing;
-using SharedCore.Misc;
+using Shared.Core;
+using Shared.Core.ByteParsing;
+using Shared.Core.Misc;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace AnimationMeta.Presentation
 {

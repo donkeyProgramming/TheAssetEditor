@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.Editors.BoneMapping
+namespace Shared.Ui.Editors.BoneMapping
 {
     [DebuggerDisplay("AnimatedBone - {Name} -> {MappedBoneName}")]
     public class AnimatedBone : NotifyPropertyChangedImpl

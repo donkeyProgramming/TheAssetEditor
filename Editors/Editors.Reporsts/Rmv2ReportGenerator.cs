@@ -2,11 +2,11 @@
 using System.Globalization;
 using System.Windows;
 using CsvHelper;
-using GameFiles.RigidModel;
-using GameFiles.RigidModel.MaterialHeaders;
-using SharedCore;
-using SharedCore.ErrorHandling;
-using SharedCore.PackFiles;
+using Shared.Core;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 
 namespace AssetEditor.Report
 {

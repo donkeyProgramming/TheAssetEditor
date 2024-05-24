@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
-using SharedCore.ByteParsing;
-using SharedCore.Misc;
+using Shared.Core.ByteParsing;
+using Shared.Core.Misc;
 
-namespace GameFiles.RigidModel.Types
+namespace Shared.GameFormats.RigidModel.Types
 {
     public enum TextureType
     {

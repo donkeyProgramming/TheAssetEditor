@@ -1,4 +1,4 @@
-﻿using SharedCore.PackFiles;
+﻿using Shared.Core.PackFiles;
 
 namespace AudioResearch
 {

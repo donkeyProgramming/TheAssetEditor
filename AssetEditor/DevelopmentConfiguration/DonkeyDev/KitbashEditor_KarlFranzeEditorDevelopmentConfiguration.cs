@@ -1,6 +1,6 @@
 ﻿using AssetEditor.UiCommands;
 using Shared.Core.Events;
-using SharedCore.PackFiles;
+using Shared.Core.PackFiles;
 
 namespace AssetEditor.DevelopmentConfiguration.DonkeyDev
 {

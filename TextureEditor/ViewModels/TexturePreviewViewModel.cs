@@ -1,5 +1,5 @@
 ﻿using CommonControls.BaseDialogs;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;

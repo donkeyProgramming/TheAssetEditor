@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
-using GameFiles.RigidModel.Transforms;
-using GameFiles.RigidModel.Types;
+using Shared.GameFormats.RigidModel.Transforms;
+using Shared.GameFormats.RigidModel.Types;
 
-namespace GameFiles.RigidModel
+namespace Shared.GameFormats.RigidModel
 {
     [StructLayout(LayoutKind.Sequential)]
     [Serializable]

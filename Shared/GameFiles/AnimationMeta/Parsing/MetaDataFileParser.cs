@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using Serilog;
-using SharedCore;
-using SharedCore.ByteParsing;
-using SharedCore.PackFiles.Models;
+using Shared.Core;
+using Shared.Core.ByteParsing;
+using Shared.Core.PackFiles.Models;
 
-namespace Shared.GameFiles.AnimationMeta.Parsing
+namespace Shared.GameFormats.AnimationMeta.Parsing
 {
     public class MetaDataFileParser
     {

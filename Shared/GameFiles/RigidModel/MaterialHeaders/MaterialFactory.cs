@@ -1,7 +1,7 @@
 ﻿using Serilog;
-using SharedCore;
+using Shared.Core;
 
-namespace GameFiles.RigidModel.MaterialHeaders
+namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
     public class MaterialFactory
     {

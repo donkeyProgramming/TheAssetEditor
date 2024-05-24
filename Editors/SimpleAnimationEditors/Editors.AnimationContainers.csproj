@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\GameFiles\Shared.GameFiles.csproj" />
+    <ProjectReference Include="..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
     <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
     <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui.csproj" />
     <ProjectReference Include="..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />

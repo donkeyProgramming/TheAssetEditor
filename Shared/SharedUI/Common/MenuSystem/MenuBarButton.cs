@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Windows.Media.Imaging;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.Common.MenuSystem
+namespace Shared.Ui.Common.MenuSystem
 {
 
     public class MenuBarButton

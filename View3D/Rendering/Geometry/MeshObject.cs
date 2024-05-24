@@ -1,7 +1,7 @@
-﻿using CommonControls.Editors.BoneMapping;
-using GameFiles.RigidModel;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.GameFormats.RigidModel;
+using Shared.Ui.Editors.BoneMapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;

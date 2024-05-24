@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using SharedCore;
-using SharedCore.Misc;
+using Shared.Core;
+using Shared.Core.Misc;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;

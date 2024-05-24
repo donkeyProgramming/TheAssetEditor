@@ -4,12 +4,12 @@ using System.Linq;
 using System.Windows;
 using AnimationMeta.Presentation.View;
 using Serilog;
-using Shared.GameFiles.AnimationMeta.Parsing;
-using SharedCore;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
-using SharedCore.ToolCreation;
+using Shared.Core;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace AnimationMeta.Presentation
 {

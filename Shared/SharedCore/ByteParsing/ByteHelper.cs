@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace SharedCore.ByteParsing
+namespace Shared.Core.ByteParsing
 {
     public class ByteHelper
     {

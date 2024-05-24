@@ -3,12 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AnimationEditor.Common.ReferenceModel" 
              xmlns:s="http://schemas.singulink.com/xaml"
              xmlns:System="clr-namespace:System;assembly=mscorlib"
-             xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=Shared.Ui" 
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=Shared.Ui"
-             xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
+             xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:filterdialog="clr-namespace:CommonControls.FilterDialog;assembly=Shared.Ui"
              mc:Ignorable="d" d:DesignWidth="800">
 
     <UserControl.Resources>

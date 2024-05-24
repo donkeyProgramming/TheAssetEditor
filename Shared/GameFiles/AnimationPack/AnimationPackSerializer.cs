@@ -1,10 +1,10 @@
-﻿using GameFiles.AnimationPack.AnimPackFileTypes;
-using SharedCore;
-using SharedCore.ByteParsing;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
+﻿using Shared.Core;
+using Shared.Core.ByteParsing;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
 
-namespace GameFiles.AnimationPack
+namespace Shared.GameFormats.AnimationPack
 {
     public class AnimationInfoDataFile
     {

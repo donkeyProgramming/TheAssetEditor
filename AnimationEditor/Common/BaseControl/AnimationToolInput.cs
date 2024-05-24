@@ -1,5 +1,5 @@
-﻿using GameFiles.AnimationPack;
-using SharedCore.PackFiles.Models;
+﻿using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.AnimationPack;
 
 namespace AnimationEditor.PropCreator.ViewModels
 {

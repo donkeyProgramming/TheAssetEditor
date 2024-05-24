@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using SharedCore.PackFiles;
+using Shared.Core.PackFiles;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -4,8 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KitbasherEditor.Views.EditorViews"
-             xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:common="clr-namespace:CommonControls.Common;assembly=Shared.Ui"
+             xmlns:s="http://schemas.singulink.com/xaml" xmlns:common="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
              mc:Ignorable="d" Height="300" Width="600">
     <Grid Margin="2">
         <DockPanel LastChildFill="true">

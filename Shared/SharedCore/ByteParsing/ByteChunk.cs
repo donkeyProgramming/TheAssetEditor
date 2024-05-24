@@ -1,7 +1,8 @@
-﻿using SharedCore.Misc;
+﻿using Shared.Core;
+using Shared.Core.Misc;
 using Half = SharpDX.Half;
 
-namespace SharedCore.ByteParsing
+namespace Shared.Core.ByteParsing
 {
     public class ByteChunk
     {

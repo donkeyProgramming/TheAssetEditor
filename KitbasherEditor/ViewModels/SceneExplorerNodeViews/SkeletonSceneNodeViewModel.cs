@@ -1,7 +1,7 @@
-﻿using CommonControls.MathViews;
-using Editors.Shared.Core.Services;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
+﻿using Editors.Shared.Core.Services;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Ui.BaseDialogs.MathViews;
 using System.Collections.ObjectModel;
 using View3D.Animation;
 using View3D.SceneNodes;

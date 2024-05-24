@@ -1,12 +1,8 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace CommonControls.Behaviors
+namespace Shared.Ui.Common.Behaviors
 {
     public class TextBoxExtensions
     {
@@ -59,7 +55,7 @@ namespace CommonControls.Behaviors
         private static void ShowOrHideWatermark(TextBox tb)
         {
             // Restore TextBox background to style/theme value
-            tb.ClearValue(TextBox.BackgroundProperty);
+            tb.ClearValue(Control.BackgroundProperty);
             if (string.IsNullOrEmpty(tb.Text) && !tb.IsKeyboardFocused)
             {
                 var wm = GetWatermark(tb);
@@ -72,7 +68,7 @@ namespace CommonControls.Behaviors
 
         private static Brush CreateTextBrush(string text, TextBox tb)
         {
-            Grid g = new Grid
+            var g = new Grid
             {
                 Background = tb.Background,
                 Width = tb.ActualWidth,
@@ -88,7 +84,7 @@ namespace CommonControls.Behaviors
                 Content = text
             });
 
-            VisualBrush vb = new VisualBrush
+            var vb = new VisualBrush
             {
                 Visual = g,
                 Stretch = Stretch.None,

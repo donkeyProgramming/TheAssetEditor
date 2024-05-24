@@ -7,8 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using Microsoft.Win32;
-using SharedCore.ErrorHandling;
-using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
+using Shared.Core.ErrorHandling;
+using Shared.Ui.BaseDialogs.ErrorListDialog;
+using static Shared.Ui.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace CommonControls.BaseDialogs.ErrorListDialog
 {

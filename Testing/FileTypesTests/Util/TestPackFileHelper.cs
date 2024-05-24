@@ -1,5 +1,5 @@
-﻿using SharedCore.PackFiles.Models;
-using System.Text;
+﻿using System.Text;
+using Shared.Core.PackFiles.Models;
 
 namespace FileTypesTests.Util
 {

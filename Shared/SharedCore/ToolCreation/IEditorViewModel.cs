@@ -1,7 +1,7 @@
-﻿using SharedCore.Misc;
-using SharedCore.PackFiles.Models;
+﻿using Shared.Core.Misc;
+using Shared.Core.PackFiles.Models;
 
-namespace SharedCore.ToolCreation
+namespace Shared.Core.ToolCreation
 {
     public interface IEditorViewModel : IFileEditor
     {

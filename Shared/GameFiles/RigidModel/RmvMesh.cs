@@ -1,6 +1,6 @@
-﻿using GameFiles.RigidModel.Vertex;
+﻿using Shared.GameFormats.RigidModel.Vertex;
 
-namespace GameFiles.RigidModel
+namespace Shared.GameFormats.RigidModel
 {
     public class RmvMesh
     {

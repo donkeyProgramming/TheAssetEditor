@@ -1,8 +1,8 @@
-﻿using CommonControls.Common.MenuSystem;
-using CommonControls.PackFileBrowser;
+﻿using CommonControls.PackFileBrowser;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using SharedCore.PackFiles;
+using Shared.Core.PackFiles;
+using Shared.Ui.Common.MenuSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using GameFiles.RigidModel.MaterialHeaders;
-using SharedCore.Misc;
+using Shared.Core.Misc;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;

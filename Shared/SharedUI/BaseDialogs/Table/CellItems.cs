@@ -10,10 +10,11 @@ using System.Data;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
+using CommonControls.Table;
 using CommunityToolkit.Mvvm.Input;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.Table
+namespace Shared.Ui.BaseDialogs.Table
 {
 
     public class CellFactory
@@ -73,8 +74,8 @@ namespace CommonControls.Table
 
         public List<BaseCellItem> CreateRowInstance(params object[] values)
         {
-            List<BaseCellItem> output = new List<BaseCellItem>();
-            for (int i = 0; i < values.Length; i++)
+            var output = new List<BaseCellItem>();
+            for (var i = 0; i < values.Length; i++)
                 output.Add(CreateColumnValue(i, values[i]));
 
             return output;
@@ -82,8 +83,8 @@ namespace CommonControls.Table
 
         public List<BaseCellItem> CreateEmptyRowInstance()
         {
-            List<BaseCellItem> output = new List<BaseCellItem>();
-            for (int i = 0; i < _coloumTypes.Count; i++)
+            var output = new List<BaseCellItem>();
+            for (var i = 0; i < _coloumTypes.Count; i++)
             {
                 var columnType = _coloumTypes.ElementAt(i);
                 var defaultValue = _defaultValueMap[columnType.Value];
@@ -373,7 +374,7 @@ namespace CommonControls.Table
             var bits = new bool[b.Count];
             b.CopyTo(bits, 0);
 
-            for (int i = 0; i < NumFlags; i++)
+            for (var i = 0; i < NumFlags; i++)
                 Flags.Add(new NotifyAttr<bool>(bits[i]));
         }
 
@@ -383,8 +384,8 @@ namespace CommonControls.Table
             if (outputValues.Count != 32)
                 outputValues.AddRange(Enumerable.Repeat(false, 32 - outputValues.Count));
 
-            BitArray output = new BitArray(outputValues.ToArray());
-            int[] ouputArray = new int[1];
+            var output = new BitArray(outputValues.ToArray());
+            var ouputArray = new int[1];
             output.CopyTo(ouputArray, 0);
             var v = ouputArray[0];
             return v;

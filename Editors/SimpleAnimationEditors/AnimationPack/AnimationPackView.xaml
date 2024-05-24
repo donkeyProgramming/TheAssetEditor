@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:behaviors="clr-namespace:CommonControls.Behaviors;assembly=Shared.Ui" 
+             xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
              xmlns:texteditor="clr-namespace:CommonControls.Editors.TextEditor;assembly=Shared.Ui"
              xmlns:s="http://schemas.singulink.com/xaml"
              mc:Ignorable="d" 

@@ -3,12 +3,12 @@
 // See the LICENSE file in the project root for more information.
 
 
-using GameFiles.Animation;
-using GameFiles.RigidModel;
-using GameFiles.WsModel;
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Animation;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.WsModel;
 
-namespace CommonControls.Interfaces.AssetManagement
+namespace Shared.Ui.Interfaces.AssetManagement
 {
     /// <summary>
     /// All the data an import/export _might_ need
@@ -26,6 +26,6 @@ namespace CommonControls.Interfaces.AssetManagement
         public WsMaterial[] wsModelFile { set; get; }
         public string SkeletonName { get; set; }
         public AnimationFile skeletonFile { set; get; }
-        public AnimationFile animationFile { set; get; }        
+        public AnimationFile animationFile { set; get; }
     }
 }

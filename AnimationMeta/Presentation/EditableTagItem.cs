@@ -2,12 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using CommonControls.MathViews;
 using Microsoft.Xna.Framework;
 using Serilog;
-using SharedCore;
-using SharedCore.ByteParsing;
-using SharedCore.Misc;
+using Shared.Core;
+using Shared.Core.ByteParsing;
+using Shared.Core.Misc;
+using Shared.Ui.BaseDialogs.MathViews;
 
 namespace AnimationMeta.Presentation
 {

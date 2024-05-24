@@ -1,7 +1,7 @@
-﻿using SharedCore.ByteParsing;
-using SharedCore.PackFiles.Models;
+﻿using Shared.Core.ByteParsing;
+using Shared.Core.PackFiles.Models;
 
-namespace GameFiles.AnimationPack
+namespace Shared.GameFormats.AnimationPack
 {
     public class CampaignAnimationBin
     {

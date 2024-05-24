@@ -1,27 +1,16 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Windows;
-using CommonControls.BaseDialogs;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.Common;
-using CommonControls.Editors.AnimationFilePreviewEditor;
-using CommonControls.Editors.TextEditor;
 using Editors.Shared.Core.Services;
-using GameFiles.Animation;
 using Serilog;
-using SharedCore;
-using SharedCore.ErrorHandling;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
-using SharedCore.PackFiles.Models;
-using static CommonControls.BaseDialogs.ErrorListDialog.ErrorListViewModel;
+using Shared.Core;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Animation;
+using Shared.Ui.Common;
 
 namespace CommonControls.Editors.AnimationBatchExporter
 {

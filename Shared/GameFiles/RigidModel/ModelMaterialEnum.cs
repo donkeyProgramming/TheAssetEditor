@@ -1,4 +1,4 @@
-﻿namespace GameFiles.RigidModel
+﻿namespace Shared.GameFormats.RigidModel
 {
     public enum ModelMaterialEnum : ushort
     {

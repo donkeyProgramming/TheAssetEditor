@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using GameFiles.RigidModel;
-using GameFiles.RigidModel.Types;
-using SharedCore;
-using SharedCore.Misc;
-using SharedCore.PackFiles;
+using Shared.Core;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.Types;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

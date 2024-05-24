@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace SharedCore.ErrorHandling
+namespace Shared.Core.ErrorHandling
 {
     [DebuggerDisplay("{ErrorType}:{ItemName}-{Description}")]
     public class ErrorListDataItem

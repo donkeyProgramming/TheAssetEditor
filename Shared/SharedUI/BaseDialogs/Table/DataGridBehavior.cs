@@ -10,7 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
-namespace CommonControls.Table
+namespace Shared.Ui.BaseDialogs.Table
 {
     public class DataGridBehavior
     {
@@ -32,11 +32,11 @@ namespace CommonControls.Table
 
         private static void OnDisplayRowNumberChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
         {
-            DataGrid dataGrid = target as DataGrid;
+            var dataGrid = target as DataGrid;
             if ((bool)e.NewValue == true)
             {
                 EventHandler<DataGridRowEventArgs> loadedRowHandler = null;
-                loadedRowHandler = (object sender, DataGridRowEventArgs ea) =>
+                loadedRowHandler = (sender, ea) =>
                 {
                     if (GetDisplayRowNumber(dataGrid) == false)
                     {
@@ -53,7 +53,7 @@ namespace CommonControls.Table
                 dataGrid.LoadingRow += loadedRowHandler;
 
                 ItemsChangedEventHandler itemsChangedHandler = null;
-                itemsChangedHandler = (object sender, ItemsChangedEventArgs ea) =>
+                itemsChangedHandler = (sender, ea) =>
                 {
                     if (GetDisplayRowNumber(dataGrid) == false)
                     {
@@ -87,17 +87,17 @@ namespace CommonControls.Table
 
         private static List<T> GetVisualChildCollection<T>(object parent) where T : Visual
         {
-            List<T> visualCollection = new List<T>();
+            var visualCollection = new List<T>();
             GetVisualChildCollection(parent as DependencyObject, visualCollection);
             return visualCollection;
         }
 
         private static void GetVisualChildCollection<T>(DependencyObject parent, List<T> visualCollection) where T : Visual
         {
-            int count = VisualTreeHelper.GetChildrenCount(parent);
-            for (int i = 0; i < count; i++)
+            var count = VisualTreeHelper.GetChildrenCount(parent);
+            for (var i = 0; i < count; i++)
             {
-                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+                var child = VisualTreeHelper.GetChild(parent, i);
                 if (child is T)
                 {
                     visualCollection.Add(child as T);

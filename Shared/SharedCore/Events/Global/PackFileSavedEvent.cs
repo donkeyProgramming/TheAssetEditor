@@ -1,4 +1,4 @@
-﻿namespace SharedCore.Events.Global
+﻿namespace Shared.Core.Events.Global
 {
     public class PackFileSavedEvent
     {

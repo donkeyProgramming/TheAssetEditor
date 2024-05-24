@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SharedCore.ToolCreation;
+using Shared.Core.Events;
+using Shared.Core.ToolCreation;
 
-namespace SharedCore.Events.Global
+namespace Shared.Core.Events.Global
 {
     public class GlobalEventSender
     {

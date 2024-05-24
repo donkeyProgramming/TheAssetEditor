@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using GameFiles.RigidModel;
-using GameFiles.RigidModel.LodHeader;
 using Microsoft.Xna.Framework;
 using Serilog;
-using SharedCore;
-using SharedCore.Events;
-using SharedCore.Events.Scoped;
-using SharedCore.PackFiles;
+using Shared.Core;
+using Shared.Core.Events;
+using Shared.Core.Events.Scoped;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.LodHeader;
 using View3D.Animation;
 using View3D.SceneNodes;
 
@@ -40,7 +40,7 @@ namespace View3D.Services.SceneSaving.Geometry
                 var bytes = GenerateBytes(onlySaveVisibleNodes, new List<Rmv2ModelNode>() { mainNode }, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
                 var path = _packFileService.GetFullPath(inputFile);
                 var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
-                _eventHub.Publish(new FileSavedEvent());
+                _eventHub.Publish(new ScopedFileSavedEvent());
             }
             catch (Exception e)
             {

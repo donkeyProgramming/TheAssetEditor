@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace CommonControls.Behaviors
+namespace Shared.Ui.Common.Behaviors
 {
     public static class TreeViewExtension
     {
@@ -29,9 +29,9 @@ namespace CommonControls.Behaviors
 
         private static void OnSelectItemOnRightClickChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            bool selectItemOnRightClick = (bool)e.NewValue;
+            var selectItemOnRightClick = (bool)e.NewValue;
 
-            TreeView treeView = d as TreeView;
+            var treeView = d as TreeView;
             if (treeView != null)
             {
                 if (selectItemOnRightClick)
@@ -43,7 +43,7 @@ namespace CommonControls.Behaviors
 
         private static void OnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+            var treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
 
             if (treeViewItem != null)
             {

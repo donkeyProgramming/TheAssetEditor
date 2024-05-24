@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SharedCore.ErrorHandling;
+using Shared.Core.ErrorHandling;
 using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component.Selection;

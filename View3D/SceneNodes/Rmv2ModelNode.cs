@@ -1,8 +1,8 @@
-﻿using GameFiles.RigidModel;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Serilog;
-using SharedCore;
-using SharedCore.PackFiles;
+using Shared.Core;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.RigidModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

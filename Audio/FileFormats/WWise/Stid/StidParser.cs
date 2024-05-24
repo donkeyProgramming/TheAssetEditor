@@ -1,4 +1,4 @@
-﻿using SharedCore.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 
 namespace Audio.FileFormats.WWise.Stid
 {

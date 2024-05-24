@@ -5,7 +5,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace CommonControls.BaseDialogs
+namespace Shared.Ui.BaseDialogs
 {
     public class OptionalRadioButton : RadioButton
     {
@@ -39,7 +39,7 @@ namespace CommonControls.BaseDialogs
 
         protected override void OnClick()
         {
-            bool? wasChecked = IsChecked;
+            var wasChecked = IsChecked;
             base.OnClick();
             if (IsOptional && wasChecked == true)
                 IsChecked = false;

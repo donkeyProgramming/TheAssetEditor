@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Xna.Framework;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
-namespace CommonControls.MathViews
+namespace Shared.Ui.BaseDialogs.MathViews
 {
     public class Vector3ViewModel : NotifyPropertyChangedImpl
     {

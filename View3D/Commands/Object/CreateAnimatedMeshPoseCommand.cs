@@ -1,5 +1,5 @@
-﻿using GameFiles.RigidModel;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Shared.GameFormats.RigidModel;
 using System.Collections.Generic;
 using View3D.Animation;
 using View3D.Rendering.Geometry;

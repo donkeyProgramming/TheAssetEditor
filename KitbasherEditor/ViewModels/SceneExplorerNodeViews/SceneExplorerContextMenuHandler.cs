@@ -1,6 +1,6 @@
-﻿using CommonControls.BaseDialogs.PackFileBrowser;
-using CommunityToolkit.Mvvm.Input;
-using SharedCore.Misc;
+﻿using CommunityToolkit.Mvvm.Input;
+using Shared.Core.Misc;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;

@@ -1,6 +1,6 @@
-﻿using SharedCore.PackFiles.Models;
+﻿using Shared.Core.PackFiles.Models;
 
-namespace SharedCore.PackFiles
+namespace Shared.Core.PackFiles
 {
     public interface IPackFileUiProvider
     {

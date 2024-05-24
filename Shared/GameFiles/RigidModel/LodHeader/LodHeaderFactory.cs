@@ -1,4 +1,4 @@
-﻿namespace GameFiles.RigidModel.LodHeader
+﻿namespace Shared.GameFormats.RigidModel.LodHeader
 {
     public class LodHeaderFactory
     {

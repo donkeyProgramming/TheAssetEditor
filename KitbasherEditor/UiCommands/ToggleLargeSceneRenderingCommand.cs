@@ -1,13 +1,12 @@
-﻿using CommonControls.Common.MenuSystem;
-using CommonControls.Events.UiCommands;
-using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using KitbasherEditor.ViewModels.MenuBarViews;
+using Shared.Ui.Common.MenuSystem;
 using View3D.Components.Rendering;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
     public class ToggleLargeSceneRenderingCommand : IKitbasherUiCommand
     {
-        public string ToolTip { get; set; } = "Toogle rendering of large scenes";
+        public string ToolTip { get; set; } = "Toggle rendering of large scenes";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 

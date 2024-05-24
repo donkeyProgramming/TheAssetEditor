@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Serilog;
-using SharedCore;
-using SharedCore.Events;
+using Shared.Core;
+using Shared.Core.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;

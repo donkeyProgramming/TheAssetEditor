@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
-using SharedCore.Misc;
+using Shared.Core.Misc;
 
 namespace AnimationMeta.Presentation.View
 {

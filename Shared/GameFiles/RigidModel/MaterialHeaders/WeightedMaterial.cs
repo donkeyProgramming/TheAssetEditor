@@ -1,12 +1,12 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
-using GameFiles.RigidModel.Transforms;
-using GameFiles.RigidModel.Types;
 using Microsoft.Xna.Framework;
-using SharedCore.ByteParsing;
-using SharedCore.Misc;
+using Shared.Core.ByteParsing;
+using Shared.Core.Misc;
+using Shared.GameFormats.RigidModel.Transforms;
+using Shared.GameFormats.RigidModel.Types;
 
-namespace GameFiles.RigidModel.MaterialHeaders
+namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
     public class WeightedMaterial : IMaterial
     {

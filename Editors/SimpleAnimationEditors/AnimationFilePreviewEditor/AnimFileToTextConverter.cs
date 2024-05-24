@@ -1,10 +1,9 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Windows;
-using CommonControls.Editors.TextEditor;
-using GameFiles.Animation;
-using SharedCore.ByteParsing;
-using SharedCore.PackFiles;
+using Shared.Core.ByteParsing;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.Animation;
+using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.AnimationFilePreviewEditor
 {

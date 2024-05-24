@@ -4,14 +4,14 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.Strategies.Fbx;
-using VertexFormat = GameFiles.RigidModel.VertexFormat;
+using VertexFormat = Shared.GameFormats.RigidModel.VertexFormat;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 using AssetManagement.GenericFormats.DataStructures.Unmanaged;
-using GameFiles.RigidModel.LodHeader;
-using GameFiles.RigidModel.MaterialHeaders;
-using GameFiles.RigidModel.Types;
-using GameFiles.RigidModel.Vertex;
-using GameFiles.RigidModel;
+using Shared.GameFormats.RigidModel.Vertex;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.LodHeader;
+using Shared.GameFormats.RigidModel.Types;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 
 namespace AssetManagement.GenericFormats
 {

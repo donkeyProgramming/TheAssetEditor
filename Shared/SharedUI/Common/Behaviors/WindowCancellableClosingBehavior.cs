@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 
-namespace CommonControls.Behaviors
+namespace Shared.Ui.Common.Behaviors
 {
     public class WindowCancellableClosingBehavior
     {
@@ -43,7 +43,7 @@ namespace CommonControls.Behaviors
         private static void ClosingChanged(
           DependencyObject target, DependencyPropertyChangedEventArgs e)
         {
-            Window window = target as Window;
+            var window = target as Window;
 
             if (window != null)
             {
@@ -60,7 +60,7 @@ namespace CommonControls.Behaviors
 
         static void Window_Closing(object sender, CancelEventArgs e)
         {
-            ICommand closing = GetClosing(sender as Window);
+            var closing = GetClosing(sender as Window);
             if (closing != null)
             {
                 if (closing.CanExecute(null))

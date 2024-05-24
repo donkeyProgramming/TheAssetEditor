@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonControls.BaseDialogs;
-using CommonControls.Editors.BoneMapping;
-using CommonControls.MathViews;
-using GameFiles.Animation;
 using Microsoft.Xna.Framework;
-using SharedCore.Misc;
+using Shared.Core.Misc;
+using Shared.GameFormats.Animation;
+using Shared.Ui.BaseDialogs;
+using Shared.Ui.BaseDialogs.MathViews;
+using Shared.Ui.Editors.BoneMapping;
 using View3D.Animation;
 using View3D.Commands;
 using View3D.Commands.Object;

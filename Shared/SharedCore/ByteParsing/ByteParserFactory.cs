@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace SharedCore.ByteParsing
+namespace Shared.Core.ByteParsing
 {
     public static class ByteParserFactory
     {

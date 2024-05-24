@@ -1,10 +1,10 @@
 ﻿using System.Text;
 using System.Xml;
-using GameFiles.RigidModel;
-using GameFiles.RigidModel.Types;
-using SharedCore.PackFiles.Models;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.Types;
 
-namespace GameFiles.WsModel
+namespace Shared.GameFormats.WsModel
 {
     public class WsModelMaterialFile
     {

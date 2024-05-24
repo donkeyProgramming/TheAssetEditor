@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using CommonControls.BaseDialogs;
-using SharedCore.Misc;
+using Shared.Core.Misc;
+using Shared.Ui.BaseDialogs;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 using View3D.Services.SceneSaving;

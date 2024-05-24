@@ -1,7 +1,7 @@
 ﻿using Audio.FileFormats.WWise;
 using Audio.Storage;
 using Serilog;
-using SharedCore;
+using Shared.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;

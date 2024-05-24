@@ -1,4 +1,4 @@
-﻿using SharedCore.Misc;
+﻿using Shared.Core.Misc;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using View3D.Animation;
