@@ -10,9 +10,9 @@ namespace Editors.Shared.Core.Services
 {
     public class SkeletonAnimationLookUpHelper : IAnimationFileDiscovered
     {
-        ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
-        ConcurrentDictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new();
-        object _threadLock = new object();
+        private readonly ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
+        private readonly ConcurrentDictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = new();
+        private readonly object _threadLock = new object();
         public ObservableCollection<string> SkeletonFileNames { get; private set; } = new();
 
         public SkeletonAnimationLookUpHelper()

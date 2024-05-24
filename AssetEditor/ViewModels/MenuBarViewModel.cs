@@ -33,7 +33,6 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Ui.Common;
-using Shared.Ui.Services;
 
 namespace AssetEditor.ViewModels
 {

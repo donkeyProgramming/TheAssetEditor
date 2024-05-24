@@ -1,14 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using Shared.Core.ErrorHandling;
+﻿using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
+using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 
-namespace Shared.Ui.Services
+namespace Editors.Shared.Core.Services
 {
     public class AnimPackUpdaterService
     {
@@ -52,7 +50,7 @@ namespace Shared.Ui.Services
 
                 foreach (var binEntry in animationBinEntries)
                 {
-                    var wh3Bin = new GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3(binEntry.Name);
+                    var wh3Bin = new AnimationBinWh3(binEntry.Name);
                     wh3Bin.SkeletonName = binEntry.SkeletonName;
                     wh3Bin.MountBin = binEntry.MountName;
                     wh3Bin.LocomotionGraph = "animations/locomotion_graphs/entity_locomotion_graph.xml";
