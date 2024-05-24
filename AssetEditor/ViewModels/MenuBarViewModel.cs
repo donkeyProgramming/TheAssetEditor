@@ -57,7 +57,6 @@ namespace AssetEditor.ViewModels
         private readonly IServiceProvider _serviceProvider;
         private readonly PackFileService _packfileService;
         private readonly ApplicationSettingsService _settingsService;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
@@ -118,7 +117,6 @@ namespace AssetEditor.ViewModels
             GameInformationFactory gameInformationFactory,
             IServiceProvider provider,
             PackFileService packfileService,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             ApplicationSettingsService settingsService,
             IUiCommandFactory uiCommandFactory)
         {
@@ -127,7 +125,6 @@ namespace AssetEditor.ViewModels
             _packfileService = packfileService;
             _settingsService = settingsService;
             _uiCommandFactory = uiCommandFactory;
-            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
 
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
