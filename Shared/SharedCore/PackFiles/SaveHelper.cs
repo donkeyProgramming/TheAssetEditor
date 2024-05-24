@@ -1,5 +1,6 @@
 ﻿using System.Windows.Forms;
 using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using MessageBox = System.Windows.Forms.MessageBox;
 

@@ -9,7 +9,7 @@ using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.Misc;
+using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
 
 namespace AnimationEditor

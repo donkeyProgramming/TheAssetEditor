@@ -1,4 +1,4 @@
-﻿using Shared.Core;
+﻿using Shared.Core.Services;
 using View3D.SceneNodes;
 using View3D.Services.SceneSaving.WsModel;
 

@@ -5,7 +5,8 @@
 using System.IO;
 using System.Reflection;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel.Types;
 
 namespace Shared.Ui.Services

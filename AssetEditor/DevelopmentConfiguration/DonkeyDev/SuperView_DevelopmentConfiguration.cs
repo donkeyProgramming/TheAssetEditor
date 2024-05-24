@@ -1,7 +1,7 @@
 ﻿using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SuperView;
-using Shared.Core;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationPack;
 

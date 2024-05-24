@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using KitbasherEditor.ViewModels.MenuBarViews;
+using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;
 using Shared.Core.Misc;

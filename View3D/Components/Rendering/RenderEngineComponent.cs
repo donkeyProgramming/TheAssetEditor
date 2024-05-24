@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.Core;
+using Shared.Core.Services;
 using System;
 using System.Collections.Generic;
 using View3D.Rendering;

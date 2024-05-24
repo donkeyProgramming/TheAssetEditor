@@ -2,7 +2,7 @@
 using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using CommunityToolkit.Diagnostics;
-using Shared.Core;
+using Shared.Core.Misc;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

@@ -2,8 +2,8 @@
 using System.Globalization;
 using System.Windows;
 using CsvHelper;
-using Shared.Core;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;

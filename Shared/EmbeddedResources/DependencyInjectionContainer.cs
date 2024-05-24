@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Shared.Core;
+using Shared.Core.DependencyInjection;
 using Shared.Core.Misc;
-using Shared.Core.ToolCreation;
 
 namespace Shared.EmbeddedResources
 {
@@ -21,11 +20,6 @@ namespace Shared.EmbeddedResources
                 IconLibrary.Load();
                 DirectoryHelper.EnsureCreated();
             }
-        }
-
-        public override void RegisterTools(IToolFactory factory)
-        {
-
         }
     }
 }

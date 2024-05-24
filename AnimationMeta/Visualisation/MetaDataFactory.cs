@@ -7,7 +7,7 @@ using AnimationMeta.Visualisation.Rules;
 using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;

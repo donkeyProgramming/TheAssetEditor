@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
-using Shared.Core.ToolCreation;
 
 namespace Shared.Core.Events.Global
 {

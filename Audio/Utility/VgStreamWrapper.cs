@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using CommunityToolkit.Diagnostics;
 using Serilog;
-using Shared.Core;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
 
 namespace Audio.Utility
 {

@@ -1,4 +1,4 @@
-﻿namespace Shared.Core
+﻿namespace Shared.Core.Services
 {
     public enum GameTypeEnum
     {
@@ -51,7 +51,7 @@
 
         public GameInformation GetGameById(GameTypeEnum type)
         {
-            return Games.FirstOrDefault(x => x.Type == type);
+            return Games.First(x => x.Type == type);
         }
     }
 }

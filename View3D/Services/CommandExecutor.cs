@@ -1,5 +1,5 @@
 ﻿using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using System;
 using System.Collections.Generic;

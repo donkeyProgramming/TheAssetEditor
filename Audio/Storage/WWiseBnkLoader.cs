@@ -8,7 +8,7 @@ using Audio.FileFormats.WWise.Didx;
 using Audio.FileFormats.WWise.Hirc;
 using Audio.FileFormats.WWise.Hirc.V136;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 

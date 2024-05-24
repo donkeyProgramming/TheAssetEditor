@@ -1,6 +1,6 @@
 ﻿using Serilog;
-using Shared.Core;
 using Shared.Core.ByteParsing;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using static Shared.Core.ByteParsing.ByteChunk;
 

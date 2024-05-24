@@ -1,11 +1,12 @@
-﻿
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
-using Shared.Core.PackFiles.Models;
-using Shared.Core.PackFiles;
-using Shared.Core.ToolCreation;
 using Shared.Core.Events.Global;
 using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
+using Shared.Core.ToolCreation;
 
 namespace Shared.Core
 {
@@ -13,7 +14,6 @@ namespace Shared.Core
     {
         public DependencyInjectionContainer()
         {
-          
         }
 
         public override void Register(IServiceCollection services)
@@ -30,12 +30,6 @@ namespace Shared.Core
 
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
             services.AddScoped<EventHub>();
-
-
-        }
-
-        public override void RegisterTools(IToolFactory factory)
-        {
         }
     }
 }

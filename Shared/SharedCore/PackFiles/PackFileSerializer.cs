@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using Shared.Core.ByteParsing;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 
 namespace Shared.Core.PackFiles

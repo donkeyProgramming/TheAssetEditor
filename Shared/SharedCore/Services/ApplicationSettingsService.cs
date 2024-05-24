@@ -1,8 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
 using Serilog;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
 
-namespace Shared.Core
+namespace Shared.Core.Services
 {
     public class ApplicationSettings
     {

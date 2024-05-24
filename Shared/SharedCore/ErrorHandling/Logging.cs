@@ -2,8 +2,9 @@
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using Shared.Core.Misc;
 
-namespace Shared.Core
+namespace Shared.Core.ErrorHandling
 {
     public static class LoggerExtensions
     {

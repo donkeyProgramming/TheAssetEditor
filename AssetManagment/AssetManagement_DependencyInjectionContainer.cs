@@ -1,7 +1,7 @@
 ﻿using AssetManagement.AssetHandling;
 using AssetManagement.Strategies.Fbx;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.Misc;
+using Shared.Core.DependencyInjection;
 using Shared.Ui.Interfaces.AssetManagement;
 using System;
 using System.Collections.Generic;

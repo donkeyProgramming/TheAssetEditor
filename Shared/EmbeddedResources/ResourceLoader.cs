@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using System.Windows.Media.Imaging;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 
 namespace Shared.EmbeddedResources
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using System;
 using View3D.Animation;
 using View3D.Animation.AnimationChange;

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using Octokit;
 
-namespace Shared.Core
+namespace Shared.Core.Services
 {
     public class VersionChecker
     {

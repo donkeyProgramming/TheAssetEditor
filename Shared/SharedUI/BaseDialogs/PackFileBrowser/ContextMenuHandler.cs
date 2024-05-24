@@ -8,7 +8,7 @@ using System.Windows.Input;
 using CommonControls.BaseDialogs;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;

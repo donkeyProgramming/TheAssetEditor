@@ -3,7 +3,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.ToolCreation;
 
-namespace Shared.Core.Misc
+namespace Shared.Core.DependencyInjection
 {
     public class DependencyContainer
     {

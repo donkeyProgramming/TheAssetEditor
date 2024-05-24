@@ -6,7 +6,7 @@ using Serilog;
 using AssetManagement.AnimationProcessor;
 using Shared.GameFormats.RigidModel.Vertex;
 using Shared.GameFormats.Animation;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 
 namespace AssetManagement.MeshProcessing.Common
 {

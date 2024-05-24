@@ -4,7 +4,6 @@ using System.Windows;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.Shared.Core.Services;
 using Serilog;
-using Shared.Core;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;

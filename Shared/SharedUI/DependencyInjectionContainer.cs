@@ -1,6 +1,6 @@
 ﻿using CommonControls.Editors.BoneMapping.View;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.Misc;
+using Shared.Core.DependencyInjection;
 using Shared.Core.PackFiles;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs;
@@ -18,7 +18,6 @@ namespace Shared.Ui
     {
         public DependencyInjectionContainer()
         {
-      
         }
 
         public override void Register(IServiceCollection services)

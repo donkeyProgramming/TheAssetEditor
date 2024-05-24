@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using Serilog;
-using Shared.Core;
 using Shared.Core.ByteParsing;
+using Shared.Core.ErrorHandling;
 
 namespace Audio.FileFormats.WWise
 {

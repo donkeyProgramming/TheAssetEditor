@@ -4,9 +4,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 
 namespace AssetEditor.Report
 {

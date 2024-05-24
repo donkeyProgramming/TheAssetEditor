@@ -4,8 +4,8 @@ using AnimationEditor.PropCreator.ViewModels;
 using AnimationMeta.Visualisation;
 using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
-using Shared.Core;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 
 namespace AnimationEditor.Common.ReferenceModel

@@ -1,5 +1,4 @@
 ﻿using Serilog;
-using Shared.Core;
 using Shared.Core.ErrorHandling;
 
 namespace Audio.BnkCompiler

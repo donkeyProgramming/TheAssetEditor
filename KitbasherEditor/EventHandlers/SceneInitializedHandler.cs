@@ -7,7 +7,7 @@ using KitbasherEditor.ViewModels;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using View3D.Components.Component;

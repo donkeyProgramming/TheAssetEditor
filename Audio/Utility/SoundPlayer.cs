@@ -1,7 +1,7 @@
 ﻿using Audio.FileFormats.WWise.Hirc;
 using Audio.Storage;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using System;

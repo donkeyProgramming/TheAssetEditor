@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
-using Shared.Core.Misc;
+using Shared.Core.DependencyInjection;
 using View3D.Commands;
 using View3D.Commands.Bone;
 using View3D.Commands.Bone.Clipboard;

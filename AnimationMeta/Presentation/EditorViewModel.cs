@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using AnimationMeta.Presentation.View;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;

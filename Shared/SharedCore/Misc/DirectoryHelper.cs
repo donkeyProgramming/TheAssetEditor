@@ -1,4 +1,4 @@
-﻿namespace Shared.Core
+﻿namespace Shared.Core.Misc
 {
     public class DirectoryHelper
     {

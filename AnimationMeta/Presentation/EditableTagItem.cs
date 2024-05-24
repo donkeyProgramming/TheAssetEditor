@@ -4,8 +4,8 @@
 
 using Microsoft.Xna.Framework;
 using Serilog;
-using Shared.Core;
 using Shared.Core.ByteParsing;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.MathViews;
 

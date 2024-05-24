@@ -7,8 +7,9 @@ using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 
 namespace AssetEditor
 {
@@ -26,7 +27,7 @@ namespace AssetEditor
             //new FastBinParser2().Load(file);
 
 
-            Shared.Core.VersionChecker.CheckVersion();
+            VersionChecker.CheckVersion();
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
             _serviceProvider = new DependencyInjectionConfig().Build();

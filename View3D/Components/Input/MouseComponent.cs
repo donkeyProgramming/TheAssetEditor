@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop.Input;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using System;
 using View3D.Services;
 

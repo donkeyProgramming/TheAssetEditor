@@ -7,7 +7,7 @@ using Audio.Presentation.Compiler;
 using Audio.Storage;
 using Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.Misc;
+using Shared.Core.DependencyInjection;
 using Shared.Core.PackFiles;
 using Shared.Core.ToolCreation;
 using System.IO;

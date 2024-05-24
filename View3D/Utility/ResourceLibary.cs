@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Pfim;
 using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using System;
 using System.Collections.Generic;

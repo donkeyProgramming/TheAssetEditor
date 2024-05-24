@@ -1,7 +1,7 @@
-﻿using Shared.Core;
-using Shared.Core.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
 
 namespace Shared.GameFormats.AnimationPack

@@ -1,5 +1,6 @@
 ﻿using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel.Types;

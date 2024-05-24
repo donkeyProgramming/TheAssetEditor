@@ -1,4 +1,4 @@
-﻿namespace Shared.Core.ToolCreation
+﻿namespace Shared.Core.DependencyInjection
 {
     public interface IScopeHelper
     {

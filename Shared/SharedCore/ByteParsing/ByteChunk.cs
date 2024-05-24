@@ -1,5 +1,4 @@
-﻿using Shared.Core;
-using Shared.Core.Misc;
+﻿using Shared.Core.Misc;
 using Half = SharpDX.Half;
 
 namespace Shared.Core.ByteParsing

@@ -1,5 +1,5 @@
 ﻿using Serilog;
-using Shared.Core;
+using Shared.Core.ErrorHandling;
 using System.Collections.Generic;
 using System.Linq;
 using View3D.Components.Component.Selection;

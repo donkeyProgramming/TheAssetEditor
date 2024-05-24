@@ -3,7 +3,7 @@ using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.CampaignAnimBin;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.Misc;
+using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
 
 namespace Editors.AnimationContainers

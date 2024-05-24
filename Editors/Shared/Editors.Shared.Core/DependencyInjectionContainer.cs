@@ -1,6 +1,6 @@
 ﻿using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.Misc;
+using Shared.Core.DependencyInjection;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 

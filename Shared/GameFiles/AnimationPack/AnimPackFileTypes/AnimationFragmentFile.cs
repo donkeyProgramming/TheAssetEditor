@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Diagnostics;
-using Shared.Core;
 using Shared.Core.ByteParsing;
 using Shared.Core.Misc;
+using Shared.Core.Services;
 using Shared.GameFormats.DB;
 
 namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes

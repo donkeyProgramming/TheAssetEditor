@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Text;
-using Shared.Core;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 
 namespace Shared.GameFormats.AnimationPack
 {

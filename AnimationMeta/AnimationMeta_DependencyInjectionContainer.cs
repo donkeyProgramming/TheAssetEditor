@@ -2,7 +2,7 @@
 using AnimationMeta.Presentation.View;
 using AnimationMeta.Visualisation;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.Misc;
+using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
