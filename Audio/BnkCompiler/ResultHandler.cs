@@ -29,8 +29,13 @@ namespace Audio.BnkCompiler
             if (string.IsNullOrWhiteSpace(compilerData.ProjectSettings.Language) == false)
                 bnkOutputPath += $"\\{compilerData.ProjectSettings.Language}";
 
-            SaveHelper.SavePackFile(_pfs, bnkOutputPath, compileResult.OutputBnkFile, false);
-            SaveHelper.SavePackFile(_pfs, datOutputPath, compileResult.OutputDatFile, false);
+            SaveHelper.SavePackFile(_pfs, bnkOutputPath, compileResult.OutputBnkFile, true);
+
+            if (compileResult.Project.Events.Count > 0)
+                SaveHelper.SavePackFile(_pfs, datOutputPath, compileResult.OutputDatFile, true);
+
+            if (compileResult.Project.DialogueEvents.Count > 0)
+                SaveHelper.SavePackFile(_pfs, datOutputPath, compileResult.OutputStatesDatFile, true);
         }
 
         void ExportToDirectory(CompileResult result, CompilerSettings settings)
@@ -43,8 +48,17 @@ namespace Audio.BnkCompiler
                 var bnkPath = Path.Combine(outputDirectory, $"{result.Project.ProjectSettings.BnkName}.bnk");
                 File.WriteAllBytes(bnkPath, result.OutputBnkFile.DataSource.ReadData());
 
-                var datPath = Path.Combine(outputDirectory, $"{result.Project.ProjectSettings.BnkName}.dat");
-                File.WriteAllBytes(datPath, result.OutputDatFile.DataSource.ReadData());
+                if (result.Project.Events.Count > 0)
+                {
+                    var datPath = Path.Combine(outputDirectory, $"{result.Project.ProjectSettings.BnkName}.dat");
+                    File.WriteAllBytes(datPath, result.OutputDatFile.DataSource.ReadData());
+                }
+
+                if (result.Project.DialogueEvents.Count > 0)
+                {
+                    var statesDatPath = Path.Combine(outputDirectory, $"{result.Project.ProjectSettings.BnkName}.dat");
+                    File.WriteAllBytes(statesDatPath, result.OutputStatesDatFile.DataSource.ReadData());
+                }
 
                 if (convertResultToXml)
                 {

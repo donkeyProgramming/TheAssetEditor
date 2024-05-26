@@ -41,14 +41,14 @@ namespace Audio.FileFormats.WWise.Hirc.V112
 
         public override uint DefaultSwitch => ulDefaultSwitch;
 
-        public override uint ParentId => NodeBaseParams.DirectParentID;
+        public override uint ParentId => NodeBaseParams.DirectParentId;
 
         public override List<SwitchListItem> Items => SwitchList.Select(x => new SwitchListItem() { SwitchId = x.SwitchId, ChildNodeIds = x.NodeIdList }).ToList();
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
 
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
     }
 
     public class Children
@@ -112,7 +112,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
 
         public byte bOverrideAttachmentParams { get; set; }
         public uint OverrideBusId { get; set; }
-        public uint DirectParentID { get; set; }
+        public uint DirectParentId { get; set; }
         public byte byBitVector { get; set; }
 
         public NodeInitialParams NodeInitialParams { get; set; }
@@ -134,7 +134,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
             node.NodeInitialFxParams = NodeInitialFxParams.Create(chunk);
             node.bOverrideAttachmentParams = chunk.ReadByte();
             node.OverrideBusId = chunk.ReadUInt32();
-            node.DirectParentID = chunk.ReadUInt32();
+            node.DirectParentId = chunk.ReadUInt32();
             node.byBitVector = chunk.ReadByte();
             node.NodeInitialParams = NodeInitialParams.Create(chunk);
             node.PositioningParams = PositioningParams.Create(chunk);

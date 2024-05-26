@@ -86,7 +86,7 @@ namespace Audio.Storage
 
             /*
             // Output CSV of known IDs matched with strings
-            using (var file = File.CreateText("C:\\Users\\georg\\Desktop\\id_name_matches.csv"))
+            using (var file = File.CreateText("C:\\Users\\george\\Desktop\\id_name_matches.csv"))
                 foreach (var item in _nameLookUp)
                 {
                     var id = item;
@@ -103,18 +103,18 @@ namespace Audio.Storage
             var datFiles = pfs.FindAllWithExtention(".dat");
             datFiles = PackFileUtil.FilterUnvantedFiles(pfs, datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat" }, out var removedFiles);
 
-            
+
             var failedDatParsing = new List<(string, string)>();
             var masterDat = new SoundDatFile();
 
             foreach (var datFile in datFiles)
             {
                 // Commented out what would output dat dumps of dat files.
-                //var outputDat = $"C:\\Users\\georg\\AssetEditor\\Temp\\dat_dump_{datFile}.txt";
+                var outputDat = $"C:\\Users\\george\\AssetEditor\\Temp\\dat_dump_{datFile}.txt";
                 try
                 {
                     var parsedFile = LoadDatFile(datFile);
-                    //parsedFile.DumpToFile(outputDat);
+                    parsedFile.DumpToFile(outputDat);
                     masterDat.Merge(parsedFile);
                 }
                 catch (Exception e)
@@ -130,7 +130,7 @@ namespace Audio.Storage
 
         SoundDatFile LoadDatFile(PackFile datFile)
         {
-            if(_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Attila)
+            if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Attila)
                 return DatFileParser.Parse(datFile, true);
             else
                 return DatFileParser.Parse(datFile, false);

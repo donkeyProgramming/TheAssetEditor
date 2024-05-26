@@ -33,5 +33,14 @@ namespace Audio.FileFormats.WWise.Hirc.Shared
             var byteArray = memStream.ToArray();
             return byteArray;
         }
+
+        public static byte[] GetCustomArgumentsAsBytes(List<Argument> arguments)
+        {
+            using var memStream = new MemoryStream();
+            arguments.ForEach(e => memStream.Write(ByteParsers.UInt32.EncodeValue(e.ulGroupId, out _)));
+            arguments.ForEach(e => memStream.Write(ByteParsers.Byte.EncodeValue((byte)e.eGroupType, out _)));
+            var byteArray = memStream.ToArray();
+            return byteArray;
+        }
     }
 }

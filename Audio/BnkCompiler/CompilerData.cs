@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using static Audio.FileFormats.WWise.Hirc.Shared.AkDecisionTree;
+
 
 namespace Audio.BnkCompiler
 {
@@ -19,12 +21,16 @@ namespace Audio.BnkCompiler
         public List<string> Actions { get; set; }
     }
 
+    public class DialogueEvent : IAudioProjectHircItem
+    {
+        public Node RootNode { get; set; }
+        public uint NodesCount { get; set; } = 0;
+    }
+
     public class RandomContainer : IAudioProjectHircItem
     {
         public List<string> Children { get; set; }
-        public string StatePropNum_Priority { get; set; } = null;
-        public string UserAuxSendVolume0 { get; set; } = null;
-        public string InitialDelay { get; set; } = null;
+        public string DirectParentId { get; set; } = null;
     }
 
     public class Action : IAudioProjectHircItem
@@ -36,20 +42,23 @@ namespace Audio.BnkCompiler
     public class GameSound : IAudioProjectHircItem
     {
         public string Path { get; set; }
-        public string DirectParentID { get; set; } = null;
+        public string DirectParentId { get; set; } = null;
+        public bool IsDialogueEventSound { get; set; }
+        public string DialogueEvent { get; set; }
+
     }
 
     public class ActorMixer : IAudioProjectHircItem
     {
-        public string DirectParentId { get; set; } = null;
+        public uint DirectParentId { get; set; } = 0;
         public List<string> Children { get; set; } = new List<string>();
         public List<string> ActorMixerChildren { get; set; } = new List<string>();
+        public string DialogueEvent { get; set; }
     }
 
     public class ProjectSettings
     {
         public int Version { get; set; } = 1;
-        public string ProjectType { get; set; }
         public string OutputGame { get; set; } = CompilerConstants.Game_Warhammer3;
         public string BnkName { get; set; }
         public string Language { get; internal set; }
@@ -65,6 +74,8 @@ namespace Audio.BnkCompiler
         public List<GameSound> GameSounds { get; set; } = new List<GameSound>();
         public List<ActorMixer> ActorMixers { get; set; } = new List<ActorMixer>();
         public List<RandomContainer> RandomContainers { get; set; } = new List<RandomContainer>();
+        public List<DialogueEvent> DialogueEvents { get; set; } = new List<DialogueEvent>();
+        public List<string> DatStates { get; set; } = new List<string>();
 
         public void PreperForCompile(bool allowOverrideIdForActions, bool allowOverrideIdForMixers, bool allowOverrideIdForSounds)
         {
@@ -73,6 +84,8 @@ namespace Audio.BnkCompiler
             _allProjectItems.AddRange(GameSounds);
             _allProjectItems.AddRange(ActorMixers);
             _allProjectItems.AddRange(RandomContainers);
+            _allProjectItems.AddRange(DialogueEvents);
+
 
             // Compute the write ids
             Events.ForEach(x => Process(x, false, WWiseHash.Compute));
@@ -80,6 +93,8 @@ namespace Audio.BnkCompiler
             GameSounds.ForEach(x => Process(x, allowOverrideIdForSounds, WWiseHash.Compute));
             ActorMixers.ForEach(x => Process(x, allowOverrideIdForMixers, WWiseHash.Compute));
             RandomContainers.ForEach(x => Process(x, false, WWiseHash.Compute));
+            DialogueEvents.ForEach(x => Process(x, false, WWiseHash.Compute));
+
         }
 
         public uint GetHircItemIdFromName(string name)

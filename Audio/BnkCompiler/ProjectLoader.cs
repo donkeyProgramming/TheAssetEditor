@@ -1,6 +1,5 @@
 ﻿using Audio.BnkCompiler.Validation;
 using Microsoft.Xna.Framework.Media;
-using Newtonsoft.Json;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -12,6 +11,10 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using Audio.Utility;
+using static Audio.FileFormats.WWise.Hirc.Shared.AkDecisionTree;
+
 
 
 namespace Audio.BnkCompiler
@@ -19,6 +22,7 @@ namespace Audio.BnkCompiler
     public class ProjectLoader
     {
         private readonly PackFileService _pfs;
+        private static Dictionary<string, string> EventToMixers;
 
         public ProjectLoader(PackFileService pfs)
         {
@@ -27,9 +31,12 @@ namespace Audio.BnkCompiler
 
         public Result<CompilerData> LoadProject(string path, CompilerSettings settings)
         {
+            // Find packfile
             var packfile = _pfs.FindFile(path);
             if (packfile == null)
                 return Result<CompilerData>.FromError("BnkCompiler-Loader", $"Unable to find file '{path}'");
+
+            // Load project
             return LoadProject(packfile, settings);
         }
 
@@ -37,10 +44,18 @@ namespace Audio.BnkCompiler
         {
             try
             {
+                // Configure JsonSerializerOptions
+                var options = new JsonSerializerOptions
+                {
+                    ReadCommentHandling = JsonCommentHandling.Skip,
+                    AllowTrailingCommas = true
+                };
+
                 // Load the file
                 var bytes = packfile.DataSource.ReadData();
                 var str = Encoding.UTF8.GetString(bytes);
-                var projectFile = JsonConvert.DeserializeObject<CompilerInputProject>(str, new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error });
+                var projectFile = JsonSerializer.Deserialize<CompilerInputProject>(str, options);
+
                 if (projectFile == null)
                     return Result<CompilerData>.FromError("BnkCompiler-Loader", "Unable to load file. Please validate the Json using an online validator.");
 
@@ -50,7 +65,7 @@ namespace Audio.BnkCompiler
                     return Result<CompilerData>.FromError(validateInputResult.LogItems);
 
                 // Convert and validate to compiler input
-                var compilerData = ConvertSimpleInputToCompilerData(projectFile, settings);
+                var compilerData = ConvertInputToCompilerData(projectFile, settings);
                 SaveCompilerDataToPackFile(compilerData, settings, packfile);
                 var validateProjectResult = ValidateProjectFile(compilerData);
                 if (validateProjectResult.IsSuccess == false)
@@ -58,7 +73,7 @@ namespace Audio.BnkCompiler
 
                 return Result<CompilerData>.FromOk(compilerData);
             }
-            catch (JsonSerializationException e)
+            catch (JsonException e)
             {
                 return Result<CompilerData>.FromError("BnkCompiler-Loader", $"{e.Message}");
             }
@@ -72,16 +87,25 @@ namespace Audio.BnkCompiler
         {
             if (settings.SaveGeneratedCompilerInput)
             {
+                // Get file path and directory
                 var filePath = _pfs.GetFullPath(packfile);
-                var fileNameWithoutExtenetion = Path.GetFileNameWithoutExtension(filePath);
+                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
                 var directory = Path.GetDirectoryName(filePath);
 
-                var compilerDataAsStr = JsonConvert.SerializeObject(compilerData, Formatting.Indented);
-                var outputName = $"{fileNameWithoutExtenetion}_generated.json";
+                // Serialize compiler data
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                };
+                var compilerDataAsStr = JsonSerializer.Serialize(compilerData, options);
+                var outputName = $"{fileNameWithoutExtension}_generated.json";
+
+                // Add file to pack
                 _pfs.AddFileToPack(_pfs.GetEditablePack(), directory, PackFile.CreateFromASCII(outputName, compilerDataAsStr));
             }
         }
 
+        // Validate the project file
         Result<bool> ValidateProjectFile(CompilerData projectFile)
         {
             var validator = new AudioProjectXmlValidator(_pfs, projectFile);
@@ -89,48 +113,68 @@ namespace Audio.BnkCompiler
             if (result.IsValid == false)
                 return Result<bool>.FromError("BnkCompiler-Validation", result);
 
-            // Validate for name collisions and uniqe ids
+            // Validate for name collisions and unique ids
             return Result<bool>.FromOk(true);
         }
 
+        // Validate the input file
         Result<bool> ValidateInputFile(CompilerInputProject projectFile)
         {
             return Result<bool>.FromOk(true);
         }
 
-        CompilerData ConvertSimpleInputToCompilerData(CompilerInputProject input, CompilerSettings settings)
+        static int GenerateRandomNumber()
         {
+            var rand = new Random();
+            var min = 10000000;
+            var max = 99999999;
 
-            var compilerData = new CompilerData();
-            compilerData.ProjectSettings.Version = 1;
-            compilerData.ProjectSettings.BnkName = input.Settings.BnkName;
-            compilerData.ProjectSettings.Language = input.Settings.Language;
+            return rand.Next(min, max + 1);
+        }
 
-            var mixers = new List<ActorMixer>() { };
-            var actions = new List<string>() { };
-            var sounds = new List<string>() { };
+        private static int CountNodeDescendants(Node node)
+        {
+            var count = node.Children.Count;
 
-            var currentItem = 0;
-            var currentSound = 0;
+            foreach (var child in node.Children)
+                count += CountNodeDescendants(child);
 
-            // Add mixers to compilerData first so they can be individually referenced later
-            foreach (var item in input.Project)
+            return count;
+        }
+
+        private static void PrintNode(Node node, int depth)
+        {
+            if (node == null)
+                return;
+
+            var indentation = new string(' ', depth * 4);
+            Console.WriteLine($"{indentation}Key: {node.Key}");
+            Console.WriteLine($"{indentation}AudioNodeId: {node.AudioNodeId}");
+            Console.WriteLine($"{indentation}Children_uIdx: {node.Children_uIdx}");
+            Console.WriteLine($"{indentation}Children_uCount: {node.Children_uCount}");
+            Console.WriteLine($"{indentation}uWeight: {node.uWeight}");
+            Console.WriteLine($"{indentation}uProbability: {node.uProbability}");
+
+            foreach (var childNode in node.Children)
             {
-                var mixerId = $"{item.Event}_mixer";
-                var mixerParent = item.ActorMixer;
-                var isMixerAdded = false;
+                PrintNode(childNode, depth + 1);
+            }
+        }
 
-                foreach (var mixerItem in mixers)
-                {
-                    if (mixerItem.DirectParentId == mixerParent)
-                    {
-                        isMixerAdded = true;
-                        break;
-                    }
-                }
+        static void AddEventMixersToCompilerData(List<ActorMixer> mixers, CompilerInputProject input, CompilerData compilerData)
+        {
+            // Add mixers for normal events
+            foreach (var hircEvent in input.Events)
+            {
+                var eventId = hircEvent.Event;
+                var eventMixer = hircEvent.Mixer;
+                var mixerId = $"{GenerateRandomNumber()}_mixer_{GenerateRandomNumber()}";
+                var mixerParent = CompilerConstants.VanillaIds[eventMixer.ToLower()];
 
-                if (isMixerAdded == false)
+                if (!EventToMixers.ContainsKey(eventId))
                 {
+                    EventToMixers.Add(eventId, mixerId);
+
                     var mixer = new ActorMixer()
                     {
                         Name = mixerId,
@@ -141,123 +185,323 @@ namespace Audio.BnkCompiler
                     compilerData.ActorMixers.Add(mixer);
                 }
             }
+        }
 
-            // Add all other objects relating to individual mixers
-            foreach (var item in input.Project)
+        static void AddDialogueEventMixersToCompilerData(List<ActorMixer> mixers, CompilerInputProject input, CompilerData compilerData)
+        {
+            // Add mixers for dialogue events
+            foreach (var hircDialogueEvent in input.DialogueEvents)
             {
-                currentItem = currentItem + 1;
-                var eventId = item.Event;
-                var mixerId = $"{item.Event}_mixer";
-                var mixerParent = item.ActorMixer;
-                var defaultSound = new GameSound();
-                var currentMixer = new ActorMixer();
+                var eventId = hircDialogueEvent.DialogueEvent;
+                var mixerId = $"{GenerateRandomNumber()}_mixer_{GenerateRandomNumber()}";
+                var dialogueEventBnk = CompilerConstants.MatchDialogueEventToBnk(eventId);
+                var mixerParent = CompilerConstants.VanillaIds[dialogueEventBnk];
 
-                foreach (var mixerItem in mixers)
+                if (!EventToMixers.ContainsKey(eventId))
                 {
-                    if (mixerItem.DirectParentId == mixerParent)
+                    EventToMixers.Add(eventId, mixerId);
+
+                    var mixer = new ActorMixer()
                     {
-                        currentMixer = mixerItem;
-                        break;
-                    }
+                        Name = mixerId,
+                        DirectParentId = mixerParent,
+                        DialogueEvent = eventId
+                    };
+
+                    mixers.Add(mixer);
+                    compilerData.ActorMixers.Add(mixer);
                 }
+            }
+        }
 
-                var soundsCount = item.Sounds.Count();
+        static void AddSingleSoundEvents(CompilerData compilerData, ActorMixer currentMixer, CompilerInputProject.ProjectEvent hircEvent)
+        {
+            var eventId = hircEvent.Event;
+            var mixerId = currentMixer.Name;
 
-                if (item.SoundContainerType != null || (soundsCount > 1 && item.SoundContainerType == null))
+            foreach (var sound in hircEvent.Sounds)
+            {
+                var soundId = $"{eventId}_sound";
+                var actionId = $"{eventId}_action";
+
+                var defaultSound = new GameSound()
                 {
-                    if (item.SoundContainerType == "Random" || (soundsCount > 1 && item.SoundContainerType == null)) // if there's a random container
+                    Name = soundId,
+                    Path = sound,
+                    DirectParentId = mixerId
+                };
+
+                currentMixer.Children.Add(soundId);
+                compilerData.GameSounds.Add(defaultSound);
+
+                var defaultAction = new Action()
+                {
+                    Name = actionId,
+                    Type = "Play",
+                    ChildId = soundId
+                };
+
+                compilerData.Actions.Add(defaultAction);
+
+                var defaultEvent = new Event()
+                {
+                    Name = eventId,
+                    Actions = new List<string>() { actionId }
+                };
+
+                compilerData.Events.Add(defaultEvent);
+            }
+        }
+
+        static void AddMultipleSoundEvents(CompilerData compilerData, ActorMixer currentMixer, CompilerInputProject.ProjectEvent hircEvent)
+        {
+            var eventId = hircEvent.Event;
+            var mixerId = currentMixer.Name;
+            var containerId = $"{GenerateRandomNumber()}_random_container_{GenerateRandomNumber()}";
+
+            var soundsCount = hircEvent.Sounds.Count;
+            var currentSound = 0;
+
+            var sounds = new List<string>() { };
+
+            foreach (var sound in hircEvent.Sounds)
+            {
+                currentSound++;
+                var soundId = $"{eventId}_sound_{currentSound}";
+                var actionId = $"{eventId}_action_{currentSound}";
+
+                var defaultSound = new GameSound()
+                {
+                    Name = soundId,
+                    Path = sound,
+                    DirectParentId = containerId
+                };
+
+                compilerData.GameSounds.Add(defaultSound);
+                sounds.Add(soundId);
+
+                // once the final sound is reached add everything else
+                if (currentSound == soundsCount)
+                {
+                    var defaultAction = new Action()
                     {
-                        foreach (var sound in item.Sounds)
+                        Name = actionId,
+                        Type = "Play",
+                        ChildId = containerId
+                    };
+
+                    compilerData.Actions.Add(defaultAction);
+
+                    var defaultRandomContainer = new RandomContainer()
+                    {
+                        Name = containerId,
+                        Children = sounds,
+                        DirectParentId = mixerId
+                    };
+
+                    compilerData.RandomContainers.Add(defaultRandomContainer);
+                    currentMixer.Children.Add(containerId);
+
+                    var defaultEvent = new Event()
+                    {
+                        Name = eventId,
+                        Actions = new List<string>() { actionId }
+                    };
+
+                    compilerData.Events.Add(defaultEvent);
+                }
+            }
+        }
+
+        static void AddMultipleSoundDialogueEvents(CompilerData compilerData, Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch, CompilerInputProject.ProjectDialogueEvent hircDialogueEvent)
+        {
+            var mixerId = currentMixer.Name;
+            var containerId = $"{GenerateRandomNumber()}_random_container_{GenerateRandomNumber()}";
+            var hashedContainer = WWiseHash.Compute(containerId);
+
+            var soundsCount = branch.Sounds.Count;
+            var statePath = branch.StatePath;
+            var currentSoundIndex = 0;
+            var currentStateIndex = 0;
+
+            var sounds = new List<string>() { };
+
+            foreach (var sound in branch.Sounds)
+            {
+                currentSoundIndex++;
+                var soundId = $"{GenerateRandomNumber()}_sound_{GenerateRandomNumber()}";
+
+                var defaultSound = new GameSound()
+                {
+                    Name = soundId,
+                    Path = sound,
+                    DirectParentId = containerId,
+                    IsDialogueEventSound = true,
+                    DialogueEvent = currentMixer.DialogueEvent
+                };
+
+                compilerData.GameSounds.Add(defaultSound);
+                sounds.Add(soundId);
+
+                // once the final sound is reached add everything else
+                if (currentSoundIndex == soundsCount - 1)
+                {
+                    var defaultRandomContainer = new RandomContainer()
+                    {
+                        Name = containerId,
+                        Children = sounds,
+                        DirectParentId = mixerId
+                    };
+
+                    compilerData.RandomContainers.Add(defaultRandomContainer);
+                    currentMixer.Children.Add(containerId);
+
+                    var statePathArray = statePath.Split('.');
+                    var parentNode = rootNode;
+
+                    foreach (var state in statePathArray)
+                    {
+                        // record all states for adding to a dat file
+                        if (!compilerData.DatStates.Contains(state))
+                            compilerData.DatStates.Add(state);
+
+                        currentStateIndex++;
+                        var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WWiseHash.Compute(state);
+
+                        var parentExists = false;
+                        Node existingParentNode = null;
+
+                        if (currentStateIndex == 1)
                         {
-                            currentSound = currentSound + 1;
-                            var soundId = $"{eventId}_sound_{currentSound}";
-                            var actionId = $"{eventId}_action_{currentSound}";
-                            var containerId = $"{eventId}_random_container";
-
-                            defaultSound = new GameSound()
+                            // Check if the parent node already exists
+                            foreach (var childNode in parentNode.Children)
                             {
-                                Name = soundId,
-                                Path = sound,
-                                DirectParentID = containerId
-                            };
-
-                            compilerData.GameSounds.Add(defaultSound);
-                            sounds.Add(soundId);
-
-                            if (currentSound == soundsCount)
-                            {
-                                var defaultAction = new Action()
+                                if (childNode.Key == hashedState)
                                 {
-                                    Name = actionId,
-                                    Type = "Play",
-                                    ChildId = containerId
-                                };
-
-                                compilerData.Actions.Add(defaultAction);
-
-                                var defaultRandomContainer = new RandomContainer()
-                                {
-                                    Name = containerId,
-                                    Children = sounds
-                                };
-
-                                compilerData.RandomContainers.Add(defaultRandomContainer);
-                                currentMixer.Children.Add(containerId);
-
-                                var defaultEvent = new Event()
-                                {
-                                    Name = eventId,
-                                    Actions = new List<string>() { actionId }
-                                };
-
-                                compilerData.Events.Add(defaultEvent);
-                                sounds = new List<string>();
-                                currentSound = 0;
+                                    parentExists = true;
+                                    existingParentNode = childNode;
+                                    break;
+                                }
                             }
                         }
-                    }
-                }
-                else // if there's no container
-                {
-                    foreach (var sound in item.Sounds)
-                    {
-                        currentSound = currentSound + 1;
-                        var soundId = $"{eventId}_sound_{currentSound}";
-                        var actionId = $"{eventId}_action_{currentSound}";
 
-                        defaultSound = new GameSound()
+                        // If the parent node exists, update parentNode
+                        if (parentExists)
+                            parentNode = existingParentNode;
+
+                        else
                         {
-                            Name = soundId,
-                            Path = sound,
-                            DirectParentID = mixerId
-                        };
-
-                        currentMixer.Children.Add(soundId);
-                        compilerData.GameSounds.Add(defaultSound);
-
-                        var defaultAction = new Action()
-                        {
-                            Name = actionId,
-                            Type = "Play",
-                            ChildId = soundId
-                        };
-
-                        compilerData.Actions.Add(defaultAction);
-                        actions.Add(actionId);
-
-                        if (currentSound == soundsCount)
-                        {
-                            var defaultEvent = new Event()
+                            // Create a new parent node and add it to the current parentNode's children
+                            var newNode = new Node(new BinaryNode
                             {
-                                Name = eventId,
-                                Actions = actions
-                            };
+                                Key = hashedState,
+                                AudioNodeId = (currentStateIndex == statePathArray.Length) ? hashedContainer : 0,
+                                Children_uIdx = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
+                                Children_uCount = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
+                                uWeight = 50,
+                                uProbability = 100
+                            });
 
-                            compilerData.Events.Add(defaultEvent);
-                            actions = new List<string>();
-                            currentSound = 0;
+                            parentNode.Children.Add(newNode);
+                            parentNode = newNode;
                         }
                     }
+                }
+            }
+        }
+
+        static CompilerData ConvertInputToCompilerData(CompilerInputProject input, CompilerSettings settings)
+        {
+            var compilerData = new CompilerData();
+            compilerData.ProjectSettings.Version = 1;
+            compilerData.ProjectSettings.BnkName = input.Settings.BnkName;
+            compilerData.ProjectSettings.Language = input.Settings.Language;
+
+            var mixers = new List<ActorMixer>() { };
+            EventToMixers = new Dictionary<string, string>();
+
+            if (input.Events != null)
+            {
+                // Add mixers to compilerData first so they can be individually referenced later
+                AddEventMixersToCompilerData(mixers, input, compilerData);
+
+                // Add events and their associated actions, containers, and sounds
+                foreach (var hircEvent in input.Events)
+                {
+                    var eventId = hircEvent.Event;
+                    var mixerId = EventToMixers[eventId];
+                    var soundsCount = hircEvent.Sounds.Count;
+                    var currentMixer = new ActorMixer();
+
+                    foreach (var mixerItem in mixers)
+                        if (mixerItem.Name == mixerId)
+                        {
+                            currentMixer = mixerItem;
+                            break;
+                        }
+
+                    if (soundsCount == 1)
+                        AddSingleSoundEvents(compilerData, currentMixer, hircEvent);
+
+                    else if (soundsCount > 1)
+                        AddMultipleSoundEvents(compilerData, currentMixer, hircEvent);
+                }
+            }
+
+            if (input.DialogueEvents != null)
+            {
+                // Add mixers to compilerData first so they can be individually referenced later
+                AddDialogueEventMixersToCompilerData(mixers, input, compilerData);
+
+                // Add dialogue_events and their associated nodes, containers, and sounds
+                foreach (var hircDialogueEvent in input.DialogueEvents)
+                {
+                    var eventId = hircDialogueEvent.DialogueEvent;
+                    var mixerId = EventToMixers[eventId];
+                    var currentMixer = new ActorMixer();
+                    var dialogueEvent = new DialogueEvent();
+
+                    var rootNode = new Node(new BinaryNode
+                    {
+                        Key = 0, // If value is 0 it will be read and written as 0 as some keys can equal 0.
+                        AudioNodeId = 0, // Set to 0 if no value, otherwise value will be set by the script.
+                        Children_uIdx = 1, // Set to 0 if no value, set to 1 if value.
+                        Children_uCount = 1, // Set to 0 if no value, set to 1 if value.
+                        uWeight = 50, // Always 50
+                        uProbability = 100 // Always 100
+                    });
+
+                    dialogueEvent.Name = hircDialogueEvent.DialogueEvent;
+                    dialogueEvent.RootNode = rootNode;
+
+                    foreach (var mixerItem in mixers)
+                        if (mixerItem.Name == mixerId)
+                        {
+                            currentMixer = mixerItem;
+                            break;
+                        }
+
+                    foreach (var branch in hircDialogueEvent.DecisionTree)
+                    {
+                        var soundsCount = branch.Sounds.Count;
+
+                        if (soundsCount == 1)
+                        {
+                            throw new NotImplementedException();
+                        }
+
+                        else if (soundsCount > 1)
+                        {
+                            AddMultipleSoundDialogueEvents(compilerData, rootNode, currentMixer, branch, hircDialogueEvent);
+                        }
+                    }
+
+                    //Console.WriteLine($"======================= PRINTING CUSTOM DECISION TREE GRAPH PRE PROCESSING =======================");
+                    //PrintNode(rootNode, 0);
+
+                    var rootNodeDescendants = CountNodeDescendants(rootNode);
+                    dialogueEvent.NodesCount = (uint)(rootNodeDescendants + 1);
+                    compilerData.DialogueEvents.Add(dialogueEvent);
                 }
             }
 

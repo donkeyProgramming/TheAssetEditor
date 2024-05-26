@@ -10,6 +10,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
         public Children Children { get; set; }
         public List<CAkLayer> LayerList { get; set; } = new List<CAkLayer>();
         public byte bIsContinuousValidation { get; set; }
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
 
 
 
@@ -29,7 +30,6 @@ namespace Audio.FileFormats.WWise.Hirc.V112
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
 
         public List<uint> GetChildren() => Children.ChildIdList;
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
     }
 
     public class CAkLayer

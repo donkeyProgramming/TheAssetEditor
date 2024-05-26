@@ -50,7 +50,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 AkPlaylist.Add(AkPlaylistItem.Create(chunk));
         }
 
-        public override uint GetParentId() => NodeBaseParams.DirectParentID;
+        public override uint GetParentId() => NodeBaseParams.DirectParentId;
         public override List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
 
         public override void UpdateSize()
@@ -90,7 +90,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 memStream.Write(ByteParsers.UInt32.EncodeValue(akPlaylistItem.PlayId, out _));
                 memStream.Write(ByteParsers.UInt32.EncodeValue(Convert.ToUInt32(akPlaylistItem.Weight), out _));
             }
-            
+
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity

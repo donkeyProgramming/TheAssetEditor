@@ -4,6 +4,7 @@ using System.IO;
 
 namespace Audio.BnkCompiler.Validation
 {
+    /*
     public class CompilerInputProjectValidation : AbstractValidator<CompilerInputProject>
     {
         public CompilerInputProjectValidation()
@@ -33,4 +34,5 @@ namespace Audio.BnkCompiler.Validation
 
         }
     }
+    */
 }

@@ -247,13 +247,13 @@ namespace AudioResearch
                     return cakEvent;
 
                 if (instance is CAkRanSeqCntr_v136 cakRand)
-                    return FindRootParent(cakRand.NodeBaseParams.DirectParentID, audioRepository);
+                    return FindRootParent(cakRand.NodeBaseParams.DirectParentId, audioRepository);
                 if (instance is CAkLayerCntr_v136 cakLayer)
-                    return FindRootParent(cakLayer.NodeBaseParams.DirectParentID, audioRepository);
+                    return FindRootParent(cakLayer.NodeBaseParams.DirectParentId, audioRepository);
                 if (instance is CAkSwitchCntr_v136 cakSwitch)
-                    return FindRootParent(cakSwitch.NodeBaseParams.DirectParentID, audioRepository);
+                    return FindRootParent(cakSwitch.NodeBaseParams.DirectParentId, audioRepository);
                 if (instance is CAkActorMixer_v136 cakMixer)
-                    return null;//FindRootParent(cakMixer.NodeBaseParams.DirectParentID, audioRepository);
+                    return null;//FindRootParent(cakMixer.NodeBaseParams.DirectParentId, audioRepository);
 
                 throw new Exception("Not expected!");
                 //return FindRootParent(parentID, audioRepository);   

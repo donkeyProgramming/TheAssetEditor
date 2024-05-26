@@ -26,14 +26,16 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             var wwiseRandomContainer = new CAkRanSeqCntr_v136();
             wwiseRandomContainer.Id = project.GetHircItemIdFromName(inputContainer.Name);
             wwiseRandomContainer.Type = HircType.SequenceContainer;
-            wwiseRandomContainer.NodeBaseParams = NodeBaseParams.CreateDefault();
+            wwiseRandomContainer.NodeBaseParams = NodeBaseParams.CreateDefaultRandomContainer();
+            wwiseRandomContainer.byBitVector = 0x12;
+            wwiseRandomContainer.fTransitionTime = 1000;
 
             var mixer = project.GetActionMixerForObject(inputContainer.Name);
             if (mixer != null)
-                wwiseRandomContainer.NodeBaseParams.DirectParentID = project.GetHircItemIdFromName(mixer.Name);
+                wwiseRandomContainer.NodeBaseParams.DirectParentId = project.GetHircItemIdFromName(inputContainer.DirectParentId);
 
             wwiseRandomContainer.sLoopCount = 1;
-            wwiseRandomContainer.wAvoidRepeatCount = 1;
+            wwiseRandomContainer.wAvoidRepeatCount = 2;
 
             var allChildIds = inputContainer.Children
             .Select(x => project.GetHircItemIdFromName(x))

@@ -7,6 +7,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
+
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
@@ -34,7 +36,6 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         }
 
         public List<uint> GetChildren() => Children.ChildIdList;
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
     }
 }
 

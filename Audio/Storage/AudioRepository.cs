@@ -17,6 +17,7 @@ namespace Audio.Storage
         List<HircItem> GetHircObject(uint id, string owningFileName);
         string GetNameFromHash(uint value);
         string GetNameFromHash(uint value, out bool found);
+        string GetNameFromHash(uint? key);
     }
 
     public class AudioRepository : IAudioRepository
@@ -82,7 +83,13 @@ namespace Audio.Storage
             File.WriteAllText(path, ss.ToString());
         }
 
-
+        public string GetNameFromHash(uint? key)
+        {
+            if (key.HasValue)
+                return GetNameFromHash(key.Value);
+            else
+                throw new System.NotImplementedException();
+        }
     }
 
 }
