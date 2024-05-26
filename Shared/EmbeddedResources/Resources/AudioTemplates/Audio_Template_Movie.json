@@ -1,0 +1,39 @@
+/* 
+  ================= README =================
+  This is a template audio project for custom movie audio.
+
+  Example Events:
+  - Play_Movie_warhammer3_prologue_pro_int
+  - Play_Movie_EventPics_hef_politics
+
+  Below is an explanation of the fields used in this project's configuration:
+  - BnkName: This is the name of the bnk. The bnk name in this tempalte should start with the name of the vanilla bnk "global_movies__", the rest of the bnk name can be custom.
+  - Language: This is the language folder that you want the project to output to.
+  - EventName: This is the name of the event. Event names in this template should start with "Play_Movie_" followed by the path of the .ca_vp8 movie file in the pack (excluding the movies folder) e.g. warhammer3/emp/your_movie.ca_vp8.
+  - Mixer: The mixer determines how the sound will be played in game. In this template the mixer should be "Movie".
+  - Sounds: Define the path to your sound files here. If multiple sound files are specified a random sound is played each time the event is triggered.
+*/
+
+{
+  "Settings": {
+    "BnkName": "global_movies__template",
+    "Language": "english(uk)"
+  },
+
+  "Project": [
+    {
+      "Events": [
+        {
+          "EventName": "Play_Movie_warhammer3_emp_template_event_1",
+          "Mixer": "Movie",
+          "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
+        },
+        {
+          "EventName": "Play_Movie_warhammer3_emp_template_event_2",
+          "Mixer": "Movie",
+          "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
+        }
+      ]
+    }
+  ]
+}

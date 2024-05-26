@@ -313,7 +313,7 @@ namespace Audio.BnkCompiler
             }
         }
 
-        static void AddMultipleSoundDialogueEvents(CompilerData compilerData, Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch, CompilerInputProject.ProjectDialogueEvent hircDialogueEvent)
+        static void AddMultipleSoundDialogueEvents(CompilerData compilerData, Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
         {
             var mixerId = currentMixer.Name;
             var containerId = $"{GenerateRandomNumber()}_random_container_{GenerateRandomNumber()}";
@@ -492,7 +492,7 @@ namespace Audio.BnkCompiler
 
                         else if (soundsCount > 1)
                         {
-                            AddMultipleSoundDialogueEvents(compilerData, rootNode, currentMixer, branch, hircDialogueEvent);
+                            AddMultipleSoundDialogueEvents(compilerData, rootNode, currentMixer, branch);
                         }
                     }
 

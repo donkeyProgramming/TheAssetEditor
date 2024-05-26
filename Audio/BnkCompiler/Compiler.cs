@@ -32,10 +32,12 @@ namespace Audio.BnkCompiler
         public static readonly Dictionary<string, uint> VanillaIds = new Dictionary<string, uint>()
         {
             // Ids for Event mixers
-            {"advisor", 517250292},
+            {"campaign advisor", 517250292},
+            {"event narration", 517250292},
             {"battle individual vocalisation", 508226369},
             {"diplomacy line", 54848735},
-            {"ind magic", 140075115},
+            {"magic", 140075115},
+            {"ability", 140075115},
             {"movie", 573597124},
             {"quest battle", 659413513},
             {"ui", 608071769},

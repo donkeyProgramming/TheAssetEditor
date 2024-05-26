@@ -1,0 +1,42 @@
+// Example Event: IND_Magic_Imrik_Dragon_Horn_Blow
+
+/* 
+  ================= README =================
+  This is a template audio project for custom ability audio. Vanilla uses several different names for ability audio: Battle_Individual_Ability, Battle_IND_Ability, IND_Ability, but they all work the same.
+  For standardisation all templates for these type of sounds follow the "Battle_Individual" convention.
+
+  Example Events:
+  - Battle_Individual_Ability_Storm_Dragon_Human_To_Dragon_Pre_Life
+  - Battle_IND_Ability_Mislead_Summon
+
+  Below is an explanation of the fields used in this project's configuration:
+  - BnkName: This is the name of the bnk. The bnk name in this tempalte should start with the name of the vanilla bnk "battle_individual_magic__", the rest of the bnk name can be custom.
+  - Language: This is the language folder that you want the project to output to.
+  - EventName: This is the name of the event. Event names in this template should start with "Battle_Individual_Ability_", the rest of the event name can be custom.
+  - Mixer: The mixer determines how the sound will be played in game. In this template the mixer should be "Ability".
+  - Sounds: Define the path to your sound files here. If multiple sound files are specified a random sound is played each time the event is triggered.
+*/
+
+{
+  "Settings": {
+    "BnkName": "battle_individual_magic__template",
+    "Language": "english(uk)"
+  },
+
+  "Project": [
+    {
+      "Events": [
+        {
+          "EventName": "Battle_Individual_Ability_Template_Event_1",
+          "Mixer": "Ability",
+          "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
+        },
+        {
+          "EventName": "Battle_Individual_Ability_Template_Event_2",
+          "Mixer": "Ability",
+          "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
+        }
+      ]
+    }
+  ]
+}
