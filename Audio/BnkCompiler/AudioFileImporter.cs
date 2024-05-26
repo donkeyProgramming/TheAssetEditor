@@ -34,7 +34,7 @@ namespace Audio.BnkCompiler
             }
 
             var wavToWem = new WWiseWavToWem();
-            wavToWem.InitialiseWwiseProject();
+            InitialiseWwiseProject();
             wavToWem.WavToWem(wavFiles, wavFilePaths);
 
             foreach (var gameSound in compilerData.GameSounds)
@@ -69,7 +69,7 @@ namespace Audio.BnkCompiler
             return Result<bool>.FromOk(true);
         }
 
-        string GetExpectedFolder(CompilerData compilerData)
+        static string GetExpectedFolder(CompilerData compilerData)
         {
             var basePath = "audio\\wwise";
             if (string.IsNullOrEmpty(compilerData.ProjectSettings.Language) == false)

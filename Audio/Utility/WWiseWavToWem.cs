@@ -13,7 +13,6 @@ namespace Audio.Utility
 {
     public class WWiseWavToWem
     {
-        //void EnsureCreated() => GetCliPath();
         ApplicationSettingsService _settingsService;
 
         public WWiseWavToWem()
@@ -21,10 +20,52 @@ namespace Audio.Utility
             _settingsService = new ApplicationSettingsService();
         }
 
-        public void CreateWsources(List<string> wavFiles, string audioFolderPath)
+        public void WavToWem(List<string> wavFiles, List<string> wavFilePaths)
         {
+            var wwiseCliPath = _settingsService.CurrentSettings.WwisePath; // Define the root path to Wwise and the specific WwiseCLI executable
 
-            var wsourcesPath = $"{DirectoryHelper.Temp}\\wav_to_wem.wsources";
+            var tempFolderPath = $"{DirectoryHelper.Temp}";
+            var wavToWemFolderPath = $"{tempFolderPath}\\WavToWem";
+            var audioFolderPath = $"{tempFolderPath}\\Audio";
+            var wprojPath = $"{wavToWemFolderPath}\\WavToWemWwiseProject\\WavToWemWwiseProject.wproj";
+            var wsourcesPath = $"{wavToWemFolderPath}\\wav_to_wem.wsources";
+
+            DirectoryHelper.EnsureCreated(wavToWemFolderPath);
+
+            CopyWavs(wavFilePaths);
+            CreateWsources(wavFiles, audioFolderPath);
+
+            var arguments = $"{wprojPath} -ConvertExternalSources {wsourcesPath} -ExternalSourcesOutput {audioFolderPath}"; 
+
+            RunExternalCommand(wwiseCliPath, arguments);
+            DeleteExcessStuff(audioFolderPath);
+        }
+
+        public static void CopyWavs(List<string> wavFilePaths)
+        {
+            foreach (var wavFilePath in wavFilePaths)
+            {
+                var originalWavPath = wavFilePath;
+                var wavFile = Path.GetFileName(wavFilePath);
+                var tempWavPath = $"{DirectoryHelper.Temp}\\Audio\\{wavFile}";
+                try
+                {
+                    File.Copy(originalWavPath, tempWavPath, true); // The 'true' parameter allows overwriting if the file already exists
+                    Console.WriteLine($"Copied {wavFile} from {originalWavPath} to {tempWavPath}");
+                }
+                catch (IOException iox)
+                {
+                    Console.WriteLine($"Error occurred when coppying file: {iox.Message}");
+                }
+            }
+        }
+
+        public static void CreateWsources(List<string> wavFiles, string audioFolderPath)
+        {
+            var tempFolderPath = $"{DirectoryHelper.Temp}";
+            var wavToWemFolderPath = $"{tempFolderPath}\\WavToWem";
+            var wsourcesPath = $"{wavToWemFolderPath}\\wav_to_wem.wsources";
+
             var sources = from wavFile in wavFiles
                           select new XElement("Source",
                               new XAttribute("Path", Path.GetFileName(wavFile)),
@@ -42,54 +83,11 @@ namespace Audio.Utility
             Console.WriteLine($"Saved list.wsources to {wsourcesPath}");
         }
 
-        public void CopyWavs(List<string> wavFilePaths)
-        {
-            foreach (var wavFilePath in wavFilePaths)
-            {
-                var originalWavPath = wavFilePath;
-                var wavFile = Path.GetFileName(wavFilePath);
-                var tempWavPath = $"{DirectoryHelper.Temp}\\Audio\\{wavFile}";
-                try
-                {
-                    // Copy the file
-                    File.Copy(originalWavPath, tempWavPath, true); // The 'true' parameter allows overwriting if the file already exists
-                    Console.WriteLine($"Copied {wavFile} from {originalWavPath} to {tempWavPath}");
-                }
-                catch (IOException iox)
-                {
-                    Console.WriteLine($"Error occurred when coppying file: {iox.Message}");
-                }
-            }
-        }
-
-        public void WavToWem(List<string> wavFiles, List<string> wavFilePaths)
-        {
-
-            // Define the root path to Wwise and the specific WwiseCLI executable
-            var wwiseCliPath = _settingsService.CurrentSettings.WwisePath;
-
-            // Path to the parent directory of the current directory
-            var tempFolderPath = $"{DirectoryHelper.Temp}";
-            var audioFolderPath = $"{tempFolderPath}\\Audio";
-            var wprojPath = $"{tempFolderPath}\\WavToWemWwiseProject\\WavToWemWwiseProject.wproj";
-            var wsourcesPath = $"{tempFolderPath}\\wav_to_wem.wsources";
-
-            CopyWavs(wavFilePaths);
-            CreateWsources(wavFiles, audioFolderPath);
-
-            // Construct the command arguments for WwiseCLI
-            var arguments = $"{wprojPath} -ConvertExternalSources {wsourcesPath} -ExternalSourcesOutput {audioFolderPath}";
-                
-            // Run WwiseCLI.exe with the specified arguments
-            RunExternalCommand(wwiseCliPath, arguments);
-            DeleteExcessStuff(audioFolderPath);
-        }
-
-        void RunExternalCommand(string filePath, string arguments)
+        static void RunExternalCommand(string filePath, string arguments)
         {
             try
             {
-                ProcessStartInfo startInfo = new ProcessStartInfo()
+                var startInfo = new ProcessStartInfo()
                 {
                     FileName = filePath,
                     Arguments = arguments,
@@ -99,19 +97,16 @@ namespace Audio.Utility
                     RedirectStandardError = true
                 };
 
-                using (Process process = Process.Start(startInfo))
+                using var process = Process.Start(startInfo);
+                process.WaitForExit();
+
+                var output = process.StandardOutput.ReadToEnd();
+                var error = process.StandardError.ReadToEnd();
+
+                Console.WriteLine(output);
+                if (!string.IsNullOrEmpty(error))
                 {
-                    process.WaitForExit();
-
-                    // Optionally, capture and display/log the output
-                    var output = process.StandardOutput.ReadToEnd();
-                    var error = process.StandardError.ReadToEnd();
-
-                    Console.WriteLine(output);
-                    if (!string.IsNullOrEmpty(error))
-                    {
-                        Console.Error.WriteLine(error);
-                    }
+                    Console.Error.WriteLine(error);
                 }
             }
             catch (Exception ex)
@@ -120,47 +115,36 @@ namespace Audio.Utility
             }
         }
 
-        public void DeleteExcessStuff(string audioFolderPath)
+        public static void DeleteExcessStuff(string audioFolderPath)
         {
             var excessFolderPath = $"{audioFolderPath}\\Windows";
 
-            // Ensure the source directory exists
             if (Directory.Exists(excessFolderPath))
             {
-                // Get all .wem files in the source directory
-                string[] wemFiles = Directory.GetFiles(excessFolderPath, "*.wem");
+                var wemFiles = Directory.GetFiles(excessFolderPath, "*.wem");
 
-                foreach (string file in wemFiles)
+                foreach (var file in wemFiles)
                 {
-                    // Get the filename
-                    string fileName = Path.GetFileName(file);
-                    // Define the destination path for the file
-                    string destFile = Path.Combine(audioFolderPath, fileName);
+                    var fileName = Path.GetFileName(file);
+                    var fileDestination = Path.Combine(audioFolderPath, fileName);
 
-                    // Check if the file already exists at the destination
-                    if (!File.Exists(destFile))
+                    if (!File.Exists(fileDestination))
                     {
-                        // Move the file
-                        File.Move(file, destFile);
-                        Console.WriteLine($"Moved {file} to {destFile}");
+                        File.Move(file, fileDestination);
+                        Console.WriteLine($"Moved {file} to {fileDestination}");
                     }
                     else
-                    {
                         Console.WriteLine($"File {fileName} already exists at the destination. Skipping move.");
-                    }
                 }
 
-                // Get all remaining files in the source directory
-                string[] remainingFiles = Directory.GetFiles(excessFolderPath);
+                var remainingFiles = Directory.GetFiles(excessFolderPath);
 
-                foreach (string file in remainingFiles)
+                foreach (var file in remainingFiles)
                 {
-                    // Delete the file
                     File.Delete(file);
                     Console.WriteLine($"Deleted {file}");
                 }
 
-                // Attempt to delete the source directory
                 try
                 {
                     Directory.Delete(excessFolderPath, true); // The true parameter allows for recursive deletion
@@ -177,26 +161,23 @@ namespace Audio.Utility
             }
         }
 
-        public void InitialiseWwiseProject()
+        public static void InitialiseWwiseProject()
         {
             var assembly = Assembly.GetExecutingAssembly();
             var resourceRootNamespace = "Audio.Resources";
             var tempFolderPath = $"{DirectoryHelper.Temp}";
-            var wavToWemWwiseProjectPath = $"{tempFolderPath}\\wavToWemWwiseProjectPath";
+            var wavToWemFolderPath = $"{tempFolderPath}\\WavToWem";
+            var wavToWemWwiseProjectPath = $"{wavToWemFolderPath}\\WavToWemWwiseProjectPath";
 
-            // Check if the wavToWemWwiseProjectPath folder exists
             if (Directory.Exists(wavToWemWwiseProjectPath))
                 return;
 
             else
             {
-                // Construct the full namespace for the embedded resource
                 var resourceFolderPath = $"{resourceRootNamespace}.WavToWemWwiseProject.WavToWemWwiseProject.zip";
 
-                // Use a temporary file path to save the embedded zip before extracting
                 var tempZipPath = Path.Combine(Path.GetTempPath(), "WavToWemWwiseProject.zip");
 
-                // Extract the embedded resource and write it to the temporary file
                 using (var resourceStream = assembly.GetManifestResourceStream(resourceFolderPath))
                 {
                     if (resourceStream == null)
@@ -206,10 +187,8 @@ namespace Audio.Utility
                     resourceStream.CopyTo(fileStream);
                 }
 
-                // Extract the zip file to the specified path
-                ZipFile.ExtractToDirectory(tempZipPath, tempFolderPath, overwriteFiles: true);
+                ZipFile.ExtractToDirectory(tempZipPath, wavToWemFolderPath, overwriteFiles: true);
 
-                // Optionally, delete the temporary zip file after extraction
                 File.Delete(tempZipPath);
             }
         }
