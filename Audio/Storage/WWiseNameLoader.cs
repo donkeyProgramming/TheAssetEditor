@@ -1,9 +1,11 @@
 ﻿using Audio.FileFormats.Dat;
 using Audio.FileFormats.WWise;
 using Audio.Utility;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
+using SharpDX.MediaFoundation.DirectX;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -97,24 +99,24 @@ namespace Audio.Storage
             return _nameLookUp;
         }
 
-
         SoundDatFile LoadDatFiles(PackFileService pfs, out List<string> failedFiles)
         {
+            var datDumpsFolderName = $"{DirectoryHelper.Temp}\\DatDumps";
+            DirectoryHelper.EnsureCreated(datDumpsFolderName);
+
             var datFiles = pfs.FindAllWithExtention(".dat");
             datFiles = PackFileUtil.FilterUnvantedFiles(pfs, datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat" }, out var removedFiles);
-
 
             var failedDatParsing = new List<(string, string)>();
             var masterDat = new SoundDatFile();
 
             foreach (var datFile in datFiles)
             {
-                // Commented out what would output dat dumps of dat files.
-                var outputDat = $"C:\\Users\\george\\AssetEditor\\Temp\\dat_dump_{datFile}.txt";
+                var datDump = $"{datDumpsFolderName}\\dat_dump_{datFile}.txt";
                 try
                 {
                     var parsedFile = LoadDatFile(datFile);
-                    parsedFile.DumpToFile(outputDat);
+                    //parsedFile.DumpToFile(datDump); // This creates dat dumps for individual dat files
                     masterDat.Merge(parsedFile);
                 }
                 catch (Exception e)
@@ -125,6 +127,9 @@ namespace Audio.Storage
             }
 
             failedFiles = failedDatParsing.Select(x => x.Item1).ToList();
+
+            var masterDatDump = $"{datDumpsFolderName}\\dat_dump_master.txt";
+            masterDat.DumpToFile(masterDatDump);
             return masterDat;
         }
 

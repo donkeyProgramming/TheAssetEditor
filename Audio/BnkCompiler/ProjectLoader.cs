@@ -1,28 +1,23 @@
 ﻿using Audio.BnkCompiler.Validation;
-using Microsoft.Xna.Framework.Media;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using Audio.Utility;
-using static Audio.FileFormats.WWise.Hirc.Shared.AkDecisionTree;
 using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Audio.FileFormats.WWise.Hirc.Shared;
 
 namespace Audio.BnkCompiler
 {
     public class ProjectLoader
     {
         private readonly PackFileService _pfs;
-        private static Dictionary<string, string> EventToMixers;
-        private static readonly IVanillaWwiseIds _vanillaWwiseIds;
+        private static readonly IVanillaObjectIds _VanillaObjectIds = new VanillaObjectIds();
+        private static Dictionary<string, string> EventToMixers = new Dictionary<string, string>();
 
         public ProjectLoader(PackFileService pfs)
         {
@@ -132,7 +127,7 @@ namespace Audio.BnkCompiler
             return rand.Next(min, max + 1);
         }
 
-        private static int CountNodeDescendants(Node node)
+        private static int CountNodeDescendants(AkDecisionTree.Node node)
         {
             var count = node.Children.Count;
 
@@ -142,7 +137,7 @@ namespace Audio.BnkCompiler
             return count;
         }
 
-        private static void PrintNode(Node node, int depth)
+        private static void PrintNode(AkDecisionTree.Node node, int depth)
         {
             if (node == null)
                 return;
@@ -169,7 +164,7 @@ namespace Audio.BnkCompiler
                 var eventId = hircEvent.Event;
                 var eventMixer = hircEvent.Mixer;
                 var mixerId = $"{GenerateRandomNumber()}_mixer_{GenerateRandomNumber()}";
-                var mixerParent = _vanillaWwiseIds.EventMixerIds[eventMixer.ToLower()];
+                var mixerParent = _VanillaObjectIds.EventMixerIds[eventMixer.ToLower()];
 
                 if (!EventToMixers.ContainsKey(eventId))
                 {
@@ -195,7 +190,7 @@ namespace Audio.BnkCompiler
                 var eventId = hircDialogueEvent.DialogueEvent;
                 var mixerId = $"{GenerateRandomNumber()}_mixer_{GenerateRandomNumber()}";
                 var dialogueEventBnk = CompilerConstants.MatchDialogueEventToBnk(eventId);
-                var mixerParent = _vanillaWwiseIds.DialogueEventMixerIds[dialogueEventBnk];
+                var mixerParent = _VanillaObjectIds.DialogueEventMixerIds[dialogueEventBnk];
 
                 if (!EventToMixers.ContainsKey(eventId))
                 {
@@ -313,7 +308,7 @@ namespace Audio.BnkCompiler
             }
         }
 
-        static void AddMultipleSoundDialogueEvents(CompilerData compilerData, Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
+        static void AddMultipleSoundDialogueEvents(CompilerData compilerData, AkDecisionTree.Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
         {
             var mixerId = currentMixer.Name;
             var containerId = $"{GenerateRandomNumber()}_random_container_{GenerateRandomNumber()}";
@@ -369,7 +364,7 @@ namespace Audio.BnkCompiler
                         var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WWiseHash.Compute(state);
 
                         var parentExists = false;
-                        Node existingParentNode = null;
+                        AkDecisionTree.Node existingParentNode = null;
 
                         if (currentStateIndex == 1)
                         {
@@ -392,7 +387,7 @@ namespace Audio.BnkCompiler
                         else
                         {
                             // Create a new parent node and add it to the current parentNode's children
-                            var newNode = new Node(new BinaryNode
+                            var newNode = new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
                             {
                                 Key = hashedState,
                                 AudioNodeId = (currentStateIndex == statePathArray.Length) ? hashedContainer : 0,
@@ -418,7 +413,6 @@ namespace Audio.BnkCompiler
             compilerData.ProjectSettings.Language = input.Settings.Language;
 
             var mixers = new List<ActorMixer>() { };
-            EventToMixers = new Dictionary<string, string>();
 
             if (input.Events != null)
             {
@@ -461,7 +455,7 @@ namespace Audio.BnkCompiler
                     var currentMixer = new ActorMixer();
                     var dialogueEvent = new DialogueEvent();
 
-                    var rootNode = new Node(new BinaryNode
+                    var rootNode = new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
                     {
                         Key = 0, // If value is 0 it will be read and written as 0 as some keys can equal 0.
                         AudioNodeId = 0, // Set to 0 if no value, otherwise value will be set by the script.

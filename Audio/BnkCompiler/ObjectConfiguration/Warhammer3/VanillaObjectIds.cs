@@ -2,7 +2,7 @@
 
 namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 {
-    public interface IVanillaWwiseIds
+    public interface IVanillaObjectIds
     {
         Dictionary<string, uint> EventMixerIds { get; }
         Dictionary<string, uint> DialogueEventMixerIds { get; }
@@ -10,7 +10,7 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 
     }
 
-    public class VanillaWwiseIds : IVanillaWwiseIds
+    public class VanillaObjectIds : IVanillaObjectIds
     {
         public Dictionary<string, uint> EventMixerIds { get; } = new Dictionary<string, uint>()
         {
@@ -23,7 +23,6 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
             {"movie", 573597124},
             {"quest battle", 659413513},
             {"ui", 608071769},
-            {"event narration", 517250292},
         };
 
         public Dictionary<string, uint> DialogueEventMixerIds { get; } = new Dictionary<string, uint>()

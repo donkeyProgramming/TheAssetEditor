@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Audio.FileFormats.WWise.Hirc.Shared;
 using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Audio.Storage;
 
 namespace Audio.BnkCompiler
 {
@@ -270,15 +271,20 @@ namespace Audio.BnkCompiler
     {
         private readonly HircBuilder _hircBuilder;
         private readonly BnkHeaderBuilder _headerBuilder;
+        private readonly RepositoryProvider _provider;
 
-        public Compiler(HircBuilder hircBuilder, BnkHeaderBuilder headerBuilder)
+        public Compiler(HircBuilder hircBuilder, BnkHeaderBuilder headerBuilder, RepositoryProvider provider)
         {
             _hircBuilder = hircBuilder;
             _headerBuilder = headerBuilder;
+            _provider = provider;
         }
 
         public Result<CompileResult> CompileProject(CompilerData audioProject)
         {
+            // Load audio repository to access dat dump.
+            var audioRepository = new AudioRepository(_provider, false);
+
             // Build the wwise object graph 
             var header = _headerBuilder.Generate(audioProject);
             var hircChunk = _hircBuilder.Generate(audioProject);
@@ -302,7 +308,6 @@ namespace Audio.BnkCompiler
 
             return Result<CompileResult>.FromOk(compileResult);
         }
-
 
         PackFile ConvertToPackFile(BkhdHeader header, HircChunk hircChunk, string outputFile)
         {

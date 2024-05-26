@@ -13,7 +13,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
     public class SoundGenerator : IWWiseHircGenerator
     {
         public string GameName => CompilerConstants.Game_Warhammer3;
-        private static readonly IVanillaWwiseIds _vanillaWwiseIds;
+        private static readonly IVanillaObjectIds _VanillaObjectIds = new VanillaObjectIds();
         public Type AudioProjectType => typeof(GameSound);
 
         private readonly PackFileService _pfs;
@@ -63,9 +63,9 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 var dialogueEventBnk = CompilerConstants.MatchDialogueEventToBnk(inputSound.DialogueEvent);
                 var attenuationKey = $"{dialogueEventBnk}_attenuation";
 
-                if (_vanillaWwiseIds.AttenuationIds.ContainsKey(attenuationKey))
+                if (_VanillaObjectIds.AttenuationIds.ContainsKey(attenuationKey))
                 {
-                    var attenuationId = _vanillaWwiseIds.AttenuationIds[attenuationKey];
+                    var attenuationId = _VanillaObjectIds.AttenuationIds[attenuationKey];
 
                     wwiseSound.NodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle()
                     {

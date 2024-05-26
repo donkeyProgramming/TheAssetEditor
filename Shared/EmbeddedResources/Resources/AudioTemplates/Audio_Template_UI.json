@@ -21,20 +21,16 @@
     "Language": "english(uk)"
   },
 
-  "Project": [
+  "Events": [
     {
-      "Events": [
-        {
-          "EventName": "UI_CAM_Template_Event_1",
-          "Mixer": "UI",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
-        },
-        {
-          "EventName": "UI_BAT_Template_Event_1",
-          "Mixer": "UI",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
-        }
-      ]
+      "EventName": "UI_CAM_Template_Event_1",
+      "Mixer": "UI",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
+    },
+    {
+      "EventName": "UI_BAT_Template_Event_1",
+      "Mixer": "UI",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
     }
   ]
 }

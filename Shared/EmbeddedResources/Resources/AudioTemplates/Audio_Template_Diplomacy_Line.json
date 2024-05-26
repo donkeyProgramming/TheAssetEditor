@@ -20,21 +20,16 @@
     "Language": "english(uk)"
   },
 
-  "Project": [
+  "Events": [
     {
-      "Events": [
-        {
-          "EventName": "Play_diplomacy_positive_template_event_1",
-          "Mixer": "Diplomacy Line",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
-        },
-        {
-          "EventName": "Play_diplomacy_negative_template_event_1",
-          "Mixer": "Diplomacy Line",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
-        }
-      ]
+      "EventName": "Play_diplomacy_positive_template_event_1",
+      "Mixer": "Diplomacy Line",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
+    },
+    {
+      "EventName": "Play_diplomacy_negative_template_event_1",
+      "Mixer": "Diplomacy Line",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
     }
   ]
 }
-  

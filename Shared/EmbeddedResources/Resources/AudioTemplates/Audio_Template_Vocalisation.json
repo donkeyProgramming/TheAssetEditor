@@ -24,20 +24,16 @@
     "Language": "english(uk)"
   },
 
-  "Project": [
+  "Events": [
     {
-      "Events": [
-        {
-          "EventName": "Battle_Individual_Vocalisation_template_event_1",
-          "Mixer": "Battle Individual Vocalisation",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
-        },
-        {
-          "EventName": "Battle_Individual_Vocalisation_template_event_2",
-          "Mixer": "Battle Individual Vocalisation",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
-        }
-      ]
+      "EventName": "Battle_Individual_Vocalisation_template_event_1",
+      "Mixer": "Battle Individual Vocalisation",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
+    },
+    {
+      "EventName": "Battle_Individual_Vocalisation_template_event_2",
+      "Mixer": "Battle Individual Vocalisation",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
     }
   ]
 }

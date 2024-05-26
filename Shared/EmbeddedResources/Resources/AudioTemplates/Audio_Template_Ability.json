@@ -23,20 +23,16 @@
     "Language": "english(uk)"
   },
 
-  "Project": [
+  "Events": [
     {
-      "Events": [
-        {
-          "EventName": "Battle_Individual_Ability_Template_Event_1",
-          "Mixer": "Ability",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
-        },
-        {
-          "EventName": "Battle_Individual_Ability_Template_Event_2",
-          "Mixer": "Ability",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
-        }
-      ]
+      "EventName": "Battle_Individual_Ability_Template_Event_1",
+      "Mixer": "Ability",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
+    },
+    {
+      "EventName": "Battle_Individual_Ability_Template_Event_2",
+      "Mixer": "Ability",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
     }
   ]
 }

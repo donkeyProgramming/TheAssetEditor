@@ -21,20 +21,16 @@
     "Language": "english(uk)"
   },
 
-  "Project": [
+  "Events": [
     {
-      "Events": [
-        {
-          "EventName": "Battle_Individual_Magic_Template_Event_Houdini_1",
-          "Mixer": "Magic",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
-        },
-        {
-          "EventName": "Battle_Individual_Magic_Template_Event_Houdini_2",
-          "Mixer": "Magic",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
-        }
-      ]
+      "EventName": "Battle_Individual_Magic_Template_Event_Houdini_1",
+      "Mixer": "Magic",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
+    },
+    {
+      "EventName": "Battle_Individual_Magic_Template_Event_Houdini_2",
+      "Mixer": "Magic",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
     }
   ]
 }

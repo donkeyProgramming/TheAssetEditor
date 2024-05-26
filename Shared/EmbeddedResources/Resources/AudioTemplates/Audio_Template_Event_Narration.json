@@ -20,20 +20,16 @@
     "Language": "english(uk)"
   },
 
-  "Project": [
+  "Events": [
     {
-      "Events": [
-        {
-          "EventName": "Play_dilemma_narration_template_event_1",
-          "Mixer": "Event Narration",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
-        },
-        {
-          "EventName": "Play_dilemma_narration_template_event_2",
-          "Mixer": "Event Narration",
-          "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
-        }
-      ]
+      "EventName": "Play_dilemma_narration_template_event_1",
+      "Mixer": "Event Narration",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
+    },
+    {
+      "EventName": "Play_dilemma_narration_template_event_2",
+      "Mixer": "Event Narration",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
     }
   ]
 }
