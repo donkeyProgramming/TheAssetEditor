@@ -294,10 +294,10 @@ namespace Audio.BnkCompiler
 
     public class Compiler
     {
-        private readonly HichBuilder _hircBuilder;
+        private readonly HircBuilder _hircBuilder;
         private readonly BnkHeaderBuilder _headerBuilder;
 
-        public Compiler(HichBuilder hircBuilder, BnkHeaderBuilder headerBuilder)
+        public Compiler(HircBuilder hircBuilder, BnkHeaderBuilder headerBuilder)
         {
             _hircBuilder = hircBuilder;
             _headerBuilder = headerBuilder;

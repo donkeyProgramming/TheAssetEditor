@@ -7,12 +7,12 @@ using System.Linq;
 
 namespace Audio.BnkCompiler.ObjectGeneration
 {
-    public class HichBuilder
+    public class HircBuilder
     {
         private readonly IEnumerable<IWWiseHircGenerator> _wwiseHircGenerators;
         private readonly HircSorter _hircSorter = new HircSorter();
 
-        public HichBuilder(IEnumerable<IWWiseHircGenerator> wwiseHircGenerators)
+        public HircBuilder(IEnumerable<IWWiseHircGenerator> wwiseHircGenerators)
         {
             _wwiseHircGenerators = wwiseHircGenerators;
         }
