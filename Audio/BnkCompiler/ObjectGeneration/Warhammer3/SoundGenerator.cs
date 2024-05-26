@@ -6,12 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class SoundGenerator : IWWiseHircGenerator
     {
         public string GameName => CompilerConstants.Game_Warhammer3;
+        private static readonly IVanillaWwiseIds _vanillaWwiseIds;
         public Type AudioProjectType => typeof(GameSound);
 
         private readonly PackFileService _pfs;
@@ -31,7 +33,6 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public CAkSound_v136 ConvertToWWise(GameSound inputSound, CompilerData project)
         {
             var file = _pfs.FindFile(inputSound.Path);
-
             var nodeBaseParams = NodeBaseParams.CreateDefault();
             var wavFile = Path.GetFileName(inputSound.Path);
             var wavFileName = wavFile.Replace(".wem", "");
@@ -62,9 +63,9 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 var dialogueEventBnk = CompilerConstants.MatchDialogueEventToBnk(inputSound.DialogueEvent);
                 var attenuationKey = $"{dialogueEventBnk}_attenuation";
 
-                if (CompilerConstants.VanillaIds.ContainsKey(attenuationKey))
+                if (_vanillaWwiseIds.AttenuationIds.ContainsKey(attenuationKey))
                 {
-                    var attenuationId = CompilerConstants.VanillaIds[attenuationKey];
+                    var attenuationId = _vanillaWwiseIds.AttenuationIds[attenuationKey];
 
                     wwiseSound.NodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle()
                     {

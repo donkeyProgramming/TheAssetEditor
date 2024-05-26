@@ -14,8 +14,7 @@ using System.Text;
 using System.Text.Json;
 using Audio.Utility;
 using static Audio.FileFormats.WWise.Hirc.Shared.AkDecisionTree;
-
-
+using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Audio.BnkCompiler
 {
@@ -23,6 +22,7 @@ namespace Audio.BnkCompiler
     {
         private readonly PackFileService _pfs;
         private static Dictionary<string, string> EventToMixers;
+        private static readonly IVanillaWwiseIds _vanillaWwiseIds;
 
         public ProjectLoader(PackFileService pfs)
         {
@@ -169,7 +169,7 @@ namespace Audio.BnkCompiler
                 var eventId = hircEvent.Event;
                 var eventMixer = hircEvent.Mixer;
                 var mixerId = $"{GenerateRandomNumber()}_mixer_{GenerateRandomNumber()}";
-                var mixerParent = CompilerConstants.VanillaIds[eventMixer.ToLower()];
+                var mixerParent = _vanillaWwiseIds.EventMixerIds[eventMixer.ToLower()];
 
                 if (!EventToMixers.ContainsKey(eventId))
                 {
@@ -195,7 +195,7 @@ namespace Audio.BnkCompiler
                 var eventId = hircDialogueEvent.DialogueEvent;
                 var mixerId = $"{GenerateRandomNumber()}_mixer_{GenerateRandomNumber()}";
                 var dialogueEventBnk = CompilerConstants.MatchDialogueEventToBnk(eventId);
-                var mixerParent = CompilerConstants.VanillaIds[dialogueEventBnk];
+                var mixerParent = _vanillaWwiseIds.DialogueEventMixerIds[dialogueEventBnk];
 
                 if (!EventToMixers.ContainsKey(eventId))
                 {

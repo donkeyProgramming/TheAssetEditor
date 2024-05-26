@@ -12,9 +12,8 @@ using Audio.Utility;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using static Audio.FileFormats.WWise.Hirc.Shared.AkDecisionTree;
-
-
+using Audio.FileFormats.WWise.Hirc.Shared;
+using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Audio.BnkCompiler
 {
@@ -29,33 +28,6 @@ namespace Audio.BnkCompiler
     internal static class CompilerConstants
     {
         public static readonly string Game_Warhammer3 = "Warhammer3";
-        public static readonly Dictionary<string, uint> VanillaIds = new Dictionary<string, uint>()
-        {
-            // Ids for Event mixers
-            {"campaign advisor", 517250292},
-            {"event narration", 517250292},
-            {"battle individual vocalisation", 508226369},
-            {"diplomacy line", 54848735},
-            {"magic", 140075115},
-            {"ability", 140075115},
-            {"movie", 573597124},
-            {"quest battle", 659413513},
-            {"ui", 608071769},
-            {"event narration", 517250292},
-
-            // Ids for Dialogue Event mixers 
-            {"battle_vo_conversational", 600762068},
-            {"battle_vo_orders", 1009314120},
-            {"campaign_vo_conversational", 652491101},
-            {"campaign_vo", 306196174},
-            {"frontend_vo", 745637913},
-
-            // Ids for attenuation objects for Dialogue Events 
-            {"battle_vo_conversational_attenuation", 649943956},
-            {"battle_vo_orders_attenuation", 803409642},
-            {"campaign_vo_conversational_attenuation", 62329658},
-            {"campaign_vo_attenuation", 432982952},
-        };
 
         public static string MatchDialogueEventToBnk(string dialogueEvent)
         {
