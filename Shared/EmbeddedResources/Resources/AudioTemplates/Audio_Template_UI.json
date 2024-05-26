@@ -1,0 +1,36 @@
+{/* 
+  ================= README =================
+  This is a template audio project for custom UI audio for campaign and battle. Vanilla uses different names for campaign and battle audio: UI_CAM, UI_BAT respectively. 
+  For standardisation it's recommended you follow that vanilla naming convention.
+
+  Example Events:
+  - UI_CAM_ANI_Sotek_Sacrifice_Performed
+  - UI_BAT_SABL_Terrorgheist_Skull_Enable
+
+  Below is an explanation of the fields used in this project's configuration:
+  - BnkName: This is the name of the bnk. The bnk name in this tempalte should start with the name of the vanilla bnk "global_ui__", the rest of the bnk name can be custom.
+  - Language: This is the language folder that you want the project to output to.
+  - EventName: This is the name of the event. Event names in this template should start with "UI_", the rest of the event name can be custom.
+  - Mixer: The mixer determines how the sound will be played in game. In this template the mixer should be "UI".
+  - Sounds: Define the path to your sound files here. If multiple sound files are specified a random sound is played each time the event is triggered.
+*/
+
+{
+  "Settings": {
+    "BnkName": "global_ui__template",
+    "Language": "english(uk)"
+  },
+
+  "Events": [
+    {
+      "EventName": "UI_CAM_Template_Event_1",
+      "Mixer": "UI",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
+    },
+    {
+      "EventName": "UI_BAT_Template_Event_1",
+      "Mixer": "UI",
+      "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
+    }
+  ]
+}

@@ -52,7 +52,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
 
         }
 
-        public override uint GetParentId() => NodeBaseParams.DirectParentID;
+        public override uint GetParentId() => NodeBaseParams.DirectParentId;
         public override List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
 
         public override void UpdateSize() => throw new NotImplementedException();

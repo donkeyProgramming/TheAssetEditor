@@ -42,7 +42,8 @@ namespace Audio
             serviceCollection.AddScoped<IWWiseHircGenerator, SoundGenerator>();
             serviceCollection.AddScoped<IWWiseHircGenerator, ActorMixerGenerator>();
             serviceCollection.AddScoped<IWWiseHircGenerator, RandomContainerGenerator>();
-            serviceCollection.AddScoped<HichBuilder>();
+            serviceCollection.AddScoped<IWWiseHircGenerator, DialogueEventGenerator>();
+            serviceCollection.AddScoped<HircBuilder>();
             serviceCollection.AddScoped<BnkHeaderBuilder>();
             serviceCollection.AddScoped<CompilerService>();
             serviceCollection.AddScoped<ProjectLoader>();
@@ -76,26 +77,3 @@ namespace Audio
 
 
 }
-
-/*
- * 
- * Final test, add a new sound in meta tabel Karl franze running : "Look at me....Wiiiii" 
- * Vocalisation_dlc14_medusa_idle_hiss
- * 
-    event > action > sound > .wem
-    event > action > random-sequence > sound(s) > .wem
-    event > action > switch > switch/segment/sound > ...
-    event > action > music segment > music track(s) > .wem(s).
-    event > action > music random-sequence > music segment(s) > ...
-    event > action > music switch > switch(es)/segment(s)/random-sequence(s) > ...
-
-
-    Event => action     =>  sound
-                        =>  CAkActionSetAkProp
-                        =>  Switch  => sound
-                                    => Rand
-
-                        =>  Rand    => Sound
- */
-
-

@@ -17,6 +17,7 @@ namespace Audio.Storage
         List<HircItem> GetHircObject(uint id, string owningFileName);
         string GetNameFromHash(uint value);
         string GetNameFromHash(uint value, out bool found);
+        string GetNameFromHash(uint? key);
     }
 
     public class AudioRepository : IAudioRepository
@@ -24,11 +25,19 @@ namespace Audio.Storage
         public Dictionary<uint, string> NameLookUpTable { get; private set; } = new Dictionary<uint, string>();
         public Dictionary<uint, List<HircItem>> HircObjects { get; private set; } = new Dictionary<uint, List<HircItem>>();
 
-        public AudioRepository(RepositoryProvider provider)
+        public AudioRepository(RepositoryProvider provider, bool loadHircObjects = true)
         {
-            var data = provider.Load();
-            NameLookUpTable = data.NameLookUpTable;
-            HircObjects = data.HircObjects;
+            if (loadHircObjects)
+            {
+                var data = provider.LoadWwiseBnkAndDatData();
+                NameLookUpTable = data.NameLookUpTable;
+                HircObjects = data.HircObjects;
+            }
+            else
+            {
+                var data = provider.LoadWwiseDatData();
+                NameLookUpTable = data.NameLookUpTable;
+            }
         }
 
         public List<HircItem> GetHircObject(uint id)
@@ -53,7 +62,6 @@ namespace Audio.Storage
                 return NameLookUpTable[value];
             return value.ToString();
         }
-
 
         public List<T> GetAllOfType<T>() where T : HircItem
         {
@@ -82,7 +90,13 @@ namespace Audio.Storage
             File.WriteAllText(path, ss.ToString());
         }
 
-
+        public string GetNameFromHash(uint? key)
+        {
+            if (key.HasValue)
+                return GetNameFromHash(key.Value);
+            else
+                throw new System.NotImplementedException();
+        }
     }
 
 }

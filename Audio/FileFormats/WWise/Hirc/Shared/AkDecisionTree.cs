@@ -2,23 +2,25 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Audio.FileFormats.WWise.Hirc.Shared
 {
     public class AkDecisionTree
     {
+        public Node Root { get; set; }
+        public static List<BinaryNode> flattenedTree;
+
         public class BinaryNode
         {
-            public uint Key { get; set; }
+            public uint? Key { get; set; }
             public uint AudioNodeId { get; set; }
             public ushort Children_uIdx { get; set; }
             public ushort Children_uCount { get; set; }
-
             public ushort uWeight { get; set; }
             public ushort uProbability { get; set; }
-
-
             public static readonly int SerializationByteSize = 12;
 
             public BinaryNode(ByteChunk chunk)
@@ -30,23 +32,27 @@ namespace Audio.FileFormats.WWise.Hirc.Shared
                 uWeight = chunk.ReadUShort();
                 uProbability = chunk.ReadUShort();
             }
+
+            public BinaryNode()
+            {
+                Key = 0;
+                AudioNodeId = 0;
+                Children_uIdx = 0;
+                Children_uCount = 0;
+                uWeight = 0;
+                uProbability = 0;
+            }
         }
 
-        [DebuggerDisplay("Node Key:[{Key}] Children:[{Children.Count}]")]
         public class Node
         {
-            // Some Nodes at the _maxDepth have AudioNodeId == 0 and no children so we cannot use AudioNodeId = 0 to check
-            // so we should check for children instead - works for now
             public bool IsAudioNode() => Children.Count == 0;
-
-            public uint Key { get; set; }
+            public uint? Key { get; set; }
             public uint AudioNodeId { get; set; }
             public ushort Children_uIdx { get; set; }
             public ushort Children_uCount { get; set; }
-
             public ushort uWeight { get; set; }
             public ushort uProbability { get; set; }
-
             public List<Node> Children { get; set; } = new List<Node>();
 
             public Node(BinaryNode sNode)
@@ -60,98 +66,242 @@ namespace Audio.FileFormats.WWise.Hirc.Shared
             }
         }
 
-
-        // It's immutable. _maxTreeDepth equals to the actual depth of three. AudioNode should be at this level.
-        //But it's not always true. CA uses some kind of 'optimization' and AudioNode might be on the same level as DecisionNodes...
-        public readonly uint _maxTreeDepth;
-        public Node Root { get; set; }
-
-        public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint uTreeDataSize)
+        private static void PrintBinaryNodes(List<BinaryNode> binaryNodes, int depth)
         {
-            _maxTreeDepth = maxTreeDepth;
-            var numNodes = uTreeDataSize / BinaryNode.SerializationByteSize;
-            var flattenTree = new List<BinaryNode>();
-            foreach (var item in Enumerable.Range(0, (int)numNodes))
-                flattenTree.Add(new BinaryNode(chunk));
+            foreach (var node in binaryNodes)
+            {
+                string indent = new string(' ', depth * 2);
+                if (node.AudioNodeId != 0)
+                    Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
 
-            Root = ConvertListToGraph(flattenTree, _maxTreeDepth, 0, 0, 0);
+                else
+                    Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+            }
         }
 
-        Node ConvertListToGraph(List<BinaryNode> flattenTree, uint maxTreeDepth, ushort parentsFirstChildIndex, ushort childIndex, uint currentDepth)
+        private static void PrintGraph(Node node, int depth)
         {
-            var sNode = flattenTree[parentsFirstChildIndex + childIndex];
+            if (node.AudioNodeId != 0)
+                Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+            else
+                Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+
+            foreach (var child in node.Children)
+                PrintGraph(child, depth + 1);
+        }
+
+
+        // Sorts nodes into order by ID recursively at each depth level
+        private static void SortNodes(Node node)
+        {
+            // Sort children of the current node
+            node.Children.Sort((node1, node2) => node1.Key.Value.CompareTo(node2.Key.Value));
+
+            // Recursively sort children of each child node
+            foreach (var child in node.Children)
+                SortNodes(child);
+        }
+
+        private static void UpdateChildrenData(Node node, ref ushort childrenId)
+        {
+            node.Children_uIdx = childrenId;
+
+            var childrenCount = node.Children.Count;
+            node.Children_uCount = (ushort)childrenCount;
+
+            childrenId += (ushort)childrenCount; // Incrementing the value in the caller's scope
+
+            foreach (var child in node.Children)
+            {
+                UpdateChildrenData(child, ref childrenId); // Pass by reference
+            }
+        }
+
+        private static int CountNodeDescendants(Node node)
+        {
+            var count = node.Children.Count;
+
+            foreach (var child in node.Children)
+                count += CountNodeDescendants(child);
+
+            return count;
+        }
+
+        private static string ConvertGraphToString(Node node, int depth)
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            if (node.AudioNodeId != 0)
+                stringBuilder.AppendLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+            else
+                stringBuilder.AppendLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+
+            foreach (var child in node.Children)
+                stringBuilder.Append(ConvertGraphToString(child, depth + 1));
+
+            return stringBuilder.ToString();
+        }
+
+        static Node ConvertListToGraph(List<BinaryNode> flattenedTree, uint maxTreeDepth, ushort parentsFirstChildIndex, ushort childIndex, uint currentDepth)
+        {
+            var sNode = flattenedTree[parentsFirstChildIndex + childIndex];
             var isAtMaxDepth = currentDepth == maxTreeDepth;
-            var isOutsideRange = sNode.Children_uIdx >= flattenTree.Count;
+            var isOutsideRange = sNode.Children_uIdx >= flattenedTree.Count;
 
             if (isAtMaxDepth || isOutsideRange)
             {
-                sNode.Children_uCount = 0;
                 sNode.Children_uIdx = 0;
-                return new Node(sNode); // Audio node
+                sNode.Children_uCount = 0;
+                return new Node(sNode);
             }
             else
             {
                 sNode.AudioNodeId = 0;
                 var pathNode = new Node(sNode);
-                for (int i = 0; i < sNode.Children_uCount; i++)
+                for (var i = 0; i < sNode.Children_uCount; i++)
                 {
-                    var childNode = ConvertListToGraph(flattenTree, maxTreeDepth, sNode.Children_uIdx, (ushort)i, currentDepth + 1);
+                    var childNode = ConvertListToGraph(flattenedTree, maxTreeDepth, sNode.Children_uIdx, (ushort)i, currentDepth + 1);
                     pathNode.Children.Add(childNode);
                 }
                 return pathNode;
             }
         }
 
-        public byte[] GetAsBytes()
+        static int ConvertGraphToList(Node node, List<BinaryNode> flattenedTree, int currentIndex)
         {
-            throw new NotImplementedException();
-            //using var memStream = new MemoryStream();
-            //var flattenTree = Flatten();
-            //flattenTree.ForEach(e => memStream.Write(e.GetAsBytes()));
-            //var byteArray = memStream.ToArray();
-            //return byteArray;
-        }
-    }
-
-
-
-
-    /*
-      public class AkBankSourceData
-    {
-        public uint PluginId { get; set; }
-        public ushort PluginId_type { get; set; }
-        public ushort PluginId_company { get; set; }
-        public SourceType StreamType { get; set; }
-
-        public AkMediaInformation akMediaInformation { get; set; }
-        public uint uSize { get; set; }
-        public static AkBankSourceData Create(ByteChunk chunk)
-        {
-            var output = new AkBankSourceData()
+            // Add the current node to the flattened tree
+            var binaryNode = new BinaryNode
             {
-                PluginId = chunk.ReadUInt32(),
-                //PluginId_type = chunk.ReadUShort(),
-                //PluginId_company = chunk.ReadUShort(),
-                StreamType = (SourceType)chunk.ReadByte()
+                Key = node.Key,
+                AudioNodeId = node.AudioNodeId,
+                Children_uIdx = node.Children_uIdx,
+                Children_uCount = node.Children_uCount,
+                uWeight = node.uWeight,
+                uProbability = node.uProbability
             };
 
-         
-            output.PluginId_type = (ushort)((output.PluginId >> 0) & 0x000F);
-            output.PluginId_company = (ushort)((output.PluginId >> 4) & 0x03FF);
+            // Insert the current node at the currentIndex
+            flattenedTree.Insert(currentIndex, binaryNode);
 
-            if (output.StreamType != SourceType.Streaming)
+            // Calculate the insert index for children based on current index
+            var insertIndex = currentIndex + 1;
+
+            // Traverse children in a depth-first manner
+            foreach (var child in node.Children)
             {
-             //   throw new Exception();
+                currentIndex++;
+                currentIndex = ConvertGraphToList(child, flattenedTree, insertIndex);
+                insertIndex++;
             }
 
-            if (output.PluginId_type == 0x02)
-                output.uSize = chunk.ReadUInt32();
+            return currentIndex;
+        }
 
-            output.akMediaInformation = AkMediaInformation.Create(chunk);
+        public static List<BinaryNode> ReflattenTree(Node rootNode, uint uTreeDepth)
+        {
+            // Sort nodes into order by ID at each depth level
+            SortNodes(rootNode);
 
-            return output;
+            // Update / verify all child ID and Count data in nodes
+            ushort childrenId = 1;
+            UpdateChildrenData(rootNode, ref childrenId);
+
+            Console.WriteLine($"======================= PRINTING CUSTOM DECISION TREE GRAPH =======================");
+            PrintGraph(rootNode, 0);
+
+            flattenedTree = new List<BinaryNode>();
+            ConvertGraphToList(rootNode, flattenedTree, 0);
+
+            Console.WriteLine($"======================= PRINTING FLATTENED CUSTOM DECISION TREE =======================");
+            PrintBinaryNodes(flattenedTree, 0);
+
+            var validateRootNodeGraph = ConvertListToGraph(flattenedTree, (uint)uTreeDepth, 0, 0, 0);
+            var validateRootNodeGraphString = ConvertGraphToString(validateRootNodeGraph, 0);
+            var rootNodeString = ConvertGraphToString(rootNode, 0);
+
+            if (rootNodeString != validateRootNodeGraphString)
+                throw new Exception("Graphs not equal - validation failed.");
+            else
+                Console.WriteLine($"======================= VALIDATION COMPLETE: GRAPH IS VALID =======================");
+
+            return flattenedTree;
+        }
+
+        public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint uTreeDataSize)
+        {
+            // Produce initial flattenedTree
+            flattenedTree = new List<BinaryNode>();
+            var numNodes = uTreeDataSize / BinaryNode.SerializationByteSize;
+
+            foreach (var item in Enumerable.Range(0, (int)numNodes))
+                flattenedTree.Add(new BinaryNode(chunk));
+
+            // Convert flattenedTree into a graph
+            Root = ConvertListToGraph(flattenedTree, maxTreeDepth, 0, 0, 0);
+
+            // Sort nodes into order by ID at each depth level
+            SortNodes(Root);
+
+            // Update / verify all child ID and Count data in nodes
+            ushort childrenId = 1;
+            UpdateChildrenData(Root, ref childrenId);
+
+            //Console.WriteLine($"======================= PRINTING FLATTENEDTREE WITH DEPTH {maxTreeDepth} =======================");
+            //PrintBinaryNodes(flattenedTree, 0);
+            //Console.WriteLine($"======================= PRINTING GRAPH WITH DEPTH {maxTreeDepth} =======================");
+            //PrintGraph(Root, 0);
+        }
+
+        public byte[] GetAsBytes()
+        {
+            using var memStream = new MemoryStream();
+            foreach (var binaryNode in flattenedTree)
+            {
+                //Console.WriteLine($"Writing node: {binaryNode.Key}");
+                memStream.Write(ByteParsers.UInt32.EncodeValue(binaryNode.Key ?? 0, out _), 0, 4);
+
+                if (binaryNode.AudioNodeId != 0)
+                {
+                    // Write AudioNodeId if not empty
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(binaryNode.AudioNodeId, out _), 0, 4);
+                }
+                else
+                {
+                    // Write Children_uIdx and Children_uCount if AudioNodeId is empty
+                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.Children_uIdx, out _), 0, 2);
+                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.Children_uCount, out _), 0, 2);
+                }
+
+                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.uWeight, out _), 0, 2);
+                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.uProbability, out _), 0, 2);
+            }
+
+            return memStream.ToArray();
+        }
+
+        public static byte[] GetAsBytes(List<BinaryNode> flattenedTree)
+        {
+            using var memStream = new MemoryStream();
+            foreach (var binaryNode in flattenedTree)
+            {
+                // Write binary node properties to memory stream
+                memStream.Write(ByteParsers.UInt32.EncodeValue(binaryNode.Key ?? 0, out _), 0, 4);
+
+                if (binaryNode.AudioNodeId != 0)
+                {
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(binaryNode.AudioNodeId, out _), 0, 4);
+                }
+                else
+                {
+                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.Children_uIdx, out _), 0, 2);
+                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.Children_uCount, out _), 0, 2);
+                }
+
+                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.uWeight, out _), 0, 2);
+                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.uProbability, out _), 0, 2);
+            }
+
+            return memStream.ToArray();
         }
     }
-     */
 }

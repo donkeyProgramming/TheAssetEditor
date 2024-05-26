@@ -20,7 +20,7 @@ namespace Audio.BnkCompiler.Validation
             RuleFor(x => x.Actions).ForEach(x => x.SetValidator(new ActionValidator(allItems)));
             RuleFor(x => x.Events).ForEach(x => x.SetValidator(new EventValidator(allItems)));
 
-            // Validate that all ids are Uniqe
+            // Validate that all ids are Unique
             RuleFor(x => x).Custom((projectFile, context) => ValidateUniqeIds(projectXml, context));
         }
 

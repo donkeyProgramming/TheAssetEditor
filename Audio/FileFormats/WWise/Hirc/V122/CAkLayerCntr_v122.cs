@@ -10,6 +10,7 @@ namespace Audio.FileFormats.WWise.Hirc.V122
         public Children Children { get; set; }
         public List<CAkLayer> LayerList { get; set; } = new List<CAkLayer>();
         public byte bIsContinuousValidation { get; set; }
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {

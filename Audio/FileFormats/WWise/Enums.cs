@@ -168,12 +168,18 @@
         InitialDelay = 0x3B,
         CenterPCT = 0x0E,
         UnknownThing = 0x4A,
+        Attenuation = 0x46,
     }
 
     public enum AkGroupType : byte
     {
         Switch = 0x00,
         State = 0x01,
+    }
+
+    public enum AkMode : byte
+    {
+        BestMatch = 0x00
     }
 
     public enum AkRtpcType : byte

@@ -86,7 +86,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public NodeInitialFxParams NodeInitialFxParams { get; set; }
         public byte bOverrideAttachmentParams { get; set; }
         public uint OverrideBusId { get; set; }
-        public uint DirectParentID { get; set; }
+        public uint DirectParentId { get; set; }
         public byte byBitVector { get; set; }
 
         public NodeInitialParams NodeInitialParams { get; set; }
@@ -109,7 +109,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
             node.bOverrideAttachmentParams = chunk.ReadByte();
             node.OverrideBusId = chunk.ReadUInt32();
-            node.DirectParentID = chunk.ReadUInt32();
+            node.DirectParentId = chunk.ReadUInt32();
             node.byBitVector = chunk.ReadByte();
 
             node.NodeInitialParams = NodeInitialParams.Create(chunk);
@@ -132,8 +132,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 bitsFXBypass = 0,
             };
             instance.bOverrideAttachmentParams = 0;
-            instance.OverrideBusId = 0;    // "Master Audio Bus"
-            instance.DirectParentID = 0;
+            instance.OverrideBusId = 0;
+            instance.DirectParentId = 0;
             instance.byBitVector = 0;
             instance.NodeInitialParams = new NodeInitialParams()
             {
@@ -141,9 +141,9 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 {
                     Values = new List<AkPropBundle.AkPropBundleInstance>()
                     {
-                        //new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.StatePropNum_Priority, Value = 100},
-                        //new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.UserAuxSendVolume0, Value = -96},
-                        //new AkPropBundle.AkPropBundleInstance(){Type = AkPropBundleType.InitialDelay, Value = 0.5199999809265137f},
+                        //new(){Type = AkPropBundleType.StatePropNum_Priority, Value = 100},
+                        //new(){Type = AkPropBundleType.UserAuxSendVolume0, Value = -96},
+                        //new(){Type = AkPropBundleType.InitialDelay, Value = 0.5199999809265137f},
                     }
                 },
                 AkPropBundle1 = new AkPropBundleMinMax()
@@ -165,7 +165,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             instance.AdvSettingsParams = new AdvSettingsParams()
             {
                 byBitVector = 0x00,
-                eVirtualQueueBehavior = 0x01,   // [FromElapsedTime]
+                eVirtualQueueBehavior = 0x01,
                 u16MaxNumInstance = 0,
                 eBelowThresholdBehavior = 0,
                 byBitVector2 = 0
@@ -175,14 +175,8 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             return instance;
         }
 
-        public static NodeBaseParams CreateCustomContainerParams(RandomContainer initialParams)
+        public static NodeBaseParams CreateDefaultRandomContainer()
         {
-            var statePropNum_Priority = initialParams.StatePropNum_Priority;
-            var userAuxSendVolume0 = initialParams.UserAuxSendVolume0;
-            var initialDelay = initialParams.InitialDelay;
-
-            // add the other params
-
             NodeBaseParams instance = new NodeBaseParams();
             instance.NodeInitialFxParams = new NodeInitialFxParams()
             {
@@ -191,15 +185,16 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 bitsFXBypass = 0,
             };
             instance.bOverrideAttachmentParams = 0;
-            instance.OverrideBusId = 0;    // "Master Audio Bus"
-            instance.DirectParentID = 0;
-            instance.byBitVector = 0;
+            instance.OverrideBusId = 0;
+            instance.DirectParentId = 0;
+            instance.byBitVector = 0x02;
             instance.NodeInitialParams = new NodeInitialParams()
             {
                 AkPropBundle0 = new AkPropBundle()
                 {
                     Values = new List<AkPropBundle.AkPropBundleInstance>()
-
+                    {
+                    }
                 },
                 AkPropBundle1 = new AkPropBundleMinMax()
                 {
@@ -207,29 +202,9 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 }
             };
 
-            // add them in reverse order
-            if (initialDelay != null)
-            {
-                var addStateInitialDelay = new AkPropBundle.AkPropBundleInstance() { Type = AkPropBundleType.InitialDelay, Value = float.Parse(initialParams.InitialDelay) };
-                instance.NodeInitialParams.AkPropBundle0.Values.Add(addStateInitialDelay);
-            }
-
-            if (userAuxSendVolume0 != null)
-            {
-                var adduserAuxSendVolume0 = new AkPropBundle.AkPropBundleInstance() { Type = AkPropBundleType.UserAuxSendVolume0, Value = float.Parse(initialParams.UserAuxSendVolume0) };
-                instance.NodeInitialParams.AkPropBundle0.Values.Add(adduserAuxSendVolume0);
-            }
-
-            if (statePropNum_Priority != null)
-            {
-                var addstatePropNum_Priority = new AkPropBundle.AkPropBundleInstance() { Type = AkPropBundleType.StatePropNum_Priority, Value = float.Parse(initialParams.StatePropNum_Priority) };
-                instance.NodeInitialParams.AkPropBundle0.Values.Add(addstatePropNum_Priority);
-            }
-
             instance.PositioningParams = new PositioningParams()
             {
-                uBitsPositioning = 0x03,
-                uBits3d = 0x08
+                uBitsPositioning = 0x00,
             };
             instance.AuxParams = new AuxParams()
             {
@@ -239,9 +214,9 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             instance.AdvSettingsParams = new AdvSettingsParams()
             {
                 byBitVector = 0x00,
-                eVirtualQueueBehavior = 0x01,   // [FromElapsedTime]
+                eVirtualQueueBehavior = 0x01,
                 u16MaxNumInstance = 0,
-                eBelowThresholdBehavior = 0,
+                eBelowThresholdBehavior = 0x02,
                 byBitVector2 = 0
             };
             instance.StateChunk = new StateChunk();
@@ -256,7 +231,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
             memStream.Write(ByteParsers.Byte.EncodeValue(bOverrideAttachmentParams, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(OverrideBusId, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(DirectParentID, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(DirectParentId, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(byBitVector, out _));
 
             memStream.Write(NodeInitialParams.GetAsByteArray());
@@ -309,7 +284,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public class AkPropBundleInstance
         {
             public AkPropBundleType Type { get; set; }
-            public float Value { get; set; }
+            public uint Value { get; set; }
         }
 
         public List<AkPropBundleInstance> Values { get; set; } = new List<AkPropBundleInstance>();
@@ -323,7 +298,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 output.Values.Add(new AkPropBundleInstance() { Type = (AkPropBundleType)chunk.ReadByte() });
 
             for (byte i = 0; i < propsCount; i++)
-                output.Values[i].Value = chunk.ReadSingle();
+                output.Values[i].Value = chunk.ReadUInt32();
 
             return output;
         }
@@ -341,7 +316,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 memStream.Write(ByteParsers.Byte.EncodeValue((byte)v.Type, out _));
 
             foreach (var v in Values)
-                memStream.Write(ByteParsers.Single.EncodeValue(v.Value, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(v.Value, out _));
 
             return memStream.ToArray();
         }
@@ -500,17 +475,26 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public uint GetSize()
         {
-            if (uBitsPositioning != 0x03 && uBits3d != 0x08)
+            if (uBitsPositioning == 0x03 && uBits3d == 0x08)
+                return 2;
+
+            else if (uBitsPositioning == 0x00)
+                return 1;
+
+            else
                 throw new NotImplementedException();
-            return 2;
         }
 
         public byte[] GetAsByteArray()
         {
-            if (uBitsPositioning != 0x03 && uBits3d != 0x08)
-                throw new NotImplementedException();
+            if (uBitsPositioning == 0x03 && uBits3d == 0x08)
+                return new byte[] { 0x03, 0x08 };
 
-            return new byte[] { 0x03, 0x08 };
+            else if (uBitsPositioning == 0x00)
+                return new byte[] { 0x00 };
+
+            else
+                throw new NotImplementedException();
         }
     }
 

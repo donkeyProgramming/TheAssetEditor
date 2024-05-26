@@ -15,6 +15,8 @@ namespace Audio.FileFormats.WWise.Hirc.V122
         public Children Children { get; set; }
         public List<CAkSwitchPackage> SwitchList { get; set; } = new List<CAkSwitchPackage>();
         public List<AkSwitchNodeParams> Parameters { get; set; } = new List<AkSwitchNodeParams>();
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
+
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
@@ -99,7 +101,7 @@ namespace Audio.FileFormats.WWise.Hirc.V122
 
         public byte bOverrideAttachmentParams { get; set; }
         public uint OverrideBusId { get; set; }
-        public uint DirectParentID { get; set; }
+        public uint DirectParentId { get; set; }
         public byte byBitVector { get; set; }
 
         public NodeInitialParams NodeInitialParams { get; set; }
@@ -121,7 +123,7 @@ namespace Audio.FileFormats.WWise.Hirc.V122
             node.NodeInitialFxParams = NodeInitialFxParams.Create(chunk);
             node.bOverrideAttachmentParams = chunk.ReadByte();
             node.OverrideBusId = chunk.ReadUInt32();
-            node.DirectParentID = chunk.ReadUInt32();
+            node.DirectParentId = chunk.ReadUInt32();
             node.byBitVector = chunk.ReadByte();
             node.NodeInitialParams = NodeInitialParams.Create(chunk);
             node.PositioningParams = PositioningParams.Create(chunk);

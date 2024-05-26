@@ -55,19 +55,33 @@ namespace Audio.BnkCompiler.ObjectGeneration
                     {
                         if (container.Name == childName && !addedItems.Contains(container))
                         {
-                            mixerChildren.Add(container);
-                            Console.WriteLine($"Collected Random Container \"{container.Name}\" to sortedProjectItems");
+                            // Collect children of the random container
+                            var containerChildren = new List<IAudioProjectHircItem>();
 
-                            // Add children of the random container to the list
                             foreach (var containerChildName in container.Children)
                             {
                                 var gameSoundChild = project.GameSounds.FirstOrDefault(sound => sound.Name == containerChildName);
                                 if (gameSoundChild != null && !addedItems.Contains(gameSoundChild))
                                 {
-                                    mixerChildren.Add(gameSoundChild);
-                                    Console.WriteLine($"Collected Child \"{gameSoundChild.Name}\" from Random Container \"{container.Name}\" to sortedProjectItems");
+                                    containerChildren.Add(gameSoundChild);
                                 }
                             }
+
+                            // Sort container children by key
+                            var sortedContainerChildren = containerChildren.OrderBy(child => WWiseHash.Compute(child.Name)).ToList();
+
+                            // Add container children to sortedProjectItems
+                            foreach (var containerChild in sortedContainerChildren)
+                            {
+                                sortedProjectItems.Add(containerChild);
+                                addedItems.Add(containerChild);
+                                Console.WriteLine($"Collected Child \"{containerChild.Name}\" from Random Container \"{container.Name}\" to sortedProjectItems");
+                            }
+
+                            // Add the random container itself after its children
+                            sortedProjectItems.Add(container);
+                            addedItems.Add(container);
+                            Console.WriteLine($"Collected Random Container \"{container.Name}\" to sortedProjectItems");
                         }
                     }
                 }
@@ -110,8 +124,22 @@ namespace Audio.BnkCompiler.ObjectGeneration
                 }
             }
 
+            // Add Dialogue Events
+            var sortedDialogueEvents = project.DialogueEvents.OrderBy(x => GetSortingId(x)).ToList();
+            foreach (var currentDialogueEvent in sortedDialogueEvents)
+            {
+                // Add current event
+                if (!addedItems.Contains(currentDialogueEvent))
+                {
+                    sortedProjectItems.Add(currentDialogueEvent);
+                    addedItems.Add(currentDialogueEvent);
+                    Console.WriteLine($"Added Event \"{currentDialogueEvent.Name}\" to sortedProjectItems");
+                }
+            }
+
             return sortedProjectItems;
         }
+
 
         uint GetSortingId(IAudioProjectHircItem item) => WWiseHash.Compute(item.Name);
 
@@ -130,7 +158,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
                 var children = mixer.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Name == childId)).ToList();
                 output.Add(mixer);
                 Console.WriteLine($"Added root mixer: {mixer.Name}");
-                    
+
                 ProcessChildren(children, output, project);
             }
 

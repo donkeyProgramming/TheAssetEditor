@@ -46,10 +46,6 @@ namespace Audio.Utility
             return ConvertFileUsingVgSteam(wemName, wavName);
         }
 
-        /// <summary>
-        ///  VgSteam CLI converts files automatically depending on extentions
-        /// </summary>
-        /// <returns>Path of the new file</returns>
         private Result<string> ConvertFileUsingVgSteam(string sourceFileName, string targetFileName)
         {
             try

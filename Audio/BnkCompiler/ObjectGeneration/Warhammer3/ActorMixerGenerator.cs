@@ -32,7 +32,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseActorMixer.Id = project.GetHircItemIdFromName(actorMixer.Name);
             wwiseActorMixer.Type = HircType.ActorMixer;
             wwiseActorMixer.NodeBaseParams = NodeBaseParams.CreateDefault();
-            wwiseActorMixer.NodeBaseParams.DirectParentID = Convert.ToUInt32(actorMixer.DirectParentId);
+            wwiseActorMixer.NodeBaseParams.DirectParentId = actorMixer.DirectParentId;
 
             wwiseActorMixer.Children = new Children()
             {

@@ -6,12 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class SoundGenerator : IWWiseHircGenerator
     {
         public string GameName => CompilerConstants.Game_Warhammer3;
+        private static readonly IVanillaObjectIds _VanillaObjectIds = new VanillaObjectIds();
         public Type AudioProjectType => typeof(GameSound);
 
         private readonly PackFileService _pfs;
@@ -31,10 +33,9 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public CAkSound_v136 ConvertToWWise(GameSound inputSound, CompilerData project)
         {
             var file = _pfs.FindFile(inputSound.Path);
-            var soundIdStr = Path.GetFileNameWithoutExtension(inputSound.Path).Trim();
-            var soundId = uint.Parse(soundIdStr);
-
             var nodeBaseParams = NodeBaseParams.CreateDefault();
+            var wavFile = Path.GetFileName(inputSound.Path);
+            var wavFileName = wavFile.Replace(".wem", "");
 
             var wwiseSound = new CAkSound_v136()
             {
@@ -46,7 +47,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                     StreamType = SourceType.Streaming,
                     akMediaInformation = new AkMediaInformation()
                     {
-                        SourceId = soundId,
+                        SourceId = uint.Parse(wavFileName),
                         uInMemoryMediaSize = (uint)file.DataSource.Size,
                         uSourceBits = 0x01,
                     }
@@ -54,7 +55,38 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 NodeBaseParams = nodeBaseParams
             };
 
-            wwiseSound.NodeBaseParams.DirectParentID = project.GetHircItemIdFromName(inputSound.DirectParentID);
+            wwiseSound.NodeBaseParams.DirectParentId = project.GetHircItemIdFromName(inputSound.DirectParentId);
+
+            // Applying Dialogue_Event attenuation directly to sounds as they don't appear to take the vanilla mixer's attenuation
+            if (inputSound.IsDialogueEventSound == true)
+            {
+                var dialogueEventBnk = CompilerConstants.MatchDialogueEventToBnk(inputSound.DialogueEvent);
+                var attenuationKey = $"{dialogueEventBnk}_attenuation";
+
+                if (_VanillaObjectIds.AttenuationIds.ContainsKey(attenuationKey))
+                {
+                    var attenuationId = _VanillaObjectIds.AttenuationIds[attenuationKey];
+
+                    wwiseSound.NodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle()
+                    {
+                        Values = new List<AkPropBundle.AkPropBundleInstance>()
+                        {
+                            new(){Type = AkPropBundleType.Attenuation, Value = attenuationId}
+                        }
+                    };
+                }
+            }
+
+            // Testing: force apply attenuation ID
+            /*
+            wwiseSound.NodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle()
+            {
+                Values = new List<AkPropBundle.AkPropBundleInstance>()
+                        {
+                            new(){Type = AkPropBundleType.Attenuation, Value = 803409642}
+                        }
+            };
+            */
 
             wwiseSound.UpdateSize();
             return wwiseSound;

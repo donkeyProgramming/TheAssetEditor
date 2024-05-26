@@ -6,7 +6,9 @@ namespace Audio.Storage
 {
     public interface RepositoryProvider
     {
-        AudioData Load();
+        AudioData LoadWwiseBnkAndDatData();
+        AudioData LoadWwiseDatData();
+
     }
 
     public class AudioData
@@ -27,7 +29,7 @@ namespace Audio.Storage
             _wwiseNameLoader = wwiseNameLoader;
         }
 
-        public AudioData Load()
+        public AudioData LoadWwiseBnkAndDatData()
         {
             var nameList = _wwiseNameLoader.BuildNameHelper();
             var loadResult = _wwiseDataLoader.LoadBnkFiles();
@@ -37,6 +39,16 @@ namespace Audio.Storage
                 NameLookUpTable = nameList,
                 HircObjects = loadResult.HircList,
                 DidxAudioObject = loadResult.DidxAudioList
+            };
+        }
+
+        public AudioData LoadWwiseDatData()
+        {
+            var nameList = _wwiseNameLoader.BuildNameHelper();
+
+            return new AudioData()
+            {
+                NameLookUpTable = nameList
             };
         }
     }

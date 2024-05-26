@@ -53,7 +53,7 @@ namespace Audio.Utility
                     var name = _audioRepository.GetNameFromHash(item.Key);
                     if (item.Key == 0)
                         name = "Any";
-                    currentPath.Items.Add(new DecisionPathItem() { DisplayName = name, Value = item.Key });
+                    currentPath.Items.Add(new DecisionPathItem() { DisplayName = name, Value = (uint)item.Key });
                 }
 
                 decisionPath.Add(currentPath);
@@ -74,7 +74,6 @@ namespace Audio.Utility
 
             return decisionPathCollection;
         }
-
 
         List<(AkDecisionTree.Node[], uint)> GetDecisionPaths(AkDecisionTree decisionTree)
         {
@@ -100,14 +99,11 @@ namespace Audio.Utility
             });
         }
 
-
         public class WritePath
         {
             public List<string> Legs { get; set; }
 
         }
-
-
 
         [DebuggerDisplay("WriteNode {Id}")]
         class WriteNode
@@ -131,7 +127,6 @@ namespace Audio.Utility
             }
         }
 
-
         public void Write()
         {
             var rootNode = new WriteNode();
@@ -154,16 +149,13 @@ namespace Audio.Utility
                     currentNode = currentNode.AddChild(pathLeg);
             }
 
-
             //var t = new AkDecisionTree.Node()
             //{ 
             //
             //}
 
             // Convert to flat list
-
         }
-
 
         public void CalculateCount(AkDecisionTree.Node node)
         {

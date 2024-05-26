@@ -8,6 +8,7 @@ namespace Audio.BnkCompiler
     using Shared.Core.ErrorHandling;
     using Shared.Core.Misc;
     using Shared.Core.PackFiles;
+    using static Audio.Utility.WWiseWavToWem;
 
     public class AudioFileImporter
     {
@@ -33,26 +34,14 @@ namespace Audio.BnkCompiler
             }
 
             var wavToWem = new WWiseWavToWem();
-            wavToWem.InitialiseWwiseProject();
+            InitialiseWwiseProject();
             wavToWem.WavToWem(wavFiles, wavFilePaths);
 
             foreach (var gameSound in compilerData.GameSounds)
             {
-                var importType = DetermineImportType(compilerData, gameSound);
-                if (importType == SoundFileImportType.None)
-                {
-                    continue;
-                }
-                else if (importType == SoundFileImportType.Unknown)
-                {
-                    return Result<bool>.FromError("Audio converter", $"Unable to determine import type for '{gameSound.Path}' for item '{gameSound.Name}'");
-                }
-                else if (importType == SoundFileImportType.Disk)
-                {
-                    var converterResult = ImportFromDisk(compilerData, gameSound);
-                    if (converterResult.IsSuccess == false)
-                        return converterResult;
-                }
+                var converterResult = ImportFromDisk(compilerData, gameSound);
+                if (converterResult.IsSuccess == false)
+                    return converterResult;
             }
             return Result<bool>.FromOk(true);
         }
@@ -65,12 +54,13 @@ namespace Audio.BnkCompiler
             // Convert file
             var tempFolderPath = $"{DirectoryHelper.Temp}";
             var audioFolderPath = $"{tempFolderPath}\\Audio";
-            var fileName = Path.GetFileName(gameSound.Path);
-            var newFileName = fileName.Replace(".wav", ".wem");
-            var wemPath = $"{audioFolderPath}\\{newFileName}";
+            var wavFile = Path.GetFileName(gameSound.Path);
+            var wavFileName = wavFile.Replace(".wav", "");
+            var wemFile = wavFile.Replace(".wav", ".wem");
+            var wemPath = $"{audioFolderPath}\\{wemFile}";
 
             // Compute hash
-            var hashName = WWiseHash.Compute(newFileName);
+            var hashName = WWiseHash.Compute(wavFileName);
 
             // Load
             var createdFiles = PackFileUtil.LoadFilesFromDisk(_pfs, new PackFileUtil.FileRef(wemPath, GetExpectedFolder(compilerData), $"{hashName}.wem"));
@@ -79,53 +69,13 @@ namespace Audio.BnkCompiler
             return Result<bool>.FromOk(true);
         }
 
-        SoundFileImportType DetermineImportType(CompilerData compilerData, GameSound gameSound)
-        {
-            var path = gameSound.Path;
-            if (File.Exists(path))
-                return SoundFileImportType.Disk;
-
-            if (_pfs.FindFile(path) != null)
-            {
-                var filename = Path.GetFileNameWithoutExtension(path);
-
-                // Check if file has correct naming
-                var convertResult = uint.TryParse(filename, out var _);
-                if (convertResult == false)
-                    return SoundFileImportType.PackFile;
-
-                // Check if file has correct extension
-                var extension = Path.GetExtension(path).ToLower();
-                if (extension != ".wem")
-                    return SoundFileImportType.PackFile;
-
-                // Check if file is in correct folder
-                var filePath = Path.GetDirectoryName(path);
-                var expectedFolder = GetExpectedFolder(compilerData);
-                if (string.Compare(filePath, expectedFolder, true) != 0)
-                    return SoundFileImportType.PackFile;
-
-                return SoundFileImportType.None;
-            }
-
-            return SoundFileImportType.Unknown;
-        }
-
-        string GetExpectedFolder(CompilerData compilerData)
+        static string GetExpectedFolder(CompilerData compilerData)
         {
             var basePath = "audio\\wwise";
             if (string.IsNullOrEmpty(compilerData.ProjectSettings.Language) == false)
                 basePath += $"\\{compilerData.ProjectSettings.Language}";
 
             return basePath;
-        }
-
-        enum SoundFileImportType
-        {
-            None,
-            Unknown,
-            Disk,
-            PackFile
         }
     }
 }

@@ -143,7 +143,7 @@ namespace Audio.Utility
             var mixers = _audioRepository.GetAllOfType<CAkActorMixer_v136>();
 
             var allRootNodes = mixers
-                .Where(x => x.NodeBaseParams.DirectParentID == 0)
+                .Where(x => x.NodeBaseParams.DirectParentId == 0)
                 .DistinctBy(x => x.Id)
                 .ToList();
 

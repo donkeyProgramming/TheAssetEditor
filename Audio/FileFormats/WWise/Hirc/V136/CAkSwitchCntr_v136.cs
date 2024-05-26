@@ -15,6 +15,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public Children Children { get; set; }
         public List<ICAkSwitchCntr.ICAkSwitchPackage> SwitchList { get; set; } = new();
         public List<AkSwitchNodeParams> Parameters { get; set; } = new();
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
 
 
         protected override void CreateSpecificData(ByteChunk chunk)
@@ -40,7 +41,5 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public uint GroupId { get => ulGroupID; }
         public uint DefaultSwitch { get => ulDefaultSwitch; }
-
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
     }
 }

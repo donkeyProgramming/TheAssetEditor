@@ -7,12 +7,12 @@ using System.Linq;
 
 namespace Audio.BnkCompiler.ObjectGeneration
 {
-    public class HichBuilder
+    public class HircBuilder
     {
         private readonly IEnumerable<IWWiseHircGenerator> _wwiseHircGenerators;
         private readonly HircSorter _hircSorter = new HircSorter();
 
-        public HichBuilder(IEnumerable<IWWiseHircGenerator> wwiseHircGenerators)
+        public HircBuilder(IEnumerable<IWWiseHircGenerator> wwiseHircGenerators)
         {
             _wwiseHircGenerators = wwiseHircGenerators;
         }
@@ -45,7 +45,15 @@ namespace Audio.BnkCompiler.ObjectGeneration
 
         IWWiseHircGenerator FindGenerator(IAudioProjectHircItem projectItem, string game)
         {
-            var generators = _wwiseHircGenerators.Where(x => x.GameName.Equals(game, StringComparison.InvariantCultureIgnoreCase) && x.AudioProjectType == projectItem.GetType()).ToList();
+            //var generators = _wwiseHircGenerators.Where(x => x.GameName.Equals(game, StringComparison.InvariantCultureIgnoreCase) && x.AudioProjectType == projectItem.GetType()).ToList();
+            var generators = new List<IWWiseHircGenerator>();
+            foreach (var generator in _wwiseHircGenerators)
+            {
+                if (generator.GameName.Equals(game, StringComparison.InvariantCultureIgnoreCase) && generator.AudioProjectType == projectItem.GetType())
+                {
+                    generators.Add(generator);
+                }
+            }
             Guard.IsEqualTo(generators.Count(), 1);
             return generators.First();
         }

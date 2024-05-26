@@ -8,22 +8,30 @@ namespace Audio.BnkCompiler
         public class ProjectSettings
         {
             public string BnkName { get; set; }
-            public string Language { get; set; } = CompilerConstants.Language_English;
+            public string Language { get; set; }
         }
 
-        public class ProjectContents
+        public class ProjectDecisionTree
         {
-            public string Event { get; set; }
-            public string Type { get; set; }
-            public string SoundContainerType { get; set; }
-            public string ActorMixer { get; set; }
-            public string AudioBus { get; set; }
+            public string StatePath { get; set; }
             public List<string> Sounds { get; set; }
         }
 
-        public ProjectSettings Settings { get; set; } = new ProjectSettings();
-        public List<ProjectContents> Project { get; set; } = new List<ProjectContents>();
+        public class ProjectDialogueEvent
+        {
+            public string DialogueEvent { get; set; }
+            public List<ProjectDecisionTree> DecisionTree { get; set; }
+        }
 
+        public class ProjectEvent
+        {
+            public string Event { get; set; }
+            public string Mixer { get; set; }
+            public List<string> Sounds { get; set; }
+        }
+
+        public ProjectSettings Settings { get; set; }
+        public List<ProjectDialogueEvent> DialogueEvents { get; set; }
+        public List<ProjectEvent> Events { get; set; }
     }
 }
-

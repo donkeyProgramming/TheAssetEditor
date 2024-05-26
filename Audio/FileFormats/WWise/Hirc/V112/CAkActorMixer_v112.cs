@@ -20,6 +20,6 @@ namespace Audio.FileFormats.WWise.Hirc.V112
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
 
         public List<uint> GetChildren() => Children.ChildIdList;
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentID;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
     }
 }

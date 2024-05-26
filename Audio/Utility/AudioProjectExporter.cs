@@ -102,7 +102,7 @@ namespace Audio.Utility
                 var outputMixer = new ActorMixer
                 {
                     Name = mixerNames[mixer.Id],
-                    DirectParentId = "Master",
+                    DirectParentId = 0,
                     OverrideId = mixer.Id,
                     Children = audioChildren.Select(x => project.GameSounds.First(sound => sound.OverrideId == x.Id).Name).ToList(), // we have to match on this
                     ActorMixerChildren = mixerChildren.Select(x => mixerNames[x.Id]).ToList(),
@@ -118,7 +118,7 @@ namespace Audio.Utility
             var nameDictionary = new Dictionary<uint, string>();
             foreach (var mixer in mixers)
             {
-                if (mixer.NodeBaseParams.DirectParentID == 0)
+                if (mixer.NodeBaseParams.DirectParentId == 0)
                     nameDictionary.Add(mixer.Id, "RootMixer");
                 else
 
