@@ -189,7 +189,7 @@ namespace Audio.BnkCompiler
             {
                 var eventId = hircDialogueEvent.DialogueEvent;
                 var mixerId = $"{GenerateRandomNumber()}_mixer_{GenerateRandomNumber()}";
-                var dialogueEventBnk = CompilerConstants.MatchDialogueEventToBnk(eventId);
+                var dialogueEventBnk = DialogueEventData.MatchDialogueEventToBnk(eventId);
                 var mixerParent = _VanillaObjectIds.DialogueEventMixerIds[dialogueEventBnk];
 
                 if (!EventToMixers.ContainsKey(eventId))

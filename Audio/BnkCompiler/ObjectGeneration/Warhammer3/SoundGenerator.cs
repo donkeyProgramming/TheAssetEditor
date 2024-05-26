@@ -60,7 +60,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             // Applying Dialogue_Event attenuation directly to sounds as they don't appear to take the vanilla mixer's attenuation
             if (inputSound.IsDialogueEventSound == true)
             {
-                var dialogueEventBnk = CompilerConstants.MatchDialogueEventToBnk(inputSound.DialogueEvent);
+                var dialogueEventBnk = DialogueEventData.MatchDialogueEventToBnk(inputSound.DialogueEvent);
                 var attenuationKey = $"{dialogueEventBnk}_attenuation";
 
                 if (_VanillaObjectIds.AttenuationIds.ContainsKey(attenuationKey))
