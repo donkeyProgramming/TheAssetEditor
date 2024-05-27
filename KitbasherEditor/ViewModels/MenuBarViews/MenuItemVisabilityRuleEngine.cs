@@ -1,16 +1,16 @@
-﻿using Shared.Ui.Common.MenuSystem;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Shared.Ui.Common.MenuSystem;
 using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
     public class MenuItemVisibilityRuleEngine
     {
-        Dictionary<ActionEnabledRule, Func<bool>> _actionEnabledRules = new Dictionary<ActionEnabledRule, Func<bool>>();
-        Dictionary<ButtonVisibilityRule, Func<bool>> _buttonVisabilityRules = new Dictionary<ButtonVisibilityRule, Func<bool>>();
+        private readonly Dictionary<ActionEnabledRule, Func<bool>> _actionEnabledRules = new Dictionary<ActionEnabledRule, Func<bool>>();
+        private readonly Dictionary<ButtonVisibilityRule, Func<bool>> _buttonVisabilityRules = new Dictionary<ButtonVisibilityRule, Func<bool>>();
+        private readonly SelectionManager _selectionManager;
 
-        SelectionManager _selectionManager;
         public MenuItemVisibilityRuleEngine(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;

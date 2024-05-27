@@ -1,14 +1,18 @@
-﻿using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop.Internals;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
+using Microsoft.Xna.Framework.Input;
+using MonoGame.Framework.WpfInterop.Internals;
 
 namespace MonoGame.Framework.WpfInterop.Input
 {
+
     /// <summary>
     /// Helper class that converts WPF mouse input to the XNA/MonoGame <see cref="_mouseState"/>.
     /// Required for any WPF hosted control.
@@ -79,122 +83,67 @@ namespace MonoGame.Framework.WpfInterop.Input
         #endregion
 
         #region Methods
-
         public MouseState GetState() => _mouseState;
 
         private void HandleMouse(object sender, MouseEventArgs e)
         {
-
             if (e.Handled)
                 return;
-
-            if (e.LeftButton == MouseButtonState.Pressed)
+      
+            // Detect if there is a window that is on top of the main application. If so, we dont want to capture the mouse
+            // This shit is buggy and bad =(
+            GetCursorPos(out var p);
+            var topToBottom = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>()).ToList();
+            foreach(var window in topToBottom) 
             {
-
+                var hitPoint = window.PointFromScreen(new Point() {X = p.X, Y = p.Y });
+                var hitResult = VisualTreeHelper.HitTest(window, hitPoint);
+                if (hitResult?.VisualHit != null)
+                {
+                    if (window.ToString() != "AssetEditor.Views.MainWindow")
+                    {
+                        _focusElement.ReleaseMouseCapture();
+                        return;
+                    }
+                }
             }
 
             var pos = e.GetPosition(_focusElement);
-
-            if (!CaptureMouseWithin)
-            {
-                // clamp as fast moving mouse will somtimes still report values outside the control without explicit capture (e.g. negative values)
-                pos = new Point(Clamp(pos.X, 0, _focusElement.ActualWidth), Clamp(pos.Y, 0, _focusElement.ActualHeight));
-            }
             if (_focusElement.IsMouseDirectlyOver && System.Windows.Input.Keyboard.FocusedElement != _focusElement)
             {
-                //if (WindowHelper.IsControlOnActiveWindow(_focusElement))
+                if (e.LeftButton == MouseButtonState.Pressed)
                 {
-                    // however, only focus if we are the active window, otherwise the window will become active and pop into foreground just by hovering the mouse over the game panel
-
-                    //finally check if user wants us to focus already on mouse over
-                    //if (_focusElement.FocusOnMouseOver)
-                    if (e.LeftButton == MouseButtonState.Pressed)
+                    var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
+                    HitTestResult result = VisualTreeHelper.HitTest(res, pos);
+                    if (result?.VisualHit == _focusElement)
                     {
-                        var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
-                        HitTestResult result = VisualTreeHelper.HitTest(res, pos);
-                        if (result?.VisualHit == _focusElement)
-                            _focusElement.Focus();
-
-
-
+                        _focusElement.Focus();
                     }
-                    //else
-                    //{
-                    //    // otherwise focus only when the user clicks into the game
-                    //    // on windows this behaviour doesn't require an explicit left click
-                    //    // instead, left, middle, right and even xbuttons work (the only thing that doesn't trigger focus is scrolling)
-                    //    // so mimic that exactly
-                    //    if (e.LeftButton == MouseButtonState.Pressed ||
-                    //        e.RightButton == MouseButtonState.Pressed ||
-                    //        e.MiddleButton == MouseButtonState.Pressed ||
-                    //        e.XButton1 == MouseButtonState.Pressed ||
-                    //        e.XButton2 == MouseButtonState.Pressed)
-                    //    {
-                    //        _focusElement.Focus();
-                    //    }
-                    //}
                 }
             }
 
             if ((!_focusElement.IsMouseDirectlyOver || _focusElement.IsMouseCaptured) && CaptureMouseWithin)
             {
-
                 var v = (Visual)_focusElement;
                 bool hit = false;
-                //VisualTreeHelper.HitTest(v, filterTarget => HitTestFilterBehavior.Continue, target =>
-                //{
-                //    if (target.VisualHit == _focusElement)
-                //    {
-                //        // our actual element was hit
-                //        hit = true;
-                //    }
-                //    return HitTestResultBehavior.Continue;
-                //}, new PointHitTestParameters(pos));
-
                 var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
                 //if (res == null) return; <-- please see: https://github.com/donkeyProgramming/TheAssetEditor/pull/90#:~:text=Monogame.WpfInterop/Input/WpfMouse.cs
                 HitTestResult result = VisualTreeHelper.HitTest(res, pos);
                 if (result?.VisualHit == _focusElement)
                     hit = true;
 
-
-
-                // IsMouseDirectlyOver always returns true if the mouse is captured, so we need to do our own hit testing if the Mouse is captured to find out whether it is actually over the control or not
-                if (hit)
-                {
-
-                    //{
-                    //    // outside the hitbox
-                    //
-                    //    // when the mouse is leaving the control we need to register button releases
-                    //    // when the user clicks in the control, holds the button and moves it outside the control and releases there it normally does not registered
-                    //    // the control would thus think that the button is still pressed
-                    //    // using capture allows us to receive this event, propagate it and then free the mouse
-                    //
-                    //    _mouseState = new MouseState(_mouseState.X, _mouseState.Y, _mouseState.ScrollWheelValue,
-                    //        (ButtonState) e.LeftButton, (ButtonState) e.MiddleButton, (ButtonState) e.RightButton, (ButtonState) e.XButton1,
-                    //        (ButtonState) e.XButton2);
-                    //    // only release if LeftMouse is up
-                    //    if (e.LeftButton == MouseButtonState.Released)
-                    //    {
-                    //        _focusElement.ReleaseMouseCapture();
-                    //    }
-                    //    e.Handled = true;
-                    //    return;
-                    //}
-                    // inside the control and captured -> still requires full update, so run code below and don't return right away
-                }
-                else
+                if (!hit)
                 {
                     if (_focusElement.IsMouseCaptured)
                     {
-
+                        Console.WriteLine($"We are here 2 - {_focusElement.IsMouseDirectlyOver} | {result?.VisualHit}");
                         _mouseState = new MouseState(_mouseState.X, _mouseState.Y, _mouseState.ScrollWheelValue,
                             (ButtonState)e.LeftButton, (ButtonState)e.MiddleButton, (ButtonState)e.RightButton, (ButtonState)e.XButton1,
                             (ButtonState)e.XButton2);
                         // only release if LeftMouse is up
                         if (e.LeftButton == MouseButtonState.Released)
                         {
+                            Console.WriteLine("We are here 3");
                             _focusElement.ReleaseMouseCapture();
                         }
                         e.Handled = true;
@@ -205,35 +154,15 @@ namespace MonoGame.Framework.WpfInterop.Input
                 }
             }
 
-            if (CaptureMouseWithin)
+            if (!_focusElement.IsMouseCaptured)
             {
-                // capture the mouse, this allows receiving of mouse event while the mouse is leaving the control: https://msdn.microsoft.com/en-us/library/ms591452(v=vs.110).aspx
-                if (!_focusElement.IsMouseCaptured)
+                if (e.LeftButton == MouseButtonState.Pressed)
                 {
-                    // however, only focus if we are the active window, otherwise the window will become active and pop into foreground just by hovering the mouse over the game panel
-                    //if (WindowHelper.IsControlOnActiveWindow(_focusElement))
-                    //if ()
-                    {
-                        // however, only focus if we are the active window, otherwise the window will become active while remaining in the background
-                        //
-                        if (e.LeftButton == MouseButtonState.Pressed)
-                            _focusElement.CaptureMouse();
-                    }
-                    //else
-                    //{
-                    //    // don't update mouse events if we are just hovering over different window
-                    //    return;
-                    //}
+                    _focusElement.CaptureMouse();
                 }
+
             }
-            else
-            {
-                if (_focusElement.IsFocused && !WindowHelper.IsControlOnActiveWindow(_focusElement))
-                {
-                    // don't update mouse events if we are just hovering over different window
-                    return;
-                }
-            }
+           
             e.Handled = true;
             var m = _mouseState;
             var w = e as MouseWheelEventArgs;
@@ -259,6 +188,43 @@ namespace MonoGame.Framework.WpfInterop.Input
 
         [DllImport("User32.dll")]
         private static extern bool SetCursorPos(int x, int y);
+
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetCursorPos(out POINT lpPoint);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+
+        const uint GW_HWNDNEXT = 2;
+        [DllImport("User32")] static extern IntPtr GetTopWindow(IntPtr hWnd);
+        [DllImport("User32")] static extern IntPtr GetWindow(IntPtr hWnd, uint wCmd);
+
+        public IEnumerable<Window> SortWindowsTopToBottom(IEnumerable<Window> unsorted)
+        {
+            var byHandle = unsorted.Select(win =>
+                {
+                    var a = PresentationSource.FromVisual(win);
+                    var s = ((HwndSource)a);
+                    return (win, s?.Handle);
+                })
+                .Where(x => x.Handle != null)
+                .Where(x=>x.win.ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerWindow")
+                .ToDictionary(x => x.Handle);
+
+
+            for (IntPtr hWnd = GetTopWindow(IntPtr.Zero); hWnd != IntPtr.Zero; hWnd = GetWindow(hWnd, GW_HWNDNEXT))
+            {
+                if (byHandle.ContainsKey(hWnd))
+                    yield return byHandle[hWnd].win;
+            }
+        }
 
         public void Dispose()
         {

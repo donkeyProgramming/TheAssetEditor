@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using View3D.Animation.AnimationChange;
-using View3D.Utility;
 
 namespace View3D.Animation
 {

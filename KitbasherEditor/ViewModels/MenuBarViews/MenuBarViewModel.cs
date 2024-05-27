@@ -1,13 +1,13 @@
-﻿using KitbasherEditor.ViewModels.MenuBarViews.Helpers;
-using KitbasherEditor.ViewModels.UiCommands;
-using Shared.Core.Events;
-using Shared.EmbeddedResources;
-using Shared.Ui.Common.MenuSystem;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using KitbasherEditor.ViewModels.MenuBarViews.Helpers;
+using KitbasherEditor.ViewModels.UiCommands;
+using Shared.Core.Events;
+using Shared.EmbeddedResources;
+using Shared.Ui.Common.MenuSystem;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 
@@ -95,7 +95,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         ObservableCollection<ToolbarItem> CreateToolbarMenu()
         {
-            ToolBarBuilder builder = new ToolBarBuilder(_uiCommands);
+            ToolbarBuilder builder = new ToolbarBuilder(_uiCommands);
 
             var fileToolbar = builder.CreateRootToolBar("File");
             builder.CreateToolBarItem<SaveCommand>(fileToolbar, "Save");

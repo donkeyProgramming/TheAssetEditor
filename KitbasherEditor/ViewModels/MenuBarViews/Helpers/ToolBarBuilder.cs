@@ -7,12 +7,12 @@ using System.Linq;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews.Helpers
 {
-    public class ToolBarBuilder
+    public class ToolbarBuilder
     {
         ObservableCollection<ToolbarItem> _toolBarItems { get; set; } = new ObservableCollection<ToolbarItem>();
         Dictionary<Type, MenuAction> _actionList = new();
 
-        public ToolBarBuilder(Dictionary<Type, MenuAction> actionList)
+        public ToolbarBuilder(Dictionary<Type, MenuAction> actionList)
         {
             _actionList = actionList;
         }

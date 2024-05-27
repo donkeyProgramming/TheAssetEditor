@@ -1,16 +1,16 @@
-﻿using Shared.Ui.Common.MenuSystem;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Media.Imaging;
+using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews.Helpers
 {
     public class ButtonBuilder
     {
-        ObservableCollection<MenuBarButton> _menuBarButtons = new ObservableCollection<MenuBarButton>();
-        Dictionary<Type, MenuAction> _actionList = new();
+        private readonly ObservableCollection<MenuBarButton> _menuBarButtons = new ObservableCollection<MenuBarButton>();
+        private readonly Dictionary<Type, MenuAction> _actionList = new();
 
         public ButtonBuilder(Dictionary<Type, MenuAction> actionList)
         {
@@ -18,7 +18,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews.Helpers
         }
 
         public ObservableCollection<MenuBarButton> Build() => _menuBarButtons;
-
 
         public void CreateButton<T>(BitmapImage image, ButtonVisibilityRule buttonVisibilityRule = ButtonVisibilityRule.Always) where T : IKitbasherUiCommand
         {

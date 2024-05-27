@@ -1,6 +1,5 @@
-﻿using System;
-
-namespace View3D.Utility
+﻿
+namespace Shared.Core.Misc
 {
     public class TimeSpanExtension
     {
@@ -19,7 +18,7 @@ namespace View3D.Utility
             TimeSpan = timeSpan;
         }
 
-        public int Microseconds => (int)((TimeSpan.Ticks / TicksPerMicrosecond) % 1000);
+        public int Microseconds => (int)(TimeSpan.Ticks / TicksPerMicrosecond % 1000);
 
 
         // Returns the total number of Microseconds rounded to the nearest whole number

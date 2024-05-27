@@ -3,7 +3,6 @@ using AnimationEditor;
 using AnimationMeta;
 using AssetManagement;
 using Audio;
-using KitbasherEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shared.Core.DependencyInjection;
@@ -33,7 +32,7 @@ namespace AssetEditor.Services
                 new Editors.Shared.Core.DependencyInjectionContainer(),
                 new Editors.AnimationContainers.DependencyInjectionContainer(),
                 new Editors.Reports.DependencyInjectionContainer(),
-                new KitbasherEditor_DependencyInjectionContainer(),
+                new KitbasherEditor.DependencyInjectionContainer(),
                 new AssetManagement_DependencyInjectionContainer(),
                 new AnimationMeta_DependencyInjectionContainer(),
                 new AudioEditor_DependencyInjectionContainer(),

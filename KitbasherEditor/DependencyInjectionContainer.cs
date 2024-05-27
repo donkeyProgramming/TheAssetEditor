@@ -22,7 +22,7 @@ using View3D.Services.SceneSaving;
 
 namespace KitbasherEditor
 {
-    public class KitbasherEditor_DependencyInjectionContainer : DependencyContainer
+    public class DependencyInjectionContainer : DependencyContainer
     {
         public override void Register(IServiceCollection serviceCollection)
         {
@@ -47,7 +47,7 @@ namespace KitbasherEditor
 
             // Save dialog
             serviceCollection.AddScoped<SaveDialogViewModel>();
-            serviceCollection.AddScoped<SaveDialogView>();
+            serviceCollection.AddTransient<SaveDialogView>();
             serviceCollection.AddScoped<SaveSettings>();
 
             // Menubar 

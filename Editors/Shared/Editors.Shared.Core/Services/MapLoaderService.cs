@@ -5,7 +5,7 @@ namespace KitbasherEditor.Services
 {
     public class MapLoaderService
     {
-        public static void Load(PackFileService pfs, KitbashSceneCreator modelLoaderService)
+        public static void Load(PackFileService pfs/*, KitbashSceneCreator modelLoaderService*/)
         {
             //var allFiles = pfs.FindAllFilesInDirectory(@"terrain\campaigns\wh2_main_great_vortex_map_1\global_meshes");
             //var landMeshes = allFiles.Where(x => x.Extention == ".rigid_model_v2" && x.Name.Contains("land_mesh", StringComparison.InvariantCultureIgnoreCase));
@@ -26,7 +26,7 @@ namespace KitbasherEditor.Services
             {
                 try
                 {
-                    modelLoaderService.LoadModelIntoMainScene(item);
+                    //modelLoaderService.LoadModelIntoMainScene(item);
                 }
                 catch
                 {

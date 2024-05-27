@@ -1,9 +1,9 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using System.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.MathViews;
-using System.ComponentModel;
 using View3D.Commands;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
@@ -23,8 +23,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         TransformMode _activeMode = TransformMode.None;
 
-        SelectionManager _selectionManager;
-        CommandExecutor _commandExecutor;
+        private readonly SelectionManager _selectionManager;
+        private readonly CommandExecutor _commandExecutor;
         private readonly CommandFactory _commandFactory;
 
         public System.Windows.Input.ICommand ApplyCommand { get; set; }
@@ -45,7 +45,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         public NotifyAttr<DoubleViewModel> VertexMovementFalloff { get; set; }
 
         public NotifyAttr<bool> ShowVertexFalloff { get; set; } = new NotifyAttr<bool>(false);
-
 
         public TransformToolViewModel(SelectionManager selectionManager, CommandExecutor commandExecutor, CommandFactory commandFactory, EventHub eventHub)
         {

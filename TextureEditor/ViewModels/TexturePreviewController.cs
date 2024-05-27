@@ -12,6 +12,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using TextureEditor.Views;
+using View3D.Rendering;
 using View3D.Services;
 using View3D.Utility;
 

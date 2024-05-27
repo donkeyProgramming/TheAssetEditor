@@ -23,10 +23,6 @@ namespace AssetEditor
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            //var file = new PackFile("Testfile.bmd", new FileSystemSource(@"C:\Users\ole_k\Downloads\grn_tree_of_beards_01.bmd"));
-            //new FastBinParser2().Load(file);
-
-
             VersionChecker.CheckVersion();
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 

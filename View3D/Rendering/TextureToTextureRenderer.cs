@@ -1,9 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using View3D.Utility;
 
-namespace View3D.Utility
+namespace View3D.Rendering
 {
     public class TextureToTextureRenderer : IDisposable
     {
@@ -28,7 +29,7 @@ namespace View3D.Utility
 
         public Texture2D RenderToTexture(Texture2D texture, int width, int height, DrawSettings settings, string outputPath = null)
         {
-            RenderTarget2D renderTarget = new RenderTarget2D(_device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
+            var renderTarget = new RenderTarget2D(_device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
             DrawTextureToTarget(renderTarget, texture, settings);
             if (outputPath != null)
                 SaveTexture(renderTarget, outputPath);
@@ -38,7 +39,7 @@ namespace View3D.Utility
         void DrawTextureToTarget(RenderTarget2D renderTarget, Texture2D texture, DrawSettings setings)
         {
             _device.SetRenderTarget(renderTarget);
-            _device.Clear(Microsoft.Xna.Framework.Color.Transparent);
+            _device.Clear(Color.Transparent);
             _device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
 
             var previewShader = _resourceLibary.GetEffect(ShaderTypes.TexturePreview);
@@ -52,7 +53,7 @@ namespace View3D.Utility
             previewShader.Parameters["OnlyBlue"].SetValue(setings.OnlyBlue);
             previewShader.Parameters["ApplyOnlyAlpha"].SetValue(setings.OnlyAlpha);
 
-            _spriteBatch.Draw(texture, Vector2.Zero, Microsoft.Xna.Framework.Color.Red);
+            _spriteBatch.Draw(texture, Vector2.Zero, Color.Red);
             _spriteBatch.End();
 
             _device.SetRenderTarget(null);
@@ -60,7 +61,7 @@ namespace View3D.Utility
 
         public void SaveTexture(Texture2D texture, string path)
         {
-            using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
+            using (var stream = new FileStream(path, FileMode.OpenOrCreate))
             {
                 texture.SaveAsPng(stream, texture.Width, texture.Height);
             }

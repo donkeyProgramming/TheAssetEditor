@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using MonoGame.Framework.WpfInterop;
@@ -37,7 +38,6 @@ namespace Shared.Ui.BaseDialogs
                 Content = view,
                 AlwaysOnTop = true,
             };
-
             if (viewModel is IGameComponent component)
             {
                 _wpfGame.AddComponent(component);
@@ -81,11 +81,14 @@ namespace Shared.Ui.BaseDialogs
         {
             Style = (Style)FindResource("CustomWindowStyle");
             Closing += AssetEditorWindow_Closing;
-            Deactivated += AssetEditorWindow_Deactivated;
+            Deactivated += AssetEditorWindow_Deactivated;  
 
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
             VerticalContentAlignment = VerticalAlignment.Stretch;
-            SizeToContent = SizeToContent.WidthAndHeight;
+           // SizeToContent = SizeToContent.WidthAndHeight;
+            Owner = Application.Current.MainWindow;
+
+
         }
 
         private void AssetEditorWindow_Deactivated(object sender, EventArgs e)
