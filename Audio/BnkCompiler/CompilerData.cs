@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
-using static Audio.FileFormats.WWise.Hirc.Shared.AkDecisionTree;
-
+using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Audio.FileFormats.WWise.Hirc.Shared;
 
 namespace Audio.BnkCompiler
 {
@@ -23,7 +23,7 @@ namespace Audio.BnkCompiler
 
     public class DialogueEvent : IAudioProjectHircItem
     {
-        public Node RootNode { get; set; }
+        public AkDecisionTree.Node RootNode { get; set; }
         public uint NodesCount { get; set; } = 0;
     }
 
@@ -86,7 +86,6 @@ namespace Audio.BnkCompiler
             _allProjectItems.AddRange(RandomContainers);
             _allProjectItems.AddRange(DialogueEvents);
 
-
             // Compute the write ids
             Events.ForEach(x => Process(x, false, WWiseHash.Compute));
             Actions.ForEach(x => Process(x, allowOverrideIdForActions, WWiseHash.Compute));
@@ -126,20 +125,4 @@ namespace Audio.BnkCompiler
                 item.SerializationId = hashFunc(item.Name);
         }
     }
-
-    /*
-     	<!--DialogEvents-->
-	<DialogEvent Id="battle_vo_order_halt" bnkFile="gamebnk.bnk">
-		<MergeTable Source="Pack|System">customSounds/dialogEvents/battle_vo_order_halt_halflings.csv</MergeTable>
-		<MergeTable Source="Pack|System">customSounds/dialogEvents/battle_vo_order_halt_super_goblins.csv</MergeTable>
-	</DialogEvent>
-
-
-	<!--Containers-->
-	<RandomContainer id="my_container" ForceId="222s2ss">
-		<Instance chance="5000" child="CustomAudioFile_ID"/>
-	</RandomContainer>
-     */
 }
-
-

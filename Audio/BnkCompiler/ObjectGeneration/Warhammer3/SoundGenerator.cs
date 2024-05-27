@@ -13,7 +13,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
     public class SoundGenerator : IWWiseHircGenerator
     {
         public string GameName => CompilerConstants.Game_Warhammer3;
-        private static readonly IVanillaObjectIds _VanillaObjectIds = new VanillaObjectIds();
+        private static readonly IVanillaObjectIds _VanillaObjectIds = new IdProvider();
         public Type AudioProjectType => typeof(GameSound);
 
         private readonly PackFileService _pfs;

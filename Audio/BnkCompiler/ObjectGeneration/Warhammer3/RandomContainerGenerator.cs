@@ -1,11 +1,10 @@
-﻿using Audio.BnkCompiler;
-using Audio.FileFormats.WWise;
+﻿using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Hirc.V136;
 using CommunityToolkit.Diagnostics;
-using Microsoft.Xna.Framework.Media;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {

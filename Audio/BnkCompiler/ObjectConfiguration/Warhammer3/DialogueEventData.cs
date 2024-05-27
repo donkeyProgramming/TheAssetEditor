@@ -11,16 +11,15 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
     {
         private readonly IAudioRepository _audioRepository;
 
-        public DialogueEventData(IAudioRepository audioRepository)
-        {
-            _audioRepository = audioRepository;
-        }
+        public DialogueEventData(IAudioRepository audioRepository) => _audioRepository = audioRepository;
 
         public static Dictionary<string, List<string>> ExtractedDialogueEvents = new Dictionary<string, List<string>>();
 
-        // Dynamically extract dialogue events from the dat files (dialogue events are contained within Section 4).
+        // Dynamically extract dialogue events from the master dat file (dialogue events are contained within Section 4).
         public void ExtractDialogueEventsFromDat()
         {
+            ExtractedDialogueEvents = new Dictionary<string, List<string>>();
+
             var datDumpMasterPath = $"{DirectoryHelper.Temp}\\DatDumps\\dat_dump_master.txt";
             var lines = File.ReadAllLines(datDumpMasterPath);
             var datSection4 = ExtractSection(lines, "Section 4", "Section 5");
@@ -31,22 +30,24 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
                 var dialogueEvent = parts.Item1;
                 var stateGroups = parts.Item2;
 
-                foreach (var value in stateGroups)
+                foreach (var hashedId in stateGroups)
                 {
-                    if (value != "")
+                    if (hashedId != "")
                     {
-                        var hashedId = uint.Parse(value);
+                        var stateGroup = _audioRepository.GetNameFromHash(uint.Parse(hashedId));
 
                         if (!ExtractedDialogueEvents.ContainsKey(dialogueEvent))
                             ExtractedDialogueEvents[dialogueEvent] = new List<string>();
 
-                        ExtractedDialogueEvents[dialogueEvent].Add(_audioRepository.GetNameFromHash(hashedId));
+                        ExtractedDialogueEvents[dialogueEvent].Add(stateGroup);
                     }
                 }
             }
+
+            ExportDialogueEvents();
         }
 
-        public static List<string> ExtractSection(string[] lines, string startSection, string endSection)
+        private static List<string> ExtractSection(string[] lines, string startSection, string endSection)
         {
             var sectionLines = new List<string>();
             var inSection = false;
@@ -69,7 +70,7 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
             return sectionLines;
         }
 
-        public static Tuple<string, List<string>> ParseLine(string line)
+        private static Tuple<string, List<string>> ParseLine(string line)
         {
             var commaIndex = line.IndexOf(',');
 
@@ -85,6 +86,26 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
             return new Tuple<string, List<string>>(key, values);
         }
 
+        private static void ExportDialogueEvents()
+        {
+            var csvFilePath = $"{DirectoryHelper.Temp}\\DatDumps\\extracted_dialogue_events.csv";
+            using var writer = new StreamWriter(csvFilePath);
+
+            foreach (var dictionaryEntry in ExtractedDialogueEvents)
+            {
+                var dialogueEvent = dictionaryEntry.Key;
+                var stateGroups = dictionaryEntry.Value;
+
+                var csvLine = dialogueEvent;
+
+                foreach (var stateGroup in stateGroups)
+                    csvLine += $",{stateGroup}";
+
+                writer.WriteLine(csvLine);
+            }
+        }
+
+        // Get the bnk that a dialogue event is contained within.
         public static string MatchDialogueEventToBnk(string dialogueEvent)
         {
             dialogueEvent = dialogueEvent.ToLower();
@@ -108,7 +129,7 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
                 return "battle_individual_melee";
 
             else
-                throw new Exception($"{dialogueEvent} could not be matched to a bnk.");
+                throw new Exception($"Error: {dialogueEvent} could not be matched to a bnk.");
         }
     }
 }

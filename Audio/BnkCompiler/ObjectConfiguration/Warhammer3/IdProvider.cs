@@ -10,7 +10,7 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 
     }
 
-    public class VanillaObjectIds : IVanillaObjectIds
+    public class IdProvider : IVanillaObjectIds
     {
         public Dictionary<string, uint> EventMixerIds { get; } = new Dictionary<string, uint>()
         {
@@ -41,5 +41,10 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
             {"campaign_vo_conversational_attenuation", 62329658},
             {"campaign_vo_attenuation", 432982952},
         };
+    }
+
+    internal static class CompilerConstants
+    {
+        public static readonly string Game_Warhammer3 = "Warhammer3";
     }
 }

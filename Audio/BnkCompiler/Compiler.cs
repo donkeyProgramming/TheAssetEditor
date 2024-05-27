@@ -8,11 +8,6 @@ using Audio.FileFormats.WWise.Hirc;
 using CommunityToolkit.Diagnostics;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
-using Audio.Utility;
-using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using Audio.FileFormats.WWise.Hirc.Shared;
 using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Audio.Storage;
 
@@ -24,11 +19,6 @@ namespace Audio.BnkCompiler
         public PackFile OutputBnkFile { get; set; }
         public PackFile OutputDatFile { get; set; }
         public PackFile OutputStatesDatFile { get; set; }
-    }
-
-    internal static class CompilerConstants
-    {
-        public static readonly string Game_Warhammer3 = "Warhammer3";
     }
 
     public class Compiler
@@ -49,19 +39,21 @@ namespace Audio.BnkCompiler
             // Load audio repository to access dat dump.
             var audioRepository = new AudioRepository(_provider, false);
 
+            // Extract dialogue events and their state groups from dat file
             var dialogueEventStateGroups = new DialogueEventData(audioRepository);
             dialogueEventStateGroups.ExtractDialogueEventsFromDat();
 
-            // Build the wwise object graph 
+            // Build the wwise object graph. 
             var header = _headerBuilder.Generate(audioProject);
             var hircChunk = _hircBuilder.Generate(audioProject);
 
-            //Ensure all write ids are not causing conflicts. Todo, this will cause issues with reuse of sounds
+            // Ensure all write ids are not causing conflicts.
             var allIds = hircChunk.Hircs.Select(x => x.Id).ToList();
             var originalCount = allIds.Count();
             var uniqueCount = allIds.Distinct().Count();
             Guard.IsEqualTo(originalCount, uniqueCount);
 
+            // Build the dat files.
             var eventDat = (audioProject.Events.Count == 0) ? null : BuildDat(audioProject);
             var statesDat = (audioProject.DialogueEvents.Count == 0) ? null : BuildStatesDat(audioProject);
 
@@ -76,7 +68,7 @@ namespace Audio.BnkCompiler
             return Result<CompileResult>.FromOk(compileResult);
         }
 
-        PackFile ConvertToPackFile(BkhdHeader header, HircChunk hircChunk, string outputFile)
+        private PackFile ConvertToPackFile(BkhdHeader header, HircChunk hircChunk, string outputFile)
         {
             var outputName = $"{outputFile}.bnk";
             var headerBytes = BkhdParser.GetAsByteArray(header);
@@ -96,7 +88,7 @@ namespace Audio.BnkCompiler
             return bnkPackFile;
         }
 
-        PackFile BuildDat(CompilerData projectFile)
+        private PackFile BuildDat(CompilerData projectFile)
         {
             var outputName = $"event_data__{projectFile.ProjectSettings.BnkName}.dat";
             var datFile = new SoundDatFile();
@@ -110,7 +102,7 @@ namespace Audio.BnkCompiler
             return packFile;
         }
 
-        PackFile BuildStatesDat(CompilerData projectFile)
+        private PackFile BuildStatesDat(CompilerData projectFile)
         {
             var outputName = $"states_data__{projectFile.ProjectSettings.BnkName}.dat";
             var datFile = new SoundDatFile();
