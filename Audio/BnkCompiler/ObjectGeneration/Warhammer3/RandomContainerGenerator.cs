@@ -29,7 +29,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseRandomContainer.byBitVector = 0x12;
             wwiseRandomContainer.fTransitionTime = 1000;
 
-            var mixer = project.GetActionMixerForObject(inputContainer.Name);
+            var mixer = project.GetActorMixerForObject(inputContainer.Name);
             if (mixer != null)
                 wwiseRandomContainer.NodeBaseParams.DirectParentId = project.GetHircItemIdFromName(inputContainer.DirectParentId);
 

@@ -106,7 +106,7 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
         }
 
         // Get the bnk that a dialogue event is contained within.
-        public static string MatchDialogueEventToBnk(string dialogueEvent)
+        public static string GetBnkFromDialogueEvent(string dialogueEvent)
         {
             dialogueEvent = dialogueEvent.ToLower();
 

@@ -43,8 +43,8 @@ namespace Audio.BnkCompiler
     {
         public string Path { get; set; }
         public string DirectParentId { get; set; } = null;
-        public bool IsDialogueEventSound { get; set; }
         public string DialogueEvent { get; set; }
+        public uint Attenuation { get; set; }
 
     }
 
@@ -93,7 +93,6 @@ namespace Audio.BnkCompiler
             ActorMixers.ForEach(x => Process(x, allowOverrideIdForMixers, WWiseHash.Compute));
             RandomContainers.ForEach(x => Process(x, false, WWiseHash.Compute));
             DialogueEvents.ForEach(x => Process(x, false, WWiseHash.Compute));
-
         }
 
         public uint GetHircItemIdFromName(string name)
@@ -101,17 +100,10 @@ namespace Audio.BnkCompiler
             return _allProjectItems.First(x => x.Name == name).SerializationId;
         }
 
-        public IAudioProjectHircItem GetActionMixerForObject(string objectName)
+        public IAudioProjectHircItem GetActorMixerForObject(string objectName)
         {
             var mixers = _allProjectItems.Where(x => x is ActorMixer).Cast<ActorMixer>().ToList();
             var mixer = mixers.Where(x => x.Children.Contains(objectName)).ToList();
-            return mixer.FirstOrDefault();
-        }
-
-        public IAudioProjectHircItem GetActionMixerParentForActorMixer(string soundName)
-        {
-            var mixers = _allProjectItems.Where(x => x is ActorMixer).Cast<ActorMixer>().ToList();
-            var mixer = mixers.Where(x => x.ActorMixerChildren.Contains(soundName)).ToList();
             return mixer.FirstOrDefault();
         }
 

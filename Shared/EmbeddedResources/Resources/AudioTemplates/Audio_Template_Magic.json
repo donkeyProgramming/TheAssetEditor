@@ -11,7 +11,7 @@
   - BnkName: This is the name of the bnk. The bnk name in this tempalte should start with the name of the vanilla bnk "battle_individual_magic__", the rest of the bnk name can be custom.
   - Language: This is the language folder that you want the project to output to.
   - EventName: This is the name of the event. Event names in this template should start with "Battle_Individual_Magic_", the rest of the event name can be custom.
-  - Mixer: The mixer determines how the sound will be played in game. In this template the mixer should be "Magic".
+  - Mixer: The mixer determines how the sound will be played in game. In this template the mixer should be "magic".
   - Sounds: Define the path to your sound files here. If multiple sound files are specified a random sound is played each time the event is triggered.
 */
 
@@ -24,12 +24,12 @@
   "Events": [
     {
       "EventName": "Battle_Individual_Magic_Template_Event_Houdini_1",
-      "Mixer": "Magic",
+      "Mixer": "magic",
       "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
     },
     {
       "EventName": "Battle_Individual_Magic_Template_Event_Houdini_2",
-      "Mixer": "Magic",
+      "Mixer": "magic",
       "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
     }
   ]
