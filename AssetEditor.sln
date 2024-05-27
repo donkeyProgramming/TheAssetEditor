@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Editors", "Editors", "{07AC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "View3D", "View3D\View3D.csproj", "{8494EA8F-DBD8-4E4C-880C-7401CE2FB240}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KitbasherEditor", "KitbasherEditor\KitbasherEditor.csproj", "{D7225D7F-87E4-4FAD-A3BE-9165DFDC315E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.KitbasherEditor", "Editors\KitbasherEditor\Editors.KitbasherEditor.csproj", "{D7225D7F-87E4-4FAD-A3BE-9165DFDC315E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextureEditor", "TextureEditor\TextureEditor.csproj", "{70708A4D-A71A-487A-87DE-47E526F2E142}"
 EndProject
@@ -68,7 +68,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.Shared.Core", "Edit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.AnimationContainers", "Editors\SimpleAnimationEditors\Editors.AnimationContainers.csproj", "{CAEB33BF-48DF-4388-BE6B-7D7ABBB9414B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.Reports", "Editors\Editors.Reporsts\Editors.Reports.csproj", "{EAFBC3D8-A146-4BA3-8024-DE4E20D3C884}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.Reports", "Editors\Reports\Editors.Reports.csproj", "{EAFBC3D8-A146-4BA3-8024-DE4E20D3C884}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

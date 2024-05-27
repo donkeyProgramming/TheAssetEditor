@@ -32,9 +32,8 @@
         <ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
         <ProjectReference Include="..\AssetManagment\AssetManagement.csproj" />
         <ProjectReference Include="..\Audio\Audio.csproj" />
-        <ProjectReference Include="..\Editors\Editors.Reporsts\Editors.Reports.csproj" />
-  
-        <ProjectReference Include="..\KitbasherEditor\KitbasherEditor.csproj" />
+        <ProjectReference Include="..\Editors\KitbasherEditor\Editors.KitbasherEditor.csproj" />
+        <ProjectReference Include="..\Editors\Reports\Editors.Reports.csproj" />
         <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
         <ProjectReference Include="..\Shared\EmbeddedResources\Shared.EmbeddedResources.csproj" />
         <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
