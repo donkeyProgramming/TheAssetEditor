@@ -1,5 +1,3 @@
-// Example Event: IND_Magic_Imrik_Dragon_Horn_Blow
-
 /* 
   ================= README =================
   This is a template audio project for custom ability audio. Vanilla uses several different names for ability audio: Battle_Individual_Ability, Battle_IND_Ability, IND_Ability, but they all work the same.

@@ -1,4 +1,4 @@
-{ /* 
+/* 
   ================= README =================
   This is a template audio project for custom UI audio for campaign and battle. Vanilla uses different names for campaign and battle audio: UI_CAM, UI_BAT respectively. 
   For standardisation it's recommended you follow that vanilla naming convention.

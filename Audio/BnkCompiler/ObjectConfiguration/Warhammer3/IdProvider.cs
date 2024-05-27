@@ -27,7 +27,7 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
         {
             // {"Type of Event", Mixer Id}
             {"ability", 140075115},
-            {"advisor", 517250292},
+            {"campaign_advisor", 517250292},
             {"diplomacy_line", 54848735},
             {"event_narration", 517250292},
             {"magic", 140075115},
