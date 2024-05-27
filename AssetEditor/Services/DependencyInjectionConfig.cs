@@ -1,6 +1,5 @@
 ﻿using System;
 using AnimationEditor;
-using AnimationMeta;
 using AssetManagement;
 using Audio;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +33,7 @@ namespace AssetEditor.Services
                 new Editors.Reports.DependencyInjectionContainer(),
                 new KitbasherEditor.DependencyInjectionContainer(),
                 new AssetManagement_DependencyInjectionContainer(),
-                new AnimationMeta_DependencyInjectionContainer(),
+                new AnimationMeta.DependencyInjectionContainer(),
                 new AudioEditor_DependencyInjectionContainer(),
                 new TextureEditor_DependencyInjectionContainer(),
                 new AnimationEditors_DependencyInjectionContainer(),

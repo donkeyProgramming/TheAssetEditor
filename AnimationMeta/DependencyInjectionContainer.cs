@@ -8,7 +8,7 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace AnimationMeta
 {
-    public class AnimationMeta_DependencyInjectionContainer : DependencyContainer
+    public class DependencyInjectionContainer : DependencyContainer
     {
         public override void Register(IServiceCollection serviceCollection)
         {
