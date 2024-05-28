@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ToolCreation;
-using TextureEditor;
 using View3D;
 
 namespace AssetEditor.Services
@@ -35,7 +34,7 @@ namespace AssetEditor.Services
                 new AssetManagement_DependencyInjectionContainer(),
                 new AnimationMeta.DependencyInjectionContainer(),
                 new AudioEditor_DependencyInjectionContainer(),
-                new TextureEditor_DependencyInjectionContainer(),
+                new Editors.TextureEditor.DependencyInjectionContainer(),
                 new AnimationEditors_DependencyInjectionContainer(),
 
                 // Host application

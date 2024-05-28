@@ -18,12 +18,12 @@ namespace TextureEditor.ViewModels
 {
     public class TexturePreviewController : IDisposable
     {
-        PackFileService _packFileService;
-        ResourceLibary _resourceLib;
-        TextureToTextureRenderer _textureRenderer;
-        string _imagePath;
-        TexturePreviewViewModel _viewModel;
-        GameWorld _scene;
+        private readonly PackFileService _packFileService;
+        private readonly ResourceLibary _resourceLib;
+        private readonly TextureToTextureRenderer _textureRenderer;
+        private readonly string _imagePath;
+        private readonly TexturePreviewViewModel _viewModel;
+        private readonly GameWorld _scene;
 
         public class ViewModelWrapper : NotifyPropertyChangedImpl
         {

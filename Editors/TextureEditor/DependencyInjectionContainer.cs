@@ -4,9 +4,9 @@ using Shared.Core.ToolCreation;
 using TextureEditor.ViewModels;
 using TextureEditor.Views;
 
-namespace TextureEditor
+namespace Editors.TextureEditor
 {
-    public class TextureEditor_DependencyInjectionContainer : DependencyContainer
+    public class DependencyInjectionContainer : DependencyContainer
     {
         public override void Register(IServiceCollection serviceCollection)
         {

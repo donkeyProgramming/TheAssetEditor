@@ -10,7 +10,7 @@ namespace Editors.AnimationContainers
 {
     public class DependencyInjectionContainer : DependencyContainer
     {
-        public DependencyInjectionContainer(bool loadResource = true)
+        public DependencyInjectionContainer()
         {
         }
 

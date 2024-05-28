@@ -1,13 +1,13 @@
-﻿using CommonControls.PackFileBrowser;
-using Shared.Core.Misc;
-using Shared.Core.PackFiles;
-using Shared.GameFormats.RigidModel.Types;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using CommonControls.PackFileBrowser;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.RigidModel.Types;
 using TextureEditor.ViewModels;
 using View3D.SceneNodes;
 

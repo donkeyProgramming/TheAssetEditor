@@ -82,7 +82,6 @@ namespace View3D.Services
             return texture.Value.Path;
         }
 
-
         void UpdateTextureIfMissing(Rmv2MeshNode meshNode, PackFileService pfs, TextureType texureType, string newPath)
         {
             var newFile = pfs.FindFile(newPath);
@@ -97,6 +96,5 @@ namespace View3D.Services
                 meshNode.UseTexture(texureType, true);
             }
         }
-
     }
 }
