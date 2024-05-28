@@ -1,28 +1,22 @@
 ﻿using KitbasherEditor.ViewModels.MenuBarViews;
+using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
-using View3D.Services.SceneSaving.Geometry;
+using View3D.Components.Component;
+using View3D.Services.SceneSaving;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class SaveAsCommand : IKitbasherUiCommand
+    public class SaveAsCommand :  SaveCommandBase, IKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "SaveAs";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        private readonly SceneSaverService _sceneSaverService;
-        private readonly KitbasherRootScene _kitbasherRootScene;
-
-        public SaveAsCommand(SceneSaverService sceneSaverService, KitbasherRootScene kitbasherRootScene)
+        public SaveAsCommand(IWindowFactory windowFactory, SaveSettings settings, SceneManager sceneManager, SaveService saveService)
+            : base(windowFactory, settings, sceneManager, saveService)
         {
-            _sceneSaverService = sceneSaverService;
-            _kitbasherRootScene = kitbasherRootScene;
         }
 
-        public void Execute()
-        {
-            throw new System.Exception();
-            //_sceneSaverService.SaveAs(_kitbasherRootScene.SelectedOutputFormat);
-        }
+        public void Execute() => Save(true);
     }
 }

@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Windows;
 using Shared.Core.Misc;
-using Shared.Ui.BaseDialogs;
+using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common;
 
 namespace Shared.Ui.Editors.BoneMapping

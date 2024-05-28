@@ -5,7 +5,6 @@ namespace View3D.Services.SceneSaving.Lod
     public enum LodStrategy
     {
         Default,
-        Simplygon,
         Lod0ForAll,
     }
 

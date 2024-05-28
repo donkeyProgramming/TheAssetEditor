@@ -1,5 +1,5 @@
 ﻿using Shared.Core.Events;
-using Shared.Ui.BaseDialogs;
+using Shared.Ui.BaseDialogs.WindowHandling;
 
 namespace CommonControls.Editors.AnimationBatchExporter;
 

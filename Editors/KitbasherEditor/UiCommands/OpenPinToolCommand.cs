@@ -1,7 +1,7 @@
 ﻿using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.Views.EditorViews.PinTool;
-using Shared.Ui.BaseDialogs;
+using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.UiCommands

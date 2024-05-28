@@ -7,6 +7,7 @@
              xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit" 
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:texteditor="clr-namespace:Shared.Ui.Editors.TextEditor"
+            xmlns:resources="clr-namespace:Shared.EmbeddedResources;assembly=Shared.EmbeddedResources"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
@@ -21,7 +22,7 @@
                 </Style>
             </ToolBar.Resources>
             <Button Command="{Binding SaveCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <Image Source="../../Resources/Icons/Save.png" Height="16"/>
+                <Image Height="16"  Source="{Binding Source={x:Static resources:IconLibrary.SaveFileIcon}}"/>
             </Button>
             <Separator/>
             <ComboBox Name="highlightingComboBox"   

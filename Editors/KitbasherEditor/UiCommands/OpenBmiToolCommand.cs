@@ -1,13 +1,11 @@
-﻿using System.Windows;
-using CommonControls.BaseDialogs;
-using Editors.Shared.Core.Services;
+﻿using Editors.Shared.Core.Services;
 using KitbasherEditor.ViewModels.BmiEditor;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.Views.EditorViews;
 using Shared.Core.PackFiles;
+using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 using View3D.Animation;
-using View3D.Commands;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 
@@ -19,17 +17,17 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.OneObjectSelected;
         public Hotkey HotKey { get; } = null;
 
-        PackFileService _packFileService;
-        SkeletonAnimationLookUpHelper _skeletonHelper;
-        SelectionManager _selectionManager;
-        private readonly CommandFactory _commandFactory;
+        private readonly PackFileService _packFileService;
+        private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
+        private readonly SelectionManager _selectionManager;
+        private readonly IWindowFactory _windowFactory;
 
-        public OpenBmiToolCommand(PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, SelectionManager selectionManager, CommandFactory commandFactory)
+        public OpenBmiToolCommand(PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, SelectionManager selectionManager, IWindowFactory windowFactory)
         {
             _packFileService = packFileService;
             _skeletonHelper = skeletonHelper;
             _selectionManager = selectionManager;
-            _commandFactory = commandFactory;
+            _windowFactory = windowFactory;
         }
 
         public void Execute()
@@ -40,18 +38,12 @@ namespace KitbasherEditor.ViewModels.UiCommands
             if (meshNode != null)
             {
                 var skeletonName = meshNode.Geometry.ParentSkeletonName;
-
                 var newSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, skeletonName);
-                GameSkeleton skeleton = new GameSkeleton(newSkeletonFile, null);
+                var skeleton = new GameSkeleton(newSkeletonFile, null);
 
-                var window = new ControllerHostWindow(true, ResizeMode.CanResize)
-                {
-                    DataContext = new BmiViewModel(skeleton, meshNode, _commandFactory),
-                    Title = "Bmi Tool",
-                    Content = new BmiView(),
-                };
-
-                window.Show();
+                var window = _windowFactory.Create<BmiViewModel, BmiView>("BMI tool", 1200, 1100);
+                window.TypedContext.Initialize(skeleton, meshNode);
+                window.ShowWindow();
             }
         }
     }

@@ -5,10 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows;
+using System.Windows.Input;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.EmbeddedResources;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
@@ -56,8 +58,8 @@ namespace View3D.Services.SceneSaving.Material.Strategies
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
                 var materialTemplate = game switch
                 {
-                    GameTypeEnum.Warhammer3 => LoadMaterialTemplate("View3D.Content.Game.MaterialTemplate_wh3.xml.material"),
-                    GameTypeEnum.Warhammer2 => LoadMaterialTemplate("View3D.Content.Game.MaterialTemplate_wh2.xml.material"),
+                    GameTypeEnum.Warhammer3 => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_wh3.xml.material"),
+                    GameTypeEnum.Warhammer2 => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_wh2.xml.material"),
                     _ => throw new Exception("Unknown game - unable to generate ws model")
                 };
 
@@ -132,14 +134,6 @@ namespace View3D.Services.SceneSaving.Material.Strategies
             if (materialFileName == null)
                 materialFileName = CreateNewMaterial(modelFilePath, mesh, uniqueName, materialTemplate);
             return materialFileName;
-        }
-
-        string LoadMaterialTemplate(string key)
-        {
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(key);
-            using var reader = new StreamReader(stream!);
-            var result = reader.ReadToEnd();
-            return result;
         }
 
         string CreateNewMaterial(string modelFilePath, Rmv2MeshNode mesh, string uniqueName, string materialTemplate)

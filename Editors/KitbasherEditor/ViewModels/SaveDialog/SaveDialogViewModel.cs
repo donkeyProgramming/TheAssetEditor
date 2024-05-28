@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Shared.Core.Misc;
-using Shared.Ui.BaseDialogs;
 using View3D.Components.Component;
 using View3D.SceneNodes;
 using View3D.Services.SceneSaving;
@@ -17,7 +16,6 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         private readonly SaveSettings _settings;
         private readonly SceneManager _sceneManager;
         private readonly SaveService _saveService;
-        private IAssetEditorWindow _parentWindow;
 
         public ObservableCollection<LodGroupNodeViewModel> LodNodes { get; set; } = new ObservableCollection<LodGroupNodeViewModel>();  // Move to own class
         public List<ComboBoxItem<GeometryStrategy>> MeshStrategies { get; set; } 
@@ -51,11 +49,6 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             _settings.IsInitialized = true;
         }
 
-        public void Initialise(IAssetEditorWindow parentWindow)
-        {
-            _parentWindow = parentWindow;
-        }
-
         void BuildLodOverview()
         {
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
@@ -74,16 +67,15 @@ namespace KitbasherEditor.ViewModels.SaveDialog
   
             // Update meshes based on lod settings
             // Trigger mesh save 
-            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            _saveService.Save(mainNode, _settings);
+            //var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            //_saveService.Save(mainNode, _settings);
         }
 
         public void HandleSave()
         {
             HandleApply();
-            HandleClose();
         }
-
-        public void HandleClose() => _parentWindow.CloseWindow();
     }
+
+    
 }

@@ -1,29 +1,57 @@
 ﻿using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.Views.EditorViews;
-using Shared.Ui.BaseDialogs;
+using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
+using View3D.Components.Component;
+using View3D.SceneNodes;
+using View3D.Services.SceneSaving;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
-    public class SaveCommand : IKitbasherUiCommand
+    public class SaveCommandBase
+    {
+        private readonly IWindowFactory _windowFactory;
+        private readonly SaveSettings _settings;
+        private readonly SceneManager _sceneManager;
+        private readonly SaveService _saveService;
+
+        public SaveCommandBase(IWindowFactory windowFactory, SaveSettings settings, SceneManager sceneManager, SaveService saveService)
+        {
+            _windowFactory = windowFactory;
+            _settings = settings;
+            _sceneManager = sceneManager;
+            _saveService = saveService;
+        }
+
+        protected void Save(bool forceShowDialog)
+        {
+            bool saveScene = true;
+            if (_settings.IsInitialized == false || forceShowDialog)
+            {
+                var window = _windowFactory.Create<SaveDialogViewModel, SaveDialogView>("Save", 630, 350);
+                saveScene = window.ShowWindow(true) == true;
+            }
+
+            if (saveScene)
+            {
+                var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+                _saveService.Save(mainNode, _settings);
+            }
+        }
+    }
+
+    public class SaveCommand : SaveCommandBase, IKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Save";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        private readonly IWindowFactory _windowFactory;
-
-        public SaveCommand(IWindowFactory windowFactory)
+        public SaveCommand(IWindowFactory windowFactory, SaveSettings settings, SceneManager sceneManager, SaveService saveService)
+            :base(windowFactory, settings, sceneManager, saveService)
         {
-            _windowFactory = windowFactory;
         }
 
-        public void Execute()
-        {
-            var window = _windowFactory.Create<SaveDialogViewModel, SaveDialogView>("Save", 600, 350);
-            window.TypedContext.Initialise(window);
-            window.ShowWindow();
-        }
+        public void Execute() => Save(false);
     }
 }

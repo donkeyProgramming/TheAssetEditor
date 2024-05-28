@@ -1,7 +1,7 @@
 ﻿using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
-using Shared.Ui.BaseDialogs;
+using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.UiCommands

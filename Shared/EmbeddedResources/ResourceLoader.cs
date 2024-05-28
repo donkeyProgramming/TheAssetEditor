@@ -6,11 +6,17 @@ namespace Shared.EmbeddedResources
 {
     public static class ResourceLoader
     {
-        public static string[] LoadStringArray(string resourcePath)
+        public static string LoadString(string resourcePath)
         {
             using var stream = GetResourceStream(resourcePath);
             using var reader = new StreamReader(stream);
-            return reader.ReadToEnd().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            return reader.ReadToEnd();
+        }
+
+        public static string[] LoadStringArray(string resourcePath)
+        {
+            return LoadString(resourcePath)
+                .Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
         }
 
         public static BitmapImage LoadBitmapImage(string resourcePath)
@@ -48,5 +54,7 @@ namespace Shared.EmbeddedResources
 
             return stream;
         }
+
+
     }
 }

@@ -58,7 +58,7 @@ namespace View3D
             serviceCollection.AddScoped<LodStrategyProvider>();
             serviceCollection.AddScoped<ILodGenerationStrategy, DefaultLodGeneration>();
             serviceCollection.AddScoped<ILodGenerationStrategy, Lod0ForAllLodGeneration>();
-            serviceCollection.AddScoped<ILodGenerationStrategy, SimplygonLodGeneration>();
+            //serviceCollection.AddScoped<ILodGenerationStrategy, SimplygonLodGeneration>();
 
             serviceCollection.AddScoped<MaterialStrategyProvider>();
             serviceCollection.AddScoped<IMaterialStrategy, Warhammer3WsModelStrategy>();

@@ -8,7 +8,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
-using Shared.Ui.BaseDialogs;
+using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;
 using View3D.Components.Component.Selection;
@@ -48,14 +48,14 @@ namespace KitbasherEditor.ViewModels.UiCommands
             if (existingSkeletonFile == null)
                 throw new Exception("TargetSkeleton not found -" + targetSkeletonName);
 
-            var selectedMeshses = state.SelectedObjects<Rmv2MeshNode>();
-            if (selectedMeshses.Count(x => x.Geometry.VertexFormat == UiVertexFormat.Static) != 0)
+            var selectedMeshes = state.SelectedObjects<Rmv2MeshNode>();
+            if (selectedMeshes.Count(x => x.Geometry.VertexFormat == UiVertexFormat.Static) != 0)
             {
                 MessageBox.Show($"A static mesh is selected, which can not be remapped");
                 return;
             }
 
-            var selectedMeshSkeletons = selectedMeshses
+            var selectedMeshSkeletons = selectedMeshes
                 .Select(x => x.Geometry.ParentSkeletonName)
                 .Distinct();
 
@@ -70,14 +70,14 @@ namespace KitbasherEditor.ViewModels.UiCommands
 
             // Ensure all the bones have valid stuff
             var allUsedBoneIndexes = new List<byte>();
-            foreach (var mesh in selectedMeshses)
+            foreach (var mesh in selectedMeshes)
             {
                 var boneIndexes = mesh.Geometry.GetUniqeBlendIndices();
                 var activeBonesMin = boneIndexes.Min(x => x);
                 var activeBonesMax = boneIndexes.Max(x => x);
 
                 var skeletonBonesMax = newSkeletonFile.Bones.Max(x => x.Id);
-                bool hasValidBoneMapping = activeBonesMin >= 0 && skeletonBonesMax >= activeBonesMax;
+                var hasValidBoneMapping = activeBonesMin >= 0 && skeletonBonesMax >= activeBonesMax;
                 if (!hasValidBoneMapping)
                 {
                     MessageBox.Show($"Mesh {mesh.Name} has an invalid bones, this might cause issues. Its a result of an invalid re-rigging most of the time");
@@ -105,7 +105,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
                 MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
 
             var window = _windowFactory.Create<ReRiggingViewModel, BoneMappingView>("Re-rigging", 1200, 1100);
-            window.TypedContext.Initialize(selectedMeshses, window, config);
+            window.TypedContext.Initialize(selectedMeshes, window, config);
             window.ShowWindow();
         }
     }

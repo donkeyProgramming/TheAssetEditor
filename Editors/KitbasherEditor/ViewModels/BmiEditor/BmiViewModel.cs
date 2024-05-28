@@ -1,6 +1,5 @@
 ﻿using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.MathViews;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -25,7 +24,6 @@ namespace KitbasherEditor.ViewModels.BmiEditor
             set { SetAndNotify(ref _selectedBone, value); CheckButtonsEnabled = value != null; }
         }
 
-
         public bool _checkButtonsEnabled = false;
         public bool CheckButtonsEnabled
         {
@@ -40,9 +38,13 @@ namespace KitbasherEditor.ViewModels.BmiEditor
             set { SetAndNotify(ref _scaleFactor, value); }
         }
 
-        public BmiViewModel(GameSkeleton skeleton, Rmv2MeshNode meshNode, CommandFactory commandFactory)
+        public BmiViewModel(CommandFactory commandFactory)
         {
             _commandFactory = commandFactory;
+        }
+
+        public void Initialize(GameSkeleton skeleton, Rmv2MeshNode meshNode)
+        {
             _meshNode = meshNode;
             _skeleton = skeleton;
             CreateBoneOverview(_skeleton);
@@ -117,125 +119,6 @@ namespace KitbasherEditor.ViewModels.BmiEditor
                     return result;
             }
             return null;
-        }
-
-        class FilterHelper
-        {
-            public static ObservableCollection<SkeletonBoneNode> FilterBoneList(string filterText, bool onlySHowUsedBones, ObservableCollection<SkeletonBoneNode> completeList)
-            {
-                var output = new ObservableCollection<SkeletonBoneNode>();
-                FilterBoneListRecursive(filterText, onlySHowUsedBones, completeList, output);
-                return completeList;
-            }
-
-            static void FilterBoneListRecursive(string filterText, bool onlySHowUsedBones, ObservableCollection<SkeletonBoneNode> completeList, ObservableCollection<SkeletonBoneNode> output)
-            {
-                foreach (var item in completeList)
-                {
-                    bool isVisible = IsBoneVisibleInFilter(item, onlySHowUsedBones, filterText, true);
-                    item.IsVisible = isVisible;
-                    if (isVisible)
-                    {
-                        FilterBoneListRecursive(filterText, onlySHowUsedBones, item.Children, item.Children);
-                    }
-                }
-            }
-
-            static bool IsBoneVisibleInFilter(SkeletonBoneNode bone, bool onlySHowUsedBones, string filterText, bool checkChildren)
-            {
-                var contains = bone.BoneName.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) != -1;
-                if (onlySHowUsedBones)
-                {
-                    if (contains && bone.IsUsedByCurrentModel)
-                        return contains;
-                }
-                else
-                {
-                    if (contains)
-                        return contains;
-                }
-                if (checkChildren)
-                {
-                    foreach (var child in bone.Children)
-                    {
-                        var res = IsBoneVisibleInFilter(child, onlySHowUsedBones, filterText, checkChildren);
-                        if (res == true)
-                            return true;
-                    }
-                }
-
-                return false;
-            }
-        }
-    }
-
-    public class SkeletonBoneNode : NotifyPropertyChangedImpl
-    {
-        public bool IsUsedByCurrentModel { get; set; }
-
-        bool _isChecked = true;
-        public bool IsChecked
-        {
-            get { return _isChecked; }
-            set { SetAndNotify(ref _isChecked, value); }
-        }
-
-        bool _isVisible = true;
-        public bool IsVisible
-        {
-            get { return _isVisible; }
-            set { SetAndNotify(ref _isVisible, value); }
-        }
-
-        string _boneName;
-        public string BoneName
-        {
-            get { return _boneName; }
-            set { SetAndNotify(ref _boneName, value); }
-        }
-
-        int _boneIndex;
-        public int BoneIndex
-        {
-            get { return _boneIndex; }
-            set { SetAndNotify(ref _boneIndex, value); }
-        }
-
-
-        int _parentBoneIndex;
-        public int ParentBoneIndex
-        {
-            get { return _parentBoneIndex; }
-            set { SetAndNotify(ref _parentBoneIndex, value); }
-        }
-
-        public override string ToString()
-        {
-            return BoneName + "[" + BoneIndex + "]";
-        }
-
-        public void SetCheckStatusForSelfAndChildren(bool value)
-        {
-            IsChecked = value;
-            foreach (var child in Children)
-                child.SetCheckStatusForSelfAndChildren(value);
-        }
-
-        public ObservableCollection<SkeletonBoneNode> Children { get; set; } = new ObservableCollection<SkeletonBoneNode>();
-
-        public List<int> GetAllCheckedChildBoneIndexes()
-        {
-            var output = new List<int>();
-            RecusrivlyBuildMappingList(this, output);
-            return output;
-        }
-
-        static void RecusrivlyBuildMappingList(SkeletonBoneNode bone, List<int> output)
-        {
-            if (bone.IsChecked)
-                output.Add(bone.BoneIndex);
-            foreach (var child in bone.Children)
-                RecusrivlyBuildMappingList(child, output);
         }
     }
 }

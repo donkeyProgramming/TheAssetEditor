@@ -9,24 +9,24 @@ namespace View3D.Services.SceneSaving
 {
     public class SaveValidatorService
     {
-        ErrorList Validate(MainEditableNode mainNode)
+        static ErrorList Validate(MainEditableNode mainNode)
         {
             var errorList = new ErrorList();
 
             var skeleton = mainNode.SkeletonNode.Skeleton;
             var meshes = mainNode.GetMeshNodes(0);
 
-            // Different skeltons
+            // Different skeletons
             if (skeleton != null)
             {
                 var activeSkeletonName = skeleton.SkeletonName;
-                var skeltonNames = meshes.Select(x => x.Geometry.ParentSkeletonName).Distinct().ToList();
+                var skeletonNames = meshes.Select(x => x.Geometry.ParentSkeletonName).Distinct().ToList();
 
-                if (skeltonNames.Count != 1)
+                if (skeletonNames.Count != 1)
                     errorList.Error("Skeleton", "Model contains meshes with multiple skeleton references. They will not animate well in game");
 
-                skeltonNames.Remove(activeSkeletonName);
-                if (skeltonNames.Count != 0)
+                skeletonNames.Remove(activeSkeletonName);
+                if (skeletonNames.Count != 0)
                     errorList.Error("Skeleton", "Model contains meshes that have not been re-rigged. They will not behave well in game");
             }
 
@@ -40,7 +40,7 @@ namespace View3D.Services.SceneSaving
 
             // Large model count
             if (meshes.Count > 50)
-                errorList.Warning("Mesh Count", "Model contains a large amount of mehses, might cause performance issues");
+                errorList.Warning("Mesh Count", "Model contains a large amount of meshes, might cause performance issues");
 
             if (ModelCombiner.HasPotentialCombineMeshes(meshes, out _))
                 errorList.Warning("Mesh", "Model contains multiple meshes that can be merged. Consider merging them for performance reasons");

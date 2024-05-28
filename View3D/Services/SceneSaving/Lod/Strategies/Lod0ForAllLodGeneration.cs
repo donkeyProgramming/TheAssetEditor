@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using View3D.SceneNodes;
+﻿using View3D.SceneNodes;
 
 namespace View3D.Services.SceneSaving.Lod.Strategies
 {
@@ -7,7 +6,7 @@ namespace View3D.Services.SceneSaving.Lod.Strategies
     {
 
         public LodStrategy StrategyId => LodStrategy.Lod0ForAll;
-        public string Name => "Lod0";
+        public string Name => "Lod0_ForAll";
         public string Description => "Copy lod 0 to all other lods";
         public bool IsAvailable => true;
 
