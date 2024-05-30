@@ -8,9 +8,9 @@ namespace View3D.Rendering
 {
     public class TextureToTextureRenderer : IDisposable
     {
-        GraphicsDevice _device;
-        SpriteBatch _spriteBatch;
-        ResourceLibary _resourceLibary;
+        public readonly GraphicsDevice _device;
+        public readonly SpriteBatch _spriteBatch;
+        public readonly ResourceLibary _resourceLibary;
 
         public class DrawSettings
         {

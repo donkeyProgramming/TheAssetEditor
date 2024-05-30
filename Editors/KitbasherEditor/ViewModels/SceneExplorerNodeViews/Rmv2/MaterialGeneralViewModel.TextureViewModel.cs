@@ -68,7 +68,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 UpdateTexturePath(path);
 
             }
-            public void Preview() => TexturePreviewController.CreateWindow(Path, _packfileService);
+            public void Preview() => TexturePreviewControllerCreator.CreateWindow(Path, _packfileService);
 
             public void Browse()
             {

@@ -1,13 +1,7 @@
-﻿using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Pfim;
-using Serilog;
-using Shared.Core.ErrorHandling;
-using Shared.Core.PackFiles;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.PackFiles;
 using View3D.Components;
 using View3D.Services;
 
@@ -26,13 +20,14 @@ namespace View3D.Utility
 
     public class ResourceLibary : BaseComponent, IDisposable
     {
-        ILogger _logger = Logging.Create<ResourceLibary>();
+        //private readonly  ILogger _logger = Logging.Create<ResourceLibary>();
 
-        Dictionary<string, Texture2D> _textureMap = new Dictionary<string, Texture2D>();
-        Dictionary<ShaderTypes, Effect> _shaders = new Dictionary<ShaderTypes, Effect>();
+        private readonly  Dictionary<string, Texture2D> _cachedTextures = new Dictionary<string, Texture2D>();
+        private readonly Dictionary<ShaderTypes, Effect> _cachedShaders = new Dictionary<ShaderTypes, Effect>();
 
-        PackFileService Pfs { get; set; }
-        ContentManager Content { get; set; }
+        private readonly PackFileService _pfs;
+        private readonly GameWorld _gameWorld;
+
         public SpriteBatch CommonSpriteBatch { get; private set; }
         public SpriteFont DefaultFont { get; private set; }
 
@@ -40,22 +35,18 @@ namespace View3D.Utility
         public TextureCube PbrSpecular { get; private set; }
         public Texture2D PbrLut { get; private set; }
 
-        GameWorld _gameWorld;
+   
         public ResourceLibary(GameWorld mainScene, PackFileService pf)
         {
-            Pfs = pf;
+            _pfs = pf;
             _gameWorld = mainScene;
         }
 
-        public SpriteFont LoadFont(string path)
-        {
-            return Content.Load<SpriteFont>(path);
-        }
+        public SpriteFont LoadFont(string path) => _gameWorld.Content.Load<SpriteFont>(path);
+        
 
         public override void Initialize()
         {
-            Content = _gameWorld.Content;
-
             // Load default shaders
             LoadEffect("Shaders\\Phazer\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
             LoadEffect("Shaders\\Phazer\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
@@ -66,184 +57,65 @@ namespace View3D.Utility
             DefaultFont = LoadFont("Fonts//DefaultFont");
             CommonSpriteBatch = new SpriteBatch(_gameWorld.GraphicsDevice);
 
-            //PbrSpecular= LoadTexture(@"C:\Users\ole_k\Downloads\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512.dds", false, true);
-            //PbrDiffuse  = LoadTexture(@"C:\Users\ole_k\Downloads\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.dds", false, true);
-
-            PbrDiffuse = Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
-            PbrSpecular = Content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
-            PbrLut = Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
+            PbrDiffuse = _gameWorld.Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
+            PbrSpecular = _gameWorld.Content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
+            PbrLut = _gameWorld.Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
         }
 
+        public Texture2D ForceLoadImage(string imagePath, out ImageInformation imageInformation)
+        {
+            return ImageLoader.ForceLoadImage(imagePath, _pfs, _gameWorld.GraphicsDevice, out imageInformation);
+        }
 
         public Texture2D LoadTexture(string fileName, bool forceRefreshTexture = false, bool fromFile = false)
         {
             if (forceRefreshTexture == false)
             {
-                if (_textureMap.ContainsKey(fileName))
-                    return _textureMap[fileName];
+                if (_cachedTextures.ContainsKey(fileName))
+                    return _cachedTextures[fileName];
             }
 
-            var texture = LoadTextureAsTexture2d(fileName, _gameWorld.GraphicsDevice, new ImageInformation(), fromFile);
+            var texture = ImageLoader.LoadTextureAsTexture2d(fileName, _pfs, _gameWorld.GraphicsDevice, out var _, fromFile);
             if (texture != null)
-                _textureMap[fileName] = texture;
+                _cachedTextures[fileName] = texture;
             return texture;
-        }
-
-        public Texture2D ForceLoadImage(string fileName, out ImageInformation imageInfo, bool fromFile = false)
-        {
-            imageInfo = new ImageInformation();
-            return LoadTextureAsTexture2d(fileName, _gameWorld.GraphicsDevice, imageInfo, fromFile);
-        }
-
-        public void SaveTexture(Texture2D texture, string path)
-        {
-            using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate))
-            {
-                texture.SaveAsPng(stream, texture.Width, texture.Height);
-            }
-        }
-
-        Texture2D LoadTextureAsTexture2d(string fileName, GraphicsDevice device, ImageInformation out_imageInfo, bool fromFile)
-        {
-            byte[] imageContent = null;
-            try
-            {
-                if (fromFile)
-                {
-                    if (File.Exists(fileName) == false)
-                    {
-                        _logger.Here().Error($"Unable to find texture: {fileName}");
-                        return null;
-                    }
-
-                    imageContent = File.ReadAllBytes(fileName);
-                }
-                else
-                {
-                    var imageFile = Pfs.FindFile(fileName);
-                    if (imageFile == null)
-                    {
-                        _logger.Here().Error($"Unable to find texture: {fileName}");
-                        return null;
-                    }
-                    imageContent = imageFile.DataSource.ReadData();
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error($"Error loading texture {fileName} - {e.Message})");
-                return null;
-            }
-
-            try
-            {
-                using (MemoryStream stream = new MemoryStream(imageContent))
-                {
-                    using var image = Pfim.Pfim.FromStream(stream);
-                    out_imageInfo.SetFromImage(image);
-
-                    Texture2D texture = null;
-                    if (image.Format == ImageFormat.Rgba32)
-                    {
-                        try
-                        {
-                            texture = new Texture2D(device, image.Width, image.Height, true, SurfaceFormat.Bgra32);
-                            texture.SetData(0, null, image.Data, 0, image.DataLen);
-                        }
-                        catch
-                        {
-                            _logger.Here().Error($"Error loading texture ({fileName} - with format {image.Format}, tried loading as {ImageFormat.Rgba32})");
-                        }
-                    }
-
-                    // Try loading using all types
-#if DEBUG
-                    if (texture == null)
-                    {
-                        var possibleSurfaceFormats = Enum.GetValues(typeof(SurfaceFormat)).Cast<SurfaceFormat>();
-                        foreach (var surfaceFormat in possibleSurfaceFormats)
-                        {
-                            try
-                            {
-                                texture = new Texture2D(device, image.Width, image.Height, true, surfaceFormat);
-                                texture.SetData(0, null, image.Data, 0, image.DataLen);
-                                break;
-                            }
-                            catch (Exception e)
-                            {
-                                _logger.Here().Error($"Error loading texture ({fileName} - with format {image.Format}, tried loading as {surfaceFormat}) - {e.Message}");
-                            }
-                        }
-                    }
-#endif
-
-                    if (texture == null)
-                    {
-                        _logger.Here().Error($"Error loading texture ({fileName} - Unknown texture format {image.Format})");
-                        return null;
-                    }
-
-                    // Load mipmaps
-                    for (int i = 0; i < image.MipMaps.Length; i++)
-                    {
-                        try
-                        {
-                            var mipmap = image.MipMaps[i];
-                            if (mipmap.Width > 4)
-                                texture.SetData(i + 1, null, image.Data, mipmap.DataOffset, mipmap.DataLen);
-                        }
-                        catch
-                        {
-                            _logger.Here().Warning($"Error loading Mipmap [{i}]");
-                        }
-                    }
-
-                    return texture;
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error($"Error loading texture {fileName} - {e.Message})");
-                return null;
-            }
         }
 
         public Effect LoadEffect(string fileName, ShaderTypes type)
         {
-            if (_shaders.ContainsKey(type))
-                return _shaders[type];
-            var effect = Content.Load<Effect>(fileName);
-            _shaders[type] = effect;
+            if (_cachedShaders.ContainsKey(type))
+                return _cachedShaders[type];
+            var effect = _gameWorld.Content.Load<Effect>(fileName);
+            _cachedShaders[type] = effect;
             return effect;
         }
 
         public Effect GetEffect(ShaderTypes type)
         {
-            if (_shaders.ContainsKey(type))
-                return _shaders[type].Clone();
+            if (_cachedShaders.ContainsKey(type))
+                return _cachedShaders[type].Clone();
             throw new Exception($"Shader not found: ShaderTypes::{type}");
         }
 
         public Effect GetStaticEffect(ShaderTypes type)
         {
-            if (_shaders.ContainsKey(type))
-                return _shaders[type];
+            if (_cachedShaders.ContainsKey(type))
+                return _cachedShaders[type];
             throw new Exception($"Shader not found: ShaderTypes::{type}");
         }
 
         public void Dispose()
         {
-            foreach (var item in _textureMap)
+            foreach (var item in _cachedTextures)
                 item.Value.Dispose();
-            _textureMap.Clear();
+            _cachedTextures.Clear();
 
-            foreach (var item in _shaders)
+            foreach (var item in _cachedShaders)
                 item.Value.Dispose();
-            _shaders.Clear();
+            _cachedShaders.Clear();
 
-
-            Content?.Dispose();
-            Content = null;
+            _gameWorld.Content?.Dispose();
+            _gameWorld.Content = null;
 
             PbrDiffuse?.Dispose();
             PbrDiffuse = null;
@@ -259,5 +131,6 @@ namespace View3D.Utility
         }
 
         public SpriteBatch CreateSpriteBatch() => new SpriteBatch(_gameWorld.GraphicsDevice);
+
     }
 }

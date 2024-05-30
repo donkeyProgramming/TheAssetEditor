@@ -16,27 +16,20 @@ using View3D.Utility;
 
 namespace TextureEditor.ViewModels
 {
-    public class TexturePreviewController : IDisposable
+    public class ViewModelWrapper : NotifyPropertyChangedImpl
     {
-        private readonly PackFileService _packFileService;
-        private readonly ResourceLibary _resourceLib;
-        private readonly TextureToTextureRenderer _textureRenderer;
-        private readonly string _imagePath;
-        private readonly TexturePreviewViewModel _viewModel;
-        private readonly GameWorld _scene;
-
-        public class ViewModelWrapper : NotifyPropertyChangedImpl
+        TexturePreviewViewModel _viewModel;
+        public TexturePreviewViewModel ViewModel
         {
-            TexturePreviewViewModel _viewModel;
-            public TexturePreviewViewModel ViewModel
-            {
-                get => _viewModel;
-                set => SetAndNotify(ref _viewModel, value);
-            }
-
-            public void ShowTextureDetailsInfo() => ViewModel.ShowTextureDetailsInfo();
+            get => _viewModel;
+            set => SetAndNotify(ref _viewModel, value);
         }
 
+        public void ShowTextureDetailsInfo() => ViewModel.ShowTextureDetailsInfo();
+    }
+
+    public static class TexturePreviewControllerCreator
+    {
         public static void CreateWindow(string imagePath, PackFileService packFileService)
         {
             TexturePreviewViewModel viewModel = new TexturePreviewViewModel();
@@ -50,6 +43,16 @@ namespace TextureEditor.ViewModels
                 containingWindow.ShowDialog();
             }
         }
+    }
+
+    public class TexturePreviewController : IDisposable
+    {
+        private readonly PackFileService _packFileService;
+        private readonly ResourceLibary _resourceLib;
+        private readonly TextureToTextureRenderer _textureRenderer;
+        private readonly string _imagePath;
+        private readonly TexturePreviewViewModel _viewModel;
+        private readonly GameWorld _scene;
 
         public TexturePreviewController(string imagePath, TexturePreviewViewModel viewModel, PackFileService packFileService)
         {
@@ -57,7 +60,7 @@ namespace TextureEditor.ViewModels
             _viewModel = viewModel;
             _packFileService = packFileService;
 
-            _scene = new GameWorld(null, null);
+            _scene = new GameWorld(null);
             _scene.Components.Add(new ResourceLibary(_scene, packFileService));
             _scene.ForceCreate();
 
@@ -88,10 +91,10 @@ namespace TextureEditor.ViewModels
                         using (var g = Graphics.FromImage(sourceBitmap))
                         {
                             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                            DrawCheckerBoard(g, texture.Width, texture.Height);
-                            var bitmap = ConvertTextureToImage(renderedTexture);
+                            TextureHelper.DrawCheckerBoard(g, texture.Width, texture.Height);
+                            var bitmap = TextureHelper.ConvertTextureToImage(renderedTexture);
                             g.DrawImage(bitmap, 0, 0);
-                            _viewModel.PreviewImage[i] = BitmapToImageSource(sourceBitmap);
+                            _viewModel.PreviewImage[i] = TextureHelper.BitmapToImageSource(sourceBitmap);
                         }
                     }
                 }
@@ -100,52 +103,6 @@ namespace TextureEditor.ViewModels
             _viewModel.FormatRgbaCheckbox = true;
         }
 
-        private void DrawCheckerBoard(Graphics g, int width, int height)
-        {
-            var size = 50;
-            var countX = (width / size) + 1;
-            var countY = (height / size) + 1;
-            using (SolidBrush blackBrush = new SolidBrush(Color.DarkGray))
-            using (SolidBrush whiteBrush = new SolidBrush(Color.LightGray))
-            {
-                for (int i = 0; i < countX; i++)
-                {
-                    for (int j = 0; j < countY; j++)
-                    {
-                        if ((j % 2 == 0 && i % 2 == 0) || (j % 2 != 0 && i % 2 != 0))
-                            g.FillRectangle(blackBrush, i * size, j * size, size, size);
-                        else if ((j % 2 == 0 && i % 2 != 0) || (j % 2 != 0 && i % 2 == 0))
-                            g.FillRectangle(whiteBrush, i * size, j * size, size, size);
-                    }
-                }
-            }
-        }
-
-        public Image ConvertTextureToImage(Texture2D texture)
-        {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                texture.SaveAsPng(stream, texture.Width, texture.Height);
-                stream.Seek(0, SeekOrigin.Begin);
-                return Image.FromStream(stream);
-            }
-        }
-
-        BitmapImage BitmapToImageSource(Image bitmap)
-        {
-            using (MemoryStream memory = new MemoryStream())
-            {
-                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-                memory.Position = 0;
-                BitmapImage bitmapimage = new BitmapImage();
-                bitmapimage.BeginInit();
-                bitmapimage.StreamSource = memory;
-                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapimage.EndInit();
-
-                return bitmapimage;
-            }
-        }
 
         public void Dispose()
         {

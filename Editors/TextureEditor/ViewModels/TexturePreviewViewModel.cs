@@ -65,6 +65,8 @@ namespace TextureEditor.ViewModels
 
         public void ShowTextureDetailsInfo()
         {
+
+            // MOve this to a general concept 
             var containingWindow = new ControllerHostWindow(false, ResizeMode.CanResize);
             containingWindow.Title = "Texture Details";
             containingWindow.Width = 550;

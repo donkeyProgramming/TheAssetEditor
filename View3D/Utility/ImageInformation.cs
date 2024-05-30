@@ -32,7 +32,6 @@ namespace View3D.Utility
         public uint Header10_MiscFlags2 { get; set; }
 
 
-
         public void SetFromImage(IImage image)
         {
             Format = image.Format;
