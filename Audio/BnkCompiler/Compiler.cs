@@ -41,7 +41,7 @@ namespace Audio.BnkCompiler
 
             // Extract dialogue events and their state groups from dat file
             var dialogueEventStateGroups = new DialogueEventData(audioRepository);
-            dialogueEventStateGroups.ExtractDialogueEventsFromDat();
+            dialogueEventStateGroups.ExtractDialogueEventsDataFromDat();
 
             // Build the wwise object graph. 
             var header = _headerBuilder.Generate(audioProject);
