@@ -5,6 +5,10 @@ using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.Shared.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Animation;
+using Shared.GameFormats.AnimationMeta.Definitions;
+using Shared.GameFormats.AnimationMeta.Parsing;
 using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 using Shared.Ui.Editors.TextEditor;
@@ -14,6 +18,8 @@ namespace CommonControls.Editors.AnimationPack.Converters
     public class AnimationBinWh3FileToXmlConverter : BaseAnimConverter<AnimationBinWh3FileToXmlConverter.XmlFormat, AnimationBinWh3>
     {
         private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private string AnimationPersistanceMetaFileName = "";
+        private Dictionary<string, uint> AnimationsVersionFoundInPersistenceMeta = new();
 
         public AnimationBinWh3FileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
@@ -164,11 +170,13 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 }
                 else
                 {
-                    var filename = Path.GetFileNameWithoutExtension(filepath).ToLowerInvariant();
+                    var filename = System.IO.Path.GetFileNameWithoutExtension(filepath).ToLowerInvariant();
                     if (filename != type.Data.Name.ToLowerInvariant())
                         errorList.Error("Name", $"The name of the bin file has to be the same as the provided name. {filename} vs {type.Data.Name}");
                 }
 
+
+                AnimationsVersionFoundInPersistenceMeta.Clear();
                 foreach (var animation in type.Animations)
                 {
                     var slot = slotHelper.GetfromValue(animation.Slot);
@@ -184,11 +192,19 @@ namespace CommonControls.Editors.AnimationPack.Converters
                             errorList.Warning(animation.Slot, $"Animation file {animationRef.File} is not found");
                         else if (!IsAnimFile(animationRef.File, pfs))
                             errorList.Error(animation.Slot, $"Animation file {animationRef.File} does not appears to be a valid animation file");
+                        else
+                            ValidateAnimationVersionAgainstPersistenceMeta(animationRef.File, animation.Slot, pfs, errorList);
 
                         if (pfs.FindFile(animationRef.Meta) == null)
                             errorList.Warning(animation.Slot, $"Meta file {animationRef.Meta} is not found");
                         else if (!IsAnimMetaFile(animationRef.Meta, pfs))
                             errorList.Error(animation.Slot, $"Meta file {animationRef.Meta} does not appear to be a valid meta animation");
+                        else
+                        {
+                            CheckForAnimationVersionsInMeta(animationRef.File, animationRef.Meta, animation.Slot, pfs, errorList);
+                            var mountBin = type.Data.MountBin;
+                            CheckForRiderAndHisMountAnimationsVersion(mountBin, AnimPackToValidate, animation.Slot, animationRef.File, pfs, errorList); ;
+                        }
 
                         if (pfs.FindFile(animationRef.Sound) == null)
                             errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} is not found");
@@ -196,6 +212,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                             errorList.Error(animation.Slot, $"Sound file {animationRef.Sound} does not appear to be a valid meta sound");
                     }
                 }
+
 
                 if (errorList.Errors.Count != 0)
                     ErrorListWindow.ShowDialog("Errors", errorList, false);
@@ -236,6 +253,136 @@ namespace CommonControls.Editors.AnimationPack.Converters
             bool headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithDotMeta && headerIsReallyAnimMetaFile;
         }
+
+        private bool CheckForAnimationVersionsInMeta(string mainAnimationFile, string metaFile, string animationSlot, PackFileService pfs, ErrorList errorList)
+        {
+            var result = true;
+
+
+            var theFile = pfs.FindFile(metaFile);
+            var data = theFile.DataSource.ReadData();
+            var parsed = new MetaDataFileParser().ParseFile(data);
+
+            var mainAnimationVersion = GetAnimationHeader(mainAnimationFile, pfs).Version;
+
+            var metaItems = parsed.Items;
+
+            foreach (var item in metaItems)
+            {
+                if (item.DisplayName.Contains("SPLICE"))
+                {
+                    var splice = (Splice_v11)item;
+                    var animPath = splice.Animation;
+                    if (animPath == null || animPath == "")
+                    {
+                        errorList.Warning(animationSlot, $"Animation Meta Splice {metaFile} has no animation defined");
+                        result = false;
+                        continue;
+                    }
+
+                    var animationVersion = GetAnimationHeader(animPath, pfs).Version;
+
+                    if (animationSlot == "PERSISTENT_METADATA_ALIVE") //check for this too, cus this plays throughtout char animation (all of them)
+                    {
+                        AnimationsVersionFoundInPersistenceMeta[animPath] = animationVersion;
+                        AnimationPersistanceMetaFileName = metaFile;
+                    }
+                    else
+                    {
+                        if (mainAnimationVersion == 5 && animationVersion == 8) continue; //no idea why this isn't problem in vanilla wh3
+                        if (mainAnimationVersion == 8 && animationVersion == 5) continue; //no idea why this isn't problem in vanilla wh3
+
+                        var isTheVersionMatch = animationVersion == mainAnimationVersion;
+
+                        if (!isTheVersionMatch)
+                        {
+                            errorList.Error(animationSlot, $"Animation Meta Splice {metaFile} has different version than in the main animation. File referenced in meta: {animPath} with version {animationVersion} vs in the main animation {mainAnimationFile} with version {mainAnimationVersion}");
+                            result = false;
+                        }
+                    }
+                }
+
+
+            }
+
+            return result;
+        }
+
+        private bool ValidateAnimationVersionAgainstPersistenceMeta(string mainAnimationFile, string animationSlot, PackFileService pfs, ErrorList errorList)
+        {
+            var versions = AnimationsVersionFoundInPersistenceMeta;
+            var result = true;
+
+            var mainAnimation = pfs.FindFile(mainAnimationFile);
+            var mainAnimationParsed = AnimationFile.Create(mainAnimation);
+            var mainAnimationVersion = mainAnimationParsed.Header.Version;
+
+            foreach (var (path, version) in versions)
+            {
+                if (version == mainAnimationVersion) continue;
+                else
+                {
+                    errorList.Error(animationSlot, $"Animation Meta Splice {AnimationPersistanceMetaFileName} has different version than in the main animation. File referenced in meta: {path} with version {version} vs in the main animation {mainAnimationFile} with version {mainAnimationVersion}");
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+
+        private bool CheckForRiderAndHisMountAnimationsVersion(string mountBinReference, PackFile animpack, string animationSlot, string animationFile, PackFileService pfs, ErrorList errorList)
+        {
+            if (!animationSlot.Contains("RIDER_")) return true;
+
+            var result = true;
+
+            var animPack = AnimationPackSerializer.Load(animpack, pfs);
+            var itemNames = animPack.Files.ToList();
+
+            var findMountBinReference = itemNames.Find(x => x.FileName.Contains(mountBinReference));
+            if (findMountBinReference == null)
+            {
+                errorList.Warning(animationSlot, $"Cannot validate referenced {mountBinReference} of this rider, perhaps it's located in outside the current animpak files? or it is defined in another animpack or mod?");
+                return false;
+            }
+
+            var mountBinBytes = findMountBinReference.ToByteArray();
+
+            var parsedBin = ConvertBytesToXmlClass(mountBinBytes);
+            var animations = parsedBin.Animations;
+
+            var riderAnimationSlotWithoutPrefix = animationSlot.Substring(6);
+            var mainAnimationToCompareVersion = GetAnimationHeader(animationFile, pfs).Version;
+
+            foreach (var anim in animations)
+            {
+                if (!anim.Slot.Contains(riderAnimationSlotWithoutPrefix)) continue;
+
+                var animationInstances = anim.Ref;
+                foreach (var animationInstance in animationInstances)
+                {
+                    var version = GetAnimationHeader(animationInstance.File, pfs).Version;
+                    var isVersionMatch = version == mainAnimationToCompareVersion;
+                    if (!isVersionMatch)
+                    {
+                        errorList.Error(animationSlot, $"Rider animation version mismatch with mount animation. Mount animation {animationInstance.File} with version {version} vs in the main animation {animationFile} with version {mainAnimationToCompareVersion}");
+                        result = false;
+                    }
+                }
+
+            }
+
+            return result;
+        }
+
+
+        private AnimationFile.AnimationHeader GetAnimationHeader(string path, PackFileService pfs)
+        {
+            var mainAnimation = pfs.FindFile(path);
+            var mainAnimationParsed = AnimationFile.Create(mainAnimation);
+            return mainAnimationParsed.Header;
+        }
+
 
 
         [XmlRoot(ElementName = "Instance")]

@@ -174,6 +174,8 @@ namespace CommonControls.Editors.AnimationPack
                 MessageBox.Show("Can not save in this mode - Open the file normally");
                 return false;
             }
+            var converter = (AnimationBinWh3FileToXmlConverter)_activeConverter;
+            converter.AnimPackToValidate = _packFile;
 
             var fileName = AnimationPackItems.SelectedItem.FileName;
             var bytes = _activeConverter.ToBytes(SelectedItemViewModel.Text, fileName, _pfs, out var error);
