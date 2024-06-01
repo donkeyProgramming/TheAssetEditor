@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -20,6 +21,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         private readonly Rmv2MeshNode _meshNode;
         private readonly PackFileService _pfs;
         private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly EventHub _eventHub;
 
         public ICommand ResolveTexturesCommand { get; set; }
         public ICommand DeleteMissingTexturesCommand { get; set; }
@@ -55,11 +57,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public UiVertexFormat VertexType { get { return _meshNode.Geometry.VertexFormat; } set { ChangeVertexType(value); } }
         public IEnumerable<UiVertexFormat> PossibleVertexTypes { get; set; }
 
-        public MaterialGeneralViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode meshNode, PackFileService pfs,  ApplicationSettingsService applicationSettings)
+        public MaterialGeneralViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode meshNode, PackFileService pfs,  ApplicationSettingsService applicationSettings, EventHub eventHub)
         {
             _kitbasherRootScene = kitbasherRootScene;
             _meshNode = meshNode;
             _pfs = pfs;
+            _eventHub = eventHub;
             _applicationSettingsService = applicationSettings;
             PossibleVertexTypes = new UiVertexFormat[] { UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic };
             ResolveTexturesCommand = new RelayCommand(ResolveMissingTextures);
@@ -78,7 +81,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             TextureList.Clear();
             foreach (var enumValue in distinctEnumList)
             {
-                var textureView = new TextureViewModel(_meshNode, _pfs, enumValue);
+                var textureView = new TextureViewModel(_meshNode, _pfs, enumValue,_eventHub);
                 TextureList.Add(textureView);
             }
 

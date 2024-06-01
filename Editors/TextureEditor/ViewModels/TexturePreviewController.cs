@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using CommonControls.BaseDialogs;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using TextureEditor.Views;
@@ -24,6 +25,7 @@ namespace TextureEditor.ViewModels
         private readonly string _imagePath;
         private readonly TexturePreviewViewModel _viewModel;
         private readonly GameWorld _scene;
+        private readonly EventHub _eventHub;
 
         public class ViewModelWrapper : NotifyPropertyChangedImpl
         {
@@ -37,12 +39,12 @@ namespace TextureEditor.ViewModels
             public void ShowTextureDetailsInfo() => ViewModel.ShowTextureDetailsInfo();
         }
 
-        public static void CreateWindow(string imagePath, PackFileService packFileService)
+        public static void CreateWindow(string imagePath, PackFileService packFileService, EventHub eventHub)
         {
             TexturePreviewViewModel viewModel = new TexturePreviewViewModel();
             viewModel.ImagePath.Value = imagePath;
 
-            using (var controller = new TexturePreviewController(imagePath, viewModel, packFileService))
+            using (var controller = new TexturePreviewController(imagePath, viewModel, packFileService, eventHub))
             {
                 var containingWindow = new ControllerHostWindow(false, ResizeMode.CanResize);
                 containingWindow.Title = "Texture Preview Window";
@@ -51,13 +53,14 @@ namespace TextureEditor.ViewModels
             }
         }
 
-        public TexturePreviewController(string imagePath, TexturePreviewViewModel viewModel, PackFileService packFileService)
+        public TexturePreviewController(string imagePath, TexturePreviewViewModel viewModel, PackFileService packFileService, EventHub eventHub)
         {
             _imagePath = imagePath;
             _viewModel = viewModel;
             _packFileService = packFileService;
+            _eventHub = eventHub;
 
-            _scene = new GameWorld(null, null);
+            _scene = new GameWorld(_eventHub);
             _scene.Components.Add(new ResourceLibary(_scene, packFileService));
             _scene.ForceCreate();
 
