@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using AnimationEditor.AnimationKeyframeEditor;
+using System.Windows.Forms;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.Services;
@@ -11,6 +13,7 @@ using AnimationEditor.MountAnimationCreator.ViewModels;
 using AnimationEditor.PropCreator.ViewModels;
 using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -19,6 +22,8 @@ using Shared.Ui.Common;
 using View3D.Animation;
 using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
+using MessageBox = System.Windows.Forms.MessageBox;
+using Clipboard = System.Windows.Clipboard;
 
 
 namespace AnimationEditor.MountAnimationCreator
@@ -312,6 +317,25 @@ namespace AnimationEditor.MountAnimationCreator
 
                 ActiveOutputFragment.UpdatePossibleValues(MountLinkController.LoadAnimationSetForSkeleton(_rider.Skeleton.SkeletonName, true));
             }
+        }
+
+        public void CopyAnimation()
+        {
+            if (_newAnimation.AnimationClip == null)
+            {
+                MessageBox.Show("new animation not generated!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _newAnimation.Player.Pause();
+
+            var currentFrame = 0;
+            var endFrame = _newAnimation.AnimationClip.DynamicFrames.Count;
+            var skeleton = _newAnimation.Skeleton;
+            var frames = _newAnimation.AnimationClip;
+            var jsonText = JsonConvert.SerializeObject(AnimationCliboardCreator.CreateFrameClipboard(skeleton, frames, currentFrame, endFrame));
+            Clipboard.SetText(jsonText);
+            MessageBox.Show($"copied frame {currentFrame} up to {endFrame - 1}", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }
