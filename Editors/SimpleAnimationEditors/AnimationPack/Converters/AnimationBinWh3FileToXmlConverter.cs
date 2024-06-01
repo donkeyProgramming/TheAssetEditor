@@ -2,6 +2,7 @@
 using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
+using CsvHelper;
 using Editors.Shared.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -267,7 +268,14 @@ namespace CommonControls.Editors.AnimationPack.Converters
             var data = theFile.DataSource.ReadData();
             var parsed = new MetaDataFileParser().ParseFile(data);
 
-            var mainAnimationVersion = GetAnimationHeader(mainAnimationFile, pfs).Version;
+            var mainAnimationHeader = GetAnimationHeader(mainAnimationFile, pfs);
+            if (mainAnimationHeader == null)
+            {
+                errorList.Error(animationSlot, $"Cannot locate animation {mainAnimationFile} while trying to parse meta");
+                return false;
+            }
+
+            var mainAnimationVersion = mainAnimationHeader.Version;
 
             var metaItems = parsed.Items;
 
@@ -426,6 +434,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
         private AnimationFile.AnimationHeader GetAnimationHeader(string path, PackFileService pfs)
         {
             var mainAnimation = pfs.FindFile(path);
+            if (mainAnimation == null) return null;
             var mainAnimationParsed = AnimationFile.Create(mainAnimation);
             return mainAnimationParsed.Header;
         }
