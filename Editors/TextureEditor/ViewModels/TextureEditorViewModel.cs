@@ -1,4 +1,5 @@
 ﻿using System;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -11,6 +12,7 @@ namespace TextureEditor.ViewModels
         PackFileService _pfs;
         PackFile _file;
         TexturePreviewController _controller;
+        EventHub _eventHub;
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
 
@@ -25,9 +27,10 @@ namespace TextureEditor.ViewModels
             set => SetAndNotify(ref _viewModel, value);
         }
 
-        public TextureEditorViewModel(PackFileService pfs)
+        public TextureEditorViewModel(PackFileService pfs, EventHub eventHub)
         {
             _pfs = pfs;
+            _eventHub = eventHub;
         }
 
         public void Load(PackFile file)
@@ -38,7 +41,7 @@ namespace TextureEditor.ViewModels
             var viewModel = new TexturePreviewViewModel();
             viewModel.ImagePath.Value = _pfs.GetFullPath(file);
 
-            _controller = new TexturePreviewController(_pfs.GetFullPath(file), viewModel, _pfs);
+            _controller = new TexturePreviewController(_pfs.GetFullPath(file), viewModel, _pfs, _eventHub);
             ViewModel = viewModel;
         }
 
