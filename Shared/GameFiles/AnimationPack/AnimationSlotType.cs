@@ -2,6 +2,7 @@
 using System.Text;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.EmbeddedResources;
 
 namespace Shared.GameFormats.AnimationPack
 {
@@ -40,23 +41,23 @@ namespace Shared.GameFormats.AnimationPack
             switch (game)
             {
                 case GameTypeEnum.Warhammer2:
-                    Load("CommonControls.Resources.AnimationSlots.Warhammer2AnimationSlots.txt");
+                    Load("Resources.AnimationSlots.Warhammer2AnimationSlots.txt");
                     break;
 
                 case GameTypeEnum.Warhammer3:
-                    Load("CommonControls.Resources.AnimationSlots.Warhammer3AnimationSlots_dlc24.txt");
+                    Load("Resources.AnimationSlots.Warhammer3AnimationSlots_dlc24.txt");
                     break;
 
                 case GameTypeEnum.Troy:
-                    Load("CommonControls.Resources.AnimationSlots.TroyAnimationSlots.txt");
+                    Load("Resources.AnimationSlots.TroyAnimationSlots.txt");
                     break;
 
                 case GameTypeEnum.ThreeKingdoms:
-                    Load("CommonControls.Resources.AnimationSlots.3kAnimationSlots.txt");
+                    Load("Resources.AnimationSlots.3kAnimationSlots.txt");
                     break;
 
                 default:
-                    Load("CommonControls.Resources.AnimationSlots.Warhammer2AnimationSlots.txt");
+                    Load("Resources.AnimationSlots.Warhammer2AnimationSlots.txt");
                     break;
             }
         }
@@ -84,13 +85,10 @@ namespace Shared.GameFormats.AnimationPack
         void Load(string resourcePath)
         {
             Values = new List<AnimationSlotType>();
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
-            using (var reader = new StreamReader(stream))
-            {
-                var result = reader.ReadToEnd().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                for (var i = 0; i < result.Length; i++)
-                    Values.Add(new AnimationSlotType(i, result[i].Trim()));
-            }
+            var strings = ResourceLoader.LoadStringArray(resourcePath);
+            for (var i = 0; i < strings.Length; i++)
+                Values.Add(new AnimationSlotType(i, strings[i].Trim()));
+            
         }
 
         public void ExportAnimationDebugList(PackFileService pfs, string outputName)

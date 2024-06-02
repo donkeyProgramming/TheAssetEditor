@@ -13,6 +13,9 @@
                         <DataTrigger Binding="{Binding IsError}" Value="true">
                             <Setter Property="Background" Value="OrangeRed" />
                         </DataTrigger>
+                        <DataTrigger Binding="{Binding IsWarning}" Value="true">
+                            <Setter Property="Background" Value="#A98304" />
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </ListView.Resources>
