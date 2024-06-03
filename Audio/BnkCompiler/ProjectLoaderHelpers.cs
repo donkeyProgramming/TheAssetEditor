@@ -6,7 +6,7 @@ namespace Audio.BnkCompiler
 {
     public class ProjectLoaderHelpers
     {
-        private static readonly IVanillaObjectIds _VanillaObjectIds = new IdProvider();
+        private static readonly IVanillaObjectIds s_vanillaObjectIds = new IdProvider();
 
         public static int GenerateRandomNumber()
         {
@@ -48,8 +48,8 @@ namespace Audio.BnkCompiler
         {
             var attenuationKey = $"{eventMixer}_attenuation";
 
-            if (_VanillaObjectIds.AttenuationIds.ContainsKey(attenuationKey))
-                return _VanillaObjectIds.AttenuationIds[attenuationKey];
+            if (s_vanillaObjectIds.AttenuationIds.ContainsKey(attenuationKey))
+                return s_vanillaObjectIds.AttenuationIds[attenuationKey];
 
             else
                 return 0;

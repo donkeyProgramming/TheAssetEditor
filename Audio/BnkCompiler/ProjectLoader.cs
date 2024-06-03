@@ -17,7 +17,7 @@ namespace Audio.BnkCompiler
     {
         private readonly PackFileService _pfs;
         private static readonly IVanillaObjectIds _VanillaObjectIds = new IdProvider();
-        private static Dictionary<string, string> EventToMixers = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> s_eventToMixers = new Dictionary<string, string>();
 
         public ProjectLoader(PackFileService pfs)
         {
@@ -128,9 +128,9 @@ namespace Audio.BnkCompiler
                 var mixerId = $"{ProjectLoaderHelpers.GenerateRandomNumber()}_mixer_{ProjectLoaderHelpers.GenerateRandomNumber()}";
                 var mixerParent = _VanillaObjectIds.EventMixerIds[eventMixer.ToLower()];
 
-                if (!EventToMixers.ContainsKey(eventId))
+                if (!s_eventToMixers.ContainsKey(eventId))
                 {
-                    EventToMixers.Add(eventId, mixerId);
+                    s_eventToMixers.Add(eventId, mixerId);
 
                     var mixer = new ActorMixer()
                     {
@@ -154,9 +154,9 @@ namespace Audio.BnkCompiler
                 var dialogueEventBnk = DialogueEventData.GetBnkFromDialogueEvent(eventId);
                 var mixerParent = _VanillaObjectIds.DialogueEventMixerIds[dialogueEventBnk];
 
-                if (!EventToMixers.ContainsKey(eventId))
+                if (!s_eventToMixers.ContainsKey(eventId))
                 {
-                    EventToMixers.Add(eventId, mixerId);
+                    s_eventToMixers.Add(eventId, mixerId);
 
                     var mixer = new ActorMixer()
                     {
@@ -476,7 +476,7 @@ namespace Audio.BnkCompiler
                 foreach (var hircEvent in input.Events)
                 {
                     var eventId = hircEvent.Event;
-                    var mixerId = EventToMixers[eventId];
+                    var mixerId = s_eventToMixers[eventId];
                     var soundsCount = hircEvent.Sounds.Count;
                     var currentMixer = new ActorMixer();
 
@@ -504,7 +504,7 @@ namespace Audio.BnkCompiler
                 foreach (var hircDialogueEvent in input.DialogueEvents)
                 {
                     var eventId = hircDialogueEvent.DialogueEvent;
-                    var mixerId = EventToMixers[eventId];
+                    var mixerId = s_eventToMixers[eventId];
                     var currentMixer = new ActorMixer();
                     var dialogueEvent = new DialogueEvent();
 

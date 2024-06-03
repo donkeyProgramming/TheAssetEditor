@@ -15,17 +15,42 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 
         public static Dictionary<string, List<string>> ExtractedDialogueEvents = new Dictionary<string, List<string>>();
         public static List<string> ExtractedStateGroups = new List<string>();
-        public static Dictionary<string, List<string>> ExtractedStates = new Dictionary<string, List<string>>();        
+        public static Dictionary<string, List<string>> ExtractedStates = new Dictionary<string, List<string>>();
 
-        // Dynamically extract dialogue events from the master dat file (dialogue events are contained within Section 4).
+        // Get the bnk that a dialogue event is contained within.
+        public static string GetBnkFromDialogueEvent(string dialogueEvent)
+        {
+            dialogueEvent = dialogueEvent.ToLower();
+
+            if (dialogueEvent.Contains("battle_vo_conversation"))
+                return "battle_vo_conversational";
+
+            else if (dialogueEvent.Contains("battle_vo_order"))
+                return "battle_vo_orders";
+
+            else if (dialogueEvent.Contains("campaign_vo_cs") || dialogueEvent.Contains("Campaign_CS"))
+                return "campaign_vo_conversational";
+
+            else if (dialogueEvent.Contains("campaign_vo") || dialogueEvent == "gotrek_felix_arrival" || dialogueEvent == "gotrek_felix_departure")
+                return "campaign_vo";
+
+            else if (dialogueEvent.Contains("frontend_vo"))
+                return "frontend_vo";
+
+            else if (dialogueEvent == "Battle_Individual_Melee_Weapon_Hit")
+                return "battle_individual_melee";
+
+            else
+                throw new Exception($"Error: {dialogueEvent} could not be matched to a bnk.");
+        }
+
         public void ExtractDialogueEventsDataFromDat()
         {
             ExtractedDialogueEvents = new Dictionary<string, List<string>>();
             ExtractedStateGroups = new List<string>();
 
             var datDumpMasterPath = $"{DirectoryHelper.Temp}\\DatDumps\\dat_dump_master.txt";
-            var lines = File.ReadAllLines(datDumpMasterPath);
-            var datSection4 = ExtractSection(lines, "Section 4", "Section 5");
+            var datSection4 = ExtractSection(datDumpMasterPath, "Section 4", "Section 5");
 
             foreach (var line in datSection4)
             {
@@ -56,14 +81,12 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
             ExportData(ExtractedDialogueEvents, csvFilePath);
         }
 
-        // Dynamically extract states from the master dat file (states are contained within Section 3).
         public static void ExtractStatesDataFromDat()
         {
             ExtractedStates = new Dictionary<string, List<string>>();
 
             var datDumpMasterPath = $"{DirectoryHelper.Temp}\\DatDumps\\dat_dump_master.txt";
-            var lines = File.ReadAllLines(datDumpMasterPath);
-            var datSection4 = ExtractSection(lines, "Section 3", "Section 4");
+            var datSection4 = ExtractSection(datDumpMasterPath, "Section 3", "Section 4");
 
             foreach (var line in datSection4)
             {
@@ -91,8 +114,9 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
             ExportData(ExtractedStates, csvFilePath);
         }
 
-        private static List<string> ExtractSection(string[] lines, string startSection, string endSection)
+        private static List<string> ExtractSection(string datFile, string startSection, string endSection)
         {
+            var lines = File.ReadAllLines(datFile);
             var sectionLines = new List<string>();
             var inSection = false;
 
@@ -133,11 +157,9 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
         private static void ExportData(Dictionary<string, List<string>> data, string csvFilePath)
         {
             using var writer = new StreamWriter(csvFilePath);
-            // Write the headers
             var headerLine = string.Join(",", data.Keys);
             writer.WriteLine(headerLine);
 
-            // Get the maximum number of items in any group to ensure all rows are filled
             var maxItems = data.Values.Max(states => states.Count);
 
             for (var i = 0; i < maxItems; i++)
@@ -149,39 +171,12 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
                     if (i < states.Count)
                         row.Add(states[i]);
                     else
-                        row.Add(string.Empty); // Add empty string if there are no more items in this group
+                        row.Add(string.Empty);
                 }
 
                 var csvLine = string.Join(",", row);
                 writer.WriteLine(csvLine);
             }
-        }
-
-        // Get the bnk that a dialogue event is contained within.
-        public static string GetBnkFromDialogueEvent(string dialogueEvent)
-        {
-            dialogueEvent = dialogueEvent.ToLower();
-
-            if (dialogueEvent.Contains("battle_vo_conversation"))
-                return "battle_vo_conversational";
-
-            else if (dialogueEvent.Contains("battle_vo_order"))
-                return "battle_vo_orders";
-
-            else if (dialogueEvent.Contains("campaign_vo_cs") || dialogueEvent.Contains("Campaign_CS"))
-                return "campaign_vo_conversational";
-
-            else if (dialogueEvent.Contains("campaign_vo") || dialogueEvent == "gotrek_felix_arrival" || dialogueEvent == "gotrek_felix_departure")
-                return "campaign_vo";
-
-            else if (dialogueEvent.Contains("frontend_vo"))
-                return "frontend_vo";
-
-            else if (dialogueEvent == "Battle_Individual_Melee_Weapon_Hit")
-                return "battle_individual_melee";
-
-            else
-                throw new Exception($"Error: {dialogueEvent} could not be matched to a bnk.");
         }
     }
 }

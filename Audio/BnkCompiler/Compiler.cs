@@ -39,10 +39,6 @@ namespace Audio.BnkCompiler
             // Load audio repository to access dat dump.
             var audioRepository = new AudioRepository(_provider, false);
 
-            // Extract dialogue events and their state groups from dat file
-            var dialogueEventStateGroups = new DialogueEventData(audioRepository);
-            dialogueEventStateGroups.ExtractDialogueEventsDataFromDat();
-
             // Build the wwise object graph. 
             var header = _headerBuilder.Generate(audioProject);
             var hircChunk = _hircBuilder.Generate(audioProject);

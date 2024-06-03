@@ -33,22 +33,12 @@ namespace Audio.Storage
                 var data = provider.LoadWwiseBnkAndDatData();
                 NameLookUpTable = data.NameLookUpTable;
                 HircObjects = data.HircObjects;
-                LoadDialogueEventData(this);
             }
             else
             {
                 var data = provider.LoadWwiseDatData();
                 NameLookUpTable = data.NameLookUpTable;
-                LoadDialogueEventData(this);
             }
-        }
-
-        public static void LoadDialogueEventData(IAudioRepository audioRepository)
-        {
-            // Extract dialogue events and their state groups from dat file
-            var dialogueEventData = new DialogueEventData(audioRepository);
-            dialogueEventData.ExtractDialogueEventsDataFromDat();
-            DialogueEventData.ExtractStatesDataFromDat();
         }
 
         public List<HircItem> GetHircObject(uint id)
