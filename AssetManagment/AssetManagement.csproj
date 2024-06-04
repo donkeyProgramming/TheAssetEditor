@@ -7,7 +7,14 @@
 	  <Compile Remove="GenericFormats\Managed\MeshDataStructures.cs" />
 	</ItemGroup>
 
-  <ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <WarningsAsErrors />
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <WarningsAsErrors />
+    </PropertyGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
     <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>

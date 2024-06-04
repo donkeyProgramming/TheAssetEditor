@@ -139,7 +139,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateGroupedButton<SelectGizmoModeCommand>("Gizmo", true, IconLibrary.Gizmo_CursorIcon);
             builder.CreateGroupedButton<MoveGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_MoveIcon);
             builder.CreateGroupedButton<RotateGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_RotateIcon);
-            builder.CreateGroupedButton<ScaleGizmoUpCommand>("Gizmo", false, IconLibrary.Gizmo_ScaleIcon);
+            builder.CreateGroupedButton<ScaleGizmoModeCommand>("Gizmo", false, IconLibrary.Gizmo_ScaleIcon);
             builder.CreateButtonSeparator();
 
             // Selection buttons

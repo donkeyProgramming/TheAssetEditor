@@ -84,7 +84,6 @@ namespace MonoGame.Framework.WpfInterop.Input
 
         #region Methods
         public MouseState GetState() => _mouseState;
-
         private void HandleMouse(object sender, MouseEventArgs e)
         {
             if (e.Handled)
@@ -114,7 +113,7 @@ namespace MonoGame.Framework.WpfInterop.Input
                 if (e.LeftButton == MouseButtonState.Pressed)
                 {
                     var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
-                    HitTestResult result = VisualTreeHelper.HitTest(res, pos);
+                    var result = VisualTreeHelper.HitTest(res, pos);
                     if (result?.VisualHit == _focusElement)
                     {
                         _focusElement.Focus();
@@ -128,7 +127,7 @@ namespace MonoGame.Framework.WpfInterop.Input
                 bool hit = false;
                 var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
                 //if (res == null) return; <-- please see: https://github.com/donkeyProgramming/TheAssetEditor/pull/90#:~:text=Monogame.WpfInterop/Input/WpfMouse.cs
-                HitTestResult result = VisualTreeHelper.HitTest(res, pos);
+                var result = VisualTreeHelper.HitTest(res, pos);
                 if (result?.VisualHit == _focusElement)
                     hit = true;
 
@@ -136,14 +135,12 @@ namespace MonoGame.Framework.WpfInterop.Input
                 {
                     if (_focusElement.IsMouseCaptured)
                     {
-                        Console.WriteLine($"We are here 2 - {_focusElement.IsMouseDirectlyOver} | {result?.VisualHit}");
                         _mouseState = new MouseState(_mouseState.X, _mouseState.Y, _mouseState.ScrollWheelValue,
                             (ButtonState)e.LeftButton, (ButtonState)e.MiddleButton, (ButtonState)e.RightButton, (ButtonState)e.XButton1,
                             (ButtonState)e.XButton2);
                         // only release if LeftMouse is up
                         if (e.LeftButton == MouseButtonState.Released)
                         {
-                            Console.WriteLine("We are here 3");
                             _focusElement.ReleaseMouseCapture();
                         }
                         e.Handled = true;

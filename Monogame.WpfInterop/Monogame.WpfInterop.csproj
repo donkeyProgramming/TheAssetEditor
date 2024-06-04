@@ -5,6 +5,18 @@
 	 <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+    <PropertyGroup>
+        <NoWarn></NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <WarningsAsErrors />
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+      <WarningsAsErrors />
+    </PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
 		<PackageReference Include="System.Drawing.Common" Version="7.0.0" />
