@@ -1,5 +1,5 @@
 ﻿using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
-using Audio.FileFormats.WWise.Hirc.Shared;
+using Shared.GameFormats.WWise.Hirc.Shared;
 using System;
 
 namespace Audio.BnkCompiler

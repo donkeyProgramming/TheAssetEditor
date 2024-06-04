@@ -1,10 +1,10 @@
-﻿using Audio.AudioEditor;
-using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Hirc.V136;
-using Audio.Storage;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Audio.AudioEditor;
+using Audio.Storage;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace AudioResearch
 {

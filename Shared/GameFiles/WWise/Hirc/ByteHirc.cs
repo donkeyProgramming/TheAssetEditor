@@ -1,7 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
 using System;
 
-namespace Audio.FileFormats.WWise.Hirc
+namespace Shared.GameFormats.WWise.Hirc
 {
     public class ByteHirc : HircItem
     {

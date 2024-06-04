@@ -1,6 +1,6 @@
 ﻿using System;
-using Audio.FileFormats.WWise.Bkhd;
 using Audio.Utility;
+using Shared.GameFormats.WWise.Bkhd;
 
 namespace Audio.BnkCompiler.ObjectGeneration
 {

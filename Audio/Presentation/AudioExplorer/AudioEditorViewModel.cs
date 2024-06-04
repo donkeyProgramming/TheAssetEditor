@@ -4,14 +4,15 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using Audio.AudioEditor;
-using Audio.FileFormats.WWise.Hirc;
-using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.BaseDialogs;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace Audio.Presentation.AudioExplorer
 {
@@ -102,7 +103,7 @@ namespace Audio.Presentation.AudioExplorer
             var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(_audioRepository) }, WriteIndented = true });
             SelectedNodeText.Value = hircAsString;
 
-            if (selectedNode.Item.Type == FileFormats.WWise.HircType.Sound)
+            if (selectedNode.Item.Type == HircType.Sound)
             {
                 var findAudioParentStructureHelper = new FindAudioParentStructureHelper();
                 var parentStructs = findAudioParentStructureHelper.Compute(selectedNode.Item, _audioRepository);

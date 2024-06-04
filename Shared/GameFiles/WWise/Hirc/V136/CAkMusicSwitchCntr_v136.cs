@@ -1,8 +1,9 @@
-﻿using Audio.FileFormats.WWise.Hirc.Shared;
-using Shared.Core.ByteParsing;
+﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc.Shared;
 using System;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkMusicSwitchCntr_v136 : HircItem, INodeBaseParamsAccessor
     {
@@ -17,7 +18,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public ArgumentList ArgumentList { get; set; }
         public uint uTreeDataSize { get; set; }
         public byte uMode { get; set; }
-        public Shared.AkDecisionTree AkDecisionTree { get; set; }
+        public AkDecisionTree AkDecisionTree { get; set; }
 
 
         protected override void CreateSpecificData(ByteChunk chunk)
@@ -29,7 +30,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             ArgumentList = new ArgumentList(chunk, uTreeDepth);
             uTreeDataSize = chunk.ReadUInt32();
             uMode = chunk.ReadByte();
-            AkDecisionTree = new Shared.AkDecisionTree(chunk, uTreeDepth, uTreeDataSize);
+            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize);
         }
 
         public override void UpdateSize() => throw new NotImplementedException();

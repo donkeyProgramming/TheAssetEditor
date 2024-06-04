@@ -1,7 +1,8 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
 using System;
 
-namespace Audio.FileFormats.WWise.Hirc
+namespace Shared.GameFormats.WWise.Hirc
 {
     public class CAkUnknown : HircItem
     {

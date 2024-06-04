@@ -1,8 +1,10 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
 using System;
 using System.Collections.Generic;
 
-namespace Audio.FileFormats.WWise.Hirc.V112
+namespace Shared.GameFormats.WWise.Hirc.V112
 {
     public class CAkLayerCntr_v112 : HircItem, ICAkLayerCntr
     {
@@ -20,7 +22,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
             Children = Children.Create(chunk);
 
             var layerCount = chunk.ReadUInt32();
-            for (int i = 0; i < layerCount; i++)
+            for (var i = 0; i < layerCount; i++)
                 LayerList.Add(CAkLayer.Create(chunk));
 
             bIsContinuousValidation = chunk.ReadByte();
@@ -48,7 +50,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
             instance.rtpcID = chunk.ReadUInt32();
             instance.rtpcType = (AkRtpcType)chunk.ReadByte();
             var ulNumAssoc = chunk.ReadUInt32();
-            for (int i = 0; i < ulNumAssoc; i++)
+            for (var i = 0; i < ulNumAssoc; i++)
                 instance.CAssociatedChildDataList.Add(CAssociatedChildData.Create(chunk));
 
             return instance;
@@ -68,7 +70,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
             var instance = new CAssociatedChildData();
             instance.ulAssociatedChildID = chunk.ReadUInt32();
             instance.ulCurveSize = chunk.ReadUInt32();
-            for (int i = 0; i < instance.ulCurveSize; i++)
+            for (var i = 0; i < instance.ulCurveSize; i++)
                 instance.AkRTPCGraphPointList.Add(AkRTPCGraphPoint.Create(chunk));
             return instance;
         }

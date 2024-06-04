@@ -1,9 +1,10 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise.Hirc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Audio.FileFormats.WWise.Hirc.V122
+namespace Shared.GameFormats.WWise.Hirc.V122
 {
 
 
@@ -51,7 +52,7 @@ namespace Audio.FileFormats.WWise.Hirc.V122
             Children = Children.Create(chunk);
 
             var playListItemCount = chunk.ReadUShort();
-            for (int i = 0; i < playListItemCount; i++)
+            for (var i = 0; i < playListItemCount; i++)
                 AkPlaylist.Add(AkPlaylistItem.Create(chunk));
 
         }

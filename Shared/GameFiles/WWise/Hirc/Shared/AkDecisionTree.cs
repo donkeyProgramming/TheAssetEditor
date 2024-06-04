@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Audio.FileFormats.WWise.Hirc.Shared
+namespace Shared.GameFormats.WWise.Hirc.Shared
 {
     public class AkDecisionTree
     {
@@ -70,7 +70,7 @@ namespace Audio.FileFormats.WWise.Hirc.Shared
         {
             foreach (var node in binaryNodes)
             {
-                string indent = new string(' ', depth * 2);
+                var indent = new string(' ', depth * 2);
                 if (node.AudioNodeId != 0)
                     Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
 
@@ -129,7 +129,7 @@ namespace Audio.FileFormats.WWise.Hirc.Shared
 
         private static string ConvertGraphToString(Node node, int depth)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
             if (node.AudioNodeId != 0)
                 stringBuilder.AppendLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
@@ -215,7 +215,7 @@ namespace Audio.FileFormats.WWise.Hirc.Shared
             Console.WriteLine($"======================= PRINTING FLATTENED CUSTOM DECISION TREE =======================");
             PrintBinaryNodes(flattenedTree, 0);
 
-            var validateRootNodeGraph = ConvertListToGraph(flattenedTree, (uint)uTreeDepth, 0, 0, 0);
+            var validateRootNodeGraph = ConvertListToGraph(flattenedTree, uTreeDepth, 0, 0, 0);
             var validateRootNodeGraphString = ConvertGraphToString(validateRootNodeGraph, 0);
             var rootNodeString = ConvertGraphToString(rootNode, 0);
 

@@ -1,7 +1,6 @@
-﻿using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Hirc;
-using Audio.FileFormats.WWise.Hirc.V136;
-using Audio.Storage;
+﻿using Audio.Storage;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
 
 namespace Audio.AudioEditor
 {

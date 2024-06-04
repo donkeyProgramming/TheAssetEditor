@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkActorMixer_v136 : HircItem, INodeBaseParamsAccessor, ICAkActorMixer
     {

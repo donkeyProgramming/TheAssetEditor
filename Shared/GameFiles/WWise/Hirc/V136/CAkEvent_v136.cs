@@ -1,8 +1,10 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkEvent_v136 : HircItem, ICAkEvent
     {
@@ -16,7 +18,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         protected override void CreateSpecificData(ByteChunk chunk)
         {
             var actionCount = chunk.ReadByte();
-            for (int i = 0; i < actionCount; i++)
+            for (var i = 0; i < actionCount; i++)
                 Actions.Add(new Action() { ActionId = chunk.ReadUInt32() });
         }
 

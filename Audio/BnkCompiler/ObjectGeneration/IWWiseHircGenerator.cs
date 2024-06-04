@@ -1,4 +1,4 @@
-﻿using Audio.FileFormats.WWise;
+﻿using Shared.GameFormats.WWise;
 using System;
 
 namespace Audio.BnkCompiler.ObjectGeneration

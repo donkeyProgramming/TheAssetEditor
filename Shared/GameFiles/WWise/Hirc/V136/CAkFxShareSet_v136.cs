@@ -1,8 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
 using System;
 using System.Collections.Generic;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
     //Seems like it's exactly the same as FxCustom...
     //Not sure if there's a fancy C# way of doing things, but I just copy+pasted it below
@@ -24,14 +25,14 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             AkPluginParam = AkPluginParam.Create(chunk, plugin_id, uSize);
 
             var uNumBankData = chunk.ReadByte();
-            for (int i = 0; i < uNumBankData; i++)
+            for (var i = 0; i < uNumBankData; i++)
                 mediaList.Add(AkMediaMap.Create(chunk));
 
             InitialRTPC = InitialRTPC.Create(chunk);
             StateChunk = StateChunk.Create(chunk);
 
             var numValues = chunk.ReadShort();
-            for (int i = 0; i < numValues; i++)
+            for (var i = 0; i < numValues; i++)
                 propertyValuesList.Add(PluginPropertyValue.Create(chunk));
         }
 

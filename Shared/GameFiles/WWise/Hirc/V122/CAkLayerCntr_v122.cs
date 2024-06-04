@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Audio.FileFormats.WWise.Hirc.V122
+namespace Shared.GameFormats.WWise.Hirc.V122
 {
     public class CAkLayerCntr_v122 : HircItem
     {
@@ -18,7 +18,7 @@ namespace Audio.FileFormats.WWise.Hirc.V122
             Children = Children.Create(chunk);
 
             var layerCount = chunk.ReadUInt32();
-            for (int i = 0; i < layerCount; i++)
+            for (var i = 0; i < layerCount; i++)
                 LayerList.Add(CAkLayer.Create(chunk));
 
             bIsContinuousValidation = chunk.ReadByte();
@@ -44,7 +44,7 @@ namespace Audio.FileFormats.WWise.Hirc.V122
             instance.rtpcID = chunk.ReadUInt32();
             instance.rtpcType = (AkRtpcType)chunk.ReadByte();
             var ulNumAssoc = chunk.ReadUInt32();
-            for (int i = 0; i < ulNumAssoc; i++)
+            for (var i = 0; i < ulNumAssoc; i++)
                 instance.CAssociatedChildDataList.Add(CAssociatedChildData.Create(chunk));
 
             return instance;
@@ -66,7 +66,7 @@ namespace Audio.FileFormats.WWise.Hirc.V122
             instance.unknown_custom0 = chunk.ReadByte();
             instance.unknown_custom1 = chunk.ReadByte();
             var pointCount = chunk.ReadUInt32();
-            for (int i = 0; i < pointCount; i++)
+            for (var i = 0; i < pointCount; i++)
                 instance.AkRTPCGraphPointList.Add(AkRTPCGraphPoint.Create(chunk));
             return instance;
         }

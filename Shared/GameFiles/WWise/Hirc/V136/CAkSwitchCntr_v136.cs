@@ -1,8 +1,10 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
 using System;
 using System.Collections.Generic;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
 
     public class CAkSwitchCntr_v136 : HircItem, INodeBaseParamsAccessor, ICAkSwitchCntr
@@ -28,11 +30,11 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             Children = Children.Create(chunk);
 
             var switchListCount = chunk.ReadUInt32();
-            for (int i = 0; i < switchListCount; i++)
+            for (var i = 0; i < switchListCount; i++)
                 SwitchList.Add(CAkSwitchPackage.Create(chunk));
 
             var paramCount = chunk.ReadUInt32();
-            for (int i = 0; i < paramCount; i++)
+            for (var i = 0; i < paramCount; i++)
                 Parameters.Add(AkSwitchNodeParams.Create(chunk));
         }
 

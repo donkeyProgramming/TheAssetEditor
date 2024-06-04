@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
-using Audio.FileFormats.WWise.Bkhd;
-using Audio.FileFormats.WWise.Data;
-using Audio.FileFormats.WWise.Didx;
-using Audio.FileFormats.WWise.Hirc;
-using Audio.FileFormats.WWise.Stid;
 using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.WWise.Bkhd;
+using Shared.GameFormats.WWise.Data;
+using Shared.GameFormats.WWise.Didx;
+using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.WWise.Stid;
 
-namespace Audio.FileFormats.WWise
+namespace Shared.GameFormats.WWise
 {
     public class BnkParser
     {
@@ -33,19 +33,19 @@ namespace Audio.FileFormats.WWise
                 var indexBeforeRead = chunk.Index;
                 var expectedIndexAfterRead = indexBeforeRead + BnkChunkHeader.HeaderByteSize + chunckHeader.ChunkSize;
 
-                if (WWiseObjectHeaders.BKHD == chunckHeader.Tag) 
+                if (WWiseObjectHeaders.BKHD == chunckHeader.Tag)
                     parsedBnkFile.Header = LoadHeader(fullName, chunk);
-                else if (WWiseObjectHeaders.HIRC == chunckHeader.Tag) 
+                else if (WWiseObjectHeaders.HIRC == chunckHeader.Tag)
                     parsedBnkFile.HircChuck = LoadHircs(fullName, chunk, chunckHeader.ChunkSize, parsedBnkFile.Header.dwBankGeneratorVersion);
                 else if (WWiseObjectHeaders.DIDX == chunckHeader.Tag)
-                    parsedBnkFile.DidxChunk = LoadDidx(fullName, chunk);  
+                    parsedBnkFile.DidxChunk = LoadDidx(fullName, chunk);
                 else if (WWiseObjectHeaders.DATA == chunckHeader.Tag)
                     parsedBnkFile.DataChunk = LoadData(fullName, chunk);
                 else if (WWiseObjectHeaders.STID == chunckHeader.Tag)
                     LoadStid(fullName, chunk);  // We never care about this. Discard after loading
                 else
                     throw new ArgumentException($"Unknown data block '{chunckHeader.Tag}' while parsing bnk file '{fullName}'");
- 
+
                 // Verify
                 var bytesRead = expectedIndexAfterRead - indexBeforeRead;
                 if (chunk.Index != expectedIndexAfterRead)

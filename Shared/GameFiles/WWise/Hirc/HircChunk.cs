@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Audio.FileFormats.WWise.Hirc
+namespace Shared.GameFormats.WWise.Hirc
 {
     public class HircChunk
     {

@@ -1,11 +1,13 @@
-﻿using Audio.FileFormats.WWise.Hirc.Shared;
-using Shared.Core.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 using System;
-using static Audio.FileFormats.WWise.Hirc.Shared.AkDecisionTree;
-using static Audio.FileFormats.WWise.Hirc.Shared.ArgumentList;
+using static Shared.GameFormats.WWise.Hirc.Shared.AkDecisionTree;
+using static Shared.GameFormats.WWise.Hirc.Shared.ArgumentList;
 using System.Collections.Generic;
+using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc.Shared;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkDialogueEvent_v136 : HircItem, ICADialogEvent
     {
@@ -36,18 +38,18 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public override void UpdateSize()
         {
-            Size = HircHeaderSize + 1 + 4 + ((uint)CustomArgumentList.Count * 5) + 4 + 1 + uTreeDataSize + 1 + 1;
+            Size = HircHeaderSize + 1 + 4 + (uint)CustomArgumentList.Count * 5 + 4 + 1 + uTreeDataSize + 1 + 1;
         }
         public override byte[] GetAsByteArray()
         {
             using var memStream = WriteHeader();
             memStream.Write(ByteParsers.Byte.EncodeValue(uProbability, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(uTreeDepth, out _));
-            memStream.Write(ArgumentList.GetCustomArgumentsAsBytes(CustomArgumentList));
+            memStream.Write(GetCustomArgumentsAsBytes(CustomArgumentList));
             memStream.Write(ByteParsers.UInt32.EncodeValue(uTreeDataSize, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(uMode, out _));
 
-            memStream.Write(AkDecisionTree.GetAsBytes(CustomAkDecisionTree));
+            memStream.Write(GetAsBytes(CustomAkDecisionTree));
 
             memStream.Write(ByteParsers.Byte.EncodeValue(AkPropBundle0, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(AkPropBundle1, out _));

@@ -1,8 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Audio.FileFormats.WWise.Hirc.Shared
+namespace Shared.GameFormats.WWise.Hirc.Shared
 {
     public class ArgumentList
     {
@@ -12,10 +13,10 @@ namespace Audio.FileFormats.WWise.Hirc.Shared
             for (uint i = 0; i < numItems; i++)
                 Arguments.Add(new Argument());
 
-            for (int i = 0; i < numItems; i++)
+            for (var i = 0; i < numItems; i++)
                 Arguments[i].ulGroupId = chunk.ReadUInt32();
 
-            for (int i = 0; i < numItems; i++)
+            for (var i = 0; i < numItems; i++)
                 Arguments[i].eGroupType = (AkGroupType)chunk.ReadByte();
         }
 

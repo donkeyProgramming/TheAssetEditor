@@ -1,7 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
 using System.IO;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkSound_v136 : HircItem, ICAkSound, INodeBaseParamsAccessor
     {

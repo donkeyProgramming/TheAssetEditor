@@ -1,7 +1,7 @@
-﻿using Audio.FileFormats.WWise.Hirc.Shared;
+﻿using Shared.GameFormats.WWise.Hirc.Shared;
 using System.Collections.Generic;
 
-namespace Audio.FileFormats.WWise.Hirc
+namespace Shared.GameFormats.WWise.Hirc
 {
     public interface ICAkEvent
     {
@@ -70,7 +70,7 @@ namespace Audio.FileFormats.WWise.Hirc
     }
 
 
-  
+
     public abstract class CAkSwitchCntr : HircItem
     {
         public abstract uint GroupId { get; }

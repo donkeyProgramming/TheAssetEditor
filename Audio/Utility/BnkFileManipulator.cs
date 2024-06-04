@@ -1,7 +1,7 @@
-﻿using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Hirc;
+﻿using System.Linq;
 using Shared.Core.PackFiles.Models;
-using System.Linq;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
 
 namespace Audio.Utility
 {

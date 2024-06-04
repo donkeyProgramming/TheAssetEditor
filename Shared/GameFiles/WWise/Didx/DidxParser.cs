@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Shared.Core.ByteParsing;
 
-namespace Audio.FileFormats.WWise.Didx
+namespace Shared.GameFormats.WWise.Didx
 {
     public class DidxChunk
     {
@@ -23,7 +23,7 @@ namespace Audio.FileFormats.WWise.Didx
         }
     }
 
-    public class DidxParser 
+    public class DidxParser
     {
         public DidxChunk Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
         {
@@ -38,6 +38,6 @@ namespace Audio.FileFormats.WWise.Didx
             return new DidxChunk { MediaList = MediaListediaList };
         }
 
-       
+
     }
 }

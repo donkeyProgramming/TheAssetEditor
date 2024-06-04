@@ -1,8 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
 using System;
 using System.Collections.Generic;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkMusicRanSeqCntr_v136 : HircItem
     {
@@ -36,7 +37,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             instance.MusicNodeParams = MusicNodeParams.Create(chunk);
 
             var numRules = chunk.ReadUInt32();
-            for (int i = 0; i < numRules; i++)
+            for (var i = 0; i < numRules; i++)
                 instance.pPlayList.Add(AkMusicTransitionRule.Create(chunk));
 
             return instance;
@@ -63,11 +64,11 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             var instance = new AkMusicTransitionRule();
 
             var uNumSrc = chunk.ReadUInt32();
-            for (int i = 0; i < uNumSrc; i++)
+            for (var i = 0; i < uNumSrc; i++)
                 instance.srcIDList.Add(chunk.ReadUInt32());
 
             var uNumDst = chunk.ReadUInt32();
-            for (int i = 0; i < uNumDst; i++)
+            for (var i = 0; i < uNumDst; i++)
                 instance.dstIDList.Add(chunk.ReadUInt32());
 
             instance.AkMusicTransSrcRule = AkMusicTransSrcRule.Create(chunk);
@@ -218,7 +219,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             instance.bIsUsingWeight = chunk.ReadByte();
             instance.bIsShuffle = chunk.ReadByte();
 
-            for (int i = 0; i < NumChildren; i++)
+            for (var i = 0; i < NumChildren; i++)
                 instance.pPlayList.Add(Create(chunk));
 
             return instance;

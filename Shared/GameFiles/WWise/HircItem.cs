@@ -4,7 +4,7 @@ using Serilog;
 using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 
-namespace Audio.FileFormats.WWise
+namespace Shared.GameFormats.WWise
 {
     public abstract class HircItem
     {

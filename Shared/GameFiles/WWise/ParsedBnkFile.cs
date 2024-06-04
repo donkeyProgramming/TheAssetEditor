@@ -1,9 +1,9 @@
-﻿using Audio.FileFormats.WWise.Bkhd;
-using Audio.FileFormats.WWise.Didx;
-using Audio.FileFormats.WWise.Hirc;
-using Shared.Core.ByteParsing;
+﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise.Bkhd;
+using Shared.GameFormats.WWise.Didx;
+using Shared.GameFormats.WWise.Hirc;
 
-namespace Audio.FileFormats.WWise
+namespace Shared.GameFormats.WWise
 {
     public class ParsedBnkFile
     {

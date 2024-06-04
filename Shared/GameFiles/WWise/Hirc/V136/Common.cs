@@ -1,6 +1,8 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class Children
     {
@@ -10,7 +12,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         {
             var instance = new Children();
             var numChildren = chunk.ReadUInt32();
-            for (int i = 0; i < numChildren; i++)
+            for (var i = 0; i < numChildren; i++)
                 instance.ChildIdList.Add(chunk.ReadUInt32());
 
             return instance;
@@ -48,7 +50,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             var instance = new CAkSwitchPackage();
             instance.SwitchId = chunk.ReadUInt32();
             var numChildren = chunk.ReadUInt32();
-            for (int i = 0; i < numChildren; i++)
+            for (var i = 0; i < numChildren; i++)
                 instance.NodeIdList.Add(chunk.ReadUInt32());
 
             return instance;
@@ -120,7 +122,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public static NodeBaseParams CreateDefault()
         {
-            NodeBaseParams instance = new NodeBaseParams();
+            var instance = new NodeBaseParams();
             instance.NodeInitialFxParams = new NodeInitialFxParams()
             {
                 bIsOverrideParentFX = 0,
@@ -173,7 +175,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
 
         public static NodeBaseParams CreateDefaultRandomContainer()
         {
-            NodeBaseParams instance = new NodeBaseParams();
+            var instance = new NodeBaseParams();
             instance.NodeInitialFxParams = new NodeInitialFxParams()
             {
                 bIsOverrideParentFX = 0,
@@ -383,7 +385,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             if (uNumFx != 0)
             {
                 instance.bitsFXBypass = chunk.ReadByte();
-                for (int i = 0; i < uNumFx; i++)
+                for (var i = 0; i < uNumFx; i++)
                     instance.FxList.Add(FXChunk.Create(chunk));
             }
 
@@ -454,14 +456,14 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                     instance.TransitionTime = chunk.ReadSingle();
 
                     var numVertexes = chunk.ReadUInt32();
-                    for (int i = 0; i < numVertexes; i++)
+                    for (var i = 0; i < numVertexes; i++)
                         instance.VertexList.Add(AkPathVertex.Create(chunk));
 
                     var numPlayListItems = chunk.ReadUInt32();
-                    for (int i = 0; i < numPlayListItems; i++)
+                    for (var i = 0; i < numPlayListItems; i++)
                         instance.PlayListItems.Add(AkPathListItemOffset.Create(chunk));
 
-                    for (int i = 0; i < numPlayListItems; i++)
+                    for (var i = 0; i < numPlayListItems; i++)
                         instance.Params.Add(Ak3DAutomationParams.Create(chunk));
                 }
             }
@@ -643,11 +645,11 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         {
             var instance = new StateChunk();
             var numStateProps = chunk.ReadByte();
-            for (int i = 0; i < numStateProps; i++)
+            for (var i = 0; i < numStateProps; i++)
                 instance.StateProps.Add(AkStatePropertyInfo.Create(chunk));
 
             var numStateGroups = chunk.ReadByte();
-            for (int i = 0; i < numStateGroups; i++)
+            for (var i = 0; i < numStateGroups; i++)
                 instance.StateChunks.Add(AkStateGroupChunk.Create(chunk));
             return instance;
         }
@@ -684,7 +686,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             instance.eStateSyncType = chunk.ReadByte();
 
             var count = chunk.ReadByte();
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
                 instance.States.Add(AkState.Create(chunk));
 
             return instance;
@@ -713,7 +715,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         {
             var instance = new InitialRTPC();
             var count = chunk.ReadUShort();
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
                 instance.RTPCList.Add(RTPC.Create(chunk));
 
             return instance;
@@ -757,7 +759,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             instance.eScaling = chunk.ReadByte();
 
             var count = chunk.ReadUShort();
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
                 instance.pRTPCMgr.Add(AkRTPCGraphPoint.Create(chunk));
 
             return instance;

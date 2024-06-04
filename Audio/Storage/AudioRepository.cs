@@ -1,5 +1,5 @@
 ﻿using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
-using Audio.FileFormats.WWise;
+using Shared.GameFormats.WWise;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

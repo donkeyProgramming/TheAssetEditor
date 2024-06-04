@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.Json;
 using Audio.Utility;
 using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
-using Audio.FileFormats.WWise.Hirc.Shared;
+using Shared.GameFormats.WWise.Hirc.Shared;
 
 namespace Audio.BnkCompiler
 {

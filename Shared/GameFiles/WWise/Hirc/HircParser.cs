@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Audio.FileFormats.WWise.Hirc
+namespace Shared.GameFormats.WWise.Hirc
 {
     public class HircParser
     {
@@ -30,7 +30,7 @@ namespace Audio.FileFormats.WWise.Hirc
             };
 
             var failedItems = new List<uint>();
-            HircFactory factory = GetHircFactory(bnkVersion);
+            var factory = GetHircFactory(bnkVersion);
 
             for (uint itemIndex = 0; itemIndex < hircChuck.NumHircItems; itemIndex++)
             {

@@ -1,9 +1,10 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise.Hirc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Audio.FileFormats.WWise.Hirc.V112
+namespace Shared.GameFormats.WWise.Hirc.V112
 {
 
     public class CAkRanSeqCnt_V112 : CAkRanSeqCnt
@@ -47,7 +48,7 @@ namespace Audio.FileFormats.WWise.Hirc.V112
             Children = Children.Create(chunk);
 
             var playListItemCount = chunk.ReadUShort();
-            for (int i = 0; i < playListItemCount; i++)
+            for (var i = 0; i < playListItemCount; i++)
                 AkPlaylist.Add(AkPlaylistItem.Create(chunk));
 
         }

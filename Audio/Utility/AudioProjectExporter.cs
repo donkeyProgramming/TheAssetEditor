@@ -1,8 +1,8 @@
 ﻿using Audio.BnkCompiler;
-using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using CommunityToolkit.Diagnostics;
 using Shared.Core.Misc;
+using Shared.GameFormats.WWise.Hirc.V136;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

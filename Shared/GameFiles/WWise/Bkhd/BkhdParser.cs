@@ -1,7 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
 using System.IO;
 
-namespace Audio.FileFormats.WWise.Bkhd
+namespace Shared.GameFormats.WWise.Bkhd
 {
     public class BkhdParser
     {

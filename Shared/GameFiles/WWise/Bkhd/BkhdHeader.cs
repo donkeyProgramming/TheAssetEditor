@@ -1,4 +1,4 @@
-﻿namespace Audio.FileFormats.WWise.Bkhd
+﻿namespace Shared.GameFormats.WWise.Bkhd
 {
     public class BkhdHeader
     {

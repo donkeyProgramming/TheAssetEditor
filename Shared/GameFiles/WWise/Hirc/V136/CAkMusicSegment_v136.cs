@@ -1,8 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
 using System;
 using System.Collections.Generic;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkMusicSegment_v136 : HircItem, INodeBaseParamsAccessor
     {
@@ -20,7 +21,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             fDuration = chunk.ReadInt64(); //chunk.ReadDouble();
 
             var ulNumMarkers = chunk.ReadUInt32();
-            for (int i = 0; i < ulNumMarkers; i++)
+            for (var i = 0; i < ulNumMarkers; i++)
                 pArrayMarkersList.Add(AkMusicMarkerWwise.Create(chunk));
         }
 
@@ -47,7 +48,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             //The above wasn't working because uStringSize is an uint32, yet the ReadString was trying to read it as a uint16
             //So instead I just made it read the raw bytes, stored in a list
             var uStringSize = chunk.ReadUInt32();
-            for (int i = 0; i < uStringSize; i++)
+            for (var i = 0; i < uStringSize; i++)
                 instance.pMarkerName.Add(chunk.ReadByte());
 
             return instance;
@@ -73,7 +74,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             instance.bMeterInfoFlag = chunk.ReadByte();
 
             var NumStingers = chunk.ReadUInt32();
-            for (int i = 0; i < NumStingers; i++)
+            for (var i = 0; i < NumStingers; i++)
                 instance.pStingersList.Add(CAkStinger.Create(chunk));
 
             return instance;

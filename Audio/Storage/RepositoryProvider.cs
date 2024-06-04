@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Didx;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Didx;
 
 namespace Audio.Storage
 {

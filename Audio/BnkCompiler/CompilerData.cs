@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
-using Audio.FileFormats.WWise.Hirc.Shared;
+using Shared.GameFormats.WWise.Hirc.Shared;
 
 namespace Audio.BnkCompiler
 {

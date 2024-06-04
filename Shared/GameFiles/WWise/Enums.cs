@@ -1,4 +1,4 @@
-﻿namespace Audio.FileFormats.WWise
+﻿namespace Shared.GameFormats.WWise
 {
 
     public static class WWiseObjectHeaders

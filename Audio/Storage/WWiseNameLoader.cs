@@ -1,17 +1,14 @@
-﻿using Audio.FileFormats.WWise;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.GameFormats.Dat;
-using SharpDX.MediaFoundation.DirectX;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows.Documents;
 
 namespace Audio.Storage
 {

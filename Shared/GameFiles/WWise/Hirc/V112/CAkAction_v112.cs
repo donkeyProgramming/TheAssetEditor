@@ -1,7 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
 using System;
 
-namespace Audio.FileFormats.WWise.Hirc.V112
+namespace Shared.GameFormats.WWise.Hirc.V112
 {
     public class CAkAction_v112 : HircItem, ICAkAction
     {

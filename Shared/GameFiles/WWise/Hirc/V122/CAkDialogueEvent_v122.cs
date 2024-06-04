@@ -1,8 +1,9 @@
-﻿using Audio.FileFormats.WWise.Hirc.Shared;
-using Shared.Core.ByteParsing;
+﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.WWise.Hirc.Shared;
 using System;
 
-namespace Audio.FileFormats.WWise.Hirc.V122
+namespace Shared.GameFormats.WWise.Hirc.V122
 {
     public class CAkDialogueEvent_v122 : HircItem, ICADialogEvent
     {

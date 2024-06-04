@@ -1,5 +1,5 @@
-﻿using Audio.FileFormats.WWise;
-using Audio.Storage;
+﻿using Audio.Storage;
+using Shared.GameFormats.WWise;
 using Shared.Ui.Common;
 using System.Collections.Generic;
 using System.Linq;

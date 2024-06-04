@@ -1,8 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
 using System;
 using System.Collections.Generic;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkFxCustom_v136 : HircItem
     {
@@ -22,14 +23,14 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             AkPluginParam = AkPluginParam.Create(chunk, plugin_id, uSize);
 
             var uNumBankData = chunk.ReadByte();
-            for (int i = 0; i < uNumBankData; i++)
+            for (var i = 0; i < uNumBankData; i++)
                 mediaList.Add(AkMediaMap.Create(chunk));
 
             InitialRTPC = InitialRTPC.Create(chunk);
             StateChunk = StateChunk.Create(chunk);
 
             var numValues = chunk.ReadShort();
-            for (int i = 0; i < numValues; i++)
+            for (var i = 0; i < numValues; i++)
                 propertyValuesList.Add(PluginPropertyValue.Create(chunk));
 
         }
@@ -119,7 +120,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
                 default:
                     //Default "gap"
                     var instance = new AkPluginParam();
-                    for (int i = 0; i < uSize; i++)
+                    for (var i = 0; i < uSize; i++)
                         instance.pParamBlock.Add(chunk.ReadByte());
                     return instance;
             }

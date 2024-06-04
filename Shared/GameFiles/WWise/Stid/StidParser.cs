@@ -1,6 +1,6 @@
 ﻿using Shared.Core.ByteParsing;
 
-namespace Audio.FileFormats.WWise.Stid
+namespace Shared.GameFormats.WWise.Stid
 {
     public class StidParser
     {

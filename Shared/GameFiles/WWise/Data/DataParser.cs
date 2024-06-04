@@ -1,9 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
 using System.Text;
 
-namespace Audio.FileFormats.WWise.Data
+namespace Shared.GameFormats.WWise.Data
 {
-    public class DataParser 
+    public class DataParser
     {
         public ByteChunk Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
         {

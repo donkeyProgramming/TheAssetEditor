@@ -1,7 +1,6 @@
 ﻿using Audio.BnkCompiler;
 using Audio.BnkCompiler.ObjectGeneration;
 using Audio.BnkCompiler.ObjectGeneration.Warhammer3;
-using Audio.FileFormats.WWise;
 using Audio.Presentation.AudioExplorer;
 using Audio.Presentation.Compiler;
 using Audio.Storage;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.PackFiles;
 using Shared.Core.ToolCreation;
+using Shared.GameFormats.WWise;
 using System.IO;
 using System.Linq;
 

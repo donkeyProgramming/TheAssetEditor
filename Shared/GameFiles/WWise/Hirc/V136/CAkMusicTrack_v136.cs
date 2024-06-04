@@ -1,9 +1,11 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Audio.FileFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.WWise.Hirc.V136
 {
 
 
@@ -31,18 +33,18 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             uFlags = chunk.ReadByte();
 
             var numSources = chunk.ReadUInt32();
-            for (int i = 0; i < numSources; i++)
+            for (var i = 0; i < numSources; i++)
                 pSourceList.Add(AkBankSourceData.Create(chunk));
 
             var numPlaylistItem = chunk.ReadUInt32();
-            for (int i = 0; i < numPlaylistItem; i++)
+            for (var i = 0; i < numPlaylistItem; i++)
                 pPlaylistList.Add(AkTrackSrcInfo.Create(chunk));
 
             if (numPlaylistItem > 0)
                 numSubTrack = chunk.ReadUInt32();
 
             var numClipAutomationItem = chunk.ReadUInt32();
-            for (int i = 0; i < numClipAutomationItem; i++)
+            for (var i = 0; i < numClipAutomationItem; i++)
                 pItemsList.Add(AkClipAutomation.Create(chunk));
 
             NodeBaseParams = NodeBaseParams.Create(chunk);
@@ -55,7 +57,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
 
-        public List<uint> GetChildren() => pSourceList.Select(x=>x.akMediaInformation.SourceId).ToList();
+        public List<uint> GetChildren() => pSourceList.Select(x => x.akMediaInformation.SourceId).ToList();
     }
 
     public class AkTrackSrcInfo
@@ -96,7 +98,7 @@ namespace Audio.FileFormats.WWise.Hirc.V136
             instance.uClipIndex = chunk.ReadUInt32();
             instance.eAutoType = chunk.ReadUInt32();
             var uNumPoints = chunk.ReadUInt32();
-            for (int i = 0; i < uNumPoints; i++)
+            for (var i = 0; i < uNumPoints; i++)
                 instance.pRTPCMgr.Add(AkRTPCGraphPoint.Create(chunk));
 
             return instance;
