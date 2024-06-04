@@ -1,8 +1,4 @@
-﻿using Audio.BnkCompiler;
-using Shared.Core.ByteParsing;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using Shared.Core.ByteParsing;
 
 namespace Audio.FileFormats.WWise.Hirc.V136
 {

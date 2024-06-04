@@ -1,7 +1,5 @@
-﻿using Shared.Core.ByteParsing;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
+using Shared.Core.ByteParsing;
 
 namespace Audio.FileFormats.WWise.Didx
 {
