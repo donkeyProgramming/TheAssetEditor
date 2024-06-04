@@ -270,7 +270,6 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 	// Calculate the position of the vertex in the world.
     output.viewDirection = normalize(CameraPos - output.worldPosition);
     return output;
-
 }
 
 // --------------------------------------- Pixel shader Math/Helper functons ---------------------------------------------
