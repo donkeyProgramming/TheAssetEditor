@@ -252,7 +252,7 @@ float3 sample_environment_specular_new(in float roughness_in, in float3 reflecte
 // -------------------------------------------------------------------------------------
 PixelInputType main(in VertexInputType input) // main is the default function name
 {
-    PixelInputType output;
+    PixelInputType output = (PixelInputType) 0;
 
     DoSkinning(input, WeightCount, output.position, output.normal, output.tangent, output.binormal);    
 
