@@ -52,7 +52,7 @@ namespace Editors.Reports
             if(_isStarted)
                 _pfs.FileLookUpEvent -= LookUpEventHandler;
             _isStarted = false;
-
+            _files.Clear();
         }
     }
 }
