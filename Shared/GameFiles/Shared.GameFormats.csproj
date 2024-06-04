@@ -15,6 +15,7 @@
     </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EmbeddedResources\Shared.EmbeddedResources.csproj" />
     <ProjectReference Include="..\SharedCore\Shared.Core.csproj" />
   </ItemGroup>
 

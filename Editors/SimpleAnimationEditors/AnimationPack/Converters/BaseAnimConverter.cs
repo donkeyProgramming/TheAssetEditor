@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.AnimationPack.Converters
@@ -16,6 +17,8 @@ namespace CommonControls.Editors.AnimationPack.Converters
         public bool ShouldShowLineNumbers() => true;
         public string GetSyntaxType() => "XML";
         public bool CanSaveOnError() => false;
+
+        public PackFile AnimPackToValidate = null;
 
         protected abstract ITextConverter.SaveError Validate(XmlType type, string s, PackFileService pfs, string filepath);
         protected abstract XmlType ConvertBytesToXmlClass(byte[] bytes);

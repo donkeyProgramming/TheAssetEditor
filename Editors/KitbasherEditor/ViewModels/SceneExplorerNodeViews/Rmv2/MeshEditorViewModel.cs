@@ -1,4 +1,5 @@
 ﻿using Editors.Shared.Core.Services;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -15,11 +16,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public MaterialGeneralViewModel MaterialGeneral { get; set; }
         public WeightedMaterialViewModel Material { get; set; }
 
-        public MeshEditorViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, SceneManager sceneManager, ApplicationSettingsService applicationSettings)
+        public MeshEditorViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, SceneManager sceneManager, ApplicationSettingsService applicationSettings, EventHub eventHub)
         {
             Mesh = new MeshViewModel(node, sceneManager);
             Animation = new AnimationViewModel(kitbasherRootScene, node, pfs, animLookUp);
-            MaterialGeneral = new MaterialGeneralViewModel(kitbasherRootScene, node, pfs, applicationSettings);
+            MaterialGeneral = new MaterialGeneralViewModel(kitbasherRootScene, node, pfs, applicationSettings, eventHub);
 
             if (node.Material is WeightedMaterial)
                 Material = new WeightedMaterialViewModel(node);

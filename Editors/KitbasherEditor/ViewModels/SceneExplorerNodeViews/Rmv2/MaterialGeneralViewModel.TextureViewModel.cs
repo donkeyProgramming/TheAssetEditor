@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using CommonControls.PackFileBrowser;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel.Types;
@@ -19,6 +20,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         {
             PackFileService _packfileService;
             Rmv2MeshNode _meshNode;
+            EventHub _eventHub;
             public TextureType TexureType { get; private set; }
 
             bool _useTexture = true;
@@ -46,9 +48,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             private readonly Dictionary<string, List<string>> _errorsByPropertyName = new Dictionary<string, List<string>>();
             private string _path = "";
 
-            public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TextureType texureType)
+            public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TextureType texureType, EventHub eventHub)
             {
                 _packfileService = packfileService;
+                _eventHub = eventHub;
                 _meshNode = meshNode;
                 TexureType = texureType;
                 TextureTypeStr = TexureType.ToString();
@@ -68,7 +71,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 UpdateTexturePath(path);
 
             }
-            public void Preview() => TexturePreviewControllerCreator.CreateWindow(Path, _packfileService);
+            public void Preview() => TexturePreviewController.CreateWindow(Path, _packfileService, _eventHub);
 
             public void Browse()
             {
