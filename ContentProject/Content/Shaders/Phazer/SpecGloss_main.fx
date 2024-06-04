@@ -2,6 +2,7 @@
 #include "tone_mapping.fx"
 #include "const_layout.hlsli"
 #include "inputlayouts.hlsli"
+#include "GPUSkinning.hlsli"
 
 // -------------------------------------------------------------------------------
 //
@@ -195,55 +196,16 @@ float3 sample_environment_specular_new(in float roughness_in, in float3 reflecte
     return result;
 }
 
-// --------------------- Vertex shader
+// -------------------------------------------------------------------------------------
+//		VERTEX SHADER
+// -------------------------------------------------------------------------------------
 PixelInputType main(in VertexInputType input) // main is the default function name
 {
-    PixelInputType output;
+    PixelInputType output = (PixelInputType) 0;
 
-    float fac = 1;
-    float4x4 scale4x4 = float4x4(
-		fac, 0, 0, 0,
-		0, fac, 0, 0,
-		0, 0, fac, 0,
-		0, 0, 0, 1);
+    DoSkinning(input, WeightCount, output.position, output.normal, output.tangent, output.binormal);
 
-    if (doAnimation && WeightCount != 0)
-    {
-        float4x4 PM[4];
-        PM[0] = tranforms[input.BoneIndices.x];
-        PM[1] = tranforms[input.BoneIndices.y];
-        PM[2] = tranforms[input.BoneIndices.z];
-        PM[3] = tranforms[input.BoneIndices.w];
-
-        float4 pos = 0;
-        float4 normal = 0;
-        float4 tangent = 0;
-        float4 biNormal = 0;
-
-        for (int i = 0; i < 4; i++)
-        {
-            pos += input.Weights[i] * mul(input.position, PM[i]);
-            normal.xyz += input.Weights[i] * mul(input.normal, (float3x3) PM[i]);
-            tangent.xyz += input.Weights[i] * mul(input.tangent, (float3x3) PM[i]);
-            biNormal.xyz += input.Weights[i] * mul(input.binormal, (float3x3) PM[i]);
-        }
-
-        output.position = pos;
-        output.normal = normal.xyz;
-        output.tangent = tangent.xyz;
-        output.binormal = biNormal.xyz;
-    }
-    else
-    {
-        output.position = input.position;
-        output.normal = input.normal;
-        output.tangent = input.tangent;
-        output.binormal = input.binormal;
-    }
-
-	//output.position = float4(output.position.xyz, 1);
-
-    output.position = mul(mul(output.position, scale4x4), World);
+    output.position = mul(output.position, World);
     output.worldPosition = output.position.xyz;
     output.position = mul(output.position, View);
     output.position = mul(output.position, Projection);
@@ -257,9 +219,7 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 	// Calculate the position of the vertex in the world.
     output.viewDirection = normalize(CameraPos - output.worldPosition);
     return output;
-
-}
-// --------------------- Vertex shader End
+} 
 
 // --------------------- Pixel shader
 float substance_smoothness_get_our_smoothness(in float substance_smoothness)
