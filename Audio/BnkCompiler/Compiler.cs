@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
 using Audio.BnkCompiler.ObjectGeneration;
-using Audio.FileFormats.Dat;
 using Audio.FileFormats.WWise;
 using Audio.FileFormats.WWise.Bkhd;
 using Audio.FileFormats.WWise.Hirc;
@@ -10,6 +9,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Audio.Storage;
+using Shared.GameFormats.Dat;
 
 namespace Audio.BnkCompiler
 {

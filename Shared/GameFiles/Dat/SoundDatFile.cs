@@ -1,11 +1,7 @@
-﻿using Audio.Storage;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Text;
 
-namespace Audio.FileFormats.Dat
+namespace Shared.GameFormats.Dat
 {
     public class SoundDatFile
     {
@@ -48,7 +44,7 @@ namespace Audio.FileFormats.Dat
 
         public void DumpToFile(string filePath)
         {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
 
             builder.AppendLine($"Section 1 -{Event0.Count}");
             foreach (var item in Event0)
@@ -109,7 +105,7 @@ namespace Audio.FileFormats.Dat
             return output.ToArray();
         }
 
-        public void SaveTextVersion(string savePath, IAudioRepository audioRepository)
+        /*public void SaveTextVersion(string savePath, IAudioRepository audioRepository)
         {
             StringBuilder output = new StringBuilder();
             output.AppendLine($"Events (count:{Event0.Count}):");
@@ -144,6 +140,6 @@ namespace Audio.FileFormats.Dat
             // bnk names
             // Battle enums
             // Campagin enims
-        }
+        }*/
     }
 }

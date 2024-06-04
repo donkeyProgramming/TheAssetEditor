@@ -1,10 +1,8 @@
-﻿using Shared.Core.ByteParsing;
+﻿using System.Text;
+using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles.Models;
-using System.IO;
-using System.Linq;
-using System.Text;
 
-namespace Audio.FileFormats.Dat
+namespace Shared.GameFormats.Dat
 {
     public class DatFileParser
     {
@@ -12,40 +10,40 @@ namespace Audio.FileFormats.Dat
         {
             var chunk = file.DataSource.ReadDataAsChunk();
 
-            SoundDatFile output = new SoundDatFile();
+            var output = new SoundDatFile();
 
             var sectionZeroCount = chunk.ReadUInt32();
-            for (int i = 0; i < sectionZeroCount; i++)
+            for (var i = 0; i < sectionZeroCount; i++)
                 output.Event0.Add(new SoundDatFile.EventWithValue() { EventName = ReadStr32(chunk), Value = chunk.ReadSingle() });
 
             var sectionOneCount = chunk.ReadInt32();
-            for (int i = 0; i < sectionOneCount; i++)
+            for (var i = 0; i < sectionOneCount; i++)
             {
                 var eventEnum = new SoundDatFile.EventEnums() { EnumName = ReadStr32(chunk) };
                 var attrValCount = chunk.ReadUInt32();
-                for (int j = 0; j < attrValCount; j++)
+                for (var j = 0; j < attrValCount; j++)
                     eventEnum.EnumValues.Add(ReadStr32(chunk));
 
                 output.EnumGroup0.Add(eventEnum);
             }
 
             var sectionTwoCount = chunk.ReadInt32();
-            for (int i = 0; i < sectionTwoCount; i++)
+            for (var i = 0; i < sectionTwoCount; i++)
             {
                 var eventEnum = new SoundDatFile.EventEnums() { EnumName = ReadStr32(chunk) };
                 var attrValCount = chunk.ReadUInt32();
-                for (int j = 0; j < attrValCount; j++)
+                for (var j = 0; j < attrValCount; j++)
                     eventEnum.EnumValues.Add(ReadStr32(chunk));
 
                 output.EnumGroup1.Add(eventEnum);
             }
 
             var sectionThreeCount = chunk.ReadInt32();
-            for (int i = 0; i < sectionThreeCount; i++)
+            for (var i = 0; i < sectionThreeCount; i++)
             {
                 var eventEnum = new SoundDatFile.EventWithValues() { EventName = ReadStr32(chunk) };
                 var attrValCount = chunk.ReadUInt32();
-                for (int j = 0; j < attrValCount; j++)
+                for (var j = 0; j < attrValCount; j++)
                     eventEnum.Values.Add(chunk.ReadUInt32());
 
                 output.VoiceEvents.Add(eventEnum);
@@ -54,17 +52,17 @@ namespace Audio.FileFormats.Dat
             if (isAtilla)
             {
                 var sectionFourCount = chunk.ReadInt32();
-                for (int i = 0; i < sectionFourCount; i++)
+                for (var i = 0; i < sectionFourCount; i++)
                     output.SettingValues.Add(new SoundDatFile.SettingValue() { EventName = ReadStr32(chunk) });
             }
             else
             {
                 var sectionFourCount = chunk.ReadInt32();
-                for (int i = 0; i < sectionFourCount; i++)
+                for (var i = 0; i < sectionFourCount; i++)
                     output.SettingValues.Add(new SoundDatFile.SettingValue() { EventName = ReadStr32(chunk), MinValue = chunk.ReadSingle(), MaxValue = chunk.ReadSingle() });
 
                 var sectionFiveCount = chunk.ReadInt32();
-                for (int i = 0; i < sectionFiveCount; i++)
+                for (var i = 0; i < sectionFiveCount; i++)
                     output.Unknown.Add(ReadStr32(chunk));
             }
 
@@ -141,7 +139,6 @@ namespace Audio.FileFormats.Dat
             var strBytes = Encoding.UTF8.GetBytes(str);
             buffer.AddRange(strBytes);
             return buffer.ToArray();
-
         }
     }
 }
