@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Shared.Core.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.WWise.Bkhd;
 using Shared.GameFormats.WWise.Data;

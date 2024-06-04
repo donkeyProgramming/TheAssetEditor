@@ -1,5 +1,5 @@
-﻿using Shared.Core.ByteParsing;
-using System.Text;
+﻿using System.Text;
+using Shared.Core.ByteParsing;
 
 namespace Shared.GameFormats.WWise.Data
 {

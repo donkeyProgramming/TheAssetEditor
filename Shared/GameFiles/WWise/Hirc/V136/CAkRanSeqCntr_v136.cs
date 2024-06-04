@@ -1,9 +1,4 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.WWise.Hirc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkRanSeqCntr_v136 : CAkRanSeqCnt, INodeBaseParamsAccessor

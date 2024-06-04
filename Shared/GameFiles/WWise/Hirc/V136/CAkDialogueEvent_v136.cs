@@ -1,11 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
-using System;
+using Shared.GameFormats.WWise.Hirc.Shared;
 using static Shared.GameFormats.WWise.Hirc.Shared.AkDecisionTree;
 using static Shared.GameFormats.WWise.Hirc.Shared.ArgumentList;
-using System.Collections.Generic;
-using Shared.GameFormats.WWise.Hirc;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc.Shared;
 
 namespace Shared.GameFormats.WWise.Hirc.V136
 {

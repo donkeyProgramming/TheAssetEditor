@@ -1,5 +1,4 @@
 ﻿using Shared.GameFormats.WWise.Hirc.Shared;
-using System.Collections.Generic;
 
 namespace Shared.GameFormats.WWise.Hirc
 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Shared.GameFormats.WWise;
-
-namespace Shared.GameFormats.WWise.Hirc
+﻿namespace Shared.GameFormats.WWise.Hirc
 {
     public class HircFactory
     {

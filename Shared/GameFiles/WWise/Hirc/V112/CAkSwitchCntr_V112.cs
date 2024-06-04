@@ -1,9 +1,4 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using static Shared.GameFormats.WWise.Hirc.ICAkSwitchCntr;
 
 namespace Shared.GameFormats.WWise.Hirc.V112

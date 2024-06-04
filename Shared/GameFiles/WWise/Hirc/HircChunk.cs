@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Shared.GameFormats.WWise.Hirc
+﻿namespace Shared.GameFormats.WWise.Hirc
 {
     public class HircChunk
     {

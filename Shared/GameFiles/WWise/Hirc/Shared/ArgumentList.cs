@@ -1,7 +1,4 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.WWise;
-using System.Collections.Generic;
-using System.IO;
 
 namespace Shared.GameFormats.WWise.Hirc.Shared
 {

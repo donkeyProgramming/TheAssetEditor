@@ -1,5 +1,4 @@
 ﻿using Shared.Core.ByteParsing;
-using System.IO;
 
 namespace Shared.GameFormats.WWise.Bkhd
 {
