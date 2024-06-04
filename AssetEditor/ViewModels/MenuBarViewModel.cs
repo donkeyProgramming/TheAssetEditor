@@ -262,10 +262,12 @@ namespace AssetEditor.ViewModels
         void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
         void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SkeletonEditorViewModel>>();
         void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();
+        
         private void RunDialogueEventTesting()
         {
-            //var DialogueEventGenerator = new DialogueEventGenerator(_packfileService);
-            //DialogueEventGenerator.DoDialogueEventGenerator();
+            var mainWindow = new Editors.AudioEditor.MainWindow();
+            mainWindow.DataContext = _serviceProvider.GetRequiredService<MainViewModel>();
+            mainWindow.Show();
         }
 
         private void CreateAudioTemplate(string audioTemplateFile)
