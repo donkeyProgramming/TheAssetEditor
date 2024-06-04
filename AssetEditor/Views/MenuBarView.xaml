@@ -90,14 +90,14 @@
                     <MenuItem Header="Compile Audio Projects" Command="{Binding MenuBar.CompileAudioProjectsCommand}"/>
                     <MenuItem Header="Audio Templates">
                         <MenuItem Header="Ability" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_Ability.json"/>
-                        <MenuItem Header="Battle Individual Vocalisation" Command="{Binding CMenuBar.reateTemplateCommand}" CommandParameter="Audio_Template_Vocalisation.json"/>
-                        <MenuItem Header="Campaign Advisor" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_Campaign_Advisor.json"/>
+                        <MenuItem Header="Advisor" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_Campaign_Advisor.json"/>
                         <MenuItem Header="Diplomacy Line" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_Diplomacy_Line.json"/>
                         <MenuItem Header="Event Narration" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_Event_Narration.json"/>
                         <MenuItem Header="Magic" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_Magic.json"/>
                         <MenuItem Header="Movie" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_Movie.json"/>
-                        <MenuItem Header="Quest Battle" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_Quest_Battle_Speech.json"/>
+                        <MenuItem Header="Quest Battle" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_Quest_Battle.json"/>
                         <MenuItem Header="UI" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_UI.json"/>
+                        <MenuItem Header="Vocalisation" Command="{Binding MenuBar.CreateTemplateCommand}" CommandParameter="Audio_Template_Vocalisation.json"/>
                     </MenuItem>
                     <MenuItem Header="Dialogue Event Testing" Command="{Binding MenuBar.DialogueEventTesting}"/>
                 </MenuItem>

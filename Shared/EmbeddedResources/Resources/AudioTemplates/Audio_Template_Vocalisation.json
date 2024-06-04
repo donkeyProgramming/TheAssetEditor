@@ -14,7 +14,7 @@
   - BnkName: This is the name of the bnk. The bnk name in this tempalte should start with the name of the vanilla bnk "campaign_advice__", the rest of the bnk name can be custom.
   - Language: This is the language folder that you want the project to output to.
   - EventName: This is the name of the event. Event names in this template should start with "Battle_Individual_Vocalisation_", the rest of the event name can be custom.
-  - Mixer: The mixer determines how the sound will be played in game. In this template the mixer should be "Advisor".
+  - Mixer: The mixer determines how the sound will be played in game. In this template the mixer should be "vocalisation".
   - Sounds: Define the path to your sound files here. If multiple sound files are specified a random sound is played each time the event is triggered.
 */
 
@@ -27,12 +27,12 @@
   "Events": [
     {
       "EventName": "Battle_Individual_Vocalisation_template_event_1",
-      "Mixer": "Battle Individual Vocalisation",
+      "Mixer": "vocalisation",
       "Sounds": [ "C:\\path\\to\\your_wav_1.wav" ]
     },
     {
       "EventName": "Battle_Individual_Vocalisation_template_event_2",
-      "Mixer": "Battle Individual Vocalisation",
+      "Mixer": "vocalisation",
       "Sounds": [ "C:\\path\\to\\your_wav_1.wav", "C:\\path\\to\\your_wav_2.wav" ]
     }
   ]
