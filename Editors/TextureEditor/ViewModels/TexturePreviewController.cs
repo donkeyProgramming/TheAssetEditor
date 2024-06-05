@@ -61,10 +61,10 @@ namespace TextureEditor.ViewModels
             _eventHub = eventHub;
 
             _scene = new GameWorld(_eventHub);
+            _resourceLib = new ResourceLibary(_scene, packFileService);
             _scene.Components.Add(new ResourceLibary(_scene, packFileService));
             _scene.ForceCreate();
 
-            _resourceLib = _scene.GetComponent<ResourceLibary>();
             _textureRenderer = new TextureToTextureRenderer(_scene.GraphicsDevice, new SpriteBatch(_scene.GraphicsDevice), _resourceLib);
             CreateImage();
         }

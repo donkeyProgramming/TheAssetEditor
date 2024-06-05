@@ -1,28 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Monogame.WpfInterop.Events;
 using Shared.Core.Events;
 using System;
 using System.Collections.Generic;
 
-
 namespace MonoGame.Framework.WpfInterop
 {
-    public interface IComponentManager
-    {
-        public T GetComponent<T>() where T : IGameComponent;
-        public T AddComponent<T>(T comp) where T : IGameComponent;
-        public void RemoveComponent<T>(T comp) where T : IGameComponent;
-    }
-
-    public class SceneInitializedEvent
-    {
-    }
-
     /// <summary>
     /// The replacement for <see cref="Game"/>. Unlike <see cref="Game"/> the <see cref="WpfGame"/> is a WPF control and can be hosted inside WPF windows.
     /// </summary>
-    public abstract class WpfGame : D3D11Host, IComponentManager
+    public abstract class WpfGame : D3D11Host
     {
         private readonly EventHub _eventHub;
         private readonly string _contentDir;

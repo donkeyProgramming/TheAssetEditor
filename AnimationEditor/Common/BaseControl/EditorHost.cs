@@ -3,7 +3,7 @@ using System.Windows.Input;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using CommunityToolkit.Mvvm.Input;
-using MonoGame.Framework.WpfInterop;
+using Monogame.WpfInterop.Events;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
