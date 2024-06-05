@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Threading;
-using AssetEditor.DevelopmentConfiguration;
+using AssetEditor.DevConfigs.Base;
 using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
@@ -13,9 +13,6 @@ using Shared.Core.Services;
 
 namespace AssetEditor
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         IServiceProvider _serviceProvider;
@@ -40,12 +37,9 @@ namespace AssetEditor
                 settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
                 settingsService.Save();
             }
-
-            DevelopmentConfigurationManager devConfigManager = null;
-            if (settingsService.CurrentSettings.IsDeveloperRun)
-                devConfigManager = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
-
-            devConfigManager?.OverrideSettings();        
+            var devConfigManager = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
+            devConfigManager.Initialize(e);
+            devConfigManager.OverrideSettings();        
 
             // Load all packfiles
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
@@ -62,8 +56,8 @@ namespace AssetEditor
                 }
             }
 
-            devConfigManager?.CreateTestPackFiles();
-            devConfigManager?.OpenFileOnLoad();
+            devConfigManager.CreateTestPackFiles();
+            devConfigManager.OpenFileOnLoad();
 
             ShowMainWindow();
         }

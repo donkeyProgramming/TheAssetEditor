@@ -1,4 +1,4 @@
-﻿using AssetEditor.DevelopmentConfiguration;
+﻿using AssetEditor.DevConfigs.Base;
 using AssetEditor.Services;
 using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;

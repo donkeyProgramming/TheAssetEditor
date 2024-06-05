@@ -3,6 +3,11 @@
     "AssetEditor": {
       "commandName": "Project",
       "nativeDebugging": false
+    },
+    "AssetEditor-KitbashKarl": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg Kitbash_Karl",
+      "nativeDebugging": false
     }
   }
 }

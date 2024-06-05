@@ -33,6 +33,13 @@ namespace Shared.EmbeddedResources
             return bitmapImage;
         }
 
+        public static string GetDevelopmentDataFolder()
+        {
+            var workingDirectory = Environment.CurrentDirectory;
+            var projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
+            return projectDirectory + "\\Data";
+        }
+
         private static Stream GetResourceStream(string resourcePath)
         {
             var fullPath = "Shared.EmbeddedResources." + resourcePath;
