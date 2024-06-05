@@ -1,6 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.WpfWindow;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 
 namespace View3D.Components.Input

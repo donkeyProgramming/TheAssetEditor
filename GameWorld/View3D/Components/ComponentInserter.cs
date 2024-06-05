@@ -1,9 +1,14 @@
 ﻿using System.Collections.Generic;
+using GameWorld.WpfWindow;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 
 namespace View3D.Components
 {
+    public interface IComponentInserter
+    {
+        void Execute();
+    }
+
     public class ComponentInserter : IComponentInserter
     {
         private readonly WpfGame _wpfGame;
@@ -20,10 +25,5 @@ namespace View3D.Components
             foreach (var component in _components)
                 _wpfGame.AddComponent(component);
         }
-    }
-
-    public interface IComponentInserter
-    {
-        void Execute();
     }
 }

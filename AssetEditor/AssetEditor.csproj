@@ -43,7 +43,6 @@
         <ProjectReference Include="..\Editors\Reports\Editors.Reports.csproj" />
         <ProjectReference Include="..\Editors\Shared\Editors.Shared.DevConfig\Editors.Shared.DevConfig.csproj" />
         <ProjectReference Include="..\Editors\TextureEditor\Editors.TextureEditor.csproj" />
-        <ProjectReference Include="..\GameWorld\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
         <ProjectReference Include="..\GameWorld\View3D\View3D.csproj" />
         <ProjectReference Include="..\Shared\EmbeddedResources\Shared.EmbeddedResources.csproj" />
         <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
@@ -69,10 +68,6 @@
 
     <ItemGroup>
         <None Include="..\.editorconfig" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="UiCommands\" />
     </ItemGroup>
 
 

@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop;
+﻿using GameWorld.WpfWindow;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace View3D.Components
 {

@@ -24,7 +24,7 @@ namespace AssetEditor.Services
                 new Shared.Ui.DependencyInjectionContainer(),
                 new Shared.GameFormats.DependencyInjectionContainer(),
                 new Shared.EmbeddedResources.DependencyInjectionContainer(loadResources),
-                new Monogame.WpfInterop.DependencyInjectionContainer(),
+                new GameWorld.WpfWindow.DependencyInjectionContainer(),
                 new View3D.DependencyInjectionContainer(),
                
                 // Misc

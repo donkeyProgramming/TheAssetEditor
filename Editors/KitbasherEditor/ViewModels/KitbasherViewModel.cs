@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
+using GameWorld.WpfWindow;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using MonoGame.Framework.WpfInterop;
 using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;

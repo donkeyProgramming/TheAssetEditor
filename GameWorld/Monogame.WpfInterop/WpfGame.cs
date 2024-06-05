@@ -5,9 +5,10 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Monogame.WpfInterop.Events;
 using Monogame.WpfInterop.ResourceHandling;
+using MonoGame.Framework.WpfInterop;
 using Shared.Core.Events;
 
-namespace MonoGame.Framework.WpfInterop
+namespace GameWorld.WpfWindow
 {
     /// <summary>
     /// The replacement for <see cref="Game"/>. Unlike <see cref="Game"/> the <see cref="WpfGame"/> is a WPF control and can be hosted inside WPF windows.
@@ -20,8 +21,8 @@ namespace MonoGame.Framework.WpfInterop
         private readonly string _contentDir;
 
         private ContentManager _content;
-        private readonly List<IUpdateable> _sortedUpdateables;
-        private readonly List<IDrawable> _sortedDrawables;
+        private readonly List<IUpdateable> _sortedUpdateable;
+        private readonly List<IDrawable> _sortedDrawable;
 
         /// <summary>
         /// Creates a new instance of a game host panel.
@@ -36,8 +37,8 @@ namespace MonoGame.Framework.WpfInterop
 
             Focusable = true;
             Components = new GameComponentCollection();
-            _sortedDrawables = new List<IDrawable>();
-            _sortedUpdateables = new List<IUpdateable>();
+            _sortedDrawable = new List<IDrawable>();
+            _sortedUpdateable = new List<IUpdateable>();
         }
 
         /// <summary>
@@ -83,8 +84,8 @@ namespace MonoGame.Framework.WpfInterop
 
             Services.RemoveService(typeof(IGraphicsDeviceService));
             Services.RemoveService(typeof(IGraphicsDeviceManager));
-            _sortedUpdateables.Clear();
-            _sortedDrawables.Clear();
+            _sortedUpdateable.Clear();
+            _sortedDrawable.Clear();
         }
 
         /// <summary>
@@ -93,19 +94,15 @@ namespace MonoGame.Framework.WpfInterop
         /// <param name="gameTime"></param>
         protected virtual void Draw(GameTime gameTime)
         {
-            for (int i = 0; i < _sortedDrawables.Count; i++)
+            for (var i = 0; i < _sortedDrawable.Count; i++)
             {
-                if (_sortedDrawables[i].Visible)
-                    _sortedDrawables[i].Draw(gameTime);
+                if (_sortedDrawable[i].Visible)
+                    _sortedDrawable[i].Draw(gameTime);
             }
         }
 
         protected override void OnGraphicDeviceDisposed()
         {
-
-            //Content.Unload();
-            //Content?.Dispose();
-            //Content = null;
             _resourceLibrary.Reset();
         }
 
@@ -147,10 +144,10 @@ namespace MonoGame.Framework.WpfInterop
         /// <param name="gameTime"></param>
         protected virtual void Update(GameTime gameTime)
         {
-            for (int i = 0; i < _sortedUpdateables.Count; i++)
+            for (var i = 0; i < _sortedUpdateable.Count; i++)
             {
-                if (_sortedUpdateables[i].Enabled)
-                    _sortedUpdateables[i].Update(gameTime);
+                if (_sortedUpdateable[i].Enabled)
+                    _sortedUpdateable[i].Update(gameTime);
             }
         }
 
@@ -160,13 +157,13 @@ namespace MonoGame.Framework.WpfInterop
             if (update != null)
             {
                 update.UpdateOrderChanged -= UpdateOrderChanged;
-                _sortedUpdateables.Remove(update);
+                _sortedUpdateable.Remove(update);
             }
             var draw = args.GameComponent as IDrawable;
             if (draw != null)
             {
                 draw.DrawOrderChanged -= DrawOrderChanged;
-                _sortedDrawables.Remove(draw);
+                _sortedDrawable.Remove(draw);
             }
         }
 
@@ -178,14 +175,14 @@ namespace MonoGame.Framework.WpfInterop
             var update = args.GameComponent as IUpdateable;
             if (update != null)
             {
-                _sortedUpdateables.Add(update);
+                _sortedUpdateable.Add(update);
                 update.UpdateOrderChanged += UpdateOrderChanged;
                 SortUpdatables();
             }
             var draw = args.GameComponent as IDrawable;
             if (draw != null)
             {
-                _sortedDrawables.Add(draw);
+                _sortedDrawable.Add(draw);
                 draw.DrawOrderChanged += DrawOrderChanged;
                 SortDrawables();
             }
@@ -217,7 +214,7 @@ namespace MonoGame.Framework.WpfInterop
 
         private void SortDrawables()
         {
-            _sortedDrawables.Sort((a, b) => a.DrawOrder.CompareTo(b.DrawOrder));
+            _sortedDrawable.Sort((a, b) => a.DrawOrder.CompareTo(b.DrawOrder));
         }
 
         private void DrawOrderChanged(object sender, EventArgs e)
@@ -232,7 +229,7 @@ namespace MonoGame.Framework.WpfInterop
 
         private void SortUpdatables()
         {
-            _sortedUpdateables.Sort((a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder));
+            _sortedUpdateable.Sort((a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder));
         }
     }
 }

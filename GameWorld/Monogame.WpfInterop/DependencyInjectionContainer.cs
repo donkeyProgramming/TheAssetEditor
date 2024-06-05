@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Monogame.WpfInterop.ResourceHandling;
-using MonoGame.Framework.WpfInterop;
 using Shared.Core.DependencyInjection;
 
-namespace Monogame.WpfInterop
+namespace GameWorld.WpfWindow
 {
     public class DependencyInjectionContainer : DependencyContainer
     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.WpfWindow;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop.Internals;
 using System;

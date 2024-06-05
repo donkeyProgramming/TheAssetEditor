@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using GameWorld.WpfWindow;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Framework.WpfInterop.Internals;
 

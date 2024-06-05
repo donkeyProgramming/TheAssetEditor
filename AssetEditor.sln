@@ -60,7 +60,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{1C72D5BE-B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.Shared.DevConfig", "Editors\Shared\Editors.Shared.DevConfig\Editors.Shared.DevConfig.csproj", "{A64E6963-4D30-47FF-AAAF-54533534C657}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monogame.WpfInterop", "GameWorld\Monogame.WpfInterop\Monogame.WpfInterop.csproj", "{DA0742FD-2538-41B9-84BB-81F93B030072}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameWorld.WpfWindow", "GameWorld\Monogame.WpfInterop\GameWorld.WpfWindow.csproj", "{DA0742FD-2538-41B9-84BB-81F93B030072}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
