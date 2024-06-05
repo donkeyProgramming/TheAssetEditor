@@ -40,7 +40,7 @@ namespace AudioResearch
             //
             //// OvnTest.Compile();
             ////GeneratOvnProject();
-            /// TestDialogEventSerialization();
+            // TestDialogEventSerialization();
             //// LogicalChainingTest();
             //
             //var currentProjectName = $"Data\\OvnExample\\ProjectSimple.json";

@@ -1,17 +1,15 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using System.Collections.ObjectModel;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Input;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {
     public class WeightedMaterialViewModel : NotifyPropertyChangedImpl
     {
-        WeightedMaterial _weightedMaterial;
+        private readonly WeightedMaterial _weightedMaterial;
 
         public NotifyAttr<string> Filters { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<int> MatrixIndex { get; set; } = new NotifyAttr<int>();
@@ -29,13 +27,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public ICommand SetDefaultParentMatrixIndexCommand { get; set; }
         public ICommand SetDefaultMatrixIndexCommand { get; set; }
 
-
-
         public WeightedMaterialViewModel(Rmv2MeshNode node)
         {
-            _weightedMaterial = node.Material as WeightedMaterial;
-            if (_weightedMaterial == null)
+            var castMaterial = node.Material as WeightedMaterial;
+            if (castMaterial == null)
                 throw new Exception($"Material is not WeightedMaterial - {node.Material.GetType()}");
+            _weightedMaterial = castMaterial;
 
             Filters.Value = _weightedMaterial.Filters;
             MatrixIndex.Value = _weightedMaterial.MatrixIndex;

@@ -69,8 +69,7 @@ namespace Shared.GameFormats.AnimationPack
 
         public static AnimationPackFile Load(PackFile pf, PackFileService pfs, GameTypeEnum preferedGame = GameTypeEnum.Unknown)
         {
-            var output = new AnimationPackFile();
-            output.FileName = pfs.GetFullPath(pf);
+            var output = new AnimationPackFile(pfs.GetFullPath(pf));
 
             var dataChunk = pf.DataSource.ReadDataAsChunk();
             var files = FindAllSubFiles(dataChunk);

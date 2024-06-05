@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows;
 using CommonControls.PackFileBrowser;
 using Shared.Core.Events;
@@ -18,9 +15,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
     {
         public class TextureViewModel : NotifyPropertyChangedImpl, INotifyDataErrorInfo
         {
-            PackFileService _packfileService;
-            Rmv2MeshNode _meshNode;
-            EventHub _eventHub;
+            private readonly PackFileService _packfileService;
+            private readonly Rmv2MeshNode _meshNode;
+            private readonly EventHub _eventHub;
             public TextureType TexureType { get; private set; }
 
             bool _useTexture = true;

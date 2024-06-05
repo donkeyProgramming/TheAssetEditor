@@ -45,7 +45,7 @@ namespace View3D.Components.Input
             return currentUp && lastDown;
         }
 
-        public bool IsKeyComboReleased(Keys key, Keys modificationKey, bool consumeIfTrue = true)
+        public bool IsKeyComboReleased(Keys key, Keys modificationKey)
         {
             var value = (IsKeyReleased(key) && IsKeyDownOrReleased(modificationKey));
             return value;
