@@ -1,5 +1,5 @@
 ﻿using Shared.Core.Services;
-namespace AssetEditor.DevConfigs.Base;
+namespace Editors.Shared.DevConfig.Base;
 
 public interface IDeveloperConfiguration
 {

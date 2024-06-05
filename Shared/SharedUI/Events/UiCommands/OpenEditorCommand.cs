@@ -1,7 +1,7 @@
 ﻿using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 
-namespace AssetEditor.UiCommands
+namespace Shared.Ui.Events.UiCommands
 {
     public class OpenEditorCommand : IUiCommand
     {

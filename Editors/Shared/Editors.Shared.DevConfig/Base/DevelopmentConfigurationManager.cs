@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 
-namespace AssetEditor.DevConfigs.Base
+namespace Editors.Shared.DevConfig.Base
 {
     public class DevelopmentConfigurationManager
     {
@@ -15,7 +13,7 @@ namespace AssetEditor.DevConfigs.Base
         private readonly PackFileService _packFileService;
         private readonly ApplicationSettingsService _settingsService;
         private readonly IEnumerable<IDeveloperConfiguration> _developerConfigurations;
-        private IDeveloperConfiguration _activeConfig;
+        private IDeveloperConfiguration? _activeConfig;
 
         public DevelopmentConfigurationManager(IEnumerable<IDeveloperConfiguration> developerConfigurations, PackFileService packFileService, ApplicationSettingsService settingsService)
         {
@@ -37,7 +35,7 @@ namespace AssetEditor.DevConfigs.Base
 
         public void OverrideSettings() => _activeConfig?.OverrideSettings(_settingsService.CurrentSettings);
 
-        internal void Initialize(StartupEventArgs e)
+        public void Initialize(StartupEventArgs e)
         {
             var cfgName = GetDevCfg(e);
             if (cfgName == null)
@@ -50,7 +48,7 @@ namespace AssetEditor.DevConfigs.Base
             if (selectedCfg == null)
             {
                 _logger.Here().Error($"DevCfg '{e.Args[1]}' not found. Possible values are:");
-                foreach(var cfg in _developerConfigurations)
+                foreach (var cfg in _developerConfigurations)
                     _logger.Here().Error(cfg.GetType().Name);
 
                 return;
@@ -60,7 +58,7 @@ namespace AssetEditor.DevConfigs.Base
             _logger.Here().Information($"Dev cfg {_activeConfig.GetType().Name} selected");
         }
 
-        static string GetDevCfg(StartupEventArgs args)
+        static string? GetDevCfg(StartupEventArgs args)
         {
             if (args.Args.Length != 2)
                 return null;

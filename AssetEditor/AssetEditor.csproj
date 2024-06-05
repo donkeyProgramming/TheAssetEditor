@@ -41,6 +41,7 @@
         <ProjectReference Include="..\Audio\Audio.csproj" />
         <ProjectReference Include="..\Editors\KitbasherEditor\Editors.KitbasherEditor.csproj" />
         <ProjectReference Include="..\Editors\Reports\Editors.Reports.csproj" />
+        <ProjectReference Include="..\Editors\Shared\Editors.Shared.DevConfig\Editors.Shared.DevConfig.csproj" />
         <ProjectReference Include="..\Editors\TextureEditor\Editors.TextureEditor.csproj" />
         <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
         <ProjectReference Include="..\Shared\EmbeddedResources\Shared.EmbeddedResources.csproj" />
@@ -68,6 +69,10 @@
 
     <ItemGroup>
         <None Include="..\.editorconfig" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="UiCommands\" />
     </ItemGroup>
 
 

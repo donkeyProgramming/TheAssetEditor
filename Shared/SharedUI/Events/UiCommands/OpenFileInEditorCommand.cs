@@ -2,7 +2,7 @@
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
-namespace AssetEditor.UiCommands
+namespace Shared.Ui.Events.UiCommands
 {
     public class OpenFileInEditorCommand : IUiCommand
     {

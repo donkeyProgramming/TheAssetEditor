@@ -1,11 +1,11 @@
 ﻿using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.PropCreator.ViewModels;
-using AssetEditor.DevConfigs.Base;
+using Editors.Shared.DevConfig.Base;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 
-namespace AssetEditor.DevConfig
+namespace Editors.Shared.DevConfig.Configs
 {
     internal class AnimTransfer_DwarfArcher : IDeveloperConfiguration
     {

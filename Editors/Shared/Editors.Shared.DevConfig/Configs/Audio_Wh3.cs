@@ -1,10 +1,10 @@
-﻿using AssetEditor.DevConfigs.Base;
-using AssetEditor.UiCommands;
-using Audio.Presentation.AudioExplorer;
+﻿using Audio.Presentation.AudioExplorer;
+using Editors.Shared.DevConfig.Base;
 using Shared.Core.Events;
 using Shared.Core.Services;
+using Shared.Ui.Events.UiCommands;
 
-namespace AssetEditor.DevConfig
+namespace Editors.Shared.DevConfig.Configs
 {
     internal class Audio_Wh3 : IDeveloperConfiguration
     {

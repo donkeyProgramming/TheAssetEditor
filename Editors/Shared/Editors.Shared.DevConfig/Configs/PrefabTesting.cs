@@ -1,9 +1,9 @@
-﻿using AssetEditor.DevConfigs.Base;
+﻿using Editors.Shared.DevConfig.Base;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.FastBin;
 
-namespace AssetEditor.DevConfig
+namespace Editors.Shared.DevConfig.Configs
 {
     internal class PrefabTesting : IDeveloperConfiguration
     {

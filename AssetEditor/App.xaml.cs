@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Threading;
-using AssetEditor.DevConfigs.Base;
 using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
+using Editors.Shared.DevConfig.Base;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;

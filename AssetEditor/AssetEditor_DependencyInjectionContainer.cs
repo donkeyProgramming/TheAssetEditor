@@ -1,12 +1,11 @@
-﻿using AssetEditor.DevConfigs.Base;
-using AssetEditor.Services;
-using AssetEditor.UiCommands;
+﻿using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
+using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor
 {
@@ -24,9 +23,6 @@ namespace AssetEditor
             serviceCollection.AddTransient<SettingsWindow>();
             serviceCollection.AddScoped<SettingsViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
-
-            serviceCollection.AddTransient<DevelopmentConfigurationManager>();
-            RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Scoped);
         }
     }
 }

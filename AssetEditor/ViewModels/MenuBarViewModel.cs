@@ -15,7 +15,6 @@ using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
 using AssetEditor.Report;
-using AssetEditor.UiCommands;
 using AssetEditor.Views.Settings;
 using Audio.Presentation.AudioExplorer;
 using Audio.Presentation.Compiler;
@@ -34,6 +33,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Ui.Common;
+using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {

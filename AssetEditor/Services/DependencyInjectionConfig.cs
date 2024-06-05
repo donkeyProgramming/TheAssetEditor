@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using AnimationEditor;
 using AssetManagement;
 using Audio;
@@ -26,6 +27,9 @@ namespace AssetEditor.Services
                 new Shared.EmbeddedResources.DependencyInjectionContainer(loadResources),
                 new View3D_DependencyContainer(),
                
+                // Misc
+                new Editors.Shared.DevConfig.DependencyInjectionContainer(),
+
                 // Domains
                 new Editors.Shared.Core.DependencyInjectionContainer(),
                 new Editors.AnimationContainers.DependencyInjectionContainer(),
@@ -55,8 +59,11 @@ namespace AssetEditor.Services
 
         void ConfigureServiceOptions(ServiceProviderOptions options)
         {
-            options.ValidateOnBuild = true;
-            options.ValidateScopes = true;
+            if (Debugger.IsAttached)
+            {
+                options.ValidateOnBuild = true;
+                options.ValidateScopes = true;
+            }
         }
 
         private void ConfigureServices(IServiceCollection services)

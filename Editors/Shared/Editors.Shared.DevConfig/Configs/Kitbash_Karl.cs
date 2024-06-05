@@ -1,11 +1,11 @@
-﻿using AssetEditor.DevConfigs.Base;
-using AssetEditor.UiCommands;
+﻿using Editors.Shared.DevConfig.Base;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.EmbeddedResources;
+using Shared.Ui.Events.UiCommands;
 
-namespace AssetEditor.DevConfigs
+namespace Editors.Shared.DevConfig.Configs
 {
     internal class Kitbash_Karl : IDeveloperConfiguration
     {
