@@ -15,8 +15,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GameWorld\View3D\View3D.csproj" />
       <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
-    <ProjectReference Include="..\View3D\View3D.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,12 +3,6 @@ using AssetManagement.Strategies.Fbx;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Ui.Interfaces.AssetManagement;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using View3D;
 
 namespace AssetManagement
 {

@@ -3,9 +3,6 @@
 	  <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\View3D\View3D.csproj" />
-  </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <WarningsAsErrors />
@@ -13,5 +10,8 @@
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <WarningsAsErrors />
     </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\GameWorld\View3D\View3D.csproj" />
+    </ItemGroup>
 
 </Project>
