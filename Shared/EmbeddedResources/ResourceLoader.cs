@@ -36,7 +36,9 @@ namespace Shared.EmbeddedResources
         public static string GetDevelopmentDataFolder()
         {
             var workingDirectory = Environment.CurrentDirectory;
-            var projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
+            var projectDirectory = Directory.GetParent(workingDirectory)?.Parent?.Parent?.Parent?.FullName;
+            if (projectDirectory == null)
+                throw new Exception($"Unable to find project director from working directory - {workingDirectory}");
             return projectDirectory + "\\Data";
         }
 
