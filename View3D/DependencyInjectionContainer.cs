@@ -28,7 +28,7 @@ using View3D.Utility;
 
 namespace View3D
 {
-    public class View3D_DependencyContainer : DependencyContainer
+    public class DependencyInjectionContainer : DependencyContainer
     {
         public override void Register(IServiceCollection serviceCollection)
         {
@@ -135,14 +135,12 @@ namespace View3D
             serviceCollection.AddTransient<DeleteFrameBoneCommand>();
             serviceCollection.AddTransient<InterpolateFramesBoneCommand>();
             serviceCollection.AddTransient<InterpolateFramesSelectedBonesBoneCommand>();
-
         }
+
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {
             serviceCollection.AddScoped<T>();
             serviceCollection.AddScoped<IGameComponent, T>(x => x.GetService<T>());
         }
     }
-
-
 }

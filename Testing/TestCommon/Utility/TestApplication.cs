@@ -1,9 +1,7 @@
-﻿
-using CommonControls;
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
-using System;
 using View3D;
 
 namespace TestCommon.Utility
@@ -13,7 +11,7 @@ namespace TestCommon.Utility
         DependencyContainer[] _dependencyContainers = new DependencyContainer[]
         {
             //new DependencyInjectionContainer(false),
-            new View3D_DependencyContainer(),
+            //new DependencyInjectionContainer(),
             new Test_DependencyContainer(),
         };
 

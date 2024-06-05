@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ToolCreation;
-using View3D;
 
 namespace AssetEditor.Services
 {
@@ -25,7 +24,7 @@ namespace AssetEditor.Services
                 new Shared.Ui.DependencyInjectionContainer(),
                 new Shared.GameFormats.DependencyInjectionContainer(),
                 new Shared.EmbeddedResources.DependencyInjectionContainer(loadResources),
-                new View3D_DependencyContainer(),
+                new View3D.DependencyInjectionContainer(),
                
                 // Misc
                 new Editors.Shared.DevConfig.DependencyInjectionContainer(),
