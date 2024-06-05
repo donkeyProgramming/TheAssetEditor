@@ -29,13 +29,13 @@ namespace AnimationMeta.Visualisation
     {
         private readonly ILogger _logger = Logging.Create<MetaDataFactory>();
         private readonly ComplexMeshLoader _complexMeshLoader;
-        private readonly ResourceLibary _resourceLibrary;
+        private readonly ResourceLibrary _resourceLibrary;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly PackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
 
         public MetaDataFactory(ComplexMeshLoader complexMeshLoader,
-            ResourceLibary resourceLibary, 
+            ResourceLibrary resourceLibary, 
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
             PackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent)

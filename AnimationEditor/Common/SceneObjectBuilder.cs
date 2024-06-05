@@ -21,7 +21,7 @@ namespace AnimationEditor.Common.ReferenceModel
         private readonly ILogger _logger = Logging.Create<SceneObjectBuilder>();
         private readonly GameWorld _mainScene;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ResourceLibary _resourceLibrary;
+        private readonly ResourceLibrary _resourceLibrary;
         private readonly SceneManager _sceneManager;
         private readonly PackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
@@ -29,7 +29,7 @@ namespace AnimationEditor.Common.ReferenceModel
         private readonly SelectionManager _selectionManager;
 
         public SceneObjectBuilder(GameWorld mainScene,
-            IServiceProvider serviceProvider, ResourceLibary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
+            IServiceProvider serviceProvider, ResourceLibrary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader, SelectionManager selectionManager)
         {
             _mainScene = mainScene;

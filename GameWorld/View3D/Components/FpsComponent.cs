@@ -12,9 +12,9 @@ namespace View3D.Components.Component
         private int _frames;
         private int _liveFrames;
         private TimeSpan _timeElapsed;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
 
-        public FpsComponent(ResourceLibary resourceLibary)
+        public FpsComponent(ResourceLibrary resourceLibary)
         {
             _resourceLibary = resourceLibary;
         }

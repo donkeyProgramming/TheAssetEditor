@@ -11,10 +11,10 @@ namespace View3D.Components.Component
         string _animationText;
         GameTime _animationStart;
         bool _startAnimation;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
         private readonly EventHub _eventHub;
 
-        public CommandStackRenderer(ResourceLibary resourceLibary, EventHub eventHub)
+        public CommandStackRenderer(ResourceLibrary resourceLibary, EventHub eventHub)
         {
             _resourceLibary = resourceLibary;
             _eventHub = eventHub;

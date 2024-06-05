@@ -20,7 +20,7 @@ namespace TextureEditor.ViewModels
     public class TexturePreviewController : IDisposable
     {
         private readonly PackFileService _packFileService;
-        private readonly ResourceLibary _resourceLib;
+        private readonly ResourceLibrary _resourceLib;
         private readonly TextureToTextureRenderer _textureRenderer;
         private readonly string _imagePath;
         private readonly TexturePreviewViewModel _viewModel;
@@ -61,8 +61,8 @@ namespace TextureEditor.ViewModels
             _eventHub = eventHub;
 
             _scene = new GameWorld(_eventHub);
-            _resourceLib = new ResourceLibary(_scene, packFileService);
-            _scene.Components.Add(new ResourceLibary(_scene, packFileService));
+            _resourceLib = new ResourceLibrary(_scene, packFileService);
+            //_scene.Components.Add(new ResourceLibary(_scene, packFileService));
             _scene.ForceCreate();
 
             _textureRenderer = new TextureToTextureRenderer(_scene.GraphicsDevice, new SpriteBatch(_scene.GraphicsDevice), _resourceLib);

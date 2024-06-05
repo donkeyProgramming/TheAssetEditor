@@ -19,13 +19,13 @@ namespace View3D.SceneNodes
     {
         private readonly ILogger _logger = Logging.Create<Rmv2ModelNodeLoader>();
 
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
         private readonly IGeometryGraphicsContextFactory _contextFactory;
         private readonly PackFileService _packFileService;
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public Rmv2ModelNodeLoader(ResourceLibary resourceLibary, IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService)
+        public Rmv2ModelNodeLoader(ResourceLibrary resourceLibary, IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService)
         {
             _resourceLibary = resourceLibary;
             _contextFactory = contextFactory;

@@ -26,10 +26,10 @@ namespace View3D.Components.Component.Selection
         LineMeshRender _lineGeometry;
         VertexInstanceMesh VertexRenderer;
         float _vertexSelectionFallof = 0;
-        private readonly ResourceLibary _resourceLib;
+        private readonly ResourceLibrary _resourceLib;
         private readonly DeviceResolverComponent _deviceResolverComponent;
 
-        public SelectionManager(EventHub eventHub, RenderEngineComponent renderEngine, ResourceLibary resourceLib, DeviceResolverComponent deviceResolverComponent)
+        public SelectionManager(EventHub eventHub, RenderEngineComponent renderEngine, ResourceLibrary resourceLib, DeviceResolverComponent deviceResolverComponent)
         {
             _eventHub = eventHub;
             _renderEngine = renderEngine;

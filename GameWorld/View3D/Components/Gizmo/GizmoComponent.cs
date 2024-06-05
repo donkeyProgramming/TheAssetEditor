@@ -20,7 +20,7 @@ namespace View3D.Components.Gizmo
         private readonly SelectionManager _selectionManager;
         private readonly CommandExecutor _commandManager;
         private readonly ArcBallCamera _camera;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
         private readonly DeviceResolverComponent _deviceResolverComponent;
         private readonly CommandFactory _commandFactory;
         Gizmo _gizmo;
@@ -31,7 +31,7 @@ namespace View3D.Components.Gizmo
 
         public GizmoComponent(EventHub eventHub,
             KeyboardComponent keyboardComponent, MouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
-            ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
+            ResourceLibrary resourceLibary, DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
             SelectionManager selectionManager)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;

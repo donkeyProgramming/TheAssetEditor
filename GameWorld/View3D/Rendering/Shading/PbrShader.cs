@@ -13,9 +13,9 @@ namespace View3D.Rendering.Shading
 
         protected Dictionary<TextureType, EffectParameter> _textures = new Dictionary<TextureType, EffectParameter>();
         protected Dictionary<TextureType, EffectParameter> _useTextures = new Dictionary<TextureType, EffectParameter>();
-        protected ResourceLibary _resourceLibary;
+        protected ResourceLibrary _resourceLibary;
 
-        public PbrShader(ResourceLibary resourceLibary, RenderFormats renderFormat)
+        public PbrShader(ResourceLibrary resourceLibary, RenderFormats renderFormat)
         {
             _resourceLibary = resourceLibary;
             RenderFormat = renderFormat;
@@ -66,7 +66,7 @@ namespace View3D.Rendering.Shading
 
     public class PbrShader_SpecGloss : PbrShader
     {
-        public PbrShader_SpecGloss(ResourceLibary resourceLibary) : base(resourceLibary, RenderFormats.SpecGloss)
+        public PbrShader_SpecGloss(ResourceLibrary resourceLibary) : base(resourceLibary, RenderFormats.SpecGloss)
         {
             Effect = resourceLibary.GetEffect(ShaderTypes.Pbr_SpecGloss);
 
@@ -100,7 +100,7 @@ namespace View3D.Rendering.Shading
 
     public class PbrShader_MetalRoughness : PbrShader
     {
-        public PbrShader_MetalRoughness(ResourceLibary resourceLibary) : base(resourceLibary, RenderFormats.MetalRoughness)
+        public PbrShader_MetalRoughness(ResourceLibrary resourceLibary) : base(resourceLibary, RenderFormats.MetalRoughness)
         {
             Effect = resourceLibary.GetEffect(ShaderTypes.Pbs_MetalRough);
 

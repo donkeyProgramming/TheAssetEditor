@@ -9,10 +9,10 @@ namespace View3D.Rendering.RenderItems
     {
         Vector3 _pos;
 
-        ResourceLibary _resourceLib;
+        ResourceLibrary _resourceLib;
         string _text;
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
-        public TextRenderItem(ResourceLibary resourceLib, string text, Vector3 pos)
+        public TextRenderItem(ResourceLibrary resourceLib, string text, Vector3 pos)
         {
             _resourceLib = resourceLib;
             _text = text;

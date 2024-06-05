@@ -13,7 +13,7 @@ namespace View3D.Rendering
         private Effect _shader;
         private List<VertexPositionColor> _originalVertices = new List<VertexPositionColor>();
 
-        public LineMeshRender(ResourceLibary resourceLibrary)
+        public LineMeshRender(ResourceLibrary resourceLibrary)
         {
             _shader = resourceLibrary.GetStaticEffect(ShaderTypes.Line);
         }

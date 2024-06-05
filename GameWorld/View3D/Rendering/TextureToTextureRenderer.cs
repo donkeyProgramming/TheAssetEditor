@@ -10,7 +10,7 @@ namespace View3D.Rendering
     {
         public readonly GraphicsDevice _device;
         public readonly SpriteBatch _spriteBatch;
-        public readonly ResourceLibary _resourceLibary;
+        public readonly ResourceLibrary _resourceLibary;
 
         public class DrawSettings
         {
@@ -20,7 +20,7 @@ namespace View3D.Rendering
             public bool OnlyAlpha { get; set; } = false;
         }
 
-        public TextureToTextureRenderer(GraphicsDevice device, SpriteBatch spriteBatch, ResourceLibary resourceLibary)
+        public TextureToTextureRenderer(GraphicsDevice device, SpriteBatch spriteBatch, ResourceLibrary resourceLibary)
         {
             _device = device;
             _spriteBatch = spriteBatch;

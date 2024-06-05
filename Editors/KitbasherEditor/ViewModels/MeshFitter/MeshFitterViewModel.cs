@@ -20,7 +20,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
     {
         private readonly CommandFactory _commandFactory;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
         private readonly SceneManager _sceneManager;
         GameSkeleton _targetSkeleton;
         GameSkeleton _fromSkeleton;
@@ -41,7 +41,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0);
         public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0);
 
-        public MeshFitterViewModel(CommandFactory commandFactory, AnimationsContainerComponent animationsContainerComponent, ResourceLibary resourceLibary, SceneManager sceneManager)
+        public MeshFitterViewModel(CommandFactory commandFactory, AnimationsContainerComponent animationsContainerComponent, ResourceLibrary resourceLibary, SceneManager sceneManager)
         {
             _commandFactory = commandFactory;
             _animationsContainerComponent = animationsContainerComponent;

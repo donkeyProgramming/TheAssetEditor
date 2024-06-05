@@ -26,7 +26,7 @@ namespace View3D.SceneNodes
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
-        ResourceLibary _resourceLib;
+        ResourceLibrary _resourceLib;
 
         public string OriginalFilePath { get; set; }
         public int OriginalPartIndex { get; internal set; }
@@ -83,7 +83,7 @@ namespace View3D.SceneNodes
             Effect = shader;
         }
 
-        public void Initialize(ResourceLibary resourceLib)
+        public void Initialize(ResourceLibrary resourceLib)
         {
             _resourceLib = resourceLib;
             if (_resourceLib != null && Effect == null)

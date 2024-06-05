@@ -11,9 +11,9 @@ namespace View3D.Components.Component
     {
         LineMeshRender _gridMesh;
         private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
 
-        public GridComponent(RenderEngineComponent renderEngineComponent, ResourceLibary resourceLibary)
+        public GridComponent(RenderEngineComponent renderEngineComponent, ResourceLibrary resourceLibary)
         {
             _renderEngineComponent = renderEngineComponent;
             _resourceLibary = resourceLibary;

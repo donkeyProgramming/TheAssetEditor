@@ -16,12 +16,12 @@ namespace View3D.Components.Component
         GameTime _animationStart;
         bool _startAnimation;
 
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
         private readonly DeviceResolverComponent _deviceResolverComponent;
         private readonly KeyboardComponent _keyboardComponent;
         private readonly RenderEngineComponent _renderEngineComponent;
 
-        public LightControllerComponent(ResourceLibary resourceLibary, DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent)
+        public LightControllerComponent(ResourceLibrary resourceLibary, DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent)
         {
             _resourceLibary = resourceLibary;
             _deviceResolverComponent = deviceResolverComponent;

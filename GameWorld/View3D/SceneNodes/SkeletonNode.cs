@@ -27,7 +27,7 @@ namespace View3D.SceneNodes
 
         public GameSkeleton Skeleton { get; set; }
 
-        public SkeletonNode(ResourceLibary resourceLibary, GameSkeleton skeleton, string name = "Skeleton") : base(name)
+        public SkeletonNode(ResourceLibrary resourceLibary, GameSkeleton skeleton, string name = "Skeleton") : base(name)
         {
             _lineRenderer = new LineMeshRender(resourceLibary);
             Skeleton = skeleton;

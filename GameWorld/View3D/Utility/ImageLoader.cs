@@ -59,7 +59,7 @@ namespace View3D.Utility
             return image;
         }
 
-        private static Texture2D ConvertTexture2D(string fileName, IImage image, GraphicsDevice device )
+        private static Texture2D ConvertTexture2D(string fileName, IImage image, GraphicsDevice device)
         {
             Texture2D texture = null;
             if (image.Format == ImageFormat.Rgba32)

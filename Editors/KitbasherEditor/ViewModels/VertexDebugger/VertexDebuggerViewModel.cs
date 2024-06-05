@@ -37,12 +37,12 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         Effect _lineShader;
 
         private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
         private readonly SelectionManager _selectionManager;
         private readonly EventHub _eventHub;
 
         public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent,
-            ResourceLibary resourceLibary,
+            ResourceLibrary resourceLibary,
             SelectionManager selectionManager,
             EventHub eventHub)
         {

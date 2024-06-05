@@ -83,7 +83,7 @@ namespace View3D
             RegisterGameComponent<CommandStackRenderer>(serviceCollection);
             RegisterGameComponent<KeyboardComponent>(serviceCollection);
             RegisterGameComponent<MouseComponent>(serviceCollection);
-            RegisterGameComponent<ResourceLibary>(serviceCollection);
+            RegisterGameComponent<ResourceLibrary>(serviceCollection);
             RegisterGameComponent<FpsComponent>(serviceCollection);
             RegisterGameComponent<ArcBallCamera>(serviceCollection);
             RegisterGameComponent<SceneManager>(serviceCollection);

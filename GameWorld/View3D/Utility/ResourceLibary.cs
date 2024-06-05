@@ -18,7 +18,7 @@ namespace View3D.Utility
         GeometryInstance,
     }
 
-    public class ResourceLibary : BaseComponent, IDisposable
+    public class ResourceLibrary : BaseComponent, IDisposable
     {
         //private readonly  ILogger _logger = Logging.Create<ResourceLibary>();
 
@@ -35,8 +35,7 @@ namespace View3D.Utility
         public TextureCube PbrSpecular { get; private set; }
         public Texture2D PbrLut { get; private set; }
 
-   
-        public ResourceLibary(GameWorld mainScene, PackFileService pf)
+        public ResourceLibrary(GameWorld mainScene, PackFileService pf)
         {
             _pfs = pf;
             _gameWorld = mainScene;
@@ -44,7 +43,6 @@ namespace View3D.Utility
 
         public SpriteFont LoadFont(string path) => _gameWorld.Content.Load<SpriteFont>(path);
         
-
         public override void Initialize()
         {
             // Load default shaders

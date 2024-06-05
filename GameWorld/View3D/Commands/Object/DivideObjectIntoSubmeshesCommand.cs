@@ -23,13 +23,13 @@ namespace View3D.Commands.Object
         private readonly List<GroupNode> _newGroupNodes = new List<GroupNode>();
         private readonly SelectionManager _selectionManager;
         ISelectionState _originalSelectionState;
-        private readonly ResourceLibary _resourceLib;
+        private readonly ResourceLibrary _resourceLib;
         private readonly RenderEngineComponent _renderEngineComponent;
 
         public string HintText { get => "Divide Object"; }
         public bool IsMutation { get => true; }
 
-        public DivideObjectIntoSubmeshesCommand( SelectionManager selectionManager, ResourceLibary resourceLibary, RenderEngineComponent renderEngineComponent)
+        public DivideObjectIntoSubmeshesCommand( SelectionManager selectionManager, ResourceLibrary resourceLibary, RenderEngineComponent renderEngineComponent)
         {
             _selectionManager = selectionManager;
             _resourceLib = resourceLibary;

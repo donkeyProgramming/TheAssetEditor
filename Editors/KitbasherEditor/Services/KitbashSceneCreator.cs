@@ -22,14 +22,14 @@ namespace KitbasherEditor.Services
         private readonly PackFileService _packFileService;
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly ComplexMeshLoader _complexMeshLoader;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
         private readonly SceneManager _sceneManager;
         private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
 
         public KitbashSceneCreator(
             KitbasherRootScene kitbasherRootScene,
             ComplexMeshLoader complexMeshLoader,
-            ResourceLibary resourceLibary,
+            ResourceLibrary resourceLibary,
             SceneManager sceneManager,
             PackFileService packFileService,
             Rmv2ModelNodeLoader rmv2ModelNodeLoader)
