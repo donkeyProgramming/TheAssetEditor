@@ -9,7 +9,7 @@ namespace View3D.Services
         private bool _disposed;
         WpfGraphicsDeviceService _deviceServiceHandle;
 
-        public GameWorld(EventHub eventHub, string contentDir = "BuiltContent") : base(eventHub, contentDir)
+        public GameWorld(IResourceLibrary resourceLibrary, EventHub eventHub, string contentDir = "BuiltContent") : base(resourceLibrary, eventHub, contentDir)
         {
 
         }
@@ -22,15 +22,6 @@ namespace View3D.Services
             base.Initialize();
         }
 
-        protected override void LoadContent()
-        {
-            base.LoadContent();
-        }
-
-        protected override void Draw(GameTime time)
-        {
-            base.Draw(time);
-        }
 
         protected override void Dispose(bool disposing)
         {

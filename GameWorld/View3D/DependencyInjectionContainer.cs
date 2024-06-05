@@ -36,6 +36,8 @@ namespace View3D
             serviceCollection.AddScoped<GameWorld>();
             serviceCollection.AddScoped<WpfGame>(x => x.GetService<GameWorld>());
             serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
+            serviceCollection.AddSingleton<IResourceLibrary, ResourceLibrary>();
+            serviceCollection.AddSingleton<ResourceLibrary>(x => x.GetService<IResourceLibrary>() as ResourceLibrary);
 
             // Services
             serviceCollection.AddScoped<ViewOnlySelectedService>();
@@ -83,7 +85,7 @@ namespace View3D
             RegisterGameComponent<CommandStackRenderer>(serviceCollection);
             RegisterGameComponent<KeyboardComponent>(serviceCollection);
             RegisterGameComponent<MouseComponent>(serviceCollection);
-            RegisterGameComponent<ResourceLibrary>(serviceCollection);
+        
             RegisterGameComponent<FpsComponent>(serviceCollection);
             RegisterGameComponent<ArcBallCamera>(serviceCollection);
             RegisterGameComponent<SceneManager>(serviceCollection);

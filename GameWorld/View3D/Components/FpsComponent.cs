@@ -5,24 +5,22 @@ using View3D.Utility;
 
 namespace View3D.Components.Component
 {
-    public class FpsComponent : BaseComponent, IDisposable
+    public class FpsComponent : BaseComponent
     {
-        private SpriteBatch _spriteBatch;
         private SpriteFont _font;
         private int _frames;
         private int _liveFrames;
         private TimeSpan _timeElapsed;
-        private readonly ResourceLibrary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibrary;
 
-        public FpsComponent(ResourceLibrary resourceLibary)
+        public FpsComponent(ResourceLibrary resourceLibrary)
         {
-            _resourceLibary = resourceLibary;
+            _resourceLibrary = resourceLibrary;
         }
 
         protected override void LoadContent()
         {
-            _font = _resourceLibary.DefaultFont;
-            _spriteBatch = _resourceLibary.CreateSpriteBatch();
+            _font = _resourceLibrary.DefaultFont;
         }
 
         public override void Update(GameTime gameTime)
@@ -39,14 +37,9 @@ namespace View3D.Components.Component
         public override void Draw(GameTime gameTime)
         {
             _liveFrames++;
-            _spriteBatch.Begin();
-            _spriteBatch.DrawString(_font, $"FPS: {_frames}", new Vector2(5), Color.White);
-            _spriteBatch.End();
-        }
-
-        public void Dispose()
-        {
-            _spriteBatch.Dispose();
+            _resourceLibrary.CommonSpriteBatch.Begin();
+            _resourceLibrary.CommonSpriteBatch.DrawString(_font, $"FPS: {_frames}", new Vector2(5), Color.White);
+            _resourceLibrary.CommonSpriteBatch.End();
         }
     }
 }

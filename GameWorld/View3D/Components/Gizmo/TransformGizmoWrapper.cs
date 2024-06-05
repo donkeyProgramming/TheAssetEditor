@@ -240,8 +240,6 @@ namespace View3D.Components.Gizmo
         {
             transform.Decompose(out var scale, out var rot, out var trans);
 
-            Console.WriteLine($"gizmo position {Position}");
-
             if (_selectionState is BoneSelectionState boneSelectionState)
             {
                 var objCenter = Vector3.Zero;

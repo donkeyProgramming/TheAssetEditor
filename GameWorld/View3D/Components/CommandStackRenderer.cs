@@ -7,31 +7,19 @@ namespace View3D.Components.Component
 {
     public class CommandStackRenderer : BaseComponent
     {
-        SpriteBatch _spriteBatch;
         string _animationText;
         GameTime _animationStart;
         bool _startAnimation;
-        private readonly ResourceLibrary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibrary;
         private readonly EventHub _eventHub;
 
-        public CommandStackRenderer(ResourceLibrary resourceLibary, EventHub eventHub)
+        public CommandStackRenderer(ResourceLibrary resourceLibrary, EventHub eventHub)
         {
-            _resourceLibary = resourceLibary;
+            _resourceLibrary = resourceLibrary;
             _eventHub = eventHub;
 
             _eventHub.Register<CommandStackUndoEvent>(Handle);
             _eventHub.Register<CommandStackChangedEvent>(Handle);
-        }
-
-        public override void Initialize()
-        {
-            _spriteBatch = _resourceLibary.CreateSpriteBatch();
-        }
-
-        public void Dispose()
-        {
-            _spriteBatch.Dispose();
-            _spriteBatch = null;
         }
 
         public override void Draw(GameTime gameTime)
@@ -44,9 +32,9 @@ namespace View3D.Components.Component
                 if (lerpValue >= 1)
                     _animationStart = null;
 
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-                _spriteBatch.DrawString(_resourceLibary.DefaultFont, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue));
-                _spriteBatch.End();
+                _resourceLibrary.CommonSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+                _resourceLibrary.CommonSpriteBatch.DrawString(_resourceLibrary.DefaultFont, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue));
+                _resourceLibrary.CommonSpriteBatch.End();
             }
 
             base.Draw(gameTime);
@@ -57,8 +45,6 @@ namespace View3D.Components.Component
             _animationText = text;
             _startAnimation = true;
         }
-
-
 
         public override void Update(GameTime gameTime)
         {

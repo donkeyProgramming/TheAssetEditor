@@ -8,11 +8,18 @@ using System.Collections.Generic;
 
 namespace MonoGame.Framework.WpfInterop
 {
+    public interface IResourceLibrary
+    {
+        public void Initialize(WpfGame game);
+        public void Reset();
+    }
+
     /// <summary>
     /// The replacement for <see cref="Game"/>. Unlike <see cref="Game"/> the <see cref="WpfGame"/> is a WPF control and can be hosted inside WPF windows.
     /// </summary>
     public abstract class WpfGame : D3D11Host
     {
+        private readonly IResourceLibrary _resourceLibrary;
         private readonly EventHub _eventHub;
         private readonly string _contentDir;
 
@@ -20,14 +27,14 @@ namespace MonoGame.Framework.WpfInterop
         private readonly List<IUpdateable> _sortedUpdateables;
         private readonly List<IDrawable> _sortedDrawables;
 
-
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        protected WpfGame(EventHub eventHub, string contentDir)
+        protected WpfGame(IResourceLibrary resourceLibrary, EventHub eventHub, string contentDir)
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));
+            _resourceLibrary = resourceLibrary;
             _eventHub = eventHub;
             _contentDir = contentDir;
 
@@ -70,8 +77,8 @@ namespace MonoGame.Framework.WpfInterop
         {
             foreach (var c in Components)
             {
-                var disp = c as IDisposable;
-                disp?.Dispose();
+                var disposable = c as IDisposable;
+                disposable?.Dispose();
             }
             Components.ComponentAdded -= ComponentAdded;
             Components.ComponentRemoved -= ComponentRemoved;
@@ -79,14 +86,8 @@ namespace MonoGame.Framework.WpfInterop
 
             Services.RemoveService(typeof(IGraphicsDeviceService));
             Services.RemoveService(typeof(IGraphicsDeviceManager));
-
-            UnloadContent();
             _sortedUpdateables.Clear();
             _sortedDrawables.Clear();
-
-            Content.Unload();
-            Content?.Dispose();
-            Content = null;
         }
 
         /// <summary>
@@ -102,33 +103,32 @@ namespace MonoGame.Framework.WpfInterop
             }
         }
 
+        protected override void OnGraphicDeviceDisposed()
+        {
+
+            //Content.Unload();
+            //Content?.Dispose();
+            //Content = null;
+            _resourceLibrary.Reset();
+        }
+
         /// <summary>
         /// Initialize is called once when the control is created.
         /// </summary>
         protected override void Initialize()
         {
             base.Initialize();
-            Content = new ContentManager(Services, _contentDir);
 
-            // hook events now (graphics, etc. is now loaded)
-            // any components added prior we insert manually
+            Content = new ContentManager(Services, _contentDir);
+            _resourceLibrary.Initialize(this);
+
             foreach (var c in Components)
-            {
                 ComponentAdded(this, new GameComponentCollectionEventArgs(c));
-            }
+
             Components.ComponentAdded += ComponentAdded;
             Components.ComponentRemoved += ComponentRemoved;
 
-            LoadContent();
             _eventHub.Publish(new SceneInitializedEvent());
-        }
-
-        /// <summary>
-        /// Load content is called once by <see cref="Initialize()"/>.
-        /// </summary>
-        protected virtual void LoadContent()
-        {
-
         }
 
         /// <summary>
@@ -142,12 +142,6 @@ namespace MonoGame.Framework.WpfInterop
             Draw(time);
         }
 
-        /// <summary>
-        /// Unload content is called once when the control is destroyed.
-        /// </summary>
-        protected virtual void UnloadContent()
-        {
-        }
 
         /// <summary>
         /// The update method that is called to update your game logic.

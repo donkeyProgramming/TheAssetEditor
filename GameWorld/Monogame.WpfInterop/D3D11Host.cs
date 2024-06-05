@@ -47,7 +47,7 @@ namespace MonoGame.Framework.WpfInterop
         private bool _isActive;
         private SpriteBatch _spriteBatch;
         private double _dpiScalingFactor = 1;
-        private static bool _useASingleSharedGraphicsDevice = false;
+        private static bool _useASingleSharedGraphicsDevice = true;
         private List<IDisposable> _toBeDisposedNextFrame = new List<IDisposable>();
 
         /// <summary>
@@ -259,11 +259,6 @@ namespace MonoGame.Framework.WpfInterop
                         // Do not associate graphics device with window.
                         DeviceWindowHandle = IntPtr.Zero,
                         DepthStencilFormat = DepthFormat.Depth24,
-
-
-
-
-
                     };
                     var gd = CreateSharedGraphicsDevice(presentationParameters);
                     if (UseASingleSharedGraphicsDevice)
@@ -273,19 +268,6 @@ namespace MonoGame.Framework.WpfInterop
                 }
             }
         }
-
-        /*
-                     _parameters = new PresentationParameters
-            {
-                BackBufferWidth = Math.Max(width, 1),
-                BackBufferHeight = Math.Max(height, 1),
-                BackBufferFormat = SurfaceFormat.Color,
-                DepthStencilFormat = DepthFormat.Depth24,
-                DeviceWindowHandle = windowHandle,
-                PresentationInterval = Microsoft.Xna.Framework.Graphics.PresentInterval.Immediate,
-                IsFullScreen = false
-            };
-         */
 
         private static GraphicsDevice CreateSharedGraphicsDevice(PresentationParameters presentationParameters)
         {
@@ -306,6 +288,10 @@ namespace MonoGame.Framework.WpfInterop
 
                 CreateGraphicsDeviceDependentResources(pp);
             }
+        }
+
+        protected virtual void OnGraphicDeviceDisposed()
+        { 
         }
 
         private void UninitializeGraphicsDevice()
@@ -336,6 +322,8 @@ namespace MonoGame.Framework.WpfInterop
                         _staticGraphicsDevice = null;
                     else
                         _graphicsDevice = null;
+
+                    OnGraphicDeviceDisposed();
                 }
             }
         }

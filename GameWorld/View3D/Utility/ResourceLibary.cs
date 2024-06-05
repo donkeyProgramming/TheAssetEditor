@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.WpfInterop;
 using Shared.Core.PackFiles;
-using View3D.Components;
-using View3D.Services;
 
 namespace View3D.Utility
 {
@@ -18,15 +17,16 @@ namespace View3D.Utility
         GeometryInstance,
     }
 
-    public class ResourceLibrary : BaseComponent, IDisposable
+    public class ResourceLibrary : IResourceLibrary
     {
         //private readonly  ILogger _logger = Logging.Create<ResourceLibary>();
 
-        private readonly  Dictionary<string, Texture2D> _cachedTextures = new Dictionary<string, Texture2D>();
-        private readonly Dictionary<ShaderTypes, Effect> _cachedShaders = new Dictionary<ShaderTypes, Effect>();
+        private readonly Dictionary<string, Texture2D> _cachedTextures = new();
+        private readonly Dictionary<ShaderTypes, Effect> _cachedShaders = new();
 
         private readonly PackFileService _pfs;
-        private readonly GameWorld _gameWorld;
+        private WpfGame _gameWorld;
+        private bool _isInitialized = false;
 
         public SpriteBatch CommonSpriteBatch { get; private set; }
         public SpriteFont DefaultFont { get; private set; }
@@ -35,16 +35,21 @@ namespace View3D.Utility
         public TextureCube PbrSpecular { get; private set; }
         public Texture2D PbrLut { get; private set; }
 
-        public ResourceLibrary(GameWorld mainScene, PackFileService pf)
+        public ResourceLibrary(PackFileService pf)
         {
             _pfs = pf;
-            _gameWorld = mainScene;
         }
 
         public SpriteFont LoadFont(string path) => _gameWorld.Content.Load<SpriteFont>(path);
         
-        public override void Initialize()
+        public void Initialize(WpfGame game)
         {
+            if (_isInitialized)
+                return;
+
+            _isInitialized = true;
+            _gameWorld = game;
+
             // Load default shaders
             LoadEffect("Shaders\\Phazer\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
             LoadEffect("Shaders\\Phazer\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
@@ -58,6 +63,32 @@ namespace View3D.Utility
             PbrDiffuse = _gameWorld.Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
             PbrSpecular = _gameWorld.Content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
             PbrLut = _gameWorld.Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
+        }
+
+        public void Reset()
+        {
+           foreach (var item in _cachedTextures)
+               item.Value.Dispose();
+           _cachedTextures.Clear();
+           
+           foreach (var item in _cachedShaders)
+               item.Value.Dispose();
+           _cachedShaders.Clear();
+           
+            PbrDiffuse?.Dispose();
+            PbrDiffuse = null;
+            
+            PbrSpecular?.Dispose();
+            PbrSpecular = null;
+            
+            PbrLut?.Dispose();
+            PbrLut = null;
+            
+            CommonSpriteBatch?.Dispose();
+            CommonSpriteBatch = null;
+
+            _gameWorld = null;
+            _isInitialized = false;
         }
 
         public Texture2D ForceLoadImage(string imagePath, out ImageInformation imageInformation)
@@ -102,33 +133,6 @@ namespace View3D.Utility
             throw new Exception($"Shader not found: ShaderTypes::{type}");
         }
 
-        public void Dispose()
-        {
-            foreach (var item in _cachedTextures)
-                item.Value.Dispose();
-            _cachedTextures.Clear();
-
-            foreach (var item in _cachedShaders)
-                item.Value.Dispose();
-            _cachedShaders.Clear();
-
-            _gameWorld.Content?.Dispose();
-            _gameWorld.Content = null;
-
-            PbrDiffuse?.Dispose();
-            PbrDiffuse = null;
-
-            PbrSpecular?.Dispose();
-            PbrSpecular = null;
-
-            PbrLut?.Dispose();
-            PbrLut = null;
-
-            CommonSpriteBatch?.Dispose();
-            CommonSpriteBatch = null;
-        }
-
         public SpriteBatch CreateSpriteBatch() => new SpriteBatch(_gameWorld.GraphicsDevice);
-
     }
 }

@@ -60,8 +60,10 @@ namespace TextureEditor.ViewModels
             _packFileService = packFileService;
             _eventHub = eventHub;
 
-            _scene = new GameWorld(_eventHub);
-            _resourceLib = new ResourceLibrary(_scene, packFileService);
+            _resourceLib = new ResourceLibrary(packFileService);
+            _scene = new GameWorld(_resourceLib, _eventHub);
+          
+            _resourceLib.Initialize(_scene);
             //_scene.Components.Add(new ResourceLibary(_scene, packFileService));
             _scene.ForceCreate();
 
