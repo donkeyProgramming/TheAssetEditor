@@ -15,8 +15,6 @@ namespace MonoGame.Framework.WpfInterop.Internals
     /// </remarks>
     internal class D3D11Image : D3DImage, IDisposable
     {
-        #region Fields
-
         private static readonly object _d3d9Lock = new object();
 
         // Use a Direct3D 9 device for interoperability. The device is shared by
@@ -26,10 +24,6 @@ namespace MonoGame.Framework.WpfInterop.Internals
 
         private Texture _backBuffer;
         private bool _disposed;
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="D3D11Image"/> class.
@@ -51,10 +45,6 @@ namespace MonoGame.Framework.WpfInterop.Internals
         {
             Dispose(false);
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Releases all resources used by an instance of the <see cref="D3D11Image"/> class.
@@ -181,7 +171,5 @@ namespace MonoGame.Framework.WpfInterop.Internals
             if (_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
         }
-
-        #endregion
     }
 }

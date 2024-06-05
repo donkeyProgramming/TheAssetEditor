@@ -6,18 +6,12 @@ namespace MonoGame.Framework.WpfInterop.Input
 {
     internal static class WindowHelper
     {
-        #region Fields
-
         /// <summary>
         /// Returns the window of the given control or null if unable to find a window.
         /// If null, the default implementation is used
         /// </summary>
         /// <returns></returns>
         public static Func<IInputElement, Window> FindWindow = null;
-
-        #endregion
-
-        #region Methods
 
         public static bool IsControlOnActiveWindow(IInputElement element)
         {
@@ -41,6 +35,5 @@ namespace MonoGame.Framework.WpfInterop.Input
             return controlWindow;
         }
 
-        #endregion
     }
 }

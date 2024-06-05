@@ -27,15 +27,10 @@ namespace MonoGame.Framework.WpfInterop
         private readonly EventHub _eventHub;
         private readonly string _contentDir;
 
-        #region Fields
-
         private ContentManager _content;
         private readonly List<IUpdateable> _sortedUpdateables;
         private readonly List<IDrawable> _sortedDrawables;
 
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Creates a new instance of a game host panel.
@@ -52,10 +47,6 @@ namespace MonoGame.Framework.WpfInterop
             _sortedDrawables = new List<IDrawable>();
             _sortedUpdateables = new List<IUpdateable>();
         }
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets or sets whether this instance takes focus instantly on mouse over.
@@ -81,10 +72,6 @@ namespace MonoGame.Framework.WpfInterop
                 _content = value;
             }
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Dispose is called to dispose of resources.
@@ -266,9 +253,5 @@ namespace MonoGame.Framework.WpfInterop
         {
             _sortedUpdateables.Sort((a, b) => a.UpdateOrder.CompareTo(b.UpdateOrder));
         }
-
-
-
-        #endregion
     }
 }

@@ -19,16 +19,10 @@ namespace MonoGame.Framework.WpfInterop.Input
     /// </summary>
     public class WpfMouse : IDisposable
     {
-        #region Fields
-
         private FrameworkElement _focusElement;
 
         private MouseState _mouseState;
         private bool _captureMouseWithin = true;
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Creates a new instance of the mouse helper.
@@ -52,9 +46,6 @@ namespace MonoGame.Framework.WpfInterop.Input
             _focusElement.MouseRightButtonUp += HandleMouse;
         }
 
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets or sets the mouse capture behaviour.
@@ -79,10 +70,6 @@ namespace MonoGame.Framework.WpfInterop.Input
                 _captureMouseWithin = value;
             }
         }
-
-        #endregion
-
-        #region Methods
         public MouseState GetState() => _mouseState;
         private void HandleMouse(object sender, MouseEventArgs e)
         {
@@ -237,7 +224,5 @@ namespace MonoGame.Framework.WpfInterop.Input
             _focusElement.MouseRightButtonUp -= HandleMouse;
             _focusElement = null;
         }
-
-        #endregion
     }
 }

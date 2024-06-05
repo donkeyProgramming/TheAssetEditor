@@ -11,10 +11,7 @@ namespace MonoGame.Framework.WpfInterop
     public class WpfGraphicsDeviceService : IGraphicsDeviceService, IGraphicsDeviceManager, IDisposable
     {
         internal const int MsaaSampleLimit = 32;
-
         readonly WpfGame _host;
-
-        #region Constructors
 
         /// <summary>
         /// Create a new instance of the dummy. The constructor will autom. add the instance itself to the <see cref="D3D11Host.Services"/> container of <see cref="host"/>.
@@ -56,9 +53,6 @@ namespace MonoGame.Framework.WpfInterop
             _host.GraphicsDevice.Disposing -= GraphicsDevice_Disposing;
         }
 
-        #endregion
-
-        #region Events
 
         /// <inheritdoc />
         public event EventHandler<EventArgs> DeviceCreated;
@@ -71,10 +65,6 @@ namespace MonoGame.Framework.WpfInterop
 
         /// <inheritdoc />
         public event EventHandler<EventArgs> DeviceResetting;
-
-        #endregion
-
-        #region Properties
 
         public GraphicsDevice GraphicsDevice { get; }
 
@@ -108,9 +98,6 @@ namespace MonoGame.Framework.WpfInterop
 
         public int PreferredBackBufferHeight => (int)_host.ActualHeight;
 
-        #endregion
-
-        #region Methods
 
         public bool BeginDraw()
         {
@@ -152,7 +139,5 @@ namespace MonoGame.Framework.WpfInterop
             //_host.GraphicsDevice.DeviceReset -= GraphicsDevice_DeviceReset;
             //_host.GraphicsDevice.DeviceResetting -= GraphicsDevice_DeviceResetting;
         }
-
-        #endregion
     }
 }

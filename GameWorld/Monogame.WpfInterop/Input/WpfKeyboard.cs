@@ -14,13 +14,7 @@ namespace MonoGame.Framework.WpfInterop.Input
     /// </summary>
     public class WpfKeyboard
     {
-        #region Fields
-
         private readonly WpfGame _focusElement;
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Creates a new instance of the keyboard helper.
@@ -33,10 +27,6 @@ namespace MonoGame.Framework.WpfInterop.Input
 
             _focusElement = focusElement;
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Gets the active keyboardstate.
@@ -85,7 +75,5 @@ namespace MonoGame.Framework.WpfInterop.Input
 
         [DllImport("user32.dll", EntryPoint = "GetKeyboardState", SetLastError = true)]
         private static extern bool NativeGetKeyboardState([Out] byte[] keyStates);
-
-        #endregion
     }
 }

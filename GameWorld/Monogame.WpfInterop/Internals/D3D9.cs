@@ -21,15 +21,10 @@ namespace MonoGame.Framework.WpfInterop.Internals
     /// </remarks>
     internal class D3D9 : IDisposable
     {
-        #region Fields
-
         private DeviceEx _device;
         private Direct3DEx _direct3D;
         private bool _disposed;
 
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="D3D9"/> class.
@@ -72,10 +67,6 @@ namespace MonoGame.Framework.WpfInterop.Internals
         {
             Dispose(false);
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Releases all resources used by an instance of the <see cref="D3D9"/> class.
@@ -167,7 +158,5 @@ namespace MonoGame.Framework.WpfInterop.Internals
             if (_disposed)
                 throw new ObjectDisposedException(GetType().FullName);
         }
-
-        #endregion
     }
 }
