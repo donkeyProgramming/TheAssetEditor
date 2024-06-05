@@ -1,13 +1,13 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Events;
 using View3D.Commands;
 using View3D.Components.Component;
 using View3D.Components.Component.Selection;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
-using View3D.Utility;
 
 namespace View3D.Components.Gizmo
 {
@@ -21,7 +21,7 @@ namespace View3D.Components.Gizmo
         private readonly CommandExecutor _commandManager;
         private readonly ArcBallCamera _camera;
         private readonly ResourceLibrary _resourceLibary;
-        private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly IDeviceResolver _deviceResolverComponent;
         private readonly CommandFactory _commandFactory;
         Gizmo _gizmo;
         bool _isEnabled = false;
@@ -31,7 +31,7 @@ namespace View3D.Components.Gizmo
 
         public GizmoComponent(EventHub eventHub,
             KeyboardComponent keyboardComponent, MouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
-            ResourceLibrary resourceLibary, DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
+            ResourceLibrary resourceLibary, IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
             SelectionManager selectionManager)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;

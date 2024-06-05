@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Monogame.WpfInterop.ResourceHandling;
 using View3D.Components.Rendering;
-using View3D.Utility;
 
 namespace View3D.Rendering.RenderItems
 {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Utility;
 
 namespace View3D.Rendering
 {

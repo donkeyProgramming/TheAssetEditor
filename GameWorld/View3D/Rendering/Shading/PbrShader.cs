@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.GameFormats.RigidModel.Types;
 using System.Collections.Generic;
-using View3D.Utility;
 
 namespace View3D.Rendering.Shading
 {

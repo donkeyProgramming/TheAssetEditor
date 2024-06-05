@@ -4,10 +4,10 @@ namespace View3D.Components.Rendering
 {
     public class ClearScreenComponent : BaseComponent
     {
-        private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly IDeviceResolver _deviceResolverComponent;
         private readonly Color _clearColour = new Color(54, 54, 54);
 
-        public ClearScreenComponent(DeviceResolverComponent deviceResolverComponent)
+        public ClearScreenComponent(IDeviceResolver deviceResolverComponent)
         {
             DrawOrder = (int)ComponentDrawOrderEnum.ClearScreenComponent;
             _deviceResolverComponent = deviceResolverComponent;

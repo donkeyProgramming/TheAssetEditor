@@ -12,7 +12,7 @@ namespace View3D.Components.Rendering
         MouseComponent _mouse;
         KeyboardComponent _keyboard;
 
-        public ArcBallCamera(DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, MouseComponent mouseComponent)
+        public ArcBallCamera(IDeviceResolver deviceResolverComponent, KeyboardComponent keyboardComponent, MouseComponent mouseComponent)
         {
             Zoom = 10;
             Yaw = 0.8f;
@@ -156,7 +156,7 @@ namespace View3D.Components.Rendering
         #region ICamera Members        
 
         private Matrix viewMatrix;
-        private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly IDeviceResolver _deviceResolverComponent;
 
         public Matrix ViewMatrix
         {

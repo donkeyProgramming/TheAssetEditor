@@ -1,11 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Monogame.WpfInterop.ResourceHandling;
 using System;
 using System.Runtime.InteropServices;
 using View3D.Components;
 using View3D.Components.Component.Selection;
 using View3D.Rendering.Geometry;
-using View3D.Utility;
 
 namespace View3D.Rendering
 {
@@ -65,7 +65,7 @@ namespace View3D.Rendering
         Vector3 _selectedColur = new Vector3(1, 0, 0);
         Vector3 _deselectedColur = new Vector3(1, 1, 1);
 
-        public VertexInstanceMesh(DeviceResolverComponent deviceResolverComponent, ResourceLibrary resourceLibary)
+        public VertexInstanceMesh(IDeviceResolver deviceResolverComponent, ResourceLibrary resourceLibary)
         {
             Initialize(deviceResolverComponent.Device, resourceLibary);
         }

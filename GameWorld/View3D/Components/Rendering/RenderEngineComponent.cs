@@ -1,10 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Services;
 using System;
 using System.Collections.Generic;
 using View3D.Rendering;
-using View3D.Utility;
 
 namespace View3D.Components.Rendering
 {
@@ -38,7 +38,7 @@ namespace View3D.Components.Rendering
         ArcBallCamera _camera;
         Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = new Dictionary<RenderBuckedId, List<IRenderItem>>();
         ResourceLibrary _resourceLib;
-        private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly IDeviceResolver _deviceResolverComponent;
         ApplicationSettingsService _applicationSettingsService;
 
         bool _cullingEnabled = false;
@@ -51,7 +51,7 @@ namespace View3D.Components.Rendering
 
         public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;
 
-        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, DeviceResolverComponent deviceResolverComponent, ApplicationSettingsService applicationSettingsService)
+        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService)
         {
             _camera = camera;
             _resourceLib = resourceLib;

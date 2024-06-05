@@ -1,12 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Events;
-using System;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.RenderItems;
 using View3D.Rendering.Shading;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace View3D.Components.Component.Selection
 {
@@ -27,9 +27,9 @@ namespace View3D.Components.Component.Selection
         VertexInstanceMesh VertexRenderer;
         float _vertexSelectionFallof = 0;
         private readonly ResourceLibrary _resourceLib;
-        private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly IDeviceResolver _deviceResolverComponent;
 
-        public SelectionManager(EventHub eventHub, RenderEngineComponent renderEngine, ResourceLibrary resourceLib, DeviceResolverComponent deviceResolverComponent)
+        public SelectionManager(EventHub eventHub, RenderEngineComponent renderEngine, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent)
         {
             _eventHub = eventHub;
             _renderEngine = renderEngine;

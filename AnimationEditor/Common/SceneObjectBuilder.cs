@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.ResourceHandling;
+using MonoGame.Framework.WpfInterop;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -18,7 +20,7 @@ namespace AnimationEditor.Common.ReferenceModel
     public class SceneObjectBuilder
     {
         private readonly ILogger _logger = Logging.Create<SceneObjectBuilder>();
-        private readonly GameWorld _mainScene;
+        private readonly WpfGame _mainScene;
         private readonly IServiceProvider _serviceProvider;
         private readonly ResourceLibrary _resourceLibrary;
         private readonly SceneManager _sceneManager;
@@ -26,7 +28,7 @@ namespace AnimationEditor.Common.ReferenceModel
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly ComplexMeshLoader _complexMeshLoader;
 
-        public SceneObjectBuilder(GameWorld mainScene,
+        public SceneObjectBuilder(WpfGame mainScene,
             IServiceProvider serviceProvider, ResourceLibrary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader)
         {

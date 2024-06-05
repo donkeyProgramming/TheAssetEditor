@@ -82,13 +82,7 @@ namespace View3D.Rendering.Geometry
 
         public GeometryGraphicsContextFactory(IDeviceResolver deviceResolverComponent)
         {
-
             _deviceResolverComponent = deviceResolverComponent;
-        }
-
-        public static GeometryGraphicsContextFactory CreateInstance(GraphicsDevice device)
-        {
-            return new GeometryGraphicsContextFactory(new ManualDeviceResolver(device));
         }
 
         public IGraphicsCardGeometry Create()

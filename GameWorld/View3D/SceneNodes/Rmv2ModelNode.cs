@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.ResourceHandling;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -11,7 +12,6 @@ using View3D.Animation;
 using View3D.Components.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Services;
-using View3D.Utility;
 
 namespace View3D.SceneNodes
 {

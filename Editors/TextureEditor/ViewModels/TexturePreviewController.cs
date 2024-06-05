@@ -7,13 +7,14 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using CommonControls.BaseDialogs;
 using Microsoft.Xna.Framework.Graphics;
+using Monogame.WpfInterop.ResourceHandling;
+using MonoGame.Framework.WpfInterop;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using TextureEditor.Views;
 using View3D.Rendering;
 using View3D.Services;
-using View3D.Utility;
 
 namespace TextureEditor.ViewModels
 {
@@ -24,7 +25,7 @@ namespace TextureEditor.ViewModels
         private readonly TextureToTextureRenderer _textureRenderer;
         private readonly string _imagePath;
         private readonly TexturePreviewViewModel _viewModel;
-        private readonly GameWorld _scene;
+        private readonly WpfGame _scene;
         private readonly EventHub _eventHub;
 
         public class ViewModelWrapper : NotifyPropertyChangedImpl
@@ -61,7 +62,7 @@ namespace TextureEditor.ViewModels
             _eventHub = eventHub;
 
             _resourceLib = new ResourceLibrary(packFileService);
-            _scene = new GameWorld(_resourceLib, _eventHub);
+            _scene = new WpfGame(_resourceLib, _eventHub);
           
             _resourceLib.Initialize(_scene);
             //_scene.Components.Add(new ResourceLibary(_scene, packFileService));

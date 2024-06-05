@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
@@ -30,7 +29,7 @@ namespace View3D.Components.Component.Selection
 
         SelectionManager _selectionManager;
 
-        private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly IDeviceResolver _deviceResolverComponent;
         private readonly CommandFactory _commandFactory;
         SceneManager _sceneManger;
 
@@ -42,7 +41,7 @@ namespace View3D.Components.Component.Selection
         public SelectionComponent(
             MouseComponent mouseComponent, KeyboardComponent keyboardComponent,
             ArcBallCamera camera, SelectionManager selectionManager,
-            DeviceResolverComponent deviceResolverComponent, CommandFactory commandFactory,
+            IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
             SceneManager sceneManager)
         {
             _mouseComponent = mouseComponent;

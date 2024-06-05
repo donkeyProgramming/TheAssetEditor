@@ -4,6 +4,7 @@ using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using CommunityToolkit.Mvvm.Input;
 using Monogame.WpfInterop.Events;
+using MonoGame.Framework.WpfInterop;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
@@ -24,7 +25,7 @@ namespace AnimationEditor.PropCreator.ViewModels
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Name missing");
         public PackFile MainFile { get; set; }
 
-        public NotifyAttr<GameWorld> GameWorld { get; private set; } = new NotifyAttr<GameWorld>();
+        public NotifyAttr<WpfGame> GameWorld { get; private set; } = new NotifyAttr<WpfGame>();
         public ObservableCollection<SceneObjectViewModel> SceneObjects { get; set; } = new ObservableCollection<SceneObjectViewModel>();
         public AnimationPlayerViewModel Player { get; set; }
 
@@ -38,7 +39,7 @@ namespace AnimationEditor.PropCreator.ViewModels
         public EditorHost(
             IComponentInserter componentInserter,
             AnimationPlayerViewModel animationPlayerViewModel,
-            GameWorld gameWorld,
+            WpfGame gameWorld,
             FocusSelectableObjectService focusSelectableObjectService,
             TEditor editor,
             EventHub eventHub)

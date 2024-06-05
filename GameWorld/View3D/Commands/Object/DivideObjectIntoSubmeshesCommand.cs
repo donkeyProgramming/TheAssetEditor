@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Monogame.WpfInterop.ResourceHandling;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Ui.Common;
@@ -9,7 +10,6 @@ using View3D.Components.Rendering;
 using View3D.Rendering.Shading;
 using View3D.SceneNodes;
 using View3D.Services;
-using View3D.Utility;
 
 namespace View3D.Commands.Object
 {

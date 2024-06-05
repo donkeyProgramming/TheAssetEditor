@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.ResourceHandling;
 using MonoGame.Framework.WpfInterop;
 using Shared.Core.DependencyInjection;
 using View3D.Commands;
@@ -24,7 +25,6 @@ using View3D.Services.SceneSaving.Lod;
 using View3D.Services.SceneSaving.Lod.Strategies;
 using View3D.Services.SceneSaving.Material.Strategies;
 using View3D.Services.SceneSaving.WsModel;
-using View3D.Utility;
 
 namespace View3D
 {
@@ -33,12 +33,8 @@ namespace View3D
         public override void Register(IServiceCollection serviceCollection)
         {
             // Graphics scene
-            serviceCollection.AddScoped<GameWorld>();
-            serviceCollection.AddScoped<WpfGame>(x => x.GetService<GameWorld>());
             serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
-            serviceCollection.AddSingleton<IResourceLibrary, ResourceLibrary>();
-            serviceCollection.AddSingleton<ResourceLibrary>(x => x.GetService<IResourceLibrary>() as ResourceLibrary);
-
+          
             // Services
             serviceCollection.AddScoped<ViewOnlySelectedService>();
             serviceCollection.AddScoped<FocusSelectableObjectService>();
@@ -69,7 +65,7 @@ namespace View3D
             
 
             // Resolvers - sort of hacks 
-            serviceCollection.AddScoped<IDeviceResolver, DeviceResolverComponent>(x => x.GetService<DeviceResolverComponent>());
+            serviceCollection.AddScoped<IDeviceResolver, DeviceResolver>();
 
             // Components
             RegisterComponents(serviceCollection);
@@ -81,7 +77,6 @@ namespace View3D
         void RegisterComponents(IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<IComponentInserter, ComponentInserter>();
-            RegisterGameComponent<DeviceResolverComponent>(serviceCollection);
             RegisterGameComponent<CommandStackRenderer>(serviceCollection);
             RegisterGameComponent<KeyboardComponent>(serviceCollection);
             RegisterGameComponent<MouseComponent>(serviceCollection);

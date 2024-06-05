@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
+using Monogame.WpfInterop.ResourceHandling;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
-using View3D.Utility;
 
 namespace View3D.Components.Component
 {
@@ -17,11 +17,11 @@ namespace View3D.Components.Component
         bool _startAnimation;
 
         private readonly ResourceLibrary _resourceLibary;
-        private readonly DeviceResolverComponent _deviceResolverComponent;
+        private readonly IDeviceResolver _deviceResolverComponent;
         private readonly KeyboardComponent _keyboardComponent;
         private readonly RenderEngineComponent _renderEngineComponent;
 
-        public LightControllerComponent(ResourceLibrary resourceLibary, DeviceResolverComponent deviceResolverComponent, KeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent)
+        public LightControllerComponent(ResourceLibrary resourceLibary, IDeviceResolver deviceResolverComponent, KeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent)
         {
             _resourceLibary = resourceLibary;
             _deviceResolverComponent = deviceResolverComponent;
@@ -31,8 +31,6 @@ namespace View3D.Components.Component
 
         public override void Initialize()
         {
-
-
             _font = _resourceLibary.DefaultFont;
             _spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
         }

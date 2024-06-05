@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Events;
 using Shared.Ui.BaseDialogs.MathViews;
 using System;
@@ -11,7 +12,6 @@ using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.VertexDebugger
 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Framework.WpfInterop;
 using MonoGame.Framework.WpfInterop.Input;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -42,7 +43,7 @@ namespace View3D.Components.Input
             }
         }
 
-        public MouseComponent(GameWorld game)
+        public MouseComponent(WpfGame game)
         {
             _wpfMouse = new WpfMouse(game);
             _wpfMouse.CaptureMouseWithin = true;

@@ -1,25 +1,21 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Monogame.WpfInterop.Events;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Events;
-using System;
-using System.Collections.Generic;
 
 namespace MonoGame.Framework.WpfInterop
 {
-    public interface IResourceLibrary
-    {
-        public void Initialize(WpfGame game);
-        public void Reset();
-    }
-
     /// <summary>
     /// The replacement for <see cref="Game"/>. Unlike <see cref="Game"/> the <see cref="WpfGame"/> is a WPF control and can be hosted inside WPF windows.
     /// </summary>
-    public abstract class WpfGame : D3D11Host
+    public class WpfGame : D3D11Host
     {
-        private readonly IResourceLibrary _resourceLibrary;
+        WpfGraphicsDeviceService _deviceServiceHandle;
+        private readonly ResourceLibrary _resourceLibrary;
         private readonly EventHub _eventHub;
         private readonly string _contentDir;
 
@@ -30,7 +26,7 @@ namespace MonoGame.Framework.WpfInterop
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        protected WpfGame(IResourceLibrary resourceLibrary, EventHub eventHub, string contentDir)
+        public WpfGame(ResourceLibrary resourceLibrary, EventHub eventHub, string contentDir = "BuiltContent")
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));
@@ -75,6 +71,7 @@ namespace MonoGame.Framework.WpfInterop
         /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
+            _deviceServiceHandle = null;
             foreach (var c in Components)
             {
                 var disposable = c as IDisposable;
@@ -117,6 +114,7 @@ namespace MonoGame.Framework.WpfInterop
         /// </summary>
         protected override void Initialize()
         {
+            _deviceServiceHandle = new WpfGraphicsDeviceService(this);
             base.Initialize();
 
             Content = new ContentManager(Services, _contentDir);

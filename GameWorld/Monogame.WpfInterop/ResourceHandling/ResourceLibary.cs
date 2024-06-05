@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Framework.WpfInterop;
 using Shared.Core.PackFiles;
+using View3D.Utility;
 
-namespace View3D.Utility
+namespace Monogame.WpfInterop.ResourceHandling
 {
     public enum ShaderTypes
     {
@@ -17,7 +18,7 @@ namespace View3D.Utility
         GeometryInstance,
     }
 
-    public class ResourceLibrary : IResourceLibrary
+    public class ResourceLibrary
     {
         //private readonly  ILogger _logger = Logging.Create<ResourceLibary>();
 
@@ -41,7 +42,7 @@ namespace View3D.Utility
         }
 
         public SpriteFont LoadFont(string path) => _gameWorld.Content.Load<SpriteFont>(path);
-        
+
         public void Initialize(WpfGame game)
         {
             if (_isInitialized)
@@ -67,23 +68,23 @@ namespace View3D.Utility
 
         public void Reset()
         {
-           foreach (var item in _cachedTextures)
-               item.Value.Dispose();
-           _cachedTextures.Clear();
-           
-           foreach (var item in _cachedShaders)
-               item.Value.Dispose();
-           _cachedShaders.Clear();
-           
+            foreach (var item in _cachedTextures)
+                item.Value.Dispose();
+            _cachedTextures.Clear();
+
+            foreach (var item in _cachedShaders)
+                item.Value.Dispose();
+            _cachedShaders.Clear();
+
             PbrDiffuse?.Dispose();
             PbrDiffuse = null;
-            
+
             PbrSpecular?.Dispose();
             PbrSpecular = null;
-            
+
             PbrLut?.Dispose();
             PbrLut = null;
-            
+
             CommonSpriteBatch?.Dispose();
             CommonSpriteBatch = null;
 

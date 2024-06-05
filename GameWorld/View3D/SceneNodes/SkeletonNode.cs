@@ -1,10 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.ResourceHandling;
 using System;
 using View3D.Animation;
 using View3D.Components.Rendering;
 using View3D.Rendering;
 using View3D.Rendering.RenderItems;
-using View3D.Utility;
 
 namespace View3D.SceneNodes
 {

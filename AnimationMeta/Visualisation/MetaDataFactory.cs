@@ -6,6 +6,7 @@ using AnimationMeta.Visualisation.Instances;
 using AnimationMeta.Visualisation.Rules;
 using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.ResourceHandling;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
@@ -21,7 +22,6 @@ using View3D.Rendering;
 using View3D.Rendering.RenderItems;
 using View3D.SceneNodes;
 using View3D.Services;
-using View3D.Utility;
 
 namespace AnimationMeta.Visualisation
 {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Misc;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
@@ -12,7 +13,6 @@ using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.MeshFitter
 {

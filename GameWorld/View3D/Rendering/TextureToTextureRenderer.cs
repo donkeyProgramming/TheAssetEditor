@@ -2,7 +2,7 @@
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using View3D.Utility;
+using Monogame.WpfInterop.ResourceHandling;
 
 namespace View3D.Rendering
 {
