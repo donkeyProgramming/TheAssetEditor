@@ -3,12 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <WarningsAsErrors />
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <WarningsAsErrors />
-    </PropertyGroup>
+
   <ItemGroup>
     <None Update="BuiltContent\Fonts\DefaultFont.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -10,13 +10,6 @@
     <PackageReference Include="geometry3Sharp" Version="1.0.324" />
   </ItemGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <WarningsAsErrors />
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <WarningsAsErrors />
-    </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\GameWorld\View3D\View3D.csproj" />
     <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />

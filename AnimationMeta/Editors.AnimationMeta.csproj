@@ -3,17 +3,13 @@
 		<TargetFramework>net6.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <WarningsAsErrors />
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <WarningsAsErrors />
-	</PropertyGroup>
+
 	<ItemGroup>
         <ProjectReference Include="..\Editors\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
         <ProjectReference Include="..\GameWorld\View3D\View3D.csproj" />
         <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
 	</ItemGroup>
+    
 	<ItemGroup>
 	  <Compile Update="Presentation\View\EditorValueEditor.xaml.cs">
 	    <SubType>Code</SubType>
