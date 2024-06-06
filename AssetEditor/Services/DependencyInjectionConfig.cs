@@ -36,7 +36,7 @@ namespace AssetEditor.Services
                 new Editors.Reports.DependencyInjectionContainer(),
                 new KitbasherEditor.DependencyInjectionContainer(),
                 new AssetManagement_DependencyInjectionContainer(),
-                new AnimationMeta.DependencyInjectionContainer(),
+                new Editors.AnimationMeta.DependencyInjectionContainer(),
                 new AudioEditor_DependencyInjectionContainer(),
                 new Editors.TextureEditor.DependencyInjectionContainer(),
                 new AnimationEditors_DependencyInjectionContainer(),

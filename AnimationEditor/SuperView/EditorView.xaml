@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:AnimationEditor.SuperView"
              xmlns:referencemodel="clr-namespace:AnimationEditor.Common.ReferenceModel"
              xmlns:s="http://schemas.singulink.com/xaml"
-             xmlns:view="clr-namespace:AnimationMeta.Presentation.View;assembly=AnimationMeta"
+             xmlns:view="clr-namespace:AnimationMeta.Presentation.View;assembly=Editors.AnimationMeta"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
