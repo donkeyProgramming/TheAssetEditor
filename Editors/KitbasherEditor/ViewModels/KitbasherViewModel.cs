@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using GameWorld.WpfWindow;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.DependencyInjection;

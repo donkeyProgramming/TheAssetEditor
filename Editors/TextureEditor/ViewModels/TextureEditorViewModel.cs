@@ -1,5 +1,6 @@
 ﻿using System;
-using Shared.Core.Events;
+using GameWorld.WpfWindow;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -9,39 +10,46 @@ namespace TextureEditor.ViewModels
 {
     public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IDisposable
     {
-        PackFileService _pfs;
-        PackFile _file;
+        private readonly PackFileService _pfs;
+
+        private readonly WpfGame _wpfGame;
+        private readonly ResourceLibrary _resourceLibrary;
+
         TexturePreviewController _controller;
-        EventHub _eventHub;
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
 
-        public PackFile MainFile { get => _file; set => Load(value); }
-        public bool HasUnsavedChanges { get => false; set { } }
+        PackFile _packFile;
+        public PackFile MainFile { get => _packFile; set => Load(value); }  // Change to own interface or function
+
+        public bool HasUnsavedChanges { get => false; set { } } // Move to own interface
 
 
-        TexturePreviewViewModel _viewModel;
+        TexturePreviewViewModel _viewModel; // UseNotify
         public TexturePreviewViewModel ViewModel
         {
             get => _viewModel;
             set => SetAndNotify(ref _viewModel, value);
         }
 
-        public TextureEditorViewModel(PackFileService pfs, EventHub eventHub)
+        public TextureEditorViewModel(PackFileService pfs,  WpfGame wpfGame, ResourceLibrary resourceLibrary)
         {
             _pfs = pfs;
-            _eventHub = eventHub;
+            _wpfGame = wpfGame;
+            _resourceLibrary = resourceLibrary;
         }
 
-        public void Load(PackFile file)
+        private void Load(PackFile packFile)
         {
-            _file = file;
-            DisplayName.Value = file.Name;
+            _packFile = packFile;
+            _wpfGame.ForceCreate();
+            DisplayName.Value = _packFile.Name;
 
             var viewModel = new TexturePreviewViewModel();
-            viewModel.ImagePath.Value = _pfs.GetFullPath(file);
+            viewModel.ImagePath.Value = _pfs.GetFullPath(_packFile);
 
-            _controller = new TexturePreviewController(_pfs.GetFullPath(file), viewModel, _pfs, _eventHub);
+            _controller = new TexturePreviewController(viewModel, _resourceLibrary, _wpfGame);
+            _controller.Build(_pfs.GetFullPath(_packFile));
             ViewModel = viewModel;
         }
 

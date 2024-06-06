@@ -26,9 +26,9 @@ namespace TextureEditor.ViewModels
         public bool FormatBCheckbox { get => _formatCheckbox[3]; set => UpdateFormat(3, value); }
         public bool FormatACheckbox { get => _formatCheckbox[4]; set => UpdateFormat(4, value); }
 
-
-        List<bool> _formatCheckbox = new List<bool>() { false, false, false, false, false };
+        readonly List<bool> _formatCheckbox = new List<bool>() { false, false, false, false, false };
         ImageSource[] _previewImage = new ImageSource[5];
+
         public ImageSource[] PreviewImage
         {
             get { return _previewImage; }
@@ -41,7 +41,7 @@ namespace TextureEditor.ViewModels
 
         void UpdateFormat(int index, bool value)
         {
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
                 _formatCheckbox[i] = false;
 
             _formatCheckbox[index] = value;
@@ -60,12 +60,10 @@ namespace TextureEditor.ViewModels
             Height.Value = _information.Height;
             Format.Value = _information.Format.ToString();
             NumMipMaps.Value = _information.Header_MipMapCount;
-
         }
 
         public void ShowTextureDetailsInfo()
         {
-
             // MOve this to a general concept 
             var containingWindow = new ControllerHostWindow(false, ResizeMode.CanResize);
             containingWindow.Title = "Texture Details";

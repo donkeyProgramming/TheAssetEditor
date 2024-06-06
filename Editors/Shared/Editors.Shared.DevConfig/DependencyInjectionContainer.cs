@@ -13,7 +13,7 @@ namespace Editors.Shared.DevConfig
         public override void Register(IServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<DevelopmentConfigurationManager>();
-            RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Scoped);
+            RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
     }
 }
