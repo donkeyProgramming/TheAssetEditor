@@ -6,17 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-    <PropertyGroup>
-        <NoWarn></NoWarn>
-    </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-      <WarningsAsErrors />
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-      <WarningsAsErrors />
-    </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Serilog" Version="2.10.0" />

@@ -6,7 +6,6 @@ using View3D.Services.MeshOptimization;
 
 namespace View3D.Commands.Object
 {
-
     public class ReduceMeshCommand : ICommand
     {
         List<Rmv2MeshNode> _meshList;
@@ -33,7 +32,7 @@ namespace View3D.Commands.Object
         public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
-
+            
             foreach (var meshNode in _meshList)
             {
                 var originalMesh = meshNode.Geometry;
@@ -47,7 +46,7 @@ namespace View3D.Commands.Object
         {
             for (int i = 0; i < _meshList.Count; i++)
                 _meshList[i].Geometry = _originalGeometry[i];
-
+            
             _selectionManager.SetState(_oldState);
         }
     }
