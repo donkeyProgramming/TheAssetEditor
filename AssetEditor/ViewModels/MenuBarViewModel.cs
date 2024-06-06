@@ -241,10 +241,10 @@ namespace AssetEditor.ViewModels
             window.DataContext = _serviceProvider.GetRequiredService<SettingsViewModel>();
             window.ShowDialog();
         }
-
+        
         void CreatePackFile()
         {
-            TextInputWindow window = new TextInputWindow("New Packfile name", "");
+            var window = new TextInputWindow("New Packfile name", "");
             if (window.ShowDialog() == true)
             {
                 var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue, PackFileCAType.MOD);

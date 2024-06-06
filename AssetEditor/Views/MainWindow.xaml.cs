@@ -8,9 +8,6 @@ using Shared.Ui.Common;
 
 namespace AssetEditor.Views
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         Point _lastMouseDown;
@@ -19,7 +16,7 @@ namespace AssetEditor.Views
         public MainWindow()
         {
             InitializeComponent();
-            Title = $"AssetEditor v{VersionChecker.CurrentVersion}";
+            Title = $"AssetEditor v{VersionChecker.CurrentVersion} - Beta";
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)

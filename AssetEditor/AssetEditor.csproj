@@ -3,7 +3,7 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
-        <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
+        <ApplicationIcon>AssetEditorIcon.ico</ApplicationIcon>
         <AssemblyName>AssetEditor v0.45</AssemblyName>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
