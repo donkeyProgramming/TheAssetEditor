@@ -201,7 +201,7 @@ namespace View3D.Rendering
 
         public void Dispose()
         {
-            _effect.Dispose();
+           // _effect.Dispose();
             _instanceVertexDeclaration.Dispose();
             _instanceBuffer.Dispose();
         }

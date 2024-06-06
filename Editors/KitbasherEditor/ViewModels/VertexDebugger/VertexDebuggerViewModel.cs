@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Events;
 using Shared.Ui.BaseDialogs.MathViews;
-using System;
 using System.Collections.ObjectModel;
 using View3D.Components;
 using View3D.Components.Component.Selection;

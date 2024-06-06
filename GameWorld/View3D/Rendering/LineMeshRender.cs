@@ -10,7 +10,7 @@ namespace View3D.Rendering
 {
     public class LineMeshRender : IDisposable
     {
-        private Effect _shader;
+        private readonly Effect _shader;
         private List<VertexPositionColor> _originalVertices = new List<VertexPositionColor>();
 
         public LineMeshRender(ResourceLibrary resourceLibrary)
@@ -145,10 +145,8 @@ namespace View3D.Rendering
                 vertices[2 * i + 1] = vertices[2 * i];
             }
             // fix points to use with LineList
-            for (int i = 0; i < steps; i++)
-            {
+            for (var i = 0; i < steps; i++)
                 vertices[2 * i + 1] = vertices[2 * i + 2];
-            }
             return vertices;
         }
 
@@ -276,7 +274,7 @@ namespace View3D.Rendering
         public void Dispose()
         {
             //_shader.Dispose();
-            _shader = null;
+            //_shader = null;
         }
     }
 }

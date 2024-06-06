@@ -45,6 +45,7 @@ namespace Shared.Ui.BaseDialogs.WindowHandling
 
         void OnComponentRemoved(IGameComponent component)
         {
+            _wpfGame.RemoveComponent(component);
         }
     }
 
