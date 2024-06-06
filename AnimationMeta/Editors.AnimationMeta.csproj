@@ -9,20 +9,5 @@
         <ProjectReference Include="..\GameWorld\View3D\View3D.csproj" />
         <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
 	</ItemGroup>
-    
-	<ItemGroup>
-	  <Compile Update="Presentation\View\EditorValueEditor.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="Presentation\View\MainEditorView.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="Presentation\View\MetaEntriesListView.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="Presentation\View\NewTagWindow.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	</ItemGroup>
 
 </Project>
