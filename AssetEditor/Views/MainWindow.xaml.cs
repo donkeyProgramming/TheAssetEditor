@@ -16,7 +16,7 @@ namespace AssetEditor.Views
         public MainWindow()
         {
             InitializeComponent();
-            Title = $"AssetEditor v{VersionChecker.CurrentVersion} - Beta";
+            Title = $"AssetEditor v{VersionChecker.CurrentVersion} - Beta v2";
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)
