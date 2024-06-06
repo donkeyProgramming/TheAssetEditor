@@ -1,21 +1,14 @@
-﻿using System;
-using GameWorld.WpfWindow;
-using Monogame.WpfInterop.ResourceHandling;
-using Shared.Core.Misc;
+﻿using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
 namespace TextureEditor.ViewModels
 {
-    public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IDisposable
+    public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
         private readonly PackFileService _pfs;
-
-        private readonly WpfGame _wpfGame;
-        private readonly ResourceLibrary _resourceLibrary;
-
-        TexturePreviewController _controller;
+        private readonly TextureBuilder _textureBuilder;
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
 
@@ -32,27 +25,25 @@ namespace TextureEditor.ViewModels
             set => SetAndNotify(ref _viewModel, value);
         }
 
-        public TextureEditorViewModel(PackFileService pfs,  WpfGame wpfGame, ResourceLibrary resourceLibrary)
+        public TextureEditorViewModel(PackFileService pfs, TextureBuilder textureBuilder)
         {
             _pfs = pfs;
-            _wpfGame = wpfGame;
-            _resourceLibrary = resourceLibrary;
+            _textureBuilder = textureBuilder;
         }
 
         private void Load(PackFile packFile)
         {
             _packFile = packFile;
-            _wpfGame.ForceCreate();
+ 
             DisplayName.Value = _packFile.Name;
 
             var viewModel = new TexturePreviewViewModel();
             viewModel.ImagePath.Value = _pfs.GetFullPath(_packFile);
 
-            _controller = new TexturePreviewController(viewModel, _resourceLibrary, _wpfGame);
-            _controller.Build(_pfs.GetFullPath(_packFile));
+            _textureBuilder.Build(viewModel, _pfs.GetFullPath(_packFile));
             ViewModel = viewModel;
         }
-
+          
         public void ShowTextureDetailsInfo() => ViewModel.ShowTextureDetailsInfo();
 
         public void Close()
@@ -61,11 +52,5 @@ namespace TextureEditor.ViewModels
         }
 
         public bool Save() => false;
-
-        public void Dispose()
-        {
-            if (_controller != null)
-                _controller.Dispose();
-        }
     }
 }

@@ -401,7 +401,7 @@ namespace MonoGame.Framework.WpfInterop
             }
         }
 
-        public void ForceCreate()
+        public void ForceEnsureCreated()
         {
             OnLoaded(null, null);
         }

@@ -1,10 +1,12 @@
 ﻿using System.Linq;
 using AssetEditor.ViewModels;
+using KitbasherEditor.Views.EditorViews;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
+using Shared.Ui.BaseDialogs.WindowHandling;
 
 namespace AssetEditor.Services
 {
@@ -51,6 +53,13 @@ namespace AssetEditor.Services
             editorViewModel.MainFile = file;
             _mainViewModel.CurrentEditorsList.Add(editorViewModel);
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;
+        }
+
+        public void OpenFileInWindow(PackFile file, int width, int height)
+        {
+            var fullFileName = _packFileService.GetFullPath(file);
+            var editorViewModel = _toolFactory.Create(fullFileName);
+            
         }
     }
 }

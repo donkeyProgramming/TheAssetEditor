@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework;
 
 namespace Shared.Ui.BaseDialogs.WindowHandling
 {
-
     public class WindowFactory : IWindowFactory
     {
         private readonly IServiceProvider _serviceProvider;

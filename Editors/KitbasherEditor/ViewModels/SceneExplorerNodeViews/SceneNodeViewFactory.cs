@@ -6,7 +6,6 @@ using Shared.Core.Services;
 using View3D.Components.Component;
 using View3D.Components.Rendering;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
@@ -18,7 +17,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         private readonly PackFileService _packFileService;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly EventHub _eventHub;
+        private readonly IUiCommandFactory _uiCommandFactory;
 
         public SceneNodeViewFactory(SceneManager sceneManager,
             KitbasherRootScene kitbasherRootScene, 
@@ -26,7 +25,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             PackFileService packFileService, 
             ApplicationSettingsService applicationSettingsService,
             RenderEngineComponent renderEngineComponent,
-            EventHub eventHub)
+            IUiCommandFactory uiCommandFactory)
         {
             _sceneManager = sceneManager;
             _kitbasherRootScene = kitbasherRootScene;
@@ -34,7 +33,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _packFileService = packFileService;
             _applicationSettingsService = applicationSettingsService;
             _renderEngineComponent = renderEngineComponent;
-            _eventHub = eventHub;
+            _uiCommandFactory = uiCommandFactory;
         }
 
         public ISceneNodeViewModel CreateEditorView(ISceneNode node)
@@ -44,7 +43,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 case MainEditableNode mainNode:
                     return new MainEditableNodeViewModel(_kitbasherRootScene, mainNode, _skeletonAnimationLookUpHelper, _packFileService, _renderEngineComponent);
                 case Rmv2MeshNode m:
-                    return new MeshEditorViewModel(_kitbasherRootScene, m, _packFileService, _skeletonAnimationLookUpHelper, _sceneManager, _applicationSettingsService, _eventHub);
+                    return new MeshEditorViewModel(_kitbasherRootScene, m, _packFileService, _skeletonAnimationLookUpHelper, _sceneManager, _applicationSettingsService, _uiCommandFactory);
                 case SkeletonNode s:
                     return new SkeletonSceneNodeViewModel(s, _packFileService, _skeletonAnimationLookUpHelper);
                 case GroupNode n:

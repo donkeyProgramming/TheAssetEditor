@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using Shared.Core.Misc;
 using View3D.Components.Component;
 using View3D.SceneNodes;
