@@ -297,36 +297,38 @@ namespace MonoGame.Framework.WpfInterop
 
         private void UninitializeGraphicsDevice()
         {
-            lock (GraphicsDeviceLock)
-            {
-                _referenceCount--;
-                if (_referenceCount == 0 || !UseASingleSharedGraphicsDevice)
-                {
-                    // dirty workaround. when just calling .Dispose monogame crashes because MonoGame internal _swapChain is null and
-                    // they just blindly trust it isn't null and call .Dipose on it
-
-                    // as a workaround we will now call the bare minimum setup methods to create a (temporary) swapchain in the last second and then call Dispose
-                    // that way Dispose doesn't crash
-
-                    // literally anything but 0 will do, our WPF window is already closed at this point (returns 0) so just use a random pointer
-                    // technically a swapChain will be attached to this device handle for a few ms before we dispose it again
-                    // let's hope attaching it to "1" doesn't break anything
-                    GraphicsDevice.PresentationParameters.DeviceWindowHandle = new IntPtr(1);
-
-                    // call below will now trigger some events on the GraphicsDevice and we have no way of suppressing them
-                    // but we need to call reset to actually create a swapChain, otherwise Dispose will crash
-                    GraphicsDevice.Reset();
-
-                    // finally we can safely call dispose without receiving NullReferenceException
-                    GraphicsDevice.Dispose();
-                    if (UseASingleSharedGraphicsDevice)
-                        _staticGraphicsDevice = null;
-                    else
-                        _graphicsDevice = null;
-
-                    OnGraphicDeviceDisposed();
-                }
-            }
+            // We pretende this is a singelton...
+            //return;
+            //lock (GraphicsDeviceLock)
+            //{
+            //    _referenceCount--;
+            //    if (_referenceCount == 0 || !UseASingleSharedGraphicsDevice)
+            //    {
+            //        // dirty workaround. when just calling .Dispose monogame crashes because MonoGame internal _swapChain is null and
+            //        // they just blindly trust it isn't null and call .Dipose on it
+            //
+            //        // as a workaround we will now call the bare minimum setup methods to create a (temporary) swapchain in the last second and then call Dispose
+            //        // that way Dispose doesn't crash
+            //
+            //        // literally anything but 0 will do, our WPF window is already closed at this point (returns 0) so just use a random pointer
+            //        // technically a swapChain will be attached to this device handle for a few ms before we dispose it again
+            //        // let's hope attaching it to "1" doesn't break anything
+            //        GraphicsDevice.PresentationParameters.DeviceWindowHandle = new IntPtr(1);
+            //
+            //        // call below will now trigger some events on the GraphicsDevice and we have no way of suppressing them
+            //        // but we need to call reset to actually create a swapChain, otherwise Dispose will crash
+            //        GraphicsDevice.Reset();
+            //
+            //        // finally we can safely call dispose without receiving NullReferenceException
+            //        GraphicsDevice.Dispose();
+            //        if (UseASingleSharedGraphicsDevice)
+            //            _staticGraphicsDevice = null;
+            //        else
+            //            _graphicsDevice = null;
+            //
+            //        OnGraphicDeviceDisposed();
+            //    }
+            //}
         }
 
         private void CreateBackBuffer()

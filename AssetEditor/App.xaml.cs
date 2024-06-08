@@ -6,6 +6,7 @@ using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Editors.Shared.DevConfig.Base;
+using GameWorld.WpfWindow;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -25,6 +26,10 @@ namespace AssetEditor
 
             _serviceProvider = new DependencyInjectionConfig().Build();
             _rootScope = _serviceProvider.CreateScope();
+
+            // Init 3d world
+            var gameWorld = _rootScope.ServiceProvider.GetRequiredService<WpfGame>();
+            gameWorld.ForceEnsureCreated();
 
             // Show the settings window if its the first time the tool is ran
             var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();

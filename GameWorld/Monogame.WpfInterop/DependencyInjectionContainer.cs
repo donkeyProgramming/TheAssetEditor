@@ -9,7 +9,7 @@ namespace GameWorld.WpfWindow
         public override void Register(IServiceCollection serviceCollection)
         {
             // Graphics scene
-            serviceCollection.AddScoped<WpfGame>();
+            serviceCollection.AddScoped<WpfGame>(); // Its really a singleton...
             serviceCollection.AddSingleton<ResourceLibrary>();
         }
     }
