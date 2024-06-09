@@ -16,10 +16,10 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
         {
             var typedProjectItem = projectItem as Action;
             Guard.IsNotNull(typedProjectItem);
-            return ConvertToWWise(typedProjectItem, project.ProjectSettings.BnkName, project);
+            return ConvertToWWise(typedProjectItem, project);
         }
 
-        public CAkAction_v136 ConvertToWWise(Action inputAction, string bnkName, CompilerData project)
+        public CAkAction_v136 ConvertToWWise(Action inputAction, CompilerData project)
         {
             var wwiseAction = new CAkAction_v136();
             wwiseAction.Id = inputAction.Id;
@@ -27,7 +27,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseAction.ActionType = ActionType.Play;
             wwiseAction.idExt = inputAction.ChildId;
             wwiseAction.AkPlayActionParams.byBitVector = 0x04;
-            wwiseAction.AkPlayActionParams.bankId = WwiseHash.Compute(bnkName);
+            wwiseAction.AkPlayActionParams.bankId = WwiseHash.Compute(project.ProjectSettings.BnkName);
             wwiseAction.UpdateSize();
 
             return wwiseAction;

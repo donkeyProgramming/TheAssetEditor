@@ -21,13 +21,13 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
         public CAkActorMixer_v136 ConvertToWWise(ActorMixer actorMixer, CompilerData project)
         {
-            var allChildIds = actorMixer.Children.ToList();
-
             var wwiseActorMixer = new CAkActorMixer_v136();
-            wwiseActorMixer.Id = project.GetHircItemIdFromName(actorMixer.Name);
+            wwiseActorMixer.Id = actorMixer.Id;
             wwiseActorMixer.Type = HircType.ActorMixer;
             wwiseActorMixer.NodeBaseParams = NodeBaseParams.CreateDefault();
             wwiseActorMixer.NodeBaseParams.DirectParentId = actorMixer.DirectParentId;
+
+            var allChildIds = actorMixer.Children.ToList();
 
             wwiseActorMixer.Children = new Children()
             {

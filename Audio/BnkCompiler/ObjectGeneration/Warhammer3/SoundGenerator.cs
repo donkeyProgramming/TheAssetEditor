@@ -42,7 +42,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 Type = HircType.Sound,
                 AkBankSourceData = new AkBankSourceData()
                 {
-                    PluginId = 0x00040001,  // [VORBIS]
+                    PluginId = 0x00040001, // [VORBIS]
                     StreamType = SourceType.Streaming,
                     akMediaInformation = new AkMediaInformation()
                     {
