@@ -26,7 +26,7 @@
 
                 <Label Grid.Row="0" Grid.Column="0">Path:</Label>
                 <DockPanel Grid.Row="0" Grid.Column="1" LastChildFill="True">
-                    <Button DockPanel.Dock="Right">Browse</Button>
+                    <Button DockPanel.Dock="Right" Click="{s:MethodBinding HandleBrowseLocation}" >Browse</Button>
                     <TextBox DockPanel.Dock="Left" Text="{Binding OutputPath.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
                 </DockPanel>
 
