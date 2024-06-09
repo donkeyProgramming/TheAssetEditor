@@ -16,11 +16,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public MaterialGeneralViewModel MaterialGeneral { get; set; }
         public WeightedMaterialViewModel Material { get; set; }
 
-        public MeshEditorViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, SceneManager sceneManager, ApplicationSettingsService applicationSettings, EventHub eventHub)
+        public MeshEditorViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode node, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp, SceneManager sceneManager, ApplicationSettingsService applicationSettings, IUiCommandFactory uiCommandFactory)
         {
             Mesh = new MeshViewModel(node, sceneManager);
             Animation = new AnimationViewModel(kitbasherRootScene, node, pfs, animLookUp);
-            MaterialGeneral = new MaterialGeneralViewModel(kitbasherRootScene, node, pfs, applicationSettings, eventHub);
+            MaterialGeneral = new MaterialGeneralViewModel(kitbasherRootScene, node, pfs, applicationSettings, uiCommandFactory);
 
             if (node.Material is WeightedMaterial)
                 Material = new WeightedMaterialViewModel(node);

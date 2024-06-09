@@ -104,6 +104,7 @@ namespace Shared.Core.ToolCreation
             var instance = (Control)Activator.CreateInstance(toolView);
 
             var newWindow = new Window();
+            newWindow.Style = (Style)Application.Current.Resources["CustomWindowStyle"];
             newWindow.Content = instance;
             newWindow.DataContext = viewModel;
 

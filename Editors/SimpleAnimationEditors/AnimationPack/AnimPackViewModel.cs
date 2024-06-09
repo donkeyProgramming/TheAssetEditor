@@ -213,8 +213,7 @@ namespace CommonControls.Editors.AnimationPack
                     return false;
             }
 
-            var newAnimPack = new AnimationPackFile();
-            newAnimPack.FileName = _pfs.GetFullPath(MainFile);
+            var newAnimPack = new AnimationPackFile(_pfs.GetFullPath(MainFile));
 
             foreach (var file in AnimationPackItems.PossibleValues)
                 newAnimPack.AddFile(file);

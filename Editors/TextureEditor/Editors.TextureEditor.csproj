@@ -2,16 +2,11 @@
   <PropertyGroup>
 	  <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+      <Nullable>enable</Nullable>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\View3D\View3D.csproj" />
-  </ItemGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <WarningsAsErrors />
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <WarningsAsErrors />
-    </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\GameWorld\View3D\View3D.csproj" />
+    </ItemGroup>
 
 </Project>

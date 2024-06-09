@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Events;
 using Shared.Ui.BaseDialogs.MathViews;
-using System;
 using System.Collections.ObjectModel;
 using View3D.Components;
 using View3D.Components.Component.Selection;
@@ -11,7 +11,6 @@ using View3D.Rendering;
 using View3D.Rendering.Geometry;
 using View3D.Rendering.RenderItems;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.VertexDebugger
 {
@@ -37,12 +36,12 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
         Effect _lineShader;
 
         private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
         private readonly SelectionManager _selectionManager;
         private readonly EventHub _eventHub;
 
         public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent,
-            ResourceLibary resourceLibary,
+            ResourceLibrary resourceLibary,
             SelectionManager selectionManager,
             EventHub eventHub)
         {

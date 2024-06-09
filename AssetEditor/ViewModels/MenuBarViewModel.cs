@@ -15,7 +15,6 @@ using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
 using AnimationEditor.SuperView;
 using AssetEditor.Report;
-using AssetEditor.UiCommands;
 using AssetEditor.Views.Settings;
 using Audio.Presentation.AudioExplorer;
 using Audio.Presentation.Compiler;
@@ -23,6 +22,7 @@ using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Reports;
 using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -33,6 +33,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Ui.Common;
+using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {
@@ -58,6 +59,7 @@ namespace AssetEditor.ViewModels
         private readonly PackFileService _packfileService;
         private readonly ApplicationSettingsService _settingsService;
         private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly TouchedFilesRecorder _touchedFilesRecorder;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
         public ICommand CreateNewPackFileCommand { get; set; }
@@ -93,6 +95,12 @@ namespace AssetEditor.ViewModels
         public ICommand GenerateMetaDataReportCommand { get; set; }
         public ICommand GenerateFileListReportCommand { get; set; }
         public ICommand GenerateMetaDataJsonsReportCommand { get; set; }
+
+        public ICommand TouchedFileRecorderStartCommand { get; set; }
+        public ICommand TouchedFileRecorderPrintCommand { get; set; }
+        public ICommand TouchedFileRecorderExtractCommand { get; set; }
+        public ICommand TouchedFileRecorderStopCommand { get; set; }
+
         public ICommand CreateAnimPackWarhammer3Command { get; set; }
         public ICommand CreateAnimPack3kCommand { get; set; }
         public ICommand OpenAnimationKeyframeCommand { get; set; }
@@ -112,13 +120,15 @@ namespace AssetEditor.ViewModels
             IServiceProvider provider,
             PackFileService packfileService,
             ApplicationSettingsService settingsService,
-            IUiCommandFactory uiCommandFactory)
+            IUiCommandFactory uiCommandFactory,
+            TouchedFilesRecorder touchedFilesRecorder)
         {
             _gameInformationFactory = gameInformationFactory;
             _serviceProvider = provider;
             _packfileService = packfileService;
             _settingsService = settingsService;
             _uiCommandFactory = uiCommandFactory;
+            _touchedFilesRecorder = touchedFilesRecorder;
 
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
@@ -143,6 +153,11 @@ namespace AssetEditor.ViewModels
             GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
             GenerateFileListReportCommand = new RelayCommand(GenerateFileListReport);
             GenerateMetaDataJsonsReportCommand = new RelayCommand(GenerateMetaDataJsonsReport);
+
+            TouchedFileRecorderStartCommand = new RelayCommand(() => _touchedFilesRecorder.Start());
+            TouchedFileRecorderPrintCommand = new RelayCommand(() => _touchedFilesRecorder.Print());
+            TouchedFileRecorderExtractCommand = new RelayCommand(() => _touchedFilesRecorder.ExtractFilesToPack(@"c:\temp\extractedPack.pack"));
+            TouchedFileRecorderStopCommand = new RelayCommand(() => _touchedFilesRecorder.Stop());
 
             SearchCommand = new RelayCommand(Search);
 
@@ -226,10 +241,10 @@ namespace AssetEditor.ViewModels
             window.DataContext = _serviceProvider.GetRequiredService<SettingsViewModel>();
             window.ShowDialog();
         }
-
+        
         void CreatePackFile()
         {
-            TextInputWindow window = new TextInputWindow("New Packfile name", "");
+            var window = new TextInputWindow("New Packfile name", "");
             if (window.ShowDialog() == true)
             {
                 var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue, PackFileCAType.MOD);
