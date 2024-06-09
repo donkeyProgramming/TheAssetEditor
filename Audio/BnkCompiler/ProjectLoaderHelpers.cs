@@ -206,7 +206,7 @@ namespace Audio.BnkCompiler
         {
             var eventMixer = hircEvent.Mixer;
             var eventId = hircEvent.Event;
-            var mixerId = currentMixer.Name;
+            var mixerId = currentMixer.Id;
             var containerId = GetNextUsableWwiseId(UsableWwiseId);
 
             var soundsCount = hircEvent.Sounds.Count;
@@ -305,11 +305,12 @@ namespace Audio.BnkCompiler
 
         public static void AddMultipleSoundDialogueEvent(CompilerData compilerData, AkDecisionTree.Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
         {
-            var mixerId = currentMixer.Name;
+            var mixerId = currentMixer.Id;
             var containerId = GetNextUsableWwiseId(UsableWwiseId);
 
             var soundsCount = branch.Sounds.Count;
             var statePath = branch.StatePath;
+
             var currentSoundIndex = 0;
             var currentStateIndex = 0;
 

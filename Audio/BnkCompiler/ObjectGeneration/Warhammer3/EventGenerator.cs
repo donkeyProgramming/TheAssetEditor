@@ -30,9 +30,9 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return wwiseEvent;
         }
 
-        private static CAkEvent_v136.Action CreateActionFromInputEvent(string actionName, CompilerData project)
+        private static CAkEvent_v136.Action CreateActionFromInputEvent(uint actionId, CompilerData project)
         {
-            return new CAkEvent_v136.Action() { ActionId = project.GetHircItemIdFromName(actionName) };
+            return new CAkEvent_v136.Action() { ActionId = actionId };
         }
     }
 }

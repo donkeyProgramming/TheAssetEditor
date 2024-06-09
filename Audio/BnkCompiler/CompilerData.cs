@@ -29,7 +29,7 @@ namespace Audio.BnkCompiler
     public class RandomContainer : IAudioProjectHircItem
     {
         public List<uint> Children { get; set; }
-        public string DirectParentId { get; set; } = null;
+        public uint DirectParentId { get; set; } = 0;
     }
 
     public class Action : IAudioProjectHircItem
