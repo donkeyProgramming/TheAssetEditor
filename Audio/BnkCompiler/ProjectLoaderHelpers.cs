@@ -89,7 +89,6 @@ namespace Audio.BnkCompiler
                         AddMultipleSoundDialogueEvent(compilerData, rootNode, currentMixer, branch);
                 }
 
-                //Console.WriteLine($"======================= PRINTING CUSTOM DECISION TREE GRAPH PRE PROCESSING =======================");
                 //PrintNode(rootNode, 0);
 
                 var rootNodeDescendants = CountNodeDescendants(rootNode);
@@ -236,7 +235,7 @@ namespace Audio.BnkCompiler
                     Attenuation = GetAttenuationId(eventMixer)
                 };
 
-                // once the final sound is reached add everything else
+                // Once the final sound is reached add everything else
                 if (currentSound == soundsCount)
                 {
                     currentMixer.Children.Add(containerId);
@@ -298,59 +297,12 @@ namespace Audio.BnkCompiler
                     Attenuation = GetAttenuationId(dialogueEventBnk)
                 };
 
-                var statePathArray = statePath.Split('.');
-                var parentNode = rootNode;
-
-                foreach (var state in statePathArray)
-                {
-                    // record all states for adding to a dat file.
-                    if (!compilerData.StatesDat.Contains(state))
-                        compilerData.StatesDat.Add(state);
-
-                    currentStateIndex++;
-                    var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WwiseHash.Compute(state);
-
-                    var parentExists = false;
-                    AkDecisionTree.Node existingParentNode = null;
-
-                    if (currentStateIndex == 1)
-                    {
-                        // Check if the parent node already exists.
-                        foreach (var childNode in parentNode.Children)
-                        {
-                            if (childNode.Key == hashedState)
-                            {
-                                parentExists = true;
-                                existingParentNode = childNode;
-                                break;
-                            }
-                        }
-                    }
-
-                    // If the parent node exists, update parentNode.
-                    if (parentExists)
-                        parentNode = existingParentNode;
-
-                    else
-                    {
-                        // Create a new parent node and add it to the current parentNode's children.
-                        var newNode = new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
-                        {
-                            Key = hashedState,
-                            AudioNodeId = (currentStateIndex == statePathArray.Length) ? containerId : 0,
-                            Children_uIdx = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
-                            Children_uCount = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
-                            uWeight = 50,
-                            uProbability = 100
-                        });
-
-                        parentNode.Children.Add(newNode);
-                        parentNode = newNode;
-                    }
-                }
-
                 currentMixer.Children.Add(soundId);
                 compilerData.GameSounds.Add(defaultSound);
+
+                var statePathArray = statePath.Split('.');
+
+                ProcessStatePath(rootNode, statePathArray, compilerData, currentStateIndex, containerId);
             }
         }
 
@@ -386,7 +338,7 @@ namespace Audio.BnkCompiler
                 compilerData.GameSounds.Add(defaultSound);
                 sounds.Add(soundId);
 
-                // once the final sound is reached add everything else.
+                // Once the final sound is reached add everything else.
                 if (currentSoundIndex == soundsCount - 1)
                 {
                     var defaultRandomContainer = new RandomContainer()
@@ -400,55 +352,59 @@ namespace Audio.BnkCompiler
                     currentMixer.Children.Add(containerId);
 
                     var statePathArray = statePath.Split('.');
-                    var parentNode = rootNode;
 
-                    foreach (var state in statePathArray)
+                    ProcessStatePath(rootNode, statePathArray, compilerData, currentStateIndex, containerId);
+                }
+            }
+        }
+
+        private static void ProcessStatePath(AkDecisionTree.Node parentNode, string[] statePathArray, CompilerData compilerData, int currentStateIndex, uint containerId)
+        {
+            foreach (var state in statePathArray)
+            {
+                // Record all states for adding to a dat file.
+                if (!compilerData.StatesDat.Contains(state))
+                    compilerData.StatesDat.Add(state);
+
+                currentStateIndex++;
+                var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WwiseHash.Compute(state);
+
+                var parentExists = false;
+                AkDecisionTree.Node existingParentNode = null;
+
+                if (currentStateIndex == 1)
+                {
+                    // Check if the parent node already exists.
+                    foreach (var childNode in parentNode.Children)
                     {
-                        // record all states for adding to a dat file.
-                        if (!compilerData.StatesDat.Contains(state))
-                            compilerData.StatesDat.Add(state);
-
-                        currentStateIndex++;
-                        var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WwiseHash.Compute(state);
-
-                        var parentExists = false;
-                        AkDecisionTree.Node existingParentNode = null;
-
-                        if (currentStateIndex == 1)
+                        if (childNode.Key == hashedState)
                         {
-                            // Check if the parent node already exists.
-                            foreach (var childNode in parentNode.Children)
-                            {
-                                if (childNode.Key == hashedState)
-                                {
-                                    parentExists = true;
-                                    existingParentNode = childNode;
-                                    break;
-                                }
-                            }
-                        }
-
-                        // If the parent node exists, update parentNode.
-                        if (parentExists)
-                            parentNode = existingParentNode;
-
-                        else
-                        {
-                            // Create a new parent node and add it to the current parentNode's children.
-                            var newNode = new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
-                            {
-                                Key = hashedState,
-                                AudioNodeId = (currentStateIndex == statePathArray.Length) ? containerId : 0,
-                                Children_uIdx = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
-                                Children_uCount = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
-                                uWeight = 50,
-                                uProbability = 100
-                            });
-
-                            parentNode.Children.Add(newNode);
-                            parentNode = newNode;
+                            parentExists = true;
+                            existingParentNode = childNode;
+                            break;
                         }
                     }
+                }
+
+                // If the parent node exists, update parentNode.
+                if (parentExists)
+                    parentNode = existingParentNode;
+
+                else
+                {
+                    // Create a new parent node and add it to the current parentNode's children.
+                    var newNode = new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
+                    {
+                        Key = hashedState,
+                        AudioNodeId = (currentStateIndex == statePathArray.Length) ? containerId : 0,
+                        Children_uIdx = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
+                        Children_uCount = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
+                        uWeight = 50,
+                        uProbability = 100
+                    });
+
+                    parentNode.Children.Add(newNode);
+                    parentNode = newNode;
                 }
             }
         }
@@ -480,6 +436,7 @@ namespace Audio.BnkCompiler
                 return;
 
             var indentation = new string(' ', depth * 4);
+            Console.WriteLine($"======================= PRINTING CUSTOM DECISION TREE GRAPH =======================");
             Console.WriteLine($"{indentation}Key: {node.Key}");
             Console.WriteLine($"{indentation}AudioNodeId: {node.AudioNodeId}");
             Console.WriteLine($"{indentation}Children_uIdx: {node.Children_uIdx}");
