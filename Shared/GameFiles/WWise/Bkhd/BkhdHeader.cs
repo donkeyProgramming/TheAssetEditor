@@ -7,8 +7,8 @@
         public BnkChunkHeader ChunkHeader { get; set; } = new BnkChunkHeader() { Tag = "BKHD", ChunkSize = 0x18 };
 
         public uint dwBankGeneratorVersion { get; set; }
-        public uint dwSoundBankID { get; set; }     // Name of the file
-        public uint dwLanguageID { get; set; }      // Enum 11 - English
+        public uint dwSoundBankId { get; set; }     // Name of the file
+        public uint dwLanguageId { get; set; }      // Enum 11 - English
         public uint bFeedbackInBank { get; set; }
         public uint dwProjectID { get; set; }
         public byte[] padding { get; set; }

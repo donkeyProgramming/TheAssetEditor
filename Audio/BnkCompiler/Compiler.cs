@@ -39,7 +39,7 @@ namespace Audio.BnkCompiler
             var audioRepository = new AudioRepository(_provider, false);
 
             // Build the wwise object graph. 
-            var header = _headerBuilder.Generate(audioProject);
+            var header = BnkHeaderBuilder.Generate(audioProject);
             var hircChunk = _hircBuilder.Generate(audioProject);
 
             // Ensure all write ids are not causing conflicts.

@@ -17,7 +17,7 @@ namespace Audio.BnkCompiler
     {
         private readonly PackFileService _pfs;
         public static readonly Dictionary<string, string> EventToMixers = new Dictionary<string, string>();
-        public static readonly IVanillaObjectIds VanillaObjectIds = new IdProvider();
+        public static readonly IVanillaObjectIds VanillaObjectIds = new WwiseIdProvider();
 
         public ProjectLoader(PackFileService pfs)
         {
