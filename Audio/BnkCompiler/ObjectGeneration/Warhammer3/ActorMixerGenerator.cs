@@ -9,7 +9,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class ActorMixerGenerator : IWWiseHircGenerator
     {
-        public string GameName => CompilerConstants.Game_Warhammer3;
+        public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(ActorMixer);
 
         public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
@@ -21,13 +21,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
         public CAkActorMixer_v136 ConvertToWWise(ActorMixer actorMixer, CompilerData project)
         {
-            var allActorChildren = actorMixer.ActorMixerChildren.ToList();
-            var allSoundsChildren = actorMixer.Children.ToList();
-            var allChildren = allActorChildren.Concat(allSoundsChildren);
-            var allChildIds = allChildren
-                .Select(x => project.GetHircItemIdFromName(x))
-                .OrderBy(x => x)
-                .ToList();
+            var allChildIds = actorMixer.Children.ToList();
 
             var wwiseActorMixer = new CAkActorMixer_v136();
             wwiseActorMixer.Id = project.GetHircItemIdFromName(actorMixer.Name);
@@ -41,6 +35,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             };
 
             wwiseActorMixer.UpdateSize();
+
             return wwiseActorMixer;
         }
     }

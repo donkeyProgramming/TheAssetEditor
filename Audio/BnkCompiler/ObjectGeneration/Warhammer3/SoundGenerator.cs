@@ -12,7 +12,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class SoundGenerator : IWWiseHircGenerator
     {
-        public string GameName => CompilerConstants.Game_Warhammer3;
+        public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(GameSound);
 
         private readonly PackFileService _pfs;
@@ -38,7 +38,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
             var wwiseSound = new CAkSound_v136()
             {
-                Id = project.GetHircItemIdFromName(inputSound.Name),
+                Id = inputSound.Id,
                 Type = HircType.Sound,
                 AkBankSourceData = new AkBankSourceData()
                 {
@@ -54,10 +54,11 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 NodeBaseParams = nodeBaseParams
             };
 
-            wwiseSound.NodeBaseParams.DirectParentId = project.GetHircItemIdFromName(inputSound.DirectParentId);
+            wwiseSound.NodeBaseParams.DirectParentId = inputSound.DirectParentId;
 
             // Applying attenuation directly to sounds is necessary as they don't appear to use the vanilla mixer's attenuation even though they're being routed through it.
             var attenuationId = inputSound.Attenuation;
+
             if (attenuationId != 0)
             {
                 wwiseSound.NodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle()
@@ -70,6 +71,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             }
 
             wwiseSound.UpdateSize();
+
             return wwiseSound;
         }
 

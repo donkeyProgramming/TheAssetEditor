@@ -66,6 +66,7 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 
     internal static class CompilerConstants
     {
-        public static readonly string Game_Warhammer3 = "Warhammer3";
+        public static readonly string GameWarhammer3 = "Warhammer3";
+        public static readonly string ActionType = "Play";
     }
 }

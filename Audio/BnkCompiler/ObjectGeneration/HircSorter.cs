@@ -24,7 +24,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
                 children.Reverse();
 
                 foreach (var childName in children)
-                    Console.WriteLine($"########################## {childName} = {WWiseHash.Compute(childName)}");
+                    Console.WriteLine($"########################## {childName} = {WwiseHash.Compute(childName)}");
 
                 // Create a list to store children
                 var mixerChildren = new List<IAudioProjectHircItem>();
@@ -68,7 +68,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
                             }
 
                             // Sort container children by key
-                            var sortedContainerChildren = containerChildren.OrderBy(child => WWiseHash.Compute(child.Name)).ToList();
+                            var sortedContainerChildren = containerChildren.OrderBy(child => WwiseHash.Compute(child.Name)).ToList();
 
                             // Add container children to sortedProjectItems
                             foreach (var containerChild in sortedContainerChildren)
@@ -141,7 +141,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
         }
 
 
-        uint GetSortingId(IAudioProjectHircItem item) => WWiseHash.Compute(item.Name);
+        uint GetSortingId(IAudioProjectHircItem item) => WwiseHash.Compute(item.Name);
 
         List<ActorMixer> SortActorMixerList(CompilerData project)
         {

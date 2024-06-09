@@ -9,6 +9,7 @@ namespace Audio.BnkCompiler
         {
             public string BnkName { get; set; }
             public string Language { get; set; }
+            public uint WwiseStartId { get; set; }
         }
 
         public class ProjectDecisionTree

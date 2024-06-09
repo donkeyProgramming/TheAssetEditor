@@ -56,7 +56,7 @@ namespace Audio.Utility
         //public byte[] CopyHircToOwnBnk(ByteChunk wholeBnkChunk, uint hircId, string outputBnkNameWithoutExtention)
         //{
         //    var header = BkhdParser.Create(wholeBnkChunk);
-        //    header.dwSoundBankId = WWiseHash.Compute(outputBnkNameWithoutExtention);
+        //    header.dwSoundBankId = WwiseHash.Compute(outputBnkNameWithoutExtention);
         //
         //    wholeBnkChunk.Index = 0;
         //    var hirc = FindHirc(wholeBnkChunk, hircId);

@@ -1,5 +1,6 @@
 ﻿using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Audio.Utility;
+using Shared.Core.PackFiles;
 using Shared.GameFormats.WWise.Hirc.Shared;
 using SharpDX.XAudio2;
 using System;
@@ -11,21 +12,23 @@ namespace Audio.BnkCompiler
 {
     public class ProjectLoaderHelpers
     {
+        public static uint UsableWwiseId { get; set; }
+
         public static void AddEvents(List<ActorMixer> mixers, CompilerInputProject input, CompilerData compilerData)
         {
-            // Add mixers to compilerData first so they can be individually referenced later
+            // Add mixers to compilerData first so they can be individually referenced later.
             AddEventMixers(mixers, input, compilerData);
 
-            // Add events and their associated actions, containers, and sounds
+            // Add events and their associated actions, containers, and sounds.
             foreach (var hircEvent in input.Events)
             {
-                var eventId = hircEvent.Event;
-                var mixerId = EventToMixers[eventId];
+                var eventId = WwiseHash.Compute(hircEvent.Event);
+                var mixerId = EventMixers[eventId];
                 var soundsCount = hircEvent.Sounds.Count;
                 var currentMixer = new ActorMixer();
 
                 foreach (var mixerItem in mixers)
-                    if (mixerItem.Name == mixerId)
+                    if (mixerItem.Id == mixerId)
                     {
                         currentMixer = mixerItem;
                         break;
@@ -41,14 +44,16 @@ namespace Audio.BnkCompiler
 
         public static void AddDialogueEvents(List<ActorMixer> mixers, CompilerInputProject input, CompilerData compilerData)
         {
-            // Add mixers to compilerData first so they can be individually referenced later
+            UsableWwiseId = input.Settings.WwiseStartId;
+
+            // Add mixers to compilerData first so they can be individually referenced later.
             AddDialogueEventMixers(mixers, input, compilerData);
 
-            // Add dialogue_events and their associated nodes, containers, and sounds
+            // Add Dialogue Events and their associated nodes, containers, and sounds.
             foreach (var hircDialogueEvent in input.DialogueEvents)
             {
-                var eventId = hircDialogueEvent.DialogueEvent;
-                var mixerId = EventToMixers[eventId];
+                var eventId = WwiseHash.Compute(hircDialogueEvent.DialogueEvent);
+                var mixerId = EventMixers[eventId];
                 var currentMixer = new ActorMixer();
                 var dialogueEvent = new DialogueEvent();
 
@@ -59,15 +64,15 @@ namespace Audio.BnkCompiler
                     AudioNodeId = 0, // Set to 0 if if this property is unused, set to 1 if it's used.
                     Children_uIdx = 1, // Set to 0 if this property is unused, set to 1 if it's used. This value is updated later.
                     Children_uCount = 1, // Set to 0 if this property is unused, set to 1 if it's used. This value is updated later.
-                    uWeight = 50, // Always 50 in WH3 Dialogue Events
-                    uProbability = 100 // Always 100 in WH3 Dialogue Events
+                    uWeight = 50, // Always 50 in WH3 Dialogue Events.
+                    uProbability = 100 // Always 100 in WH3 Dialogue Events.
                 });
 
                 dialogueEvent.Name = hircDialogueEvent.DialogueEvent;
                 dialogueEvent.RootNode = rootNode;
 
                 foreach (var mixerItem in mixers)
-                    if (mixerItem.Name == mixerId)
+                    if (mixerItem.Id == mixerId)
                     {
                         currentMixer = mixerItem;
                         break;
@@ -87,7 +92,7 @@ namespace Audio.BnkCompiler
                 //Console.WriteLine($"======================= PRINTING CUSTOM DECISION TREE GRAPH PRE PROCESSING =======================");
                 //PrintNode(rootNode, 0);
 
-                var rootNodeDescendants = ProjectLoaderHelpers.CountNodeDescendants(rootNode);
+                var rootNodeDescendants = CountNodeDescendants(rootNode);
                 dialogueEvent.NodesCount = (uint)(rootNodeDescendants + 1);
                 compilerData.DialogueEvents.Add(dialogueEvent);
             }
@@ -100,18 +105,23 @@ namespace Audio.BnkCompiler
             foreach (var hircEvent in input.Events)
             {
                 currentMixer++;
-                var eventId = hircEvent.Event;
+
+                var eventId = WwiseHash.Compute(hircEvent.Event);
+
+                var mixerName = $"{eventId}_mixer_{currentMixer}";
+                var mixerId = WwiseHash.Compute(mixerName);
+
                 var eventMixer = hircEvent.Mixer;
-                var mixerId = $"{eventId}_mixer_{currentMixer}";
                 var mixerParent = VanillaObjectIds.EventMixerIds[eventMixer.ToLower()];
 
-                if (!EventToMixers.ContainsKey(eventId))
+                if (!EventMixers.ContainsKey(eventId))
                 {
-                    EventToMixers.Add(eventId, mixerId);
+                    EventMixers.Add(eventId, mixerId);
 
                     var mixer = new ActorMixer()
                     {
-                        Name = mixerId,
+                        Name = mixerName,
+                        Id = mixerId,
                         DirectParentId = mixerParent
                     };
 
@@ -125,20 +135,22 @@ namespace Audio.BnkCompiler
         {
             foreach (var hircDialogueEvent in input.DialogueEvents)
             {
-                var eventId = hircDialogueEvent.DialogueEvent;
-                var mixerId = $"{GenerateRandomNumber()}_mixer_{GenerateRandomNumber()}";
-                var dialogueEventBnk = DialogueEventData.GetBnkFromDialogueEvent(eventId);
+                var eventName = hircDialogueEvent.DialogueEvent;
+                var eventId = WwiseHash.Compute(eventName);
+                var mixerId = GetNextUsableWwiseId(UsableWwiseId);
+
+                var dialogueEventBnk = DialogueEventData.GetBnkFromDialogueEvent(eventName);
                 var mixerParent = VanillaObjectIds.DialogueEventMixerIds[dialogueEventBnk];
 
-                if (!EventToMixers.ContainsKey(eventId))
+                if (!DialogueEventMixers.ContainsKey(eventId))
                 {
-                    EventToMixers.Add(eventId, mixerId);
+                    DialogueEventMixers.Add(eventId, mixerId);
 
                     var mixer = new ActorMixer()
                     {
-                        Name = mixerId,
+                        Id = mixerId,
                         DirectParentId = mixerParent,
-                        DialogueEvent = eventId
+                        DialogueEvent = eventName
                     };
 
                     mixers.Add(mixer);
@@ -151,27 +163,33 @@ namespace Audio.BnkCompiler
         {
             var eventMixer = hircEvent.Mixer;
             var eventId = hircEvent.Event;
-            var mixerId = currentMixer.Name;
+            var mixerId = currentMixer.Id;
 
             foreach (var sound in hircEvent.Sounds)
             {
-                var soundId = $"{eventId}_sound";
-                var actionId = $"{eventId}_action";
+                var soundName = $"{eventId}_sound";
+                var soundId = WwiseHash.Compute(soundName);
+
+                var actionName = $"{eventId}_action";
+                var actionId = WwiseHash.Compute(actionName);
+
+                currentMixer.Children.Add(soundId);
 
                 var defaultSound = new GameSound()
                 {
-                    Name = soundId,
+                    Name = soundName,
+                    Id = soundId,
                     Path = sound,
                     DirectParentId = mixerId,
-                    Attenuation = ProjectLoaderHelpers.GetAttenuationId(eventMixer)
+                    Attenuation = GetAttenuationId(eventMixer)
                 };
 
-                currentMixer.Children.Add(soundId);
                 compilerData.GameSounds.Add(defaultSound);
 
                 var defaultAction = new Action()
                 {
-                    Name = actionId,
+                    Name = actionName,
+                    Id = actionId,
                     Type = "Play",
                     ChildId = soundId
                 };
@@ -181,7 +199,7 @@ namespace Audio.BnkCompiler
                 var defaultEvent = new Event()
                 {
                     Name = eventId,
-                    Actions = new List<string>() { actionId }
+                    Actions = new List<uint>() { actionId }
                 };
 
                 compilerData.Events.Add(defaultEvent);
@@ -193,112 +211,111 @@ namespace Audio.BnkCompiler
             var eventMixer = hircEvent.Mixer;
             var eventId = hircEvent.Event;
             var mixerId = currentMixer.Name;
-
-            var containerId = $"{GenerateRandomNumber()}_random_container_{GenerateRandomNumber()}";
+            var containerId = GetNextUsableWwiseId(UsableWwiseId);
 
             var soundsCount = hircEvent.Sounds.Count;
             var currentSound = 0;
-
-            var sounds = new List<string>() { };
+            var sounds = new List<uint>() { };
 
             foreach (var sound in hircEvent.Sounds)
             {
                 currentSound++;
-                var soundId = $"{eventId}_sound_{currentSound}";
-                var actionId = $"{eventId}_action_{currentSound}";
+
+                var soundName = $"{eventId}_sound_{currentSound}";
+                var soundId = WwiseHash.Compute(soundName);
+
+                var actionName = $"{eventId}_action_{currentSound}";
+                var actionId = WwiseHash.Compute(actionName);
 
                 var defaultSound = new GameSound()
                 {
-                    Name = soundId,
+                    Name = soundName,
+                    Id = soundId,
                     Path = sound,
                     DirectParentId = containerId,
                     Attenuation = GetAttenuationId(eventMixer)
                 };
 
-                compilerData.GameSounds.Add(defaultSound);
-                sounds.Add(soundId);
-
                 // once the final sound is reached add everything else
                 if (currentSound == soundsCount)
                 {
+                    currentMixer.Children.Add(containerId);
+
                     var defaultAction = new Action()
                     {
-                        Name = actionId,
+                        Name = actionName,
+                        Id = actionId,
                         Type = "Play",
                         ChildId = containerId
                     };
 
-                    compilerData.Actions.Add(defaultAction);
-
                     var defaultRandomContainer = new RandomContainer()
                     {
-                        Name = containerId,
+                        Id = containerId,
                         Children = sounds,
                         DirectParentId = mixerId
                     };
 
-                    compilerData.RandomContainers.Add(defaultRandomContainer);
-                    currentMixer.Children.Add(containerId);
-
                     var defaultEvent = new Event()
                     {
                         Name = eventId,
-                        Actions = new List<string>() { actionId }
+                        Actions = new List<uint>() { actionId }
                     };
 
+                    compilerData.Actions.Add(defaultAction);
+                    compilerData.RandomContainers.Add(defaultRandomContainer);
                     compilerData.Events.Add(defaultEvent);
                 }
+
+                compilerData.GameSounds.Add(defaultSound);
+                sounds.Add(soundId);
             }
         }
 
         public static void AddSingleSoundDialogueEvent(CompilerData compilerData, AkDecisionTree.Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
         {
-            var mixerId = currentMixer.Name;
-            var containerId = $"{GenerateRandomNumber()}_random_container_{GenerateRandomNumber()}";
-            var hashedContainer = WWiseHash.Compute(containerId);
-
+            var mixerId = currentMixer.Id;
+            var containerId = GetNextUsableWwiseId(UsableWwiseId);
             var statePath = branch.StatePath;
+
             var currentSoundIndex = 0;
             var currentStateIndex = 0;
 
             foreach (var sound in branch.Sounds)
             {
                 currentSoundIndex++;
-                var soundId = $"{GenerateRandomNumber()}_sound_{GenerateRandomNumber()}";
 
+                var soundId = GetNextUsableWwiseId(UsableWwiseId);
                 var dialogueEvent = currentMixer.DialogueEvent;
                 var dialogueEventBnk = DialogueEventData.GetBnkFromDialogueEvent(dialogueEvent);
 
                 var defaultSound = new GameSound()
                 {
-                    Name = soundId,
+                    Id = soundId,
                     Path = sound,
                     DirectParentId = mixerId,
                     DialogueEvent = currentMixer.DialogueEvent,
                     Attenuation = GetAttenuationId(dialogueEventBnk)
                 };
 
-                compilerData.GameSounds.Add(defaultSound);
-                currentMixer.Children.Add(soundId);
-
                 var statePathArray = statePath.Split('.');
                 var parentNode = rootNode;
 
                 foreach (var state in statePathArray)
                 {
-                    // record all states for adding to a dat file
-                    if (!compilerData.DatStates.Contains(state))
-                        compilerData.DatStates.Add(state);
+                    // record all states for adding to a dat file.
+                    if (!compilerData.StatesDat.Contains(state))
+                        compilerData.StatesDat.Add(state);
 
                     currentStateIndex++;
-                    var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WWiseHash.Compute(state);
+                    var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WwiseHash.Compute(state);
 
                     var parentExists = false;
                     AkDecisionTree.Node existingParentNode = null;
 
                     if (currentStateIndex == 1)
                     {
-                        // Check if the parent node already exists
+                        // Check if the parent node already exists.
                         foreach (var childNode in parentNode.Children)
                         {
                             if (childNode.Key == hashedState)
@@ -310,17 +327,17 @@ namespace Audio.BnkCompiler
                         }
                     }
 
-                    // If the parent node exists, update parentNode
+                    // If the parent node exists, update parentNode.
                     if (parentExists)
                         parentNode = existingParentNode;
 
                     else
                     {
-                        // Create a new parent node and add it to the current parentNode's children
+                        // Create a new parent node and add it to the current parentNode's children.
                         var newNode = new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
                         {
                             Key = hashedState,
-                            AudioNodeId = (currentStateIndex == statePathArray.Length) ? hashedContainer : 0,
+                            AudioNodeId = (currentStateIndex == statePathArray.Length) ? containerId : 0,
                             Children_uIdx = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
                             Children_uCount = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
                             uWeight = 50,
@@ -331,33 +348,35 @@ namespace Audio.BnkCompiler
                         parentNode = newNode;
                     }
                 }
+
+                currentMixer.Children.Add(soundId);
+                compilerData.GameSounds.Add(defaultSound);
             }
         }
 
         public static void AddMultipleSoundDialogueEvent(CompilerData compilerData, AkDecisionTree.Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
         {
             var mixerId = currentMixer.Name;
-            var containerId = $"{GenerateRandomNumber()}_random_container_{GenerateRandomNumber()}";
-            var hashedContainer = WWiseHash.Compute(containerId);
+            var containerId = GetNextUsableWwiseId(UsableWwiseId);
 
             var soundsCount = branch.Sounds.Count;
             var statePath = branch.StatePath;
             var currentSoundIndex = 0;
             var currentStateIndex = 0;
 
-            var sounds = new List<string>() { };
+            var sounds = new List<uint>() { };
 
             foreach (var sound in branch.Sounds)
             {
                 currentSoundIndex++;
-                var soundId = $"{GenerateRandomNumber()}_sound_{GenerateRandomNumber()}";
+                var soundId = GetNextUsableWwiseId(UsableWwiseId);
 
                 var dialogueEvent = currentMixer.DialogueEvent;
                 var dialogueEventBnk = DialogueEventData.GetBnkFromDialogueEvent(dialogueEvent);
 
                 var defaultSound = new GameSound()
                 {
-                    Name = soundId,
+                    Id = soundId,
                     Path = sound,
                     DirectParentId = containerId,
                     DialogueEvent = currentMixer.DialogueEvent,
@@ -367,12 +386,12 @@ namespace Audio.BnkCompiler
                 compilerData.GameSounds.Add(defaultSound);
                 sounds.Add(soundId);
 
-                // once the final sound is reached add everything else
+                // once the final sound is reached add everything else.
                 if (currentSoundIndex == soundsCount - 1)
                 {
                     var defaultRandomContainer = new RandomContainer()
                     {
-                        Name = containerId,
+                        Id = containerId,
                         Children = sounds,
                         DirectParentId = mixerId
                     };
@@ -385,19 +404,19 @@ namespace Audio.BnkCompiler
 
                     foreach (var state in statePathArray)
                     {
-                        // record all states for adding to a dat file
-                        if (!compilerData.DatStates.Contains(state))
-                            compilerData.DatStates.Add(state);
+                        // record all states for adding to a dat file.
+                        if (!compilerData.StatesDat.Contains(state))
+                            compilerData.StatesDat.Add(state);
 
                         currentStateIndex++;
-                        var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WWiseHash.Compute(state);
+                        var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WwiseHash.Compute(state);
 
                         var parentExists = false;
                         AkDecisionTree.Node existingParentNode = null;
 
                         if (currentStateIndex == 1)
                         {
-                            // Check if the parent node already exists
+                            // Check if the parent node already exists.
                             foreach (var childNode in parentNode.Children)
                             {
                                 if (childNode.Key == hashedState)
@@ -409,17 +428,17 @@ namespace Audio.BnkCompiler
                             }
                         }
 
-                        // If the parent node exists, update parentNode
+                        // If the parent node exists, update parentNode.
                         if (parentExists)
                             parentNode = existingParentNode;
 
                         else
                         {
-                            // Create a new parent node and add it to the current parentNode's children
+                            // Create a new parent node and add it to the current parentNode's children.
                             var newNode = new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
                             {
                                 Key = hashedState,
-                                AudioNodeId = (currentStateIndex == statePathArray.Length) ? hashedContainer : 0,
+                                AudioNodeId = (currentStateIndex == statePathArray.Length) ? containerId : 0,
                                 Children_uIdx = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
                                 Children_uCount = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
                                 uWeight = 50,
@@ -472,13 +491,12 @@ namespace Audio.BnkCompiler
                 PrintNode(childNode, depth + 1);
         }
 
-        public static int GenerateRandomNumber()
+        public static uint GetNextUsableWwiseId(uint wwiseStartId)
         {
-            var rand = new Random();
-            var min = 10000000;
-            var max = 99999999;
+            wwiseStartId++;
+            // validate the Id to check it's not already in use
 
-            return rand.Next(min, max + 1);
+            return wwiseStartId;
         }
     }
 }

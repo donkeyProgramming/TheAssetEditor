@@ -9,7 +9,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class ActionGenerator : IWWiseHircGenerator
     {
-        public string GameName => CompilerConstants.Game_Warhammer3;
+        public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(Action);
 
         public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
@@ -22,13 +22,14 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public CAkAction_v136 ConvertToWWise(Action inputAction, string bnkName, CompilerData project)
         {
             var wwiseAction = new CAkAction_v136();
-            wwiseAction.Id = project.GetHircItemIdFromName(inputAction.Name);
+            wwiseAction.Id = inputAction.Id;
             wwiseAction.Type = HircType.Action;
             wwiseAction.ActionType = ActionType.Play;
-            wwiseAction.idExt = project.GetHircItemIdFromName(inputAction.ChildId);
+            wwiseAction.idExt = inputAction.ChildId;
             wwiseAction.AkPlayActionParams.byBitVector = 0x04;
-            wwiseAction.AkPlayActionParams.bankId = WWiseHash.Compute(bnkName);
+            wwiseAction.AkPlayActionParams.bankId = WwiseHash.Compute(bnkName);
             wwiseAction.UpdateSize();
+
             return wwiseAction;
         }
     }

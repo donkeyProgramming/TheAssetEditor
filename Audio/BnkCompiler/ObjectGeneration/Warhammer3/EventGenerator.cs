@@ -9,7 +9,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class EventGenerator : IWWiseHircGenerator
     {
-        public string GameName => CompilerConstants.Game_Warhammer3;
+        public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(Event);
 
         public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)

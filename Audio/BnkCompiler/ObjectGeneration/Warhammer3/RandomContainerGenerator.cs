@@ -10,7 +10,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class RandomContainerGenerator : IWWiseHircGenerator
     {
-        public string GameName => CompilerConstants.Game_Warhammer3;
+        public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(RandomContainer);
 
         public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
@@ -29,7 +29,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseRandomContainer.byBitVector = 0x12;
             wwiseRandomContainer.fTransitionTime = 1000;
 
-            var mixer = project.GetActorMixerForObject(inputContainer.Name);
+            var mixer = project.GetActorMixerForObject(inputContainer.Id;
             if (mixer != null)
                 wwiseRandomContainer.NodeBaseParams.DirectParentId = project.GetHircItemIdFromName(inputContainer.DirectParentId);
 

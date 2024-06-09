@@ -16,7 +16,8 @@ namespace Audio.BnkCompiler
     public class ProjectLoader
     {
         private readonly PackFileService _pfs;
-        public static readonly Dictionary<string, string> EventToMixers = new Dictionary<string, string>();
+        public static readonly Dictionary<uint, uint> EventMixers = new Dictionary<uint, uint>();
+        public static readonly Dictionary<uint, uint> DialogueEventMixers = new Dictionary<uint, uint>();
         public static readonly IVanillaObjectIds VanillaObjectIds = new WwiseIdProvider();
 
         public ProjectLoader(PackFileService pfs)
@@ -127,6 +128,7 @@ namespace Audio.BnkCompiler
             compilerData.ProjectSettings.Version = 1;
             compilerData.ProjectSettings.BnkName = input.Settings.BnkName;
             compilerData.ProjectSettings.Language = input.Settings.Language;
+            compilerData.ProjectSettings.WwiseStartId = input.Settings.WwiseStartId;
 
             var mixers = new List<ActorMixer>() { };
 
@@ -137,7 +139,6 @@ namespace Audio.BnkCompiler
                 AddDialogueEvents(mixers, input, compilerData);
 
             compilerData.StoreWwiseObjects();
-            compilerData.ProcessHircIds();
 
             return compilerData;
         }

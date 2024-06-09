@@ -102,7 +102,7 @@ namespace Audio.BnkCompiler
             var outputName = $"states_data__{projectFile.ProjectSettings.BnkName}.dat";
             var datFile = new SoundDatFile();
 
-            foreach (var state in projectFile.DatStates)
+            foreach (var state in projectFile.StatesDat)
                 datFile.Event0.Add(new SoundDatFile.EventWithValue() { EventName = state, Value = 400 });
 
             var bytes = DatFileParser.GetAsByteArray(datFile);
