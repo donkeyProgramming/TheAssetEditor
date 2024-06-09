@@ -71,7 +71,7 @@ namespace Audio.BnkCompiler.Validation
                 });
         }
 
-        private bool ValidateActionReference(string actionId, List<IAudioProjectHircItem> allItems) => allItems.Any(x => x.Name == actionId && x is Action);   // Can only point to actions! 
+        private bool ValidateActionReference(uint actionId, List<IAudioProjectHircItem> allItems) => allItems.Any(x => x.Id == actionId && x is Action);   // Can only point to actions! 
     }
 
     public class ActionValidator : AbstractValidator<Action>

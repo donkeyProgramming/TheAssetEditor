@@ -23,20 +23,17 @@ namespace Audio.BnkCompiler.ObjectGeneration
                 var children = mixer.Children.ToList();
                 children.Reverse();
 
-                foreach (var childName in children)
-                    Console.WriteLine($"########################## {childName} = {WwiseHash.Compute(childName)}");
-
                 // Create a list to store children
                 var mixerChildren = new List<IAudioProjectHircItem>();
 
                 // Iterate over the mixer children
-                foreach (var childName in children)
+                foreach (var child in children)
                 {
                     // Find game sounds with the child name
                     IAudioProjectHircItem gameSound = null;
                     foreach (var sound in project.GameSounds)
                     {
-                        if (sound.Name == childName)
+                        if (sound.Id == child)
                         {
                             gameSound = sound;
                             break;
@@ -45,7 +42,6 @@ namespace Audio.BnkCompiler.ObjectGeneration
 
                     if (gameSound != null)
                     {
-                        Console.WriteLine($"Collected Game Sound \"{gameSound.Name}\"");
                         mixerChildren.Add(gameSound);
                         continue; // Move to the next child
                     }
@@ -53,14 +49,14 @@ namespace Audio.BnkCompiler.ObjectGeneration
                     // Find random containers with the child name
                     foreach (var container in project.RandomContainers)
                     {
-                        if (container.Name == childName && !addedItems.Contains(container))
+                        if (container.Id == child && !addedItems.Contains(container))
                         {
                             // Collect children of the random container
                             var containerChildren = new List<IAudioProjectHircItem>();
 
-                            foreach (var containerChildName in container.Children)
+                            foreach (var containerchild in container.Children)
                             {
-                                var gameSoundChild = project.GameSounds.FirstOrDefault(sound => sound.Name == containerChildName);
+                                var gameSoundChild = project.GameSounds.FirstOrDefault(sound => sound.Id == containerchild);
                                 if (gameSoundChild != null && !addedItems.Contains(gameSoundChild))
                                 {
                                     containerChildren.Add(gameSoundChild);
@@ -75,13 +71,11 @@ namespace Audio.BnkCompiler.ObjectGeneration
                             {
                                 sortedProjectItems.Add(containerChild);
                                 addedItems.Add(containerChild);
-                                Console.WriteLine($"Collected Child \"{containerChild.Name}\" from Random Container \"{container.Name}\" to sortedProjectItems");
                             }
 
                             // Add the random container itself after its children
                             sortedProjectItems.Add(container);
                             addedItems.Add(container);
-                            Console.WriteLine($"Collected Random Container \"{container.Name}\" to sortedProjectItems");
                         }
                     }
                 }
@@ -93,7 +87,6 @@ namespace Audio.BnkCompiler.ObjectGeneration
                     {
                         sortedProjectItems.Add(child);
                         addedItems.Add(child);
-                        Console.WriteLine($"Added {child.GetType().Name} \"{child.Name}\" to sortedProjectItems");
                     }
                 }
 
@@ -107,11 +100,11 @@ namespace Audio.BnkCompiler.ObjectGeneration
             }
 
             // Add Events and actions
-            var sortedEvents = project.Events.OrderBy(x => GetSortingId(x)).ToList();
+            var sortedEvents = project.Events.OrderBy(x => x).ToList();
             foreach (var currentEvent in sortedEvents)
             {
-                var actions = currentEvent.Actions.Select(x => project.Actions.First(action => action.Name == x)).ToList();
-                var sortedActions = actions.OrderBy(x => GetSortingId(x)).ToList();
+                var actions = currentEvent.Actions.Select(x => project.Actions.First(action => action.Id == x)).ToList();
+                var sortedActions = actions.OrderBy(x => x).ToList();
 
                 sortedProjectItems.AddRange(sortedActions);
 
@@ -125,7 +118,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
             }
 
             // Add Dialogue Events
-            var sortedDialogueEvents = project.DialogueEvents.OrderBy(x => GetSortingId(x)).ToList();
+            var sortedDialogueEvents = project.DialogueEvents.OrderBy(x => x).ToList();
             foreach (var currentDialogueEvent in sortedDialogueEvents)
             {
                 // Add current event
@@ -140,9 +133,6 @@ namespace Audio.BnkCompiler.ObjectGeneration
             return sortedProjectItems;
         }
 
-
-        uint GetSortingId(IAudioProjectHircItem item) => WwiseHash.Compute(item.Name);
-
         List<ActorMixer> SortActorMixerList(CompilerData project)
         {
             List<ActorMixer> output = new List<ActorMixer>();
@@ -155,7 +145,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
 
             foreach (var mixer in roots)
             {
-                var children = mixer.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Name == childId)).ToList();
+                var children = mixer.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Id == childId)).ToList();
                 output.Add(mixer);
                 Console.WriteLine($"Added root mixer: {mixer.Name}");
 
@@ -169,12 +159,12 @@ namespace Audio.BnkCompiler.ObjectGeneration
 
         void ProcessChildren(List<ActorMixer> children, List<ActorMixer> outputList, CompilerData project)
         {
-            var sortedChildren = children.OrderByDescending(x => GetSortingId(x)).ToList();
+            var sortedChildren = children.OrderByDescending(x => x).ToList();
 
             outputList.AddRange(sortedChildren);
             foreach (var child in sortedChildren)
             {
-                var childOfChildren = child.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Name == childId)).ToList();
+                var childOfChildren = child.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Id == childId)).ToList();
                 ProcessChildren(childOfChildren, outputList, project);
             }
         }
@@ -188,7 +178,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
 
                 bool isReferenced = mixers
                     .Where(x => x != currentMixer)
-                    .Any(x => x.ActorMixerChildren.Contains(currentMixer.Name));
+                    .Any(x => x.ActorMixerChildren.Contains(currentMixer.Id));
                 if (isReferenced)
                     return true;
             }

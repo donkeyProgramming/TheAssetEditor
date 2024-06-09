@@ -43,9 +43,9 @@ namespace AudioResearch
             var compiler = application.GetService<CompilerService>();
             var compilerSettings = new CompilerSettings()
             {
-                UserOverrideIdForActions = useActionIdFromBnk,
-                UseOverrideIdForSounds = useSoundIdFromBnk,
-                UseOverrideIdForMixers = useMixerIdFromBnk,
+                UserIdForActions = useActionIdFromBnk,
+                UseIdForSounds = useSoundIdFromBnk,
+                UseIdForMixers = useMixerIdFromBnk,
                 ConvertResultToXml = true,
                 FileExportPath = "D:\\Research\\Audio\\CustomBnks",
             };
