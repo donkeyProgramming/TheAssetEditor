@@ -62,7 +62,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.Shared.DevConfig", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameWorld.WpfWindow", "GameWorld\Monogame.WpfInterop\GameWorld.WpfWindow.csproj", "{DA0742FD-2538-41B9-84BB-81F93B030072}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editors.AudioEditor", "Editors.AudioEditor\Editors.AudioEditor.csproj", "{BF81404F-4CFB-4BF6-92B1-B2990DFFE9D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.AudioEditor", "Editors.AudioEditor\Editors.AudioEditor.csproj", "{BF81404F-4CFB-4BF6-92B1-B2990DFFE9D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -150,6 +150,10 @@ Global
 		{DA0742FD-2538-41B9-84BB-81F93B030072}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA0742FD-2538-41B9-84BB-81F93B030072}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA0742FD-2538-41B9-84BB-81F93B030072}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF81404F-4CFB-4BF6-92B1-B2990DFFE9D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF81404F-4CFB-4BF6-92B1-B2990DFFE9D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF81404F-4CFB-4BF6-92B1-B2990DFFE9D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF81404F-4CFB-4BF6-92B1-B2990DFFE9D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
