@@ -1,11 +1,8 @@
 ﻿using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Audio.Utility;
-using Shared.Core.PackFiles;
 using Shared.GameFormats.WWise.Hirc.Shared;
-using SharpDX.XAudio2;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using static Audio.BnkCompiler.ProjectLoader;
 
 namespace Audio.BnkCompiler
@@ -189,7 +186,7 @@ namespace Audio.BnkCompiler
                 {
                     Name = actionName,
                     Id = actionId,
-                    Type = "Play",
+                    Type = CompilerConstants.ActionType,
                     ChildId = soundId
                 };
 
@@ -244,7 +241,7 @@ namespace Audio.BnkCompiler
                     {
                         Name = actionName,
                         Id = actionId,
-                        Type = "Play",
+                        Type = CompilerConstants.ActionType,
                         ChildId = containerId
                     };
 
