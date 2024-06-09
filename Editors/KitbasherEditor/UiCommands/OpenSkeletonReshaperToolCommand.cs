@@ -47,6 +47,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
             var meshNodes = meshesToFit
                 .Where(x => x is Rmv2MeshNode)
                 .Select(x => x as Rmv2MeshNode)
+                .Cast<Rmv2MeshNode>()
                 .ToList();
 
             var allSkeltonNames = meshNodes

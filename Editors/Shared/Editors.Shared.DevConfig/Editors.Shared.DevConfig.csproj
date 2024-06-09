@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\AnimationEditor\AnimationEditor.csproj" />
+      <ProjectReference Include="..\..\..\Audio\Audio.csproj" />
+      <ProjectReference Include="..\..\..\Shared\EmbeddedResources\Shared.EmbeddedResources.csproj" />
+      <ProjectReference Include="..\..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
+      <ProjectReference Include="..\..\..\Shared\SharedCore\Shared.Core.csproj" />
+      <ProjectReference Include="..\..\..\Shared\SharedUI\Shared.Ui.csproj" />
+      <ProjectReference Include="..\..\SimpleAnimationEditors\Editors.AnimationContainers.csproj" />
+    </ItemGroup>
+
+</Project>

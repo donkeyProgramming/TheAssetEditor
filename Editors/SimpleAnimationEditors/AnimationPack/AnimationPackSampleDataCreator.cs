@@ -40,7 +40,7 @@ namespace CommonControls.Editors.AnimationPack
                 return null;
             }
 
-            var animPack = new AnimationPackFile();
+            var animPack = new AnimationPackFile("Placeholder");
             return SaveHelper.Save(pfs, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
         }
 
@@ -58,7 +58,7 @@ namespace CommonControls.Editors.AnimationPack
                 }
 
                 // Create dummy data
-                var animPack = new AnimationPackFile();
+                var animPack = new AnimationPackFile("Placeholder");
                 SaveHelper.Save(pfs, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
             }
         }

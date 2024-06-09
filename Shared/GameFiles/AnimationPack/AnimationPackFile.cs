@@ -2,7 +2,6 @@
 
 namespace Shared.GameFormats.AnimationPack
 {
-
     public interface IAnimationBinGenericFormat
     {
         public AnimationPackFile PackFileReference { get; }
@@ -36,10 +35,15 @@ namespace Shared.GameFormats.AnimationPack
 
     public class AnimationPackFile
     {
-        public string FileName { get; set; }
-        List<IAnimationPackFile> _files { get; set; } = new List<IAnimationPackFile>();
+        public string FileName { get; private set; }
+        private readonly List<IAnimationPackFile> _files = new();
 
         public IEnumerable<IAnimationPackFile> Files { get => _files; }
+
+        public AnimationPackFile(string fileName)
+        {
+            FileName = fileName;
+        }
 
         public void AddFile(IAnimationPackFile file)
         {
@@ -47,16 +51,7 @@ namespace Shared.GameFormats.AnimationPack
             _files.Add(file);
         }
 
-        /*public List<AnimationFragmentFile> GetAnimationSets(string skeletonName = null)
-        {
-            var sets = _files.Where(x => x is AnimationFragmentFile).Cast<AnimationFragmentFile>();
-            if(skeletonName != null)
-                sets = sets.Where(x => x.Skeletons.Values.Contains(skeletonName));
-
-            return sets.ToList();
-        }*/
-
-        public List<IAnimationBinGenericFormat> GetGenericAnimationSets(string skeletonName = null)
+        public List<IAnimationBinGenericFormat> GetGenericAnimationSets(string? skeletonName = null)
         {
             var sets = _files.Where(x => x is IAnimationBinGenericFormat).Cast<IAnimationBinGenericFormat>();
             if (skeletonName != null)

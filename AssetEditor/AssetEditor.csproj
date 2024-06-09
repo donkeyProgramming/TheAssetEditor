@@ -3,36 +3,16 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
-        <ApplicationIcon>hnet.com-image (1).ico</ApplicationIcon>
+        <ApplicationIcon>AssetEditorIcon.ico</ApplicationIcon>
         <AssemblyName>AssetEditor v0.45</AssemblyName>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <WarningsAsErrors />
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <WarningsAsErrors />
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <Optimize>false</Optimize>
-        <PlatformTarget>x64</PlatformTarget>
-        <SignAssembly>false</SignAssembly>
-        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <SignAssembly>true</SignAssembly>
-        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="CsvHelper" Version="27.0.3" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
-
     </ItemGroup>
 
     <ItemGroup>
@@ -41,11 +21,11 @@
         <ProjectReference Include="..\Audio\Audio.csproj" />
         <ProjectReference Include="..\Editors\KitbasherEditor\Editors.KitbasherEditor.csproj" />
         <ProjectReference Include="..\Editors\Reports\Editors.Reports.csproj" />
+        <ProjectReference Include="..\Editors\Shared\Editors.Shared.DevConfig\Editors.Shared.DevConfig.csproj" />
         <ProjectReference Include="..\Editors\TextureEditor\Editors.TextureEditor.csproj" />
-        <ProjectReference Include="..\Monogame.WpfInterop\Monogame.WpfInterop.csproj" />
+        <ProjectReference Include="..\GameWorld\View3D\View3D.csproj" />
         <ProjectReference Include="..\Shared\EmbeddedResources\Shared.EmbeddedResources.csproj" />
         <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
-        <ProjectReference Include="..\View3D\View3D.csproj" />
     </ItemGroup>
 
     <PropertyGroup>
@@ -55,10 +35,7 @@
         <Product>AssetEditor</Product>
         <PackageProjectUrl>https://github.com/donkeyProgramming/TheAssetEditor</PackageProjectUrl>
         <RepositoryUrl>https://github.com/donkeyProgramming/TheAssetEditor</RepositoryUrl>
-        <RepositoryType>GIT</RepositoryType>
-        <AssemblyVersion>0.45.0.0</AssemblyVersion>
-        <FileVersion>0.45.0.0</FileVersion>
-        <PackageId>AssetEditor v0.45</PackageId>
+        <PackageId>AssetEditor</PackageId>
         <AnalysisLevel>6.0</AnalysisLevel>
     </PropertyGroup>
 

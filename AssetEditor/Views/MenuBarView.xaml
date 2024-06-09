@@ -63,6 +63,13 @@
                 <MenuItem Header="Meta Jsons" Command="{Binding MenuBar.GenerateMetaDataJsonsReportCommand}"/>
                 <Separator/>
                 <MenuItem Header="Search" Command="{Binding MenuBar.SearchCommand}"/>
+                <Separator/>
+                <MenuItem Header="Touched Files">
+                    <MenuItem Header="Start Recorder" Command="{Binding MenuBar.TouchedFileRecorderStartCommand }"/>
+                    <MenuItem Header="Print Files" Command="{Binding MenuBar.TouchedFileRecorderPrintCommand }"/>
+                    <MenuItem Header="Extract to Pack" Command="{Binding MenuBar.TouchedFileRecorderExtractCommand }"/>
+                    <MenuItem Header="Stop Recorder" Command="{Binding MenuBar.TouchedFileRecorderStopCommand }"/>
+                </MenuItem>
             </MenuItem>
 
             <MenuItem Header="Options">

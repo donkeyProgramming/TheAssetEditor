@@ -12,6 +12,7 @@ namespace Editors.TextureEditor
         {
             serviceCollection.AddTransient<TexturePreviewView>();
             serviceCollection.AddTransient<TextureEditorViewModel>();
+            serviceCollection.AddTransient<TextureBuilder>();  
             serviceCollection.AddTransient<IEditorViewModel, TextureEditorViewModel>();
         }
 

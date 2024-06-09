@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows;
 using CommonControls.PackFileBrowser;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel.Types;
-using TextureEditor.ViewModels;
+using Shared.Ui.Events.UiCommands;
 using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
@@ -18,9 +15,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
     {
         public class TextureViewModel : NotifyPropertyChangedImpl, INotifyDataErrorInfo
         {
-            PackFileService _packfileService;
-            Rmv2MeshNode _meshNode;
-            EventHub _eventHub;
+            private readonly PackFileService _packfileService;
+            private readonly Rmv2MeshNode _meshNode;
+            private readonly IUiCommandFactory _uiCommandFactory;
+
             public TextureType TexureType { get; private set; }
 
             bool _useTexture = true;
@@ -48,10 +46,10 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             private readonly Dictionary<string, List<string>> _errorsByPropertyName = new Dictionary<string, List<string>>();
             private string _path = "";
 
-            public TextureViewModel(Rmv2MeshNode meshNode, PackFileService packfileService, TextureType texureType, EventHub eventHub)
+            public TextureViewModel(Rmv2MeshNode meshNode, TextureType texureType, PackFileService packfileService, IUiCommandFactory uiCommandFactory)
             {
                 _packfileService = packfileService;
-                _eventHub = eventHub;
+                _uiCommandFactory = uiCommandFactory;
                 _meshNode = meshNode;
                 TexureType = texureType;
                 TextureTypeStr = TexureType.ToString();
@@ -71,24 +69,26 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 UpdateTexturePath(path);
 
             }
-            public void Preview() => TexturePreviewController.CreateWindow(Path, _packfileService, _eventHub);
+            public void Preview()
+            {
+                _uiCommandFactory.Create<OpenFileInWindowedEditorCommand>().Execute(Path, 800, 900);
+            }
+
 
             public void Browse()
             {
-                using (var browser = new PackFileBrowserWindow(_packfileService))
+                using var browser = new PackFileBrowserWindow(_packfileService);
+                browser.ViewModel.Filter.SetExtentions(new List<string>() { ".dds", ".png", });
+                if (browser.ShowDialog() == true && browser.SelectedFile != null)
                 {
-                    browser.ViewModel.Filter.SetExtentions(new List<string>() { ".dds", ".png", });
-                    if (browser.ShowDialog() == true && browser.SelectedFile != null)
+                    try
                     {
-                        try
-                        {
-                            var path = _packfileService.GetFullPath(browser.SelectedFile);
-                            UpdateTexturePath(path);
-                        }
-                        catch
-                        {
-                            UpdatePreviewTexture(false);
-                        }
+                        var path = _packfileService.GetFullPath(browser.SelectedFile);
+                        UpdateTexturePath(path);
+                    }
+                    catch
+                    {
+                        UpdatePreviewTexture(false);
                     }
                 }
             }

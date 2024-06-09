@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Threading;
-using AssetEditor.DevelopmentConfiguration;
 using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
+using Editors.Shared.DevConfig.Base;
+using GameWorld.WpfWindow;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -13,9 +14,6 @@ using Shared.Core.Services;
 
 namespace AssetEditor
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         IServiceProvider _serviceProvider;
@@ -29,6 +27,10 @@ namespace AssetEditor
             _serviceProvider = new DependencyInjectionConfig().Build();
             _rootScope = _serviceProvider.CreateScope();
 
+            // Init 3d world
+            var gameWorld = _rootScope.ServiceProvider.GetRequiredService<WpfGame>();
+            gameWorld.ForceEnsureCreated();
+
             // Show the settings window if its the first time the tool is ran
             var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
@@ -40,12 +42,9 @@ namespace AssetEditor
                 settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
                 settingsService.Save();
             }
-
-            DevelopmentConfigurationManager devConfigManager = null;
-            if (settingsService.CurrentSettings.IsDeveloperRun)
-                devConfigManager = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
-
-            devConfigManager?.OverrideSettings();        
+            var devConfigManager = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
+            devConfigManager.Initialize(e);
+            devConfigManager.OverrideSettings();        
 
             // Load all packfiles
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
@@ -62,8 +61,8 @@ namespace AssetEditor
                 }
             }
 
-            devConfigManager?.CreateTestPackFiles();
-            devConfigManager?.OpenFileOnLoad();
+            devConfigManager.CreateTestPackFiles();
+            devConfigManager.OpenFileOnLoad();
 
             ShowMainWindow();
         }

@@ -1,28 +1,22 @@
-﻿using Shared.Core.ToolCreation;
-using Shared.Ui.Common;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Shared.Core.Services;
+using Shared.Core.ToolCreation;
+using Shared.Ui.Common;
 
 namespace AssetEditor.Views
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         Point _lastMouseDown;
-        IEditorViewModel draggedItem;
+        IEditorViewModel _draggedItem;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
-
-            Title = $"AssetEditor v{fvi.FileMajorPart}.{fvi.FileMinorPart}";
+            Title = $"AssetEditor v{VersionChecker.CurrentVersion} - Beta v2";
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)
@@ -39,7 +33,7 @@ namespace AssetEditor.Views
                     item.Focus();
                     item.Focusable = false;
 
-                    draggedItem = item.DataContext as IEditorViewModel;
+                    _draggedItem = item.DataContext as IEditorViewModel;
                 }
             }
             catch
@@ -58,7 +52,7 @@ namespace AssetEditor.Views
                     if ((Math.Abs(currentPosition.X - _lastMouseDown.X) > 10.0) ||
                         (Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0))
                     {
-                        if (draggedItem != null)
+                        if (_draggedItem != null)
                         {
                             DragDrop.DoDragDrop(EditorsTabControl, EditorsTabControl.SelectedValue, DragDropEffects.Move);
                         }
@@ -66,7 +60,7 @@ namespace AssetEditor.Views
                 }
                 else
                 {
-                    draggedItem = null;
+                    _draggedItem = null;
                 }
             }
             catch
@@ -84,16 +78,16 @@ namespace AssetEditor.Views
 
                 if (DataContext is IDropTarget<IEditorViewModel, bool> dropContainer)
                 {
-                    if (draggedItem == null)
+                    if (_draggedItem == null)
                         return;
 
                     var dropTargetNode = dropTargetItem?.DataContext as IEditorViewModel;
                     if (dropTargetNode == null)
                         return;
 
-                    if (dropContainer.AllowDrop(draggedItem, dropTargetNode, insertAfterTargetNode))
+                    if (dropContainer.AllowDrop(_draggedItem, dropTargetNode, insertAfterTargetNode))
                     {
-                        dropContainer.Drop(draggedItem, dropTargetNode, insertAfterTargetNode);
+                        dropContainer.Drop(_draggedItem, dropTargetNode, insertAfterTargetNode);
                         e.Effects = DragDropEffects.None;
                         e.Handled = true;
                     }

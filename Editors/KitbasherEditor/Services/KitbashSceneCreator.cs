@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Diagnostics.CodeAnalysis;
 using KitbasherEditor.ViewModels;
+using Monogame.WpfInterop.ResourceHandling;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -16,20 +17,20 @@ namespace KitbasherEditor.Services
     {
         private readonly ILogger _logger = Logging.Create<KitbashSceneCreator>();
 
-        private MainEditableNode MainNode { get; set; }
-        public ISceneNode ReferenceMeshNode { get; private set; }
+        private MainEditableNode? _mainNode;
+        [AllowNull]public ISceneNode ReferenceMeshNode { get; private set; }
 
         private readonly PackFileService _packFileService;
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly ComplexMeshLoader _complexMeshLoader;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibrary;
         private readonly SceneManager _sceneManager;
         private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
 
         public KitbashSceneCreator(
             KitbasherRootScene kitbasherRootScene,
             ComplexMeshLoader complexMeshLoader,
-            ResourceLibary resourceLibary,
+            ResourceLibrary resourceLibrary,
             SceneManager sceneManager,
             PackFileService packFileService,
             Rmv2ModelNodeLoader rmv2ModelNodeLoader)
@@ -37,15 +38,15 @@ namespace KitbasherEditor.Services
             _packFileService = packFileService;
             _kitbasherRootScene = kitbasherRootScene;
             _complexMeshLoader = complexMeshLoader;
-            _resourceLibary = resourceLibary;
+            _resourceLibrary = resourceLibrary;
             _sceneManager = sceneManager;
             _rmv2ModelNodeLoader = rmv2ModelNodeLoader;
         }
 
         public void Create()
         {
-            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(_resourceLibary, null) { IsLockable = false });
-            MainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(SpecialNodes.EditableModel, skeletonNode, _packFileService));
+            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(_resourceLibrary, null) { IsLockable = false });
+            _mainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(SpecialNodes.EditableModel, skeletonNode, _packFileService));
             ReferenceMeshNode = _sceneManager.RootNode.AddObject(new GroupNode(SpecialNodes.ReferenceMeshs) { IsEditable = false, IsLockable = false });
         }
 
@@ -54,7 +55,7 @@ namespace KitbasherEditor.Services
             var modelFullPath = _packFileService.GetFullPath(file);
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
-            _rmv2ModelNodeLoader.CreateModelNodesFromFile(MainNode, rmv, _kitbasherRootScene.Player, modelFullPath);
+            _rmv2ModelNodeLoader.CreateModelNodesFromFile(_mainNode, rmv, _kitbasherRootScene.Player, modelFullPath);
             _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
         }
 
@@ -62,6 +63,8 @@ namespace KitbasherEditor.Services
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
             var result = LoadModel(file);
+            if (result == null)
+                throw new Exception($"Unable to load model - {_packFileService.GetFullPath(file)}");
 
             var lodNodes = new List<Rmv2LodNode>();
             result.ForeachNodeRecursive((node) =>
@@ -71,7 +74,7 @@ namespace KitbasherEditor.Services
             });
 
             foreach (var node in lodNodes)
-                SceneNodeHelper.MakeNodeEditable(MainNode, node);
+                SceneNodeHelper.MakeNodeEditable(_mainNode, node);
         }
 
         public void LoadReference(PackFile file)
@@ -81,7 +84,7 @@ namespace KitbasherEditor.Services
             ReferenceMeshNode.AddObject(result);
         }
 
-        SceneNode LoadModel(PackFile file)
+        SceneNode? LoadModel(PackFile file)
         {
             var loadedNode = _complexMeshLoader.Load(file, _kitbasherRootScene.Player);
             if (loadedNode == null)
@@ -100,7 +103,7 @@ namespace KitbasherEditor.Services
                 {
                     if (_kitbasherRootScene.Skeleton != null)
                     {
-                        int boneIndex = _kitbasherRootScene.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
+                        var boneIndex = _kitbasherRootScene.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
                         mesh.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(_kitbasherRootScene, boneIndex);
                     }
                 }

@@ -8,6 +8,7 @@ namespace Shared.Core.Services
     public class VersionChecker
     {
         private static readonly string GitHubLink = @"https://github.com/donkeyProgramming/TheAssetEditor/releases/latest";
+        public static string CurrentVersion { get => "0.45"; }
 
         public static void CheckVersion()
         {
@@ -16,10 +17,6 @@ namespace Shared.Core.Services
 
             try
             {
-                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-
-                var currentVersion = "v" + fvi.FileMajorPart + "." + fvi.FileMinorPart;
                 var client = new GitHubClient(new ProductHeaderValue("AssetEditor_instance"));
 
                 client.Repository.Release.GetAll("donkeyProgramming", "TheAssetEditor").ContinueWith(
@@ -38,6 +35,8 @@ namespace Shared.Core.Services
 
                             var releases = task.Result;
                             var latest = releases.FirstOrDefault();
+                            var currentVersion = "v" + CurrentVersion;
+
                             if (!latest.TagName.Contains(currentVersion, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 ProcessMessage(latest, currentVersion);

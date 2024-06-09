@@ -55,7 +55,7 @@
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,10,0,0">
                         <StackPanel>
                             <Label HorizontalContentAlignment="Center" Width="40" >RGBA</Label>
-                            <CheckBox  IsChecked="{Binding ViewModel.FormatRgbaCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <RadioButton GroupName="RGBA"  IsChecked="{Binding ViewModel.FormatRgbaCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Image Source="{Binding Path=ViewModel.PreviewImage[0], UpdateSourceTrigger=PropertyChanged}" Width="{StaticResource LayerImageSize}" Height="{StaticResource LayerImageSize}" HorizontalAlignment="Right"/>
                     </StackPanel>
@@ -63,7 +63,7 @@
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                         <StackPanel>
                             <Label HorizontalContentAlignment="Center" Width="40">R</Label>
-                            <CheckBox  IsChecked="{Binding ViewModel.FormatRCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <RadioButton GroupName="RGBA"  IsChecked="{Binding ViewModel.FormatRCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </StackPanel>
                         <Image Source="{Binding Path=ViewModel.PreviewImage[1], UpdateSourceTrigger=PropertyChanged}" Width="{StaticResource LayerImageSize}" Height="{StaticResource LayerImageSize}" HorizontalAlignment="Right"/>
                     </StackPanel>
@@ -71,7 +71,7 @@
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                         <StackPanel>
                             <Label HorizontalContentAlignment="Center" Width="40">G</Label>
-                            <CheckBox IsChecked="{Binding ViewModel.FormatGCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <RadioButton GroupName="RGBA" IsChecked="{Binding ViewModel.FormatGCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </StackPanel>
                         <Image Source="{Binding Path=ViewModel.PreviewImage[2], UpdateSourceTrigger=PropertyChanged}" Width="{StaticResource LayerImageSize}" Height="{StaticResource LayerImageSize}" HorizontalAlignment="Right"/>
                     </StackPanel>
@@ -79,7 +79,7 @@
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                         <StackPanel>
                             <Label HorizontalContentAlignment="Center" Width="40">B</Label>
-                            <CheckBox IsChecked="{Binding ViewModel.FormatBCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <RadioButton GroupName="RGBA" IsChecked="{Binding ViewModel.FormatBCheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Image Source="{Binding Path=ViewModel.PreviewImage[3], UpdateSourceTrigger=PropertyChanged}" Width="{StaticResource LayerImageSize}" Height="{StaticResource LayerImageSize}" HorizontalAlignment="Right"/>
                     </StackPanel>
@@ -87,12 +87,10 @@
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                         <StackPanel>
                             <Label HorizontalContentAlignment="Center" Width="40" >A</Label>
-                            <CheckBox IsChecked="{Binding FormatACheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <RadioButton GroupName="RGBA" IsChecked="{Binding FormatACheckbox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Image Source="{Binding Path=ViewModel.PreviewImage[4], UpdateSourceTrigger=PropertyChanged}" Width="{StaticResource LayerImageSize}" Height="{StaticResource LayerImageSize}" HorizontalAlignment="Right"/>
                     </StackPanel>
-
-
                 </StackPanel>
             </GroupBox>
         </DockPanel>

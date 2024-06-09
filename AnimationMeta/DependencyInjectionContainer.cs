@@ -6,7 +6,7 @@ using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace AnimationMeta
+namespace Editors.AnimationMeta
 {
     public class DependencyInjectionContainer : DependencyContainer
     {
