@@ -11,8 +11,7 @@ namespace Audio.BnkCompiler
     public abstract class IAudioProjectHircItem
     {
         public string Name { get; set; }
-        public uint OverrideId { get; set; } = 0;
-        [JsonIgnore]
+        public uint Id { get; set; }
         public uint SerializationId { get; set; }
     }
 
@@ -66,7 +65,7 @@ namespace Audio.BnkCompiler
 
     public class CompilerData
     {
-        private List<IAudioProjectHircItem> _allProjectItems = new List<IAudioProjectHircItem>();
+        private List<IAudioProjectHircItem> _projectWwiseObjects = new List<IAudioProjectHircItem>();
 
         public ProjectSettings ProjectSettings { get; set; } = new ProjectSettings();
         public List<Event> Events { get; set; } = new List<Event>();
@@ -77,44 +76,31 @@ namespace Audio.BnkCompiler
         public List<DialogueEvent> DialogueEvents { get; set; } = new List<DialogueEvent>();
         public List<string> DatStates { get; set; } = new List<string>();
 
-        public void PreperForCompile(bool allowOverrideIdForActions, bool allowOverrideIdForMixers, bool allowOverrideIdForSounds)
+        public void StoreWwiseObjects()
         {
-            _allProjectItems.AddRange(Events);
-            _allProjectItems.AddRange(Actions);
-            _allProjectItems.AddRange(GameSounds);
-            _allProjectItems.AddRange(ActorMixers);
-            _allProjectItems.AddRange(RandomContainers);
-            _allProjectItems.AddRange(DialogueEvents);
+            _projectWwiseObjects.AddRange(Events);
+            _projectWwiseObjects.AddRange(Actions);
+            _projectWwiseObjects.AddRange(GameSounds);
+            _projectWwiseObjects.AddRange(ActorMixers);
+            _projectWwiseObjects.AddRange(RandomContainers);
+            _projectWwiseObjects.AddRange(DialogueEvents);
+        }
 
-            // Compute the write ids
-            Events.ForEach(x => Process(x, false, WWiseHash.Compute));
-            Actions.ForEach(x => Process(x, allowOverrideIdForActions, WWiseHash.Compute));
-            GameSounds.ForEach(x => Process(x, allowOverrideIdForSounds, WWiseHash.Compute));
-            ActorMixers.ForEach(x => Process(x, allowOverrideIdForMixers, WWiseHash.Compute));
-            RandomContainers.ForEach(x => Process(x, false, WWiseHash.Compute));
-            DialogueEvents.ForEach(x => Process(x, false, WWiseHash.Compute));
+        public void ProcessHircIds()
+        {
+            // Handle objects with a Name or Override Id and convert it into one common hirc Id property.
         }
 
         public uint GetHircItemIdFromName(string name)
         {
-            return _allProjectItems.First(x => x.Name == name).SerializationId;
+            return _projectWwiseObjects.First(x => x.Name == name).SerializationId;
         }
 
         public IAudioProjectHircItem GetActorMixerForObject(string objectName)
         {
-            var mixers = _allProjectItems.Where(x => x is ActorMixer).Cast<ActorMixer>().ToList();
+            var mixers = _projectWwiseObjects.Where(x => x is ActorMixer).Cast<ActorMixer>().ToList();
             var mixer = mixers.Where(x => x.Children.Contains(objectName)).ToList();
             return mixer.FirstOrDefault();
-        }
-
-        public uint ConvertStringToWWiseId(string id) => WWiseHash.Compute(id);
-
-        void Process(IAudioProjectHircItem item, bool allowUseOfOverrideID, Func<string, uint> hashFunc)
-        {
-            if (item.OverrideId != 0 && allowUseOfOverrideID)
-                item.SerializationId = item.OverrideId;
-            else
-                item.SerializationId = hashFunc(item.Name);
         }
     }
 }

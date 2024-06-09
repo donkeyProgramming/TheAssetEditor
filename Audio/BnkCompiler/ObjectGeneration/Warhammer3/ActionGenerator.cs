@@ -3,6 +3,7 @@ using System;
 using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc.V136;
+using Audio.Utility;
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -25,10 +26,8 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseAction.Type = HircType.Action;
             wwiseAction.ActionType = ActionType.Play;
             wwiseAction.idExt = project.GetHircItemIdFromName(inputAction.ChildId);
-
             wwiseAction.AkPlayActionParams.byBitVector = 0x04;
-            wwiseAction.AkPlayActionParams.bankId = project.ConvertStringToWWiseId(bnkName);
-
+            wwiseAction.AkPlayActionParams.bankId = WWiseHash.Compute(bnkName);
             wwiseAction.UpdateSize();
             return wwiseAction;
         }

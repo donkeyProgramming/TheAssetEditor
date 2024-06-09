@@ -61,8 +61,11 @@ namespace Audio.BnkCompiler
 
                 // Convert and validate to compiler input
                 var compilerData = ConvertInputToCompilerData(projectFile, settings);
+
                 SaveCompilerDataToPackFile(compilerData, settings, packfile);
+
                 var validateProjectResult = ValidateProjectFile(compilerData);
+
                 if (validateProjectResult.IsSuccess == false)
                     return Result<CompilerData>.FromError(validateProjectResult.LogItems);
 
@@ -133,8 +136,9 @@ namespace Audio.BnkCompiler
             if (input.DialogueEvents != null)
                 AddDialogueEvents(mixers, input, compilerData);
 
-            compilerData.PreperForCompile(settings.UserOverrideIdForActions, settings.UseOverrideIdForMixers, settings.UseOverrideIdForSounds);
-            
+            compilerData.StoreWwiseObjects();
+            compilerData.ProcessHircIds();
+
             return compilerData;
         }
     }
