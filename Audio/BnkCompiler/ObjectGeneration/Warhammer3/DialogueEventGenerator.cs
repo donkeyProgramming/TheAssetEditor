@@ -30,9 +30,9 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseDialogueEvent.Id = inputDialogueEvent.Id;
             wwiseDialogueEvent.Type = HircType.Dialogue_Event;
 
-            var ExtractedDialogueEvents = DialogueEventData.ExtractedDialogueEvents;
+            var extractedDialogueEvents = DialogueEventData.ExtractedDialogueEvents;
 
-            foreach (var stateGroup in ExtractedDialogueEvents[inputDialogueEvent.Name])
+            foreach (var stateGroup in extractedDialogueEvents[inputDialogueEvent.Name])
             {
                 var argument = new ArgumentList.Argument
                 {

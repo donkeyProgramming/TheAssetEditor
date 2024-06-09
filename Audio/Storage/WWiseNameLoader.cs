@@ -138,7 +138,6 @@ namespace Audio.Storage
                 return DatFileParser.Parse(datFile, false);
         }
 
-
         void AddNames(string[] names)
         {
             foreach (var name in names)
