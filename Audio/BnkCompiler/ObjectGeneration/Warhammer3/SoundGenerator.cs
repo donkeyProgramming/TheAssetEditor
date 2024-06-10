@@ -31,9 +31,10 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
         public CAkSound_v136 ConvertToWWise(GameSound inputSound, CompilerData project)
         {
-            var file = _pfs.FindFile(inputSound.Path);
+            var filePath = inputSound.FilePath;
+            var file = _pfs.FindFile(filePath);
             var nodeBaseParams = NodeBaseParams.CreateDefault();
-            var wavFile = Path.GetFileName(inputSound.Path);
+            var wavFile = Path.GetFileName(filePath);
             var wavFileName = wavFile.Replace(".wem", "");
 
             var wwiseSound = new CAkSound_v136()

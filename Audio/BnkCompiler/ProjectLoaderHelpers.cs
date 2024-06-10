@@ -3,6 +3,7 @@ using Audio.Utility;
 using Shared.GameFormats.WWise.Hirc.Shared;
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms.Design;
 using static Audio.BnkCompiler.ProjectLoader;
 
 namespace Audio.BnkCompiler
@@ -19,10 +20,14 @@ namespace Audio.BnkCompiler
             // Add events and their associated actions, containers, and sounds.
             foreach (var hircEvent in input.Events)
             {
-                var eventId = WwiseHash.Compute(hircEvent.Event);
+                var eventName = hircEvent.Event;
+                var eventId = WwiseHash.Compute(eventName);
                 var mixerId = EventMixers[eventId];
                 var soundsCount = hircEvent.Sounds.Count;
                 var currentMixer = new ActorMixer();
+
+                // Record all Events for adding to a dat file.
+                RecordDatData(compilerData.EventsDat, eventName);
 
                 foreach (var mixerItem in mixers)
                     if (mixerItem.Id == mixerId)
@@ -58,9 +63,9 @@ namespace Audio.BnkCompiler
                 var rootNode = new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
                 {
                     Key = 0, // If value is 0 it will be read and written as 0 as some keys can equal 0. In the case of the WH3 Dialogue Events the root node value always exists and is always 0.
-                    AudioNodeId = 0, // Set to 0 if if this property is unused, set to 1 if it's used.
-                    Children_uIdx = 1, // Set to 0 if this property is unused, set to 1 if it's used. This value is updated later.
-                    Children_uCount = 1, // Set to 0 if this property is unused, set to 1 if it's used. This value is updated later.
+                    AudioNodeId = 0, // The root node in WH3 Dialogue Events is always unused so the value is set to 0.
+                    Children_uIdx = 1, // This value is set to 1 to initialise the value. Its intended value is updated later.
+                    Children_uCount = 1, // This value is set to 1 to initialise the value. Its intended value is updated later.
                     uWeight = 50, // Always 50 in WH3 Dialogue Events.
                     uProbability = 100 // Always 100 in WH3 Dialogue Events.
                 });
@@ -116,7 +121,6 @@ namespace Audio.BnkCompiler
 
                     var mixer = new ActorMixer()
                     {
-                        Name = mixerName,
                         Id = mixerId,
                         DirectParentId = mixerParent
                     };
@@ -175,7 +179,7 @@ namespace Audio.BnkCompiler
                 {
                     Name = soundName,
                     Id = soundId,
-                    Path = sound,
+                    FilePath = sound,
                     DirectParentId = mixerId,
                     Attenuation = GetAttenuationId(eventMixer)
                 };
@@ -184,7 +188,6 @@ namespace Audio.BnkCompiler
 
                 var defaultAction = new Action()
                 {
-                    Name = actionName,
                     Id = actionId,
                     Type = CompilerConstants.ActionType,
                     ChildId = soundId
@@ -194,7 +197,6 @@ namespace Audio.BnkCompiler
 
                 var defaultEvent = new Event()
                 {
-                    Name = eventId,
                     Actions = new List<uint>() { actionId }
                 };
 
@@ -227,7 +229,7 @@ namespace Audio.BnkCompiler
                 {
                     Name = soundName,
                     Id = soundId,
-                    Path = sound,
+                    FilePath = sound,
                     DirectParentId = containerId,
                     Attenuation = GetAttenuationId(eventMixer)
                 };
@@ -239,7 +241,6 @@ namespace Audio.BnkCompiler
 
                     var defaultAction = new Action()
                     {
-                        Name = actionName,
                         Id = actionId,
                         Type = CompilerConstants.ActionType,
                         ChildId = containerId
@@ -254,7 +255,6 @@ namespace Audio.BnkCompiler
 
                     var defaultEvent = new Event()
                     {
-                        Name = eventId,
                         Actions = new List<uint>() { actionId }
                     };
 
@@ -272,7 +272,7 @@ namespace Audio.BnkCompiler
         {
             var mixerId = currentMixer.Id;
             var containerId = GetNextUsableWwiseId(UsableWwiseId);
-            var statePath = branch.StatePath;
+            var stateFilePath = branch.StatePath;
 
             var currentSoundIndex = 0;
             var currentStateIndex = 0;
@@ -288,7 +288,7 @@ namespace Audio.BnkCompiler
                 var defaultSound = new GameSound()
                 {
                     Id = soundId,
-                    Path = sound,
+                    FilePath = sound,
                     DirectParentId = mixerId,
                     DialogueEvent = currentMixer.DialogueEvent,
                     Attenuation = GetAttenuationId(dialogueEventBnk)
@@ -309,7 +309,7 @@ namespace Audio.BnkCompiler
             var containerId = GetNextUsableWwiseId(UsableWwiseId);
 
             var soundsCount = branch.Sounds.Count;
-            var statePath = branch.StatePath;
+            var stateFilePath = branch.StatePath;
 
             var currentSoundIndex = 0;
             var currentStateIndex = 0;
@@ -327,7 +327,7 @@ namespace Audio.BnkCompiler
                 var defaultSound = new GameSound()
                 {
                     Id = soundId,
-                    Path = sound,
+                    FilePath = sound,
                     DirectParentId = containerId,
                     DialogueEvent = currentMixer.DialogueEvent,
                     Attenuation = GetAttenuationId(dialogueEventBnk)
@@ -360,9 +360,8 @@ namespace Audio.BnkCompiler
         {
             foreach (var state in statePathArray)
             {
-                // Record all states for adding to a dat file.
-                if (!compilerData.StatesDat.Contains(state))
-                    compilerData.StatesDat.Add(state);
+                // Record all States for adding to a dat file.
+                RecordDatData(compilerData.StatesDat, state);
 
                 currentStateIndex++;
                 var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WwiseHash.Compute(state);
@@ -393,23 +392,35 @@ namespace Audio.BnkCompiler
                     // Create a new parent node and add it to the current parentNode's children.
                     var newNode = new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
                     {
-                        Key = hashedState,
-                        AudioNodeId = (currentStateIndex == statePathArray.Length) ? containerId : 0,
-                        Children_uIdx = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
-                        Children_uCount = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1),
-                        uWeight = 50,
-                        uProbability = 100
+                        Key = hashedState, // The hashed value of the State that is used in this node.
+                        AudioNodeId = (currentStateIndex == statePathArray.Length) ? containerId : 0, // If this is the last state in the path AudioNodeId is set to containerId, otherwise it's set to 0 which removes the property.
+                        Children_uIdx = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1), // If this is the last state in the path Children_uIdx is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
+                        Children_uCount = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1), // If this is the last state in the path Children_uCount is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
+                        uWeight = 50, // Always 50 in WH3 Dialogue Events.
+                        uProbability = 100 // Always 100 in WH3 Dialogue Events.
                     });
-
-                    parentNode.Children.Add(newNode);
-                    parentNode = newNode;
                 }
             }
         }
 
-        public static uint GetAttenuationId(string eventMixer)
+        public static void RecordDatData(List<string> datData, string value)
         {
-            var attenuationKey = $"{eventMixer}_attenuation";
+            if (!datData.Contains(value))
+                datData.Add(value);
+        }
+
+        public static uint GetNextUsableWwiseId(uint wwiseStartId)
+        {
+            wwiseStartId++;
+
+            throw new NotImplementedException("Todo"); // validate the Id to check it's not already in use.
+
+            return wwiseStartId;
+        }
+
+        public static uint GetAttenuationId(string attenuationKeyPrefix)
+        {
+            var attenuationKey = $"{attenuationKeyPrefix}_attenuation";
 
             if (VanillaObjectIds.AttenuationIds.ContainsKey(attenuationKey))
                 return VanillaObjectIds.AttenuationIds[attenuationKey];
@@ -444,14 +455,6 @@ namespace Audio.BnkCompiler
 
             foreach (var childNode in node.Children)
                 PrintNode(childNode, depth + 1);
-        }
-
-        public static uint GetNextUsableWwiseId(uint wwiseStartId)
-        {
-            wwiseStartId++;
-            // validate the Id to check it's not already in use
-
-            return wwiseStartId;
         }
     }
 }

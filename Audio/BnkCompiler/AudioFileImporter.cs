@@ -28,9 +28,9 @@ namespace Audio.BnkCompiler
 
             foreach (var gameSound in compilerData.GameSounds)
             {
-                var wavFile = Path.GetFileName(gameSound.Path);
+                var wavFile = Path.GetFileName(gameSound.SoundPath);
                 wavFiles.Add(wavFile);
-                wavFilePaths.Add(gameSound.Path);
+                wavFilePaths.Add(gameSound.SoundPath);
             }
 
             var wavToWem = new WWiseWavToWem();
@@ -48,13 +48,13 @@ namespace Audio.BnkCompiler
 
         private Result<bool> ImportFromDisk(CompilerData compilerData, GameSound gameSound)
         {
-            if (File.Exists(gameSound.Path) == false)
-                return Result<bool>.FromError("Audio converter", $"Importing from disk: Unable to find file '{gameSound.Path}' for item '{gameSound.Name}' on disk");
+            if (File.Exists(gameSound.SoundPath) == false)
+                return Result<bool>.FromError("Audio converter", $"Importing from disk: Unable to find file '{gameSound.SoundPath}' for item '{gameSound.Id}' on disk");
 
             // Convert file
             var tempFolderPath = $"{DirectoryHelper.Temp}";
             var audioFolderPath = $"{tempFolderPath}\\Audio";
-            var wavFile = Path.GetFileName(gameSound.Path);
+            var wavFile = Path.GetFileName(gameSound.SoundPath);
             var wavFileName = wavFile.Replace(".wav", "");
             var wemFile = wavFile.Replace(".wav", ".wem");
             var wemPath = $"{audioFolderPath}\\{wemFile}";
@@ -64,7 +64,7 @@ namespace Audio.BnkCompiler
 
             // Load
             var createdFiles = PackFileUtil.LoadFilesFromDisk(_pfs, new PackFileUtil.FileRef(wemPath, GetExpectedFolder(compilerData), $"{hashName}.wem"));
-            gameSound.Path = _pfs.GetFullPath(createdFiles.First());
+            gameSound.SoundPath = _pfs.GetFullPath(createdFiles.First());
 
             return Result<bool>.FromOk(true);
         }

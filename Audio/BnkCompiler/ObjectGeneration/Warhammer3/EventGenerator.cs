@@ -22,7 +22,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public CAkEvent_v136 ConvertToWWise(Event inputEvent, CompilerData project)
         {
             var wwiseEvent = new CAkEvent_v136();
-            wwiseEvent.Id = project.GetHircItemIdFromName(inputEvent.Name);
+            wwiseEvent.Id = inputEvent.Id;
             wwiseEvent.Type = HircType.Event;
             wwiseEvent.Actions = inputEvent.Actions.Select(x => CreateActionFromInputEvent(x, project)).ToList();
 

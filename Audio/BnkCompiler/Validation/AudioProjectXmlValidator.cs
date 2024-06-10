@@ -28,7 +28,7 @@ namespace Audio.BnkCompiler.Validation
         void ValidateUniqeIds(CompilerData projectXml, ValidationContext<CompilerData> context)
         {
             var allIds = GetAllItems(projectXml)
-             .Select(x => x.Name)
+             .Select(x => x.Id)
              .ToList();
 
             var query = allIds.GroupBy(x => x)
@@ -57,10 +57,10 @@ namespace Audio.BnkCompiler.Validation
     {
         public EventValidator(List<IAudioProjectHircItem> allItems)
         {
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Item is missing ID");
+            RuleFor(x => x.Id).NotEmpty().WithMessage("Item is missing ID");
 
             RuleFor(x => x.Actions)
-                .NotEmpty().WithMessage(x => $"Event '{x.Name}' has no actions")
+                .NotEmpty().WithMessage(x => $"Event '{x.Id}' has no actions")
                 .Custom((actionInstanceList, context) =>
                 {
                     foreach (var action in actionInstanceList)
@@ -80,14 +80,14 @@ namespace Audio.BnkCompiler.Validation
 
         public ActionValidator(List<IAudioProjectHircItem> allItems)
         {
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Item is missing ID");
-            //6RuleFor(x => x.ChildId).Must(x => ValidateChildReference(x, allItems)).WithMessage($"ActionChild has invalid reference");
+            RuleFor(x => x.Id).NotEmpty().WithMessage("Item is missing ID");
+            RuleFor(x => x.ChildId).Must(x => ValidateChildReference(x, allItems)).WithMessage($"ActionChild has invalid reference");
             RuleFor(x => x.Type)
                 .NotEmpty().WithMessage("ActionChild has no type")
                 .Must(ValidateChildActionType).WithMessage(x => $"ActionChild has invalid type '{x.Type}'. Valid values are {string.Join(", ", ValidActionTypes)}");
         }
 
-        private bool ValidateChildReference(string id, List<IAudioProjectHircItem> allItems) => allItems.Any(x => x.Name == id);
+        private bool ValidateChildReference(uint id, List<IAudioProjectHircItem> allItems) => allItems.Any(x => x.Id == id);
         private bool ValidateChildActionType(string childType) => ValidActionTypes.Contains(childType, StringComparer.InvariantCultureIgnoreCase);
     }
 
@@ -96,7 +96,7 @@ namespace Audio.BnkCompiler.Validation
         public GameSoundValidator(PackFileService pfs)
         {
             RuleFor(x => x).NotNull().WithMessage("Item is null");
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Item is missing ID");
+            RuleFor(x => x.Id).NotEmpty().WithMessage("Item is missing ID");
             RuleFor(x => x)
                 .Custom((x, context) =>
                 {

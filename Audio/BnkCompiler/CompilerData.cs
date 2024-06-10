@@ -12,7 +12,6 @@ namespace Audio.BnkCompiler
     {
         public string Name { get; set; }
         public uint Id { get; set; }
-        public uint SerializationId { get; set; }
     }
 
     public class Event : IAudioProjectHircItem
@@ -24,6 +23,7 @@ namespace Audio.BnkCompiler
     {
         public AkDecisionTree.Node RootNode { get; set; }
         public uint NodesCount { get; set; } = 0;
+
     }
 
     public class RandomContainer : IAudioProjectHircItem
@@ -40,7 +40,7 @@ namespace Audio.BnkCompiler
 
     public class GameSound : IAudioProjectHircItem
     {
-        public string Path { get; set; }
+        public string FilePath { get; set; }
         public uint DirectParentId { get; set; } = 0;
         public string DialogueEvent { get; set; }
         public uint Attenuation { get; set; }
@@ -74,6 +74,7 @@ namespace Audio.BnkCompiler
         public List<ActorMixer> ActorMixers { get; set; } = new List<ActorMixer>();
         public List<RandomContainer> RandomContainers { get; set; } = new List<RandomContainer>();
         public List<DialogueEvent> DialogueEvents { get; set; } = new List<DialogueEvent>();
+        public List<string> EventsDat { get; set; } = new List<string>();
         public List<string> StatesDat { get; set; } = new List<string>();
 
         public void StoreWwiseObjects()
@@ -84,18 +85,6 @@ namespace Audio.BnkCompiler
             _projectWwiseObjects.AddRange(ActorMixers);
             _projectWwiseObjects.AddRange(RandomContainers);
             _projectWwiseObjects.AddRange(DialogueEvents);
-        }
-
-        public uint GetHircItemIdFromName(string name)
-        {
-            return _projectWwiseObjects.First(x => x.Name == name).SerializationId;
-        }
-
-        public IAudioProjectHircItem GetActorMixerForObject(uint objectId)
-        {
-            var mixers = _projectWwiseObjects.Where(x => x is ActorMixer).Cast<ActorMixer>().ToList();
-            var mixer = mixers.Where(x => x.Children.Contains(objectId)).ToList();
-            return mixer.FirstOrDefault();
         }
     }
 }

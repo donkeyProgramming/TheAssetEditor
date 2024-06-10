@@ -64,7 +64,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
                             }
 
                             // Sort container children by key
-                            var sortedContainerChildren = containerChildren.OrderBy(child => WwiseHash.Compute(child.Name)).ToList();
+                            var sortedContainerChildren = containerChildren.OrderBy(child => child.Id).ToList();
 
                             // Add container children to sortedProjectItems
                             foreach (var containerChild in sortedContainerChildren)
@@ -95,7 +95,6 @@ namespace Audio.BnkCompiler.ObjectGeneration
                 {
                     sortedProjectItems.Add(mixer);
                     addedItems.Add(mixer);
-                    Console.WriteLine($"Added Mixer \"{mixer.Name}\" to sortedProjectItems");
                 }
             }
 
@@ -113,7 +112,6 @@ namespace Audio.BnkCompiler.ObjectGeneration
                 {
                     sortedProjectItems.Add(currentEvent);
                     addedItems.Add(currentEvent);
-                    Console.WriteLine($"Added Event \"{currentEvent.Name}\" to sortedProjectItems");
                 }
             }
 
@@ -126,28 +124,26 @@ namespace Audio.BnkCompiler.ObjectGeneration
                 {
                     sortedProjectItems.Add(currentDialogueEvent);
                     addedItems.Add(currentDialogueEvent);
-                    Console.WriteLine($"Added Event \"{currentDialogueEvent.Name}\" to sortedProjectItems");
                 }
             }
 
             return sortedProjectItems;
         }
 
-        List<ActorMixer> SortActorMixerList(CompilerData project)
+        static List<ActorMixer> SortActorMixerList(CompilerData project)
         {
-            List<ActorMixer> output = new List<ActorMixer>();
+            var output = new List<ActorMixer>();
 
-            var mixers = project.ActorMixers;//.Shuffle().ToList(); // For testing
+            var mixers = project.ActorMixers;
 
             // Find the root
             var roots = mixers.Where(x => HasReferences(x, mixers) == false).ToList();
-            //Guard.IsEqualTo(roots.Count(), 1);
+            Guard.IsEqualTo(roots.Count(), 1);
 
             foreach (var mixer in roots)
             {
                 var children = mixer.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Id == childId)).ToList();
                 output.Add(mixer);
-                Console.WriteLine($"Added root mixer: {mixer.Name}");
 
                 ProcessChildren(children, output, project);
             }
@@ -157,11 +153,12 @@ namespace Audio.BnkCompiler.ObjectGeneration
             return output;
         }
 
-        void ProcessChildren(List<ActorMixer> children, List<ActorMixer> outputList, CompilerData project)
+        static void ProcessChildren(List<ActorMixer> children, List<ActorMixer> outputList, CompilerData project)
         {
             var sortedChildren = children.OrderByDescending(x => x).ToList();
 
             outputList.AddRange(sortedChildren);
+
             foreach (var child in sortedChildren)
             {
                 var childOfChildren = child.ActorMixerChildren.Select(childId => project.ActorMixers.First(x => x.Id == childId)).ToList();
@@ -169,16 +166,17 @@ namespace Audio.BnkCompiler.ObjectGeneration
             }
         }
 
-        bool HasReferences(ActorMixer currentMixer, List<ActorMixer> mixers)
+        static bool HasReferences(ActorMixer currentMixer, List<ActorMixer> mixers)
         {
             foreach (var mixer in mixers)
             {
                 if (mixer == currentMixer)
                     continue;
 
-                bool isReferenced = mixers
+                var isReferenced = mixers
                     .Where(x => x != currentMixer)
                     .Any(x => x.ActorMixerChildren.Contains(currentMixer.Id));
+
                 if (isReferenced)
                     return true;
             }

@@ -94,8 +94,8 @@ namespace Audio.BnkCompiler
             var outputName = $"event_data__{projectFile.ProjectSettings.BnkName}.dat";
             var datFile = new SoundDatFile();
 
-            foreach (var wwiseEvent in projectFile.Events)
-                datFile.Event0.Add(new SoundDatFile.EventWithValue() { EventName = wwiseEvent.Name, Value = 400 });
+            foreach (var wwiseEvent in projectFile.StatesDat)
+                datFile.Event0.Add(new SoundDatFile.EventWithValue() { EventName = wwiseEvent, Value = 400 });
 
             var bytes = DatFileParser.GetAsByteArray(datFile);
             var packFile = new PackFile(outputName, new MemorySource(bytes));
