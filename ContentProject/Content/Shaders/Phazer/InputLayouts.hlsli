@@ -1,4 +1,7 @@
-﻿struct VertexInputType
+﻿#ifndef INPUTLAYOUT_HSLSI
+#define INPUTLAYOUT_HSLSI
+
+struct VertexInputType
 {
     float4 position : POSITION;
     float3 normal : NORMAL0;
@@ -24,3 +27,17 @@ struct PixelInputType
     float3 worldPosition : TEXCOORD5;
 
 };
+
+struct GBufferMaterial
+{
+    float4 position;
+    
+    float3 pixelNormal;
+    
+    float4 diffuse;
+    float3 specular;
+    float roughness;
+    
+    int useAlpha;
+};    
+#endif

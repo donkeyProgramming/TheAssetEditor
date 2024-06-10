@@ -1,251 +1,46 @@
-﻿#include "pbr_lib.fx"
-#include "tone_mapping.fx"						
-#include "const_layout.hlsli"
-#include "InputLayouts.hlsli"
-#include "GPUSkinning.hlsli"
+﻿/*                                                                                                              z
+MIT License
 
-// -------------------------------------------------------------------------------
-//
-//	Constant, and WORDs for Ole ;(
-//
-// -------------------------------------------------------------------------------
-// TODO: change these into thing controllable from the program
+Copyright Phazer(c) 2022-2024 
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+*/
+
+/********************************************************************
+    Uses code and concepts from 
+    https://github.com/Nadrin/PBR/
+    
+    Original License Included: License_Nadrin_Pbr.txt
+********************************************************************/                                 
+
+#include "const_layout.hlsli"                 
+#include "GPUSkinning.hlsli" 
+#include "TextureSamplers.hlsli"
+#include "inputlayouts.hlsli"
+#include "pbr_lib.hlsli"
+#include "CALib.hlsli"
+#include "tone_mapping.hlsli"
 
 // Direction for directional lighting source
-// TODO: good candiates for a dial, where Z is constant and X+Y is controller by the mouse
-// or use your camera class to controll the direction light = "orbital light control"
 static const float3 light_Direction_Constant = normalize(float3(0.1, 0.1, 1.f));
 
 // directional light strength, dial from 0 - X
-// TODO: good candiates for a dials
+
 static const float Directional_Light_Raddiance = 5.0f;
 static const float Ambient_Light_Raddiance = 1.0f;
 
 // colors for lighting, set a color almost white, with a TINY blue tint to change mood in scene
 // typically these two are simply te same color, unless one wanted to simular artifical light (like a lamp/flashlight etc)
-// TODO: good candiates for a dials
 static const float3 Directional_Light_color = float3(1, 1, 1);
 static const float3 Ambient_Light_color = float3(1, 1, 1);
-
-
-
-
-
-//  From http://en.wikipedia.org/wiki/SRGB                          //
-//                                                                  //
-//  It seems that gamma to linear and back again is not a simple    //
-//  pow function.  The functions above are just a simplification    //
-//  of what the spec is and what the hardware is doing, which is    //
-//  following this spec.                                            //
-//////////////////////////////////////////////////////////////////////
-float gamma_accurate_component(in const float linear_val)
-{
-    const float srgb_gamma_ramp_inflection_point = 0.0031308f;
-
-    if (linear_val <= srgb_gamma_ramp_inflection_point)
-    {
-        return 12.92f * linear_val;
-    }
-    else
-    {
-        const float a = 0.055f;
-
-        return ((1.0f + a) * pow(linear_val, 1.0f / 2.4f)) - a;
-    }
-}
-
-float3 gamma_accurate(in const float3 vLinear)
-{
-    return float3(gamma_accurate_component(vLinear.r), gamma_accurate_component(vLinear.g), gamma_accurate_component(vLinear.b));
-}
-
-
-float3 _gamma(in float3 vLinear)
-{
-    return gamma_accurate(vLinear);
-}
-
-float _gamma(in float fLinear)
-{
-    return gamma_accurate_component(fLinear);
-}
-
-//#include "pbr_lib.hlsli"
-//#include "tone_mapping.hlsli"
-
-/*
-bool doAnimation = true;
-
-float4x4 World;
-float4x4 View;
-float3 CameraPos;
-float4x4 Projection;
-
-float4x4 EnvMapTransform;
-float4x4 DirLightTransform;
-
-float LightMult = 1;
-
-bool debug = true;
-float debugVal = 0;
-int show_reflections = false;
-bool is_diffuse_linear = false;
-bool is_specular_linear = false;
-float exposure = 1;
-bool scale_by_one_over_pi = false;
-
-float light0_roughnessFactor = 1;
-float light0_radiannce = 1;
-float light0_ambientFactor = 1;
-
-float3 TintColour = float3(1, 1, 1);
-
-// Textures
-Texture2D<float4> DiffuseTexture;
-Texture2D<float4> SpecularTexture;
-Texture2D<float4> NormalTexture;
-Texture2D<float4> GlossTexture;
-Texture2D<float4> MaterialMapTexture;
-
-TextureCube<float4> tex_cube_diffuse;
-TextureCube<float4> tex_cube_specular;
-Texture2D<float4> specularBRDF_LUT;
-
-bool UseDiffuse = true;
-bool UseSpecular = true;
-bool UseNormal = true;
-bool UseGloss = true;
-bool UseAlpha = false;
-
-float4x4 tranforms[256];
-int WeightCount = 0;
-  */
-
-float ModelRenderScale = 1;
-SamplerState SampleType
-{
-	//Texture = <tex_cube_specular>;
-    MinFilter = LINEAR;
-    MagFilter = LINEAR;
-    Mipfilter = LINEAR;
-    Filter = Anisotropic;
-    MaxAnisotropy = 16;
-    AddressU = Wrap;
-    AddressV = Wrap;
-};
-
-SamplerState spBRDF_Sampler
-{
-	//Texture = <tex_cube_specular>;
-    MinFilter = LINEAR;
-    MagFilter = LINEAR;
-    Mipfilter = LINEAR;
-    Filter = LINEAR;
-    MaxAnisotropy = 16;
-    AddressU = Clamp;
-    AddressV = Clamp;
-};
-
-SamplerState s_normal
-{
-	//Texture = <tex_cube_specular>;
-    MinFilter = LINEAR;
-    MagFilter = LINEAR;
-    Mipfilter = LINEAR;
-    Filter = LINEAR;
-    MaxAnisotropy = 16;
-    AddressU = Wrap;
-    AddressV = Wrap;
-};
-
-float3 getBlueNormal(PixelInputType input)
-{
-	//float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));
-    float3x3 basis = float3x3(normalize(input.tangent.xyz), normalize(input.binormal.xyz), normalize(input.normal.xyz)); // works in own shader
-
-    float4 NormalTex = NormalTexture.Sample(s_normal, input.tex);
-
-    float3 Np = 0;
-    Np.x = NormalTex.r * NormalTex.a;
-    Np.y = 1.0 - NormalTex.g;
-    Np = (Np * 2.0f) - 1.0f;
-
-    Np.z = sqrt(1 - Np.x * Np.x - Np.y * Np.y);
-
-	//Np.y = -Np.y;
-    return normalize(mul(normalize(Np.xyz), basis));
-}
-
-float get_cube_env_scale_factor()
-{
-    return 1.0f;
-}
-
-float adjust_linear_smoothness(in const float linear_smoothness)
-{
-    return linear_smoothness * linear_smoothness;
-}
-
-float3 get_environment_colour(in float3 direction, in float lod)
-{
-    return (tex_cube_specular.SampleLevel(SampleType, direction, lod).rgb) * light0_ambientFactor;
-}
-
-float get_env_map_lod(in float roughness_in)
-{
-    float smoothness = pow(1.0 - roughness_in, 4.0);
-
-    float roughness = 1.0 - smoothness;
-
-	//    This must be the number of mip-maps in the environment map!
-    float texture_num_lods = 6.0f;
-
-    float env_map_lod = roughness * (texture_num_lods - 1.0);
-
-    return env_map_lod;
-}
-
-float3 sample_environment_specular(in float roughness_in, in float3 reflected_view_vec)
-{
-    const float env_lod_pow = 1.8f;
-	//const float env_map_lod_smoothness = adjust_linear_smoothness(1 - roughness_in);
-    const float env_map_lod_smoothness = (1 - roughness_in);
-    const float roughness = 1.0f - pow(env_map_lod_smoothness, env_lod_pow);
-
-    float texture_num_lods = 4; //<------- LOWER = more reflective
-    float env_map_lod = roughness * (texture_num_lods - 1);
-    float3 environment_colour = get_environment_colour(reflected_view_vec, env_map_lod);
-
-    float3 result = environment_colour * get_cube_env_scale_factor();
-
-    return result;
-}
-
-float3 sample_environment_specular_new(in float roughness_in, in float3 reflected_view_vec)
-{
-#if 1
-	//const float env_lod_pow = 1.8f;
-    const float env_lod_pow = 1.8f;
-    const float env_map_lod_smoothness = adjust_linear_smoothness(1 - roughness_in);
-    const float roughness = 1.0f - pow(env_map_lod_smoothness, env_lod_pow);
-
-    float texture_num_lods = 5; // to a lower number
-    float env_map_lod = roughness * (texture_num_lods - 1);
-    float3 environment_colour = get_environment_colour(reflected_view_vec, env_map_lod);
-#else
-	const float roughness = roughness_in;
-	const float offset = 3;
-	float texture_num_lods = 9.0f; // - offset;
-	float env_map_lod = roughness * (texture_num_lods - 1);
-	env_map_lod += offset;
-	float3 environment_colour = get_environment_colour(reflected_view_vec, env_map_lod);
-#endif
-
-    float3 result = environment_colour * get_cube_env_scale_factor();
-
-    return result;
-}
 
 // -------------------------------------------------------------------------------------
 //		VERTEX SHADER
@@ -272,38 +67,9 @@ PixelInputType main(in VertexInputType input) // main is the default function na
     return output;
 }
 
-// --------------------------------------- Pixel shader Math/Helper functons ---------------------------------------------
-
-float substance_smoothness_get_our_smoothness(in float substance_smoothness)
-{
-	//	This value is correct for roughnesses from second_join_pos to 1.0.  This is valid for
-	//	the end of the roughness curve...
-    float original_roughness = 1.0f - substance_smoothness;
-
-    float original_roughness_x2 = original_roughness * original_roughness;
-    float original_roughness_x3 = original_roughness_x2 * original_roughness;
-    float original_roughness_x4 = original_roughness_x3 * original_roughness;
-    float original_roughness_x5 = original_roughness_x4 * original_roughness;
-
-    return 1.0f - saturate((28.09f * original_roughness_x5) - (64.578f * original_roughness_x4) + (48.629f * original_roughness_x3) - (12.659f * original_roughness_x2) + (1.5459f * original_roughness));
-}
-
-static const float texture_alpha_ref = 0.1f;
-
-void alpha_test(in const float pixel_alpha)
-{
-    clip(pixel_alpha < 0.7f ? -1 : 1);
-	//clip(-1);
-}
-
-float nfmod(float a, float b)
-{
-    return a - b * floor(a / b);
-}
-
-
-
-
+// --------------------------------------------------------------------------------------------------------------------------------------
+// Get Directional Light
+// --------------------------------------------------------------------------------------------------------------------------------------
 
 float3 getDirectionalLight(in float3 N, in float3 albedo, in float roughness, in float metalness, in float3 viewDir, in float3 lightDir)
 {
@@ -515,16 +281,16 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 
 	
 	
-    float3 bumpNormal = getBlueNormal(input);
+    float3 pixelNormal = GetPixelNormal(input);
 
     if (UseNormal == false)
     {
-        bumpNormal = _input.normal;
+        pixelNormal = _input.normal;
 		//return float4(1, 0, 0, 1);
     }
 
     float3 envColor = getAmbientLight(
-		bumpNormal,
+		pixelNormal,
 		normalize(input.viewDirection),
 		DiffuseTex.rgb * TintColour,
 		roughness,
@@ -540,7 +306,7 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 	
 	// directional ligting color    
     float3 dirColor = getDirectionalLight(
-		bumpNormal,
+		pixelNormal,
 		DiffuseTex.rgb * TintColour,
 		roughness,
 		metalness,
