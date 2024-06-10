@@ -419,8 +419,7 @@ technique BasicColorDrawing
 //	{
 //        alpha_test(DiffuseTex.a);
 //    }
-		
-	
+		                                              	
 //    static const float gamma_value = 2.2;
 
 //    float3 hdrColor = color.rgb * exposure;
