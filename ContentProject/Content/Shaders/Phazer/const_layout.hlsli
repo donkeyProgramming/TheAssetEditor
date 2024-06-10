@@ -1,4 +1,7 @@
-﻿bool doAnimation = true;
+﻿#ifndef CONST_LAYOUT_HLSLI
+#define CONST_LAYOUT_HLSLI
+
+bool doAnimation = true;
 
 float4x4 World;
 float4x4 View;
@@ -42,3 +45,5 @@ bool UseAlpha = false;
 
 float4x4 tranforms[256];
 int WeightCount = 0;
+
+#endif // CONST_LAYOUT_HLSLI
