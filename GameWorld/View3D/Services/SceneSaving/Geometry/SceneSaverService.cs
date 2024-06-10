@@ -39,8 +39,7 @@ namespace View3D.Services.SceneSaving.Geometry
             {
                 var inputFile = _packFileService.FindFile(outputPath);
                 var bytes = GenerateBytes(onlySaveVisibleNodes, new List<Rmv2ModelNode>() { mainNode }, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
-                var path = _packFileService.GetFullPath(inputFile);
-                var res = SaveHelper.Save(_packFileService, path, inputFile, bytes);
+                var res = SaveHelper.Save(_packFileService, outputPath, inputFile, bytes);
                 _eventHub.Publish(new ScopedFileSavedEvent());
             }
             catch (Exception e)
