@@ -31,19 +31,13 @@ namespace Audio.Presentation.AudioExplorer
         // Public attributes
         public ObservableCollection<HircTreeItem> TreeList { get; set; } = new ObservableCollection<HircTreeItem>();
         public HircTreeItem SelectedNode { get => _selectedNode; set { SetAndNotify(ref _selectedNode, value); OnNodeSelected(_selectedNode); } }
-
         public NotifyAttr<bool> ShowIds { get; set; }
         public NotifyAttr<bool> ShowBnkName { get; set; }
         public NotifyAttr<bool> UseBnkNameWhileParsing { get; set; }
         public NotifyAttr<bool> ShowEvents { get; set; }
         public NotifyAttr<bool> ShowDialogEvents { get; set; }
-
         public NotifyAttr<bool> IsPlaySoundButtonEnabled { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> CanExportCurrrentDialogEventAsCsvAction { get; set; } = new NotifyAttr<bool>(false);
-
-
-
-
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Explorer");
         public NotifyAttr<string> SelectedNodeText { get; set; } = new NotifyAttr<string>("");
         public PackFile MainFile { get => _mainFile; set { _mainFile = value; } }
@@ -165,9 +159,4 @@ namespace Audio.Presentation.AudioExplorer
             }
         }
     }
-
-
-
-
 }
-

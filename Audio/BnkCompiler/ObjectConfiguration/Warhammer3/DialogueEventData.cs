@@ -1,32 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Shared.Core.Misc;
 using Audio.Storage;
 using Shared.Core.PackFiles;
-using Shared.Core.Events;
-using Microsoft.VisualBasic.Devices;
-using Shared.Core.PackFiles.Models;
-using System.Text;
 using Shared.GameFormats.Dat;
 
 namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 {
     public class DialogueEventData
     {
-        private readonly PackFileService _packFileService;
-        private readonly IAudioRepository _audioRepository;
-
-        public DialogueEventData(PackFileService packFileService, IAudioRepository audioRepository)
-        {
-            _packFileService = packFileService;
-            _audioRepository = audioRepository;
-        }
-
         public static Dictionary<string, List<string>> ExtractedDialogueEvents = new Dictionary<string, List<string>>();
-        public static List<string> ExtractedStateGroups = new List<string>();
-        public static Dictionary<string, List<string>> ExtractedStates = new Dictionary<string, List<string>>();
 
         // Get the bnk that a dialogue event is contained within.
         public static string GetBnkFromDialogueEvent(string dialogueEvent)
@@ -55,16 +37,27 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
                 throw new Exception($"Error: {dialogueEvent} could not be matched to a bnk.");
         }
 
-        public void StoreExtractedDialogueEvents()
+        public static void StoreExtractedDialogueEvents(IAudioRepository audioRepository, PackFileService packFileService)
         {
             ExtractedDialogueEvents = new Dictionary<string, List<string>>();
-            ExtractedStateGroups = new List<string>();
-            var eventDataDatFile = _packFileService.FindFile(@"audio\wwise\event_data__core.dat");
-            //var parsedDatFile = WWiseNameLoader.LoadDatFile(eventDataDatFile);
-            //var datSection4 = SoundDatFile.VoiceEvents;
-            // create a dictionary of dialogue events and their states
 
-            ExtractedStateGroups.Sort();
+            var eventDataDatFile = packFileService.FindFile(@"audio\wwise\event_data__core.dat");
+            var parsedDatFile = DatFileParser.Parse(eventDataDatFile, false);
+            var extractedDialogueEvents = parsedDatFile.DialogueEvents;
+
+            foreach (var dialogueEvent in extractedDialogueEvents)
+            {
+                Console.WriteLine(dialogueEvent.EventName);
+                // create a dictionary key for the dialogue event
+
+                foreach (var stateGroupId in dialogueEvent.Values)
+                {
+                    var stateGroup = audioRepository.GetNameFromHash(stateGroupId);
+                    Console.WriteLine(stateGroup);
+                    // add the stateGroups to the dialogue event dictionary key
+                }
+            }
+            Console.WriteLine("FINISHED");
         }
     }
 }

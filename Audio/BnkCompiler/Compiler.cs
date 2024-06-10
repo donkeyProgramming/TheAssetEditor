@@ -9,6 +9,8 @@ using Shared.GameFormats.Dat;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Bkhd;
 using Shared.GameFormats.WWise.Hirc;
+using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Shared.Core.PackFiles;
 
 namespace Audio.BnkCompiler
 {
@@ -25,18 +27,22 @@ namespace Audio.BnkCompiler
         private readonly HircBuilder _hircBuilder;
         private readonly BnkHeaderBuilder _headerBuilder;
         private readonly RepositoryProvider _provider;
+        private readonly PackFileService _packFileService;
 
-        public Compiler(HircBuilder hircBuilder, BnkHeaderBuilder headerBuilder, RepositoryProvider provider)
+        public Compiler(HircBuilder hircBuilder, BnkHeaderBuilder headerBuilder, RepositoryProvider provider, PackFileService packFileService)
         {
             _hircBuilder = hircBuilder;
             _headerBuilder = headerBuilder;
             _provider = provider;
+            _packFileService = packFileService;
         }
 
         public Result<CompileResult> CompileProject(CompilerData audioProject)
         {
             // Load audio repository to access dat dump.
             var audioRepository = new AudioRepository(_provider, false);
+
+            DialogueEventData.StoreExtractedDialogueEvents(audioRepository, _packFileService);
 
             // Build the wwise object graph. 
             var header = BnkHeaderBuilder.Generate(audioProject);
@@ -83,7 +89,7 @@ namespace Audio.BnkCompiler
             return bnkPackFile;
         }
 
-        private PackFile BuildDat(CompilerData projectFile)
+        private static PackFile BuildDat(CompilerData projectFile)
         {
             var outputName = $"event_data__{projectFile.ProjectSettings.BnkName}.dat";
             var datFile = new SoundDatFile();
@@ -97,7 +103,7 @@ namespace Audio.BnkCompiler
             return packFile;
         }
 
-        private PackFile BuildStatesDat(CompilerData projectFile)
+        private static PackFile BuildStatesDat(CompilerData projectFile)
         {
             var outputName = $"states_data__{projectFile.ProjectSettings.BnkName}.dat";
             var datFile = new SoundDatFile();
