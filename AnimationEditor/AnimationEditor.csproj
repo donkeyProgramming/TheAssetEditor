@@ -11,7 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AnimationMeta\Editors.AnimationMeta.csproj" />
     <ProjectReference Include="..\Editors\SimpleAnimationEditors\Editors.AnimationContainers.csproj" />
-    <ProjectReference Include="..\GameWorld\View3D\View3D.csproj" />
+    <ProjectReference Include="..\GameWorld\View3D\GameWorld.Core.csproj" />
         <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
   </ItemGroup>
 

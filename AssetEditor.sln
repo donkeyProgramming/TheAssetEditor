@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExternalProjects", "Externa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Editors", "Editors", "{07AC615B-A8FC-4E1A-BDD5-BC11452429A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "View3D", "GameWorld\View3D\View3D.csproj", "{8494EA8F-DBD8-4E4C-880C-7401CE2FB240}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameWorld.Core", "GameWorld\View3D\GameWorld.Core.csproj", "{8494EA8F-DBD8-4E4C-880C-7401CE2FB240}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.KitbasherEditor", "Editors\KitbasherEditor\Editors.KitbasherEditor.csproj", "{D7225D7F-87E4-4FAD-A3BE-9165DFDC315E}"
 EndProject
