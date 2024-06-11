@@ -48,13 +48,13 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
             foreach (var dialogueEvent in extractedDialogueEvents)
             {
                 Console.WriteLine(dialogueEvent.EventName);
-                // create a dictionary key for the dialogue event
+                throw new NotImplementedException("Todo"); // create a dictionary key for the dialogue event
 
                 foreach (var stateGroupId in dialogueEvent.Values)
                 {
                     var stateGroup = audioRepository.GetNameFromHash(stateGroupId);
                     Console.WriteLine(stateGroup);
-                    // add the stateGroups to the dialogue event dictionary key
+                    throw new NotImplementedException("Todo"); // add the stateGroups to the dialogue event dictionary key
                 }
             }
             Console.WriteLine("FINISHED");
