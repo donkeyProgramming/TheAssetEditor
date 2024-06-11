@@ -38,7 +38,7 @@ namespace Audio.BnkCompiler
         public string Type { get; set; }
     }
 
-    public class GameSound : IAudioProjectHircItem
+    public class Sound : IAudioProjectHircItem
     {
         public string FilePath { get; set; }
         public uint DirectParentId { get; set; } = 0;
@@ -66,11 +66,11 @@ namespace Audio.BnkCompiler
 
     public class CompilerData
     {
-        private List<IAudioProjectHircItem> _projectWwiseObjects = new List<IAudioProjectHircItem>();
+        private readonly List<IAudioProjectHircItem> _projectWwiseObjects = new List<IAudioProjectHircItem>();
         public ProjectSettings ProjectSettings { get; set; } = new ProjectSettings();
         public List<Event> Events { get; set; } = new List<Event>();
         public List<Action> Actions { get; set; } = new List<Action>();
-        public List<GameSound> GameSounds { get; set; } = new List<GameSound>();
+        public List<Sound> Sounds { get; set; } = new List<Sound>();
         public List<ActorMixer> ActorMixers { get; set; } = new List<ActorMixer>();
         public List<RandomContainer> RandomContainers { get; set; } = new List<RandomContainer>();
         public List<DialogueEvent> DialogueEvents { get; set; } = new List<DialogueEvent>();
@@ -81,7 +81,7 @@ namespace Audio.BnkCompiler
         {
             _projectWwiseObjects.AddRange(Events);
             _projectWwiseObjects.AddRange(Actions);
-            _projectWwiseObjects.AddRange(GameSounds);
+            _projectWwiseObjects.AddRange(Sounds);
             _projectWwiseObjects.AddRange(ActorMixers);
             _projectWwiseObjects.AddRange(RandomContainers);
             _projectWwiseObjects.AddRange(DialogueEvents);

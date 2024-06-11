@@ -17,7 +17,7 @@ namespace Audio.BnkCompiler.Validation
             RuleFor(x => x).NotNull().WithMessage("Project file is missing");
 
             RuleFor(x => x.ProjectSettings).SetValidator(new SettingsValidator());
-            RuleFor(x => x.GameSounds).ForEach(x => x.SetValidator(new GameSoundValidator(pfs)));
+            RuleFor(x => x.Sounds).ForEach(x => x.SetValidator(new GameSoundValidator(pfs)));
             RuleFor(x => x.Actions).ForEach(x => x.SetValidator(new ActionValidator(allItems)));
             RuleFor(x => x.Events).ForEach(x => x.SetValidator(new EventValidator(allItems)));
 
@@ -48,7 +48,7 @@ namespace Audio.BnkCompiler.Validation
             var output = new List<IAudioProjectHircItem>();
             output.AddRange(projectXml.Actions);
             output.AddRange(projectXml.Events);
-            output.AddRange(projectXml.GameSounds);
+            output.AddRange(projectXml.Sounds);
             return output;
         }
     }
@@ -91,7 +91,7 @@ namespace Audio.BnkCompiler.Validation
         private bool ValidateChildActionType(string childType) => ValidActionTypes.Contains(childType, StringComparer.InvariantCultureIgnoreCase);
     }
 
-    public class GameSoundValidator : AbstractValidator<GameSound>
+    public class GameSoundValidator : AbstractValidator<Sound>
     {
         public GameSoundValidator(PackFileService pfs)
         {

@@ -31,7 +31,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
                 {
                     // Find game sounds with the child name
                     IAudioProjectHircItem gameSound = null;
-                    foreach (var sound in project.GameSounds)
+                    foreach (var sound in project.Sounds)
                     {
                         if (sound.Id == child)
                         {
@@ -56,7 +56,7 @@ namespace Audio.BnkCompiler.ObjectGeneration
 
                             foreach (var containerchild in container.Children)
                             {
-                                var gameSoundChild = project.GameSounds.FirstOrDefault(sound => sound.Id == containerchild);
+                                var gameSoundChild = project.Sounds.FirstOrDefault(sound => sound.Id == containerchild);
                                 if (gameSoundChild != null && !addedItems.Contains(gameSoundChild))
                                 {
                                     containerChildren.Add(gameSoundChild);

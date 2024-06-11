@@ -13,7 +13,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
     public class SoundGenerator : IWWiseHircGenerator
     {
         public string GameName => CompilerConstants.GameWarhammer3;
-        public Type AudioProjectType => typeof(GameSound);
+        public Type AudioProjectType => typeof(Sound);
 
         private readonly PackFileService _pfs;
 
@@ -24,12 +24,12 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
         public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
         {
-            var typedProjectItem = projectItem as GameSound;
+            var typedProjectItem = projectItem as Sound;
             Guard.IsNotNull(typedProjectItem);
             return ConvertToWWise(typedProjectItem, project);
         }
 
-        public CAkSound_v136 ConvertToWWise(GameSound inputSound, CompilerData project)
+        public CAkSound_v136 ConvertToWWise(Sound inputSound, CompilerData project)
         {
             var filePath = inputSound.FilePath;
             var file = _pfs.FindFile(filePath);
@@ -76,7 +76,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return wwiseSound;
         }
 
-        public List<CAkSound_v136> ConvertToWWise(IEnumerable<GameSound> inputSound, CompilerData project)
+        public List<CAkSound_v136> ConvertToWWise(IEnumerable<Sound> inputSound, CompilerData project)
         {
             return inputSound.Select(x => ConvertToWWise(x, project)).ToList();
         }

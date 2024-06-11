@@ -68,5 +68,7 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
     {
         public static readonly string GameWarhammer3 = "Warhammer3";
         public static readonly string ActionType = "Play";
+        public static readonly ushort UWeight = 50; // Always 50 in WH3 Dialogue Events.
+        public static readonly ushort UProbability = 100; // Always 100 in WH3 Dialogue Events.
     }
 }
