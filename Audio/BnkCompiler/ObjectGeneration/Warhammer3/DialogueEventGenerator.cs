@@ -12,7 +12,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class DialogueEventGenerator : IWWiseHircGenerator
     {
-        public string GameName => CompilerConstants.Game_Warhammer3;
+        public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(DialogueEvent);
 
         public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
@@ -27,16 +27,16 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             var wwiseDialogueEvent = new CAkDialogueEvent_v136();
             wwiseDialogueEvent.CustomArgumentList = new List<ArgumentList.Argument>();
 
-            wwiseDialogueEvent.Id = project.GetHircItemIdFromName(inputDialogueEvent.Name);
+            wwiseDialogueEvent.Id = inputDialogueEvent.Id;
             wwiseDialogueEvent.Type = HircType.Dialogue_Event;
 
-            var ExtractedDialogueEvents = DialogueEventData.ExtractedDialogueEvents;
+            var extractedDialogueEvents = DialogueEventData.ExtractedDialogueEvents;
 
-            foreach (var stateGroup in ExtractedDialogueEvents[inputDialogueEvent.Name])
+            foreach (var stateGroup in extractedDialogueEvents[inputDialogueEvent.Name])
             {
                 var argument = new ArgumentList.Argument
                 {
-                    ulGroupId = WWiseHash.Compute(stateGroup),
+                    ulGroupId = WwiseHash.Compute(stateGroup),
                     eGroupType = AkGroupType.State
                 };
                 wwiseDialogueEvent.CustomArgumentList.Add(argument);

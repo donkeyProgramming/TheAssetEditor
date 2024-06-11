@@ -138,12 +138,11 @@ namespace Audio.Storage
                 return DatFileParser.Parse(datFile, false);
         }
 
-
         void AddNames(string[] names)
         {
             foreach (var name in names)
             {
-                var hashVal = WWiseHash.Compute(name.Trim());
+                var hashVal = WwiseHash.Compute(name.Trim());
                 _nameLookUp[hashVal] = name;
             }
         }
