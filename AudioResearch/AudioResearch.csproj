@@ -20,7 +20,7 @@
 
     <ItemGroup>
     <ProjectReference Include="..\AssetEditor\AssetEditor.csproj" />
-    <ProjectReference Include="..\Audio\Editors.Audio.csproj" />
+    <ProjectReference Include="..\Editors\Audio\Editors.Audio.csproj" />
         <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
   </ItemGroup>
 
