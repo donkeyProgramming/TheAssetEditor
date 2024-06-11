@@ -13,6 +13,11 @@
       "commandName": "Project",
       "commandLineArgs": "-devcfg Texture_Karl",
       "nativeDebugging": false
+    },
+    "AssetEditor-AudioEditor": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg AudioEditor_Wh3",
+      "nativeDebugging": false
     }
   }
 }

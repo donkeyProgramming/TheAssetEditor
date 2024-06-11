@@ -16,9 +16,8 @@ using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace Audio.Presentation.AudioExplorer
 {
-    public class AudioEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public class AudioExplorerViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-
         public EventSelectionFilter EventFilter { get; set; }
 
         private readonly IAudioRepository _audioRepository;
@@ -43,7 +42,7 @@ namespace Audio.Presentation.AudioExplorer
         public PackFile MainFile { get => _mainFile; set { _mainFile = value; } }
         public bool HasUnsavedChanges { get; set; }
 
-        public AudioEditorViewModel(IAudioRepository audioRepository, SoundPlayer soundPlayer, AudioResearchHelper audioResearchHelper)
+        public AudioExplorerViewModel(IAudioRepository audioRepository, SoundPlayer soundPlayer, AudioResearchHelper audioResearchHelper)
         {
             _audioRepository = audioRepository;
             _soundPlayer = soundPlayer;

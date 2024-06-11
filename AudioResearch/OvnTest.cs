@@ -72,7 +72,7 @@ namespace AudioResearch
             var hircs = audioRepo.HircObjects.Select(x => x.Value.First());
             var ids = hircs.Select(x => $"{x.Id}-{x.Type}").ToList();
 
-            var projectExporter = new AudioProjectExporterSimple();
+            //var projectExporter = new AudioProjectExporterSimple();
             //projectExporter.CreateFromRepositoryToFile(audioRepo, "campaign_diplomacy__ovn", path);
         }
     }

@@ -5,9 +5,9 @@ namespace Audio.Presentation.AudioExplorer
     /// <summary>
     /// Interaction logic for AudioEditorMainView.xaml
     /// </summary>
-    public partial class AudioEditorMainView : UserControl
+    public partial class AudioExplorerView : UserControl
     {
-        public AudioEditorMainView()
+        public AudioExplorerView()
         {
             InitializeComponent();
         }

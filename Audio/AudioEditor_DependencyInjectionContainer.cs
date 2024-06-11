@@ -5,6 +5,7 @@ using Audio.Presentation.AudioExplorer;
 using Audio.Presentation.Compiler;
 using Audio.Storage;
 using Audio.Utility;
+using Editors.Audio.Presentation.AudioEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.PackFiles;
@@ -13,19 +14,22 @@ using Shared.GameFormats.WWise;
 using System.IO;
 using System.Linq;
 
-namespace Audio
+namespace Editors.Audio
 {
-    public class AudioEditor_DependencyInjectionContainer : DependencyContainer
+    public class DependencyInjectionContainer : DependencyContainer
     {
         public override void Register(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<VgStreamWrapper>();
 
-            serviceCollection.AddScoped<AudioEditorMainView>();
-            serviceCollection.AddScoped<AudioEditorViewModel>();
+            serviceCollection.AddScoped<AudioExplorerView>();
+            serviceCollection.AddScoped<AudioExplorerViewModel>();
 
             serviceCollection.AddScoped<CompilerView>();
             serviceCollection.AddScoped<CompilerViewModel>();
+
+            serviceCollection.AddScoped<AudioEditorView>();
+            serviceCollection.AddScoped<AudioEditorViewModel>();
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
@@ -54,8 +58,9 @@ namespace Audio
 
         public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<AudioEditorViewModel, AudioEditorMainView>();
+            factory.RegisterTool<AudioExplorerViewModel, AudioExplorerView>();
             factory.RegisterTool<CompilerViewModel, CompilerView>();// ( new ExtentionToTool( EditorEnums.AudioCompiler_Editor,  new[] { ".audio_json"}));
+            factory.RegisterTool<AudioEditorViewModel, AudioEditorView>();
         }
     }
 

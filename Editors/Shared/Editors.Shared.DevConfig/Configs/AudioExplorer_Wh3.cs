@@ -6,24 +6,24 @@ using Shared.Ui.Events.UiCommands;
 
 namespace Editors.Shared.DevConfig.Configs
 {
-    internal class Audio_Attila : IDeveloperConfiguration
+    internal class AudioExplorer_Wh3 : IDeveloperConfiguration
     {
         private readonly IUiCommandFactory _uiCommandFactory;
 
-        public Audio_Attila(IUiCommandFactory uiCommandFactory)
+        public AudioExplorer_Wh3(IUiCommandFactory uiCommandFactory)
         {
             _uiCommandFactory = uiCommandFactory;
         }
 
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
-            currentSettings.CurrentGame = GameTypeEnum.Attila;
+            currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.SkipLoadingWemFiles = false;
         }
 
         public void OpenFileOnLoad()
         {
-            _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
+            _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioExplorerViewModel>();
         }
     }
 }

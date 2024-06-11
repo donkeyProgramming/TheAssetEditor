@@ -22,6 +22,7 @@ using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.Presentation.AudioEditor;
 using Editors.Reports;
 using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,6 +69,7 @@ namespace AssetEditor.ViewModels
         public ICommand OpenMountCreatorCommand { get; set; }
         public ICommand OpenAnimationBatchExporterCommand { get; set; }
         public ICommand OpenWh2AnimpackUpdaterCommand { get; set; }
+        public ICommand OpenAudioExplorerCommand { get; set; }
         public ICommand OpenAudioEditorCommand { get; set; }
         public ICommand DialogueEventTesting { get; set; }
         public ICommand CreateTemplateCommand { get; }
@@ -143,6 +145,7 @@ namespace AssetEditor.ViewModels
             OpenTechSkeletonEditorCommand = new RelayCommand(OpenTechSkeletonEditor);
             OpenAnimationBatchExporterCommand = new RelayCommand(OpenAnimationBatchExporter);
             OpenWh2AnimpackUpdaterCommand = new RelayCommand(OpenWh2AnimpackUpdater);
+            OpenAudioExplorerCommand = new RelayCommand(OpenAudioExplorerEditor);
             OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
             CompileAudioProjectsCommand = new RelayCommand(CompileAudioProjects);
             DialogueEventTesting = new RelayCommand(RunDialogueEventTesting);
@@ -273,6 +276,7 @@ namespace AssetEditor.ViewModels
         void OpenCampaignAnimCreatorEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<CampaignAnimationCreatorViewModel>>();
         void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationTransferToolViewModel>>();
         void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SuperViewViewModel>>();
+        void OpenAudioExplorerEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioExplorerViewModel>();
         void OpenAudioEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
         void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
         void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SkeletonEditorViewModel>>();

@@ -1,4 +1,4 @@
-﻿using Audio.Presentation.AudioExplorer;
+﻿using Editors.Audio.Presentation.AudioEditor;
 using Editors.Shared.DevConfig.Base;
 using Shared.Core.Events;
 using Shared.Core.Services;
@@ -6,11 +6,11 @@ using Shared.Ui.Events.UiCommands;
 
 namespace Editors.Shared.DevConfig.Configs
 {
-    internal class Audio_Wh3 : IDeveloperConfiguration
+    internal class AudioEditor_Wh3 : IDeveloperConfiguration
     {
         private readonly IUiCommandFactory _uiCommandFactory;
 
-        public Audio_Wh3(IUiCommandFactory uiCommandFactory)
+        public AudioEditor_Wh3(IUiCommandFactory uiCommandFactory)
         {
             _uiCommandFactory = uiCommandFactory;
         }
@@ -18,6 +18,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
+            currentSettings.LoadCaPacksByDefault = true;
             currentSettings.SkipLoadingWemFiles = false;
         }
 

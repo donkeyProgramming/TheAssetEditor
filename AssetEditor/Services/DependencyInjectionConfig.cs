@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using AnimationEditor;
 using AssetManagement;
-using Audio;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shared.Core.DependencyInjection;
@@ -37,7 +36,7 @@ namespace AssetEditor.Services
                 new KitbasherEditor.DependencyInjectionContainer(),
                 new AssetManagement_DependencyInjectionContainer(),
                 new Editors.AnimationMeta.DependencyInjectionContainer(),
-                new AudioEditor_DependencyInjectionContainer(),
+                new Editors.Audio.DependencyInjectionContainer(),
                 new Editors.TextureEditor.DependencyInjectionContainer(),
                 new AnimationEditors_DependencyInjectionContainer(),
 
