@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Shared.Core.Misc;
 using Audio.Storage;
+using Shared.Core.PackFiles;
+using Shared.GameFormats.Dat;
 
 namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 {
     public class DialogueEventData
     {
-        private readonly IAudioRepository _audioRepository;
-
-        public DialogueEventData(IAudioRepository audioRepository) => _audioRepository = audioRepository;
-
         public static Dictionary<string, List<string>> ExtractedDialogueEvents = new Dictionary<string, List<string>>();
-        public static List<string> ExtractedStateGroups = new List<string>();
-        public static Dictionary<string, List<string>> ExtractedStates = new Dictionary<string, List<string>>();
 
         // Get the bnk that a dialogue event is contained within.
         public static string GetBnkFromDialogueEvent(string dialogueEvent)
@@ -44,139 +37,27 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
                 throw new Exception($"Error: {dialogueEvent} could not be matched to a bnk.");
         }
 
-        public void ExtractDialogueEventsDataFromDat()
+        public static void StoreExtractedDialogueEvents(IAudioRepository audioRepository, PackFileService packFileService)
         {
             ExtractedDialogueEvents = new Dictionary<string, List<string>>();
-            ExtractedStateGroups = new List<string>();
 
-            var datDumpMasterPath = $"{DirectoryHelper.Temp}\\DatDumps\\dat_dump_master.txt";
-            var datSection4 = ExtractSection(datDumpMasterPath, "Section 4", "Section 5");
+            var eventDataDatFile = packFileService.FindFile(@"audio\wwise\event_data__core.dat");
+            var parsedDatFile = DatFileParser.Parse(eventDataDatFile, false);
+            var extractedDialogueEvents = parsedDatFile.DialogueEvents;
 
-            foreach (var line in datSection4)
+            foreach (var dialogueEvent in extractedDialogueEvents)
             {
-                var parts = ParseLine(line);
-                var extractedDialogueEvent = parts.Item1;
-                var extractedStateGroups = parts.Item2;
+                Console.WriteLine(dialogueEvent.EventName);
+                throw new NotImplementedException("Todo"); // create a dictionary key for the dialogue event
 
-                foreach (var extractedStateGroup in extractedStateGroups)
+                foreach (var stateGroupId in dialogueEvent.Values)
                 {
-                    if (extractedStateGroup != "")
-                    {
-                        var stateGroup = _audioRepository.GetNameFromHash(uint.Parse(extractedStateGroup));
-
-                        if (!ExtractedDialogueEvents.ContainsKey(extractedDialogueEvent))
-                            ExtractedDialogueEvents[extractedDialogueEvent] = new List<string>();
-
-                        ExtractedDialogueEvents[extractedDialogueEvent].Add(stateGroup);
-
-                        if (!ExtractedStateGroups.Contains(stateGroup))
-                            ExtractedStateGroups.Add(stateGroup);
-                    }
+                    var stateGroup = audioRepository.GetNameFromHash(stateGroupId);
+                    Console.WriteLine(stateGroup);
+                    throw new NotImplementedException("Todo"); // add the stateGroups to the dialogue event dictionary key
                 }
             }
-
-            ExtractedStateGroups.Sort();
-
-            var csvFilePath = $"{DirectoryHelper.Temp}\\DatDumps\\dat_dump_dialogue_events.csv";
-            ExportData(ExtractedDialogueEvents, csvFilePath);
-        }
-
-        public static void ExtractStatesDataFromDat()
-        {
-            ExtractedStates = new Dictionary<string, List<string>>();
-
-            var datDumpMasterPath = $"{DirectoryHelper.Temp}\\DatDumps\\dat_dump_master.txt";
-            var datSection4 = ExtractSection(datDumpMasterPath, "Section 3", "Section 4");
-
-            foreach (var line in datSection4)
-            {
-                var parts = ParseLine(line);
-                var extractedStateGroup = parts.Item1;
-                var extractedStates = parts.Item2;
-
-                foreach (var extractedState in extractedStates)
-                {
-                    if (ExtractedStateGroups.Contains(extractedStateGroup))
-                    {
-                        var state = extractedState;
-                        if (state == "None")
-                            state = "Any";
-
-                        if (!ExtractedStates.ContainsKey(extractedStateGroup))
-                            ExtractedStates[extractedStateGroup] = new List<string>();
-
-                        ExtractedStates[extractedStateGroup].Add(state);
-                    }
-                }
-            }
-
-            var csvFilePath = $"{DirectoryHelper.Temp}\\DatDumps\\dat_dump_states.csv";
-            ExportData(ExtractedStates, csvFilePath);
-        }
-
-        private static List<string> ExtractSection(string datFile, string startSection, string endSection)
-        {
-            var lines = File.ReadAllLines(datFile);
-            var sectionLines = new List<string>();
-            var inSection = false;
-
-            foreach (var line in lines)
-            {
-                if (line.StartsWith(startSection))
-                {
-                    inSection = true;
-                    continue;
-                }
-
-                if (inSection && line.StartsWith(endSection))
-                    break;
-
-                if (inSection)
-                    sectionLines.Add(line);
-            }
-
-            return sectionLines;
-        }
-
-        private static Tuple<string, List<string>> ParseLine(string line)
-        {
-            var commaIndex = line.IndexOf(',');
-
-            if (commaIndex == -1)
-                throw new Exception("Invalid line format");
-
-            var key = line.Substring(0, commaIndex).Trim();
-            var valuesPart = line.Substring(commaIndex + 1).Trim();
-
-            valuesPart = valuesPart.Trim('[', ']');
-            var values = valuesPart.Split(',').Select(s => s.Trim()).ToList();
-
-            return new Tuple<string, List<string>>(key, values);
-        }
-
-        private static void ExportData(Dictionary<string, List<string>> data, string csvFilePath)
-        {
-            using var writer = new StreamWriter(csvFilePath);
-            var headerLine = string.Join(",", data.Keys);
-            writer.WriteLine(headerLine);
-
-            var maxItems = data.Values.Max(states => states.Count);
-
-            for (var i = 0; i < maxItems; i++)
-            {
-                var row = new List<string>();
-
-                foreach (var states in data.Values)
-                {
-                    if (i < states.Count)
-                        row.Add(states[i]);
-                    else
-                        row.Add(string.Empty);
-                }
-
-                var csvLine = string.Join(",", row);
-                writer.WriteLine(csvLine);
-            }
+            Console.WriteLine("FINISHED");
         }
     }
 }

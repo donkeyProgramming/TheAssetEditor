@@ -12,8 +12,8 @@ namespace Shared.GameFormats.WWise.Bkhd
                 ChunkHeader = BnkChunkHeader.CreateFromBytes(chunk),
 
                 dwBankGeneratorVersion = chunk.ReadUInt32(),
-                dwSoundBankID = chunk.ReadUInt32(),
-                dwLanguageID = chunk.ReadUInt32(),
+                dwSoundBankId = chunk.ReadUInt32(),
+                dwLanguageId = chunk.ReadUInt32(),
                 bFeedbackInBank = chunk.ReadUInt32(),
                 dwProjectID = chunk.ReadUInt32(),
             };
@@ -40,8 +40,8 @@ namespace Shared.GameFormats.WWise.Bkhd
             using var memStream = new MemoryStream();
             memStream.Write(BnkChunkHeader.GetAsByteArray(header.ChunkHeader));
             memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwBankGeneratorVersion, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwSoundBankID, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwLanguageID, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwSoundBankId, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwLanguageId, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(header.bFeedbackInBank, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(header.dwProjectID, out _));
             memStream.Write(header.padding);

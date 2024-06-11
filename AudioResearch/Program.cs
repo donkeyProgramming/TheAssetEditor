@@ -734,7 +734,7 @@ namespace AudioResearch
                   content = content.GetRange(1, content.Count - 1).ToList();
                   var colNames = header.Split(sep);
 
-                  var fnameHash = WWiseHash.Compute(fname);
+                  var fnameHash = WwiseHash.Compute(fname);
                   var dialogEvent = dialogEvents.Find(e => e.Id == fnameHash);
                   if (dialogEvent is null)
                   {
@@ -763,7 +763,7 @@ namespace AudioResearch
                           }
                           catch
                           {
-                              key = strings[i] == DEFAULT_KEYWORD ? 0 : WWiseHash.Compute(strings[i]);
+                              key = strings[i] == DEFAULT_KEYWORD ? 0 : WwiseHash.Compute(strings[i]);
                           }
 
                           AkDecisionTree.NodeContent node;

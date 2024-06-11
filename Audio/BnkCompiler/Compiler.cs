@@ -9,6 +9,8 @@ using Shared.GameFormats.Dat;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Bkhd;
 using Shared.GameFormats.WWise.Hirc;
+using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Shared.Core.PackFiles;
 
 namespace Audio.BnkCompiler
 {
@@ -25,12 +27,14 @@ namespace Audio.BnkCompiler
         private readonly HircBuilder _hircBuilder;
         private readonly BnkHeaderBuilder _headerBuilder;
         private readonly RepositoryProvider _provider;
+        private readonly PackFileService _packFileService;
 
-        public Compiler(HircBuilder hircBuilder, BnkHeaderBuilder headerBuilder, RepositoryProvider provider)
+        public Compiler(HircBuilder hircBuilder, BnkHeaderBuilder headerBuilder, RepositoryProvider provider, PackFileService packFileService)
         {
             _hircBuilder = hircBuilder;
             _headerBuilder = headerBuilder;
             _provider = provider;
+            _packFileService = packFileService;
         }
 
         public Result<CompileResult> CompileProject(CompilerData audioProject)
@@ -38,8 +42,10 @@ namespace Audio.BnkCompiler
             // Load audio repository to access dat dump.
             var audioRepository = new AudioRepository(_provider, false);
 
+            DialogueEventData.StoreExtractedDialogueEvents(audioRepository, _packFileService);
+
             // Build the wwise object graph. 
-            var header = _headerBuilder.Generate(audioProject);
+            var header = BnkHeaderBuilder.Generate(audioProject);
             var hircChunk = _hircBuilder.Generate(audioProject);
 
             // Ensure all write ids are not causing conflicts.
@@ -83,13 +89,13 @@ namespace Audio.BnkCompiler
             return bnkPackFile;
         }
 
-        private PackFile BuildDat(CompilerData projectFile)
+        private static PackFile BuildDat(CompilerData projectFile)
         {
             var outputName = $"event_data__{projectFile.ProjectSettings.BnkName}.dat";
             var datFile = new SoundDatFile();
 
-            foreach (var wwiseEvent in projectFile.Events)
-                datFile.Event0.Add(new SoundDatFile.EventWithValue() { EventName = wwiseEvent.Name, Value = 400 });
+            foreach (var wwiseEvent in projectFile.StatesDat)
+                datFile.Event0.Add(new SoundDatFile.EventWithValue() { EventName = wwiseEvent, Value = 400 });
 
             var bytes = DatFileParser.GetAsByteArray(datFile);
             var packFile = new PackFile(outputName, new MemorySource(bytes));
@@ -97,12 +103,12 @@ namespace Audio.BnkCompiler
             return packFile;
         }
 
-        private PackFile BuildStatesDat(CompilerData projectFile)
+        private static PackFile BuildStatesDat(CompilerData projectFile)
         {
             var outputName = $"states_data__{projectFile.ProjectSettings.BnkName}.dat";
             var datFile = new SoundDatFile();
 
-            foreach (var state in projectFile.DatStates)
+            foreach (var state in projectFile.StatesDat)
                 datFile.Event0.Add(new SoundDatFile.EventWithValue() { EventName = state, Value = 400 });
 
             var bytes = DatFileParser.GetAsByteArray(datFile);

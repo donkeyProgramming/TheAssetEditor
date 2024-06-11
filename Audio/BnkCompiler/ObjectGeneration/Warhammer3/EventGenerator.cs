@@ -9,7 +9,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class EventGenerator : IWWiseHircGenerator
     {
-        public string GameName => CompilerConstants.Game_Warhammer3;
+        public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(Event);
 
         public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
@@ -22,7 +22,7 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public CAkEvent_v136 ConvertToWWise(Event inputEvent, CompilerData project)
         {
             var wwiseEvent = new CAkEvent_v136();
-            wwiseEvent.Id = project.GetHircItemIdFromName(inputEvent.Name);
+            wwiseEvent.Id = inputEvent.Id;
             wwiseEvent.Type = HircType.Event;
             wwiseEvent.Actions = inputEvent.Actions.Select(x => CreateActionFromInputEvent(x, project)).ToList();
 
@@ -30,9 +30,9 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return wwiseEvent;
         }
 
-        private static CAkEvent_v136.Action CreateActionFromInputEvent(string actionName, CompilerData project)
+        private static CAkEvent_v136.Action CreateActionFromInputEvent(uint actionId, CompilerData project)
         {
-            return new CAkEvent_v136.Action() { ActionId = project.GetHircItemIdFromName(actionName) };
+            return new CAkEvent_v136.Action() { ActionId = actionId };
         }
     }
 }

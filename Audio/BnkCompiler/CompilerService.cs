@@ -5,9 +5,9 @@ namespace Audio.BnkCompiler
 {
     public class CompilerSettings
     {
-        public bool UserOverrideIdForActions { get; set; } = false;
-        public bool UseOverrideIdForMixers { get; set; } = false;
-        public bool UseOverrideIdForSounds { get; set; } = false;
+        public bool UserIdForActions { get; set; } = false;
+        public bool UseIdForMixers { get; set; } = false;
+        public bool UseIdForSounds { get; set; } = false;
         public bool SaveGeneratedCompilerInput { get; set; } = true;
 
         public string WWiserPath { get; set; } = "D:\\Research\\Audio\\WWiser\\wwiser.pyz";

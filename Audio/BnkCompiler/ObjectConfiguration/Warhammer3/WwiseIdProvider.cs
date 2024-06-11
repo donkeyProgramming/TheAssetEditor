@@ -10,13 +10,12 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 
     }
 
-    public class IdProvider : IVanillaObjectIds
+    public class WwiseIdProvider : IVanillaObjectIds
     {
         /*
         How to find Ids:
 
             Finding Ids for mixer objects can be done by using the Audio Explorer and referring to the lowest ActorMixer in the Graph Structure of a given sound (top level mixer).
-
             Finding Ids for attenuation objects involves clicking on the sound of an event in the Audio Explorer to find the parent bnk and the top level mixer. 
             Then extract the parent bnk to your PC, load it with Wwiser, then click Dump Bnk.
             Open the Xml file that Dump Bnk created and ctrl+f for the mixer Id. Find the Actor Mixer object and look through its settings to see if there's any attenuation - if so then that's the attenuation Id.
@@ -48,7 +47,7 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
             {"frontend_vo", 745637913}
         };
 
-        // Attenuation IDs used for the top level mixers of dialogue events. This essentially pairs up a key from DialogueEventMixerIds or EventMixerIds with "_attenuation" and associates this with an attenuation object Id.
+        // Attenuation Ids used for the top level mixers of dialogue events. This essentially pairs up a key from DialogueEventMixerIds or EventMixerIds with "_attenuation" and associates this with an attenuation object Id.
         public Dictionary<string, uint> AttenuationIds { get; } = new Dictionary<string, uint>()
         {
             // {"Type of attenuation", Attenuation Id}
@@ -67,6 +66,9 @@ namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 
     internal static class CompilerConstants
     {
-        public static readonly string Game_Warhammer3 = "Warhammer3";
+        public static readonly string GameWarhammer3 = "Warhammer3";
+        public static readonly string ActionType = "Play";
+        public static readonly ushort UWeight = 50; // Always 50 in WH3 Dialogue Events.
+        public static readonly ushort UProbability = 100; // Always 100 in WH3 Dialogue Events.
     }
 }

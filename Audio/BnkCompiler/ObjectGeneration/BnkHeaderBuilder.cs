@@ -6,16 +6,17 @@ namespace Audio.BnkCompiler.ObjectGeneration
 {
     public class BnkHeaderBuilder
     {
-        public BkhdHeader Generate(CompilerData projectFile)
+        public static BkhdHeader Generate(CompilerData projectFile)
         {
-            // throw new System.Exception();
             var bnkName = projectFile.ProjectSettings.BnkName;
-            var soundBankId = WWiseHash.Compute(bnkName);
+            var soundBankId = WwiseHash.Compute(bnkName);
+            var language = WwiseHash.Compute(projectFile.ProjectSettings.Language);
+
             var header = new BkhdHeader()
             {
                 dwBankGeneratorVersion = 0x80000088,
-                dwSoundBankID = soundBankId,
-                dwLanguageID = 550298558, // English(UK)
+                dwSoundBankId = soundBankId,
+                dwLanguageId = language,
                 bFeedbackInBank = 0x10,
                 dwProjectID = 2361,
                 padding = BitConverter.GetBytes(0x04)

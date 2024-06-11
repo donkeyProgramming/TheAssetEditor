@@ -38,7 +38,7 @@ namespace Shared.GameFormats.Dat
         public List<EventWithValue> Event0 { get; set; } = new List<EventWithValue>();
         public List<EventEnums> EnumGroup0 { get; set; } = new List<EventEnums>();
         public List<EventEnums> EnumGroup1 { get; set; } = new List<EventEnums>();
-        public List<EventWithValues> VoiceEvents { get; set; } = new List<EventWithValues>();
+        public List<EventWithValues> DialogueEvents { get; set; } = new List<EventWithValues>();
         public List<SettingValue> SettingValues { get; set; } = new List<SettingValue>();
         public List<string> Unknown { get; set; } = new List<string>();
 
@@ -58,8 +58,8 @@ namespace Shared.GameFormats.Dat
             foreach (var item in EnumGroup1)
                 builder.AppendLine($"{item.EnumName}, [{string.Join(",", item.EnumValues)}]");
 
-            builder.AppendLine($"Section 4 -{VoiceEvents.Count}");
-            foreach (var item in VoiceEvents)
+            builder.AppendLine($"Section 4 -{DialogueEvents.Count}");
+            foreach (var item in DialogueEvents)
                 builder.AppendLine($"{item.EventName}, [{string.Join(",", item.Values)}]");
 
             builder.AppendLine($"Section 5 -{SettingValues.Count}");
@@ -82,7 +82,7 @@ namespace Shared.GameFormats.Dat
             Event0.AddRange(other.Event0);
             EnumGroup0.AddRange(other.EnumGroup0);
             EnumGroup1.AddRange(other.EnumGroup1);
-            VoiceEvents.AddRange(other.VoiceEvents);
+            DialogueEvents.AddRange(other.DialogueEvents);
             SettingValues.AddRange(other.SettingValues);
             Unknown.AddRange(other.Unknown);
         }
@@ -98,7 +98,7 @@ namespace Shared.GameFormats.Dat
             output.AddRange(EnumGroup1.Select(x => x.EnumName));
             output.AddRange(EnumGroup1.SelectMany(x => x.EnumValues));
 
-            output.AddRange(VoiceEvents.Select(x => x.EventName));
+            output.AddRange(DialogueEvents.Select(x => x.EventName));
             output.AddRange(SettingValues.Select(x => x.EventName));
             output.AddRange(Unknown.Select(x => x));
 
@@ -113,8 +113,8 @@ namespace Shared.GameFormats.Dat
                 output.AppendLine($"\t{item.EventName}[{item.Value}]");
 
             output.AppendLine();
-            output.AppendLine($"Unknown (count:{VoiceEvents.Count}):");
-            foreach (var item in VoiceEvents)
+            output.AppendLine($"Unknown (count:{DialogueEvents.Count}):");
+            foreach (var item in DialogueEvents)
                 output.AppendLine($"\t{item.EventName} [{string.Join(", ", item.Values.Select(x => audioRepository.GetNameFromHash(x)))}]");
 
             output.AppendLine();

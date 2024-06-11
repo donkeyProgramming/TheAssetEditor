@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 
+/*
 namespace Audio.Utility
 {
     public class AudioProjectExporter
@@ -30,7 +31,7 @@ namespace Audio.Utility
             var projectEvent = new Event()
             {
                 Name = eventName,
-                OverrideId = wwiseEvent.Id,
+                Id = wwiseEvent.Id,
                 Actions = new List<string> { actionName },
             };
 
@@ -46,7 +47,7 @@ namespace Audio.Utility
             var projectAction = new Action()
             {
                 Name = actionName,
-                OverrideId = wwiseActionInstance.Id,
+                Id = wwiseActionInstance.Id,
                 ChildId = soundName,
                 Type = "Play"
             };
@@ -62,7 +63,7 @@ namespace Audio.Utility
             var projectSound = new GameSound()
             {
                 Name = soundName,
-                OverrideId = wwiseSoundInstance.Id,
+                Id = wwiseSoundInstance.Id,
                 Path = $"Audio\\WWise\\{wwiseSoundInstance.AkBankSourceData.akMediaInformation.SourceId}.wem",
             };
 
@@ -103,8 +104,8 @@ namespace Audio.Utility
                 {
                     Name = mixerNames[mixer.Id],
                     DirectParentId = 0,
-                    OverrideId = mixer.Id,
-                    Children = audioChildren.Select(x => project.GameSounds.First(sound => sound.OverrideId == x.Id).Name).ToList(), // we have to match on this
+                    Id = mixer.Id,
+                    Children = audioChildren.Select(x => project.GameSounds.First(sound => sound.Id == x.Id).Name).ToList(), // we have to match on this
                     ActorMixerChildren = mixerChildren.Select(x => mixerNames[x.Id]).ToList(),
                 };
 
@@ -140,4 +141,4 @@ namespace Audio.Utility
         }
     }
 }
-
+*/

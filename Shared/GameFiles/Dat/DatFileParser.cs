@@ -46,7 +46,7 @@ namespace Shared.GameFormats.Dat
                 for (var j = 0; j < attrValCount; j++)
                     eventEnum.Values.Add(chunk.ReadUInt32());
 
-                output.VoiceEvents.Add(eventEnum);
+                output.DialogueEvents.Add(eventEnum);
             }
 
             if (isAtilla)
@@ -100,8 +100,8 @@ namespace Shared.GameFormats.Dat
                     memStream.Write(WriteStr32(enumType.EnumName));
             }
 
-            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)file.VoiceEvents.Count(), out _));
-            foreach (var voiceEvent in file.VoiceEvents)
+            memStream.Write(ByteParsers.UInt32.EncodeValue((uint)file.DialogueEvents.Count(), out _));
+            foreach (var voiceEvent in file.DialogueEvents)
             {
                 memStream.Write(WriteStr32(voiceEvent.EventName));
                 memStream.Write(ByteParsers.UInt32.EncodeValue((uint)voiceEvent.Values.Count(), out _));

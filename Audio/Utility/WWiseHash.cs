@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Audio.Utility
 {
-    public static class WWiseHash
+    public static class WwiseHash
     {
         public static uint Compute(string name)
         {
