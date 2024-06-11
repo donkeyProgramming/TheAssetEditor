@@ -1,8 +1,9 @@
-﻿using View3D.SceneNodes;
+﻿using System.Windows;
+using View3D.SceneNodes;
 
 namespace View3D.Services.SceneSaving.Lod.Strategies
 {
-    public class Lod0ForAllLodGeneration : ILodGenerationStrategy
+    public class Lod0ForAllLodGeneration : OptimizedLodGeneratorBase, ILodGenerationStrategy
     {
 
         public LodStrategy StrategyId => LodStrategy.Lod0ForAll;
@@ -16,10 +17,11 @@ namespace View3D.Services.SceneSaving.Lod.Strategies
         }
 
         public void Generate(MainEditableNode mainNode, LodGenerationSettings[] settings)
-        {
-            //var res = MessageBox.Show("Are you sure to copy lod 0 to every lod slots? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            //if (res != MessageBoxResult.Yes) return;
-            //
+        {           
+            var res = MessageBox.Show("Are you sure to copy lod 0 to every lod slots? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes)
+                return;
+            
             //mainNode.GetLodNodes().ForEach(x =>
             //{
             //    x.LodReductionFactor = 1;
@@ -30,5 +32,9 @@ namespace View3D.Services.SceneSaving.Lod.Strategies
             //_lodGenerationService.CreateLodsForRootNode(mainNode);
         }
 
+        protected override void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
