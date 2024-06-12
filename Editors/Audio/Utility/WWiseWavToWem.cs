@@ -164,7 +164,7 @@ namespace Audio.Utility
         public static void InitialiseWwiseProject()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var resourceRootNamespace = "Audio.Resources";
+            var resourceRootNamespace = "Shared.Resources.AudioConversion";
             var tempFolderPath = $"{DirectoryHelper.Temp}";
             var wavToWemFolderPath = $"{tempFolderPath}\\WavToWem";
             var wavToWemWwiseProjectPath = $"{wavToWemFolderPath}\\WavToWemWwiseProjectPath";
