@@ -1,12 +1,15 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Windows;
 using Audio.AudioEditor;
 using Audio.Storage;
 using Audio.Utility;
 using CommonControls.BaseDialogs;
+using Newtonsoft.Json.Linq;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
@@ -22,7 +25,6 @@ namespace Audio.Presentation.AudioExplorer
 
         private readonly IAudioRepository _audioRepository;
         private readonly SoundPlayer _soundPlayer;
-        private readonly AudioResearchHelper _audioResearchHelper;
 
         PackFile _mainFile;
         HircTreeItem _selectedNode;
@@ -42,11 +44,10 @@ namespace Audio.Presentation.AudioExplorer
         public PackFile MainFile { get => _mainFile; set { _mainFile = value; } }
         public bool HasUnsavedChanges { get; set; }
 
-        public AudioExplorerViewModel(IAudioRepository audioRepository, SoundPlayer soundPlayer, AudioResearchHelper audioResearchHelper)
+        public AudioExplorerViewModel(IAudioRepository audioRepository, SoundPlayer soundPlayer)
         {
             _audioRepository = audioRepository;
             _soundPlayer = soundPlayer;
-            _audioResearchHelper = audioResearchHelper;
 
             ShowIds = new NotifyAttr<bool>(false, RefreshList);
             ShowBnkName = new NotifyAttr<bool>(false, RefreshList);
@@ -93,7 +94,7 @@ namespace Audio.Presentation.AudioExplorer
             if (selectedNode == null || selectedNode.Item == null)
                 return;
 
-            var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(_audioRepository) }, WriteIndented = true });
+            var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
             SelectedNodeText.Value = hircAsString;
 
             if (selectedNode.Item.Type == HircType.Sound)
@@ -115,19 +116,14 @@ namespace Audio.Presentation.AudioExplorer
 
         public void PlaySelectedSoundAction()
         {
-            var hircAsString = JsonSerializer.Serialize((object)_selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(_audioRepository) }, WriteIndented = true });
-            var hircInitialSubstring = hircAsString.Substring(0, hircAsString.IndexOf("\"uInMemoryMediaSize\""));
-            var substringFrom = "\"SourceId\": \"";
-            var substringTo = "\",";
-            var substringStart = hircInitialSubstring.IndexOf(substringFrom) + substringFrom.Length;
-            var substringEnd = hircInitialSubstring.IndexOf(substringTo, substringStart);
-            var sourceID = hircInitialSubstring.Substring(substringStart, substringEnd - substringStart);
+            var nodeDisplayName = _selectedNode.DisplayName;
+            var regex = new Regex(@"(\d+)\.wem");
+            var match = regex.Match(nodeDisplayName);
+            var sourceId = match.Groups[1].Value;
 
-            _soundPlayer.PlaySound(sourceID, TreeList.First().Item.Id);
+            _soundPlayer.PlaySound(sourceId, TreeList.First().Item.Id);
         }
 
-        public void ExportCurrrentDialogEventAsCsvAction() => _audioResearchHelper.ExportDialogEventsToFile(_selectedNode.Item as CAkDialogueEvent_v136, true);
-        public void ExportIdListAction() => _audioResearchHelper.ExportNamesToFile("c:\\temp\\wwiseIds.txt", true);
         public void LoadHircFromIdAction()
         {
             var window = new TextInputWindow("Hirc Input", "Hirc ID", true);
@@ -153,7 +149,7 @@ namespace Audio.Presentation.AudioExplorer
                     return;
                 }
 
-                var hircAsString = JsonSerializer.Serialize<object[]>(foundHircs.ToArray(), new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter(), new WwiseJsonNumberConverterFactory(_audioRepository) }, WriteIndented = true });
+                var hircAsString = JsonSerializer.Serialize<object[]>(foundHircs.ToArray(), new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
                 SelectedNodeText.Value = hircAsString;
             }
         }
