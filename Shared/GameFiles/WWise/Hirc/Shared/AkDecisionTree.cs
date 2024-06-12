@@ -210,15 +210,6 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             Console.WriteLine($"======================= PRINTING FLATTENED CUSTOM DECISION TREE =======================");
             PrintBinaryNodes(flattenedTree, 0);
 
-            var validateRootNodeGraph = ConvertListToGraph(flattenedTree, uTreeDepth, 0, 0, 0);
-            var validateRootNodeGraphString = ConvertGraphToString(validateRootNodeGraph, 0);
-            var rootNodeString = ConvertGraphToString(rootNode, 0);
-
-            if (rootNodeString != validateRootNodeGraphString)
-                throw new Exception("Graphs not equal - validation failed.");
-            else
-                Console.WriteLine($"======================= VALIDATION COMPLETE: GRAPH IS VALID =======================");
-
             return flattenedTree;
         }
 

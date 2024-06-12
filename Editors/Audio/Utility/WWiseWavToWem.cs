@@ -13,7 +13,7 @@ namespace Audio.Utility
 {
     public class WWiseWavToWem
     {
-        ApplicationSettingsService _settingsService;
+        readonly ApplicationSettingsService _settingsService;
 
         public WWiseWavToWem()
         {

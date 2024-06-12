@@ -37,9 +37,7 @@ namespace Editors.Audio
             serviceCollection.AddTransient<WWiseBnkLoader>();
             serviceCollection.AddTransient<WWiseNameLoader>();
             serviceCollection.AddTransient<BnkParser>();
-
             serviceCollection.AddTransient<SoundPlayer>();
-            serviceCollection.AddTransient<AudioResearchHelper>();
 
             serviceCollection.AddScoped<IWWiseHircGenerator, ActionGenerator>();
             serviceCollection.AddScoped<IWWiseHircGenerator, EventGenerator>();
