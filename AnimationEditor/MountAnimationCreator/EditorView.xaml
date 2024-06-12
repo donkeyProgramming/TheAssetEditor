@@ -16,6 +16,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <local:RiderAttachmentSubView Grid.Row="0" />
@@ -24,5 +25,6 @@
         <views:SaveAndPreviewView Grid.Row="3"/>
         <local:VisualisationHelperSubView  Grid.Row="4" />
         <Button Content="Refresh Tool" Click="{s:MethodBinding RefreshViewAction}" Grid.Row="5" Margin="10,0,10,0"/>
+        <Button Content="Copy rider all animation frames" Click="{s:MethodBinding CopyAnimation}" Grid.Row="6" Margin="10,0,10,0"/>
     </Grid>
 </UserControl>
