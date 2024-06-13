@@ -11,7 +11,7 @@ namespace Editors.Reports
 
         public override void Register(IServiceCollection services)
         {
-            services.AddSingleton<TouchedFilesRecorder>();
+           
         }
     }
 }

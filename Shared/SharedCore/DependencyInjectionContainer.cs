@@ -27,6 +27,7 @@ namespace Shared.Core
             services.AddSingleton<PackFileService>();
             services.AddSingleton<GlobalEventSender>();
             services.AddSingleton<ScopeRepository>();
+            services.AddSingleton<TouchedFilesRecorder>();
 
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
             services.AddScoped<EventHub>();
