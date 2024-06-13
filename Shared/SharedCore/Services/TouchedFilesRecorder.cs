@@ -3,7 +3,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
-namespace Editors.Reports
+namespace Shared.Core.Services
 {
     public class TouchedFilesRecorder
     {
@@ -25,7 +25,7 @@ namespace Editors.Reports
 
         public void Start()
         {
-            if(_isStarted)
+            if (_isStarted)
                 return;
             _pfs.FileLookUpEvent += LookUpEventHandler;
             _isStarted = true;
@@ -41,7 +41,7 @@ namespace Editors.Reports
         {
             var newPack = _pfs.CreateNewPackFileContainer("AutoExtracted", PackFileCAType.MOD);
 
-            foreach(var item in _files)
+            foreach (var item in _files)
                 _pfs.CopyFileFromOtherPackFile(item.Container, item.FilePath, newPack);
 
             _pfs.Save(newPack, path, false);
@@ -49,7 +49,7 @@ namespace Editors.Reports
 
         public void Stop()
         {
-            if(_isStarted)
+            if (_isStarted)
                 _pfs.FileLookUpEvent -= LookUpEventHandler;
             _isStarted = false;
             _files.Clear();
