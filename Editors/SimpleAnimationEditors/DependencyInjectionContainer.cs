@@ -2,11 +2,13 @@
 using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.CampaignAnimBin;
+using CommonControls.Editors.TextEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
+using Shared.Ui.Editors.TextEditor;
 
-namespace Editors.AnimationContainers
+namespace Editors.AnimationTextEditors
 {
     public class DependencyInjectionContainer : DependencyContainer
     {
@@ -16,18 +18,46 @@ namespace Editors.AnimationContainers
 
         public override void Register(IServiceCollection services)
         {
-            AnimationPack_DependencyInjectionContainer.Register(services);
-            CampaignAnimBin_DependencyInjectionContainer.Register(services);
-            AnimationFilePreviewEditor_DependencyInjectionContainer.Register(services);
-            AnimationBatchExporter_DependencyInjectionContainer.Register(services);
+            RegisterAnimPack(services);
+            RegisterCampaignAnimBin(services);
+            RegisterAnimFileViewer(services);
+            RegisterBatchConverter(services);
         }
 
         public override void RegisterTools(IToolFactory factory)
         {
-            AnimationPack_DependencyInjectionContainer.RegisterTools(factory);
-            CampaignAnimBin_DependencyInjectionContainer.RegisterTools(factory);
-            AnimationFilePreviewEditor_DependencyInjectionContainer.RegisterTools(factory);
-            AnimationBatchExporter_DependencyInjectionContainer.RegisterTools(factory);
+            factory.RegisterTool<AnimPackViewModel, AnimationPackView>(new ExtensionToTool(EditorEnums.AnimationPack_Editor, new[] { ".animpack" }));
+            factory.RegisterTool<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(new PathToTool(EditorEnums.XML_Editor, ".bin", @"animations\campaign\database"));
+            factory.RegisterTool<TextEditorViewModel<AnimFileToTextConverter>, TextEditorView>(new ExtensionToTool(EditorEnums.XML_Editor, new[] { ".anim" }));
+            factory.RegisterTool<TextEditorViewModel<InvMatrixToTextConverter>, TextEditorView>(new ExtensionToTool(EditorEnums.XML_Editor, new[] { ".bone_inv_trans_mats" }));
+        }
+
+        private static void RegisterCampaignAnimBin(IServiceCollection services)
+        {
+            services.AddTransient<CampaignAnimBinToXmlConverter>();
+            services.AddTransient<TextEditorViewModel<CampaignAnimBinToXmlConverter>>();
+        }
+
+        private static void RegisterAnimFileViewer(IServiceCollection services)
+        {
+            services.AddTransient<AnimFileToTextConverter>();
+            services.AddTransient<TextEditorViewModel<AnimFileToTextConverter>>();
+
+            services.AddTransient<InvMatrixToTextConverter>();
+            services.AddTransient<TextEditorViewModel<InvMatrixToTextConverter>>();
+        }
+
+        private static void RegisterBatchConverter(IServiceCollection services)
+        {
+            services.AddTransient<OpenAnimationBatchConverterCommand>();
+            services.AddTransient<AnimationBatchExportViewModel>();
+            services.AddTransient<AnimationBatchExportView>();
+        }
+
+        private static void RegisterAnimPack(IServiceCollection services)
+        {
+            services.AddTransient<AnimationPackView>();
+            services.AddTransient<AnimPackViewModel>();
         }
     }
 }

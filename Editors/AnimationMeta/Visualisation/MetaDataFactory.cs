@@ -25,7 +25,8 @@ using View3D.Services;
 
 namespace AnimationMeta.Visualisation
 {
-    public class MetaDataFactory
+
+    public class MetaDataFactory : IMetaDataFactory
     {
         private readonly ILogger _logger = Logging.Create<MetaDataFactory>();
         private readonly ComplexMeshLoader _complexMeshLoader;
@@ -35,13 +36,13 @@ namespace AnimationMeta.Visualisation
         private readonly AnimationsContainerComponent _animationsContainerComponent;
 
         public MetaDataFactory(ComplexMeshLoader complexMeshLoader,
-            ResourceLibrary resourceLibary, 
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            ResourceLibrary resourceLibrary,
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             PackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent)
         {
             _complexMeshLoader = complexMeshLoader;
-            _resourceLibrary = resourceLibary;
+            _resourceLibrary = resourceLibrary;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _packFileService = packFileService;
             _animationsContainerComponent = animationsContainerComponent;

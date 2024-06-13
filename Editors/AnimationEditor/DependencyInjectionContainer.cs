@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
 
-namespace Editors.AnimationEditor
+namespace Editors.AnimationVisualEditors
 {
     public class DependencyInjectionContainer : DependencyContainer
     {

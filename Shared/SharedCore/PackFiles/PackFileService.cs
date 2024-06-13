@@ -233,7 +233,7 @@ namespace Shared.Core.PackFiles
             return output;
         }
 
-        public string GetFullPath(PackFile file, PackFileContainer container = null)
+        public string GetFullPath(PackFile file, PackFileContainer? container = null)
         {
             if (container == null)
             {

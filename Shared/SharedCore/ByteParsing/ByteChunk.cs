@@ -5,8 +5,7 @@ namespace Shared.Core.ByteParsing
 {
     public class ByteChunk
     {
-        byte[] _buffer;
-
+        readonly byte[] _buffer;
 
         int _currentIndex = 0;
         public int CurrentIndex
@@ -177,7 +176,7 @@ namespace Shared.Core.ByteParsing
                 output.Add(item);
             }
 
-            return new UnknownParseResult() { Data = output.ToArray() };
+            return new UnknownParseResult(output.ToArray());
         }
 
         public UnknownParseResult[] PeakUnknown(int numBytes)
@@ -216,7 +215,13 @@ namespace Shared.Core.ByteParsing
 
         public class UnknownParseResult
         {
-            public Item[] Data { get; set; }
+            public Item[] Data { get; private set; }
+
+            public UnknownParseResult(Item[] data)
+            {
+                Data = data;
+            }
+
             public override string ToString()
             {
                 return string.Join(" \n", Data.Select(x => x.DisplayStr()));
@@ -245,7 +250,7 @@ namespace Shared.Core.ByteParsing
         }
 
 
-        public byte[] Debug_LookForDataAfterFixedStr(int size)
+        public byte[]? Debug_LookForDataAfterFixedStr(int size)
         {
             var dataCpy = new ByteChunk(ReadBytes(size));
             Index -= size;
@@ -265,8 +270,7 @@ namespace Shared.Core.ByteParsing
             return null;
         }
 
-
-        public string Debug_LookForStrAfterFixedStr(int size)
+        public string? Debug_LookForStrAfterFixedStr(int size)
         {
             var dataCpy = new ByteChunk(ReadBytes(size));
             Index -= size;
@@ -287,7 +291,6 @@ namespace Shared.Core.ByteParsing
 
             return null;
         }
-
 
         public override string ToString()
         {

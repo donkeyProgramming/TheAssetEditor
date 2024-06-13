@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using AnimationEditor.AnimationKeyframeEditor;
 using System.Windows.Forms;
 using AnimationEditor.Common.AnimationPlayer;
@@ -16,7 +15,6 @@ using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
 using View3D.Animation;
@@ -24,6 +22,8 @@ using View3D.Components.Component.Selection;
 using View3D.SceneNodes;
 using MessageBox = System.Windows.Forms.MessageBox;
 using Clipboard = System.Windows.Clipboard;
+using Shared.Ui.Events.UiCommands;
+using Shared.Core.Events;
 
 
 namespace AnimationEditor.MountAnimationCreator
@@ -32,8 +32,8 @@ namespace AnimationEditor.MountAnimationCreator
     {
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly SceneObjectBuilder _sceneObjectBuilder;
+        private readonly IUiCommandFactory _uiCommandFactory;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
-        private readonly ApplicationSettingsService _applicationSettings;
         private readonly PackFileService _pfs;
         private readonly SelectionManager _selectionManager;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -71,22 +71,19 @@ namespace AnimationEditor.MountAnimationCreator
         public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
         public FilterCollection<AnimationBinEntryGenericFormat> ActiveFragmentSlot { get; set; }
 
-
-
         public MountAnimationCreatorViewModel( PackFileService pfs, 
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
-            SelectionManager selectionManager, 
-            ApplicationSettingsService applicationSettings,
+            SelectionManager selectionManager,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
-            SceneObjectBuilder sceneObjectBuilder)
+            SceneObjectBuilder sceneObjectBuilder,
+            IUiCommandFactory uiCommandFactory)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
             _animationPlayerViewModel = animationPlayerViewModel;
             _sceneObjectBuilder = sceneObjectBuilder;
+            _uiCommandFactory = uiCommandFactory;
             _pfs = pfs;
-
-            _applicationSettings = applicationSettings;
 
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _selectionManager = selectionManager;
@@ -285,8 +282,7 @@ namespace AnimationEditor.MountAnimationCreator
             if (animationSet != null)
             {
                 var animpackFileName = animationSet.PackFileReference.FileName;
-                var packFile = _pfs.FindFile(animpackFileName);
-                CommonControls.Editors.AnimationPack.AnimPackViewModel.ShowPreviewWinodow(packFile, _pfs, _skeletonAnimationLookUpHelper, animpackFileName, _applicationSettings);
+                _uiCommandFactory.Create<OpenFileInWindowedEditorCommand>().Execute(animpackFileName, 800, 900);
             }
         }
 

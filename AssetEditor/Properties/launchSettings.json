@@ -4,19 +4,24 @@
       "commandName": "Project",
       "nativeDebugging": false
     },
-    "AssetEditor-KitbashKarl": {
+    "AE-KitbashKarl": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg Kitbash_Karl",
       "nativeDebugging": false
     },
-    "AssetEditor-TextureKarl": {
+    "AE-TextureKarl": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg Texture_Karl",
       "nativeDebugging": false
     },
-    "AssetEditor-AudioEditor": {
+    "AE-AudioEditor": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg AudioEditor_Wh3",
+      "nativeDebugging": false
+    },
+    "AE-SuperView": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg SuperView_Rat",
       "nativeDebugging": false
     }
   }

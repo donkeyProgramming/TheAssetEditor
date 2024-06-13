@@ -26,7 +26,7 @@ namespace Shared.Core.Services
                         {
                             if (task.IsFaulted)
                             {
-                                Exception ex = task.Exception;
+                                Exception? ex = task.Exception;
                                 while (ex is AggregateException && ex.InnerException != null)
                                     ex = ex.InnerException;
                                 if (ex != null)
@@ -34,7 +34,7 @@ namespace Shared.Core.Services
                             }
 
                             var releases = task.Result;
-                            var latest = releases.FirstOrDefault();
+                            var latest = releases.First();
                             var currentVersion = "v" + CurrentVersion;
 
                             if (!latest.TagName.Contains(currentVersion, StringComparison.InvariantCultureIgnoreCase))

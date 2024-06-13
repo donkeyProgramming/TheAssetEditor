@@ -2,7 +2,7 @@
 {
     public class ChuckWriter
     {
-        List<byte> _bytes = new List<byte>();
+        readonly List<byte> _bytes = new List<byte>();
 
         public void Write<T>(T value, SpesificByteParser<T> parser)
         {

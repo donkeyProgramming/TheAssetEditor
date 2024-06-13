@@ -16,7 +16,10 @@ namespace Shared.Core.ByteParsing
             try
             {
                 var p = handle.AddrOfPinnedObject() + offset;
-                return (T)Marshal.PtrToStructure(p, typeof(T));
+                var pointerToStruct = Marshal.PtrToStructure(p, typeof(T));
+                if (pointerToStruct == null)
+                    throw new Exception("Object is null after getting pointerToStruct");
+                return (T)pointerToStruct;
             }
             finally
             {

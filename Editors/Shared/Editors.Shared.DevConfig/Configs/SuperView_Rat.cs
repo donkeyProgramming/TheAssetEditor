@@ -4,6 +4,7 @@ using Editors.Shared.DevConfig.Base;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
+using Shared.EmbeddedResources;
 using Shared.GameFormats.AnimationPack;
 
 namespace Editors.Shared.DevConfig.Configs
@@ -25,6 +26,9 @@ namespace Editors.Shared.DevConfig.Configs
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.LoadWemFiles = true;
+            currentSettings.LoadCaPacksByDefault = false;
+            var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Throt.pack";
+            _packFileService.Load(packFile, false, true);
         }
 
         public void OpenFileOnLoad()
@@ -32,7 +36,7 @@ namespace Editors.Shared.DevConfig.Configs
             CreateThrot(_editorCreator, _toolFactory, _packFileService);
         }
 
-        static void CreateThrot(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        void CreateThrot(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
             var editorView = toolFactory.Create<EditorHost<SuperViewViewModel>>();
             var debugInput = new AnimationToolInput()

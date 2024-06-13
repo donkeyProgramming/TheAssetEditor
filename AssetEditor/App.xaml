@@ -15,7 +15,7 @@
             <!--Value converters-->
             <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
             <valueconverters:BoolToColourConverter x:Key="ColourConverter_black_red" TrueValue="Black" FalseValue="Red"/>
-            <valueconverters:BoolToColourConverter x:Key="BoolToColour_white_red" TrueValue="White" FalseValue="Red"/>
+            <valueconverters:BoolToColourConverter x:Key="BoolToColour_white_red" TrueValue="Gray" FalseValue="Red"/>
             <valueconverters:BoolToColourConverter x:Key="BoolToColour_black_gray" TrueValue="Black" FalseValue="Gray"/>
             <valueconverters:BoolToColourConverter x:Key="BoolToColour_white_gray" TrueValue="White" FalseValue="Gray"/>
             <valueconverters:InverseBooleanConverter x:Key="InvBoolConverter"/>

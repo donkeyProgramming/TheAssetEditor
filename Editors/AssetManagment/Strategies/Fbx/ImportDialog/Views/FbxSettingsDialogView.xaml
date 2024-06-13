@@ -1,0 +1,50 @@
+﻿<Window
+    x:Class="AssetManagement.Strategies.Fbx.ImportDialog.Views.FbxSettingsDialogView"                        
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"     
+    xmlns:s="http://schemas.singulink.com/xaml"                      
+    xmlns:controls="clr-namespace:AssetManagement.Strategies.Fbx.ImportDialog.Views.SubPanelViews"
+    
+     mc:Ignorable="d" d:DesignWidth="380"   
+   ResizeMode="CanResize"
+    Width="400"
+       >
+    <Grid>
+        <!--<DockPanel>-->
+        <DockPanel>
+
+            <!--File Info Panel (should be its own ViewMode-Mode ?-->
+            <controls:FbxFileInfoPanelView DockPanel.Dock="Top"/>
+
+            <!--Anim Info (should be its own ViewMode-Mode ?-->
+            <controls:FBXAnimationPanelView DockPanel.Dock="Top"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" DockPanel.Dock="Top">
+                <Button
+                x:Name="ImportButton"
+                Content="Import&#xA;"
+                Height="23"
+                
+                Margin="0,20,6,5"
+                VerticalAlignment="Bottom" 
+                Width="175"             
+                IsDefault="True"            
+                Click="{s:MethodBinding ImportButtonClicked}"/>
+
+                <Button
+                x:Name="CancelButton"
+                Content="Cancel" 
+                Height="23" 
+                Margin="0,20,0,5"            
+                VerticalAlignment="Bottom"
+                Width="199" 
+                IsCancel="True" HorizontalAlignment="Left"/>
+            </StackPanel>
+
+        </DockPanel>
+
+    </Grid>
+</Window>
+    

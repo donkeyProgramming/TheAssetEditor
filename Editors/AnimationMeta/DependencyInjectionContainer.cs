@@ -1,6 +1,7 @@
 ﻿using AnimationMeta.Presentation;
 using AnimationMeta.Presentation.View;
 using AnimationMeta.Visualisation;
+using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
@@ -17,7 +18,7 @@ namespace Editors.AnimationMeta
             serviceCollection.AddTransient<MainEditorView>();
             serviceCollection.AddTransient<EditorViewModel>();
 
-            serviceCollection.AddScoped<MetaDataFactory>(); // Needs heavy refactorying!
+            serviceCollection.AddScoped<IMetaDataFactory, MetaDataFactory>(); // Needs heavy refactorying!
         }
 
         public override void RegisterTools(IToolFactory factory)
