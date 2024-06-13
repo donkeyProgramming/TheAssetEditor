@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using View3D.SceneNodes;
+using View3D.Services.SceneSaving.Lod.MeshDecimatorIntegration;
 
 namespace View3D.Services.SceneSaving.Lod.Strategies
 {
@@ -8,7 +9,7 @@ namespace View3D.Services.SceneSaving.Lod.Strategies
 
         public LodStrategy StrategyId => LodStrategy.Lod0ForAll;
         public string Name => "Lod0_ForAll";
-        public string Description => "Copy lod 0 to all other lods";
+        public string Description => "Copy lod 0 to all other LODs";
         public bool IsAvailable => true;
 
         public Lod0ForAllLodGeneration()
@@ -21,20 +22,22 @@ namespace View3D.Services.SceneSaving.Lod.Strategies
             var res = MessageBox.Show("Are you sure to copy lod 0 to every lod slots? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (res != MessageBoxResult.Yes)
                 return;
-            
-            //mainNode.GetLodNodes().ForEach(x =>
-            //{
-            //    x.LodReductionFactor = 1;
-            //    x.OptimizeLod_Alpha = false;
-            //    x.OptimizeLod_Vertex = false;
-            //});
-            //
-            //_lodGenerationService.CreateLodsForRootNode(mainNode);
+
+            foreach (var setting in settings)
+            {
+                setting.LodRectionFactor = 1;
+                setting.OptimizeAlpha = false;
+                setting.OptimizeVertex = false;
+            }
+
+            CreateLodsForRootNode(mainNode, settings);
         }
 
         protected override void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio)
         {
-            throw new System.NotImplementedException();
+            var originalMesh = rmv2MeshNode.Geometry;
+            var reducedMesh = DecimatorMeshOptimizer.GetReducedMeshCopy(originalMesh, deductionRatio);
+            rmv2MeshNode.Geometry = reducedMesh;
         }
     }
 }

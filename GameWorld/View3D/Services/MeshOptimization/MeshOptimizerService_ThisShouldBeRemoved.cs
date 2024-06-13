@@ -1,7 +1,6 @@
 ﻿///using Simplygon;
 using View3D.Rendering.Geometry;
 using View3D.Services.SceneSaving.Lod.MeshDecimatorIntegration;
-using View3D.Services.SceneSaving.Lod.SimplygonIntegration;
 
 namespace View3D.Services.MeshOptimization
 {

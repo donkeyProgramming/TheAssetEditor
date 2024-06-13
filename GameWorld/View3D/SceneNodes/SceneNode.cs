@@ -1,15 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Shared.Core.Misc;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Shared.Core.Misc;
 using View3D.Components.Component;
-using View3D.Components.Rendering;
-using View3D.Rendering.Geometry;
 
 namespace View3D.SceneNodes
 {
-
-
     public abstract class SceneNode : NotifyPropertyChangedImpl, ISceneNode
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
