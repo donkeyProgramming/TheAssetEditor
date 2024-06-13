@@ -9,7 +9,7 @@ using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor
 {
-    internal class AssetEditor_DependencyInjectionContainer : DependencyContainer
+    internal class DependencyInjectionContainer : DependencyContainer
     {
         public override void Register(IServiceCollection serviceCollection)
         {

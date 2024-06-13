@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using AssetManagement;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shared.Core.DependencyInjection;
@@ -33,14 +32,14 @@ namespace AssetEditor.Services
                 new Editors.AnimationContainers.DependencyInjectionContainer(),
                 new Editors.Reports.DependencyInjectionContainer(),
                 new KitbasherEditor.DependencyInjectionContainer(),
-                new AssetManagement_DependencyInjectionContainer(),
+                new Editors.AssetManagement.DependencyInjectionContainer(),
                 new Editors.AnimationMeta.DependencyInjectionContainer(),
                 new Editors.Audio.DependencyInjectionContainer(),
                 new Editors.TextureEditor.DependencyInjectionContainer(),
                 new Editors.AnimationEditor.DependencyInjectionContainer(),
 
                 // Host application
-                new AssetEditor_DependencyInjectionContainer(),
+                new DependencyInjectionContainer(),
             };
         }
 
