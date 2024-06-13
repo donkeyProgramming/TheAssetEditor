@@ -12,9 +12,9 @@ namespace KitbasherEditor.ViewModels.UiCommands
     public class SaveCommandBase
     {
         private readonly IWindowFactory _windowFactory;
-        private readonly SaveSettings _settings;
         private readonly SceneManager _sceneManager;
         private readonly SaveService _saveService;
+        private SaveSettings _settings;
 
         public SaveCommandBase(IWindowFactory windowFactory, SaveSettings settings, SceneManager sceneManager, SaveService saveService)
         {
@@ -30,7 +30,10 @@ namespace KitbasherEditor.ViewModels.UiCommands
             if (_settings.IsInitialized == false || forceShowDialog)
             {
                 var window = _windowFactory.Create<SaveDialogViewModel, SaveDialogView>("Save", 630, 350);
+                window.TypedContext.Initialize(_settings);
                 saveScene = window.ShowWindow(true) == true;
+                if (saveScene)
+                    window.TypedContext.UpdateSettings(ref _settings);
             }
 
             if (saveScene)
