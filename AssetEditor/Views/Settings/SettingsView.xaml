@@ -99,19 +99,19 @@
                     SelectedItem="{Binding CurrentGame, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ItemsSource="{Binding Source={StaticResource GameTypeEnums}}"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Use TextEditor For Unknown Files"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Use TextEditor for unknown files"/>
                 <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding UseTextEditorForUnknownFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Load Ca Packs By Default"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Load CA packs by default"/>
                 <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding LoadCaPacksByDefault, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Autogene Attachment Points for meshes"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Autogene attachment points for meshes"/>
                 <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding AutoGenerateAttachmentPointsFromMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="Auto resolve missing textures"/>
                 <CheckBox Grid.Row="4" Grid.Column="2" IsChecked="{Binding AutoResolveMissingTextures, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                <TextBlock Grid.Row="5" Grid.Column="0"><Run Text="Hide wh2 texture selectors if warhammer 3 is selected"/><Run Language="en-gb" Text=" "/></TextBlock>
+                <TextBlock Grid.Row="5" Grid.Column="0"><Run Text="Hide Wh2 Texture Selectors if Wh3 is selected"/><Run Language="en-gb" Text=" "/></TextBlock>
                 <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding HideWh2TextureSelectors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </Grid>
         </GroupBox>
