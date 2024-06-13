@@ -4,7 +4,6 @@ namespace Shared.Core.ByteParsing
 {
     public class IOFunctions
     {
-        // static public byte[] staticBuffer = new byte[1024];
         public static string ReadZeroTerminatedAscii(BinaryReader reader, byte[] preAllocatedBuffer)
         {
             var index = 0;
