@@ -10,7 +10,6 @@ using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
@@ -26,12 +25,11 @@ namespace AnimationEditor.AnimationKeyframeEditor
 {
     public class AnimationKeyframeEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<AnimationKeyframeEditorViewModel>
     {
-        private SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
-        private AnimationPlayerViewModel _animationPlayerViewModel;
-        private SceneObjectBuilder _sceneObjectBuilder;
-        private PackFileService _pfs;
-        private ApplicationSettingsService _applicationSettings;
-        private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
+        private readonly AnimationPlayerViewModel _animationPlayerViewModel;
+        private readonly SceneObjectBuilder _sceneObjectBuilder;
+        private readonly PackFileService _pfs;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private GizmoToolbox _gizmoToolbox;
         private CopyPastePose _copyPastePose;
         private CopyPasteFromClipboardPose _copyPasteClipboardPose;
@@ -52,8 +50,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public CommandExecutor CommandExecutor { get => _commandExecutor; private set { _commandExecutor = value; } }
         private CommandExecutor _commandExecutor;
 
-        AnimationToolInput _inputRiderData;
-        AnimationToolInput _inputMountData;
         private SceneObject _newAnimation;
 
         public SceneObject Mount { get => _mount; private set { _mount = value; } }
@@ -162,7 +158,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public AnimationKeyframeEditorViewModel(PackFileService pfs,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             SelectionComponent selectionComponent,
-            ApplicationSettingsService applicationSettings,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
             SceneObjectBuilder sceneObjectBuilder,
@@ -176,7 +171,6 @@ namespace AnimationEditor.AnimationKeyframeEditor
             _sceneObjectBuilder = sceneObjectBuilder;
             _pfs = pfs;
 
-            _applicationSettings = applicationSettings;
 
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _selectionComponent = selectionComponent;
@@ -208,8 +202,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public void Initialize(EditorHost<AnimationKeyframeEditorViewModel> owner)
         {
-            var riderItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Rider", Color.Black, _inputRiderData);
-            var mountItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Mount", Color.Black, _inputMountData);
+            var riderItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Rider", Color.Black, null);
+            var mountItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Mount", Color.Black, null);
             mountItem.Data.IsSelectable = true;
 
             var propAsset = _sceneObjectBuilder.CreateAsset("New Anim", Color.Red);

@@ -10,7 +10,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
     public class TextureFileEditorServiceViewModel
     {
-        TextureFileEditorService _textureService;
+        private readonly TextureFileEditorService _textureService;
 
         public ICommand CreateProjectCommand { get; set; }
         public ICommand RefreshProjectCommand { get; set; }
@@ -27,6 +27,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public TextureFileEditorServiceViewModel(MainEditableNode mainNode)
         {
+            _textureService = mainNode.TextureFileEditorService;
+
             CreateProjectCommand = new RelayCommand(() => _textureService.CreateProject());
             RefreshProjectCommand = new RelayCommand(() => _textureService.RefreshProject());
             RefreshTexturesCommand = new RelayCommand(() => _textureService.RefreshTextures());
@@ -34,7 +36,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             OpenFolderCommand = new RelayCommand(() => _textureService.OpenProjectFolder());
             BrowseCommand = new RelayCommand(Browse);
 
-            _textureService = mainNode.TextureFileEditorService;
             _textureService.UpdateStatus();
             UpdateView();
         }

@@ -4,8 +4,8 @@ namespace Shared.Core.ToolCreation
 {
     public class ExtensionToTool : IPackFileToToolSelector
     {
-        string[] _validExtentionsCore;
-        string[] _validExtentionsOptimal;
+        readonly string[] _validExtentionsCore;
+        readonly string[] _validExtentionsOptimal;
 
         public ExtensionToTool(EditorEnums editorDisplayName, string[] coreTools, string[] optionalTools = null)
         {

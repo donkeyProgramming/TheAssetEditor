@@ -13,7 +13,7 @@ namespace Shared.Core.Events
 
     public interface IUiCommandFactory
     {
-        T Create<T>(Action<T> configure = null) where T : IUiCommand;
+        T Create<T>(Action<T>? configure = null) where T : IUiCommand;
     }
 
     public class UiCommandFactory : IUiCommandFactory
@@ -25,7 +25,7 @@ namespace Shared.Core.Events
             _serviceProvider = serviceProvider;
         }
 
-        public T Create<T>(Action<T> configure = null) where T : IUiCommand
+        public T Create<T>(Action<T>? configure = null) where T : IUiCommand
         {
             var instance = _serviceProvider.GetRequiredService<T>();
             configure?.Invoke(instance);
