@@ -1,8 +1,8 @@
-﻿using AnimationMeta.Visualisation.Instances;
+﻿using System.Collections.Generic;
+using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
-using System.Collections.Generic;
 using View3D.Animation;
 using View3D.Components;
 using View3D.SceneNodes;

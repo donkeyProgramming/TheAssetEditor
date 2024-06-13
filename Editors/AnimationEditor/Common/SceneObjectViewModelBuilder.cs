@@ -1,11 +1,10 @@
 ﻿using System.Linq;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.PropCreator.ViewModels;
-using AnimationMeta.Visualisation;
 using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 
 namespace AnimationEditor.Common.ReferenceModel
@@ -13,15 +12,15 @@ namespace AnimationEditor.Common.ReferenceModel
     public class SceneObjectViewModelBuilder
     {
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
-        private readonly MetaDataFactory _metaDataFactory;
+        private readonly IMetaDataFactory _metaDataFactory;
         private readonly SceneObjectBuilder _assetViewModelBuilder;
         private readonly IToolFactory _toolFactory;
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
-        private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly IUiCommandFactory _uiCommandFactory;
 
-        public SceneObjectViewModelBuilder(AnimationPlayerViewModel animationPlayerViewModel, MetaDataFactory metaDataFactory, SceneObjectBuilder assetViewModelBuilder,
-            IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, ApplicationSettingsService applicationSettingsService)
+        public SceneObjectViewModelBuilder(AnimationPlayerViewModel animationPlayerViewModel, IMetaDataFactory metaDataFactory, SceneObjectBuilder assetViewModelBuilder,
+            IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, IUiCommandFactory uiCommandFactory)
         {
             _animationPlayerViewModel = animationPlayerViewModel;
             _metaDataFactory = metaDataFactory;
@@ -29,13 +28,13 @@ namespace AnimationEditor.Common.ReferenceModel
             _toolFactory = toolFactory;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
-            _applicationSettingsService = applicationSettingsService;
+            _uiCommandFactory = uiCommandFactory;
         }
 
         public SceneObjectViewModel CreateAsset(bool createByDefault, string header, Color skeletonColour, AnimationToolInput input, bool allowMetaData = false)
         {
             var mainAsset = _assetViewModelBuilder.CreateAsset(header, skeletonColour);
-            var returnObj = new SceneObjectViewModel(_metaDataFactory, _toolFactory, _pfs, mainAsset, header + ":", _assetViewModelBuilder, _skeletonHelper, _applicationSettingsService);
+            var returnObj = new SceneObjectViewModel(_uiCommandFactory, _metaDataFactory, _toolFactory, _pfs, mainAsset, header + ":", _assetViewModelBuilder, _skeletonHelper);
             returnObj.AllowMetaData.Value = allowMetaData;
 
             if (createByDefault)

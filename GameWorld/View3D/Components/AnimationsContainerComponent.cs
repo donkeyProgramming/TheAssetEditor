@@ -7,7 +7,7 @@ namespace View3D.Components.Component
 {
     public class AnimationsContainerComponent : BaseComponent
     {
-        Dictionary<string, AnimationPlayer> _playerMap = new Dictionary<string, AnimationPlayer>();
+        readonly Dictionary<string, AnimationPlayer> _playerMap = new Dictionary<string, AnimationPlayer>();
 
         public AnimationsContainerComponent()
         {
@@ -45,7 +45,5 @@ namespace View3D.Components.Component
                 item.Value.Update(gameTime);
             base.Update(gameTime);
         }
-
-
     }
 }

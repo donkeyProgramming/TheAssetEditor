@@ -2,13 +2,13 @@
 using System.IO;
 using System.Linq;
 using System.Windows;
-using CommonControls.Editors.AnimationPack;
 using Editors.Shared.Core.Services;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
+using Shared.Ui.Events.UiCommands;
 
 namespace AnimationEditor.Common.ReferenceModel
 {
@@ -20,21 +20,20 @@ namespace AnimationEditor.Common.ReferenceModel
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly SelectMetaViewModel _metaViewModel;
-        private readonly ApplicationSettingsService _applicationSettings;
+        private readonly IUiCommandFactory _uiCommandFactory;
 
         public FilterCollection<IAnimationBinGenericFormat> FragmentList { get; set; }
 
         public FilterCollection<AnimationBinEntryGenericFormat> FragmentSlotList { get; set; }
 
-        public SelectFragAndSlotViewModel(SceneObjectBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject asset, SelectMetaViewModel metaViewModel, ApplicationSettingsService applicationSettings)
+        public SelectFragAndSlotViewModel(SceneObjectBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject asset, SelectMetaViewModel metaViewModel, IUiCommandFactory uiCommandFactory)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _asset = asset;
             _metaViewModel = metaViewModel;
-            _applicationSettings = applicationSettings;
-
+            _uiCommandFactory = uiCommandFactory;
             FragmentList = new FilterCollection<IAnimationBinGenericFormat>(null, (value) => FragmentSelected(value, FragmentSlotList, _asset.SkeletonName.Value))
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FullPath).Success; }
@@ -53,8 +52,7 @@ namespace AnimationEditor.Common.ReferenceModel
             if (FragmentList.SelectedItem != null && FragmentList.SelectedItem != null)
             {
                 var animPack = FragmentList.SelectedItem.PackFileReference;
-                var packFile = _pfs.FindFile(animPack.FileName);
-                AnimPackViewModel.ShowPreviewWinodow(packFile, _pfs, _skeletonAnimationLookUpHelper, FragmentList.SelectedItem.FullPath, _applicationSettings);
+                _uiCommandFactory.Create<OpenFileInWindowedEditorCommand>().Execute(animPack.FileName, 800, 900);
             }
         }
 

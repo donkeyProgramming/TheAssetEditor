@@ -1,5 +1,5 @@
-﻿using AnimationMeta.Visualisation;
-using Editors.Shared.Core.Services;
+﻿using Editors.Shared.Core.Services;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -12,7 +12,7 @@ namespace AnimationEditor.Common.ReferenceModel
     public class SceneObjectViewModel : NotifyPropertyChangedImpl
     {
         private readonly PackFileService _pfs;
-        private readonly MetaDataFactory _metaDataFactory;
+        private readonly IMetaDataFactory _metaDataFactory;
         private readonly IToolFactory _toolFactory;
 
         public NotifyAttr<string> HeaderName { get; set; } = new NotifyAttr<string>();
@@ -44,14 +44,14 @@ namespace AnimationEditor.Common.ReferenceModel
         public NotifyAttr<bool> IsControlVisible { get; set; } = new(true);
         public NotifyAttr<bool> AllowMetaData { get; set; } = new();
 
-        public SceneObjectViewModel(MetaDataFactory metaDataFactory, 
+        public SceneObjectViewModel(IUiCommandFactory uiCommandFactory,
+            IMetaDataFactory metaDataFactory, 
             IToolFactory toolFactory,
             PackFileService packFileService, 
             SceneObject data,
             string headerName, 
             SceneObjectBuilder sceneObjectBuilder,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
-            ApplicationSettingsService applicationSettingsService)
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _metaDataFactory = metaDataFactory;
             _toolFactory = toolFactory;
@@ -63,7 +63,7 @@ namespace AnimationEditor.Common.ReferenceModel
             AnimViewModel = new SelectAnimationViewModel(sceneObjectBuilder, Data, _pfs, skeletonAnimationLookUpHelper);
             SkeletonInformation = new SkeletonPreviewViewModel(Data);
             MetaFileInformation = new SelectMetaViewModel(sceneObjectBuilder, Data, _pfs);
-            FragAndSlotSelection = new SelectFragAndSlotViewModel(sceneObjectBuilder, _pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation, applicationSettingsService);
+            FragAndSlotSelection = new SelectFragAndSlotViewModel(sceneObjectBuilder, _pfs, skeletonAnimationLookUpHelper, Data, MetaFileInformation, uiCommandFactory);
 
             Data.AnimationChanged += (x) => OnSceneObjectChanged();
             Data.SkeletonChanged += (x) => OnSceneObjectChanged();
