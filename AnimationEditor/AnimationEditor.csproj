@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AnimationMeta\Editors.AnimationMeta.csproj" />
+    <ProjectReference Include="..\Editors\AnimationMeta\Editors.AnimationMeta.csproj" />
     <ProjectReference Include="..\Editors\SimpleAnimationEditors\Editors.AnimationContainers.csproj" />
     <ProjectReference Include="..\GameWorld\View3D\GameWorld.Core.csproj" />
         <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
