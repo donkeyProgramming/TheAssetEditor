@@ -25,7 +25,7 @@ namespace Shared.Core.PackFiles
     {
         static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileSerializer));
 
-        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered, bool skipSoundFiles, IDuplicatePackFileResolver dubplicatePackFileResolver)
+        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered animationFileDiscovered, bool loadWemFiles, IDuplicatePackFileResolver dubplicatePackFileResolver)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace Shared.Core.PackFiles
                     var addFile = true;
 
                     // Should we skip sound files? 
-                    if (skipSoundFiles)
+                    if (loadWemFiles == false)
                         addFile = packFileName.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase) == false;
 
                     if (addFile)

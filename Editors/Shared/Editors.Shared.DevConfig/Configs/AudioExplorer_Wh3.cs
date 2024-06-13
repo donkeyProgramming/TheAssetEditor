@@ -18,7 +18,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-            currentSettings.SkipLoadingWemFiles = false;
+            currentSettings.LoadWemFiles = false;
         }
 
         public void OpenFileOnLoad()

@@ -25,6 +25,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
+            currentSettings.LoadWemFiles = true;
             currentSettings.LoadCaPacksByDefault = false;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Throt.pack";
             _packFileService.Load(packFile, false, true);

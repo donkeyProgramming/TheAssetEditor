@@ -23,22 +23,18 @@ namespace Audio.Utility
             _vgStreamWrapper = vgStreamWrapper;
         }
 
-        public bool PlaySound(string sourceID, uint parentEventId)
+        public bool PlaySound(string sourceId, uint parentEventId)
         {
-            if (sourceID == null)
+            if (sourceId == null)
             {
                 _logger.Here().Warning("Input is not a valid wwise sound");
                 return false;
             }
 
-            _logger.Here().Information($"User selected {sourceID}.wem to be played");
-            var outputName = _audioRepository.GetNameFromHash(parentEventId) + "-" + sourceID;
-            return PlaySound(sourceID, outputName);
-        }
+            _logger.Here().Information($"User selected {sourceId}.wem to be played");
+            var outputName = $"{_audioRepository.GetNameFromHash(parentEventId)}-{sourceId}";
 
-        public bool PlaySound(string sourceID, string outputName)
-        {
-            var audioFile = FindSoundFile(_language, sourceID);
+            var audioFile = FindSoundFile(_language, sourceId);
             if (audioFile == null)
             {
                 _logger.Here().Error("Unable to find sound");
