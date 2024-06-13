@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeshDecimator", "MeshDecima
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContentProject", "GameWorld\ContentProject\ContentProject.csproj", "{D29AB45B-3CFD-4994-BD54-CE301704D6CA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssetManagement", "AssetManagment\AssetManagement.csproj", "{413ABA15-75C4-4B2F-8B84-E5B8EADFE57F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.AssetManagement", "AssetManagment\Editors.AssetManagement.csproj", "{413ABA15-75C4-4B2F-8B84-E5B8EADFE57F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{7070A990-1A62-46A9-ABDF-BE030E3A4336}"
 EndProject
