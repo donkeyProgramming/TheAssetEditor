@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AssetManagment\Editors.AssetManagement.csproj" />
+        <ProjectReference Include="..\Editors\AssetManagment\Editors.AssetManagement.csproj" />
         <ProjectReference Include="..\Editors\Audio\Editors.Audio.csproj" />
         <ProjectReference Include="..\Editors\KitbasherEditor\Editors.KitbasherEditor.csproj" />
         <ProjectReference Include="..\Editors\Reports\Editors.Reports.csproj" />

@@ -1,0 +1,93 @@
+﻿<Window x:Class="AssetManagement.Strategies.Fbx.Views.FBXSettings.FBXSetttingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:s="http://schemas.singulink.com/xaml"                        
+    SizeToContent="WidthAndHeight"
+    mc:Ignorable="d" d:DesignHeight="137.155" d:DesignWidth="768.503">
+    
+    <Grid>
+        <Grid>
+            <StackPanel Orientation="Vertical" Height="114" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Label x:Name="SkeletonFile" Content="Skeleton File:" Width="94"/>
+
+                    <TextBox x:Name="SkeletonFileTextBox" 
+                             IsReadOnly="True"
+                              Width="405" 
+                             Text="{Binding SkeletonFileName.Value,  UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <TextBox.ToolTip>
+                            <ToolTip>
+                                Not implemented yet
+                            </ToolTip>
+                        </TextBox.ToolTip>
+                    </TextBox>
+
+                    <Button x:Name="BrowseAnimButton" Content="Browse .ANIM..."  Width="114"  Height="26" 
+                            ToolTipService.ShowOnDisabled="true"                            
+                            Click="{s:MethodBinding BrowseButtonClicked}">
+                        <Button.ToolTip>
+                            <ToolTip>
+                                Not implemented yet
+                            </ToolTip>
+                        </Button.ToolTip>
+                    </Button>
+
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Height="28">
+
+                    <Label x:Name="label2" Content="Skeleton Name:" Width="94"/>
+
+                    <TextBox x:Name="SkeletonNameTextBox"  Width="405"
+                             Text="{Binding SkeletonName.Value,  UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        <TextBox.ToolTip>
+                            <TextBlock>
+                                Skeleton name stored in .FBX File
+                                <LineBreak />
+                                Used in the .rigid_model_v2
+                                <LineBreak />
+                                Enter name manually if needed.
+                            </TextBlock>
+                        </TextBox.ToolTip>
+                    </TextBox>
+
+                    <CheckBox x:Name="DoAutoRig" Content="Attemp Auto-Rig"  Width="154" 
+                              IsEnabled="False"                              
+                              IsChecked="{Binding UseAutoRigging.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <StackPanel Orientation="Horizontal" Width="auto" HorizontalAlignment="Right">
+            <Button
+                Name="ImportButton"
+                Content="Import&#xD;&#xA;"
+                Height="23"
+                HorizontalAlignment="Right" 
+                Margin="0,0,26,5"
+                VerticalAlignment="Bottom" 
+                Width="75"             
+                IsDefault="True"            
+                Click="{s:MethodBinding ImportButtonClicked}" Grid.ColumnSpan="2">
+            </Button>
+
+            <Button
+                Name="CancelButton"
+                Content="Cancel" 
+                Height="23" 
+                Margin="0,0,37,5"            
+                VerticalAlignment="Bottom"
+                Width="75" 
+                IsCancel="True" HorizontalAlignment="Left">
+            </Button>
+
+        </StackPanel>
+
+
+
+
+    </Grid>
+</Window>
+    
