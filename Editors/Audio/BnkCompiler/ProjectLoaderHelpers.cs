@@ -142,17 +142,18 @@ namespace Audio.BnkCompiler
         public static void AddSingleSoundEvent(CompilerData compilerData, ActorMixer currentMixer, CompilerInputProject.ProjectEvent projectEvent)
         {
             var eventMixer = projectEvent.Mixer;
-            var eventId = projectEvent.Event;
+            var eventName = projectEvent.Event;
+            var eventId = WwiseHash.Compute(eventName);
             var mixerId = currentMixer.Id;
-            var soundName = $"{eventId}_sound";
+            var soundName = $"{eventName}_sound";
             var soundId = WwiseHash.Compute(soundName);
-            var actionName = $"{eventId}_action";
+            var actionName = $"{eventName}_action";
             var actionId = WwiseHash.Compute(actionName);
 
             var soundFilePath = projectEvent.Sounds[0];
             var hircSound = CreateSound(soundId, mixerId, eventMixer, soundFilePath);
             var hircAction = CreateAction(actionId, soundId, CompilerConstants.ActionType);
-            var hircEvent = CreateEvent(actionId);
+            var hircEvent = CreateEvent(eventId, actionId);
 
             currentMixer.Children.Add(soundId);
             compilerData.Sounds.Add(hircSound);
@@ -163,9 +164,12 @@ namespace Audio.BnkCompiler
         public static void AddMultipleSoundEvent(CompilerData compilerData, ActorMixer currentMixer, CompilerInputProject.ProjectEvent projectEvent)
         {
             var eventMixer = projectEvent.Mixer;
-            var eventId = projectEvent.Event;
+            var eventName = projectEvent.Event;
+            var eventId = WwiseHash.Compute(eventName);
             var mixerId = currentMixer.Id;
-            var containerId = GetNextUsableWwiseId(UsableWwiseId);
+            var containerName = $"{eventName}_random_container";
+            var containerId = WwiseHash.Compute(containerName);
+
 
             var soundsCount = projectEvent.Sounds.Count;
             var currentSound = 0;
@@ -175,9 +179,9 @@ namespace Audio.BnkCompiler
             {
                 currentSound++;
 
-                var soundName = $"{eventId}_sound_{currentSound}";
+                var soundName = $"{eventName}_sound_{currentSound}";
                 var soundId = WwiseHash.Compute(soundName);
-                var actionName = $"{eventId}_action_{currentSound}";
+                var actionName = $"{eventName}_action_{currentSound}";
                 var actionId = WwiseHash.Compute(actionName);
 
                 var hircSound = CreateSound(soundId, containerId, eventMixer, sound);
@@ -187,7 +191,7 @@ namespace Audio.BnkCompiler
                 {
                     var hircAction = CreateAction(actionId, containerId, CompilerConstants.ActionType);
                     var hircRandomContainer = CreateRandomContainer(containerId, mixerId, sounds);
-                    var hircEvent = CreateEvent(actionId);
+                    var hircEvent = CreateEvent(eventId, actionId);
                     
                     currentMixer.Children.Add(containerId);
                     compilerData.Actions.Add(hircAction);
@@ -332,10 +336,11 @@ namespace Audio.BnkCompiler
             };
         }
 
-        private static Event CreateEvent(uint actionId)
+        private static Event CreateEvent(uint eventId, uint actionId)
         {
             return new Event()
             {
+                Id = eventId,
                 Actions = new List<uint>() { actionId }
             };
         }

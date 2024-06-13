@@ -7,7 +7,7 @@ namespace AssetEditor.Services
 {
     public class SimpleApplication : IDisposable
     {
-        public bool SkipLoadingWemFiles { get; set; } = true;
+        public bool LoadWemFiles { get; set; } = true;
         private readonly IServiceScope _serviceScope;
 
         public SimpleApplication(bool loadAllCaFiles = true)
@@ -17,7 +17,7 @@ namespace AssetEditor.Services
 
             // Configure based on settings
             var settingsService = _serviceScope.ServiceProvider.GetService<ApplicationSettingsService>();
-            settingsService.CurrentSettings.SkipLoadingWemFiles = SkipLoadingWemFiles;
+            settingsService.CurrentSettings.LoadWemFiles = LoadWemFiles;
 
             if (loadAllCaFiles)
             {

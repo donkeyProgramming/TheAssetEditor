@@ -255,7 +255,7 @@ namespace Shared.Core.PackFiles
 
         public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
-            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.SkipLoadingWemFiles, new CustomPackDuplicatePackFileResolver());
+            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
             Database.AddPackFile(pack);
             return pack;
         }
@@ -284,7 +284,7 @@ namespace Shared.Core.PackFiles
                         {
                             using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                             {
-                                var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.SkipLoadingWemFiles, new CaPackDuplicatePackFileResolver());
+                                var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.LoadWemFiles, new CaPackDuplicatePackFileResolver());
                                 packList.Add(pack);
                             }
                         }

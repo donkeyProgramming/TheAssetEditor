@@ -24,8 +24,10 @@ namespace Audio.BnkCompiler
 
         public Result<bool> ImportAudio(CompilerData compilerData)
         {
-            List<string> wavFiles = new List<string>();
-            List<string> wavFilePaths = new List<string>();
+            InitialiseWwiseProject();
+
+            var wavFiles = new List<string>();
+            var wavFilePaths = new List<string>();
 
             foreach (var sound in compilerData.Sounds)
             {
@@ -35,7 +37,6 @@ namespace Audio.BnkCompiler
             }
 
             var wavToWem = new WWiseWavToWem();
-            InitialiseWwiseProject();
             wavToWem.WavToWem(wavFiles, wavFilePaths);
 
             foreach (var sound in compilerData.Sounds)

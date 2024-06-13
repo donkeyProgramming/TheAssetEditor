@@ -35,7 +35,7 @@ namespace Audio.Utility
             CopyWavs(wavFilePaths);
             CreateWsources(wavFiles, audioFolderPath);
 
-            var arguments = $"{wprojPath} -ConvertExternalSources {wsourcesPath} -ExternalSourcesOutput {audioFolderPath}"; 
+            var arguments = $"\"{wprojPath}\" -ConvertExternalSources \"{wsourcesPath}\" -ExternalSourcesOutput \"{audioFolderPath}\"";
 
             RunExternalCommand(wwiseCliPath, arguments);
             DeleteExcessStuff(audioFolderPath);
@@ -92,7 +92,7 @@ namespace Audio.Utility
                     FileName = filePath,
                     Arguments = arguments,
                     UseShellExecute = false,
-                    CreateNoWindow = true,
+                    CreateNoWindow = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true
                 };
@@ -163,34 +163,31 @@ namespace Audio.Utility
 
         public static void InitialiseWwiseProject()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceRootNamespace = "Shared.Resources.AudioConversion";
-            var tempFolderPath = $"{DirectoryHelper.Temp}";
-            var wavToWemFolderPath = $"{tempFolderPath}\\WavToWem";
-            var wavToWemWwiseProjectPath = $"{wavToWemFolderPath}\\WavToWemWwiseProjectPath";
+            var assemblyName = "Shared.EmbeddedResources";
+            var assembly = Assembly.Load(assemblyName);
+            var resourceRootNamespace = $"{assemblyName}.Resources.AudioConversion";
+            var tempFolderPath = DirectoryHelper.Temp;
+            var wavToWemFolderPath = Path.Combine(tempFolderPath, "WavToWem");
+            var wavToWemWwiseProjectPath = Path.Combine(wavToWemFolderPath, "WavToWemWwiseProjectPath");
 
             if (Directory.Exists(wavToWemWwiseProjectPath))
                 return;
 
-            else
+            var resourceFolderPath = $"{resourceRootNamespace}.WavToWemWwiseProject.WavToWemWwiseProject.zip";
+            var tempZipPath = Path.Combine(Path.GetTempPath(), "WavToWemWwiseProject.zip");
+
+            using (var resourceStream = assembly.GetManifestResourceStream(resourceFolderPath))
             {
-                var resourceFolderPath = $"{resourceRootNamespace}.WavToWemWwiseProject.WavToWemWwiseProject.zip";
+                if (resourceStream == null)
+                    throw new InvalidOperationException($"Failed to retrieve resource stream for {resourceFolderPath}.");
 
-                var tempZipPath = Path.Combine(Path.GetTempPath(), "WavToWemWwiseProject.zip");
-
-                using (var resourceStream = assembly.GetManifestResourceStream(resourceFolderPath))
-                {
-                    if (resourceStream == null)
-                        throw new InvalidOperationException($"Resource {resourceFolderPath} not found. Make sure the resource exists and is set to 'Embedded Resource'.");
-
-                    using var fileStream = new FileStream(tempZipPath, FileMode.Create, FileAccess.Write);
-                    resourceStream.CopyTo(fileStream);
-                }
-
-                ZipFile.ExtractToDirectory(tempZipPath, wavToWemFolderPath, overwriteFiles: true);
-
-                File.Delete(tempZipPath);
+                using var fileStream = new FileStream(tempZipPath, FileMode.Create, FileAccess.Write);
+                resourceStream.CopyTo(fileStream);
             }
+
+            ZipFile.ExtractToDirectory(tempZipPath, wavToWemFolderPath, overwriteFiles: true);
+            File.Delete(tempZipPath);
         }
+
     }
 }

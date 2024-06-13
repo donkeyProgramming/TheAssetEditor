@@ -15,7 +15,7 @@
         </ObjectDataProvider>
     </UserControl.Resources>
 
-        <Grid Height="auto" Width="auto">
+    <Grid Height="auto" Width="auto">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -61,14 +61,18 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Wwise"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,437,16" Grid.RowSpan="2"><Run Text="Wwise"/><Run Language="en-gb" Text="CLI I"/><Run Text="nstallation Location"/></TextBlock>
                 <TextBox Grid.Row="0" Grid.Column="1" 
                     Text="{Binding WwisePath}"
-                    behaviors:TextBoxExtensions.Watermark="Path to Wwise .exe"
-                    IsReadOnly="True"/>
+                    behaviors:TextBoxExtensions.Watermark="Path to WwiseCLI.exe"
+                    IsReadOnly="True" Margin="63,0,0,16" Grid.RowSpan="2"/>
                 <Button Grid.Column="2" Content="..." Command="{Binding BrowseCommand}"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Load audio (.wem) files" Grid.ColumnSpan="2" Margin="0,0,476,0"/>
+                <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding LoadWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="24,0,0,0"/>
             </Grid>
         </GroupBox>
 
@@ -91,36 +95,24 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Current Game"/>
-                <TextBlock Grid.Row="0" Grid.Column="1" Text=":"/>
-                <ComboBox  Grid.Row="0" Grid.Column="2" Width="100"
+                <ComboBox Grid.Row="0" Grid.Column="2" Width="100"
                     SelectedItem="{Binding CurrentGame, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ItemsSource="{Binding Source={StaticResource GameTypeEnums}}"/>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Use TextEditor For Unknown Files"/>
-                <TextBlock Grid.Row="1" Grid.Column="1" Text=":"/>
-                <CheckBox  Grid.Row="1" Grid.Column="2" IsChecked="{Binding UseTextEditorForUnknownFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding UseTextEditorForUnknownFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Load Ca Packs By Default"/>
-                <TextBlock Grid.Row="2" Grid.Column="1" Text=":"/>
-                <CheckBox  Grid.Row="2" Grid.Column="2" IsChecked="{Binding LoadCaPacksByDefault, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding LoadCaPacksByDefault, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Autogene Attachment Points for meshes"/>
+                <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding AutoGenerateAttachmentPointsFromMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Skip loading wem (sound) files"/>
-                <TextBlock Grid.Row="3" Grid.Column="1" Text=":"/>
-                <CheckBox  Grid.Row="3" Grid.Column="2" IsChecked="{Binding SkipLoadingWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Auto resolve missing textures"/>
+                <CheckBox Grid.Row="4" Grid.Column="2" IsChecked="{Binding AutoResolveMissingTextures, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Autogene Attachment Points for meshes"/>
-                <TextBlock Grid.Row="4" Grid.Column="1" Text=":"/>
-                <CheckBox  Grid.Row="4" Grid.Column="2" IsChecked="{Binding AutoGenerateAttachmentPointsFromMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-                <TextBlock Grid.Row="5" Grid.Column="0" Text="Auto resolve missing textures"/>
-                <TextBlock Grid.Row="5" Grid.Column="1" Text=":"/>
-                <CheckBox  Grid.Row="5" Grid.Column="2" IsChecked="{Binding AutoResolveMissingTextures, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-                <TextBlock Grid.Row="6" Grid.Column="0" Text="Hide wh2 texture selectors if warhammer 3 is selected"/>
-                <TextBlock Grid.Row="6" Grid.Column="1" Text=":"/>
-                <CheckBox  Grid.Row="6" Grid.Column="2" IsChecked="{Binding HideWh2TextureSelectors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <TextBlock Grid.Row="5" Grid.Column="0"><Run Text="Hide wh2 texture selectors if warhammer 3 is selected"/><Run Language="en-gb" Text=" "/></TextBlock>
+                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding HideWh2TextureSelectors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </Grid>
         </GroupBox>
     </Grid>

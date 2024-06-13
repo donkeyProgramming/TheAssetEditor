@@ -11,6 +11,7 @@ using Shared.GameFormats.WWise.Bkhd;
 using Shared.GameFormats.WWise.Hirc;
 using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Shared.Core.PackFiles;
+using System;
 
 namespace Audio.BnkCompiler
 {
