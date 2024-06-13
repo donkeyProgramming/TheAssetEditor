@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\AnimationEditor\AnimationEditor.csproj" />
+      <ProjectReference Include="..\..\..\AnimationEditor\Editors.AnimationEditor.csproj" />
       <ProjectReference Include="..\..\..\Shared\EmbeddedResources\Shared.EmbeddedResources.csproj" />
       <ProjectReference Include="..\..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
       <ProjectReference Include="..\..\..\Shared\SharedCore\Shared.Core.csproj" />

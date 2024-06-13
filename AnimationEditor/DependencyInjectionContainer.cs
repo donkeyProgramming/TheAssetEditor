@@ -12,9 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
 
-namespace AnimationEditor
+namespace Editors.AnimationEditor
 {
-    public class AnimationEditors_DependencyInjectionContainer : DependencyContainer
+    public class DependencyInjectionContainer : DependencyContainer
     {
         public override void Register(IServiceCollection serviceCollection)
         {

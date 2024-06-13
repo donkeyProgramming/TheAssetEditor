@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AnimationEditor\AnimationEditor.csproj" />
+        <ProjectReference Include="..\AnimationEditor\Editors.AnimationEditor.csproj" />
         <ProjectReference Include="..\AssetManagment\AssetManagement.csproj" />
         <ProjectReference Include="..\Editors\Audio\Editors.Audio.csproj" />
         <ProjectReference Include="..\Editors\KitbasherEditor\Editors.KitbasherEditor.csproj" />

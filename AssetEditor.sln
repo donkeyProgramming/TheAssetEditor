@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameWorld.Core", "GameWorld
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.KitbasherEditor", "Editors\KitbasherEditor\Editors.KitbasherEditor.csproj", "{D7225D7F-87E4-4FAD-A3BE-9165DFDC315E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimationEditor", "AnimationEditor\AnimationEditor.csproj", "{0FCB6133-32A4-4115-BD53-474C703E7B34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.AnimationEditor", "AnimationEditor\Editors.AnimationEditor.csproj", "{0FCB6133-32A4-4115-BD53-474C703E7B34}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experiments", "Experiments", "{FF70C4FA-A9A7-4DEC-87A3-4BF5F23EF336}"
 EndProject

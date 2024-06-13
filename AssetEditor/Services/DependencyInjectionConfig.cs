@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using AnimationEditor;
 using AssetManagement;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -38,7 +37,7 @@ namespace AssetEditor.Services
                 new Editors.AnimationMeta.DependencyInjectionContainer(),
                 new Editors.Audio.DependencyInjectionContainer(),
                 new Editors.TextureEditor.DependencyInjectionContainer(),
-                new AnimationEditors_DependencyInjectionContainer(),
+                new Editors.AnimationEditor.DependencyInjectionContainer(),
 
                 // Host application
                 new AssetEditor_DependencyInjectionContainer(),
