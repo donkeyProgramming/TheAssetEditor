@@ -29,14 +29,14 @@ namespace AssetEditor.Services
 
                 // Domains
                 new Editors.Shared.Core.DependencyInjectionContainer(),
-                new Editors.AnimationContainers.DependencyInjectionContainer(),
+                new Editors.AnimationTextEditors.DependencyInjectionContainer(),
                 new Editors.Reports.DependencyInjectionContainer(),
                 new KitbasherEditor.DependencyInjectionContainer(),
                 new Editors.AssetManagement.DependencyInjectionContainer(),
                 new Editors.AnimationMeta.DependencyInjectionContainer(),
                 new Editors.Audio.DependencyInjectionContainer(),
                 new Editors.TextureEditor.DependencyInjectionContainer(),
-                new Editors.AnimationEditor.DependencyInjectionContainer(),
+                new Editors.AnimationVisualEditors.DependencyInjectionContainer(),
 
                 // Host application
                 new DependencyInjectionContainer(),
