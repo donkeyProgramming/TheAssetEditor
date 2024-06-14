@@ -71,8 +71,8 @@ namespace AssetEditor.ViewModels
         public ICommand OpenAudioExplorerCommand { get; set; }
         public ICommand OpenAudioEditorCommand { get; set; }
         public ICommand DialogueEventTesting { get; set; }
-        public ICommand CreateTemplateCommand { get; }
-        public ICommand CompileAudioProjectsCommand { get; set; }
+        public ICommand CreateAudioTemplateCommand { get; }
+        public ICommand CompileAudioCommand { get; set; }
         public ICommand SearchCommand { get; set; }
         public ICommand OpenRome2RePacksCommand { get; set; }
         public ICommand OpenThreeKingdomsPacksCommand { get; set; }
@@ -146,9 +146,8 @@ namespace AssetEditor.ViewModels
             OpenWh2AnimpackUpdaterCommand = new RelayCommand(OpenWh2AnimpackUpdater);
             OpenAudioExplorerCommand = new RelayCommand(OpenAudioExplorerEditor);
             OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
-            CompileAudioProjectsCommand = new RelayCommand(CompileAudioProjects);
-            DialogueEventTesting = new RelayCommand(RunDialogueEventTesting);
-            CreateTemplateCommand = new RelayCommand<string>(CreateAudioTemplate);
+            CompileAudioCommand = new RelayCommand(CompileAudioProjects);
+            CreateAudioTemplateCommand = new RelayCommand<string>(CreateAudioTemplate);
             OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframe);
 
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
@@ -280,11 +279,6 @@ namespace AssetEditor.ViewModels
         void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
         void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SkeletonEditorViewModel>>();
         void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();
-        private void RunDialogueEventTesting()
-        {
-            //var DialogueEventGenerator = new DialogueEventGenerator(_packfileService);
-            //DialogueEventGenerator.DoDialogueEventGenerator();
-        }
 
         private void CreateAudioTemplate(string audioTemplateFile)
         {
@@ -292,27 +286,19 @@ namespace AssetEditor.ViewModels
                 return;
 
             var pack = _packfileService.GetEditablePack();
-            var resourcePath = $"Shared.EmbeddedResources.Resources.AudioTemplates.{audioTemplateFile}";
+            var assemblyName = "Shared.EmbeddedResources";
+            var assembly = Assembly.Load(assemblyName);
+            var resourcePath = $"{assemblyName}.Resources.AudioTemplates.{audioTemplateFile}";
 
-            // Check if the resource path is valid
-            if (resourcePath == null)
-            {
-                Console.WriteLine($"Resource path for template type {audioTemplateFile} is null.");
-                return;
-            }
+            using var stream = assembly.GetManifestResourceStream(resourcePath);
 
-            // Read the embedded resource
-            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
             if (stream == null)
-            {
-                Console.WriteLine($"Resource {resourcePath} not found.");
-                return;
-            }
+                throw new Exception($"Resource {resourcePath} not found.");
 
             using var reader = new StreamReader(stream);
             var text = reader.ReadToEnd();
             var byteArray = Encoding.ASCII.GetBytes(text);
-            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{audioTemplateFile}.json", new MemorySource(byteArray)));
+            _packfileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{audioTemplateFile}", new MemorySource(byteArray)));
         }
 
         void OpenWh2AnimpackUpdater()
