@@ -49,7 +49,12 @@ namespace Audio.BnkCompiler
 
         public static void AddDialogueEvents(List<ActorMixer> mixers, CompilerInputProject input, CompilerData compilerData)
         {
-            UsableWwiseId = input.Settings.WwiseStartId;
+            var wwiseIdStart = input.Settings.WwiseStartId;
+
+            if (wwiseIdStart == 0)
+                UsableWwiseId = 1;
+            else
+                UsableWwiseId = wwiseIdStart;
 
             // Add mixers to compilerData first so they can be individually referenced later.
             AddDialogueEventMixers(mixers, input, compilerData);
@@ -378,7 +383,7 @@ namespace Audio.BnkCompiler
         {
             wwiseStartId++;
 
-            throw new NotImplementedException("Todo"); // validate the Id to check it's not already in use.
+            // throw new NotImplementedException("Todo"); // validate the Id to check it's not already in use.
 
             return wwiseStartId;
         }
