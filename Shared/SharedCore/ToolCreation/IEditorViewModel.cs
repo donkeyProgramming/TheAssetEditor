@@ -28,7 +28,6 @@ namespace Shared.Core.ToolCreation
     public interface IEditorCreator
     {
         void OpenFile(PackFile file);
-        void OpenFileInWindow(PackFile file, int width, int height);
         void CreateEmptyEditor(IEditorViewModel editorView);
     }
 

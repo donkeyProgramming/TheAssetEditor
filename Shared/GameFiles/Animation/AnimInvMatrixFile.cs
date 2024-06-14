@@ -14,10 +14,11 @@ namespace Shared.GameFormats.Animation
                 throw new Exception("Trying to load AnimInvMatrix with no data, chunk size = 0");
 
             chunk.Reset();
-            var output = new AnimInvMatrixFile();
-
-            output.Version = chunk.ReadUInt32();
-            output.MatrixList = new Matrix[chunk.ReadUInt32()];
+            var output = new AnimInvMatrixFile
+            {
+                Version = chunk.ReadUInt32(),
+                MatrixList = new Matrix[chunk.ReadUInt32()]
+            };
 
             for (var i = 0; i < output.MatrixList.Length; i++)
             {

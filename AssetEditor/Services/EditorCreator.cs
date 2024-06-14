@@ -52,12 +52,5 @@ namespace AssetEditor.Services
             _mainViewModel.CurrentEditorsList.Add(editorViewModel);
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;
         }
-
-        public void OpenFileInWindow(PackFile file, int width, int height)
-        {
-            var fullFileName = _packFileService.GetFullPath(file);
-            var editorViewModel = _toolFactory.Create(fullFileName);
-            
-        }
     }
 }
