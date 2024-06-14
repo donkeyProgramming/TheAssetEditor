@@ -9,7 +9,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace AssetEditor.Report
+namespace Editors.Reports
 {
     public class AnimMetaDataReportGenerator
     {
@@ -57,7 +57,7 @@ namespace AssetEditor.Report
             var failedFiles = new List<string>();
 
             var metaTable = new List<(string Path, MetaDataFile File)>();
-            for (int i = 0; i < fileList.Count; i++)
+            for (var i = 0; i < fileList.Count; i++)
             {
                 var fileName = fileList[i].FileName;
                 //if (fileName.Contains("hu1_2hh_knockback_l_01.anm.meta") == false)

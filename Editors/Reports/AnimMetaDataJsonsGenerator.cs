@@ -14,7 +14,7 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 
-namespace AssetEditor.Report
+namespace Editors.Reports
 {
     public class AnimMetaDataJsonsGenerator
     {
@@ -40,8 +40,8 @@ namespace AssetEditor.Report
 
         void dumpAsJson(string gameOutputDir, string fileName, object data)
         {
-            string jsonString = JsonConvert.SerializeObject(data, _jsonOptions);
-            string json_filepath = Path.Join(gameOutputDir, fileName);
+            var jsonString = JsonConvert.SerializeObject(data, _jsonOptions);
+            var json_filepath = Path.Join(gameOutputDir, fileName);
             Directory.CreateDirectory(Path.GetDirectoryName(json_filepath));
             File.WriteAllText(json_filepath, jsonString);
         }
@@ -56,16 +56,16 @@ namespace AssetEditor.Report
             DirectoryHelper.EnsureCreated(gameOutputDir);
 
             //dump animtable
-            PackFile animPack = _pfs.Database.PackFiles[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
-            AnimationPackFile animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
+            var animPack = _pfs.Database.PackFiles[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
+            var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
 
             var converter = new AnimationBinWh3FileToXmlConverter(new SkeletonAnimationLookUpHelper());
             foreach (var animFile in animPackFile.Files)
             {
                 if (animFile is AnimationBinWh3)
                 {
-                    string text = converter.GetText(animFile.ToByteArray());
-                    string xml_filepath = Path.Join(gameOutputDir, animFile.FileName + ".xml");
+                    var text = converter.GetText(animFile.ToByteArray());
+                    var xml_filepath = Path.Join(gameOutputDir, animFile.FileName + ".xml");
                     Directory.CreateDirectory(Path.GetDirectoryName(xml_filepath));
                     File.WriteAllText(xml_filepath, text);
                 }

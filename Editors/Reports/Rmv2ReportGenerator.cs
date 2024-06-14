@@ -8,7 +8,7 @@ using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 
-namespace AssetEditor.Report
+namespace Editors.Reports
 {
     public class Rmv2ReportGenerator
     {
@@ -27,18 +27,18 @@ namespace AssetEditor.Report
             var weightedMaterialRecords = new List<dynamic>();
 
             var modelFactory = ModelFactory.Create(false);
-            for (int i = 0; i < fileList.Count; i++)
+            for (var i = 0; i < fileList.Count; i++)
             {
                 var meshFile = fileList[i];
-                string path = _pfs.GetFullPath(meshFile);
+                var path = _pfs.GetFullPath(meshFile);
                 var rmvData = meshFile.DataSource.ReadData();
                 try
                 {
                     var rmvFile = modelFactory.Load(rmvData);
 
-                    for (int lodIndex = 0; lodIndex < rmvFile.ModelList.Length; lodIndex++)
+                    for (var lodIndex = 0; lodIndex < rmvFile.ModelList.Length; lodIndex++)
                     {
-                        for (int modelIndex = 0; modelIndex < rmvFile.ModelList[lodIndex].Length; modelIndex++)
+                        for (var modelIndex = 0; modelIndex < rmvFile.ModelList[lodIndex].Length; modelIndex++)
                         {
                             var model = rmvFile.ModelList[lodIndex][modelIndex];
                             dynamic versionInfoRecord = new ExpandoObject();

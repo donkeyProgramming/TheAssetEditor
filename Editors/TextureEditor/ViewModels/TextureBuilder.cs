@@ -10,7 +10,7 @@ using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
 using View3D.Rendering;
 
-namespace TextureEditor.ViewModels
+namespace Editors.TextureEditor.ViewModels
 {
     public class TextureBuilder
     {
@@ -66,18 +66,18 @@ namespace TextureEditor.ViewModels
         private static void DrawCheckerBoard(Graphics g, int width, int height)
         {
             var size = 50;
-            var countX = (width / size) + 1;
-            var countY = (height / size) + 1;
+            var countX = width / size + 1;
+            var countY = height / size + 1;
             using var blackBrush = new SolidBrush(System.Drawing.Color.DarkGray);
             using var whiteBrush = new SolidBrush(System.Drawing.Color.LightGray);
 
-            for (int i = 0; i < countX; i++)
+            for (var i = 0; i < countX; i++)
             {
-                for (int j = 0; j < countY; j++)
+                for (var j = 0; j < countY; j++)
                 {
-                    if ((j % 2 == 0 && i % 2 == 0) || (j % 2 != 0 && i % 2 != 0))
+                    if (j % 2 == 0 && i % 2 == 0 || j % 2 != 0 && i % 2 != 0)
                         g.FillRectangle(blackBrush, i * size, j * size, size, size);
-                    else if ((j % 2 == 0 && i % 2 != 0) || (j % 2 != 0 && i % 2 == 0))
+                    else if (j % 2 == 0 && i % 2 != 0 || j % 2 != 0 && i % 2 == 0)
                         g.FillRectangle(whiteBrush, i * size, j * size, size, size);
                 }
             }

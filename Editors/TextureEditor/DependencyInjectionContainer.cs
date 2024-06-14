@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Editors.TextureEditor.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
-using TextureEditor.ViewModels;
 using TextureEditor.Views;
 
 namespace Editors.TextureEditor

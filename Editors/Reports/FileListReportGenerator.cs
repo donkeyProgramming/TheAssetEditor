@@ -10,7 +10,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 
-namespace AssetEditor.Report
+namespace Editors.Reports
 {
     public class FileListReportGenerator
     {
@@ -70,7 +70,7 @@ namespace AssetEditor.Report
                     WriteItem(writer, fileItem);
 
                     if (counter % 1000 == 0)
-                        _logger.Here().Information($"Files processed {counter}/{fileCount} = {((float)counter / (float)fileCount) * 100}%");
+                        _logger.Here().Information($"Files processed {counter}/{fileCount} = {counter / (float)fileCount * 100}%");
 
                     counter++;
                 }
@@ -182,7 +182,7 @@ namespace AssetEditor.Report
 
             var version = DetermineVersion(fileReader);
             var output = new Dictionary<string, FileItem>();
-            string currentLine = "";
+            var currentLine = "";
 
             while ((currentLine = fileReader.ReadLine()) != null)
             {

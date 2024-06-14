@@ -6,7 +6,7 @@ using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.Misc;
 using TextureEditor.Views;
 
-namespace TextureEditor.ViewModels
+namespace Editors.TextureEditor.ViewModels
 {
     public class TexturePreviewViewModel : NotifyPropertyChangedImpl
     {

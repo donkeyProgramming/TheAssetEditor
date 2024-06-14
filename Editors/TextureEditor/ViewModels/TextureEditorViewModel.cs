@@ -3,7 +3,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
-namespace TextureEditor.ViewModels
+namespace Editors.TextureEditor.ViewModels
 {
     public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
@@ -34,7 +34,7 @@ namespace TextureEditor.ViewModels
         private void Load(PackFile packFile)
         {
             _packFile = packFile;
- 
+
             DisplayName.Value = _packFile.Name;
 
             var viewModel = new TexturePreviewViewModel();
@@ -43,7 +43,7 @@ namespace TextureEditor.ViewModels
             _textureBuilder.Build(viewModel, _pfs.GetFullPath(_packFile));
             ViewModel = viewModel;
         }
-          
+
         public void ShowTextureDetailsInfo() => ViewModel.ShowTextureDetailsInfo();
 
         public void Close()
