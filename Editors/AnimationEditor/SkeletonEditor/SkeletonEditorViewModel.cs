@@ -5,6 +5,7 @@ using System.Windows;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.PackFileBrowser;
+using Editors.Shared.Core.Common.BaseControl;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -15,8 +16,9 @@ using View3D.Services;
 
 namespace AnimationEditor.SkeletonEditor
 {
-    public class SkeletonEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<SkeletonEditorViewModel>
+    public class SkeletonEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<SkeletonEditorViewModel>, IEditorViewModelTypeProvider
     {
+        public Type EditorViewModelType => typeof(EditorView);
         SceneObject _techSkeletonNode;
 
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;

@@ -9,13 +9,19 @@ namespace Shared.Ui.Common.DataTemplates
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
+            
+            if(item == null)
+                return base.SelectTemplate(item, container);
+
             var parent = FindParent<TabControl>(container);
             var toolFactory = (IToolFactory)parent.GetValue(ToolFactoryParameter.ViewFactoryProperty);
             var viewType = toolFactory.GetViewTypeFromViewModel(item.GetType());
 
             var factory = new FrameworkElementFactory(viewType);
-            var dt = new DataTemplate();
-            dt.VisualTree = factory;
+            var dt = new DataTemplate
+            {
+                VisualTree = factory
+            };
 
             return dt;
         }
@@ -29,8 +35,7 @@ namespace Shared.Ui.Common.DataTemplates
             if (parentObject == null) return null;
 
             //check if the parent matches the type we're looking for
-            var parent = parentObject as T;
-            if (parent != null)
+            if (parentObject is T parent)
                 return parent;
             else
                 return FindParent<T>(parentObject);

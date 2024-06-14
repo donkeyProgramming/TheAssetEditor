@@ -86,12 +86,12 @@ namespace AnimationEditor.Common.ReferenceModel
                 ModelNode.ModelMatrix = matrix;
         }
 
-        internal void SelectedBoneIndex(int? boneIndex)
+        public void SelectedBoneIndex(int? boneIndex)
         {
             SkeletonSceneNode.SelectedBoneIndex = boneIndex;
         }
 
-        internal void SelectedBoneScale(float scaleMult)
+        public void SelectedBoneScale(float scaleMult)
         {
             SkeletonSceneNode.SelectedBoneScaleMult = scaleMult;
         }

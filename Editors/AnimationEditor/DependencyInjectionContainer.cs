@@ -1,9 +1,7 @@
 ﻿using AnimationEditor.AnimationKeyframeEditor;
 using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
-using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.BaseControl;
-using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
@@ -18,12 +16,6 @@ namespace Editors.AnimationVisualEditors
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<SceneObjectBuilder>();
-            serviceCollection.AddTransient<SceneObject>();
-            serviceCollection.AddScoped<AnimationPlayerViewModel>();
-            serviceCollection.AddScoped<SceneObjectViewModelBuilder>();
-            serviceCollection.AddScoped<EditorHostView>();
-
             serviceCollection.AddScoped<EditorHost<SuperViewViewModel>>();
             serviceCollection.AddScoped<SuperViewViewModel>();
 

@@ -22,6 +22,7 @@ namespace AnimationEditor.PropCreator.ViewModels
 
     public class EditorHost<TEditor> : NotifyPropertyChangedImpl, IEditorViewModel
     {
+        public IToolFactory ToolsFactory { get; set; }
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Name missing");
         public PackFile MainFile { get; set; }
 
@@ -36,7 +37,7 @@ namespace AnimationEditor.PropCreator.ViewModels
         public ICommand ResetCameraCommand { get; set; } 
         public ICommand FocusCamerasCommand { get; set; }
 
-        public EditorHost(
+        public EditorHost(IToolFactory toolFactory,
             IComponentInserter componentInserter,
             AnimationPlayerViewModel animationPlayerViewModel,
             WpfGame gameWorld,
@@ -44,6 +45,7 @@ namespace AnimationEditor.PropCreator.ViewModels
             TEditor editor,
             EventHub eventHub)
         {
+            ToolsFactory = toolFactory;
             Editor = editor;
             GameWorld.Value = gameWorld;
             Player = animationPlayerViewModel;

@@ -4,14 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:referencemodel="clr-namespace:AnimationEditor.Common.ReferenceModel" 
-             xmlns:animationplayer="clr-namespace:AnimationEditor.Common.AnimationPlayer"
-             xmlns:mountcreator="clr-namespace:AnimationEditor.MountAnimationCreator" 
-             xmlns:campaignanimationcreator="clr-namespace:AnimationEditor.CampaignAnimationCreator"
-             xmlns:animationtransfertool="clr-namespace:AnimationEditor.AnimationTransferTool"
-             xmlns:superview="clr-namespace:AnimationEditor.SuperView"
-             xmlns:skeletoneditor="clr-namespace:AnimationEditor.SkeletonEditor"
-             xmlns:animationkeyframeeditor="clr-namespace:AnimationEditor.AnimationKeyframeEditor"
+             xmlns:animationplayer="clr-namespace:AnimationEditor.Common.AnimationPlayer" 
+             xmlns:basecontrol="clr-namespace:Editors.Shared.Core.Common.BaseControl"
              mc:Ignorable="d" >
+
+    <UserControl.Resources>
+        <basecontrol:HostTemplateSelector x:Key="EditorSelector" />
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width=".75*"/>
@@ -58,7 +58,6 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-
             <ListView Grid.Row="1" ItemsSource="{Binding SceneObjects, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
@@ -76,33 +75,9 @@
 
             <ScrollViewer  Grid.Row="3" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
                 <DockPanel  DockPanel.Dock="Top">
-                    <ContentControl Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}" >
-                        <ContentControl.Resources>
-                            <DataTemplate DataType="{ x:Type mountcreator:MountAnimationCreatorViewModel}">
-                                <mountcreator:EditorView  />
-                            </DataTemplate>
+                    <ContentControl Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}"       
+                                    ContentTemplateSelector="{StaticResource EditorSelector}"/>
 
-                            <DataTemplate DataType="{ x:Type campaignanimationcreator:CampaignAnimationCreatorViewModel}">
-                                <campaignanimationcreator:EditorView  />
-                            </DataTemplate>
-
-                            <DataTemplate DataType="{ x:Type animationtransfertool:AnimationTransferToolViewModel}">
-                                <animationtransfertool:EditorView  />
-                            </DataTemplate>
-
-                            <DataTemplate DataType="{ x:Type skeletoneditor:SkeletonEditorViewModel}">
-                                <skeletoneditor:EditorView  />
-                            </DataTemplate>
-
-                            <DataTemplate DataType="{ x:Type superview:SuperViewViewModel}">
-                                <superview:EditorView />
-                            </DataTemplate>
-                            
-                            <DataTemplate DataType="{ x:Type animationkeyframeeditor:AnimationKeyframeEditorViewModel}">
-                                <animationkeyframeeditor:EditorView  />
-                            </DataTemplate>
-                        </ContentControl.Resources>
-                    </ContentControl>
                 </DockPanel>
             </ScrollViewer>
         </Grid>

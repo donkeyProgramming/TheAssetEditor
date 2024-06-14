@@ -43,30 +43,30 @@ namespace Shared.Ui.Common.Behaviors
         private static void OnSelectedItemChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             return;
-            var item = e.NewValue as TreeViewItem;
-
-            if (item != null)
-            {
-                item.SetValue(TreeViewItem.IsSelectedProperty, true);
-            }
-            else
-            {
-                var cast = sender as BindableSelectedItemBehavior;
-
-                var treeItem = cast.AssociatedObject
-                           .ItemContainerGenerator
-                           .ContainerFromItemRecursive(e.NewValue);
-                if (treeItem != null)
-                    treeItem.SetValue(TreeViewItem.IsSelectedProperty, true);
-                else
-                {
-                    var oldTreeItem = cast.AssociatedObject
-                        .ItemContainerGenerator
-                        .ContainerFromItemRecursive(e.OldValue);
-                    if (oldTreeItem != null)
-                        oldTreeItem.SetValue(TreeViewItem.IsSelectedProperty, false);
-                }
-            }
+            //var item = e.NewValue as TreeViewItem;
+            //
+            //if (item != null)
+            //{
+            //    item.SetValue(TreeViewItem.IsSelectedProperty, true);
+            //}
+            //else
+            //{
+            //    var cast = sender as BindableSelectedItemBehavior;
+            //
+            //    var treeItem = cast.AssociatedObject
+            //               .ItemContainerGenerator
+            //               .ContainerFromItemRecursive(e.NewValue);
+            //    if (treeItem != null)
+            //        treeItem.SetValue(TreeViewItem.IsSelectedProperty, true);
+            //    else
+            //    {
+            //        var oldTreeItem = cast.AssociatedObject
+            //            .ItemContainerGenerator
+            //            .ContainerFromItemRecursive(e.OldValue);
+            //        if (oldTreeItem != null)
+            //            oldTreeItem.SetValue(TreeViewItem.IsSelectedProperty, false);
+            //    }
+            //}
         }
 
         protected override void OnAttached()

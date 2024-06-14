@@ -1,4 +1,5 @@
-﻿using Shared.Core.ErrorHandling;
+﻿using System.IO;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;

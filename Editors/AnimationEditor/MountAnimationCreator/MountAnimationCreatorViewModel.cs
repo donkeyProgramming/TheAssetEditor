@@ -24,12 +24,14 @@ using MessageBox = System.Windows.Forms.MessageBox;
 using Clipboard = System.Windows.Clipboard;
 using Shared.Ui.Events.UiCommands;
 using Shared.Core.Events;
+using Editors.Shared.Core.Common.BaseControl;
 
 
 namespace AnimationEditor.MountAnimationCreator
 {
-    public class MountAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<MountAnimationCreatorViewModel>
+    public class MountAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<MountAnimationCreatorViewModel>, IEditorViewModelTypeProvider
     {
+        public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly SceneObjectBuilder _sceneObjectBuilder;
         private readonly IUiCommandFactory _uiCommandFactory;

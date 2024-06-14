@@ -9,6 +9,7 @@ using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Editors.BoneMapping.View;
 using CommonControls.SelectionListDialog;
+using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Serilog;
@@ -24,8 +25,9 @@ using View3D.Animation;
 
 namespace AnimationEditor.AnimationTransferTool
 {
-    public class AnimationTransferToolViewModel : IHostedEditor<AnimationTransferToolViewModel>
+    public class AnimationTransferToolViewModel : IHostedEditor<AnimationTransferToolViewModel>, IEditorViewModelTypeProvider
     {
+        public Type EditorViewModelType => typeof(EditorView);
         AnimationToolInput _inputTargetData;
         AnimationToolInput _inputSourceData;
 

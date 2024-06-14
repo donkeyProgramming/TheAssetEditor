@@ -1,6 +1,8 @@
-﻿using AnimationEditor.Common.ReferenceModel;
+﻿using System;
+using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationMeta.Presentation;
+using Editors.Shared.Core.Common.BaseControl;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -8,7 +10,7 @@ using Shared.Core.PackFiles.Models;
 
 namespace AnimationEditor.SuperView
 {
-    public class SuperViewViewModel : IHostedEditor<SuperViewViewModel>
+    public class SuperViewViewModel : IHostedEditor<SuperViewViewModel>, IEditorViewModelTypeProvider
     {
         SceneObject _asset;
         AnimationToolInput _debugDataToLoad;
@@ -24,6 +26,8 @@ namespace AnimationEditor.SuperView
         public EditorViewModel MetaEditor { get; private set; }
 
         public string EditorName { get; } = "Super View";
+
+        public Type EditorViewModelType => typeof(EditorView);
 
         public SuperViewViewModel(SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             PackFileService packFileService, 

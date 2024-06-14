@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Windows;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
+using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
@@ -12,8 +14,9 @@ using View3D.Animation;
 
 namespace AnimationEditor.CampaignAnimationCreator
 {
-    public class CampaignAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<CampaignAnimationCreatorViewModel>
+    public class CampaignAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<CampaignAnimationCreatorViewModel>, IEditorViewModelTypeProvider
     {
+        public Type EditorViewModelType => typeof(EditorView);
         AnimationToolInput _debugDataToLoad;
         SceneObject _selectedUnit;
         AnimationClip _selectedAnimationClip;

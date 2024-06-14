@@ -1,12 +1,10 @@
 ﻿using System.Linq;
 using AssetEditor.ViewModels;
-using KitbasherEditor.Views.EditorViews;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.WindowHandling;
 
 namespace AssetEditor.Services
 {

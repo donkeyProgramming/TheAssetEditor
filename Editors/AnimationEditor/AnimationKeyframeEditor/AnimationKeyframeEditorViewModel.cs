@@ -6,6 +6,7 @@ using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.ViewModels;
 using AnimationEditor.PropCreator.ViewModels;
+using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
@@ -23,8 +24,9 @@ using SkeletonBoneNode = AnimationEditor.Common.ReferenceModel.SkeletonBoneNode;
 
 namespace AnimationEditor.AnimationKeyframeEditor
 {
-    public class AnimationKeyframeEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<AnimationKeyframeEditorViewModel>
+    public class AnimationKeyframeEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<AnimationKeyframeEditorViewModel>, IEditorViewModelTypeProvider
     {
+        public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly SceneObjectBuilder _sceneObjectBuilder;

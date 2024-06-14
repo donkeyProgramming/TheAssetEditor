@@ -4,6 +4,7 @@
       <TargetFramework>net6.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+      	<UseWPF>true</UseWPF>      
   </PropertyGroup>
 
 
@@ -11,6 +12,7 @@
     <ProjectReference Include="..\..\..\GameWorld\View3D\GameWorld.Core.csproj" />
     <ProjectReference Include="..\..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
     <ProjectReference Include="..\..\..\Shared\SharedCore\Shared.Core.csproj" />
+    <ProjectReference Include="..\..\..\Shared\SharedUI\Shared.Ui.csproj" />
   </ItemGroup>
 
 </Project>
