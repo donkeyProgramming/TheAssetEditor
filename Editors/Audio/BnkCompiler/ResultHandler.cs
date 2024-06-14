@@ -40,8 +40,7 @@ namespace Audio.BnkCompiler
 
         void ExportToDirectory(CompileResult result, CompilerSettings settings)
         {
-            string outputDirectory = settings.FileExportPath;
-            bool convertResultToXml = settings.ConvertResultToXml;
+            var outputDirectory = settings.FileExportPath;
 
             if (string.IsNullOrWhiteSpace(outputDirectory) == false)
             {
@@ -58,12 +57,6 @@ namespace Audio.BnkCompiler
                 {
                     var statesDatPath = Path.Combine(outputDirectory, $"{result.Project.ProjectSettings.BnkName}.dat");
                     File.WriteAllBytes(statesDatPath, result.OutputStatesDatFile.DataSource.ReadData());
-                }
-
-                if (convertResultToXml)
-                {
-                    Guard.IsNotNullOrEmpty(settings.WWiserPath);
-                    BnkToXmlConverter.Convert(settings.WWiserPath, bnkPath, true);
                 }
             }
         }

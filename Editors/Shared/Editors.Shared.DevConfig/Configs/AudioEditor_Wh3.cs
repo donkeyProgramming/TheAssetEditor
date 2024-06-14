@@ -19,7 +19,7 @@ namespace Editors.Shared.DevConfig.Configs
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.LoadCaPacksByDefault = true;
-            currentSettings.SkipLoadingWemFiles = false;
+            currentSettings.LoadWemFiles = false;
         }
 
         public void OpenFileOnLoad()

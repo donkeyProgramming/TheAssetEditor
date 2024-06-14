@@ -9,9 +9,6 @@ namespace Audio.BnkCompiler
         public bool UseIdForMixers { get; set; } = false;
         public bool UseIdForSounds { get; set; } = false;
         public bool SaveGeneratedCompilerInput { get; set; } = true;
-
-        public string WWiserPath { get; set; } = "D:\\Research\\Audio\\WWiser\\wwiser.pyz";
-        public bool ConvertResultToXml { get; set; }
         public string FileExportPath { get; set; }
 
         public static CompilerSettings Default() => new CompilerSettings();

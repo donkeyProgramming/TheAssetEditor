@@ -25,8 +25,8 @@ namespace AssetEditor.ViewModels
         bool _autoGenerateAttachmentPointsFromMeshes;
         public bool AutoGenerateAttachmentPointsFromMeshes { get => _autoGenerateAttachmentPointsFromMeshes; set => SetAndNotify(ref _autoGenerateAttachmentPointsFromMeshes, value); }
 
-        bool _skipLoadingWemFiles;
-        public bool SkipLoadingWemFiles { get => _skipLoadingWemFiles; set => SetAndNotify(ref _skipLoadingWemFiles, value); }
+        bool _LoadWemFiles;
+        public bool LoadWemFiles { get => _LoadWemFiles; set => SetAndNotify(ref _LoadWemFiles, value); }
 
         bool _autoResolveMissingTextures;
         public bool AutoResolveMissingTextures { get => _autoResolveMissingTextures; set => SetAndNotify(ref _autoResolveMissingTextures, value); }
@@ -63,7 +63,7 @@ namespace AssetEditor.ViewModels
             LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
             AutoGenerateAttachmentPointsFromMeshes = _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes;
             AutoResolveMissingTextures = _settingsService.CurrentSettings.AutoResolveMissingTextures;
-            SkipLoadingWemFiles = _settingsService.CurrentSettings.SkipLoadingWemFiles;
+            LoadWemFiles = _settingsService.CurrentSettings.LoadWemFiles;
             HideWh2TextureSelectors = _settingsService.CurrentSettings.HideWh2TextureSelectors;
             WwisePath = _settingsService.CurrentSettings.WwisePath;
 
@@ -76,7 +76,7 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
             _settingsService.CurrentSettings.UseTextEditorForUnknownFiles = UseTextEditorForUnknownFiles;
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;
-            _settingsService.CurrentSettings.SkipLoadingWemFiles = SkipLoadingWemFiles;
+            _settingsService.CurrentSettings.LoadWemFiles = LoadWemFiles;
             _settingsService.CurrentSettings.AutoResolveMissingTextures = AutoResolveMissingTextures;
             _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes = AutoGenerateAttachmentPointsFromMeshes;
             _settingsService.CurrentSettings.HideWh2TextureSelectors = HideWh2TextureSelectors;

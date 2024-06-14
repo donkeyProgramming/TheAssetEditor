@@ -81,7 +81,7 @@ namespace Audio.BnkCompiler.Validation
         public ActionValidator(List<IAudioProjectHircItem> allItems)
         {
             RuleFor(x => x.Id).NotEmpty().WithMessage("Item is missing ID");
-            RuleFor(x => x.ChildId).Must(x => ValidateChildReference(x, allItems)).WithMessage($"ActionChild has invalid reference");
+            //RuleFor(x => x.ChildId).Must(x => ValidateChildReference(x, allItems)).WithMessage($"ActionChild has invalid reference");
             RuleFor(x => x.Type)
                 .NotEmpty().WithMessage("ActionChild has no type")
                 .Must(ValidateChildActionType).WithMessage(x => $"ActionChild has invalid type '{x.Type}'. Valid values are {string.Join(", ", ValidActionTypes)}");

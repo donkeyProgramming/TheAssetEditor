@@ -104,30 +104,34 @@ namespace Audio.Utility
             DirectoryHelper.EnsureCreated(VgStreamFolderName);
             DirectoryHelper.EnsureCreated(AudioFolderName);
 
-            var vgStreamCli = $"{VgStreamFolderName}\\vgstream.exe";
+            var vgStreamCli = Path.Combine(VgStreamFolderName, "vgstream.exe");
             if (File.Exists(vgStreamCli))
                 return vgStreamCli;
 
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            string folderName = string.Format("{0}.Resources.VgStream.", executingAssembly.GetName().Name);
-
-            var vgStreamFiles = executingAssembly
+            var assemblyName = "Shared.EmbeddedResources";
+            var assembly = Assembly.Load(assemblyName);
+            var resourceRootNamespace = $"{assemblyName}.Resources.AudioConversion.vgstream";
+            var vgStreamFiles = assembly
                 .GetManifestResourceNames()
-                .Where(r => r.StartsWith(folderName, StringComparison.InvariantCultureIgnoreCase)).ToArray();
+                .Where(r => r.StartsWith(resourceRootNamespace, StringComparison.InvariantCultureIgnoreCase)).ToArray();
 
             foreach (var file in vgStreamFiles)
             {
-                var fileName = file.Replace(folderName, "", StringComparison.InvariantCultureIgnoreCase);
+                var fileName = file.Substring(resourceRootNamespace.Length + 1);
                 var outputFileName = $"{VgStreamFolderName}\\{fileName}";
-                using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(file);
-                using var fStream = new FileStream(outputFileName, FileMode.OpenOrCreate);
-                stream!.CopyTo(fStream);
-            }
 
-            if (File.Exists(vgStreamCli) == false)
-                throw new Exception("Failed to create vgStreamCli - Unknown error");
+                using var resourceStream = assembly.GetManifestResourceStream(file);
+
+                if (resourceStream == null)
+                    throw new Exception($"Failed to retrieve resource stream for {file}");
+
+                using var fileStream = new FileStream(outputFileName, FileMode.OpenOrCreate);
+                resourceStream.CopyTo(fileStream);
+            }
 
             return vgStreamCli;
         }
+
+
     }
 }

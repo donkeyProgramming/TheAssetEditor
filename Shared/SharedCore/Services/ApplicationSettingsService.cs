@@ -21,7 +21,7 @@ namespace Shared.Core.Services
         public bool UseTextEditorForUnknownFiles { get; set; } = true;
         public bool LoadCaPacksByDefault { get; set; } = true;
         public bool AutoResolveMissingTextures { get; set; } = true;
-        public bool SkipLoadingWemFiles { get; set; } = true;
+        public bool LoadWemFiles { get; set; } = true;
         public bool AutoGenerateAttachmentPointsFromMeshes { get; set; } = true;
         public bool IsFirstTimeStartingApplication { get; set; } = true;
         public bool IsDeveloperRun { get; set; } = false;
