@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using GameWorld.Core.SceneNodes;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
-using View3D.SceneNodes;
 
-namespace View3D.Services
+namespace GameWorld.Core.Services
 {
     public class MissingTextureResolver
     {

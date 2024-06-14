@@ -1,11 +1,11 @@
-﻿using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.Views.EditorViews;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
-using View3D.Components.Component;
-using View3D.SceneNodes;
-using View3D.Services.SceneSaving;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

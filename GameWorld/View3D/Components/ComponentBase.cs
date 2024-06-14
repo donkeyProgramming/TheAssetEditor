@@ -2,7 +2,7 @@
 using Shared.Core.Misc;
 using System;
 
-namespace View3D.Components
+namespace GameWorld.Core.Components
 {
 
     public class BaseComponent : NotifyPropertyChangedImpl, IDrawable, IGameComponent, IUpdateable

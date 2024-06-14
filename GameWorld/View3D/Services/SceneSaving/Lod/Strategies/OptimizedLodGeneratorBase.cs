@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving;
+using GameWorld.Core.Utility;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel;
-using View3D.SceneNodes;
-using View3D.Utility;
 
-namespace View3D.Services.SceneSaving.Lod.Strategies
+namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
     public abstract class OptimizedLodGeneratorBase
     {

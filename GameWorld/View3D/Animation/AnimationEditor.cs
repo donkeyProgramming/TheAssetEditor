@@ -2,9 +2,9 @@
 using Shared.GameFormats.Animation;
 using System;
 using System.Linq;
-using static View3D.Animation.AnimationClip;
+using static GameWorld.Core.Animation.AnimationClip;
 
-namespace View3D.Animation
+namespace GameWorld.Core.Animation
 {
     public class AnimationEditor
     {
@@ -55,13 +55,13 @@ namespace View3D.Animation
         private static void CreateBoneTable(GameSkeleton skeleton, int[] bones, ref AnimationFile animFile)
         {
             // Add the bones
-            for (int i = 0; i < bones.Length; i++)
+            for (var i = 0; i < bones.Length; i++)
             {
                 var originalBoneIndex = bones[i];
                 animFile.Bones[i] = new AnimationFile.BoneInfo() { Id = i, Name = skeleton.BoneNames[originalBoneIndex], ParentId = skeleton.GetParentBoneIndex(originalBoneIndex) };
             }
 
-            for (int i = 0; i < bones.Length; i++)
+            for (var i = 0; i < bones.Length; i++)
             {
                 if (animFile.Bones[i].ParentId == -1)
                     continue;
@@ -79,9 +79,9 @@ namespace View3D.Animation
         {
             var origianlFrames = newRiderAnim.DynamicFrames.ToList();
 
-            for (int i = 0; i < loopCounter - 1; i++)
+            for (var i = 0; i < loopCounter - 1; i++)
             {
-                for (int frameIndex = 0; frameIndex < origianlFrames.Count; frameIndex++)
+                for (var frameIndex = 0; frameIndex < origianlFrames.Count; frameIndex++)
                 {
                     var newFrame = origianlFrames[frameIndex].Clone();
                     newRiderAnim.DynamicFrames.Add(newFrame);
@@ -95,20 +95,20 @@ namespace View3D.Animation
             output.DynamicFrames.Clear();
 
             var fraction = 1.0f / (newFrameCount - 1);
-            for (int i = 0; i < newFrameCount; i++)
+            for (var i = 0; i < newFrameCount; i++)
             {
-                float t = i * fraction;
+                var t = i * fraction;
                 var keyframe = AnimationSampler.Sample(t, skeleton, newAnim);
 
-                KeyFrame newKeyFrame = new KeyFrame();
-                for (int boneIndex = 0; boneIndex < skeleton.BoneCount; boneIndex++)
+                var newKeyFrame = new KeyFrame();
+                for (var boneIndex = 0; boneIndex < skeleton.BoneCount; boneIndex++)
                 {
                     newKeyFrame.Rotation.Add(keyframe.BoneTransforms[boneIndex].Rotation);
                     newKeyFrame.Position.Add(keyframe.BoneTransforms[boneIndex].Translation);
                 }
 
 
-                for (int b = 0; b < skeleton.BoneCount; b++)
+                for (var b = 0; b < skeleton.BoneCount; b++)
                     newKeyFrame.Scale.Add(Vector3.One);
 
                 output.DynamicFrames.Add(newKeyFrame);

@@ -4,9 +4,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Animation;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
 
-namespace View3D.Commands.Bone.Clipboard
+namespace GameWorld.Core.Commands.Bone.Clipboard
 {
     public class PasteIntoSelectedBonesInRangeTransformFromClipboardBoneCommand : ICommand
     {
@@ -47,7 +48,7 @@ namespace View3D.Commands.Bone.Clipboard
 
         public void Execute()
         {
-            int frameNr = _pasteInTargetAnimationAtFrame;
+            var frameNr = _pasteInTargetAnimationAtFrame;
             var copyFramesEnds = _copyFramesLength + frameNr;
             var isTheTargetFramesShorterThanCopiedFrames = _backupFrames.Count < copyFramesEnds;
 
@@ -56,7 +57,7 @@ namespace View3D.Commands.Bone.Clipboard
                 var lastFrame = _animation.DynamicFrames.Last().Clone();
                 var delta = copyFramesEnds - _backupFrames.Count;
 
-                for (int i = 0; i < delta; i++)
+                for (var i = 0; i < delta; i++)
                 {
                     _animation.DynamicFrames.Add(lastFrame.Clone());
                 }

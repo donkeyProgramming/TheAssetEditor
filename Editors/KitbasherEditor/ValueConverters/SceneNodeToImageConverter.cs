@@ -1,8 +1,8 @@
-﻿using Shared.EmbeddedResources;
+﻿using GameWorld.Core.SceneNodes;
+using Shared.EmbeddedResources;
 using System;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ValueConverters
 {

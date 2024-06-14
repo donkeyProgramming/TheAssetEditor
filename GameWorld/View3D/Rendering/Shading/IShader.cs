@@ -1,8 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Rendering;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel.Types;
 
-namespace View3D.Rendering.Shading
+namespace GameWorld.Core.Rendering.Shading
 {
     public interface IShader
     {
@@ -49,7 +50,7 @@ namespace View3D.Rendering.Shading
 
         public void SetCommonParmeters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
         {
-            var typedEffect = (Effect as BasicEffect);
+            var typedEffect = Effect as BasicEffect;
             typedEffect.Projection = commonShaderParameters.Projection;
             typedEffect.View = commonShaderParameters.View;
             typedEffect.World = modelMatrix;

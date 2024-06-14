@@ -1,11 +1,11 @@
-﻿using Serilog;
+﻿using GameWorld.Core.Commands;
+using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using System;
 using System.Collections.Generic;
-using View3D.Commands;
 
-namespace View3D.Components.Component
+namespace GameWorld.Core.Services
 {
     public class CommandStackChangedEvent
     {

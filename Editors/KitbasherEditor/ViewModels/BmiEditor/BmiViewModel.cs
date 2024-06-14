@@ -1,12 +1,12 @@
-﻿using Shared.Core.Misc;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.SceneNodes;
+using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.MathViews;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using View3D.Animation;
-using View3D.Commands;
-using View3D.Commands.Object;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.BmiEditor
 {

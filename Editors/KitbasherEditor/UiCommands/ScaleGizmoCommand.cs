@@ -1,7 +1,7 @@
-﻿using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using GameWorld.Core.Components.Gizmo;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using System.Windows.Input;
-using View3D.Components.Gizmo;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

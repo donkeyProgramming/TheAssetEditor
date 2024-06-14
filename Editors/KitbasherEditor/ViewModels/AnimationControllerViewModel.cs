@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
 using KitbasherEditor.Events;
 using Shared.Core.Events;
 using Shared.Core.Misc;
@@ -10,7 +11,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
-using View3D.Animation;
 using static CommonControls.FilterDialog.FilterUserControl;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 

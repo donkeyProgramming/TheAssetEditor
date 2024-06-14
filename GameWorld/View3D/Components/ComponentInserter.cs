@@ -2,7 +2,7 @@
 using GameWorld.WpfWindow;
 using Microsoft.Xna.Framework;
 
-namespace View3D.Components
+namespace GameWorld.Core.Components
 {
     public interface IComponentInserter
     {

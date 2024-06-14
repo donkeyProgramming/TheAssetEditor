@@ -11,6 +11,7 @@ using CommonControls.Editors.BoneMapping.View;
 using CommonControls.SelectionListDialog;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -21,7 +22,6 @@ using Shared.Ui.BaseDialogs.MathViews;
 using Shared.Ui.BaseDialogs.SelectionListDialog;
 using Shared.Ui.Common;
 using Shared.Ui.Editors.BoneMapping;
-using View3D.Animation;
 
 namespace AnimationEditor.AnimationTransferTool
 {

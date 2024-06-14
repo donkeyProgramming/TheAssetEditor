@@ -1,10 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Components.Input;
+using GameWorld.Core.Utility;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using View3D.Components.Input;
 
-namespace View3D.Components.Rendering
+namespace GameWorld.Core.Components.Rendering
 {
     public class ArcBallCamera : BaseComponent, IDisposable
     {
@@ -56,7 +57,7 @@ namespace View3D.Components.Rendering
         /// </summary>        
         public void MoveCameraRight(float amount)
         {
-            Vector3 right = Vector3.Normalize(LookAt - Position); //calculate forward
+            var right = Vector3.Normalize(LookAt - Position); //calculate forward
             right = Vector3.Cross(right, Vector3.Up); //calculate the real right
             right.Y = 0;
             right.Normalize();
@@ -75,7 +76,7 @@ namespace View3D.Components.Rendering
         /// </summary>        
         public void MoveCameraForward(float amount)
         {
-            Vector3 forward = Vector3.Normalize(LookAt - Position);
+            var forward = Vector3.Normalize(LookAt - Position);
             forward.Y = 0;
             forward.Normalize();
             LookAt += forward * amount;
@@ -233,8 +234,8 @@ namespace View3D.Components.Rendering
                     if (Math.Abs(deltaMouseWheel) > 250)   // Weird bug, sometimes this value is very large, probably related to state clearing. Temp fix
                         deltaMouseWheel = 250 * Math.Sign(deltaMouseWheel);
 
-                    var oldZoom = (Zoom / 10);
-                    Zoom += (deltaMouseWheel * 0.005f) * oldZoom;
+                    var oldZoom = Zoom / 10;
+                    Zoom += deltaMouseWheel * 0.005f * oldZoom;
                     //_logger.Here().Information($"Setting zoom {Zoom} - {deltaMouseWheel} - {oldZoom}");
                 }
             }
@@ -245,7 +246,7 @@ namespace View3D.Components.Rendering
         {
             return Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.ToRadians(45), // 45 degree angle
-                (float)_graphicsDevice.Viewport.Width /
+                _graphicsDevice.Viewport.Width /
                 (float)_graphicsDevice.Viewport.Height,
                 .01f, 25000) * Matrix.CreateScale(-1, 1, 1);
         }
@@ -254,19 +255,19 @@ namespace View3D.Components.Rendering
         {
             var projection = ProjectionMatrix;
 
-            Vector3 nearPoint = _graphicsDevice.Viewport.Unproject(new Vector3(mouseLocation.X,
+            var nearPoint = _graphicsDevice.Viewport.Unproject(new Vector3(mouseLocation.X,
                    mouseLocation.Y, 0.0f),
                    projection,
                    ViewMatrix,
                    Matrix.Identity);
 
-            Vector3 farPoint = _graphicsDevice.Viewport.Unproject(new Vector3(mouseLocation.X,
+            var farPoint = _graphicsDevice.Viewport.Unproject(new Vector3(mouseLocation.X,
                     mouseLocation.Y, 1.0f),
                     projection,
                     ViewMatrix,
                     Matrix.Identity);
 
-            Vector3 direction = farPoint - nearPoint;
+            var direction = farPoint - nearPoint;
             direction.Normalize();
 
             return new Ray(nearPoint, direction);
@@ -278,20 +279,20 @@ namespace View3D.Components.Rendering
             // Many many thanks to him...
 
             // Point in screen space of the center of the region selected
-            Vector2 regionCenterScreen = new Vector2(source.Center.X, source.Center.Y);
+            var regionCenterScreen = new Vector2(source.Center.X, source.Center.Y);
 
             // Generate the projection matrix for the screen region
-            Matrix regionProjMatrix = ProjectionMatrix;
+            var regionProjMatrix = ProjectionMatrix;
 
             // Calculate the region dimensions in the projection matrix. M11 is inverse of width, M22 is inverse of height.
-            regionProjMatrix.M11 /= ((float)source.Width / (float)_graphicsDevice.Viewport.Width);
-            regionProjMatrix.M22 /= ((float)source.Height / (float)_graphicsDevice.Viewport.Height);
+            regionProjMatrix.M11 /= source.Width / (float)_graphicsDevice.Viewport.Width;
+            regionProjMatrix.M22 /= source.Height / (float)_graphicsDevice.Viewport.Height;
 
             // Calculate the region center in the projection matrix. M31 is horizonatal center.
-            regionProjMatrix.M31 = (regionCenterScreen.X - (_graphicsDevice.Viewport.Width / 2f)) / ((float)source.Width / 2f);
+            regionProjMatrix.M31 = (regionCenterScreen.X - _graphicsDevice.Viewport.Width / 2f) / (source.Width / 2f);
 
             // M32 is vertical center. Notice that the screen has low Y on top, projection has low Y on bottom.
-            regionProjMatrix.M32 = -(regionCenterScreen.Y - (_graphicsDevice.Viewport.Height / 2f)) / ((float)source.Height / 2f);
+            regionProjMatrix.M32 = -(regionCenterScreen.Y - _graphicsDevice.Viewport.Height / 2f) / (source.Height / 2f);
 
             return new BoundingFrustum(ViewMatrix * regionProjMatrix);
         }

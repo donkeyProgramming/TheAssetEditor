@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace View3D.SceneNodes
+namespace GameWorld.Core.SceneNodes
 {
     public static class SceneNodeHelper
     {
@@ -132,7 +132,7 @@ namespace View3D.SceneNodes
 
         public static bool AreAllNodesVisible(Rmv2ModelNode searchStart)
         {
-            bool isAllVisible = true;
+            var isAllVisible = true;
             searchStart.GetLodNodes()[0].ForeachNodeRecursive((node) =>
             {
                 if (!node.IsVisible)

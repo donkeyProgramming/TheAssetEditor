@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.Animation.AnimationChange;
+using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using System;
-using View3D.Animation;
-using View3D.Animation.AnimationChange;
-using View3D.SceneNodes;
 
 namespace Editors.AnimationMeta.Visualisation.Rules
 {

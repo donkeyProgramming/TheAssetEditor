@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using View3D.SceneNodes;
+using GameWorld.Core.SceneNodes;
 
-namespace View3D.Components.Component.Selection
+namespace GameWorld.Core.Components.Selection
 {
     public class FaceSelectionState : ISelectionState
     {

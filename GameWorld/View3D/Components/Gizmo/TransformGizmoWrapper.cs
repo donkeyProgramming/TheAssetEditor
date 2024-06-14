@@ -1,18 +1,18 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Bone;
+using GameWorld.Core.Commands.Vertex;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
+using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Commands;
-using View3D.Commands.Bone;
-using View3D.Commands.Vertex;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
 
-namespace View3D.Components.Gizmo
+namespace GameWorld.Core.Components.Gizmo
 {
     public class TransformGizmoWrapper : ITransformable
     {
@@ -49,16 +49,16 @@ namespace View3D.Components.Gizmo
                 foreach (var item in _effectedObjects)
                     Position += item.MeshCenter;
 
-                Position = (Position / _effectedObjects.Count);
+                Position = Position / _effectedObjects.Count;
             }
             if (_selectionState is VertexSelectionState vertSelectionState)
             {
                 _effectedObjects = effectedObjects;
 
-                for (int i = 0; i < vertSelectionState.SelectedVertices.Count; i++)
+                for (var i = 0; i < vertSelectionState.SelectedVertices.Count; i++)
                     Position += _effectedObjects[0].GetVertexById(vertSelectionState.SelectedVertices[i]);
 
-                Position = (Position / vertSelectionState.SelectedVertices.Count);
+                Position = Position / vertSelectionState.SelectedVertices.Count;
             }
         }
 
@@ -91,14 +91,14 @@ namespace View3D.Components.Gizmo
             }
 
             Orientation = AverageOrientation(rotations);
-            Position = (Position / totalBones);
-            Scale = (Scale / totalBones);
+            Position = Position / totalBones;
+            Scale = Scale / totalBones;
         }
 
         private Quaternion AverageOrientation(List<Quaternion> orientations)
         {
-            Quaternion average = orientations[0];
-            for (int i = 1; i < orientations.Count; i++)
+            var average = orientations[0];
+            for (var i = 1; i < orientations.Count; i++)
             {
                 average = Quaternion.Slerp(average, orientations[i], 1.0f / (i + 1));
             }
@@ -108,7 +108,7 @@ namespace View3D.Components.Gizmo
         public void Start(CommandExecutor commandManager)
         {
 
-            if(_activeCommand is TransformVertexCommand transformVertexCommand)
+            if (_activeCommand is TransformVertexCommand transformVertexCommand)
             {
                 //   MessageBox.Show("Transform debug check - Please inform the creator of the tool that you got this message. Would also love it if you tried undoing your last command to see if that works..\n E-001");
                 transformVertexCommand.InvertWindingOrder = _invertedWindingOrder;
@@ -118,7 +118,7 @@ namespace View3D.Components.Gizmo
                 _activeCommand = null;
             }
 
-            if(_activeCommand is TransformBoneCommand transformBoneCommand)
+            if (_activeCommand is TransformBoneCommand transformBoneCommand)
             {
                 var matrix = _totalGizomTransform;
                 matrix.Translation = Position;
@@ -127,7 +127,7 @@ namespace View3D.Components.Gizmo
                 _activeCommand = null;
             }
 
-            if(_selectionState is BoneSelectionState)
+            if (_selectionState is BoneSelectionState)
             {
                 _totalGizomTransform = Matrix.Identity;
                 _activeCommand = _commandFactory.Create<TransformBoneCommand>().Configure(x => x.Configure(_selectedBones, (BoneSelectionState)_selectionState)).Build();
@@ -166,16 +166,16 @@ namespace View3D.Components.Gizmo
         Matrix FixRotationAxis2(Matrix transform)
         {
             // Decompose the transform matrix into its scale, rotation, and translation components
-            transform.Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation);
+            transform.Decompose(out var scale, out var rotation, out var translation);
 
             // Create a quaternion representing a 180-degree rotation around the X axis
-            Quaternion flipQuaternion = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.Pi);
+            var flipQuaternion = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.Pi);
 
             // Apply the rotation to the quaternion to correct the axis alignment
-            Quaternion correctedQuaternion = flipQuaternion * rotation;
+            var correctedQuaternion = flipQuaternion * rotation;
 
             // Recompose the transform matrix with the corrected rotation
-            Matrix fixedTransform = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(correctedQuaternion) * Matrix.CreateTranslation(translation);
+            var fixedTransform = Matrix.CreateScale(scale) * Matrix.CreateFromQuaternion(correctedQuaternion) * Matrix.CreateTranslation(translation);
 
             return fixedTransform;
         }
@@ -216,7 +216,7 @@ namespace View3D.Components.Gizmo
                 foreach (var geo in _effectedObjects)
                 {
                     var indexes = geo.GetIndexBuffer();
-                    for (int i = 0; i < indexes.Count; i += 3)
+                    for (var i = 0; i < indexes.Count; i += 3)
                     {
                         var temp = indexes[i + 2];
                         indexes[i + 2] = indexes[i + 0];
@@ -258,12 +258,12 @@ namespace View3D.Components.Gizmo
 
                 if (_selectionState is ObjectSelectionState objectSelectionState)
                 {
-                    for (int i = 0; i < geo.VertexCount(); i++)
+                    for (var i = 0; i < geo.VertexCount(); i++)
                         TransformVertex(transform, geo, objCenter, i);
                 }
                 else if (_selectionState is VertexSelectionState vertSelectionState)
                 {
-                    for (int i = 0; i < vertSelectionState.VertexWeights.Count; i++)
+                    for (var i = 0; i < vertSelectionState.VertexWeights.Count; i++)
                     {
                         if (vertSelectionState.VertexWeights[i] != 0)
                         {

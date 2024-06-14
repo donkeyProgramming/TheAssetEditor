@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -9,11 +11,9 @@ using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.WsModel;
 using Shared.Ui.Editors.VariantMeshDefinition;
-using View3D.Animation;
-using View3D.SceneNodes;
 using static Shared.GameFormats.Vmd.VariantMeshDefinition;
 
-namespace View3D.Services
+namespace GameWorld.Core.Services
 {
     public class ComplexMeshLoader
     {
@@ -119,7 +119,7 @@ namespace View3D.Services
                 foreach (var meshReference in slot.ChildReferences)
                     Load(meshReference.Reference.ToLower(), slotNode, player, slot.AttachmentPoint);
 
-                for (int i = 0; i < slotNode.Children.Count(); i++)
+                for (var i = 0; i < slotNode.Children.Count(); i++)
                 {
                     slotNode.Children[i].IsVisible = i == 0;
                     slotNode.Children[i].IsExpanded = false;
@@ -182,14 +182,14 @@ namespace View3D.Services
                     else
                     {
                         mesh.OriginalFilePath = _packFileService.GetFullPath(file);
-                        bool useAlpha = materialConfig.Alpha;
+                        var useAlpha = materialConfig.Alpha;
                         if (useAlpha)
                             mesh.Material.AlphaMode = AlphaMode.Transparent;
                         else
                             mesh.Material.AlphaMode = AlphaMode.Opaque;
 
                         var allTextures = mesh.Material.GetAllTextures();
-                        for (int i = 0; i < 0; i++)
+                        for (var i = 0; i < 0; i++)
                         {
                             mesh.Material.SetTexture(allTextures[i].TexureType, "");
                             mesh.UpdateTexture("", allTextures[i].TexureType);

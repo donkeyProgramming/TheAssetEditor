@@ -1,7 +1,7 @@
-﻿using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Services;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
-using View3D.Components.Component.Selection;
-using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

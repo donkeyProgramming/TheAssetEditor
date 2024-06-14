@@ -1,10 +1,11 @@
-﻿using Shared.Ui.Editors.BoneMapping;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.SceneNodes;
+using Shared.Ui.Editors.BoneMapping;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
 
-namespace View3D.Commands.Object
+namespace GameWorld.Core.Commands.Object
 {
     public class RemapBoneIndexesCommand : ICommand
     {
@@ -42,7 +43,7 @@ namespace View3D.Commands.Object
 
         public void Undo()
         {
-            for (int i = 0; i < _meshNodeList.Count; i++)
+            for (var i = 0; i < _meshNodeList.Count; i++)
             {
                 _meshNodeList[i].Geometry = _originalGeometry[i];
                 _meshNodeList[i].Geometry.ParentSkeletonName = _originalSkeletonName;

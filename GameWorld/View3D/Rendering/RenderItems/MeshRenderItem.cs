@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering.Shading;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using View3D.Components.Rendering;
-using View3D.Rendering.Shading;
 
-namespace View3D.Rendering.RenderItems
+namespace GameWorld.Core.Rendering.RenderItems
 {
     public class GeoRenderItem : IRenderItem
     {

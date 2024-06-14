@@ -1,13 +1,14 @@
-﻿using Serilog;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Face;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
+using Serilog;
 using Shared.Core.ErrorHandling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Commands.Face;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
 
-namespace View3D.Commands.Object
+namespace GameWorld.Core.Commands.Object
 {
     public class DuplicateObjectCommand : ICommand
     {

@@ -1,27 +1,27 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering;
+using GameWorld.Core.Rendering.RenderItems;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using System;
-using View3D.Components.Rendering;
-using View3D.Rendering;
-using View3D.Rendering.RenderItems;
 
-namespace View3D.Components.Component
+namespace GameWorld.Core.Components
 {
     public class GridComponent : BaseComponent, IDisposable
     {
         LineMeshRender _gridMesh;
         private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly ResourceLibrary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibrary;
 
         public GridComponent(RenderEngineComponent renderEngineComponent, ResourceLibrary resourceLibary)
         {
             _renderEngineComponent = renderEngineComponent;
-            _resourceLibary = resourceLibary;
+            _resourceLibrary = resourceLibary;
         }
 
         public override void Initialize()
         {
-            _gridMesh = new LineMeshRender(_resourceLibary);
+            _gridMesh = new LineMeshRender(_resourceLibrary);
             _gridMesh.CreateGrid();
 
             base.Initialize();

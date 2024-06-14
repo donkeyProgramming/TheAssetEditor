@@ -1,12 +1,12 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering;
+using GameWorld.Core.Rendering.RenderItems;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using System;
-using View3D.Animation;
-using View3D.Components.Rendering;
-using View3D.Rendering;
-using View3D.Rendering.RenderItems;
 
-namespace View3D.SceneNodes
+namespace GameWorld.Core.SceneNodes
 {
     public interface ISkeletonProvider
     {
@@ -44,10 +44,10 @@ namespace View3D.SceneNodes
             if (IsVisible && Skeleton != null)
             {
                 _lineRenderer.Clear();
-                for (int i = 0; i < Skeleton.BoneCount; i++)
+                for (var i = 0; i < Skeleton.BoneCount; i++)
                 {
-                    float scale = SkeletonScale;
-                    Color drawColour = NodeColour;
+                    var scale = SkeletonScale;
+                    var drawColour = NodeColour;
                     if (SelectedBoneIndex.HasValue && SelectedBoneIndex.Value == i)
                     {
                         drawColour = SelectedNodeColour;

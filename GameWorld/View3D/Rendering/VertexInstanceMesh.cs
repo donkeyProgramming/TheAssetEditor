@@ -1,13 +1,13 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.Utility;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Runtime.InteropServices;
-using View3D.Components;
-using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
 
-namespace View3D.Rendering
+namespace GameWorld.Core.Rendering
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct InstanceDataOrientation : IVertexType
@@ -87,7 +87,7 @@ namespace View3D.Rendering
 
         void GenerateGeometry(GraphicsDevice device)
         {
-            VertexPosition[] vertices = new VertexPosition[24];
+            var vertices = new VertexPosition[24];
             vertices[0].Position = new Vector3(-1, 1, -1);
             vertices[1].Position = new Vector3(1, 1, -1);
             vertices[2].Position = new Vector3(-1, 1, 1);
@@ -121,7 +121,7 @@ namespace View3D.Rendering
             _geometryBuffer = new VertexBuffer(device, VertexPosition.VertexDeclaration, 24, BufferUsage.WriteOnly);
             _geometryBuffer.SetData(vertices);
 
-            int[] indices = new int[36];
+            var indices = new int[36];
             indices[0] = 0; indices[1] = 1; indices[2] = 2;
             indices[3] = 1; indices[4] = 3; indices[5] = 2;
 
@@ -147,13 +147,13 @@ namespace View3D.Rendering
         public void Update(MeshObject geo, Matrix modelMatrix, Quaternion objectRotation, Vector3 cameraPos, VertexSelectionState selectedVertexes)
         {
             _currentInstanceCount = geo.VertexCount();
-            for (int i = 0; i < _currentInstanceCount && i < _maxInstanceCount; i++)
+            for (var i = 0; i < _currentInstanceCount && i < _maxInstanceCount; i++)
             {
                 var vertPos = Vector3.Transform(geo.GetVertexById(i), modelMatrix);
                 var distance = (cameraPos - vertPos).Length();
                 var distanceScale = distance * 1.5f;
 
-                Matrix world = Matrix.CreateScale(0.0025f * distanceScale) * Matrix.CreateFromQuaternion(objectRotation) * Matrix.CreateTranslation(vertPos);
+                var world = Matrix.CreateScale(0.0025f * distanceScale) * Matrix.CreateFromQuaternion(objectRotation) * Matrix.CreateTranslation(vertPos);
 
                 _instanceTransform[i].World0 = new Vector3(world[0, 0], world[0, 1], world[0, 2]);
                 _instanceTransform[i].World1 = new Vector3(world[1, 0], world[1, 1], world[1, 2]);
@@ -167,11 +167,11 @@ namespace View3D.Rendering
 
         private void GenerateInstanceInformation(int count)
         {
-            Random rnd = new Random();
+            var rnd = new Random();
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                Matrix world = Matrix.CreateScale((float)rnd.NextDouble() * 1) *
+                var world = Matrix.CreateScale((float)rnd.NextDouble() * 1) *
                     Matrix.CreateRotationZ((float)rnd.NextDouble()) *
                     Matrix.CreateTranslation((float)rnd.NextDouble() * 20, (float)rnd.NextDouble() * 20, (float)rnd.NextDouble() * 20);
 
@@ -201,7 +201,7 @@ namespace View3D.Rendering
 
         public void Dispose()
         {
-           // _effect.Dispose();
+            // _effect.Dispose();
             _instanceVertexDeclaration.Dispose();
             _instanceBuffer.Dispose();
         }

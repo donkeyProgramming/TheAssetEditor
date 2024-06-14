@@ -1,7 +1,7 @@
-﻿using Shared.Core.Misc;
+﻿using GameWorld.Core.Animation;
+using Shared.Core.Misc;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using View3D.Animation;
 
 namespace AnimationEditor.Common.ReferenceModel
 {

@@ -1,10 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-//using Simplygon;
-using View3D.Rendering;
-using View3D.Rendering.Geometry;
-
-
-namespace View3D.Services.SceneSaving.Lod.SimplygonIntegration
+﻿
+namespace GameWorld.Core.Services.SceneSaving.Lod.SimplygonIntegration
 {
     //public class SimplygonMeshOptimizer
     //{

@@ -1,4 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
+using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using KitbasherEditor.ViewModels;
 using Serilog;
@@ -6,10 +10,6 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
-using View3D.Components.Component;
-using View3D.SceneNodes;
-using View3D.Services;
-using View3D.Utility;
 
 namespace KitbasherEditor.Services
 {

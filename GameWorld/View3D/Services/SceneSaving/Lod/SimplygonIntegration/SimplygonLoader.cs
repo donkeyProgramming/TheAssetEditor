@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 //using Simplygon;
 
-namespace View3D.Services.SceneSaving.Lod.SimplygonIntegration
+namespace GameWorld.Core.Services.SceneSaving.Lod.SimplygonIntegration
 {
     public class Loader
     {

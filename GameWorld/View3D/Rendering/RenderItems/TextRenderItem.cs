@@ -1,9 +1,9 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Components.Rendering;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using View3D.Components.Rendering;
 
-namespace View3D.Rendering.RenderItems
+namespace GameWorld.Core.Rendering.RenderItems
 {
     public class TextRenderItem : IRenderItem
     {
@@ -28,7 +28,7 @@ namespace View3D.Rendering.RenderItems
         float x = 1;
         public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix ModelMatrix)
         {
-            Color colour = Color.Red;
+            var colour = Color.Red;
 
             var measure = _resourceLib.DefaultFont.MeasureString(_text);
             var viewport = device.Viewport;

@@ -1,12 +1,12 @@
 ﻿using Editors.Shared.Core.Services;
-using View3D.Animation;
-using View3D.SceneNodes;
+using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
 
 namespace Editors.AnimationMeta.Visualisation.Instances
 {
     public class AnimatedPropInstance : IMetaDataInstance
     {
-        private SceneNode _node;
+        private readonly SceneNode _node;
 
         public AnimationPlayer Player { get; private set; }
 

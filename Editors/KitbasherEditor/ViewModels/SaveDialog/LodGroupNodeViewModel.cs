@@ -1,7 +1,7 @@
 ﻿using System.Linq;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving;
 using Shared.Core.Misc;
-using View3D.SceneNodes;
-using View3D.Services.SceneSaving;
 
 namespace KitbasherEditor.ViewModels.SaveDialog
 {

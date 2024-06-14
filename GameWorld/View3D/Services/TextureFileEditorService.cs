@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Utility;
+using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -13,10 +15,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
-using View3D.SceneNodes;
-using View3D.Utility;
 
-namespace View3D.Services
+namespace GameWorld.Core.Services
 {
     public class TextureFileEditorService
     {
@@ -64,36 +64,36 @@ namespace View3D.Services
         public void UpdateStatus()
         {
             return;
-            TextureList.Clear();
-
-            // Check if there is a project file there
-            var loadResult = LoadProject(ProjectPath + "\\" + ProjectFileName, false);
-            if (loadResult == true)
-                return;
-
-            ProjectPath = DetermineDefaultProjectName(_node);
-            var allTexutes = _node.GetMeshesInLod(0, false)
-                   .SelectMany(x => x.Material.GetAllTextures())
-                   .DistinctBy(x => x.Path.ToLower())
-                   .ToList();
-
-            var cfgTextureItems = new List<Texture>();
-            foreach (var texture in allTexutes)
-            {
-                cfgTextureItems.Add(new Texture()
-                {
-                    Type = texture.TexureType,
-                    SystemPath = DetermineTextureName(ProjectPath, texture.Path),
-                    GamePath = texture.Path
-                });
-            }
-
-            BuildStatusFromCfg(cfgTextureItems);
+            //TextureList.Clear();
+            //
+            //// Check if there is a project file there
+            //var loadResult = LoadProject(ProjectPath + "\\" + ProjectFileName, false);
+            //if (loadResult == true)
+            //    return;
+            //
+            //ProjectPath = DetermineDefaultProjectName(_node);
+            //var allTexutes = _node.GetMeshesInLod(0, false)
+            //       .SelectMany(x => x.Material.GetAllTextures())
+            //       .DistinctBy(x => x.Path.ToLower())
+            //       .ToList();
+            //
+            //var cfgTextureItems = new List<Texture>();
+            //foreach (var texture in allTexutes)
+            //{
+            //    cfgTextureItems.Add(new Texture()
+            //    {
+            //        Type = texture.TexureType,
+            //        SystemPath = DetermineTextureName(ProjectPath, texture.Path),
+            //        GamePath = texture.Path
+            //    });
+            //}
+            //
+            //BuildStatusFromCfg(cfgTextureItems);
         }
 
         void BuildStatusFromCfg(List<Texture> cfgItems)
         {
-            string[] directoryContent = new string[0];
+            var directoryContent = new string[0];
             if (Directory.Exists(ProjectPath))
                 directoryContent = Directory.GetFiles(ProjectPath);
 
@@ -373,11 +373,11 @@ namespace View3D.Services
 
         private void ExportUvMap(string outputDirectory, Rmv2MeshNode mesh)
         {
-            Pen blackPen = new Pen(Color.Red, 1);
-            using Bitmap image = new Bitmap(1024, 1024);
+            var blackPen = new Pen(Color.Red, 1);
+            using var image = new Bitmap(1024, 1024);
             using var graphics = Graphics.FromImage(image);
 
-            for (int i = 0; i < mesh.Geometry.GetIndexCount(); i += 3)
+            for (var i = 0; i < mesh.Geometry.GetIndexCount(); i += 3)
             {
                 var idx0 = mesh.Geometry.IndexArray[i + 0];
                 var idx1 = mesh.Geometry.IndexArray[i + 1];
@@ -395,7 +395,7 @@ namespace View3D.Services
             var imagePathWithoutExtention = outputDirectory + "\\Uv_map_" + mesh.Name;
             for (var index = 0; index < 1024; index++)
             {
-                var name = (index == 0) ? imagePathWithoutExtention : string.Format("{0} _{1}", imagePathWithoutExtention, index);
+                var name = index == 0 ? imagePathWithoutExtention : string.Format("{0} _{1}", imagePathWithoutExtention, index);
                 name += ".png";
                 if (File.Exists(name))
                     continue;

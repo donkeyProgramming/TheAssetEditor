@@ -1,10 +1,11 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Rendering;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel.Types;
 using System.Collections.Generic;
 
-namespace View3D.Rendering.Shading
+namespace GameWorld.Core.Rendering.Shading
 {
     public abstract class PbrShader : IShader, IShaderTextures, IShaderAnimation
     {
@@ -42,7 +43,7 @@ namespace View3D.Rendering.Shading
         {
             Effect.Parameters["View"].SetValue(commonShaderParameters.View);
             Effect.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
-            Effect.Parameters["EnvMapTransform"].SetValue((Matrix.CreateRotationY(commonShaderParameters.EnvLightRotationsRadians_Y)));
+            Effect.Parameters["EnvMapTransform"].SetValue(Matrix.CreateRotationY(commonShaderParameters.EnvLightRotationsRadians_Y));
             Effect.Parameters["DirLightTransform"].SetValue(Matrix.CreateRotationY(commonShaderParameters.DirLightRotationRadians_Y) * Matrix.CreateRotationX(commonShaderParameters.DirLightRotationRadians_X));
             Effect.Parameters["LightMult"].SetValue(commonShaderParameters.LightIntensityMult);
             Effect.Parameters["World"].SetValue(modelMatrix);
@@ -54,7 +55,7 @@ namespace View3D.Rendering.Shading
 
         public void SetAnimationParameters(Matrix[] transforms, int weightCount)
         {
-            Effect.Parameters["WeightCount"].SetValue((int)weightCount);
+            Effect.Parameters["WeightCount"].SetValue(weightCount);
             Effect.Parameters["tranforms"].SetValue(transforms);
         }
 

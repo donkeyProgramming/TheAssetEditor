@@ -1,10 +1,10 @@
 ﻿using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.MathViews;
 using System.Collections.ObjectModel;
-using View3D.Animation;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {

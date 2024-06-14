@@ -22,7 +22,7 @@ namespace AssetEditor.Services
                 new Shared.GameFormats.DependencyInjectionContainer(),
                 new Shared.EmbeddedResources.DependencyInjectionContainer(loadResources),
                 new GameWorld.WpfWindow.DependencyInjectionContainer(),
-                new View3D.DependencyInjectionContainer(),
+                new GameWorld.Core.DependencyInjectionContainer(),
                
                 // Misc
                 new Editors.Shared.DevConfig.DependencyInjectionContainer(),

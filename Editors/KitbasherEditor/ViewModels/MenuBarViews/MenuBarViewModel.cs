@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels.MenuBarViews.Helpers;
 using KitbasherEditor.ViewModels.UiCommands;
 using Shared.Core.Events;
 using Shared.EmbeddedResources;
 using Shared.Ui.Common.MenuSystem;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {

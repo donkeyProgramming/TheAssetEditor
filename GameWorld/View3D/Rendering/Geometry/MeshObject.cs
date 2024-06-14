@@ -1,13 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Rendering.Shading;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
 using Shared.Ui.Editors.BoneMapping;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Rendering.Shading;
 
-namespace View3D.Rendering.Geometry
+namespace GameWorld.Core.Rendering.Geometry
 {
     public class MeshObject
     {
@@ -63,8 +63,8 @@ namespace View3D.Rendering.Geometry
         public List<Vector3> GetVertexList()
         {
             var vertCount = VertexArray.Length;
-            List<Vector3> output = new List<Vector3>(vertCount);
-            for (int i = 0; i < vertCount; i++)
+            var output = new List<Vector3>(vertCount);
+            for (var i = 0; i < vertCount; i++)
                 output.Add(GetVertexById(i));
             return output;
         }
@@ -120,7 +120,7 @@ namespace View3D.Rendering.Geometry
             else if (WeightCount == 2 || WeightCount == 4)
             {
                 var output = new List<byte>();
-                for (int i = 0; i < VertexArray.Count(); i++)
+                for (var i = 0; i < VertexArray.Count(); i++)
                 {
                     if (WeightCount == 2)
                     {
@@ -147,7 +147,7 @@ namespace View3D.Rendering.Geometry
 
         public void UpdateAnimationIndecies(List<IndexRemapping> remapping)
         {
-            for (int i = 0; i < VertexArray.Length; i++)
+            for (var i = 0; i < VertexArray.Length; i++)
             {
                 VertexArray[i].BlendIndices.X = GetMappedBlendIndex((byte)VertexArray[i].BlendIndices.X, remapping);
                 VertexArray[i].BlendIndices.Y = GetMappedBlendIndex((byte)VertexArray[i].BlendIndices.Y, remapping);
@@ -161,7 +161,7 @@ namespace View3D.Rendering.Geometry
                 }
 
                 var totalBlendWeight = VertexArray[i].BlendWeights.X + VertexArray[i].BlendWeights.Y + VertexArray[i].BlendWeights.Z + VertexArray[i].BlendWeights.W;
-                if ((1 - totalBlendWeight) >= float.Epsilon || (1 - totalBlendWeight) <= float.Epsilon)
+                if (1 - totalBlendWeight >= float.Epsilon || 1 - totalBlendWeight <= float.Epsilon)
                 {
                     var factor = 1 / totalBlendWeight;
                     VertexArray[i].BlendWeights.X *= factor;
@@ -189,7 +189,7 @@ namespace View3D.Rendering.Geometry
             var newVertexArray = new VertexPositionNormalTextureCustom[newVertexBufferSize];
 
             // Copy current vertex buffer
-            int currentVertexIndex = 0;
+            var currentVertexIndex = 0;
             for (; currentVertexIndex < VertexCount(); currentVertexIndex++)
                 newVertexArray[currentVertexIndex] = VertexArray[currentVertexIndex];
 
@@ -198,19 +198,19 @@ namespace View3D.Rendering.Geometry
             var newIndexArray = new ushort[newIndexBufferSize];
 
             // Copy current index buffer
-            int currentIndexIndex = 0;
+            var currentIndexIndex = 0;
             for (; currentIndexIndex < GetIndexCount(); currentIndexIndex++)
                 newIndexArray[currentIndexIndex] = IndexArray[currentIndexIndex];
 
             // Copy others into main
             foreach (var geo in others)
             {
-                ushort geoOffset = (ushort)(currentVertexIndex);
-                int geoVertexIndex = 0;
+                var geoOffset = (ushort)currentVertexIndex;
+                var geoVertexIndex = 0;
                 for (; geoVertexIndex < geo.VertexCount();)
                     newVertexArray[currentVertexIndex++] = geo.VertexArray[geoVertexIndex++];
 
-                int geoIndexIndex = 0;
+                var geoIndexIndex = 0;
                 for (; geoIndexIndex < geo.GetIndexCount();)
                     newIndexArray[currentIndexIndex++] = (ushort)(geo.IndexArray[geoIndexIndex++] + geoOffset); ;
             }
@@ -230,7 +230,7 @@ namespace View3D.Rendering.Geometry
 
             if (updateMesh)
             {
-                for (int i = 0; i < VertexArray.Length; i++)
+                for (var i = 0; i < VertexArray.Length; i++)
                 {
                     if (newFormat != UiVertexFormat.Static)
                     {
@@ -338,14 +338,14 @@ namespace View3D.Rendering.Geometry
             }
 
             var points = new Vector3[count];
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
                 points[i] = GetVertexById(i);
             BoundingBox = BoundingBox.CreateFromPoints(points);
 
             // Update mesh center
             var corners = BoundingBox.GetCorners();
             MeshCenter = Vector3.Zero;
-            for (int i = 0; i < corners.Length; i++)
+            for (var i = 0; i < corners.Length; i++)
                 MeshCenter += corners[i];
             MeshCenter = MeshCenter / corners.Length;
         }
@@ -357,9 +357,9 @@ namespace View3D.Rendering.Geometry
 
         public void RemoveFaces(List<int> facesToDelete)
         {
-            var newIndexList = new ushort[IndexArray.Length - (facesToDelete.Count * 3)];
+            var newIndexList = new ushort[IndexArray.Length - facesToDelete.Count * 3];
             var writeIndex = 0;
-            for (int i = 0; i < IndexArray.Length;)
+            for (var i = 0; i < IndexArray.Length;)
             {
                 if (facesToDelete.Contains(i) == false)
                     newIndexList[writeIndex++] = IndexArray[i++];
@@ -376,7 +376,7 @@ namespace View3D.Rendering.Geometry
             uniqeIndexes.Sort();
 
             var newVertexList = new List<VertexPositionNormalTextureCustom>();
-            Dictionary<ushort, ushort> remappingTable = new Dictionary<ushort, ushort>();
+            var remappingTable = new Dictionary<ushort, ushort>();
             for (ushort i = 0; i < VertexArray.Length; i++)
             {
                 if (uniqeIndexes.Contains(i))
@@ -386,7 +386,7 @@ namespace View3D.Rendering.Geometry
                 }
             }
 
-            for (int i = 0; i < newIndexList.Length; i++)
+            for (var i = 0; i < newIndexList.Length; i++)
                 newIndexList[i] = remappingTable[newIndexList[i]];
 
             IndexArray = newIndexList;
@@ -404,7 +404,7 @@ namespace View3D.Rendering.Geometry
             uniqeIndexes.Sort();
 
             var newVertexList = new List<VertexPositionNormalTextureCustom>();
-            Dictionary<ushort, ushort> remappingTable = new Dictionary<ushort, ushort>();
+            var remappingTable = new Dictionary<ushort, ushort>();
             for (ushort i = 0; i < VertexArray.Length; i++)
             {
                 if (uniqeIndexes.Contains(i))
@@ -414,7 +414,7 @@ namespace View3D.Rendering.Geometry
                 }
             }
 
-            for (int i = 0; i < newIndexList.Length; i++)
+            for (var i = 0; i < newIndexList.Length; i++)
                 newIndexList[i] = remappingTable[newIndexList[i]];
 
             mesh.IndexArray = newIndexList;

@@ -1,12 +1,12 @@
-﻿using MeshDecimator;
+﻿using GameWorld.Core.Rendering;
+using GameWorld.Core.Rendering.Geometry;
+using MeshDecimator;
 using Microsoft.Xna.Framework;
 using System;
 using System.Linq;
-using View3D.Rendering;
-using View3D.Rendering.Geometry;
 
 
-namespace View3D.Services.SceneSaving.Lod.MeshDecimatorIntegration
+namespace GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration
 {
     public class DecimatorMeshOptimizer
     {

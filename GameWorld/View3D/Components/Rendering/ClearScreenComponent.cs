@@ -1,6 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Utility;
+using Microsoft.Xna.Framework;
 
-namespace View3D.Components.Rendering
+namespace GameWorld.Core.Components.Rendering
 {
     public class ClearScreenComponent : BaseComponent
     {

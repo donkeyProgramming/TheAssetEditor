@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using View3D.Services.SceneSaving.Lod;
-using View3D.Services.SceneSaving.Geometry;
-using View3D.Services.SceneSaving.WsModel;
-
-namespace KitbasherEditor.ViewModels.SaveDialog
+﻿namespace KitbasherEditor.ViewModels.SaveDialog
 {
     public class ComboBoxItem<T> where T : Enum
     {

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.SceneNodes;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Editors.BoneMapping;
-using View3D.Commands;
-using View3D.Commands.Object;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.MeshFitter
 {

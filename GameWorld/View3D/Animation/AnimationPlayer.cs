@@ -1,12 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Animation.AnimationChange;
+using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using View3D.Animation.AnimationChange;
 
-namespace View3D.Animation
+namespace GameWorld.Core.Animation
 {
     public class AnimationFrame
     {
@@ -33,7 +33,7 @@ namespace View3D.Animation
 
         public Matrix GetSkeletonAnimatedWorld(GameSkeleton gameSkeleton, int boneIndex)
         {
-            Matrix output = gameSkeleton.GetWorldTransform(boneIndex) * BoneTransforms[boneIndex].WorldTransform;
+            var output = gameSkeleton.GetWorldTransform(boneIndex) * BoneTransforms[boneIndex].WorldTransform;
             return output;
         }
 
@@ -73,7 +73,7 @@ namespace View3D.Animation
 
         private int TimeUsToFrame(long timeUs)
         {
-            int frame = (int)(timeUs / _animationClip.MicrosecondsPerFrame);
+            var frame = (int)(timeUs / _animationClip.MicrosecondsPerFrame);
             return MathUtil.EnsureRange(frame, 0, FrameCount() - 1);
         }
 
@@ -92,8 +92,8 @@ namespace View3D.Animation
 
                 if (_animationClip != null)
                 {
-                    int frameIndex = MathUtil.EnsureRange(value, 0, FrameCount() - 1);
-                    long timeInUs = FrameToStartTimeUs(frameIndex);
+                    var frameIndex = MathUtil.EnsureRange(value, 0, FrameCount() - 1);
+                    var timeInUs = FrameToStartTimeUs(frameIndex);
                     _timeSinceStart = TimeSpanExtension.FromMicroseconds(timeInUs);
                     OnFrameChanged?.Invoke(CurrentFrame);
                 }
@@ -107,7 +107,7 @@ namespace View3D.Animation
 
         public void SetAnimation(AnimationClip animation, GameSkeleton skeleton, bool allowAnimationsFromDifferentSkeletons = false)
         {
-            if (allowAnimationsFromDifferentSkeletons == false && (animation != null && _skeleton != null))
+            if (allowAnimationsFromDifferentSkeletons == false && animation != null && _skeleton != null)
             {
                 if (animation.AnimationBoneCount != skeleton.BoneCount)
                     throw new Exception("This animation does not work for this skeleton!");
@@ -124,7 +124,7 @@ namespace View3D.Animation
 
         public void Update(GameTime gameTime)
         {
-            long animationLengthUs = GetAnimationLengthUs();
+            var animationLengthUs = GetAnimationLengthUs();
             if (animationLengthUs != 0 && IsPlaying && IsEnabled)
             {
                 _timeSinceStart.TimeSpan += gameTime.ElapsedGameTime;
@@ -158,7 +158,7 @@ namespace View3D.Animation
                 }
                 //Fix this so if crash no break
                 float sampleT = 0;
-                long animationLengthUs = GetAnimationLengthUs();
+                var animationLengthUs = GetAnimationLengthUs();
                 if (animationLengthUs != 0)
                     sampleT = (float)_timeSinceStart.TotalMicrosecondsAsLong / animationLengthUs;
                 _currentAnimFrame = AnimationSampler.Sample(sampleT, _skeleton, _animationClip, AnimationRules, !IsPlaying);

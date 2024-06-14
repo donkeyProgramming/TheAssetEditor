@@ -4,10 +4,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
 using Microsoft.Xna.Framework;
-using View3D.Animation;
 
-namespace View3D.Commands.Bone
+namespace GameWorld.Core.Commands.Bone
 {
     public class DeleteFrameBoneCommand : ICommand
     {
@@ -21,7 +22,7 @@ namespace View3D.Commands.Bone
 
         public void Configure(AnimationClip animation, int frameToInsert)
         {
-            _animation = animation;            
+            _animation = animation;
             _frameToInsert = frameToInsert;
 
             foreach (var frame in _animation.DynamicFrames)

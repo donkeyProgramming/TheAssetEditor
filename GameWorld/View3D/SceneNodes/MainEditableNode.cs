@@ -1,7 +1,7 @@
-﻿using Shared.Core.PackFiles;
-using View3D.Services;
+﻿using GameWorld.Core.Services;
+using Shared.Core.PackFiles;
 
-namespace View3D.SceneNodes
+namespace GameWorld.Core.SceneNodes
 {
     public class MainEditableNode : Rmv2ModelNode
     {

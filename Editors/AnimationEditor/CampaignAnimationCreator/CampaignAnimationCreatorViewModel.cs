@@ -5,12 +5,12 @@ using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Common;
-using View3D.Animation;
 
 namespace AnimationEditor.CampaignAnimationCreator
 {

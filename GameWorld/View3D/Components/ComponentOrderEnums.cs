@@ -1,4 +1,4 @@
-﻿namespace View3D.Components
+﻿namespace GameWorld.Core.Components
 {
     public enum ComponentUpdateOrderEnum
     {

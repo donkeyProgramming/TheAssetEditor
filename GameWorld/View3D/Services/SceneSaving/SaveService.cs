@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving.Geometry;
+using GameWorld.Core.Services.SceneSaving.Lod;
+using GameWorld.Core.Services.SceneSaving.Material;
 using Shared.Core.PackFiles;
-using View3D.SceneNodes;
-using View3D.Services.SceneSaving.Geometry;
-using View3D.Services.SceneSaving.Lod;
-using View3D.Services.SceneSaving.WsModel;
 
-namespace View3D.Services.SceneSaving
+namespace GameWorld.Core.Services.SceneSaving
 {
     public class SaveService
     {
@@ -15,7 +15,7 @@ namespace View3D.Services.SceneSaving
         private readonly GeometryStrategyProvider _geometryStrategyProvider;
         private readonly LodStrategyProvider _lodStrategyProvider;
         private readonly MaterialStrategyProvider _materialStrategyProvider;
-       
+
         public SaveService(PackFileService packFileService,
             GeometryStrategyProvider geometryStrategyProvider,
             LodStrategyProvider lodStrategyProvider,
@@ -44,12 +44,12 @@ namespace View3D.Services.SceneSaving
 
             // Update lod values
             var model = mainNode.Model;
-            for (int i = 0; i < model.LodHeaders.Count(); i++)
-            { 
+            for (var i = 0; i < model.LodHeaders.Count(); i++)
+            {
                 model.LodHeaders[i].LodCameraDistance = settings.LodSettingsPerLod[i].CameraDistance;
                 model.LodHeaders[i].QualityLvl = settings.LodSettingsPerLod[i].QualityLvl;
             }
-            
+
             _lodStrategyProvider.GetStrategy(settings.LodGenerationMethod).Generate(mainNode, settings.LodSettingsPerLod);
             _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, onlyVisibleNodes);
             _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, outputPath, onlyVisibleNodes);

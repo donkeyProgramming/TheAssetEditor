@@ -1,7 +1,7 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using View3D.Components;
+﻿using GameWorld.Core.Utility;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace View3D.Rendering.Geometry
+namespace GameWorld.Core.Rendering.Geometry
 {
     public interface IGraphicsCardGeometry
     {

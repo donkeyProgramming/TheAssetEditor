@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -7,8 +9,6 @@ using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using View3D.SceneNodes;
-using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {

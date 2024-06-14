@@ -1,13 +1,13 @@
 ﻿using System.IO;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using KitbasherEditor.Events;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.RigidModel;
-using View3D.Animation;
-using View3D.Components.Component;
-using View3D.SceneNodes;
-using View3D.Services;
 
 namespace KitbasherEditor.ViewModels
 {

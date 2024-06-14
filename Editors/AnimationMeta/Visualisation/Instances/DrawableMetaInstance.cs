@@ -1,20 +1,20 @@
 ﻿using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Utility;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using System;
-using View3D.Animation;
-using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace Editors.AnimationMeta.Visualisation.Instances
 {
     public class DrawableMetaInstance : IMetaDataInstance
     {
-        private ILogger _logger = Logging.Create<MetaDataFactory>();
+        private readonly ILogger _logger = Logging.Create<MetaDataFactory>();
         private bool _hasError = false;
 
-        private SceneNode _node;
-        private string _description;
+        private readonly SceneNode _node;
+        private readonly string _description;
         public AnimationPlayer Player => null;
 
         private SkeletonBoneAnimationResolver _animationResolver;

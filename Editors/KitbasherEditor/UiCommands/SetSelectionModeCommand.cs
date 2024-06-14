@@ -1,8 +1,8 @@
-﻿using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using GameWorld.Core.Components.Selection;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using System;
 using System.Windows.Input;
-using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

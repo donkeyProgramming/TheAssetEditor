@@ -5,9 +5,8 @@ using Microsoft.Xna.Framework.Input;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using System;
-using View3D.Services;
 
-namespace View3D.Components.Input
+namespace GameWorld.Core.Components.Input
 {
     public enum MouseButton
     {
@@ -17,7 +16,7 @@ namespace View3D.Components.Input
 
     public class MouseComponent : BaseComponent, IDisposable
     {
-        ILogger _logger = Logging.Create<MouseComponent>();
+        readonly ILogger _logger = Logging.Create<MouseComponent>();
 
         MouseState _currentMouseState;
         MouseState _lastMousesState;

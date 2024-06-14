@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Utility;
+using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -6,11 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using View3D.Components.Rendering;
-using View3D.SceneNodes;
-using View3D.Utility;
 
-namespace View3D.Components.Component
+namespace GameWorld.Core.Components
 {
     public static class SpecialNodes
     {
@@ -45,7 +45,7 @@ namespace View3D.Components.Component
             _renderEngineComponent = renderEngineComponent;
             _eventHub = eventHub;
             RootNode = new GroupNode(SpecialNodes.Root) { SceneManager = this, IsEditable = true, IsLockable = false };
-            
+
         }
 
         public T GetNodeByName<T>(string name) where T : class, ISceneNode
@@ -71,7 +71,7 @@ namespace View3D.Components.Component
 
         public Matrix GetWorldPosition(ISceneNode node)
         {
-            Queue<ISceneNode> nodes = new Queue<ISceneNode>();
+            var nodes = new Queue<ISceneNode>();
             while (node != null)
             {
                 nodes.Enqueue(node);
@@ -88,7 +88,7 @@ namespace View3D.Components.Component
         public ISelectable SelectObject(Ray ray)
         {
             ISelectable bestItem = null;
-            float bestDistance = float.MaxValue;
+            var bestDistance = float.MaxValue;
             SelectObjectsHirarchy(RootNode, ray, ref bestItem, ref bestDistance);
             return bestItem;
         }
@@ -106,7 +106,7 @@ namespace View3D.Components.Component
             {
                 if (root is ISelectable selectableNode && selectableNode.IsSelectable)
                 {
-                    Vector3 pivotPoint = Vector3.Zero;
+                    var pivotPoint = Vector3.Zero;
                     if (selectableNode is Rmv2MeshNode meshNode)
                         pivotPoint = meshNode.Material.PivotPoint;
 
@@ -114,7 +114,7 @@ namespace View3D.Components.Component
                         output_selectedNodes.Add(selectableNode);
                 }
 
-                bool isUnselectableGroup = root is GroupNode groupNode && groupNode.IsLockable == true && groupNode.IsSelectable == false;
+                var isUnselectableGroup = root is GroupNode groupNode && groupNode.IsLockable == true && groupNode.IsSelectable == false;
                 if (!isUnselectableGroup)
                 {
                     foreach (var child in root.Children)
@@ -129,7 +129,7 @@ namespace View3D.Components.Component
             {
                 if (root is ISelectable selectableNode && selectableNode.IsSelectable)
                 {
-                    Vector3 pivotPoint = Vector3.Zero;
+                    var pivotPoint = Vector3.Zero;
                     if (selectableNode is Rmv2MeshNode meshNode)
                         pivotPoint = meshNode.Material.PivotPoint;
 
@@ -145,7 +145,7 @@ namespace View3D.Components.Component
 
                 }
 
-                bool isUnselectableGroup = root is GroupNode groupNode && groupNode.IsLockable == true && groupNode.IsSelectable == false;
+                var isUnselectableGroup = root is GroupNode groupNode && groupNode.IsLockable == true && groupNode.IsSelectable == false;
                 if (!isUnselectableGroup)
                 {
                     foreach (var child in root.Children)

@@ -1,7 +1,7 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
+using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
-using View3D.Animation;
 
 namespace AnimationEditor.SkeletonEditor
 {

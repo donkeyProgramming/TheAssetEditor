@@ -1,4 +1,8 @@
-﻿using System;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
+using GameWorld.Core.Utility;
 using GameWorld.WpfWindow;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,11 +12,6 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Animation;
-using View3D.Animation;
-using View3D.Components.Component;
-using View3D.SceneNodes;
-using View3D.Services;
-using View3D.Utility;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
@@ -52,7 +51,7 @@ namespace AnimationEditor.Common.ReferenceModel
             skeletonSceneNode.NodeColour = skeletonColour;
             parentNode.AddObject(skeletonSceneNode);
 
-            var animationPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new View3D.Animation.AnimationPlayer(), description);
+            var animationPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new GameWorld.Core.Animation.AnimationPlayer(), description);
             instance.Player = animationPlayer;
             instance.ParentNode = parentNode;
             instance.SkeletonSceneNode = skeletonSceneNode;

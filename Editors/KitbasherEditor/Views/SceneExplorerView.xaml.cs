@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using View3D.SceneNodes;
+using GameWorld.Core.SceneNodes;
 
 namespace KitbasherEditor.Views
 {

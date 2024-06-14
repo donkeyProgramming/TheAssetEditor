@@ -1,11 +1,11 @@
 ﻿using Editors.Shared.Core.Services;
+using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
-using View3D.Components.Component;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {

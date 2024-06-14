@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.SceneNodes;
 using Shared.Core.ErrorHandling;
-using View3D.SceneNodes;
 using static Shared.Ui.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
-namespace View3D.Utility
+namespace GameWorld.Core.Utility
 {
     public class ModelCombiner
     {
         public static bool CanCombine(Rmv2MeshNode meshA, Rmv2MeshNode meshB, out string errorMessage)
         {
             // Textures
-            if (!ValidateTextures(meshA, meshA.Name, meshB, meshB.Name, out string textureErrorMsg))
+            if (!ValidateTextures(meshA, meshA.Name, meshB, meshB.Name, out var textureErrorMsg))
             {
                 errorMessage = "Texture - " + textureErrorMsg;
                 return false;
@@ -69,7 +69,7 @@ namespace View3D.Utility
             var groupedOutput = new List<List<Rmv2MeshNode>>();
             foreach (var currentMesh in meshList)
             {
-                bool foundMeshToCombineWith = false;
+                var foundMeshToCombineWith = false;
                 foreach (var potentialCombineTargetGroup in groupedOutput)
                 {
                     var canCombine = CanCombine(potentialCombineTargetGroup.First(), currentMesh, out _);

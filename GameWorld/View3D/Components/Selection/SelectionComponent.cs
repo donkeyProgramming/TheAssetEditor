@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Bone;
+using GameWorld.Core.Commands.Face;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.Commands.Vertex;
+using GameWorld.Core.Components.Input;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using View3D.Commands;
-using View3D.Commands.Bone;
-using View3D.Commands.Face;
-using View3D.Commands.Object;
-using View3D.Commands.Vertex;
-using View3D.Components.Input;
-using View3D.Components.Rendering;
-using View3D.SceneNodes;
-using View3D.Utility;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
-using MouseButton = View3D.Components.Input.MouseButton;
+using MouseButton = GameWorld.Core.Components.Input.MouseButton;
 
-namespace View3D.Components.Component.Selection
+namespace GameWorld.Core.Components.Selection
 {
     public class SelectionComponent : BaseComponent, IDisposable
     {
@@ -136,12 +136,12 @@ namespace View3D.Components.Component.Selection
             {
                 if (boneState.RenderObject == null)
                 {
-                    System.Windows.Forms.MessageBox.Show("no object was selected. select an object first then you can select the bone", "no object", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("no object was selected. select an object first then you can select the bone", "no object", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 if (boneState.CurrentAnimation == null)
                 {
-                    System.Windows.Forms.MessageBox.Show("no animation was played. select a frame by scrubbing the animation using the control below", "no animation", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("no animation was played. select a frame by scrubbing the animation using the control below", "no animation", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 var vertexObject = boneState.RenderObject as Rmv2MeshNode;

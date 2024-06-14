@@ -1,10 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using View3D.Animation;
-using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
 
-namespace View3D.Commands.Object
+namespace GameWorld.Core.Commands.Object
 {
     public class GrowMeshCommand : ICommand
     {
@@ -34,15 +35,15 @@ namespace View3D.Commands.Object
             var mesh = _node.Geometry as MeshObject;
             var vertexCount = mesh.VertexCount();
 
-            Vector3[] normals = new Vector3[vertexCount];
-            float tolerance = 0.0001f;
+            var normals = new Vector3[vertexCount];
+            var tolerance = 0.0001f;
 
-            for (int i = 0; i < vertexCount; i++)
+            for (var i = 0; i < vertexCount; i++)
             {
                 normals[i] = mesh.GetVertexExtented(i).Normal;
 
                 // Find all vertexes with the same position
-                for (int j = 0; j < vertexCount; j++)
+                for (var j = 0; j < vertexCount; j++)
                 {
                     if (i == j)
                         continue;
@@ -57,7 +58,7 @@ namespace View3D.Commands.Object
                 normals[i] = Vector3.Normalize(normals[i]);
             }
 
-            for (int i = 0; i < mesh.VertexCount(); i++)
+            for (var i = 0; i < mesh.VertexCount(); i++)
             {
                 var vertex = mesh.GetVertexExtented(i);
                 var bones = vertex.GetBoneIndexs();
@@ -65,7 +66,7 @@ namespace View3D.Commands.Object
 
                 float boneWeight = 0;
 
-                for (int boneIndex = 0; boneIndex < bones.Length; boneIndex++)
+                for (var boneIndex = 0; boneIndex < bones.Length; boneIndex++)
                 {
                     if (_bonesAffectedScale.Contains(bones[boneIndex]))
                         boneWeight += weights[boneIndex];

@@ -1,5 +1,5 @@
-﻿using Shared.Core.Misc;
-using View3D.SceneNodes;
+﻿using GameWorld.Core.SceneNodes;
+using Shared.Core.Misc;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {

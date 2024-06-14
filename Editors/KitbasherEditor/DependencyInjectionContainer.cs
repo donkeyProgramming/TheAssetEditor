@@ -1,4 +1,6 @@
 ﻿using System;
+using GameWorld.Core.Services;
+using GameWorld.Core.Services.SceneSaving;
 using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
@@ -17,8 +19,6 @@ using Shared.Core.DependencyInjection;
 using Shared.Core.PackFiles;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Common.MenuSystem;
-using View3D.Services;
-using View3D.Services.SceneSaving;
 
 namespace KitbasherEditor
 {

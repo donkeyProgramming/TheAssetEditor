@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using View3D.Components.Component.Selection;
+using GameWorld.Core.Components.Selection;
 
-namespace View3D.Commands.Face
+namespace GameWorld.Core.Commands.Face
 {
     public class ConvertFacesToVertexSelectionCommand : ICommand
     {

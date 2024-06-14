@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
-using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering.Geometry;
 
-namespace View3D.Commands.Face
+namespace GameWorld.Core.Commands.Face
 {
     public class DeleteFaceCommand : ICommand
     {

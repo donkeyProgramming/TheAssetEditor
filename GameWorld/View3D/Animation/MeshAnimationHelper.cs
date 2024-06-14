@@ -1,8 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
+﻿using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 
-namespace View3D.Animation
+namespace GameWorld.Core.Animation
 {
     public class MeshAnimationHelper
     {
@@ -19,7 +19,7 @@ namespace View3D.Animation
             var geo = _mesh.Geometry as MeshObject;
             var vert = geo.GetVertexExtented(vertexId);
             var m = GetVertexTransform(frame, vertexId);
-            Matrix finalTransfrom = Matrix.CreateTranslation(new Vector3(vert.Position.X, vert.Position.Y, vert.Position.Z)) * m;
+            var finalTransfrom = Matrix.CreateTranslation(new Vector3(vert.Position.X, vert.Position.Y, vert.Position.Z)) * m;
             return finalTransfrom;
         }
 
@@ -32,7 +32,7 @@ namespace View3D.Animation
             var blendWeight = new float[4] { vert.BlendWeights.X, vert.BlendWeights.Y, vert.BlendWeights.Z, vert.BlendWeights.W };
 
             var transformSum = new Matrix();
-            for (int i = 0; i < geo.WeightCount; i++)
+            for (var i = 0; i < geo.WeightCount; i++)
             {
                 var simpleMatrix = frame.BoneTransforms[blendIndex[i]].WorldTransform;
                 transformSum += simpleMatrix * blendWeight[i];

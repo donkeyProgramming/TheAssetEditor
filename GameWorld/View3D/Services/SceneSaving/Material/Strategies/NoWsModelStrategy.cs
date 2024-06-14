@@ -1,7 +1,7 @@
-﻿using View3D.SceneNodes;
-using View3D.Services.SceneSaving.WsModel;
+﻿using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving.Material;
 
-namespace View3D.Services.SceneSaving.Material.Strategies
+namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 {
     public class NoWsModelStrategy : IMaterialStrategy
     {
@@ -12,7 +12,7 @@ namespace View3D.Services.SceneSaving.Material.Strategies
 
         public NoWsModelStrategy()
         {
-        
+
         }
 
         public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)

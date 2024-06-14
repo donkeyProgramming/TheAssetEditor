@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace View3D.SceneNodes
+namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2LodNode : GroupNode
     {

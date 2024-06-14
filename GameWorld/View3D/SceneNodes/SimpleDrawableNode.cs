@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using GameWorld.Core.Components.Rendering;
 using Microsoft.Xna.Framework;
-using View3D.Components.Rendering;
 
-namespace View3D.SceneNodes
+namespace GameWorld.Core.SceneNodes
 {
     public class SimpleDrawableNode : GroupNode, IDrawableItem
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace View3D.Services.SceneSaving.WsModel
+namespace GameWorld.Core.Services.SceneSaving.Material
 {
     public class MaterialStrategyProvider
     {

@@ -1,4 +1,4 @@
-﻿using View3D.Animation;
+﻿using GameWorld.Core.Animation;
 
 namespace KitbasherEditor.Events
 {

@@ -1,15 +1,15 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Editors.BoneMapping;
-using View3D.Animation;
-using View3D.Commands;
-using View3D.Commands.Object;
-using View3D.Components.Component;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.MeshFitter
 {

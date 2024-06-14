@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using GameWorld.Core.Rendering;
 using GameWorld.WpfWindow;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
-using View3D.Rendering;
 
 namespace Editors.TextureEditor.ViewModels
 {

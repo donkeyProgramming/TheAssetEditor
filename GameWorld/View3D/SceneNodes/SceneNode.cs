@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameWorld.Core.Components;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
-using View3D.Components.Component;
 
-namespace View3D.SceneNodes
+namespace GameWorld.Core.SceneNodes
 {
     public abstract class SceneNode : NotifyPropertyChangedImpl, ISceneNode
     {

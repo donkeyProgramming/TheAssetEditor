@@ -1,7 +1,7 @@
 ﻿using System.Windows.Input;
+using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
-using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

@@ -1,8 +1,10 @@
 ﻿using System;
-using View3D.SceneNodes;
-using View3D.Services.SceneSaving.Lod.MeshDecimatorIntegration;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving;
+using GameWorld.Core.Services.SceneSaving.Lod;
+using GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration;
 
-namespace View3D.Services.SceneSaving.Lod.Strategies
+namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
     public class DefaultLodGeneration : OptimizedLodGeneratorBase, ILodGenerationStrategy
     {

@@ -4,9 +4,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Animation;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
 
-namespace View3D.Commands.Bone.Clipboard
+namespace GameWorld.Core.Commands.Bone.Clipboard
 {
     public class PasteIntoSelectedBonesTransformFromClipboardBoneCommand : ICommand
     {
@@ -23,7 +24,7 @@ namespace View3D.Commands.Bone.Clipboard
         bool _pasteRotation = false;
         bool _pasteScale = false;
 
-        public void Configure(GameSkeleton intoSkeleton, BoneTransformClipboardData copyFromFrameInClipboard, AnimationClip animation,  List<int> selectedBones = null, 
+        public void Configure(GameSkeleton intoSkeleton, BoneTransformClipboardData copyFromFrameInClipboard, AnimationClip animation, List<int> selectedBones = null,
             bool pastePosition = false, bool pasteRotation = false, bool pasteScale = false)
         {
             _intoSkeleton = intoSkeleton;
@@ -52,7 +53,7 @@ namespace View3D.Commands.Bone.Clipboard
                 var lastFrame = _animation.DynamicFrames.Last().Clone();
                 var delta = _fromFrame.Frames.Count - _backupFrames.Count;
 
-                for (int i = 0; i < delta; i++)
+                for (var i = 0; i < delta; i++)
                 {
                     _animation.DynamicFrames.Add(lastFrame.Clone());
                 }

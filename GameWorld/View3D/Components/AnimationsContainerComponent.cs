@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Animation;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Animation;
 
-namespace View3D.Components.Component
+namespace GameWorld.Core.Components
 {
     public class AnimationsContainerComponent : BaseComponent
     {

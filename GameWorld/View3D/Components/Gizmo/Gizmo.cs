@@ -1,9 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Components.Input;
+using GameWorld.Core.Components.Rendering;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using View3D.Components.Rendering;
 
 // -------------------------------------------------------------
 // -- XNA 3D Gizmo (Component)
@@ -22,7 +23,7 @@ using View3D.Components.Rendering;
 // -- You may find additional XNA resources and information on these sites.
 // ------------------------------------------------------------
 
-namespace View3D.Components.Gizmo
+namespace GameWorld.Core.Components.Gizmo
 {
     public class Gizmo : IDisposable
     {
@@ -137,10 +138,10 @@ namespace View3D.Components.Gizmo
 
 
         ArcBallCamera _camera;
-        Input.MouseComponent _mouse;
+        MouseComponent _mouse;
 
 
-        public Gizmo(ArcBallCamera camera, Input.MouseComponent mouse, GraphicsDevice graphics, SpriteBatch spriteBatch, SpriteFont font)
+        public Gizmo(ArcBallCamera camera, MouseComponent mouse, GraphicsDevice graphics, SpriteBatch spriteBatch, SpriteFont font)
         {
             SceneWorld = Matrix.Identity;
             _graphics = graphics;
@@ -172,9 +173,9 @@ namespace View3D.Components.Gizmo
             var vertexList = new List<VertexPositionColor>(18);
 
             // helper to apply colors
-            Color xColor = _axisColors[0];
-            Color yColor = _axisColors[1];
-            Color zColor = _axisColors[2];
+            var xColor = _axisColors[0];
+            var yColor = _axisColors[1];
+            var zColor = _axisColors[2];
 
 
             // -- X Axis -- // index 0 - 5
@@ -221,13 +222,13 @@ namespace View3D.Components.Gizmo
         {
             if (_isActive && enableMove)
             {
-                Vector3 translateScaleLocal = Vector3.Zero;
-                Vector3 translateScaleWorld = Vector3.Zero;
+                var translateScaleLocal = Vector3.Zero;
+                var translateScaleWorld = Vector3.Zero;
 
-                Matrix rotationLocal = Matrix.Identity;
-                Matrix rotationWorld = Matrix.Identity;
+                var rotationLocal = Matrix.Identity;
+                var rotationWorld = Matrix.Identity;
 
-                if (_mouse.IsMouseButtonDown(Input.MouseButton.Left) && ActiveAxis != GizmoAxis.None)
+                if (_mouse.IsMouseButtonDown(MouseButton.Left) && ActiveAxis != GizmoAxis.None)
                 {
                     if (_mouse.LastState().LeftButton == ButtonState.Released)
                         StartEvent?.Invoke();
@@ -257,7 +258,7 @@ namespace View3D.Components.Gizmo
                 UpdateGizmoPosition();
 
                 // -- Trigger Translation, Rotation & Scale events -- //
-                if (_mouse.IsMouseButtonDown(Input.MouseButton.Left))
+                if (_mouse.IsMouseButtonDown(MouseButton.Left))
                 {
                     if (translateScaleWorld != Vector3.Zero)
                     {
@@ -294,7 +295,7 @@ namespace View3D.Components.Gizmo
             _isActive = true;
 
             // -- Scale Gizmo to fit on-screen -- //
-            Vector3 vLength = _camera.Position - _position;
+            var vLength = _camera.Position - _position;
             const float scaleFactor = 25;
 
             _screenScale = vLength.Length() / scaleFactor;
@@ -367,16 +368,16 @@ namespace View3D.Components.Gizmo
             }
 
 
-            Ray ray = _camera.CreateCameraRay(mousePosition);
-            Matrix transform = Matrix.Invert(_rotationMatrix);
+            var ray = _camera.CreateCameraRay(mousePosition);
+            var transform = Matrix.Invert(_rotationMatrix);
             ray.Position = Vector3.Transform(ray.Position, transform);
             ray.Direction = Vector3.TransformNormal(ray.Direction, transform);
 
-            Vector3 deltaTransform = Vector3.Zero;
-            float? intersection = ray.Intersects(plane);
+            var deltaTransform = Vector3.Zero;
+            var intersection = ray.Intersects(plane);
             if (intersection.HasValue)
             {
-                _intersectPosition = ray.Position + (ray.Direction * intersection.Value);
+                _intersectPosition = ray.Position + ray.Direction * intersection.Value;
                 var mouseDragDelta = Vector3.Zero;
                 if (_lastIntersectionPosition != Vector3.Zero)
                     mouseDragDelta = _intersectPosition - _lastIntersectionPosition;
@@ -421,24 +422,24 @@ namespace View3D.Components.Gizmo
 
         private void HandleRotation(GameTime gameTime, out Matrix out_transformLocal, out Matrix out_transfromWorld)
         {
-            float delta = _mouse.DeltaPosition().X * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var delta = _mouse.DeltaPosition().X * (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (SnapEnabled)
             {
-                float snapValue = MathHelper.ToRadians(RotationSnapValue);
+                var snapValue = MathHelper.ToRadians(RotationSnapValue);
                 _rotationSnapDelta += delta;
-                float snapped = (int)(_rotationSnapDelta / snapValue) * snapValue;
+                var snapped = (int)(_rotationSnapDelta / snapValue) * snapValue;
                 _rotationSnapDelta -= snapped;
                 delta = snapped;
             }
 
 
             // rotation matrix to transform - if more than one objects selected, always use world-space.
-            Matrix rot = Matrix.Identity;
+            var rot = Matrix.Identity;
             rot.Forward = SceneWorld.Forward;
             rot.Up = SceneWorld.Up;
             rot.Right = SceneWorld.Right;
 
-            Matrix rotationMatrixLocal = Matrix.Identity;
+            var rotationMatrixLocal = Matrix.Identity;
             rotationMatrixLocal.Forward = SceneWorld.Forward;
             rotationMatrixLocal.Up = SceneWorld.Up;
             rotationMatrixLocal.Right = SceneWorld.Right;
@@ -509,7 +510,7 @@ namespace View3D.Components.Gizmo
 
         private void ApplyLineColor(int startindex, int count, Color color)
         {
-            for (int i = startindex; i < (startindex + count); i++)
+            for (var i = startindex; i < startindex + count; i++)
                 _translationLineVertices[i].Color = color;
         }
 
@@ -521,8 +522,8 @@ namespace View3D.Components.Gizmo
             if (!Enabled)
                 return;
 
-            float closestintersection = float.MaxValue;
-            Ray ray = _camera.CreateCameraRay(mousePosition);
+            var closestintersection = float.MaxValue;
+            var ray = _camera.CreateCameraRay(mousePosition);
 
             var intersection = XSphere.Intersects(ray);
             if (intersection.HasValue)
@@ -580,7 +581,7 @@ namespace View3D.Components.Gizmo
             if (Selection.Count == 0)
                 return Vector3.Zero;
 
-            Vector3 center = Vector3.Zero;
+            var center = Vector3.Zero;
             foreach (var selected in Selection)
                 center += selected.Position;
             return center / Selection.Count;
@@ -608,7 +609,7 @@ namespace View3D.Components.Gizmo
 
 
             // draw the 3d meshes
-            for (int i = 0; i < 3; i++) //(order: x, y, z)
+            for (var i = 0; i < 3; i++) //(order: x, y, z)
             {
                 GizmoModel activeModel;
                 switch (ActiveMode)
@@ -658,16 +659,16 @@ namespace View3D.Components.Gizmo
             _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
             // -- Draw Axis identifiers ("X,Y,Z") -- // 
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
-                Vector3 screenPos =
+                var screenPos =
                   _graphics.Viewport.Project(_modelLocalSpace[i].Translation + _modelLocalSpace[i].Backward + _axisTextOffset,
                                              projection, view, _gizmoWorld);
 
                 if (screenPos.Z < 0f || screenPos.Z > 1.0f)
                     continue;
 
-                Color color = _axisColors[i];
+                var color = _axisColors[i];
                 switch (i)
                 {
                     case 0:

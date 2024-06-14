@@ -1,7 +1,7 @@
-﻿using Shared.GameFormats.AnimationMeta.Parsing;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
+using Shared.GameFormats.AnimationMeta.Parsing;
 using Shared.GameFormats.AnimationPack;
-using View3D.Animation;
-using View3D.SceneNodes;
 
 namespace Editors.Shared.Core.Services
 {

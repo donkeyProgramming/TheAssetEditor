@@ -1,12 +1,13 @@
 ﻿using System;
+using GameWorld.Core.Components.Input;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using View3D.Components.Input;
-using View3D.Components.Rendering;
 
-namespace View3D.Components.Component
+namespace GameWorld.Core.Components
 {
     public class LightControllerComponent : BaseComponent, IDisposable
     {
@@ -47,7 +48,7 @@ namespace View3D.Components.Component
             if (_animationStart != null)
             {
                 var timeDiff = (gameTime.TotalGameTime - _animationStart.TotalGameTime).TotalMilliseconds;
-                float lerpValue = (float)timeDiff / 2000.0f;
+                var lerpValue = (float)timeDiff / 2000.0f;
                 var alphaValue = MathHelper.Lerp(1, 0, lerpValue);
                 if (lerpValue >= 1)
                     _animationStart = null;
@@ -63,10 +64,10 @@ namespace View3D.Components.Component
 
         public override void Update(GameTime gameTime)
         {
-            bool lightMoved = false;
-            bool DirlightMoved_X = false;
-            bool DirlightMoved_Y = false;
-            bool lightIntensityChanged = false;
+            var lightMoved = false;
+            var DirlightMoved_X = false;
+            var DirlightMoved_Y = false;
+            var lightIntensityChanged = false;
             if (_keyboardComponent.IsKeyDown(Keys.PageUp) && !_keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
                 _renderEngineComponent.EnvLightRotationDegrees_Y += 1.0f;

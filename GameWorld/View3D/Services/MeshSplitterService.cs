@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Rendering.Geometry;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Rendering.Geometry;
 
-namespace View3D.Services
+namespace GameWorld.Core.Services
 {
     public class MeshSplitterService
     {
@@ -64,9 +64,9 @@ namespace View3D.Services
         {
             var subMeshList = new List<SubFaceObject>();
 
-            for (int i = 0; i < indexList.Count; i += 3)
+            for (var i = 0; i < indexList.Count; i += 3)
             {
-                bool isContainedInExistingObject = false;
+                var isContainedInExistingObject = false;
                 foreach (var currentObject in subMeshList)
                 {
                     if (currentObject.IsConnectedToFace(i))
@@ -95,9 +95,9 @@ namespace View3D.Services
 
         List<SubFaceObject> MergeSubMeshes(List<SubFaceObject> list)
         {
-            for (int i = 0; i < list.Count; i++)
+            for (var i = 0; i < list.Count; i++)
             {
-                for (int j = 0; j < list.Count; j++)
+                for (var j = 0; j < list.Count; j++)
                 {
                     if (i == j)
                         continue;
@@ -181,7 +181,7 @@ namespace View3D.Services
             public void ComputeBoundingBox()
             {
                 var vertList = new Vector3[_subMeshDistinctIndexList.Count()];
-                for (int i = 0; i < _subMeshDistinctIndexList.Count; i++)
+                for (var i = 0; i < _subMeshDistinctIndexList.Count; i++)
                     vertList[i] = _meshVertexList[_subMeshDistinctIndexList[i]];
                 _bb = BoundingBox.CreateFromPoints(vertList);
             }
@@ -196,7 +196,7 @@ namespace View3D.Services
                     foreach (var otherVertIndex in otherIndexes)
                     {
 
-                        float tolerance = 0.0001f * 0.0001f;
+                        var tolerance = 0.0001f * 0.0001f;
                         if (ContainsVertex(selfIndexes, otherVertIndex, _meshVertexList, tolerance))
                             return true;
                     }

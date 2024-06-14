@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
+using GameWorld.Core.Components;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
 
-namespace View3D.Services
+namespace GameWorld.Core.Services
 {
     public class ViewOnlySelectedService
     {

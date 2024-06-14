@@ -1,4 +1,12 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.Components.Gizmo;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.Rendering.RenderItems;
+using GameWorld.Core.Rendering.Shading;
+using GameWorld.Core.Utility;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Misc;
@@ -8,15 +16,8 @@ using Shared.GameFormats.RigidModel.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Animation;
-using View3D.Components.Gizmo;
-using View3D.Components.Rendering;
-using View3D.Rendering.Geometry;
-using View3D.Rendering.RenderItems;
-using View3D.Rendering.Shading;
-using View3D.Utility;
 
-namespace View3D.SceneNodes
+namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IDrawableItem
     {
@@ -93,17 +94,17 @@ namespace View3D.SceneNodes
 
         void CreateShader()
         {
-            if (_renderEngineComponent.MainRenderFormat == Rendering.RenderFormats.MetalRoughness)
+            if (_renderEngineComponent.MainRenderFormat == RenderFormats.MetalRoughness)
                 Effect = new PbrShader_MetalRoughness(_resourceLib);
             else
                 Effect = new PbrShader_SpecGloss(_resourceLib);
 
-            Texture2D diffuse = LoadTexture(TextureType.Diffuse);
-            Texture2D baseColour = LoadTexture(TextureType.BaseColour);
-            Texture2D specTexture = LoadTexture(TextureType.Specular);
-            Texture2D normalTexture = LoadTexture(TextureType.Normal);
-            Texture2D glossTexture = LoadTexture(TextureType.Gloss);
-            Texture2D materialTexture = LoadTexture(TextureType.MaterialMap);
+            var diffuse = LoadTexture(TextureType.Diffuse);
+            var baseColour = LoadTexture(TextureType.BaseColour);
+            var specTexture = LoadTexture(TextureType.Specular);
+            var normalTexture = LoadTexture(TextureType.Normal);
+            var glossTexture = LoadTexture(TextureType.Gloss);
+            var materialTexture = LoadTexture(TextureType.MaterialMap);
 
             Effect.SetTexture(diffuse, TextureType.Diffuse);
             Effect.SetTexture(baseColour, TextureType.BaseColour);
@@ -159,8 +160,8 @@ namespace View3D.SceneNodes
             if (Effect == null || renderEngine.MainRenderFormat != Effect.RenderFormat)
                 CreateShader();
 
-            Matrix[] data = new Matrix[256];
-            for (int i = 0; i < 256; i++)
+            var data = new Matrix[256];
+            for (var i = 0; i < 256; i++)
                 data[i] = Matrix.Identity;
 
             if (AnimationPlayer != null)
@@ -168,7 +169,7 @@ namespace View3D.SceneNodes
                 var frame = AnimationPlayer.GetCurrentAnimationFrame();
                 if (frame != null)
                 {
-                    for (int i = 0; i < frame.BoneTransforms.Count(); i++)
+                    for (var i = 0; i < frame.BoneTransforms.Count(); i++)
                         data[i] = frame.BoneTransforms[i].WorldTransform;
                 }
             }

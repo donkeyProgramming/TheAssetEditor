@@ -1,16 +1,16 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using System.Collections.ObjectModel;
+using GameWorld.Core.Components;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.Rendering.RenderItems;
+using GameWorld.Core.SceneNodes;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
 using Shared.Ui.BaseDialogs.MathViews;
-using System.Collections.ObjectModel;
-using View3D.Components;
-using View3D.Components.Component.Selection;
-using View3D.Components.Rendering;
-using View3D.Rendering;
-using View3D.Rendering.Geometry;
-using View3D.Rendering.RenderItems;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.VertexDebugger
 {

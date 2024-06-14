@@ -1,9 +1,10 @@
-﻿using Serilog;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Components.Selection;
+using Serilog;
 using Shared.Core.ErrorHandling;
 using System.Collections.Generic;
-using View3D.Components.Component.Selection;
 
-namespace View3D.Commands.Vertex
+namespace GameWorld.Core.Commands.Vertex
 {
     public class VertexSelectionCommand : ICommand
     {

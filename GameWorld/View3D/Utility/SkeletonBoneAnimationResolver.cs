@@ -1,7 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using View3D.SceneNodes;
+﻿using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 
-namespace View3D.Utility
+namespace GameWorld.Core.Utility
 {
     public class SkeletonBoneAnimationResolver
     {

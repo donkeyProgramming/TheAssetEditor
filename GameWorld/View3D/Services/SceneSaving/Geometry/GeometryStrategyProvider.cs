@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace View3D.Services.SceneSaving.Geometry
+namespace GameWorld.Core.Services.SceneSaving.Geometry
 {
     public class GeometryStrategyProvider
     {

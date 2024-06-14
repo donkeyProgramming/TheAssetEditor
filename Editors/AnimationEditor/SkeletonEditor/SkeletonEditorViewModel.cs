@@ -6,13 +6,13 @@ using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.PackFileBrowser;
 using Editors.Shared.Core.Common.BaseControl;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
-using View3D.Animation;
-using View3D.Services;
 
 namespace AnimationEditor.SkeletonEditor
 {

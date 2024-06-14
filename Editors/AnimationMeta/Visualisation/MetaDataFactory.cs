@@ -5,6 +5,13 @@ using System.Linq;
 using Editors.AnimationMeta.Visualisation.Instances;
 using Editors.AnimationMeta.Visualisation.Rules;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Components;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering;
+using GameWorld.Core.Rendering.RenderItems;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Serilog;
@@ -15,13 +22,6 @@ using Shared.GameFormats.Animation;
 using Shared.GameFormats.AnimationMeta.Definitions;
 using Shared.GameFormats.AnimationMeta.Parsing;
 using Shared.GameFormats.AnimationPack;
-using View3D.Animation;
-using View3D.Components.Component;
-using View3D.Components.Rendering;
-using View3D.Rendering;
-using View3D.Rendering.RenderItems;
-using View3D.SceneNodes;
-using View3D.Services;
 
 namespace Editors.AnimationMeta.Visualisation
 {

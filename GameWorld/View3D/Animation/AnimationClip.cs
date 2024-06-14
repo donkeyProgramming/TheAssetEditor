@@ -7,7 +7,7 @@ using Shared.GameFormats.RigidModel.Transforms;
 using static Shared.GameFormats.Animation.AnimationFile;
 
 
-namespace View3D.Animation
+namespace GameWorld.Core.Animation
 {
     public class AnimationClip
     {
@@ -72,7 +72,7 @@ namespace View3D.Animation
                 }
 
                 // make sure we have whole number of microsecond per frame
-                long framePlayTimeUs = (long)Math.Ceiling(value / DynamicFrames.Count * MicrosecondsPerSecond);
+                var framePlayTimeUs = (long)Math.Ceiling(value / DynamicFrames.Count * MicrosecondsPerSecond);
                 _playTimeUs = framePlayTimeUs * DynamicFrames.Count;
             }
         }
@@ -105,7 +105,7 @@ namespace View3D.Animation
 
         List<KeyFrame> CreateKeyFramesFromAnimationPart(AnimationPart animationPart, GameSkeleton skeleton)
         {
-            List<KeyFrame> newDynamicFrames = new List<KeyFrame>();
+            var newDynamicFrames = new List<KeyFrame>();
 
             var animationSkeletonBoneCount = animationPart.RotationMappings.Count;
             var frameCount = animationPart.DynamicFrames.Count;
@@ -113,15 +113,15 @@ namespace View3D.Animation
             if (frameCount == 0 && animationPart.StaticFrame != null)
                 frameCount = 1; // Poses
 
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
                 var newKeyframe = new KeyFrame();
 
-                for (int animationSkeletonBoneIndex = 0; animationSkeletonBoneIndex < animationSkeletonBoneCount; animationSkeletonBoneIndex++)
+                for (var animationSkeletonBoneIndex = 0; animationSkeletonBoneIndex < animationSkeletonBoneCount; animationSkeletonBoneIndex++)
                 {
                     // We can apply animations to a skeleton where the skeleton of the animation is different then the skeleton we are applying it to
                     // If that is the case we just discard the information.
-                    bool isBoneIndexValid = animationSkeletonBoneIndex < skeleton.BoneCount;
+                    var isBoneIndexValid = animationSkeletonBoneIndex < skeleton.BoneCount;
                     if (isBoneIndexValid)
                     {
                         var translationLookup = animationPart.TranslationMappings[animationSkeletonBoneIndex];
@@ -165,7 +165,7 @@ namespace View3D.Animation
             output.AnimationParts.Add(new AnimationPart());
 
             output.Bones = new BoneInfo[skeleton.BoneCount];
-            for (int i = 0; i < skeleton.BoneCount; i++)
+            for (var i = 0; i < skeleton.BoneCount; i++)
             {
                 output.Bones[i] = new BoneInfo()
                 {
@@ -179,7 +179,7 @@ namespace View3D.Animation
             }
 
 
-            for (int i = 0; i < DynamicFrames.Count; i++)
+            for (var i = 0; i < DynamicFrames.Count; i++)
                 output.AnimationParts[0].DynamicFrames.Add(CreateFrameFromKeyFrame(i, skeleton));
 
             return output;
@@ -187,10 +187,10 @@ namespace View3D.Animation
 
         private Frame CreateFrameFromKeyFrame(int frameIndex, GameSkeleton skeleton)
         {
-            KeyFrame frame = DynamicFrames[frameIndex];
+            var frame = DynamicFrames[frameIndex];
             var output = new Frame();
 
-            for (int boneIndex = 0; boneIndex < frame.Position.Count(); boneIndex++)
+            for (var boneIndex = 0; boneIndex < frame.Position.Count(); boneIndex++)
             {
                 var scale = GetAccumulatedBoneScale(boneIndex, frameIndex, skeleton);
                 var transform = frame.Position[boneIndex] * scale;
@@ -214,7 +214,7 @@ namespace View3D.Animation
 
         public AnimationClip Clone()
         {
-            AnimationClip copy = new AnimationClip();
+            var copy = new AnimationClip();
             foreach (var item in DynamicFrames)
                 copy.DynamicFrames.Add(item.Clone());
             copy.PlayTimeInSec = PlayTimeInSec;
@@ -227,7 +227,7 @@ namespace View3D.Animation
             var clip = new AnimationClip();
 
             var frame = new KeyFrame();
-            for (int i = 0; i < skeleton.BoneCount; i++)
+            for (var i = 0; i < skeleton.BoneCount; i++)
             {
                 frame.Position.Add(skeleton.Translation[i]);
                 frame.Rotation.Add(skeleton.Rotation[i]);
@@ -246,7 +246,7 @@ namespace View3D.Animation
         {
             foreach (var frame in DynamicFrames)
             {
-                for (int i = 0; i < AnimationBoneCount; i++)
+                for (var i = 0; i < AnimationBoneCount; i++)
                     frame.Scale[i] = new Vector3(scale);
             }
         }

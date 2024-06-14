@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows;
 using CommonControls.Editors.BoneMapping.View;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using Shared.Core.PackFiles;
@@ -11,8 +13,6 @@ using Shared.GameFormats.RigidModel;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
 using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.UiCommands

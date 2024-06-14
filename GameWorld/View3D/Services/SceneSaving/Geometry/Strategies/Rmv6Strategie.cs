@@ -1,7 +1,7 @@
-﻿using Shared.GameFormats.RigidModel;
-using View3D.SceneNodes;
+﻿using GameWorld.Core.SceneNodes;
+using Shared.GameFormats.RigidModel;
 
-namespace View3D.Services.SceneSaving.Geometry.Strategies
+namespace GameWorld.Core.Services.SceneSaving.Geometry.Strategies
 {
     public class Rmw6Strategy : IGeometryStrategy
     {

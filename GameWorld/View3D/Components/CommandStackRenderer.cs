@@ -1,9 +1,10 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Services;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
 
-namespace View3D.Components.Component
+namespace GameWorld.Core.Components
 {
     public class CommandStackRenderer : BaseComponent
     {
@@ -27,7 +28,7 @@ namespace View3D.Components.Component
             if (_animationStart != null)
             {
                 var timeDiff = (gameTime.TotalGameTime - _animationStart.TotalGameTime).TotalMilliseconds;
-                float lerpValue = (float)timeDiff / 2000.0f;
+                var lerpValue = (float)timeDiff / 2000.0f;
                 var alphaValue = MathHelper.Lerp(1, 0, lerpValue);
                 if (lerpValue >= 1)
                     _animationStart = null;

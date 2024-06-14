@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameWorld.Core.Components.Selection;
 using Shared.Ui.Common.MenuSystem;
-using View3D.Components.Component.Selection;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {

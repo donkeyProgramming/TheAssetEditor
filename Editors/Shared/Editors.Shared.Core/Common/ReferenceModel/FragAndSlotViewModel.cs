@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -61,7 +62,7 @@ namespace AnimationEditor.Common.ReferenceModel
             _asset.SkeletonChanged += OnSkeletonChange;
         }
 
-        private void OnSkeletonChange(View3D.Animation.GameSkeleton newValue)
+        private void OnSkeletonChange(GameSkeleton newValue)
         {
             Unsubscribe();
 

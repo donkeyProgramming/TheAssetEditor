@@ -1,8 +1,8 @@
-﻿using View3D.Services.SceneSaving.Lod;
-using View3D.Services.SceneSaving.Geometry;
-using View3D.Services.SceneSaving.WsModel;
+﻿using GameWorld.Core.Services.SceneSaving.Lod;
+using GameWorld.Core.Services.SceneSaving.Geometry;
+using GameWorld.Core.Services.SceneSaving.Material;
 
-namespace View3D.Services.SceneSaving
+namespace GameWorld.Core.Services.SceneSaving
 {
     public class SaveSettings
     {

@@ -3,9 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.Generic;
-using View3D.Animation;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
 
-namespace View3D.Commands.Bone
+namespace GameWorld.Core.Commands.Bone
 {
     public class PasteWholeTransformBoneCommand : ICommand
     {
@@ -22,7 +23,7 @@ namespace View3D.Commands.Bone
         bool _pasteScale = true;
 
 
-        public void Configure(AnimationClip.KeyFrame copyFromFrame, AnimationClip animation, int startingFrame, 
+        public void Configure(AnimationClip.KeyFrame copyFromFrame, AnimationClip animation, int startingFrame,
             bool pastePosition = true, bool pasteRotation = true, bool pasteScale = true)
         {
             _fromFrame = copyFromFrame;

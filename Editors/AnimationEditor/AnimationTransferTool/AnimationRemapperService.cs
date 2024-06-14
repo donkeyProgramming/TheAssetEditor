@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Animation;
+using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Ui.Editors.BoneMapping;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Animation;
 
 namespace AnimationEditor.AnimationTransferTool
 {
@@ -26,7 +26,7 @@ namespace AnimationEditor.AnimationTransferTool
             var newPlayTime = (float)_settings.SpeedMult.Value * animationToCopy.PlayTimeInSec;
 
             //animationToCopy.RemoveOptimizations(copyFromSkeleton);
-            var resampledAnimationToCopy = View3D.Animation.AnimationEditor.ReSample(copyFromSkeleton, animationToCopy, newFrameCount, newPlayTime);
+            var resampledAnimationToCopy = GameWorld.Core.Animation.AnimationEditor.ReSample(copyFromSkeleton, animationToCopy, newFrameCount, newPlayTime);
             var newAnimation = CreateNewAnimation(copyToSkeleton, resampledAnimationToCopy);
 
             if (copyFromSkeleton.SkeletonName != copyToSkeleton.SkeletonName)

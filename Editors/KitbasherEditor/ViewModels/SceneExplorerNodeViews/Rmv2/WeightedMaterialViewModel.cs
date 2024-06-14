@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using GameWorld.Core.SceneNodes;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {

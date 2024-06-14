@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -14,9 +16,8 @@ using Shared.EmbeddedResources;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
-using View3D.SceneNodes;
 
-namespace View3D.Services.SceneSaving.Material.Strategies
+namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 {
     public class WsModelGeneratorService
     {

@@ -9,7 +9,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel.Types;
 
-namespace View3D.Utility
+namespace GameWorld.Core.Utility
 {
     public class TextureConverter
     {

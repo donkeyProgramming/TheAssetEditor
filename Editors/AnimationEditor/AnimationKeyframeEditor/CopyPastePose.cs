@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Windows.Forms;
-using View3D.Commands.Bone;
+using GameWorld.Core.Commands.Bone;
 
 namespace AnimationEditor.AnimationKeyframeEditor
 {

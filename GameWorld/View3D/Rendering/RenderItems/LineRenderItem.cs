@@ -1,8 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Components.Rendering;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using View3D.Components.Rendering;
 
-namespace View3D.Rendering.RenderItems
+namespace GameWorld.Core.Rendering.RenderItems
 {
     public class LineRenderItem : IRenderItem
     {

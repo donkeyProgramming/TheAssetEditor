@@ -1,9 +1,9 @@
-﻿using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Components.Component;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

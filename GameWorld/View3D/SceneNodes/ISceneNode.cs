@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Components;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering.Geometry;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using View3D.Components.Component;
-using View3D.Components.Rendering;
-using View3D.Rendering.Geometry;
 
-namespace View3D.SceneNodes
+namespace GameWorld.Core.SceneNodes
 {
     public interface ISceneNode
     {

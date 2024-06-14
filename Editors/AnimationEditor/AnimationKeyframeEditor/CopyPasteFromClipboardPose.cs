@@ -3,8 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Windows.Forms;
+using GameWorld.Core.Commands.Bone.Clipboard;
 using Newtonsoft.Json;
-using View3D.Commands.Bone.Clipboard;
 
 namespace AnimationEditor.AnimationKeyframeEditor
 {

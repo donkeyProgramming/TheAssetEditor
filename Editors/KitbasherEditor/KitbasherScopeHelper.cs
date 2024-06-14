@@ -1,8 +1,8 @@
-﻿using KitbasherEditor.EventHandlers;
+﻿using GameWorld.Core.Components;
+using KitbasherEditor.EventHandlers;
 using KitbasherEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using View3D.Components;
 
 namespace KitbasherEditor
 {

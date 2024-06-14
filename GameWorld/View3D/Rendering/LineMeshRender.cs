@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace View3D.Rendering
+namespace GameWorld.Core.Rendering
 {
     public class LineMeshRender : IDisposable
     {
@@ -26,7 +26,7 @@ namespace View3D.Rendering
         public void CreateLineList(List<(Vector3, Vector3)> lines)
         {
             Clear();
-            for (int i = 0; i < lines.Count; i++)
+            for (var i = 0; i < lines.Count; i++)
                 AddLine(lines[i].Item1, lines[i].Item2);
         }
 
@@ -76,20 +76,20 @@ namespace View3D.Rendering
             const int lineCount = 10;
             const float spacing = 1;
             const float length = 10;
-            const float offset = (lineCount * spacing) / 2;
+            const float offset = lineCount * spacing / 2;
 
             var list = new List<(Vector3, Vector3)>();
-            for (int i = 0; i <= lineCount; i++)
+            for (var i = 0; i <= lineCount; i++)
             {
-                var start = new Vector3((i * spacing) - offset, 0, -length * 0.5f);
-                var stop = new Vector3((i * spacing) - offset, 0, length * 0.5f);
+                var start = new Vector3(i * spacing - offset, 0, -length * 0.5f);
+                var stop = new Vector3(i * spacing - offset, 0, length * 0.5f);
                 list.Add((start, stop));
             }
 
-            for (int i = 0; i <= lineCount; i++)
+            for (var i = 0; i <= lineCount; i++)
             {
-                var start = new Vector3(-length * 0.5f, 0, (i * spacing) - offset);
-                var stop = new Vector3(length * 0.5f, 0, (i * spacing) - offset);
+                var start = new Vector3(-length * 0.5f, 0, i * spacing - offset);
+                var stop = new Vector3(length * 0.5f, 0, i * spacing - offset);
                 list.Add((start, stop));
             }
             CreateLineList(list);
@@ -130,7 +130,7 @@ namespace View3D.Rendering
         private IEnumerable<(int, float, float)> CircleAnglesGenerator(int steps = 20)
         {
             var stepSize = 2 * MathF.PI / steps;
-            for (int i = 0; i < steps + 1; i++)
+            for (var i = 0; i < steps + 1; i++)
             {
                 yield return (i, MathF.Cos(stepSize * i), MathF.Sin(stepSize * i));
             }
@@ -159,7 +159,7 @@ namespace View3D.Rendering
                 vertices[2 * i + 1] = vertices[2 * i];
             }
             // fix points to use with LineList
-            for (int i = 0; i < steps; i++)
+            for (var i = 0; i < steps; i++)
             {
                 vertices[2 * i + 1] = vertices[2 * i + 2];
             }
@@ -181,7 +181,7 @@ namespace View3D.Rendering
             }
 
             // fix points
-            for (int i = 0; i < steps; i++)
+            for (var i = 0; i < steps; i++)
             {
                 vertices[2 * i + 1] = vertices[2 * i + 2];
             }
@@ -190,14 +190,14 @@ namespace View3D.Rendering
 
         public void AddCorridorSplash(Vector3 startPos, Vector3 endPos, Matrix transformationM, Color color, int steps = 30)
         {
-            Vector3 diffVector = endPos - startPos;
+            var diffVector = endPos - startPos;
             var circle = CreateCircle(steps);
             Vector3.Transform(circle, ref transformationM, circle);
             var startCircleVertices = circle.Select(v => new VertexPositionColor(v, color)).ToArray();
             var endCircleVertices = circle.Select(v => new VertexPositionColor(v + diffVector, color)).ToArray();
             var connectionCircleVertices = new VertexPositionColor[circle.Length];
             var edgesVertices = new VertexPositionColor[2 * circle.Length];
-            foreach (int i in Enumerable.Range(0, circle.Length / 2))
+            foreach (var i in Enumerable.Range(0, circle.Length / 2))
             {
                 connectionCircleVertices[2 * i] = new VertexPositionColor(startCircleVertices[2 * i].Position, color);
                 connectionCircleVertices[2 * i + 1] = new VertexPositionColor(endCircleVertices[2 * i].Position, color);
@@ -214,7 +214,7 @@ namespace View3D.Rendering
 
         public void AddConeSplash(Vector3 startPos, Vector3 endPos, Matrix transformationM, float coneAngleDegrees, Color color, int steps = 30, int angleSteps = 60)
         {
-            float halfAngle = MathHelper.ToRadians(coneAngleDegrees / 2);
+            var halfAngle = MathHelper.ToRadians(coneAngleDegrees / 2);
 
             var circleSteps = new List<float>();
             var angleStep = MathF.PI / angleSteps;
@@ -229,7 +229,7 @@ namespace View3D.Rendering
                 Vector3.Transform(lastCircleVectors, ref transformationM, lastCircleVectors);
                 var lastCircle = lastCircleVectors.Select(v => new VertexPositionColor(v, color)).ToArray();
                 var rays = new VertexPositionColor[lastCircleVectors.Length];
-                foreach (int j in Enumerable.Range(0, rays.Length / 2))
+                foreach (var j in Enumerable.Range(0, rays.Length / 2))
                 {
                     rays[2 * j] = new VertexPositionColor(startPos, color);
                     rays[2 * j + 1] = new VertexPositionColor(lastCircle[2 * j].Position, color);
@@ -238,13 +238,13 @@ namespace View3D.Rendering
                 _originalVertices.AddRange(rays);
             }
 
-            int coneCircleSize = 2 * (steps + 1);
-            Vector3[] circlesVectors = new Vector3[circleSteps.Count * coneCircleSize];
-            foreach (int i in Enumerable.Range(0, circleSteps.Count))
+            var coneCircleSize = 2 * (steps + 1);
+            var circlesVectors = new Vector3[circleSteps.Count * coneCircleSize];
+            foreach (var i in Enumerable.Range(0, circleSteps.Count))
             {
-                float sectorAngle = circleSteps[i];
+                var sectorAngle = circleSteps[i];
                 var circleVectors = CreateConeCircle(sectorAngle);
-                foreach (int j in Enumerable.Range(0, circleVectors.Length))
+                foreach (var j in Enumerable.Range(0, circleVectors.Length))
                 {
                     circlesVectors[i * coneCircleSize + j] = circleVectors[j];
                 }

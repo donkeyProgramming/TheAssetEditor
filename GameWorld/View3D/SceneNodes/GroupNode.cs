@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace View3D.SceneNodes
+namespace GameWorld.Core.SceneNodes
 {
     public class GroupNode : SceneNode
     {

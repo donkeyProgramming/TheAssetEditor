@@ -5,10 +5,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
 using Microsoft.Xna.Framework;
-using View3D.Animation;
 
-namespace View3D.Commands.Bone.Clipboard
+namespace GameWorld.Core.Commands.Bone.Clipboard
 {
     public class BoneTransformClipboardData
     {

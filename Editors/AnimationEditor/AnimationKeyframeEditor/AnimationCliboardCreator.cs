@@ -9,8 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using View3D.Animation;
-using View3D.Commands.Bone.Clipboard;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands.Bone.Clipboard;
 
 namespace AnimationEditor.AnimationKeyframeEditor
 {

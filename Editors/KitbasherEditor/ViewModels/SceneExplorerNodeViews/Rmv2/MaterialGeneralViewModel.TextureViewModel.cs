@@ -2,12 +2,12 @@
 using System.ComponentModel;
 using System.Windows;
 using CommonControls.PackFileBrowser;
+using GameWorld.Core.SceneNodes;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.Ui.Events.UiCommands;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {

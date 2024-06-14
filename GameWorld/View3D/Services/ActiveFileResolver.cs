@@ -1,4 +1,4 @@
-﻿namespace View3D.Services
+﻿namespace GameWorld.Core.Services
 {
     public interface IActiveFileResolver
     {

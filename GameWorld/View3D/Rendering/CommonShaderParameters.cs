@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace View3D.Rendering
+namespace GameWorld.Core.Rendering
 {
     public class CommonShaderParameters
     {

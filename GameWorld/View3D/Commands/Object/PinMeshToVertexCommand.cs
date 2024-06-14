@@ -1,11 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
 
-namespace View3D.Commands.Object
+namespace GameWorld.Core.Commands.Object
 {
     public class PinMeshToVertexCommand : ICommand
     {
@@ -48,7 +49,7 @@ namespace View3D.Commands.Object
             {
                 currentMesh.Geometry.ChangeVertexType(_source.Geometry.VertexFormat, _source.Geometry.ParentSkeletonName, false);
 
-                for (int i = 0; i < currentMesh.Geometry.VertexCount(); i++)
+                for (var i = 0; i < currentMesh.Geometry.VertexCount(); i++)
                 {
                     currentMesh.UpdatePivotPoint(Vector3.Zero);
                     currentMesh.Geometry.SetVertexBlendIndex(i, sourceVert.BlendIndices);
@@ -61,7 +62,7 @@ namespace View3D.Commands.Object
 
         public void Undo()
         {
-            for (int i = 0; i < _meshesToPin.Count; i++)
+            for (var i = 0; i < _meshesToPin.Count; i++)
             {
                 _meshesToPin[i].Geometry = _originalGeos[i];
                 _meshesToPin[i].Geometry.ParentSkeletonName = _originalSkeletonNames[i];

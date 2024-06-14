@@ -1,15 +1,17 @@
 ﻿using System;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Components;
+using GameWorld.Core.Components.Input;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Services;
+using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Shared.Core.Events;
-using View3D.Commands;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
-using View3D.Components.Input;
-using View3D.Components.Rendering;
 
-namespace View3D.Components.Gizmo
+namespace GameWorld.Core.Components.Gizmo
 {
     public class GizmoComponent : BaseComponent, IDisposable
     {

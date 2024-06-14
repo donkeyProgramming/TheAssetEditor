@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace View3D.Services.SceneSaving.Lod
+namespace GameWorld.Core.Services.SceneSaving.Lod
 {
     public class LodStrategyProvider
     {
@@ -22,8 +22,8 @@ namespace View3D.Services.SceneSaving.Lod
         }
 
         public ILodGenerationStrategy GetStrategy(LodStrategy strategy)
-        { 
-            return _lodGenerationStrategies.First(x=>x.StrategyId == strategy);
+        {
+            return _lodGenerationStrategies.First(x => x.StrategyId == strategy);
         }
     }
 

@@ -1,13 +1,13 @@
 ﻿using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
 using KitbasherEditor.ViewModels.BmiEditor;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.Views.EditorViews;
 using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
-using View3D.Animation;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

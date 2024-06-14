@@ -8,18 +8,18 @@ using AnimationEditor.MountAnimationCreator.ViewModels;
 using AnimationEditor.PropCreator.ViewModels;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Bone;
+using GameWorld.Core.Components.Gizmo;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
-using View3D.Animation;
-using View3D.Commands;
-using View3D.Commands.Bone;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
-using View3D.Components.Gizmo;
 using SkeletonBoneNode = AnimationEditor.Common.ReferenceModel.SkeletonBoneNode;
 
 namespace AnimationEditor.AnimationKeyframeEditor

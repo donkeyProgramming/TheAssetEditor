@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
-using View3D.Animation;
-using View3D.Components;
-using View3D.SceneNodes;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace AnimationEditor.Common.ReferenceModel
@@ -31,7 +31,7 @@ namespace AnimationEditor.Common.ReferenceModel
         bool _isSelectable = false;
         public bool IsSelectable { get => _isSelectable; set { _isSelectable = value; SetSelectableState(); } }
 
-        public View3D.Animation.AnimationPlayer Player { get; set; }
+        public GameWorld.Core.Animation.AnimationPlayer Player { get; set; }
         public List<IMetaDataInstance> MetaDataItems { get; set; } = new List<IMetaDataInstance>();
 
         public SceneNode MainNode { get => ParentNode; }

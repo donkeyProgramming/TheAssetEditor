@@ -5,15 +5,15 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using CommonControls.BaseDialogs.ErrorListDialog;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Utility;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel.Types;
-using View3D.SceneNodes;
-using View3D.Utility;
 using MS = Microsoft.Xna.Framework;
 
-namespace View3D.Services
+namespace GameWorld.Core.Services
 {
     public class Rmv2UpdaterService
     {
@@ -175,8 +175,8 @@ namespace View3D.Services
         private static float GetMetalNess(MS::Vector4 specularPixel, MS::Vector4 diffusePixel)
         {
             // calculate luminosity, to have a scalars to use in comparisons
-            float luminosity_Specular = ColorHelper.GetPixelLuminosity(specularPixel);
-            float luminosity_Diffuse = ColorHelper.GetPixelLuminosity(diffusePixel);
+            var luminosity_Specular = ColorHelper.GetPixelLuminosity(specularPixel);
+            var luminosity_Diffuse = ColorHelper.GetPixelLuminosity(diffusePixel);
 
             // "rules" (heuristic) for creating metal map
             // TODO: improve, as it in some situations it doesn't look "pefect"
@@ -218,12 +218,12 @@ namespace View3D.Services
             var outBaseColourTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);
             var outMaterialMapTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);
 
-            for (int y = 0; y < inputDiffuseTex.Height; y++)
+            for (var y = 0; y < inputDiffuseTex.Height; y++)
             {
-                for (int x = 0; x < inputDiffuseTex.Width; x++)
+                for (var x = 0; x < inputDiffuseTex.Width; x++)
                 {
                     // get roughness from WH2 smoothness (gloss_map.r)
-                    float roughness = GetRoughnessFromPixel(inputGlosMapTex, y, x);
+                    var roughness = GetRoughnessFromPixel(inputGlosMapTex, y, x);
 
                     var diffuseColorFloat = ColorHelper.ColorToVector4(inputDiffuseTex.GetPixel(x, y));
                     var spcularColorFloat = ColorHelper.ColorToVector4(inputSpecularTex.GetPixel(x, y));
@@ -273,10 +273,10 @@ namespace View3D.Services
         {
             const float smooth_gamma_scale = 1.0f / 0.90f; // rough const test roughness adjuster value
 
-            float smoothness = Math.Clamp((float)(inputGlosMapTex.GetPixel(x, y).R) / 255.0f, 0.0f, 1.0f);
-            float roughness = Math.Clamp(1.0f - smoothness, 0.0f, 1.0f);
+            var smoothness = Math.Clamp(inputGlosMapTex.GetPixel(x, y).R / 255.0f, 0.0f, 1.0f);
+            var roughness = Math.Clamp(1.0f - smoothness, 0.0f, 1.0f);
 
-            roughness = (float)Math.Pow(roughness, (1.0 / 2.2) * smooth_gamma_scale);
+            roughness = (float)Math.Pow(roughness, 1.0 / 2.2 * smooth_gamma_scale);
 
             return roughness;
 
@@ -292,12 +292,12 @@ namespace View3D.Services
             var outMaterialMapTex = new Bitmap(inputDiffuseTex.Width, inputDiffuseTex.Height);
 
 
-            for (int y = 0; y < inputDiffuseTex.Height; y++)
+            for (var y = 0; y < inputDiffuseTex.Height; y++)
             {
-                for (int x = 0; x < inputDiffuseTex.Width; x++)
+                for (var x = 0; x < inputDiffuseTex.Width; x++)
                 {
 
-                    float roughness = GetRoughnessFromPixel(inputGlosMapTex, y, x);
+                    var roughness = GetRoughnessFromPixel(inputGlosMapTex, y, x);
 
                     var diffusePixelFloat = ColorHelper.ColorToVector4(inputDiffuseTex.GetPixel(x, y));
 
@@ -317,7 +317,7 @@ namespace View3D.Services
                     // this MIGHT work in most cases:               
                     const float specular_threshold_offet = 0.07f;
                     var baseColorPixelFloat =
-                        (luminosity_Specular - specular_threshold_offet >= luminosity_Diffuse) ? specularPixelFloat : diffusePixelFloat;
+                        luminosity_Specular - specular_threshold_offet >= luminosity_Diffuse ? specularPixelFloat : diffusePixelFloat;
 
                     // adjust base_colour brightness
                     const float brightNess = 1.3f; // rough const test pre-gamma brightness adjusted (evil:))
@@ -427,7 +427,7 @@ namespace View3D.Services
                 {
                     const float a = 0.055f;
 
-                    return ((1.0f + a) * (float)Math.Pow(linear_val, 1.0 / 2.4)) - a;
+                    return (1.0f + a) * (float)Math.Pow(linear_val, 1.0 / 2.4) - a;
                 }
             }
 
@@ -490,10 +490,10 @@ namespace View3D.Services
             public static MS::Vector4 ColorToVector4(Color c)
             {
                 return new MS::Vector4(
-                    Math.Clamp(((float)c.R) / 255.0f, 0.0f, 1.0f),
-                    Math.Clamp(((float)c.G) / 255.0f, 0.0f, 1.0f),
-                    Math.Clamp(((float)c.B) / 255.0f, 0.0f, 1.0f),
-                    Math.Clamp(((float)c.A) / 255.0f, 0.0f, 1.0f)
+                    Math.Clamp(c.R / 255.0f, 0.0f, 1.0f),
+                    Math.Clamp(c.G / 255.0f, 0.0f, 1.0f),
+                    Math.Clamp(c.B / 255.0f, 0.0f, 1.0f),
+                    Math.Clamp(c.A / 255.0f, 0.0f, 1.0f)
 
                 );
             }
@@ -504,10 +504,10 @@ namespace View3D.Services
             public static Color Vector4ToColor(MS::Vector4 v)
             {
                 return Color.FromArgb(
-                    (int)Math.Clamp((float)(v.W) * 255.0f, 0.0f, 255.0f),
-                    (int)Math.Clamp((float)(v.X) * 255.0f, 0.0f, 255.0f),
-                    (int)Math.Clamp((float)(v.Y) * 255.0f, 0.0f, 255.0f),
-                    (int)Math.Clamp((float)(v.Z) * 255.0f, 0.0f, 255.0f)
+                    (int)Math.Clamp(v.W * 255.0f, 0.0f, 255.0f),
+                    (int)Math.Clamp(v.X * 255.0f, 0.0f, 255.0f),
+                    (int)Math.Clamp(v.Y * 255.0f, 0.0f, 255.0f),
+                    (int)Math.Clamp(v.Z * 255.0f, 0.0f, 255.0f)
 
                 );
 
@@ -518,7 +518,7 @@ namespace View3D.Services
             /// </summary>            
             public static float GetPixelLuminosity(MS::Vector4 vColor)
             {
-                return (0.2126f * vColor.X + 0.7152f * vColor.Y + 0.0722f * vColor.Z);
+                return 0.2126f * vColor.X + 0.7152f * vColor.Y + 0.0722f * vColor.Z;
             }
 
         }

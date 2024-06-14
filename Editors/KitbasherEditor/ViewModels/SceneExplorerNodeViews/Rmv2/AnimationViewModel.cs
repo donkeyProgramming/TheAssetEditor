@@ -1,20 +1,18 @@
 ﻿using Editors.Shared.Core.Services;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Utility;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Ui.Common;
 using Shared.Ui.Editors.BoneMapping;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
-using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {
     public class AnimationViewModel : NotifyPropertyChangedImpl
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
-        Rmv2MeshNode _meshNode;
+        private readonly Rmv2MeshNode _meshNode;
 
         public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>("");
         public List<AnimatedBone> AnimatedBones { get; set; }
@@ -67,7 +65,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
         private void ModelBoneList_SelectedItemChanged(AnimatedBone newValue)
         {
-            MainEditableNode mainNode = _meshNode.GetParentModel() as MainEditableNode;
+            var mainNode = _meshNode.GetParentModel() as MainEditableNode;
             if (mainNode == null)
                 return;
 

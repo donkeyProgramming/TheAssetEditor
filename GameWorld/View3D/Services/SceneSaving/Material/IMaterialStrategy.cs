@@ -1,7 +1,6 @@
-﻿using View3D.SceneNodes;
-using View3D.Services.SceneSaving.Lod;
+﻿using GameWorld.Core.SceneNodes;
 
-namespace View3D.Services.SceneSaving.WsModel
+namespace GameWorld.Core.Services.SceneSaving.Material
 {
     public enum MaterialStrategy
     {

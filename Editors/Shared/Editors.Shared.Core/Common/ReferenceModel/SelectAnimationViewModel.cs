@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using static CommonControls.FilterDialog.FilterUserControl;
@@ -34,12 +35,12 @@ namespace AnimationEditor.Common.ReferenceModel
             _data.AnimationChanged += OnAnimationChanged;
         }
 
-        void OnAnimationChanged(View3D.Animation.AnimationClip newValue)
+        void OnAnimationChanged(AnimationClip newValue)
         {
             NotifyPropertyChanged(nameof(SelectedAnimation));
         }
 
-        void OnSkeletonChanged(View3D.Animation.GameSkeleton newValue)
+        void OnSkeletonChanged(GameSkeleton newValue)
         {
             SkeletonChanged(_data.SkeletonName.Value);
         }

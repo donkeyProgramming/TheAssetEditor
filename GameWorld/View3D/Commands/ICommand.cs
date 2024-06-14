@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using GameWorld.Core.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using View3D.Components.Component;
 
-namespace View3D.Commands
+namespace GameWorld.Core.Commands
 {
     public interface ICommand
     {

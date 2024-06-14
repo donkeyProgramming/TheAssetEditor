@@ -1,8 +1,8 @@
 ﻿///using Simplygon;
-using View3D.Rendering.Geometry;
-using View3D.Services.SceneSaving.Lod.MeshDecimatorIntegration;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration;
 
-namespace View3D.Services.MeshOptimization
+namespace GameWorld.Core.Services.MeshOptimization
 {
     public class MeshOptimizerService_ThisShouldBeRemoved
     {
@@ -17,7 +17,7 @@ namespace View3D.Services.MeshOptimization
             //    }
             //    else // simplygon failed to initialize, use old mesh reducer (MeshDecimator)
             //    {
-                    return DecimatorMeshOptimizer.GetReducedMeshCopy(originalMesh, factor);
+            return DecimatorMeshOptimizer.GetReducedMeshCopy(originalMesh, factor);
             //    }
             //}
         }

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
+using GameWorld.Core.Rendering;
+using GameWorld.Core.Rendering.Geometry;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Vertex;
-using View3D.Rendering;
-using View3D.Rendering.Geometry;
 
-namespace View3D.Services
+namespace GameWorld.Core.Services
 {
     public class MeshBuilderService
     {
@@ -17,7 +17,7 @@ namespace View3D.Services
             output.VertexArray = new VertexPositionNormalTextureCustom[modelPart.Mesh.VertexList.Length];
             output.IndexArray = (ushort[])modelPart.Mesh.IndexList.Clone();
 
-            for (int i = 0; i < modelPart.Mesh.VertexList.Length; i++)
+            for (var i = 0; i < modelPart.Mesh.VertexList.Length; i++)
             {
                 var vertex = modelPart.Mesh.VertexList[i];
                 output.VertexArray[i].Position = vertex.Position;
@@ -54,14 +54,14 @@ namespace View3D.Services
         public static RmvMesh CreateRmvMeshFromGeometry(MeshObject geometry)
         {
             // Ensure normalized
-            for (int i = 0; i < geometry.VertexArray.Length; i++)
+            for (var i = 0; i < geometry.VertexArray.Length; i++)
             {
                 geometry.VertexArray[i].Normal = Vector3.Normalize(geometry.VertexArray[i].Normal);
                 geometry.VertexArray[i].BiNormal = Vector3.Normalize(geometry.VertexArray[i].BiNormal);
                 geometry.VertexArray[i].Tangent = Vector3.Normalize(geometry.VertexArray[i].Tangent);
             }
 
-            RmvMesh mesh = new RmvMesh();
+            var mesh = new RmvMesh();
             mesh.IndexList = geometry.GetIndexBuffer().ToArray();
             mesh.VertexList = geometry.VertexArray.
                 Select(x => new CommonVertex()

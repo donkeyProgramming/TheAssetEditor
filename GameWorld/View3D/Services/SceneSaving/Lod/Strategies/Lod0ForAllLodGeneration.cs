@@ -1,8 +1,10 @@
 ﻿using System.Windows;
-using View3D.SceneNodes;
-using View3D.Services.SceneSaving.Lod.MeshDecimatorIntegration;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving;
+using GameWorld.Core.Services.SceneSaving.Lod;
+using GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration;
 
-namespace View3D.Services.SceneSaving.Lod.Strategies
+namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
     public class Lod0ForAllLodGeneration : OptimizedLodGeneratorBase, ILodGenerationStrategy
     {
@@ -18,7 +20,7 @@ namespace View3D.Services.SceneSaving.Lod.Strategies
         }
 
         public void Generate(MainEditableNode mainNode, LodGenerationSettings[] settings)
-        {           
+        {
             var res = MessageBox.Show("Are you sure to copy lod 0 to every lod slots? This cannot be undone!", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (res != MessageBoxResult.Yes)
                 return;

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
-namespace View3D.Components.Component
+namespace GameWorld.Core.Components
 {
     public class FpsComponent : BaseComponent
     {

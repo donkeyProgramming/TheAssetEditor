@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace View3D.SceneNodes
+namespace GameWorld.Core.SceneNodes
 {
 
 
@@ -14,7 +14,7 @@ namespace View3D.SceneNodes
         {
             Name = name;
 
-            for (int lodIndex = 0; lodIndex < lodCount; lodIndex++)
+            for (var lodIndex = 0; lodIndex < lodCount; lodIndex++)
             {
                 var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex)
                 {

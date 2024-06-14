@@ -2,11 +2,11 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
 using Shared.Core.Misc;
-using View3D.Commands;
-using View3D.Commands.Object;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.PinTool
 {

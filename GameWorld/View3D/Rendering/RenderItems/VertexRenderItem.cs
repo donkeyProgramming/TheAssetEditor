@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using View3D.Components.Component.Selection;
-using View3D.Components.Rendering;
-using View3D.SceneNodes;
 
-namespace View3D.Rendering.RenderItems
+namespace GameWorld.Core.Rendering.RenderItems
 {
     public class VertexRenderItem : IRenderItem
     {

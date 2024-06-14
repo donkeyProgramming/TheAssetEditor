@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Utility;
 using Shared.Ui.Common;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
-using View3D.Utility;
 
-namespace View3D.Commands.Object
+namespace GameWorld.Core.Commands.Object
 {
     public class CombineMeshCommand : ICommand
     {

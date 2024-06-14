@@ -2,9 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using View3D.Animation;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
 
-namespace View3D.Commands.Bone
+namespace GameWorld.Core.Commands.Bone
 {
     public class ResetTransformBoneCommand : ICommand
     {
@@ -12,7 +13,7 @@ namespace View3D.Commands.Bone
         AnimationClip _originalAnimationClip;
         AnimationClip _currentAnimationClip;
         int _currentFrame;
-        
+
 
         public string HintText => "Bone Reset Transform";
 

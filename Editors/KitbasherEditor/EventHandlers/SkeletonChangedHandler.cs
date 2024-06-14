@@ -1,7 +1,7 @@
-﻿using KitbasherEditor.Events;
+﻿using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
+using KitbasherEditor.Events;
 using Shared.Core.Events;
-using View3D.Components.Component;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.EventHandlers
 {

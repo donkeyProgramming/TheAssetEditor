@@ -1,6 +1,7 @@
-﻿using View3D.SceneNodes;
+﻿using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving;
 
-namespace View3D.Services.SceneSaving.Lod
+namespace GameWorld.Core.Services.SceneSaving.Lod
 {
     public enum LodStrategy
     {

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using View3D.Commands;
-using View3D.Commands.Face;
-using View3D.Commands.Object;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Face;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
 
-namespace View3D.Services
+namespace GameWorld.Core.Services
 {
     public class FaceEditor
     {

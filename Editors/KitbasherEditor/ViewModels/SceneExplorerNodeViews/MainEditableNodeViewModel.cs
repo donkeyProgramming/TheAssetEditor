@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using View3D.Components.Rendering;
-using View3D.Rendering;
-using View3D.SceneNodes;
-using View3D.Services;
 using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews

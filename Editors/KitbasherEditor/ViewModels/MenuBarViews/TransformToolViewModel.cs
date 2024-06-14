@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Components.Gizmo;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.MathViews;
-using View3D.Commands;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
-using View3D.Components.Gizmo;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {

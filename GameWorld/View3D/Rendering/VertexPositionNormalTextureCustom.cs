@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace View3D.Rendering
+namespace GameWorld.Core.Rendering
 {
     public struct VertexPositionNormalTextureCustom : IVertexType
     {

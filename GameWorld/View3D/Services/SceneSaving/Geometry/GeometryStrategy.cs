@@ -1,7 +1,6 @@
-﻿using View3D.SceneNodes;
-using View3D.Services.SceneSaving.WsModel;
+﻿using GameWorld.Core.SceneNodes;
 
-namespace View3D.Services.SceneSaving.Geometry
+namespace GameWorld.Core.Services.SceneSaving.Geometry
 {
     public enum GeometryStrategy
     {

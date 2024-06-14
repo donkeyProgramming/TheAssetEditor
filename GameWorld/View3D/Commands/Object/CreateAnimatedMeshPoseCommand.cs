@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel;
 using System.Collections.Generic;
-using View3D.Animation;
-using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
 
-namespace View3D.Commands.Object
+namespace GameWorld.Core.Commands.Object
 {
     public class CreateAnimatedMeshPoseCommand : ICommand
     {
@@ -34,9 +34,9 @@ namespace View3D.Commands.Object
 
             foreach (var node in _meshNodes)
             {
-                MeshAnimationHelper meshHelper = new MeshAnimationHelper(node, Matrix.Identity);
+                var meshHelper = new MeshAnimationHelper(node, Matrix.Identity);
 
-                for (int i = 0; i < node.Geometry.VertexCount(); i++)
+                for (var i = 0; i < node.Geometry.VertexCount(); i++)
                 {
                     var vert = meshHelper.GetVertexTransform(_frame, i);
                     node.Geometry.TransformVertex(i, vert);
@@ -51,7 +51,7 @@ namespace View3D.Commands.Object
 
         public void Undo()
         {
-            for (int i = 0; i < _meshNodes.Count; i++)
+            for (var i = 0; i < _meshNodes.Count; i++)
                 _meshNodes[i].Geometry = _originalGeometries[i];
         }
     }

@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
 using System.Windows.Input;
-using View3D.SceneNodes;
-using View3D.Services;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {

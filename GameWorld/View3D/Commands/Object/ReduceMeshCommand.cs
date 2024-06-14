@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
-using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
-using View3D.Services.MeshOptimization;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.MeshOptimization;
 
-namespace View3D.Commands.Object
+namespace GameWorld.Core.Commands.Object
 {
     public class ReduceMeshCommand : ICommand
     {
@@ -32,7 +33,7 @@ namespace View3D.Commands.Object
         public void Execute()
         {
             _oldState = _selectionManager.GetStateCopy();
-            
+
             foreach (var meshNode in _meshList)
             {
                 var originalMesh = meshNode.Geometry;
@@ -44,9 +45,9 @@ namespace View3D.Commands.Object
 
         public void Undo()
         {
-            for (int i = 0; i < _meshList.Count; i++)
+            for (var i = 0; i < _meshList.Count; i++)
                 _meshList[i].Geometry = _originalGeometry[i];
-            
+
             _selectionManager.SetState(_oldState);
         }
     }

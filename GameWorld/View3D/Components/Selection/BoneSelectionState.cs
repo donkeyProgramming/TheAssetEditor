@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using View3D.Animation;
-using View3D.SceneNodes;
+using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
 
-namespace View3D.Components.Component.Selection
+namespace GameWorld.Core.Components.Selection
 {
     public delegate void BoneModifiedEvent(BoneSelectionState state);
 
@@ -81,7 +81,7 @@ namespace View3D.Components.Component.Selection
                 CurrentFrame = CurrentFrame,
                 RenderObject = RenderObject,
                 EnableInverseKinematics = EnableInverseKinematics,
-                InverseKinematicsEndBoneIndex =  InverseKinematicsEndBoneIndex,
+                InverseKinematicsEndBoneIndex = InverseKinematicsEndBoneIndex,
             };
         }
 

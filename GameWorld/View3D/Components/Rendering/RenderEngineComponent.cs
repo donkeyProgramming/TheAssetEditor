@@ -1,12 +1,13 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Rendering;
+using GameWorld.Core.Utility;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Services;
 using System;
 using System.Collections.Generic;
-using View3D.Rendering;
 
-namespace View3D.Components.Rendering
+namespace GameWorld.Core.Components.Rendering
 {
     public enum RenderBuckedId
     {
@@ -89,7 +90,7 @@ namespace View3D.Components.Rendering
             _rasterStates[RasterizerStateEnum.Default].DepthClipEnable = true;
             _rasterStates[RasterizerStateEnum.Default].MultiSampleAntiAlias = true;
 
-            float depthOffsetBias = 0.00005f;
+            var depthOffsetBias = 0.00005f;
             _rasterStates[RasterizerStateEnum.Wireframe] = new RasterizerState();
             _rasterStates[RasterizerStateEnum.Wireframe].FillMode = FillMode.WireFrame;
             _rasterStates[RasterizerStateEnum.Wireframe].CullMode = cullMode;
@@ -145,7 +146,7 @@ namespace View3D.Components.Rendering
 
         public override void Draw(GameTime gameTime)
         {
-            CommonShaderParameters commonShaderParameters = new CommonShaderParameters()
+            var commonShaderParameters = new CommonShaderParameters()
             {
                 Projection = _camera.ProjectionMatrix,
                 View = _camera.ViewMatrix,

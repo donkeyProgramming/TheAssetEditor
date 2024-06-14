@@ -1,7 +1,7 @@
 ﻿using GameWorld.WpfWindow;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace View3D.Components
+namespace GameWorld.Core.Utility
 {
     public interface IDeviceResolver
     {
@@ -10,7 +10,7 @@ namespace View3D.Components
 
     public class DeviceResolver : IDeviceResolver
     {
-        private readonly  WpfGame _scene;
+        private readonly WpfGame _scene;
         public DeviceResolver(WpfGame game)
         {
             _scene = game;

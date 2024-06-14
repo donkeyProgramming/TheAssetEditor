@@ -1,21 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.Commands.Face;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering.Shading;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using GameWorld.WpfWindow.ResourceHandling;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Ui.Common;
-using View3D.Commands.Face;
-using View3D.Components.Component.Selection;
-using View3D.Components.Rendering;
-using View3D.Rendering.Shading;
-using View3D.SceneNodes;
-using View3D.Services;
 
-namespace View3D.Commands.Object
+namespace GameWorld.Core.Commands.Object
 {
     public class DivideObjectIntoSubmeshesCommand : ICommand
     {
-        ILogger _logger = Logging.Create<FaceSelectionCommand>();
+        readonly ILogger _logger = Logging.Create<FaceSelectionCommand>();
 
         IEditableGeometry _objectToSplit;
         bool _combineOverlappingVertexes;
@@ -29,7 +29,7 @@ namespace View3D.Commands.Object
         public string HintText { get => "Divide Object"; }
         public bool IsMutation { get => true; }
 
-        public DivideObjectIntoSubmeshesCommand( SelectionManager selectionManager, ResourceLibrary resourceLibary, RenderEngineComponent renderEngineComponent)
+        public DivideObjectIntoSubmeshesCommand(SelectionManager selectionManager, ResourceLibrary resourceLibary, RenderEngineComponent renderEngineComponent)
         {
             _selectionManager = selectionManager;
             _resourceLib = resourceLibary;
@@ -60,8 +60,8 @@ namespace View3D.Commands.Object
 
                 GroupNode currentGroupNode = null;
 
-                int counter = 0;
-                List<Rmv2MeshNode> createdMeshes = new List<Rmv2MeshNode>();
+                var counter = 0;
+                var createdMeshes = new List<Rmv2MeshNode>();
 
                 foreach (var mesh in newSplitMeshes)
                 {

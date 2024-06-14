@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Data;
-using View3D.SceneNodes;
+using GameWorld.Core.SceneNodes;
 
 namespace KitbasherEditor.ValueConverters
 {

@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
+using GameWorld.Core.Components.Selection;
 
-namespace View3D.Commands.Bone
+namespace GameWorld.Core.Commands.Bone
 {
     public class BoneSelectionCommand : ICommand
     {
-        SelectionManager _selectionManager;
+        readonly SelectionManager _selectionManager;
         ISelectionState _oldState;
 
-         BoneSelectionState  _hackOldState;
+        BoneSelectionState _hackOldState;
 
         bool _isAdd;
         bool _isRemove;
@@ -42,9 +41,9 @@ namespace View3D.Commands.Bone
             var currentState = _selectionManager.GetState() as BoneSelectionState;
             if (currentState != null)
             {
-                _hackOldState = (BoneSelectionState) currentState.Clone();
+                _hackOldState = (BoneSelectionState)currentState.Clone();
             }
-            if(currentState == null && _hackOldState != null)
+            if (currentState == null && _hackOldState != null)
             {
                 currentState = _hackOldState;
             }

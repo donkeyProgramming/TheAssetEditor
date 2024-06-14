@@ -1,30 +1,30 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Bone;
+using GameWorld.Core.Commands.Bone.Clipboard;
+using GameWorld.Core.Commands.Face;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.Commands.Vertex;
+using GameWorld.Core.Components;
+using GameWorld.Core.Components.Gizmo;
+using GameWorld.Core.Components.Input;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
+using GameWorld.Core.Services.SceneSaving;
+using GameWorld.Core.Services.SceneSaving.Geometry;
+using GameWorld.Core.Services.SceneSaving.Geometry.Strategies;
+using GameWorld.Core.Services.SceneSaving.Lod;
+using GameWorld.Core.Services.SceneSaving.Lod.Strategies;
+using GameWorld.Core.Services.SceneSaving.Material;
+using GameWorld.Core.Services.SceneSaving.Material.Strategies;
+using GameWorld.Core.Utility;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Shared.Core.DependencyInjection;
-using View3D.Commands;
-using View3D.Commands.Bone;
-using View3D.Commands.Bone.Clipboard;
-using View3D.Commands.Face;
-using View3D.Commands.Object;
-using View3D.Commands.Vertex;
-using View3D.Components;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
-using View3D.Components.Gizmo;
-using View3D.Components.Input;
-using View3D.Components.Rendering;
-using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
-using View3D.Services;
-using View3D.Services.SceneSaving;
-using View3D.Services.SceneSaving.Geometry;
-using View3D.Services.SceneSaving.Geometry.Strategies;
-using View3D.Services.SceneSaving.Lod;
-using View3D.Services.SceneSaving.Lod.Strategies;
-using View3D.Services.SceneSaving.Material.Strategies;
-using View3D.Services.SceneSaving.WsModel;
 
-namespace View3D
+namespace GameWorld.Core
 {
     public class DependencyInjectionContainer : DependencyContainer
     {
@@ -32,7 +32,7 @@ namespace View3D
         {
             // Graphics scene
             serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
-          
+
             // Services
             serviceCollection.AddScoped<ViewOnlySelectedService>();
             serviceCollection.AddScoped<FocusSelectableObjectService>();
@@ -60,7 +60,7 @@ namespace View3D
             serviceCollection.AddScoped<IMaterialStrategy, Warhammer3WsModelStrategy>();
             serviceCollection.AddScoped<IMaterialStrategy, Warhammer2WsModelStrategy>();
             serviceCollection.AddScoped<IMaterialStrategy, NoWsModelStrategy>();
-            
+
 
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolver>();
@@ -78,7 +78,7 @@ namespace View3D
             RegisterGameComponent<CommandStackRenderer>(serviceCollection);
             RegisterGameComponent<KeyboardComponent>(serviceCollection);
             RegisterGameComponent<MouseComponent>(serviceCollection);
-        
+
             RegisterGameComponent<FpsComponent>(serviceCollection);
             RegisterGameComponent<ArcBallCamera>(serviceCollection);
             RegisterGameComponent<SceneManager>(serviceCollection);

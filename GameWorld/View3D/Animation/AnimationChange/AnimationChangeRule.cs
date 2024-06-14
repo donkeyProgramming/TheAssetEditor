@@ -1,4 +1,4 @@
-﻿namespace View3D.Animation.AnimationChange
+﻿namespace GameWorld.Core.Animation.AnimationChange
 {
     public interface IAnimationChangeRule
     {

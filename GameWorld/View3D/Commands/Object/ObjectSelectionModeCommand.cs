@@ -1,7 +1,8 @@
-﻿using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
 
-namespace View3D.Commands.Object
+namespace GameWorld.Core.Commands.Object
 {
 
     public class ObjectSelectionModeCommand : ICommand

@@ -1,13 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Animation.AnimationChange;
+using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Animation.AnimationChange;
 
-namespace View3D.Animation
+namespace GameWorld.Core.Animation
 {
     public class AnimationSampler
     {
@@ -32,7 +32,7 @@ namespace View3D.Animation
                 }
 
                 // Compute the worldspace values
-                for (int boneIndex = 0; boneIndex < currentFrame.BoneTransforms.Count(); boneIndex++)
+                for (var boneIndex = 0; boneIndex < currentFrame.BoneTransforms.Count(); boneIndex++)
                 {
                     currentFrame.BoneTransforms[boneIndex].ComputeWorldMatrixFromComponents();
                     if (animationChangeRules != null)
@@ -57,7 +57,7 @@ namespace View3D.Animation
 
                 // Remove the skeleten info from the world transform.
                 // This is applied again in the animation shader.
-                for (int boneIndex = 0; boneIndex < skeleton.BoneCount; boneIndex++)
+                for (var boneIndex = 0; boneIndex < skeleton.BoneCount; boneIndex++)
                 {
                     var inv = Matrix.Invert(skeleton.GetWorldTransform(boneIndex));
                     currentFrame.BoneTransforms[boneIndex].WorldTransform = Matrix.Multiply(inv, currentFrame.BoneTransforms[boneIndex].WorldTransform);
@@ -67,7 +67,7 @@ namespace View3D.Animation
             }
             catch (Exception e)
             {
-                ILogger logger = Logging.Create<AnimationSampler>();
+                var logger = Logging.Create<AnimationSampler>();
                 logger.Error(e.Message);
                 throw;
             }
@@ -95,7 +95,7 @@ namespace View3D.Animation
                 }
 
                 // Compute the worldspace values
-                for (int boneIndex = 0; boneIndex < currentFrame.BoneTransforms.Count(); boneIndex++)
+                for (var boneIndex = 0; boneIndex < currentFrame.BoneTransforms.Count(); boneIndex++)
                 {
                     currentFrame.BoneTransforms[boneIndex].ComputeWorldMatrixFromComponents();
                     if (animationChangeRules != null)
@@ -120,7 +120,7 @@ namespace View3D.Animation
 
                 // Remove the skeleten info from the world transform.
                 // This is applied again in the animation shader.
-                for (int boneIndex = 0; boneIndex < skeleton.BoneCount; boneIndex++)
+                for (var boneIndex = 0; boneIndex < skeleton.BoneCount; boneIndex++)
                 {
                     var inv = Matrix.Invert(skeleton.GetWorldTransform(boneIndex));
                     currentFrame.BoneTransforms[boneIndex].WorldTransform = Matrix.Multiply(inv, currentFrame.BoneTransforms[boneIndex].WorldTransform);
@@ -130,7 +130,7 @@ namespace View3D.Animation
             }
             catch (Exception e)
             {
-                ILogger logger = Logging.Create<AnimationSampler>();
+                var logger = Logging.Create<AnimationSampler>();
                 logger.Error(e.Message);
                 throw;
             }
@@ -142,25 +142,25 @@ namespace View3D.Animation
             try
             {
                 var clampedT = MathUtil.EnsureRange(t_between_0_and_1, 0, 1);
-                int frameIndex = 0;
+                var frameIndex = 0;
                 float frameIterpolation = 0;
 
                 if (animationClip != null)
                 {
-                    int maxFrames = animationClip.DynamicFrames.Count() - 1;
+                    var maxFrames = animationClip.DynamicFrames.Count() - 1;
                     if (maxFrames < 0)
                         maxFrames = 0;
-                    float frameWithLeftover = maxFrames * clampedT;
-                    float clampedFrame = (float)Math.Round(frameWithLeftover);
+                    var frameWithLeftover = maxFrames * clampedT;
+                    var clampedFrame = (float)Math.Round(frameWithLeftover);
 
-                    frameIndex = (int)(clampedFrame);
+                    frameIndex = (int)clampedFrame;
                     frameIterpolation = frameWithLeftover - clampedFrame;
                 }
                 return Sample(frameIndex, frameIterpolation, skeleton, animationClip, animationChangeRules, freezeFrame);
             }
             catch (Exception e)
             {
-                ILogger logger = Logging.Create<AnimationSampler>();
+                var logger = Logging.Create<AnimationSampler>();
                 logger.Error(e.Message);
                 throw;
             }
@@ -168,7 +168,7 @@ namespace View3D.Animation
 
         static AnimationClip.KeyFrame GetKeyFrameFromIndex(List<AnimationClip.KeyFrame> keyframes, int frameIndex)
         {
-            int count = keyframes.Count();
+            var count = keyframes.Count();
             if (frameIndex >= count)
                 return null;
 
@@ -210,12 +210,12 @@ namespace View3D.Animation
             var skeletonBoneCount = finalAnimationFrame.BoneTransforms.Count();
             var animBoneCount = currentFrame.GetBoneCountFromFrame();
             var boneCount = Math.Min(skeletonBoneCount, animBoneCount);
-            if(freezeFrame)
+            if (freezeFrame)
             {
                 if (animationInterpolation < 0) animationInterpolation = 0;
                 if (animationInterpolation > 0) animationInterpolation = 1;
             }
-            for (int boneIndex = 0; boneIndex < boneCount; boneIndex++)
+            for (var boneIndex = 0; boneIndex < boneCount; boneIndex++)
             {
                 finalAnimationFrame.BoneTransforms[boneIndex].Translation = ComputeTranslationCurrentFrame(boneIndex, currentFrame, nextFrame, animationInterpolation);
                 finalAnimationFrame.BoneTransforms[boneIndex].Rotation = ComputeRotationCurrentFrame(boneIndex, currentFrame, nextFrame, animationInterpolation);

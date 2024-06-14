@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -12,10 +14,8 @@ using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.LodHeader;
-using View3D.Animation;
-using View3D.SceneNodes;
 
-namespace View3D.Services.SceneSaving.Geometry
+namespace GameWorld.Core.Services.SceneSaving.Geometry
 {
     public class SceneSaverService
     {

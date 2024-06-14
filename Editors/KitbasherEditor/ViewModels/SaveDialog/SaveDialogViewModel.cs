@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
+using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving;
+using GameWorld.Core.Services.SceneSaving.Geometry;
+using GameWorld.Core.Services.SceneSaving.Lod;
+using GameWorld.Core.Services.SceneSaving.Material;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using View3D.Components.Component;
-using View3D.SceneNodes;
-using View3D.Services.SceneSaving;
-using View3D.Services.SceneSaving.Geometry;
-using View3D.Services.SceneSaving.Lod;
-using View3D.Services.SceneSaving.WsModel;
 
 namespace KitbasherEditor.ViewModels.SaveDialog
 {

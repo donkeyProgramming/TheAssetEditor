@@ -1,7 +1,4 @@
-﻿using View3D.SceneNodes;
-using View3D.Services.SceneSaving.Lod.MeshDecimatorIntegration;
-
-namespace View3D.Services.SceneSaving.Lod.Strategies
+﻿namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
     //public class SimplygonLodGeneration : OptimizedLodGeneratorBase, ILodGenerationStrategy
     //{

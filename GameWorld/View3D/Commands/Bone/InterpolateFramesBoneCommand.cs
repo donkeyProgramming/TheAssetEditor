@@ -1,6 +1,7 @@
-﻿using View3D.Animation;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
 
-namespace View3D.Commands.Bone
+namespace GameWorld.Core.Commands.Bone
 {
     public class InterpolateFramesBoneCommand : ICommand
     {
@@ -21,7 +22,7 @@ namespace View3D.Commands.Bone
 
 
         public void Configure(AnimationClip animation, int frameNrToInterpolate, int frameANr,
-            int frameBNr, GameSkeleton skeleton, float interpolationValue, 
+            int frameBNr, GameSkeleton skeleton, float interpolationValue,
             bool interpolatePosition = true, bool interpolateRotation = true, bool interpolateScale = true)
         {
             _frameNr = frameNrToInterpolate;
@@ -39,14 +40,14 @@ namespace View3D.Commands.Bone
         public void Execute()
         {
             var sampledFrame = AnimationSampler.SampleBetween2Frames(_frameANr, _frameBNr, _interpolationValue, _skeleton, _animationBackup);
-            for (int i = 0; i < sampledFrame.BoneTransforms.Count; i++)
+            for (var i = 0; i < sampledFrame.BoneTransforms.Count; i++)
             {
                 if (_interpolatePosition) _target.DynamicFrames[_frameNr].Position[i] = sampledFrame.BoneTransforms[i].Translation;
-                if(_interpolateRotation) _target.DynamicFrames[_frameNr].Rotation[i] = sampledFrame.BoneTransforms[i].Rotation;
+                if (_interpolateRotation) _target.DynamicFrames[_frameNr].Rotation[i] = sampledFrame.BoneTransforms[i].Rotation;
                 if (_interpolateScale) _target.DynamicFrames[_frameNr].Scale[i] = sampledFrame.BoneTransforms[i].Scale;
 
             }
-           
+
         }
 
         public void Undo()

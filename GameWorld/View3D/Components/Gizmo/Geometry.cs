@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace View3D.Components.Gizmo
+namespace GameWorld.Core.Components.Gizmo
 {
     internal class GizmoModel
     {
@@ -13,7 +13,7 @@ namespace View3D.Components.Gizmo
             Indices = indices;
             var texdata = new[] { new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1) };
             Vertices = new VertexPositionNormalTexture[positions.Length];
-            for (int i = 0; i < positions.Length; i++)
+            for (var i = 0; i < positions.Length; i++)
                 Vertices[i] = new VertexPositionNormalTexture(positions[i], normals[i], texdata[i % 3]);
         }
     }

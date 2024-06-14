@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Animation;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.Animation;
-using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
 
-namespace View3D.Utility
+namespace GameWorld.Core.Utility
 {
     public static class IntersectionMath
     {
@@ -17,15 +17,15 @@ namespace View3D.Utility
 
         public static float? IntersectVertex(Ray ray, MeshObject geometry, Vector3 cameraPos, Matrix matrix, out int selectedVertex)
         {
-            Matrix inverseTransform = Matrix.Invert(matrix);
+            var inverseTransform = Matrix.Invert(matrix);
             ray.Position = Vector3.Transform(ray.Position, inverseTransform);
             ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
             cameraPos = Vector3.Transform(cameraPos, inverseTransform);
 
             var vertexList = geometry.GetVertexList();
-            float bestDistance = float.MaxValue;
+            var bestDistance = float.MaxValue;
             selectedVertex = -1;
-            for (int i = 0; i < vertexList.Count; i++)
+            for (var i = 0; i < vertexList.Count; i++)
             {
                 var distance = (cameraPos - vertexList[i]).Length();
                 var distanceScale = 0.0025f * distance * 1.5f;
@@ -53,13 +53,13 @@ namespace View3D.Utility
         {
             face = null;
 
-            Matrix inverseTransform = Matrix.Invert(matrix);
+            var inverseTransform = Matrix.Invert(matrix);
             ray.Position = Vector3.Transform(ray.Position, inverseTransform);
             ray.Direction = Vector3.TransformNormal(ray.Direction, inverseTransform);
 
-            int faceIndex = -1;
-            float bestDistance = float.MaxValue;
-            for (int i = 0; i < geometry.GetIndexCount(); i += 3)
+            var faceIndex = -1;
+            var bestDistance = float.MaxValue;
+            for (var i = 0; i < geometry.GetIndexCount(); i += 3)
             {
                 var index0 = geometry.GetIndex(i + 0);
                 var index1 = geometry.GetIndex(i + 1);
@@ -69,7 +69,7 @@ namespace View3D.Utility
                 var vert1 = geometry.GetVertexById(index1);
                 var vert2 = geometry.GetVertexById(index2);
 
-                var res = IntersectionMath.MollerTrumboreIntersection(ray, vert0, vert1, vert2, out var intersectionPoint);
+                var res = MollerTrumboreIntersection(ray, vert0, vert1, vert2, out var intersectionPoint);
                 if (res)
                 {
                     var dist = intersectionPoint;
@@ -90,7 +90,7 @@ namespace View3D.Utility
 
         public static bool IntersectObject(BoundingFrustum boundingFrustum, MeshObject geometry, Matrix matrix)
         {
-            for (int i = 0; i < geometry.VertexCount(); i++)
+            for (var i = 0; i < geometry.VertexCount(); i++)
             {
                 if (boundingFrustum.Contains(Vector3.Transform(geometry.GetVertexById(i), matrix)) != ContainmentType.Disjoint)
                     return true;
@@ -107,10 +107,10 @@ namespace View3D.Utility
             var vertList = geometry.GetVertexList();
 
             var transformedVertList = new Vector3[vertList.Count];
-            for (int i = 0; i < vertList.Count; i++)
+            for (var i = 0; i < vertList.Count; i++)
                 transformedVertList[i] = Vector3.Transform(vertList[i], matrix);
 
-            for (int i = 0; i < indexList.Count; i += 3)
+            for (var i = 0; i < indexList.Count; i += 3)
             {
                 var index0 = indexList[i + 0];
                 var index1 = indexList[i + 1];
@@ -133,7 +133,7 @@ namespace View3D.Utility
         {
             vertices = new List<int>();
 
-            for (int i = 0; i < geometry.GetIndexCount(); i++)
+            for (var i = 0; i < geometry.GetIndexCount(); i++)
             {
                 var index = geometry.GetIndex(i);
 
@@ -149,9 +149,9 @@ namespace View3D.Utility
         public static ushort FindClosestVertexIndex(MeshObject mesh, Vector3 point, out float distance)
         {
             var closestDist = float.PositiveInfinity;
-            int bestVertexIndex = -1;
+            var bestVertexIndex = -1;
 
-            for (int i = 0; i < mesh.VertexArray.Length; i++)
+            for (var i = 0; i < mesh.VertexArray.Length; i++)
             {
                 var dist = (point - mesh.VertexArray[i].Position3()).LengthSquared();
                 if (dist < closestDist)
@@ -196,7 +196,7 @@ namespace View3D.Utility
                 return false;
             }
             // At this stage we can compute t to find out where the intersection point is on the line.
-            float t = f * Vector3.Dot(edge2, q);
+            var t = f * Vector3.Dot(edge2, q);
             if (t > EPSILON) // ray intersection
             {
                 distance = t;
@@ -221,7 +221,7 @@ namespace View3D.Utility
             if (currentFrame == null) return false;
             var totalBones = currentFrame.BoneTransforms.Count;
 
-            for (int boneIdx = 0; boneIdx < totalBones; boneIdx++)
+            for (var boneIdx = 0; boneIdx < totalBones; boneIdx++)
             {
                 var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
                 bone.Decompose(out var _, out var _, out var trans);

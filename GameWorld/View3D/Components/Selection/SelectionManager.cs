@@ -1,14 +1,15 @@
 ﻿using System;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering;
+using GameWorld.Core.Rendering.RenderItems;
+using GameWorld.Core.Rendering.Shading;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
-using View3D.Components.Rendering;
-using View3D.Rendering;
-using View3D.Rendering.RenderItems;
-using View3D.Rendering.Shading;
-using View3D.SceneNodes;
 
-namespace View3D.Components.Component.Selection
+namespace GameWorld.Core.Components.Selection
 {
     public class SelectionChangedEvent
     {
@@ -77,7 +78,7 @@ namespace View3D.Components.Component.Selection
                     _currentState = new VertexSelectionState(selectedObj, _vertexSelectionFallof);
                     break;
                 case GeometrySelectionMode.Bone:
-                    _currentState = new BoneSelectionState(selectedObj); 
+                    _currentState = new BoneSelectionState(selectedObj);
                     break;
 
                 default:
@@ -137,7 +138,7 @@ namespace View3D.Components.Component.Selection
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = vertexObject.RenderMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
             }
 
-            if(selectionState is BoneSelectionState selectionBoneState && selectionBoneState.RenderObject != null)
+            if (selectionState is BoneSelectionState selectionBoneState && selectionBoneState.RenderObject != null)
             {
                 var sceneNode = selectionBoneState.RenderObject as Rmv2MeshNode;
                 var animPlayer = sceneNode.AnimationPlayer;

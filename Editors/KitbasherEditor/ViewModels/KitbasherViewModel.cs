@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using GameWorld.Core.Services;
+using GameWorld.Core.Services.SceneSaving;
 using GameWorld.WpfWindow;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.DependencyInjection;
@@ -9,8 +11,6 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.Common;
-using View3D.Components.Component;
-using View3D.Services.SceneSaving;
 
 namespace KitbasherEditor.ViewModels
 {

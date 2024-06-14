@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.Components;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
-using View3D.Components.Rendering;
-using View3D.SceneNodes;
 
-namespace View3D.Services
+namespace GameWorld.Core.Services
 {
     public class FocusSelectableObjectService
     {
-        private readonly  ILogger _logger = Logging.Create<FocusSelectableObjectService>();
+        private readonly ILogger _logger = Logging.Create<FocusSelectableObjectService>();
         private readonly SelectionManager _selectionManager;
         private readonly ArcBallCamera _arcBallCamera;
         private readonly SceneManager _sceneManager;
@@ -28,7 +28,7 @@ namespace View3D.Services
         public void LookAt(Vector3 position) => _arcBallCamera.LookAt = position;
 
         public void FocusSelection() => Focus(_selectionManager.GetState());
-        
+
         public void FocusScene()
         {
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
@@ -47,8 +47,8 @@ namespace View3D.Services
                 return;
 
             // Create a suber bb
-            BoundingBox bb = items[0].Geometry.BoundingBox;
-            for (int i = 1; i < items.Count; i++)
+            var bb = items[0].Geometry.BoundingBox;
+            for (var i = 1; i < items.Count; i++)
                 bb = BoundingBox.CreateMerged(bb, items[i].Geometry.BoundingBox);
 
             var bbCorners = bb.GetCorners();
@@ -56,7 +56,7 @@ namespace View3D.Services
 
             double fov = MathHelper.ToRadians(45);
             double boundSphereRadius = bbCorners.Select(x => Vector3.Distance(x, bbCenter)).Max();
-            double camDistance = boundSphereRadius * 2.0 / Math.Tan(fov / 2.0) / 2;
+            var camDistance = boundSphereRadius * 2.0 / Math.Tan(fov / 2.0) / 2;
 
             _arcBallCamera.LookAt = bbCenter;
             _arcBallCamera.Zoom = (float)camDistance;

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Utility;
 using Shared.Core.ErrorHandling;
-using View3D.Commands;
-using View3D.Commands.Object;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
-using View3D.Utility;
 
-namespace View3D.Services
+namespace GameWorld.Core.Services
 {
     public class ObjectEditor
     {
@@ -111,15 +111,15 @@ namespace View3D.Services
         public void SortMeshes(ISceneNode node)
         {
             var children = new List<ISceneNode>(node.Children);
-            for (int i = 0; i < children.Count; i++)
+            for (var i = 0; i < children.Count; i++)
                 node.RemoveObject(children[i]);
 
             children.Sort((x, y) => x.Name.CompareTo(y.Name));
 
-            for (int i = 0; i < children.Count; i++)
+            for (var i = 0; i < children.Count; i++)
                 node.AddObject(children[i]);
 
-            for (int i = 0; i < children.Count; i++)
+            for (var i = 0; i < children.Count; i++)
             {
                 if (children[i] is GroupNode)
                     SortMeshes(children[i]);

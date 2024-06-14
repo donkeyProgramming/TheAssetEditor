@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Components.Gizmo;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
-using View3D.Animation;
-using View3D.Components.Component.Selection;
-using View3D.Components.Gizmo;
-using View3D.SceneNodes;
-using static View3D.Animation.AnimationClip;
+using static GameWorld.Core.Animation.AnimationClip;
 
-namespace View3D.Commands.Bone
+namespace GameWorld.Core.Commands.Bone
 {
     public class TransformBoneCommand : ICommand
     {
         List<int> _selectedBones;
         BoneSelectionState _boneSelectionState;
         int _currentFrame;
-        AnimationClip.KeyFrame _oldFrame;
+        KeyFrame _oldFrame;
         public Matrix Transform { get; set; }
 
         public string HintText => "Bone Transform";
@@ -49,7 +50,7 @@ namespace View3D.Commands.Bone
             //    ApplyTransformationInverseKinematic(newPosition, _selectedBones[0], _boneSelectionState.InverseKinematicsEndBoneIndex);
             //    return;
             //}
-            if (_oldTransform ==  Matrix.Identity)
+            if (_oldTransform == Matrix.Identity)
             {
                 _oldTransform = newPosition;
                 return;
@@ -96,7 +97,7 @@ namespace View3D.Commands.Bone
 
         public Matrix GetSkeletonAnimatedBoneFromWorld(AnimationFrame frame, GameSkeleton gameSkeleton, int boneIndex, Matrix objectInWorldTransform)
         {
-            Matrix output = objectInWorldTransform * Matrix.Invert(frame.GetSkeletonAnimatedWorld(gameSkeleton, boneIndex));
+            var output = objectInWorldTransform * Matrix.Invert(frame.GetSkeletonAnimatedWorld(gameSkeleton, boneIndex));
             return output;
         }
 
@@ -108,22 +109,22 @@ namespace View3D.Commands.Bone
             var currentAnimFrame = animationPlayer.GetCurrentAnimationFrame();
 
             // Get the chain of bones from startBone to endBone
-            int boneCount = 1;
-            int boneIndex = startBone;
+            var boneCount = 1;
+            var boneIndex = startBone;
             while (boneIndex != endBone)
             {
                 boneIndex = currentAnimFrame.GetParentBoneIndex(_boneSelectionState.Skeleton, boneIndex);
                 boneCount++;
             }
             boneIndex = startBone;
-            Vector3[] positions = new Vector3[boneCount];
-            Quaternion[] rotations = new Quaternion[boneCount];
-            float[] boneLengths = new float[boneCount - 1];
-            int[] boneIndices = new int[boneCount];
+            var positions = new Vector3[boneCount];
+            var rotations = new Quaternion[boneCount];
+            var boneLengths = new float[boneCount - 1];
+            var boneIndices = new int[boneCount];
             float totalLength = 0;
 
 
-            for (int i = 0; i < boneCount; i++)
+            for (var i = 0; i < boneCount; i++)
             {
                 var transform = Matrix.CreateScale(1);
                 // Get the current bone world transform
@@ -132,7 +133,7 @@ namespace View3D.Commands.Bone
                 // Store the position and rotation of the current bone
                 positions[i] = currentBoneWorldTransform.Translation;
                 currentBoneWorldTransform.Decompose(out _, out var rotation, out _);
-                rotations[i] =  rotation;
+                rotations[i] = rotation;
                 boneIndices[i] = boneIndex;
 
                 // Calculate the length of the bone and add it to the total length
@@ -150,18 +151,18 @@ namespace View3D.Commands.Bone
             if (Vector3.Distance(newPosition.Translation, positions[0]) > totalLength)
             {
                 // The target is unreachable, move the end effector towards the target
-                for (int i = boneCount - 2; i >= 0; i--)
+                for (var i = boneCount - 2; i >= 0; i--)
                 {
                     positions[i + 1] = newPosition.Translation;
-                    Vector3 direction = Vector3.Normalize(positions[i] - positions[i + 1]);
+                    var direction = Vector3.Normalize(positions[i] - positions[i + 1]);
                     positions[i] = positions[i + 1] + direction * boneLengths[i];
                 }
             }
             else
             {
                 // The target is reachable, apply the FABRIK algorithm
-                Vector3 rootPosition = positions[0];
-                float tolerance = 0.01f;
+                var rootPosition = positions[0];
+                var tolerance = 0.01f;
                 while (Vector3.Distance(newPosition.Translation, positions[boneCount - 1]) > tolerance)
                 {
                     // Stage 1: Forward reaching
@@ -172,16 +173,16 @@ namespace View3D.Commands.Bone
                 }
 
                 // Update the position and rotation of each bone in the chain
-                for (int i = 0; i < boneCount - 1; i++)
+                for (var i = 0; i < boneCount - 1; i++)
                 {
                     _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Position[boneIndices[i]] = positions[i];
                     continue;
-                    if (i < boneCount - 1)
-                    {
-                        Vector3 direction = Vector3.Normalize(positions[i + 1] - positions[i]);
-                        Quaternion rotation = Quaternion.CreateFromAxisAngle(Vector3.Cross(Vector3.UnitX, direction), (float)Math.Acos(Vector3.Dot(Vector3.UnitX, direction)));
-                        _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Rotation[boneIndices[i]] = rotation;
-                    }
+                    //if (i < boneCount - 1)
+                    //{
+                    //    var direction = Vector3.Normalize(positions[i + 1] - positions[i]);
+                    //    var rotation = Quaternion.CreateFromAxisAngle(Vector3.Cross(Vector3.UnitX, direction), (float)Math.Acos(Vector3.Dot(Vector3.UnitX, direction)));
+                    //    _boneSelectionState.CurrentAnimation.DynamicFrames[_currentFrame].Rotation[boneIndices[i]] = rotation;
+                    //}
                 }
             }
 
@@ -193,7 +194,7 @@ namespace View3D.Commands.Bone
             if (index < 0) return;
 
             positions[index + 1] = targetPosition;
-            Vector3 direction = Vector3.Normalize(positions[index] - positions[index + 1]);
+            var direction = Vector3.Normalize(positions[index] - positions[index + 1]);
             positions[index] = positions[index + 1] + direction * boneLengths[index];
 
             ForwardReaching(positions, boneLengths, positions[index], index - 1);
@@ -205,7 +206,7 @@ namespace View3D.Commands.Bone
             if (index >= positions.Length - 1) return;
 
             positions[index] = rootPosition;
-            Vector3 direction = Vector3.Normalize(positions[index + 1] - positions[index]);
+            var direction = Vector3.Normalize(positions[index + 1] - positions[index]);
             positions[index + 1] = positions[index] + direction * boneLengths[index];
 
             BackwardReaching(positions, boneLengths, positions[index + 1], index + 1);
@@ -213,12 +214,12 @@ namespace View3D.Commands.Bone
 
         public static void CompareKeyFrames(KeyFrame A, KeyFrame B)
         {
-            for (int j = 0; j < A.Position.Count; j++)
+            for (var j = 0; j < A.Position.Count; j++)
             {
                 var posDiff = A.Position[j] - B.Position[j];
                 var rotDiff = A.Rotation[j].ToVector4() - B.Rotation[j].ToVector4();
                 var scaleDiff = A.Scale[j] - B.Scale[j];
-                if(posDiff != new Vector3(0) || rotDiff != new Vector4(0) || scaleDiff != new Vector3(0))
+                if (posDiff != new Vector3(0) || rotDiff != new Vector4(0) || scaleDiff != new Vector3(0))
                     Console.WriteLine($"Bone {j}: Position difference: {posDiff}, Rotation difference: {rotDiff}, Scale difference: {scaleDiff}");
             }
         }

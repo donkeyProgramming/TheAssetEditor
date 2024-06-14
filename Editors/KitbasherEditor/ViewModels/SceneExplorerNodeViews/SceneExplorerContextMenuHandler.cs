@@ -1,14 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
-using View3D.Commands;
-using View3D.Commands.Object;
-using View3D.Components.Component;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {

@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace View3D.Animation
+namespace GameWorld.Core.Animation
 {
     public class GameSkeleton
     {
@@ -34,8 +34,8 @@ namespace View3D.Animation
             SkeletonName = skeletonFile.Header.SkeletonName;
             AnimationPlayer = animationPlayer;
 
-            int skeletonAnimFrameIndex = 0;
-            for (int i = 0; i < boneCount; i++)
+            var skeletonAnimFrameIndex = 0;
+            for (var i = 0; i < boneCount; i++)
             {
                 _parentBoneIds[i] = skeletonFile.Bones[i].ParentId;
                 BoneNames[i] = skeletonFile.Bones[i].Name;
@@ -61,7 +61,7 @@ namespace View3D.Animation
         public void RebuildSkeletonMatrix()
         {
             _worldTransform = new List<Matrix>(new Matrix[BoneCount]);
-            for (int i = 0; i < BoneCount; i++)
+            for (var i = 0; i < BoneCount; i++)
             {
                 var translationMatrix = Matrix.CreateTranslation(Translation[i]);
                 var rotationMatrix = Matrix.CreateFromQuaternion(Rotation[i]);
@@ -70,7 +70,7 @@ namespace View3D.Animation
                 _worldTransform[i] = transform;
             }
 
-            for (int i = 0; i < BoneCount; i++)
+            for (var i = 0; i < BoneCount; i++)
             {
                 var parentIndex = GetParentBoneIndex(i);
                 if (parentIndex == -1)
@@ -122,7 +122,7 @@ namespace View3D.Animation
 
         public int GetBoneIndexByName(string name)
         {
-            for (int i = 0; i < BoneNames.Count(); i++)
+            for (var i = 0; i < BoneNames.Count(); i++)
             {
                 if (BoneNames[i] == name)
                     return i;
@@ -159,7 +159,7 @@ namespace View3D.Animation
         public List<int> GetDirectChildBones(int parentBoneIndex)
         {
             var output = new List<int>();
-            for (int i = 0; i < _parentBoneIds.Count; i++)
+            for (var i = 0; i < _parentBoneIds.Count; i++)
             {
                 if (_parentBoneIds[i] == parentBoneIndex)
                     output.Add(i);
@@ -170,7 +170,7 @@ namespace View3D.Animation
         public List<int> GetAllChildBones(int parentBoneIndex)
         {
             var output = new List<int>();
-            for (int i = 0; i < _parentBoneIds.Count; i++)
+            for (var i = 0; i < _parentBoneIds.Count; i++)
             {
                 if (_parentBoneIds[i] == parentBoneIndex)
                 {
@@ -185,7 +185,7 @@ namespace View3D.Animation
         public AnimationFrame ConvertToAnimationFrame()
         {
             var currentFrame = new AnimationFrame();
-            for (int i = 0; i < BoneCount; i++)
+            for (var i = 0; i < BoneCount; i++)
             {
                 currentFrame.BoneTransforms.Add(new AnimationFrame.BoneKeyFrame()
                 {
@@ -204,13 +204,13 @@ namespace View3D.Animation
         public AnimInvMatrixFile CreateInvMatrixFile()
         {
             if (HasBoneScale())
-                throw new System.Exception("Skeleton contains scale and can not be saved. Bake first");
+                throw new Exception("Skeleton contains scale and can not be saved. Bake first");
 
             var output = new AnimInvMatrixFile();
 
             output.Version = 1;
             output.MatrixList = new Matrix[_worldTransform.Count];
-            for (int i = 0; i < _worldTransform.Count; i++)
+            for (var i = 0; i < _worldTransform.Count; i++)
                 output.MatrixList[i] = Matrix.Transpose(Matrix.Invert(_worldTransform[i]));
 
             return output;
@@ -248,13 +248,13 @@ namespace View3D.Animation
 
         public void BakeScaleIntoSkeleton()
         {
-            for (int i = 0; i < BoneCount; i++)
+            for (var i = 0; i < BoneCount; i++)
             {
-                float scale = GetAccumulatedBoneScale(i);
+                var scale = GetAccumulatedBoneScale(i);
                 Translation[i] = Translation[i] * scale;
             }
 
-            for (int i = 0; i < BoneCount; i++)
+            for (var i = 0; i < BoneCount; i++)
                 Scale[i] = 1;
             RebuildSkeletonMatrix();
         }
@@ -285,7 +285,7 @@ namespace View3D.Animation
                     BoneId = 0,
                     Parent = null,
                 };
-                for (int i = 1; i < skeleton.BoneCount; i++)
+                for (var i = 1; i < skeleton.BoneCount; i++)
                 {
                     Console.WriteLine($"Adding bone {i}");
                     var parentBoneId = skeleton.GetParentBoneIndex(i);

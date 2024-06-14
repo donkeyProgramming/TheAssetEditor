@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using View3D.Animation;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
 
-namespace View3D.Commands.Bone
+namespace GameWorld.Core.Commands.Bone
 {
     public class InterpolateFramesSelectedBonesBoneCommand : ICommand
     {

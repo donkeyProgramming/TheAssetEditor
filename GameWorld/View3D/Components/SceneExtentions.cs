@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace View3D.Components.Component
+namespace GameWorld.Core.Components
 {
     public static class SceneExtentions
     {
@@ -19,14 +19,14 @@ namespace View3D.Components.Component
 
         private static IEnumerable<T> depthFirstTraversal<T>(this T node, Func<T, IEnumerable<T>> childs, Func<T, bool> condition)
         {
-            IEnumerable<T> childrens = childs(node);
+            var childrens = childs(node);
             if (childrens == null)
                 yield break;
             if (condition(node))
                 yield return node;
-            foreach (T i in childrens)
+            foreach (var i in childrens)
             {
-                foreach (T j in depthFirstTraversal(i, childs, condition))
+                foreach (var j in i.depthFirstTraversal(childs, condition))
                 {
                     if (condition(j))
                         yield return j;
@@ -36,17 +36,17 @@ namespace View3D.Components.Component
 
         private static IEnumerable<T> breadthFirstTraversal<T>(this T node, Func<T, IEnumerable<T>> childs, Func<T, bool> condition)
         {
-            Queue<T> queue = new Queue<T>();
+            var queue = new Queue<T>();
             queue.Enqueue(node);
             while (queue.Count > 0)
             {
-                T currentnode = queue.Dequeue();
+                var currentnode = queue.Dequeue();
                 if (condition(currentnode))
                     yield return currentnode;
-                IEnumerable<T> childrens = childs(currentnode);
+                var childrens = childs(currentnode);
                 if (childrens != null)
                 {
-                    foreach (T child in childrens)
+                    foreach (var child in childrens)
                         queue.Enqueue(child);
                 }
             }
@@ -54,11 +54,11 @@ namespace View3D.Components.Component
 
         private static IEnumerable<T> depthFirstTraversalWithoutStackoverflow<T>(this T node, Func<T, IEnumerable<T>> childs, Func<T, bool> condition)
         {
-            Stack<T> stack = new Stack<T>();
+            var stack = new Stack<T>();
             stack.Push(node);
             while (stack.Count > 0)
             {
-                T currentnode = stack.Pop();
+                var currentnode = stack.Pop();
                 if (condition(currentnode))
                     yield return currentnode;
                 var childrens = childs(currentnode);

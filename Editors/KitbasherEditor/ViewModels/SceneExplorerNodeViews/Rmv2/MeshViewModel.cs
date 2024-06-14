@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel;
@@ -6,8 +8,6 @@ using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.Ui.BaseDialogs.MathViews;
 using System.Windows;
 using System.Windows.Input;
-using View3D.Components.Component;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {

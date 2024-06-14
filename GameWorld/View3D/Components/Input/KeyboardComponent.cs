@@ -3,7 +3,7 @@ using GameWorld.WpfWindow.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace View3D.Components.Input
+namespace GameWorld.Core.Components.Input
 {
     public delegate void KeybordButtonReleasedDelegate(Keys key);
 
@@ -47,7 +47,7 @@ namespace View3D.Components.Input
 
         public bool IsKeyComboReleased(Keys key, Keys modificationKey)
         {
-            var value = (IsKeyReleased(key) && IsKeyDownOrReleased(modificationKey));
+            var value = IsKeyReleased(key) && IsKeyDownOrReleased(modificationKey);
             return value;
         }
 

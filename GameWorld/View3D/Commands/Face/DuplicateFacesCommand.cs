@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
 
-namespace View3D.Commands.Face
+namespace GameWorld.Core.Commands.Face
 {
     public class DuplicateFacesCommand : ICommand
     {
-        SelectionManager _selectionManager;
+        readonly SelectionManager _selectionManager;
 
         // Undo variables
         ISelectionState _oldState;

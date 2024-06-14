@@ -3,14 +3,14 @@ using System.Windows.Input;
 using AnimationEditor.Common.AnimationPlayer;
 using AnimationEditor.Common.ReferenceModel;
 using CommunityToolkit.Mvvm.Input;
+using GameWorld.Core.Components;
+using GameWorld.Core.Services;
 using GameWorld.WpfWindow;
 using GameWorld.WpfWindow.Events;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
-using View3D.Components;
-using View3D.Services;
 
 namespace AnimationEditor.PropCreator.ViewModels
 {

@@ -1,10 +1,10 @@
-﻿using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.Components;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
+using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
-using View3D.Commands;
-using View3D.Commands.Object;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
 using MessageBox = System.Windows.MessageBox;
 
 namespace KitbasherEditor.ViewModels.UiCommands

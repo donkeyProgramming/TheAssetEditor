@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using View3D.SceneNodes;
+using GameWorld.Core.SceneNodes;
 
 namespace KitbasherEditor.ValueConverters
 {

@@ -1,9 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering.Geometry;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
 
-namespace View3D.Commands.Vertex
+namespace GameWorld.Core.Commands.Vertex
 {
 
     public class TransformVertexCommand : ICommand
@@ -41,13 +42,13 @@ namespace View3D.Commands.Vertex
         {
             Transform.Decompose(out var scale, out var rot, out var trans);
 
-            for (int meshIndex = 0; meshIndex < _geometryList.Count; meshIndex++)
+            for (var meshIndex = 0; meshIndex < _geometryList.Count; meshIndex++)
             {
                 var geo = _geometryList[meshIndex];
                 if (_oldSelectionState.Mode == GeometrySelectionMode.Vertex)
                 {
                     var vState = _oldSelectionState as VertexSelectionState;
-                    for (int vertIndex = 0; vertIndex < vState.VertexWeights.Count; vertIndex++)
+                    for (var vertIndex = 0; vertIndex < vState.VertexWeights.Count; vertIndex++)
                     {
                         if (vState.VertexWeights[vertIndex] != 0)
                         {
@@ -66,13 +67,13 @@ namespace View3D.Commands.Vertex
                 else
                 {
                     var undoMatrix = Matrix.CreateTranslation(-PivotPoint) * Matrix.Invert(Transform) * Matrix.CreateTranslation(PivotPoint);
-                    for (int v = 0; v < geo.VertexCount(); v++)
+                    for (var v = 0; v < geo.VertexCount(); v++)
                         geo.TransformVertex(v, undoMatrix);
 
                     if (InvertWindingOrder)
                     {
                         var indexes = geo.GetIndexBuffer();
-                        for (int index = 0; index < indexes.Count; index += 3)
+                        for (var index = 0; index < indexes.Count; index += 3)
                         {
                             var temp = indexes[index + 2];
                             indexes[index + 2] = indexes[index + 0];

@@ -1,17 +1,11 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows.Forms;
-using View3D.Animation;
-using View3D.Commands.Bone;
-using View3D.Commands.Object;
-using View3D.Components.Component.Selection;
-using View3D.Components.Gizmo;
-using View3D.SceneNodes;
+using GameWorld.Core.Commands.Bone;
+using GameWorld.Core.Commands.Object;
+using GameWorld.Core.Components.Gizmo;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
 
 namespace AnimationEditor.AnimationKeyframeEditor
 {

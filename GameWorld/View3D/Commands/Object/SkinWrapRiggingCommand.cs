@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using View3D.Components.Component.Selection;
-using View3D.Rendering.Geometry;
-using View3D.SceneNodes;
-using View3D.Utility;
+using GameWorld.Core.Commands;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Utility;
 
-namespace View3D.Commands.Object
+namespace GameWorld.Core.Commands.Object
 {
     // TODO: THis is delete and not used
     public class SkinWrapRiggingCommand : ICommand
@@ -48,14 +49,14 @@ namespace View3D.Commands.Object
 
                 var clostestDist = float.PositiveInfinity;
                 MeshObject closestMesh = null;
-                int closestVertexId = 0;
+                var closestVertexId = 0;
 
-                for (int i = 0; i < affectedMesh.Geometry.VertexCount(); i++)
+                for (var i = 0; i < affectedMesh.Geometry.VertexCount(); i++)
                 {
                     var currentVertex = affectedMesh.Geometry.VertexArray[i].Position3();
                     foreach (var source in _sources)
                     {
-                        var closestIndex = IntersectionMath.FindClosestVertexIndex(source.Geometry, currentVertex, out float distance);
+                        var closestIndex = IntersectionMath.FindClosestVertexIndex(source.Geometry, currentVertex, out var distance);
                         if (distance < clostestDist)
                         {
 
@@ -75,7 +76,7 @@ namespace View3D.Commands.Object
 
         public void Undo()
         {
-            for (int i = 0; i < _affectedMeshes.Count; i++)
+            for (var i = 0; i < _affectedMeshes.Count; i++)
             {
                 _affectedMeshes[i].Geometry = _originalGeos[i];
                 _affectedMeshes[i].Geometry.ParentSkeletonName = _originalSkeletonNames[i];

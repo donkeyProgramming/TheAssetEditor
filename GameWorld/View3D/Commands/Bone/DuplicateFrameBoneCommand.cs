@@ -3,9 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.Generic;
-using View3D.Animation;
+using GameWorld.Core.Animation;
+using GameWorld.Core.Commands;
 
-namespace View3D.Commands.Bone
+namespace GameWorld.Core.Commands.Bone
 {
     public class DuplicateFrameBoneCommand : ICommand
     {
@@ -19,7 +20,7 @@ namespace View3D.Commands.Bone
 
         public void Configure(AnimationClip animation, int frameToInsert)
         {
-            _animation = animation;            
+            _animation = animation;
             _frameToInsert = frameToInsert;
 
             foreach (var frame in _animation.DynamicFrames)
@@ -27,7 +28,7 @@ namespace View3D.Commands.Bone
                 _backupFrames.Add(frame.Clone());
             }
         }
-        
+
         public void Execute()
         {
             var clone = _animation.DynamicFrames[_frameToInsert].Clone();

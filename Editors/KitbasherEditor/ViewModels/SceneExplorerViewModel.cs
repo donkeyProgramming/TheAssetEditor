@@ -1,4 +1,9 @@
-﻿using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Components;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using System;
@@ -6,10 +11,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
-using View3D.Commands;
-using View3D.Components.Component;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
 
 namespace KitbasherEditor.ViewModels
 {

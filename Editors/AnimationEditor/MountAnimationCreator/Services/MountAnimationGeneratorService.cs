@@ -1,5 +1,7 @@
 ﻿using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.ViewModels;
+using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -8,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using View3D.Animation;
-using View3D.SceneNodes;
 
 namespace AnimationEditor.MountAnimationCreator.Services
 {
@@ -44,11 +44,11 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
             var newRiderAnim = riderAnimation.Clone();
 
-            View3D.Animation.AnimationEditor.LoopAnimation(newRiderAnim, (int)_animationSettings.LoopCounter.Value);
+            GameWorld.Core.Animation.AnimationEditor.LoopAnimation(newRiderAnim, (int)_animationSettings.LoopCounter.Value);
 
             // Resample
             if (_animationSettings.FitAnimation)
-                newRiderAnim = View3D.Animation.AnimationEditor.ReSample(_riderSkeleton, newRiderAnim, mountAnimation.DynamicFrames.Count, mountAnimation.PlayTimeInSec);
+                newRiderAnim = GameWorld.Core.Animation.AnimationEditor.ReSample(_riderSkeleton, newRiderAnim, mountAnimation.DynamicFrames.Count, mountAnimation.PlayTimeInSec);
 
             var maxFrameCount = Math.Min(mountAnimation.DynamicFrames.Count, newRiderAnim.DynamicFrames.Count);
             for (int i = 0; i < maxFrameCount; i++)

@@ -1,6 +1,7 @@
-﻿using View3D.SceneNodes;
+﻿using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving.Geometry;
 
-namespace View3D.Services.SceneSaving.Geometry.Strategies
+namespace GameWorld.Core.Services.SceneSaving.Geometry.Strategies
 {
     public class NoMeshStrategy : IGeometryStrategy
     {

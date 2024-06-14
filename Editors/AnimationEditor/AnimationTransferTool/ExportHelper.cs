@@ -1,5 +1,5 @@
 ﻿using System;
-using View3D.Animation;
+using GameWorld.Core.Animation;
 
 namespace AnimationEditor.AnimationTransferTool
 {

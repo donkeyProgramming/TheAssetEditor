@@ -17,14 +17,14 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
-using View3D.Animation;
-using View3D.Components.Component.Selection;
-using View3D.SceneNodes;
 using MessageBox = System.Windows.Forms.MessageBox;
 using Clipboard = System.Windows.Clipboard;
 using Shared.Ui.Events.UiCommands;
 using Shared.Core.Events;
 using Editors.Shared.Core.Common.BaseControl;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
 
 
 namespace AnimationEditor.MountAnimationCreator

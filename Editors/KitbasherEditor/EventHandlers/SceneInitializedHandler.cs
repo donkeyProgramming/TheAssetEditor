@@ -1,4 +1,9 @@
 ﻿using System.Windows;
+using GameWorld.Core.Components;
+using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
+using GameWorld.Core.Services.SceneSaving;
+using GameWorld.Core.Services.SceneSaving.Geometry;
 using GameWorld.WpfWindow.Events;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
@@ -7,11 +12,6 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
-using View3D.Components.Component;
-using View3D.SceneNodes;
-using View3D.Services;
-using View3D.Services.SceneSaving;
-using View3D.Services.SceneSaving.Geometry;
 
 namespace KitbasherEditor.EventHandlers
 {

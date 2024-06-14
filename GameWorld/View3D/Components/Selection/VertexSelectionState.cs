@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using View3D.SceneNodes;
 
-namespace View3D.Components.Component.Selection
+namespace GameWorld.Core.Components.Selection
 {
     public class VertexSelectionState : ISelectionState
     {
@@ -53,7 +53,7 @@ namespace View3D.Components.Component.Selection
             var vertListLength = vertexList.Count;
 
             // Clear all
-            for (int currentVertIndex = 0; currentVertIndex < vertexList.Count; currentVertIndex++)
+            for (var currentVertIndex = 0; currentVertIndex < vertexList.Count; currentVertIndex++)
                 VertexWeights[currentVertIndex] = 0;
 
             // Compute new
@@ -65,7 +65,7 @@ namespace View3D.Components.Component.Selection
             else
             {
                 var vertsInUse = SelectedVertices.Select(x => vertexList[x]);
-                for (int currentVertIndex = 0; currentVertIndex < vertexList.Count; currentVertIndex++)
+                for (var currentVertIndex = 0; currentVertIndex < vertexList.Count; currentVertIndex++)
                 {
                     var currentVertPos = vertexList[currentVertIndex];
                     if (SelectedVertices.Contains(currentVertIndex))
@@ -76,7 +76,7 @@ namespace View3D.Components.Component.Selection
                     {
                         var dist = GetClosestVertexDist(currentVertPos, vertsInUse);
                         if (dist <= distanceOffset)
-                            VertexWeights[currentVertIndex] = 1 - (dist / distanceOffset);
+                            VertexWeights[currentVertIndex] = 1 - dist / distanceOffset;
                     }
                 }
             }
@@ -85,7 +85,7 @@ namespace View3D.Components.Component.Selection
 
         float GetClosestVertexDist(Vector3 currentPos, IEnumerable<Vector3> vertList)
         {
-            float closest = float.MaxValue;
+            var closest = float.MaxValue;
             foreach (var vert in vertList)
             {
                 var dist = Vector3.Distance(vert, currentPos);
