@@ -1,5 +1,3 @@
-loc50+
-
 v0.XX
 ----------------------------
 	* Vertex tranform undo bug	
