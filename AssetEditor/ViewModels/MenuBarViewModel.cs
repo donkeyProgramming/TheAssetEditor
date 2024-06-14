@@ -333,7 +333,7 @@ namespace AssetEditor.ViewModels
 
         void GenerateFileListReport() => FileListReportGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
 
-        void GenerateMetaDataJsonsReport() => AnimMetaDataJsonsGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
+        void GenerateMetaDataJsonsReport() => AnimMetaDataJsonGenerator.Generate(_packfileService, _settingsService, _gameInformationFactory);
 
         void Search()
         {

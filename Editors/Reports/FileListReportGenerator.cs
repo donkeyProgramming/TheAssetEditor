@@ -25,11 +25,11 @@ namespace Editors.Reports
             public bool IsDb { get; set; } = false;
         }
 
-        ILogger _logger = Logging.Create<FileListReportGenerator>();
-        PackFileService _pfs;
-        ApplicationSettingsService _settingsService;
+        private readonly ILogger _logger = Logging.Create<FileListReportGenerator>();
+        private readonly PackFileService _pfs;
+        private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
-        HashAlgorithm _md5Instance;
+        private readonly HashAlgorithm _md5Instance;
 
         public FileListReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
@@ -172,8 +172,6 @@ namespace Editors.Reports
 
             Process.Start("explorer.exe", outputFolder);
         }
-
-
 
         Dictionary<string, FileItem> LoadFile(string path)
         {

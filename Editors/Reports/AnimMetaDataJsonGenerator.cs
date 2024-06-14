@@ -7,7 +7,6 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.AnimationMeta.Parsing;
@@ -16,15 +15,15 @@ using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 
 namespace Editors.Reports
 {
-    public class AnimMetaDataJsonsGenerator
+    public class AnimMetaDataJsonGenerator
     {
-        private readonly ILogger _logger = Logging.Create<AnimMetaDataJsonsGenerator>();
+        private readonly ILogger _logger = Logging.Create<AnimMetaDataJsonGenerator>();
         private readonly PackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
         private readonly JsonSerializerSettings _jsonOptions;
 
-        public AnimMetaDataJsonsGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public AnimMetaDataJsonGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _pfs = pfs;
             _settingsService = settingsService;
@@ -34,16 +33,16 @@ namespace Editors.Reports
 
         public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
-            var instance = new AnimMetaDataJsonsGenerator(pfs, settingsService, gameInformationFactory);
+            var instance = new AnimMetaDataJsonGenerator(pfs, settingsService, gameInformationFactory);
             instance.Create();
         }
 
-        void dumpAsJson(string gameOutputDir, string fileName, object data)
+        void DumpAsJson(string gameOutputDir, string fileName, object data)
         {
             var jsonString = JsonConvert.SerializeObject(data, _jsonOptions);
-            var json_filepath = Path.Join(gameOutputDir, fileName);
-            Directory.CreateDirectory(Path.GetDirectoryName(json_filepath));
-            File.WriteAllText(json_filepath, jsonString);
+            var jsonFilePath = Path.Join(gameOutputDir, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(jsonFilePath));
+            File.WriteAllText(jsonFilePath, jsonString);
         }
 
         public void Create()
@@ -55,7 +54,7 @@ namespace Editors.Reports
                 Directory.Delete(gameOutputDir, true);
             DirectoryHelper.EnsureCreated(gameOutputDir);
 
-            //dump animtable
+            //dump animationTable
             var animPack = _pfs.Database.PackFiles[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
             var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
 
@@ -65,9 +64,9 @@ namespace Editors.Reports
                 if (animFile is AnimationBinWh3)
                 {
                     var text = converter.GetText(animFile.ToByteArray());
-                    var xml_filepath = Path.Join(gameOutputDir, animFile.FileName + ".xml");
-                    Directory.CreateDirectory(Path.GetDirectoryName(xml_filepath));
-                    File.WriteAllText(xml_filepath, text);
+                    var xmlFilePath = Path.Join(gameOutputDir, animFile.FileName + ".xml");
+                    Directory.CreateDirectory(Path.GetDirectoryName(xmlFilePath));
+                    File.WriteAllText(xmlFilePath, text);
                 }
             }
 
@@ -82,7 +81,7 @@ namespace Editors.Reports
 
                     var parser = new MetaDataFileParser();
                     var metaData = parser.ParseFile(data);
-                    dumpAsJson(gameOutputDir, fileName + ".json", metaData);
+                    DumpAsJson(gameOutputDir, fileName + ".json", metaData);
                 }
                 catch (Exception e)
                 {
@@ -96,7 +95,7 @@ namespace Editors.Reports
                 try
                 {
                     var animationHeader = AnimationFile.GetAnimationHeader(packFile);
-                    dumpAsJson(gameOutputDir, fileName + ".header.json", animationHeader);
+                    DumpAsJson(gameOutputDir, fileName + ".header.json", animationHeader);
                 }
                 catch (Exception e)
                 {

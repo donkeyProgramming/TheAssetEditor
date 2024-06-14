@@ -12,7 +12,7 @@ namespace Editors.Reports
 {
     public class Rmv2ReportGenerator
     {
-        PackFileService _pfs;
+        private readonly PackFileService _pfs;
         public Rmv2ReportGenerator(PackFileService pfs)
         {
             _pfs = pfs;
