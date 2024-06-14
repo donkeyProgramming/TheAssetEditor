@@ -5,7 +5,6 @@ using AnimationEditor.Common.BaseControl;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.PropCreator.ViewModels;
 using AnimationEditor.SkeletonEditor;
-using AnimationEditor.SuperView;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
@@ -16,9 +15,6 @@ namespace Editors.AnimationVisualEditors
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<EditorHost<SuperViewViewModel>>();
-            serviceCollection.AddScoped<SuperViewViewModel>();
-
             serviceCollection.AddScoped<EditorHost<SkeletonEditorViewModel>>();
             serviceCollection.AddScoped<SkeletonEditorViewModel>();
 
@@ -39,7 +35,6 @@ namespace Editors.AnimationVisualEditors
         {
             factory.RegisterTool<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>();
             factory.RegisterTool<EditorHost<AnimationTransferToolViewModel>, EditorHostView>();
-            factory.RegisterTool<EditorHost<SuperViewViewModel>, EditorHostView>();
             factory.RegisterTool<EditorHost<SkeletonEditorViewModel>, EditorHostView>();
             factory.RegisterTool<EditorHost<CampaignAnimationCreatorViewModel>, EditorHostView>();
             factory.RegisterTool<EditorHost<AnimationKeyframeEditorViewModel>, EditorHostView>();

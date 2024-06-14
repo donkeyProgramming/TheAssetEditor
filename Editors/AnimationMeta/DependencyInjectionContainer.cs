@@ -1,5 +1,8 @@
-﻿using Editors.AnimationMeta.Presentation;
+﻿using AnimationEditor.Common.BaseControl;
+using AnimationEditor.PropCreator.ViewModels;
+using Editors.AnimationMeta.Presentation;
 using Editors.AnimationMeta.Presentation.View;
+using Editors.AnimationMeta.SuperView;
 using Editors.AnimationMeta.Visualisation;
 using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,11 +21,16 @@ namespace Editors.AnimationMeta
             serviceCollection.AddTransient<MainEditorView>();
             serviceCollection.AddTransient<EditorViewModel>();
 
+            serviceCollection.AddScoped<EditorHost<SuperViewViewModel>>();
+            serviceCollection.AddScoped<SuperViewViewModel>();
+
             serviceCollection.AddScoped<IMetaDataFactory, MetaDataFactory>(); // Needs heavy refactorying!
         }
 
         public override void RegisterTools(IToolFactory factory)
         {
+            factory.RegisterTool<EditorHost<SuperViewViewModel>, EditorHostView>();
+
             factory.RegisterTool<EditorViewModel, MainEditorView>(new ExtensionToTool(EditorEnums.Meta_Editor, new[] { ".anm.meta", ".meta", ".snd.meta" }));
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace AnimationEditor.SuperView
+namespace Editors.AnimationMeta.SuperView
 {
     /// <summary>
     /// Interaction logic for EditorView.xaml

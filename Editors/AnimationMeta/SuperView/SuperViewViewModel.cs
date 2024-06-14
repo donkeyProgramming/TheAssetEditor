@@ -8,7 +8,7 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
-namespace AnimationEditor.SuperView
+namespace Editors.AnimationMeta.SuperView
 {
     public class SuperViewViewModel : IHostedEditor<SuperViewViewModel>, IEditorViewModelTypeProvider
     {
@@ -30,8 +30,8 @@ namespace AnimationEditor.SuperView
         public Type EditorViewModelType => typeof(EditorView);
 
         public SuperViewViewModel(SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
-            PackFileService packFileService, 
-            SceneObjectBuilder sceneObjectBuilder, 
+            PackFileService packFileService,
+            SceneObjectBuilder sceneObjectBuilder,
             CopyPasteManager copyPasteManager)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
