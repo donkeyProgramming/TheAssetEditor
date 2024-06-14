@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 
-namespace MonoGame.Framework.WpfInterop.Internals
+namespace GameWorld.WpfWindow.Internals
 {
     public static class LogicalTreeHelperEx
     {
@@ -18,9 +18,9 @@ namespace MonoGame.Framework.WpfInterop.Internals
             {
                 //get parent item
                 // this one works when setting tabs explicitly, but breaks on <TabControl ItemsSource={Binding ...}" />
-                DependencyObject parentObject = LogicalTreeHelper.GetParent(child);
+                var parentObject = LogicalTreeHelper.GetParent(child);
                 // this one does not work when set explicitely, but works when using ItemsSource bindings
-                DependencyObject parentObject2 = VisualTreeHelper.GetParent(child);
+                var parentObject2 = VisualTreeHelper.GetParent(child);
 
                 //we've reached the end of the tree
                 if (parentObject == null && parentObject2 == null)

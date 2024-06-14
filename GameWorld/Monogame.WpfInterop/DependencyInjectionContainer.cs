@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Monogame.WpfInterop.ResourceHandling;
+﻿using GameWorld.WpfWindow.ResourceHandling;
+using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 
 namespace GameWorld.WpfWindow

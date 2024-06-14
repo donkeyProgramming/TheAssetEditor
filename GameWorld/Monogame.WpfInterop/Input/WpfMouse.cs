@@ -8,10 +8,10 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using GameWorld.WpfWindow;
+using GameWorld.WpfWindow.Internals;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop.Internals;
 
-namespace MonoGame.Framework.WpfInterop.Input
+namespace GameWorld.WpfWindow.Input
 {
 
     /// <summary>
@@ -76,14 +76,14 @@ namespace MonoGame.Framework.WpfInterop.Input
         {
             if (e.Handled)
                 return;
-      
+
             // Detect if there is a window that is on top of the main application. If so, we dont want to capture the mouse
             // This shit is buggy and bad =(
             GetCursorPos(out var p);
             var topToBottom = SortWindowsTopToBottom(Application.Current.Windows.OfType<Window>()).ToList();
-            foreach(var window in topToBottom) 
+            foreach (var window in topToBottom)
             {
-                var hitPoint = window.PointFromScreen(new Point() {X = p.X, Y = p.Y });
+                var hitPoint = window.PointFromScreen(new Point() { X = p.X, Y = p.Y });
                 var hitResult = VisualTreeHelper.HitTest(window, hitPoint);
                 if (hitResult?.VisualHit != null)
                 {
@@ -112,7 +112,7 @@ namespace MonoGame.Framework.WpfInterop.Input
             if ((!_focusElement.IsMouseDirectlyOver || _focusElement.IsMouseCaptured) && CaptureMouseWithin)
             {
                 var v = (Visual)_focusElement;
-                bool hit = false;
+                var hit = false;
                 var res = LogicalTreeHelperEx.FindParent<Grid>(_focusElement);
                 //if (res == null) return; <-- please see: https://github.com/donkeyProgramming/TheAssetEditor/pull/90#:~:text=Monogame.WpfInterop/Input/WpfMouse.cs
                 var result = VisualTreeHelper.HitTest(res, pos);
@@ -147,7 +147,7 @@ namespace MonoGame.Framework.WpfInterop.Input
                 }
 
             }
-           
+
             e.Handled = true;
             var m = _mouseState;
             var w = e as MouseWheelEventArgs;
@@ -156,7 +156,7 @@ namespace MonoGame.Framework.WpfInterop.Input
 
         private static double Clamp(double v, int min, double max)
         {
-            return v < min ? min : (v > max ? max : v);
+            return v < min ? min : v > max ? max : v;
         }
 
         /// <summary>
@@ -196,15 +196,15 @@ namespace MonoGame.Framework.WpfInterop.Input
             var byHandle = unsorted.Select(win =>
                 {
                     var a = PresentationSource.FromVisual(win);
-                    var s = ((HwndSource)a);
+                    var s = (HwndSource)a;
                     return (win, s?.Handle);
                 })
                 .Where(x => x.Handle != null)
-                .Where(x=>x.win.ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerWindow")
+                .Where(x => x.win.ToString() != "Microsoft.VisualStudio.DesignTools.WpfTap.WpfVisualTreeService.Adorners.AdornerWindow")
                 .ToDictionary(x => x.Handle);
 
 
-            for (IntPtr hWnd = GetTopWindow(IntPtr.Zero); hWnd != IntPtr.Zero; hWnd = GetWindow(hWnd, GW_HWNDNEXT))
+            for (var hWnd = GetTopWindow(IntPtr.Zero); hWnd != IntPtr.Zero; hWnd = GetWindow(hWnd, GW_HWNDNEXT))
             {
                 if (byHandle.ContainsKey(hWnd))
                     yield return byHandle[hWnd].win;

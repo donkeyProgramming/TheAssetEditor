@@ -1,7 +1,6 @@
-﻿using GameWorld.WpfWindow;
+﻿using GameWorld.WpfWindow.Internals;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.WpfInterop.Internals;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,7 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Color = Microsoft.Xna.Framework.Color;
 
-namespace MonoGame.Framework.WpfInterop
+namespace GameWorld.WpfWindow
 {
     /// <summary>
     /// Host a Direct3D 11 scene.
@@ -292,7 +291,7 @@ namespace MonoGame.Framework.WpfInterop
         }
 
         protected virtual void OnGraphicDeviceDisposed()
-        { 
+        {
         }
 
         private void UninitializeGraphicsDevice()
@@ -353,8 +352,8 @@ namespace MonoGame.Framework.WpfInterop
                 _toBeDisposedNextFrame.Add(_cachedRenderTarget);
             }
 
-            int width = (int)(Math.Max(ActualWidth, 1) * DpiScalingFactor);
-            int height = (int)(Math.Max(ActualHeight, 1) * DpiScalingFactor);
+            var width = (int)(Math.Max(ActualWidth, 1) * DpiScalingFactor);
+            var height = (int)(Math.Max(ActualHeight, 1) * DpiScalingFactor);
 
             CreateGraphicsDeviceDependentResources(new PresentationParameters
             {
@@ -462,7 +461,7 @@ namespace MonoGame.Framework.WpfInterop
                 if (Environment.Is64BitOperatingSystem || Environment.Is64BitProcess)
                 {
                     // catch and rethrow because WPF just swallows it silently on x64..
-                    BackgroundWorker deCancerifyWpf = new BackgroundWorker();
+                    var deCancerifyWpf = new BackgroundWorker();
                     deCancerifyWpf.DoWork += (e, arg) => { arg.Result = arg.Argument; };
                     deCancerifyWpf.RunWorkerCompleted += (e, arg) =>
                     {
@@ -591,7 +590,7 @@ namespace MonoGame.Framework.WpfInterop
 
         private void DisposeRenderTargetsFromPreviousFrames()
         {
-            for (int i = 0; i < _toBeDisposedNextFrame.Count; i++)
+            for (var i = 0; i < _toBeDisposedNextFrame.Count; i++)
             {
                 _toBeDisposedNextFrame[i]?.Dispose();
                 _toBeDisposedNextFrame.RemoveAt(i--);

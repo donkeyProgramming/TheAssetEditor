@@ -1,6 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GameWorld.WpfWindow.ResourceHandling;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Monogame.WpfInterop.ResourceHandling;
 using View3D.Components.Rendering;
 
 namespace View3D.Rendering.RenderItems

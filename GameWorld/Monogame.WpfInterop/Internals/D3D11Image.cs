@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Texture = SharpDX.Direct3D9.Texture;
 
-namespace MonoGame.Framework.WpfInterop.Internals
+namespace GameWorld.WpfWindow.Internals
 {
     /// <summary>
     /// Wraps the <see cref="D3DImage"/> to make it compatible with Direct3D 11.
@@ -89,7 +89,7 @@ namespace MonoGame.Framework.WpfInterop.Internals
             if (_backBuffer != null)
             {
                 // Set texture as new back buffer.
-                using (Surface surface = _backBuffer.GetSurfaceLevel(0))
+                using (var surface = _backBuffer.GetSurfaceLevel(0))
                 {
                     Lock();
                     SetBackBuffer(D3DResourceType.IDirect3DSurface9, surface.NativePointer);

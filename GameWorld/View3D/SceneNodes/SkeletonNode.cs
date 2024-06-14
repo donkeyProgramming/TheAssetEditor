@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.ResourceHandling;
+﻿using GameWorld.WpfWindow.ResourceHandling;
+using Microsoft.Xna.Framework;
 using System;
 using View3D.Animation;
 using View3D.Components.Rendering;

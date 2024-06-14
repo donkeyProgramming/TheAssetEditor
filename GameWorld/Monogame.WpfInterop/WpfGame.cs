@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameWorld.WpfWindow.Events;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Monogame.WpfInterop.Events;
-using Monogame.WpfInterop.ResourceHandling;
-using MonoGame.Framework.WpfInterop;
 using Shared.Core.Events;
 
 namespace GameWorld.WpfWindow
@@ -44,7 +43,7 @@ namespace GameWorld.WpfWindow
         /// <summary>
         /// Gets or sets whether this instance takes focus instantly on mouse over.
         /// If set to false, the user must click into the game panel to gain focus.
-        /// This applies to both <see cref="MonoGame.Framework.WpfInterop.Input.WpfMouse"/> and <see cref="MonoGame.Framework.WpfInterop.Input.WpfKeyboard"/> behaviour.
+        /// This applies to both <see cref="Input.WpfMouse"/> and <see cref="Input.WpfKeyboard"/> behaviour.
         /// Defaults to true.
         /// </summary>
         public bool FocusOnMouseOver { get; set; } = false;

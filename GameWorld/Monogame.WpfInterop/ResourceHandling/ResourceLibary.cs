@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using GameWorld.WpfWindow;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.PackFiles;
-using View3D.Utility;
 
-namespace Monogame.WpfInterop.ResourceHandling
+namespace GameWorld.WpfWindow.ResourceHandling
 {
     public enum ShaderTypes
     {

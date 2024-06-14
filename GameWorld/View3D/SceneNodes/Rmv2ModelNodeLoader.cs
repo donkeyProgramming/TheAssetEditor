@@ -1,4 +1,4 @@
-﻿using Monogame.WpfInterop.ResourceHandling;
+﻿using GameWorld.WpfWindow.ResourceHandling;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;

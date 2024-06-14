@@ -1,8 +1,8 @@
 ﻿using System;
 using GameWorld.WpfWindow;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.ResourceHandling;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;

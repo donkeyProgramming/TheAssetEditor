@@ -2,9 +2,9 @@
 using System.Windows;
 using System.Windows.Media;
 using CommonControls.BaseDialogs;
+using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.Misc;
 using TextureEditor.Views;
-using View3D.Utility;
 
 namespace TextureEditor.ViewModels
 {

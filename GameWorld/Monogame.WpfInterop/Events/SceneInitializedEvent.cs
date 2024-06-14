@@ -1,4 +1,4 @@
-﻿namespace Monogame.WpfInterop.Events
+﻿namespace GameWorld.WpfWindow.Events
 {
     public class SceneInitializedEvent
     {

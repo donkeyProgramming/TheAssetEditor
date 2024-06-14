@@ -1,7 +1,7 @@
 ﻿using Pfim;
 using System.Text;
 
-namespace View3D.Utility
+namespace GameWorld.WpfWindow.ResourceHandling
 {
     public class ImageInformation
     {

@@ -6,7 +6,7 @@ using DeviceType = SharpDX.Direct3D9.DeviceType;
 using PresentInterval = SharpDX.Direct3D9.PresentInterval;
 using Texture = SharpDX.Direct3D9.Texture;
 
-namespace MonoGame.Framework.WpfInterop.Internals
+namespace GameWorld.WpfWindow.Internals
 {
     /// <summary>
     /// Represents a Direct3D 9 device required for Direct3D 11 interoperability.
@@ -35,7 +35,7 @@ namespace MonoGame.Framework.WpfInterop.Internals
             // the Windows Display Driver Model (WDDM). Use Direct3D on any other platform.
             _direct3D = new Direct3DEx();
 
-            PresentParameters presentparams = new PresentParameters
+            var presentparams = new PresentParameters
             {
                 Windowed = true,
                 SwapEffect = SwapEffect.Discard,
@@ -98,7 +98,7 @@ namespace MonoGame.Framework.WpfInterop.Internals
             if (renderTarget == null)
                 return null;
 
-            IntPtr handle = renderTarget.GetSharedHandle();
+            var handle = renderTarget.GetSharedHandle();
             if (handle == IntPtr.Zero)
                 throw new ArgumentException("Unable to access resource. The texture needs to be created as a shared resource.", "renderTarget");
 

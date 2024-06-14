@@ -1,8 +1,8 @@
 ﻿using System;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Monogame.WpfInterop.ResourceHandling;
 using View3D.Components.Input;
 using View3D.Components.Rendering;
 

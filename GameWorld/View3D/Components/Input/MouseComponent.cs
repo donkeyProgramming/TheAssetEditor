@@ -1,7 +1,7 @@
 ﻿using GameWorld.WpfWindow;
+using GameWorld.WpfWindow.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Framework.WpfInterop.Input;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using System;

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Monogame.WpfInterop.ResourceHandling;
 
 namespace View3D.Rendering
 {

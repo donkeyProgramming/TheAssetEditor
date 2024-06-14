@@ -1,10 +1,9 @@
-﻿using GameWorld.WpfWindow;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Windows;
 
-namespace MonoGame.Framework.WpfInterop
+namespace GameWorld.WpfWindow
 {
     /// <summary>
     /// The <see cref="Microsoft.Xna.Framework.Content.ContentManager"/> needs a <see cref="IGraphicsDeviceService"/> to be in the <see cref="System.ComponentModel.Design.IServiceContainer"/>. This class fulfills this purpose.

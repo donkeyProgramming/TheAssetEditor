@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using Keyboard = System.Windows.Input.Keyboard;
 
-namespace MonoGame.Framework.WpfInterop.Input
+namespace GameWorld.WpfWindow.Input
 {
     /// <summary>
     /// Helper class that accesses a native API to get the current keystate.
@@ -56,9 +56,9 @@ namespace MonoGame.Framework.WpfInterop.Input
             {
                 // skip the first 8 entries as they are actually mouse events and not keyboard keys
                 const int skipMouseKeys = 8;
-                for (int i = skipMouseKeys; i < keyStates.Length; i++)
+                for (var i = skipMouseKeys; i < keyStates.Length; i++)
                 {
-                    byte key = keyStates[i];
+                    var key = keyStates[i];
 
                     //Logical 'and' so we can drop the low-order bit for toggled keys, else that key will appear with the value 1!
                     if ((key & 0x80) != 0)

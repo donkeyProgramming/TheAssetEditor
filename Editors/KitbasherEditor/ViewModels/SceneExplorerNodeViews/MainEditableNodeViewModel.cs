@@ -1,8 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using Editors.Shared.Core.Services;
-using MonoGame.Framework.WpfInterop;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using View3D.Components.Rendering;

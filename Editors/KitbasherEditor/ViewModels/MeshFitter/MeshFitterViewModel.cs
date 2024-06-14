@@ -1,5 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.ResourceHandling;
+﻿using GameWorld.WpfWindow.ResourceHandling;
+using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;

@@ -1,6 +1,6 @@
 ﻿using System;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Events;
 using View3D.Components.Rendering;
 using View3D.Rendering;

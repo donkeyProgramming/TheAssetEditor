@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows;
 
-namespace MonoGame.Framework.WpfInterop.Input
+namespace GameWorld.WpfWindow.Input
 {
     internal static class WindowHelper
     {

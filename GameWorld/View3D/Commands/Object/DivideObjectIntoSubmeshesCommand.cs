@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Monogame.WpfInterop.ResourceHandling;
+using GameWorld.WpfWindow.ResourceHandling;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Ui.Common;

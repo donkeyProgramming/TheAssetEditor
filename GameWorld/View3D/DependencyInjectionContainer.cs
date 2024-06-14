@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
-using Monogame.WpfInterop.ResourceHandling;
-using MonoGame.Framework.WpfInterop;
 using Shared.Core.DependencyInjection;
 using View3D.Commands;
 using View3D.Commands.Bone;

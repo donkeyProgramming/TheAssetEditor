@@ -6,8 +6,8 @@ using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using GameWorld.WpfWindow;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
-using Monogame.WpfInterop.ResourceHandling;
 using View3D.Rendering;
 
 namespace TextureEditor.ViewModels

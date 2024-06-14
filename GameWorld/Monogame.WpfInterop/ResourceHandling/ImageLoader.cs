@@ -5,7 +5,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 
-namespace View3D.Utility
+namespace GameWorld.WpfWindow.ResourceHandling
 {
     public static class ImageLoader
     {
@@ -82,7 +82,7 @@ namespace View3D.Utility
             }
 
             // Load mipmaps
-            for (int i = 0; i < image.MipMaps.Length; i++)
+            for (var i = 0; i < image.MipMaps.Length; i++)
             {
                 try
                 {
@@ -107,7 +107,7 @@ namespace View3D.Utility
                 return null;
 
             var image = LoadImageFromBytes(imageContent, out out_imageInfo);
-            if(image == null)
+            if (image == null)
                 return null;
 
             return ConvertTexture2D(fileName, image, device);
