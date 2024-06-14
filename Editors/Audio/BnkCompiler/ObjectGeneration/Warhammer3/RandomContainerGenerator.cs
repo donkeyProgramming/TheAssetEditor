@@ -1,13 +1,12 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System;
 using System.Linq;
-using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc.V136;
 using System.Collections.Generic;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
-
-namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
+namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class RandomContainerGenerator : IWWiseHircGenerator
     {

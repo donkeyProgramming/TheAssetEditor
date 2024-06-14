@@ -4,9 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Editors.Audio.BnkCompiler;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
-namespace Audio.BnkCompiler.Validation
+namespace Editors.Audio.BnkCompiler.Validation
 {
     public class AudioProjectXmlValidator : AbstractValidator<CompilerData>
     {

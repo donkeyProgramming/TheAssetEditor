@@ -2,7 +2,7 @@
 using System.IO;
 
 
-namespace Audio.BnkCompiler.Validation
+namespace Editors.Audio.BnkCompiler.Validation
 {
     /*
     public class CompilerInputProjectValidation : AbstractValidator<CompilerInputProject>

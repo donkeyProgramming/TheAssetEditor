@@ -2,7 +2,7 @@
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Didx;
 
-namespace Audio.Storage
+namespace Editors.Audio.Storage
 {
     public interface RepositoryProvider
     {

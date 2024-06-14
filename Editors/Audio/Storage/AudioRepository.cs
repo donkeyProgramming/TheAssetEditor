@@ -1,11 +1,10 @@
-﻿using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
-using Shared.GameFormats.WWise;
+﻿using Shared.GameFormats.WWise;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Audio.Storage
+namespace Editors.Audio.Storage
 {
     public interface IAudioRepository
     {

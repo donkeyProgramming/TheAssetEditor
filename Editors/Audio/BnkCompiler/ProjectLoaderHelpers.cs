@@ -1,5 +1,5 @@
-﻿using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
-using Audio.Utility;
+﻿using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Editors.Audio.Utility;
 using Microsoft.Xna.Framework.Media;
 using Shared.GameFormats.WWise.Hirc.Shared;
 using System;
@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms.Design;
 using System.Windows.Input;
-using static Audio.BnkCompiler.ProjectLoader;
+using static Editors.Audio.BnkCompiler.ProjectLoader;
 
-namespace Audio.BnkCompiler
+namespace Editors.Audio.BnkCompiler
 {
     public class ProjectLoaderHelpers
     {
@@ -197,7 +197,7 @@ namespace Audio.BnkCompiler
                     var hircAction = CreateAction(actionId, containerId, CompilerConstants.ActionType);
                     var hircRandomContainer = CreateRandomContainer(containerId, mixerId, sounds);
                     var hircEvent = CreateEvent(eventId, actionId);
-                    
+
                     currentMixer.Children.Add(containerId);
                     compilerData.Actions.Add(hircAction);
                     compilerData.RandomContainers.Add(hircRandomContainer);
@@ -298,9 +298,9 @@ namespace Audio.BnkCompiler
 
                 else
                 {
-                    var audioNodeId = (currentStateIndex == statePathArray.Length) ? containerId : 0; // If 0 this property is not initialised. If this is the last state in the path AudioNodeId is set to containerId, otherwise it's set to 0 which removes the property.
-                    var children_uIdx = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1); // If 0 this property is not initialised. If this is the last state in the path Children_uIdx is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
-                    var children_uCount = (ushort)((currentStateIndex == statePathArray.Length) ? 0 : 1); // If 0 this property is not initialised. If this is the last state in the path Children_uCount is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
+                    var audioNodeId = currentStateIndex == statePathArray.Length ? containerId : 0; // If 0 this property is not initialised. If this is the last state in the path AudioNodeId is set to containerId, otherwise it's set to 0 which removes the property.
+                    var children_uIdx = (ushort)(currentStateIndex == statePathArray.Length ? 0 : 1); // If 0 this property is not initialised. If this is the last state in the path Children_uIdx is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
+                    var children_uCount = (ushort)(currentStateIndex == statePathArray.Length ? 0 : 1); // If 0 this property is not initialised. If this is the last state in the path Children_uCount is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
                     var newNode = CreateNode(hashedState, audioNodeId, children_uIdx, children_uCount, CompilerConstants.UWeight, CompilerConstants.UProbability);
                     parentNode.Children.Add(newNode);
                     parentNode = newNode;

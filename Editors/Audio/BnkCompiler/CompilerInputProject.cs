@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 
-namespace Audio.BnkCompiler
+namespace Editors.Audio.BnkCompiler
 {
     public class CompilerInputProject
     {

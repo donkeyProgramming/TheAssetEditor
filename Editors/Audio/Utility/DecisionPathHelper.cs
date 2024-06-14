@@ -1,4 +1,4 @@
-﻿using Audio.Storage;
+﻿using Editors.Audio.Storage;
 using Shared.GameFormats.WWise.Hirc;
 using Shared.GameFormats.WWise.Hirc.Shared;
 using Shared.GameFormats.WWise.Hirc.V136;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Audio.Utility
+namespace Editors.Audio.Utility
 {
     public class DecisionPathHelper
     {
@@ -44,10 +44,10 @@ namespace Audio.Utility
         DecisionPathCollection GetDecisionPaths(AkDecisionTree decisionTree, ArgumentList argumentsList)
         {
             var paths = GetDecisionPaths(decisionTree);
-            List<DecisionPath> decisionPath = new List<DecisionPath>();
+            var decisionPath = new List<DecisionPath>();
             foreach (var path in paths)
             {
-                DecisionPath currentPath = new DecisionPath() { ChildNodeId = path.Item2 };
+                var currentPath = new DecisionPath() { ChildNodeId = path.Item2 };
                 foreach (var item in path.Item1.Skip(1))
                 {
                     var name = _audioRepository.GetNameFromHash(item.Key);

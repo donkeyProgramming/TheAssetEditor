@@ -1,6 +1,5 @@
-﻿using Audio.BnkCompiler;
-using Audio.Storage;
-using Audio.Utility;
+﻿using Editors.Audio.Presentation.AudioExplorer;
+using Editors.Audio.Storage;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;
 using Shared.GameFormats.WWise.Hirc.V136;
@@ -8,7 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace Audio.AudioEditor
+namespace Editors.Audio.Utility
 {
 
     public class DialogEventInfoPrinter
@@ -42,7 +41,7 @@ namespace Audio.AudioEditor
                 throw new InvalidCastException("dialogEvent is not a HircItem.");
             }
 
-            DecisionPathHelper helper = new DecisionPathHelper(_repository);
+            var helper = new DecisionPathHelper(_repository);
             var paths = helper.GetDecisionPaths(dialogEvent);
 
             // Splitting the string by '.' and enclosing each part in quotes
@@ -91,7 +90,7 @@ namespace Audio.AudioEditor
 
             var hirc = GetAsType<ICADialogEvent>(item);
 
-            DecisionPathHelper helper = new DecisionPathHelper(_repository);
+            var helper = new DecisionPathHelper(_repository);
             var paths = helper.GetDecisionPaths(hirc);
 
             var dialogEventNode = new HircTreeItem() { DisplayName = $"Dialog_Event {_repository.GetNameFromHash(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
@@ -124,7 +123,7 @@ namespace Audio.AudioEditor
                 file.WriteLine(string.Join(",", name));
             }
             */
-            
+
         }
 
         void ProcessAction(HircItem item, HircTreeItem parent)
@@ -186,7 +185,7 @@ namespace Audio.AudioEditor
             parent.Children.Add(actorMixerNode);
 
             ProcessNext(actorMixer.GetChildren(), actorMixerNode);
-        } 
+        }
 
         void ProcessSwitchControl(HircItem item, HircTreeItem parent)
         {
@@ -250,7 +249,7 @@ namespace Audio.AudioEditor
         {
             var hirc = GetAsType<CAkMusicSwitchCntr_v136>(item);
 
-            DecisionPathHelper helper = new DecisionPathHelper(_repository);
+            var helper = new DecisionPathHelper(_repository);
             var paths = helper.GetDecisionPaths(hirc);
 
             var dialogEventNode = new HircTreeItem() { DisplayName = $"Music Switch {_repository.GetNameFromHash(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };

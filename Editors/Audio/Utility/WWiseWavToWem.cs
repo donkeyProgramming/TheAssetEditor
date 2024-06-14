@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using Shared.Core.Misc;
 using Shared.Core.Services;
 
-namespace Audio.Utility
+namespace Editors.Audio.Utility
 {
     public class WWiseWavToWem
     {

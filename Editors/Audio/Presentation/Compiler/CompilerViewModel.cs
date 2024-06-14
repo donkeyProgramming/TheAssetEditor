@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Linq;
-using Audio.BnkCompiler;
 using CommonControls.PackFileBrowser;
+using Editors.Audio.BnkCompiler;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -9,7 +9,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.ErrorListDialog;
 
-namespace Audio.Presentation.Compiler
+namespace Editors.Audio.Presentation.Compiler
 {
     public class CompilerViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {

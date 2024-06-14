@@ -1,10 +1,10 @@
-﻿using Audio.Storage;
+﻿using Editors.Audio.Storage;
 using Shared.GameFormats.WWise;
 using Shared.Ui.Common;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Audio.AudioEditor
+namespace Editors.Audio.Presentation.AudioExplorer
 {
     public class EventSelectionFilter
     {

@@ -1,10 +1,8 @@
-﻿using Audio.Utility;
-using CommunityToolkit.Diagnostics;
-using Shared.Core.ErrorHandling;
+﻿using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using System.IO;
 
-namespace Audio.BnkCompiler
+namespace Editors.Audio.BnkCompiler
 {
     public class ResultHandler
     {

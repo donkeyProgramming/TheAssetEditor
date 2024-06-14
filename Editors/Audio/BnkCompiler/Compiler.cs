@@ -1,7 +1,5 @@
 ﻿using System.IO;
 using System.Linq;
-using Audio.BnkCompiler.ObjectGeneration;
-using Audio.Storage;
 using CommunityToolkit.Diagnostics;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
@@ -9,11 +7,13 @@ using Shared.GameFormats.Dat;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Bkhd;
 using Shared.GameFormats.WWise.Hirc;
-using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Shared.Core.PackFiles;
 using System;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Editors.Audio.BnkCompiler.ObjectGeneration;
+using Editors.Audio.Storage;
 
-namespace Audio.BnkCompiler
+namespace Editors.Audio.BnkCompiler
 {
     public class CompileResult
     {
@@ -56,8 +56,8 @@ namespace Audio.BnkCompiler
             Guard.IsEqualTo(originalCount, uniqueCount);
 
             // Build the dat files.
-            var eventDat = (audioProject.Events.Count == 0) ? null : BuildDat(audioProject);
-            var statesDat = (audioProject.DialogueEvents.Count == 0) ? null : BuildStatesDat(audioProject);
+            var eventDat = audioProject.Events.Count == 0 ? null : BuildDat(audioProject);
+            var statesDat = audioProject.DialogueEvents.Count == 0 ? null : BuildStatesDat(audioProject);
 
             var compileResult = new CompileResult()
             {

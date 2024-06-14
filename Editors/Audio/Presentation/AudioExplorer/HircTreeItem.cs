@@ -1,7 +1,7 @@
 ﻿using Shared.GameFormats.WWise;
 using System.Collections.Generic;
 
-namespace Audio.AudioEditor
+namespace Editors.Audio.Presentation.AudioExplorer
 {
     public class HircTreeItem
     {

@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Editors.Audio.Utility;
 
-namespace Audio.BnkCompiler
+namespace Editors.Audio.BnkCompiler
 {
-    using Audio.Utility;
     using Microsoft.Xna.Framework.Media;
     using Shared.Core.ErrorHandling;
     using Shared.Core.Misc;
     using Shared.Core.PackFiles;
-    using static Audio.Utility.WWiseWavToWem;
+    using static Editors.Audio.Utility.WWiseWavToWem;
 
     public class AudioFileImporter
     {

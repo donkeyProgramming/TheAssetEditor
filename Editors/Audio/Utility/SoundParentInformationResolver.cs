@@ -1,13 +1,12 @@
-﻿using Audio.AudioEditor;
-using Audio.Storage;
-using CommunityToolkit.Diagnostics;
+﻿using CommunityToolkit.Diagnostics;
+using Editors.Audio.Storage;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;
 using Shared.GameFormats.WWise.Hirc.V136;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Audio.Utility
+namespace Editors.Audio.Utility
 {
     public class FindAudioParentStructureHelper
     {

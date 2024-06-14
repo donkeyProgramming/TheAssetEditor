@@ -1,7 +1,8 @@
-﻿using Shared.GameFormats.WWise;
+﻿using Editors.Audio.BnkCompiler;
+using Shared.GameFormats.WWise;
 using System;
 
-namespace Audio.BnkCompiler.ObjectGeneration
+namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {
     public interface IWWiseHircGenerator
     {

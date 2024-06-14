@@ -7,7 +7,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 
-namespace Audio.Utility
+namespace Editors.Audio.Utility
 {
     public class VgStreamWrapper
     {

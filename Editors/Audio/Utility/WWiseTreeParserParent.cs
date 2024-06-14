@@ -1,8 +1,9 @@
-﻿using Audio.Storage;
+﻿using Editors.Audio.Presentation.AudioExplorer;
+using Editors.Audio.Storage;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;
 
-namespace Audio.AudioEditor
+namespace Editors.Audio.Utility
 {
     public class WWiseTreeParserParent : WWiseTreeParserBase
     {

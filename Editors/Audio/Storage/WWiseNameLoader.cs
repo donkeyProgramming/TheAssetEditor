@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Audio.Utility;
+using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.GameFormats.Dat;
 
-namespace Audio.Storage
+namespace Editors.Audio.Storage
 {
     public class WWiseNameLoader
     {

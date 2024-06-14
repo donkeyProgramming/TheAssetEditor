@@ -1,12 +1,8 @@
-﻿using Audio.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Serialization;
-using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+﻿using System.Collections.Generic;
 using Shared.GameFormats.WWise.Hirc.Shared;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
-namespace Audio.BnkCompiler
+namespace Editors.Audio.BnkCompiler
 {
     public abstract class IAudioProjectHircItem
     {

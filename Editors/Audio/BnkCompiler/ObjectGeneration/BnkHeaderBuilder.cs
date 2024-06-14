@@ -1,8 +1,9 @@
 ﻿using System;
-using Audio.Utility;
+using Editors.Audio.BnkCompiler;
+using Editors.Audio.Utility;
 using Shared.GameFormats.WWise.Bkhd;
 
-namespace Audio.BnkCompiler.ObjectGeneration
+namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {
     public class BnkHeaderBuilder
     {

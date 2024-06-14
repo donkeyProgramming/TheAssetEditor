@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
+namespace Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 {
     public interface IVanillaObjectIds
     {

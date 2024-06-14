@@ -12,7 +12,7 @@ using Shared.GameFormats.WWise.Didx;
 using Shared.GameFormats.WWise.Hirc;
 using Shared.GameFormats.WWise.Hirc.V136;
 
-namespace Audio.Storage
+namespace Editors.Audio.Storage
 {
 
     public class WWiseBnkLoader

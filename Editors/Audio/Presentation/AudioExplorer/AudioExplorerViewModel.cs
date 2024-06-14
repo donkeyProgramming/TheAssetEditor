@@ -5,10 +5,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Windows;
-using Audio.AudioEditor;
-using Audio.Storage;
-using Audio.Utility;
 using CommonControls.BaseDialogs;
+using Editors.Audio.Storage;
+using Editors.Audio.Utility;
 using Newtonsoft.Json.Linq;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
@@ -17,7 +16,7 @@ using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;
 using Shared.GameFormats.WWise.Hirc.V136;
 
-namespace Audio.Presentation.AudioExplorer
+namespace Editors.Audio.Presentation.AudioExplorer
 {
     public class AudioExplorerViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {

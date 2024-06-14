@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Audio.Storage;
+using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Dat;
 
-namespace Audio.BnkCompiler.ObjectConfiguration.Warhammer3
+namespace Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3
 {
     public class DialogueEventData
     {

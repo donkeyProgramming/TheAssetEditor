@@ -1,7 +1,7 @@
 ﻿using Serilog;
 using Shared.Core.ErrorHandling;
 
-namespace Audio.BnkCompiler
+namespace Editors.Audio.BnkCompiler
 {
     public class CompilerSettings
     {

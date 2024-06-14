@@ -1,11 +1,12 @@
 ﻿using CommunityToolkit.Diagnostics;
+using Editors.Audio.BnkCompiler;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Audio.BnkCompiler.ObjectGeneration
+namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {
     public class HircBuilder
     {

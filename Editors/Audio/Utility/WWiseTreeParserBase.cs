@@ -1,4 +1,5 @@
-﻿using Audio.Storage;
+﻿using Editors.Audio.Presentation.AudioExplorer;
+using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.WWise;
@@ -6,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Audio.AudioEditor
+namespace Editors.Audio.Utility
 {
     public abstract class WWiseTreeParserBase
     {
@@ -29,7 +30,7 @@ namespace Audio.AudioEditor
 
         public HircTreeItem BuildHierarchy(HircItem item)
         {
-            HircTreeItem root = new HircTreeItem();
+            var root = new HircTreeItem();
             ProcessHircObject(item, root);
             var actualRoot = root.Children.FirstOrDefault();
             actualRoot.Parent = null;

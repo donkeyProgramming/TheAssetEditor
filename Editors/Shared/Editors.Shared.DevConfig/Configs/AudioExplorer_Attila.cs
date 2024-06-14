@@ -1,4 +1,4 @@
-﻿using Audio.Presentation.AudioExplorer;
+﻿using Editors.Audio.Presentation.AudioExplorer;
 using Editors.Shared.DevConfig.Base;
 using Shared.Core.Events;
 using Shared.Core.Services;

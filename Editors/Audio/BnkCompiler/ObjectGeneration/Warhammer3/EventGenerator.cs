@@ -1,11 +1,13 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System;
 using System.Linq;
-using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc.V136;
+using Editors.Audio.BnkCompiler;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Editors.Audio.BnkCompiler.ObjectGeneration;
 
-namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
+namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class EventGenerator : IWWiseHircGenerator
     {

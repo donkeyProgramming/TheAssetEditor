@@ -1,5 +1,4 @@
-﻿using Audio.BnkCompiler.Validation;
-using Shared.Core.ErrorHandling;
+﻿using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using System;
@@ -7,11 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
-using Shared.GameFormats.WWise.Hirc.Shared;
-using static Audio.BnkCompiler.ProjectLoaderHelpers;
+using static Editors.Audio.BnkCompiler.ProjectLoaderHelpers;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Editors.Audio.BnkCompiler.Validation;
 
-namespace Audio.BnkCompiler
+namespace Editors.Audio.BnkCompiler
 {
     public class ProjectLoader
     {
