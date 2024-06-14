@@ -10,7 +10,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace AnimationMeta.Presentation
+namespace Editors.AnimationMeta.Presentation
 {
 
     public abstract class MetaTagViewBase : NotifyPropertyChangedImpl
@@ -138,7 +138,7 @@ namespace AnimationMeta.Presentation
             var totalCount = byteList.Sum(x => x.Length);
             var byteArray = new byte[totalCount];
 
-            int currentByte = 0;
+            var currentByte = 0;
             foreach (var byteItem in byteList)
             {
                 byteItem.CopyTo(byteArray, currentByte);
@@ -155,8 +155,8 @@ namespace AnimationMeta.Presentation
 
         string FormatFieldName(string name)
         {
-            string newName = "";
-            for (int i = 0; i < name.Length; i++)
+            var newName = "";
+            for (var i = 0; i < name.Length; i++)
             {
                 if (char.IsUpper(name[i]) && i != 0)
                     newName += " ";

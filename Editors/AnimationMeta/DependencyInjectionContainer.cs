@@ -1,6 +1,6 @@
-﻿using AnimationMeta.Presentation;
-using AnimationMeta.Presentation.View;
-using AnimationMeta.Visualisation;
+﻿using Editors.AnimationMeta.Presentation;
+using Editors.AnimationMeta.Presentation.View;
+using Editors.AnimationMeta.Visualisation;
 using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;

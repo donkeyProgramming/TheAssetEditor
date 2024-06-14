@@ -6,7 +6,7 @@ using View3D.Animation;
 using View3D.Animation.AnimationChange;
 using View3D.SceneNodes;
 
-namespace AnimationMeta.Visualisation.Rules
+namespace Editors.AnimationMeta.Visualisation.Rules
 {
     public class CopyRootTransform : ILocalSpaceAnimationRule
     {
@@ -34,7 +34,7 @@ namespace AnimationMeta.Visualisation.Rules
             try
             {
                 var transform = _skeletonProvider.Skeleton.GetAnimatedWorldTranform(_boneId);
-                Matrix m = Matrix.CreateFromQuaternion(_offsetRot) * Matrix.CreateTranslation(_offsetPos) * transform;
+                var m = Matrix.CreateFromQuaternion(_offsetRot) * Matrix.CreateTranslation(_offsetPos) * transform;
                 frame.BoneTransforms[0].WorldTransform = m;
             }
             catch (Exception e)

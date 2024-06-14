@@ -3,11 +3,8 @@ using System.Windows;
 using System.Windows.Input;
 using Shared.Core.Misc;
 
-namespace AnimationMeta.Presentation.View
+namespace Editors.AnimationMeta.Presentation.View
 {
-    /// <summary>
-    /// Interaction logic for NewTagWindow.xaml
-    /// </summary>
     public partial class NewTagWindow : Window
     {
         public NewTagWindow()

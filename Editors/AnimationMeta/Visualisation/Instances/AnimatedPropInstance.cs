@@ -2,7 +2,7 @@
 using View3D.Animation;
 using View3D.SceneNodes;
 
-namespace AnimationMeta.Visualisation.Instances
+namespace Editors.AnimationMeta.Visualisation.Instances
 {
     public class AnimatedPropInstance : IMetaDataInstance
     {

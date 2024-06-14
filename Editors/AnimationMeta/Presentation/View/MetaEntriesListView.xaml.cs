@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace AnimationMeta.Presentation.View
+namespace Editors.AnimationMeta.Presentation.View
 {
     /// <summary>
     /// Interaction logic for EditorTagExplorer.xaml

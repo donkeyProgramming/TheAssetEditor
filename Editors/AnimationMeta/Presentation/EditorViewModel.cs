@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using AnimationMeta.Presentation.View;
+using Editors.AnimationMeta.Presentation.View;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
@@ -11,7 +11,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace AnimationMeta.Presentation
+namespace Editors.AnimationMeta.Presentation
 {
     public class EditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ISaveableEditor
     {
@@ -33,7 +33,7 @@ namespace AnimationMeta.Presentation
 
         MetaTagViewBase _selectedTag;
         MetaTagViewBase _prevSelectedTag;
-        List<MetaTagViewBase> _selectedTags = new List<MetaTagViewBase>();
+        readonly List<MetaTagViewBase> _selectedTags = new List<MetaTagViewBase>();
         public MetaTagViewBase SelectedTag { get => _selectedTag; set => SetAndNotify(ref _selectedTag, value); }
 
         public EditorViewModel(PackFileService pf, CopyPasteManager copyPasteManager)
@@ -117,7 +117,7 @@ namespace AnimationMeta.Presentation
             var dialog = new NewTagWindow();
             var allDefs = MetaDataTagDeSerializer.GetSupportedTypes();
 
-            NewTagWindowViewModel model = new NewTagWindowViewModel();
+            var model = new NewTagWindowViewModel();
             model.Items = new ObservableCollection<string>(allDefs);
             dialog.DataContext = model;
 
@@ -285,7 +285,7 @@ namespace AnimationMeta.Presentation
 
             _logger.Here().Information("Generating bytes");
 
-            MetaDataFileParser parser = new MetaDataFileParser();
+            var parser = new MetaDataFileParser();
             var bytes = parser.GenerateBytes(_metaDataFile.Version, tagDataItems);
             _logger.Here().Information("Saving");
             var res = SaveHelper.Save(_pf, path, null, bytes);

@@ -6,7 +6,7 @@ using View3D.Animation;
 using View3D.SceneNodes;
 using View3D.Utility;
 
-namespace AnimationMeta.Visualisation.Instances
+namespace Editors.AnimationMeta.Visualisation.Instances
 {
     public class DrawableMetaInstance : IMetaDataInstance
     {

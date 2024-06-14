@@ -6,7 +6,7 @@ using Shared.GameFormats.AnimationMeta.Definitions;
 using View3D.Animation;
 using View3D.Animation.AnimationChange;
 
-namespace AnimationMeta.Visualisation.Rules
+namespace Editors.AnimationMeta.Visualisation.Rules
 {
     public class TransformBoneRule : ILocalSpaceAnimationRule
     {
@@ -29,7 +29,7 @@ namespace AnimationMeta.Visualisation.Rules
             try
             {
                 var quat = new Quaternion(_metadata.Orientation);
-                Matrix m = Matrix.CreateFromQuaternion(quat) * Matrix.CreateTranslation(_metadata.Position) * frame.BoneTransforms[_metadata.TargetNode].WorldTransform;
+                var m = Matrix.CreateFromQuaternion(quat) * Matrix.CreateTranslation(_metadata.Position) * frame.BoneTransforms[_metadata.TargetNode].WorldTransform;
                 frame.BoneTransforms[_metadata.TargetNode].WorldTransform = m;
             }
             catch (Exception e)

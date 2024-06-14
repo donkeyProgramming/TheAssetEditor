@@ -6,7 +6,7 @@ using View3D.Animation;
 using View3D.Animation.AnimationChange;
 using View3D.SceneNodes;
 
-namespace AnimationMeta.Visualisation.Rules
+namespace Editors.AnimationMeta.Visualisation.Rules
 {
     public class DockEquipmentRule : IWorldSpaceAnimationRule
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.PropCreator.ViewModels;
-using AnimationMeta.Presentation;
+using Editors.AnimationMeta.Presentation;
 using Editors.Shared.Core.Common.BaseControl;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
