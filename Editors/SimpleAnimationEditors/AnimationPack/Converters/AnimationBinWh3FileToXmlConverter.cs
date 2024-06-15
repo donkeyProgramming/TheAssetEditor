@@ -384,6 +384,11 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             var riderAnimationSlotWithoutPrefix = animationSlot.Substring(6);
             var mainAnimationToCompareHeader = GetAnimationHeader(animationFile, pfs);
+            if(mainAnimationToCompareHeader == null)
+            {
+                errorList.Warning(animationSlot, $"Cannot validate referenced {mountBinReference} of this rider, perhaps it's located in outside the current animpak files? or it is defined in another animpack or mod?");
+                return false;
+            }
             var mainAnimationToCompareVersion = mainAnimationToCompareHeader.Version;
             var mainAnimationToData = GetAnimationData(animationFile, pfs);
             var mainAnimationLength = mainAnimationToData.AnimationParts[0].DynamicFrames.Count;
