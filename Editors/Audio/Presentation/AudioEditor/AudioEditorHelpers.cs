@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,13 +11,12 @@ using Newtonsoft.Json;
 
 namespace Editors.Audio.Presentation.AudioEditor
 {
-    public class AudioEditorViewModelHelpers
+    public static class AudioEditorHelpers
     {
         public static DataGrid GetDataGrid()
         {
             var mainWindow = Application.Current.MainWindow;
-            var dataGrid = FindVisualChild<DataGrid>(mainWindow, "AudioEditorDataGrid");
-            return dataGrid;
+            return FindVisualChild<DataGrid>(mainWindow, "AudioEditorDataGrid");
         }
 
         public static T FindVisualChild<T>(DependencyObject parent, string name) where T : DependencyObject
@@ -35,8 +35,27 @@ namespace Editors.Audio.Presentation.AudioEditor
                         return foundChild;
                 }
             }
-
             return null;
+        }
+
+        public static void ConfigureDataGrid(IAudioRepository audioRepository, string selectedEventName, ObservableCollection<Dictionary<string, string>> dataGridItems)
+        {
+            var dataGrid = GetDataGrid();
+            dataGrid.Columns.Clear();
+            dataGridItems.Clear();
+
+            var stateGroups = audioRepository.DialogueEventsWithStateGroups[selectedEventName];
+
+            foreach (var stateGroup in stateGroups)
+            {
+                var column = new DataGridTemplateColumn
+                {
+                    Header = AddExtraUnderScoresToStateGroup(stateGroup),
+                    CellTemplate = CreateComboBoxTemplate(audioRepository, stateGroup)
+                };
+
+                dataGrid.Columns.Add(column);
+            }
         }
 
         public static DataTemplate CreateComboBoxTemplate(IAudioRepository audioRepository, string stateGroup)
@@ -59,17 +78,13 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public static string AddExtraUnderScoresToStateGroup(string stateGroup)
         {
-            return stateGroup.Replace("_", "__"); // Apparently WPF doesn't_like_underscores
+            return stateGroup.Replace("_", "__");
         }
 
         public static string SerializeDataGrid(ObservableCollection<Dictionary<string, string>> dataGridItems)
         {
-            var rows = new List<Dictionary<string, string>>();
-
-            foreach (var item in dataGridItems)
-                rows.Add(item);
-
-            return JsonConvert.SerializeObject(rows, Formatting.Indented);
+            return JsonConvert.SerializeObject(dataGridItems.ToList(), Formatting.Indented);
         }
     }
 }
+

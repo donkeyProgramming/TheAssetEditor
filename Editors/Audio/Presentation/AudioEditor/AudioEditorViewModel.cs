@@ -64,31 +64,15 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         private void AddEvent()
         {
-            if (_selectedEventName == null)
+            if (string.IsNullOrEmpty(_selectedEventName))
                 return;
 
-            var dataGrid = AudioEditorViewModelHelpers.GetDataGrid();
-            dataGrid.Columns.Clear();
-            DataGridItems.Clear();
-
-            var dialogueEventsWithStateGroups = _audioRepository.DialogueEventsWithStateGroups;
-            var stateGroups = dialogueEventsWithStateGroups[_selectedEventName];
-
-            foreach (var stateGroup in stateGroups)
-            {
-                var column = new DataGridTemplateColumn
-                {
-                    Header = AudioEditorViewModelHelpers.AddExtraUnderScoresToStateGroup(stateGroup),
-                    CellTemplate = AudioEditorViewModelHelpers.CreateComboBoxTemplate(_audioRepository, stateGroup)
-                };
-
-                dataGrid.Columns.Add(column);
-            }
+            AudioEditorHelpers.ConfigureDataGrid(_audioRepository, _selectedEventName, DataGridItems);
         }
 
         private void AddStatePath()
         {
-            if (_selectedEventName == null)
+            if (string.IsNullOrEmpty(_selectedEventName))
                 return;
 
             var newRow = new Dictionary<string, string>();
