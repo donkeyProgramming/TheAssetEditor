@@ -38,7 +38,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             return null;
         }
 
-        public static void ConfigureDataGrid(IAudioRepository audioRepository, string selectedEventName, ObservableCollection<Dictionary<string, string>> dataGridItems)
+        public static void ConfigureDataGrid(IAudioRepository audioRepository, string selectedEventName, ObservableCollection<Dictionary<string, object>> dataGridItems)
         {
             var dataGrid = GetDataGrid();
             dataGrid.Columns.Clear();

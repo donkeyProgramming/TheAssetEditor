@@ -26,7 +26,7 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public EventSelectionFilter EventFilter { get; set; }
 
-        public ObservableCollection<Dictionary<string, string>> DataGridItems { get; set; } = new ObservableCollection<Dictionary<string, string>>();
+        public ObservableCollection<Dictionary<string, object>> DataGridItems { get; set; } = new ObservableCollection<Dictionary<string, object>>();
 
         public AudioEditorViewModel(PackFileService packFileService, IAudioRepository audioRepository)
         {
@@ -60,6 +60,10 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             _selectedEventName = newValue.DisplayName.ToString();
             Debug.WriteLine($"selectedEventName: {_selectedEventName}");
+
+            var dataGrid = AudioEditorHelpers.GetDataGrid();
+            dataGrid.Columns.Clear();
+            DataGridItems.Clear();
         }
 
         private void AddEvent()
@@ -75,7 +79,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             if (string.IsNullOrEmpty(_selectedEventName))
                 return;
 
-            var newRow = new Dictionary<string, string>();
+            var newRow = new Dictionary<string, object>();
             DataGridItems.Add(newRow);
         }
     }

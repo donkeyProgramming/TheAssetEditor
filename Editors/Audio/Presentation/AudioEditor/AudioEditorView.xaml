@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:s="http://schemas.singulink.com/xaml" 
              xmlns:local="clr-namespace:Editors.Audio.Presentation.AudioEditor"
-             xmlns:explorer="clr-namespace:Editors.Audio.Presentation.AudioExplorer"
+             xmlns:explorer="clr-namespace:Editors.Audio.Presentation.AudioExplorer" d:DataContext="{d:DesignInstance Type=local:AudioEditorViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
