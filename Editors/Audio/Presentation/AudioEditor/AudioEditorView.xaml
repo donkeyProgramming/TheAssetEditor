@@ -3,17 +3,40 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-              xmlns:s="http://schemas.singulink.com/xaml" 
+             xmlns:s="http://schemas.singulink.com/xaml" 
              xmlns:local="clr-namespace:Editors.Audio.Presentation.AudioEditor"
+             xmlns:explorer="clr-namespace:Editors.Audio.Presentation.AudioExplorer"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="{Binding ExampleVariable.Value, UpdateSourceTrigger=PropertyChanged}"/>
-        <Button Grid.Row="1" Content="IncreaseNumber" Click="{s:MethodBinding ExampleAction}"/>
-    </Grid>
+    <DockPanel>
+        <!-- ComboBox for Event Filtering -->
+        <DockPanel DockPanel.Dock="Top">
+            <Label DockPanel.Dock="Left" Content="Events:"/>
+            <ComboBox DockPanel.Dock="Top"
+                      IsEditable="True"
+                      IsTextSearchEnabled="true"
+                      DisplayMemberPath="DisplayName"
+                      Text="{Binding EventFilter.EventList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                      ItemsSource="{Binding EventFilter.EventList.Values}" 
+                      SelectedItem="{Binding EventFilter.EventList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+        </DockPanel>
+
+        <!-- Buttons for Adding and Removing Columns -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Button Content="Add Event" Command="{Binding AddEventCommand}" Margin="5"/>
+            <Button Content="Add State Path" Command="{Binding AddStatePathCommand}" Margin="5"/>
+        </StackPanel>
+
+        <!-- DataGrid Section -->
+        <DataGrid x:Name="AudioEditorDataGrid" DockPanel.Dock="Bottom" Margin="5" ItemsSource="{Binding DataGridItems}" AutoGenerateColumns="False">
+            <!-- Columns defined dynamically -->
+        </DataGrid>
+    </DockPanel>
 </UserControl>
