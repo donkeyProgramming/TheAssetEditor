@@ -24,17 +24,19 @@ namespace Editors.Audio.Presentation.AudioEditor
             for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
             {
                 var child = VisualTreeHelper.GetChild(parent, i);
+
                 if (child is T typedChild && child is FrameworkElement element && element.Name == name)
-                {
                     return typedChild;
-                }
+
                 else
                 {
                     var foundChild = FindVisualChild<T>(child, name);
+
                     if (foundChild != null)
                         return foundChild;
                 }
             }
+
             return null;
         }
 
@@ -62,6 +64,7 @@ namespace Editors.Audio.Presentation.AudioEditor
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(ComboBox));
+            var states = audioRepository.StateGroupsWithStates[stateGroup];
 
             var binding = new Binding($"[{stateGroup}]")
             {
@@ -69,16 +72,17 @@ namespace Editors.Audio.Presentation.AudioEditor
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             };
 
-            factory.SetBinding(ComboBox.ItemsSourceProperty, new Binding { Source = audioRepository.StateGroupsWithStates[stateGroup] });
+            factory.SetBinding(ComboBox.ItemsSourceProperty, new Binding { Source = states });
             factory.SetBinding(ComboBox.SelectedItemProperty, binding);
 
             template.VisualTree = factory;
+
             return template;
         }
 
         public static string AddExtraUnderScoresToStateGroup(string stateGroup)
         {
-            return stateGroup.Replace("_", "__");
+            return stateGroup.Replace("_", "__"); // Apparently WPF doesn't_like_underscores
         }
 
         public static string SerializeDataGrid(ObservableCollection<Dictionary<string, string>> dataGridItems)
