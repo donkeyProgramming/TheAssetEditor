@@ -36,8 +36,8 @@ namespace Editors.Audio
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
 
-            serviceCollection.AddTransient<WWiseBnkLoader>();
-            serviceCollection.AddTransient<WWiseNameLoader>();
+            serviceCollection.AddTransient<BnkLoader>();
+            serviceCollection.AddTransient<DatLoader>();
             serviceCollection.AddTransient<BnkParser>();
             serviceCollection.AddTransient<SoundPlayer>();
 

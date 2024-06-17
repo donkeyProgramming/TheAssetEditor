@@ -1,6 +1,8 @@
 ﻿using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Microsoft.Xna.Framework.Media;
+using Shared.Core.PackFiles;
 using Shared.GameFormats.WWise.Hirc.Shared;
 using System;
 using System.Collections.Generic;
@@ -47,7 +49,7 @@ namespace Editors.Audio.BnkCompiler
             }
         }
 
-        public static void AddDialogueEvents(List<ActorMixer> mixers, CompilerInputProject input, CompilerData compilerData)
+        public static void AddDialogueEvents(IAudioRepository audioRepository, List<ActorMixer> mixers, CompilerInputProject input, CompilerData compilerData)
         {
             var wwiseIdStart = input.Settings.WwiseStartId;
 
@@ -57,7 +59,7 @@ namespace Editors.Audio.BnkCompiler
                 UsableWwiseId = wwiseIdStart;
 
             // Add mixers to compilerData first so they can be individually referenced later.
-            AddDialogueEventMixers(mixers, input, compilerData);
+            AddDialogueEventMixers(audioRepository, mixers, input, compilerData);
 
             // Add Dialogue Events and their associated nodes, containers, and sounds.
             foreach (var hircDialogueEvent in input.DialogueEvents)
@@ -88,10 +90,10 @@ namespace Editors.Audio.BnkCompiler
                     var soundsCount = branch.Sounds.Count;
 
                     if (soundsCount == 1)
-                        AddSingleSoundDialogueEvent(compilerData, rootNode, currentMixer, branch);
+                        AddSingleSoundDialogueEvent(audioRepository, compilerData, rootNode, currentMixer, branch);
 
                     else if (soundsCount > 1)
-                        AddMultipleSoundDialogueEvent(compilerData, rootNode, currentMixer, branch);
+                        AddMultipleSoundDialogueEvent(audioRepository, compilerData, rootNode, currentMixer, branch);
                 }
 
                 //PrintNode(rootNode, 0); // print for testing
@@ -108,7 +110,8 @@ namespace Editors.Audio.BnkCompiler
             foreach (var hircEvent in input.Events)
             {
                 currentMixer++;
-                var eventId = WwiseHash.Compute(hircEvent.Event);
+                var eventName = hircEvent.Event;
+                var eventId = WwiseHash.Compute(eventName);
                 var mixerName = $"{eventId}_mixer_{currentMixer}";
                 var mixerId = WwiseHash.Compute(mixerName);
                 var eventMixer = hircEvent.Mixer;
@@ -124,22 +127,22 @@ namespace Editors.Audio.BnkCompiler
             }
         }
 
-        public static void AddDialogueEventMixers(List<ActorMixer> mixers, CompilerInputProject input, CompilerData compilerData)
+        public static void AddDialogueEventMixers(IAudioRepository audioRepository, List<ActorMixer> mixers, CompilerInputProject input, CompilerData compilerData)
         {
             foreach (var hircDialogueEvent in input.DialogueEvents)
             {
-                var eventName = hircDialogueEvent.DialogueEvent;
-                var eventId = WwiseHash.Compute(eventName);
+                var dialogueEventName = hircDialogueEvent.DialogueEvent;
+                var dialogueEventId = WwiseHash.Compute(dialogueEventName);
                 var mixerId = GetNextUsableWwiseId(UsableWwiseId);
-                var dialogueEventBnk = DialogueEventData.GetBnkFromDialogueEvent(eventName);
+                var dialogueEventBnk = audioRepository.GetOwnerFileFromDialogueEvent(dialogueEventId, true);
                 var mixerParent = VanillaObjectIds.DialogueEventMixerIds[dialogueEventBnk];
 
-                if (!DialogueEventMixers.ContainsKey(eventId))
+                if (!DialogueEventMixers.ContainsKey(dialogueEventId))
                 {
-                    var mixer = CreateMixer(mixerId, mixerParent, eventName);
+                    var mixer = CreateMixer(mixerId, mixerParent, dialogueEventName);
                     mixers.Add(mixer);
                     compilerData.ActorMixers.Add(mixer);
-                    DialogueEventMixers.Add(eventId, mixerId);
+                    DialogueEventMixers.Add(dialogueEventId, mixerId);
                 }
             }
         }
@@ -175,7 +178,6 @@ namespace Editors.Audio.BnkCompiler
             var containerName = $"{eventName}_random_container";
             var containerId = WwiseHash.Compute(containerName);
 
-
             var soundsCount = projectEvent.Sounds.Count;
             var currentSound = 0;
             var sounds = new List<uint>() { };
@@ -209,16 +211,17 @@ namespace Editors.Audio.BnkCompiler
             }
         }
 
-        public static void AddSingleSoundDialogueEvent(CompilerData compilerData, AkDecisionTree.Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
+        public static void AddSingleSoundDialogueEvent(IAudioRepository audioRepository, CompilerData compilerData, AkDecisionTree.Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
         {
             var mixerId = currentMixer.Id;
             var containerId = GetNextUsableWwiseId(UsableWwiseId);
             var soundId = GetNextUsableWwiseId(UsableWwiseId);
-            var dialogueEvent = currentMixer.DialogueEvent;
-            var dialogueEventBnk = DialogueEventData.GetBnkFromDialogueEvent(dialogueEvent);
+            var dialogueEventName = currentMixer.DialogueEvent;
+            var dialogueEventId = WwiseHash.Compute(dialogueEventName);
+            var dialogueEventBnk = audioRepository.GetOwnerFileFromDialogueEvent(dialogueEventId, true);
 
             var soundFilePath = branch.Sounds[0];
-            var hircSound = CreateSound(soundId, mixerId, dialogueEventBnk, soundFilePath, dialogueEvent);
+            var hircSound = CreateSound(soundId, mixerId, dialogueEventBnk, soundFilePath, dialogueEventName);
             currentMixer.Children.Add(soundId);
             compilerData.Sounds.Add(hircSound);
 
@@ -227,7 +230,7 @@ namespace Editors.Audio.BnkCompiler
             ProcessStatePath(rootNode, statePathArray, compilerData, containerId);
         }
 
-        public static void AddMultipleSoundDialogueEvent(CompilerData compilerData, AkDecisionTree.Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
+        public static void AddMultipleSoundDialogueEvent(IAudioRepository audioRepository, CompilerData compilerData, AkDecisionTree.Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
         {
             var mixerId = currentMixer.Id;
             var containerId = GetNextUsableWwiseId(UsableWwiseId);
@@ -241,9 +244,11 @@ namespace Editors.Audio.BnkCompiler
                 currentSoundIndex++;
 
                 var soundId = GetNextUsableWwiseId(UsableWwiseId);
-                var dialogueEvent = currentMixer.DialogueEvent;
-                var dialogueEventBnk = DialogueEventData.GetBnkFromDialogueEvent(dialogueEvent);
-                var hircSound = CreateSound(soundId, containerId, dialogueEventBnk, sound, dialogueEvent);
+                var dialogueEventName = currentMixer.DialogueEvent;
+                var dialogueEventId = WwiseHash.Compute(dialogueEventName);
+                var dialogueEventBnk = audioRepository.GetOwnerFileFromDialogueEvent(dialogueEventId, true);
+
+                var hircSound = CreateSound(soundId, containerId, dialogueEventBnk, sound, dialogueEventName);
 
                 compilerData.Sounds.Add(hircSound);
                 sounds.Add(soundId);
