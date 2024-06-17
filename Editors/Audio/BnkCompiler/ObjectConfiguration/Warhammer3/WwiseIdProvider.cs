@@ -14,7 +14,6 @@ namespace Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3
     {
         /*
         How to find Ids:
-
             Finding Ids for mixer objects can be done by using the Audio Explorer and referring to the lowest ActorMixer in the Graph Structure of a given sound (top level mixer).
             Finding Ids for attenuation objects involves clicking on the sound of an event in the Audio Explorer to find the parent bnk and the top level mixer. 
             Then extract the parent bnk to your PC, load it with Wwiser, then click Dump Bnk.
@@ -39,7 +38,7 @@ namespace Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3
         // Top level mixers for Dialogue Events
         public Dictionary<string, uint> DialogueEventMixerIds { get; } = new Dictionary<string, uint>()
         {
-            // {"Type of Dialogue Event", Mixer Id}
+            // {"Name of Dialogue Event", Mixer Id}
             {"battle_vo_conversational", 600762068},
             {"battle_vo_orders", 1009314120},
             {"campaign_vo_conversational", 652491101},

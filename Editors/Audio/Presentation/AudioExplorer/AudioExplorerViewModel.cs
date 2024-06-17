@@ -54,7 +54,7 @@ namespace Editors.Audio.Presentation.AudioExplorer
             ShowEvents = new NotifyAttr<bool>(true, RefreshList);
             ShowDialogEvents = new NotifyAttr<bool>(true, RefreshList);
 
-            EventFilter = new EventSelectionFilter(_audioRepository);
+            EventFilter = new EventSelectionFilter(_audioRepository, true, true);
             EventFilter.EventList.SelectedItemChanged += OnEventSelected;
         }
 
