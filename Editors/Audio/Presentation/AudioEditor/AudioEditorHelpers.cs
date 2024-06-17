@@ -40,10 +40,15 @@ namespace Editors.Audio.Presentation.AudioEditor
             return null;
         }
 
-        public static void ConfigureDataGrid(IAudioRepository audioRepository, string selectedEventName, ObservableCollection<Dictionary<string, object>> dataGridItems)
+        public static void ConfigureDataGrid(IAudioRepository audioRepository, string selectedEventName, ObservableCollection<Dictionary<string, string>> dataGridItems)
         {
             var dataGrid = GetDataGrid();
             dataGrid.Columns.Clear();
+
+            // DataGrid settings
+            dataGrid.CanUserAddRows = false; // Setting this fucker to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF.
+            dataGrid.ItemsSource = dataGridItems; 
+
             dataGridItems.Clear();
 
             var stateGroups = audioRepository.DialogueEventsWithStateGroups[selectedEventName];
@@ -91,4 +96,3 @@ namespace Editors.Audio.Presentation.AudioEditor
         }
     }
 }
-

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Controls;
@@ -6,6 +7,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.Presentation.AudioExplorer;
 using Editors.Audio.Storage;
+using Newtonsoft.Json;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -26,7 +28,7 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public EventSelectionFilter EventFilter { get; set; }
 
-        public ObservableCollection<Dictionary<string, object>> DataGridItems { get; set; } = new ObservableCollection<Dictionary<string, object>>();
+        public ObservableCollection<Dictionary<string, string>> DataGridItems { get; set; } = new ObservableCollection<Dictionary<string, string>>();
 
         public AudioEditorViewModel(PackFileService packFileService, IAudioRepository audioRepository)
         {
@@ -61,6 +63,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             _selectedEventName = newValue.DisplayName.ToString();
             Debug.WriteLine($"selectedEventName: {_selectedEventName}");
 
+            // Clear all previously recorded data. Do I want to do this? Maybe I need some way of storing the data for different objects and reinstating it.
             var dataGrid = AudioEditorHelpers.GetDataGrid();
             dataGrid.Columns.Clear();
             DataGridItems.Clear();
@@ -79,7 +82,8 @@ namespace Editors.Audio.Presentation.AudioEditor
             if (string.IsNullOrEmpty(_selectedEventName))
                 return;
 
-            var newRow = new Dictionary<string, object>();
+            // Add a row
+            var newRow = new Dictionary<string, string>();
             DataGridItems.Add(newRow);
         }
     }
