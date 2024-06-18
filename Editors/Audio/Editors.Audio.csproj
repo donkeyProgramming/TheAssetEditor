@@ -2,15 +2,9 @@
 
 
 	<PropertyGroup>
-		<TargetFramework>net6.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.1.0" />
-    <PackageReference Include="FluentValidation" Version="11.5.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui.csproj" />
