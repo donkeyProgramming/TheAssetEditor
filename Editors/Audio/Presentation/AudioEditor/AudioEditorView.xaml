@@ -30,8 +30,10 @@
 
         <!-- Buttons for Adding and Removing Columns -->
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Button Content="Add Event" Command="{Binding AddEventCommand}" Margin="5"/>
+            <Button Content="Edit Event" Command="{Binding EditEventCommand}" Margin="5"/>
             <Button Content="Add State Path" Command="{Binding AddStatePathCommand}" Margin="5"/>
+            <Button Content="Save Event" Command="{Binding SaveEventCommand}" Margin="5"/>
+            <Button Content="Create Audio Project" Command="{Binding CreateAudioProject}" Margin="5"/>
         </StackPanel>
 
         <!-- DataGrid Section -->

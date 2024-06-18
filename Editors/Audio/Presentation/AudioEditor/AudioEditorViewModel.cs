@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Windows.Controls;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.Presentation.AudioExplorer;
@@ -23,20 +21,25 @@ namespace Editors.Audio.Presentation.AudioEditor
         private readonly IAudioRepository _audioRepository;
         private string _selectedEventName;
 
-        public ICommand AddEventCommand { get; set; }
-        public ICommand AddStatePathCommand { get; set; }
-
-        public EventSelectionFilter EventFilter { get; set; }
-
         public ObservableCollection<Dictionary<string, string>> DataGridItems { get; set; } = new ObservableCollection<Dictionary<string, string>>();
+        public Dictionary<string, List<Dictionary<string, string>>> EventData { get; set; } = new Dictionary<string, List<Dictionary<string, string>>>();
+
+        public ICommand EditEventCommand { get; private set; }
+        public ICommand AddStatePathCommand { get; private set; }
+        public ICommand SaveEventCommand { get; private set; }
+        public ICommand CreateAudioProject { get; private set; }
+
+        public EventSelectionFilter EventFilter { get; private set; }
 
         public AudioEditorViewModel(PackFileService packFileService, IAudioRepository audioRepository)
         {
             _packFileService = packFileService;
             _audioRepository = audioRepository;
 
-            AddEventCommand = new RelayCommand(AddEvent);
+            EditEventCommand = new RelayCommand(EditEvent);
             AddStatePathCommand = new RelayCommand(AddStatePath);
+            SaveEventCommand = new RelayCommand(SaveEvent);
+            CreateAudioProject = new RelayCommand(() => PrepareAudioProject(EventData));
 
             EventFilter = new EventSelectionFilter(_audioRepository, false, true);
             EventFilter.EventList.SelectedItemChanged += OnEventSelected;
@@ -62,19 +65,15 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             _selectedEventName = newValue.DisplayName.ToString();
             Debug.WriteLine($"selectedEventName: {_selectedEventName}");
-
-            // Clear all previously recorded data. Do I want to do this? Maybe I need some way of storing the data for different objects and reinstating it.
-            var dataGrid = AudioEditorHelpers.GetDataGrid();
-            dataGrid.Columns.Clear();
-            DataGridItems.Clear();
         }
 
-        private void AddEvent()
+        private void EditEvent()
         {
             if (string.IsNullOrEmpty(_selectedEventName))
                 return;
 
-            AudioEditorHelpers.ConfigureDataGrid(_audioRepository, _selectedEventName, DataGridItems);
+            AudioEditorViewModelHelpers.AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
+            AudioEditorViewModelHelpers.ConfigureDataGrid(_audioRepository, _selectedEventName, DataGridItems);
         }
 
         private void AddStatePath()
@@ -82,9 +81,44 @@ namespace Editors.Audio.Presentation.AudioEditor
             if (string.IsNullOrEmpty(_selectedEventName))
                 return;
 
-            // Add a row
             var newRow = new Dictionary<string, string>();
             DataGridItems.Add(newRow);
+        }
+
+        private void SaveEvent()
+        {
+            if (!EventData.ContainsKey(_selectedEventName))
+                EventData[_selectedEventName] = new List<Dictionary<string, string>>();
+
+            // Add each item from DataGridItems to the EventData list for the selected event
+            foreach (var item in DataGridItems)
+                EventData[_selectedEventName].Add(new Dictionary<string, string>(item));
+
+            var dataGridItemsJson = JsonConvert.SerializeObject(DataGridItems, Formatting.Indented);
+            var eventDataJson = JsonConvert.SerializeObject(EventData, Formatting.Indented);
+            Debug.WriteLine($"dataGridItems: {dataGridItemsJson}");
+            Debug.WriteLine($"eventData: {eventDataJson}");
+        }
+
+        private static void PrepareAudioProject(Dictionary<string, List<Dictionary<string, string>>> eventData)
+        {
+            // Create an instance of AudioProject
+            var audioProject = new AudioProject();
+
+            // Set BnkName and Language settings
+            audioProject.Settings.BnkName = "battle_vo_conversational__ovn_vo_actor_Albion_Dural_Durak";
+            audioProject.Settings.Language = "english(uk)";
+
+            foreach (var eventName in eventData.Keys)
+            {
+                var eventItems = eventData[eventName];
+
+                foreach (var eventItem in eventItems)
+                    audioProject.AddAudioEditorItem(eventName, eventItem);
+            }
+
+            var audioProjectjson = AudioProjectSerialisation.ConvertToAudioProject(audioProject);
+            Debug.WriteLine($"eventData: {audioProjectjson}");
         }
     }
 }
