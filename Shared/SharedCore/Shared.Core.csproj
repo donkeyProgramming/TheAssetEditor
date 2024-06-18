@@ -19,16 +19,19 @@
         <PackageReference Include="CommunityToolkit.Diagnostics" Version="8.2.2" />
         <PackageReference Include="Octokit" Version="12.0.0" />
         <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.1.303" />
-        <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
-        <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
         <PackageReference Include="Pfim" Version="0.10.3" />
         <PackageReference Include="DotNetKit.Wpf.AutoCompleteComboBox" Version="1.6.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
         <PackageReference Include="Singulink.WPF.Data.MethodBinding" Version="1.1.0" />
         <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
         <PackageReference Include="CsvHelper" Version="33.0.0" />
-
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+        
+        <!-- Libs to override stuff that gives error related to monogame-->
         <PackageReference Include="Libuv" Version="1.10.0" />
+        <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
+        <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     </ItemGroup>
    
 </Project>
