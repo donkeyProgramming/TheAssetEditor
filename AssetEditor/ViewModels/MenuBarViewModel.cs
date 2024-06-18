@@ -68,11 +68,12 @@ namespace AssetEditor.ViewModels
         public ICommand OpenMountCreatorCommand { get; set; }
         public ICommand OpenAnimationBatchExporterCommand { get; set; }
         public ICommand OpenWh2AnimpackUpdaterCommand { get; set; }
+
         public ICommand OpenAudioExplorerCommand { get; set; }
         public ICommand OpenAudioEditorCommand { get; set; }
-        public ICommand DialogueEventTesting { get; set; }
-        public ICommand CreateTemplateCommand { get; }
-        public ICommand CompileAudioProjectsCommand { get; set; }
+        public ICommand CreateTemplateCommand { get; set; }
+        public ICommand CompileAudioCommand { get; set; }
+
         public ICommand SearchCommand { get; set; }
         public ICommand OpenRome2RePacksCommand { get; set; }
         public ICommand OpenThreeKingdomsPacksCommand { get; set; }
@@ -87,7 +88,6 @@ namespace AssetEditor.ViewModels
         public ICommand DownloadRmeCommand { get; set; }
 
         public ICommand OpenCampaignAnimCreatorCommand { get; set; }
-
         public ICommand OpenAnimationTransferToolCommand { get; set; }
         public ICommand OpenSuperViewToolCommand { get; set; }
         public ICommand OpenTechSkeletonEditorCommand { get; set; }
@@ -106,7 +106,6 @@ namespace AssetEditor.ViewModels
         public ICommand CreateAnimPack3kCommand { get; set; }
         public ICommand OpenAnimationKeyframeCommand { get; set; }
 
-        // Tutorials
         public ICommand OpenAnimatedPropTutorialCommand { get; set; }
         public ICommand OpenAssetEdBasic0TutorialCommand { get; set; }
         public ICommand OpenAssetEdBasic1TutorialCommand { get; set; }
@@ -144,13 +143,13 @@ namespace AssetEditor.ViewModels
             OpenTechSkeletonEditorCommand = new RelayCommand(OpenTechSkeletonEditor);
             OpenAnimationBatchExporterCommand = new RelayCommand(OpenAnimationBatchExporter);
             OpenWh2AnimpackUpdaterCommand = new RelayCommand(OpenWh2AnimpackUpdater);
+
             OpenAudioExplorerCommand = new RelayCommand(OpenAudioExplorerEditor);
             OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
-            CompileAudioProjectsCommand = new RelayCommand(CompileAudioProjects);
-            DialogueEventTesting = new RelayCommand(RunDialogueEventTesting);
+            CompileAudioCommand = new RelayCommand(CompileAudioProjects);
             CreateTemplateCommand = new RelayCommand<string>(CreateAudioTemplate);
-            OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframe);
 
+            OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframe);
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);
             GenerateMetaDataReportCommand = new RelayCommand(GenerateMetaDataReport);
             GenerateFileListReportCommand = new RelayCommand(GenerateFileListReport);
@@ -243,7 +242,7 @@ namespace AssetEditor.ViewModels
             window.DataContext = _serviceProvider.GetRequiredService<SettingsViewModel>();
             window.ShowDialog();
         }
-        
+
         void CreatePackFile()
         {
             var window = new TextInputWindow("New Packfile name", "");
@@ -280,11 +279,6 @@ namespace AssetEditor.ViewModels
         void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
         void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SkeletonEditorViewModel>>();
         void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();
-        private void RunDialogueEventTesting()
-        {
-            //var DialogueEventGenerator = new DialogueEventGenerator(_packfileService);
-            //DialogueEventGenerator.DoDialogueEventGenerator();
-        }
 
         private void CreateAudioTemplate(string audioTemplateFile)
         {
@@ -294,21 +288,10 @@ namespace AssetEditor.ViewModels
             var pack = _packfileService.GetEditablePack();
             var resourcePath = $"Shared.EmbeddedResources.Resources.AudioTemplates.{audioTemplateFile}";
 
-            // Check if the resource path is valid
             if (resourcePath == null)
-            {
-                Console.WriteLine($"Resource path for template type {audioTemplateFile} is null.");
                 return;
-            }
 
-            // Read the embedded resource
             using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
-            if (stream == null)
-            {
-                Console.WriteLine($"Resource {resourcePath} not found.");
-                return;
-            }
-
             using var reader = new StreamReader(stream);
             var text = reader.ReadToEnd();
             var byteArray = Encoding.ASCII.GetBytes(text);

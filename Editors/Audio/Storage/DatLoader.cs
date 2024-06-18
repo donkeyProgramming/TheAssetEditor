@@ -12,22 +12,34 @@ using Shared.GameFormats.Dat;
 
 namespace Editors.Audio.Storage
 {
-    public class WWiseNameLoader
+    public class DatLoader
     {
         private readonly PackFileService _pfs;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
         private Dictionary<uint, string> _nameLookUp { get; set; } = new Dictionary<uint, string>();
 
-        public WWiseNameLoader(PackFileService pfs, ApplicationSettingsService applicationSettingsService)
+        public DatLoader(PackFileService pfs, ApplicationSettingsService applicationSettingsService)
         {
             _pfs = pfs;
             _applicationSettingsService = applicationSettingsService;
         }
 
-        public Dictionary<uint, string> BuildNameHelper()
+        public (Dictionary<uint, string> nameLookUp, List<SoundDatFile.DatDialogueEventsWithStateGroups> dialogueEventsWithStateGroups, List<SoundDatFile.DatStateGroupsWithStates> stateGroupsWithStates) LoadDatData()
         {
             var wh3Db = LoadDatFiles(_pfs, out var _);
+            var nameLookUp = BuildNameHelper(wh3Db);
+            var dialogueEventsWithStateGroups = wh3Db.DialogueEventsWithStateGroups;
+            var stateGroupsWithStates0 = wh3Db.StateGroupsWithStates0;
+            var stateGroupsWithStates1 = wh3Db.StateGroupsWithStates1;
+            var stateGroupsWithStates = stateGroupsWithStates0.Concat(stateGroupsWithStates1).ToList();
+            ChangeNoneStatesToAny(stateGroupsWithStates);
+
+            return (nameLookUp, dialogueEventsWithStateGroups, stateGroupsWithStates);
+        }
+
+        public Dictionary<uint, string> BuildNameHelper(SoundDatFile wh3Db)
+        {
             var wh3DbNameList = wh3Db.CreateFileNameList();
             AddNames(wh3DbNameList);
 
@@ -35,44 +47,6 @@ namespace Editors.Audio.Storage
             var bnkFiles = _pfs.FindAllWithExtention(".bnk");
             var bnkNames = bnkFiles.Select(x => x.Name.Replace(".bnk", "")).ToArray();
             AddNames(bnkNames);
-
-            // Load all string from the game exe
-            if (File.Exists(@"C:\Users\ole_k\Desktop\Strings\game_wh3_1_2.txt"))
-            {
-                var exeContent = File.ReadAllLines(@"C:\Users\ole_k\Desktop\Strings\game_wh3_1_2.txt");
-                exeContent = exeContent.Select(x => x.ToLower()).ToArray();
-                var exeContentDistinct = exeContent.Distinct().ToArray();
-                AddNames(exeContent);
-            }
-
-            // Load all from wwiser
-            if (File.Exists(@"C:\Users\ole_k\Desktop\Wh3 sounds\wwiser.txt"))
-            {
-                var filecontent = File.ReadAllLines(@"C:\Users\ole_k\Desktop\Wh3 sounds\wwiser.txt");
-                AddNames(filecontent);
-            }
-
-            // Load all from sound test
-            if (File.Exists(@"C:\Users\georg\Desktop\potential_strings.txt"))
-            {
-                var filecontent = File.ReadAllLines(@"C:\Users\georg\Desktop\potential_strings.txt");
-                AddNames(filecontent);
-            }
-
-            // Load all from game db tables
-            if (Directory.Exists(@"C:\Users\ole_k\Desktop\Wh3 sounds\DbTables"))
-            {
-                var files = Directory.GetFiles(@"C:\Users\ole_k\Desktop\Wh3 sounds\DbTables");
-                foreach (var file in files)
-                {
-                    var fileLines = File.ReadAllLines(file);
-                    foreach (var fileLine in fileLines)
-                    {
-                        var content = fileLine.Split("\t");
-                        AddNames(content);
-                    }
-                }
-            }
 
             var wwiseIdFiles = _pfs.FindAllWithExtention(".wwiseids");
             foreach (var item in wwiseIdFiles)
@@ -82,16 +56,6 @@ namespace Editors.Audio.Storage
                 var splitData = data.Split("\n");
                 AddNames(splitData);
             }
-
-            /*
-            // Output CSV of known IDs matched with strings
-            using (var file = File.CreateText("C:\\Users\\george\\Desktop\\id_name_matches.csv"))
-                foreach (var item in _nameLookUp)
-                {
-                    var id = item;
-                    file.WriteLine(string.Join(",", id));
-                }
-            */
 
             return _nameLookUp;
         }
@@ -113,8 +77,8 @@ namespace Editors.Audio.Storage
                 try
                 {
                     var parsedFile = LoadDatFile(datFile);
-                    //parsedFile.DumpToFile(datDump); // This creates dat dumps for individual dat files
                     masterDat.Merge(parsedFile);
+                    //parsedFile.DumpToFile(datDump); // This creates dat dumps for individual dat files
                 }
                 catch (Exception e)
                 {
@@ -146,6 +110,21 @@ namespace Editors.Audio.Storage
                 _nameLookUp[hashVal] = name;
             }
         }
-    }
 
+        private static void ChangeNoneStatesToAny(List<SoundDatFile.DatStateGroupsWithStates> stateGroupsWithStates)
+        {
+            foreach (var item in stateGroupsWithStates)
+            {
+                for (var i = 0; i < item.States.Count; i++)
+                {
+                    if (item.States[i] == "None")
+                    {
+                        // Replace States equal to "None" with "Any". In Wwise when no state is selected in a State Group it sets the State to "Any", for some reason CA's dat has that State called "None" which doesn't make sense.
+                        // It's not as if no state is applied, what actually happens is the State Path uses 'any' State from the State Group, or in other words 'all' States not 'none'... Confusing I know.
+                        item.States[i] = "Any";
+                    }
+                }
+            }
+        }
+    }
 }

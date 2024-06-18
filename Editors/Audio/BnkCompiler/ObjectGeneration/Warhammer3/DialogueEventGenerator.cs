@@ -1,18 +1,25 @@
 ﻿using System;
-using CommunityToolkit.Diagnostics;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using CommunityToolkit.Diagnostics;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Editors.Audio.Storage;
+using Editors.Audio.Utility;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc.Shared;
 using Shared.GameFormats.WWise.Hirc.V136;
-using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
-using Editors.Audio.BnkCompiler;
-using Editors.Audio.Utility;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class DialogueEventGenerator : IWWiseHircGenerator
     {
+        private readonly IAudioRepository _audioRepository;
+
+        public DialogueEventGenerator(IAudioRepository audioRepository)
+        {
+            _audioRepository = audioRepository;
+        }
+
         public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(DialogueEvent);
 
@@ -31,7 +38,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseDialogueEvent.Id = inputDialogueEvent.Id;
             wwiseDialogueEvent.Type = HircType.Dialogue_Event;
 
-            var extractedDialogueEvents = DialogueEventData.ExtractedDialogueEvents;
+            var extractedDialogueEvents = _audioRepository.DialogueEventsWithStateGroups;
 
             foreach (var stateGroup in extractedDialogueEvents[inputDialogueEvent.Name])
             {
