@@ -4,12 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
+        Style="{StaticResource CustomWindowStyle}"
         Title="Create New Tag" Height="450" Width="400">
     <Grid>
         <ListView
-            ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}" 
+            ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}"
             SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
             MouseDoubleClick="ListView_MouseDoubleClick">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Height" Value="24"/>
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
     </Grid>
     

@@ -1,20 +1,9 @@
-﻿using System.Text;
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
-using Shared.GameFormats.RigidModel;
-using SharpGLTF.Geometry.VertexTypes;
-using SharpGLTF.Geometry;
+﻿using Shared.GameFormats.RigidModel;
 using SharpGLTF.Materials;
 using System.Numerics;
-using System.Linq;
-using SharpGLTF.Scenes;
 using SharpGLTF.Schema2;
 using Shared.GameFormats.Animation;
-using System.Collections.ObjectModel;
-using SharpGLTF.Memory;
-using System.Drawing.Imaging;
 using MeshImportExport;
-using Microsoft.Xna.Framework.Graphics;
 
 //https://github.com/ValveResourceFormat/ValveResourceFormat/blob/master/ValveResourceFormat/IO/GltfModelExporter.Material.cs material info
 
@@ -151,13 +140,7 @@ internal class Program
 
         return null;
     }
-
-    public void BuildMaterial()
-    {
-        var material = new MaterialBuilder()
-                .WithDoubleSide(true)
-                .WithChannelImage(KnownChannel.Normal, "");
-    }
+ 
 
     //static void M2ain(string[] args)
     //{

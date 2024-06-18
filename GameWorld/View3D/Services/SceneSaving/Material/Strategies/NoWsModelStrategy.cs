@@ -1,5 +1,4 @@
 ﻿using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services.SceneSaving.Material;
 
 namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 {
@@ -7,7 +6,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
     {
         public MaterialStrategy StrategyId => MaterialStrategy.WsModel_Warhammer2;
         public string Name => "None";
-        public string Description => "Dont generate a ws model";
+        public string Description => "Don't generate a ws model";
         public bool IsAvailable => true;
 
         public NoWsModelStrategy()

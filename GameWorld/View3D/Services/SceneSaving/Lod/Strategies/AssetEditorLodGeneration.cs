@@ -1,14 +1,11 @@
-﻿using System;
-using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services.SceneSaving;
-using GameWorld.Core.Services.SceneSaving.Lod;
+﻿using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration;
 
 namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
-    public class DefaultLodGeneration : OptimizedLodGeneratorBase, ILodGenerationStrategy
+    public class AssetEditorLodGeneration : LodGeneratorBase, ILodGenerationStrategy
     {
-        public LodStrategy StrategyId => LodStrategy.Default;
+        public LodStrategy StrategyId => LodStrategy.AssetEditor;
         public string Name => "Default";
         public string Description => "Use AssetEditor Algorithm";
         public bool IsAvailable => true;
@@ -20,9 +17,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 
         protected override void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio)
         {
-            var originalMesh = rmv2MeshNode.Geometry;
-            //var reducedMesh = MeshOptimizerService.CreatedReducedCopy(originalMesh, deductionRatio);
-            var reducedMesh = DecimatorMeshOptimizer.GetReducedMeshCopy(originalMesh, deductionRatio);
+            var reducedMesh = DecimatorMeshOptimizer.GetReducedMeshCopy(rmv2MeshNode.Geometry, deductionRatio);
             rmv2MeshNode.Geometry = reducedMesh;
         }
     }

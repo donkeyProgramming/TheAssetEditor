@@ -1,5 +1,4 @@
 ﻿using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services.SceneSaving.Material;
 using Shared.Core.Services;
 
 namespace GameWorld.Core.Services.SceneSaving.Material.Strategies

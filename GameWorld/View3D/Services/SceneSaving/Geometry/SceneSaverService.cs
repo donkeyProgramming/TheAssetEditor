@@ -22,14 +22,12 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
         private readonly ILogger _logger = Logging.Create<SceneSaverService>();
         private readonly EventHub _eventHub;
         private readonly PackFileService _packFileService;
-        private readonly IActiveFileResolver _activeFileResolver;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public SceneSaverService(EventHub eventHub, PackFileService packFileService, IActiveFileResolver activeFileResolver, ApplicationSettingsService applicationSettingsService)
+        public SceneSaverService(EventHub eventHub, PackFileService packFileService,ApplicationSettingsService applicationSettingsService)
         {
             _eventHub = eventHub;
             _packFileService = packFileService;
-            _activeFileResolver = activeFileResolver;
             _applicationSettingsService = applicationSettingsService;
         }
 
@@ -130,7 +128,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
 
         static RmvLodHeader[] CreateLodHeaders(RmvLodHeader[] baseHeaders, RmvVersionEnum version)
         {
-            var numLods = baseHeaders.Count();
+            var numLods = baseHeaders.Length;
             var factory = LodHeaderFactory.Create();
             var output = new RmvLodHeader[numLods];
             for (var i = 0; i < numLods; i++)

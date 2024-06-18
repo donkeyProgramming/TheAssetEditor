@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Linq;
 
-
 namespace GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration
 {
     public class DecimatorMeshOptimizer
@@ -40,11 +39,11 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration
                       0, 0, 0, 0)).ToArray();
             }
 
-            var currentTriangleCount = sourceSubMeshIndices.Length / 3;
+            var currentTriangleCount = sourceVertices.Length;
             var targetTriangleCount = (int)Math.Ceiling(currentTriangleCount * quality);
 
-            var algorithm = MeshDecimation.CreateAlgorithm(Algorithm.Default);
-            algorithm.Verbose = true;
+            var algorithm = MeshDecimation.CreateAlgorithm(Algorithm.FastQuadricMesh);
+            algorithm.PreserveBorders = true;
             var destMesh = MeshDecimation.DecimateMesh(algorithm, sourceMesh, targetTriangleCount);
 
             var destVertices = destMesh.Vertices;

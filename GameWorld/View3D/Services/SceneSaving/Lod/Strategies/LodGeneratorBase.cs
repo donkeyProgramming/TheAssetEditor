@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services.SceneSaving;
 using GameWorld.Core.Utility;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel;
 
 namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
-    public abstract class OptimizedLodGeneratorBase
+    public abstract class LodGeneratorBase
     {
         protected abstract void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio);
 
@@ -28,7 +27,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
         public void CreateLodsForRootNode(Rmv2ModelNode rootNode, LodGenerationSettings[] lodGenerationSettings)
         {
             var lods = rootNode.GetLodNodes();
-            var firtLod = lods.First();
+            var firstLod = lods.First();
             var lodRootNodes = lods
                 .Skip(1)
                 .Take(rootNode.Children.Count - 1)
@@ -37,7 +36,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
             // Delete all the lods
             DeleteAllLods(lodRootNodes);
 
-            var meshList = firtLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
+            var meshList = firstLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
             var generatedLod = CreateLods(meshList, lodGenerationSettings);
 
             for (var i = 0; i < lodRootNodes.Count; i++)
@@ -50,7 +49,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
         List<Rmv2MeshNode[]> CreateLods(List<Rmv2MeshNode> originalModel, LodGenerationSettings[] settings)
         {
             var output = new List<Rmv2MeshNode[]>();
-            for (var lodIndex = 0; lodIndex < settings.Length; lodIndex++)
+            for (var lodIndex = 1; lodIndex < settings.Length; lodIndex++)
             {
                 var deductionRatio = settings[lodIndex].LodRectionFactor;
                 var optimize = settings[lodIndex].OptimizeAlpha || settings[lodIndex].OptimizeVertex;
@@ -82,7 +81,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
                 foreach (var mesh in originalMeshClone)
                 {
                     if (mesh.ReduceMeshOnLodGeneration && settings[lodIndex].LodRectionFactor != 1)
-                        ReduceMesh(mesh, deductionRatio/*, false*/);
+                        ReduceMesh(mesh, deductionRatio);
                 }
 
                 output.Add(originalMeshClone.ToArray());

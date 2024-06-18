@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Windows;
-using System.Windows.Input;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -21,14 +18,11 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 {
     public class WsModelGeneratorService
     {
-        ILogger _logger = Logging.Create<WsModelGeneratorService>();
-
+        private readonly ILogger _logger = Logging.Create<WsModelGeneratorService>();
         private readonly PackFileService _packFileService;
-        private readonly IActiveFileResolver _activeFileResolver;
         private readonly List<WsModelMaterialFile> _existingMaterials;
 
-
-        private static readonly Dictionary<string, TextureType> TemplateStringToTextureTypes = new Dictionary<string, TextureType>
+        private static readonly Dictionary<string, TextureType> TemplateStringToTextureTypes = new()
         {
             {"BASE_COLOUR_PATH", TextureType.BaseColour},
             {"MATERIAL_MAP", TextureType.MaterialMap},
@@ -39,10 +33,9 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             {"SPECULAR_PATH", TextureType.Specular },
         };
 
-        public WsModelGeneratorService(PackFileService packFileService, IActiveFileResolver activeFileResolver)
+        public WsModelGeneratorService(PackFileService packFileService)
         {
             _packFileService = packFileService;
-            _activeFileResolver = activeFileResolver;
             _existingMaterials = LoadAllExistingMaterials();
         }
 
@@ -82,7 +75,6 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             sb.Append("<model version=\"1\">\n");
             sb.Append($"\t<geometry>{modelFilePath}</geometry>\n");
             sb.Append("\t\t<materials>\n");
-
 
             var lodNodes = mainNode.GetLodNodes();
             for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
@@ -193,7 +185,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             return null;
         }
 
-        bool IsMaterialMatch(GameTypeEnum game, Rmv2MeshNode mesh, WsModelMaterialFile material)
+        static bool IsMaterialMatch(GameTypeEnum game, Rmv2MeshNode mesh, WsModelMaterialFile material)
         {
             var vertexType = ModelMaterialEnumHelper.GetToolVertexFormat(mesh.Material.BinaryVertexFormat);
             if (vertexType != material.VertexType)

@@ -13,18 +13,19 @@ namespace MeshImportExport
 {
     internal class MeshExport
     {
-        public static MeshBuilder<VertexPositionNormal, VertexTexture1, VertexJoints4> CreateMesh(RmvModel rmvMesh, MaterialBuilder material)
+        public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> CreateMesh(RmvModel rmvMesh, MaterialBuilder material)
         {
-            var mesh = new MeshBuilder<VertexPositionNormal, VertexTexture1, VertexJoints4>(rmvMesh.Material.ModelName);
+            var mesh = new MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>(rmvMesh.Material.ModelName);
             mesh.VertexPreprocessor.SetValidationPreprocessors();
             var prim = mesh.UsePrimitive(material);
 
-            var vertexList = new List<VertexBuilder<VertexPositionNormal, VertexTexture1, VertexJoints4>>();
+            var vertexList = new List<VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>>();
             foreach (var vertex in rmvMesh.Mesh.VertexList)
             {
-                var glTfvertex = new VertexBuilder<VertexPositionNormal, VertexTexture1, VertexJoints4>();
+                var glTfvertex = new VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>();
                 glTfvertex.Geometry.Position = new Vector3(vertex.Position.X, vertex.Position.Y, vertex.Position.Z);
                 glTfvertex.Geometry.Normal = new Vector3(vertex.Normal.X, vertex.Normal.Y, vertex.Normal.Z);
+                glTfvertex.Geometry.Tangent = new Vector4(vertex.Tangent.X, vertex.Tangent.Y, vertex.Tangent.Z, 1);
                 glTfvertex.Material.TexCoord = new Vector2(vertex.Uv.X, vertex.Uv.Y);
 
                 if (vertex.WeightCount == 2)
