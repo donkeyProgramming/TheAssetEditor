@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Shared.GameFormats.Dat;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Didx;
 
@@ -6,9 +7,7 @@ namespace Editors.Audio.Storage
 {
     public interface RepositoryProvider
     {
-        AudioData LoadWwiseBnkAndDatData();
-        AudioData LoadWwiseDatData();
-
+        AudioData LoadBnkAndDatData();
     }
 
     public class AudioData
@@ -16,39 +15,33 @@ namespace Editors.Audio.Storage
         public Dictionary<uint, string> NameLookUpTable { get; internal set; }
         public Dictionary<uint, List<HircItem>> HircObjects { get; internal set; }
         public Dictionary<uint, List<DidxAudio>> DidxAudioObject { get; internal set; }
+        public List<SoundDatFile.DatDialogueEventsWithStateGroups> DialogueEventsWithStateGroups { get; internal set; }
+        public List<SoundDatFile.DatStateGroupsWithStates> StateGroupsWithStates { get; internal set; }
     }
 
     public class CreateRepositoryFromAllPackFiles : RepositoryProvider
     {
-        private readonly WWiseBnkLoader _wwiseDataLoader;
-        private readonly WWiseNameLoader _wwiseNameLoader;
+        private readonly BnkLoader _bnkLoader;
+        private readonly DatLoader _datLoader;
 
-        public CreateRepositoryFromAllPackFiles(WWiseBnkLoader wwiseDataLoader, WWiseNameLoader wwiseNameLoader)
+        public CreateRepositoryFromAllPackFiles(BnkLoader bnkLoader, DatLoader datLoader)
         {
-            _wwiseDataLoader = wwiseDataLoader;
-            _wwiseNameLoader = wwiseNameLoader;
+            _bnkLoader = bnkLoader;
+            _datLoader = datLoader;
         }
 
-        public AudioData LoadWwiseBnkAndDatData()
+        public AudioData LoadBnkAndDatData()
         {
-            var nameList = _wwiseNameLoader.BuildNameHelper();
-            var loadResult = _wwiseDataLoader.LoadBnkFiles();
+            var (nameLookUp, dialogueEventsWithStateGroups, stateGroupsWithStates) = _datLoader.LoadDatData();
+            var loadResult = _bnkLoader.LoadBnkFiles();
 
             return new AudioData()
             {
-                NameLookUpTable = nameList,
+                NameLookUpTable = nameLookUp,
+                DialogueEventsWithStateGroups = dialogueEventsWithStateGroups,
+                StateGroupsWithStates = stateGroupsWithStates,
                 HircObjects = loadResult.HircList,
                 DidxAudioObject = loadResult.DidxAudioList
-            };
-        }
-
-        public AudioData LoadWwiseDatData()
-        {
-            var nameList = _wwiseNameLoader.BuildNameHelper();
-
-            return new AudioData()
-            {
-                NameLookUpTable = nameList
             };
         }
     }

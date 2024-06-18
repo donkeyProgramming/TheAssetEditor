@@ -55,10 +55,5 @@ namespace Shared.GameFormats.WWise
         protected abstract void CreateSpecificData(ByteChunk chunk);
         public abstract void UpdateSize();
         public abstract byte[] GetAsByteArray();
-
     }
-
-
-
-
 }

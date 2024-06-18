@@ -1,15 +1,21 @@
-﻿using Shared.GameFormats.WWise;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Shared.GameFormats.Dat;
+using Shared.GameFormats.WWise;
 
 namespace Editors.Audio.Storage
 {
     public interface IAudioRepository
     {
         Dictionary<uint, string> NameLookUpTable { get; }
+        List<SoundDatFile.DatDialogueEventsWithStateGroups> DatDialogueEventsWithStateGroups { get; }
+        List<SoundDatFile.DatStateGroupsWithStates> DatStateGroupsWithStates { get; }
+        Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; }
+        Dictionary<string, List<string>> StateGroupsWithStates { get; }
         Dictionary<uint, List<HircItem>> HircObjects { get; }
+
 
         void ExportNameListToFile(string outputDirectory, bool includeIds = false);
         List<T> GetAllOfType<T>() where T : HircItem;
@@ -18,25 +24,30 @@ namespace Editors.Audio.Storage
         string GetNameFromHash(uint value);
         string GetNameFromHash(uint value, out bool found);
         string GetNameFromHash(uint? key);
+        string GetOwnerFileFromDialogueEvent(uint id, bool removeFileType = false);
     }
 
     public class AudioRepository : IAudioRepository
     {
         public Dictionary<uint, string> NameLookUpTable { get; private set; } = new Dictionary<uint, string>();
+        public List<SoundDatFile.DatDialogueEventsWithStateGroups> DatDialogueEventsWithStateGroups { get; private set; } = new List<SoundDatFile.DatDialogueEventsWithStateGroups>();
+        public List<SoundDatFile.DatStateGroupsWithStates> DatStateGroupsWithStates { get; private set; } = new List<SoundDatFile.DatStateGroupsWithStates>();
+        public Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; private set; }
+        public Dictionary<string, List<string>> StateGroupsWithStates { get; private set; }
         public Dictionary<uint, List<HircItem>> HircObjects { get; private set; } = new Dictionary<uint, List<HircItem>>();
 
-        public AudioRepository(RepositoryProvider provider, bool loadHircObjects = true)
+
+        public AudioRepository(RepositoryProvider provider)
         {
-            if (loadHircObjects)
             {
-                var data = provider.LoadWwiseBnkAndDatData();
+                var data = provider.LoadBnkAndDatData();
                 NameLookUpTable = data.NameLookUpTable;
+                DatDialogueEventsWithStateGroups = data.DialogueEventsWithStateGroups;
+                DatStateGroupsWithStates = data.StateGroupsWithStates;
                 HircObjects = data.HircObjects;
-            }
-            else
-            {
-                var data = provider.LoadWwiseDatData();
-                NameLookUpTable = data.NameLookUpTable;
+
+                StoreDialogueEventsWithStateGroups();
+                StoreStateGroupsWithStates();
             }
         }
 
@@ -54,7 +65,6 @@ namespace Editors.Audio.Storage
             return hircs;
         }
 
-        // Name lookup
         public string GetNameFromHash(uint value, out bool found)
         {
             found = NameLookUpTable.ContainsKey(value);
@@ -97,6 +107,60 @@ namespace Editors.Audio.Storage
             else
                 throw new System.NotImplementedException();
         }
-    }
 
+        public string GetOwnerFileFromDialogueEvent(uint id, bool removeFileType = false)
+        {
+            foreach (var hircObject in HircObjects)
+            {
+                var hircItem = hircObject.Value[0];
+
+                if (hircItem.Type == HircType.Dialogue_Event)
+                {
+                    var file = Path.GetFileName(hircItem.OwnerFile);
+
+                    if (removeFileType)
+                        file = Path.GetFileName(file);
+
+                    return file;
+                }
+            }
+
+            return null;
+        }
+
+        public void StoreDialogueEventsWithStateGroups()
+        {
+            DialogueEventsWithStateGroups = new Dictionary<string, List<string>>();
+            var dialogueEventsWithStateGroups = DatDialogueEventsWithStateGroups;
+
+            foreach (var dialogueEvent in dialogueEventsWithStateGroups)
+            {
+                if (!DialogueEventsWithStateGroups.ContainsKey(dialogueEvent.EventName))
+                    DialogueEventsWithStateGroups[dialogueEvent.EventName] = new List<string>();
+
+                foreach (var stateGroupId in dialogueEvent.StateGroups)
+                {
+                    var stateGroup = GetNameFromHash(stateGroupId);
+                    DialogueEventsWithStateGroups[dialogueEvent.EventName].Add(stateGroup);
+                }
+            }
+        }
+
+        public void StoreStateGroupsWithStates()
+        {
+            StateGroupsWithStates = new Dictionary<string, List<string>>();
+            var stateGroupsWithStates = DatStateGroupsWithStates;
+
+            foreach (var stateGroup in stateGroupsWithStates)
+            {
+                if (!StateGroupsWithStates.ContainsKey(stateGroup.StateGroupName))
+                    StateGroupsWithStates[stateGroup.StateGroupName] = new List<string>();
+
+                foreach (var state in stateGroup.States)
+                {
+                    StateGroupsWithStates[stateGroup.StateGroupName].Add(state);
+                }
+            }
+        }
+    }
 }

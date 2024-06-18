@@ -14,8 +14,7 @@ using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace Editors.Audio.Storage
 {
-
-    public class WWiseBnkLoader
+    public class BnkLoader
     {
         protected readonly IAudioRepository _repository;
         public NodeBaseParams NodeBaseParams { get; set; }
@@ -29,9 +28,9 @@ namespace Editors.Audio.Storage
 
         private readonly PackFileService _pfs;
         private readonly BnkParser _bnkParser;
-        readonly ILogger _logger = Logging.Create<WWiseBnkLoader>();
+        readonly ILogger _logger = Logging.Create<BnkLoader>();
 
-        public WWiseBnkLoader(PackFileService pfs, BnkParser bnkParser)
+        public BnkLoader(PackFileService pfs, BnkParser bnkParser)
         {
             _pfs = pfs;
             _bnkParser = bnkParser;
@@ -61,7 +60,7 @@ namespace Editors.Audio.Storage
             var failedBnks = new List<(string bnkFile, string Error)>();
 
             var counter = 1;
-            //foreach(var bnkFile in wantedBnkFiles)
+
             Parallel.ForEach(wantedBnkFiles, bnkFile =>
             {
                 var name = bnkFile.Key;
@@ -83,23 +82,6 @@ namespace Editors.Audio.Storage
             });
 
             var output = new LoadResult();
-
-            /*
-            // Generate CSV of IDs
-            using (var file = File.CreateText("C:\\Users\\george\\Desktop\\hirc_ids.csv"))
-            foreach (var parsedBnk in parsedBnkList)
-            {
-                    foreach (var item in parsedBnk.HircChuck.Hircs)
-                {
-                    
-                    if (item.Type == HircType.ActorMixer)                             
-                    {
-                        var id = item.Id;
-                        file.WriteLine(string.Join(",", id));
-                    }
-                }
-            }
-            */
 
             // Combine the data
             foreach (var parsedBnk in parsedBnkList)
