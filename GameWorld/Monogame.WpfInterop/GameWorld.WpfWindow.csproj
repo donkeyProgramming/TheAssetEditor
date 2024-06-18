@@ -6,10 +6,6 @@
   </PropertyGroup>
 
 	<ItemGroup>
-        <PackageReference Include="Pfim" Version="0.10.3" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
 	</ItemGroup>
 

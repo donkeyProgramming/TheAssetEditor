@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetKit.Wpf.AutoCompleteComboBox" Version="1.6.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\GameWorld\View3D\GameWorld.Core.csproj" />
     <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui.csproj" />
     <ProjectReference Include="..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />

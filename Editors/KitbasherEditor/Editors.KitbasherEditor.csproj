@@ -6,9 +6,7 @@
       <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="geometry3Sharp" Version="1.0.324" />
-  </ItemGroup>
+
 
   <ItemGroup>
     <ProjectReference Include="..\..\GameWorld\View3D\GameWorld.Core.csproj" />
