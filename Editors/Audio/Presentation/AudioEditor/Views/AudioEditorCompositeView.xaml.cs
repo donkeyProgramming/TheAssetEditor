@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Editors.Audio.Presentation.AudioEditor
 {
     /// <summary>
-    /// Interaction logic for AudioEditorCompositeView.xaml
+    /// Interaction logic for AudioEditorView.xaml
     /// </summary>
-    public partial class AudioEditorCompositeView : UserControl
+    public partial class AudioEditorView : UserControl
     {
-        public AudioEditorCompositeView()
+        public AudioEditorView()
         {
             InitializeComponent();
         }

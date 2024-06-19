@@ -279,7 +279,7 @@ namespace AssetEditor.ViewModels
         void OpenAudioEditor()
         {
             var openEditorCommand = _uiCommandFactory.Create<OpenEditorCommand>();
-            openEditorCommand.Execute<AudioEditorCompositeViewModel>();
+            openEditorCommand.Execute<AudioEditorViewModel>();
         }
 
         void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();

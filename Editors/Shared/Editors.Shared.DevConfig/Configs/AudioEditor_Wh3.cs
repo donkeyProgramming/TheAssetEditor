@@ -24,7 +24,7 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OpenFileOnLoad()
         {
-            _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorCompositeViewModel>();
+            _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
         }
     }
 }

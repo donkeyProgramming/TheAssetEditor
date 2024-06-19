@@ -31,10 +31,10 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerView>();
             serviceCollection.AddScoped<CompilerViewModel>();
 
-            serviceCollection.AddScoped<AudioEditorView>();
-            serviceCollection.AddScoped<AudioEditorViewModel>();
+            serviceCollection.AddScoped<AudioEditorDataView>();
+            serviceCollection.AddScoped<AudioEditorDataViewModel>();
             serviceCollection.AddScoped<AudioEditorSettingsViewModel>();
-            serviceCollection.AddScoped<AudioEditorCompositeViewModel>();
+            serviceCollection.AddScoped<AudioEditorViewModel>();
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
@@ -63,8 +63,8 @@ namespace Editors.Audio
         {
             factory.RegisterTool<AudioExplorerViewModel, AudioExplorerView>();
             factory.RegisterTool<CompilerViewModel, CompilerView>();
+            factory.RegisterTool<AudioEditorDataViewModel, AudioEditorDataView>();
             factory.RegisterTool<AudioEditorViewModel, AudioEditorView>();
-            factory.RegisterTool<AudioEditorCompositeViewModel, AudioEditorCompositeView>();
         }
     }
 }

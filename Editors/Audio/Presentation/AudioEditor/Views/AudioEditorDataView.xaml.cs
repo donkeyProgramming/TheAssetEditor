@@ -6,11 +6,11 @@ using Audio.Presentation.AudioExplorer;
 namespace Editors.Audio.Presentation.AudioEditor
 {
     /// <summary>
-    /// Interaction logic for AudioEditorView.xaml
+    /// Interaction logic for AudioEditorDataView.xaml
     /// </summary>
-    public partial class AudioEditorView : UserControl
+    public partial class AudioEditorDataView : UserControl
     {
-        public AudioEditorView()
+        public AudioEditorDataView()
         {
             InitializeComponent();
         }
