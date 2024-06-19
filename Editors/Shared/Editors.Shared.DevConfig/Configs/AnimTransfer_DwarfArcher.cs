@@ -22,16 +22,17 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
+            currentSettings.LoadCaPacksByDefault = true;
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-            currentSettings.LoadWemFiles = true;
+            currentSettings.LoadWemFiles = false;
         }
 
         public void OpenFileOnLoad()
         {
-            CreateDwardAndEmpArcher(_editorCreator, _toolFactory, _packFileService);
+            CreateDwarfAndEmpArcher(_editorCreator, _toolFactory, _packFileService);
         }
 
-        static void CreateDwardAndEmpArcher(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        static void CreateDwarfAndEmpArcher(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
         {
             var editorView = toolFactory.Create<EditorHost<AnimationTransferToolViewModel>>();
             var targetInput = new AnimationToolInput()

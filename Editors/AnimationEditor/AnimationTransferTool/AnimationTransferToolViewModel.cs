@@ -19,6 +19,7 @@ using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
 using Shared.Ui.BaseDialogs.SelectionListDialog;
+using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common;
 using Shared.Ui.Editors.BoneMapping;
 
@@ -32,11 +33,10 @@ namespace AnimationEditor.AnimationTransferTool
 
         private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
         private readonly SceneObjectBuilder _assetViewModelBuilder;
-
+        private readonly IWindowFactory _windowFactory;
         private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-
         private readonly AnimationPlayerViewModel _player;
 
         private SceneObject _copyTo;
@@ -45,11 +45,11 @@ namespace AnimationEditor.AnimationTransferTool
 
         List<IndexRemapping> _remappingInformation;
         RemappedAnimatedBoneConfiguration _config;
-        BoneMappingWindow _activeBoneMappingWindow;
+        AssetEditorWindow<BoneMappingViewModel> _activeBoneMappingWindow;
 
         public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
-        public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = new ObservableCollection<SkeletonBoneNode>();
-        public ObservableCollection<SkeletonBoneNode> FlatBoneList { get; set; } = new ObservableCollection<SkeletonBoneNode>();
+        public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = [];
+        public ObservableCollection<SkeletonBoneNode> FlatBoneList { get; set; } = [];
         public AnimationSettings AnimationSettings { get; set; } = new AnimationSettings();
 
         public NotifyAttr<SkeletonBoneNode> SelectedBone { get; set; } = new NotifyAttr<SkeletonBoneNode>();
@@ -61,11 +61,12 @@ namespace AnimationEditor.AnimationTransferTool
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
-            SceneObjectBuilder assetViewModelBuilder)
+            SceneObjectBuilder assetViewModelBuilder,
+            IWindowFactory windowFactory)
         {
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
             _assetViewModelBuilder = assetViewModelBuilder;
-
+            _windowFactory = windowFactory;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _player = player;
@@ -168,11 +169,11 @@ namespace AnimationEditor.AnimationTransferTool
 
         public void OpenMappingWindow()
         {
-            if (_activeBoneMappingWindow != null)
-            {
-                _activeBoneMappingWindow.Focus();
-                return;
-            }
+            //if (_activeBoneMappingWindow != null)
+            //{
+            //    _activeBoneMappingWindow.Focus();
+            //    return;
+            //}
 
             if (_copyTo.Skeleton == null || _copyFrom.Skeleton == null)
             {
@@ -193,39 +194,47 @@ namespace AnimationEditor.AnimationTransferTool
                 _config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(sourceSkeleton);
                 _config.SkeletonBoneHighlighter = new SkeletonBoneHighlighter(Generated, _copyFrom);
             }
+           
+            _activeBoneMappingWindow = _windowFactory.Create<BoneMappingViewModel, BoneMappingView>("Bone-Mapping", 1200, 1100);
+            _activeBoneMappingWindow.TypedContext.Initialize(_activeBoneMappingWindow, _config);
+            var windowResult = _activeBoneMappingWindow.ShowWindow(true);
+            if (windowResult == true)
+            {
+                _remappingInformation = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
+                UpdateAnimation();
+                UpdateBonesAfterMapping(Bones);
+            }
 
             // TODO
-           /* _activeBoneMappingWindow = new BoneMappingWindow(new BoneMappingViewModel(_config), false);
-            _activeBoneMappingWindow.Show();
-            _activeBoneMappingWindow.ApplySettings += BoneMappingWindow_Apply;
-            _activeBoneMappingWindow.Closed += BoneMappingWindow_Closed;*/
+            /* _activeBoneMappingWindow = new BoneMappingWindow(new BoneMappingViewModel(_config), false);
+             _activeBoneMappingWindow.Show();
+             _activeBoneMappingWindow.ApplySettings += BoneMappingWindow_Apply;
+             _activeBoneMappingWindow.Closed += BoneMappingWindow_Closed;*/
         }
 
-        private void BoneMappingWindow_Apply(object sender, EventArgs e)
-        {
-            _remappingInformation = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
-            UpdateAnimation();
-            UpdateBonesAfterMapping(Bones);
-        }
-
-        private void BoneMappingWindow_Closed(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_activeBoneMappingWindow.Result == true)
-                {
-                    _remappingInformation = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
-                    UpdateAnimation();
-                    UpdateBonesAfterMapping(Bones);
-                }
-            }
-            finally
-            {
-                _activeBoneMappingWindow.Closed -= BoneMappingWindow_Closed;
-                _activeBoneMappingWindow.ApplySettings -= BoneMappingWindow_Apply;
-                _activeBoneMappingWindow = null;
-            }
-        }
+        //private void BoneMappingWindow_Apply(object sender, EventArgs e)
+        //{
+        //
+        //}
+        //
+        //private void BoneMappingWindow_Closed(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        if (_activeBoneMappingWindow.Result == true)
+        //        {
+        //            _remappingInformation = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
+        //            UpdateAnimation();
+        //            UpdateBonesAfterMapping(Bones);
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        _activeBoneMappingWindow.Closed -= BoneMappingWindow_Closed;
+        //        _activeBoneMappingWindow.ApplySettings -= BoneMappingWindow_Apply;
+        //        _activeBoneMappingWindow = null;
+        //    }
+        //}
 
         void UpdateBonesAfterMapping(IEnumerable<SkeletonBoneNode> bones)
         {
