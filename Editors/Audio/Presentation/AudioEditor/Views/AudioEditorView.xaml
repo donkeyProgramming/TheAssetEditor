@@ -3,25 +3,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Editors.Audio.Presentation.AudioEditor"
-             xmlns:local1="clr-namespace:Editors.Audio.Presentation.AudioEditor.AudioEditorSettings"
+             xmlns:local1="clr-namespace:Editors.Audio.Presentation.AudioEditor.Views"
+             xmlns:local2="clr-namespace:Editors.Audio.Presentation.AudioEditor.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
             <ColumnDefinition Width="Auto" />
-            <!-- Auto width for the GridSplitter -->
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <!-- AudioEditorView -->
-        <local:AudioEditorDataView Grid.Column="0" />
+        <!-- AudioEditorDataView -->
+        <local1:AudioEditorDataView Grid.Column="0" />
 
         <!-- GridSplitter -->
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" />
 
         <!-- AudioEditorSettingsView -->
-        <local1:AudioEditorSettingsView Grid.Column="2" />
+        <local2:AudioEditorSettingsView Grid.Column="2" />
     </Grid>
 </UserControl>

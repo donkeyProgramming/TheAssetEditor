@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Editors.Audio.Presentation.AudioEditor
 {
-    internal static class AudioProjectSerialisation
+    public class AudioProjectSerialisation
     {
         public static string ConvertToAudioProject(AudioProject audioProject)
         {

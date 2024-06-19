@@ -1,9 +1,6 @@
-﻿using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using Audio.Presentation.AudioExplorer;
+﻿using System.Windows.Controls;
 
-namespace Editors.Audio.Presentation.AudioEditor
+namespace Editors.Audio.Presentation.AudioEditor.Views
 {
     /// <summary>
     /// Interaction logic for AudioEditorDataView.xaml

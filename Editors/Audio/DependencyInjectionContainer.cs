@@ -11,11 +11,8 @@ using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using Shared.Core.PackFiles;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.WWise;
-using System.IO;
-using System.Linq;
 
 namespace Editors.Audio
 {
@@ -31,7 +28,6 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerView>();
             serviceCollection.AddScoped<CompilerViewModel>();
 
-            serviceCollection.AddScoped<AudioEditorDataView>();
             serviceCollection.AddScoped<AudioEditorDataViewModel>();
             serviceCollection.AddScoped<AudioEditorSettingsViewModel>();
             serviceCollection.AddScoped<AudioEditorViewModel>();

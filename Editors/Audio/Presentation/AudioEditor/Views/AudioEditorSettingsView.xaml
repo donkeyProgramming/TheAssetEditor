@@ -1,89 +1,102 @@
-﻿<UserControl x:Class="Editors.Audio.Presentation.AudioEditor.AudioEditorSettings.AudioEditorSettingsView"
+﻿<UserControl x:Class="Editors.Audio.Presentation.AudioEditor.Views.AudioEditorSettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Editors.Audio.Presentation.AudioEditor.AudioEditorSettings"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="400">
-    <DockPanel LastChildFill="False">
-        <Label DockPanel.Dock="Top" Content="Audio Editor Settings:" FontSize="18" FontWeight="Bold"/>
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewmodels="clr-namespace:Editors.Audio.Presentation.AudioEditor.ViewModels"
+             xmlns:converters="clr-namespace:Editors.Audio.Presentation.AudioEditor"
+             d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorSettingsViewModel}"
+             mc:Ignorable="d"
+             d:DesignHeight="800">
 
-        <!-- Audio Project Type Section -->
-        <GroupBox DockPanel.Dock="Top" Margin="5" Header="Audio Project Type:">
-            <StackPanel Margin="10">
-                <RadioButton GroupName="ProjectType" Content="Campaign VO" Margin="0 0 5 0"/>
-                <RadioButton GroupName="ProjectType" Content="Battle VO" Margin="0 0 5 0"/>
-                <RadioButton GroupName="ProjectType" Content="Frontend VO" Margin="0 0 5 0"/>
+    <!-- Resources Section -->
+    <UserControl.Resources>
+        <converters:EnumConverter x:Key="EnumConverter"/>
+    </UserControl.Resources>
+
+    <!-- Content -->
+    <DockPanel LastChildFill="False">
+        <Label DockPanel.Dock="Top" Content="Audio Project Settings" FontSize="16"/>
+
+        <!-- Audio Project Type -->
+        <GroupBox DockPanel.Dock="Top" Margin="5" Header="Audio Project Type">
+            <StackPanel Margin="10 5 0 10" Orientation="Horizontal">
+                <CheckBox Content="Campaign VO" Margin="0 2.5 5 0"
+                          IsChecked="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.CampaignVO}}"/>
+                <CheckBox Content="Battle VO" Margin="0 2.5 5 0"
+                          IsChecked="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Frontend VO" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.FrontendVO}}"/>
             </StackPanel>
         </GroupBox>
 
-        <!-- Audio Quality Settings Section -->
-        <GroupBox DockPanel.Dock="Top" Margin="5" Header="Audio Quality Settings:">
-            <Grid Margin="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-
-                <Label Grid.Row="0" Grid.Column="0" Content="Sample Rate"/>
-                <Label Grid.Row="0" Grid.Column="1" Content=":"/>
-                <ComboBox Grid.Row="0" Grid.Column="2" SelectedIndex="0">
-                    <ComboBoxItem Content="44.1 kHz"/>
-                    <ComboBoxItem Content="48 kHz"/>
-                    <ComboBoxItem Content="96 kHz"/>
-                </ComboBox>
-
-                <Label Grid.Row="1" Grid.Column="0" Content="Bit Depth"/>
-                <Label Grid.Row="1" Grid.Column="1" Content=":"/>
-                <ComboBox Grid.Row="1" Grid.Column="2" SelectedIndex="0">
-                    <ComboBoxItem Content="16-bit"/>
-                    <ComboBoxItem Content="24-bit"/>
-                    <ComboBoxItem Content="32-bit"/>
-                </ComboBox>
-            </Grid>
+        <!-- Dialogue Events Preset -->
+        <GroupBox DockPanel.Dock="Top" Margin="5" Header="Dialogue Events Preset">
+            <StackPanel Margin="10 5 0 10" Orientation="Horizontal">
+                <CheckBox Content="All" Margin="0 2.5 5 0"
+                          IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.All}}"/>
+                <CheckBox Content="Essential" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.Essential}}"/>
+            </StackPanel>
         </GroupBox>
 
-        <!-- Output Settings Section -->
-        <GroupBox DockPanel.Dock="Top" Margin="5" Header="Output Settings:">
-            <Grid Margin="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
+        <!-- VO Type -->
+        <GroupBox DockPanel.Dock="Top" Margin="5" Header="VO Type">
+            <StackPanel Margin="10 0 0 10">
+                <!-- Campaign VO Types -->
+                <CheckBox Content="Lord" Margin="0 10 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CampaignLord}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.CampaignVO}}"/>
+                <CheckBox Content="Hero" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CampaignHero}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.CampaignVO}}"/>
 
-                <Label Grid.Row="0" Grid.Column="0" Content="Output Format"/>
-                <Label Grid.Row="0" Grid.Column="1" Content=":"/>
-                <ComboBox Grid.Row="0" Grid.Column="2" SelectedIndex="0">
-                    <ComboBoxItem Content="WAV"/>
-                    <ComboBoxItem Content="MP3"/>
-                    <ComboBoxItem Content="OGG"/>
-                </ComboBox>
+                <!-- Battle VO Types -->
+                <!-- Lord -->
+                <Label Content="Lord" FontWeight="Bold" Margin="-5 0 0 0"
+                       Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Melee Lord" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.MeleeLord}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Skirmish Lord" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SkirmishLord}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Caster Lord" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CasterLord}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
 
-                <Label Grid.Row="1" Grid.Column="0" Content="Channels"/>
-                <Label Grid.Row="1" Grid.Column="1" Content=":"/>
-                <ComboBox Grid.Row="1" Grid.Column="2" SelectedIndex="0">
-                    <ComboBoxItem Content="Mono"/>
-                    <ComboBoxItem Content="Stereo"/>
-                    <ComboBoxItem Content="5.1 Surround"/>
-                </ComboBox>
+                <!-- Hero -->
+                <Label Content="Hero" FontWeight="Bold" Margin="-5 5 0 0"
+                       Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Melee Hero" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.MeleeHero}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Skirmish Hero" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SkirmishHero}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Caster Hero" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CasterHero}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
 
-                <Label Grid.Row="2" Grid.Column="0" Content="Destination Folder"/>
-                <Label Grid.Row="2" Grid.Column="1" Content=":"/>
-                <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding DestinationFolder, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="2"/>
-            </Grid>
+                <!-- Unit -->
+                <Label Content="Unit" FontWeight="Bold" Margin="-5 5 0 0"
+                       Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Infantry Unit" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.InfantryUnit}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Skirmisher Unit" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SkirmisherUnit}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Cavalry Unit" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CavalryUnit}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="SEM Unit" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SEMUnit}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <CheckBox Content="Artillery Unit" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.ArtilleryUnit}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+            </StackPanel>
         </GroupBox>
-
     </DockPanel>
 </UserControl>
