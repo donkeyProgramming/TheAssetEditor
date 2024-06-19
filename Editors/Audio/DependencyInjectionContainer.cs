@@ -63,7 +63,6 @@ namespace Editors.Audio
         {
             factory.RegisterTool<AudioExplorerViewModel, AudioExplorerView>();
             factory.RegisterTool<CompilerViewModel, CompilerView>();
-            factory.RegisterTool<AudioEditorDataViewModel, AudioEditorDataView>();
             factory.RegisterTool<AudioEditorViewModel, AudioEditorView>();
         }
     }

@@ -10,17 +10,10 @@ using Shared.Core.ToolCreation;
 
 namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 {
-    public class AudioEditorSettingsViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public class AudioEditorSettingsViewModel
     {
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor Settings");
-
         public AudioEditorSettingsViewModel()
         {
         }
-
-        public void Close() { }
-        public bool Save() => true;
-        public PackFile MainFile { get; set; }
-        public bool HasUnsavedChanges { get; set; } = false;
     }
 }
