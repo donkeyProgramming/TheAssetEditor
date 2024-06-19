@@ -11,8 +11,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = new Hotkey(Key.Q, ModifierKeys.None);
 
-        GizmoComponent _gizmoComponent;
-        TransformToolViewModel _transformToolViewModel;
+        private readonly GizmoComponent _gizmoComponent;
+        private readonly TransformToolViewModel _transformToolViewModel;
 
         public SelectGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel)
         {
@@ -34,8 +34,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = new Hotkey(Key.W, ModifierKeys.None);
 
-        GizmoComponent _gizmoComponent;
-        TransformToolViewModel _transformToolViewModel;
+        private readonly GizmoComponent _gizmoComponent;
+        private readonly TransformToolViewModel _transformToolViewModel;
 
         public MoveGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel)
         {
@@ -60,8 +60,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = new Hotkey(Key.E, ModifierKeys.None);
 
-        GizmoComponent _gizmoComponent;
-        TransformToolViewModel _transformToolViewModel;
+        private readonly GizmoComponent _gizmoComponent;
+        private readonly TransformToolViewModel _transformToolViewModel;
 
         public RotateGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel)
         {
@@ -86,8 +86,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = new Hotkey(Key.R, ModifierKeys.None);
 
-        GizmoComponent _gizmoComponent;
-        TransformToolViewModel _transformToolViewModel;
+        private readonly GizmoComponent _gizmoComponent;
+        private readonly TransformToolViewModel _transformToolViewModel;
 
         public ScaleGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel)
         {

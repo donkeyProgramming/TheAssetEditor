@@ -11,7 +11,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = new Hotkey(Key.Add, ModifierKeys.None);
 
-        GizmoComponent _gizmoComponent;
+        private readonly  GizmoComponent _gizmoComponent;
 
      
         public ScaleGizmoUpCommand(GizmoComponent gizmoComponent)
@@ -28,7 +28,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = new Hotkey(Key.Add, ModifierKeys.None);
 
-        GizmoComponent _gizmoComponent;
+        private readonly GizmoComponent _gizmoComponent;
 
 
         public ScaleGizmoDownCommand(GizmoComponent gizmoComponent)

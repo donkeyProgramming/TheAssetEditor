@@ -13,8 +13,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
         public Hotkey HotKey { get; } = null;
 
-        SelectionManager _selectionManager;
-        ObjectEditor _objectEditor;
+        private readonly SelectionManager _selectionManager;
+        private readonly ObjectEditor _objectEditor;
 
         public ReduceMeshCommand(SelectionManager selectionManager, ObjectEditor objectEditor)
         {

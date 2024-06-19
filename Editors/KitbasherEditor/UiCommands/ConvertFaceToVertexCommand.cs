@@ -11,8 +11,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.FaceSelected;
         public Hotkey HotKey { get; } = null;
 
-        FaceEditor _faceEditor;
-        SelectionManager _selectionManager;
+        private readonly FaceEditor _faceEditor;
+        private readonly SelectionManager _selectionManager;
 
         public ConvertFaceToVertexCommand(FaceEditor faceEditor, SelectionManager selectionManager)
         {

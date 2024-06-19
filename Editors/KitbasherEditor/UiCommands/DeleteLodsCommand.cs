@@ -2,8 +2,6 @@
 using GameWorld.Core.SceneNodes;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
@@ -14,7 +12,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public Hotkey HotKey { get; } = null;
 
 
-        SceneManager _sceneManager;
+        private readonly SceneManager _sceneManager;
 
         public DeleteLodsCommand(SceneManager sceneManager)
         {

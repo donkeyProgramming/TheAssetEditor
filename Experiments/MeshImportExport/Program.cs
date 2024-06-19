@@ -78,9 +78,9 @@ internal class Program
         var invMatrixRootBase = invMatrixFile.MatrixList[0];
         var frameBase = file.AnimationParts[0].DynamicFrames[0];
 
-
+        Dictionary<Node, BoneMetaData> boneMetaData = new();
         var output = new List<(Node node, Matrix4x4 invMatrix)>();
-        var rootNode = (orgRoot.CreateNode("Bone_0")
+        var rootNode = (orgRoot.CreateNode(file.Bones[0].Name)
                    .WithLocalRotation(new Quaternion(frameBase.Quaternion[0].X, frameBase.Quaternion[0].Y, frameBase.Quaternion[0].Z, frameBase.Quaternion[0].W))
                    .WithLocalTranslation(new Vector3(frameBase.Transforms[0].X, frameBase.Transforms[0].Y, frameBase.Transforms[0].Z))
                    ,
@@ -89,11 +89,12 @@ internal class Program
                    invMatrixRootBase.M31, invMatrixRootBase.M32, invMatrixRootBase.M33, invMatrixRootBase.M34,
                    invMatrixRootBase.M41, invMatrixRootBase.M42, invMatrixRootBase.M43, invMatrixRootBase.M44)));
 
+        boneMetaData[rootNode.Item1] = new BoneMetaData(file.Bones[0].Name, file.Bones[0].Id);
         output.Add(rootNode);
         var allBonesButFirst = file.Bones.Skip(1);
         foreach (var boneInfo in allBonesButFirst)
         {
-            var parent = FindBoneInList(boneInfo.ParentId, output.Select(x => x.node).ToList());
+            var parent = FindBoneInList(boneMetaData, boneInfo.ParentId, output.Select(x => x.node).ToList());
             if (parent == null)
             {
 
@@ -104,7 +105,7 @@ internal class Program
 
                 var invMatrix = invMatrixFile.MatrixList[boneInfo.Id];
 
-                var newNode = (parent.CreateNode("Bone_" + boneInfo.Id)
+                var newNode = (parent.CreateNode(boneInfo.Name)
                     .WithLocalRotation(new Quaternion(frame.Quaternion[boneInfo.Id].X, frame.Quaternion[boneInfo.Id].Y, frame.Quaternion[boneInfo.Id].Z, frame.Quaternion[boneInfo.Id].W))
                     .WithLocalTranslation(new Vector3(frame.Transforms[boneInfo.Id].X, frame.Transforms[boneInfo.Id].Y, frame.Transforms[boneInfo.Id].Z))
 
@@ -115,25 +116,28 @@ internal class Program
                     invMatrix.M41, invMatrix.M42, invMatrix.M43, invMatrix.M44)));
 
                 output.Add(newNode);
+                boneMetaData[newNode.Item1] = new BoneMetaData(boneInfo.Name, boneInfo.Id);
             }
         }
         return output;
     }
 
+    record BoneMetaData(string Name, int Id);
 
 
-    static Node? FindBoneInList(int parentId, IEnumerable<Node> boneList)
+    static Node? FindBoneInList(Dictionary<Node, BoneMetaData> boneMetaData, int parentId, IEnumerable<Node> boneList)
     {
         foreach (var bone in boneList)
         {
-            var boneIndex = int.Parse(bone.Name.Replace("Bone_", ""));
+            var metaData = boneMetaData[bone];
+            var boneIndex = metaData.Id;
             if (boneIndex == parentId)
                 return bone;
         }
 
         foreach (var bone in boneList)
         {
-            var res = FindBoneInList(parentId, bone.VisualChildren);
+            var res = FindBoneInList(boneMetaData, parentId, bone.VisualChildren);
             if (res != null)
                 return res;
         }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using CommonControls.Editors.BoneMapping.View;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components;
