@@ -1,5 +1,5 @@
 ﻿using AnimationEditor.AnimationTransferTool;
-using AnimationEditor.PropCreator.ViewModels;
+using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.DevConfig.Base;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;

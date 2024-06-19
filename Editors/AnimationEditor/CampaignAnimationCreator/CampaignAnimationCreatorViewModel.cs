@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Windows;
-using AnimationEditor.Common.ReferenceModel;
-using AnimationEditor.PropCreator.ViewModels;
+using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.BaseControl;
+using Editors.Shared.Core.Common.ReferenceModel;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
@@ -14,7 +14,7 @@ using Shared.Ui.Common;
 
 namespace AnimationEditor.CampaignAnimationCreator
 {
-    public class CampaignAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<CampaignAnimationCreatorViewModel>, IEditorViewModelTypeProvider
+    public class CampaignAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<CampaignAnimationCreatorViewModel>
     {
         public Type EditorViewModelType => typeof(EditorView);
         AnimationToolInput _debugDataToLoad;

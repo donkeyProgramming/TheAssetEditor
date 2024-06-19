@@ -1,5 +1,5 @@
-﻿using AnimationEditor.PropCreator.ViewModels;
-using AnimationEditor.SkeletonEditor;
+﻿using AnimationEditor.SkeletonEditor;
+using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.DevConfig.Base;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;

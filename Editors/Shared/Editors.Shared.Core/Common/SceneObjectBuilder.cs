@@ -14,7 +14,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Animation;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
-namespace AnimationEditor.Common.ReferenceModel
+namespace Editors.Shared.Core.Common
 {
     public class SceneObjectBuilder
     {
@@ -90,7 +90,7 @@ namespace AnimationEditor.Common.ReferenceModel
                 {
                     if (assetViewModel.Skeleton != null)
                     {
-                        int boneIndex = assetViewModel.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
+                        var boneIndex = assetViewModel.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
                         mesh.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(assetViewModel, boneIndex);
                     }
                 }

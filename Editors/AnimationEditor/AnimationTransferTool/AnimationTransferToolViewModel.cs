@@ -4,11 +4,10 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using AnimationEditor.Common.AnimationPlayer;
-using AnimationEditor.Common.ReferenceModel;
-using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.Editors.BoneMapping.View;
 using CommonControls.SelectionListDialog;
+using Editors.Shared.Core.Common;
+using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
@@ -25,7 +24,7 @@ using Shared.Ui.Editors.BoneMapping;
 
 namespace AnimationEditor.AnimationTransferTool
 {
-    public class AnimationTransferToolViewModel : IHostedEditor<AnimationTransferToolViewModel>, IEditorViewModelTypeProvider
+    public class AnimationTransferToolViewModel : IHostedEditor<AnimationTransferToolViewModel>
     {
         public Type EditorViewModelType => typeof(EditorView);
         AnimationToolInput _inputTargetData;

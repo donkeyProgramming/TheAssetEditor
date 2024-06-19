@@ -127,11 +127,7 @@ namespace MeshDecimator.Algorithms
         /// <param name="targetTris">The target count of triangles.</param>
         protected void ReportStatus(int iteration, int originalTris, int currentTris, int targetTris)
         {
-            var statusReportInvoker = this.statusReportInvoker;
-            if (statusReportInvoker != null)
-            {
-                statusReportInvoker.Invoke(iteration, originalTris, currentTris, targetTris);
-            }
+            this.statusReportInvoker?.Invoke(iteration, originalTris, currentTris, targetTris);
         }
         #endregion
 

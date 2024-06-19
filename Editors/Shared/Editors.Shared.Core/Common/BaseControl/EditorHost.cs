@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using AnimationEditor.Common.AnimationPlayer;
-using AnimationEditor.Common.ReferenceModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Shared.Core.Common.AnimationPlayer;
+using Editors.Shared.Core.Common.ReferenceModel;
 using GameWorld.Core.Components;
 using GameWorld.Core.Services;
 using GameWorld.WpfWindow;
@@ -12,9 +12,9 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
-namespace AnimationEditor.PropCreator.ViewModels
+namespace Editors.Shared.Core.Common.BaseControl
 {
-    public interface IHostedEditor<T>
+    public interface IHostedEditor<T> : IEditorViewModelTypeProvider
     {
         void Initialize(EditorHost<T> owner);
         string EditorName { get; }
@@ -34,7 +34,7 @@ namespace AnimationEditor.PropCreator.ViewModels
 
         private readonly FocusSelectableObjectService _focusSelectableObjectService;
 
-        public ICommand ResetCameraCommand { get; set; } 
+        public ICommand ResetCameraCommand { get; set; }
         public ICommand FocusCamerasCommand { get; set; }
 
         public EditorHost(IToolFactory toolFactory,
@@ -66,7 +66,7 @@ namespace AnimationEditor.PropCreator.ViewModels
         void Initialize(SceneInitializedEvent sceneInitializedEvent)
         {
             var typed = Editor as IHostedEditor<TEditor>;
-            typed.Initialize(this);
+            typed!.Initialize(this);
         }
 
         void ResetCameraAction() => _focusSelectableObjectService.ResetCamera();

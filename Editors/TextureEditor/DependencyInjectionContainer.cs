@@ -18,7 +18,7 @@ namespace Editors.TextureEditor
 
         public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<TextureEditorViewModel, TexturePreviewView>(new ExtensionToTool(EditorEnums.Texture_Editor, new[] { ".dds", ".png", ".jpeg" }));
+            factory.RegisterTool<TextureEditorViewModel, TexturePreviewView>(new ExtensionToTool(EditorEnums.Texture_Editor, [".dds", ".png", ".jpeg"]));
         }
     }
 }

@@ -8,7 +8,7 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
-namespace AnimationEditor.Common.ReferenceModel
+namespace Editors.Shared.Core.Common
 {
     public class SceneObject : BaseComponent, ISkeletonProvider
     {

@@ -17,11 +17,10 @@ namespace KitbasherEditor.EventHandlers
 {
     public class SceneInitializedHandler
     {
-        ILogger _logger = Logging.Create<SceneInitializedHandler>();
+        private readonly ILogger _logger = Logging.Create<SceneInitializedHandler>();
 
         private readonly KitbasherViewModel _kitbasherViewModel;
         private readonly PackFileService _packFileService;
-        private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly EventHub _eventHub;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly SaveSettings _saveSettings;
@@ -31,7 +30,6 @@ namespace KitbasherEditor.EventHandlers
         public SceneInitializedHandler(
             KitbasherViewModel kitbasherViewModel,
             PackFileService packFileService,
-            KitbasherRootScene kitbasherRootScene,
             EventHub eventHub,
             KitbashSceneCreator kitbashSceneCreator,
             SaveSettings saveSettings,
@@ -40,7 +38,6 @@ namespace KitbasherEditor.EventHandlers
         {
             _kitbasherViewModel = kitbasherViewModel;
             _packFileService = packFileService;
-            _kitbasherRootScene = kitbasherRootScene;
             _eventHub = eventHub;
             _kitbashSceneCreator = kitbashSceneCreator;
             _saveSettings = saveSettings;

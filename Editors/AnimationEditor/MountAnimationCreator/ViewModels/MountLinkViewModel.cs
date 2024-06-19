@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using AnimationEditor.Common.ReferenceModel;
+using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using CommonControls.PackFileBrowser;
+using Editors.Shared.Core.Common;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 
-namespace AnimationEditor.Common.ReferenceModel
+namespace Editors.Shared.Core.Common.ReferenceModel
 {
     public class SelectMeshViewModel : NotifyPropertyChangedImpl
     {

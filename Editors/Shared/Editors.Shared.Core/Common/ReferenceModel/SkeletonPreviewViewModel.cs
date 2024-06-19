@@ -3,7 +3,7 @@ using Shared.Core.Misc;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace AnimationEditor.Common.ReferenceModel
+namespace Editors.Shared.Core.Common.ReferenceModel
 {
     public class SkeletonPreviewViewModel : NotifyPropertyChangedImpl
     {
@@ -85,7 +85,7 @@ namespace AnimationEditor.Common.ReferenceModel
         {
             var output = new List<SkeletonBoneNode>();
 
-            for (int i = 0; i < skeleton.BoneCount; i++)
+            for (var i = 0; i < skeleton.BoneCount; i++)
             {
                 var parentBoneId = skeleton.GetParentBoneIndex(i);
                 if (parentBoneId == -1)
@@ -107,7 +107,7 @@ namespace AnimationEditor.Common.ReferenceModel
         public static ObservableCollection<SkeletonBoneNode> CreateFlatSkeletonList(GameSkeleton skeleton, int startBone = -1)
         {
             var output = new ObservableCollection<SkeletonBoneNode>();
-            for (int i = 0; i < skeleton.BoneCount; i++)
+            for (var i = 0; i < skeleton.BoneCount; i++)
             {
                 if (startBone == -1 || IsIndirectChildOf(i, startBone, skeleton))
                 {
@@ -136,7 +136,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         static SkeletonBoneNode CreateNode(int boneId, int parentBoneId, string boneName)
         {
-            SkeletonBoneNode item = new SkeletonBoneNode
+            var item = new SkeletonBoneNode
             {
                 BoneIndex = boneId,
                 BoneName = boneName,
@@ -147,7 +147,7 @@ namespace AnimationEditor.Common.ReferenceModel
 
         static SkeletonBoneNode GetParent(IEnumerable<SkeletonBoneNode> root, int parentBoneId)
         {
-            foreach (SkeletonBoneNode item in root)
+            foreach (var item in root)
             {
                 if (item.BoneIndex == parentBoneId)
                     return item;

@@ -1,4 +1,4 @@
-﻿using AnimationEditor.Common.ReferenceModel;
+﻿using Editors.Shared.Core.Common;
 using Shared.Ui.Editors.BoneMapping;
 
 namespace AnimationEditor.AnimationTransferTool

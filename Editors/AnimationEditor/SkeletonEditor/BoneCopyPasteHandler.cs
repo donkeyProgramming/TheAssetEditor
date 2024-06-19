@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using AnimationEditor.Common.ReferenceModel;
+using Editors.Shared.Core.Common.ReferenceModel;
 using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
