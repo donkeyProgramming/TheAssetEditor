@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using AnimationEditor.Common.AnimationPlayer;
-using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.ViewModels;
-using AnimationEditor.PropCreator.ViewModels;
+using Editors.Shared.Core.Common;
+using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
+using Editors.Shared.Core.Common.ReferenceModel;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
@@ -20,11 +20,11 @@ using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
-using SkeletonBoneNode = AnimationEditor.Common.ReferenceModel.SkeletonBoneNode;
+using SkeletonBoneNode = Editors.Shared.Core.Common.ReferenceModel.SkeletonBoneNode;
 
 namespace AnimationEditor.AnimationKeyframeEditor
 {
-    public class AnimationKeyframeEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<AnimationKeyframeEditorViewModel>, IEditorViewModelTypeProvider
+    public class AnimationKeyframeEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<AnimationKeyframeEditorViewModel>
     {
         public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;

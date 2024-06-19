@@ -1,6 +1,4 @@
-﻿using System.Windows;
-using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration;
+﻿using GameWorld.Core.SceneNodes;
 
 namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
@@ -29,8 +27,6 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 
         protected override void ReduceMesh(Rmv2MeshNode rmv2MeshNode, float deductionRatio)
         {
-            //var reducedMesh = DecimatorMeshOptimizer.GetReducedMeshCopy(rmv2MeshNode.Geometry, deductionRatio);
-            //rmv2MeshNode.Geometry = reducedMesh;
         }
     }
 }

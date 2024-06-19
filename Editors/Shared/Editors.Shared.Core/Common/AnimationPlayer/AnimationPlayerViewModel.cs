@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using AnimationEditor.Common.ReferenceModel;
 using Shared.Core.Misc;
 
-namespace AnimationEditor.Common.AnimationPlayer
+namespace Editors.Shared.Core.Common.AnimationPlayer
 {
     public class AnimationPlayerViewModel : NotifyPropertyChangedImpl
     {
@@ -25,7 +24,7 @@ namespace AnimationEditor.Common.AnimationPlayer
         public AnimationPlayerViewModel()
         {
             IsEnabled.Value = false;
-            IsEnabled.PropertyChanged += (x,y)=> OnAnimationPlayerEnabled(IsEnabled.Value);
+            IsEnabled.PropertyChanged += (x, y) => OnAnimationPlayerEnabled(IsEnabled.Value);
         }
 
         private void OnMainAnimationChanged(AssetPlayerItem oldAnimation, AssetPlayerItem mainAnimation)
@@ -40,7 +39,7 @@ namespace AnimationEditor.Common.AnimationPlayer
         public void RegisterAsset(SceneObject asset)
         {
             _assetList.Add(asset);
-            var playerItem = new AssetPlayerItem() { Asset = asset};
+            var playerItem = new AssetPlayerItem() { Asset = asset };
             PlayerItems.Add(playerItem);
 
             asset.Player.LoopAnimation = false;

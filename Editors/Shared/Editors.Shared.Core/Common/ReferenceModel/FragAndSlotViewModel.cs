@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Windows;
+using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using Shared.Core.Events;
@@ -11,7 +12,7 @@ using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
 using Shared.Ui.Events.UiCommands;
 
-namespace AnimationEditor.Common.ReferenceModel
+namespace Editors.Shared.Core.Common.ReferenceModel
 {
     public class SelectFragAndSlotViewModel : NotifyPropertyChangedImpl
     {

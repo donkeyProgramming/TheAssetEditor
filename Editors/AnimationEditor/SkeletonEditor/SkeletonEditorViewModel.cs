@@ -2,10 +2,10 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
-using AnimationEditor.Common.ReferenceModel;
-using AnimationEditor.PropCreator.ViewModels;
 using CommonControls.PackFileBrowser;
+using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.BaseControl;
+using Editors.Shared.Core.Common.ReferenceModel;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
@@ -16,7 +16,7 @@ using Shared.Ui.BaseDialogs.MathViews;
 
 namespace AnimationEditor.SkeletonEditor
 {
-    public class SkeletonEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<SkeletonEditorViewModel>, IEditorViewModelTypeProvider
+    public class SkeletonEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<SkeletonEditorViewModel>
     {
         public Type EditorViewModelType => typeof(EditorView);
         SceneObject _techSkeletonNode;

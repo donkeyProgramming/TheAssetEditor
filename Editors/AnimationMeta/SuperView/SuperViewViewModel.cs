@@ -1,7 +1,6 @@
 ﻿using System;
-using AnimationEditor.Common.ReferenceModel;
-using AnimationEditor.PropCreator.ViewModels;
 using Editors.AnimationMeta.Presentation;
+using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.BaseControl;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
@@ -10,7 +9,7 @@ using Shared.Core.PackFiles.Models;
 
 namespace Editors.AnimationMeta.SuperView
 {
-    public class SuperViewViewModel : IHostedEditor<SuperViewViewModel>, IEditorViewModelTypeProvider
+    public class SuperViewViewModel : IHostedEditor<SuperViewViewModel>
     {
         SceneObject _asset;
         AnimationToolInput _debugDataToLoad;

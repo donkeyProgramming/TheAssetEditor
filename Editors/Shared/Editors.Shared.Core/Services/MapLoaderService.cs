@@ -1,7 +1,7 @@
 ﻿using Shared.Core.PackFiles;
 using System.Linq;
 
-namespace KitbasherEditor.Services
+namespace Editors.Shared.Core.Services
 {
     public class MapLoaderService
     {

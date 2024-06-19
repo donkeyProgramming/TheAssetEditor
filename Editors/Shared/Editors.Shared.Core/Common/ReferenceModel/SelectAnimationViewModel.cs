@@ -7,7 +7,7 @@ using Shared.Core.PackFiles;
 using static CommonControls.FilterDialog.FilterUserControl;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
-namespace AnimationEditor.Common.ReferenceModel
+namespace Editors.Shared.Core.Common.ReferenceModel
 {
     public class SelectAnimationViewModel : NotifyPropertyChangedImpl
     {

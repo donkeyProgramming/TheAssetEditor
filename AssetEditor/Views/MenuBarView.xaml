@@ -83,10 +83,10 @@
 
             <MenuItem Header="Tools">
                 <MenuItem Header="Mount animation editor" Command="{Binding MenuBar.OpenMountCreatorCommand}"/>
-                <MenuItem Header="Campaign animation converter" Command="{Binding MenuBar.OpenCampaignAnimCreatorCommand}"/>
-                <MenuItem Header="Animation Transfer Tool" Command="{Binding MenuBar.OpenAnimationTransferToolCommand}" />
+                <MenuItem Header="Campaign animation converter" Command="{Binding MenuBar.OpenCampaignAnimCreatorCommand}" IsEnabled="False"/>
+                <MenuItem Header="Animation Transfer Tool" Command="{Binding MenuBar.OpenAnimationTransferToolCommand}" IsEnabled="False" />
                 <MenuItem Header="Super view" Command="{Binding MenuBar.OpenSuperViewToolCommand}" />
-                <MenuItem Header="Skeleton Editor" Command="{Binding MenuBar.OpenTechSkeletonEditorCommand}" />
+                <MenuItem Header="Skeleton Editor" Command="{Binding MenuBar.OpenTechSkeletonEditorCommand}" IsEnabled="False"/>
                 <MenuItem Header="Animation Keyframe Editor" Command="{Binding MenuBar.OpenAnimationKeyframeCommand}" />
                 <Separator/>
                 <MenuItem Header="Animation File Batch converter" Command="{Binding MenuBar.OpenAnimationBatchExporterCommand}" />

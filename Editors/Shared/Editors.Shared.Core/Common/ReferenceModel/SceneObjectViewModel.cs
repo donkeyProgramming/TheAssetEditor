@@ -7,7 +7,7 @@ using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace AnimationEditor.Common.ReferenceModel
+namespace Editors.Shared.Core.Common.ReferenceModel
 {
     public class SceneObjectViewModel : NotifyPropertyChangedImpl
     {
@@ -45,11 +45,11 @@ namespace AnimationEditor.Common.ReferenceModel
         public NotifyAttr<bool> AllowMetaData { get; set; } = new();
 
         public SceneObjectViewModel(IUiCommandFactory uiCommandFactory,
-            IMetaDataFactory metaDataFactory, 
+            IMetaDataFactory metaDataFactory,
             IToolFactory toolFactory,
-            PackFileService packFileService, 
+            PackFileService packFileService,
             SceneObject data,
-            string headerName, 
+            string headerName,
             SceneObjectBuilder sceneObjectBuilder,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {

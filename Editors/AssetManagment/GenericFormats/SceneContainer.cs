@@ -3,7 +3,6 @@ using Matrix = Microsoft.Xna.Framework.Matrix;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 using Quaternion = Microsoft.Xna.Framework.Quaternion;
 using System;
-using System.Runtime.InteropServices;
 using AssetManagement.GenericFormats.Unmanaged;
 using AssetManagement.GenericFormats.DataStructures.Managed;
 

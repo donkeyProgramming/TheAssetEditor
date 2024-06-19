@@ -1,7 +1,7 @@
 ﻿using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.AnimationPack;
 
-namespace AnimationEditor.PropCreator.ViewModels
+namespace Editors.Shared.Core.Common.BaseControl
 {
     public class AnimationToolInput
     {

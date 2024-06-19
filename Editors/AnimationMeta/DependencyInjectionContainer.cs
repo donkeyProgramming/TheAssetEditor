@@ -1,9 +1,9 @@
 ﻿using AnimationEditor.Common.BaseControl;
-using AnimationEditor.PropCreator.ViewModels;
 using Editors.AnimationMeta.Presentation;
 using Editors.AnimationMeta.Presentation.View;
 using Editors.AnimationMeta.SuperView;
 using Editors.AnimationMeta.Visualisation;
+using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;

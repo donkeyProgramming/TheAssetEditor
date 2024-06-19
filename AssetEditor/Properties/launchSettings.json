@@ -23,6 +23,11 @@
       "commandName": "Project",
       "commandLineArgs": "-devcfg SuperView_Rat",
       "nativeDebugging": false
+    },
+    "AE-AnimTransfer": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg AnimTransfer_DwarfArcher",
+      "nativeDebugging": false
     }
   }
 }

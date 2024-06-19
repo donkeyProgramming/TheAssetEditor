@@ -5,11 +5,8 @@ using System.IO;
 using System.Linq;
 using AnimationEditor.AnimationKeyframeEditor;
 using System.Windows.Forms;
-using AnimationEditor.Common.AnimationPlayer;
-using AnimationEditor.Common.ReferenceModel;
 using AnimationEditor.MountAnimationCreator.Services;
 using AnimationEditor.MountAnimationCreator.ViewModels;
-using AnimationEditor.PropCreator.ViewModels;
 using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
@@ -21,15 +18,18 @@ using MessageBox = System.Windows.Forms.MessageBox;
 using Clipboard = System.Windows.Clipboard;
 using Shared.Ui.Events.UiCommands;
 using Shared.Core.Events;
-using Editors.Shared.Core.Common.BaseControl;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Animation;
 using GameWorld.Core.SceneNodes;
+using Editors.Shared.Core.Common.BaseControl;
+using Editors.Shared.Core.Common;
+using Editors.Shared.Core.Common.AnimationPlayer;
+using Editors.Shared.Core.Common.ReferenceModel;
 
 
 namespace AnimationEditor.MountAnimationCreator
 {
-    public class MountAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<MountAnimationCreatorViewModel>, IEditorViewModelTypeProvider
+    public class MountAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<MountAnimationCreatorViewModel>
     {
         public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;

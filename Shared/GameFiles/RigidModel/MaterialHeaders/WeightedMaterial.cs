@@ -95,7 +95,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
         public RmvTexture? GetTexture(TextureType texureType)
         {
-            if (TexturesParams.Count(x => x.TexureType == texureType) != 0)
+            if (TexturesParams.Any(x => x.TexureType == texureType))
                 return TexturesParams.FirstOrDefault(x => x.TexureType == texureType);
             return null;
         }
@@ -243,12 +243,12 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 },
                 MatrixIndex = typedMaterial.MatrixIndex,
                 ParentMatrixIndex = typedMaterial.ParentMatrixIndex,
-                AttachmentPointCount = (uint)typedMaterial.AttachmentPointParams.Count(),
-                FloatParamCount = (uint)typedMaterial.FloatParams.Count(),
-                IntParamCount = (uint)typedMaterial.IntParams.Count(),
-                StringParamCount = (uint)typedMaterial.StringParams.Count(),
-                Vec4ParamCount = (uint)typedMaterial.Vec4Params.Count(),
-                TextureCount = (uint)typedMaterial.TexturesParams.Count(),
+                AttachmentPointCount = (uint)typedMaterial.AttachmentPointParams.Count,
+                FloatParamCount = (uint)typedMaterial.FloatParams.Count,
+                IntParamCount = (uint)typedMaterial.IntParams.Count,
+                StringParamCount = (uint)typedMaterial.StringParams.Count,
+                Vec4ParamCount = (uint)typedMaterial.Vec4Params.Count,
+                TextureCount = (uint)typedMaterial.TexturesParams.Count,
                 PaddingArray = new byte[124],
             };
 

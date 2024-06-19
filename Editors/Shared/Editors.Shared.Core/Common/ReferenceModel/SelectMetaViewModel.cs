@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using static CommonControls.FilterDialog.FilterUserControl;
 
-namespace AnimationEditor.Common.ReferenceModel
+namespace Editors.Shared.Core.Common.ReferenceModel
 {
     public class SelectMetaViewModel : NotifyPropertyChangedImpl
     {
@@ -16,15 +16,15 @@ namespace AnimationEditor.Common.ReferenceModel
         ObservableCollection<PackFile> _metaList = new();
         public ObservableCollection<PackFile> MetaFiles { get { return _metaList; } set { SetAndNotify(ref _metaList, value); } }
 
-        public PackFile SelectedMetaFile 
+        public PackFile SelectedMetaFile
         {
-            get => _data.MetaData; 
-            set { _assetViewModelEditor.SetMetaFile(_data, value, _data.PersistMetaData); RefreshMetaDataElements(); } 
+            get => _data.MetaData;
+            set { _assetViewModelEditor.SetMetaFile(_data, value, _data.PersistMetaData); RefreshMetaDataElements(); }
         }
 
-        public PackFile SelectedPersistMetaFile 
-        { 
-            get => _data.PersistMetaData; 
+        public PackFile SelectedPersistMetaFile
+        {
+            get => _data.PersistMetaData;
             set { _assetViewModelEditor.SetMetaFile(_data, _data.MetaData, value); RefreshMetaDataElements(); }
         }
 
@@ -33,13 +33,13 @@ namespace AnimationEditor.Common.ReferenceModel
         public SelectMetaViewModel(SceneObjectBuilder assetViewModelEditor, SceneObject data, PackFileService pfs)
         {
             _assetViewModelEditor = assetViewModelEditor;
-            
+
             _data = data;
             _pfs = pfs;
 
             _data.MetaDataChanged += (x) => RefreshMetaDataElements();
 
-            
+
             var files = _pfs.FindAllWithExtention(".meta").Where(x => !x.Name.Contains(".snd."));
             MetaFiles = new ObservableCollection<PackFile>(files);
         }

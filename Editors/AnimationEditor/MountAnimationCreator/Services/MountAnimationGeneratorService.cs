@@ -1,5 +1,5 @@
-﻿using AnimationEditor.Common.ReferenceModel;
-using AnimationEditor.MountAnimationCreator.ViewModels;
+﻿using AnimationEditor.MountAnimationCreator.ViewModels;
+using Editors.Shared.Core.Common;
 using GameWorld.Core.Animation;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
