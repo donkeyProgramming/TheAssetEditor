@@ -11,25 +11,29 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
-namespace Editors.Audio.Presentation.AudioEditor
+namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 {
     public class AudioEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
-
         private readonly PackFileService _packFileService;
         private readonly IAudioRepository _audioRepository;
         private string _selectedEventName;
+        private ObservableCollection<string> _eventItems;
+        private string _filterText;
+        private string _selectedEvent;
 
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
         public ObservableCollection<Dictionary<string, string>> DataGridItems { get; set; } = new ObservableCollection<Dictionary<string, string>>();
         public Dictionary<string, List<Dictionary<string, string>>> EventData { get; set; } = new Dictionary<string, List<Dictionary<string, string>>>();
+        public EventSelectionFilter EventFilter { get; private set; }
+        public ObservableCollection<string> EventItems { get { return _eventItems; } set { SetAndNotify(ref _eventItems, value); } }
+        public string FilterText { get { return _filterText; } set { SetAndNotify(ref _filterText, value); } }
+        public string SelectedEvent { get { return _selectedEvent; } set { SetAndNotify(ref _selectedEvent, value); OnSelectedEventChanged(value); } }
 
         public ICommand EditEventCommand { get; private set; }
         public ICommand AddStatePathCommand { get; private set; }
         public ICommand SaveEventCommand { get; private set; }
         public ICommand CreateAudioProject { get; private set; }
-
-        public EventSelectionFilter EventFilter { get; private set; }
 
         public AudioEditorViewModel(PackFileService packFileService, IAudioRepository audioRepository)
         {
@@ -43,6 +47,8 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             EventFilter = new EventSelectionFilter(_audioRepository, false, true);
             EventFilter.EventList.SelectedItemChanged += OnEventSelected;
+
+            EventItems = new ObservableCollection<string>(EventData.Keys);
         }
 
         public void Close()
@@ -65,6 +71,16 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             _selectedEventName = newValue.DisplayName.ToString();
             Debug.WriteLine($"selectedEventName: {_selectedEventName}");
+        }
+
+        private void OnSelectedEventChanged(string newValue)
+        {
+            // Custom logic when SelectedEvent changes
+            if (!DisableCallbacks)
+            {
+                // Handle selected event change logic here
+                Debug.WriteLine($"Selected Event: {newValue}");
+            }
         }
 
         private void EditEvent()
@@ -98,6 +114,9 @@ namespace Editors.Audio.Presentation.AudioEditor
             var eventDataJson = JsonConvert.SerializeObject(EventData, Formatting.Indented);
             Debug.WriteLine($"dataGridItems: {dataGridItemsJson}");
             Debug.WriteLine($"eventData: {eventDataJson}");
+
+            // Update EventItems after modifying EventData
+            EventItems = new ObservableCollection<string>(EventData.Keys);
         }
 
         private static void PrepareAudioProject(Dictionary<string, List<Dictionary<string, string>>> eventData)

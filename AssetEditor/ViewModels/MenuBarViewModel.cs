@@ -19,7 +19,7 @@ using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationMeta.SuperView;
-using Editors.Audio.Presentation.AudioEditor;
+using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Presentation.AudioExplorer;
 using Editors.Audio.Presentation.Compiler;
 using Editors.Reports;
@@ -275,7 +275,13 @@ namespace AssetEditor.ViewModels
         void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationTransferToolViewModel>>();
         void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SuperViewViewModel>>();
         void OpenAudioExplorerEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioExplorerViewModel>();
-        void OpenAudioEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
+
+        void OpenAudioEditor()
+        {
+            var openEditorCommand = _uiCommandFactory.Create<OpenEditorCommand>();
+            openEditorCommand.Execute<AudioEditorCompositeViewModel>();
+        }
+
         void CompileAudioProjects() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
         void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SkeletonEditorViewModel>>();
         void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();

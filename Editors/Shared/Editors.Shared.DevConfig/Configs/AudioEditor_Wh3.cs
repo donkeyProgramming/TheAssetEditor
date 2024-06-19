@@ -1,4 +1,4 @@
-﻿using Editors.Audio.Presentation.AudioEditor;
+﻿using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Shared.DevConfig.Base;
 using Shared.Core.Events;
 using Shared.Core.Services;
@@ -24,7 +24,7 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OpenFileOnLoad()
         {
-            _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
+            _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorCompositeViewModel>();
         }
     }
 }
