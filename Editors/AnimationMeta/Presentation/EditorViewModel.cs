@@ -68,7 +68,6 @@ namespace Editors.AnimationMeta.Presentation
                 else
                     throw new System.Exception();
             }
-
         }
 
         public void MoveUpAction()

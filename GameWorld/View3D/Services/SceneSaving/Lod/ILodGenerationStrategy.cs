@@ -5,7 +5,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod
 {
     public enum LodStrategy
     {
-        Default,
+        AssetEditor,
         Lod0ForAll,
     }
 
