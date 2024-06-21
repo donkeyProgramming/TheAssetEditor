@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Xml;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 
@@ -53,6 +55,8 @@ namespace Shared.GameFormats.WsModel
 
                 if (textureSlotName == "s_diffuse")
                     Textures[TextureType.Diffuse] = texturePath;
+                else if (textureSlotName == "t_diffuse_map")
+                    Textures[TextureType.Diffuse] = texturePath;
 
                 if (textureSlotName == "s_gloss")
                     Textures[TextureType.Gloss] = texturePath;
@@ -63,19 +67,26 @@ namespace Shared.GameFormats.WsModel
                     Textures[TextureType.Mask] = texturePath;
                 else if (textureSlotName == "t_xml_mask")
                     Textures[TextureType.Mask] = texturePath;
+                else if (textureSlotName == "t_colour_mask_map")
+                    Textures[TextureType.Mask] = texturePath;
 
                 if (textureSlotName == "s_normal")
+                    Textures[TextureType.Normal] = texturePath;
+                else if (textureSlotName == "t_normal_map")
                     Textures[TextureType.Normal] = texturePath;
                 else if (textureSlotName == "t_xml_normal")
                     Textures[TextureType.Normal] = texturePath;
 
                 if (textureSlotName == "s_specular")
                     Textures[TextureType.Specular] = texturePath;
+                else if (textureSlotName == "t_specular_colour_map")
+                    Textures[TextureType.Specular] = texturePath;
 
                 if (textureSlotName == "t_xml_base_colour")
                     Textures[TextureType.BaseColour] = texturePath;
                 else if (textureSlotName == "s_base_colour")
                     Textures[TextureType.BaseColour] = texturePath;
+
 
                 if (textureSlotName == "t_xml_material_map")
                     Textures[TextureType.MaterialMap] = texturePath;

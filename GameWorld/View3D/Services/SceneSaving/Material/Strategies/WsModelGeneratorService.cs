@@ -50,13 +50,14 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
                 }
 
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
+
                 var materialTemplate = game switch
                 {
                     GameTypeEnum.Warhammer3 => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_wh3.xml.material"),
                     GameTypeEnum.Warhammer2 => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_wh2.xml.material"),
+                    GameTypeEnum.Pharaoh => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_pharaoh.xml.material"),
                     _ => throw new Exception("Unknown game - unable to generate ws model")
                 };
-
                 var wsModelData = CreateWsModel(mainNode, game, modelFilePath, materialTemplate);
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
                 SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile, Encoding.UTF8.GetBytes(wsModelData));
@@ -77,19 +78,39 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             sb.Append("\t\t<materials>\n");
 
             var lodNodes = mainNode.GetLodNodes();
-            for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
+            if (game != GameTypeEnum.Pharaoh)
             {
-                var meshes = mainNode.GetMeshesInLod(lodIndex, false);
-                var uniqueNames = GenerateUniqueNames(meshes);
-                for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
+                for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
                 {
-                    var materialFile = GetOrCreateMaterial(modelFilePath, game, meshes[meshIndex], uniqueNames[meshIndex], materialTemplate);
-                    sb.Append($"\t\t\t<material lod_index=\"{lodIndex}\" part_index=\"{meshIndex}\">");
-                    sb.Append(materialFile);
-                    sb.Append("</material>\n");
-                }
+                    var meshes = mainNode.GetMeshesInLod(lodIndex, false);
+                    var uniqueNames = GenerateUniqueNames(meshes);
+                    for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
+                    {
+                        var materialFile = GetOrCreateMaterial(modelFilePath, game, meshes[meshIndex], uniqueNames[meshIndex], materialTemplate);
+                        sb.Append($"\t\t\t<material lod_index=\"{lodIndex}\" part_index=\"{meshIndex}\">");
+                        sb.Append(materialFile);
+                        sb.Append("</material>\n");
+                    }
 
-                sb.AppendLine();
+                    sb.AppendLine();
+                }
+            }
+            else
+            {
+                for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
+                {
+                    var meshes = mainNode.GetMeshesInLod(lodIndex, false);
+                    var uniqueNames = GenerateUniqueNames(meshes);
+                    for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
+                    {
+                        var materialFile = GetOrCreateMaterial(modelFilePath, game, meshes[meshIndex], uniqueNames[meshIndex], materialTemplate);
+                        sb.Append($"\t\t\t<material part_index=\"{meshIndex}\" lod_index=\"{lodIndex}\">");
+                        sb.Append(materialFile);
+                        sb.Append("</material>\n");
+                    }
+
+                    sb.AppendLine();
+                }
             }
 
             sb.Append("\t</materials>\n");

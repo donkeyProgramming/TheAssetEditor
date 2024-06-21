@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using Shared.Core.ErrorHandling;
 
@@ -8,6 +9,11 @@ namespace Shared.EmbeddedResources
     {
         public static string LoadString(string resourcePath)
         {
+            MessageBox.Show("loading string");
+            if (resourcePath == null)
+            {
+                throw new Exception("Resource not found: " + resourcePath);
+            }
             using var stream = GetResourceStream(resourcePath);
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
