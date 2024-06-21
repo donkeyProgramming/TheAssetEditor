@@ -41,8 +41,10 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         void BuildLodOverview(SaveSettings saveSettings)
         {
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            var lodNodesInModel = mainNode.GetLodNodes();
+
             LodNodes.Clear();
-            foreach (var lodNode in mainNode.GetLodNodes())
+            foreach (var lodNode in lodNodesInModel)
                 LodNodes.Add(new LodGroupNodeViewModel(lodNode, saveSettings));
         }
 
@@ -53,11 +55,6 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             saveSettings.GeometryOutputType = SelectedMeshStrategy.Value.Value;
             saveSettings.MaterialOutputType = SelectedWsModelStrategy.Value.Value;
             saveSettings.LodGenerationMethod = SelectedLodStrategy.Value.Value;
-  
-            // Update meshes based on lod settings
-            // Trigger mesh save 
-            //var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            //_saveService.Save(mainNode, _settings);
         }
 
         public void HandleBrowseLocation()
@@ -90,7 +87,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
 
             BuildLodOverview(settings);
 
-            settings.IsInitialized = true;
+            settings.IsUserInitialized = true;
         }
 
         internal void UpdateSettings(ref SaveSettings settings)
@@ -98,6 +95,4 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             HandleApply(ref settings);
         }
     }
-
-    
 }

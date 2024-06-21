@@ -3,6 +3,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using Pfim;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 using SharpGLTF.Materials;
@@ -10,9 +13,112 @@ using SharpGLTF.Memory;
 
 namespace MeshImportExport
 {
+    public enum ExporterType
+    { 
+        NormalTexture,
+        MaterialTexture,
+        Geometry,
+    }
+
+    public class ExportFactory
+    {
+        public T GetExporter<T>() where T:IExporter
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public abstract class IExporterSettings
+    { 
+        public PackFile FileToExport { get; set; }
+        public string OutputPath { get; set; }
+        public bool GenerateImportSettings { get; set; }
+    }
+
+    public interface IExporter
+    {
+        //ExporterType ExporterType { get; }
+        public string Name { get; }
+        public string[] SupportedFileExtensions { get; }
+    }
+
+    //-----------------------
+
+    public class NormalTextureExportSettings : IExporterSettings
+    { 
+        public bool ConvertToBlueMap { get; set; }
+    }
+
+    public class NormalTextureExporter : IExporter
+    {
+        public string Name => "DDS_To_Png_Normal";
+        public string[] SupportedFileExtensions => [".dds"];
+
+        public void Export(NormalTextureExportSettings settings)
+        {
+            var data = TextureHelper.ConvertDdsToPng(settings.FileToExport.DataSource.ReadData());
+            File.WriteAllBytes(settings.OutputPath, data);
+        }
+    }
+
+
+
+    //-----------------------
+
+    public class MaterialTextureExportSettings : IExporterSettings
+    {
+        public bool SwapRoughness { get; set; }
+    }
+
+    public class MaterialTextureExporter : IExporter
+    {
+        public string Name => "DDS_To_Png_Material";
+        public string[] SupportedFileExtensions => [".dds"];
+
+        public void Export(MaterialTextureExportSettings settings)
+        {
+            var data = TextureHelper.ConvertDdsToPng(settings.FileToExport.DataSource.ReadData());
+            File.WriteAllBytes(settings.OutputPath, data);
+        }
+    }
+
+
+    //-----------------------
+
+    public class GltfExportSettings : IExporterSettings
+    {
+        public bool ExportTextures { get; set; }
+    }
+
+    public class GlTfExporter : IExporter
+    {
+        private readonly ExportFactory _exportFactory;
+
+        public string Name => "Rmv2_To_Gltf";
+        public string[] SupportedFileExtensions => [".rmv2"];
+
+
+        public void Export(GltfExportSettings settings)
+        {
+            _exportFactory.GetExporter<MaterialTextureExporter>().Export(new MaterialTextureExportSettings() { SwapRoughness = true });
+            _exportFactory.GetExporter<NormalTextureExporter>().Export(new NormalTextureExportSettings() { ConvertToBlueMap = true });
+
+            // Export gltf
+        }
+    }
+
+
+    public class GlTfExporterView
+    {
+        public NotifyAttr<bool> Swap { get; set; } = new NotifyAttr<bool>(true);
+        public string SwapDescription { get; } = "Bla bla, blender likes this";
+    }
+
+
+
+
     internal class TextureHelper
     {
-
         public static MaterialBuilder BuildMaterial(FileHelper fileHelper, RmvModel model)
         {
             var basePath = model.Material.GetTexture(TextureType.BaseColour);

@@ -27,7 +27,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         protected void Save(bool forceShowDialog)
         {
             var saveScene = true;
-            if (_settings.IsInitialized == false || forceShowDialog)
+            if (_settings.IsUserInitialized == false || forceShowDialog)
             {
                 var window = _windowFactory.Create<SaveDialogViewModel, SaveDialogView>("Save", 630, 350);
                 window.TypedContext.Initialize(_settings);

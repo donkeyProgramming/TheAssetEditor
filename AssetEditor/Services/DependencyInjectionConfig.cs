@@ -37,6 +37,7 @@ namespace AssetEditor.Services
                 new Editors.Audio.DependencyInjectionContainer(),
                 new Editors.TextureEditor.DependencyInjectionContainer(),
                 new Editors.AnimationVisualEditors.DependencyInjectionContainer(),
+                new Editors.ImportExport.DependencyInjectionContainer(),
 
                 // Host application
                 new DependencyInjectionContainer(),

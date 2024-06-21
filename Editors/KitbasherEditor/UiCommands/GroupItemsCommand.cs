@@ -12,8 +12,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
         public Hotkey HotKey { get; } = new Hotkey(Key.G, ModifierKeys.Control);
 
-        SelectionManager _selectionManager;
-        ObjectEditor _objectEditor;
+        private readonly SelectionManager _selectionManager;
+        private readonly ObjectEditor _objectEditor;
 
         public GroupItemsCommand(SelectionManager selectionManager, ObjectEditor objectEditor)
         {

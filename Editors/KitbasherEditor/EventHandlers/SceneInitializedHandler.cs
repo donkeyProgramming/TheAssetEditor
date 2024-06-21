@@ -3,7 +3,6 @@ using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Services.SceneSaving;
-using GameWorld.Core.Services.SceneSaving.Geometry;
 using GameWorld.WpfWindow.Events;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
@@ -73,33 +72,15 @@ namespace KitbasherEditor.EventHandlers
         void ConfigureDefaultSettings(string fileName)
         {
             _saveSettings.OutputName = fileName;
-            _saveSettings.GeometryOutputType = GeometryStrategy.Rmv7;  //   _kitbasherRootScene.SelectedOutputFormat = rmv.Header.Version;
-
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            var numLods = mainNode.Model.LodHeaders.Count();
-            var lodValues = new List<LodGenerationSettings>();
-
-            for(int i = 0; i <  numLods; i++) 
-            {
-                var lodHeader = mainNode.Model.LodHeaders[i];
-
-                var setting = new LodGenerationSettings()
-                {
-                    CameraDistance = lodHeader.LodCameraDistance,
-                    QualityLvl = lodHeader.QualityLvl,
-                    LodRectionFactor = GetDefaultLodReductionValue(numLods, i),
-                    OptimizeAlpha = i >= 2 ? true : false,
-                    OptimizeVertex = i >= 2 ? true : false,
-                };
-                lodValues.Add(setting);
-            }
-
-            _saveSettings.LodSettingsPerLod = lodValues.ToArray();
+            _saveSettings.InitializeFromModel(mainNode);
         }
 
         public static float GetDefaultLodReductionValue(int numLods, int currentLodIndex)
         {
             var lerpValue = (1.0f / (numLods - 1)) * (numLods - 1 - currentLodIndex);
+            if(float.IsNaN(lerpValue))
+                lerpValue = 1;
             var deductionRatio = MathHelper.Lerp(0.25f, 1, lerpValue);
             return deductionRatio;
         }

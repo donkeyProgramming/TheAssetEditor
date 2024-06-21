@@ -1,5 +1,5 @@
-﻿using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services.SceneSaving;
+﻿using System.Collections.Generic;
+using GameWorld.Core.SceneNodes;
 
 namespace GameWorld.Core.Services.SceneSaving.Lod
 {
@@ -16,6 +16,6 @@ namespace GameWorld.Core.Services.SceneSaving.Lod
         public bool IsAvailable { get; }
         public LodStrategy StrategyId { get; }
 
-        void Generate(MainEditableNode mainNode, LodGenerationSettings[] settings);
+        void Generate(MainEditableNode mainNode, List<LodGenerationSettings> settings);
     }
 }

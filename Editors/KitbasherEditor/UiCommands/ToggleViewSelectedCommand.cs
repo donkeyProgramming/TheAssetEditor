@@ -11,7 +11,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = new Hotkey(Key.Space, ModifierKeys.None);
 
-        ViewOnlySelectedService _viewOnlySelectedComp;
+        private readonly ViewOnlySelectedService _viewOnlySelectedComp;
 
         public ToggleViewSelectedCommand(ViewOnlySelectedService viewOnlySelectedComp)
         {

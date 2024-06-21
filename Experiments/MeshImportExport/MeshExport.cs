@@ -30,8 +30,8 @@ namespace MeshImportExport
 
                 if (vertex.WeightCount == 2)
                 {
-                    glTfvertex.Skinning.Weights = new Vector4(0, 1, 0, 0);
-                    glTfvertex.Skinning.Joints = new Vector4(0, 1, 0, 0);
+                    //glTfvertex.Skinning.Weights = new Vector4(0, 1, 0, 0);
+                    //glTfvertex.Skinning.Joints = new Vector4(0, 1, 0, 0);
 
                     //if (vertex.BoneWeight[0] == 0)
                     //    vertex.BoneIndex[0] = 0;
@@ -41,6 +41,23 @@ namespace MeshImportExport
                     //
                     //glTfvertex.Skinning.Weights = new Vector4(vertex.BoneWeight[0], vertex.BoneWeight[1], 0, 0);
                     //glTfvertex.Skinning.Joints = new Vector4(vertex.BoneIndex[0], vertex.BoneIndex[1], 0, 0);
+
+                    if (vertex.BoneWeight[0] == 0)
+                        vertex.BoneIndex[0] = 0;
+
+                    if (vertex.BoneWeight[1] == 0)
+                        vertex.BoneIndex[1] = 0;
+
+                    var sum = vertex.BoneWeight[0] + vertex.BoneWeight[1];
+                    if (Math.Abs(sum - 1) > 4E-07)
+                    {
+
+                        vertex.BoneWeight[0] += Math.Abs(sum - 1);
+                        // Values are within specified tolerance of each other....
+                    }
+
+                    glTfvertex.Skinning.Weights = new Vector4(vertex.BoneWeight[0], vertex.BoneWeight[1], 0, 0);
+                    glTfvertex.Skinning.Joints = new Vector4(vertex.BoneIndex[0], vertex.BoneIndex[1], 0, 0);
                 }
                 else if (vertex.WeightCount == 4)
                 {

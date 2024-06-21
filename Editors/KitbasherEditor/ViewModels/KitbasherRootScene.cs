@@ -7,7 +7,6 @@ using KitbasherEditor.Events;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
-using Shared.GameFormats.RigidModel;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -26,16 +25,15 @@ namespace KitbasherEditor.ViewModels
         }
 
         public GameSkeleton Skeleton { get; private set; }
-        public RmvVersionEnum SelectedOutputFormat { get; set; }    // TODO:Remoev this
         public AnimationPlayer Player { get; private set; }
 
         public void SetSkeletonFromName(string skeletonName)
         {
-            string cleanSkeletonName = "";
+            var cleanSkeletonName = "";
             if (!string.IsNullOrWhiteSpace(skeletonName))
                 cleanSkeletonName = Path.GetFileNameWithoutExtension(skeletonName);
 
-            string animationFolder = "animations\\skeletons\\";
+            var animationFolder = "animations\\skeletons\\";
             var skeletonFilePath = animationFolder + cleanSkeletonName + ".anim";
             var skeletonPfs = _packFileService.FindFile(skeletonFilePath);
             if (skeletonPfs != null)
