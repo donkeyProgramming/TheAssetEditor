@@ -35,7 +35,7 @@ namespace Shared.Core.PackFiles
 
         public bool TriggerFileUpdates { get; set; } = true;
 
-        public PackFileContainer Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false)
+        public PackFileContainer? Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false)
         {
             try
             {
@@ -54,19 +54,15 @@ namespace Shared.Core.PackFiles
                     return null;
                 }
 
-                using (var fileStram = File.OpenRead(packFileSystemPath))
-                {
-                    using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
-                    {
-                        var container = Load(reader, packFileSystemPath);
-                        var notCaPacksLoaded = Database.PackFiles.Count(x => !x.IsCaPackFile);
-                        if (container.IsCaPackFile == false && setToMainPackIfFirst)
-                            SetEditablePack(container);
+                using var fileStream = File.OpenRead(packFileSystemPath);
+                using var reader = new BinaryReader(fileStream, Encoding.ASCII);
+                var container = Load(reader, packFileSystemPath);
+                var notCaPacksLoaded = Database.PackFiles.Count(x => !x.IsCaPackFile);
+                if (container.IsCaPackFile == false && setToMainPackIfFirst)
+                    SetEditablePack(container);
 
-                        _settingsService.AddRecentlyOpenedPackFile(packFileSystemPath);
-                        return container;
-                    }
-                }
+                _settingsService.AddRecentlyOpenedPackFile(packFileSystemPath);
+                return container;
             }
             catch (Exception e)
             {
