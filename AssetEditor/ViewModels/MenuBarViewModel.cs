@@ -21,6 +21,7 @@ using Editors.AnimationMeta.SuperView;
 using Editors.Audio.Presentation.AudioEditor;
 using Editors.Audio.Presentation.AudioExplorer;
 using Editors.Audio.Presentation.Compiler;
+using Editors.ImportExport.Exporting;
 using Editors.Reports;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
@@ -60,6 +61,7 @@ namespace AssetEditor.ViewModels
         private readonly ApplicationSettingsService _settingsService;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly TouchedFilesRecorder _touchedFilesRecorder;
+        private readonly DisplayExportFileToolCommand _displayExportFileToolCommand;
 
         public ICommand OpenSettingsWindowCommand { get; set; }
         public ICommand CreateNewPackFileCommand { get; set; }
@@ -121,7 +123,8 @@ namespace AssetEditor.ViewModels
             PackFileService packfileService,
             ApplicationSettingsService settingsService,
             IUiCommandFactory uiCommandFactory,
-            TouchedFilesRecorder touchedFilesRecorder)
+            TouchedFilesRecorder touchedFilesRecorder, 
+            DisplayExportFileToolCommand displayExportFileToolCommand)
         {
             _gameInformationFactory = gameInformationFactory;
             _serviceProvider = provider;
@@ -129,7 +132,7 @@ namespace AssetEditor.ViewModels
             _settingsService = settingsService;
             _uiCommandFactory = uiCommandFactory;
             _touchedFilesRecorder = touchedFilesRecorder;
-
+            _displayExportFileToolCommand = displayExportFileToolCommand;
             OpenSettingsWindowCommand = new RelayCommand(ShowSettingsDialog);
             OpenPackFileCommand = new RelayCommand(OpenPackFile);
             CreateNewPackFileCommand = new RelayCommand(CreatePackFile);
