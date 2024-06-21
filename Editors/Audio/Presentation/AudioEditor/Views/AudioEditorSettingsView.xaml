@@ -22,81 +22,116 @@
         <GroupBox DockPanel.Dock="Top" Margin="5" Header="Audio Project Type">
             <StackPanel Margin="10 5 0 10" Orientation="Horizontal">
                 <CheckBox Content="Campaign VO" Margin="0 2.5 5 0"
-                          IsChecked="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.CampaignVO}}"/>
+                          IsChecked="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.CampaignVO}}"
+                          ToolTip="PLACEHOLDER TOOLTIP"/>
                 <CheckBox Content="Battle VO" Margin="0 2.5 5 0"
-                          IsChecked="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                          IsChecked="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                          ToolTip="PLACEHOLDER TOOLTIP"/>
                 <CheckBox Content="Frontend VO" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.FrontendVO}}"/>
+                          IsChecked="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.FrontendVO}}"
+                          ToolTip="PLACEHOLDER TOOLTIP"/>
             </StackPanel>
         </GroupBox>
 
         <!-- Dialogue Events Preset -->
         <GroupBox DockPanel.Dock="Top" Margin="5" Header="Dialogue Events Preset">
             <StackPanel Margin="10 5 0 10" Orientation="Horizontal">
-                <CheckBox Content="All" Margin="0 2.5 5 0"
-                          IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.All}}"/>
-                <CheckBox Content="Essential" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.Essential}}"/>
+                <CheckBox Content="Essential" Margin="0 2.5 5 0"
+                          IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.Essential}}"
+                          ToolTip="PLACEHOLDER TOOLTIP"/>
+                <CheckBox Content="All" Margin="0 2.5 0 0"
+                          IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.All}}"
+                          ToolTip="PLACEHOLDER TOOLTIP"/>
             </StackPanel>
         </GroupBox>
 
         <!-- VO Type -->
         <GroupBox DockPanel.Dock="Top" Margin="5" Header="VO Type">
-            <StackPanel Margin="10 0 0 10">
+            <Grid Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
                 <!-- Campaign VO Types -->
-                <CheckBox Content="Lord" Margin="0 10 0 0"
+                <StackPanel>
+                    <CheckBox Content="Lord" Margin="0 5 0 0"
                           IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CampaignLord}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.CampaignVO}}"/>
-                <CheckBox Content="Hero" Margin="0 2.5 0 0"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.CampaignVO}}"
+                          ToolTip="PLACEHOLDER TOOLTIP"/>
+                    <CheckBox Content="Hero" Margin="0 2.5 0 0"
                           IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CampaignHero}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.CampaignVO}}"/>
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.CampaignVO}}"
+                          ToolTip="PLACEHOLDER TOOLTIP"/>
+                </StackPanel>
 
                 <!-- Battle VO Types -->
                 <!-- Lord -->
-                <Label Content="Lord" FontWeight="Bold" Margin="-5 0 0 0"
-                       Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="Melee Lord" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.MeleeLord}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="Skirmish Lord" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SkirmishLord}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="Caster Lord" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CasterLord}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <StackPanel Grid.Column="0">
+                    <CheckBox Content="Melee Lord" Margin="0 5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.MeleeLord}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                    <CheckBox Content="Skirmish Lord" Margin="0 2.5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SkirmishLord}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                    <CheckBox Content="Caster Lord" Margin="0 2.5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CasterLord}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                </StackPanel>
 
                 <!-- Hero -->
-                <Label Content="Hero" FontWeight="Bold" Margin="-5 5 0 0"
-                       Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="Melee Hero" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.MeleeHero}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="Skirmish Hero" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SkirmishHero}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="Caster Hero" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CasterHero}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
+                <StackPanel Grid.Column="1">
+                    <CheckBox Content="Melee Hero" Margin="0 5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.MeleeHero}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                    <CheckBox Content="Skirmish Hero" Margin="0 2.5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SkirmishHero}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                    <CheckBox Content="Caster Hero" Margin="0 2.5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CasterHero}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                </StackPanel>
 
                 <!-- Unit -->
-                <Label Content="Unit" FontWeight="Bold" Margin="-5 5 0 0"
-                       Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="Infantry Unit" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.InfantryUnit}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="Skirmisher Unit" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SkirmisherUnit}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="Cavalry Unit" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CavalryUnit}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="SEM Unit" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SEMUnit}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-                <CheckBox Content="Artillery Unit" Margin="0 2.5 0 0"
-                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.ArtilleryUnit}}"
-                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"/>
-            </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <CheckBox Content="Infantry Unit" Margin="0 5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.InfantryUnit}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                    <CheckBox Content="Skirmisher Unit" Margin="0 2.5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SkirmisherUnit}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                    <CheckBox Content="Cavalry Unit" Margin="0 2.5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.CavalryUnit}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                    <CheckBox Content="SEM Unit" Margin="0 2.5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.SEMUnit}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                    <CheckBox Content="Artillery Unit" Margin="0 2.5 0 0"
+                      IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.ArtilleryUnit}}"
+                      Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.BattleVO}}"
+                      ToolTip="PLACEHOLDER TOOLTIP"/>
+                </StackPanel>
+
+
+                <!-- Frontend VO Types -->
+                <StackPanel Grid.Column="0">
+                    <CheckBox Content="Lord" Margin="0 5 0 0"
+                          IsChecked="{Binding SelectedVOType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:VOType.GenericFrontend}}"
+                          Visibility="{Binding SelectedProjectType, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:AudioProjectType.FrontendVO}}"
+                          ToolTip="PLACEHOLDER TOOLTIP"/>
+                </StackPanel>
+            </Grid>
         </GroupBox>
     </DockPanel>
 </UserControl>

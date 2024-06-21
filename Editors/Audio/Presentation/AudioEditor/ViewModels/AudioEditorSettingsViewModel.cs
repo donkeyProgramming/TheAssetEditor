@@ -35,7 +35,8 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         SkirmisherUnit,
         CavalryUnit,
         SEMUnit,
-        ArtilleryUnit
+        ArtilleryUnit,
+        GenericFrontend
     }
 
     public class AudioEditorSettingsViewModel : INotifyPropertyChanged
