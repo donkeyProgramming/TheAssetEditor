@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.SceneNodes;
+﻿using System.Collections.Generic;
+using GameWorld.Core.SceneNodes;
 
 namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 {
@@ -13,7 +14,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
         {
         }
 
-        public void Generate(MainEditableNode mainNode, LodGenerationSettings[] settings)
+        public void Generate(MainEditableNode mainNode, List<LodGenerationSettings> settings)
         {
             foreach (var setting in settings)
             {

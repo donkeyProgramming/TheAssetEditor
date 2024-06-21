@@ -3,10 +3,6 @@ using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.PackFiles;
 using Shared.Ui.Common.MenuSystem;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Shapes;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

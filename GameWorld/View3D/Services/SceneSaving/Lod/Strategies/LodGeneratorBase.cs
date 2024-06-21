@@ -24,7 +24,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
             }
         }
 
-        public void CreateLodsForRootNode(Rmv2ModelNode rootNode, LodGenerationSettings[] lodGenerationSettings)
+        public void CreateLodsForRootNode(Rmv2ModelNode rootNode, List<LodGenerationSettings> lodGenerationSettings)
         {
             var lods = rootNode.GetLodNodes();
             var firstLod = lods.First();
@@ -46,10 +46,10 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
             }
         }
 
-        List<Rmv2MeshNode[]> CreateLods(List<Rmv2MeshNode> originalModel, LodGenerationSettings[] settings)
+        List<Rmv2MeshNode[]> CreateLods(List<Rmv2MeshNode> originalModel, List<LodGenerationSettings> settings)
         {
             var output = new List<Rmv2MeshNode[]>();
-            for (var lodIndex = 1; lodIndex < settings.Length; lodIndex++)
+            for (var lodIndex = 1; lodIndex < settings.Count; lodIndex++)
             {
                 var deductionRatio = settings[lodIndex].LodRectionFactor;
                 var optimize = settings[lodIndex].OptimizeAlpha || settings[lodIndex].OptimizeVertex;

@@ -51,8 +51,8 @@ namespace GameWorld.Core.Services.SceneSaving
             }
 
             _lodStrategyProvider.GetStrategy(settings.LodGenerationMethod).Generate(mainNode, settings.LodSettingsPerLod);
-            _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, onlyVisibleNodes);
             _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, outputPath, onlyVisibleNodes);
+            _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, onlyVisibleNodes);
         }
     }
 }

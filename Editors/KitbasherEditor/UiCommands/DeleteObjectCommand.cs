@@ -13,9 +13,9 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public Hotkey HotKey { get; } = new Hotkey(Key.Delete, ModifierKeys.None);
 
 
-        SelectionManager _selectionManager;
-        ObjectEditor _objectEditor;
-        FaceEditor _faceEditor;
+        private readonly SelectionManager _selectionManager;
+        private readonly ObjectEditor _objectEditor;
+        private readonly FaceEditor _faceEditor;
 
         public DeleteObjectCommand(SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor)
         {

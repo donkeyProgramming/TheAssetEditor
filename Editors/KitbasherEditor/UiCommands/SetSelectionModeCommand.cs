@@ -1,7 +1,6 @@
 ﻿using GameWorld.Core.Components.Selection;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
-using System;
 using System.Windows.Input;
 
 namespace KitbasherEditor.ViewModels.UiCommands
@@ -12,7 +11,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public abstract Hotkey HotKey { get; }
 
-        SelectionComponent _selectionComponent;
+        private readonly SelectionComponent _selectionComponent;
 
         protected SetSelectionModeCommand(SelectionComponent selectionComponent)
         {

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using GameWorld.Core.SceneNodes;
+﻿using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services.SceneSaving;
 using Shared.Core.Misc;
 

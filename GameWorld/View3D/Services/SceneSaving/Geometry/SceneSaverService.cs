@@ -36,7 +36,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             try
             {
                 var inputFile = _packFileService.FindFile(outputPath);
-                var bytes = GenerateBytes(onlySaveVisibleNodes, new List<Rmv2ModelNode>() { mainNode }, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+                var bytes = GenerateBytes(onlySaveVisibleNodes, mainNode, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
                 var res = SaveHelper.Save(_packFileService, outputPath, inputFile, bytes);
                 _eventHub.Publish(new ScopedFileSavedEvent());
             }
@@ -47,14 +47,11 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             }
         }
 
-        static byte[] GenerateBytes(bool onlySaveVisibleNodes, List<Rmv2ModelNode> modelNodes, GameSkeleton skeleton, RmvVersionEnum version, bool enrichModel = true)
+        byte[] GenerateBytes(bool onlySaveVisibleNodes, Rmv2ModelNode modelNode, GameSkeleton skeleton, RmvVersionEnum version, bool enrichModel = true)
         {
-            var logger = Logging.Create<SceneSaverService>();
-            logger.Here().Information($"Starting to save model. Nodes = {modelNodes.Count}, Skeleton = {skeleton}, Version = {version}");
+            _logger.Here().Information($"Starting to save model. Skeleton = {skeleton}, Version = {version}");
 
-            var lodCount = (uint)modelNodes.First().Model.LodHeaders.Length;
-
-            logger.Here().Information($"Creating header");
+            var lodCount = (uint)modelNode.Children.Count;
             var outputFile = new RmvFile()
             {
                 Header = new RmvFileHeader()
@@ -65,74 +62,79 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                     LodCount = lodCount
                 },
 
-                LodHeaders = CreateLodHeaders(modelNodes.First().Model.LodHeaders, version)
+                LodHeaders = CreateLodHeaders(lodCount, modelNode.Model.LodHeaders, version)
             };
 
             // Create all the meshes
-            logger.Here().Information($"Creating meshes");
+            _logger.Here().Information($"Creating meshes");
             var newMeshList = new List<RmvModel>[lodCount];
             for (var i = 0; i < lodCount; i++)
-                newMeshList[i] = new List<RmvModel>();
+                newMeshList[i] = [];
 
-            foreach (var modelNode in modelNodes)
+            for (var currentLodIndex = 0; currentLodIndex < lodCount; currentLodIndex++)
             {
-                for (var currentLodIndex = 0; currentLodIndex < lodCount; currentLodIndex++)
+                var meshes = modelNode.GetMeshesInLod(currentLodIndex, onlySaveVisibleNodes);
+
+                for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
-                    var meshes = modelNode.GetMeshesInLod(currentLodIndex, onlySaveVisibleNodes);
+                    _logger.Here().Information($"Creating model. Lod: {currentLodIndex}, Model: {meshIndex}");
 
-                    for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
+                    var newModel = new RmvModel()
                     {
-                        logger.Here().Information($"Creating model. Lod: {currentLodIndex}, Model: {meshIndex}");
+                        CommonHeader = meshes[meshIndex].CommonHeader,
+                        Material = meshes[meshIndex].Material,
+                        Mesh = MeshBuilderService.CreateRmvMeshFromGeometry(meshes[meshIndex].Geometry)
+                    };
 
-                        var newModel = new RmvModel()
-                        {
-                            CommonHeader = meshes[meshIndex].CommonHeader,
-                            Material = meshes[meshIndex].Material,
-                            Mesh = MeshBuilderService.CreateRmvMeshFromGeometry(meshes[meshIndex].Geometry)
-                        };
+                    newModel.UpdateBoundingBox(meshes[meshIndex].Geometry.BoundingBox);
 
-                        newModel.UpdateBoundingBox(meshes[meshIndex].Geometry.BoundingBox);
+                    var boneNames = new string[0];
+                    if (skeleton != null)
+                        boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();
 
-                        var boneNames = new string[0];
-                        if (skeleton != null)
-                            boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();
+                    newModel.Material.UpdateEnumsBeforeSaving(meshes[meshIndex].Geometry.VertexFormat, version);
 
-                        newModel.Material.UpdateEnumsBeforeSaving(meshes[meshIndex].Geometry.VertexFormat, version);
+                    if (enrichModel)
+                        newModel.Material.EnrichDataBeforeSaving(boneNames, BoundingBox.CreateFromPoints(newModel.Mesh.VertexList.Select(x => x.GetPosistionAsVec3())));
 
-                        if (enrichModel)
-                            newModel.Material.EnrichDataBeforeSaving(boneNames, BoundingBox.CreateFromPoints(newModel.Mesh.VertexList.Select(x => x.GetPosistionAsVec3())));
-
-                        logger.Here().Information($"Model. Lod: {currentLodIndex}, Model: {meshIndex} created.");
-                        newMeshList[currentLodIndex].Add(newModel);
-                    }
+                    _logger.Here().Information($"Model. Lod: {currentLodIndex}, Model: {meshIndex} created.");
+                    newMeshList[currentLodIndex].Add(newModel);
                 }
             }
-
+            
             // Convert the list to an array
             var newMeshListArray = new RmvModel[lodCount][];
             for (var i = 0; i < lodCount; i++)
                 newMeshListArray[i] = newMeshList[i].ToArray();
 
-            // Update data in the header and recalc offset
-            logger.Here().Information($"Update offsets");
+            // Update data in the header and reCalc offset
+            _logger.Here().Information($"Update offsets");
             outputFile.ModelList = newMeshListArray;
             outputFile.UpdateOffsets();
 
             // Output the data
-            logger.Here().Information($"Generating bytes.");
+            _logger.Here().Information($"Generating bytes.");
             var outputBytes = ModelFactory.Create().Save(outputFile);
 
-            logger.Here().Information($"Model saved correctly");
+            _logger.Here().Information($"Model saved correctly");
             return outputBytes;
         }
 
-        static RmvLodHeader[] CreateLodHeaders(RmvLodHeader[] baseHeaders, RmvVersionEnum version)
+        static RmvLodHeader[] CreateLodHeaders(uint expectedLodCount, RmvLodHeader[] originalModelHeaders, RmvVersionEnum version)
         {
-            var numLods = baseHeaders.Length;
+            var numLods = originalModelHeaders.Length;
             var factory = LodHeaderFactory.Create();
-            var output = new RmvLodHeader[numLods];
-            for (var i = 0; i < numLods; i++)
-                output[i] = factory.CreateFromBase(version, baseHeaders[i], (uint)i);
+            var output = new RmvLodHeader[expectedLodCount];
+            
+            for (var i = 0; i < expectedLodCount; i++)
+            {
+                var hasOriginalMeshLod = originalModelHeaders.Length > i;
+                if (hasOriginalMeshLod)
+                    output[i] = factory.CreateFromBase(version, originalModelHeaders[i], (uint)i);  // Use the mesh lod header
+                else
+                    output[i] = factory.CreateFromBase(version, output[i-1], (uint)i);  // Use the last generated lod header
+            }
+
             return output;
         }
     }

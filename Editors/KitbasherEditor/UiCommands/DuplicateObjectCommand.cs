@@ -9,12 +9,12 @@ namespace KitbasherEditor.ViewModels.UiCommands
     public class DuplicateObjectCommand : IKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Duplicate selection";
-        public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.ObjectOrFaceSelected;
         public Hotkey HotKey { get; } = new Hotkey(Key.D, ModifierKeys.Control);
 
-        SelectionManager _selectionManager;
-        ObjectEditor _objectEditor;
-        FaceEditor _faceEditor;
+        private readonly SelectionManager _selectionManager;
+        private readonly ObjectEditor _objectEditor;
+        private readonly FaceEditor _faceEditor;
 
         public DuplicateObjectCommand(SelectionManager selectionManager, ObjectEditor objectEditor, FaceEditor faceEditor)
         {

@@ -3,7 +3,6 @@ using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
-using System.Linq;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {
@@ -13,7 +12,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        SceneManager _sceneManager;
+        private readonly SceneManager _sceneManager;
         private readonly ObjectEditor _objectEditor;
 
         public SortMeshesCommand(SceneManager sceneManager, ObjectEditor objectEditor)

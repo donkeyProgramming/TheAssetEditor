@@ -5,8 +5,8 @@ namespace GameWorld.Core.Utility
 {
     public class SkeletonBoneAnimationResolver
     {
-        ISkeletonProvider _animationProvider;
-        int _boneIndex;
+        private readonly ISkeletonProvider _animationProvider;
+        private readonly int _boneIndex;
 
         public SkeletonBoneAnimationResolver(ISkeletonProvider gameSkeleton, int boneIndex)
         {

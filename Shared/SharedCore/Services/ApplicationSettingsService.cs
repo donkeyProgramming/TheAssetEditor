@@ -14,7 +14,7 @@ namespace Shared.Core.Services
             public string Path { get; set; }
         }
 
-        public ObservableCollection<string> RecentPackFilePaths = new ObservableCollection<string>();
+        public ObservableCollection<string> RecentPackFilePaths { get; set; } = new ObservableCollection<string>();
 
         public List<GamePathPair> GameDirectories { get; set; } = new List<GamePathPair>();
         public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Warhammer2;

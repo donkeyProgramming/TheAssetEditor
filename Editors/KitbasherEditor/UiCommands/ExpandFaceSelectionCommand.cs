@@ -12,9 +12,9 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.FaceSelected;
         public Hotkey HotKey { get; } = null;
 
-        FaceEditor _faceEditor;
-        SelectionManager _selectionManager;
-        WindowKeyboard _keyboard;
+        private readonly  FaceEditor _faceEditor;
+        private readonly  SelectionManager _selectionManager;
+        private readonly  WindowKeyboard _keyboard;
 
         public ExpandFaceSelectionCommand(FaceEditor faceEditor, SelectionManager selectionManager, WindowKeyboard keyboard)
         {

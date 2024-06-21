@@ -13,8 +13,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.TwoOrMoreObjectsSelected;
         public Hotkey HotKey { get; } = new Hotkey(Key.M, ModifierKeys.Control);
 
-        SelectionManager _selectionManager;
-        ObjectEditor _objectEditor;
+        private readonly SelectionManager _selectionManager;
+        private readonly ObjectEditor _objectEditor;
 
         public MergeObjectsCommand(SelectionManager selectionManager, ObjectEditor objectEditor)
         {

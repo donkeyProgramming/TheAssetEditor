@@ -1,6 +1,5 @@
 ﻿using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
-using System;
 
 namespace KitbasherEditor.ViewModels.UiCommands
 {

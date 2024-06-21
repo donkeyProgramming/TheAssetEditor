@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+      <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
+    <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Exporting\Exporters\DdsToNormalPng\" />
+    <Folder Include="Exporting\Exporters\Rmv2ToGltf\" />
+    <Folder Include="Image\" />
+    <Folder Include="Geometry\" />
+    <Folder Include="Importing\" />
+  </ItemGroup>
+
+</Project>

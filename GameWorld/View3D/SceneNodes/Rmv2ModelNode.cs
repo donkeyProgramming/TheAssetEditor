@@ -4,8 +4,6 @@ using System.Linq;
 
 namespace GameWorld.Core.SceneNodes
 {
-
-
     public class Rmv2ModelNode : GroupNode
     {
         public RmvFile Model { get; set; }
