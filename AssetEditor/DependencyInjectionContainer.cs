@@ -1,4 +1,5 @@
 ﻿using AssetEditor.Services;
+using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
@@ -17,6 +18,12 @@ namespace AssetEditor
             serviceCollection.AddScoped<MainViewModel>();
             serviceCollection.AddScoped<IEditorCreator, EditorCreator>();
 
+            serviceCollection.AddTransient<DeepSearchCommand>();
+            serviceCollection.AddTransient<GenerateReportCommand>();
+            serviceCollection.AddTransient<OpenGamePackCommand>();
+            serviceCollection.AddTransient<OpenPackFileCommand>();
+            serviceCollection.AddTransient<OpenSettingsDialogCommand>();
+            serviceCollection.AddTransient<OpenWebpageCommand>();
             serviceCollection.AddTransient<OpenEditorCommand>();
             serviceCollection.AddTransient<OpenFileInEditorCommand>();
             serviceCollection.AddTransient<OpenFileInWindowedEditorCommand>();

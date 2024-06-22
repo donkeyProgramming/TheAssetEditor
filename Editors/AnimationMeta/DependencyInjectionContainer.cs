@@ -7,6 +7,7 @@ using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
@@ -30,8 +31,7 @@ namespace Editors.AnimationMeta
         public override void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<EditorHost<SuperViewViewModel>, EditorHostView>();
-
-            factory.RegisterTool<EditorViewModel, MainEditorView>(new ExtensionToTool(EditorEnums.Meta_Editor, new[] { ".anm.meta", ".meta", ".snd.meta" }));
+            factory.RegisterTool<EditorViewModel, MainEditorView>(new ExtensionToTool(EditorEnums.Meta_Editor, [".anm.meta", ".meta", ".snd.meta"]));
         }
     }
 }
