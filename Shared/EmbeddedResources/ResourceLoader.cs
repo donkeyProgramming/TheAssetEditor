@@ -9,7 +9,6 @@ namespace Shared.EmbeddedResources
     {
         public static string LoadString(string resourcePath)
         {
-            MessageBox.Show("loading string");
             if (resourcePath == null)
             {
                 throw new Exception("Resource not found: " + resourcePath);

@@ -78,39 +78,19 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             sb.Append("\t\t<materials>\n");
 
             var lodNodes = mainNode.GetLodNodes();
-            if (game != GameTypeEnum.Pharaoh)
+            for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
             {
-                for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
+                var meshes = mainNode.GetMeshesInLod(lodIndex, false);
+                var uniqueNames = GenerateUniqueNames(meshes);
+                for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
-                    var meshes = mainNode.GetMeshesInLod(lodIndex, false);
-                    var uniqueNames = GenerateUniqueNames(meshes);
-                    for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
-                    {
-                        var materialFile = GetOrCreateMaterial(modelFilePath, game, meshes[meshIndex], uniqueNames[meshIndex], materialTemplate);
-                        sb.Append($"\t\t\t<material lod_index=\"{lodIndex}\" part_index=\"{meshIndex}\">");
-                        sb.Append(materialFile);
-                        sb.Append("</material>\n");
-                    }
-
-                    sb.AppendLine();
+                    var materialFile = GetOrCreateMaterial(modelFilePath, game, meshes[meshIndex], uniqueNames[meshIndex], materialTemplate);
+                    sb.Append($"\t\t\t<material lod_index=\"{lodIndex}\" part_index=\"{meshIndex}\">");
+                    sb.Append(materialFile);
+                    sb.Append("</material>\n");
                 }
-            }
-            else
-            {
-                for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
-                {
-                    var meshes = mainNode.GetMeshesInLod(lodIndex, false);
-                    var uniqueNames = GenerateUniqueNames(meshes);
-                    for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
-                    {
-                        var materialFile = GetOrCreateMaterial(modelFilePath, game, meshes[meshIndex], uniqueNames[meshIndex], materialTemplate);
-                        sb.Append($"\t\t\t<material part_index=\"{meshIndex}\" lod_index=\"{lodIndex}\">");
-                        sb.Append(materialFile);
-                        sb.Append("</material>\n");
-                    }
 
-                    sb.AppendLine();
-                }
+                sb.AppendLine();
             }
 
             sb.Append("\t</materials>\n");

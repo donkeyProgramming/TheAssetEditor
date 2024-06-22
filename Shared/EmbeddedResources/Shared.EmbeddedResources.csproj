@@ -121,12 +121,8 @@
     <None Remove="Resources\AudioConversion\vgstream\xmp-vgmstream.dll" />
     <None Remove="Resources\AudioConversion\WavToWemWwiseProject\WavToWemWwiseProject.zip" />
     <None Remove="Resources\WsModelTemplates\MaterialTemplate_pharaoh.xml.material" />
-    <None Remove="Resources\WsModelTemplates\MaterialTemplate_pharaoh1.xml.material" />
-    <None Remove="Resources\WsModelTemplates\MaterialTemplate_wh2 - Copy.xml.material" />
     <None Remove="Resources\WsModelTemplates\MaterialTemplate_wh2.xml.material" />
-    <None Remove="Resources\WsModelTemplates\MaterialTemplate_wh3 - Copy.xml.material" />
     <None Remove="Resources\WsModelTemplates\MaterialTemplate_wh3.xml.material" />
-    <None Remove="Resources\WsModelTemplates\testMatTemplate.txt" />
   </ItemGroup>
 
   <ItemGroup>

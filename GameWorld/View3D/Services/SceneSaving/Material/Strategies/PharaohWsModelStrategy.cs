@@ -14,7 +14,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 
         public MaterialStrategy StrategyId => MaterialStrategy.WsModel_Pharaoh;
         public string Name => "Pharaoh";
-        public string Description => "Hopefully generates WsModel";
+        public string Description => "Generates the WsModel for Pharaoh Total War";
         public bool IsAvailable => true;
 
         public PharaohWsModelStrategy(WsModelGeneratorService wsModelGeneratorService)
