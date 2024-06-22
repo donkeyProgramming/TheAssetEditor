@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Editors.Audio.Presentation.AudioEditor.ViewModels;
+using Editors.Audio.Storage;
 
 namespace Editors.Audio.Presentation.AudioEditor
 {

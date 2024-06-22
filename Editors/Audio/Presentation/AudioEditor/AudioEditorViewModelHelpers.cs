@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 
@@ -170,6 +173,75 @@ namespace Editors.Audio.Presentation.AudioEditor
         public static string AddExtraUnderScoresToStateGroup(string stateGroupWithQualifier)
         {
             return stateGroupWithQualifier.Replace("_", "__"); // Apparently WPF doesn't_like_underscores
+        }
+
+        public static void UpdateAudioProjectEventSubType(AudioEditorViewModel viewModel)
+        {
+            var audioProjectSettings = new AudioProjectSettings();
+            viewModel.AudioProjectSubTypes.Clear();
+
+            if (viewModel.SelectedAudioProjectEventType == "Non-VO")
+                foreach (var item in audioProjectSettings.NonVO)
+                    viewModel.AudioProjectSubTypes.Add(item);
+
+            else if (viewModel.SelectedAudioProjectEventType == "Frontend VO")
+                foreach (var item in audioProjectSettings.FrontendVO)
+                    viewModel.AudioProjectSubTypes.Add(item);
+
+            else if (viewModel.SelectedAudioProjectEventType == "Campaign VO")
+                foreach (var item in audioProjectSettings.CampaignVO)
+                    viewModel.AudioProjectSubTypes.Add(item);
+
+            else if (viewModel.SelectedAudioProjectEventType == "Battle VO")
+                foreach (var item in audioProjectSettings.BattleVO)
+                    viewModel.AudioProjectSubTypes.Add(item);
+
+            Debug.WriteLine($"AudioProjectSubTypes changed to: {string.Join(", ", viewModel.AudioProjectSubTypes)}");
+        }
+
+        // STILL NEED TO FINISH THIS
+        public static void UpdateAudioProjectDialogueEvents(AudioEditorViewModel viewModel)
+        {
+            viewModel.AudioProjectDialogueEvents.Clear();
+
+            if (viewModel.SelectedAudioProjectEventType == "Frontend VO" 
+                && viewModel.SelectedAudioProjectEventSubtype == "Lord" 
+                && (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All || viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.Essential))
+            {
+                AddDialogueEventToDisplayData(viewModel, AudioProjectSettings.FrontendVODialogueEventsAll);
+            }
+
+
+            if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Lord")
+            {
+                if (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All)
+                    AddDialogueEventToDisplayData(viewModel, AudioProjectSettings.CampaignVODialogueEventsAll);
+
+                else
+                {
+
+                }
+            }
+
+            if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Hero")
+            {
+                if (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All)
+                    AddDialogueEventToDisplayData(viewModel, AudioProjectSettings.CampaignVODialogueEventsAll);
+
+                else
+                {
+
+                }
+            }
+        }
+
+        public static void AddDialogueEventToDisplayData(AudioEditorViewModel viewModel, List<string>  displayData)
+        {
+            foreach (var dialogueEvent in displayData)
+                viewModel.AudioProjectDialogueEvents.Add(dialogueEvent);
+
+            viewModel.AudioProjectDialogueEventsText.Value = string.Join(Environment.NewLine, viewModel.AudioProjectDialogueEvents);
+            Debug.WriteLine($"AudioProjectDialogueEvents changed to: {viewModel.AudioProjectDialogueEventsText.Value}");
         }
     }
 }

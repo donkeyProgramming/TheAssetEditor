@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using Editors.Audio.Presentation.AudioEditor.ViewModels;
+using Editors.Audio.Storage;
 
 namespace Editors.Audio.Presentation.AudioEditor.Views
 {
@@ -8,10 +9,9 @@ namespace Editors.Audio.Presentation.AudioEditor.Views
     /// </summary>
     public partial class AudioEditorSettingsView : UserControl
     {
-        public AudioEditorSettingsView()
+        public AudioEditorSettingsView( )
         {
             InitializeComponent();
-            DataContext = new AudioEditorSettingsViewModel();
         }
     }
 }

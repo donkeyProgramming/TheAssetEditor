@@ -10,53 +10,28 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <DockPanel>
-        <!-- ComboBox for All Event Filtering -->
-        <DockPanel DockPanel.Dock="Top">
-            <Label DockPanel.Dock="Left" Content="All Events:"/>
-            <ComboBox DockPanel.Dock="Top"
-                      IsEditable="True"
-                      IsTextSearchEnabled="true"
-                      DisplayMemberPath="DisplayName"
-                      Text="{Binding EventFilter.EventList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                      ItemsSource="{Binding EventFilter.EventList.Values}" 
-                      SelectedItem="{Binding EventFilter.EventList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                <ComboBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ComboBox.ItemsPanel>
-            </ComboBox>
-        </DockPanel>
-
-        <!-- ComboBox for Audio Project Event Filtering -->
-        <DockPanel DockPanel.Dock="Top">
+        <!-- Audio Project Event Selection -->
+        <DockPanel DockPanel.Dock="Top" Margin="0 5 5 0">
             <Label DockPanel.Dock="Left" Content="Audio Project Events:"/>
             <ComboBox x:Name="MyComboBox"
-              DockPanel.Dock="Top"
-              IsEditable="True"
-              IsTextSearchEnabled="True"
-              Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-              ItemsSource="{Binding EventItems}"
-              SelectedItem="{Binding SelectedEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                <ComboBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ComboBox.ItemsPanel>
+                      DockPanel.Dock="Top"
+                      IsEditable="True"
+                      IsTextSearchEnabled="True"
+                      Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                      ItemsSource="{Binding AudioProjectDialogueEvents}"
+                      SelectedItem="{Binding SelectedAudioProjectEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">     
             </ComboBox>
         </DockPanel>
 
         <!-- Buttons for Adding and Removing Columns -->
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Button Content="Edit Event" Command="{Binding EditEventCommand}" Margin="5"/>
+        <StackPanel DockPanel.Dock="Top" Margin="0 5 5 0" Orientation="Horizontal">
             <Button Content="Add State Path" Command="{Binding AddStatePathCommand}" Margin="5"/>
             <Button Content="Save Event" Command="{Binding SaveEventCommand}" Margin="5"/>
             <Button Content="Create Audio Project" Command="{Binding CreateAudioProject}" Margin="5"/>
         </StackPanel>
 
-        <!-- DataGrid Section -->
-        <DataGrid x:Name="AudioEditorDataGrid" DockPanel.Dock="Bottom" Margin="5" ItemsSource="{Binding DataGridItems}" AutoGenerateColumns="False">
-            <!-- Columns defined dynamically -->
+        <!-- Dynamically defined DataGrid -->
+        <DataGrid x:Name="AudioEditorDataGrid" DockPanel.Dock="Bottom" Margin="5 5 5 5" ItemsSource="{Binding DataGridItems}" AutoGenerateColumns="False">
         </DataGrid>
     </DockPanel>
 </UserControl>
