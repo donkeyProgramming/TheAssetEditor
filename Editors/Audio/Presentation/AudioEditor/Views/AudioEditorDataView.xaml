@@ -4,34 +4,57 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:s="http://schemas.singulink.com/xaml" 
-             xmlns:explorer="clr-namespace:Editors.Audio.Presentation.AudioExplorer" 
              xmlns:viewmodels="clr-namespace:Editors.Audio.Presentation.AudioEditor.ViewModels" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <DockPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Menu -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File" HorizontalAlignment="Left">
+                <MenuItem Header="Load Audio Project" Click="{s:MethodBinding LoadAudioProject}" />
+                <MenuItem Header="Save Audio Project" Click="{s:MethodBinding SaveAudioProject}" />
+                <Separator />
+                <MenuItem Header="Load Custom States" Click="{s:MethodBinding LoadCustomStates}" />
+                <MenuItem Header="Save Custom States" Click="{s:MethodBinding SaveCustomStates}" />
+            </MenuItem>
+        </Menu>
+
         <!-- Audio Project Event Selection -->
-        <DockPanel DockPanel.Dock="Top" Margin="0 5 5 0">
-            <Label DockPanel.Dock="Left" Content="Audio Project Events:"/>
-            <ComboBox x:Name="MyComboBox"
-                      DockPanel.Dock="Top"
+        <Grid Grid.Row="1" Margin="2.5 5 5 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" Content="Audio Project Events:" VerticalAlignment="Center"/>
+
+            <ComboBox Grid.Column="1"
+                      x:Name="MyComboBox"
                       IsEditable="True"
                       IsTextSearchEnabled="True"
                       Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                       ItemsSource="{Binding AudioProjectDialogueEvents}"
-                      SelectedItem="{Binding SelectedAudioProjectEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">     
-            </ComboBox>
-        </DockPanel>
+                      SelectedItem="{Binding SelectedAudioProjectEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                      VerticalAlignment="Center"
+                      Margin="5,0"/>
 
-        <!-- Buttons for Adding and Removing Columns -->
-        <StackPanel DockPanel.Dock="Top" Margin="0 5 5 0" Orientation="Horizontal">
-            <Button Content="Add State Path" Command="{Binding AddStatePathCommand}" Margin="5"/>
-            <Button Content="Save Event" Command="{Binding SaveEventCommand}" Margin="5"/>
-            <Button Content="Create Audio Project" Command="{Binding CreateAudioProject}" Margin="5"/>
-        </StackPanel>
+            <Button Grid.Column="2" Content="Add State Path" Command="{Binding AddStatePathCommand}" Margin="5,0" VerticalAlignment="Center"/>
 
-        <!-- Dynamically defined DataGrid -->
-        <DataGrid x:Name="AudioEditorDataGrid" DockPanel.Dock="Bottom" Margin="5 5 5 5" ItemsSource="{Binding DataGridItems}" AutoGenerateColumns="False">
+            <CheckBox Grid.Column="3" Content="Show Custom States Only" Margin="5,0" VerticalAlignment="Center" IsChecked="{Binding ShowCustomStatesOnly, Mode=TwoWay}" />
+        </Grid>
+
+        <!-- Dynamic DataGrid -->
+        <DataGrid Grid.Row="3" x:Name="AudioEditorDataGrid" Margin="0 10 0 5" ItemsSource="{Binding AudioEditorDataGridItems}" AutoGenerateColumns="False">
         </DataGrid>
-    </DockPanel>
+    </Grid>
 </UserControl>

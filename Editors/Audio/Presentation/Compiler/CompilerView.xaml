@@ -19,8 +19,8 @@
         <DockPanel Grid.Row="0" LastChildFill="True">
             <Label Content="Project:"/>
             <Button DockPanel.Dock="Right" Margin="2,2,2,2"  Content="Browse" Click="{s:MethodBinding BrowseProjectFileAction}"/>
-            <Border  BorderBrush="Black"  BorderThickness="1">
-                <TextBlock Background="White" Margin="2,2,2,2" Text="{Binding ProjectFilePath.Value, UpdateSourceTrigger=PropertyChanged}" />
+            <Border  BorderBrush="#4f4f4f"  BorderThickness="1">
+                <TextBlock Background="#3a3a3a" Margin="2,2,2,2" Text="{Binding ProjectFilePath.Value, UpdateSourceTrigger=PropertyChanged}" />
             </Border>
         </DockPanel>
 

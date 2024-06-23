@@ -73,7 +73,7 @@ namespace AssetEditor.ViewModels
 
         public ICommand OpenAudioExplorerCommand { get; set; }
         public ICommand OpenAudioEditorCommand { get; set; }
-        public ICommand CreateTemplateCommand { get; set; }
+        public ICommand CreateAudioTemplateCommand { get; set; }
         public ICommand CompileAudioCommand { get; set; }
 
         public ICommand SearchCommand { get; set; }
@@ -150,7 +150,7 @@ namespace AssetEditor.ViewModels
             OpenAudioExplorerCommand = new RelayCommand(OpenAudioExplorerEditor);
             OpenAudioEditorCommand = new RelayCommand(OpenAudioEditor);
             CompileAudioCommand = new RelayCommand(CompileAudioProjects);
-            CreateTemplateCommand = new RelayCommand<string>(CreateAudioTemplate);
+            CreateAudioTemplateCommand = new RelayCommand<string>(CreateAudioTemplate);
 
             OpenAnimationKeyframeCommand = new RelayCommand(OpenAnimationKeyframe);
             GenerateRmv2ReportCommand = new RelayCommand(GenerateRmv2Report);

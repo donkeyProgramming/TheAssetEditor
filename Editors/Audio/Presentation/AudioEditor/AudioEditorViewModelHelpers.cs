@@ -3,16 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Media;
 using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
-
 
 namespace Editors.Audio.Presentation.AudioEditor
 {
@@ -61,13 +58,12 @@ namespace Editors.Audio.Presentation.AudioEditor
             var dataGrid = GetDataGrid();
 
             // DataGrid settings:
-            dataGrid.CanUserAddRows = false; // Setting this fucker to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF.
+            dataGrid.CanUserAddRows = false; // Setting this bastard to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF.
             dataGrid.ItemsSource = dataGridItems;
 
             // Clear existing items.
             dataGrid.Columns.Clear();
             dataGridItems.Clear();
-
 
             var stateGroups = audioRepository.DialogueEventsWithStateGroups[selectedEventName];
             var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[selectedEventName];
@@ -208,14 +204,14 @@ namespace Editors.Audio.Presentation.AudioEditor
                 && viewModel.SelectedAudioProjectEventSubtype == "Lord" 
                 && (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All || viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.Essential))
             {
-                AddDialogueEventToDisplayData(viewModel, AudioProjectSettings.FrontendVODialogueEventsAll);
+                AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioProjectSettings.FrontendVODialogueEventsAll);
             }
 
 
             if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Lord")
             {
                 if (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All)
-                    AddDialogueEventToDisplayData(viewModel, AudioProjectSettings.CampaignVODialogueEventsAll);
+                    AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioProjectSettings.CampaignVODialogueEventsAll);
 
                 else
                 {
@@ -226,7 +222,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Hero")
             {
                 if (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All)
-                    AddDialogueEventToDisplayData(viewModel, AudioProjectSettings.CampaignVODialogueEventsAll);
+                    AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioProjectSettings.CampaignVODialogueEventsAll);
 
                 else
                 {
@@ -235,12 +231,11 @@ namespace Editors.Audio.Presentation.AudioEditor
             }
         }
 
-        public static void AddDialogueEventToDisplayData(AudioEditorViewModel viewModel, List<string>  displayData)
+        public static void AddDialogueEventAudioProjectDialogueEvents(AudioEditorViewModel viewModel, List<string>  displayData)
         {
             foreach (var dialogueEvent in displayData)
                 viewModel.AudioProjectDialogueEvents.Add(dialogueEvent);
 
-            viewModel.AudioProjectDialogueEventsText.Value = string.Join(Environment.NewLine, viewModel.AudioProjectDialogueEvents);
             Debug.WriteLine($"AudioProjectDialogueEvents changed to: {viewModel.AudioProjectDialogueEventsText.Value}");
         }
     }

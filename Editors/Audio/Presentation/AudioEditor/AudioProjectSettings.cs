@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Editors.Audio.Storage;
-using Editors.Audio.Utility;
+﻿using System.Collections.Generic;
 
 namespace Editors.Audio.Presentation.AudioEditor
 {
