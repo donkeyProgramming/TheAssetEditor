@@ -59,6 +59,7 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<MaterialStrategyProvider>();
             serviceCollection.AddScoped<IMaterialStrategy, Warhammer3WsModelStrategy>();
             serviceCollection.AddScoped<IMaterialStrategy, Warhammer2WsModelStrategy>();
+            serviceCollection.AddScoped<IMaterialStrategy, PharaohWsModelStrategy>();
             serviceCollection.AddScoped<IMaterialStrategy, NoWsModelStrategy>();
 
 

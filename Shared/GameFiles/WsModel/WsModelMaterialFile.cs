@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Xml;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 
@@ -51,33 +53,19 @@ namespace Shared.GameFormats.WsModel
                 var textureSlotName = slotNode[0].InnerText;
                 var texturePath = pathNode[0].InnerText;
 
-                if (textureSlotName == "s_diffuse")
+            if (textureSlotName.Contains("diffuse"))
                     Textures[TextureType.Diffuse] = texturePath;
-
-                if (textureSlotName == "s_gloss")
+            if (textureSlotName.Contains("gloss"))
                     Textures[TextureType.Gloss] = texturePath;
-
-                if (textureSlotName == "s_mask")
+            if (textureSlotName.Contains("mask"))
                     Textures[TextureType.Mask] = texturePath;
-                else if (textureSlotName == "s_mask1")
-                    Textures[TextureType.Mask] = texturePath;
-                else if (textureSlotName == "t_xml_mask")
-                    Textures[TextureType.Mask] = texturePath;
-
-                if (textureSlotName == "s_normal")
+            if (textureSlotName.Contains("normal"))
                     Textures[TextureType.Normal] = texturePath;
-                else if (textureSlotName == "t_xml_normal")
-                    Textures[TextureType.Normal] = texturePath;
-
-                if (textureSlotName == "s_specular")
+            if (textureSlotName.Contains("specular"))
                     Textures[TextureType.Specular] = texturePath;
-
-                if (textureSlotName == "t_xml_base_colour")
+            if (textureSlotName.Contains("base_colour"))
                     Textures[TextureType.BaseColour] = texturePath;
-                else if (textureSlotName == "s_base_colour")
-                    Textures[TextureType.BaseColour] = texturePath;
-
-                if (textureSlotName == "t_xml_material_map")
+            if (textureSlotName.Contains("material_map"))
                     Textures[TextureType.MaterialMap] = texturePath;
             }
         }

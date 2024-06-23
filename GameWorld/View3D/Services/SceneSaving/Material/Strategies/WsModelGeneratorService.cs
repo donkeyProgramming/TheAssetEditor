@@ -50,13 +50,14 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
                 }
 
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
+
                 var materialTemplate = game switch
                 {
                     GameTypeEnum.Warhammer3 => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_wh3.xml.material"),
                     GameTypeEnum.Warhammer2 => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_wh2.xml.material"),
+                    GameTypeEnum.Pharaoh => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_pharaoh.xml.material"),
                     _ => throw new Exception("Unknown game - unable to generate ws model")
                 };
-
                 var wsModelData = CreateWsModel(mainNode, game, modelFilePath, materialTemplate);
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
                 SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile, Encoding.UTF8.GetBytes(wsModelData));
