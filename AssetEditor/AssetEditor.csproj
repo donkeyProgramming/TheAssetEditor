@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0-windows7.0</TargetFramework>
+        <TargetFramework>net8.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
         <ApplicationIcon>AssetEditorIcon.ico</ApplicationIcon>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
@@ -47,7 +47,6 @@
 -->
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
-    <BaseOutputPath>C:\Users\Josh E\Downloads</BaseOutputPath>
 </PropertyGroup>
 
 </Project>
