@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Editors.Audio.Storage;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Shared.Core.PackFiles;
@@ -31,36 +32,35 @@ namespace Editors.Audio.Presentation.AudioEditor
             }
         }
 
-        public static void ProcessAudioProject(PackFileService packFileService, Dictionary<string, List<Dictionary<string, string>>> eventData)
+        public static string ProcessAudioProject(PackFileService packFileService, Dictionary<string, List<Dictionary<string, string>>> eventData)
         {
-            // Create an instance of AudioProject
-            var audioProject = new AudioProjectData();
+            var audioProjectData = new AudioProjectData();
 
-            // Set BnkName and Language settings
-            audioProject.Settings.BnkName = "battle_vo_conversational__ovn_vo_actor_Albion_Dural_Durak";
-            audioProject.Settings.Language = "english(uk)";
+            audioProjectData.Settings.BnkName = "battle_vo_conversational__ovn_vo_actor_Albion_Dural_Durak";
+            audioProjectData.Settings.Language = "english(uk)";
 
             foreach (var eventName in eventData.Keys)
             {
                 var eventItems = eventData[eventName];
 
-                // If eventItems is empty, add an empty AudioProjectItem
                 if (eventItems.Count == 0)
-                    audioProject.AddAudioEditorItem(eventName, new Dictionary<string, string>());
+                    audioProjectData.AddAudioEditorItem(eventName, new Dictionary<string, string>());
 
                 else
                 {
                     foreach (var eventItem in eventItems)
-                        audioProject.AddAudioEditorItem(eventName, eventItem);
+                        audioProjectData.AddAudioEditorItem(eventName, eventItem);
                 }
             }
 
-            var audioProjectJson = ConvertToAudioProject(audioProject);
+            var audioProjectJson = ConvertToAudioProject(audioProjectData);
             Debug.WriteLine($"eventData: {audioProjectJson}");
 
             var pack = packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(audioProjectJson);
             packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"audio_project.json", new MemorySource(byteArray)));
+
+            return audioProjectJson;
         }
 
         public void AddAudioEditorItem(string eventName, Dictionary<string, string> statePath)
@@ -125,6 +125,48 @@ namespace Editors.Audio.Presentation.AudioEditor
             var serializedAudioProject = root.ToString(Formatting.Indented);
 
             return serializedAudioProject;
+        }
+
+        public static Dictionary<string, List<Dictionary<string, string>>> ConvertFromAudioProject(IAudioRepository audioRepository, string audioProjectJson)
+        {
+            var eventData = new Dictionary<string, List<Dictionary<string, string>>>();
+            var root = JObject.Parse(audioProjectJson);
+            var dialogueEvents = root["DialogueEvents"] as JArray;
+
+            AudioEditorViewModelHelpers.AddQualifiersToStateGroups(audioRepository.DialogueEventsWithStateGroups);
+            var dialogueEventsWithStateGroupsWithQualifiers = AudioEditorViewModelHelpers.DialogueEventsWithStateGroupsWithQualifiers;
+
+            foreach (var item in dialogueEvents)
+            {
+                var dialogueEvent = item["DialogueEvent"].ToString();
+                var decisionTree = item["DecisionTree"] as JArray;
+
+                var eventDataItems = new List<Dictionary<string, string>>();
+
+                foreach (var decisionTreeItem in decisionTree)
+                {
+
+                    var statePathString = decisionTreeItem["StatePath"].ToString();
+                    var statePath = new Dictionary<string, string>();
+
+                    if (!string.IsNullOrEmpty(statePathString) && dialogueEventsWithStateGroupsWithQualifiers.ContainsKey(dialogueEvent))
+                    {
+                        var statePathSegments = statePathString.Split('.');
+                        var stateGroupKeys = dialogueEventsWithStateGroupsWithQualifiers[dialogueEvent];
+
+                        for (var i = 0; i < statePathSegments.Length && i < stateGroupKeys.Count; i++)
+                        {
+                            statePath[stateGroupKeys[i]] = statePathSegments[i];
+                        }
+                    }
+
+                    eventDataItems.Add(statePath);
+                }
+
+                eventData[dialogueEvent] = eventDataItems;
+            }
+
+            return eventData;
         }
     }
 }

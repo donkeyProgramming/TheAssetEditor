@@ -195,8 +195,16 @@ namespace Editors.Audio.Presentation.AudioEditor
             Debug.WriteLine($"AudioProjectSubTypes changed to: {string.Join(", ", viewModel.AudioProjectSubTypes)}");
         }
 
+        public static void CreateAudioProjectDialogueEventsListFromAudioProject(AudioEditorViewModel viewModel, Dictionary<string, List<Dictionary<string, string>>> eventData)
+        {
+            viewModel.AudioProjectDialogueEvents.Clear();
+            
+            foreach (var dialogueEvent in eventData.Keys)
+                viewModel.AudioProjectDialogueEvents.Add(dialogueEvent);
+        }
+
         // STILL NEED TO FINISH THIS
-        public static void UpdateAudioProjectDialogueEvents(AudioEditorViewModel viewModel)
+        public static void CreateAudioProjectDialogueEventsList(AudioEditorViewModel viewModel)
         {
             viewModel.AudioProjectDialogueEvents.Clear();
 
@@ -231,12 +239,16 @@ namespace Editors.Audio.Presentation.AudioEditor
             }
         }
 
-        public static void AddDialogueEventAudioProjectDialogueEvents(AudioEditorViewModel viewModel, List<string>  displayData)
+        public static void AddDialogueEventAudioProjectDialogueEvents(AudioEditorViewModel viewModel, List<string> displayData)
         {
             foreach (var dialogueEvent in displayData)
                 viewModel.AudioProjectDialogueEvents.Add(dialogueEvent);
 
             Debug.WriteLine($"AudioProjectDialogueEvents changed to: {viewModel.AudioProjectDialogueEventsText.Value}");
         }
+
+        
+
+
     }
 }
