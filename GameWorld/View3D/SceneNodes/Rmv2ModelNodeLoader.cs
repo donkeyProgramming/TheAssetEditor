@@ -46,6 +46,22 @@ namespace GameWorld.Core.SceneNodes
                 {
                     var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, _contextFactory.Create());
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
+
+                    //This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
+                    //from the model file path.
+                    if (rmvModel.Material.ModelName == "")
+                    {
+                        string[] parts = modelFullPath.Split('\\');
+                        if (parts.Length >= 2)
+                        {
+                            rmvModel.Material.ModelName = parts[parts.Length - 2];
+                        }
+                        else
+                        {
+                            rmvModel.Material.ModelName = parts[0];
+                        }
+                    }
+
                     var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, _renderEngineComponent);
                     node.Initialize(_resourceLibrary);
                     node.OriginalFilePath = modelFullPath;
