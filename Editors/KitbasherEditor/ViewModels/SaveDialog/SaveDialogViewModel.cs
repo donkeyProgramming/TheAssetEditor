@@ -10,16 +10,19 @@ using Shared.Core.PackFiles;
 
 namespace KitbasherEditor.ViewModels.SaveDialog
 {
-    internal class SaveDialogViewModel : NotifyPropertyChangedImpl // Rename to MeshSaveSettingsDialogViewModel
+    internal class SaveDialogViewModel : NotifyPropertyChangedImpl 
     {
         private readonly SceneManager _sceneManager;
         private readonly SaveService _saveService;
         private readonly PackFileService _pfs;
+        private readonly SaveSettings _saveSettings;
 
-        public ObservableCollection<LodGroupNodeViewModel> LodNodes { get; set; } = new ObservableCollection<LodGroupNodeViewModel>();  // Move to own class
+        public ObservableCollection<LodGroupNodeViewModel> LodNodes { get; set; } = []; 
         public List<ComboBoxItem<GeometryStrategy>> MeshStrategies { get; set; } 
         public List<ComboBoxItem<MaterialStrategy>> WsStrategies { get; set; } 
-        public List<ComboBoxItem<LodStrategy>> LodStrategies { get; set; } 
+        public List<ComboBoxItem<LodStrategy>> LodStrategies { get; set; }
+        public List<int> PossibleLodNumbers { get; set; } = [1,4,5];
+   
 
         public NotifyAttr<string> OutputPath { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<ComboBoxItem<GeometryStrategy>> SelectedMeshStrategy { get; set; } = new NotifyAttr<ComboBoxItem<GeometryStrategy>>();
@@ -27,15 +30,48 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         public NotifyAttr<ComboBoxItem<LodStrategy>> SelectedLodStrategy { get; set; } = new NotifyAttr<ComboBoxItem<LodStrategy>>();
         public NotifyAttr<bool> OnlySaveVisible { get; set; } = new NotifyAttr<bool>(false);
 
-        public SaveDialogViewModel(SceneManager sceneManager, SaveService saveService, PackFileService pfs)
+        int _numberOfLodsToGenerate;
+        public int NumberOfLodsToGenerate { get => _numberOfLodsToGenerate; set => SetAndNotify(ref _numberOfLodsToGenerate, value, NumberOfLodsChanged); }
+
+        public SaveDialogViewModel(SceneManager sceneManager, SaveService saveService, PackFileService pfs, SaveSettings saveSettings)
         {
             _sceneManager = sceneManager;
             _saveService = saveService;
             _pfs = pfs;
+            _saveSettings = saveSettings;
 
             MeshStrategies = _saveService.GetGeometryStrategies().Select(x => new ComboBoxItem<GeometryStrategy>(x.StrategyId, x.Name, x.Description)).ToList();
             WsStrategies = _saveService.GetMaterialStrategies().Select(x => new ComboBoxItem<MaterialStrategy>(x.StrategyId, x.Name, x.Description)).ToList();
             LodStrategies = _saveService.GetLodStrategies().Select(x => new ComboBoxItem<LodStrategy>(x.StrategyId, x.Name, x.Description)).ToList();
+
+            Initialize(saveSettings);
+        }
+
+        internal void Initialize(SaveSettings settings)
+        {
+            OutputPath.Value = settings.OutputName;
+            SelectedMeshStrategy.Value = MeshStrategies.First(x => x.Value == settings.GeometryOutputType);
+            SelectedWsModelStrategy.Value = WsStrategies.First(x => x.Value == settings.MaterialOutputType);
+            SelectedLodStrategy.Value = LodStrategies.First(x => x.Value == settings.LodGenerationMethod);
+            OnlySaveVisible.Value = settings.OnlySaveVisible;
+            NumberOfLodsToGenerate = settings.NumberOfLodsToGenerate;
+
+            BuildLodOverview(settings);
+
+            settings.IsUserInitialized = true;
+        }
+
+        void NumberOfLodsChanged(int _) 
+        {
+            // Rename to MeshSaveSettingsDialogViewModel
+            // update when ever a value is changed! 
+            // Special handing of the number of lods - regenereate the child table
+            // Ensure changes in lod table is updated
+            // Clean up 
+            // NumberOfLodsToGenerate to notify attr with callback
+            // If number of lods == 1, give warning message! 
+            _saveService.Refreah();
+            BuildLodOverview()
         }
 
         void BuildLodOverview(SaveSettings saveSettings)
@@ -48,19 +84,22 @@ namespace KitbasherEditor.ViewModels.SaveDialog
                 LodNodes.Add(new LodGroupNodeViewModel(lodNode, saveSettings));
         }
 
-        public void HandleApply(ref SaveSettings saveSettings)
-        {
-            saveSettings.OutputName = OutputPath.Value;
-            saveSettings.OnlySaveVisible = OnlySaveVisible.Value;
-            saveSettings.GeometryOutputType = SelectedMeshStrategy.Value.Value;
-            saveSettings.MaterialOutputType = SelectedWsModelStrategy.Value.Value;
-            saveSettings.LodGenerationMethod = SelectedLodStrategy.Value.Value;
-        }
+        //public void HandleApply(ref SaveSettings saveSettings)
+        //{
+        //    saveSettings.OutputName = OutputPath.Value;
+        //    saveSettings.OnlySaveVisible = OnlySaveVisible.Value;
+        //    saveSettings.GeometryOutputType = SelectedMeshStrategy.Value.Value;
+        //    saveSettings.MaterialOutputType = SelectedWsModelStrategy.Value.Value;
+        //    saveSettings.LodGenerationMethod = SelectedLodStrategy.Value.Value;
+        //    saveSettings.NumberOfLodsToGenerate = NumberOfLodsToGenerate;
+        //
+        //    // Update lod settings
+        //}
 
         public void HandleBrowseLocation()
         {
             var extension = ".rigid_model_v2";
-            var dialogResult = _pfs.UiProvider.DisplaySaveDialog(_pfs, new List<string>() { extension }, out _, out var filePath);
+            var dialogResult = _pfs.UiProvider.DisplaySaveDialog(_pfs, [extension], out _, out var filePath);
 
             if (dialogResult == true)
             {
@@ -72,27 +111,14 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             }
         }
 
-        public void HandleSave(ref SaveSettings saveSettings)
-        {
-            HandleApply(ref saveSettings);
-        }
-
-        internal void Initialize(SaveSettings settings)
-        {
-            OutputPath.Value = settings.OutputName;
-            SelectedMeshStrategy.Value = MeshStrategies.First(x => x.Value == settings.GeometryOutputType);
-            SelectedWsModelStrategy.Value = WsStrategies.First(x => x.Value == settings.MaterialOutputType);
-            SelectedLodStrategy.Value = LodStrategies.First(x => x.Value == settings.LodGenerationMethod);
-            OnlySaveVisible.Value = settings.OnlySaveVisible;
-
-            BuildLodOverview(settings);
-
-            settings.IsUserInitialized = true;
-        }
-
-        internal void UpdateSettings(ref SaveSettings settings)
-        {
-            HandleApply(ref settings);
-        }
+        //public void HandleSave(ref SaveSettings saveSettings)
+        //{
+        //    HandleApply(ref saveSettings);
+        //}
+        //
+        //internal void UpdateSettings(ref SaveSettings settings)
+        //{
+        //    HandleApply(ref settings);
+        //}
     }
 }

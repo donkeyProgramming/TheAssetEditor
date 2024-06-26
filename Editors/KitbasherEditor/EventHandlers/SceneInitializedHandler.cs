@@ -6,7 +6,6 @@ using GameWorld.Core.Services.SceneSaving;
 using GameWorld.WpfWindow.Events;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
-using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -56,7 +55,10 @@ namespace KitbasherEditor.EventHandlers
                 _kitbashSceneCreator.LoadMainEditableModel(fileToLoad);
 
                 _focusSelectableObjectComponent.FocusScene();
-                ConfigureDefaultSettings(fileName);
+                
+                _saveSettings.OutputName = fileName;
+                var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+                _saveSettings.InitializeFromModel(mainNode);
 
                 _kitbasherViewModel.DisplayName.Value = fileToLoad.Name;
             }
@@ -67,22 +69,6 @@ namespace KitbasherEditor.EventHandlers
             }
 
             _eventHub.UnRegister<SceneInitializedEvent>(OnSceneInitialized);
-        }
-
-        void ConfigureDefaultSettings(string fileName)
-        {
-            _saveSettings.OutputName = fileName;
-            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            _saveSettings.InitializeFromModel(mainNode);
-        }
-
-        public static float GetDefaultLodReductionValue(int numLods, int currentLodIndex)
-        {
-            var lerpValue = (1.0f / (numLods - 1)) * (numLods - 1 - currentLodIndex);
-            if(float.IsNaN(lerpValue))
-                lerpValue = 1;
-            var deductionRatio = MathHelper.Lerp(0.25f, 1, lerpValue);
-            return deductionRatio;
         }
     }
 }

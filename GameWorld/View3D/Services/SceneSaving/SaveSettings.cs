@@ -16,6 +16,13 @@ namespace GameWorld.Core.Services.SceneSaving
         public LodStrategy LodGenerationMethod { get; set; } = LodStrategy.AssetEditor;
         public List<LodGenerationSettings> LodSettingsPerLod { get; set; }  // Init on load
         public bool OnlySaveVisible { get; set; } = true;
+        public int NumberOfLodsToGenerate { get; set; } = 4;
+
+
+        public void RefreshLodSettings()
+        { 
+        
+        }
 
         public void InitializeFromModel(Rmv2ModelNode modelNode)
         {
@@ -27,11 +34,12 @@ namespace GameWorld.Core.Services.SceneSaving
             var numLodsInGeometry = modelNode.Model.LodHeaders.Length;
             var numLodNodes = modelNode.Children.Count;
             var lodValues = new List<LodGenerationSettings>();
-        
+            NumberOfLodsToGenerate = numLodsInGeometry;
+
             for (var i = 0; i < numLodNodes; i++)
             {
                 float cameraDistance = possibleCameraDistances[i];
-                byte qualityLvl = possibleQualityValues[i];
+                var qualityLvl = possibleQualityValues[i];
 
                 if (i < numLodsInGeometry)
                 {
@@ -62,12 +70,6 @@ namespace GameWorld.Core.Services.SceneSaving
             var deductionRatio = MathHelper.Lerp(0.25f, 1, lerpValue);
             return deductionRatio;
         }
-
-
-
-
-
-
     }
 
     public class LodGenerationSettings

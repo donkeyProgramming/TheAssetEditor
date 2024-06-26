@@ -22,6 +22,7 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="0">Path:</Label>
@@ -50,6 +51,13 @@
                           DisplayMemberPath="DisplayName" 
                           SelectedItem="{Binding SelectedLodStrategy.Value}"
                           ToolTip="{Binding Path=SelectedItem.Description, RelativeSource={RelativeSource Self}}"/>
+
+                <Label Grid.Row="4" Grid.Column="0">Number of lods:</Label>
+                <ComboBox Grid.Row="4" Grid.Column="1" Width="200" HorizontalAlignment="Right" Margin="0,1,0,1" 
+                     ItemsSource="{Binding PossibleLodNumbers}" 
+                     DisplayMemberPath="DisplayName" 
+                     SelectedItem="{Binding NumberOfLodsToGenerate.Value}"
+                     ToolTip="Number of lods that will be generated. Normal is 4, large models have 5 and some special models have 1"/>
             </Grid>
 
             <Label DockPanel.Dock="top"  Margin="2,10,2,0">Lod Info:</Label>
