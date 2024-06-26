@@ -105,6 +105,14 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             foreach (var mesh in meshes)
             {
                 var fileName = mesh.Name;
+                var modelFullPath = mesh.OriginalFilePath;
+                //if mesh name is blank, grab a mesh name from the file path, so far the only
+                //total war with this issue appears to be Pharaoh.
+                if (String.IsNullOrWhiteSpace(fileName))
+                {
+                    modelFullPath = Path.GetFileNameWithoutExtension(fileName);
+                }
+
                 for (var index = 0; index < 1024; index++)
                 {
                     var name = index == 0 ? fileName : string.Format("{0}_{1}", fileName, index);
