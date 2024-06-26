@@ -9,6 +9,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using System;
+using System.IO;
 
 namespace GameWorld.Core.SceneNodes
 {
@@ -49,17 +50,9 @@ namespace GameWorld.Core.SceneNodes
 
                     //This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
                     //from the model file path.
-                    if (rmvModel.Material.ModelName == "")
+                    if (String.IsNullOrWhiteSpace(rmvModel.Material.ModelName))
                     {
-                        string[] parts = modelFullPath.Split('\\');
-                        if (parts.Length >= 2)
-                        {
-                            rmvModel.Material.ModelName = parts[parts.Length - 2];
-                        }
-                        else
-                        {
-                            rmvModel.Material.ModelName = parts[0];
-                        }
+                        rmvModel.Material.ModelName = Path.GetFileNameWithoutExtension(modelFullPath);
                     }
 
                     var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, _renderEngineComponent);

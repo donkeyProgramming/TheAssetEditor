@@ -108,17 +108,9 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
                 var modelFullPath = mesh.OriginalFilePath;
                 //if mesh name is blank, grab a mesh name from the file path, so far the only
                 //total war with this issue appears to be Pharaoh.
-                if (fileName == "")
+                if (String.IsNullOrWhiteSpace(fileName))
                 {
-                    string[] parts = modelFullPath.Split('\\');
-                    if (parts.Length >= 2)
-                    {
-                        fileName = parts[parts.Length - 2];
-                    }
-                    else
-                    {
-                        fileName = parts[0];
-                    }
+                    modelFullPath = Path.GetFileNameWithoutExtension(fileName);
                 }
 
                 for (var index = 0; index < 1024; index++)
