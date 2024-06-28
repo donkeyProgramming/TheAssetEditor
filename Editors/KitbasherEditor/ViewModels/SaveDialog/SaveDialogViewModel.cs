@@ -61,40 +61,38 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             settings.IsUserInitialized = true;
         }
 
-        void NumberOfLodsChanged(int _) 
+        void NumberOfLodsChanged(int newValue) 
         {
-            // Rename to MeshSaveSettingsDialogViewModel
-            // update when ever a value is changed! 
-            // Special handing of the number of lods - regenereate the child table
-            // Ensure changes in lod table is updated
-            // Clean up 
-            // NumberOfLodsToGenerate to notify attr with callback
-            // If number of lods == 1, give warning message! 
-            _saveService.Refreah();
-            BuildLodOverview()
+            _saveSettings.NumberOfLodsToGenerate = newValue;
+            _saveSettings.RefreshLodSettings();
+            BuildLodOverview(_saveSettings);
         }
 
         void BuildLodOverview(SaveSettings saveSettings)
         {
-            var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
-            var lodNodesInModel = mainNode.GetLodNodes();
-
             LodNodes.Clear();
-            foreach (var lodNode in lodNodesInModel)
-                LodNodes.Add(new LodGroupNodeViewModel(lodNode, saveSettings));
+            var lodNodesInModel = _sceneManager
+                .GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel)
+                .GetLodNodes();
+
+            for (var i = 0; i < _saveSettings.NumberOfLodsToGenerate; i++)
+            {
+                Rmv2LodNode? lodNode = null;
+                if(i > lodNodesInModel.Count)
+                    lodNode = lodNodesInModel[i];
+                LodNodes.Add(new LodGroupNodeViewModel(lodNode, i, saveSettings));
+            }
         }
 
-        //public void HandleApply(ref SaveSettings saveSettings)
-        //{
-        //    saveSettings.OutputName = OutputPath.Value;
-        //    saveSettings.OnlySaveVisible = OnlySaveVisible.Value;
-        //    saveSettings.GeometryOutputType = SelectedMeshStrategy.Value.Value;
-        //    saveSettings.MaterialOutputType = SelectedWsModelStrategy.Value.Value;
-        //    saveSettings.LodGenerationMethod = SelectedLodStrategy.Value.Value;
-        //    saveSettings.NumberOfLodsToGenerate = NumberOfLodsToGenerate;
-        //
-        //    // Update lod settings
-        //}
+        public void HandleApply(ref SaveSettings saveSettings)
+        {
+            saveSettings.OutputName = OutputPath.Value;
+            saveSettings.OnlySaveVisible = OnlySaveVisible.Value;
+            saveSettings.GeometryOutputType = SelectedMeshStrategy.Value.Value;
+            saveSettings.MaterialOutputType = SelectedWsModelStrategy.Value.Value;
+            saveSettings.LodGenerationMethod = SelectedLodStrategy.Value.Value;
+            saveSettings.NumberOfLodsToGenerate = NumberOfLodsToGenerate;
+        }
 
         public void HandleBrowseLocation()
         {
@@ -111,14 +109,14 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             }
         }
 
-        //public void HandleSave(ref SaveSettings saveSettings)
-        //{
-        //    HandleApply(ref saveSettings);
-        //}
-        //
-        //internal void UpdateSettings(ref SaveSettings settings)
-        //{
-        //    HandleApply(ref settings);
-        //}
+       public void HandleSave(ref SaveSettings saveSettings)
+       {
+           HandleApply(ref saveSettings);
+       }
+       
+       internal void UpdateSettings(ref SaveSettings settings)
+       {
+           HandleApply(ref settings);
+       }
     }
 }

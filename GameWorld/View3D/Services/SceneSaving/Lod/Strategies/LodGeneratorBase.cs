@@ -27,22 +27,30 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
         public void CreateLodsForRootNode(Rmv2ModelNode rootNode, List<LodGenerationSettings> lodGenerationSettings)
         {
             var lods = rootNode.GetLodNodes();
-            var firstLod = lods.First();
-            var lodRootNodes = lods
+            var generationSource = lods.First();
+            var lodsToRemove = lods
                 .Skip(1)
                 .Take(rootNode.Children.Count - 1)
                 .ToList();
 
             // Delete all the lods
-            DeleteAllLods(lodRootNodes);
+            DeleteAllLods(lodsToRemove);
 
-            var meshList = firstLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
+            var meshList = generationSource.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
             var generatedLod = CreateLods(meshList, lodGenerationSettings);
 
-            for (var i = 0; i < lodRootNodes.Count; i++)
+            for (var i = 0; i < lodsToRemove.Count; i++)
             {
+                var newLodNode = (Rmv2LodNode)generationSource.CreateCopyInstance();
+                generationSource.CopyInto(newLodNode);
+                newLodNode.LodValue = i + 1;
+                newLodNode.Name = "Lod " + newLodNode.LodValue;
+
+                var newNodeMeshList = generationSource.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
+                var generatedLod = CreateLods(meshList, lodGenerationSettings);
+
                 foreach (var mesh in generatedLod[i])
-                    lodRootNodes[i].AddObject(mesh);
+                    lodsToRemove[i].AddObject(mesh);
             }
         }
 

@@ -55,8 +55,8 @@
                 <Label Grid.Row="4" Grid.Column="0">Number of lods:</Label>
                 <ComboBox Grid.Row="4" Grid.Column="1" Width="200" HorizontalAlignment="Right" Margin="0,1,0,1" 
                      ItemsSource="{Binding PossibleLodNumbers}" 
-                     DisplayMemberPath="DisplayName" 
-                     SelectedItem="{Binding NumberOfLodsToGenerate.Value}"
+
+                     SelectedItem="{Binding NumberOfLodsToGenerate}"
                      ToolTip="Number of lods that will be generated. Normal is 4, large models have 5 and some special models have 1"/>
             </Grid>
 
@@ -77,10 +77,6 @@
                             <common:DataGridNumericColumn Header="Num Polygons" Binding="{Binding PolygonCount.Value}" IsReadOnly="True" />
                             <common:DataGridNumericColumn Header="Num Meshes" Binding="{Binding MeshCount.Value}" IsReadOnly="True" />
                             <common:DataGridNumericColumn Header="Num Textures" Binding="{Binding TextureCount.Value}" IsReadOnly="True" />
-                            
-                            
-                            
-                            
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>

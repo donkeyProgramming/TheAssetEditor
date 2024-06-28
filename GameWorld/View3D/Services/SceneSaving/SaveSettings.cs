@@ -14,52 +14,62 @@ namespace GameWorld.Core.Services.SceneSaving
         public GeometryStrategy GeometryOutputType { get; set; } = GeometryStrategy.Rmv7;
         public MaterialStrategy MaterialOutputType { get; set; } = MaterialStrategy.WsModel_Warhammer3;
         public LodStrategy LodGenerationMethod { get; set; } = LodStrategy.AssetEditor;
-        public List<LodGenerationSettings> LodSettingsPerLod { get; set; }  // Init on load
+        public List<LodGenerationSettings> LodSettingsPerLod { get; set; } = [];
         public bool OnlySaveVisible { get; set; } = true;
         public int NumberOfLodsToGenerate { get; set; } = 4;
 
 
         public void RefreshLodSettings()
-        { 
-        
+        {
+            LodSettingsPerLod.Clear();
+            for (var i = 0; i < NumberOfLodsToGenerate; i++)
+            {
+                var settings = GenerateLodSettingsForIndex(i, NumberOfLodsToGenerate, null);
+                LodSettingsPerLod.Add(settings);
+            }
         }
 
         public void InitializeFromModel(Rmv2ModelNode modelNode)
         {
+            LodSettingsPerLod.Clear();
+
+            NumberOfLodsToGenerate = modelNode.Model.LodHeaders.Length;
+
+            for (var i = 0; i < NumberOfLodsToGenerate; i++)
+            {
+                var settings = GenerateLodSettingsForIndex(i, NumberOfLodsToGenerate, modelNode);
+                LodSettingsPerLod.Add(settings);
+            }
+        }
+
+        LodGenerationSettings GenerateLodSettingsForIndex(int lodIndex, int lodCount, Rmv2ModelNode? node)
+        {
             int[] possibleCameraDistances = [20, 80, 100, 10000, 10000, 10000];
             byte[] possibleQualityValues = [2, 0, 0, 0, 0, 0, 0];
 
-            GeometryOutputType = GeometryStrategy.Rmv7;  
-        
-            var numLodsInGeometry = modelNode.Model.LodHeaders.Length;
-            var numLodNodes = modelNode.Children.Count;
-            var lodValues = new List<LodGenerationSettings>();
-            NumberOfLodsToGenerate = numLodsInGeometry;
+            float cameraDistance = possibleCameraDistances[lodIndex];
+            var qualityLvl = possibleQualityValues[lodIndex];
 
-            for (var i = 0; i < numLodNodes; i++)
+            if (node != null)
             {
-                float cameraDistance = possibleCameraDistances[i];
-                var qualityLvl = possibleQualityValues[i];
-
-                if (i < numLodsInGeometry)
-                {
-                    var lodHeader = modelNode.Model.LodHeaders[i];
+                var numLodsInGeometry = node.Model.LodHeaders.Length;
+                if (lodIndex < numLodsInGeometry)
+                { 
+                    var lodHeader = node.Model.LodHeaders[lodIndex];
                     cameraDistance = lodHeader.LodCameraDistance;
                     qualityLvl = lodHeader.QualityLvl;
                 }
-                  
-                var setting = new LodGenerationSettings()
-                {
-                    CameraDistance = cameraDistance,
-                    QualityLvl = qualityLvl,
-                    LodRectionFactor = GetDefaultLodReductionValue(numLodNodes, i),
-                    OptimizeAlpha = i >= 2,
-                    OptimizeVertex = i >= 2,
-                };
-                lodValues.Add(setting);
             }
-        
-            LodSettingsPerLod = lodValues;
+
+            var setting = new LodGenerationSettings()
+            {
+                CameraDistance = cameraDistance,
+                QualityLvl = qualityLvl,
+                LodRectionFactor = GetDefaultLodReductionValue(lodCount, lodIndex),
+                OptimizeAlpha = lodIndex >= 2,
+                OptimizeVertex = lodIndex >= 2,
+            };
+            return setting;
         }
 
         static float GetDefaultLodReductionValue(int numLods, int currentLodIndex)
