@@ -14,7 +14,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry.Strategies
         {
         }
 
-        public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
+        public void Generate(MainEditableNode mainNode, SaveSettings saveSettings)
         {
         }
     }

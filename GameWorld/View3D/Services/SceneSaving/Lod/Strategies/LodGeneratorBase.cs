@@ -53,11 +53,11 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
             // Delete all the lods
             DeleteAllLods(lodsToRemove);
 
-            for (var i = 1; i < lodGenerationSettings.Count - 1; i++)
+            for (var i = 1; i < lodGenerationSettings.Count; i++)
             {
                 var newLodNode = (Rmv2LodNode)generationSource.CreateCopyInstance();
                 generationSource.CopyInto(newLodNode);
-                newLodNode.LodValue = i + 1;
+                newLodNode.LodValue = i;
                 newLodNode.Name = "Lod " + newLodNode.LodValue;
                 rootNode.AddObject(newLodNode);
 

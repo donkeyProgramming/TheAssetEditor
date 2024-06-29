@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -31,12 +32,12 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             _applicationSettingsService = applicationSettingsService;
         }
 
-        public void Save(string outputPath, MainEditableNode mainNode, RmvVersionEnum rmvVersionEnum, bool onlySaveVisibleNodes = true)
+        public void Save(string outputPath, MainEditableNode mainNode, RmvVersionEnum rmvVersionEnum, SaveSettings saveSettings)
         {
             try
             {
                 var inputFile = _packFileService.FindFile(outputPath);
-                var bytes = GenerateBytes(onlySaveVisibleNodes, mainNode, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+                var bytes = GenerateBytes(mainNode, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, saveSettings, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
                 var res = SaveHelper.Save(_packFileService, outputPath, inputFile, bytes);
                 _eventHub.Publish(new ScopedFileSavedEvent());
             }
@@ -47,11 +48,15 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             }
         }
 
-        byte[] GenerateBytes(bool onlySaveVisibleNodes, Rmv2ModelNode modelNode, GameSkeleton skeleton, RmvVersionEnum version, bool enrichModel = true)
+        byte[] GenerateBytes(Rmv2ModelNode modelNode, GameSkeleton skeleton, RmvVersionEnum version, SaveSettings saveSettings, bool enrichModel = true)
         {
             _logger.Here().Information($"Starting to save model. Skeleton = {skeleton}, Version = {version}");
 
             var lodCount = (uint)modelNode.Children.Count;
+
+            if ( !(saveSettings.NumberOfLodsToGenerate == lodCount && saveSettings.LodSettingsPerLod.Count == lodCount) )
+                throw new Exception($"Error computer number of lods. saveSettings.NumberOfLodsToGenerate:{saveSettings.NumberOfLodsToGenerate}, lodCount:{lodCount}, saveSettings.LodSettingsPerLod.Count{saveSettings.LodSettingsPerLod.Count}");
+
             var outputFile = new RmvFile()
             {
                 Header = new RmvFileHeader()
@@ -62,7 +67,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                     LodCount = lodCount
                 },
 
-                LodHeaders = CreateLodHeaders(lodCount, modelNode.Model.LodHeaders, version)
+                LodHeaders = CreateLodHeaders(lodCount, saveSettings, modelNode.Model.LodHeaders, version)
             };
 
             // Create all the meshes
@@ -73,7 +78,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
 
             for (var currentLodIndex = 0; currentLodIndex < lodCount; currentLodIndex++)
             {
-                var meshes = modelNode.GetMeshesInLod(currentLodIndex, onlySaveVisibleNodes);
+                var meshes = modelNode.GetMeshesInLod(currentLodIndex, saveSettings.OnlySaveVisible);
 
                 for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
@@ -120,9 +125,8 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             return outputBytes;
         }
 
-        static RmvLodHeader[] CreateLodHeaders(uint expectedLodCount, RmvLodHeader[] originalModelHeaders, RmvVersionEnum version)
+        static RmvLodHeader[] CreateLodHeaders(uint expectedLodCount, SaveSettings saveSettings, RmvLodHeader[] originalModelHeaders, RmvVersionEnum version)
         {
-            var numLods = originalModelHeaders.Length;
             var factory = LodHeaderFactory.Create();
             var output = new RmvLodHeader[expectedLodCount];
             
@@ -133,6 +137,9 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                     output[i] = factory.CreateFromBase(version, originalModelHeaders[i], (uint)i);  // Use the mesh lod header
                 else
                     output[i] = factory.CreateFromBase(version, output[i-1], (uint)i);  // Use the last generated lod header
+
+                output[i].LodCameraDistance = saveSettings.LodSettingsPerLod[i].CameraDistance;
+                output[i].QualityLvl = saveSettings.LodSettingsPerLod[i].QualityLvl;
             }
 
             return output;
