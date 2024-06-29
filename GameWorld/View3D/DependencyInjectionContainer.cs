@@ -33,6 +33,9 @@ namespace GameWorld.Core
             // Graphics scene
             serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
 
+            // Settings
+            serviceCollection.AddScoped<SaveSettings>();
+
             // Services
             serviceCollection.AddScoped<ViewOnlySelectedService>();
             serviceCollection.AddScoped<FocusSelectableObjectService>();
