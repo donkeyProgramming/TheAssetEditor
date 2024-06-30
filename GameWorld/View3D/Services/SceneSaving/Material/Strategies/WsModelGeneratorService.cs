@@ -134,20 +134,22 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             uniqueName = uniqueName.Trim();
             var materialFileName = FindApplicableExistingMaterial(game, mesh);
             if (materialFileName == null)
-                materialFileName = CreateNewMaterial(modelFilePath, mesh, uniqueName, materialTemplate);
+                materialFileName = CreateNewMaterial(modelFilePath, mesh, uniqueName, materialTemplate, game);
             return materialFileName;
         }
 
-        string CreateNewMaterial(string modelFilePath, Rmv2MeshNode mesh, string uniqueName, string materialTemplate)
+        string CreateNewMaterial(string modelFilePath, Rmv2MeshNode mesh, string uniqueName, string materialTemplate, GameTypeEnum game)
         {
             var vertexType = ModelMaterialEnumHelper.GetToolVertexFormat(mesh.Material.BinaryVertexFormat);
             var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
 
-            var shaderNamePart = vertexType switch
+            var shaderNamePart = (vertexType, game) switch
             {
-                UiVertexFormat.Cinematic => "weighted4",
-                UiVertexFormat.Weighted => "weighted2",
-                UiVertexFormat.Static => "rigid",
+                (UiVertexFormat.Cinematic, GameTypeEnum.Pharaoh) => "weighted_standard_4",
+                (UiVertexFormat.Weighted, GameTypeEnum.Pharaoh) => "weighted_standard_2",
+                (UiVertexFormat.Static, _) => "rigid",
+                (UiVertexFormat.Cinematic, _) when game != GameTypeEnum.Pharaoh => "weighted4",
+                (UiVertexFormat.Weighted, _) when game != GameTypeEnum.Pharaoh => "weighted2",
                 _ => throw new Exception("Unknown vertex type")
             };
 
@@ -155,7 +157,16 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             var shaderAlphaStr = "";
             if (alphaOn)
                 shaderAlphaStr = "_alpha";
-            var shaderName = $"shaders/{shaderNamePart}_character{shaderAlphaStr}.xml.shader";
+            var shaderName = "";
+            if (game != GameTypeEnum.Pharaoh)
+            {
+                shaderName = $"shaders/{shaderNamePart}_character{shaderAlphaStr}.xml.shader";
+            }
+            else
+            {
+                shaderName = $"shaders/system/{shaderNamePart}.xml.shader";
+
+            }
             materialTemplate = materialTemplate.Replace("SHADER_PATH", shaderName);
 
             // Update the textures
@@ -172,7 +183,16 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             }
 
             // Save the new file
-            var fileName = uniqueName + "_" + shaderNamePart + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
+            var fileName = "";
+            if (game != GameTypeEnum.Pharaoh)
+            {
+                fileName = uniqueName + "_" + shaderNamePart + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
+            }
+            else
+            {
+                fileName = uniqueName + "_" + shaderNamePart + ".xml";
+            }
+
             materialTemplate = materialTemplate.Replace("FILE_NAME", fileName);
 
             var dir = Path.GetDirectoryName(modelFilePath);
