@@ -21,38 +21,65 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 
                 foreach (var child in itemsToDelete)
                     child.Parent.RemoveObject(child);
+
+                var numLods = lodRootNodes.Count;
+                for (var i = 0; i < numLods; i++)
+                    lodRootNodes[i].Parent.RemoveObject(lodRootNodes[i]);
+            }
+        }
+
+        private void DeleteAllMeshes(Rmv2LodNode meshNode)
+        {
+            foreach (var lod in meshNode.GetAllModels(false))
+            {
+                var itemsToDelete = new List<ISceneNode>();
+                foreach (var child in lod.Children)
+                    itemsToDelete.Add(child);
+
+                foreach (var child in itemsToDelete)
+                    child.Parent.RemoveObject(child);
             }
         }
 
         public void CreateLodsForRootNode(Rmv2ModelNode rootNode, List<LodGenerationSettings> lodGenerationSettings)
         {
             var lods = rootNode.GetLodNodes();
-            var firstLod = lods.First();
-            var lodRootNodes = lods
+            var generationSource = lods.First();
+            var lodsToRemove = lods
                 .Skip(1)
                 .Take(rootNode.Children.Count - 1)
                 .ToList();
 
             // Delete all the lods
-            DeleteAllLods(lodRootNodes);
+            DeleteAllLods(lodsToRemove);
 
-            var meshList = firstLod.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
-            var generatedLod = CreateLods(meshList, lodGenerationSettings);
-
-            for (var i = 0; i < lodRootNodes.Count; i++)
+            for (var i = 1; i < lodGenerationSettings.Count; i++)
             {
-                foreach (var mesh in generatedLod[i])
-                    lodRootNodes[i].AddObject(mesh);
+                var newLodNode = (Rmv2LodNode)generationSource.CreateCopyInstance();
+                generationSource.CopyInto(newLodNode);
+                newLodNode.LodValue = i;
+                newLodNode.Name = "Lod " + newLodNode.LodValue;
+                rootNode.AddObject(newLodNode);
+
+                var meshList = generationSource.GetAllModelsGrouped(false).SelectMany(x => x.Value).ToList();
+                var generatedLod = CreateLods(meshList, lodGenerationSettings[i]);
+
+                // Delete all models
+                DeleteAllMeshes(newLodNode);
+
+                // Add new meshes
+                foreach (var mesh in generatedLod)
+                    newLodNode.AddObject(mesh);
             }
         }
 
-        List<Rmv2MeshNode[]> CreateLods(List<Rmv2MeshNode> originalModel, List<LodGenerationSettings> settings)
+        List<Rmv2MeshNode> CreateLods(List<Rmv2MeshNode> originalModel, LodGenerationSettings settings)
         {
-            var output = new List<Rmv2MeshNode[]>();
-            for (var lodIndex = 1; lodIndex < settings.Count; lodIndex++)
+         //   var output = new List<Rmv2MeshNode>();
+            //for (var lodIndex = 1; lodIndex < settings.Count; lodIndex++)
             {
-                var deductionRatio = settings[lodIndex].LodRectionFactor;
-                var optimize = settings[lodIndex].OptimizeAlpha || settings[lodIndex].OptimizeVertex;
+                var deductionRatio = settings.LodRectionFactor;
+                var optimize = settings.OptimizeAlpha || settings.OptimizeVertex;
 
                 // We want to work on a clone of all the meshes
                 var originalMeshClone = originalModel.Select(x => SceneNodeHelper.CloneNode(x)).ToList();
@@ -66,7 +93,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
                         if (mesh.Geometry.VertexFormat != UiVertexFormat.Static)
                             mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted, mesh.Geometry.ParentSkeletonName);
 
-                        if (settings[lodIndex].OptimizeAlpha)
+                        if (settings.OptimizeAlpha)
                             mesh.Material.AlphaMode = AlphaMode.Opaque;
                     }
 
@@ -80,14 +107,14 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
                 // Reduce the polygon count
                 foreach (var mesh in originalMeshClone)
                 {
-                    if (mesh.ReduceMeshOnLodGeneration && settings[lodIndex].LodRectionFactor != 1)
+                    if (mesh.ReduceMeshOnLodGeneration && settings.LodRectionFactor != 1)
                         ReduceMesh(mesh, deductionRatio);
                 }
-
-                output.Add(originalMeshClone.ToArray());
+                return originalMeshClone;
+                //output.Add(originalMeshClone);
             }
 
-            return output;
+            //return output;
         }
     }
 }

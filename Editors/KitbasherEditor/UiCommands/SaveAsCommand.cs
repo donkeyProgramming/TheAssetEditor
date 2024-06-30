@@ -1,7 +1,8 @@
-﻿using GameWorld.Core.Components;
+﻿using Editors.KitbasherEditor.ViewModels.SaveDialog;
+using GameWorld.Core.Components;
 using GameWorld.Core.Services.SceneSaving;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using Shared.Ui.BaseDialogs.WindowHandling;
+using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.UiCommands
@@ -12,8 +13,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        public SaveAsCommand(IWindowFactory windowFactory, SaveSettings settings, SceneManager sceneManager, SaveService saveService)
-            : base(windowFactory, settings, sceneManager, saveService)
+        public SaveAsCommand(SaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory)
+            : base(settings, sceneManager, saveService, saveWindowFactory)
         {
         }
 

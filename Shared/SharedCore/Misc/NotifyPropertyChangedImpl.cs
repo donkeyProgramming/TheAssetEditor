@@ -8,7 +8,7 @@ namespace Shared.Core.Misc
     {
         [JsonIgnore]
         public bool DisableCallbacks { get; set; } = false;
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
         public delegate void ValueChangedDelegate();
         public delegate void ValueChangedDelegate<T>(T newValue);
         public delegate bool BeforeValueChangedDelegate<T>(T newValue);
@@ -34,7 +34,7 @@ namespace Shared.Core.Misc
                 valueChangedDelegate?.Invoke(newValue);
         }
 
-        protected virtual void SetAndNotifyWhenChanged<T>(ref T variable, T newValue, ValueChangedDelegate<T> valueChangedDelegate = null, [CallerMemberName] string propertyName = "")
+        protected virtual void SetAndNotifyWhenChanged<T>(ref T variable, T newValue, ValueChangedDelegate<T>? valueChangedDelegate = null, [CallerMemberName] string propertyName = "")
         {
             if (EqualityComparer<T>.Default.Equals(variable, newValue))
                 return;
@@ -62,7 +62,7 @@ namespace Shared.Core.Misc
 
     public class DisableCallbacks : IDisposable
     {
-        NotifyPropertyChangedImpl _view;
+        private readonly NotifyPropertyChangedImpl _view;
         public DisableCallbacks(NotifyPropertyChangedImpl view)
         {
             _view = view;

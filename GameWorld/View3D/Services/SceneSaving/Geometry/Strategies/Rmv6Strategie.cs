@@ -17,9 +17,9 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry.Strategies
             _sceneSaverService = sceneSaverService;
         }
 
-        public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
+        public void Generate(MainEditableNode mainNode, SaveSettings saveSettings)
         {
-            _sceneSaverService.Save(outputPath, mainNode, RmvVersionEnum.RMV2_V6, onlyVisibleNodes);
+            _sceneSaverService.Save(saveSettings.OutputName, mainNode, RmvVersionEnum.RMV2_V6, saveSettings);
         }
     }
 }
