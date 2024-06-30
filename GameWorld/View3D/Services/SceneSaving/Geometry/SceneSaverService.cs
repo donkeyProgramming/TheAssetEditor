@@ -39,7 +39,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                 var inputFile = _packFileService.FindFile(outputPath);
                 var bytes = GenerateBytes(mainNode, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, saveSettings, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
                 var res = SaveHelper.Save(_packFileService, outputPath, inputFile, bytes);
-                _eventHub.Publish(new ScopedFileSavedEvent());
+                _eventHub.Publish(new ScopedFileSavedEvent() {NewPath = outputPath });
             }
             catch (Exception e)
             {

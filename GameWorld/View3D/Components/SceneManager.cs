@@ -33,7 +33,7 @@ namespace GameWorld.Core.Components
 
     public class SceneManager : BaseComponent, IDisposable
     {
-        ILogger _logger = Logging.Create<SceneManager>();
+        private readonly ILogger _logger = Logging.Create<SceneManager>();
         public ISceneNode RootNode { get; private set; }
 
 

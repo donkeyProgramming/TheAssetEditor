@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using GameWorld.Core.Components;
+﻿using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
+using GameWorld.Core.Services.SceneSaving;
 using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using KitbasherEditor.ViewModels;
@@ -16,16 +16,13 @@ namespace KitbasherEditor.Services
     public class KitbashSceneCreator
     {
         private readonly ILogger _logger = Logging.Create<KitbashSceneCreator>();
-
-        private MainEditableNode? _mainNode;
-        [AllowNull]public ISceneNode ReferenceMeshNode { get; private set; }
-
         private readonly PackFileService _packFileService;
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly ComplexMeshLoader _complexMeshLoader;
         private readonly ResourceLibrary _resourceLibrary;
         private readonly SceneManager _sceneManager;
         private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
+        private readonly SaveSettings _saveSettings;
 
         public KitbashSceneCreator(
             KitbasherRootScene kitbasherRootScene,
@@ -33,7 +30,8 @@ namespace KitbasherEditor.Services
             ResourceLibrary resourceLibrary,
             SceneManager sceneManager,
             PackFileService packFileService,
-            Rmv2ModelNodeLoader rmv2ModelNodeLoader)
+            Rmv2ModelNodeLoader rmv2ModelNodeLoader,
+            SaveSettings saveSettings)
         {
             _packFileService = packFileService;
             _kitbasherRootScene = kitbasherRootScene;
@@ -41,47 +39,33 @@ namespace KitbasherEditor.Services
             _resourceLibrary = resourceLibrary;
             _sceneManager = sceneManager;
             _rmv2ModelNodeLoader = rmv2ModelNodeLoader;
+            _saveSettings = saveSettings;
         }
 
-        public void Create()
+        public void CreateFromPackFile(PackFile file)
         {
             var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(_resourceLibrary, null) { IsLockable = false });
-            _mainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(SpecialNodes.EditableModel, skeletonNode, _packFileService));
-            ReferenceMeshNode = _sceneManager.RootNode.AddObject(new GroupNode(SpecialNodes.ReferenceMeshs) { IsEditable = false, IsLockable = false });
-        }
+            var mainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(SpecialNodes.EditableModel, skeletonNode, _packFileService));
+            _ = _sceneManager.RootNode.AddObject(new GroupNode(SpecialNodes.ReferenceMeshs) { IsEditable = false, IsLockable = false });
 
-        public void LoadMainEditableModel(PackFile file)
-        {
             var modelFullPath = _packFileService.GetFullPath(file);
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
 
-            _rmv2ModelNodeLoader.CreateModelNodesFromFile(_mainNode, rmv, _kitbasherRootScene.Player, modelFullPath);
+            _rmv2ModelNodeLoader.CreateModelNodesFromFile(mainNode, rmv, _kitbasherRootScene.Player, modelFullPath);
             _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
-        }
 
-        public void LoadModelIntoMainScene(PackFile file)
-        {
-            _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
-            var result = LoadModel(file);
-            if (result == null)
-                throw new Exception($"Unable to load model - {_packFileService.GetFullPath(file)}");
-
-            var lodNodes = new List<Rmv2LodNode>();
-            result.ForeachNodeRecursive((node) =>
-            {
-                if (node is Rmv2LodNode lodNode && lodNode.LodValue == 0)
-                    lodNodes.Add(lodNode);
-            });
-
-            foreach (var node in lodNodes)
-                SceneNodeHelper.MakeNodeEditable(_mainNode, node);
+            var fullPath = _packFileService.GetFullPath(file);
+            _saveSettings.OutputName = fullPath;
+            _saveSettings.InitializeFromModel(mainNode);
         }
 
         public void LoadReference(PackFile file)
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
             var result = LoadModel(file);
-            ReferenceMeshNode.AddObject(result);
+
+            var referenceMeshNode = _sceneManager.GetNodeByName<GroupNode>(SpecialNodes.ReferenceMeshs);
+            referenceMeshNode.AddObject(result!);
         }
 
         SceneNode? LoadModel(PackFile file)

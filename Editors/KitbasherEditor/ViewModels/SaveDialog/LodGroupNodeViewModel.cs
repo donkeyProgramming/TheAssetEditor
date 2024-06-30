@@ -28,7 +28,6 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             }
         }
 
-
         public float CameraDistance
         {
             get => _saveSettings.LodSettingsPerLod[LodIndex].CameraDistance;

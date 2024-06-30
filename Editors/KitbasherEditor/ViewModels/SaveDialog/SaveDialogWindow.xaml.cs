@@ -25,7 +25,7 @@ namespace Editors.KitbasherEditor.ViewModels.SaveDialog
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            _saveDialogViewModel.HandleSave();
+            _saveDialogViewModel.ApplySettings();
             DialogResult = true;
             Close();
         }

@@ -9,7 +9,6 @@ using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Animation;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Windows.Input;
 using static CommonControls.FilterDialog.FilterUserControl;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
@@ -18,14 +17,14 @@ namespace KitbasherEditor.ViewModels
 {
     public class AnimationControllerViewModel : NotifyPropertyChangedImpl
     {
-        PackFileService _packFileService;
+        private readonly PackFileService _packFileService;
 
         PackFile _skeletonPackFile;
         PackFile Animation;
 
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly KitbasherRootScene _kitbasherRootScene;
-        AnimationPlayer _player;
+        private readonly AnimationPlayer _player;
 
         string _headerText = "No animation selected";
         public string HeaderText { get { return _headerText; } set { SetAndNotify(ref _headerText, value); } }

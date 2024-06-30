@@ -41,11 +41,17 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             MeshStrategies = _saveService.GetGeometryStrategies().Select(x => new ComboBoxItem<GeometryStrategy>(x.StrategyId, x.Name, x.Description)).ToList();
             WsStrategies = _saveService.GetMaterialStrategies().Select(x => new ComboBoxItem<MaterialStrategy>(x.StrategyId, x.Name, x.Description)).ToList();
             LodStrategies = _saveService.GetLodStrategies().Select(x => new ComboBoxItem<LodStrategy>(x.StrategyId, x.Name, x.Description)).ToList();
+
+            OutputPath = "";
+            SelectedMeshStrategy = MeshStrategies.First();
+            SelectedWsModelStrategy = WsStrategies.First();
+            SelectedLodStrategy = LodStrategies.First();
         }
 
         internal void Initialize(SaveSettings saveSettings)
         {
             _saveSettings = saveSettings;
+            _saveSettings.IsUserInitialized = true;
 
             OutputPath = _saveSettings.OutputName;
             SelectedMeshStrategy= MeshStrategies.First(x => x.Value == _saveSettings.GeometryOutputType);
@@ -55,8 +61,6 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             NumberOfLodsToGenerate = _saveSettings.NumberOfLodsToGenerate;
 
             BuildLodOverview(_saveSettings);
-
-            _saveSettings.IsUserInitialized = true;
         }
 
         partial void OnNumberOfLodsToGenerateChanged(int value) 
@@ -69,14 +73,12 @@ namespace KitbasherEditor.ViewModels.SaveDialog
 
         void BuildLodOverview(SaveSettings saveSettings)
         {
-            Guard.IsNotNull(_saveSettings);
-
             LodNodes.Clear();
             var lodNodesInModel = _sceneManager
                 .GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel)
                 .GetLodNodes();
 
-            for (var i = 0; i < _saveSettings.NumberOfLodsToGenerate; i++)
+            for (var i = 0; i < saveSettings.NumberOfLodsToGenerate; i++)
             {
                 Rmv2LodNode? lodNode = null;
                 if(i < lodNodesInModel.Count)
@@ -85,7 +87,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             }
         }
       
-        public void HandleApply()
+        public void ApplySettings()
         {
             Guard.IsNotNull(_saveSettings);
             _saveSettings.OutputName = OutputPath;
@@ -111,10 +113,5 @@ namespace KitbasherEditor.ViewModels.SaveDialog
                 OutputPath = path;
             }
         }
-
-       public void HandleSave()
-       {
-           HandleApply();
-       }
     }
 }
