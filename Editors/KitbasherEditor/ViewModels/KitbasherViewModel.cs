@@ -1,9 +1,7 @@
 ﻿using System.IO;
 using System.Windows;
 using GameWorld.Core.Services;
-using GameWorld.Core.Services.SceneSaving;
 using GameWorld.WpfWindow;
-using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Serilog;
@@ -23,10 +21,9 @@ namespace KitbasherEditor.ViewModels
     public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IEditorScopeResolverHint, ISaveableEditor,
         IDropTarget<TreeNode>
     {
-        private readonly ILogger _logger = Logging.Create<SceneInitializedHandler>();
+        private readonly ILogger _logger = Logging.Create<KitbasherViewModel>();
 
         private readonly KitbashViewDropHandler _dropHandler;
-        private readonly SaveSettings _saveSettings;
         private readonly PackFileService _pfs;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly FocusSelectableObjectService _focusSelectableObjectComponent;
@@ -52,13 +49,11 @@ namespace KitbasherEditor.ViewModels
             AnimationControllerViewModel animationControllerViewModel,
             SceneExplorerViewModel sceneExplorerViewModel,
             KitbashViewDropHandler dropHandler,
-            SaveSettings saveSettings,
             PackFileService pfs,
             KitbashSceneCreator kitbashSceneCreator,
             FocusSelectableObjectService focusSelectableObjectComponent)
         {
             _dropHandler = dropHandler;
-            _saveSettings = saveSettings;
             _pfs = pfs;
             _kitbashSceneCreator = kitbashSceneCreator;
             _focusSelectableObjectComponent = focusSelectableObjectComponent;
