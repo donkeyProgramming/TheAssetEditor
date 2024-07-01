@@ -80,8 +80,8 @@ namespace GameWorld.Core
         {
             serviceCollection.AddScoped<IComponentInserter, ComponentInserter>();
             RegisterGameComponent<CommandStackRenderer>(serviceCollection);
-            RegisterGameComponent<KeyboardComponent>(serviceCollection);
-            RegisterGameComponent<MouseComponent>(serviceCollection);
+            RegisterGameComponent<IKeyboardComponent, KeyboardComponent>(serviceCollection);
+            RegisterGameComponent<IMouseComponent, MouseComponent>(serviceCollection);
 
             RegisterGameComponent<FpsComponent>(serviceCollection);
             RegisterGameComponent<ArcBallCamera>(serviceCollection);
@@ -140,6 +140,12 @@ namespace GameWorld.Core
         {
             serviceCollection.AddScoped<T>();
             serviceCollection.AddScoped<IGameComponent, T>(x => x.GetService<T>());
+        }
+
+        protected void RegisterGameComponent<TInterface, TActual>(IServiceCollection serviceCollection) where TInterface : class, IGameComponent where TActual : class, TInterface
+        {
+            serviceCollection.AddScoped<TInterface, TActual>();
+            serviceCollection.AddScoped<IGameComponent, TInterface>(x => x.GetService<TInterface>());
         }
     }
 }

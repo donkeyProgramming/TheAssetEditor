@@ -19,10 +19,10 @@ namespace GameWorld.Core.Components
 
         private readonly ResourceLibrary _resourceLibary;
         private readonly IDeviceResolver _deviceResolverComponent;
-        private readonly KeyboardComponent _keyboardComponent;
+        private readonly IKeyboardComponent _keyboardComponent;
         private readonly RenderEngineComponent _renderEngineComponent;
 
-        public LightControllerComponent(ResourceLibrary resourceLibary, IDeviceResolver deviceResolverComponent, KeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent)
+        public LightControllerComponent(ResourceLibrary resourceLibary, IDeviceResolver deviceResolverComponent, IKeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent)
         {
             _resourceLibary = resourceLibary;
             _deviceResolverComponent = deviceResolverComponent;

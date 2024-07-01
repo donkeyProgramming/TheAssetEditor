@@ -1,11 +1,12 @@
 ﻿using System.IO;
 using System.Windows;
+using GameWorld.Core.Components;
 using GameWorld.Core.Services;
 using GameWorld.WpfWindow;
+using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Serilog;
-using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;
@@ -18,7 +19,7 @@ using Shared.Ui.Common;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IEditorScopeResolverHint, ISaveableEditor,
+    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ISaveableEditor,
         IDropTarget<TreeNode>
     {
         private readonly ILogger _logger = Logging.Create<KitbasherViewModel>();
@@ -28,9 +29,7 @@ namespace KitbasherEditor.ViewModels
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly FocusSelectableObjectService _focusSelectableObjectComponent;
 
-        public Type GetScopeResolverType { get => typeof(IScopeHelper<KitbasherViewModel>); }
-
-        public WpfGame Scene { get; set; }
+        public IWpfGame Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
         public MenuBarViewModel MenuBar { get; set; }
         public AnimationControllerViewModel Animation { get; set; }
@@ -44,27 +43,33 @@ namespace KitbasherEditor.ViewModels
 
         public KitbasherViewModel(
             EventHub eventHub,
-            WpfGame gameWorld,
+            IWpfGame gameWorld,
             MenuBarViewModel menuBarViewModel,
             AnimationControllerViewModel animationControllerViewModel,
             SceneExplorerViewModel sceneExplorerViewModel,
             KitbashViewDropHandler dropHandler,
             PackFileService pfs,
             KitbashSceneCreator kitbashSceneCreator,
-            FocusSelectableObjectService focusSelectableObjectComponent)
+            FocusSelectableObjectService focusSelectableObjectComponent,
+            IComponentInserter componentInserter,
+            SkeletonChangedHandler skeletonChangedHandler)
         {
             _dropHandler = dropHandler;
             _pfs = pfs;
             _kitbashSceneCreator = kitbashSceneCreator;
             _focusSelectableObjectComponent = focusSelectableObjectComponent;
-           
             Scene = gameWorld;
             Animation = animationControllerViewModel;
             SceneExplorer = sceneExplorerViewModel;
             MenuBar = menuBarViewModel;
-
+            
+            // Events
             eventHub.Register<ScopedFileSavedEvent>(OnFileSaved);
             eventHub.Register<CommandStackChangedEvent>(OnCommandStackChanged);
+            skeletonChangedHandler.Subscribe(eventHub);
+            
+            // Ensure all game components are added to the editor
+            componentInserter.Execute();
         }
 
         private void LoadScene(PackFile fileToLoad)

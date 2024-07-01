@@ -14,6 +14,7 @@ using KitbasherEditor.Views.EditorViews.PinTool;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.Events.Scoped;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Common.MenuSystem;
 
@@ -59,9 +60,6 @@ namespace KitbasherEditor
 
             // Event handlers
             serviceCollection.AddScoped<SkeletonChangedHandler>();
-
-            serviceCollection.AddScoped<IScopeHelper<KitbasherViewModel>, KitbasherScopeHelper>();
-
 
 
             

@@ -86,14 +86,8 @@ namespace Shared.Core.ToolCreation
         {
             var scope = _rootProvider.CreateScope();
             var instance = scope.ServiceProvider.GetRequiredService(editorType) as IEditorViewModel;
-
-            var scopeResolverHint = instance as IEditorScopeResolverHint;
-            if (scopeResolverHint != null)
-            {
-                var solver = scope.ServiceProvider.GetRequiredService(scopeResolverHint.GetScopeResolverType) as IScopeHelper;
-                solver.ResolveGlobalServices(scope.ServiceProvider);
-            }
-
+            if (instance == null)
+                throw new Exception($"Type '{editorType}' is not a IEditorViewModel");
             _scopeRepository.Add(instance, scope);
             return instance;
         }

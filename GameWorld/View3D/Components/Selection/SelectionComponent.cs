@@ -23,8 +23,8 @@ namespace GameWorld.Core.Components.Selection
         SpriteBatch _spriteBatch;
         Texture2D _textTexture;
 
-        KeyboardComponent _keyboardComponent;
-        MouseComponent _mouseComponent;
+        IKeyboardComponent _keyboardComponent;
+        IMouseComponent _mouseComponent;
         ArcBallCamera _camera;
 
         SelectionManager _selectionManager;
@@ -39,7 +39,7 @@ namespace GameWorld.Core.Components.Selection
         Vector2 _currentMousePos;
 
         public SelectionComponent(
-            MouseComponent mouseComponent, KeyboardComponent keyboardComponent,
+            IMouseComponent mouseComponent, IKeyboardComponent keyboardComponent,
             ArcBallCamera camera, SelectionManager selectionManager,
             IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
             SceneManager sceneManager)

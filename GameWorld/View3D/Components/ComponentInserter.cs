@@ -11,10 +11,10 @@ namespace GameWorld.Core.Components
 
     public class ComponentInserter : IComponentInserter
     {
-        private readonly WpfGame _wpfGame;
+        private readonly IWpfGame _wpfGame;
         private readonly IEnumerable<IGameComponent> _components;
 
-        public ComponentInserter(WpfGame wpfGame, IEnumerable<IGameComponent> components)
+        public ComponentInserter(IWpfGame wpfGame, IEnumerable<IGameComponent> components)
         {
             _wpfGame = wpfGame;
             _components = components;

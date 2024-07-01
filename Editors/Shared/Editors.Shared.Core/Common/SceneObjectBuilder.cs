@@ -19,7 +19,7 @@ namespace Editors.Shared.Core.Common
     public class SceneObjectBuilder
     {
         private readonly ILogger _logger = Logging.Create<SceneObjectBuilder>();
-        private readonly WpfGame _mainScene;
+        private readonly IWpfGame _mainScene;
         private readonly IServiceProvider _serviceProvider;
         private readonly ResourceLibrary _resourceLibrary;
         private readonly SceneManager _sceneManager;
@@ -27,7 +27,7 @@ namespace Editors.Shared.Core.Common
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly ComplexMeshLoader _complexMeshLoader;
 
-        public SceneObjectBuilder(WpfGame mainScene,
+        public SceneObjectBuilder(IWpfGame mainScene,
             IServiceProvider serviceProvider, ResourceLibrary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader)
         {

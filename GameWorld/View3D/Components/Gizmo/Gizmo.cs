@@ -137,11 +137,11 @@ namespace GameWorld.Core.Components.Gizmo
         private float _rotationSnapDelta;
 
 
-        ArcBallCamera _camera;
-        MouseComponent _mouse;
+        private readonly ArcBallCamera _camera;
+        private readonly IMouseComponent _mouse;
 
 
-        public Gizmo(ArcBallCamera camera, MouseComponent mouse, GraphicsDevice graphics, SpriteBatch spriteBatch, SpriteFont font)
+        public Gizmo(ArcBallCamera camera, IMouseComponent mouse, GraphicsDevice graphics, SpriteBatch spriteBatch, SpriteFont font)
         {
             SceneWorld = Matrix.Identity;
             _graphics = graphics;

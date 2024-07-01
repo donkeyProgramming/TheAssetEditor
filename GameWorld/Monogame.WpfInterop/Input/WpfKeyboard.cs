@@ -15,13 +15,13 @@ namespace GameWorld.WpfWindow.Input
     /// </summary>
     public class WpfKeyboard
     {
-        private readonly WpfGame _focusElement;
+        private readonly IWpfGame _focusElement;
 
         /// <summary>
         /// Creates a new instance of the keyboard helper.
         /// </summary>
         /// <param name="focusElement">The element that will be used as the focus point. Provide your implementation of <see cref="WpfGame"/> here.</param>
-        public WpfKeyboard(WpfGame focusElement)
+        public WpfKeyboard(IWpfGame focusElement)
         {
             if (focusElement == null)
                 throw new ArgumentNullException(nameof(focusElement));
@@ -35,12 +35,12 @@ namespace GameWorld.WpfWindow.Input
         /// <returns></returns>
         public KeyboardState GetState()
         {
-            if (_focusElement.IsMouseDirectlyOver && Keyboard.FocusedElement != _focusElement)
+            if (_focusElement.GetFocusElement().IsMouseDirectlyOver && Keyboard.FocusedElement != _focusElement)
             {
                 if (System.Windows.Input.Mouse.Captured == _focusElement)
-                    _focusElement.Focus();
+                    _focusElement.GetFocusElement().Focus();
             }
-            return new KeyboardState(GetKeys(_focusElement));
+            return new KeyboardState(GetKeys(_focusElement.GetFocusElement()));
         }
 
         private static Keys[] GetKeys(IInputElement focusElement)

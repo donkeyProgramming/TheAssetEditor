@@ -6,10 +6,7 @@ using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using Shared.Core.Events;
 using Shared.Core.Misc;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Input;
 
 namespace KitbasherEditor.ViewModels

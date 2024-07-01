@@ -29,12 +29,12 @@ namespace GameWorld.WpfWindow.Input
         /// Creates a new instance of the mouse helper.
         /// </summary>
         /// <param name="focusElement">The element that will be used as the focus point. Provide your implementation of <see cref="WpfGame"/> here.</param>
-        public WpfMouse(WpfGame focusElement)
+        public WpfMouse(IWpfGame focusElement, bool captureMouseWithin)
         {
             if (focusElement == null)
                 throw new ArgumentNullException(nameof(focusElement));
 
-            _focusElement = focusElement;
+            _focusElement = focusElement.GetFocusElement();
             _focusElement.MouseWheel += HandleMouse;
             // movement
             _focusElement.MouseMove += HandleMouse;
@@ -45,6 +45,8 @@ namespace GameWorld.WpfWindow.Input
             _focusElement.MouseLeftButtonUp += HandleMouse;
             _focusElement.MouseRightButtonDown += HandleMouse;
             _focusElement.MouseRightButtonUp += HandleMouse;
+
+            _captureMouseWithin = captureMouseWithin;
         }
 
 

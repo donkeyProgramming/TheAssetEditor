@@ -20,11 +20,6 @@ namespace Shared.Core.ToolCreation
         PackFile MainFile { get; set; }
     }
 
-    public interface IEditorScopeResolverHint
-    {
-        Type GetScopeResolverType { get; }
-    }
-
     public interface IEditorCreator
     {
         void OpenFile(PackFile file);
