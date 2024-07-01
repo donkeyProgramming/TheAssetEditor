@@ -7,14 +7,14 @@ namespace KitbasherEditor.ViewModels.SaveDialog
     public class LodGroupNodeViewModel : NotifyPropertyChangedImpl
     {
         private readonly Rmv2LodNode? _node;
-        private readonly SaveSettings _saveSettings;
+        private readonly GeometrySaveSettings _saveSettings;
 
         public NotifyAttr<int> PolygonCount { get; set; } = new NotifyAttr<int>(0);
         public NotifyAttr<int> TextureCount { get; set; } = new NotifyAttr<int>(0);
         public NotifyAttr<int> MeshCount { get; set; } = new NotifyAttr<int>(0);
         public int LodIndex { get; private set; }
 
-        public LodGroupNodeViewModel(Rmv2LodNode? node, int lodIndex, SaveSettings saveSettings)
+        public LodGroupNodeViewModel(Rmv2LodNode? node, int lodIndex, GeometrySaveSettings saveSettings)
         {
             _node = node;
             _saveSettings = saveSettings;

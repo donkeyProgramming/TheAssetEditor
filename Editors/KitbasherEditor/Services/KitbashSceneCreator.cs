@@ -22,7 +22,7 @@ namespace KitbasherEditor.Services
         private readonly ResourceLibrary _resourceLibrary;
         private readonly SceneManager _sceneManager;
         private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
-        private readonly SaveSettings _saveSettings;
+        private readonly GeometrySaveSettings _saveSettings;
 
         public KitbashSceneCreator(
             KitbasherRootScene kitbasherRootScene,
@@ -31,7 +31,7 @@ namespace KitbasherEditor.Services
             SceneManager sceneManager,
             PackFileService packFileService,
             Rmv2ModelNodeLoader rmv2ModelNodeLoader,
-            SaveSettings saveSettings)
+            GeometrySaveSettings saveSettings)
         {
             _packFileService = packFileService;
             _kitbasherRootScene = kitbasherRootScene;

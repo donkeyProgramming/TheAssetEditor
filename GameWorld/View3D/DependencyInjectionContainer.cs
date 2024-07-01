@@ -34,7 +34,7 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
 
             // Settings
-            serviceCollection.AddScoped<SaveSettings>();
+            serviceCollection.AddScoped<GeometrySaveSettings>();
 
             // Services
             serviceCollection.AddScoped<ViewOnlySelectedService>();

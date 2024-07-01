@@ -32,7 +32,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             _applicationSettingsService = applicationSettingsService;
         }
 
-        public void Save(string outputPath, MainEditableNode mainNode, RmvVersionEnum rmvVersionEnum, SaveSettings saveSettings)
+        public void Save(string outputPath, MainEditableNode mainNode, RmvVersionEnum rmvVersionEnum, GeometrySaveSettings saveSettings)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             }
         }
 
-        byte[] GenerateBytes(Rmv2ModelNode modelNode, GameSkeleton skeleton, RmvVersionEnum version, SaveSettings saveSettings, bool enrichModel = true)
+        byte[] GenerateBytes(Rmv2ModelNode modelNode, GameSkeleton skeleton, RmvVersionEnum version, GeometrySaveSettings saveSettings, bool enrichModel = true)
         {
             _logger.Here().Information($"Starting to save model. Skeleton = {skeleton}, Version = {version}");
 
@@ -125,7 +125,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             return outputBytes;
         }
 
-        static RmvLodHeader[] CreateLodHeaders(uint expectedLodCount, SaveSettings saveSettings, RmvLodHeader[] originalModelHeaders, RmvVersionEnum version)
+        static RmvLodHeader[] CreateLodHeaders(uint expectedLodCount, GeometrySaveSettings saveSettings, RmvLodHeader[] originalModelHeaders, RmvVersionEnum version)
         {
             var factory = LodHeaderFactory.Create();
             var output = new RmvLodHeader[expectedLodCount];

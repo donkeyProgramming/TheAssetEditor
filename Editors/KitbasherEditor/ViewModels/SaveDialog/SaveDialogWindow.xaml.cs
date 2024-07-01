@@ -18,7 +18,7 @@ namespace Editors.KitbasherEditor.ViewModels.SaveDialog
             DataContext = _saveDialogViewModel;
         }
 
-        public void Initialize(SaveSettings saveSettings)
+        public void Initialize(GeometrySaveSettings saveSettings)
         {
             _saveDialogViewModel.Initialize(saveSettings);
         }

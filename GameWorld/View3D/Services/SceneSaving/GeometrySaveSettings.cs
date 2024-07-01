@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace GameWorld.Core.Services.SceneSaving
 {
-    public class SaveSettings
+    public class GeometrySaveSettings
     {
         public bool IsUserInitialized { get; set; } = false;    // Initialized after the user has opened a settings window once
         public string OutputName { get; set; } = "";// Init on load

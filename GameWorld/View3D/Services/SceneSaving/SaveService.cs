@@ -31,7 +31,7 @@ namespace GameWorld.Core.Services.SceneSaving
         public List<MaterialStrategyInformation> GetMaterialStrategies() => _materialStrategyProvider.GetStrategies();
         public List<LodStrategyInformation> GetLodStrategies() => _lodStrategyProvider.GetStrategies();
 
-        public void Save(MainEditableNode mainNode, SaveSettings settings)
+        public void Save(MainEditableNode mainNode, GeometrySaveSettings settings)
         {
             if (_packFileService.GetEditablePack() == null)
             {

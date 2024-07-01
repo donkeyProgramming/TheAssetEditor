@@ -65,7 +65,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeshImportExport", "Experim
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.ImportExport", "Editors\Editors.ImportExport\Editors.ImportExport.csproj", "{2A6889CD-6123-4440-A958-E6B99DC5CA78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E2EVerification", "Testing\E2EVerification\E2EVerification.csproj", "{0B14A236-AAE0-4E9B-A41E-4AF9DD976BA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E2EVerification", "Testing\E2EVerification\E2EVerification.csproj", "{0B14A236-AAE0-4E9B-A41E-4AF9DD976BA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

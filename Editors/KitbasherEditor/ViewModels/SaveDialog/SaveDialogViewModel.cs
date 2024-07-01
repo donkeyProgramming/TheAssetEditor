@@ -17,7 +17,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         private readonly SceneManager _sceneManager;
         private readonly SaveService _saveService;
         private readonly PackFileService _pfs;
-        private SaveSettings? _saveSettings;
+        private GeometrySaveSettings? _saveSettings;
 
         [ObservableProperty] ObservableCollection<LodGroupNodeViewModel> _lodNodes = [];
         [ObservableProperty] List<ComboBoxItem<GeometryStrategy>> _meshStrategies;
@@ -48,7 +48,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             SelectedLodStrategy = LodStrategies.First();
         }
 
-        internal void Initialize(SaveSettings saveSettings)
+        internal void Initialize(GeometrySaveSettings saveSettings)
         {
             _saveSettings = saveSettings;
             _saveSettings.IsUserInitialized = true;
@@ -71,7 +71,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             BuildLodOverview(_saveSettings);
         }
 
-        void BuildLodOverview(SaveSettings saveSettings)
+        void BuildLodOverview(GeometrySaveSettings saveSettings)
         {
             LodNodes.Clear();
             var lodNodesInModel = _sceneManager

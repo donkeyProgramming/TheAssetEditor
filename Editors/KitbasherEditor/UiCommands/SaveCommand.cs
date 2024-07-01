@@ -13,9 +13,9 @@ namespace KitbasherEditor.ViewModels.UiCommands
         private readonly SceneManager _sceneManager;
         private readonly SaveService _saveService;
         private readonly IAbstractFormFactory<SaveDialogWindow> _saveWindowFactory;
-        private readonly SaveSettings _settings;
+        private readonly GeometrySaveSettings _settings;
 
-        public SaveCommandBase(SaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory) 
+        public SaveCommandBase(GeometrySaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory) 
         {
             _settings = settings;
             _sceneManager = sceneManager;
@@ -45,7 +45,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        public SaveCommand( SaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory)
+        public SaveCommand( GeometrySaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory)
             :base(settings, sceneManager, saveService, saveWindowFactory)
         {
         }

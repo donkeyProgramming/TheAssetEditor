@@ -14,7 +14,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry.Strategies
         {
         }
 
-        public void Generate(MainEditableNode mainNode, SaveSettings saveSettings)
+        public void Generate(MainEditableNode mainNode, GeometrySaveSettings saveSettings)
         {
         }
     }

@@ -17,6 +17,6 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
         public string Description { get; }
         public bool IsAvailable { get; }
         public GeometryStrategy StrategyId { get; }
-        public void Generate(MainEditableNode mainNode, SaveSettings saveSettings);
+        public void Generate(MainEditableNode mainNode, GeometrySaveSettings saveSettings);
     }
 }
