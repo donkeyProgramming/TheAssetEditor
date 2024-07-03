@@ -9,7 +9,7 @@ using Shared.Ui.BaseDialogs.MathViews;
 using System.Windows;
 using System.Windows.Input;
 
-namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
+namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 {
     public class MeshViewModel : NotifyPropertyChangedImpl
     {

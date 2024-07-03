@@ -5,7 +5,7 @@ using GameWorld.Core.SceneNodes;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 
-namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
+namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 {
     public class WeightedMaterialViewModel : NotifyPropertyChangedImpl
     {

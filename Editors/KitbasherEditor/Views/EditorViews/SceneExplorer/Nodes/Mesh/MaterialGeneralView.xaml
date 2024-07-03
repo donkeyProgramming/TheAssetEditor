@@ -11,10 +11,12 @@
         <System:Double x:Key="labelWidth">140</System:Double>
     </UserControl.Resources>
 
-    <GroupBox DockPanel.Dock="Top" Margin="0,5,0,0">
-        <GroupBox.Header>
-            <TextBlock Text="Material - Common" FontWeight="Bold" />
-        </GroupBox.Header>
+    <Expander DockPanel.Dock="Top" Margin="0,5,0,0" IsExpanded="True">
+        <Expander.Header>
+            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Background}" >
+                <TextBlock Text="Material - Common" FontWeight="Bold" Margin="3"/>
+            </StackPanel>
+        </Expander.Header>
         
         <DockPanel LastChildFill="False">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -97,7 +99,7 @@
             </ItemsControl>
             
         </DockPanel>
-    </GroupBox>
+    </Expander>
 
 
 </UserControl>

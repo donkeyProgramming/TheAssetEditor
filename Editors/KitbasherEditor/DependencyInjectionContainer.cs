@@ -1,4 +1,7 @@
 ﻿using Editors.KitbasherEditor.ViewModels.SaveDialog;
+using Editors.KitbasherEditor.ViewModels.SceneExplorer;
+using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using GameWorld.Core.Services;
 using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;
@@ -7,7 +10,6 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.SaveDialog;
-using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using KitbasherEditor.Views.EditorViews.PinTool;
@@ -23,6 +25,12 @@ namespace KitbasherEditor
     {
         public override void Register(IServiceCollection serviceCollection)
         {
+            // Node views
+            serviceCollection.AddTransient<MainEditableNodeViewModel>();
+            serviceCollection.AddTransient<MeshEditorViewModel>();
+            serviceCollection.AddTransient<SkeletonSceneNodeViewModel>();
+            serviceCollection.AddTransient<GroupNodeViewModel>();
+
             // Creators
             serviceCollection.AddScoped<KitbashSceneCreator>();
             serviceCollection.AddScoped<SceneNodeViewFactory>();

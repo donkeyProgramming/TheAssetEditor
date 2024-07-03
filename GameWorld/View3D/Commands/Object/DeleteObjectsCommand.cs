@@ -1,19 +1,19 @@
-﻿using GameWorld.Core.Commands;
+﻿using System.Collections.Generic;
+using System.Linq;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GameWorld.Core.Commands.Object
 {
     public class DeleteObjectsCommand : ICommand
     {
-        ILogger _logger = Logging.Create<DeleteObjectsCommand>();
-        List<SceneNode> _itemsToDelete;
-        SelectionManager _selectionManager;
-        ISelectionState _oldState;
+        private readonly ILogger _logger = Logging.Create<DeleteObjectsCommand>();
+        private readonly SelectionManager _selectionManager;
+        
+        List<ISceneNode> _itemsToDelete = [];
+        ISelectionState? _oldState;
 
         public string HintText { get => "Delete Object"; }
         public bool IsMutation { get => true; }
@@ -25,12 +25,12 @@ namespace GameWorld.Core.Commands.Object
 
         public void Configure(List<ISelectable> itemsToDelete)
         {
-            _itemsToDelete = new List<SceneNode>(itemsToDelete.Select(x => x as SceneNode));
+            _itemsToDelete = new List<ISceneNode>(itemsToDelete.Select(x => x));
         }
 
-        public void Configure(SceneNode itemToDelete)
+        public void Configure(ISceneNode itemToDelete)
         {
-            _itemsToDelete = new List<SceneNode>() { itemToDelete };
+            _itemsToDelete = [itemToDelete];
         }
 
         public void Execute()
@@ -49,7 +49,7 @@ namespace GameWorld.Core.Commands.Object
             foreach (var item in _itemsToDelete)
                 item.Parent.AddObject(item);
 
-            _selectionManager.SetState(_oldState);
+            _selectionManager.SetState(_oldState!);
         }
     }
 }

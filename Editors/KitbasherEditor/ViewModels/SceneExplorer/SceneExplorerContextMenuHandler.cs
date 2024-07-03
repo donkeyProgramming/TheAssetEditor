@@ -1,15 +1,12 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
+using CommunityToolkit.Mvvm.Input;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
@@ -25,7 +22,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public event ValueChangedDelegate<IEnumerable<ISceneNode>> SelectedNodesChanged;
 
-        public SceneExplorerContextMenuHandler(CommandExecutor commandExecutor, SceneManager sceneManager, CommandFactory commandFactory)
+        public SceneExplorerContextMenuHandler(SceneManager sceneManager, CommandFactory commandFactory)
         {
             _sceneManager = sceneManager;
             _commandFactory = commandFactory;

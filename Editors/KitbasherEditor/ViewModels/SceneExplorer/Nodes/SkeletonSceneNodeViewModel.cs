@@ -1,22 +1,25 @@
-﻿using Editors.Shared.Core.Services;
+﻿using System.Collections.ObjectModel;
 using GameWorld.Core.Animation;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.Misc;
-using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.MathViews;
-using System.Collections.ObjectModel;
 
-namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
+namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
     public class SkeletonSceneNodeViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
     {
         SkeletonNode _meshNode;
-        public SkeletonSceneNodeViewModel(SkeletonNode node, PackFileService pf, SkeletonAnimationLookUpHelper animLookUp)
+        public SkeletonSceneNodeViewModel()
         {
-            _meshNode = node;
-            CreateBoneOverview(_meshNode.Skeleton);
             BoneScale.PropertyChanged += BoneScale_PropertyChanged;
         }
+
+        public void Initialize(ISceneNode node)
+        {
+            _meshNode = node as SkeletonNode;
+            CreateBoneOverview(_meshNode.Skeleton);
+        }
+
 
         private void BoneScale_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -49,7 +52,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public DoubleViewModel BoneScale { get; set; } = new DoubleViewModel(1);
 
-
         void CreateBoneOverview(GameSkeleton skeleton)
         {
             SelectedBone = null;
@@ -60,7 +62,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 return;
 
             BoneCount = skeleton.BoneCount;
-            for (int i = 0; i < skeleton.BoneCount; i++)
+            for (var i = 0; i < skeleton.BoneCount; i++)
             {
                 var parentBoneId = skeleton.GetParentBoneIndex(i);
                 if (parentBoneId == -1)
@@ -79,7 +81,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         SkeletonBoneNode CreateNode(int boneId, int parentBoneId, string boneName)
         {
-            SkeletonBoneNode item = new SkeletonBoneNode
+            var item = new SkeletonBoneNode
             {
                 BoneIndex = boneId,
                 BoneName = boneName,
@@ -90,7 +92,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         SkeletonBoneNode GetParent(ObservableCollection<SkeletonBoneNode> root, int parentBoneId)
         {
-            foreach (SkeletonBoneNode item in root)
+            foreach (var item in root)
             {
                 if (item.BoneIndex == parentBoneId)
                     return item;
@@ -106,6 +108,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             BoneScale.PropertyChanged -= BoneScale_PropertyChanged;
         }
+
 
 
         public class SkeletonBoneNode : NotifyPropertyChangedImpl

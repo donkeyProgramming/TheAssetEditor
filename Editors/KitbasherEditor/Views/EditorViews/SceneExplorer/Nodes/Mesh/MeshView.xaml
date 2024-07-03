@@ -12,11 +12,13 @@
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">120</System:Double>
     </UserControl.Resources>
-    
-    <GroupBox DockPanel.Dock="Top" >
-        <GroupBox.Header>
-            <TextBlock Text="Mesh" FontWeight="Bold" />
-        </GroupBox.Header>
+
+    <Expander DockPanel.Dock="Top" IsExpanded="True">
+        <Expander.Header>
+            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Background}" >
+                <TextBlock Text="Mesh" FontWeight="Bold" Margin="3"/>
+            </StackPanel>
+        </Expander.Header>
 
         <DockPanel LastChildFill="False" >
             <DockPanel DockPanel.Dock="Top">
@@ -64,11 +66,11 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Material"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Rmv2 Material"/>
                 <Label>:</Label>
                 <ComboBox ItemsSource="{Binding Mesh.PossibleMaterialTypes}" SelectedItem="{Binding Mesh.SelectedMaterialType}" VerticalAlignment="Center" IsEnabled="False"/>
             </StackPanel>
 
         </DockPanel>
-    </GroupBox>
+    </Expander>
 </UserControl>

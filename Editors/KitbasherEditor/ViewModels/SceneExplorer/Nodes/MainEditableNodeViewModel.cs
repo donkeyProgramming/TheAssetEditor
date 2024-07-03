@@ -5,19 +5,21 @@ using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
+using KitbasherEditor.ViewModels;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using static CommonControls.FilterDialog.FilterUserControl;
 
-namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
+namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
     public class MainEditableNodeViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
-        MainEditableNode _mainNode;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly PackFileService _pfs;
         private readonly RenderEngineComponent _renderEngineComponent;
+
+        MainEditableNode _mainNode;
+        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         public ObservableCollection<string> SkeletonNameList { get; set; }
 
@@ -30,24 +32,24 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         RenderFormats _selectedRenderFormat;
         public RenderFormats SelectedRenderFormat { get => _selectedRenderFormat; set { SetAndNotify(ref _selectedRenderFormat, value); _renderEngineComponent.MainRenderFormat = _selectedRenderFormat; } }
 
-        public TextureFileEditorServiceViewModel TextureFileEditorServiceViewModel { get; set; }
-
-        public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene, MainEditableNode mainNode, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pfs, RenderEngineComponent renderEngineComponent)
+        public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pfs, RenderEngineComponent renderEngineComponent)
         {
             _kitbasherRootScene = kitbasherRootScene;
-            _mainNode = mainNode;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _pfs = pfs;
             _renderEngineComponent = renderEngineComponent;
             _selectedRenderFormat = _renderEngineComponent.MainRenderFormat;
 
             SkeletonNameList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
+        }
+
+        public void Initialize(ISceneNode node)
+        {
+            _mainNode = node as MainEditableNode;
             if (_mainNode.Model != null)
             {
                 SkeletonName = SkeletonNameList.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).ToLower() == _mainNode.Model.Header.SkeletonName.ToLower());
             }
-
-            TextureFileEditorServiceViewModel = new TextureFileEditorServiceViewModel(mainNode);
         }
 
         void UpdateSkeletonName()
@@ -91,5 +93,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _skeletonAnimationLookUpHelper = null;
             _mainNode = null;
         }
+
+
     }
 }

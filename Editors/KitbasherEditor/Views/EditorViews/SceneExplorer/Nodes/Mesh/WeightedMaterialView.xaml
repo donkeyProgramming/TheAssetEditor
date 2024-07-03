@@ -12,10 +12,12 @@
         <System:Double x:Key="labelWidth">120</System:Double>
     </UserControl.Resources>
 
-    <GroupBox DockPanel.Dock="Top" >
-        <GroupBox.Header>
-            <TextBlock Text="Weighted Material - Details" FontWeight="Bold" />
-        </GroupBox.Header>
+    <Expander DockPanel.Dock="Top" IsExpanded="False">
+        <Expander.Header>
+            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Background}" >
+                <TextBlock Text="RMV2 Weighted Material - Details" FontWeight="Bold" Margin="3"/>
+            </StackPanel>
+        </Expander.Header>
 
         <DockPanel LastChildFill="False" >
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -163,5 +165,5 @@
             </StackPanel>
 
         </DockPanel>
-    </GroupBox>
+    </Expander>
 </UserControl>

@@ -1,13 +1,14 @@
 ﻿using Editors.Shared.Core.Services;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
+using KitbasherEditor.ViewModels;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Ui.Common;
 using Shared.Ui.Editors.BoneMapping;
 using System.Windows;
 
-namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
+namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 {
     public class AnimationViewModel : NotifyPropertyChangedImpl
     {
@@ -38,7 +39,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 var activeBonesMax = bones.Max(x => x);
                 var skeletonBonesMax = skeletonFile.Bones.Max(x => x.Id);
 
-                bool hasValidBoneMapping = activeBonesMin >= 0 && skeletonBonesMax >= activeBonesMax;
+                var hasValidBoneMapping = activeBonesMin >= 0 && skeletonBonesMax >= activeBonesMax;
                 if (!hasValidBoneMapping)
                     MessageBox.Show("Mesh an invalid bones, this might cause issues. Its a result of an invalid re-rigging");
 

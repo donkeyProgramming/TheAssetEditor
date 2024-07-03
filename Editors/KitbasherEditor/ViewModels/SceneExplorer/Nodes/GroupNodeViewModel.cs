@@ -1,7 +1,7 @@
 ﻿using GameWorld.Core.SceneNodes;
 using Shared.Core.Misc;
 
-namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
+namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
     public class GroupNodeViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
     {
@@ -9,9 +9,13 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         public string GroupName { get => _node.Name; set { _node.Name = value; NotifyPropertyChanged(); } }
 
-        public GroupNodeViewModel(GroupNode node)
+        public GroupNodeViewModel()
         {
-            _node = node;
+            
+        }
+        public void Initialize(ISceneNode node)
+        {
+            _node = node as GroupNode;
         }
 
         public void Dispose()
