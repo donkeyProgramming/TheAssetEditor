@@ -35,6 +35,10 @@ namespace Shared.GameFormats.WsModel
                     VertexType = UiVertexFormat.Cinematic;
                 else if (Name.Contains("weighted2", StringComparison.InvariantCultureIgnoreCase))
                     VertexType = UiVertexFormat.Weighted;
+                else if (Name.Contains("weighted_standard_4", StringComparison.InvariantCultureIgnoreCase))
+                    VertexType = UiVertexFormat.Cinematic;
+                else if (Name.Contains("weighted_standard_2", StringComparison.InvariantCultureIgnoreCase))
+                    VertexType = UiVertexFormat.Weighted;
                 else
                     VertexType = UiVertexFormat.Static;
             }
