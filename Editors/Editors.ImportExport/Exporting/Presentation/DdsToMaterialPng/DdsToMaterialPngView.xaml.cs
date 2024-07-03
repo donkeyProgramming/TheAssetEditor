@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Editors.ImportExport.Exporting.Presentation
+namespace Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng
 {
     /// <summary>
-    /// Interaction logic for ExportView.xaml
+    /// Interaction logic for DdsToMaterialPngViewModel.xaml
     /// </summary>
-    public partial class ExportView : UserControl
+    public partial class DdsToMaterialPngView : UserControl
     {
-        public ExportView()
+        public DdsToMaterialPngView()
         {
             InitializeComponent();
         }

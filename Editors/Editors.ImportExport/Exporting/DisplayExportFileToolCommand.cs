@@ -1,23 +1,42 @@
 ﻿using Editors.ImportExport.Exporting.Presentation;
+using Shared.Core.Events;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
-using Shared.Ui.BaseDialogs.WindowHandling;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace Editors.ImportExport.Exporting
 {
-    public class DisplayExportFileToolCommand
+    public class DisplayExportFileToolCommand : IUiCommand
     {
-        private readonly IWindowFactory _windowFactory;
+        private readonly IAbstractFormFactory<ExportWindow> _exportWindowFactory;
 
-        public DisplayExportFileToolCommand(IWindowFactory windowFactory)
+        public DisplayExportFileToolCommand(IAbstractFormFactory<ExportWindow> exportWindowFactory)
         {
-            _windowFactory = windowFactory;
+            _exportWindowFactory = exportWindowFactory;
         }
 
         public void Execute(PackFile packFile)
         {
-            var window = _windowFactory.Create<ExporterViewModel, ExportView>($"Export File - ", 400, 400);
-            window.TypedContext.Initialize(packFile);
-            window.ShowWindow(true);
+            var window = _exportWindowFactory.Create();
+            window.Initialize(packFile);
+            window.ShowDialog();
         }
+    }
+
+    public class ExportFileContextMenuHelper : IExportFileContextMenuHelper
+    {
+        private readonly IUiCommandFactory _uiCommandFactory;
+
+        public ExportFileContextMenuHelper(IUiCommandFactory uiCommandFactory)
+        {
+            _uiCommandFactory = uiCommandFactory;
+        }
+
+        public bool CanExportFile(PackFile packFile) 
+        {
+            return true;
+        }
+
+        public void ShowDialog(PackFile packFile) => _uiCommandFactory.Create<DisplayExportFileToolCommand>().Execute(packFile);
     }
 }
