@@ -20,7 +20,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
     {
         private readonly ILogger _logger = Logging.Create<WsModelGeneratorService>();
         private readonly PackFileService _packFileService;
-        private readonly List<WsModelMaterialFile> _existingMaterials;
+        private readonly Dictionary<string, WsModelMaterialFile> _existingMaterials;
 
         private static readonly Dictionary<string, TextureType> TemplateStringToTextureTypes = new()
         {
@@ -206,9 +206,9 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
         {
             foreach (var material in _existingMaterials)
             {
-                var isMatch = IsMaterialMatch(game, mesh, material);
+                var isMatch = IsMaterialMatch(game, mesh, material.Value);
                 if (isMatch)
-                    return material.FullPath;
+                    return material.Key;
             }
 
             return null;
@@ -261,17 +261,16 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             return true;
         }
 
-        List<WsModelMaterialFile> LoadAllExistingMaterials()
+        Dictionary<string, WsModelMaterialFile> LoadAllExistingMaterials()
         {
             var materialPacks = _packFileService.FindAllWithExtentionIncludePaths(".material");
             materialPacks = materialPacks.Where(x => x.Item2.Name.Contains(".xml.material")).ToList();
-            var materialList = new List<WsModelMaterialFile>();
+            var materialList = new Dictionary<string,WsModelMaterialFile>();
             foreach (var materialPack in materialPacks)
             {
                 try
                 {
-                    var material = new WsModelMaterialFile(materialPack.Item2, materialPack.Item1);
-                    materialList.Add(material);
+                    materialList[materialPack.FileName] = new WsModelMaterialFile(materialPack.Pack);
                 }
                 catch (Exception e)
                 {

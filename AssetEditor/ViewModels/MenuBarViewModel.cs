@@ -87,6 +87,8 @@ namespace AssetEditor.ViewModels
         public ICommand GenerateMetaDataReportCommand { get; set; }
         public ICommand GenerateFileListReportCommand { get; set; }
         public ICommand GenerateMetaDataJsonsReportCommand { get; set; }
+        public ICommand GenerateMaterialReportCommand { get; set; }
+        
 
         public ICommand TouchedFileRecorderStartCommand { get; set; }
         public ICommand TouchedFileRecorderPrintCommand { get; set; }
@@ -141,6 +143,7 @@ namespace AssetEditor.ViewModels
             GenerateMetaDataReportCommand = new RelayCommand(() => _uiCommandFactory.Create<GenerateReportCommand>().MetaData());
             GenerateFileListReportCommand = new RelayCommand(() => _uiCommandFactory.Create<GenerateReportCommand>().FileList());
             GenerateMetaDataJsonsReportCommand = new RelayCommand(() => _uiCommandFactory.Create<GenerateReportCommand>().MetaDataJson());
+            GenerateMaterialReportCommand = new RelayCommand(() => _uiCommandFactory.Create<GenerateReportCommand>().Material());
 
             TouchedFileRecorderStartCommand = new RelayCommand(() => _touchedFilesRecorder.Start());
             TouchedFileRecorderPrintCommand = new RelayCommand(() => _touchedFilesRecorder.Print());

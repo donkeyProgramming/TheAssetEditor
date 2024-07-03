@@ -23,7 +23,7 @@ namespace Shared.Ui.Interfaces.AssetManagement
         public PackFile OutputPackFile { get; set; }
         public RmvFile RigidModelFile { set; get; }
         public RmvModel[] Meshes { set; get; }
-        public WsMaterial[] wsModelFile { set; get; }
+        public WsModelFile[] wsModelFile { set; get; }
         public string SkeletonName { get; set; }
         public AnimationFile skeletonFile { set; get; }
         public AnimationFile animationFile { set; get; }

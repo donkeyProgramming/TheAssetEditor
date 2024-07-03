@@ -162,7 +162,7 @@ namespace GameWorld.Core.Services
             else
                 parent.AddObject(wsModelNode);
 
-            var wsMaterial = new WsMaterial(file);
+            var wsMaterial = new WsModelFile(file);
             if (string.IsNullOrWhiteSpace(wsMaterial.GeometryPath) == false)
             {
                 var modelFile = _packFileService.FindFile(wsMaterial.GeometryPath);
@@ -171,8 +171,8 @@ namespace GameWorld.Core.Services
 
                 foreach (var materialNode in wsMaterial.MaterialList)
                 {
-                    var materialFile = _packFileService.FindFile(materialNode.Material);
-                    var materialConfig = new WsModelMaterialFile(materialFile, "");
+                    var materialFile = _packFileService.FindFile(materialNode.MaterialPath);
+                    var materialConfig = new WsModelMaterialFile(materialFile);
 
                     var mesh = loadedModelNode.GetMeshNode(materialNode.LodIndex, materialNode.PartIndex);
                     if (mesh == null)

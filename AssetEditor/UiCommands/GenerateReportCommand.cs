@@ -27,5 +27,6 @@ namespace AssetEditor.UiCommands
         public void MetaData() => AnimMetaDataReportGenerator.Generate(_packFileService, _applicationSettingsService, _gameInformationFactory);
         public void FileList() => FileListReportGenerator.Generate(_packFileService, _applicationSettingsService, _gameInformationFactory);
         public void MetaDataJson() => AnimMetaDataJsonGenerator.Generate(_packFileService, _applicationSettingsService, _gameInformationFactory);
+        public void Material() => new MaterialReportGenerator(_packFileService).Create();
     }
 }
