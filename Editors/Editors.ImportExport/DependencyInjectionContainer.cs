@@ -21,7 +21,7 @@ namespace Editors.ImportExport
             services.AddTransient<IExporter, DdsToMaterialPngExporter>();
             services.AddTransient<DdsToMaterialPngViewModel>();
 
-            services.AddScoped<DisplayExportFileToolCommand>();
+            services.AddTransient<DisplayExportFileToolCommand>();
         }
     }
 }

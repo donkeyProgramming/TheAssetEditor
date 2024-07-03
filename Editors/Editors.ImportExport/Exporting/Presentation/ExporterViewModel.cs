@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using Editors.ImportExport.Exporting.Exporters;
-using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 
@@ -19,10 +13,9 @@ namespace Editors.ImportExport.Exporting.Presentation
 
         public NotifyAttr<string> SelectedExporter { get; set; } = new NotifyAttr<string>();
 
-
         public NotifyAttr<string> SystemPath { get; set; } = new NotifyAttr<string>("C:\\myfile.dds");
 
-        public ExporterViewModel(IEnumerable<DdsToMaterialPngViewModel> exporterViewModels)
+        public ExporterViewModel(IEnumerable<IExporterViewModel> exporterViewModels)
         {
             foreach (var model in exporterViewModels)
                 _exportViewModels.Add(model);

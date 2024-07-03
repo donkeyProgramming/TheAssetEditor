@@ -185,7 +185,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void InvertSelection()
         {
-            var x = _activeNode.Parent.Children.Except(_activeNodes).ToList();
             SelectedNodesChanged?.Invoke(_activeNode.Parent.Children.Except(_activeNodes).ToList());
         }
 
