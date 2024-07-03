@@ -7,6 +7,18 @@ using Shared.Core.PackFiles.Models;
 
 namespace Editors.ImportExport.Exporting.Presentation
 {
+    // Importer
+    // --------------------------
+    //  unique ref                                              | Update Button |
+    //  Checkbox | Type | Path | Last changed | Need refresh    | Remove Button |
+    // --------------------------
+    //  unique ref                                              | Update Button |
+    //  Checkbox | Type | Path | Last changed | Need refresh    | Remove Button |
+    // --------------------------
+    // | Update all Button |
+    // => SHow status window after done with OK | Errors
+
+
     public partial class ExporterCoreViewModel : ObservableObject
     {
         private readonly IEnumerable<IExporterViewModel> _exporterViewModels;
@@ -17,6 +29,7 @@ namespace Editors.ImportExport.Exporting.Presentation
         [ObservableProperty] IExporterViewModel? _selectedExporter;
         [ObservableProperty] string _systemPath = "C:\\myfile.dds";
         [ObservableProperty] bool _createImportProject = true;
+        [ObservableProperty] string _uniqueReference = ""; // A name which shows up in the importer to help you remember what this was
 
         public ExporterCoreViewModel(IEnumerable<IExporterViewModel> exporterViewModels)
         {
