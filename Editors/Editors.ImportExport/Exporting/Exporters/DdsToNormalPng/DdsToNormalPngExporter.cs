@@ -1,11 +1,11 @@
 ﻿using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
 
-namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
+namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
 {
-    public class DdsToMaterialPngExporter
+    public class DdsToNormalPngExporter
     {
-        public void Export(string outputPath, bool convertToBlenderFormat)
+        public void Export(string outputPath)
         {
 
         }

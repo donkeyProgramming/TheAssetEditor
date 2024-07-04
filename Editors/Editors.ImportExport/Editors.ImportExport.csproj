@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
       <UseWPF>true</UseWPF>
+      <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,8 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Exporting\Exporters\DdsToNormalPng\" />
-    <Folder Include="Exporting\Exporters\Rmv2ToGltf\" />
     <Folder Include="Image\" />
     <Folder Include="Geometry\" />
     <Folder Include="Importing\" />

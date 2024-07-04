@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
+namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
 {
     /// <summary>
-    /// Interaction logic for UserControl1.xaml
+    /// Interaction logic for RmvToGltfExporterView.xaml
     /// </summary>
-    public partial class DdsToMaterialPngView : UserControl
+    public partial class RmvToGltfExporterView : UserControl
     {
-        public DdsToMaterialPngView()
+        public RmvToGltfExporterView()
         {
             InitializeComponent();
         }

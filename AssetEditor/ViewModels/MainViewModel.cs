@@ -51,7 +51,8 @@ namespace AssetEditor.ViewModels
         public MainViewModel( MenuBarViewModel menuViewModel,
             PackFileService packfileService,
             IToolFactory toolFactory,
-            IUiCommandFactory uiCommandFactory)
+            IUiCommandFactory uiCommandFactory,
+            IExportFileContextMenuHelper exportFileContextMenuHelper)
         {
             MenuBar = menuViewModel;
             _uiCommandFactory = uiCommandFactory;
@@ -66,7 +67,7 @@ namespace AssetEditor.ViewModels
             CloseToolsToLeftCommand = new RelayCommand<IEditorViewModel>(CloseToolsToLeft);
 
             FileTree = new PackFileBrowserViewModel(_packfileService);
-            FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, uiCommandFactory);
+            FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, uiCommandFactory, exportFileContextMenuHelper);
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;
