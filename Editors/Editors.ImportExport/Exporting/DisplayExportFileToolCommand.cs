@@ -2,7 +2,6 @@
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace Editors.ImportExport.Exporting
 {
@@ -21,22 +20,5 @@ namespace Editors.ImportExport.Exporting
             window.Initialize(packFile);
             window.ShowDialog();
         }
-    }
-
-    public class ExportFileContextMenuHelper : IExportFileContextMenuHelper
-    {
-        private readonly IUiCommandFactory _uiCommandFactory;
-
-        public ExportFileContextMenuHelper(IUiCommandFactory uiCommandFactory)
-        {
-            _uiCommandFactory = uiCommandFactory;
-        }
-
-        public bool CanExportFile(PackFile packFile) 
-        {
-            return true;
-        }
-
-        public void ShowDialog(PackFile packFile) => _uiCommandFactory.Create<DisplayExportFileToolCommand>().Execute(packFile);
     }
 }

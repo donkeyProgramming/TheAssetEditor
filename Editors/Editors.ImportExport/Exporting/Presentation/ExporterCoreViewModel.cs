@@ -69,6 +69,5 @@ namespace Editors.ImportExport.Exporting.Presentation
             if (dlg.ShowDialog() == true)
                 SystemPath = dlg.FileName;
         }
-        
     }
 }
