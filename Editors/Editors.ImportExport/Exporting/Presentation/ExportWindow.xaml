@@ -7,9 +7,7 @@
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
         Title="Export" Height="350" Width="600">
-    <Window.Resources>
-        <local:ExportSettingsTemplateSelector x:Key="ExportSettingsSelector" />
-    </Window.Resources>
+
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -45,7 +43,7 @@
         <ContentControl Grid.Row="3" Grid.Column="1"
                       Grid.ColumnSpan="3"
                       Content="{Binding SelectedExporter, UpdateSourceTrigger=PropertyChanged}"       
-                      ContentTemplateSelector="{StaticResource ExportSettingsSelector}"/>
+                      ContentTemplateSelector="{StaticResource ViewTemplateDataSelector}"/>
 
         <Button Grid.Row="4" Grid.ColumnSpan="4" Content="Export" Click="ExportButton_Click"/>
 

@@ -1,13 +1,8 @@
-﻿using Shared.Core.PackFiles.Models;
+﻿using Editors.ImportExport.Misc;
+using Shared.Core.PackFiles.Models;
 
 namespace Editors.ImportExport.Exporting.Exporters
 {
-    public enum ExportSupportEnum
-    { 
-        Supported,
-        NotSupported,
-        HighPriority
-    }
 
     public interface IExporterViewModel
     {

@@ -4,17 +4,17 @@ using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common.DataTemplates;
 
-namespace Editors.ImportExport.Exporting.Presentation.DdsToPng
+namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
 {
-    internal class DdsToPngExporterViewModel : IExporterViewModel, IViewProvider
+    internal class RmvToGltfExporterViewModel : IExporterViewModel, IViewProvider
     {
-        private readonly DdsToPngExporter _exporter;
+        private readonly RmvToGltfExporter _exporter;
 
-        public Type ViewType => typeof(DdsToPngView);
-        public string DisplayName => "Dds_to_Png";
-        public string OutputExtension => ".png";
+        public Type ViewType => typeof(RmvToGltfExporterView);
+        public string DisplayName => "Rmv_to_Gltf";
+        public string OutputExtension => ".glft";
 
-        public DdsToPngExporterViewModel(DdsToPngExporter exporter)
+        public RmvToGltfExporterViewModel(RmvToGltfExporter exporter)
         {
             _exporter = exporter;
         }

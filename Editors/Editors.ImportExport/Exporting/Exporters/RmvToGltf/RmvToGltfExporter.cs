@@ -3,7 +3,7 @@ using Shared.Core.PackFiles.Models;
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
 {
-    internal class DdsToPngExporter
+    internal class RmvToGltfExporter
     {
         internal ExportSupportEnum CanExportFile(PackFile file)
         {

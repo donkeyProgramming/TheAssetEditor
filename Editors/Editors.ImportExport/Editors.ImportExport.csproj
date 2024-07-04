@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <Folder Include="Exporting\Exporters\DdsToNormalPng\" />
-    <Folder Include="Exporting\Exporters\Rmv2ToGltf\" />
+    <Folder Include="Exporting\Presentation\DdsToNormalPng\" />
     <Folder Include="Image\" />
     <Folder Include="Geometry\" />
     <Folder Include="Importing\" />
