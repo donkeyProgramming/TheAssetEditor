@@ -1,4 +1,4 @@
-﻿/*                                                                                                              z
+﻿/*******************************************************************************
 MIT License
 
 Copyright Phazer(c) 2022-2024 
@@ -12,7 +12,8 @@ furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
-*/
+
+********************************************************************************/
 
 /********************************************************************
     Uses code and concepts from 
@@ -45,7 +46,7 @@ static const float3 Ambient_Light_color = float3(1, 1, 1);
 // -------------------------------------------------------------------------------------
 //		VERTEX SHADER
 // -------------------------------------------------------------------------------------
-PixelInputType main(in VertexInputType input) // main is the default function name
+PixelInputType MainVS(in VertexInputType input) // main is the default function name
 {
     PixelInputType output = (PixelInputType) 0;
 
@@ -69,15 +70,9 @@ PixelInputType main(in VertexInputType input) // main is the default function na
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 // Get Directional Light
-// --------------------------------------------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------------------------------            
 float3 getDirectionalLight(in float3 N, in float3 albedo, in float roughness, in float metalness, in float3 viewDir, in float3 lightDir)
 {
-
-	// TODO: PHAZER: alternative View direction (vector from world-space fragment position to the "eye").
-	// not really needed, might be more "precise" as it per pixel, but does not seem to change anything
-	//float3 Lo = -normalize(eyePosition - pos);
-
     float3 Lo = normalize(viewDir);
 
 	// Angle between surface normal and outgoing light direction.
@@ -90,28 +85,23 @@ float3 getDirectionalLight(in float3 N, in float3 albedo, in float roughness, in
     float3 F0 = lerp(Fdielectric, albedo, metalness);
 
 	// Direct lighting calculation for analytical lights.
-    float3 directLighting = 0.0;
-
-
-
-	//float3 Li = normalize(-LightData[0].lightDirection);
-    float3 Li = normalize(lightDir);
-	//float3 Lradiance = LightData[0].radiannce;
+    float3 directionalLightColor = 0.0;
+    	
+    float3 Li = normalize(lightDir);	
     float3 Lradiance = Directional_Light_Raddiance * LightMult;
-	
-	// Half-vector between Li and Lo.
+		
     float3 Lh = normalize(Li + Lo);
-
-	// Calculate angles between surface normal and various light vectors.
+	
+    // Calculate angles between surface normal and various light vectors.
     float cosLi = max(0.0, dot(N, Li));
     float cosLh = max(0.0, dot(N, Lh));
 
 	// Calculate Fresnel term for direct lighting. 
     float3 F = fresnelSchlick(F0, max(0.0, dot(Lh, Lo)));
 
-
 	// Calculate normal distribution for specular BRDF.
     float D = ndfGGX(cosLh, roughness);
+    
 	// Calculate geometric attenuation for specular BRDF.
     float G = gaSchlickGGX(cosLi, cosLo, roughness);
 
@@ -126,67 +116,55 @@ float3 getDirectionalLight(in float3 N, in float3 albedo, in float roughness, in
     float3 diffuseBRDF = kd * albedo;
 
 	// Cook-Torrance specular microfacet BRDF.
+    
     float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
-	// Total contribution for this light.
-    directLighting += (diffuseBRDF + specularBRDF) * Lradiance * cosLi * Directional_Light_color;
-
-
-    return directLighting;
+	
+    // Total contribution for this directional light.
+    directionalLightColor += (diffuseBRDF + specularBRDF) * Lradiance * cosLi * Directional_Light_color;
+                                              
+    return directionalLightColor;
 }
-
-
-
-
 float3 getAmbientLight(
-	in float3 _normal,
+	in float3 normal1,
 	in float3 viewDir,
 	in float3 Albedo,
 	in float roughness,
 	in float metalness,
 	float4x4 envTransform)
-{
+{   
 
-    float3 normal1 = normalize(_normal);
-
-    float3 Lo = normalize(viewDir);;
+    float3 Lo = normalize(viewDir);
 
 	// Angle between surface normal and outgoing light direction.
     float cosLo = max(0.0, dot(normal1, Lo));
 
-	// Specular reflection vector.
-	// float3 Lr = 2.0 * cosLo * N- Lo;  // written out reflect formula, not using intrinsic HLSL function
+	// Specular reflection vector.	
     float3 Lr = reflect(normal1, Lo); // HLSL intrisic reflection function
-
 
 	// Fresnel reflectance at normal incidence (for metals use albedo color).
     float3 F0 = lerp(Fdielectric, Albedo.rgb, metalness);
 
-
 	// Calculate Fresnel term for ambient lighting.	
-    float3 F = fresnelSchlick(F0, cosLo);
+    //float3 F = fresnelSchlick(F0, cosLo);
 
-	//float3 F = FresnelSchlickRoughness(cosLo, F0, roughness);
+	float3 F = FresnelSchlickRoughness(cosLo, F0, roughness);
 
 	// Get diffuse contribution factor (as with direct lighting).
     float3 kd = lerp(1.0 - F, 0.0, metalness);
-
 
 	// rotate only normal with ENV map matrix, when they are used the to sample the ENV maps
 	// don't change the actual normal, 
 	// so the transforsm does not disturb the PBR math
 
+	// the environment rotated normals    
+    float3 diffuseRotatedNormal = normalize(mul(normal1, (float3x3) EnvMapTransform));
 
-	// the environment rotated normals
-    float3 diffuse_rot_normal = mul(normal1, (float3x3) EnvMapTransform);
-    diffuse_rot_normal = normalize(diffuse_rot_normal);
-
-    float3 specular_rot_normal = mul(Lr, (float3x3) EnvMapTransform);
-    specular_rot_normal = normalize(specular_rot_normal);
+    float3 specularRotatedNormal = normalize(mul(Lr, (float3x3) EnvMapTransform));   
 
 
 
 	//float3 irradiance = tex_cube_diffuse.Sample(SampleType, normal).rgb;
-    float3 irradiance = tex_cube_diffuse.Sample(SampleType, diffuse_rot_normal).rgb;
+    float3 irradiance = tex_cube_diffuse.Sample(SampleType, diffuseRotatedNormal).rgb;
     float3 diffuseIBL = kd * Albedo.rgb * irradiance;
 
 	// TODO: scale up diffuse, if needed
@@ -210,10 +188,8 @@ float3 getAmbientLight(
 #if 0
 	float3 Lr_Rot = mul(Lr, (float3x3) EnvMapTransform);
 #endif
-    float3 specularIrradiance = sample_environment_specular(roughness, normalize(specular_rot_normal));
-
-
-
+    float3 specularIrradiance = sample_environment_specular(roughness, normalize(specularRotatedNormal));
+                                                       
 
 	// Split-sum approximation factors for Cook-Torrance specular BRDF. (look up table)
     float2 env_brdf = specularBRDF_LUT.Sample(spBRDF_Sampler, float2(cosLo, roughness)).rg;
@@ -221,11 +197,9 @@ float3 getAmbientLight(
 
     float2 brdf = specularBRDF_LUT.Sample(spBRDF_Sampler, float2(cosLo, (1.0 - roughness))).xy;
     float3 specularIBL = (brdf.x * F0 + brdf.y) * specularIrradiance;
-	//// The follow is a simpler approximation, give less "white edges" with high env light strength, but it also less "physically correct
+	
+    //// The follow is a simpler approximation, give less "white edges" with high env light strength, but it also less "physically correct
 	//float2 env_brdf = EnvBRDFApprox(roughness, cosLo);
-
-	// the more "physically correct" one, using the Look up Table texture
-	//float3 specularIBL = specularIrradiance * (F0 * env_brdf.r + env_brdf.g);
 
 
     return float4((specularIBL + diffuseIBL) * Ambient_Light_color * Ambient_Light_Raddiance, 1); // * light[0].ambientFactor;		
@@ -233,21 +207,12 @@ float3 getAmbientLight(
 
 
 
-float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
+float4 MainPS(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
 {
 
-    PixelInputType input;
-	// make a copy of input, so it can used in "inout", this is very ineffective
-	// TODO: optimize
-    input = _input;
+    GBufferMaterial material = GetMaterial()
 
-	/*   if (bIsFrontFace)
-	  {
-			input.normal *= -1;
-			input.tangent *= -1;
-			input.binormal *= -1;
-		}
-	*/
+   
     float2 texCord = float2(nfmod(input.tex.x, 1), nfmod(input.tex.y, 1));
     float4 SpecTex = float4(0, 0, 0, 1);
     if (UseSpecular)
@@ -299,9 +264,7 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 		);
 
 	
-    float3 rot_lightDir = normalize(mul(light_Direction_Constant, (float3x3) DirLightTransform));
-
-    //return float4(rot_lightDir, 1);
+    float3 rot_lightDir = normalize(mul(light_Direction_Constant, (float3x3) DirLightTransform));    
 	
 	
 	// directional ligting color    
@@ -312,8 +275,6 @@ float4 mainPs(in PixelInputType _input, bool bIsFrontFace : SV_IsFrontFace) : SV
 		metalness,
 		normalize(input.viewDirection),
 		rot_lightDir
-	
-
 	);
 
 	// add environman (ambient) light to directional light
@@ -348,7 +309,7 @@ technique BasicColorDrawing
 {
     pass P0
     {
-        VertexShader = compile vs_5_0 main();
-        PixelShader = compile ps_5_0 mainPs();
+        VertexShader = compile vs_5_0 MainVS();
+        PixelShader = compile ps_5_0 MainPS();
     }
 };
