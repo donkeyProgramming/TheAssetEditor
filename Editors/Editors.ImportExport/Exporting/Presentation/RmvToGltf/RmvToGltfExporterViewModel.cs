@@ -27,3 +27,7 @@ namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
         }
     }
 }
+
+
+// Export textures Yes|Blender|No
+// Export Animations Yes|No
