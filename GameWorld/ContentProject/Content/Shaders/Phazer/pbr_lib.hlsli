@@ -15,8 +15,7 @@ float get_direct_roughness(in float roughness_in)
     
     return roughness;
 }
-
-
+ 
 float get_env_map_lod(in float roughness_in, in float texture_num_lods)
 {
 	float smoothness = pow(1.0 - roughness_in, 4.0);
@@ -24,14 +23,11 @@ float get_env_map_lod(in float roughness_in, in float texture_num_lods)
 	float roughness = 1.0 - smoothness;
 
 	//	This must be the number of mip-maps in the environment map!
-//	float texture_num_lods = 10.0f;
-	
+    //	float texture_num_lods = 10.0f;	
 	float env_map_lod = roughness * (texture_num_lods-1);
 	
 	return env_map_lod;
 }
-
-
 
 float3 EnvBRDFApprox(float3 SpecularColor, float Roughness, float NoV)
 {
@@ -91,68 +87,4 @@ uint querySpecularTextureLevels(in TextureCube specularTexture)
     specularTexture.GetDimensions(0, width, height, levels);
     return levels;
 }
-
-float linear_accurate_component(in const float srgb_val)
-{
-    const float inflection_point = 0.04045;
-
-    if (srgb_val <= inflection_point)
-    {
-        return srgb_val / 12.92f;
-    }
-    else
-    {
-        const float a = 0.055f;
-
-        return pow((srgb_val + a) / (1.0f + a), 2.4f);
-    }
-}
-
-float3 linear_accurate(in const float3 fGamma)
-{
-    return float3(linear_accurate_component(fGamma.r), linear_accurate_component(fGamma.g), linear_accurate_component(fGamma.b));
-}
-
-float _linear(in float fGamma)
-{
-    return linear_accurate_component(fGamma);
-}
-
-float3 _linear(in float3 vGamma)
-{
-    return linear_accurate(vGamma);
-}
-
-
-
-void apply_faction_colours(inout float3 diffuse_colour_rgb, in Texture2D MaskText, in sampler S,
-in const float2 tex_coord,
-in const float3 c1,
-in const float3 c2,
-in const float3 c3)
-{
-   
-    
-    float mask_p1 = MaskText.Sample(S, tex_coord).r;
-    float mask_p2 = MaskText.Sample(S, tex_coord).g;
-    float mask_p3 = MaskText.Sample(S, tex_coord).b;
-
-	//faction colours
-    diffuse_colour_rgb = lerp(diffuse_colour_rgb, diffuse_colour_rgb * linear_accurate(c1), mask_p1);
-    diffuse_colour_rgb = lerp(diffuse_colour_rgb, diffuse_colour_rgb * linear_accurate(c2), mask_p2);
-    diffuse_colour_rgb = lerp(diffuse_colour_rgb, diffuse_colour_rgb * linear_accurate(c3), mask_p3);
-    
-}
-
-
-float3 normalSwizzle_UPDATED(in float3 ref)
-{
-
-#ifdef FXCOMPOSER
-	return ref.xyz;
-#else
-    return float3(ref.x, ref.z, ref.y);
-#endif
-}
-
 
