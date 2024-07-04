@@ -67,6 +67,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.ImportExport", "Edi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E2EVerification", "Testing\E2EVerification\E2EVerification.csproj", "{0B14A236-AAE0-4E9B-A41E-4AF9DD976BA7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CA5272EF-16DE-49A6-BAE8-58DC9EE7BDE5}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\pr-build.yml = .github\workflows\pr-build.yml
+		.github\workflows\pr-test.yml = .github\workflows\pr-test.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
