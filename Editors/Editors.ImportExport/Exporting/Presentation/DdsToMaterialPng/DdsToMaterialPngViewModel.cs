@@ -7,13 +7,10 @@ using Shared.Ui.Common.DataTemplates;
 
 namespace Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng
 {
-    internal partial class DdsToMaterialPngViewModel : ObservableObject, IExporterViewModel, IViewProvider
+    internal partial class DdsToMaterialPngViewModel : ObservableObject, IExporterViewModel, IViewProvider<DdsToMaterialPngView>
     {
-        public Type ViewType => typeof(DdsToMaterialPngView);
         public string DisplayName => "Dds_to_MaterialPng";
         public string OutputExtension => ".png";
-
-      
 
         [ObservableProperty] bool _swapBlender = true;
         private readonly DdsToMaterialPngExporter _exporter;

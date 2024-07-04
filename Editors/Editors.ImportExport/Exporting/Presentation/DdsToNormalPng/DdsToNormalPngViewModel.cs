@@ -1,19 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.ImportExport.Exporting.Exporters;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
-using Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng;
 using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common.DataTemplates;
 
 namespace Editors.ImportExport.Exporting.Presentation.DdsToNormalPng
 {
-    internal class DdsToNormalPngViewModel : ObservableObject, IExporterViewModel, IViewProvider
+    internal class DdsToNormalPngViewModel : ObservableObject, IExporterViewModel, IViewProvider<DdsToNormalPngView>
     {
         private readonly DdsToNormalPngExporter _exporter;
 
-        public Type ViewType => typeof(DdsToMaterialPngView);
-        public string DisplayName => "Dds_to_MaterialPng";
+        public string DisplayName => "Dds_to_NormalPng";
         public string OutputExtension => ".png";
 
         public DdsToNormalPngViewModel(DdsToNormalPngExporter exporter)

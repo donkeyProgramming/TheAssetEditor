@@ -6,11 +6,10 @@ using Shared.Ui.Common.DataTemplates;
 
 namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
 {
-    internal class RmvToGltfExporterViewModel : IExporterViewModel, IViewProvider
+    internal class RmvToGltfExporterViewModel : IExporterViewModel, IViewProvider<RmvToGltfExporterView>
     {
         private readonly RmvToGltfExporter _exporter;
 
-        public Type ViewType => typeof(RmvToGltfExporterView);
         public string DisplayName => "Rmv_to_Gltf";
         public string OutputExtension => ".glft";
 

@@ -6,11 +6,10 @@ using Shared.Ui.Common.DataTemplates;
 
 namespace Editors.ImportExport.Exporting.Presentation.DdsToPng
 {
-    internal class DdsToPngExporterViewModel : IExporterViewModel, IViewProvider
+    internal class DdsToPngExporterViewModel : IExporterViewModel, IViewProvider<DdsToPngView>
     {
         private readonly DdsToPngExporter _exporter;
 
-        public Type ViewType => typeof(DdsToPngView);
         public string DisplayName => "Dds_to_Png";
         public string OutputExtension => ".png";
 
