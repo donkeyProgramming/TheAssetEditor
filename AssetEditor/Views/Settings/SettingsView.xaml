@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
-             xmlns:gameinfo="clr-namespace:Shared.Core;assembly=Shared.Core" 
+             xmlns:gameinfo="clr-namespace:Shared.Core.Services;assembly=Shared.Core" 
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
              mc:Ignorable="d" >
     <UserControl.Resources>

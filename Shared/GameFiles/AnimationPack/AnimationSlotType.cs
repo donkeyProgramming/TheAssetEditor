@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.EmbeddedResources;
@@ -88,7 +87,6 @@ namespace Shared.GameFormats.AnimationPack
             var strings = ResourceLoader.LoadStringArray(resourcePath);
             for (var i = 0; i < strings.Length; i++)
                 Values.Add(new AnimationSlotType(i, strings[i].Trim()));
-            
         }
 
         public void ExportAnimationDebugList(PackFileService pfs, string outputName)

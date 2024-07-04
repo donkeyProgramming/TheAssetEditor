@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Didx;
-using Audio.FileFormats.WWise.Hirc;
-using Audio.FileFormats.WWise.Hirc.V136;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Didx;
+using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace Audio.Storage
 {

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+        <ProjectReference Include="..\Editors\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
+        <ProjectReference Include="..\GameWorld\View3D\View3D.csproj" />
+        <ProjectReference Include="..\Shared\SharedUI\Shared.Ui.csproj" />
+	</ItemGroup>
+
+</Project>

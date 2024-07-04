@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using GameWorld.WpfWindow;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
@@ -10,7 +10,6 @@ using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.Common;
 using View3D.Components.Component;
-using View3D.Services;
 using View3D.Services.SceneSaving;
 
 namespace KitbasherEditor.ViewModels
@@ -24,7 +23,7 @@ namespace KitbasherEditor.ViewModels
 
         public Type GetScopeResolverType { get => typeof(IScopeHelper<KitbasherViewModel>); }
 
-        public GameWorld Scene { get; set; }
+        public WpfGame Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
         public MenuBarViewModel MenuBar { get; set; }
         public AnimationControllerViewModel Animation { get; set; }
@@ -37,7 +36,7 @@ namespace KitbasherEditor.ViewModels
         public KitbasherViewModel(
             KitbasherRootScene kitbasherRootScene,
             EventHub eventHub,
-            GameWorld gameWorld,
+            WpfGame gameWorld,
             MenuBarViewModel menuBarViewModel,
             AnimationControllerViewModel animationControllerViewModel,
             SceneExplorerViewModel sceneExplorerViewModel,

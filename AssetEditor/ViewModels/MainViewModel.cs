@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using AssetEditor.UiCommands;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Events;
 using Shared.Core.Misc;
@@ -12,6 +11,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.Common;
+using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {

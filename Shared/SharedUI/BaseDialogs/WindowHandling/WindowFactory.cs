@@ -1,15 +1,10 @@
 ﻿using System;
+using GameWorld.WpfWindow;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
 
 namespace Shared.Ui.BaseDialogs.WindowHandling
 {
-    public interface IWindowFactory
-    {
-        ITypedAssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight) where TViewModel : class;
-    }
-
     public class WindowFactory : IWindowFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -21,7 +16,7 @@ namespace Shared.Ui.BaseDialogs.WindowHandling
             _wpfGame = wpfGame;
         }
 
-        public ITypedAssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight)
+        public AssetEditorWindow<TViewModel> Create<TViewModel, TView>(string title, int initialWidth, int initialHeight)
             where TViewModel : class
         {
             var viewModel = _serviceProvider.GetRequiredService<TViewModel>();

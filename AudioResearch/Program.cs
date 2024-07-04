@@ -1,11 +1,11 @@
 ﻿using AssetEditor;
 using AssetEditor.Services;
-using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Audio.Utility;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc.V136;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,7 +40,7 @@ namespace AudioResearch
             //
             //// OvnTest.Compile();
             ////GeneratOvnProject();
-            /// TestDialogEventSerialization();
+            // TestDialogEventSerialization();
             //// LogicalChainingTest();
             //
             //var currentProjectName = $"Data\\OvnExample\\ProjectSimple.json";
@@ -56,7 +56,7 @@ namespace AudioResearch
                 var busses = audioRepo.HircObjects
                     .SelectMany(x => x.Value)
                     .DistinctBy(x => x.Id)
-                    .Where(x => x.Type == Audio.FileFormats.WWise.HircType.Audio_Bus)
+                    .Where(x => x.Type == HircType.Audio_Bus)
                     .Cast<CAkBus_v136>()
                     .ToList();
 

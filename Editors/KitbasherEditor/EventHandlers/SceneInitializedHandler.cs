@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels;
 using Microsoft.Xna.Framework;
-using MonoGame.Framework.WpfInterop;
+using Monogame.WpfInterop.Events;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;

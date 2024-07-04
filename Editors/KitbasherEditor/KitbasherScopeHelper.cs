@@ -1,8 +1,8 @@
-﻿using KitbasherEditor.EventHandlers;
+﻿using System;
+using KitbasherEditor.EventHandlers;
 using KitbasherEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using System;
 using View3D.Components;
 
 namespace KitbasherEditor

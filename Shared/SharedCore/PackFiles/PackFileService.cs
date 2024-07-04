@@ -11,6 +11,9 @@ namespace Shared.Core.PackFiles
 {
     public class PackFileService
     {
+        public delegate void FileLookUpHander(string fileName, PackFileContainer? container, bool found);
+        public event FileLookUpHander? FileLookUpEvent;
+
         private readonly ILogger _logger = Logging.Create<PackFileService>();
         private readonly GlobalEventSender _globalEventSender;
         private readonly IAnimationFileDiscovered _skeletonAnimationLookUpHelper;
@@ -636,33 +639,34 @@ namespace Shared.Core.PackFiles
             _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
         }
 
-
-        public PackFile FindFile(string path)
+        public PackFile FindFile(string path, PackFileContainer? container = null)
         {
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
-            for (var i = Database.PackFiles.Count - 1; i >= 0; i--)
-            {
-                if (Database.PackFiles[i].FileList.ContainsKey(lowerPath))
-                {
-                    return Database.PackFiles[i].FileList[lowerPath];
-                }
-            }
-            _logger.Here().Warning($"File not found");
-            return null;
-        }
-
-        public PackFile FindFile(string path, PackFileContainer container)
-        {
-            var lowerPath = path.Replace('/', '\\').ToLower();
             _logger.Here().Information($"Searching for file {lowerPath}");
 
-            if (container.FileList.ContainsKey(lowerPath))
+            if (container == null)
             {
-                _logger.Here().Information($"File found");
-                return container.FileList[lowerPath];
+                for (var i = Database.PackFiles.Count - 1; i >= 0; i--)
+                {
+                    if (Database.PackFiles[i].FileList.ContainsKey(lowerPath))
+                    {
+                        FileLookUpEvent?.Invoke(path, Database.PackFiles[i], true);
+                        return Database.PackFiles[i].FileList[lowerPath];
+                    }
+                }
+            }
+            else
+            {
+                if (container.FileList.ContainsKey(lowerPath))
+                {
+                    _logger.Here().Information($"File found");
+                    FileLookUpEvent?.Invoke(path, container, true);
+                    return container.FileList[lowerPath];
+                }
             }
 
             _logger.Here().Warning($"File not found");
+            FileLookUpEvent?.Invoke(path, null, false);
             return null;
         }
     }

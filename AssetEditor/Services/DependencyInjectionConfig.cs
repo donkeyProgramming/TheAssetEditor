@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using AnimationEditor;
 using AssetManagement;
 using Audio;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ToolCreation;
-using View3D;
 
 namespace AssetEditor.Services
 {
@@ -24,15 +24,19 @@ namespace AssetEditor.Services
                 new Shared.Ui.DependencyInjectionContainer(),
                 new Shared.GameFormats.DependencyInjectionContainer(),
                 new Shared.EmbeddedResources.DependencyInjectionContainer(loadResources),
-                new View3D_DependencyContainer(),
+                new GameWorld.WpfWindow.DependencyInjectionContainer(),
+                new View3D.DependencyInjectionContainer(),
                
+                // Misc
+                new Editors.Shared.DevConfig.DependencyInjectionContainer(),
+
                 // Domains
                 new Editors.Shared.Core.DependencyInjectionContainer(),
                 new Editors.AnimationContainers.DependencyInjectionContainer(),
                 new Editors.Reports.DependencyInjectionContainer(),
                 new KitbasherEditor.DependencyInjectionContainer(),
                 new AssetManagement_DependencyInjectionContainer(),
-                new AnimationMeta.DependencyInjectionContainer(),
+                new Editors.AnimationMeta.DependencyInjectionContainer(),
                 new AudioEditor_DependencyInjectionContainer(),
                 new Editors.TextureEditor.DependencyInjectionContainer(),
                 new AnimationEditors_DependencyInjectionContainer(),
@@ -55,8 +59,11 @@ namespace AssetEditor.Services
 
         void ConfigureServiceOptions(ServiceProviderOptions options)
         {
-            options.ValidateOnBuild = true;
-            options.ValidateScopes = true;
+            if (Debugger.IsAttached)
+            {
+                options.ValidateOnBuild = true;
+                options.ValidateScopes = true;
+            }
         }
 
         private void ConfigureServices(IServiceCollection services)

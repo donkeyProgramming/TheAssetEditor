@@ -2,9 +2,11 @@
   <PropertyGroup>
 	  <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+      <Nullable>enable</Nullable>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\View3D\View3D.csproj" />
-  </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\GameWorld\View3D\View3D.csproj" />
+    </ItemGroup>
 
 </Project>

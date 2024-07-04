@@ -4,4 +4,11 @@
 	  <TargetFramework>net6.0-windows</TargetFramework>
   </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <WarningsAsErrors />
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <WarningsAsErrors />
+    </PropertyGroup>
+
 </Project>

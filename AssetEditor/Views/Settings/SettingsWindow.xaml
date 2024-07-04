@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AssetEditor.Views.Settings"
         mc:Ignorable="d"
         Title="AssetEditor Settings" Height="450" Width="800"
-        SizeToContent="WidthAndHeight"
+        Style="{StaticResource CustomWindowStyle}"
         ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>

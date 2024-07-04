@@ -1,8 +1,8 @@
-﻿using CommonControls.BaseDialogs;
-using Shared.Core.Misc;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using CommonControls.BaseDialogs;
+using Shared.Core.Misc;
 using TextureEditor.Views;
 using View3D.Utility;
 
@@ -11,6 +11,9 @@ namespace TextureEditor.ViewModels
     public class TexturePreviewViewModel : NotifyPropertyChangedImpl
     {
         ImageInformation _information;
+        readonly List<bool> _formatCheckbox = new() { true, false, false, false, false };
+        ImageSource[] _previewImage = new ImageSource[5];
+
         public NotifyAttr<ImageSource> ActiveImage { get; set; } = new NotifyAttr<ImageSource>();
         public NotifyAttr<ImageSource> CheckBoardImage { get; set; } = new NotifyAttr<ImageSource>();
 
@@ -26,9 +29,6 @@ namespace TextureEditor.ViewModels
         public bool FormatBCheckbox { get => _formatCheckbox[3]; set => UpdateFormat(3, value); }
         public bool FormatACheckbox { get => _formatCheckbox[4]; set => UpdateFormat(4, value); }
 
-
-        List<bool> _formatCheckbox = new List<bool>() { false, false, false, false, false };
-        ImageSource[] _previewImage = new ImageSource[5];
         public ImageSource[] PreviewImage
         {
             get { return _previewImage; }
@@ -41,16 +41,9 @@ namespace TextureEditor.ViewModels
 
         void UpdateFormat(int index, bool value)
         {
-            for (int i = 0; i < 5; i++)
-                _formatCheckbox[i] = false;
-
             _formatCheckbox[index] = value;
-            NotifyPropertyChanged("FormatRgbaCheckbox");
-            NotifyPropertyChanged("FormatRCheckbox");
-            NotifyPropertyChanged("FormatGCheckbox");
-            NotifyPropertyChanged("FormatBCheckbox");
-            NotifyPropertyChanged("FormatACheckbox");
-            ActiveImage.Value = PreviewImage[index];
+            if (value == true)
+                ActiveImage.Value = PreviewImage[index];
         }
 
         public void SetImageInformation(ImageInformation imageInformation)
@@ -60,11 +53,11 @@ namespace TextureEditor.ViewModels
             Height.Value = _information.Height;
             Format.Value = _information.Format.ToString();
             NumMipMaps.Value = _information.Header_MipMapCount;
-
         }
 
         public void ShowTextureDetailsInfo()
         {
+            // MOve this to a general concept 
             var containingWindow = new ControllerHostWindow(false, ResizeMode.CanResize);
             containingWindow.Title = "Texture Details";
             containingWindow.Width = 550;

@@ -1,50 +1,49 @@
-﻿using System;
-using Shared.Core.Events;
-using Shared.Core.Misc;
+﻿using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
 namespace TextureEditor.ViewModels
 {
-    public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IDisposable
+    public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        PackFileService _pfs;
-        PackFile _file;
-        TexturePreviewController _controller;
-        EventHub _eventHub;
+        private readonly PackFileService _pfs;
+        private readonly TextureBuilder _textureBuilder;
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
 
-        public PackFile MainFile { get => _file; set => Load(value); }
-        public bool HasUnsavedChanges { get => false; set { } }
+        PackFile _packFile;
+        public PackFile MainFile { get => _packFile; set => Load(value); }  // Change to own interface or function
+
+        public bool HasUnsavedChanges { get => false; set { } } // Move to own interface
 
 
-        TexturePreviewViewModel _viewModel;
+        TexturePreviewViewModel _viewModel; // UseNotify
         public TexturePreviewViewModel ViewModel
         {
             get => _viewModel;
             set => SetAndNotify(ref _viewModel, value);
         }
 
-        public TextureEditorViewModel(PackFileService pfs, EventHub eventHub)
+        public TextureEditorViewModel(PackFileService pfs, TextureBuilder textureBuilder)
         {
             _pfs = pfs;
-            _eventHub = eventHub;
+            _textureBuilder = textureBuilder;
         }
 
-        public void Load(PackFile file)
+        private void Load(PackFile packFile)
         {
-            _file = file;
-            DisplayName.Value = file.Name;
+            _packFile = packFile;
+ 
+            DisplayName.Value = _packFile.Name;
 
             var viewModel = new TexturePreviewViewModel();
-            viewModel.ImagePath.Value = _pfs.GetFullPath(file);
+            viewModel.ImagePath.Value = _pfs.GetFullPath(_packFile);
 
-            _controller = new TexturePreviewController(_pfs.GetFullPath(file), viewModel, _pfs, _eventHub);
+            _textureBuilder.Build(viewModel, _pfs.GetFullPath(_packFile));
             ViewModel = viewModel;
         }
-
+          
         public void ShowTextureDetailsInfo() => ViewModel.ShowTextureDetailsInfo();
 
         public void Close()
@@ -53,11 +52,5 @@ namespace TextureEditor.ViewModels
         }
 
         public bool Save() => false;
-
-        public void Dispose()
-        {
-            if (_controller != null)
-                _controller.Dispose();
-        }
     }
 }

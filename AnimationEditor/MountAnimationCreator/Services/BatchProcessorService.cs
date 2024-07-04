@@ -192,7 +192,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         void CreateAnimPackFile()
         {
-            _outAnimPack = new AnimationPackFile();
+            _outAnimPack = new AnimationPackFile("Placeholder");
             _riderOutputBin = new AnimationBinWh3(@"animations/database/battle/bin/" + _animBinName)
             {
                 SkeletonName = _riderFragment.SkeletonName,

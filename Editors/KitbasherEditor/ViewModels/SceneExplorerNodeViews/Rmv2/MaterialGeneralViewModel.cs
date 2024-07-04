@@ -5,10 +5,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Input;
 using View3D.SceneNodes;
 using View3D.Services;
@@ -21,7 +18,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         private readonly Rmv2MeshNode _meshNode;
         private readonly PackFileService _pfs;
         private readonly ApplicationSettingsService _applicationSettingsService;
-        private readonly EventHub _eventHub;
+        private readonly IUiCommandFactory _uiCommandFactory;
 
         public ICommand ResolveTexturesCommand { get; set; }
         public ICommand DeleteMissingTexturesCommand { get; set; }
@@ -57,12 +54,12 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         public UiVertexFormat VertexType { get { return _meshNode.Geometry.VertexFormat; } set { ChangeVertexType(value); } }
         public IEnumerable<UiVertexFormat> PossibleVertexTypes { get; set; }
 
-        public MaterialGeneralViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode meshNode, PackFileService pfs,  ApplicationSettingsService applicationSettings, EventHub eventHub)
+        public MaterialGeneralViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode meshNode, PackFileService pfs,  ApplicationSettingsService applicationSettings, IUiCommandFactory uiCommandFactory)
         {
             _kitbasherRootScene = kitbasherRootScene;
             _meshNode = meshNode;
             _pfs = pfs;
-            _eventHub = eventHub;
+            _uiCommandFactory = uiCommandFactory;
             _applicationSettingsService = applicationSettings;
             PossibleVertexTypes = new UiVertexFormat[] { UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic };
             ResolveTexturesCommand = new RelayCommand(ResolveMissingTextures);
@@ -81,7 +78,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
             TextureList.Clear();
             foreach (var enumValue in distinctEnumList)
             {
-                var textureView = new TextureViewModel(_meshNode, _pfs, enumValue,_eventHub);
+                var textureView = new TextureViewModel(_meshNode, enumValue, _pfs, _uiCommandFactory);
                 TextureList.Add(textureView);
             }
 

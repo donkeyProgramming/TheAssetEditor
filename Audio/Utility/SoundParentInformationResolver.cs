@@ -1,9 +1,9 @@
 ﻿using Audio.AudioEditor;
-using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Hirc;
-using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using CommunityToolkit.Diagnostics;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.WWise.Hirc.V136;
 using System.Collections.Generic;
 using System.Linq;
 

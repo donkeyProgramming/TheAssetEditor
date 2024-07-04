@@ -1,19 +1,18 @@
-﻿using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Hirc.V136;
-using CommunityToolkit.Diagnostics;
+﻿using CommunityToolkit.Diagnostics;
 using Shared.Core.PackFiles;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
     public class SoundGenerator : IWWiseHircGenerator
     {
         public string GameName => CompilerConstants.Game_Warhammer3;
-        private static readonly IVanillaObjectIds _VanillaObjectIds = new VanillaObjectIds();
         public Type AudioProjectType => typeof(GameSound);
 
         private readonly PackFileService _pfs;
@@ -57,36 +56,18 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
             wwiseSound.NodeBaseParams.DirectParentId = project.GetHircItemIdFromName(inputSound.DirectParentId);
 
-            // Applying Dialogue_Event attenuation directly to sounds as they don't appear to take the vanilla mixer's attenuation
-            if (inputSound.IsDialogueEventSound == true)
+            // Applying attenuation directly to sounds is necessary as they don't appear to use the vanilla mixer's attenuation even though they're being routed through it.
+            var attenuationId = inputSound.Attenuation;
+            if (attenuationId != 0)
             {
-                var dialogueEventBnk = CompilerConstants.MatchDialogueEventToBnk(inputSound.DialogueEvent);
-                var attenuationKey = $"{dialogueEventBnk}_attenuation";
-
-                if (_VanillaObjectIds.AttenuationIds.ContainsKey(attenuationKey))
+                wwiseSound.NodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle()
                 {
-                    var attenuationId = _VanillaObjectIds.AttenuationIds[attenuationKey];
-
-                    wwiseSound.NodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle()
+                    Values = new List<AkPropBundle.AkPropBundleInstance>()
                     {
-                        Values = new List<AkPropBundle.AkPropBundleInstance>()
-                        {
-                            new(){Type = AkPropBundleType.Attenuation, Value = attenuationId}
-                        }
-                    };
-                }
+                        new(){Type = AkPropBundleType.Attenuation, Value = attenuationId}
+                    }
+                };
             }
-
-            // Testing: force apply attenuation ID
-            /*
-            wwiseSound.NodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle()
-            {
-                Values = new List<AkPropBundle.AkPropBundleInstance>()
-                        {
-                            new(){Type = AkPropBundleType.Attenuation, Value = 803409642}
-                        }
-            };
-            */
 
             wwiseSound.UpdateSize();
             return wwiseSound;

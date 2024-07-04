@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Policy;
 using System.Windows;
 
 namespace Shared.Ui.BaseDialogs.WindowHandling
@@ -20,6 +19,9 @@ namespace Shared.Ui.BaseDialogs.WindowHandling
     public class AssetEditorWindow<TViewModel>
         : Window, ITypedAssetEditorWindow<TViewModel> where TViewModel : class
     {
+        public delegate (bool result, string errorText) ValidateOnOk(TViewModel viewModel);
+        public event ValidateOnOk ValidateOnOkEvent;
+
         public bool AlwaysOnTop { get; set; } = false;
         public TViewModel TypedContext
         {
@@ -35,7 +37,6 @@ namespace Shared.Ui.BaseDialogs.WindowHandling
 
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
             VerticalContentAlignment = VerticalAlignment.Stretch;
-            // SizeToContent = SizeToContent.WidthAndHeight;
             Owner = Application.Current.MainWindow;
         }
 
@@ -51,6 +52,17 @@ namespace Shared.Ui.BaseDialogs.WindowHandling
         private void AssetEditorControl_RequestOK(object sender, EventArgs e)
         {
             DialogResult = true;
+            if (ValidateOnOkEvent != null)
+            {
+                var res = ValidateOnOkEvent(TypedContext);
+                if (res.result == false)
+                {
+                    if(string.IsNullOrEmpty(res.errorText) == false)
+                        MessageBox.Show(res.errorText);
+                    return;   
+                }
+            }
+
             CloseWindow();
         }
 

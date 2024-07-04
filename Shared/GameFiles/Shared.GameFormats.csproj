@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0-windows</TargetFramework>
@@ -9,10 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\EmbeddedResources\Shared.EmbeddedResources.csproj" />
     <ProjectReference Include="..\SharedCore\Shared.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="AnimationMeta\" />
   </ItemGroup>
 
 </Project>

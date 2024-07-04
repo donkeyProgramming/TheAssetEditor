@@ -1,9 +1,9 @@
 ﻿using Audio.AudioEditor;
-using Audio.FileFormats.WWise.Hirc.Shared;
-using Audio.FileFormats.WWise.Hirc.V136;
 using Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.GameFormats.WWise.Hirc.Shared;
+using Shared.GameFormats.WWise.Hirc.V136;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

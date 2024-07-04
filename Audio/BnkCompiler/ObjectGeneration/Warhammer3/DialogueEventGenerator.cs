@@ -1,13 +1,12 @@
-﻿using Audio.FileFormats.WWise.Hirc.V136;
-using System;
-using Audio.FileFormats.WWise;
+﻿using System;
 using CommunityToolkit.Diagnostics;
-using Audio.FileFormats.WWise.Hirc.Shared;
 using System.Linq;
 using System.Collections.Generic;
 using Audio.Utility;
-using static Audio.FileFormats.WWise.Hirc.Shared.ArgumentList;
-
+using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc.Shared;
+using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -25,15 +24,15 @@ namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
         public CAkDialogueEvent_v136 ConvertToWWise(DialogueEvent inputDialogueEvent, CompilerData project)
         {
-            //MatchDialogueEventToBnk();
-
             var wwiseDialogueEvent = new CAkDialogueEvent_v136();
-            wwiseDialogueEvent.CustomArgumentList = new List<Argument>();
+            wwiseDialogueEvent.CustomArgumentList = new List<ArgumentList.Argument>();
 
             wwiseDialogueEvent.Id = project.GetHircItemIdFromName(inputDialogueEvent.Name);
             wwiseDialogueEvent.Type = HircType.Dialogue_Event;
 
-            foreach (var stateGroup in CompilerConstants.dialogueEventStates[inputDialogueEvent.Name])
+            var ExtractedDialogueEvents = DialogueEventData.ExtractedDialogueEvents;
+
+            foreach (var stateGroup in ExtractedDialogueEvents[inputDialogueEvent.Name])
             {
                 var argument = new ArgumentList.Argument
                 {

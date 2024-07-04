@@ -1,7 +1,7 @@
-﻿using Audio.FileFormats.WWise;
-using Audio.Storage;
+﻿using Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.GameFormats.WWise;
 using System;
 using System.Collections.Generic;
 using System.Linq;

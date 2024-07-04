@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Monogame.WpfInterop.ResourceHandling;
 using Shared.Core.Misc;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
@@ -12,7 +10,6 @@ using View3D.Commands;
 using View3D.Commands.Object;
 using View3D.Components.Component;
 using View3D.SceneNodes;
-using View3D.Utility;
 
 namespace KitbasherEditor.ViewModels.MeshFitter
 {
@@ -20,7 +17,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
     {
         private readonly CommandFactory _commandFactory;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
-        private readonly ResourceLibary _resourceLibary;
+        private readonly ResourceLibrary _resourceLibary;
         private readonly SceneManager _sceneManager;
         GameSkeleton _targetSkeleton;
         GameSkeleton _fromSkeleton;
@@ -41,7 +38,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0);
         public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0);
 
-        public MeshFitterViewModel(CommandFactory commandFactory, AnimationsContainerComponent animationsContainerComponent, ResourceLibary resourceLibary, SceneManager sceneManager)
+        public MeshFitterViewModel(CommandFactory commandFactory, AnimationsContainerComponent animationsContainerComponent, ResourceLibrary resourceLibary, SceneManager sceneManager)
         {
             _commandFactory = commandFactory;
             _animationsContainerComponent = animationsContainerComponent;

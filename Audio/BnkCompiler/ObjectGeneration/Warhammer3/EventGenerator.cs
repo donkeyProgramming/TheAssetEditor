@@ -1,8 +1,9 @@
-﻿using Audio.FileFormats.WWise;
-using Audio.FileFormats.WWise.Hirc.V136;
-using CommunityToolkit.Diagnostics;
+﻿using CommunityToolkit.Diagnostics;
 using System;
 using System.Linq;
+using Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {

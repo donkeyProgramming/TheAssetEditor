@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
     <ProjectReference Include="..\..\..\Shared\SharedCore\Shared.Core.csproj" />

@@ -2,6 +2,8 @@
   <PropertyGroup>
 	  <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+      <ImplicitUsings>enable</ImplicitUsings>
+      <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,11 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\GameWorld\View3D\View3D.csproj" />
     <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
     <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui.csproj" />
-    <ProjectReference Include="..\..\View3D\View3D.csproj" />
     <ProjectReference Include="..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
-    <ProjectReference Include="..\TextureEditor\Editors.TextureEditor.csproj" />
   </ItemGroup>
 
 </Project>
