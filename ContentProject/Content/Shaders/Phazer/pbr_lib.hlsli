@@ -15,8 +15,7 @@ float get_direct_roughness(in float roughness_in)
     
     return roughness;
 }
-
-
+ 
 float get_env_map_lod(in float roughness_in, in float texture_num_lods)
 {
 	float smoothness = pow(1.0 - roughness_in, 4.0);
@@ -24,14 +23,11 @@ float get_env_map_lod(in float roughness_in, in float texture_num_lods)
 	float roughness = 1.0 - smoothness;
 
 	//	This must be the number of mip-maps in the environment map!
-//	float texture_num_lods = 10.0f;
-	
+    //	float texture_num_lods = 10.0f;	
 	float env_map_lod = roughness * (texture_num_lods-1);
 	
 	return env_map_lod;
 }
-
-
 
 float3 EnvBRDFApprox(float3 SpecularColor, float Roughness, float NoV)
 {

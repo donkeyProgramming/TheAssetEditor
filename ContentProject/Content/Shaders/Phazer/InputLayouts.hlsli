@@ -33,11 +33,11 @@ struct GBufferMaterial
     float4 position;
     
     float3 pixelNormal;
+    float metalness;
     
     float4 diffuse;
     float3 specular;
-    float roughness;
-    
-    int useAlpha;
+    float roughness;    
+    int reserved;
 };    
 #endif
