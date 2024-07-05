@@ -561,7 +561,7 @@ namespace GameWorld.Core.Components.Gizmo
             {
                 case PivotType.ObjectCenter:
                     if (Selection.Count > 0)
-                        _position = Selection[0].GetObjectCenter();
+                        _position = Selection[0].GetObjectCentre();
                     break;
                 case PivotType.SelectionCenter:
                     _position = GetSelectionCenter();

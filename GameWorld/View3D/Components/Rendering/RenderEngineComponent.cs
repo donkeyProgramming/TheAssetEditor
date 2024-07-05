@@ -35,12 +35,12 @@ namespace GameWorld.Core.Components.Rendering
             SelectedFaces,
         }
 
-        Dictionary<RasterizerStateEnum, RasterizerState> _rasterStates = new Dictionary<RasterizerStateEnum, RasterizerState>();
-        ArcBallCamera _camera;
-        Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = new Dictionary<RenderBuckedId, List<IRenderItem>>();
-        ResourceLibrary _resourceLib;
+        private readonly Dictionary<RasterizerStateEnum, RasterizerState> _rasterStates = [];
+        private readonly ArcBallCamera _camera;
+        private readonly Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = [];
+        private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
-        ApplicationSettingsService _applicationSettingsService;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
@@ -83,27 +83,33 @@ namespace GameWorld.Core.Components.Rendering
             var cullMode = cullingEnabled ? CullMode.CullCounterClockwiseFace : CullMode.None;
             float bias = bigSceneDepthBias ? 0 : 0;
 
-            _rasterStates[RasterizerStateEnum.Default] = new RasterizerState();
-            _rasterStates[RasterizerStateEnum.Default].FillMode = FillMode.Solid;
-            _rasterStates[RasterizerStateEnum.Default].CullMode = cullMode;
-            _rasterStates[RasterizerStateEnum.Default].DepthBias = bias;
-            _rasterStates[RasterizerStateEnum.Default].DepthClipEnable = true;
-            _rasterStates[RasterizerStateEnum.Default].MultiSampleAntiAlias = true;
+            _rasterStates[RasterizerStateEnum.Default] = new RasterizerState
+            {
+                FillMode = FillMode.Solid,
+                CullMode = cullMode,
+                DepthBias = bias,
+                DepthClipEnable = true,
+                MultiSampleAntiAlias = true
+            };
 
             var depthOffsetBias = 0.00005f;
-            _rasterStates[RasterizerStateEnum.Wireframe] = new RasterizerState();
-            _rasterStates[RasterizerStateEnum.Wireframe].FillMode = FillMode.WireFrame;
-            _rasterStates[RasterizerStateEnum.Wireframe].CullMode = cullMode;
-            _rasterStates[RasterizerStateEnum.Wireframe].DepthBias = bias - depthOffsetBias; ;
-            _rasterStates[RasterizerStateEnum.Wireframe].DepthClipEnable = true;
-            _rasterStates[RasterizerStateEnum.Wireframe].MultiSampleAntiAlias = true;
+            _rasterStates[RasterizerStateEnum.Wireframe] = new RasterizerState
+            {
+                FillMode = FillMode.WireFrame,
+                CullMode = cullMode,
+                DepthBias = bias - depthOffsetBias,
+                DepthClipEnable = true,
+                MultiSampleAntiAlias = true
+            };
 
-            _rasterStates[RasterizerStateEnum.SelectedFaces] = new RasterizerState();
-            _rasterStates[RasterizerStateEnum.SelectedFaces].FillMode = FillMode.Solid;
-            _rasterStates[RasterizerStateEnum.SelectedFaces].CullMode = CullMode.None;
-            _rasterStates[RasterizerStateEnum.SelectedFaces].DepthBias = bias - depthOffsetBias;
-            _rasterStates[RasterizerStateEnum.SelectedFaces].DepthClipEnable = true;
-            _rasterStates[RasterizerStateEnum.SelectedFaces].MultiSampleAntiAlias = true;
+            _rasterStates[RasterizerStateEnum.SelectedFaces] = new RasterizerState
+            {
+                FillMode = FillMode.Solid,
+                CullMode = CullMode.None,
+                DepthBias = bias - depthOffsetBias,
+                DepthClipEnable = true,
+                MultiSampleAntiAlias = true
+            };
 
             _cullingEnabled = cullingEnabled;
             _bigSceneDepthBiasMode = bigSceneDepthBias;
@@ -128,7 +134,6 @@ namespace GameWorld.Core.Components.Rendering
 
         public override void Update(GameTime gameTime)
         {
-
             foreach (var value in _renderItems.Keys)
             {
                 if (value == RenderBuckedId.ConstantDebugLine)

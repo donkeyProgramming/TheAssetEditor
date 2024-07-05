@@ -16,7 +16,7 @@ namespace GameWorld.Core.Rendering.RenderItems
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
         {
-            Shader.SetCommonParmeters(parameters, ModelMatrix);
+            Shader.SetCommonParameters(parameters, ModelMatrix);
             if (Faces != null)
                 Geometry.ApplyMeshPart(Shader, device, Faces);
             else

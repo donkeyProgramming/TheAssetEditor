@@ -54,6 +54,6 @@ namespace Shared.GameFormats.RigidModel.Types
             }
         }
 
-        public RmvTexture Clone() => new RmvTexture() { TexureType = TexureType, _path = _path };
+        public RmvTexture Clone() => new() { TexureType = TexureType, _path = _path };
     }
 }

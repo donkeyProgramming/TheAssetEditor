@@ -297,7 +297,7 @@ namespace GameWorld.Core.Components.Gizmo
             geo.TransformVertex(index, m);
         }
 
-        public Vector3 GetObjectCenter()
+        public Vector3 GetObjectCentre()
         {
             return Position;
         }

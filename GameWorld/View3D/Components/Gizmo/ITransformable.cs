@@ -47,7 +47,7 @@ namespace GameWorld.Core.Components.Gizmo
         Vector3 Position { get; set; }
         Vector3 Scale { get; set; }
         Quaternion Orientation { get; set; }
-        Vector3 GetObjectCenter();
+        Vector3 GetObjectCentre();
 
     }
 }

@@ -7,8 +7,8 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
     {
         internal ExportSupportEnum CanExportFile(PackFile file)
         {
-            if (FileExtensionHelper.IsDdsFile(file.Name))
-                return ExportSupportEnum.Supported;
+            if (FileExtensionHelper.IsRmvFile(file.Name))
+                return ExportSupportEnum.HighPriority;
             return ExportSupportEnum.NotSupported;
         }
 
