@@ -61,10 +61,8 @@ namespace GameWorld.Core.Rendering
 
         public void SaveTexture(Texture2D texture, string path)
         {
-            using (var stream = new FileStream(path, FileMode.OpenOrCreate))
-            {
-                texture.SaveAsPng(stream, texture.Width, texture.Height);
-            }
+            using var stream = new FileStream(path, FileMode.OpenOrCreate);
+            texture.SaveAsPng(stream, texture.Width, texture.Height);
         }
 
         public void Dispose()

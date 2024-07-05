@@ -105,6 +105,7 @@ namespace GameWorld.Core.SceneNodes
             var normalTexture = LoadTexture(TextureType.Normal);
             var glossTexture = LoadTexture(TextureType.Gloss);
             var materialTexture = LoadTexture(TextureType.MaterialMap);
+            var maskTexture = LoadTexture(TextureType.Mask);
 
             Effect.SetTexture(diffuse, TextureType.Diffuse);
             Effect.SetTexture(baseColour, TextureType.BaseColour);
@@ -112,6 +113,7 @@ namespace GameWorld.Core.SceneNodes
             Effect.SetTexture(normalTexture, TextureType.Normal);
             Effect.SetTexture(glossTexture, TextureType.Gloss);
             Effect.SetTexture(materialTexture, TextureType.MaterialMap);
+            Effect.SetTexture(maskTexture, TextureType.Mask);
         }
 
         Texture2D LoadTexture(TextureType type, bool forceRefreshTexture = false)

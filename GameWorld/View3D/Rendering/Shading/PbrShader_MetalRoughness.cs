@@ -15,10 +15,12 @@ namespace GameWorld.Core.Rendering.Shading
             _textureEffectParams.Add(TextureType.BaseColour, Effect.Parameters["DiffuseTexture"]);
             _textureEffectParams.Add(TextureType.Normal, Effect.Parameters["NormalTexture"]);
             _textureEffectParams.Add(TextureType.MaterialMap, Effect.Parameters["GlossTexture"]);
+            _textureEffectParams.Add(TextureType.Mask, Effect.Parameters["MaskTexture"]);
 
             _useTextureParams.Add(TextureType.BaseColour, Effect.Parameters["UseDiffuse"]);
             _useTextureParams.Add(TextureType.Normal, Effect.Parameters["UseNormal"]);
             _useTextureParams.Add(TextureType.MaterialMap, Effect.Parameters["UseGloss"]);
+            _useTextureParams.Add(TextureType.Mask, Effect.Parameters["UseMask"]);
 
             Effect.Parameters["tex_cube_diffuse"]?.SetValue(resourceLibrary.PbrDiffuse);
             Effect.Parameters["tex_cube_specular"]?.SetValue(resourceLibrary.PbrSpecular);

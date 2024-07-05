@@ -31,7 +31,6 @@ void DoSkinning(
 	[unroll]
     for (int i = 0; i < vertexWeightCount; i++)
     {
-    
         // TODO: sawp "FramePoseMatrices out with "tranforms[input.BoneIndices[i]]"
         // ---------------------------------------------------------------------------------
 		// transform vertex position
