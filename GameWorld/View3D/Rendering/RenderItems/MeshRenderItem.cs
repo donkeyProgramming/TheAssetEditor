@@ -18,8 +18,12 @@ namespace GameWorld.Core.Rendering.RenderItems
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
         {
+            Shader.GetEffect().CurrentTechnique = Shader.GetEffect().Techniques.FirstOrDefault(x => x.Name == "BasicColorDrawing");
+
             Shader.SetCommonParameters(parameters, ModelMatrix);
             Shader.ApplyObjectParameters();
+
+           
 
             if (Faces != null)
                 ApplyMeshPart(Shader, device, Faces, Geometry.GetGeometryContext());
@@ -31,7 +35,12 @@ namespace GameWorld.Core.Rendering.RenderItems
         {
             var effect = Shader.GetEffect();
 
-            effect.CurrentTechnique = effect.Techniques.FirstOrDefault(x=>x.Name == "GlowPass");
+            effect.CurrentTechnique = effect.Techniques.FirstOrDefault(x => x.Name == "GlowDrawing");
+
+            Shader.SetCommonParameters(parameters, ModelMatrix);
+            Shader.ApplyObjectParameters();
+
+            ApplyMesh(Shader, device, Geometry.GetGeometryContext());
         }
 
         void ApplyMesh(IShader effect, GraphicsDevice device, IGraphicsCardGeometry geometry)

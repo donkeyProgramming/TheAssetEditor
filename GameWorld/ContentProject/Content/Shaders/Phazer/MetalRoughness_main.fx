@@ -309,6 +309,21 @@ float4 MainPS(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_
     return DoToneMapping(color.rgb);
 }
 
+float4 MainPS_Glow(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
+{
+    //return float4(1, 0, 0, 1);
+   GBufferMaterial material = GetMaterial(input);
+   
+   // Apply emissive 
+   float3 emissiveColour = SampleGradient(material.maskValue) * 3;
+	
+   if (UseAlpha == 1)
+       alpha_test(material.diffuse.a);
+   
+   return float4(emissiveColour, 1);
+}
+
+
 float4 SimplePixel(in PixelInputType _input /*, bool bIsFrontFace : SV_IsFrontFace*/) : SV_TARGET0
 {
     return float4(1, 0, 0, 1);
@@ -320,5 +335,14 @@ technique BasicColorDrawing
     {
         VertexShader = compile vs_5_0 MainVS();
         PixelShader = compile ps_5_0 MainPS();
+    }
+};
+
+technique GlowDrawing
+{
+    pass P0
+    {
+        VertexShader = compile vs_5_0 MainVS();
+        PixelShader = compile ps_5_0 MainPS_Glow();
     }
 };
