@@ -107,7 +107,7 @@ namespace Editors.Shared.Core.Common
             if (other.ModelNode == null)
                 return;
 
-            assetViewModel.ModelNode = SceneNodeHelper.DeepCopy(other.ModelNode);
+            assetViewModel.ModelNode = SceneNodeHelper.CloneNodeAndChildren(other.ModelNode);
 
             var cloneMeshes = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(assetViewModel.ModelNode);
             foreach (var mesh in cloneMeshes)

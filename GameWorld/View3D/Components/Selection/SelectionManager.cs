@@ -127,15 +127,15 @@ namespace GameWorld.Core.Components.Selection
 
             if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject is Rmv2MeshNode meshNode)
             {
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new GeoRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
-                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _wireframeEffect });
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new GeometryRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeometryRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _wireframeEffect });
             }
 
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
                 var vertexObject = selectionVertexState.RenderObject as Rmv2MeshNode;
                 _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, ModelMatrix = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = _vertexRenderer });
-                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = vertexObject.RenderMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeometryRenderItem() { ModelMatrix = vertexObject.RenderMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
             }
 
             if (selectionState is BoneSelectionState selectionBoneState && selectionBoneState.RenderObject != null)
@@ -171,13 +171,13 @@ namespace GameWorld.Core.Components.Selection
         {
             if (_wireframeEffect != null)
             {
-                _wireframeEffect.Effect.Dispose();
+                _wireframeEffect.Dispose();
                 _wireframeEffect = null;
             }
 
             if (_selectedFacesEffect != null)
             {
-                _selectedFacesEffect.Effect.Dispose();
+                _selectedFacesEffect.Dispose();
                 _selectedFacesEffect = null;
             }
 

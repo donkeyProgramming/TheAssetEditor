@@ -10,17 +10,17 @@ namespace GameWorld.Core.Rendering
 {
     public class LineMeshRender : IDisposable
     {
-        private readonly Effect _shader;
-        private List<VertexPositionColor> _originalVertices = new List<VertexPositionColor>();
+        private List<VertexPositionColor> _originalVertices = [];
+        private readonly ResourceLibrary _resourceLibrary;
 
         public LineMeshRender(ResourceLibrary resourceLibrary)
         {
-            _shader = resourceLibrary.GetStaticEffect(ShaderTypes.Line);
+            _resourceLibrary = resourceLibrary;
         }
 
         public void Clear()
         {
-            _originalVertices = new List<VertexPositionColor>();
+            _originalVertices = [];
         }
 
         public void CreateLineList(List<(Vector3, Vector3)> lines)
@@ -73,23 +73,23 @@ namespace GameWorld.Core.Rendering
 
         public void CreateGrid()
         {
-            const int lineCount = 10;
-            const float spacing = 1;
-            const float length = 10;
-            const float offset = lineCount * spacing / 2;
+            const int LineCount = 10;
+            const float Spacing = 1;
+            const float Length = 10;
+            const float Offset = LineCount * Spacing / 2;
 
             var list = new List<(Vector3, Vector3)>();
-            for (var i = 0; i <= lineCount; i++)
+            for (var i = 0; i <= LineCount; i++)
             {
-                var start = new Vector3(i * spacing - offset, 0, -length * 0.5f);
-                var stop = new Vector3(i * spacing - offset, 0, length * 0.5f);
+                var start = new Vector3(i * Spacing - Offset, 0, -Length * 0.5f);
+                var stop = new Vector3(i * Spacing - Offset, 0, Length * 0.5f);
                 list.Add((start, stop));
             }
 
-            for (var i = 0; i <= lineCount; i++)
+            for (var i = 0; i <= LineCount; i++)
             {
-                var start = new Vector3(-length * 0.5f, 0, i * spacing - offset);
-                var stop = new Vector3(length * 0.5f, 0, i * spacing - offset);
+                var start = new Vector3(-Length * 0.5f, 0, i * Spacing - Offset);
+                var stop = new Vector3(Length * 0.5f, 0, i * Spacing - Offset);
                 list.Add((start, stop));
             }
             CreateLineList(list);
@@ -168,8 +168,8 @@ namespace GameWorld.Core.Rendering
 
         public void AddCircle(Vector3 pos, float size, Color color)
         {
-            const int steps = 20;
-            var vertices = new VertexPositionColor[2 * (steps + 1)];
+            const int Steps = 20;
+            var vertices = new VertexPositionColor[2 * (Steps + 1)];
 
             // TODO: implement using matrix and CreateCircle
             foreach (var (i, cos, sin) in CircleAnglesGenerator())
@@ -181,7 +181,7 @@ namespace GameWorld.Core.Rendering
             }
 
             // fix points
-            for (var i = 0; i < steps; i++)
+            for (var i = 0; i < Steps; i++)
             {
                 vertices[2 * i + 1] = vertices[2 * i + 2];
             }
@@ -257,13 +257,15 @@ namespace GameWorld.Core.Rendering
 
         public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
         {
-            if (_originalVertices.Count() != 0)
+            if (_originalVertices.Count != 0)
             {
-                _shader.Parameters["View"].SetValue(commonShaderParameters.View);
-                _shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
-                _shader.Parameters["World"].SetValue(modelMatrix);
+                var shader = _resourceLibrary.GetStaticEffect(ShaderTypes.Line);
 
-                foreach (var pass in _shader.CurrentTechnique.Passes)
+                shader.Parameters["View"].SetValue(commonShaderParameters.View);
+                shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
+                shader.Parameters["World"].SetValue(modelMatrix);
+
+                foreach (var pass in shader.CurrentTechnique.Passes)
                 {
                     pass.Apply();
                     device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertices.ToArray(), 0, _originalVertices.Count() / 2);
@@ -271,10 +273,6 @@ namespace GameWorld.Core.Rendering
             }
         }
 
-        public void Dispose()
-        {
-            //_shader.Dispose();
-            //_shader = null;
-        }
+        public void Dispose() => Clear();
     }
 }

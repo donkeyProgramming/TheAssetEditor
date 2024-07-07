@@ -9,8 +9,8 @@ namespace GameWorld.Core.Rendering.RenderItems
     {
         Vector3 _pos;
 
-        ResourceLibrary _resourceLib;
-        string _text;
+        readonly ResourceLibrary _resourceLib;
+        readonly string _text;
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
         public TextRenderItem(ResourceLibrary resourceLib, string text, Vector3 pos)
         {
@@ -25,14 +25,14 @@ namespace GameWorld.Core.Rendering.RenderItems
             Render(device, parameters, ModelMatrix);
         }
 
-        float x = 1;
+       
         public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix ModelMatrix)
         {
             var colour = Color.Red;
+            float x = 1;
 
             var measure = _resourceLib.DefaultFont.MeasureString(_text);
             var viewport = device.Viewport;
-
 
             var position2d = viewport.Project(_pos, commonShaderParameters.Projection, commonShaderParameters.View, ModelMatrix);
             var centeredPosition = new Vector2(position2d.X - measure.X / 2, position2d.Y - measure.Y / 2);
@@ -40,8 +40,12 @@ namespace GameWorld.Core.Rendering.RenderItems
 
             x = 0;
             _resourceLib.CommonSpriteBatch.DrawString(_resourceLib.DefaultFont, _text, centeredPosition + new Vector2(measure.X * 0.5f, measure.Y * 0.5f), colour, x, new Vector2(measure.X * 0.5f, measure.Y * 0.5f), scale * 5, SpriteEffects.None, 0.99f);
-
             x += 0.05f;
+        }
+
+        public void DrawGlowPass(GraphicsDevice device, CommonShaderParameters parameters)
+        {
+         
         }
     }
 }

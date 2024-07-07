@@ -1,17 +1,20 @@
-﻿using GameWorld.Core.Rendering;
+﻿using System;
+using System.Collections.Generic;
+using GameWorld.Core.Rendering;
 using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Services;
-using System;
-using System.Collections.Generic;
 
 namespace GameWorld.Core.Components.Rendering
 {
+    //https://github.com/Kosmonaut3d/BloomFilter-for-Monogame-and-XNA/blob/master/Bloom%20Sample/Game1.cs
+
     public enum RenderBuckedId
     {
         Normal,
+        Glow,
         Wireframe,
         Selection,
         Line,
@@ -19,11 +22,11 @@ namespace GameWorld.Core.Components.Rendering
         ConstantDebugLine,
     }
 
-
     public interface IRenderItem
     {
         Matrix ModelMatrix { get; set; }
         void Draw(GraphicsDevice device, CommonShaderParameters parameters);
+        void DrawGlowPass(GraphicsDevice device, CommonShaderParameters parameters);
     }
 
     public class RenderEngineComponent : BaseComponent, IDisposable
@@ -66,11 +69,23 @@ namespace GameWorld.Core.Components.Rendering
 
             if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3 || _applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.ThreeKingdoms)
                 MainRenderFormat = RenderFormats.MetalRoughness;
+
+            _blendSPriteBatch = _resourceLib.CreateSpriteBatch();
         }
 
+
+
+        private BloomFilter _bloomFilter;
         public override void Initialize()
         {
             RebuildRasterStates(_cullingEnabled, _bigSceneDepthBiasMode);
+
+
+            _bloomFilter = new BloomFilter();
+            _bloomFilter.Load(_deviceResolverComponent.Device, _resourceLib, _deviceResolverComponent.Device.Viewport.Width, _deviceResolverComponent.Device.Viewport.Height);
+            _bloomFilter.BloomPreset = BloomFilter.BloomPresets.SuperWide;
+
+
             base.Initialize();
         }
 
@@ -149,6 +164,25 @@ namespace GameWorld.Core.Components.Rendering
             _renderItems[RenderBuckedId.ConstantDebugLine].Clear();
         }
 
+        RenderTarget2D _screen;
+        private Microsoft.Xna.Framework.Graphics.SpriteBatch _blendSPriteBatch;
+
+        RenderTarget2D GetScreenRenderTarget()
+        {
+            if (_screen == null)
+            {
+                _screen = new RenderTarget2D(_deviceResolverComponent.Device, _deviceResolverComponent.Device.Viewport.Width, _deviceResolverComponent.Device.Viewport.Height);
+                return _screen;
+            }
+
+            if (_screen.Width == _deviceResolverComponent.Device.Viewport.Width && _screen.Height == _deviceResolverComponent.Device.Viewport.Height)
+                return _screen;
+
+            _screen.Dispose();
+            _screen = new RenderTarget2D(_deviceResolverComponent.Device, _deviceResolverComponent.Device.Viewport.Width, _deviceResolverComponent.Device.Viewport.Height);
+            return _screen;
+        }
+
         public override void Draw(GameTime gameTime)
         {
             var commonShaderParameters = new CommonShaderParameters()
@@ -163,6 +197,17 @@ namespace GameWorld.Core.Components.Rendering
                 LightIntensityMult = LightIntensityMult
             };
 
+
+
+            var screen = GetScreenRenderTarget();
+            
+
+            // _deviceResolverComponent.Device.SetRenderTarget(null);
+            var s = _deviceResolverComponent.Device.GetRenderTargets()[0];
+            _deviceResolverComponent.Device.SetRenderTarget(screen);
+
+
+
             _resourceLib.CommonSpriteBatch.Begin();
             foreach (var item in _renderItems[RenderBuckedId.Text])
                 item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
@@ -170,6 +215,8 @@ namespace GameWorld.Core.Components.Rendering
 
             _deviceResolverComponent.Device.DepthStencilState = DepthStencilState.Default;
             _deviceResolverComponent.Device.RasterizerState = _rasterStates[RasterizerStateEnum.Default];
+
+    
 
             foreach (var item in _renderItems[RenderBuckedId.Normal])
                 item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
@@ -188,12 +235,46 @@ namespace GameWorld.Core.Components.Rendering
             foreach (var item in _renderItems[RenderBuckedId.ConstantDebugLine])
                 item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
 
+            //var _halfRes = true;
+            //int w = _deviceResolverComponent.Device.Viewport.Width;
+            //int h = _deviceResolverComponent.Device.Viewport.Height;
+            //
+            //if (_halfRes)
+            //{
+            //    w /= 2;
+            //    h /= 2;
+            //}
+            //
+            //
+            ////
+            //// Configure buffers
+            //RenderTarget2D glowScreen = new RenderTarget2D();
+            //_deviceResolverComponent.Device.SetRenderTarget(glowScreen);
+            //
+            //foreach (var item in _renderItems[RenderBuckedId.Glow])
+            //    item.DrawGlowPass(_deviceResolverComponent.Device, commonShaderParameters);
+            //
+            //Texture2D bloom = _bloomFilter.Draw(glowScreen, w, h);
+            //
+            _deviceResolverComponent.Device.SetRenderTarget(s.RenderTarget as RenderTarget2D);
+            _resourceLib.CommonSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
+            _resourceLib.CommonSpriteBatch.Draw(_screen, new Rectangle(0, 0, _deviceResolverComponent.Device.Viewport.Width/2, _deviceResolverComponent.Device.Viewport.Height/2), Color.White);
+            //_spriteBatch.Draw(bloom, new Rectangle(0, 0, _width, _height), Color.White);
+            _resourceLib.CommonSpriteBatch.End();
+            // Blur and what not
+            //------------------------
+
+
             _deviceResolverComponent.Device.DepthStencilState = DepthStencilState.Default;
             _deviceResolverComponent.Device.RasterizerState = RasterizerState.CullNone;
         }
 
         public void Dispose()
         {
+            _blendSPriteBatch.Dispose();
+            _bloomFilter.Dispose();
+            _screen.Dispose();
+
             _renderItems.Clear();
             foreach (var item in _rasterStates.Values)
                 item.Dispose();

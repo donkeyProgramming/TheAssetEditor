@@ -7,10 +7,10 @@ namespace GameWorld.Core.Rendering.RenderItems
 {
     public class LocatorRenderItem : IRenderItem
     {
-        Effect _shader;
-        Vector3 _pos;
-        float _size;
-        Color _colour = Color.Red;
+        private readonly Effect _shader;
+        private readonly Vector3 _pos;
+        private readonly float _size;
+        private readonly Color _colour = Color.Red;
 
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
 
@@ -21,13 +21,6 @@ namespace GameWorld.Core.Rendering.RenderItems
             _size = size;
         }
 
-        public LocatorRenderItem(Effect shader, Vector3 pos, float size, Color color)
-        {
-            _shader = shader;
-            _pos = pos;
-            _size = size;
-            _colour = color;
-        }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
         {
@@ -50,6 +43,11 @@ namespace GameWorld.Core.Rendering.RenderItems
                 pass.Apply();
                 device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies, 0, _originalVertecies.Count() / 2);
             }
+        }
+
+        public void DrawGlowPass(GraphicsDevice device, CommonShaderParameters parameters)
+        {
+     
         }
     }
 }

@@ -14,5 +14,10 @@ namespace GameWorld.Core.Rendering.RenderItems
         {
             LineMesh.Render(device, parameters, ModelMatrix);
         }
+
+        public void DrawGlowPass(GraphicsDevice device, CommonShaderParameters parameters)
+        {
+    
+        }
     }
 }

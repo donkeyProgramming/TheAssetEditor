@@ -20,5 +20,4 @@ namespace GameWorld.Core.Rendering
         SpecGloss,
         MetalRoughness
     }
-
 }

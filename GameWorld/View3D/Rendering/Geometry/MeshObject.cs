@@ -22,6 +22,9 @@ namespace GameWorld.Core.Rendering.Geometry
         public UiVertexFormat VertexFormat { get; private set; } = UiVertexFormat.Unknown;
         public string ParentSkeletonName { get; set; }
 
+
+        public IGraphicsCardGeometry GetGeometryContext() => Context;
+
         public MeshObject(IGraphicsCardGeometry context, string skeletonName)
         {
             ParentSkeletonName = skeletonName;
@@ -274,35 +277,9 @@ namespace GameWorld.Core.Rendering.Geometry
             VertexFormat = newFormat;
         }
 
-        public VertexPositionNormalTextureCustom GetVertexExtented(int index)//
+        public VertexPositionNormalTextureCustom GetVertexExtented(int index)
         {
             return VertexArray[index];
-        }
-
-        public void ApplyMesh(IShader effect, GraphicsDevice device)
-        {
-            if (Context.IndexBuffer == null || Context.VertexBuffer == null)
-                return;
-
-            device.Indices = Context.IndexBuffer;
-            device.SetVertexBuffer(Context.VertexBuffer);
-            foreach (var pass in effect.Effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, Context.IndexBuffer.IndexCount);
-            }
-        }
-
-        public void ApplyMeshPart(IShader effect, GraphicsDevice device, List<int> faceSelection)
-        {
-            device.Indices = Context.IndexBuffer;
-            device.SetVertexBuffer(Context.VertexBuffer);
-            foreach (var pass in effect.Effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                foreach (var item in faceSelection)
-                    device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, item, 1);
-            }
         }
 
         public int GetIndex(int i)//
@@ -310,13 +287,12 @@ namespace GameWorld.Core.Rendering.Geometry
             return IndexArray[i];
         }
 
-
         public int GetIndexCount()//
         {
             return IndexArray.Length;
         }
 
-        public List<ushort> GetIndexBuffer()//
+        public List<ushort> GetIndexBuffer()
         {
             return IndexArray.ToList();
         }
