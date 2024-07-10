@@ -175,23 +175,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         void DuplicateNode()
         {
-            var fileName = Path.GetFileNameWithoutExtension(_selectedNode.Name);
-            var extention = Path.GetExtension(_selectedNode.Name);
-            if (Path.GetExtension(fileName) != null)
-            {
-                var extraExtension = Path.GetExtension(fileName);
-                extention = extraExtension + extention;
-                fileName = Path.GetFileNameWithoutExtension(fileName);
-            }
-            var newName = fileName + "_copy" + extention;
-
-            var bytes = _selectedNode.Item.DataSource.ReadData();
-            var packFile = new PackFile(newName, new MemorySource(bytes));
-
-            var parentPath = _selectedNode.GetFullPath();
-            var path = Path.GetDirectoryName(parentPath);
-
-            _packFileService.AddFileToPack(_selectedNode.FileOwner, path, packFile);
+            _uiCommandFactory.Create<DuplicateCommand>().Execute(_selectedNode.Item);
         }
 
         void CreateFolder()
