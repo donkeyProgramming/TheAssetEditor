@@ -1,11 +1,9 @@
-﻿using GameWorld.Core.Rendering.Shading;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Shared.GameFormats.RigidModel;
-using Shared.Ui.Editors.BoneMapping;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Shared.GameFormats.RigidModel;
+using Shared.Ui.Editors.BoneMapping;
 
 namespace GameWorld.Core.Rendering.Geometry
 {

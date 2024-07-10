@@ -23,9 +23,9 @@ namespace GameWorld.Core.SceneNodes
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public Rmv2ModelNodeLoader(ResourceLibrary resourceLibary, IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService)
+        public Rmv2ModelNodeLoader(ResourceLibrary resourceLibrary, IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService)
         {
-            _resourceLibrary = resourceLibary;
+            _resourceLibrary = resourceLibrary;
             _contextFactory = contextFactory;
             _packFileService = packFileService;
             _renderEngineComponent = renderEngineComponent;
@@ -50,7 +50,7 @@ namespace GameWorld.Core.SceneNodes
 
                     //This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
                     //from the model file path.
-                    if (String.IsNullOrWhiteSpace(rmvModel.Material.ModelName))
+                    if (string.IsNullOrWhiteSpace(rmvModel.Material.ModelName))
                     {
                         rmvModel.Material.ModelName = Path.GetFileNameWithoutExtension(modelFullPath);
                     }

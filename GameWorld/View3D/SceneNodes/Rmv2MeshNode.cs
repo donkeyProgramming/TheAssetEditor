@@ -26,6 +26,7 @@ namespace GameWorld.Core.SceneNodes
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
+
         ResourceLibrary _resourceLib;
         private RenderEngineComponent _renderEngineComponent;
 
@@ -105,15 +106,6 @@ namespace GameWorld.Core.SceneNodes
             }
         }
 
-        //Texture2D LoadTexture(TextureType type, bool forceRefreshTexture = false)
-        //{
-        //    var texture = Material.GetTexture(type);
-        //    if (texture == null)
-        //        return null;
-        //
-        //    return _resourceLib.LoadTexture(texture.Value.Path, forceRefreshTexture);
-        //}
-
         public Rmv2ModelNode? GetParentModel()
         {
             var parent = Parent;
@@ -172,8 +164,7 @@ namespace GameWorld.Core.SceneNodes
             var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(Material.PivotPoint);
             RenderMatrix = modelWithOffset;
 
-            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeometryRenderItem() { Geometry = Geometry, ModelMatrix = modelWithOffset * parentWorld, Shader = Effect });
-            renderEngine.AddRenderItem(RenderBuckedId.Glow, new GeometryRenderItem() { Geometry = Geometry, ModelMatrix = modelWithOffset * parentWorld, Shader = Effect });
+            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeometryRenderItem(Geometry, Effect, modelWithOffset * parentWorld));
 
             if (DisplayPivotPoint)
                 renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Material.PivotPoint, 1));

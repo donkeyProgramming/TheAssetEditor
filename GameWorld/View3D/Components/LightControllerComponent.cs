@@ -10,10 +10,10 @@ namespace GameWorld.Core.Components
 
     public class SceneLightParametersStore
     {
-        public float EnvLightRotationDegrees_Y { get; set; }
-        public float DirLightRotationDegrees_X { get; set; }
-        public float DirLightRotationDegrees_Y { get; set; }
-        public float LightIntensityMult { get; set; }
+        public float EnvLightRotationDegrees_Y { get; set; } = 20;
+        public float DirLightRotationDegrees_X { get; set; } = 0;
+        public float DirLightRotationDegrees_Y { get; set; } = 0;
+        public float LightIntensityMult { get; set; } = 1;
     }
 
     public class LightControllerComponent : BaseComponent

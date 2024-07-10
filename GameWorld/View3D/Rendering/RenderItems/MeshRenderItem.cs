@@ -8,20 +8,27 @@ namespace GameWorld.Core.Rendering.RenderItems
 {
     public class GeometryRenderItem : IRenderItem
     {
-        public MeshObject Geometry { get; set; }
-        public IShader Shader { get; set; }
-        public Matrix ModelMatrix { get; set; }
+        private readonly MeshObject _geometry;
+        private readonly IShader _shader;
+        private readonly Matrix _modelMatrix;
+
+        public GeometryRenderItem(MeshObject geometry, IShader shader, Matrix modelMatrix)
+        {
+            _geometry = geometry;
+            _shader = shader;
+            _modelMatrix = modelMatrix;
+        }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
-            if (Shader.SupportsTechnique(RenderingTechnique.Normal) == false)
+            if (_shader.SupportsTechnique(RenderingTechnique.Normal) == false)
                 return;
 
-            Shader.SetTechnique(renderingTechnique);
-            Shader.SetCommonParameters(parameters, ModelMatrix);
-            Shader.ApplyObjectParameters();
+            _shader.SetTechnique(renderingTechnique);
+            _shader.SetCommonParameters(parameters, _modelMatrix);
+            _shader.ApplyObjectParameters();
 
-            ApplyMesh(Shader, device, Geometry.GetGeometryContext());
+            ApplyMesh(_shader, device, _geometry.GetGeometryContext());
         }
 
         void ApplyMesh(IShader effect, GraphicsDevice device, IGraphicsCardGeometry geometry)
