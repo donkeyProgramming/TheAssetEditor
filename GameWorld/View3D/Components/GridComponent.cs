@@ -23,14 +23,11 @@ namespace GameWorld.Core.Components
         {
             _gridMesh = new LineMeshRender(_resourceLibrary);
             _gridMesh.CreateGrid();
-
-            base.Initialize();
         }
 
         public override void Draw(GameTime gameTime)
         {
             _renderEngineComponent.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _gridMesh, ModelMatrix = Matrix.Identity });
-            base.Draw(gameTime);
         }
 
         public void Dispose()

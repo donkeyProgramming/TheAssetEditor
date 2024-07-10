@@ -19,7 +19,6 @@ namespace GameWorld.Core.Components.Rendering
         Selection,
         Line,
         Text,
-        ConstantDebugLine,
     }
 
     public interface IRenderItem
@@ -44,23 +43,23 @@ namespace GameWorld.Core.Components.Rendering
         private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
         private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly SceneLightParametersStore _sceneLightParameters;
 
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
 
-        public float EnvLightRotationDegrees_Y { get; set; } = 20;
-        public float DirLightRotationDegrees_X { get; set; } = 0;
-        public float DirLightRotationDegrees_Y { get; set; } = 0;
-        public float LightIntensityMult { get; set; } = 1;
+
 
         public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;
 
-        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService)
+        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneLightParametersStore sceneLightParametersStore)
         {
             _camera = camera;
             _resourceLib = resourceLib;
             _deviceResolverComponent = deviceResolverComponent;
             _applicationSettingsService = applicationSettingsService;
+            _sceneLightParameters = sceneLightParametersStore;
+
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
 
@@ -69,19 +68,19 @@ namespace GameWorld.Core.Components.Rendering
 
             if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3 || _applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.ThreeKingdoms)
                 MainRenderFormat = RenderFormats.MetalRoughness;
-
-            _blendSPriteBatch = _resourceLib.CreateSpriteBatch();
         }
 
 
 
         private BloomFilter _bloomFilter;
+        Texture2D _whiteTexture;
         public override void Initialize()
         {
             RebuildRasterStates(_cullingEnabled, _bigSceneDepthBiasMode);
 
 
-   
+            _whiteTexture = new Texture2D(_deviceResolverComponent.Device, 1, 1);
+            _whiteTexture.SetData(new[] { Color.White });
 
 
             base.Initialize();
@@ -134,7 +133,7 @@ namespace GameWorld.Core.Components.Rendering
             RebuildRasterStates(_cullingEnabled, !_bigSceneDepthBiasMode);
         }
 
-        public void ToggelBackFaceRendering()
+        public void ToggleBackFaceRendering()
         {
             _deviceResolverComponent.Device.RasterizerState = RasterizerState.CullNone;
             RebuildRasterStates(!_cullingEnabled, _bigSceneDepthBiasMode);
@@ -148,64 +147,75 @@ namespace GameWorld.Core.Components.Rendering
         public override void Update(GameTime gameTime)
         {
             foreach (var value in _renderItems.Keys)
-            {
-                if (value == RenderBuckedId.ConstantDebugLine)
-                    continue;
                 _renderItems[value].Clear();
-            }
 
             base.Update(gameTime);
         }
 
-        public void ClearDebugBuffer()
-        {
-            _renderItems[RenderBuckedId.ConstantDebugLine].Clear();
-        }
+
 
         RenderTarget2D _screen;
-        private Microsoft.Xna.Framework.Graphics.SpriteBatch _blendSPriteBatch;
+        RenderTarget2D _glow;
+
+
+        RenderTarget2D EnsureRenderTarget(RenderTarget2D existingRenderTarget)
+        {
+            var width = _deviceResolverComponent.Device.Viewport.Width;
+            var height = _deviceResolverComponent.Device.Viewport.Height;
+
+            if (existingRenderTarget == null)
+            {
+                return new RenderTarget2D(_deviceResolverComponent.Device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
+            }
+
+            if (_screen.Width == width && _screen.Height == height)
+                return existingRenderTarget;
+
+            existingRenderTarget.Dispose();
+            return new RenderTarget2D(_deviceResolverComponent.Device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
+        }
 
         RenderTarget2D GetScreenRenderTarget()
         {
-            if (_screen == null)
-            {
-                _screen = new RenderTarget2D(_deviceResolverComponent.Device, _deviceResolverComponent.Device.Viewport.Width, _deviceResolverComponent.Device.Viewport.Height);
-                return _screen;
-            }
-
-            if (_screen.Width == _deviceResolverComponent.Device.Viewport.Width && _screen.Height == _deviceResolverComponent.Device.Viewport.Height)
-                return _screen;
-
-            _screen.Dispose();
-            _screen = new RenderTarget2D(_deviceResolverComponent.Device, _deviceResolverComponent.Device.Viewport.Width, _deviceResolverComponent.Device.Viewport.Height);
+            _screen = EnsureRenderTarget(_screen);
             return _screen;
         }
 
-        RenderTarget2D _glow;
         RenderTarget2D GetGlowRenderTarget()
         {
-            if (_glow == null)
-            {
-                _glow = new RenderTarget2D(_deviceResolverComponent.Device, _deviceResolverComponent.Device.Viewport.Width, _deviceResolverComponent.Device.Viewport.Height);
-                return _glow;
-            }
-
-            if (_glow.Width == _deviceResolverComponent.Device.Viewport.Width && _glow.Height == _deviceResolverComponent.Device.Viewport.Height)
-                return _glow;
-
-            _glow.Dispose();
-            _glow = new RenderTarget2D(_deviceResolverComponent.Device, _deviceResolverComponent.Device.Viewport.Width, _deviceResolverComponent.Device.Viewport.Height);
+            _glow = EnsureRenderTarget(_glow);
             return _glow;
+        }
+       
+
+
+      
+
+
+
+
+        class TextRenderPass
+        {
+            void Draw()
+            {
+                /*
+                             _resourceLib.CommonSpriteBatch.Begin();
+                foreach (var item in _renderItems[RenderBuckedId.Text])
+                    item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
+                _resourceLib.CommonSpriteBatch.End();
+                 */
+            }
         }
 
         public override void Draw(GameTime gameTime)
         {
-
+            int w = _deviceResolverComponent.Device.Viewport.Width;
+            int h = _deviceResolverComponent.Device.Viewport.Height;
 
             if (_bloomFilter == null)
             {
                 _bloomFilter = new BloomFilter();
-                _bloomFilter.Load(_deviceResolverComponent.Device, _resourceLib, _deviceResolverComponent.Device.Viewport.Width, _deviceResolverComponent.Device.Viewport.Height);
+                _bloomFilter.Load(_deviceResolverComponent.Device, _resourceLib, w, h);
                 _bloomFilter.BloomPreset = BloomFilter.BloomPresets.SuperWide;
             }
 
@@ -215,10 +225,10 @@ namespace GameWorld.Core.Components.Rendering
                 View = _camera.ViewMatrix,
                 CameraPosition = _camera.Position,
                 CameraLookAt = _camera.LookAt,
-                EnvLightRotationsRadians_Y = MathHelper.ToRadians(EnvLightRotationDegrees_Y),
-                DirLightRotationRadians_X = MathHelper.ToRadians(DirLightRotationDegrees_X),
-                DirLightRotationRadians_Y = MathHelper.ToRadians(DirLightRotationDegrees_Y),
-                LightIntensityMult = LightIntensityMult
+                EnvLightRotationsRadians_Y = MathHelper.ToRadians(_sceneLightParameters.EnvLightRotationDegrees_Y),
+                DirLightRotationRadians_X = MathHelper.ToRadians(_sceneLightParameters.DirLightRotationDegrees_X),
+                DirLightRotationRadians_Y = MathHelper.ToRadians(_sceneLightParameters.DirLightRotationDegrees_Y),
+                LightIntensityMult = _sceneLightParameters.LightIntensityMult
             };
 
 
@@ -226,22 +236,35 @@ namespace GameWorld.Core.Components.Rendering
             var screen = GetScreenRenderTarget();
             var glow = GetGlowRenderTarget();
 
-            // _deviceResolverComponent.Device.SetRenderTarget(null);
-            var s = _deviceResolverComponent.Device.GetRenderTargets()[0];
+            var backBufferRenderTarget = _deviceResolverComponent.Device.GetRenderTargets()[0];
             _deviceResolverComponent.Device.SetRenderTarget(screen);
 
 
+            /*
+             private readonly 
+             */
 
+            /*
+             Clear screen
+             */
+            Color _clearColour = new Color(54, 54, 54);
+            _resourceLib.CommonSpriteBatch.Begin();
+            _resourceLib.CommonSpriteBatch.Draw(_whiteTexture, new Rectangle(0, 0, w, h), _clearColour); 
+            _resourceLib.CommonSpriteBatch.End();
+
+
+            //SpriteSortMode.Deferred, BlendState.AlphaBlend
             _resourceLib.CommonSpriteBatch.Begin();
             foreach (var item in _renderItems[RenderBuckedId.Text])
                 item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
             _resourceLib.CommonSpriteBatch.End();
 
             _deviceResolverComponent.Device.DepthStencilState = DepthStencilState.Default;
+
+
             _deviceResolverComponent.Device.RasterizerState = _rasterStates[RasterizerStateEnum.Default];
 
     
-
             foreach (var item in _renderItems[RenderBuckedId.Normal])
                 item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
 
@@ -255,11 +278,6 @@ namespace GameWorld.Core.Components.Rendering
 
             foreach (var item in _renderItems[RenderBuckedId.Line])
                 item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
-
-            foreach (var item in _renderItems[RenderBuckedId.ConstantDebugLine])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
-
-
 
             _deviceResolverComponent.Device.SetRenderTarget(glow);
             foreach (var item in _renderItems[RenderBuckedId.Glow])
@@ -284,8 +302,7 @@ namespace GameWorld.Core.Components.Rendering
             //foreach (var item in _renderItems[RenderBuckedId.Glow])
             //    item.DrawGlowPass(_deviceResolverComponent.Device, commonShaderParameters);
 
-            int w = _deviceResolverComponent.Device.Viewport.Width;
-            int h = _deviceResolverComponent.Device.Viewport.Height;
+
 
             Texture2D bloom = _bloomFilter.Draw(_glow, w, h);
             //
@@ -298,14 +315,13 @@ namespace GameWorld.Core.Components.Rendering
             //_resourceLib.CommonSpriteBatch.End();
 
 
-            _deviceResolverComponent.Device.SetRenderTarget(s.RenderTarget as RenderTarget2D);
-            _resourceLib.CommonSpriteBatch.Begin();//SpriteSortMode.Deferred, BlendState.Additive
-            _resourceLib.CommonSpriteBatch.Draw(_screen, new Rectangle(0, 0, w / 2, h / 2), Color.White);
+            _deviceResolverComponent.Device.SetRenderTarget(backBufferRenderTarget.RenderTarget as RenderTarget2D);
+            _resourceLib.CommonSpriteBatch.Begin();
+            _resourceLib.CommonSpriteBatch.Draw(screen, new Rectangle(0, 0, w, h), Color.White);
             _resourceLib.CommonSpriteBatch.End();
 
             _resourceLib.CommonSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-            //_resourceLib.CommonSpriteBatch.Draw(_glow, new Rectangle(0, h / 2, w / 2, h / 2), Color.White);
-            _resourceLib.CommonSpriteBatch.Draw(bloom, new Rectangle(0, 0, w / 2, h / 2), Color.White);
+            _resourceLib.CommonSpriteBatch.Draw(bloom, new Rectangle(0, 0, w, h), Color.White);
             _resourceLib.CommonSpriteBatch.End();
 
             //------------------------
@@ -317,7 +333,6 @@ namespace GameWorld.Core.Components.Rendering
 
         public void Dispose()
         {
-            _blendSPriteBatch.Dispose();
             _bloomFilter.Dispose();
             _screen.Dispose();
 
