@@ -17,22 +17,27 @@ namespace GameWorld.Core.Components.Rendering
         Glow,
         Wireframe,
         Selection,
-        Line,
         Text,
     }
+
+    public enum RenderingTechnique
+    {
+        Normal,
+        Emissive,
+    }
+
 
     public interface IRenderItem
     {
         Matrix ModelMatrix { get; set; }
-        void Draw(GraphicsDevice device, CommonShaderParameters parameters);
-        void DrawGlowPass(GraphicsDevice device, CommonShaderParameters parameters);
+        void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique);
     }
 
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
         enum RasterizerStateEnum
         {
-            Default,
+            Normal,
             Wireframe,
             SelectedFaces,
         }
@@ -70,8 +75,6 @@ namespace GameWorld.Core.Components.Rendering
                 MainRenderFormat = RenderFormats.MetalRoughness;
         }
 
-
-
         private BloomFilter _bloomFilter;
         Texture2D _whiteTexture;
         public override void Initialize()
@@ -95,7 +98,7 @@ namespace GameWorld.Core.Components.Rendering
             var cullMode = cullingEnabled ? CullMode.CullCounterClockwiseFace : CullMode.None;
             float bias = bigSceneDepthBias ? 0 : 0;
 
-            _rasterStates[RasterizerStateEnum.Default] = new RasterizerState
+            _rasterStates[RasterizerStateEnum.Normal] = new RasterizerState
             {
                 FillMode = FillMode.Solid,
                 CullMode = cullMode,
@@ -188,29 +191,10 @@ namespace GameWorld.Core.Components.Rendering
         }
        
 
-
-      
-
-
-
-
-        class TextRenderPass
-        {
-            void Draw()
-            {
-                /*
-                             _resourceLib.CommonSpriteBatch.Begin();
-                foreach (var item in _renderItems[RenderBuckedId.Text])
-                    item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
-                _resourceLib.CommonSpriteBatch.End();
-                 */
-            }
-        }
-
         public override void Draw(GameTime gameTime)
         {
-            int w = _deviceResolverComponent.Device.Viewport.Width;
-            int h = _deviceResolverComponent.Device.Viewport.Height;
+            var w = _deviceResolverComponent.Device.Viewport.Width;
+            var h = _deviceResolverComponent.Device.Viewport.Height;
 
             if (_bloomFilter == null)
             {
@@ -233,102 +217,62 @@ namespace GameWorld.Core.Components.Rendering
 
 
 
-            var screen = GetScreenRenderTarget();
-            var glow = GetGlowRenderTarget();
+            // Configure render targets
+            var defaultRenderTarget = GetScreenRenderTarget();
+      
 
             var backBufferRenderTarget = _deviceResolverComponent.Device.GetRenderTargets()[0];
-            _deviceResolverComponent.Device.SetRenderTarget(screen);
+            _deviceResolverComponent.Device.SetRenderTarget(defaultRenderTarget);
 
 
-            /*
-             private readonly 
-             */
-
-            /*
-             Clear screen
-             */
-            Color _clearColour = new Color(54, 54, 54);
+            // 2D drawing
+            var clearColour = new Color(54, 54, 54);
             _resourceLib.CommonSpriteBatch.Begin();
-            _resourceLib.CommonSpriteBatch.Draw(_whiteTexture, new Rectangle(0, 0, w, h), _clearColour); 
+            _resourceLib.CommonSpriteBatch.Draw(_whiteTexture, new Rectangle(0, 0, w, h), clearColour);
             _resourceLib.CommonSpriteBatch.End();
 
-
-            //SpriteSortMode.Deferred, BlendState.AlphaBlend
-            _resourceLib.CommonSpriteBatch.Begin();
+            _resourceLib.CommonSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             foreach (var item in _renderItems[RenderBuckedId.Text])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
+                item.Draw(_deviceResolverComponent.Device, commonShaderParameters, RenderingTechnique.Normal);
             _resourceLib.CommonSpriteBatch.End();
 
+            // 3D drawing - Normal scene
             _deviceResolverComponent.Device.DepthStencilState = DepthStencilState.Default;
-
-
-            _deviceResolverComponent.Device.RasterizerState = _rasterStates[RasterizerStateEnum.Default];
-
-    
+            
+            _deviceResolverComponent.Device.RasterizerState = _rasterStates[RasterizerStateEnum.Normal];
             foreach (var item in _renderItems[RenderBuckedId.Normal])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
+                item.Draw(_deviceResolverComponent.Device, commonShaderParameters, RenderingTechnique.Normal);
 
             _deviceResolverComponent.Device.RasterizerState = _rasterStates[RasterizerStateEnum.Wireframe];
             foreach (var item in _renderItems[RenderBuckedId.Wireframe])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
+                item.Draw(_deviceResolverComponent.Device, commonShaderParameters, RenderingTechnique.Normal);
 
             _deviceResolverComponent.Device.RasterizerState = _rasterStates[RasterizerStateEnum.SelectedFaces];
             foreach (var item in _renderItems[RenderBuckedId.Selection])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
+                item.Draw(_deviceResolverComponent.Device, commonShaderParameters, RenderingTechnique.Normal);
 
-            foreach (var item in _renderItems[RenderBuckedId.Line])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
-
-            _deviceResolverComponent.Device.SetRenderTarget(glow);
+            // 3D drawing - Emissive 
+            var glowRenderTarget = GetGlowRenderTarget();
+            _deviceResolverComponent.Device.SetRenderTarget(glowRenderTarget);
             foreach (var item in _renderItems[RenderBuckedId.Glow])
-                item.DrawGlowPass(_deviceResolverComponent.Device, commonShaderParameters);
+                item.Draw(_deviceResolverComponent.Device, commonShaderParameters, RenderingTechnique.Emissive);
 
-            //var _halfRes = true;
-            //int w = _deviceResolverComponent.Device.Viewport.Width;
-            //int h = _deviceResolverComponent.Device.Viewport.Height;
-            //
-            //if (_halfRes)
-            //{
-            //    w /= 2;
-            //    h /= 2;
-            //}
-            //
-            //
-            ////
-            //// Configure buffers
-            //RenderTarget2D glowScreen = new RenderTarget2D();
-            //_deviceResolverComponent.Device.SetRenderTarget(glowScreen);
-            //
-            //foreach (var item in _renderItems[RenderBuckedId.Glow])
-            //    item.DrawGlowPass(_deviceResolverComponent.Device, commonShaderParameters);
-
-
-
-            Texture2D bloom = _bloomFilter.Draw(_glow, w, h);
-            //
-
-            //_deviceResolverComponent.Device.SetRenderTarget(s.RenderTarget as RenderTarget2D);
-            //_resourceLib.CommonSpriteBatch.Begin();//SpriteSortMode.Deferred, BlendState.Additive
-            //_resourceLib.CommonSpriteBatch.Draw(_screen, new Rectangle(0, 0, w/2, h/2), Color.White);
-            //_resourceLib.CommonSpriteBatch.Draw(_glow, new Rectangle(0, h / 2, w / 2, h / 2), Color.White);
-            //_resourceLib.CommonSpriteBatch.Draw(bloom, new Rectangle(w / 2, h / 2, w / 2, h / 2), Color.White);
-            //_resourceLib.CommonSpriteBatch.End();
-
+            var bloomRenderTarget = _bloomFilter.Draw(_glow, w, h);
 
             _deviceResolverComponent.Device.SetRenderTarget(backBufferRenderTarget.RenderTarget as RenderTarget2D);
             _resourceLib.CommonSpriteBatch.Begin();
-            _resourceLib.CommonSpriteBatch.Draw(screen, new Rectangle(0, 0, w, h), Color.White);
+            _resourceLib.CommonSpriteBatch.Draw(defaultRenderTarget, new Rectangle(0, 0, w, h), Color.White);
             _resourceLib.CommonSpriteBatch.End();
 
             _resourceLib.CommonSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-            _resourceLib.CommonSpriteBatch.Draw(bloom, new Rectangle(0, 0, w, h), Color.White);
+            _resourceLib.CommonSpriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, w, h), Color.White);
             _resourceLib.CommonSpriteBatch.End();
 
             //------------------------
 
 
-            _deviceResolverComponent.Device.DepthStencilState = DepthStencilState.Default;
-            _deviceResolverComponent.Device.RasterizerState = RasterizerState.CullNone;
+            //_deviceResolverComponent.Device.DepthStencilState = DepthStencilState.Default;
+            //_deviceResolverComponent.Device.RasterizerState = RasterizerState.CullNone;
         }
 
         public void Dispose()

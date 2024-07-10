@@ -27,7 +27,7 @@ namespace GameWorld.Core.Components
 
         public override void Draw(GameTime gameTime)
         {
-            _renderEngineComponent.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _gridMesh, ModelMatrix = Matrix.Identity });
+            _renderEngineComponent.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _gridMesh, ModelMatrix = Matrix.Identity });
         }
 
         public void Dispose()

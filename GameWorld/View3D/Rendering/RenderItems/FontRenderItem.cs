@@ -23,14 +23,9 @@ namespace GameWorld.Core.Rendering.RenderItems
             _color = color;
         }
 
-        public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
+        public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
             _resourceLibrary.CommonSpriteBatch.DrawString(_resourceLibrary.DefaultFont, _text, _position, _color);
-        }
-
-        public void DrawGlowPass(GraphicsDevice device, CommonShaderParameters parameters)
-        {
-        
         }
     }
 }

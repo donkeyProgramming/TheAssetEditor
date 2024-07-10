@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using GameWorld.Core.Components.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -54,6 +56,19 @@ namespace GameWorld.Core.Rendering.Shading
         public void Dispose()
         {
             _effect.Dispose();
+        }
+
+        public void SetTechnique(RenderingTechnique technique)
+        {
+            // Only one supported, no need to change
+        }
+
+        public bool SupportsTechnique(RenderingTechnique technique)
+        {
+            var supported = new[] { RenderingTechnique.Normal };
+            if (supported.Contains(technique))
+                return true;
+            return false;
         }
     }
 }

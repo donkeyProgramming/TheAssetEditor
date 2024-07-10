@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.Components.Rendering;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -115,6 +117,31 @@ namespace GameWorld.Core.Rendering.Shading
                 _useTextureMap = _useTextureMap.ToDictionary()
             };
             return shaderClone;
+        }
+
+        public void SetTechnique(RenderingTechnique technique)
+        {
+            switch (technique)
+            {
+                case RenderingTechnique.Normal:
+                    GetEffect().CurrentTechnique = GetEffect().Techniques["BasicColorDrawing"];
+                    return;
+
+                case RenderingTechnique.Emissive:
+                    GetEffect().CurrentTechnique = GetEffect().Techniques["GlowDrawing"];
+                    return;
+
+                default:
+                    throw new Exception($"Unsupported RenderingTechnique {technique}");
+            }
+        }
+
+        public bool SupportsTechnique(RenderingTechnique technique)
+        {
+            var supported = new[]{ RenderingTechnique.Normal, RenderingTechnique.Emissive };
+            if (supported.Contains(technique))
+                return true;
+            return false;
         }
     }
 }

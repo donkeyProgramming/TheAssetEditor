@@ -67,8 +67,6 @@ namespace Shared.Core.ByteParsing
             return value;
         }
 
-
-
         string ReadZeroTerminatedString(StringParser parser)
         {
             if (!parser.TryDecodeZeroTerminatedString(_buffer, CurrentIndex, out var value, out var bytesRead))

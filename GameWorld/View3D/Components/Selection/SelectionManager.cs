@@ -127,7 +127,7 @@ namespace GameWorld.Core.Components.Selection
 
             if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject is Rmv2MeshNode meshNode)
             {
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new GeometryRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new SelectedFacesRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeometryRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _wireframeEffect });
             }
 
@@ -158,7 +158,7 @@ namespace GameWorld.Core.Components.Selection
                         var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
                         bone.Decompose(out var _, out var _, out var trans);
                         _lineGeometry.AddCube(Matrix.CreateScale(0.06f) * bone * renderMatrix * parentWorld, Color.Red);
-                        _renderEngine.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _lineGeometry, ModelMatrix = Matrix.Identity });
+                        _renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineGeometry, ModelMatrix = Matrix.Identity });
 
                     }
                 }

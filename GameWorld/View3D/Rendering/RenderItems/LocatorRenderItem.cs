@@ -22,7 +22,7 @@ namespace GameWorld.Core.Rendering.RenderItems
         }
 
 
-        public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
+        public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
             var _originalVertecies = new VertexPositionColor[6];
 
@@ -43,11 +43,6 @@ namespace GameWorld.Core.Rendering.RenderItems
                 pass.Apply();
                 device.DrawUserPrimitives(PrimitiveType.LineList, _originalVertecies, 0, _originalVertecies.Count() / 2);
             }
-        }
-
-        public void DrawGlowPass(GraphicsDevice device, CommonShaderParameters parameters)
-        {
-     
         }
     }
 }

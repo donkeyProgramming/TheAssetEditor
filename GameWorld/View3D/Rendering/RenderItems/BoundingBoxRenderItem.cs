@@ -28,15 +28,11 @@ namespace GameWorld.Core.Rendering.RenderItems
 
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
 
-        public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
+        public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
             Render(device, parameters, ModelMatrix);
         }
 
-        public void DrawGlowPass(GraphicsDevice device, CommonShaderParameters parameters)
-        {
-        
-        }
 
         public void Render(GraphicsDevice device, CommonShaderParameters commonShaderParameters, Matrix ModelMatrix)
         {

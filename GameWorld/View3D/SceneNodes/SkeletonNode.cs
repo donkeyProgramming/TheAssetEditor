@@ -66,7 +66,7 @@ namespace GameWorld.Core.SceneNodes
                     }
                 }
 
-                renderEngine.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = Matrix.Identity });
+                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = Matrix.Identity });
             }
         }
 

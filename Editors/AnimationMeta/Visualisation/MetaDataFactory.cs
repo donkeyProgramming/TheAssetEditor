@@ -185,7 +185,7 @@ namespace Editors.AnimationMeta.Visualisation
             lineRenderer.AddCircle(position, scale, Color.Red);
             node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, displayName, position));
 
-            node.AddItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
+            node.AddItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             root.AddObject(node);
 
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
@@ -250,7 +250,7 @@ namespace Editors.AnimationMeta.Visualisation
                 lineRenderer.AddCorridorSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, Color.Red);
             }
 
-            node.AddItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
+            node.AddItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             root.AddObject(node);
 
             return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
@@ -264,7 +264,7 @@ namespace Editors.AnimationMeta.Visualisation
             lineRenderer.AddLocator(effect.Position, 0.3f, Color.Red);
             node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, effect.VfxName, effect.Position));
 
-            node.AddItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
+            node.AddItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
             root.AddObject(node);
 
             var instance = new DrawableMetaInstance(effect.StartTime, effect.EndTime, node.Name, node);
