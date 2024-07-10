@@ -5,13 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewmodels="clr-namespace:Editors.Audio.Presentation.AudioEditor.ViewModels"
              xmlns:converters="clr-namespace:Editors.Audio.Presentation.AudioEditor"
-             d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorSettingsViewModel}"
+             d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorViewModel}"
              mc:Ignorable="d"
              d:DesignHeight="800">
 
     <!-- Resources Section -->
     <UserControl.Resources>
-        <converters:EnumConverter x:Key="EnumConverter"/>
+        <converters:SettingsEnumConverter x:Key="SettingsEnumConverter"/>
         <Style x:Key="CenterHeaderGroupBoxStyle" TargetType="GroupBox">
             <Setter Property="Template">
                 <Setter.Value>
@@ -120,13 +120,13 @@
     
                     <!-- All CheckBox -->
                     <CheckBox Content="All" Margin="0 2.5 5 0"
-                              IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.All}}"
+                              IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource SettingsEnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.All}}"
                               ToolTip="PLACEHOLDER TOOLTIP"
                               Grid.Column="1"/>
 
                     <!-- Essential CheckBox -->
                     <CheckBox Content="Essential" Margin="5 2.5 5 0"
-                              IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.Essential}}"
+                              IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource SettingsEnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.Essential}}"
                               ToolTip="PLACEHOLDER TOOLTIP"
                               Grid.Column="2"/>
                 </Grid>

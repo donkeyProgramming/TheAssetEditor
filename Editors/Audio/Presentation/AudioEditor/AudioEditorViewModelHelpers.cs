@@ -1,127 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Media;
+using Editors.Audio.BnkCompiler;
 using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
-using Shared.Core.PackFiles;
+using static Editors.Audio.Presentation.AudioEditor.DynamicDataGrid;
+using static Editors.Audio.Presentation.AudioEditor.ViewModels.AudioEditorViewModel;
 
 namespace Editors.Audio.Presentation.AudioEditor
 {
     public class AudioEditorViewModelHelpers
     {
-        private readonly PackFileService _packFileService;
-        private readonly IAudioRepository _audioRepository;
+        public static Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithQualifiers { get; set; } = [];
 
-        public static Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithQualifiers { get; set; } = new Dictionary<string, List<string>>();
-
-        public AudioEditorViewModelHelpers(PackFileService packFileService, IAudioRepository audioRepository)
+        public AudioEditorViewModelHelpers()
         {
-            _packFileService = packFileService;
-            _audioRepository = audioRepository;
         }
 
-        public static DataGrid GetDataGrid()
+        public static void InitialiseEventData(AudioEditorViewModel viewModel)
         {
-            var mainWindow = Application.Current.MainWindow;
-            return FindVisualChild<DataGrid>(mainWindow, "AudioEditorDataGrid");
-        }
-
-        public static T FindVisualChild<T>(DependencyObject parent, string name) where T : DependencyObject
-        {
-            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            foreach (var dialogueEvent in viewModel.AudioProjectDialogueEvents)
             {
-                var child = VisualTreeHelper.GetChild(parent, i);
+                var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[dialogueEvent];
 
-                if (child is T typedChild && child is FrameworkElement element && element.Name == name)
-                    return typedChild;
+                var dataGridItems = new List<Dictionary<string, object>>();
+                var dataGridItem = new Dictionary<string, object>();
 
-                else
+                foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
                 {
-                    var foundChild = FindVisualChild<T>(child, name);
-
-                    if (foundChild != null)
-                        return foundChild;
+                    var stateGroupKey = AddExtraUnderScoresToStateGroup(stateGroupWithQualifier);
+                    dataGridItem[stateGroupKey] = "";
+                    dataGridItem["AudioFilesDisplay"] = "";
                 }
-            }
 
-            return null;
-        }
-
-        public static void ConfigureDataGrid(IAudioRepository audioRepository, string selectedEventName, ObservableCollection<Dictionary<string, string>> dataGridItems)
-        {
-            var dataGrid = GetDataGrid();
-
-            // DataGrid settings:
-            dataGrid.CanUserAddRows = false; // Setting this bastard to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF.
-            dataGrid.ItemsSource = dataGridItems;
-
-            // Clear existing items.
-            dataGrid.Columns.Clear();
-            dataGridItems.Clear();
-
-            var stateGroups = audioRepository.DialogueEventsWithStateGroups[selectedEventName];
-            var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[selectedEventName];
-
-            foreach (var (stateGroup, stateGroupWithQualifier) in stateGroups.Zip(stateGroupsWithQualifiers))
-            {
-                var column = new DataGridTemplateColumn
-                {
-                    Header = AddExtraUnderScoresToStateGroup(stateGroupWithQualifier),
-                    CellTemplate = CreateComboBoxTemplate(audioRepository, stateGroup, stateGroupWithQualifier) // Makes all cells use a ComboBox of the available States.
-                };
-
-                dataGrid.Columns.Add(column);
+                dataGridItems.Add(dataGridItem);
+                EventsData[dialogueEvent] = dataGridItems;
             }
         }
 
-        public static DataTemplate CreateComboBoxTemplate(IAudioRepository audioRepository, string stateGroup, string stateGroupWithQualifier)
+        public static void LoadEvent(AudioEditorViewModel viewModel, bool isLoadingAudioProject, IAudioRepository audioRepository)
         {
-            var template = new DataTemplate();
-            var factory = new FrameworkElementFactory(typeof(ComboBox));
-            var states = audioRepository.StateGroupsWithStates[stateGroup];
+            if (string.IsNullOrEmpty(AudioEditorData.Instance.SelectedAudioProjectEvent))
+                return;
 
-            var binding = new Binding($"[{stateGroupWithQualifier}]")
-            {
-                Mode = BindingMode.TwoWay,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            };
+            Debug.WriteLine($"Loading event: {AudioEditorData.Instance.SelectedAudioProjectEvent}");
 
-            // ComboBox settings.
-            factory.SetBinding(ComboBox.SelectedItemProperty, binding);
-            factory.SetValue(ComboBox.IsTextSearchEnabledProperty, true); // Enable text search.
-            factory.SetValue(ComboBox.IsEditableProperty, true); // Enable text search.
+            if (!isLoadingAudioProject)
+                UpdateEventDataWithPreviousEvent(viewModel);
 
-            // Create the Loaded event handler to initialize and attach the TextChanged event.
-            factory.AddHandler(ComboBox.LoadedEvent, new RoutedEventHandler((sender, args) =>
-            {
-                if (sender is ComboBox comboBox)
-                {
-                    comboBox.ItemsSource = states; // Set initial full list of States.
+            ConfigureDataGrid(viewModel, audioRepository);
 
-                    if (comboBox.Template.FindName("PART_EditableTextBox", comboBox) is TextBox textBox)
-                    {
-                        // TextChanged event for filtering items.
-                        textBox.TextChanged += (s, e) =>
-                        {
-                            var filterText = textBox.Text;
-                            var filteredItems = states.Where(item => item.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
-                            
-                            comboBox.ItemsSource = filteredItems; // Set filtered list of States.
-                            comboBox.IsDropDownOpen = true; // Keep the drop-down open to show filtered results.
-                        };
-                    }
-                }
-            }));
+            if (EventsData.ContainsKey(AudioEditorData.Instance.SelectedAudioProjectEvent))
 
-            template.VisualTree = factory;
+                foreach (var statePath in EventsData[AudioEditorData.Instance.SelectedAudioProjectEvent])
+                    viewModel.AudioEditorDataGridItems.Add(statePath);
+        }
 
-            return template;
+        public static void UpdateEventDataWithPreviousEvent(AudioEditorViewModel viewModel)
+        {
+            if (viewModel.AudioEditorDataGridItems == null)
+                return;
+
+            if (viewModel._previousSelectedAudioProjectEvent != null)
+                EventsData[viewModel._previousSelectedAudioProjectEvent] = new List<Dictionary<string, object>>(viewModel.AudioEditorDataGridItems);
+        }
+
+        public static void UpdateEventDataWithCurrentEvent(AudioEditorViewModel viewModel)
+        {
+            if (viewModel.AudioEditorDataGridItems == null)
+                return;
+
+            if (viewModel._selectedAudioProjectEvent != null)
+                EventsData[viewModel._selectedAudioProjectEvent] = new List<Dictionary<string, object>>(viewModel.AudioEditorDataGridItems);
         }
 
         public static void AddQualifiersToStateGroups(Dictionary<string, List<string>> dialogueEventsWithStateGroups)
@@ -168,12 +117,12 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public static string AddExtraUnderScoresToStateGroup(string stateGroupWithQualifier)
         {
-            return stateGroupWithQualifier.Replace("_", "__"); // Apparently WPF doesn't_like_underscores
+            return stateGroupWithQualifier.Replace("_", "__"); // Apparently WPF doesn't_like_underscores.
         }
 
         public static void UpdateAudioProjectEventSubType(AudioEditorViewModel viewModel)
         {
-            var audioProjectSettings = new AudioProjectSettings();
+            var audioProjectSettings = new AudioEditorSettings();
             viewModel.AudioProjectSubTypes.Clear();
 
             if (viewModel.SelectedAudioProjectEventType == "Non-VO")
@@ -192,34 +141,49 @@ namespace Editors.Audio.Presentation.AudioEditor
                 foreach (var item in audioProjectSettings.BattleVO)
                     viewModel.AudioProjectSubTypes.Add(item);
 
-            Debug.WriteLine($"AudioProjectSubTypes changed to: {string.Join(", ", viewModel.AudioProjectSubTypes)}");
+            Debug.WriteLine($"AudioProjectSubTypes changed to: {string.Join(", ", AudioEditorData.Instance.AudioProjectSubTypes)}");
         }
 
-        public static void CreateAudioProjectDialogueEventsListFromAudioProject(AudioEditorViewModel viewModel, Dictionary<string, List<Dictionary<string, string>>> eventData)
+        public static void CreateAudioProjectDialogueEventsListFromAudioProject(AudioEditorViewModel viewModel, Dictionary<string, List<Dictionary<string, object>>> eventData)
         {
             viewModel.AudioProjectDialogueEvents.Clear();
-            
+
             foreach (var dialogueEvent in eventData.Keys)
                 viewModel.AudioProjectDialogueEvents.Add(dialogueEvent);
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // STILL NEED TO FINISH THIS
         public static void CreateAudioProjectDialogueEventsList(AudioEditorViewModel viewModel)
         {
             viewModel.AudioProjectDialogueEvents.Clear();
 
-            if (viewModel.SelectedAudioProjectEventType == "Frontend VO" 
-                && viewModel.SelectedAudioProjectEventSubtype == "Lord" 
+            if (viewModel.SelectedAudioProjectEventType == "Frontend VO"
+                && viewModel.SelectedAudioProjectEventSubtype == "Lord"
                 && (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All || viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.Essential))
             {
-                AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioProjectSettings.FrontendVODialogueEventsAll);
+                AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioEditorSettings.FrontendVODialogueEventsAll);
             }
 
 
             if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Lord")
             {
                 if (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All)
-                    AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioProjectSettings.CampaignVODialogueEventsAll);
+                    AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioEditorSettings.CampaignVODialogueEventsAll);
 
                 else
                 {
@@ -230,7 +194,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Hero")
             {
                 if (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All)
-                    AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioProjectSettings.CampaignVODialogueEventsAll);
+                    AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioEditorSettings.CampaignVODialogueEventsAll);
 
                 else
                 {
@@ -243,12 +207,38 @@ namespace Editors.Audio.Presentation.AudioEditor
         {
             foreach (var dialogueEvent in displayData)
                 viewModel.AudioProjectDialogueEvents.Add(dialogueEvent);
-
-            Debug.WriteLine($"AudioProjectDialogueEvents changed to: {viewModel.AudioProjectDialogueEventsText.Value}");
         }
 
-        
+        public class DictionaryEqualityComparer<TKey, TValue> : IEqualityComparer<Dictionary<TKey, TValue>>
+        {
+            public static readonly DictionaryEqualityComparer<TKey, TValue> Default = new DictionaryEqualityComparer<TKey, TValue>();
 
+            public bool Equals(Dictionary<TKey, TValue> x, Dictionary<TKey, TValue> y)
+            {
+                // Check if dictionaries have the same number of elements
+                if (x.Count != y.Count)
+                    return false;
 
+                // Check each key-value pair
+                foreach (var kvp in x)
+                {
+                    if (!y.TryGetValue(kvp.Key, out var value) || !EqualityComparer<TValue>.Default.Equals(kvp.Value, value))
+                        return false;
+                }
+
+                return true;
+            }
+
+            public int GetHashCode(Dictionary<TKey, TValue> obj)
+            {
+                var hash = 17;
+                foreach (var kvp in obj)
+                {
+                    hash = hash * 31 + (kvp.Key?.GetHashCode() ?? 0);
+                    hash = hash * 31 + (kvp.Value?.GetHashCode() ?? 0);
+                }
+                return hash;
+            }
+        }
     }
 }

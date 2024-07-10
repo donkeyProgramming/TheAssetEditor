@@ -2,31 +2,31 @@
 
 namespace Editors.Audio.Presentation.AudioEditor
 {
-    public class AudioProjectSettings
+    public class AudioEditorSettings
     {
-        public List<string> EventType { get; set; } = new List<string>
-        {
+        public List<string> EventType { get; set; } =
+        [
             "Frontend VO",
             "Campaign VO",
             "Campaign Conversational VO",
             "Battle VO",
             "Battle Conversational VO",
             "Non-VO"
-        };
+        ];
 
-        public List<string> FrontendVO { get; set; } = new List<string>
-        {
+        public List<string> FrontendVO { get; set; } =
+        [
             "Lord"
-        };
+        ];
 
-        public List<string> CampaignVO { get; set; } = new List<string>
-        {
+        public List<string> CampaignVO { get; set; } =
+        [
             "Lord",
             "Hero"
-        };
+        ];
 
-        public List<string> BattleVO { get; set; } = new List<string>
-        {
+        public List<string> BattleVO { get; set; } =
+        [
             "Lord - Melee",
             "Lord - Skirmisher",
             "Lord - Caster",
@@ -38,10 +38,10 @@ namespace Editors.Audio.Presentation.AudioEditor
             "Unit - Cavalry",
             "Unit - SEM",
             "Unit - Artillery"
-        };
+        ];
 
-        public List<string> NonVO { get; set; } = new List<string>
-        {
+        public List<string> NonVO { get; set; } =
+        [
             "Ability",
             "CampaignAdvisor",
             "DiplomacyLine",
@@ -52,20 +52,20 @@ namespace Editors.Audio.Presentation.AudioEditor
             "Ritual",
             "UI",
             "Vocalisation"
-        };
+        ];
 
-        public static List<string> BattleIndividualMeleeAll { get; set; } = new List<string>
-        {
+        public static List<string> BattleIndividualMeleeAll { get; set; } =
+        [
             "Battle_Individual_Melee_Weapon_Hit"
-        };
+        ];
 
-        public static List<string> FrontendVODialogueEventsAll { get; set; } = new List<string>
-        {
+        public static List<string> FrontendVODialogueEventsAll { get; set; } =
+        [
             "frontend_vo_character_select"
-        };
+        ];
 
-        public static List<string> CampaignVODialogueEventsAll { get; set; } = new List<string>
-        {
+        public static List<string> CampaignVODialogueEventsAll { get; set; } =
+        [
             "campaign_vo_agent_action_failed",
             "campaign_vo_agent_action_success",
             "campaign_vo_attack",
@@ -120,10 +120,10 @@ namespace Editors.Audio.Presentation.AudioEditor
             "campaign_vo_yes_short_aggressive",
             "gotrek_felix_arrival",
             "gotrek_felix_departure"
-        };
+        ];
 
-        public static List<string> CampaignVOConversationalAll { get; set; } = new List<string>
-        {
+        public static List<string> CampaignVOConversationalAll { get; set; } =
+        [
             "Campaign_CS_Nur_Plague_Infect",
             "Campaign_CS_Nur_Plague_Summon_Cultist",
             "campaign_vo_cs_city_buildings_damaged",
@@ -192,10 +192,10 @@ namespace Editors.Audio.Presentation.AudioEditor
             "campaign_vo_cs_weather_cold",
             "campaign_vo_cs_weather_hot",
             "campaign_vo_cs_wef_daiths_forge"
-        };
+        ];
 
-        public static List<string> BattleVoDialogueEventsAll { get; set; } = new List<string>
-        {
+        public static List<string> BattleVoDialogueEventsAll { get; set; } =
+        [
             "battle_vo_order_attack",
             "battle_vo_order_attack_alternative",
             "battle_vo_order_bat_mode_capture_neg",
@@ -233,10 +233,10 @@ namespace Editors.Audio.Presentation.AudioEditor
             "battle_vo_order_special_ability",
             "battle_vo_order_withdraw",
             "battle_vo_order_withdraw_tactical"
-        };
+        ];
 
-        public static List<string> BattleVOConversationalAll { get; set; } = new List<string>
-        {
+        public static List<string> BattleVOConversationalAll { get; set; } =
+        [
             "battle_vo_conversation_allied_unit_routing",
             "battle_vo_conversation_clash",
             "battle_vo_conversation_def_own_army_murderous_prowess_100_percent",
@@ -290,6 +290,6 @@ namespace Editors.Audio.Presentation.AudioEditor
             "battle_vo_conversation_skv_own_unit_tactical_withdraw",
             "battle_vo_conversation_skv_own_unit_warpfire_artillery",
             "battle_vo_conversation_storm_of_magic",
-        };
+        ];
     }
 }
