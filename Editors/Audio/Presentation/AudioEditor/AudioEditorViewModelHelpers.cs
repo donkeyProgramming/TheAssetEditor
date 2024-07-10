@@ -141,7 +141,7 @@ namespace Editors.Audio.Presentation.AudioEditor
                 foreach (var item in audioProjectSettings.BattleVO)
                     viewModel.AudioProjectSubTypes.Add(item);
 
-            Debug.WriteLine($"AudioProjectSubTypes changed to: {string.Join(", ", AudioEditorData.Instance.AudioProjectSubTypes)}");
+            Debug.WriteLine($"AudioProjectSubTypes changed to: {string.Join(", ", viewModel.AudioProjectSubTypes)}");
         }
 
         public static void CreateAudioProjectDialogueEventsListFromAudioProject(AudioEditorViewModel viewModel, Dictionary<string, List<Dictionary<string, object>>> eventData)

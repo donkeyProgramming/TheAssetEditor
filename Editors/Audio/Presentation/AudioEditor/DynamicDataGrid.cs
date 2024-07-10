@@ -56,8 +56,8 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public static void ConfigureDataGrid(AudioEditorViewModel viewModel, IAudioRepository audioRepository)
         {
-            var audioEditorDataGridItems = AudioEditorData.Instance.AudioEditorDataGridItems;
-            var selectedAudioProjectEvent = AudioEditorData.Instance.SelectedAudioProjectEvent;
+            var audioEditorDataGridItems = viewModel.AudioEditorDataGridItems;
+            var selectedAudioProjectEvent = viewModel.SelectedAudioProjectEvent;
 
             var dataGrid = GetDataGrid();
 
