@@ -177,6 +177,12 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         {
             var fileName = Path.GetFileNameWithoutExtension(_selectedNode.Name);
             var extention = Path.GetExtension(_selectedNode.Name);
+            if (Path.GetExtension(fileName) != null)
+            {
+                var extraExtension = Path.GetExtension(fileName);
+                extention = extraExtension + extention;
+                fileName = Path.GetFileNameWithoutExtension(fileName);
+            }
             var newName = fileName + "_copy" + extention;
 
             var bytes = _selectedNode.Item.DataSource.ReadData();
