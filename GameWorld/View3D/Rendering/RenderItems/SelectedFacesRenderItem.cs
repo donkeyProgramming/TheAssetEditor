@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.Rendering.Shading;

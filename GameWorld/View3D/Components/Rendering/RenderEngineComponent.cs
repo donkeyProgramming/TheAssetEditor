@@ -146,6 +146,14 @@ namespace GameWorld.Core.Components.Rendering
             _renderItems[id].Add(item);
         }
 
+        public void AddRenderLines(RenderBuckedId id, VertexPositionColor[] lineVertices)
+        {
+            // Clean up line renders, they should all be stored here! 
+            // BoundingBoxRenderItem. Location, LineRenderItem
+            // Store one buffer for each renderbucket, set fixed buffers to speed stuff up?
+            _renderItems[id].Add(item);
+        }
+
         public override void Update(GameTime gameTime)
         {
             foreach (var value in _renderItems.Keys)

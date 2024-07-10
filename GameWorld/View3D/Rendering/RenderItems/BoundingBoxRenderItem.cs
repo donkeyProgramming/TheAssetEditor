@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.Components.Rendering;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
@@ -8,20 +9,23 @@ namespace GameWorld.Core.Rendering.RenderItems
 
     public class BoundingBoxRenderItem : IRenderItem
     {
-        Effect _shader;
+        private readonly Effect _shader;
+        private readonly ResourceLibrary _resourceLibrary;
         BoundingBox _bb;
         Color _colour;
 
-        public BoundingBoxRenderItem(Effect shader, BoundingBox bb)
+        public BoundingBoxRenderItem(ResourceLibrary resourceLibrary, BoundingBox bb)
         {
-            _shader = shader;
+            _resourceLibrary = resourceLibrary;
+            _shader = _resourceLibrary.GetStaticEffect(ShaderTypes.Line);
             _bb = bb;
             _colour = Color.Red;
         }
 
-        public BoundingBoxRenderItem(Effect shader, BoundingBox bb, Color colour)
+        public BoundingBoxRenderItem(ResourceLibrary resourceLibrary, BoundingBox bb, Color colour)
         {
-            _shader = shader;
+            _resourceLibrary = resourceLibrary;
+            _shader = _resourceLibrary.GetStaticEffect(ShaderTypes.Line);
             _bb = bb;
             _colour = colour;
         }

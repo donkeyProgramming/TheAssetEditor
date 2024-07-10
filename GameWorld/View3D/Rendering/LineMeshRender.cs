@@ -1,4 +1,5 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Components.Rendering;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Misc;
@@ -8,6 +9,14 @@ using System.Linq;
 
 namespace GameWorld.Core.Rendering
 {
+    public static class LineHelper
+    {
+        public static IRenderItem CreateLine();
+        public static IRenderItem CreateCube();
+        public static IRenderItem CreateGrid();
+        public static IRenderItem CreateBoundingBox();
+    }
+
     public class LineMeshRender : IDisposable
     {
         private List<VertexPositionColor> _originalVertices = [];

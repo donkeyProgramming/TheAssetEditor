@@ -170,7 +170,7 @@ namespace GameWorld.Core.SceneNodes
                 renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Material.PivotPoint, 1));
 
             if (DisplayBoundingBox)
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Geometry.BoundingBox));
+                renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLib, Geometry.BoundingBox));
         }
 
         public override ISceneNode CreateCopyInstance() => new Rmv2MeshNode();

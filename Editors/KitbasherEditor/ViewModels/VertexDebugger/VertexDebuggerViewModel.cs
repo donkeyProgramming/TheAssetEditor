@@ -109,7 +109,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
                 if (SelectedVertex != null)
                 {
                     var bb = BoundingBox.CreateFromSphere(new BoundingSphere(mesh.Geometry.GetVertexById(SelectedVertex.Id), 0.05f));
-                    _renderEngineComponent.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_lineShader, bb, Color.White));
+                    _renderEngineComponent.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLibary, bb, Color.White));
                 }
 
                 var vertexList = selection.SelectedVertices;
