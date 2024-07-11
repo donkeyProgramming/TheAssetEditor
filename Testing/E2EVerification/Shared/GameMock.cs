@@ -26,7 +26,7 @@ namespace E2EVerification.Shared
             // servies.AddService(typeof(GraphicsDevice), this);
             servies.AddService(typeof(IGraphicsDeviceService), test);
 
-            Content = new ContentManager(servies, "C:\\Users\\ole_k\\source\\repos\\TheAssetEditor\\GameWorld\\ContentProject\\BuiltContent");
+            Content = new ContentManager(servies, "C:\\Users\\Josh E\\source\\repos\\TheAssetEditor\\GameWorld\\ContentProject\\BuiltContent");
         }
 
         public T AddComponent<T>(T comp) where T : IGameComponent
