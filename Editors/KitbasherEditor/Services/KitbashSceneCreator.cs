@@ -3,7 +3,6 @@ using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Services.SceneSaving;
 using GameWorld.Core.Utility;
-using GameWorld.WpfWindow.ResourceHandling;
 using KitbasherEditor.ViewModels;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -19,7 +18,6 @@ namespace KitbasherEditor.Services
         private readonly PackFileService _packFileService;
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly ComplexMeshLoader _complexMeshLoader;
-        private readonly ResourceLibrary _resourceLibrary;
         private readonly SceneManager _sceneManager;
         private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
         private readonly GeometrySaveSettings _saveSettings;
@@ -27,7 +25,6 @@ namespace KitbasherEditor.Services
         public KitbashSceneCreator(
             KitbasherRootScene kitbasherRootScene,
             ComplexMeshLoader complexMeshLoader,
-            ResourceLibrary resourceLibrary,
             SceneManager sceneManager,
             PackFileService packFileService,
             Rmv2ModelNodeLoader rmv2ModelNodeLoader,
@@ -36,7 +33,6 @@ namespace KitbasherEditor.Services
             _packFileService = packFileService;
             _kitbasherRootScene = kitbasherRootScene;
             _complexMeshLoader = complexMeshLoader;
-            _resourceLibrary = resourceLibrary;
             _sceneManager = sceneManager;
             _rmv2ModelNodeLoader = rmv2ModelNodeLoader;
             _saveSettings = saveSettings;
@@ -44,7 +40,7 @@ namespace KitbasherEditor.Services
 
         public void CreateFromPackFile(PackFile file)
         {
-            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(_resourceLibrary, null) { IsLockable = false });
+            var skeletonNode = _sceneManager.RootNode.AddObject(new SkeletonNode(null) { IsLockable = false });
             var mainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(SpecialNodes.EditableModel, skeletonNode, _packFileService));
             _ = _sceneManager.RootNode.AddObject(new GroupNode(SpecialNodes.ReferenceMeshs) { IsEditable = false, IsLockable = false });
 

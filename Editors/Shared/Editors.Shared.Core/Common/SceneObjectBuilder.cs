@@ -47,7 +47,7 @@ namespace Editors.Shared.Core.Common
             var parentNode = rootNode.AddObject(new GroupNode(description));
 
             // Create skeleton
-            var skeletonSceneNode = new SkeletonNode(_resourceLibrary, instance.Skeleton);
+            var skeletonSceneNode = new SkeletonNode(instance.Skeleton);
             skeletonSceneNode.NodeColour = skeletonColour;
             parentNode.AddObject(skeletonSceneNode);
 

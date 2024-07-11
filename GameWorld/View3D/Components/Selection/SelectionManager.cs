@@ -24,7 +24,6 @@ namespace GameWorld.Core.Components.Selection
         BasicShader _wireframeEffect;
         BasicShader _selectedFacesEffect;
 
-        LineMeshRender _lineGeometry;
         VertexInstanceMesh _vertexRenderer;
         float _vertexSelectionFallof = 0;
         private readonly ResourceLibrary _resourceLib;
@@ -42,7 +41,6 @@ namespace GameWorld.Core.Components.Selection
         {
             CreateSelectionSate(GeometrySelectionMode.Object, null, false);
 
-            _lineGeometry = new LineMeshRender(_resourceLib);
             _vertexRenderer = new VertexInstanceMesh(_deviceResolverComponent, _resourceLib);
 
             _wireframeEffect = new BasicShader(_deviceResolverComponent.Device);
@@ -112,22 +110,18 @@ namespace GameWorld.Core.Components.Selection
         {
             var selectionState = GetState();
 
-            _lineGeometry.Clear();
             if (selectionState is ObjectSelectionState objectSelectionState)
             {
                 foreach (var item in objectSelectionState.CurrentSelection())
                 {
                     if (item is Rmv2MeshNode mesh)
-                    {
-                        _lineGeometry.AddBoundingBox(item.Geometry.BoundingBox);
-                        _renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { ModelMatrix = mesh.RenderMatrix, LineMesh = _lineGeometry });
-                    }
+                        _renderEngine.AddRenderLines(LineHelper.AddBoundingBox(item.Geometry.BoundingBox, Color.Black));
                 }
             }
 
             if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject is Rmv2MeshNode meshNode)
             {
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new SelectedFacesRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new PartialGeometryRenderItem(meshNode.Geometry, meshNode.RenderMatrix, _selectedFacesEffect, selectionFaceState.SelectedFaces));
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeometryRenderItem(meshNode.Geometry, _wireframeEffect, meshNode.RenderMatrix));
             }
 
@@ -157,8 +151,7 @@ namespace GameWorld.Core.Components.Selection
                         //_lineRenderer.AddLine(Vector3.Transform(currentBoneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
                         var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
                         bone.Decompose(out var _, out var _, out var trans);
-                        _lineGeometry.AddCube(Matrix.CreateScale(0.06f) * bone * renderMatrix * parentWorld, Color.Red);
-                        _renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineGeometry, ModelMatrix = Matrix.Identity });
+                        _renderEngine.AddRenderLines(LineHelper.CreateCube(Matrix.CreateScale(0.06f) * bone * renderMatrix * parentWorld, Color.Red));
                     }
                 }
             }
@@ -184,12 +177,6 @@ namespace GameWorld.Core.Components.Selection
             {
                 _vertexRenderer.Dispose();
                 _vertexRenderer = null;
-            }
-
-            if (_lineGeometry != null)
-            {
-                _lineGeometry.Dispose();
-                _lineGeometry = null;
             }
 
             _currentState?.Clear();

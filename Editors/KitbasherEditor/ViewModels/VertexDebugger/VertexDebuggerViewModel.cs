@@ -4,11 +4,8 @@ using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.Geometry;
-using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.Core.SceneNodes;
-using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
 using Shared.Ui.BaseDialogs.MathViews;
 
@@ -16,7 +13,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 {
     class VertexDebuggerViewModel : BaseComponent, IDisposable
     {
-        public ObservableCollection<VertexInstance> VertexList { get; set; } = new ObservableCollection<VertexInstance>();
+        public ObservableCollection<VertexInstance> VertexList { get; set; } = [];
 
         VertexInstance _selectedVertex;
         public VertexInstance SelectedVertex
@@ -32,21 +29,16 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
             set { SetAndNotify(ref _debugScale, value); }
         }
 
-        LineMeshRender _lineRenderer;
-        Effect _lineShader;
 
         private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly ResourceLibrary _resourceLibary;
         private readonly SelectionManager _selectionManager;
         private readonly EventHub _eventHub;
 
         public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent,
-            ResourceLibrary resourceLibary,
             SelectionManager selectionManager,
             EventHub eventHub)
         {
             _renderEngineComponent = renderEngineComponent;
-            _resourceLibary = resourceLibary;
             _selectionManager = selectionManager;
             _eventHub = eventHub;
 
@@ -55,11 +47,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 
         public override void Initialize()
         {
-            _lineShader = _resourceLibary.GetStaticEffect(ShaderTypes.Line);
-            _lineRenderer = new LineMeshRender(_resourceLibary);
-
             Refresh();
-            base.Initialize();
         }
 
         public void Refresh()
@@ -99,8 +87,6 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 
         public override void Draw(GameTime gameTime)
         {
-            _lineRenderer.Clear();
-
             var selection = _selectionManager.GetState<VertexSelectionState>();
             if (selection != null)
             {
@@ -109,28 +95,32 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
                 if (SelectedVertex != null)
                 {
                     var bb = BoundingBox.CreateFromSphere(new BoundingSphere(mesh.Geometry.GetVertexById(SelectedVertex.Id), 0.05f));
-                    _renderEngineComponent.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLibary, bb, Color.White));
+                    _renderEngineComponent.AddRenderLines(LineHelper.AddBoundingBox(bb, Color.Black));
                 }
 
+                var modelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.Material.PivotPoint);
                 var vertexList = selection.SelectedVertices;
                 foreach (var vertexIndex in vertexList)
                 {
                     var vertexInfo = mesh.Geometry.GetVertexExtented(vertexIndex);
                     var scale = (float)DebugScale.Value;
                     var pos = vertexInfo.Position3();
-                    _lineRenderer.AddLine(pos, pos + vertexInfo.Normal * scale, Color.Red);
-                    _lineRenderer.AddLine(pos, pos + vertexInfo.BiNormal * scale, Color.Green);
-                    _lineRenderer.AddLine(pos, pos + vertexInfo.Tangent * scale, Color.Blue);
-                }
 
-                _renderEngineComponent.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.Material.PivotPoint) });
+                    var transformedPos = Vector3.Transform(pos, modelMatrix);
+                    var transformedNormal = Vector3.Transform(pos + vertexInfo.Normal * scale, modelMatrix);
+                    var transformedBiNormal = Vector3.Transform(pos + vertexInfo.BiNormal * scale, modelMatrix);
+                    var transformedTangent = Vector3.Transform(pos + vertexInfo.Tangent * scale, modelMatrix);
+
+                    _renderEngineComponent.AddRenderLines(LineHelper.AddLine(transformedPos, transformedNormal , Color.Red));
+                    _renderEngineComponent.AddRenderLines(LineHelper.AddLine(transformedPos, transformedBiNormal, Color.Green));
+                    _renderEngineComponent.AddRenderLines(LineHelper.AddLine(transformedPos, transformedTangent, Color.Blue));
+                }
             }
         }
 
         public void Dispose()
         {
             _eventHub.UnRegister<SelectionChangedEvent>(OnSelectionChanged);
-            _lineRenderer.Dispose();
         }
 
         void OnSelectionChanged(SelectionChangedEvent notification) => Refresh();

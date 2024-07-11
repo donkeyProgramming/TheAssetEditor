@@ -4,6 +4,7 @@ using System.Linq;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Gizmo;
 using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.Core.Rendering.Shading;
@@ -167,10 +168,10 @@ namespace GameWorld.Core.SceneNodes
             renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeometryRenderItem(Geometry, Effect, modelWithOffset * parentWorld));
 
             if (DisplayPivotPoint)
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Material.PivotPoint, 1));
+                renderEngine.AddRenderLines(LineHelper.AddLocator(Material.PivotPoint, 1, Color.Red));
 
             if (DisplayBoundingBox)
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLib, Geometry.BoundingBox));
+                renderEngine.AddRenderLines(LineHelper.AddBoundingBox(Geometry.BoundingBox, Color.Red));
         }
 
         public override ISceneNode CreateCopyInstance() => new Rmv2MeshNode();

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Misc;
@@ -90,26 +89,26 @@ namespace GameWorld.Core.Rendering
             return output.ToArray();
         }
 
-        public static VertexPositionColor[] AddBoundingBox(BoundingBox b)
+        public static VertexPositionColor[] AddBoundingBox(BoundingBox b, Color color)
         {
             var output = new VertexPositionColor[24];
             var corners = b.GetCorners();
             var index = 0;
 
-            output[index++] = new VertexPositionColor(corners[0], Color.Black); output[index++] = new VertexPositionColor(corners[1], Color.Black);
-            output[index++] = new VertexPositionColor(corners[2], Color.Black); output[index++] = new VertexPositionColor(corners[3], Color.Black);
-            output[index++] = new VertexPositionColor(corners[0], Color.Black); output[index++] = new VertexPositionColor(corners[3], Color.Black);
-            output[index++] = new VertexPositionColor(corners[1], Color.Black); output[index++] = new VertexPositionColor(corners[2], Color.Black);
+            output[index++] = new VertexPositionColor(corners[0], color); output[index++] = new VertexPositionColor(corners[1], color);
+            output[index++] = new VertexPositionColor(corners[2], color); output[index++] = new VertexPositionColor(corners[3], color);
+            output[index++] = new VertexPositionColor(corners[0], color); output[index++] = new VertexPositionColor(corners[3], color);
+            output[index++] = new VertexPositionColor(corners[1], color); output[index++] = new VertexPositionColor(corners[2], color);
 
-            output[index++] = new VertexPositionColor(corners[4], Color.Black); output[index++] = new VertexPositionColor(corners[5] ,Color.Black);
-            output[index++] = new VertexPositionColor(corners[6], Color.Black); output[index++] = new VertexPositionColor(corners[7] ,Color.Black);
-            output[index++] = new VertexPositionColor(corners[4], Color.Black); output[index++] = new VertexPositionColor(corners[7] ,Color.Black);
-            output[index++] = new VertexPositionColor(corners[5], Color.Black); output[index++] = new VertexPositionColor(corners[6], Color.Black);
+            output[index++] = new VertexPositionColor(corners[4], color); output[index++] = new VertexPositionColor(corners[5], color);
+            output[index++] = new VertexPositionColor(corners[6], color); output[index++] = new VertexPositionColor(corners[7], color);
+            output[index++] = new VertexPositionColor(corners[4], color); output[index++] = new VertexPositionColor(corners[7], color);
+            output[index++] = new VertexPositionColor(corners[5], color); output[index++] = new VertexPositionColor(corners[6], color);
 
-            output[index++] = new VertexPositionColor(corners[0], Color.Black); output[index++] = new VertexPositionColor(corners[4] , Color.Black);
-            output[index++] = new VertexPositionColor(corners[1], Color.Black); output[index++] = new VertexPositionColor(corners[5] , Color.Black);
-            output[index++] = new VertexPositionColor(corners[2], Color.Black); output[index++] = new VertexPositionColor(corners[6] , Color.Black);
-            output[index++] = new VertexPositionColor(corners[3], Color.Black); output[index++] = new VertexPositionColor(corners[7], Color.Black);
+            output[index++] = new VertexPositionColor(corners[0], color); output[index++] = new VertexPositionColor(corners[4], color);
+            output[index++] = new VertexPositionColor(corners[1], color); output[index++] = new VertexPositionColor(corners[5], color);
+            output[index++] = new VertexPositionColor(corners[2], color); output[index++] = new VertexPositionColor(corners[6], color);
+            output[index++] = new VertexPositionColor(corners[3], color); output[index++] = new VertexPositionColor(corners[7], color);
 
             return output;
         }
@@ -213,7 +212,7 @@ namespace GameWorld.Core.Rendering
             return output.ToArray();
         }
 
-        public static void AddConeSplash(Vector3 startPos, Vector3 endPos, Matrix transformationM, float coneAngleDegrees, Color color, int steps = 30, int angleSteps = 60)
+        public static VertexPositionColor[] AddConeSplash(Vector3 startPos, Vector3 endPos, Matrix transformationM, float coneAngleDegrees, Color color, int steps = 30, int angleSteps = 60)
         {
             var output = new List<VertexPositionColor>();
             var halfAngle = MathHelper.ToRadians(coneAngleDegrees / 2);
@@ -257,9 +256,17 @@ namespace GameWorld.Core.Rendering
             output.AddRange(circles);
             return output.ToArray();
         }
+
+        public static VertexPositionColor[] AddLine(Vector3 pos0, Vector3 pos1, Color colour)
+        {
+            var output = new VertexPositionColor[2];
+            output[0] = new VertexPositionColor(pos0, colour);
+            output[1] = new VertexPositionColor(pos1, colour);
+            return output;
+        }
     }
 
-    public class LineMeshRender : IDisposable
+   /* public class LineMeshRender : IDisposable
     {
         private List<VertexPositionColor> _originalVertices = [];
         private readonly ResourceLibrary _resourceLibrary;
@@ -525,5 +532,5 @@ namespace GameWorld.Core.Rendering
         }
 
         public void Dispose() => Clear();
-    }
+    }*/
 }

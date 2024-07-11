@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameWorld.Core.Rendering.RenderItems
 {
-    public class TextRenderItem : IRenderItem
+    public class WorldTextRenderItem : IRenderItem
     {
         Vector3 _pos;
 
@@ -13,7 +13,7 @@ namespace GameWorld.Core.Rendering.RenderItems
         readonly string _text;
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
 
-        public TextRenderItem(ResourceLibrary resourceLib, string text, Vector3 pos)
+        public WorldTextRenderItem(ResourceLibrary resourceLib, string text, Vector3 pos)
         {
             _resourceLib = resourceLib;
             _text = text;

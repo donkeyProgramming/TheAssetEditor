@@ -1,10 +1,7 @@
 ﻿using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
-using GameWorld.Core.Rendering.RenderItems;
-using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
-using System;
 
 namespace GameWorld.Core.SceneNodes
 {
@@ -13,10 +10,8 @@ namespace GameWorld.Core.SceneNodes
         GameSkeleton Skeleton { get; }
     }
 
-    public class SkeletonNode : GroupNode, ISkeletonProvider, IDrawableItem, IDisposable
+    public class SkeletonNode : GroupNode, ISkeletonProvider, IDrawableItem
     {
-        LineMeshRender _lineRenderer;
-
         public Color NodeColour = Color.Black;
         public Color SelectedNodeColour = Color.Red;
         public Vector3 LineColour = new Vector3(0, 0, 0);
@@ -27,9 +22,8 @@ namespace GameWorld.Core.SceneNodes
 
         public GameSkeleton Skeleton { get; set; }
 
-        public SkeletonNode(ResourceLibrary resourceLibary, GameSkeleton skeleton, string name = "Skeleton") : base(name)
+        public SkeletonNode(GameSkeleton skeleton, string name = "Skeleton") : base(name)
         {
-            _lineRenderer = new LineMeshRender(resourceLibary);
             Skeleton = skeleton;
         }
 
@@ -43,7 +37,6 @@ namespace GameWorld.Core.SceneNodes
 
             if (IsVisible && Skeleton != null)
             {
-                _lineRenderer.Clear();
                 for (var i = 0; i < Skeleton.BoneCount; i++)
                 {
                     var scale = SkeletonScale;
@@ -55,18 +48,16 @@ namespace GameWorld.Core.SceneNodes
                     }
 
                     var boneMatrix = Skeleton.GetAnimatedWorldTranform(i);
-                    _lineRenderer.AddCube(Matrix.CreateScale(scale) * Matrix.CreateScale(0.05f) * boneMatrix * Matrix.CreateScale(ScaleMult) * parentWorld, drawColour);
+                    renderEngine.AddRenderLines(LineHelper.CreateCube(Matrix.CreateScale(scale) * Matrix.CreateScale(0.05f) * boneMatrix * Matrix.CreateScale(ScaleMult) * parentWorld, drawColour));
 
                     var parentIndex = Skeleton.GetParentBoneIndex(i);
                     if (parentIndex != -1)
                     {
                         var currentBoneMatrix = boneMatrix * Matrix.CreateScale(ScaleMult);
                         var parentBoneMatrix = Skeleton.GetAnimatedWorldTranform(parentIndex) * Matrix.CreateScale(ScaleMult);
-                        _lineRenderer.AddLine(Vector3.Transform(currentBoneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
+                        renderEngine.AddRenderLines(LineHelper.AddLine(Vector3.Transform(currentBoneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld), Color.Black));
                     }
                 }
-
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineRenderer, ModelMatrix = Matrix.Identity });
             }
         }
 
@@ -82,12 +73,6 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.SkeletonScale = SkeletonScale;
             typedTarget.Skeleton = Skeleton;
             base.CopyInto(target);
-        }
-
-        public void Dispose()
-        {
-            _lineRenderer.Dispose();
-            _lineRenderer = null;
         }
     }
 }

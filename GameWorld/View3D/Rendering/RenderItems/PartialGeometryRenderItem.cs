@@ -7,21 +7,27 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameWorld.Core.Rendering.RenderItems
 {
-    public class SelectedFacesRenderItem : IRenderItem
+    public class PartialGeometryRenderItem : IRenderItem
     {
-        public MeshObject Geometry { get; set; }
-        public IShader Shader { get; set; }
-        public Matrix ModelMatrix { get; set; }
+        private readonly MeshObject _geometry;
+        private readonly Matrix _modelMatrix;
+        private readonly IShader _shader;
+        private readonly List<int> _selectedFaces;
 
-        public List<int> Faces { get; set; }
-
+        public PartialGeometryRenderItem(MeshObject geometry, Matrix modelMatrix, IShader shader, List<int> selectedFaces)
+        {
+            _geometry = geometry;
+            _modelMatrix = modelMatrix;
+            _shader = shader;
+            _selectedFaces = selectedFaces;
+        }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
-            Shader.SetCommonParameters(parameters, ModelMatrix);
-            Shader.ApplyObjectParameters();
+           _shader.SetCommonParameters(parameters, _modelMatrix);
+            _shader.ApplyObjectParameters();
 
-            ApplyMeshPart(Shader, device, Faces, Geometry.GetGeometryContext());
+            ApplyMeshPart(_shader, device, _selectedFaces, _geometry.GetGeometryContext());
         }
 
         void ApplyMeshPart(IShader effect, GraphicsDevice device, List<int> faceSelection, IGraphicsCardGeometry geometry)
