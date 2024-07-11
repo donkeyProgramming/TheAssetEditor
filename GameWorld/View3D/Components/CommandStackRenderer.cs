@@ -38,7 +38,7 @@ namespace GameWorld.Core.Components
                     _animationStart = null;
 
                 var renderItem = new FontRenderItem(_resourceLibrary,_animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue));
-                _renderEngineComponent.AddRenderItem(RenderBuckedId.Text, renderItem);
+                _renderEngineComponent.AddRenderItem(RenderBuckedId.Font, renderItem);
             }
         }
 

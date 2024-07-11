@@ -51,7 +51,7 @@ namespace GameWorld.Core.Components
                 if (lerpValue >= 1)
                     _animationStart = null;
 
-                _renderEngineComponent.AddRenderItem(RenderBuckedId.Text, new FontRenderItem(_resourceLibrary, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue)));
+                _renderEngineComponent.AddRenderItem(RenderBuckedId.Font, new FontRenderItem(_resourceLibrary, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue)));
             }
 
             base.Draw(gameTime);

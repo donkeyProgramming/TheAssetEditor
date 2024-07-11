@@ -6,10 +6,9 @@ namespace GameWorld.Core.Components.Rendering
     public enum RenderBuckedId
     {
         Normal,
-        Glow,
         Wireframe,
         Selection,
-        Text,
+        Font,
     }
 
     public enum RenderingTechnique

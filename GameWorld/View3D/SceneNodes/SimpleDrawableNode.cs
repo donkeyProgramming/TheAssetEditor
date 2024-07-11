@@ -34,7 +34,7 @@ namespace GameWorld.Core.SceneNodes
             foreach (var item in _renderList)
             {
                 item.ModelMatrix = m;
-                renderEngine.AddRenderItem(RenderBuckedId.Text, item);
+                renderEngine.AddRenderItem(RenderBuckedId.Font, item);
             }
 
             for (var i = 0; i < _lineVertexList.Count; i += 2)

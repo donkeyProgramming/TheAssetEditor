@@ -16,6 +16,8 @@ namespace GameWorld.Core.Components.Rendering
 
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
+        Color _backgroundColour = new (54, 54, 54);
+
         private readonly Dictionary<RasterizerStateEnum, RasterizerState> _rasterStates = [];
         private readonly ArcBallCamera _camera;
         private readonly Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = [];
@@ -31,8 +33,8 @@ namespace GameWorld.Core.Components.Rendering
         private BloomFilter _bloomFilter;
         Texture2D _whiteTexture;
 
-        RenderTarget2D _screen;
-        RenderTarget2D _glow;
+        RenderTarget2D _defaultRenderTarget;
+        RenderTarget2D _glowRenderTarget;
 
         public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;  // This should be removed!
 
@@ -100,9 +102,11 @@ namespace GameWorld.Core.Components.Rendering
 
         public override void Draw(GameTime gameTime)
         {
+
             var device = _deviceResolverComponent.Device;
-            _screen = RenderTargetHelper.GetRenderTarget(device, _screen);
-            _glow = RenderTargetHelper.GetRenderTarget(device, _glow);
+
+            _defaultRenderTarget = RenderTargetHelper.GetRenderTarget(device, _defaultRenderTarget);
+            _glowRenderTarget = RenderTargetHelper.GetRenderTarget(device, _glowRenderTarget);
 
             var w = device.Viewport.Width;
             var h = device.Viewport.Height;
@@ -114,42 +118,65 @@ namespace GameWorld.Core.Components.Rendering
                 _bloomFilter.BloomPreset = BloomFilter.BloomPresets.SuperWide;
             }
 
-            var commonShaderParameters = new CommonShaderParameters()
-            {
-                Projection = _camera.ProjectionMatrix,
-                View = _camera.ViewMatrix,
-                CameraPosition = _camera.Position,
-                CameraLookAt = _camera.LookAt,
-                EnvLightRotationsRadians_Y = MathHelper.ToRadians(_sceneLightParameters.EnvLightRotationDegrees_Y),
-                DirLightRotationRadians_X = MathHelper.ToRadians(_sceneLightParameters.DirLightRotationDegrees_X),
-                DirLightRotationRadians_Y = MathHelper.ToRadians(_sceneLightParameters.DirLightRotationDegrees_Y),
-                LightIntensityMult = _sceneLightParameters.LightIntensityMult
-            };
+            var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters);
 
             // Configure render targets
             var backBufferRenderTarget = device.GetRenderTargets()[0];
-            var defaultRenderTarget = _screen;
+            var defaultRenderTarget = _defaultRenderTarget;
             device.SetRenderTarget(defaultRenderTarget);
 
             var spriteBatch = _resourceLib.CommonSpriteBatch;
 
             // 2D drawing
-            var clearColour = new Color(54, 54, 54);
-            spriteBatch.Begin();
-            spriteBatch.Draw(_whiteTexture, new Rectangle(0, 0, w, h), clearColour);
-            spriteBatch.End();
-
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-            foreach (var item in _renderItems[RenderBuckedId.Text])
+
+            spriteBatch.Draw(_whiteTexture, new Rectangle(0, 0, w, h), _backgroundColour);
+
+            foreach (var item in _renderItems[RenderBuckedId.Font])
                 item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
             spriteBatch.End();
 
             // 3D drawing - Lines
+
+
+
+
+
+
+            // 3D drawing - Normal scene
             device.DepthStencilState = DepthStencilState.Default;
+            Render3DObjects(commonShaderParameters, RenderingTechnique.Normal);
 
+            // TODO - dont draw emissive when in edit mode!
+            // 3D drawing - Emissive 
+            device.SetRenderTarget(_glowRenderTarget);
+            Render3DObjects(commonShaderParameters, RenderingTechnique.Emissive);
+
+            //foreach (var item in _renderItems[RenderBuckedId.Normal])
+            //    item.Draw(device, commonShaderParameters, RenderingTechnique.Emissive);
             
-             var shader = _resourceLib.GetStaticEffect(ShaderTypes.Line);
+            var bloomRenderTarget = _bloomFilter.Draw(_glowRenderTarget, w, h);
 
+            device.SetRenderTarget(backBufferRenderTarget.RenderTarget as RenderTarget2D);
+            spriteBatch.Begin();
+            spriteBatch.Draw(defaultRenderTarget, new Rectangle(0, 0, w, h), Color.White);
+            spriteBatch.End();
+
+          
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
+            spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, w, h), Color.White);
+            spriteBatch.End();
+        }
+
+        void Render3DObjects(CommonShaderParameters commonShaderParameters, RenderingTechnique renderingTechnique)
+        {
+            var device = _deviceResolverComponent.Device;
+
+            if (renderingTechnique == RenderingTechnique.Normal)
+            {
+                // This should be moved to a different class 
+
+                var shader = _resourceLib.GetStaticEffect(ShaderTypes.Line);
                 shader.Parameters["View"].SetValue(commonShaderParameters.View);
                 shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
                 shader.Parameters["World"].SetValue(Matrix.Identity);
@@ -157,48 +184,28 @@ namespace GameWorld.Core.Components.Rendering
                 foreach (var pass in shader.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                device.DrawUserPrimitives(PrimitiveType.LineList, _renderLines.ToArray(), 0, _renderLines.Count / 2);
+                    device.DrawUserPrimitives(PrimitiveType.LineList, _renderLines.ToArray(), 0, _renderLines.Count / 2);
                 }
-
-
-            // 3D drawing - Normal scene
+            }
 
             device.RasterizerState = _rasterStates[RasterizerStateEnum.Normal];
             foreach (var item in _renderItems[RenderBuckedId.Normal])
-                item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
+                item.Draw(device, commonShaderParameters, renderingTechnique);
 
             device.RasterizerState = _rasterStates[RasterizerStateEnum.Wireframe];
             foreach (var item in _renderItems[RenderBuckedId.Wireframe])
-                item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
+                item.Draw(device, commonShaderParameters, renderingTechnique);
 
             device.RasterizerState = _rasterStates[RasterizerStateEnum.SelectedFaces];
             foreach (var item in _renderItems[RenderBuckedId.Selection])
-                item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
-
-            // TODO - dont draw emissive when in edit mode!
-            // 3D drawing - Emissive 
-            var glowRenderTarget = _glow;
-            device.SetRenderTarget(glowRenderTarget);
-            foreach (var item in _renderItems[RenderBuckedId.Normal])
-                item.Draw(device, commonShaderParameters, RenderingTechnique.Emissive);
-            
-            var bloomRenderTarget = _bloomFilter.Draw(glowRenderTarget, w, h);
-
-            device.SetRenderTarget(backBufferRenderTarget.RenderTarget as RenderTarget2D);
-            spriteBatch.Begin();
-            spriteBatch.Draw(defaultRenderTarget, new Rectangle(0, 0, w, h), Color.White);
-            spriteBatch.End();
-          
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-            spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, w, h), Color.White);
-            spriteBatch.End();
+                item.Draw(device, commonShaderParameters, renderingTechnique);
         }
 
         public void Dispose()
         {
             _bloomFilter.Dispose();
-            _screen.Dispose();
-            _glow.Dispose();
+            _defaultRenderTarget.Dispose();
+            _glowRenderTarget.Dispose();
             _whiteTexture.Dispose();
 
             _renderLines.Clear();
