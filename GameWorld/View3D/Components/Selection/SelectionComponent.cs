@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Resources;
 using System.Windows.Forms;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Bone;
@@ -11,6 +12,7 @@ using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
@@ -20,29 +22,26 @@ namespace GameWorld.Core.Components.Selection
 {
     public class SelectionComponent : BaseComponent, IDisposable
     {
-        SpriteBatch _spriteBatch;
+        //SpriteBatch _spriteBatch;
         Texture2D _textTexture;
-
-        IKeyboardComponent _keyboardComponent;
-        IMouseComponent _mouseComponent;
-        ArcBallCamera _camera;
-
-        SelectionManager _selectionManager;
-
-        private readonly IDeviceResolver _deviceResolverComponent;
-        private readonly CommandFactory _commandFactory;
-        SceneManager _sceneManger;
-
-
         bool _isMouseDown = false;
         Vector2 _startDrag;
         Vector2 _currentMousePos;
+
+        private readonly IKeyboardComponent _keyboardComponent;
+        private readonly IMouseComponent _mouseComponent;
+        private readonly ArcBallCamera _camera;
+        private readonly SelectionManager _selectionManager;
+        private readonly IDeviceResolver _deviceResolverComponent;
+        private readonly CommandFactory _commandFactory;
+        private readonly SceneManager _sceneManger;
+        private readonly ResourceLibrary _resourceLibrary;
 
         public SelectionComponent(
             IMouseComponent mouseComponent, IKeyboardComponent keyboardComponent,
             ArcBallCamera camera, SelectionManager selectionManager,
             IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
-            SceneManager sceneManager)
+            SceneManager sceneManager, ResourceLibrary resourceLibrary)
         {
             _mouseComponent = mouseComponent;
             _keyboardComponent = keyboardComponent;
@@ -51,6 +50,7 @@ namespace GameWorld.Core.Components.Selection
             _deviceResolverComponent = deviceResolverComponent;
             _commandFactory = commandFactory;
             _sceneManger = sceneManager;
+            _resourceLibrary = resourceLibrary;
         }
 
         public override void Initialize()
@@ -58,7 +58,7 @@ namespace GameWorld.Core.Components.Selection
             UpdateOrder = (int)ComponentUpdateOrderEnum.SelectionComponent;
             DrawOrder = (int)ComponentDrawOrderEnum.SelectionComponent;
 
-            _spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
+            //_spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
             _textTexture = new Texture2D(_deviceResolverComponent.Device, 1, 1);
             _textTexture.SetData(new Color[1 * 1] { Color.White });
 
@@ -296,20 +296,20 @@ namespace GameWorld.Core.Components.Selection
         {
             if (_isMouseDown)
             {
-                var dest = CreateSelectionRectangle(_startDrag, _currentMousePos);
+                var destination = CreateSelectionRectangle(_startDrag, _currentMousePos);
                 var lineWidth = 2;
-                var top = new Rectangle(dest.X, dest.Y, dest.Width, lineWidth);
-                var bottom = new Rectangle(dest.X, dest.Y + dest.Height, dest.Width + 2, lineWidth);
-                var left = new Rectangle(dest.X, dest.Y, lineWidth, dest.Height);
-                var right = new Rectangle(dest.X + dest.Width, dest.Y, lineWidth, dest.Height);
+                var top = new Rectangle(destination.X, destination.Y, destination.Width, lineWidth);
+                var bottom = new Rectangle(destination.X, destination.Y + destination.Height, destination.Width + 2, lineWidth);
+                var left = new Rectangle(destination.X, destination.Y, lineWidth, destination.Height);
+                var right = new Rectangle(destination.X + destination.Width, destination.Y, lineWidth, destination.Height);
 
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-                _spriteBatch.Draw(_textTexture, dest, Color.White * 0.5f);
-                _spriteBatch.Draw(_textTexture, top, Color.Red * 0.75f);
-                _spriteBatch.Draw(_textTexture, bottom, Color.Red * 0.75f);
-                _spriteBatch.Draw(_textTexture, left, Color.Red * 0.75f);
-                _spriteBatch.Draw(_textTexture, right, Color.Red * 0.75f);
-                _spriteBatch.End();
+                _resourceLibrary.CommonSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+                _resourceLibrary.CommonSpriteBatch.Draw(_textTexture, destination, Color.White * 0.5f);
+                _resourceLibrary.CommonSpriteBatch.Draw(_textTexture, top, Color.Red * 0.75f);
+                _resourceLibrary.CommonSpriteBatch.Draw(_textTexture, bottom, Color.Red * 0.75f);
+                _resourceLibrary.CommonSpriteBatch.Draw(_textTexture, left, Color.Red * 0.75f);
+                _resourceLibrary.CommonSpriteBatch.Draw(_textTexture, right, Color.Red * 0.75f);
+                _resourceLibrary.CommonSpriteBatch.End();
             }
         }
 
@@ -335,7 +335,6 @@ namespace GameWorld.Core.Components.Selection
 
         public void Dispose()
         {
-            _spriteBatch.Dispose();
             _textTexture.Dispose();
         }
     }

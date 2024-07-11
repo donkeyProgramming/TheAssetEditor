@@ -120,7 +120,7 @@ namespace GameWorld.Core.Components.Selection
                     if (item is Rmv2MeshNode mesh)
                     {
                         _lineGeometry.AddBoundingBox(item.Geometry.BoundingBox);
-                        _renderEngine.AddRenderItem(RenderBuckedId.Selection, new LineRenderItem() { ModelMatrix = mesh.RenderMatrix, LineMesh = _lineGeometry });
+                        _renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { ModelMatrix = mesh.RenderMatrix, LineMesh = _lineGeometry });
                     }
                 }
             }
@@ -134,7 +134,7 @@ namespace GameWorld.Core.Components.Selection
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
                 var vertexObject = selectionVertexState.RenderObject as Rmv2MeshNode;
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, ModelMatrix = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = _vertexRenderer });
+                _renderEngine.AddRenderItem(RenderBuckedId.Normal, new VertexRenderItem() { Node = vertexObject, ModelMatrix = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = _vertexRenderer });
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeometryRenderItem(vertexObject.Geometry, _wireframeEffect, vertexObject.RenderMatrix));
             }
 
@@ -159,7 +159,6 @@ namespace GameWorld.Core.Components.Selection
                         bone.Decompose(out var _, out var _, out var trans);
                         _lineGeometry.AddCube(Matrix.CreateScale(0.06f) * bone * renderMatrix * parentWorld, Color.Red);
                         _renderEngine.AddRenderItem(RenderBuckedId.Normal, new LineRenderItem() { LineMesh = _lineGeometry, ModelMatrix = Matrix.Identity });
-
                     }
                 }
             }

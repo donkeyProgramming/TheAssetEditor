@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CommunityToolkit.Diagnostics;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
@@ -44,6 +45,7 @@ namespace GameWorld.Core.Components.Rendering
         private readonly Dictionary<RasterizerStateEnum, RasterizerState> _rasterStates = [];
         private readonly ArcBallCamera _camera;
         private readonly Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = [];
+        private readonly List<VertexPositionColor> _renderLines = [];
         private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
         private readonly ApplicationSettingsService _applicationSettingsService;
@@ -58,17 +60,20 @@ namespace GameWorld.Core.Components.Rendering
 
         public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneLightParametersStore sceneLightParametersStore)
         {
+            UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
+            DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
+
             _camera = camera;
             _resourceLib = resourceLib;
             _deviceResolverComponent = deviceResolverComponent;
             _applicationSettingsService = applicationSettingsService;
             _sceneLightParameters = sceneLightParametersStore;
 
-            UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
-            DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
-
             foreach (RenderBuckedId value in Enum.GetValues(typeof(RenderBuckedId)))
                 _renderItems.Add(value, new List<IRenderItem>(100));
+
+            _renderLines = new List<VertexPositionColor>(1000);
+            
 
             if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3 || _applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.ThreeKingdoms)
                 MainRenderFormat = RenderFormats.MetalRoughness;
@@ -146,12 +151,10 @@ namespace GameWorld.Core.Components.Rendering
             _renderItems[id].Add(item);
         }
 
-        public void AddRenderLines(RenderBuckedId id, VertexPositionColor[] lineVertices)
+        public void AddRenderLines(VertexPositionColor[] lineVertices)
         {
-            // Clean up line renders, they should all be stored here! 
-            // BoundingBoxRenderItem. Location, LineRenderItem
-            // Store one buffer for each renderbucket, set fixed buffers to speed stuff up?
-            _renderItems[id].Add(item);
+            Guard.IsTrue(lineVertices.Length % 2 == 0);
+            _renderLines.AddRange(lineVertices);
         }
 
         public override void Update(GameTime gameTime)
@@ -197,7 +200,6 @@ namespace GameWorld.Core.Components.Rendering
             return _glow;
         }
        
-
         public override void Draw(GameTime gameTime)
         {
             var w = _deviceResolverComponent.Device.Viewport.Width;
@@ -253,6 +255,7 @@ namespace GameWorld.Core.Components.Rendering
             foreach (var item in _renderItems[RenderBuckedId.Selection])
                 item.Draw(_deviceResolverComponent.Device, commonShaderParameters, RenderingTechnique.Normal);
 
+            // TODO - dont draw emissive when in edit mode!
             // 3D drawing - Emissive 
             var glowRenderTarget = GetGlowRenderTarget();
             _deviceResolverComponent.Device.SetRenderTarget(glowRenderTarget);
@@ -276,6 +279,7 @@ namespace GameWorld.Core.Components.Rendering
             _bloomFilter.Dispose();
             _screen.Dispose();
 
+            _renderLines.Clear();
             _renderItems.Clear();
             foreach (var item in _rasterStates.Values)
                 item.Dispose();
