@@ -20,13 +20,11 @@ namespace GameWorld.Core.Services
         private readonly ILogger _logger = Logging.Create<ComplexMeshLoader>();
         private readonly PackFileService _packFileService;
         private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
-        private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public ComplexMeshLoader(Rmv2ModelNodeLoader rmv2ModelNodeLoader, PackFileService packFileService, ApplicationSettingsService applicationSettingsService)
+        public ComplexMeshLoader(Rmv2ModelNodeLoader rmv2ModelNodeLoader, PackFileService packFileService)
         {
             _packFileService = packFileService;
             _rmv2ModelNodeLoader = rmv2ModelNodeLoader;
-            _applicationSettingsService = applicationSettingsService;
         }
 
         public SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player)
@@ -53,7 +51,7 @@ namespace GameWorld.Core.Services
                     break;
 
                 case ".rigid_model_v2":
-                    LoadRigidMesh(file, ref parent, player, attachmentPointName, false);
+                    LoadRigidMesh(file, ref parent, player, attachmentPointName);
                     break;
 
                 case ".wsmodel":
@@ -133,13 +131,12 @@ namespace GameWorld.Core.Services
             }
         }
 
-        Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName, bool isParentWsModel)
+        Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName)
         {
             var rmvModel = ModelFactory.Create().Load(file.DataSource.ReadData());
 
             var modelFullPath = _packFileService.GetFullPath(file);
             var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
-            var autoResolveTexture = isParentWsModel == false && _applicationSettingsService.CurrentSettings.AutoResolveMissingTextures;
             _rmv2ModelNodeLoader.CreateModelNodesFromFile(modelNode, rmvModel, player, modelFullPath);
 
             foreach (var mesh in modelNode.GetMeshNodes(0))
@@ -167,7 +164,7 @@ namespace GameWorld.Core.Services
             {
                 var modelFile = _packFileService.FindFile(wsMaterial.GeometryPath);
                 var modelAsBase = wsModelNode as SceneNode;
-                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player, attachmentPointName, true);
+                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player, attachmentPointName);
 
                 foreach (var materialNode in wsMaterial.MaterialList)
                 {

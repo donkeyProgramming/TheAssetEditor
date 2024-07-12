@@ -1,4 +1,6 @@
-﻿using GameWorld.Core.Animation;
+﻿using System;
+using System.IO;
+using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.Services;
@@ -8,8 +10,6 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
-using System;
-using System.IO;
 
 namespace GameWorld.Core.SceneNodes
 {
@@ -38,9 +38,7 @@ namespace GameWorld.Core.SceneNodes
             for (var lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
             {
                 if (lodIndex >= outputNode.Children.Count)
-                {
                     outputNode.AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex));
-                }
 
                 var lodNode = outputNode.Children[lodIndex];
                 for (var modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
@@ -48,12 +46,10 @@ namespace GameWorld.Core.SceneNodes
                     var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, _contextFactory.Create());
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
 
-                    //This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
-                    //from the model file path.
+                    // This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
+                    // from the model file path.
                     if (string.IsNullOrWhiteSpace(rmvModel.Material.ModelName))
-                    {
                         rmvModel.Material.ModelName = Path.GetFileNameWithoutExtension(modelFullPath);
-                    }
 
                     var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, _renderEngineComponent);
                     node.Initialize(_resourceLibrary);
@@ -72,7 +68,6 @@ namespace GameWorld.Core.SceneNodes
                         {
                             _logger.Here().Error($"Error while trying to resolve textures from WS model while loading model, {e.Message}");
                         }
-
                     }
 
                     lodNode.AddObject(node);
