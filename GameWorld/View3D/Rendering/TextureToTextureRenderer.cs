@@ -42,7 +42,7 @@ namespace GameWorld.Core.Rendering
             _device.Clear(Color.Transparent);
             _device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
 
-            var previewShader = _resourceLibary.GetEffect(ShaderTypes.TexturePreview);
+            var previewShader = _resourceLibary.GetStaticEffect(ShaderTypes.TexturePreview);
 
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
                     SamplerState.LinearClamp, DepthStencilState.Default,

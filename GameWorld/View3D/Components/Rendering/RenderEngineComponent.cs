@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommunityToolkit.Diagnostics;
+using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.Events;
 using Shared.Core.Services;
 
 namespace GameWorld.Core.Components.Rendering
 {
-    //https://github.com/Kosmonaut3d/BloomFilter-for-Monogame-and-XNA/blob/master/Bloom%20Sample/Game1.cs
-
-
-
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
         Color _backgroundColour = new (54, 54, 54);
@@ -24,11 +22,12 @@ namespace GameWorld.Core.Components.Rendering
         private readonly List<VertexPositionColor> _renderLines = [];
         private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
-        private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly SceneLightParametersStore _sceneLightParameters;
-
+        private readonly EventHub _eventHub;
+        
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
+        bool _drawGlow = true;
 
         private BloomFilter _bloomFilter;
         Texture2D _whiteTexture;
@@ -37,8 +36,8 @@ namespace GameWorld.Core.Components.Rendering
         RenderTarget2D _glowRenderTarget;
 
         public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;  // This should be removed!
-
-        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneLightParametersStore sceneLightParametersStore)
+      
+        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneLightParametersStore sceneLightParametersStore, EventHub eventHub)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
@@ -46,22 +45,37 @@ namespace GameWorld.Core.Components.Rendering
             _camera = camera;
             _resourceLib = resourceLib;
             _deviceResolverComponent = deviceResolverComponent;
-            _applicationSettingsService = applicationSettingsService;
             _sceneLightParameters = sceneLightParametersStore;
+            _eventHub = eventHub;
 
             foreach (RenderBuckedId value in Enum.GetValues(typeof(RenderBuckedId)))
                 _renderItems.Add(value, new List<IRenderItem>(100));
 
             _renderLines = new List<VertexPositionColor>(1000);
             
-            if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3 || _applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.ThreeKingdoms)
+            if (applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3 || applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.ThreeKingdoms)
                 MainRenderFormat = RenderFormats.MetalRoughness;
+
+            _eventHub.Register<SelectionChangedEvent>(OnSelectionChanged);
         }
 
+        void OnSelectionChanged(SelectionChangedEvent changedEvent)
+        {
+            if (changedEvent.NewState.Mode == GeometrySelectionMode.Object)
+                _drawGlow = true;
+            else
+                _drawGlow = false;
+        }
 
         public override void Initialize()
         {
             RebuildRasterStates(_cullingEnabled, _bigSceneDepthBiasMode);
+
+            var device = _deviceResolverComponent.Device;
+
+            _bloomFilter = new BloomFilter();
+            _bloomFilter.Load(device, _resourceLib, device.Viewport.Width, device.Viewport.Height);
+            _bloomFilter.BloomPreset = BloomFilter.BloomPresets.SuperWide;
 
             _whiteTexture = new Texture2D(_deviceResolverComponent.Device, 1, 1);
             _whiteTexture.SetData(new[] { Color.White });
@@ -102,80 +116,66 @@ namespace GameWorld.Core.Components.Rendering
 
         public override void Draw(GameTime gameTime)
         {
-
             var device = _deviceResolverComponent.Device;
+            var spriteBatch = _resourceLib.CommonSpriteBatch;
+            var screenWidth = device.Viewport.Width;
+            var screenHeight = device.Viewport.Height;
+            var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters);
 
             _defaultRenderTarget = RenderTargetHelper.GetRenderTarget(device, _defaultRenderTarget);
             _glowRenderTarget = RenderTargetHelper.GetRenderTarget(device, _glowRenderTarget);
 
-            var w = device.Viewport.Width;
-            var h = device.Viewport.Height;
-
-            if (_bloomFilter == null)
-            {
-                _bloomFilter = new BloomFilter();
-                _bloomFilter.Load(device, _resourceLib, w, h);
-                _bloomFilter.BloomPreset = BloomFilter.BloomPresets.SuperWide;
-            }
-
-            var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters);
-
             // Configure render targets
-            var backBufferRenderTarget = device.GetRenderTargets()[0];
-            var defaultRenderTarget = _defaultRenderTarget;
-            device.SetRenderTarget(defaultRenderTarget);
-
-            var spriteBatch = _resourceLib.CommonSpriteBatch;
+            var backBufferRenderTarget = device.GetRenderTargets()[0].RenderTarget as RenderTarget2D;
+            device.SetRenderTarget(_defaultRenderTarget);
 
             // 2D drawing
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-
-            spriteBatch.Draw(_whiteTexture, new Rectangle(0, 0, w, h), _backgroundColour);
-
-            foreach (var item in _renderItems[RenderBuckedId.Font])
-                item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
-            spriteBatch.End();
-
-            // 3D drawing - Lines
-
-
-
-
-
+            Render2DObjects(device, commonShaderParameters);
 
             // 3D drawing - Normal scene
             device.DepthStencilState = DepthStencilState.Default;
             Render3DObjects(commonShaderParameters, RenderingTechnique.Normal);
 
-            // TODO - dont draw emissive when in edit mode!
             // 3D drawing - Emissive 
             device.SetRenderTarget(_glowRenderTarget);
             Render3DObjects(commonShaderParameters, RenderingTechnique.Emissive);
 
-            //foreach (var item in _renderItems[RenderBuckedId.Normal])
-            //    item.Draw(device, commonShaderParameters, RenderingTechnique.Emissive);
-            
-            var bloomRenderTarget = _bloomFilter.Draw(_glowRenderTarget, w, h);
-
-            device.SetRenderTarget(backBufferRenderTarget.RenderTarget as RenderTarget2D);
+            // Draw the result to the backBuffer
+            device.SetRenderTarget(backBufferRenderTarget);
             spriteBatch.Begin();
-            spriteBatch.Draw(defaultRenderTarget, new Rectangle(0, 0, w, h), Color.White);
+            spriteBatch.Draw(_defaultRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
             spriteBatch.End();
 
-          
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-            spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, w, h), Color.White);
+            if (_drawGlow)
+            {
+                var bloomRenderTarget = _bloomFilter.Draw(_glowRenderTarget, screenWidth, screenHeight);
+                device.SetRenderTarget(backBufferRenderTarget);
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
+                spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
+                spriteBatch.End();
+            }
+        }
+
+        private void Render2DObjects(GraphicsDevice device, CommonShaderParameters commonShaderParameters)
+        {
+            var spriteBatch = _resourceLib.CommonSpriteBatch;
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+
+            // Clear the screen
+            spriteBatch.Draw(_whiteTexture, new Rectangle(0, 0, device.Viewport.Width, device.Viewport.Height), _backgroundColour);
+
+            foreach (var item in _renderItems[RenderBuckedId.Font])
+                item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
             spriteBatch.End();
         }
 
         void Render3DObjects(CommonShaderParameters commonShaderParameters, RenderingTechnique renderingTechnique)
         {
             var device = _deviceResolverComponent.Device;
+            device.RasterizerState = _rasterStates[RasterizerStateEnum.Normal];
 
             if (renderingTechnique == RenderingTechnique.Normal)
             {
-                // This should be moved to a different class 
-
                 var shader = _resourceLib.GetStaticEffect(ShaderTypes.Line);
                 shader.Parameters["View"].SetValue(commonShaderParameters.View);
                 shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
@@ -188,7 +188,6 @@ namespace GameWorld.Core.Components.Rendering
                 }
             }
 
-            device.RasterizerState = _rasterStates[RasterizerStateEnum.Normal];
             foreach (var item in _renderItems[RenderBuckedId.Normal])
                 item.Draw(device, commonShaderParameters, renderingTechnique);
 
@@ -203,6 +202,8 @@ namespace GameWorld.Core.Components.Rendering
 
         public void Dispose()
         {
+            _eventHub.UnRegister<SelectionChangedEvent>(OnSelectionChanged);
+
             _bloomFilter.Dispose();
             _defaultRenderTarget.Dispose();
             _glowRenderTarget.Dispose();

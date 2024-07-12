@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GameWorld.Core.Rendering
@@ -578,6 +572,9 @@ namespace GameWorld.Core.Rendering
         /// <param name="height">height of the image</param>
         public void UpdateResolution(int width, int height)
         {
+            if (width == 1 && height == 1)
+                return;
+
             _width = width;
             _height = height;
 

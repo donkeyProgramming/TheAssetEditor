@@ -25,7 +25,7 @@ namespace GameWorld.Core.Components.Selection
         BasicShader _selectedFacesEffect;
 
         VertexInstanceMesh _vertexRenderer;
-        float _vertexSelectionFallof = 0;
+        float _vertexSelectionFalloff = 0;
         private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
 
@@ -73,7 +73,7 @@ namespace GameWorld.Core.Components.Selection
                     break;
 
                 case GeometrySelectionMode.Vertex:
-                    _currentState = new VertexSelectionState(selectedObj, _vertexSelectionFallof);
+                    _currentState = new VertexSelectionState(selectedObj, _vertexSelectionFalloff);
                     break;
                 case GeometrySelectionMode.Bone:
                     _currentState = new BoneSelectionState(selectedObj);
@@ -185,10 +185,10 @@ namespace GameWorld.Core.Components.Selection
 
         public void UpdateVertexSelectionFallof(float newValue)
         {
-            _vertexSelectionFallof = Math.Clamp(newValue, 0, float.MaxValue);
+            _vertexSelectionFalloff = Math.Clamp(newValue, 0, float.MaxValue);
             var vertexSelectionState = GetState<VertexSelectionState>();
             if (vertexSelectionState != null)
-                vertexSelectionState.UpdateWeights(_vertexSelectionFallof);
+                vertexSelectionState.UpdateWeights(_vertexSelectionFalloff);
         }
     }
 }
