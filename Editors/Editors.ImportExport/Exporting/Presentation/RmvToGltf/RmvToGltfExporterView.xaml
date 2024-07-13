@@ -16,11 +16,32 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Some setting   " HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Export Textures" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
-        <CheckBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding SwapBlender, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        <CheckBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left"  IsChecked="{Binding ExportTextures, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Convert Material" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
+        <CheckBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" 
+                  IsEnabled="{Binding ExportTextures, UpdateSourceTrigger=PropertyChanged}" 
+                  IsChecked="{Binding ConvertMaterialTextureToBlender, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                  ToolTip="Convert the Material texture into the version Blender prefers"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Convert Normal" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
+        <CheckBox Grid.Row="2" Grid.Column="2" HorizontalAlignment="Left" 
+                  IsEnabled="{Binding ExportTextures, UpdateSourceTrigger=PropertyChanged}" 
+                  IsChecked="{Binding ConvertNormalTextureToBlue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                  ToolTip="Convert the normal map texture into blue version - used by a lot of software, including blender"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Export Animations   " HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="3" Grid.Column="1" Text=" : " VerticalAlignment="Center"/>
+        <CheckBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Left" IsChecked="{Binding ExportAnimations, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
     </Grid>
     
 </UserControl>
