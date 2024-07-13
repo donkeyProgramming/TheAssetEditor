@@ -21,7 +21,7 @@ namespace Editors.ImportExport.Exporting.Presentation
     public partial class ExporterCoreViewModel : ObservableObject
     {
         private readonly IEnumerable<IExporterViewModel> _exporterViewModels;
-        string _inputFileName = string.Empty;
+        PackFile? _inputFile;
 
         [ObservableProperty] IExporterViewModel? _selectedExporterViewModel;
         [ObservableProperty] ObservableCollection<IExporterViewModel> _possibleExporters = [];
@@ -36,7 +36,7 @@ namespace Editors.ImportExport.Exporting.Presentation
 
         public void Initialize(PackFile packFile)
         {
-            _inputFileName = packFile.Name;
+            _inputFile = packFile;
             foreach (var viewModel in _exporterViewModels)
             {
                 var supported = viewModel.CanExportFile(packFile);
@@ -52,14 +52,14 @@ namespace Editors.ImportExport.Exporting.Presentation
                 SelectedExporter = PossibleExporters.FirstOrDefault();
         }
 
-        public void Export() => SelectedExporter!.Execute(SystemPath, true);
+        public void Export() => SelectedExporter!.Execute(_inputFile, SystemPath, true);
 
         [RelayCommand]
         public void BrowsePathCommand()
         {
             var dlg = new Microsoft.Win32.SaveFileDialog
             {
-                FileName = Path.GetFileNameWithoutExtension(_inputFileName),
+                FileName = Path.GetFileNameWithoutExtension(_inputFile!.Name),
                 DefaultExt = SelectedExporter!.OutputExtension,
                 Filter = $"File ({SelectedExporter!.OutputExtension})|*{SelectedExporter!.OutputExtension}"
             };
