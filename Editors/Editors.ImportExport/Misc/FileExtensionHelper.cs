@@ -18,9 +18,14 @@ namespace Editors.ImportExport.Misc
 
         public static bool IsRmvFile(string fileName)
         {
-            var isDdsFile = IsDdsFile(fileName);
-            var isMaterialFile = fileName.Contains(".rigid_model_v2", StringComparison.InvariantCultureIgnoreCase);
-            return isDdsFile && isMaterialFile;
+            var isRmv = fileName.Contains(".rigid_model_v2", StringComparison.InvariantCultureIgnoreCase);
+            return isRmv;
+        }
+
+        public static bool IsWsModelFile(string fileName)
+        {
+            var isRmv = fileName.Contains(".wsmodel", StringComparison.InvariantCultureIgnoreCase);
+            return isRmv;
         }
     }
 }

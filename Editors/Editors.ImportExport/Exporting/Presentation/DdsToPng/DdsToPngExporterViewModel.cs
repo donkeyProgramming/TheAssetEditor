@@ -20,7 +20,7 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToPng
 
         public ExportSupportEnum CanExportFile(PackFile file) => _exporter.CanExportFile(file);
 
-        public void Execute(string outputPath, bool generateImporter)
+        public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
         {
             _exporter.Export(outputPath);
         }
