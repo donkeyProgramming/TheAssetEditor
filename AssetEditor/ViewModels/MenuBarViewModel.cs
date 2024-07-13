@@ -136,7 +136,7 @@ namespace AssetEditor.ViewModels
             OpenAudioExplorerCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioExplorerViewModel>());
             OpenAudioEditorCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>());
             CompileAudioCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>());
-            CreateTemplateCommand = new RelayCommand<string>(CreateAudioTemplate);
+            CreateAudioTemplateCommand = new RelayCommand<string>(CreateAudioTemplate);
 
             OpenAnimationKeyframeCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationKeyframeEditorViewModel>>());
             GenerateRmv2ReportCommand = new RelayCommand(() => _uiCommandFactory.Create<GenerateReportCommand>().Rmv2());
