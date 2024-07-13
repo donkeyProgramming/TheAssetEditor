@@ -26,7 +26,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         }
 
         List<string> _extentionFilter;
-        public int AutoExapandResultsAfterLimitedCount { get; set; } = 50;
+        public int AutoExapandResultsAfterLimitedCount { get; set; } = 25;
 
         public PackFileFilter(ObservableCollection<TreeNode> nodes)
         {

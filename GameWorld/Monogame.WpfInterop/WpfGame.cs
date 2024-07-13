@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using GameWorld.WpfWindow.Events;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
@@ -9,10 +10,22 @@ using Shared.Core.Events;
 
 namespace GameWorld.WpfWindow
 {
+    public interface IWpfGame
+    {
+        ContentManager Content { get; set; }
+        GraphicsDevice GraphicsDevice { get; }
+
+        void ForceEnsureCreated();
+        FrameworkElement GetFocusElement();
+
+        T AddComponent<T>(T comp) where T : IGameComponent;
+        void RemoveComponent<T>(T comp) where T : IGameComponent;
+    }
+
     /// <summary>
     /// The replacement for <see cref="Game"/>. Unlike <see cref="Game"/> the <see cref="WpfGame"/> is a WPF control and can be hosted inside WPF windows.
     /// </summary>
-    public class WpfGame : D3D11Host
+    public class WpfGame : D3D11Host, IWpfGame
     {
         WpfGraphicsDeviceService _deviceServiceHandle;
         private readonly ResourceLibrary _resourceLibrary;
@@ -22,6 +35,9 @@ namespace GameWorld.WpfWindow
         private ContentManager _content;
         private readonly List<IUpdateable> _sortedUpdateable;
         private readonly List<IDrawable> _sortedDrawable;
+
+
+        public FrameworkElement GetFocusElement() { return this; }
 
         /// <summary>
         /// Creates a new instance of a game host panel.

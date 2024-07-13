@@ -28,7 +28,7 @@ namespace AssetEditor
             _rootScope = _serviceProvider.CreateScope();
 
             // Init 3d world
-            var gameWorld = _rootScope.ServiceProvider.GetRequiredService<WpfGame>();
+            var gameWorld = _rootScope.ServiceProvider.GetRequiredService<IWpfGame>();
             gameWorld.ForceEnsureCreated();
 
             // Show the settings window if its the first time the tool is ran

@@ -69,7 +69,7 @@ namespace GameWorld.Core.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, RenderEngineComponent renderEngineComponent, PbrShader shader = null)
+        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, RenderEngineComponent renderEngineComponent, PbrShader shader = null )
         {
             CommonHeader = commonHeader;
             Material = material;
@@ -137,7 +137,7 @@ namespace GameWorld.Core.SceneNodes
             return null;
         }
 
-        public Vector3 GetObjectCenter()
+        public Vector3 GetObjectCentre()
         {
             return MathUtil.GetCenter(Geometry.BoundingBox) + Position;
         }
@@ -213,12 +213,12 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.Geometry = Geometry.Clone();
             typedTarget._resourceLib = _resourceLib;
             typedTarget._renderEngineComponent = _renderEngineComponent;
+            
             //warhammer 2 compat
             if (typedTarget.Effect != null)
-            {
                 typedTarget.Effect = Effect.Clone() as PbrShader_MetalRoughness;
-            }
             typedTarget.Geometry = Geometry.Clone();
+
             typedTarget.OriginalFilePath = OriginalFilePath;
             typedTarget.OriginalPartIndex = OriginalPartIndex;
             typedTarget.ScaleMult = ScaleMult;
@@ -248,7 +248,4 @@ namespace GameWorld.Core.SceneNodes
             return output;
         }
     }
-
-
-
 }

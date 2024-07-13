@@ -5,7 +5,7 @@ namespace Shared.Core.Misc
     [DebuggerDisplay("NotifyAttr [{Value}]")]
     public class NotifyAttr<T> : NotifyPropertyChangedImpl
     {
-        ValueChangedDelegate<T> _onValueChanged;
+        private readonly ValueChangedDelegate<T>? _onValueChanged;
         T _value;
         public T Value { get => _value; set => SetAndNotifyWhenChanged(ref _value, value, _onValueChanged); }
 

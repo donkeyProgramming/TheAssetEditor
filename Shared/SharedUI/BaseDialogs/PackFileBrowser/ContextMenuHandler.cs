@@ -38,7 +38,9 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         public ICommand DeleteCommand { get; set; }
         public ICommand SavePackFileCommand { get; set; }
         public ICommand CopyNodePathCommand { get; set; }
-        public ICommand ExportCommand { get; set; }
+        public ICommand ExportToFolderCommand { get; set; }
+        public ICommand AdvancedExportToFolderCommand { get; set; }
+        
         public ICommand CopyToEditablePackCommand { get; set; }
         public ICommand DuplicateCommand { get; set; }
         public ICommand CreateFolderCommand { get; set; }
@@ -55,12 +57,14 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         protected TreeNode _selectedNode;
         protected IToolFactory _toolFactory;
         private readonly IUiCommandFactory _uiCommandFactory;
+        protected readonly IExportFileContextMenuHelper _exportFileContextMenuHelper;
 
-        public ContextMenuHandler(PackFileService pf, IToolFactory toolFactory, IUiCommandFactory uiCommandFactory)
+        public ContextMenuHandler(PackFileService pf, IToolFactory toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper)
         {
             _packFileService = pf;
             _toolFactory = toolFactory;
             _uiCommandFactory = uiCommandFactory;
+            _exportFileContextMenuHelper = exportFileContextMenuHelper;
             RenameNodeCommand = new RelayCommand(OnRenameNode);
             AddFilesCommand = new RelayCommand(OnAddFilesCommand);
             Import3DFileCommand = new RelayCommand(OnImport3DModelCommand);
@@ -76,7 +80,9 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             SetAsEditabelPackCommand = new RelayCommand(SetAsEditabelPack);
             ExpandAllChildrenCommand = new RelayCommand(ExpandAllChildren);
             CollapseAllChildrenCommand = new RelayCommand(CollapsAllChildren);
-            ExportCommand = new RelayCommand(ExportToFolder);
+            ExportToFolderCommand = new RelayCommand(ExportToFolder);
+            AdvancedExportToFolderCommand = new RelayCommand(AdvancedExportToFolder);
+            
             OpenPack_FileNotpadPluss_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files (x86)\Notepad++\notepad++.exe", _selectedNode.Item));
             OpenPackFile_HxD_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\HxD\HxD.exe", _selectedNode.Item));
         }
@@ -169,17 +175,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         void DuplicateNode()
         {
-            var fileName = Path.GetFileNameWithoutExtension(_selectedNode.Name);
-            var extention = Path.GetExtension(_selectedNode.Name);
-            var newName = fileName + "_copy" + extention;
-
-            var bytes = _selectedNode.Item.DataSource.ReadData();
-            var packFile = new PackFile(newName, new MemorySource(bytes));
-
-            var parentPath = _selectedNode.GetFullPath();
-            var path = Path.GetDirectoryName(parentPath);
-
-            _packFileService.AddFileToPack(_selectedNode.FileOwner, path, packFile);
+            _uiCommandFactory.Create<DuplicateCommand>().Execute(_selectedNode.Item);
         }
 
         void CreateFolder()
@@ -324,6 +320,11 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             }
         }
 
+        void AdvancedExportToFolder()
+        {
+            _exportFileContextMenuHelper.ShowDialog(_selectedNode.Item);
+        }
+
         void SaveSelfAndChildren(TreeNode node, string outputDirectory, string rootPath, ref int fileCounter)
         {
             if (node.NodeType == NodeType.Directory)
@@ -438,8 +439,10 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     return new ContextMenuItem() { Name = "Collapse", Command = CollapseAllChildrenCommand }; ;
                 case ContextItems.CopyFullPath:
                     return new ContextMenuItem() { Name = "Copy full path", Command = CopyNodePathCommand };
-                case ContextItems.Export:
-                    return new ContextMenuItem() { Name = "Export to disk", Command = ExportCommand };
+                case ContextItems.ExportToFolder:
+                    return new ContextMenuItem() { Name = "Export to disk", Command = ExportToFolderCommand };
+                case ContextItems.AdvancedExport:
+                    return new ContextMenuItem() { Name = "Advanced Export", Command = AdvancedExportToFolderCommand };
                 case ContextItems.Rename:
                     return new ContextMenuItem() { Name = "Rename", Command = RenameNodeCommand }; ;
                 case ContextItems.SetAsEditabelPack:
@@ -478,7 +481,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             Expand,
             Collapse,
             CopyFullPath,
-            Export,
+            ExportToFolder,
+            AdvancedExport,
             Rename,
             SetAsEditabelPack,
 

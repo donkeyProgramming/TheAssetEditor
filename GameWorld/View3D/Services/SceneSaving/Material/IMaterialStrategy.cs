@@ -5,8 +5,9 @@ namespace GameWorld.Core.Services.SceneSaving.Material
     public enum MaterialStrategy
     {
         None,
+        WsModel_Pharaoh,
         WsModel_Warhammer2,
-        WsModel_Warhammer3
+        WsModel_Warhammer3,
     }
 
     public interface IMaterialStrategy

@@ -10,8 +10,8 @@ namespace GameWorld.Core.Utility
 
     public class DeviceResolver : IDeviceResolver
     {
-        private readonly WpfGame _scene;
-        public DeviceResolver(WpfGame game)
+        private readonly IWpfGame _scene;
+        public DeviceResolver(IWpfGame game)
         {
             _scene = game;
         }

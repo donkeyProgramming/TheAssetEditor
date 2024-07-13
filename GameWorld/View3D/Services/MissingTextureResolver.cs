@@ -33,14 +33,14 @@ namespace GameWorld.Core.Services
             var wsModelFile = pfs.FindFile(newPath);
             if (wsModelFile != null)
             {
-                var wsModel = new WsMaterial(wsModelFile);
+                var wsModel = new WsModelFile(wsModelFile);
                 var material = wsModel.MaterialList.FirstOrDefault(x => x.LodIndex == meshNode.LodIndex && x.PartIndex == meshNode.OriginalPartIndex);
                 if (material != null)
                 {
-                    var wsMaterialFile = pfs.FindFile(material.Material);
+                    var wsMaterialFile = pfs.FindFile(material.MaterialPath);
                     if (wsMaterialFile != null)
                     {
-                        var wsMaterialFileContent = new WsModelMaterialFile(wsMaterialFile, "");
+                        var wsMaterialFileContent = new WsModelMaterialFile(wsMaterialFile);
                         foreach (var wsModelTexture in wsMaterialFileContent.Textures)
                             UpdateTextureIfMissing(meshNode, pfs, wsModelTexture.Key, wsModelTexture.Value);
 

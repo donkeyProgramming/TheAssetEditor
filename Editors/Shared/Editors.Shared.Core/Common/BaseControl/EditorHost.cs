@@ -26,7 +26,7 @@ namespace Editors.Shared.Core.Common.BaseControl
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Name missing");
         public PackFile MainFile { get; set; }
 
-        public NotifyAttr<WpfGame> GameWorld { get; private set; } = new NotifyAttr<WpfGame>();
+        public NotifyAttr<IWpfGame> GameWorld { get; private set; } = new NotifyAttr<IWpfGame>();
         public ObservableCollection<SceneObjectViewModel> SceneObjects { get; set; } = new ObservableCollection<SceneObjectViewModel>();
         public AnimationPlayerViewModel Player { get; set; }
 
@@ -40,7 +40,7 @@ namespace Editors.Shared.Core.Common.BaseControl
         public EditorHost(IToolFactory toolFactory,
             IComponentInserter componentInserter,
             AnimationPlayerViewModel animationPlayerViewModel,
-            WpfGame gameWorld,
+            IWpfGame gameWorld,
             FocusSelectableObjectService focusSelectableObjectService,
             TEditor editor,
             EventHub eventHub)

@@ -25,7 +25,7 @@ namespace GameWorld.Core.Components.Selection
         BasicShader _selectedFacesEffect;
 
         LineMeshRender _lineGeometry;
-        VertexInstanceMesh VertexRenderer;
+        VertexInstanceMesh _vertexRenderer;
         float _vertexSelectionFallof = 0;
         private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
@@ -43,14 +43,14 @@ namespace GameWorld.Core.Components.Selection
             CreateSelectionSate(GeometrySelectionMode.Object, null, false);
 
             _lineGeometry = new LineMeshRender(_resourceLib);
-            VertexRenderer = new VertexInstanceMesh(_deviceResolverComponent, _resourceLib);
+            _vertexRenderer = new VertexInstanceMesh(_deviceResolverComponent, _resourceLib);
 
             _wireframeEffect = new BasicShader(_deviceResolverComponent.Device);
-            _wireframeEffect.DiffuseColor = Vector3.Zero;
+            _wireframeEffect.DiffuseColour = Vector3.Zero;
 
             _selectedFacesEffect = new BasicShader(_deviceResolverComponent.Device);
-            _selectedFacesEffect.DiffuseColor = new Vector3(1, 0, 0);
-            _selectedFacesEffect.SpecularColor = new Vector3(1, 0, 0);
+            _selectedFacesEffect.DiffuseColour = new Vector3(1, 0, 0);
+            _selectedFacesEffect.SpecularColour = new Vector3(1, 0, 0);
             _selectedFacesEffect.EnableDefaultLighting();
 
             base.Initialize();
@@ -134,7 +134,7 @@ namespace GameWorld.Core.Components.Selection
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
                 var vertexObject = selectionVertexState.RenderObject as Rmv2MeshNode;
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, ModelMatrix = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = VertexRenderer });
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, ModelMatrix = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = _vertexRenderer });
                 _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = vertexObject.RenderMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
             }
 
@@ -181,10 +181,10 @@ namespace GameWorld.Core.Components.Selection
                 _selectedFacesEffect = null;
             }
 
-            if (VertexRenderer != null)
+            if (_vertexRenderer != null)
             {
-                VertexRenderer.Dispose();
-                VertexRenderer = null;
+                _vertexRenderer.Dispose();
+                _vertexRenderer = null;
             }
 
             if (_lineGeometry != null)

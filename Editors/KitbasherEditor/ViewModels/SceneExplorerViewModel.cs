@@ -1,16 +1,14 @@
-﻿using GameWorld.Core.Commands;
+﻿using System.Collections.ObjectModel;
+using System.Windows.Input;
+using Editors.KitbasherEditor.ViewModels.SceneExplorer;
+using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using GameWorld.Core.Commands;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using Shared.Core.Events;
 using Shared.Core.Misc;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Input;
 
 namespace KitbasherEditor.ViewModels
 {
@@ -18,19 +16,23 @@ namespace KitbasherEditor.ViewModels
 
     public class SceneExplorerViewModel : NotifyPropertyChangedImpl
     {
-        SceneManager _sceneManager;
-        SelectionManager _selectionManager;
+        private readonly SceneManager _sceneManager;
+        private readonly SelectionManager _selectionManager;
         private readonly SceneNodeViewFactory _sceneNodeViewFactory;
         bool _ignoreSelectionChanges = false;
 
-        public ObservableCollection<ISceneNode> SceneGraphRootNodes { get; private set; } = new ObservableCollection<ISceneNode>();
-        public ObservableCollection<ISceneNode> SelectedObjects { get; private set; } = new ObservableCollection<ISceneNode>();
+        public ObservableCollection<ISceneNode> SceneGraphRootNodes { get; private set; } = new();
+        public ObservableCollection<ISceneNode> SelectedObjects { get; private set; } = new();
         public SceneExplorerContextMenuHandler ContextMenu { get; private set; }
 
-        ISceneNodeViewModel _selectedNodeViewModel;
-        public ISceneNodeViewModel SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
+        ISceneNodeViewModel? _selectedNodeViewModel;
+        public ISceneNodeViewModel? SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
 
-        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory, CommandExecutor commandExecutor, SelectionManager selectionManager, SceneManager sceneManager, CommandFactory commandFactory, EventHub eventHub)
+        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory, 
+            SelectionManager selectionManager, 
+            SceneManager sceneManager, 
+            CommandFactory commandFactory, 
+            EventHub eventHub)
         {
             _sceneNodeViewFactory = sceneNodeViewFactory;
             _sceneManager = sceneManager;
@@ -38,7 +40,7 @@ namespace KitbasherEditor.ViewModels
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
-            ContextMenu = new SceneExplorerContextMenuHandler(commandExecutor, _sceneManager, commandFactory);
+            ContextMenu = new SceneExplorerContextMenuHandler(_sceneManager, commandFactory);
             ContextMenu.SelectedNodesChanged += OnContextMenuActionChangingSelection;
 
             SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
@@ -58,7 +60,7 @@ namespace KitbasherEditor.ViewModels
                 SelectedObjects.Add(node);
         }
 
-        private void OnSceneExplorerSelectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void OnSceneExplorerSelectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             try
             {
@@ -131,10 +133,10 @@ namespace KitbasherEditor.ViewModels
                 _ignoreSelectionChanges = false;
             }
 
-            UpdateViewModelAndContextMenyBasedOnSelection();
+            UpdateViewAndContextMenu();
         }
 
-        void UpdateViewModelAndContextMenyBasedOnSelection()
+        void UpdateViewAndContextMenu()
         {
             if (SelectedNodeViewModel != null)
                 SelectedNodeViewModel.Dispose();
@@ -192,7 +194,7 @@ namespace KitbasherEditor.ViewModels
                 SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
             }
 
-            UpdateViewModelAndContextMenyBasedOnSelection();
+            UpdateViewAndContextMenu();
         }
     }
 }

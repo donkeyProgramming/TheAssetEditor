@@ -1,6 +1,5 @@
 ﻿using System;
 using GameWorld.Core.Commands;
-using GameWorld.Core.Components;
 using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
@@ -15,10 +14,10 @@ namespace GameWorld.Core.Components.Gizmo
 {
     public class GizmoComponent : BaseComponent, IDisposable
     {
-        private readonly MouseComponent _mouse;
+        private readonly IMouseComponent _mouse;
         private readonly EventHub _eventHub;
 
-        private readonly KeyboardComponent _keyboard;
+        private readonly IKeyboardComponent _keyboard;
         private readonly SelectionManager _selectionManager;
         private readonly CommandExecutor _commandManager;
         private readonly ArcBallCamera _camera;
@@ -32,7 +31,7 @@ namespace GameWorld.Core.Components.Gizmo
 
 
         public GizmoComponent(EventHub eventHub,
-            KeyboardComponent keyboardComponent, MouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
+            IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
             ResourceLibrary resourceLibary, IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
             SelectionManager selectionManager)
         {

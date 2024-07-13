@@ -460,13 +460,13 @@ namespace Shared.Core.PackFiles
         {
             if (GetEditablePack() == null)
             {
-                MessageBox.Show("Unable to complate operation, Editable packfile not set.", "Error");
+                MessageBox.Show("Unable to complete operation, Editable packfile not set.", "Error");
                 return false;
             }
             return true;
         }
 
-        public PackFileContainer GetPackFileContainer(PackFile file)
+        public PackFileContainer? GetPackFileContainer(PackFile file)
         {
             foreach (var pf in Database.PackFiles)
             {

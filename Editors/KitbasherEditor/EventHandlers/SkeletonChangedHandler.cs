@@ -7,11 +7,15 @@ namespace KitbasherEditor.EventHandlers
 {
     public class SkeletonChangedHandler
     {
-        SceneManager _sceneManager;
+        private readonly SceneManager _sceneManager;
 
-        public SkeletonChangedHandler( EventHub eventHub, SceneManager sceneManager)
+        public SkeletonChangedHandler(SceneManager sceneManager)
         {
             _sceneManager = sceneManager;
+        }
+
+        public void Subscribe(EventHub eventHub)
+        {
             eventHub.Register<KitbasherSkeletonChangedEvent>(OnSkeletonChanged);
         }
 

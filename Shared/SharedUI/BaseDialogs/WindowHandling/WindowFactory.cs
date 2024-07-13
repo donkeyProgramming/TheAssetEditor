@@ -8,9 +8,9 @@ namespace Shared.Ui.BaseDialogs.WindowHandling
     public class WindowFactory : IWindowFactory
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly WpfGame _wpfGame;
+        private readonly IWpfGame _wpfGame;
 
-        public WindowFactory(IServiceProvider serviceProvider, WpfGame wpfGame)
+        public WindowFactory(IServiceProvider serviceProvider, IWpfGame wpfGame)
         {
             _serviceProvider = serviceProvider;
             _wpfGame = wpfGame;

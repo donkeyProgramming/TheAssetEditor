@@ -1,11 +1,13 @@
-/*
-
+#ifndef TONE_MAPPING_HLSLI
+#define TONE_MAPPING_HLSLI
+/*s
 This shader experiments the effect of different tone mapping operators.
 This is still a work in progress.
 
 More info:
 http://slideshare.net/ozlael/hable-john-uncharted2-hdr-lighting
 http://filmicgames.com/archives/75
+
 http://filmicgames.com/archives/183
 http://filmicgames.com/archives/190
 http://imdoingitwrong.wordpress.com/2010/08/19/why-reinhard-desaturates-my-blacks-3/
@@ -114,3 +116,4 @@ float3 Uncharted2ToneMapping(float3 color)
     return color;
 }
 
+#endif // TONE_MAPPING_HLSLI

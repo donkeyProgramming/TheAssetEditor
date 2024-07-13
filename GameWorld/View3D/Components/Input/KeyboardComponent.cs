@@ -5,17 +5,23 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GameWorld.Core.Components.Input
 {
-    public delegate void KeybordButtonReleasedDelegate(Keys key);
-
-    public class KeyboardComponent : BaseComponent
+    public interface IKeyboardComponent : IGameComponent
     {
-        public event KeybordButtonReleasedDelegate KeyboardButtonReleased;
+        bool IsKeyComboReleased(Keys key, Keys modificationKey);
+        bool IsKeyDown(Keys key);
+        bool IsKeyDownOrReleased(Keys key);
+        bool IsKeyReleased(Keys key);
+        bool IsKeyUp(Keys key);
+        void Update(GameTime t);
+    }
 
+    public class KeyboardComponent : BaseComponent, IKeyboardComponent
+    {
         KeyboardState _currentKeyboardState;
         KeyboardState _lastKeyboardState;
         WpfKeyboard _wpfKeyboard;
 
-        public KeyboardComponent(WpfGame game)
+        public KeyboardComponent(IWpfGame game)
         {
             _wpfKeyboard = new WpfKeyboard(game);
             UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
@@ -30,12 +36,6 @@ namespace GameWorld.Core.Components.Input
 
             if (_lastKeyboardState == null)
                 _lastKeyboardState = keyboardState;
-
-            foreach (var key in _lastKeyboardState.GetPressedKeys())
-            {
-                if (IsKeyUp(key))
-                    KeyboardButtonReleased?.Invoke(key);
-            }
         }
 
         public bool IsKeyReleased(Keys key)

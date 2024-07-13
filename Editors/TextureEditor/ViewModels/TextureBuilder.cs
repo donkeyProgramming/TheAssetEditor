@@ -16,9 +16,9 @@ namespace Editors.TextureEditor.ViewModels
     {
         private readonly ResourceLibrary _resourceLib;
         private readonly TextureToTextureRenderer _textureRenderer;
-        private readonly WpfGame _wpfGame;
+        private readonly IWpfGame _wpfGame;
 
-        public TextureBuilder(ResourceLibrary resourceLibrary, WpfGame wpfGame)
+        public TextureBuilder(ResourceLibrary resourceLibrary, IWpfGame wpfGame)
         {
             _resourceLib = resourceLibrary;
             _wpfGame = wpfGame;

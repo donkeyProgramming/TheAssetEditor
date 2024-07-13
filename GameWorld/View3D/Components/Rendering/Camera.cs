@@ -10,10 +10,10 @@ namespace GameWorld.Core.Components.Rendering
     public class ArcBallCamera : BaseComponent, IDisposable
     {
         GraphicsDevice _graphicsDevice;
-        MouseComponent _mouse;
-        KeyboardComponent _keyboard;
+        private readonly IMouseComponent _mouse;
+        private readonly IKeyboardComponent _keyboard;
 
-        public ArcBallCamera(IDeviceResolver deviceResolverComponent, KeyboardComponent keyboardComponent, MouseComponent mouseComponent)
+        public ArcBallCamera(IDeviceResolver deviceResolverComponent, IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent)
         {
             Zoom = 10;
             Yaw = 0.8f;
@@ -185,7 +185,7 @@ namespace GameWorld.Core.Components.Rendering
             Update(_mouse, _keyboard);
         }
 
-        public void Update(MouseComponent mouse, KeyboardComponent keyboard)
+        public void Update(IMouseComponent mouse, IKeyboardComponent keyboard)
         {
             if (!mouse.IsMouseOwner(this))
                 return;

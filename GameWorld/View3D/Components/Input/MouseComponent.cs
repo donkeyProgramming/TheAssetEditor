@@ -14,7 +14,27 @@ namespace GameWorld.Core.Components.Input
         Right,
     }
 
-    public class MouseComponent : BaseComponent, IDisposable
+    public interface IMouseComponent : IGameComponent
+    {
+        int DeletaScrollWheel();
+        Vector2 DeltaPosition();
+        Vector2 Position();
+   
+        bool IsMouseButtonDown(MouseButton button);
+        bool IsMouseButtonPressed(MouseButton button);
+        bool IsMouseButtonReleased(MouseButton button);
+       
+        bool IsMouseOwner(IGameComponent component);
+        IGameComponent MouseOwner { get; set; }
+
+        void ClearStates();
+        MouseState State();
+        MouseState LastState();
+
+        void Update(GameTime t);
+    }
+
+    public class MouseComponent : BaseComponent, IDisposable, IMouseComponent
     {
         readonly ILogger _logger = Logging.Create<MouseComponent>();
 
@@ -42,10 +62,9 @@ namespace GameWorld.Core.Components.Input
             }
         }
 
-        public MouseComponent(WpfGame game)
+        public MouseComponent(IWpfGame game)
         {
-            _wpfMouse = new WpfMouse(game);
-            _wpfMouse.CaptureMouseWithin = true;
+            _wpfMouse = new WpfMouse(game, true);
             UpdateOrder = (int)ComponentUpdateOrderEnum.Input;
         }
 
@@ -115,12 +134,6 @@ namespace GameWorld.Core.Components.Input
         {
             var lastPos = new Vector2(_lastMousesState.X, _lastMousesState.Y);
             return lastPos - Position();
-        }
-
-        public float DeltaPositionLength()
-        {
-            var lastPos = new Vector2(_lastMousesState.X, _lastMousesState.Y).Length();
-            return lastPos - Position().Length();
         }
 
         public int DeletaScrollWheel()

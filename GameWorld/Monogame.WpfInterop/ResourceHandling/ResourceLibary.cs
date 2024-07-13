@@ -25,7 +25,7 @@ namespace GameWorld.WpfWindow.ResourceHandling
         private readonly Dictionary<ShaderTypes, Effect> _cachedShaders = new();
 
         private readonly PackFileService _pfs;
-        private WpfGame _gameWorld;
+        private IWpfGame _gameWorld;
         private bool _isInitialized = false;
 
         public SpriteBatch CommonSpriteBatch { get; private set; }
@@ -42,7 +42,7 @@ namespace GameWorld.WpfWindow.ResourceHandling
 
         public SpriteFont LoadFont(string path) => _gameWorld.Content.Load<SpriteFont>(path);
 
-        public void Initialize(WpfGame game)
+        public void Initialize(IWpfGame game)
         {
             if (_isInitialized)
                 return;

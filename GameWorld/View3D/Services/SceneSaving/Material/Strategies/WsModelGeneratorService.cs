@@ -20,7 +20,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
     {
         private readonly ILogger _logger = Logging.Create<WsModelGeneratorService>();
         private readonly PackFileService _packFileService;
-        private readonly List<WsModelMaterialFile> _existingMaterials;
+        private readonly Dictionary<string, WsModelMaterialFile> _existingMaterials;
 
         private static readonly Dictionary<string, TextureType> TemplateStringToTextureTypes = new()
         {
@@ -50,13 +50,14 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
                 }
 
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
+
                 var materialTemplate = game switch
                 {
                     GameTypeEnum.Warhammer3 => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_wh3.xml.material"),
                     GameTypeEnum.Warhammer2 => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_wh2.xml.material"),
+                    GameTypeEnum.Pharaoh => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_pharaoh.xml.material"),
                     _ => throw new Exception("Unknown game - unable to generate ws model")
                 };
-
                 var wsModelData = CreateWsModel(mainNode, game, modelFilePath, materialTemplate);
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
                 SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile, Encoding.UTF8.GetBytes(wsModelData));
@@ -104,6 +105,14 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             foreach (var mesh in meshes)
             {
                 var fileName = mesh.Name;
+                var modelFullPath = mesh.OriginalFilePath;
+                //if mesh name is blank, grab a mesh name from the file path, so far the only
+                //total war with this issue appears to be Pharaoh.
+                if (String.IsNullOrWhiteSpace(fileName))
+                {
+                    modelFullPath = Path.GetFileNameWithoutExtension(fileName);
+                }
+
                 for (var index = 0; index < 1024; index++)
                 {
                     var name = index == 0 ? fileName : string.Format("{0}_{1}", fileName, index);
@@ -125,20 +134,22 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             uniqueName = uniqueName.Trim();
             var materialFileName = FindApplicableExistingMaterial(game, mesh);
             if (materialFileName == null)
-                materialFileName = CreateNewMaterial(modelFilePath, mesh, uniqueName, materialTemplate);
+                materialFileName = CreateNewMaterial(modelFilePath, mesh, uniqueName, materialTemplate, game);
             return materialFileName;
         }
 
-        string CreateNewMaterial(string modelFilePath, Rmv2MeshNode mesh, string uniqueName, string materialTemplate)
+        string CreateNewMaterial(string modelFilePath, Rmv2MeshNode mesh, string uniqueName, string materialTemplate, GameTypeEnum game)
         {
             var vertexType = ModelMaterialEnumHelper.GetToolVertexFormat(mesh.Material.BinaryVertexFormat);
             var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
 
-            var shaderNamePart = vertexType switch
+            var shaderNamePart = (vertexType, game) switch
             {
-                UiVertexFormat.Cinematic => "weighted4",
-                UiVertexFormat.Weighted => "weighted2",
-                UiVertexFormat.Static => "rigid",
+                (UiVertexFormat.Cinematic, GameTypeEnum.Pharaoh) => "weighted_standard_4",
+                (UiVertexFormat.Weighted, GameTypeEnum.Pharaoh) => "weighted_standard_2",
+                (UiVertexFormat.Static, _) => "rigid",
+                (UiVertexFormat.Cinematic, _) when game != GameTypeEnum.Pharaoh => "weighted4",
+                (UiVertexFormat.Weighted, _) when game != GameTypeEnum.Pharaoh => "weighted2",
                 _ => throw new Exception("Unknown vertex type")
             };
 
@@ -146,7 +157,16 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             var shaderAlphaStr = "";
             if (alphaOn)
                 shaderAlphaStr = "_alpha";
-            var shaderName = $"shaders/{shaderNamePart}_character{shaderAlphaStr}.xml.shader";
+            var shaderName = "";
+            if (game != GameTypeEnum.Pharaoh)
+            {
+                shaderName = $"shaders/{shaderNamePart}_character{shaderAlphaStr}.xml.shader";
+            }
+            else
+            {
+                shaderName = $"shaders/system/{shaderNamePart}.xml.shader";
+
+            }
             materialTemplate = materialTemplate.Replace("SHADER_PATH", shaderName);
 
             // Update the textures
@@ -163,7 +183,16 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             }
 
             // Save the new file
-            var fileName = uniqueName + "_" + shaderNamePart + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
+            var fileName = "";
+            if (game != GameTypeEnum.Pharaoh)
+            {
+                fileName = uniqueName + "_" + shaderNamePart + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
+            }
+            else
+            {
+                fileName = uniqueName + "_" + shaderNamePart + ".xml";
+            }
+
             materialTemplate = materialTemplate.Replace("FILE_NAME", fileName);
 
             var dir = Path.GetDirectoryName(modelFilePath);
@@ -177,9 +206,9 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
         {
             foreach (var material in _existingMaterials)
             {
-                var isMatch = IsMaterialMatch(game, mesh, material);
+                var isMatch = IsMaterialMatch(game, mesh, material.Value);
                 if (isMatch)
-                    return material.FullPath;
+                    return material.Key;
             }
 
             return null;
@@ -232,17 +261,16 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             return true;
         }
 
-        List<WsModelMaterialFile> LoadAllExistingMaterials()
+        Dictionary<string, WsModelMaterialFile> LoadAllExistingMaterials()
         {
             var materialPacks = _packFileService.FindAllWithExtentionIncludePaths(".material");
             materialPacks = materialPacks.Where(x => x.Item2.Name.Contains(".xml.material")).ToList();
-            var materialList = new List<WsModelMaterialFile>();
+            var materialList = new Dictionary<string,WsModelMaterialFile>();
             foreach (var materialPack in materialPacks)
             {
                 try
                 {
-                    var material = new WsModelMaterialFile(materialPack.Item2, materialPack.Item1);
-                    materialList.Add(material);
+                    materialList[materialPack.FileName] = new WsModelMaterialFile(materialPack.Pack);
                 }
                 catch (Exception e)
                 {

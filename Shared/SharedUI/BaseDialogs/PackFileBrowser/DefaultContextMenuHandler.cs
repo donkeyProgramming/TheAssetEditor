@@ -1,18 +1,18 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.ToolCreation;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
+
     public class DefaultContextMenuHandler : ContextMenuHandler
     {
-        public DefaultContextMenuHandler(PackFileService service, IToolFactory toolFactory, IUiCommandFactory uiCommandFactory) : base(service, toolFactory, uiCommandFactory)
-        { }
+        public DefaultContextMenuHandler(PackFileService service, IToolFactory toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper) 
+            : base(service, toolFactory, uiCommandFactory, exportFileContextMenuHelper)
+        {
+
+        }
 
         public override void Create(TreeNode node)
         {
@@ -89,7 +89,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 }
                 Additem(ContextItems.Expand, newContextMenu);
                 Additem(ContextItems.Collapse, newContextMenu);
-                Additem(ContextItems.Export, newContextMenu);
+                Additem(ContextItems.ExportToFolder, newContextMenu);
             }
 
             if (node.NodeType == NodeType.File)
@@ -106,7 +106,9 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
                 }
                 Additem(ContextItems.CopyFullPath, newContextMenu);
-                Additem(ContextItems.Export, newContextMenu);
+                Additem(ContextItems.ExportToFolder, newContextMenu);
+                if(_exportFileContextMenuHelper.CanExportFile(node.Item))
+                    Additem(ContextItems.AdvancedExport, newContextMenu);
                 AddSeperator(newContextMenu);
 
                 var openFolder = Additem(ContextItems.Open, newContextMenu);

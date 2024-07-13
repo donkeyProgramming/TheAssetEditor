@@ -14,8 +14,8 @@ namespace AssetEditor.Services
 
         public DependencyInjectionConfig(bool loadResources = true)
         {
-            _dependencyContainers = new DependencyContainer[]
-            {
+            _dependencyContainers =
+            [
                 // Shared
                 new Shared.Core.DependencyInjectionContainer(),
                 new Shared.Ui.DependencyInjectionContainer(),
@@ -41,15 +41,17 @@ namespace AssetEditor.Services
 
                 // Host application
                 new DependencyInjectionContainer(),
-            };
+            ];
         }
 
-        public IServiceProvider Build()
+        public IServiceProvider Build(Action<IServiceCollection> replaceServices = null)
         {
             var host = Host.CreateDefaultBuilder()
-                .ConfigureServices(ConfigureServices)
+                .ConfigureServices(x=> ConfigureServices(x, replaceServices))
                 .UseDefaultServiceProvider(ConfigureServiceOptions)
                 .Build();
+
+            
 
             RegisterTools(host.Services.GetService<IToolFactory>());
             return host.Services;
@@ -64,12 +66,14 @@ namespace AssetEditor.Services
             }
         }
 
-        private void ConfigureServices(IServiceCollection services)
+        private void ConfigureServices(IServiceCollection services, Action<IServiceCollection> replaceServices)
         {
             Logging.Configure(Serilog.Events.LogEventLevel.Information);
 
             foreach (var container in _dependencyContainers)
                 container.Register(services);
+
+            replaceServices?.Invoke(services);
         }
 
         void RegisterTools(IToolFactory factory)

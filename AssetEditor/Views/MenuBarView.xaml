@@ -61,6 +61,7 @@
                 <MenuItem Header="Meta Data" Command="{Binding MenuBar.GenerateMetaDataReportCommand}"/>
                 <MenuItem Header="File List" Command="{Binding MenuBar.GenerateFileListReportCommand}"/>
                 <MenuItem Header="Meta Jsons" Command="{Binding MenuBar.GenerateMetaDataJsonsReportCommand}"/>
+                <MenuItem Header="Materials" Command="{Binding MenuBar.GenerateMaterialReportCommand}"/>
                 <Separator/>
                 <MenuItem Header="Search" Command="{Binding MenuBar.SearchCommand}"/>
                 <Separator/>

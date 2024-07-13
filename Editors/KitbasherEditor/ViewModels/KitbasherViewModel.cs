@@ -1,12 +1,17 @@
 ﻿using System.IO;
+using System.Windows;
+using GameWorld.Core.Components;
 using GameWorld.Core.Services;
-using GameWorld.Core.Services.SceneSaving;
 using GameWorld.WpfWindow;
+using KitbasherEditor.EventHandlers;
+using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using Shared.Core.DependencyInjection;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;
 using Shared.Core.Misc;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
@@ -14,45 +19,73 @@ using Shared.Ui.Common;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IEditorScopeResolverHint, ISaveableEditor,
+    public class KitbasherViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ISaveableEditor,
         IDropTarget<TreeNode>
     {
-        private readonly KitbasherRootScene _kitbasherRootScene;
+        private readonly ILogger _logger = Logging.Create<KitbasherViewModel>();
+
         private readonly KitbashViewDropHandler _dropHandler;
-        private readonly SaveSettings _saveSettings;
+        private readonly PackFileService _pfs;
+        private readonly KitbashSceneCreator _kitbashSceneCreator;
+        private readonly FocusSelectableObjectService _focusSelectableObjectComponent;
 
-        public Type GetScopeResolverType { get => typeof(IScopeHelper<KitbasherViewModel>); }
-
-        public WpfGame Scene { get; set; }
+        public IWpfGame Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
         public MenuBarViewModel MenuBar { get; set; }
         public AnimationControllerViewModel Animation { get; set; }
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("3D Viewer");
 
-        public PackFile MainFile { get; set; }
+        PackFile _mainFile;
+        public PackFile MainFile { get => _mainFile; set { _mainFile = value; LoadScene(value); }  }
+
         private bool _hasUnsavedChanges;
 
         public KitbasherViewModel(
-            KitbasherRootScene kitbasherRootScene,
             EventHub eventHub,
-            WpfGame gameWorld,
+            IWpfGame gameWorld,
             MenuBarViewModel menuBarViewModel,
             AnimationControllerViewModel animationControllerViewModel,
             SceneExplorerViewModel sceneExplorerViewModel,
             KitbashViewDropHandler dropHandler,
-            SaveSettings saveSettings)
+            PackFileService pfs,
+            KitbashSceneCreator kitbashSceneCreator,
+            FocusSelectableObjectService focusSelectableObjectComponent,
+            IComponentInserter componentInserter,
+            SkeletonChangedHandler skeletonChangedHandler)
         {
-            _kitbasherRootScene = kitbasherRootScene;
             _dropHandler = dropHandler;
-            _saveSettings = saveSettings;
+            _pfs = pfs;
+            _kitbashSceneCreator = kitbashSceneCreator;
+            _focusSelectableObjectComponent = focusSelectableObjectComponent;
             Scene = gameWorld;
             Animation = animationControllerViewModel;
             SceneExplorer = sceneExplorerViewModel;
             MenuBar = menuBarViewModel;
-
+            
+            // Events
             eventHub.Register<ScopedFileSavedEvent>(OnFileSaved);
             eventHub.Register<CommandStackChangedEvent>(OnCommandStackChanged);
+            skeletonChangedHandler.Subscribe(eventHub);
+            
+            // Ensure all game components are added to the editor
+            componentInserter.Execute();
+        }
+
+        private void LoadScene(PackFile fileToLoad)
+        {
+            try
+            {
+                var fileName = _pfs.GetFullPath(fileToLoad);
+                _kitbashSceneCreator.CreateFromPackFile(fileToLoad);
+                _focusSelectableObjectComponent.FocusScene();
+                DisplayName.Value = fileToLoad.Name;
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error($"Error loading file {fileToLoad?.Name} - {e}");
+                MessageBox.Show($"Unable to load file\n+{e.Message}");
+            }
         }
 
         public bool Save() => true;
@@ -75,7 +108,7 @@ namespace KitbasherEditor.ViewModels
         void OnFileSaved(ScopedFileSavedEvent notification)
         {
             HasUnsavedChanges = false;
-            DisplayName.Value = Path.GetFileName(_saveSettings.OutputName);
+            DisplayName.Value = Path.GetFileName(notification.NewPath);
         }
 
         void OnCommandStackChanged(CommandStackChangedEvent notification)

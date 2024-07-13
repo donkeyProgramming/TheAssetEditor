@@ -31,7 +31,7 @@ namespace GameWorld.Core.Services.SceneSaving
         public List<MaterialStrategyInformation> GetMaterialStrategies() => _materialStrategyProvider.GetStrategies();
         public List<LodStrategyInformation> GetLodStrategies() => _lodStrategyProvider.GetStrategies();
 
-        public void Save(MainEditableNode mainNode, SaveSettings settings)
+        public void Save(MainEditableNode mainNode, GeometrySaveSettings settings)
         {
             if (_packFileService.GetEditablePack() == null)
             {
@@ -40,7 +40,6 @@ namespace GameWorld.Core.Services.SceneSaving
             }
 
             var outputPath = settings.OutputName;
-            var onlyVisibleNodes = settings.OnlySaveVisible;
 
             // Update lod values
             var model = mainNode.Model;
@@ -51,8 +50,8 @@ namespace GameWorld.Core.Services.SceneSaving
             }
 
             _lodStrategyProvider.GetStrategy(settings.LodGenerationMethod).Generate(mainNode, settings.LodSettingsPerLod);
-            _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, outputPath, onlyVisibleNodes);
-            _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, onlyVisibleNodes);
+            _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, settings);
+            _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, settings.OnlySaveVisible);
         }
     }
 }
