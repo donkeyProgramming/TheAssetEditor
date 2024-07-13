@@ -36,8 +36,8 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 
     public class AudioEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        public readonly IAudioRepository _audioRepository;
-        public readonly PackFileService _packFileService;
+        public readonly IAudioRepository AudioRepository;
+        public readonly PackFileService PackFileService;
         public string _selectedAudioProjectEvent;
         public string _previousSelectedAudioProjectEvent;
         public string _selectedAudioProjectEventType;
@@ -69,8 +69,8 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         {
             AudioEditor = audioEditor;
             AudioEditorSettings = audioEditorSettings;
-            _audioRepository = audioRepository;
-            _packFileService = packFileService;
+            AudioRepository = audioRepository;
+            PackFileService = packFileService;
 
             AddStatePathCommand = new RelayCommand(AddStatePath);
             CreateAudioProjectCommand = new RelayCommand(CreateAudioProject);
@@ -121,8 +121,8 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
                     _previousSelectedAudioProjectEvent = _selectedAudioProjectEvent;
                     Debug.WriteLine($"_selectedAudioProjectEvent changed from: {_previousSelectedAudioProjectEvent} to: {value}");
                     SetAndNotify(ref _selectedAudioProjectEvent, value);
-                    AudioEditorData.Instance.SelectedAudioProjectEvent = _selectedAudioProjectEvent;
-                    LoadEvent(this, false, _audioRepository);
+                    AudioEditorData.Instance.SelectedAudioProjectEvent = value;
+                    LoadEvent(this, false, AudioRepository);
                 }
             }
         }
@@ -132,13 +132,13 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             EventsData.Clear();
 
             CreateAudioProjectDialogueEventsList(this);
-            AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
+            AddQualifiersToStateGroups(AudioRepository.DialogueEventsWithStateGroups);
 
             InitialiseEventData(this);
 
-            LoadEvent(this, true, _audioRepository);
+            LoadEvent(this, true, AudioRepository);
 
-            AudioProjectData.AddAudioProjectToPackFile(_packFileService, EventsData);
+            AudioProjectData.AddAudioProjectToPackFile(PackFileService, EventsData);
         }
 
         public void LoadAudioProject()
@@ -148,21 +148,21 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             _previousSelectedAudioProjectEvent = "";
             _selectedAudioProjectEvent = "";
 
-            AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
+            AddQualifiersToStateGroups(AudioRepository.DialogueEventsWithStateGroups);
 
-            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
+            using var browser = new PackFileBrowserWindow(PackFileService, [".json"]);
 
             if (browser.ShowDialog())
             {
-                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
-                var packFile = _packFileService.FindFile(filePath);
+                var filePath = PackFileService.GetFullPath(browser.SelectedFile);
+                var packFile = PackFileService.FindFile(filePath);
                 var bytes = packFile.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
 
-                var eventData = AudioProjectData.ConvertAudioProjectToEventData(_audioRepository, audioProjectJson);
+                var eventData = AudioProjectData.ConvertAudioProjectToEventData(AudioRepository, audioProjectJson);
                 AudioEditorData.Instance.EventsData = eventData;
 
-                LoadEvent(this, true, _audioRepository);
+                LoadEvent(this, true, AudioRepository);
             }
 
             CreateAudioProjectDialogueEventsListFromAudioProject(this, EventsData);
@@ -171,17 +171,17 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         public void SaveAudioProject()
         {
             UpdateEventDataWithCurrentEvent(this);
-            AudioProjectData.AddAudioProjectToPackFile(_packFileService, EventsData);
+            AudioProjectData.AddAudioProjectToPackFile(PackFileService, EventsData);
         }
 
         public void LoadCustomStates()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
+            using var browser = new PackFileBrowserWindow(PackFileService, [".json"]);
 
             if (browser.ShowDialog())
             {
-                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
-                var packFile = _packFileService.FindFile(filePath);
+                var filePath = PackFileService.GetFullPath(browser.SelectedFile);
+                var packFile = PackFileService.FindFile(filePath);
                 var bytes = packFile.DataSource.ReadData();
                 var str = Encoding.UTF8.GetString(bytes);
                 var customStatesFileData = JsonConvert.DeserializeObject<List<CustomStateDataGridProperties>>(str);
@@ -196,9 +196,9 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         public void SaveCustomStates()
         {
             var dataGridItemsJson = JsonConvert.SerializeObject(CustomStatesDataGridItems, Formatting.Indented);
-            var pack = _packFileService.GetEditablePack();
+            var pack = PackFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
-            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"custom_states.json", new MemorySource(byteArray)));
+            PackFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"custom_states.json", new MemorySource(byteArray)));
         }
 
         public void AddStatePath()
