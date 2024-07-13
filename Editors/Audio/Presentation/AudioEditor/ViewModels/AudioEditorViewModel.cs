@@ -161,8 +161,6 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 
                 var eventData = AudioProjectData.ConvertAudioProjectToEventData(AudioRepository, audioProjectJson);
                 AudioEditorData.Instance.EventsData = eventData;
-
-                LoadEvent(this, true, AudioRepository);
             }
 
             CreateAudioProjectDialogueEventsListFromAudioProject(this, EventsData);
