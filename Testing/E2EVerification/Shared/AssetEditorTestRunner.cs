@@ -17,7 +17,6 @@ namespace E2EVerification.Shared
 
         public IServiceScope EditorServiceProvider { get; private set; }
         public PackFileService PackFileService { get; private set; }
-        public PackFileContainer? OutputPackFile { get; private set; }
         public IUiCommandFactory CommandFactory { get; private set; }
         public ScopeRepository ScopeRepository { get; private set; }
 
@@ -39,8 +38,14 @@ namespace E2EVerification.Shared
         {
             PackFileService.Load(path, false, true);
             if (createOutputPackFile)
-                OutputPackFile = PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
-            return OutputPackFile;
+                return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
+            return null;
+        }
+
+
+        public PackFileContainer CreateEmptyPackFile(string packFileName, bool setAsEditable)
+        {
+            return PackFileService.CreateNewPackFileContainer(packFileName, PackFileCAType.MOD, setAsEditable);
         }
 
         void MockServices(IServiceCollection services)
@@ -51,8 +56,8 @@ namespace E2EVerification.Shared
             services.Remove(gameDescriptor);
             services.AddScoped<IWpfGame, GameMock>();
 
-            var KeyboardDescriptor = new ServiceDescriptor(typeof(IKeyboardComponent), typeof(KeyboardComponent), ServiceLifetime.Scoped);
-            services.Remove(KeyboardDescriptor);
+            var keyboardDescriptor = new ServiceDescriptor(typeof(IKeyboardComponent), typeof(KeyboardComponent), ServiceLifetime.Scoped);
+            services.Remove(keyboardDescriptor);
             services.AddScoped(x => new Mock<IKeyboardComponent>().Object);
 
             var mouseDescriptor = new ServiceDescriptor(typeof(IMouseComponent), typeof(MouseComponent), ServiceLifetime.Scoped);

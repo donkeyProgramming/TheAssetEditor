@@ -11,7 +11,7 @@ namespace E2EVerification
 {
     public class KitbashEditor_SaveTests
     {
-        private readonly string _inputPackFileKarl = "C:\\Users\\ole_k\\source\\repos\\TheAssetEditor\\Data\\Karl_and_celestialgeneral.pack";
+        private readonly string _inputPackFileKarl = PathHelper.FileInDataFolder("Karl_and_celestialgeneral.pack");
         private readonly string _rmvFilePathKarl = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2";
         private readonly string _wsFilePathKarl = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.wsmodel";
 

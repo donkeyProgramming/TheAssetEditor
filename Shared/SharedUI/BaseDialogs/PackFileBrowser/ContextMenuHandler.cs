@@ -175,7 +175,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         void DuplicateNode()
         {
-            _uiCommandFactory.Create<DuplicateCommand>().Execute(_selectedNode.Item);
+            _uiCommandFactory.Create<DuplicateFileCommand>().Execute(_selectedNode.Item);
         }
 
         void CreateFolder()
