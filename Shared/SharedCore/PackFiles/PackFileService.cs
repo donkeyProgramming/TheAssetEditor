@@ -638,7 +638,6 @@ namespace Shared.Core.PackFiles
         public PackFile FindFile(string path, PackFileContainer? container = null)
         {
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
-            _logger.Here().Information($"Searching for file {lowerPath}");
 
             if (container == null)
             {
@@ -655,13 +654,11 @@ namespace Shared.Core.PackFiles
             {
                 if (container.FileList.ContainsKey(lowerPath))
                 {
-                    _logger.Here().Information($"File found");
                     FileLookUpEvent?.Invoke(path, container, true);
                     return container.FileList[lowerPath];
                 }
             }
 
-            _logger.Here().Warning($"File not found");
             FileLookUpEvent?.Invoke(path, null, false);
             return null;
         }

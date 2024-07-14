@@ -1,41 +1,39 @@
-﻿using System;
-using GameWorld.Core.Components.Input;
+﻿using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
-using GameWorld.Core.Utility;
+using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace GameWorld.Core.Components
 {
-    public class LightControllerComponent : BaseComponent, IDisposable
+
+    public class SceneLightParametersStore
     {
-        SpriteBatch _spriteBatch;
-        SpriteFont _font;
+        public float EnvLightRotationDegrees_Y { get; set; } = 20;
+        public float DirLightRotationDegrees_X { get; set; } = 0;
+        public float DirLightRotationDegrees_Y { get; set; } = 0;
+        public float LightIntensityMult { get; set; } = 1;
+    }
+
+    public class LightControllerComponent : BaseComponent
+    { 
         string _animationText;
-        GameTime _animationStart;
+        GameTime? _animationStart;
         bool _startAnimation;
 
-        private readonly ResourceLibrary _resourceLibary;
-        private readonly IDeviceResolver _deviceResolverComponent;
         private readonly IKeyboardComponent _keyboardComponent;
         private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly ResourceLibrary _resourceLibrary;
+        private readonly SceneLightParametersStore _sceneLightParametersStore;
 
-        public LightControllerComponent(ResourceLibrary resourceLibary, IDeviceResolver deviceResolverComponent, IKeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent)
+        public LightControllerComponent(IKeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent, ResourceLibrary resourceLibrary, SceneLightParametersStore sceneLightParametersStore)
         {
-            _resourceLibary = resourceLibary;
-            _deviceResolverComponent = deviceResolverComponent;
             _keyboardComponent = keyboardComponent;
             _renderEngineComponent = renderEngineComponent;
+            _resourceLibrary = resourceLibrary;
+            _sceneLightParametersStore = sceneLightParametersStore;
         }
-
-        public override void Initialize()
-        {
-            _font = _resourceLibary.DefaultFont;
-            _spriteBatch = new SpriteBatch(_deviceResolverComponent.Device);
-        }
-
 
         void CreateAnimation(string text)
         {
@@ -53,9 +51,7 @@ namespace GameWorld.Core.Components
                 if (lerpValue >= 1)
                     _animationStart = null;
 
-                _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-                _spriteBatch.DrawString(_font, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue));
-                _spriteBatch.End();
+                _renderEngineComponent.AddRenderItem(RenderBuckedId.Font, new FontRenderItem(_resourceLibrary, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue)));
             }
 
             base.Draw(gameTime);
@@ -70,64 +66,64 @@ namespace GameWorld.Core.Components
             var lightIntensityChanged = false;
             if (_keyboardComponent.IsKeyDown(Keys.PageUp) && !_keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngineComponent.EnvLightRotationDegrees_Y += 1.0f;
+                _sceneLightParametersStore.EnvLightRotationDegrees_Y += 1.0f;
                 lightMoved = true;
             }
             else if (_keyboardComponent.IsKeyDown(Keys.PageDown) && !_keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngineComponent.EnvLightRotationDegrees_Y -= 1.0f;
+                _sceneLightParametersStore.EnvLightRotationDegrees_Y -= 1.0f;
                 lightMoved = true;
             }
 
             if (_keyboardComponent.IsKeyDown(Keys.PageUp) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngineComponent.LightIntensityMult += 0.05f;
+                _sceneLightParametersStore.LightIntensityMult += 0.05f;
                 lightIntensityChanged = true;
             }
             else if (_keyboardComponent.IsKeyDown(Keys.PageDown) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngineComponent.LightIntensityMult -= 0.05f;
+                _sceneLightParametersStore.LightIntensityMult -= 0.05f;
                 lightIntensityChanged = true;
             }
             else if (_keyboardComponent.IsKeyDown(Keys.Right) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngineComponent.DirLightRotationDegrees_Y -= 1.0f;
+                _sceneLightParametersStore.DirLightRotationDegrees_Y -= 1.0f;
                 DirlightMoved_Y = true;
             }
             else if (_keyboardComponent.IsKeyDown(Keys.Left) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngineComponent.DirLightRotationDegrees_Y += 1.0f;
+                _sceneLightParametersStore.DirLightRotationDegrees_Y += 1.0f;
                 DirlightMoved_Y = true;
             }
             else if (_keyboardComponent.IsKeyDown(Keys.Up) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngineComponent.DirLightRotationDegrees_X -= 1.0f;
+                _sceneLightParametersStore.DirLightRotationDegrees_X -= 1.0f;
                 DirlightMoved_X = true;
             }
             else if (_keyboardComponent.IsKeyDown(Keys.Down) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                _renderEngineComponent.DirLightRotationDegrees_X += 1.0f;
+                _sceneLightParametersStore.DirLightRotationDegrees_X += 1.0f;
                 DirlightMoved_X = true;
             }
             else if (_keyboardComponent.IsKeyDown(Keys.Home) && _keyboardComponent.IsKeyDown(Keys.LeftAlt))
             {
-                ResetLilghtingParams();
+                ResetLightingParams();
                 lightMoved = true;
             }
 
             LimitLightValues();
 
             if (lightMoved)
-                CreateAnimation($"Env rotation Y: {_renderEngineComponent.EnvLightRotationDegrees_Y}");
+                CreateAnimation($"Env rotation Y: {_sceneLightParametersStore.EnvLightRotationDegrees_Y}");
 
             if (DirlightMoved_X)
-                CreateAnimation($"DirLight rotation X: {_renderEngineComponent.DirLightRotationDegrees_X}");
+                CreateAnimation($"DirLight rotation X: {_sceneLightParametersStore.DirLightRotationDegrees_X}");
 
             if (DirlightMoved_Y)
-                CreateAnimation($"DirLight rotation Y: {_renderEngineComponent.DirLightRotationDegrees_Y}");
+                CreateAnimation($"DirLight rotation Y: {_sceneLightParametersStore.DirLightRotationDegrees_Y}");
 
             if (lightIntensityChanged)
-                CreateAnimation($"Light intensity: {_renderEngineComponent.LightIntensityMult}");
+                CreateAnimation($"Light intensity: {_sceneLightParametersStore.LightIntensityMult}");
 
             if (_startAnimation == true)
             {
@@ -139,46 +135,34 @@ namespace GameWorld.Core.Components
         }
 
 
-        public void ResetLilghtingParams()
+        public void ResetLightingParams()
         {
-            _renderEngineComponent.LightIntensityMult = 1.0f;
-            _renderEngineComponent.EnvLightRotationDegrees_Y = 20.0f;
-            _renderEngineComponent.DirLightRotationDegrees_X = 0.0f;
-            _renderEngineComponent.DirLightRotationDegrees_Y = 0.0f;
+            _sceneLightParametersStore.LightIntensityMult = 1.0f;
+            _sceneLightParametersStore.EnvLightRotationDegrees_Y = 20.0f;
+            _sceneLightParametersStore.DirLightRotationDegrees_X = 0.0f;
+            _sceneLightParametersStore.DirLightRotationDegrees_Y = 0.0f;
         }
 
-        private static float LimitAndWrapAroundDregrees(float degrees)
+        private static float LimitAndWrapAroundDegrees(float degrees)
         {
-
             if (degrees > 360.0f)
                 return 0.0f;
-
 
             if (degrees < 0.0f)
                 return 360.0f;
 
             return degrees;
-
         }
 
         private void LimitLightValues()
         {
-            _renderEngineComponent.EnvLightRotationDegrees_Y = LimitAndWrapAroundDregrees(_renderEngineComponent.EnvLightRotationDegrees_Y);
+            _sceneLightParametersStore.EnvLightRotationDegrees_Y = LimitAndWrapAroundDegrees(_sceneLightParametersStore.EnvLightRotationDegrees_Y);
 
-            _renderEngineComponent.DirLightRotationDegrees_X = LimitAndWrapAroundDregrees(_renderEngineComponent.DirLightRotationDegrees_X);
-            _renderEngineComponent.DirLightRotationDegrees_Y = LimitAndWrapAroundDregrees(_renderEngineComponent.DirLightRotationDegrees_Y);
+            _sceneLightParametersStore.DirLightRotationDegrees_X = LimitAndWrapAroundDegrees(_sceneLightParametersStore.DirLightRotationDegrees_X);
+            _sceneLightParametersStore.DirLightRotationDegrees_Y = LimitAndWrapAroundDegrees(_sceneLightParametersStore.DirLightRotationDegrees_Y);
 
-
-            if (_renderEngineComponent.LightIntensityMult < 0)
-                _renderEngineComponent.LightIntensityMult = 0;
-        }
-
-
-        public void Dispose()
-        {
-            if (_spriteBatch != null)
-                _spriteBatch.Dispose();
-            _spriteBatch = null;
+            if (_sceneLightParametersStore.LightIntensityMult < 0)
+                _sceneLightParametersStore.LightIntensityMult = 0;
         }
     }
 }

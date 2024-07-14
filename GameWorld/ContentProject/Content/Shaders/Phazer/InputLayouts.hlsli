@@ -38,6 +38,6 @@ struct GBufferMaterial
     float4 diffuse;
     float3 specular;
     float roughness;    
-    int reserved;
+    float maskValue;
 };    
 #endif

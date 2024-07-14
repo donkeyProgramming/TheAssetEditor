@@ -20,6 +20,12 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/DefaultFont.spritefont
 
+#begin Shaders/Bloom.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/Bloom.fx
+
 #begin Shaders/Geometry/BasicShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor

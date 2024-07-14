@@ -7,7 +7,6 @@ using Editors.AnimationMeta.Visualisation.Rules;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components;
-using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.Core.SceneNodes;
@@ -152,7 +151,7 @@ namespace Editors.AnimationMeta.Visualisation
                 propPlayer.SetAnimation(clip, skeleton);
 
                 // Add the prop skeleton
-                var skeletonSceneNode = new SkeletonNode(_resourceLibrary, skeleton);
+                var skeletonSceneNode = new SkeletonNode(skeleton);
                 skeletonSceneNode.NodeColour = Color.Yellow;
                 skeletonSceneNode.ScaleMult = animatedPropMeta.Scale;
                 loadedNode.AddObject(skeletonSceneNode);
@@ -178,14 +177,9 @@ namespace Editors.AnimationMeta.Visualisation
 
         private IMetaDataInstance CreateStaticLocator(DecodedMetaEntryBase metaData, SceneNode root, Vector3 position, string displayName, float scale = 0.3f)
         {
-
-            var lineRenderer = new LineMeshRender(_resourceLibrary);
-
             var node = new SimpleDrawableNode(displayName);
-            lineRenderer.AddCircle(position, scale, Color.Red);
-            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, displayName, position));
-
-            node.AddItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, displayName, position));
+            node.AddItem(LineHelper.AddCircle(position, scale, Color.Red));
             root.AddObject(node);
 
             return new DrawableMetaInstance(metaData.StartTime, metaData.EndTime, node.Name, node);
@@ -199,18 +193,17 @@ namespace Editors.AnimationMeta.Visualisation
                 throw new ConstraintException($"{displayName}: the distance between StartPosition {splashAttack.StartPosition} and EndPosition {splashAttack.EndPosition} is close to 0");
             }
 
-
-            var lineRenderer = new LineMeshRender(_resourceLibrary);
-            var textPos = (splashAttack.EndPosition + splashAttack.StartPosition) / 2;
-
             var node = new SimpleDrawableNode(displayName);
-
-            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, "StartPos", splashAttack.StartPosition));
-            lineRenderer.AddLocator(splashAttack.StartPosition, scale, Color.Red);
-            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, "EndPos", splashAttack.EndPosition));
-            lineRenderer.AddLocator(splashAttack.EndPosition, scale, Color.Red);
-            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, displayName, textPos));
-            lineRenderer.AddLine(splashAttack.StartPosition, splashAttack.EndPosition, Color.Red);
+            var textPos = (splashAttack.EndPosition + splashAttack.StartPosition) / 2;
+            
+            node.AddItem( new WorldTextRenderItem(_resourceLibrary, "StartPos", splashAttack.StartPosition));
+            node.AddItem(LineHelper.AddLocator(splashAttack.StartPosition, scale, Color.Red));
+            
+            node.AddItem( new WorldTextRenderItem(_resourceLibrary, "EndPos", splashAttack.EndPosition));
+            node.AddItem(LineHelper.AddLocator(splashAttack.EndPosition, scale, Color.Red));
+            
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, displayName, textPos));
+            node.AddItem(LineHelper.AddLine(splashAttack.StartPosition, splashAttack.EndPosition, Color.Red));
 
             var normal = splashAttack.EndPosition - splashAttack.StartPosition;  // corresponds to Z
             normal.Normalize();
@@ -238,7 +231,7 @@ namespace Editors.AnimationMeta.Visualisation
                     throw new ConstraintException($"{displayName}: the half-angle {splashAttack.AngleForCone / 2} of the cone is close to 0");
                 }
                 var transformationM = rotationM * Matrix.CreateScale(distance) * Matrix.CreateTranslation(splashAttack.StartPosition);
-                lineRenderer.AddConeSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, splashAttack.AngleForCone, Color.Red);
+                node.AddItem(LineHelper.AddConeSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, splashAttack.AngleForCone, Color.Red));
             }
             if (splashAttack.AoeShape == 1) // Corridor
             {
@@ -247,10 +240,9 @@ namespace Editors.AnimationMeta.Visualisation
                     throw new ConstraintException($"{displayName}: the WidthForCorridor {splashAttack.WidthForCorridor} of the corridor is close to 0");
                 }
                 var transformationM = rotationM * Matrix.CreateScale(splashAttack.WidthForCorridor / 2) * Matrix.CreateTranslation(splashAttack.StartPosition);
-                lineRenderer.AddCorridorSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, Color.Red);
+                node.AddItem(LineHelper.AddCorridorSplash(splashAttack.StartPosition, splashAttack.EndPosition, transformationM, Color.Red));
             }
-
-            node.AddItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
+            
             root.AddObject(node);
 
             return new DrawableMetaInstance(splashAttack.StartTime, splashAttack.EndTime, node.Name, node);
@@ -258,13 +250,11 @@ namespace Editors.AnimationMeta.Visualisation
 
         private IMetaDataInstance CreateEffect(Effect_v11 effect, SceneNode root, ISkeletonProvider skeleton)
         {
-            var lineRenderer = new LineMeshRender(_resourceLibrary);
-
             var node = new SimpleDrawableNode("Effect:" + effect.VfxName);
-            lineRenderer.AddLocator(effect.Position, 0.3f, Color.Red);
-            node.AddItem(RenderBuckedId.Text, new TextRenderItem(_resourceLibrary, effect.VfxName, effect.Position));
 
-            node.AddItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = lineRenderer, ModelMatrix = Matrix.Identity });
+            node.AddItem(LineHelper.AddLocator(effect.Position, 0.3f, Color.Red));
+            node.AddItem(new WorldTextRenderItem(_resourceLibrary, effect.VfxName, effect.Position));
+           
             root.AddObject(node);
 
             var instance = new DrawableMetaInstance(effect.StartTime, effect.EndTime, node.Name, node);

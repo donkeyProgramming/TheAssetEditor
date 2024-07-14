@@ -28,9 +28,9 @@
             <RowDefinition Height="auto"/>
             
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="0.5*"/>
+            <RowDefinition Height="0.25*"/>
             <RowDefinition Height="5"/>
-            <RowDefinition Height="0.5*"/>
+            <RowDefinition Height="0.75*"/>
         </Grid.RowDefinitions>
 
         <local:MenuBarView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding MenuBar, Mode=OneTime}"/>
@@ -98,8 +98,7 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <TextBlock  Grid.Row="1"  Grid.Column="2" Text="Scene:" Margin="0,0,5,0"/>
-        <local:SceneExplorerView DataContext="{Binding SceneExplorer}"  Grid.Row="2" Grid.Column="2"/>
+        <local:SceneExplorerView DataContext="{Binding SceneExplorer}"  Grid.Row="0" Grid.RowSpan="3" Grid.Column="2"/>
 
         <GridSplitter Grid.Row="3"  Grid.Column="2" HorizontalAlignment="Stretch">
             <GridSplitter.Template>

@@ -58,7 +58,6 @@ namespace Shared.Core.Services
 
         public ApplicationSettingsService()
         {
-            _logger.Here().Information("Creating ApplicationSettingsService");
             Load();
         }
 
@@ -122,10 +121,7 @@ namespace Shared.Core.Services
         {
             if (File.Exists(SettingsFile))
             {
-                _logger.Here().Information($"Loading existing settings file {SettingsFile}");
-
                 var content = File.ReadAllText(SettingsFile);
-                _logger.Here().Information(content);
                 var settings = JsonSerializer.Deserialize<ApplicationSettings>(content);
                 if (settings == null)
                     _logger.Here().Information($"Failed to load settings - json parsing error.");

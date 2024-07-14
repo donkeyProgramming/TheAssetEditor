@@ -5,8 +5,8 @@ namespace E2EVerification.Shared
 {
     public class GraphicsDeviceServiceMock : IGraphicsDeviceService
     {
-        GraphicsDevice _GraphicsDevice;
-        Form HiddenForm;
+        GraphicsDevice? _GraphicsDevice;
+        Form? HiddenForm;
 
         public GraphicsDeviceServiceMock()
         {
@@ -30,22 +30,29 @@ namespace E2EVerification.Shared
 
         public GraphicsDevice GraphicsDevice
         {
-            get { return _GraphicsDevice; }
+            get { return _GraphicsDevice!; }
         }
 
-        public event EventHandler<EventArgs> DeviceCreated;
-        public event EventHandler<EventArgs> DeviceDisposing;
-        public event EventHandler<EventArgs> DeviceReset;
-        public event EventHandler<EventArgs> DeviceResetting;
-
+#pragma warning disable CS0067 
+        public event EventHandler<EventArgs>? DeviceCreated;
+        public event EventHandler<EventArgs>? DeviceDisposing;
+        public event EventHandler<EventArgs>? DeviceReset;
+        public event EventHandler<EventArgs>? DeviceResetting;
+#pragma warning restore CS0067 
         public void Release()
         {
-            _GraphicsDevice.Dispose();
-            _GraphicsDevice = null;
+            if (_GraphicsDevice != null)
+            {
+                _GraphicsDevice.Dispose();
+                _GraphicsDevice = null;
+            }
 
-            HiddenForm.Close();
-            HiddenForm.Dispose();
-            HiddenForm = null;
+            if (HiddenForm != null)
+            {
+                HiddenForm.Close();
+                HiddenForm.Dispose();
+                HiddenForm = null;
+            }
         }
     }
 }

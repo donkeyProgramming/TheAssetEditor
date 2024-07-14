@@ -17,7 +17,6 @@ namespace KitbasherEditor.ViewModels.MeshFitter
     {
         private readonly CommandFactory _commandFactory;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
-        private readonly ResourceLibrary _resourceLibrary;
         private readonly SceneManager _sceneManager;
         GameSkeleton _targetSkeleton;
         GameSkeleton _fromSkeleton;
@@ -38,11 +37,10 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0);
         public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0);
 
-        public MeshFitterViewModel(CommandFactory commandFactory, AnimationsContainerComponent animationsContainerComponent, ResourceLibrary resourceLibary, SceneManager sceneManager)
+        public MeshFitterViewModel(CommandFactory commandFactory, AnimationsContainerComponent animationsContainerComponent, SceneManager sceneManager)
         {
             _commandFactory = commandFactory;
             _animationsContainerComponent = animationsContainerComponent;
-            _resourceLibrary = resourceLibary;
             _sceneManager = sceneManager;
         }
 
@@ -80,7 +78,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _animationPlayer.SetAnimation(_animationClip, _fromSkeleton);
             _animationPlayer.Play();
 
-            _currentSkeletonNode = new SkeletonNode(_resourceLibrary, _fromSkeleton);
+            _currentSkeletonNode = new SkeletonNode(_fromSkeleton);
             _currentSkeletonNode.SelectedNodeColour = Color.White;
             _sceneManager.RootNode.AddObject(_currentSkeletonNode);
 

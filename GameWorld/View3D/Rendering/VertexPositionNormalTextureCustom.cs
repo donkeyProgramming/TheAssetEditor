@@ -32,12 +32,12 @@ namespace GameWorld.Core.Rendering
 
         public float[] GetBoneWeights()
         {
-            return new float[] { BlendWeights.X, BlendWeights.Y, BlendWeights.Z, BlendWeights.W };
+            return [BlendWeights.X, BlendWeights.Y, BlendWeights.Z, BlendWeights.W];
         }
 
         public int[] GetBoneIndexs()
         {
-            return new int[] { (int)BlendIndices.X, (int)BlendIndices.Y, (int)BlendIndices.Z, (int)BlendIndices.W };
+            return [(int)BlendIndices.X, (int)BlendIndices.Y, (int)BlendIndices.Z, (int)BlendIndices.W];
         }
 
         public Vector3 Position3()

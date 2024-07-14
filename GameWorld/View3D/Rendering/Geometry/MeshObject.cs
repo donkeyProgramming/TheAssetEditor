@@ -1,11 +1,9 @@
-﻿using GameWorld.Core.Rendering.Shading;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Shared.GameFormats.RigidModel;
-using Shared.Ui.Editors.BoneMapping;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Shared.GameFormats.RigidModel;
+using Shared.Ui.Editors.BoneMapping;
 
 namespace GameWorld.Core.Rendering.Geometry
 {
@@ -21,6 +19,9 @@ namespace GameWorld.Core.Rendering.Geometry
         public int WeightCount { get; private set; } = 0;
         public UiVertexFormat VertexFormat { get; private set; } = UiVertexFormat.Unknown;
         public string ParentSkeletonName { get; set; }
+
+
+        public IGraphicsCardGeometry GetGeometryContext() => Context;
 
         public MeshObject(IGraphicsCardGeometry context, string skeletonName)
         {
@@ -274,35 +275,9 @@ namespace GameWorld.Core.Rendering.Geometry
             VertexFormat = newFormat;
         }
 
-        public VertexPositionNormalTextureCustom GetVertexExtented(int index)//
+        public VertexPositionNormalTextureCustom GetVertexExtented(int index)
         {
             return VertexArray[index];
-        }
-
-        public void ApplyMesh(IShader effect, GraphicsDevice device)
-        {
-            if (Context.IndexBuffer == null || Context.VertexBuffer == null)
-                return;
-
-            device.Indices = Context.IndexBuffer;
-            device.SetVertexBuffer(Context.VertexBuffer);
-            foreach (var pass in effect.Effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, Context.IndexBuffer.IndexCount);
-            }
-        }
-
-        public void ApplyMeshPart(IShader effect, GraphicsDevice device, List<int> faceSelection)
-        {
-            device.Indices = Context.IndexBuffer;
-            device.SetVertexBuffer(Context.VertexBuffer);
-            foreach (var pass in effect.Effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                foreach (var item in faceSelection)
-                    device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, item, 1);
-            }
         }
 
         public int GetIndex(int i)//
@@ -310,13 +285,12 @@ namespace GameWorld.Core.Rendering.Geometry
             return IndexArray[i];
         }
 
-
         public int GetIndexCount()//
         {
             return IndexArray.Length;
         }
 
-        public List<ushort> GetIndexBuffer()//
+        public List<ushort> GetIndexBuffer()
         {
             return IndexArray.ToList();
         }

@@ -1,7 +1,6 @@
 ﻿using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
-using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using GameWorld.Core.Services;
 using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;

@@ -14,7 +14,6 @@
 
     public enum ComponentDrawOrderEnum
     {
-        ClearScreenComponent,
         Default,
 
         RenderEngine,

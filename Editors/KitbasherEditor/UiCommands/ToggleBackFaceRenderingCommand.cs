@@ -17,6 +17,6 @@ namespace KitbasherEditor.ViewModels.UiCommands
             _renderEngineComponent = renderEngineComponent;
         }
 
-        public void Execute() => _renderEngineComponent.ToggelBackFaceRendering();
+        public void Execute() => _renderEngineComponent.ToggleBackFaceRendering();
     }
 }

@@ -371,6 +371,7 @@ namespace GameWorld.WpfWindow
 
             _sharedRenderTarget = new RenderTarget2D(GraphicsDevice, width, height, false, SurfaceFormat.Bgr32,
                     DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents, true);
+            _sharedRenderTarget.Name = "sharedRenderTarget";
             _d3D11Image.SetBackBuffer(_sharedRenderTarget);
 
             // internal rendertarget; all user draws render into this before we draw it to the actual back buffer
@@ -378,6 +379,7 @@ namespace GameWorld.WpfWindow
             // -> always preserve its contents so worst case user gets to see the old screen again
             _cachedRenderTarget = new RenderTarget2D(GraphicsDevice, width, height, false, SurfaceFormat.Bgr32,
                 DepthFormat.Depth24Stencil8, ms, RenderTargetUsage.PreserveContents, false);
+            _cachedRenderTarget.Name = "cachedRenderTarget";
         }
 
         private void InitializeImageSource()
