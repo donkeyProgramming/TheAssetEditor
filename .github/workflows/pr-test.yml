@@ -26,4 +26,4 @@ jobs:
       run: dotnet dotnet build AssetEditor\AssetEditor.csproj --no-restore
 
     - name: Run tests
-      run: dotnet test TheAssetEditor\Testing\E2EVerification\E2EVerification.csproj --no-restore --verbosity normal
+      run: dotnet test AssetEditor\Testing\E2EVerification\E2EVerification.csproj --no-restore --verbosity normal
