@@ -1,14 +1,29 @@
+name: Build-Application
+
 on:
-  pull_request
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:  # Add this line to enable manual triggering
 
 jobs:
-  windows_dotnet:
-    name: Build C# Main App
+  build:
+
     runs-on: windows-latest
+
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-dotnet@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'
-    - run: dotnet build AssetEditor\AssetEditor.csproj
+        dotnet-version: '8.x'
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build the project
+      run: dotnet build AssetEditor\AssetEditor.csproj --no-restore
       

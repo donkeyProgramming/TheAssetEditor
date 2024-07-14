@@ -31,7 +31,6 @@ namespace Shared.Core.ToolCreation
             var viewModelType = typeof(ViewModel);
             var viewType = typeof(View);
 
-            _logger.Here().Information($"Registering new tool - {viewModelType}, {viewType}");
             if (_viewModelToViewMap.ContainsKey(viewModelType))
             {
                 var errorMessage = $"Tool already registered - {viewModelType}";

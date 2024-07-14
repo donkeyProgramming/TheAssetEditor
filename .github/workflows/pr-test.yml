@@ -1,6 +1,7 @@
 name: Run-Unit-Test
 
 on:
+  pull_request:
   push:
     branches:
       - master
@@ -23,7 +24,7 @@ jobs:
       run: dotnet restore
 
     - name: Build the project
-      run: dotnet dotnet build AssetEditor\AssetEditor.csproj --no-restore
+      run: dotnet build AssetEditor\AssetEditor.csproj --no-restore
 
     - name: Run tests
       run: dotnet test Testing\E2EVerification\E2EVerification.csproj --no-restore --verbosity normal
