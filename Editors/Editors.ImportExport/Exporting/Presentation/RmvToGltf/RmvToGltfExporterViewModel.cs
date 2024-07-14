@@ -1,4 +1,5 @@
-﻿using Editors.ImportExport.Exporting.Exporters;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.ImportExport.Exporting.Exporters;
 using Editors.ImportExport.Exporting.Exporters.DdsToPng;
 using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
@@ -6,12 +7,17 @@ using Shared.Ui.Common.DataTemplates;
 
 namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
 {
-    internal class RmvToGltfExporterViewModel : IExporterViewModel, IViewProvider<RmvToGltfExporterView>
+    internal partial class RmvToGltfExporterViewModel : ObservableObject, IExporterViewModel, IViewProvider<RmvToGltfExporterView>
     {
         private readonly RmvToGltfExporter _exporter;
 
         public string DisplayName => "Rmv_to_Gltf";
         public string OutputExtension => ".glft";
+
+        [ObservableProperty] bool _exportTextures = true;
+        [ObservableProperty] bool _convertMaterialTextureToBlender = true;
+        [ObservableProperty] bool _convertNormalTextureToBlue = true;
+        [ObservableProperty] bool _exportAnimations = true;
 
         public RmvToGltfExporterViewModel(RmvToGltfExporter exporter)
         {
@@ -20,13 +26,10 @@ namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
 
         public ExportSupportEnum CanExportFile(PackFile file) => _exporter.CanExportFile(file);
 
-        public void Execute(string outputPath, bool generateImporter)
+        public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
         {
-            _exporter.Export(outputPath);
+            var settings = new RmvToGltfExporterSettings(exportSource, outputPath, ExportTextures, ConvertMaterialTextureToBlender, ConvertNormalTextureToBlue, ExportAnimations);
+            _exporter.Export(settings);
         }
     }
 }
-
-
-// Export textures Yes|Blender|No
-// Export Animations Yes|No
