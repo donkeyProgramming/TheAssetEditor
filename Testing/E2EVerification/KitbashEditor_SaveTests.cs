@@ -21,7 +21,7 @@ namespace E2EVerification
         }
 
         // Save scene one lod originally- verify lods
-        // Save scene dragon - - verify lods
+        // Save scene dragon - - verify lod
 
         [Test]
         public void SaveKarl_Default()
