@@ -2,9 +2,9 @@
 
 namespace Editors.Audio.Presentation.AudioEditor
 {
-    public class AudioEditorSettings
+    public static class AudioEditorSettings
     {
-        public List<string> EventType { get; set; } =
+        public static List<string> EventType { get; } =
         [
             "Frontend VO",
             "Campaign VO",
@@ -14,18 +14,18 @@ namespace Editors.Audio.Presentation.AudioEditor
             "Non-VO"
         ];
 
-        public List<string> FrontendVO { get; set; } =
+        public static List<string> FrontendVO { get; } =
         [
             "Lord"
         ];
 
-        public List<string> CampaignVO { get; set; } =
+        public static List<string> CampaignVO { get; } =
         [
             "Lord",
             "Hero"
         ];
 
-        public List<string> BattleVO { get; set; } =
+        public static List<string> BattleVO { get; } =
         [
             "Lord - Melee",
             "Lord - Skirmisher",
@@ -40,7 +40,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             "Unit - Artillery"
         ];
 
-        public List<string> NonVO { get; set; } =
+        public static List<string> NonVO { get; } =
         [
             "Ability",
             "CampaignAdvisor",
@@ -54,17 +54,18 @@ namespace Editors.Audio.Presentation.AudioEditor
             "Vocalisation"
         ];
 
-        public static List<string> BattleIndividualMeleeAll { get; set; } =
+        // Unfortunately these have to be defined in the code rather than dynamically as there's no way to programatically define what is essential vs all Dialogue Events for each Dialogue Event Bnk type.
+        public static List<string> BattleIndividualMeleeAll { get; } =
         [
             "Battle_Individual_Melee_Weapon_Hit"
         ];
 
-        public static List<string> FrontendVODialogueEventsAll { get; set; } =
+        public static List<string> FrontendVODialogueEventsAll { get; } =
         [
             "frontend_vo_character_select"
         ];
 
-        public static List<string> CampaignVODialogueEventsAll { get; set; } =
+        public static List<string> CampaignVODialogueEventsAll { get; } =
         [
             "campaign_vo_agent_action_failed",
             "campaign_vo_agent_action_success",
@@ -122,7 +123,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             "gotrek_felix_departure"
         ];
 
-        public static List<string> CampaignVOConversationalAll { get; set; } =
+        public static List<string> CampaignVOConversationalAll { get; } =
         [
             "Campaign_CS_Nur_Plague_Infect",
             "Campaign_CS_Nur_Plague_Summon_Cultist",
@@ -194,7 +195,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             "campaign_vo_cs_wef_daiths_forge"
         ];
 
-        public static List<string> BattleVoDialogueEventsAll { get; set; } =
+        public static List<string> BattleVoDialogueEventsAll { get; } =
         [
             "battle_vo_order_attack",
             "battle_vo_order_attack_alternative",
@@ -235,7 +236,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             "battle_vo_order_withdraw_tactical"
         ];
 
-        public static List<string> BattleVOConversationalAll { get; set; } =
+        public static List<string> BattleVOConversationalAll { get; } =
         [
             "battle_vo_conversation_allied_unit_routing",
             "battle_vo_conversation_clash",

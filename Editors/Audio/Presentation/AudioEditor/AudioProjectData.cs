@@ -3,9 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using Editors.Audio.Storage;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
@@ -46,9 +45,9 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public static string ConvertEventDataToAudioProject(Dictionary<string, List<Dictionary<string, object>>> eventsData)
         {
-            var audioProject = new JObject();
+            var audioProject = new Dictionary<string, object>();
 
-            var settings = new JObject
+            var settings = new Dictionary<string, object>
             {
                 ["BnkName"] = "battle_vo_conversational__ovn_vo_actor_Albion_Dural_Durak",
                 ["Language"] = "english(uk)"
@@ -56,13 +55,13 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             audioProject["Settings"] = settings;
 
-            var dialogueEvents = new JArray();
+            var dialogueEvents = new List<object>();
 
             foreach (var eventData in eventsData)
             {
                 var dialogueEventName = eventData.Key;
                 var eventDataItems = eventData.Value;
-                var decisionTree = new JArray();
+                var decisionTree = new List<object>();
 
                 foreach (var eventDataItem in eventDataItems)
                 {
@@ -73,17 +72,17 @@ namespace Editors.Audio.Presentation.AudioEditor
                             .Select(kv => kv.Value.ToString())
                             .ToList();
 
-                        var decisionBranchItem = new JObject
+                        var decisionBranchItem = new Dictionary<string, object>
                         {
                             ["StatePath"] = string.Join(".", statePath),
-                            ["AudioFiles"] = new JArray(eventDataItem["AudioFiles"])
+                            ["AudioFiles"] = eventDataItem["AudioFiles"]
                         };
 
                         decisionTree.Add(decisionBranchItem);
                     }
                 }
 
-                var dialogueEvent = new JObject
+                var dialogueEvent = new Dictionary<string, object>
                 {
                     ["DialogueEvent"] = dialogueEventName,
                     ["DecisionTree"] = decisionTree
@@ -94,45 +93,91 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             audioProject["DialogueEvents"] = dialogueEvents;
 
-            return audioProject.ToString(Formatting.Indented);
+            // Serialize the dictionary to JSON
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            return JsonSerializer.Serialize(audioProject, options);
         }
 
         public static Dictionary<string, List<Dictionary<string, object>>> ConvertAudioProjectToEventData(IAudioRepository audioRepository, string audioProjectJson)
         {
             var eventData = new Dictionary<string, List<Dictionary<string, object>>>();
 
-            var audioProject = JObject.Parse(audioProjectJson);
-            var settings = audioProject["Settings"].ToObject<ProjectSettings>();
-            var dialogueEvents = audioProject["DialogueEvents"].ToObject<List<DialogueEventItems>>();
-
-            foreach (var dialogueEvent in dialogueEvents)
+            // Deserialize the JSON string into a dynamic object using System.Text.Json
+            using (var audioProject = JsonDocument.Parse(audioProjectJson))
             {
-                var eventKey = dialogueEvent.DialogueEvent;
-                var eventDataItems = new List<Dictionary<string, object>>();
+                var root = audioProject.RootElement;
 
-                foreach (var decisionTree in dialogueEvent.DecisionTree)
+                // Deserialize Settings
+                var settingsElement = root.GetProperty("Settings");
+                var settings = new ProjectSettings
                 {
-                    var eventDataItem = new Dictionary<string, object>();
+                    BnkName = settingsElement.GetProperty("BnkName").GetString(),
+                    Language = settingsElement.GetProperty("Language").GetString()
+                };
 
-                    var states = decisionTree.StatePath.Split('.');
-                    var stateGroups = AudioEditorViewModelHelpers.DialogueEventsWithStateGroupsWithQualifiers.GetValueOrDefault(dialogueEvent.DialogueEvent, new List<string>());
+                // Deserialize DialogueEvents
+                var dialogueEventsElement = root.GetProperty("DialogueEvents");
+                var dialogueEvents = new List<DialogueEventItems>();
 
-                    for (var i = 0; i < states.Length && i < stateGroups.Count; i++)
+                foreach (var dialogueEventElement in dialogueEventsElement.EnumerateArray())
+                {
+                    var dialogueEvent = new DialogueEventItems
                     {
-                        var stateGroup = AudioEditorViewModelHelpers.AddExtraUnderScoresToStateGroup(stateGroups[i]);
-                        var state = states[i];
-                        eventDataItem[stateGroup] = state;
+                        DialogueEvent = dialogueEventElement.GetProperty("DialogueEvent").GetString(),
+                        DecisionTree = new List<DecisionTreeItems>()
+                    };
+
+                    var decisionTreeElement = dialogueEventElement.GetProperty("DecisionTree");
+                    foreach (var decisionTreeItemElement in decisionTreeElement.EnumerateArray())
+                    {
+                        var decisionTreeItem = new DecisionTreeItems
+                        {
+                            StatePath = decisionTreeItemElement.GetProperty("StatePath").GetString(),
+                            AudioFiles = decisionTreeItemElement.GetProperty("AudioFiles").EnumerateArray()
+                                .Select(file => file.GetString())
+                                .ToList()
+                        };
+
+                        dialogueEvent.DecisionTree.Add(decisionTreeItem);
                     }
 
-                    var fileNames = decisionTree.AudioFiles.Select(filePath => $"\"{Path.GetFileName(filePath)}\"");
-                    var fileNamesString = string.Join(", ", fileNames);
-                    
-                    eventDataItem["AudioFilesDisplay"] = fileNamesString;
-                    eventDataItem["AudioFiles"] = decisionTree.AudioFiles;
-                    eventDataItems.Add(eventDataItem);
+                    dialogueEvents.Add(dialogueEvent);
                 }
 
-                eventData[eventKey] = eventDataItems;
+                // Convert DialogueEvents to eventData dictionary
+                foreach (var dialogueEvent in dialogueEvents)
+                {
+                    var eventKey = dialogueEvent.DialogueEvent;
+                    var eventDataItems = new List<Dictionary<string, object>>();
+
+                    foreach (var decisionTree in dialogueEvent.DecisionTree)
+                    {
+                        var eventDataItem = new Dictionary<string, object>();
+
+                        var states = decisionTree.StatePath.Split('.');
+                        var stateGroups = AudioEditorViewModelHelpers.DialogueEventsWithStateGroupsWithQualifiers.GetValueOrDefault(dialogueEvent.DialogueEvent, new List<string>());
+
+                        for (var i = 0; i < states.Length && i < stateGroups.Count; i++)
+                        {
+                            var stateGroup = AudioEditorViewModelHelpers.AddExtraUnderScoresToStateGroup(stateGroups[i]);
+                            var state = states[i];
+                            eventDataItem[stateGroup] = state;
+                        }
+
+                        var fileNames = decisionTree.AudioFiles.Select(filePath => Path.GetFileName(filePath));
+                        var fileNamesString = string.Join(", ", fileNames);
+
+                        eventDataItem["AudioFilesDisplay"] = fileNamesString;
+                        eventDataItem["AudioFiles"] = decisionTree.AudioFiles;
+                        eventDataItems.Add(eventDataItem);
+                    }
+
+                    eventData[eventKey] = eventDataItems;
+                }
             }
 
             return eventData;

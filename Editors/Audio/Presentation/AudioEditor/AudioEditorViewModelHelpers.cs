@@ -2,18 +2,18 @@
 using System.Diagnostics;
 using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using static Editors.Audio.Presentation.AudioEditor.DynamicDataGrid;
 using static Editors.Audio.Presentation.AudioEditor.ViewModels.AudioEditorViewModel;
 
 namespace Editors.Audio.Presentation.AudioEditor
 {
-    public class AudioEditorViewModelHelpers
+    public static class AudioEditorViewModelHelpers
     {
-        public static Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithQualifiers { get; set; } = [];
+        static readonly ILogger s_logger = Logging.Create<AudioEditorViewModel>();
 
-        public AudioEditorViewModelHelpers()
-        {
-        }
+        public static Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithQualifiers { get; set; } = [];
 
         public static void InitialiseEventData(AudioEditorViewModel viewModel)
         {
@@ -41,7 +41,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             if (string.IsNullOrEmpty(AudioEditorData.Instance.SelectedAudioProjectEvent))
                 return;
 
-            Debug.WriteLine($"Loading event: {AudioEditorData.Instance.SelectedAudioProjectEvent}");
+            s_logger.Here().Information($"Loading event: {AudioEditorData.Instance.SelectedAudioProjectEvent}");
 
             ConfigureDataGrid(viewModel, audioRepository, showCustomStatesOnly);
 
@@ -69,15 +69,6 @@ namespace Editors.Audio.Presentation.AudioEditor
                 stateGroupsWithCustomStates["VO_Battle_Special_Ability"].Add(item.CustomVOBattleSpecialAbility);
                 stateGroupsWithCustomStates["VO_Faction_Leader"].Add(item.CustomVOFactionLeader);
             }
-        }
-
-        public static void UpdateEventDataWithPreviousEvent(AudioEditorViewModel viewModel)
-        {
-            if (viewModel.AudioEditorDataGridItems == null)
-                return;
-
-            if (viewModel._previousSelectedAudioProjectEvent != null)
-                EventsData[viewModel._previousSelectedAudioProjectEvent] = new List<Dictionary<string, object>>(viewModel.AudioEditorDataGridItems);
         }
 
         public static void UpdateEventDataWithCurrentEvent(AudioEditorViewModel viewModel)
@@ -138,27 +129,27 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public static void UpdateAudioProjectEventSubType(AudioEditorViewModel viewModel)
         {
-            var audioProjectSettings = new AudioEditorSettings();
             viewModel.AudioProjectSubTypes.Clear();
 
             if (viewModel.SelectedAudioProjectEventType == "Non-VO")
-                foreach (var item in audioProjectSettings.NonVO)
+                foreach (var item in AudioEditorSettings.NonVO)
                     viewModel.AudioProjectSubTypes.Add(item);
 
             else if (viewModel.SelectedAudioProjectEventType == "Frontend VO")
-                foreach (var item in audioProjectSettings.FrontendVO)
+                foreach (var item in AudioEditorSettings.FrontendVO)
                     viewModel.AudioProjectSubTypes.Add(item);
 
             else if (viewModel.SelectedAudioProjectEventType == "Campaign VO")
-                foreach (var item in audioProjectSettings.CampaignVO)
+                foreach (var item in AudioEditorSettings.CampaignVO)
                     viewModel.AudioProjectSubTypes.Add(item);
 
             else if (viewModel.SelectedAudioProjectEventType == "Battle VO")
-                foreach (var item in audioProjectSettings.BattleVO)
+                foreach (var item in AudioEditorSettings.BattleVO)
                     viewModel.AudioProjectSubTypes.Add(item);
 
             Debug.WriteLine($"AudioProjectSubTypes changed to: {string.Join(", ", viewModel.AudioProjectSubTypes)}");
         }
+
 
         public static void CreateAudioProjectDialogueEventsListFromAudioProject(AudioEditorViewModel viewModel, Dictionary<string, List<Dictionary<string, object>>> eventData)
         {
