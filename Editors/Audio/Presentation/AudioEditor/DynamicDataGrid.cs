@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -21,6 +22,16 @@ namespace Editors.Audio.Presentation.AudioEditor
         {
             var mainWindow = Application.Current.MainWindow;
             return FindVisualChild<DataGrid>(mainWindow, "AudioEditorDataGrid");
+        }
+
+        public static T FindVisualParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            while ((child = VisualTreeHelper.GetParent(child)) != null)
+            {
+                if (child is T parent)
+                    return parent;
+            }
+            return null;
         }
 
         public static T FindVisualChild<T>(DependencyObject parent, string name) where T : DependencyObject
@@ -44,17 +55,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             return null;
         }
 
-        public static T FindVisualParent<T>(DependencyObject child) where T : DependencyObject
-        {
-            while ((child = VisualTreeHelper.GetParent(child)) != null)
-            {
-                if (child is T parent)
-                    return parent;
-            }
-            return null;
-        }
-
-        public static void ConfigureDataGrid(AudioEditorViewModel viewModel, IAudioRepository audioRepository)
+        public static void ConfigureDataGrid(AudioEditorViewModel viewModel, IAudioRepository audioRepository, bool showCustomStatesOnly)
         {
             var audioEditorDataGridItems = viewModel.AudioEditorDataGridItems;
             var selectedAudioProjectEvent = viewModel.SelectedAudioProjectEvent;
@@ -77,10 +78,26 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             foreach (var (stateGroup, stateGroupWithQualifier) in stateGroups.Zip(stateGroupsWithQualifiers))
             {
+                var states = new List<string>();
+                var customStates = new List<string>();
+                var vanillaStates = audioRepository.StateGroupsWithStates[stateGroup];
+
+                if (AudioEditorData.Instance.StateGroupsWithCustomStates.Count() > 0 )
+                    customStates = AudioEditorData.Instance.StateGroupsWithCustomStates[stateGroup];
+
+                if (showCustomStatesOnly)
+                    states.AddRange(customStates);
+
+                else
+                {
+                    states.AddRange(customStates);
+                    states.AddRange(vanillaStates);
+                }
+
                 var column = new DataGridTemplateColumn
                 {
                     Header = AddExtraUnderScoresToStateGroup(stateGroupWithQualifier),
-                    CellTemplate = CreateStatesComboBoxTemplate(audioRepository, stateGroup, stateGroupWithQualifier),
+                    CellTemplate = CreateStatesComboBoxTemplate(states, stateGroupWithQualifier, showCustomStatesOnly),
                     Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
                 };
 
@@ -122,11 +139,10 @@ namespace Editors.Audio.Presentation.AudioEditor
             Debug.WriteLine($"Added 'Remove' buttonColumn");
         }
 
-        public static DataTemplate CreateStatesComboBoxTemplate(IAudioRepository audioRepository, string stateGroup, string stateGroupWithQualifier)
+        public static DataTemplate CreateStatesComboBoxTemplate(List<string> states, string stateGroupWithQualifier, bool showCustomStatesOnly)
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(ComboBox));
-            var states = audioRepository.StateGroupsWithStates[stateGroup];
 
             var binding = new Binding($"[{AddExtraUnderScoresToStateGroup(stateGroupWithQualifier)}]")
             {
@@ -138,13 +154,14 @@ namespace Editors.Audio.Presentation.AudioEditor
             factory.SetBinding(ComboBox.SelectedItemProperty, binding);
             factory.SetValue(ComboBox.IsTextSearchEnabledProperty, true); // Enable text search.
             factory.SetValue(ComboBox.IsEditableProperty, true); // Enable text search.
+            factory.SetValue(ComboBox.ItemsSourceProperty, showCustomStatesOnly ? new List<string>() : states); // Set ItemsSource based on showCustomStatesOnly.
 
             // Create the Loaded event handler to initialize and attach the TextChanged event.
             factory.AddHandler(ComboBox.LoadedEvent, new RoutedEventHandler((sender, args) =>
             {
                 if (sender is ComboBox comboBox)
                 {
-                    comboBox.ItemsSource = states; // Set initial full list of States.
+                    comboBox.ItemsSource = states; // Set initial ItemsSource.
 
                     if (comboBox.Template.FindName("PART_EditableTextBox", comboBox) is TextBox textBox)
                     {
@@ -154,7 +171,7 @@ namespace Editors.Audio.Presentation.AudioEditor
                             var filterText = textBox.Text;
                             var filteredItems = states.Where(item => item.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
 
-                            comboBox.ItemsSource = filteredItems; // Set filtered list of States.
+                            comboBox.ItemsSource = filteredItems; // Set filtered list based on showCustomStatesOnly.
                             comboBox.IsDropDownOpen = true; // Keep the drop-down open to show filtered results.
                         };
                     }

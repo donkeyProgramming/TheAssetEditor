@@ -10,6 +10,8 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public Dictionary<string, List<Dictionary<string, object>>> EventsData { get; set; } = [];
 
+        public Dictionary<string, List<string>> StateGroupsWithCustomStates { get; set; } = [];
+
         public string SelectedAudioProjectEvent { get; set; }
 
         private AudioEditorData()

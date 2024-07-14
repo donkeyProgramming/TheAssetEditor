@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using Editors.Audio.BnkCompiler;
 using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
 using static Editors.Audio.Presentation.AudioEditor.DynamicDataGrid;
@@ -37,22 +36,39 @@ namespace Editors.Audio.Presentation.AudioEditor
             }
         }
 
-        public static void LoadEvent(AudioEditorViewModel viewModel, bool isLoadingAudioProject, IAudioRepository audioRepository)
+        public static void LoadEvent(AudioEditorViewModel viewModel, IAudioRepository audioRepository, bool showCustomStatesOnly)
         {
             if (string.IsNullOrEmpty(AudioEditorData.Instance.SelectedAudioProjectEvent))
                 return;
 
             Debug.WriteLine($"Loading event: {AudioEditorData.Instance.SelectedAudioProjectEvent}");
 
-            if (!isLoadingAudioProject)
-                UpdateEventDataWithPreviousEvent(viewModel);
-
-            ConfigureDataGrid(viewModel, audioRepository);
+            ConfigureDataGrid(viewModel, audioRepository, showCustomStatesOnly);
 
             if (EventsData.ContainsKey(AudioEditorData.Instance.SelectedAudioProjectEvent))
 
                 foreach (var statePath in EventsData[AudioEditorData.Instance.SelectedAudioProjectEvent])
                     viewModel.AudioEditorDataGridItems.Add(statePath);
+        }
+
+        public static void LoadCustomStates(AudioEditorViewModel viewModel)
+        {
+            var stateGroupsWithCustomStates = AudioEditorData.Instance.StateGroupsWithCustomStates;
+
+            stateGroupsWithCustomStates["VO_Actor"] = new List<string>();
+            stateGroupsWithCustomStates["VO_Culture"] = new List<string>();
+            stateGroupsWithCustomStates["VO_Battle_Selection"] = new List<string>();
+            stateGroupsWithCustomStates["VO_Battle_Special_Ability"] = new List<string>();
+            stateGroupsWithCustomStates["VO_Faction_Leader"] = new List<string>();
+
+            foreach (var item in viewModel.CustomStatesDataGridItems)
+            {
+                stateGroupsWithCustomStates["VO_Actor"].Add(item.CustomVOActor);
+                stateGroupsWithCustomStates["VO_Culture"].Add(item.CustomVOCulture);
+                stateGroupsWithCustomStates["VO_Battle_Selection"].Add(item.CustomVOBattleSelection);
+                stateGroupsWithCustomStates["VO_Battle_Special_Ability"].Add(item.CustomVOBattleSpecialAbility);
+                stateGroupsWithCustomStates["VO_Faction_Leader"].Add(item.CustomVOFactionLeader);
+            }
         }
 
         public static void UpdateEventDataWithPreviousEvent(AudioEditorViewModel viewModel)
@@ -69,8 +85,8 @@ namespace Editors.Audio.Presentation.AudioEditor
             if (viewModel.AudioEditorDataGridItems == null)
                 return;
 
-            if (viewModel._selectedAudioProjectEvent != null)
-                EventsData[viewModel._selectedAudioProjectEvent] = new List<Dictionary<string, object>>(viewModel.AudioEditorDataGridItems);
+            if (viewModel.SelectedAudioProjectEvent != null)
+                EventsData[viewModel.SelectedAudioProjectEvent] = new List<Dictionary<string, object>>(viewModel.AudioEditorDataGridItems);
         }
 
         public static void AddQualifiersToStateGroups(Dictionary<string, List<string>> dialogueEventsWithStateGroups)
@@ -174,7 +190,7 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             if (viewModel.SelectedAudioProjectEventType == "Frontend VO"
                 && viewModel.SelectedAudioProjectEventSubtype == "Lord"
-                && (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All || viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.Essential))
+                && (viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.All || viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.Essential))
             {
                 AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioEditorSettings.FrontendVODialogueEventsAll);
             }
@@ -182,7 +198,7 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Lord")
             {
-                if (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All)
+                if (viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.All)
                     AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioEditorSettings.CampaignVODialogueEventsAll);
 
                 else
@@ -193,7 +209,7 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Hero")
             {
-                if (viewModel.SelectedDialogueEventsPreset == DialogueEventsPreset.All)
+                if (viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.All)
                     AddDialogueEventAudioProjectDialogueEvents(viewModel, AudioEditorSettings.CampaignVODialogueEventsAll);
 
                 else

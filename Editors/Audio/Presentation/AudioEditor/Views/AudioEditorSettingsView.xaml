@@ -120,13 +120,13 @@
     
                     <!-- All CheckBox -->
                     <CheckBox Content="All" Margin="0 2.5 5 0"
-                              IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource SettingsEnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.All}}"
+                              IsChecked="{Binding SelectedAudioProjectEventsPreset, Converter={StaticResource SettingsEnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.All}}"
                               ToolTip="PLACEHOLDER TOOLTIP"
                               Grid.Column="1"/>
 
                     <!-- Essential CheckBox -->
                     <CheckBox Content="Essential" Margin="5 2.5 5 0"
-                              IsChecked="{Binding SelectedDialogueEventsPreset, Converter={StaticResource SettingsEnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.Essential}}"
+                              IsChecked="{Binding SelectedAudioProjectEventsPreset, Converter={StaticResource SettingsEnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.Essential}}"
                               ToolTip="PLACEHOLDER TOOLTIP"
                               Grid.Column="2"/>
                 </Grid>

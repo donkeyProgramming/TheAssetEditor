@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using CommonControls.PackFileBrowser;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.Storage;
 using Newtonsoft.Json;
@@ -34,15 +35,24 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         Custom
     }
 
-    public class AudioEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public partial class AudioEditorViewModel : ObservableObject, IEditorViewModel
     {
         public readonly IAudioRepository AudioRepository;
         public readonly PackFileService PackFileService;
-        public string _selectedAudioProjectEvent;
+
         public string _previousSelectedAudioProjectEvent;
-        public string _selectedAudioProjectEventType;
-        public string _selectedAudioProjectEventSubtype;
-        public DialogueEventsPreset _selectedAudioProjectEventsPreset;
+        [ObservableProperty]
+        private string _selectedAudioProjectEvent;
+        [ObservableProperty]
+        private bool _showCustomStatesOnly;
+
+        // Audio Project settings
+        [ObservableProperty]
+        private string _selectedAudioProjectEventType;
+        [ObservableProperty]
+        private string _selectedAudioProjectEventSubtype;
+        [ObservableProperty]
+        private DialogueEventsPreset _selectedAudioProjectEventsPreset;
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
         public AudioEditorDataViewModel AudioEditor { get; }
@@ -80,51 +90,35 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             AudioProjectEventType = audioProjectSettings.EventType;
         }
 
-        public string SelectedAudioProjectEventType
+        partial void OnSelectedAudioProjectEventTypeChanged(string value)
         {
-            get { return _selectedAudioProjectEventType; }
-            set
-            {
-                Debug.WriteLine($"_selectedAudioProjectEventType changed to: {value}");
-                SetAndNotify(ref _selectedAudioProjectEventType, value);
-                UpdateAudioProjectEventSubType(this);
-            }
+            Debug.WriteLine($"_selectedAudioProjectEventType changed to: {value}");
+            UpdateAudioProjectEventSubType(this);
         }
 
-        public string SelectedAudioProjectEventSubtype
+        partial void OnSelectedAudioProjectEventChanged(string value)
         {
-            get { return _selectedAudioProjectEventSubtype; }
-            set
-            {
-                Debug.WriteLine($"_selectedAudioProjectEventSubtype changed to: {value}");
-                SetAndNotify(ref _selectedAudioProjectEventSubtype, value);
-            }
+            _previousSelectedAudioProjectEvent = SelectedAudioProjectEvent;
+            Debug.WriteLine($"_selectedAudioProjectEvent changed to: {value}");
+            AudioEditorData.Instance.SelectedAudioProjectEvent = value;
+
+            LoadEvent(this, AudioRepository, ShowCustomStatesOnly);
         }
 
-        public DialogueEventsPreset SelectedDialogueEventsPreset
+        partial void OnSelectedAudioProjectEventSubtypeChanged(string value)
         {
-            get { return _selectedAudioProjectEventsPreset; }
-            set
-            {
-                Debug.WriteLine($"SelectedDialogueEventsPreset changed to: {value}");
-                SetAndNotify(ref _selectedAudioProjectEventsPreset, value);
-            }
+            Debug.WriteLine($"_selectedAudioProjectEventSubtype changed to: {value}");
         }
 
-        public string SelectedAudioProjectEvent
+        partial void OnSelectedAudioProjectEventsPresetChanged(DialogueEventsPreset value)
         {
-            get { return _selectedAudioProjectEvent; }
-            set
-            {
-                if (_selectedAudioProjectEvent != value)
-                {
-                    _previousSelectedAudioProjectEvent = _selectedAudioProjectEvent;
-                    Debug.WriteLine($"_selectedAudioProjectEvent changed from: {_previousSelectedAudioProjectEvent} to: {value}");
-                    SetAndNotify(ref _selectedAudioProjectEvent, value);
-                    AudioEditorData.Instance.SelectedAudioProjectEvent = value;
-                    LoadEvent(this, false, AudioRepository);
-                }
-            }
+            Debug.WriteLine($"_selectedAudioProjectEventsPreset changed to: {value}");
+        }
+
+        partial void OnShowCustomStatesOnlyChanged(bool value)
+        {
+            Debug.WriteLine($"_showCustomStatesOnly changed to: {value}");
+            LoadEvent(this, AudioRepository, ShowCustomStatesOnly);
         }
 
         public void CreateAudioProject()
@@ -136,7 +130,9 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 
             InitialiseEventData(this);
 
-            LoadEvent(this, true, AudioRepository);
+            AudioEditorViewModelHelpers.LoadCustomStates(this);
+
+            LoadEvent(this, AudioRepository, ShowCustomStatesOnly);
 
             AudioProjectData.AddAudioProjectToPackFile(PackFileService, EventsData);
         }
@@ -146,7 +142,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             EventsData.Clear();
             AudioEditorDataGridItems.Clear();
             _previousSelectedAudioProjectEvent = "";
-            _selectedAudioProjectEvent = "";
+            SelectedAudioProjectEvent = "";
 
             AddQualifiersToStateGroups(AudioRepository.DialogueEventsWithStateGroups);
 
@@ -162,6 +158,8 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
                 var eventData = AudioProjectData.ConvertAudioProjectToEventData(AudioRepository, audioProjectJson);
                 AudioEditorData.Instance.EventsData = eventData;
             }
+
+            AudioEditorViewModelHelpers.LoadCustomStates(this);
 
             CreateAudioProjectDialogueEventsListFromAudioProject(this, EventsData);
         }
@@ -187,7 +185,11 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
                 CustomStatesDataGridItems.Clear();
 
                 foreach (var customState in customStatesFileData)
-                    CustomStatesDataGridItems.Add(customState);         
+                    CustomStatesDataGridItems.Add(customState);
+
+                AudioEditorViewModelHelpers.LoadCustomStates(this);
+
+                LoadEvent(this, AudioRepository, ShowCustomStatesOnly);
             }
         }
 
@@ -197,18 +199,22 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             var pack = PackFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
             PackFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"custom_states.json", new MemorySource(byteArray)));
+
+            AudioEditorViewModelHelpers.LoadCustomStates(this);
+
+            LoadEvent(this, AudioRepository, ShowCustomStatesOnly);
         }
 
         public void AddStatePath()
         {
-            if (string.IsNullOrEmpty(_selectedAudioProjectEvent))
+            if (string.IsNullOrEmpty(SelectedAudioProjectEvent))
                 return;
 
             // Create a new dictionary and initialize it with the necessary keys
             var newRow = new Dictionary<string, object>();
 
             // Get the state groups with qualifiers for the selected audio project event
-            var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[_selectedAudioProjectEvent];
+            var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[SelectedAudioProjectEvent];
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {

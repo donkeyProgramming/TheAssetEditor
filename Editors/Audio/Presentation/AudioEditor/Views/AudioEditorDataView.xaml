@@ -21,9 +21,9 @@
         <Menu Grid.Row="0">
             <MenuItem Header="_File" HorizontalAlignment="Left">
                 <MenuItem Header="Load Audio Project" Click="{s:MethodBinding LoadAudioProject}" />
-                <MenuItem Header="Save Audio Project" Click="{s:MethodBinding SaveAudioProject}" />
-                <Separator />
                 <MenuItem Header="Load Custom States" Click="{s:MethodBinding LoadCustomStates}" />
+                <Separator />
+                <MenuItem Header="Save Audio Project" Click="{s:MethodBinding SaveAudioProject}" />
                 <MenuItem Header="Save Custom States" Click="{s:MethodBinding SaveCustomStates}" />
             </MenuItem>
         </Menu>
