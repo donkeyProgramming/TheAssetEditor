@@ -8,7 +8,6 @@ namespace GameWorld.Core.Rendering.Geometry
         IndexBuffer IndexBuffer { get; }
         VertexBuffer VertexBuffer { get; }
 
-
         void RebuildIndexBuffer(ushort[] indexList);
         void RebuildVertexBuffer(VertexPositionNormalTextureCustom[] vertArray, VertexDeclaration vertexDeclaration);
 
@@ -18,7 +17,7 @@ namespace GameWorld.Core.Rendering.Geometry
 
     public class GraphicsCardGeometry : IGraphicsCardGeometry
     {
-        GraphicsDevice Device;
+        private readonly GraphicsDevice Device;
         public VertexBuffer VertexBuffer { get; private set; }
         public IndexBuffer IndexBuffer { get; private set; }
 
@@ -56,7 +55,6 @@ namespace GameWorld.Core.Rendering.Geometry
                 VertexBuffer.SetData(vertArray);
             }
         }
-
 
         public IGraphicsCardGeometry Clone()
         {

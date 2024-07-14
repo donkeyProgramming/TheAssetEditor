@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameWorld.WpfWindow;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.PackFiles;
 
@@ -15,6 +14,8 @@ namespace GameWorld.WpfWindow.ResourceHandling
         Pbs_MetalRough,
         BasicEffect,
         GeometryInstance,
+        Glow,
+        BloomFilter
     }
 
     public class ResourceLibrary
@@ -51,8 +52,8 @@ namespace GameWorld.WpfWindow.ResourceHandling
             _gameWorld = game;
 
             // Load default shaders
-            LoadEffect("Shaders\\Phazer\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
-            LoadEffect("Shaders\\Phazer\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
+            var mr = LoadEffect("Shaders\\Phazer\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
+            var sg = LoadEffect("Shaders\\Phazer\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
             LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
             LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
             LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
@@ -63,6 +64,13 @@ namespace GameWorld.WpfWindow.ResourceHandling
             PbrDiffuse = _gameWorld.Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
             PbrSpecular = _gameWorld.Content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
             PbrLut = _gameWorld.Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
+
+            mr.Parameters["tex_cube_diffuse"]?.SetValue(PbrDiffuse);
+            mr.Parameters["tex_cube_specular"]?.SetValue(PbrSpecular);
+            mr.Parameters["specularBRDF_LUT"]?.SetValue(PbrLut);
+            sg.Parameters["tex_cube_diffuse"]?.SetValue(PbrDiffuse);
+            sg.Parameters["tex_cube_specular"]?.SetValue(PbrSpecular);
+            sg.Parameters["specularBRDF_LUT"]?.SetValue(PbrLut);
         }
 
         public void Reset()
@@ -134,5 +142,7 @@ namespace GameWorld.WpfWindow.ResourceHandling
         }
 
         public SpriteBatch CreateSpriteBatch() => new SpriteBatch(_gameWorld.GraphicsDevice);
+
+        public Texture2D GetTexture(string textureName) => LoadTexture(textureName);
     }
 }

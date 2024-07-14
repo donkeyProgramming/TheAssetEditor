@@ -38,6 +38,15 @@ namespace GameWorld.Core.Rendering
         }
     }
 
+    struct VertexMeshInstanceInfo
+    {
+        public Vector3 World0 { get; set; }
+        public Vector3 World1 { get; set; }
+        public Vector3 World2 { get; set; }
+        public Vector3 World3 { get; set; }
+        public Vector3 Colour { get; set; }
+    };
+
     public class VertexInstanceMesh : IDisposable
     {
         Effect _effect;
@@ -48,26 +57,17 @@ namespace GameWorld.Core.Rendering
         IndexBuffer _indexBuffer;
 
         VertexBufferBinding[] _bindings;
-        InstanceInfo[] _instanceTransform;
+        VertexMeshInstanceInfo[] _instanceTransform;
 
-        struct InstanceInfo
-        {
-            public Vector3 World0;
-            public Vector3 World1;
-            public Vector3 World2;
-            public Vector3 World3;
-            public Vector3 Colour;
-        };
-
-        int _maxInstanceCount = 50000;
+        readonly int _maxInstanceCount = 50000;
         int _currentInstanceCount;
 
-        Vector3 _selectedColur = new Vector3(1, 0, 0);
-        Vector3 _deselectedColur = new Vector3(1, 1, 1);
+        Vector3 _selectedColour = new(1, 0, 0);
+        Vector3 _deselectedColour = new (1, 1, 1);
 
-        public VertexInstanceMesh(IDeviceResolver deviceResolverComponent, ResourceLibrary resourceLibary)
+        public VertexInstanceMesh(IDeviceResolver deviceResolverComponent, ResourceLibrary resourceLibrary)
         {
-            Initialize(deviceResolverComponent.Device, resourceLibary);
+            Initialize(deviceResolverComponent.Device, resourceLibrary);
         }
 
         void Initialize(GraphicsDevice device, ResourceLibrary resourceLib)
@@ -77,7 +77,7 @@ namespace GameWorld.Core.Rendering
             _instanceVertexDeclaration = InstanceDataOrientation.VertexDeclaration;
             GenerateGeometry(device);
             _instanceBuffer = new DynamicVertexBuffer(device, _instanceVertexDeclaration, _maxInstanceCount, BufferUsage.WriteOnly);
-            _instanceTransform = new InstanceInfo[_maxInstanceCount];
+            _instanceTransform = new VertexMeshInstanceInfo[_maxInstanceCount];
             GenerateInstanceInformation(_maxInstanceCount);
 
             _bindings = new VertexBufferBinding[2];
@@ -159,7 +159,7 @@ namespace GameWorld.Core.Rendering
                 _instanceTransform[i].World1 = new Vector3(world[1, 0], world[1, 1], world[1, 2]);
                 _instanceTransform[i].World2 = new Vector3(world[2, 0], world[2, 1], world[2, 2]);
                 _instanceTransform[i].World3 = new Vector3(world[3, 0], world[3, 1], world[3, 2]);
-                _instanceTransform[i].Colour = Vector3.Lerp(_deselectedColur, _selectedColur, selectedVertexes.VertexWeights[i]);
+                _instanceTransform[i].Colour = Vector3.Lerp(_deselectedColour, _selectedColour, selectedVertexes.VertexWeights[i]);
 
             }
             _instanceBuffer.SetData(_instanceTransform, 0, Math.Min(_currentInstanceCount, _maxInstanceCount), SetDataOptions.None);
@@ -183,11 +183,8 @@ namespace GameWorld.Core.Rendering
             _instanceBuffer.SetData(_instanceTransform);
         }
 
-        //view and projection should come from your camera
         public void Draw(Matrix view, Matrix projection, GraphicsDevice device, Vector3 colour)
         {
-            //GenerateInstanceInformation(instanceCount);
-
             _effect.CurrentTechnique = _effect.Techniques["Instancing"];
             _effect.Parameters["WVP"].SetValue(view * projection);
             _effect.Parameters["VertexColour"].SetValue(colour);
@@ -201,7 +198,6 @@ namespace GameWorld.Core.Rendering
 
         public void Dispose()
         {
-            // _effect.Dispose();
             _instanceVertexDeclaration.Dispose();
             _instanceBuffer.Dispose();
         }

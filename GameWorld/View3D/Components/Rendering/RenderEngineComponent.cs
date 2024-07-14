@@ -1,200 +1,217 @@
-﻿using GameWorld.Core.Rendering;
+﻿using System;
+using System.Collections.Generic;
+using CommunityToolkit.Diagnostics;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering;
 using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.Events;
 using Shared.Core.Services;
-using System;
-using System.Collections.Generic;
 
 namespace GameWorld.Core.Components.Rendering
 {
-    public enum RenderBuckedId
-    {
-        Normal,
-        Wireframe,
-        Selection,
-        Line,
-        Text,
-        ConstantDebugLine,
-    }
-
-
-    public interface IRenderItem
-    {
-        Matrix ModelMatrix { get; set; }
-        void Draw(GraphicsDevice device, CommonShaderParameters parameters);
-    }
-
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
-        enum RasterizerStateEnum
-        {
-            Default,
-            Wireframe,
-            SelectedFaces,
-        }
+        Color _backgroundColour = new (54, 54, 54);
 
         private readonly Dictionary<RasterizerStateEnum, RasterizerState> _rasterStates = [];
         private readonly ArcBallCamera _camera;
         private readonly Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = [];
+        private readonly List<VertexPositionColor> _renderLines = [];
         private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
-        private readonly ApplicationSettingsService _applicationSettingsService;
-
+        private readonly SceneLightParametersStore _sceneLightParameters;
+        private readonly EventHub _eventHub;
+        
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
+        bool _drawGlow = true;
 
-        public float EnvLightRotationDegrees_Y { get; set; } = 20;
-        public float DirLightRotationDegrees_X { get; set; } = 0;
-        public float DirLightRotationDegrees_Y { get; set; } = 0;
-        public float LightIntensityMult { get; set; } = 1;
+        private BloomFilter _bloomFilter;
+        Texture2D _whiteTexture;
 
-        public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;
+        RenderTarget2D _defaultRenderTarget;
+        RenderTarget2D _glowRenderTarget;
 
-        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService)
+        public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;  // This should be removed!
+      
+        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneLightParametersStore sceneLightParametersStore, EventHub eventHub)
         {
+            UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
+            DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
+
             _camera = camera;
             _resourceLib = resourceLib;
             _deviceResolverComponent = deviceResolverComponent;
-            _applicationSettingsService = applicationSettingsService;
-            UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
-            DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
+            _sceneLightParameters = sceneLightParametersStore;
+            _eventHub = eventHub;
 
             foreach (RenderBuckedId value in Enum.GetValues(typeof(RenderBuckedId)))
                 _renderItems.Add(value, new List<IRenderItem>(100));
 
-            if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3 || _applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.ThreeKingdoms)
+            _renderLines = new List<VertexPositionColor>(1000);
+            
+            if (applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3 || applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.ThreeKingdoms)
                 MainRenderFormat = RenderFormats.MetalRoughness;
+
+            _eventHub.Register<SelectionChangedEvent>(OnSelectionChanged);
+        }
+
+        void OnSelectionChanged(SelectionChangedEvent changedEvent)
+        {
+            if (changedEvent.NewState.Mode == GeometrySelectionMode.Object)
+                _drawGlow = true;
+            else
+                _drawGlow = false;
         }
 
         public override void Initialize()
         {
             RebuildRasterStates(_cullingEnabled, _bigSceneDepthBiasMode);
-            base.Initialize();
+
+            var device = _deviceResolverComponent.Device;
+
+            _bloomFilter = new BloomFilter();
+            _bloomFilter.Load(device, _resourceLib, device.Viewport.Width, device.Viewport.Height);
+            _bloomFilter.BloomPreset = BloomFilter.BloomPresets.SuperWide;
+
+            _whiteTexture = new Texture2D(_deviceResolverComponent.Device, 1, 1);
+            _whiteTexture.SetData(new[] { Color.White });
         }
 
         void RebuildRasterStates(bool cullingEnabled, bool bigSceneDepthBias)
         {
-            foreach (var item in _rasterStates.Values)
-                item.Dispose();
-            _rasterStates.Clear();
-
-            var cullMode = cullingEnabled ? CullMode.CullCounterClockwiseFace : CullMode.None;
-            float bias = bigSceneDepthBias ? 0 : 0;
-
-            _rasterStates[RasterizerStateEnum.Default] = new RasterizerState
-            {
-                FillMode = FillMode.Solid,
-                CullMode = cullMode,
-                DepthBias = bias,
-                DepthClipEnable = true,
-                MultiSampleAntiAlias = true
-            };
-
-            var depthOffsetBias = 0.00005f;
-            _rasterStates[RasterizerStateEnum.Wireframe] = new RasterizerState
-            {
-                FillMode = FillMode.WireFrame,
-                CullMode = cullMode,
-                DepthBias = bias - depthOffsetBias,
-                DepthClipEnable = true,
-                MultiSampleAntiAlias = true
-            };
-
-            _rasterStates[RasterizerStateEnum.SelectedFaces] = new RasterizerState
-            {
-                FillMode = FillMode.Solid,
-                CullMode = CullMode.None,
-                DepthBias = bias - depthOffsetBias,
-                DepthClipEnable = true,
-                MultiSampleAntiAlias = true
-            };
-
             _cullingEnabled = cullingEnabled;
             _bigSceneDepthBiasMode = bigSceneDepthBias;
+
+            // Set renderState to something we dont use, so we can rebuild the ones we care about
+            _deviceResolverComponent.Device.RasterizerState = RasterizerState.CullNone;
+            RasterStateHelper.Rebuild(_rasterStates, _cullingEnabled, _bigSceneDepthBiasMode);
         }
 
-        public void ToggleLargeSceneRendering()
-        {
-            _deviceResolverComponent.Device.RasterizerState = RasterizerState.CullNone;
-            RebuildRasterStates(_cullingEnabled, !_bigSceneDepthBiasMode);
-        }
+        public void ToggleLargeSceneRendering() => RebuildRasterStates(_cullingEnabled, !_bigSceneDepthBiasMode);
 
-        public void ToggelBackFaceRendering()
-        {
-            _deviceResolverComponent.Device.RasterizerState = RasterizerState.CullNone;
-            RebuildRasterStates(!_cullingEnabled, _bigSceneDepthBiasMode);
-        }
+        public void ToggleBackFaceRendering() => RebuildRasterStates(!_cullingEnabled, _bigSceneDepthBiasMode);
 
         public void AddRenderItem(RenderBuckedId id, IRenderItem item)
         {
             _renderItems[id].Add(item);
         }
 
+        public void AddRenderLines(VertexPositionColor[] lineVertices)
+        {
+            Guard.IsTrue(lineVertices.Length % 2 == 0);
+            _renderLines.AddRange(lineVertices);
+        }
+
         public override void Update(GameTime gameTime)
         {
             foreach (var value in _renderItems.Keys)
-            {
-                if (value == RenderBuckedId.ConstantDebugLine)
-                    continue;
                 _renderItems[value].Clear();
-            }
 
-            base.Update(gameTime);
-        }
-
-        public void ClearDebugBuffer()
-        {
-            _renderItems[RenderBuckedId.ConstantDebugLine].Clear();
+            _renderLines.Clear();
         }
 
         public override void Draw(GameTime gameTime)
         {
-            var commonShaderParameters = new CommonShaderParameters()
+            var device = _deviceResolverComponent.Device;
+            var spriteBatch = _resourceLib.CommonSpriteBatch;
+            var screenWidth = device.Viewport.Width;
+            var screenHeight = device.Viewport.Height;
+            var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters);
+
+            _defaultRenderTarget = RenderTargetHelper.GetRenderTarget(device, _defaultRenderTarget);
+            _glowRenderTarget = RenderTargetHelper.GetRenderTarget(device, _glowRenderTarget);
+
+            // Configure render targets
+            var backBufferRenderTarget = device.GetRenderTargets()[0].RenderTarget as RenderTarget2D;
+            device.SetRenderTarget(_defaultRenderTarget);
+
+            // 2D drawing
+            Render2DObjects(device, commonShaderParameters);
+
+            // 3D drawing - Normal scene
+            device.DepthStencilState = DepthStencilState.Default;
+            Render3DObjects(commonShaderParameters, RenderingTechnique.Normal);
+
+            // 3D drawing - Emissive 
+            device.SetRenderTarget(_glowRenderTarget);
+            Render3DObjects(commonShaderParameters, RenderingTechnique.Emissive);
+
+            // Draw the result to the backBuffer
+            device.SetRenderTarget(backBufferRenderTarget);
+            spriteBatch.Begin();
+            spriteBatch.Draw(_defaultRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
+            spriteBatch.End();
+
+            if (_drawGlow)
             {
-                Projection = _camera.ProjectionMatrix,
-                View = _camera.ViewMatrix,
-                CameraPosition = _camera.Position,
-                CameraLookAt = _camera.LookAt,
-                EnvLightRotationsRadians_Y = MathHelper.ToRadians(EnvLightRotationDegrees_Y),
-                DirLightRotationRadians_X = MathHelper.ToRadians(DirLightRotationDegrees_X),
-                DirLightRotationRadians_Y = MathHelper.ToRadians(DirLightRotationDegrees_Y),
-                LightIntensityMult = LightIntensityMult
-            };
+                var bloomRenderTarget = _bloomFilter.Draw(_glowRenderTarget, screenWidth, screenHeight);
+                device.SetRenderTarget(backBufferRenderTarget);
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
+                spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
+                spriteBatch.End();
+            }
+        }
 
-            _resourceLib.CommonSpriteBatch.Begin();
-            foreach (var item in _renderItems[RenderBuckedId.Text])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
-            _resourceLib.CommonSpriteBatch.End();
+        private void Render2DObjects(GraphicsDevice device, CommonShaderParameters commonShaderParameters)
+        {
+            var spriteBatch = _resourceLib.CommonSpriteBatch;
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
-            _deviceResolverComponent.Device.DepthStencilState = DepthStencilState.Default;
-            _deviceResolverComponent.Device.RasterizerState = _rasterStates[RasterizerStateEnum.Default];
+            // Clear the screen
+            spriteBatch.Draw(_whiteTexture, new Rectangle(0, 0, device.Viewport.Width, device.Viewport.Height), _backgroundColour);
+
+            foreach (var item in _renderItems[RenderBuckedId.Font])
+                item.Draw(device, commonShaderParameters, RenderingTechnique.Normal);
+            spriteBatch.End();
+        }
+
+        void Render3DObjects(CommonShaderParameters commonShaderParameters, RenderingTechnique renderingTechnique)
+        {
+            var device = _deviceResolverComponent.Device;
+            device.RasterizerState = _rasterStates[RasterizerStateEnum.Normal];
+
+            if (renderingTechnique == RenderingTechnique.Normal)
+            {
+                var shader = _resourceLib.GetStaticEffect(ShaderTypes.Line);
+                shader.Parameters["View"].SetValue(commonShaderParameters.View);
+                shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
+                shader.Parameters["World"].SetValue(Matrix.Identity);
+
+                foreach (var pass in shader.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    device.DrawUserPrimitives(PrimitiveType.LineList, _renderLines.ToArray(), 0, _renderLines.Count / 2);
+                }
+            }
 
             foreach (var item in _renderItems[RenderBuckedId.Normal])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
+                item.Draw(device, commonShaderParameters, renderingTechnique);
 
-            _deviceResolverComponent.Device.RasterizerState = _rasterStates[RasterizerStateEnum.Wireframe];
+            device.RasterizerState = _rasterStates[RasterizerStateEnum.Wireframe];
             foreach (var item in _renderItems[RenderBuckedId.Wireframe])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
+                item.Draw(device, commonShaderParameters, renderingTechnique);
 
-            _deviceResolverComponent.Device.RasterizerState = _rasterStates[RasterizerStateEnum.SelectedFaces];
+            device.RasterizerState = _rasterStates[RasterizerStateEnum.SelectedFaces];
             foreach (var item in _renderItems[RenderBuckedId.Selection])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
-
-            foreach (var item in _renderItems[RenderBuckedId.Line])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
-
-            foreach (var item in _renderItems[RenderBuckedId.ConstantDebugLine])
-                item.Draw(_deviceResolverComponent.Device, commonShaderParameters);
-
-            _deviceResolverComponent.Device.DepthStencilState = DepthStencilState.Default;
-            _deviceResolverComponent.Device.RasterizerState = RasterizerState.CullNone;
+                item.Draw(device, commonShaderParameters, renderingTechnique);
         }
 
         public void Dispose()
         {
+            _eventHub.UnRegister<SelectionChangedEvent>(OnSelectionChanged);
+
+            _bloomFilter.Dispose();
+            _defaultRenderTarget.Dispose();
+            _glowRenderTarget.Dispose();
+            _whiteTexture.Dispose();
+
+            _renderLines.Clear();
             _renderItems.Clear();
+
             foreach (var item in _rasterStates.Values)
                 item.Dispose();
             _rasterStates.Clear();

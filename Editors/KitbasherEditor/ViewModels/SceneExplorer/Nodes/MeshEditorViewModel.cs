@@ -1,4 +1,5 @@
-﻿using Editors.Shared.Core.Services;
+﻿using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
+using Editors.Shared.Core.Services;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using KitbasherEditor.ViewModels;
@@ -9,7 +10,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 
-namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
+namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
     public class MeshEditorViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
     {
@@ -25,11 +26,11 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         public MaterialGeneralViewModel MaterialGeneral { get; set; }
         public WeightedMaterialViewModel Material { get; set; }
 
-        public MeshEditorViewModel(KitbasherRootScene kitbasherRootScene, 
-            PackFileService pfs, 
-            SkeletonAnimationLookUpHelper animLookUp, 
+        public MeshEditorViewModel(KitbasherRootScene kitbasherRootScene,
+            PackFileService pfs,
+            SkeletonAnimationLookUpHelper animLookUp,
             SceneManager sceneManager,
-            ApplicationSettingsService applicationSettings, 
+            ApplicationSettingsService applicationSettings,
             IUiCommandFactory uiCommandFactory)
         {
             _kitbasherRootScene = kitbasherRootScene;

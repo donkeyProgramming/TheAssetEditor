@@ -35,7 +35,8 @@ namespace GameWorld.Core
 
             // Settings
             serviceCollection.AddScoped<GeometrySaveSettings>();
-
+            serviceCollection.AddScoped<SceneLightParametersStore>();
+            
             // Services
             serviceCollection.AddScoped<ViewOnlySelectedService>();
             serviceCollection.AddScoped<FocusSelectableObjectService>();
@@ -90,10 +91,11 @@ namespace GameWorld.Core
             RegisterGameComponent<SelectionManager>(serviceCollection);
             RegisterGameComponent<SelectionComponent>(serviceCollection);
             RegisterGameComponent<RenderEngineComponent>(serviceCollection);
-            RegisterGameComponent<ClearScreenComponent>(serviceCollection);
             RegisterGameComponent<GridComponent>(serviceCollection);
             RegisterGameComponent<AnimationsContainerComponent>(serviceCollection);
             RegisterGameComponent<LightControllerComponent>(serviceCollection);
+
+            //serviceCollection.AddScoped<ISceneLightParameters>(x => x.GetRequiredService<LightControllerComponent>()); 
         }
 
         void RegisterCommands(IServiceCollection serviceCollection)
@@ -139,13 +141,13 @@ namespace GameWorld.Core
         protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
         {
             serviceCollection.AddScoped<T>();
-            serviceCollection.AddScoped<IGameComponent, T>(x => x.GetService<T>());
+            serviceCollection.AddScoped<IGameComponent, T>(x => x.GetRequiredService<T>());
         }
 
         protected void RegisterGameComponent<TInterface, TActual>(IServiceCollection serviceCollection) where TInterface : class, IGameComponent where TActual : class, TInterface
         {
             serviceCollection.AddScoped<TInterface, TActual>();
-            serviceCollection.AddScoped<IGameComponent, TInterface>(x => x.GetService<TInterface>());
+            serviceCollection.AddScoped<IGameComponent, TInterface>(x => x.GetRequiredService<TInterface>());
         }
     }
 }

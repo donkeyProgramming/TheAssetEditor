@@ -24,9 +24,8 @@ namespace GameWorld.Core.Components.Selection
         BasicShader _wireframeEffect;
         BasicShader _selectedFacesEffect;
 
-        LineMeshRender _lineGeometry;
         VertexInstanceMesh _vertexRenderer;
-        float _vertexSelectionFallof = 0;
+        float _vertexSelectionFalloff = 0;
         private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
 
@@ -42,7 +41,6 @@ namespace GameWorld.Core.Components.Selection
         {
             CreateSelectionSate(GeometrySelectionMode.Object, null, false);
 
-            _lineGeometry = new LineMeshRender(_resourceLib);
             _vertexRenderer = new VertexInstanceMesh(_deviceResolverComponent, _resourceLib);
 
             _wireframeEffect = new BasicShader(_deviceResolverComponent.Device);
@@ -75,7 +73,7 @@ namespace GameWorld.Core.Components.Selection
                     break;
 
                 case GeometrySelectionMode.Vertex:
-                    _currentState = new VertexSelectionState(selectedObj, _vertexSelectionFallof);
+                    _currentState = new VertexSelectionState(selectedObj, _vertexSelectionFalloff);
                     break;
                 case GeometrySelectionMode.Bone:
                     _currentState = new BoneSelectionState(selectedObj);
@@ -112,30 +110,26 @@ namespace GameWorld.Core.Components.Selection
         {
             var selectionState = GetState();
 
-            _lineGeometry.Clear();
             if (selectionState is ObjectSelectionState objectSelectionState)
             {
                 foreach (var item in objectSelectionState.CurrentSelection())
                 {
                     if (item is Rmv2MeshNode mesh)
-                    {
-                        _lineGeometry.AddBoundingBox(item.Geometry.BoundingBox);
-                        _renderEngine.AddRenderItem(RenderBuckedId.Selection, new LineRenderItem() { ModelMatrix = mesh.RenderMatrix, LineMesh = _lineGeometry });
-                    }
+                        _renderEngine.AddRenderLines(LineHelper.AddBoundingBox(item.Geometry.BoundingBox, Color.Black));
                 }
             }
 
             if (selectionState is FaceSelectionState selectionFaceState && selectionFaceState.RenderObject is Rmv2MeshNode meshNode)
             {
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new GeoRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _selectedFacesEffect, Faces = selectionFaceState.SelectedFaces });
-                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = meshNode.RenderMatrix, Geometry = meshNode.Geometry, Shader = _wireframeEffect });
+                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new PartialGeometryRenderItem(meshNode.Geometry, meshNode.RenderMatrix, _selectedFacesEffect, selectionFaceState.SelectedFaces));
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeometryRenderItem(meshNode.Geometry, _wireframeEffect, meshNode.RenderMatrix));
             }
 
             if (selectionState is VertexSelectionState selectionVertexState && selectionVertexState.RenderObject != null)
             {
                 var vertexObject = selectionVertexState.RenderObject as Rmv2MeshNode;
-                _renderEngine.AddRenderItem(RenderBuckedId.Selection, new VertexRenderItem() { Node = vertexObject, ModelMatrix = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = _vertexRenderer });
-                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeoRenderItem() { ModelMatrix = vertexObject.RenderMatrix, Geometry = vertexObject.Geometry, Shader = _wireframeEffect });
+                _renderEngine.AddRenderItem(RenderBuckedId.Normal, new VertexRenderItem() { Node = vertexObject, ModelMatrix = vertexObject.RenderMatrix, SelectedVertices = selectionVertexState, VertexRenderer = _vertexRenderer });
+                _renderEngine.AddRenderItem(RenderBuckedId.Wireframe, new GeometryRenderItem(vertexObject.Geometry, _wireframeEffect, vertexObject.RenderMatrix));
             }
 
             if (selectionState is BoneSelectionState selectionBoneState && selectionBoneState.RenderObject != null)
@@ -157,9 +151,7 @@ namespace GameWorld.Core.Components.Selection
                         //_lineRenderer.AddLine(Vector3.Transform(currentBoneMatrix.Translation, parentWorld), Vector3.Transform(parentBoneMatrix.Translation, parentWorld));
                         var bone = currentFrame.GetSkeletonAnimatedWorld(skeleton, boneIdx);
                         bone.Decompose(out var _, out var _, out var trans);
-                        _lineGeometry.AddCube(Matrix.CreateScale(0.06f) * bone * renderMatrix * parentWorld, Color.Red);
-                        _renderEngine.AddRenderItem(RenderBuckedId.Line, new LineRenderItem() { LineMesh = _lineGeometry, ModelMatrix = Matrix.Identity });
-
+                        _renderEngine.AddRenderLines(LineHelper.CreateCube(Matrix.CreateScale(0.06f) * bone * renderMatrix * parentWorld, Color.Red));
                     }
                 }
             }
@@ -171,13 +163,13 @@ namespace GameWorld.Core.Components.Selection
         {
             if (_wireframeEffect != null)
             {
-                _wireframeEffect.Effect.Dispose();
+                _wireframeEffect.Dispose();
                 _wireframeEffect = null;
             }
 
             if (_selectedFacesEffect != null)
             {
-                _selectedFacesEffect.Effect.Dispose();
+                _selectedFacesEffect.Dispose();
                 _selectedFacesEffect = null;
             }
 
@@ -187,22 +179,16 @@ namespace GameWorld.Core.Components.Selection
                 _vertexRenderer = null;
             }
 
-            if (_lineGeometry != null)
-            {
-                _lineGeometry.Dispose();
-                _lineGeometry = null;
-            }
-
             _currentState?.Clear();
             _currentState = null;
         }
 
         public void UpdateVertexSelectionFallof(float newValue)
         {
-            _vertexSelectionFallof = Math.Clamp(newValue, 0, float.MaxValue);
+            _vertexSelectionFalloff = Math.Clamp(newValue, 0, float.MaxValue);
             var vertexSelectionState = GetState<VertexSelectionState>();
             if (vertexSelectionState != null)
-                vertexSelectionState.UpdateWeights(_vertexSelectionFallof);
+                vertexSelectionState.UpdateWeights(_vertexSelectionFalloff);
         }
     }
 }

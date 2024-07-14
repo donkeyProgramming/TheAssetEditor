@@ -1,4 +1,7 @@
-﻿using GameWorld.Core.Animation;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Gizmo;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
@@ -8,14 +11,10 @@ using GameWorld.Core.Rendering.Shading;
 using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GameWorld.Core.SceneNodes
 {
@@ -28,7 +27,9 @@ namespace GameWorld.Core.SceneNodes
         Quaternion _orientation = Quaternion.Identity;
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
+
         ResourceLibrary _resourceLib;
+        private RenderEngineComponent _renderEngineComponent;
 
         public string OriginalFilePath { get; set; }
         public int OriginalPartIndex { get; internal set; }
@@ -63,26 +64,26 @@ namespace GameWorld.Core.SceneNodes
         }
 
 
-        public AnimationPlayer AnimationPlayer;
-        private RenderEngineComponent _renderEngineComponent;
+        public AnimationPlayer AnimationPlayer { get; set; }
+       
 
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, RenderEngineComponent renderEngineComponent, PbrShader shader = null )
+        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, RenderEngineComponent renderEngineComponent)
         {
+            _renderEngineComponent = renderEngineComponent;
+
             CommonHeader = commonHeader;
             Material = material;
             AnimationPlayer = animationPlayer;
-            _renderEngineComponent = renderEngineComponent;
+           
             Name = Material.ModelName;
             Geometry = meshObject;
 
             Position = Vector3.Zero;
             Scale = Vector3.One;
             Orientation = Quaternion.Identity;
-
-            Effect = shader;
         }
 
         public void Initialize(ResourceLibrary resourceLib)
@@ -94,37 +95,19 @@ namespace GameWorld.Core.SceneNodes
 
         void CreateShader()
         {
-            if (_renderEngineComponent.MainRenderFormat == RenderFormats.MetalRoughness)
-                Effect = new PbrShader_MetalRoughness(_resourceLib);
-            else
-                Effect = new PbrShader_SpecGloss(_resourceLib);
-
-            var diffuse = LoadTexture(TextureType.Diffuse);
-            var baseColour = LoadTexture(TextureType.BaseColour);
-            var specTexture = LoadTexture(TextureType.Specular);
-            var normalTexture = LoadTexture(TextureType.Normal);
-            var glossTexture = LoadTexture(TextureType.Gloss);
-            var materialTexture = LoadTexture(TextureType.MaterialMap);
-
-            Effect.SetTexture(diffuse, TextureType.Diffuse);
-            Effect.SetTexture(baseColour, TextureType.BaseColour);
-            Effect.SetTexture(specTexture, TextureType.Specular);
-            Effect.SetTexture(normalTexture, TextureType.Normal);
-            Effect.SetTexture(glossTexture, TextureType.Gloss);
-            Effect.SetTexture(materialTexture, TextureType.MaterialMap);
+            Effect = new PbrShader(_resourceLib, _renderEngineComponent.MainRenderFormat);
+            foreach (TextureType textureType in Enum.GetValues(typeof(TextureType)))
+            {
+                var texture = Material.GetTexture(textureType);
+                if (texture != null)
+                {
+                    _resourceLib.LoadTexture(texture.Value.Path);
+                    Effect.SetTexture(textureType, texture.Value.Path);
+                }
+            }
         }
 
-        Texture2D LoadTexture(TextureType type, bool forceRefreshTexture = false)
-        {
-            var texture = Material.GetTexture(type);
-            if (texture == null)
-                return null;
-
-            return _resourceLib.LoadTexture(texture.Value.Path, forceRefreshTexture);
-
-        }
-
-        public Rmv2ModelNode GetParentModel()
+        public Rmv2ModelNode? GetParentModel()
         {
             var parent = Parent;
             while (parent != null)
@@ -142,18 +125,14 @@ namespace GameWorld.Core.SceneNodes
             return MathUtil.GetCenter(Geometry.BoundingBox) + Position;
         }
 
-        public void UpdateTexture(string path, TextureType texureType, bool forceRefreshTexture = false)
+        public void UpdateTexture(string path, TextureType textureType, bool forceRefreshTexture = false)
         {
-            Material.SetTexture(texureType, path);
-
-            var texture = LoadTexture(texureType, forceRefreshTexture);
-            Effect.SetTexture(texture, texureType);
+            Material.SetTexture(textureType, path);
+            _resourceLib.LoadTexture(path, forceRefreshTexture);
+            Effect.SetTexture(textureType, path);
         }
 
-        public void UseTexture(TextureType texureType, bool value)
-        {
-            Effect.UseTexture(value, texureType);
-        }
+        public void UseTexture(TextureType textureType, bool value) => Effect.UseTexture(textureType, value);
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -174,25 +153,25 @@ namespace GameWorld.Core.SceneNodes
                 }
             }
 
-            Effect.SetAnimationParameters(data, Geometry.WeightCount);
-            Effect.SetScaleMult(ScaleMult);
+            Effect.AnimationTransforms = data;
+            Effect.AnimationWeightCount = Geometry.WeightCount;
             Effect.UseAnimation = AnimationPlayer.IsEnabled;
+            Effect.ScaleMult = ScaleMult;
+            Effect.UseAlpha = Material.AlphaMode == AlphaMode.Transparent;
 
             if (AttachmentBoneResolver != null)
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
 
-            Effect.UseAlpha = Material.AlphaMode == AlphaMode.Transparent;
-
             var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(Material.PivotPoint);
             RenderMatrix = modelWithOffset;
 
-            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeoRenderItem() { Geometry = Geometry, ModelMatrix = modelWithOffset * parentWorld, Shader = Effect });
+            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeometryRenderItem(Geometry, Effect, modelWithOffset * parentWorld));
 
             if (DisplayPivotPoint)
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new LocatorRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Material.PivotPoint, 1));
+                renderEngine.AddRenderLines(LineHelper.AddLocator(Material.PivotPoint, 1, Color.Red));
 
             if (DisplayBoundingBox)
-                renderEngine.AddRenderItem(RenderBuckedId.Normal, new BoundingBoxRenderItem(_resourceLib.GetStaticEffect(ShaderTypes.Line), Geometry.BoundingBox));
+                renderEngine.AddRenderLines(LineHelper.AddBoundingBox(Geometry.BoundingBox, Color.Red));
         }
 
         public override ISceneNode CreateCopyInstance() => new Rmv2MeshNode();
@@ -200,6 +179,8 @@ namespace GameWorld.Core.SceneNodes
         public override void CopyInto(ISceneNode target)
         {
             var typedTarget = target as Rmv2MeshNode;
+            if (typedTarget == null)
+                throw new Exception("Error casting");
             typedTarget.Material = Material.Clone();
             typedTarget.CommonHeader = CommonHeader;
             typedTarget.Position = Position;
@@ -213,10 +194,9 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.Geometry = Geometry.Clone();
             typedTarget._resourceLib = _resourceLib;
             typedTarget._renderEngineComponent = _renderEngineComponent;
-            
-            //warhammer 2 compat
-            if (typedTarget.Effect != null)
-                typedTarget.Effect = Effect.Clone() as PbrShader_MetalRoughness;
+           
+    
+            typedTarget.Effect = Effect.Clone();
             typedTarget.Geometry = Geometry.Clone();
 
             typedTarget.OriginalFilePath = OriginalFilePath;

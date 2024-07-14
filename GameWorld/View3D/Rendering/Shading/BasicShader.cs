@@ -1,12 +1,20 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Linq;
+using GameWorld.Core.Components.Rendering;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GameWorld.Core.Rendering.Shading
 {
-    public class BasicShader : IShader
+    public class BasicShader : IShader, IDisposable
     {
-        public BasicEffect _effect;
-        public Effect Effect => _effect;
+        private readonly BasicEffect _effect;
+
+        bool _enableDefaultLighting = false;
+
+        public Vector3 DiffuseColour { get; set; }
+        public Vector3 SpecularColour { get; set; }
+        public void EnableDefaultLighting() { _enableDefaultLighting = true; }
 
         public BasicShader(GraphicsDevice device)
         {
@@ -18,14 +26,14 @@ namespace GameWorld.Core.Rendering.Shading
             _effect = effect;
         }
 
-        public Vector3 DiffuseColour { set { _effect.DiffuseColor = value; } }
-        public Vector3 SpecularColour { set { _effect.SpecularColor = value; } }
-        public void EnableDefaultLighting() { _effect.EnableDefaultLighting(); }
-
-        public IShader Clone()
+        public BasicShader Clone()
         {
             var clonedEffect = _effect.Clone() as BasicEffect;
-            return new BasicShader(clonedEffect!);
+            return new BasicShader(clonedEffect!)
+            {
+                DiffuseColour = DiffuseColour,
+                SpecularColour = SpecularColour,
+            };
         }
 
         public void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
@@ -33,6 +41,34 @@ namespace GameWorld.Core.Rendering.Shading
             _effect.Projection = commonShaderParameters.Projection;
             _effect.View = commonShaderParameters.View;
             _effect.World = modelMatrix;
+        }
+
+        public void ApplyObjectParameters()
+        {
+            _effect.DiffuseColor = DiffuseColour;
+            _effect.SpecularColor = SpecularColour;
+            if (_enableDefaultLighting)
+                _effect.EnableDefaultLighting();
+        }
+
+        public Effect GetEffect() => _effect;
+
+        public void Dispose()
+        {
+            _effect.Dispose();
+        }
+
+        public void SetTechnique(RenderingTechnique technique)
+        {
+            // Only one supported, no need to change
+        }
+
+        public bool SupportsTechnique(RenderingTechnique technique)
+        {
+            var supported = new[] { RenderingTechnique.Normal };
+            if (supported.Contains(technique))
+                return true;
+            return false;
         }
     }
 }
