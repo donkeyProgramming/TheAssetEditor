@@ -37,7 +37,9 @@ namespace E2EVerification.Shared
 
         public FrameworkElement GetFocusElement()
         {
+#pragma warning disable CS8603 // Possible null reference return.
             return null;
+#pragma warning restore CS8603 // Possible null reference return.
         }
 
         public void RemoveComponent<T>(T comp) where T : IGameComponent
