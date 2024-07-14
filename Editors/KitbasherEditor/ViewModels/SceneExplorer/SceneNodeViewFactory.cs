@@ -1,5 +1,4 @@
 ﻿using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
-using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Extensions.DependencyInjection;
 

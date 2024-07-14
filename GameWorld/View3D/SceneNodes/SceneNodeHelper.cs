@@ -34,14 +34,14 @@ namespace GameWorld.Core.SceneNodes
         }
 
 
-        public static T DeepCopy<T>(T target) where T : ISceneNode
+        public static T CloneNodeAndChildren<T>(T target) where T : ISceneNode
         {
             var clone = (T)target.CreateCopyInstance();
             target.CopyInto(clone);
 
             foreach (var child in target.Children)
             {
-                var childClone = DeepCopy(child);
+                var childClone = CloneNodeAndChildren(child);
                 clone.Children.Add(childClone);
             }
             return clone;

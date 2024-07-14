@@ -42,7 +42,7 @@ namespace GameWorld.Core.Rendering
             _device.Clear(Color.Transparent);
             _device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
 
-            var previewShader = _resourceLibary.GetEffect(ShaderTypes.TexturePreview);
+            var previewShader = _resourceLibary.GetStaticEffect(ShaderTypes.TexturePreview);
 
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
                     SamplerState.LinearClamp, DepthStencilState.Default,
@@ -61,10 +61,8 @@ namespace GameWorld.Core.Rendering
 
         public void SaveTexture(Texture2D texture, string path)
         {
-            using (var stream = new FileStream(path, FileMode.OpenOrCreate))
-            {
-                texture.SaveAsPng(stream, texture.Width, texture.Height);
-            }
+            using var stream = new FileStream(path, FileMode.OpenOrCreate);
+            texture.SaveAsPng(stream, texture.Width, texture.Height);
         }
 
         public void Dispose()

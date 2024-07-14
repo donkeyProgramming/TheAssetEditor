@@ -1,26 +1,23 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using System;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering.RenderItems;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
 
 namespace GameWorld.Core.Components
 {
     public class FpsComponent : BaseComponent
     {
-        private SpriteFont _font;
         private int _frames;
         private int _liveFrames;
         private TimeSpan _timeElapsed;
+        private readonly RenderEngineComponent _renderEngineComponent;
         private readonly ResourceLibrary _resourceLibrary;
 
-        public FpsComponent(ResourceLibrary resourceLibrary)
+        public FpsComponent(RenderEngineComponent renderEngineComponent, ResourceLibrary resourceLibrary)
         {
+            _renderEngineComponent = renderEngineComponent;
             _resourceLibrary = resourceLibrary;
-        }
-
-        protected override void LoadContent()
-        {
-            _font = _resourceLibrary.DefaultFont;
         }
 
         public override void Update(GameTime gameTime)
@@ -37,9 +34,10 @@ namespace GameWorld.Core.Components
         public override void Draw(GameTime gameTime)
         {
             _liveFrames++;
-            _resourceLibrary.CommonSpriteBatch.Begin();
-            _resourceLibrary.CommonSpriteBatch.DrawString(_font, $"FPS: {_frames}", new Vector2(5), Color.White);
-            _resourceLibrary.CommonSpriteBatch.End();
+            var text = $"FPS: {_frames}";
+
+            var renderItem = new FontRenderItem(_resourceLibrary, text, new Vector2(5), Color.White);
+            _renderEngineComponent.AddRenderItem(RenderBuckedId.Font, renderItem);
         }
     }
 }

@@ -32,6 +32,7 @@ Texture2D<float4> DiffuseTexture;
 Texture2D<float4> SpecularTexture;
 Texture2D<float4> NormalTexture;
 Texture2D<float4> GlossTexture;
+Texture2D<float4> MaskTexture;
 
 TextureCube<float4> tex_cube_diffuse;
 TextureCube<float4> tex_cube_specular;
@@ -42,6 +43,7 @@ bool UseSpecular = true;
 bool UseNormal = true;
 bool UseGloss = true;
 bool UseAlpha = false;
+bool UseMask = true;
 
 float4x4 tranforms[256];
 int WeightCount = 0;

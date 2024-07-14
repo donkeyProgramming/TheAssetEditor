@@ -49,7 +49,7 @@ namespace Editors.ImportExport.Exporting.Presentation
             }
 
             if (SelectedExporter == null)
-                SelectedExporter = PossibleExporters.FirstOrDefault();
+                SelectedExporter = PossibleExporters.First();
         }
 
         public void Export() => SelectedExporter!.Execute(_inputFile, SystemPath, true);

@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Components.Rendering;
+﻿using System.Collections.Generic;
+using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.Rendering.Shading;
 using Microsoft.Xna.Framework;
@@ -6,39 +7,38 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameWorld.Core.Rendering.RenderItems
 {
-    public class GeometryRenderItem : IRenderItem
+    public class PartialGeometryRenderItem : IRenderItem
     {
         private readonly MeshObject _geometry;
-        private readonly IShader _shader;
         private readonly Matrix _modelMatrix;
+        private readonly IShader _shader;
+        private readonly List<int> _selectedFaces;
 
-        public GeometryRenderItem(MeshObject geometry, IShader shader, Matrix modelMatrix)
+        public PartialGeometryRenderItem(MeshObject geometry, Matrix modelMatrix, IShader shader, List<int> selectedFaces)
         {
             _geometry = geometry;
-            _shader = shader;
             _modelMatrix = modelMatrix;
+            _shader = shader;
+            _selectedFaces = selectedFaces;
         }
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
-            if (_shader.SupportsTechnique(RenderingTechnique.Normal) == false)
-                return;
-
-            _shader.SetTechnique(renderingTechnique);
-            _shader.SetCommonParameters(parameters, _modelMatrix);
+           _shader.SetCommonParameters(parameters, _modelMatrix);
             _shader.ApplyObjectParameters();
 
-            ApplyMesh(_shader, device, _geometry.GetGeometryContext());
+            ApplyMeshPart(_shader, device, _selectedFaces, _geometry.GetGeometryContext());
         }
 
-        void ApplyMesh(IShader effect, GraphicsDevice device, IGraphicsCardGeometry geometry)
+        void ApplyMeshPart(IShader effect, GraphicsDevice device, List<int> faceSelection, IGraphicsCardGeometry geometry)
         {
             device.Indices = geometry.IndexBuffer;
             device.SetVertexBuffer(geometry.VertexBuffer);
             foreach (var pass in effect.GetEffect().CurrentTechnique.Passes)
             {
                 pass.Apply();
-                device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.IndexBuffer.IndexCount);
+                foreach (var item in faceSelection)
+                    device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, item, 1);
             }
         }
     }

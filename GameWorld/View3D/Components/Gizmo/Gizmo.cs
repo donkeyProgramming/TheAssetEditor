@@ -593,6 +593,7 @@ namespace GameWorld.Core.Components.Gizmo
             if (!_isActive)
                 return;
 
+            _graphics.BlendState = BlendState.AlphaBlend;
             _graphics.DepthStencilState = DepthStencilState.None;
             _graphics.RasterizerState = RasterizerState.CullNone;
 
@@ -651,6 +652,7 @@ namespace GameWorld.Core.Components.Gizmo
             }
 
             _graphics.DepthStencilState = DepthStencilState.Default;
+           
             Draw2D(view, projection);
         }
 

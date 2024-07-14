@@ -14,7 +14,7 @@
     <Expander DockPanel.Dock="Top" Margin="0,5,0,0" IsExpanded="True">
         <Expander.Header>
             <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Background}" >
-                <TextBlock Text="Material - Common" FontWeight="Bold" Margin="3"/>
+                <TextBlock Text="RMV Material - Common" FontWeight="Bold" Margin="3"/>
             </StackPanel>
         </Expander.Header>
         

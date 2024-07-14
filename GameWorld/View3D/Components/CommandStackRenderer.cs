@@ -1,23 +1,27 @@
-﻿using GameWorld.Core.Services;
+﻿using System;
+using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering.RenderItems;
+using GameWorld.Core.Services;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
 
 namespace GameWorld.Core.Components
 {
-    public class CommandStackRenderer : BaseComponent
+    public class CommandStackRenderer : BaseComponent, IDisposable
     {
         string _animationText;
-        GameTime _animationStart;
+        GameTime? _animationStart;
         bool _startAnimation;
         private readonly ResourceLibrary _resourceLibrary;
         private readonly EventHub _eventHub;
+        private readonly RenderEngineComponent _renderEngineComponent;
 
-        public CommandStackRenderer(ResourceLibrary resourceLibrary, EventHub eventHub)
+        public CommandStackRenderer(ResourceLibrary resourceLibrary, EventHub eventHub, RenderEngineComponent renderEngineComponent)
         {
             _resourceLibrary = resourceLibrary;
             _eventHub = eventHub;
+            _renderEngineComponent = renderEngineComponent;
 
             _eventHub.Register<CommandStackUndoEvent>(Handle);
             _eventHub.Register<CommandStackChangedEvent>(Handle);
@@ -33,12 +37,9 @@ namespace GameWorld.Core.Components
                 if (lerpValue >= 1)
                     _animationStart = null;
 
-                _resourceLibrary.CommonSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
-                _resourceLibrary.CommonSpriteBatch.DrawString(_resourceLibrary.DefaultFont, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue));
-                _resourceLibrary.CommonSpriteBatch.End();
+                var renderItem = new FontRenderItem(_resourceLibrary,_animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue));
+                _renderEngineComponent.AddRenderItem(RenderBuckedId.Font, renderItem);
             }
-
-            base.Draw(gameTime);
         }
 
         void CreateAnimation(string text)
@@ -50,16 +51,18 @@ namespace GameWorld.Core.Components
         public override void Update(GameTime gameTime)
         {
             if (_startAnimation == true)
-            {
                 _animationStart = gameTime;
-            }
             _startAnimation = false;
-
-            base.Update(gameTime);
         }
 
         void Handle(CommandStackChangedEvent notification) => CreateAnimation($"Command added: {notification.HintText}");
         void Handle(CommandStackUndoEvent notification) => CreateAnimation($"Command Undone: {notification.HintText}");
+
+        public void Dispose()
+        {
+            _eventHub.UnRegister<CommandStackUndoEvent>(Handle);
+            _eventHub.UnRegister<CommandStackChangedEvent>(Handle);
+        }
     }
 }
 

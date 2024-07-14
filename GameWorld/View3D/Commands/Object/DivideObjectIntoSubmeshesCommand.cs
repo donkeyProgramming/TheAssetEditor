@@ -79,8 +79,7 @@ namespace GameWorld.Core.Commands.Object
                     }
 
                     var typedObject = _objectToSplit as Rmv2MeshNode;
-                    var shader = typedObject.Effect.Clone() as PbrShader;
-                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, _renderEngineComponent, shader);
+                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, _renderEngineComponent);
                     meshNode.Initialize(_resourceLib);
                     meshNode.IsVisible = true;
 

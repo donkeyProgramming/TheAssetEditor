@@ -14,8 +14,11 @@ namespace GameWorld.Core.Rendering.RenderItems
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
         public VertexSelectionState SelectedVertices { get; set; }
 
-        public void Draw(GraphicsDevice device, CommonShaderParameters parameters)
+        public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
+            if (renderingTechnique != RenderingTechnique.Normal)
+                return;
+
             VertexRenderer.Update(Node.Geometry, Node.RenderMatrix, Node.Orientation, parameters.CameraPosition, SelectedVertices);
             VertexRenderer.Draw(parameters.View, parameters.Projection, device, new Vector3(0, 1, 0));
         }
