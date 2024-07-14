@@ -5,9 +5,9 @@ on:
   push:
     branches:
       - master
-  workflow_dispatch:  # Add this line to enable manual triggering
+  workflow_dispatch:
 jobs:
-  build:
+  build-and-test:
 
     runs-on: windows-latest
 
