@@ -26,10 +26,10 @@ namespace Shared.Ui.Events.UiCommands
                 extension = item.Name.Substring(index);
             }
             var newName = fileName + "_copy" + extension;
-            ReadAndSave(fileName, newName, item);
+            ReadAndSave(newName, item);
         }
 
-        private void ReadAndSave(string filename, string newName, PackFile item)
+        private void ReadAndSave(string newName, PackFile item)
         {
             var bytes = item.DataSource.ReadData();
             var packFile = new PackFile(newName, new MemorySource(bytes));
