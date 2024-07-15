@@ -1,0 +1,165 @@
+﻿<UserControl x:Class="Editors.Audio.Presentation.AudioEditor.Views.AudioEditorSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewmodels="clr-namespace:Editors.Audio.Presentation.AudioEditor.ViewModels"
+             xmlns:converters="clr-namespace:Editors.Audio.Presentation.AudioEditor"
+             d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorViewModel}"
+             mc:Ignorable="d"
+             d:DesignHeight="800">
+
+    <!-- Resources Section -->
+    <UserControl.Resources>
+        <converters:SettingsEnumConverter x:Key="SettingsEnumConverter"/>
+        <Style x:Key="CenterHeaderGroupBoxStyle" TargetType="GroupBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <ContentPresenter Grid.Row="1" Content="{TemplateBinding Content}" />
+                            <Border Grid.Row="0"
+                                    Background="#3a3a3a" 
+                                    BorderBrush="#4f4f4f"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <TextBlock Text="{TemplateBinding Header}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Margin="0, 7, 0, 7"
+                                           Foreground="White"
+                                           FontSize="14"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <!-- Audio Editor Settings -->
+        <GroupBox DockPanel.Dock="Top" Header="Settings" Style="{StaticResource CenterHeaderGroupBoxStyle}">
+            <StackPanel>
+                <!-- Audio Project Name -->
+                <Grid Margin="5 10 5 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Audio Project File Name:" VerticalAlignment="Center" Margin="0 0 5 0" MinWidth="135" />
+                    <TextBox Grid.Column="1"
+                             x:Name="AudioProjectFileNameTextBox"
+                             VerticalAlignment="Center"
+                             Text="{Binding ProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Width="{Binding ActualWidth, ElementName=NameColumn}" />
+                </Grid>
+
+                <!-- Custom States Name -->
+                <Grid Margin="5 10 5 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Custom States File Name:" VerticalAlignment="Center" Margin="0 0 5 0" MinWidth="135"/>
+                    <TextBox Grid.Column="1"
+                             x:Name="CustomStateFileNameTextBox"
+                             VerticalAlignment="Center"
+                             Text="{Binding ProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Width="{Binding ActualWidth, ElementName=NameColumn}" />
+                </Grid>
+            </StackPanel>
+        </GroupBox>
+        
+        <!-- Audio Project Configuration -->
+        <GroupBox DockPanel.Dock="Top" Margin="0 10 0 0" Header="Audio Project Configuration" Style="{StaticResource CenterHeaderGroupBoxStyle}">
+            <StackPanel>
+                <!-- Event Type Selection -->
+                <Grid Margin="0 10 5 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="145"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Dialogue Event Types:" Margin="0,0,0,0" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding AudioProjectEventType}" 
+                      SelectedItem="{Binding SelectedAudioProjectEventType}" 
+                      ToolTip="PLACEHOLDER TOOLTIP"
+                      VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- Event Subtype Selection -->
+                <Grid Margin="0 5 5 0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="145"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Dialogue Event Subtypes:" Margin="0,0,0,0" VerticalAlignment="Center"/>
+                    <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding AudioProjectSubTypes}" 
+                      SelectedItem="{Binding SelectedAudioProjectEventSubtype}" 
+                      ToolTip="PLACEHOLDER TOOLTIP"
+                      VerticalAlignment="Center"/>
+                </Grid>
+
+                <!-- Dialogue Events Preset Configuration -->
+                <Grid Margin="0 5 5 5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="145"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Content="Dialogue Events Preset:" Grid.Column="0"/>
+    
+                    <!-- All CheckBox -->
+                    <CheckBox Content="All" Margin="0 2.5 5 0"
+                              IsChecked="{Binding SelectedAudioProjectEventsPreset, Converter={StaticResource SettingsEnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.All}}"
+                              ToolTip="PLACEHOLDER TOOLTIP"
+                              Grid.Column="1"/>
+
+                    <!-- Essential CheckBox -->
+                    <CheckBox Content="Essential" Margin="5 2.5 5 0"
+                              IsChecked="{Binding SelectedAudioProjectEventsPreset, Converter={StaticResource SettingsEnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.Essential}}"
+                              ToolTip="PLACEHOLDER TOOLTIP"
+                              Grid.Column="2"/>
+                </Grid>
+
+                <!-- Create Audio Project Button -->
+                <DockPanel LastChildFill="True" Margin="5 5 0 5">
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Create Audio Project" Command="{Binding CreateAudioProjectCommand}" Grid.Column="0" Margin="0 0 5 0" />
+                    </Grid>
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Custom States Section -->
+        <GroupBox DockPanel.Dock="Top" Margin="0 5 0 0" Header="Custom States Configuration" Style="{StaticResource CenterHeaderGroupBoxStyle}">
+            <StackPanel>
+                <!-- Custom States DataGrid -->
+                <DataGrid x:Name="CustomStatesDataGrid" 
+                  Margin="0 0 0 0"
+                  AutoGenerateColumns="False" 
+                  ItemsSource="{Binding CustomStatesDataGridItems}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="VO__Actor" Binding="{Binding CustomVOActor}"/>
+                        <DataGridTextColumn Header="VO__Culture" Binding="{Binding CustomVOCulture}"/>
+                        <DataGridTextColumn Header="VO__Battle__Selection" Binding="{Binding CustomVOBattleSelection}"/>
+                        <DataGridTextColumn Header="VO__Battle__Special__Ability" Binding="{Binding CustomVOBattleSpecialAbility}"/>
+                        <DataGridTextColumn Header="VO__Faction__Leader" Binding="{Binding CustomVOFactionLeader}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </GroupBox>
+    </DockPanel>
+</UserControl>

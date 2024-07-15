@@ -4,17 +4,15 @@ using Editors.Audio.BnkCompiler;
 using Editors.Audio.BnkCompiler.ObjectGeneration;
 using Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3;
 using Editors.Audio.Presentation.AudioEditor;
+using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Presentation.AudioExplorer;
 using Editors.Audio.Presentation.Compiler;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using Shared.Core.PackFiles;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.WWise;
-using System.IO;
-using System.Linq;
 
 namespace Editors.Audio
 {
@@ -30,7 +28,8 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerView>();
             serviceCollection.AddScoped<CompilerViewModel>();
 
-            serviceCollection.AddScoped<AudioEditorView>();
+            serviceCollection.AddScoped<AudioEditorDataViewModel>();
+            serviceCollection.AddScoped<AudioEditorSettingsViewModel>();
             serviceCollection.AddScoped<AudioEditorViewModel>();
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
@@ -59,26 +58,8 @@ namespace Editors.Audio
         public override void RegisterTools(IToolFactory factory)
         {
             factory.RegisterTool<AudioExplorerViewModel, AudioExplorerView>();
-            factory.RegisterTool<CompilerViewModel, CompilerView>();// ( new ExtentionToTool( EditorEnums.AudioCompiler_Editor,  new[] { ".audio_json"}));
+            factory.RegisterTool<CompilerViewModel, CompilerView>();
             factory.RegisterTool<AudioEditorViewModel, AudioEditorView>();
         }
     }
-
-    public static class AudioTool_Debug
-    {
-        public static void CreateOvnCompilerProject(PackFileService pfs)
-        {
-            PackFileUtil.LoadFilesFromDisk(pfs, new PackFileUtil.FileRef(packFilePath: @"audioprojects", systemPath: @"C:\Users\ole_k\source\repos\TheAssetEditor\AudioResearch\Data\OvnExample\ProjectSimple.json"));
-
-            // Load all wems
-            var wemReferences = Directory.GetFiles(@"D:\Research\Audio\Working pack\audio_ovn\wwise\english(uk)")
-                .Where(x => Path.GetExtension(x) == ".wem")
-                .Select(x => new PackFileUtil.FileRef(packFilePath: @"audio\wwise", systemPath: x))
-                .ToList();
-            PackFileUtil.LoadFilesFromDisk(pfs, wemReferences);
-        }
-    }
-
-
-
 }

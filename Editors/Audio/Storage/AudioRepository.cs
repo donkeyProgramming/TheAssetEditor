@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using Shared.GameFormats.Dat;
 using Shared.GameFormats.WWise;
@@ -110,18 +111,20 @@ namespace Editors.Audio.Storage
 
         public string GetOwnerFileFromDialogueEvent(uint id, bool removeFileType = false)
         {
-            foreach (var hircObject in HircObjects)
+            // Check if the dictionary contains the key first
+            if (HircObjects.TryGetValue(id, out var hircItemList))
             {
-                var hircItem = hircObject.Value[0];
-
-                if (hircItem.Type == HircType.Dialogue_Event)
+                foreach (var hircItem in hircItemList)
                 {
-                    var file = Path.GetFileName(hircItem.OwnerFile);
+                    if (hircItem.Type == HircType.Dialogue_Event && hircItem.Id == id)
+                    {
+                        var file = Path.GetFileName(hircItem.OwnerFile);
 
-                    if (removeFileType)
-                        file = Path.GetFileName(file);
+                        if (removeFileType)
+                            file = Path.GetFileNameWithoutExtension(file);
 
-                    return file;
+                        return file;
+                    }
                 }
             }
 

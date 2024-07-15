@@ -17,7 +17,7 @@ using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationMeta.SuperView;
-using Editors.Audio.Presentation.AudioEditor;
+using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Presentation.AudioExplorer;
 using Editors.Audio.Presentation.Compiler;
 using Editors.Shared.Core.Common.BaseControl;
@@ -62,7 +62,7 @@ namespace AssetEditor.ViewModels
 
         public ICommand OpenAudioExplorerCommand { get; set; }
         public ICommand OpenAudioEditorCommand { get; set; }
-        public ICommand CreateTemplateCommand { get; set; }
+        public ICommand CreateAudioTemplateCommand { get; set; }
         public ICommand CompileAudioCommand { get; set; }
 
         public ICommand SearchCommand { get; set; }
@@ -136,7 +136,7 @@ namespace AssetEditor.ViewModels
             OpenAudioExplorerCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioExplorerViewModel>());
             OpenAudioEditorCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>());
             CompileAudioCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>());
-            CreateTemplateCommand = new RelayCommand<string>(CreateAudioTemplate);
+            CreateAudioTemplateCommand = new RelayCommand<string>(CreateAudioTemplate);
 
             OpenAnimationKeyframeCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationKeyframeEditorViewModel>>());
             GenerateRmv2ReportCommand = new RelayCommand(() => _uiCommandFactory.Create<GenerateReportCommand>().Rmv2());
