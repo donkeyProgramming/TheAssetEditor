@@ -17,21 +17,16 @@ namespace Shared.Ui.Events.UiCommands
 
         public void Execute(PackFile item)
         {
-            try
+            var fileName = item.Name;
+            var extension = "";
+            if(Path.HasExtension(item.Name) == true)
             {
-                var fileName = item.Name.Substring(0, item.Name.IndexOf("."));
-                var extension = item.Name.Substring(item.Name.IndexOf("."));
-                var newName = fileName + "_copy" + extension;
-
-                readAndSave(fileName, newName, item);
+                var index = item.Name.IndexOf('.');
+                fileName = item.Name.Substring(0, index);
+                extension = item.Name.Substring(index);
             }
-            catch (ArgumentOutOfRangeException)
-            {
-                var fileName = item.Name;
-                var newName = fileName + "_copy";
-
-                readAndSave(fileName, newName, item);
-            }
+            var newName = fileName + "_copy" + extension;
+            readAndSave(fileName, newName, item);
         }
 
         public void readAndSave(string filename, string newName, PackFile item)
