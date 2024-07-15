@@ -26,20 +26,18 @@ namespace Shared.Ui.Events.UiCommands
                 extension = item.Name.Substring(index);
             }
             var newName = fileName + "_copy" + extension;
-            readAndSave(fileName, newName, item);
+            ReadAndSave(fileName, newName, item);
         }
 
-        public void readAndSave(string filename, string newName, PackFile item)
+        private void ReadAndSave(string filename, string newName, PackFile item)
         {
             var bytes = item.DataSource.ReadData();
             var packFile = new PackFile(newName, new MemorySource(bytes));
             var parentPath = _packFileService.GetFullPath(item);
-            var packContainer = _packFileService.GetPackFileContainer(item);
             var path = Path.GetDirectoryName(parentPath);
+            var editablePack = _packFileService.GetEditablePack();
 
-            _packFileService.AddFileToPack(_packFileService.GetEditablePack(), path, packFile);
+            _packFileService.AddFileToPack(editablePack, path, packFile);
         }
-
-
     }
 }
