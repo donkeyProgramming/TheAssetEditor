@@ -25,7 +25,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public abstract class ContextMenuHandler : NotifyPropertyChangedImpl
     {
-        ILogger _logger = Logging.Create<ContextMenuHandler>();
+        private readonly ILogger _logger = Logging.Create<ContextMenuHandler>();
 
         ObservableCollection<ContextMenuItem> _contextMenu;
         public ObservableCollection<ContextMenuItem> Items { get => _contextMenu; set => SetAndNotify(ref _contextMenu, value); }
@@ -33,7 +33,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         public ICommand RenameNodeCommand { get; set; }
         public ICommand AddFilesFromDirectory { get; set; }
         public ICommand AddFilesCommand { get; set; }
-        public ICommand Import3DFileCommand { get; set; }
         public ICommand CloseNodeCommand { get; set; }
         public ICommand DeleteCommand { get; set; }
         public ICommand SavePackFileCommand { get; set; }
@@ -67,7 +66,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             _exportFileContextMenuHelper = exportFileContextMenuHelper;
             RenameNodeCommand = new RelayCommand(OnRenameNode);
             AddFilesCommand = new RelayCommand(OnAddFilesCommand);
-            Import3DFileCommand = new RelayCommand(OnImport3DModelCommand);
             AddFilesFromDirectory = new RelayCommand(OnAddFilesFromDirectory);
             DuplicateCommand = new RelayCommand(DuplicateNode);
             CreateFolderCommand = new RelayCommand(CreateFolder);
@@ -149,11 +147,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     _packFileService.AddFileToPack(_selectedNode.FileOwner, parentPath, packFile);
                 }
             }
-        }
-        void OnImport3DModelCommand()
-        {
-
-            _uiCommandFactory.Create<ImportAssetCommand>().Execute(_selectedNode.FileOwner, _selectedNode.GetFullPath());
         }
 
         void OnAddFilesFromDirectory()
@@ -419,8 +412,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     return new ContextMenuItem() { Name = "Add" };
                 case ContextItems.Import:
                     return new ContextMenuItem() { Name = "Import" };
-                case ContextItems.Import3DModel:
-                    return new ContextMenuItem() { Name = "Import 3D Model File (Experimental)", Command = Import3DFileCommand };
                 case ContextItems.Create:
                     return new ContextMenuItem() { Name = "Create" };
                 case ContextItems.AddFiles:
@@ -471,7 +462,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             Add,
             Import,
             AddFiles,
-            Import3DModel,
             AddDirectory,
             CopyToEditablePack,
             Duplicate,

@@ -264,7 +264,7 @@ namespace AnimationEditor.SkeletonEditor
 
         public void LoadSkeletonAction()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, new[] { ".anim"});
+            using var browser = new PackFileBrowserWindow(_packFileService, [".anim"]);
             if (browser.ShowDialog() == true && browser.SelectedFile != null)
             {
                 var file = browser.SelectedFile;
@@ -275,7 +275,7 @@ namespace AnimationEditor.SkeletonEditor
 
         public void LoadRefMeshAction()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, new[] { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
+            using var browser = new PackFileBrowserWindow(_packFileService, [".variantmeshdefinition", ".wsmodel", ".rigid_model_v2"]);
             if (browser.ShowDialog() == true && browser.SelectedFile != null)
             {
                 var file = browser.SelectedFile;

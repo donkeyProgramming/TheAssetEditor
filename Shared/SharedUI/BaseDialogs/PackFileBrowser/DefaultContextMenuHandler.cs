@@ -50,9 +50,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     Additem(ContextItems.CreateFolder, createMenu);
 
                     AddSeperator(newContextMenu);
-                    var importSubMenu = Additem(ContextItems.Import, newContextMenu);
-                    Additem(ContextItems.Import3DModel, importSubMenu);
-                    AddSeperator(newContextMenu);
 
                     Additem(ContextItems.Expand, newContextMenu);
                     Additem(ContextItems.Collapse, newContextMenu);
@@ -76,9 +73,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     var createMenu = Additem(ContextItems.Create, newContextMenu);
                     Additem(ContextItems.CreateFolder, createMenu);
 
-                    AddSeperator(newContextMenu);
-                    var importSubMenu = Additem(ContextItems.Import, newContextMenu);
-                    Additem(ContextItems.Import3DModel, importSubMenu);
                     AddSeperator(newContextMenu);
 
                     AddSeperator(newContextMenu);

@@ -2,6 +2,7 @@
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using System;
+using System.Diagnostics;
 
 namespace AssetEditor.Services
 {
@@ -12,7 +13,8 @@ namespace AssetEditor.Services
 
         public SimpleApplication(bool loadAllCaFiles = true)
         {
-            var serviceProvider = new DependencyInjectionConfig().Build();
+            var forceValidateServiceScopes = Debugger.IsAttached;
+            var serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes);
             _serviceScope = serviceProvider.CreateScope();
 
             // Configure based on settings
