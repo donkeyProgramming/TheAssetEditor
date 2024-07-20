@@ -13,7 +13,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
 {
     // Improve using this: https://stackoverflow.com/questions/63110566/multi-select-with-multiple-level-in-wpf-treeview
 
-    public class SceneExplorerViewModel : NotifyPropertyChangedImpl
+    public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IDisposable
     {
         private readonly SceneManager _sceneManager;
         private readonly EventHub _eventHub;
@@ -27,8 +27,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
         public SceneExplorerViewModel(
             SelectionManager selectionManager,
             SceneManager sceneManager,
-            CommandFactory commandFactory,
-            EventHub eventHub)
+            EventHub eventHub,
+            SceneExplorerContextMenuHandler contextMenuHandler)
         {
             _sceneManager = sceneManager;
             _eventHub = eventHub;
@@ -36,7 +36,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
-            ContextMenu = new SceneExplorerContextMenuHandler(_sceneManager, commandFactory);
+            ContextMenu = contextMenuHandler;
             ContextMenu.SelectedNodesChanged += OnContextMenuActionChangingSelection;
 
             SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
@@ -135,7 +135,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
         void UpdateViewAndContextMenu()
         {
             _eventHub.Publish(new SceneNodeSelectedEvent(SelectedObjects.ToList()));
-            ContextMenu.Create(SelectedObjects);
         }
 
         private void RebuildTree()
@@ -184,6 +183,13 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
             }
 
             UpdateViewAndContextMenu();
+        }
+
+        public void Dispose()
+        {
+            ContextMenu.SelectedNodesChanged -= OnContextMenuActionChangingSelection;
+            SelectedObjects.CollectionChanged -= OnSceneExplorerSelectionChanged;
+            _eventHub.UnRegister(this);
         }
     }
 }

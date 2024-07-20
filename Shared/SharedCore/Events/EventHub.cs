@@ -21,6 +21,10 @@
         {
         }
 
+        public void UnRegister(object owner)
+        {
+        }
+
         public void Register<T>(Action<T> action)
         {
             if (_callbackList.ContainsKey(typeof(T)) == false)

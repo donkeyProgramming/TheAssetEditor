@@ -12,6 +12,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.SaveDialog;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
@@ -42,6 +43,7 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<KitbasherViewModel>();
             serviceCollection.AddScoped<IEditorViewModel, KitbasherViewModel>();
             serviceCollection.AddScoped<SceneExplorerViewModel>();
+            serviceCollection.AddTransient<SceneExplorerContextMenuHandler>();
             serviceCollection.AddScoped<AnimationControllerViewModel>();
 
             // View models - scene node editors
