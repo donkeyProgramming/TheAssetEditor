@@ -9,7 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Editors\AssetManagment\Editors.AssetManagement.csproj" />
         <ProjectReference Include="..\Editors\Audio\Editors.Audio.csproj" />
         <ProjectReference Include="..\Editors\Editors.ImportExport\Editors.ImportExport.csproj" />
         <ProjectReference Include="..\Editors\KitbasherEditor\Editors.KitbasherEditor.csproj" />

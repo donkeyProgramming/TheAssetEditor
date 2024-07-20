@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shared.Core.DependencyInjection;
@@ -32,7 +31,6 @@ namespace AssetEditor.Services
                 new Editors.AnimationTextEditors.DependencyInjectionContainer(),
                 new Editors.Reports.DependencyInjectionContainer(),
                 new KitbasherEditor.DependencyInjectionContainer(),
-                new Editors.AssetManagement.DependencyInjectionContainer(),
                 new Editors.AnimationMeta.DependencyInjectionContainer(),
                 new Editors.Audio.DependencyInjectionContainer(),
                 new Editors.TextureEditor.DependencyInjectionContainer(),
@@ -44,23 +42,21 @@ namespace AssetEditor.Services
             ];
         }
 
-        public IServiceProvider Build(Action<IServiceCollection> replaceServices = null)
+        public IServiceProvider Build(bool forceValidateServiceScopes, Action<IServiceCollection> replaceServices = null)
         {
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices(x=> ConfigureServices(x, replaceServices))
-                .UseDefaultServiceProvider(ConfigureServiceOptions)
+                .UseDefaultServiceProvider(x=>ConfigureServiceOptions(forceValidateServiceScopes, x))
                 .Build();
-
-            
 
             RegisterTools(host.Services.GetService<IToolFactory>());
             return host.Services;
         }
 
-        void ConfigureServiceOptions(ServiceProviderOptions options)
+        void ConfigureServiceOptions(bool forceValidateServiceScopes, ServiceProviderOptions options)
         {
-            if (Debugger.IsAttached)
-            {
+            if(forceValidateServiceScopes)
+            { 
                 options.ValidateOnBuild = true;
                 options.ValidateScopes = true;
             }
