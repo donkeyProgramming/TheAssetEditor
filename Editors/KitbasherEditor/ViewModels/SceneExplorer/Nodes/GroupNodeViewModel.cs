@@ -1,25 +1,21 @@
-﻿using GameWorld.Core.SceneNodes;
-using Shared.Core.Misc;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using GameWorld.Core.SceneNodes;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public class GroupNodeViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
+    public partial  class GroupNodeViewModel : ObservableObject, ISceneNodeViewModel
     {
-        GroupNode _node;
+        ISceneNode _node;
 
-        public string GroupName { get => _node.Name; set { _node.Name = value; NotifyPropertyChanged(); } }
+        [ObservableProperty] string _groupName = string.Empty;
 
-        public GroupNodeViewModel()
-        {
-            
-        }
         public void Initialize(ISceneNode node)
         {
-            _node = node as GroupNode;
+            GroupName = node.Name;
         }
 
-        public void Dispose()
-        {
-        }
+        partial void OnGroupNameChanged(string value) => _node.Name = value;
+
+        public void Dispose(){}
     }
 }

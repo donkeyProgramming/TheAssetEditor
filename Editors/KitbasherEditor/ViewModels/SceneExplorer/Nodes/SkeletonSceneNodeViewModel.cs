@@ -1,56 +1,38 @@
 ﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Diagnostics;
+using CommunityToolkit.Mvvm.ComponentModel;
 using GameWorld.Core.Animation;
 using GameWorld.Core.SceneNodes;
-using Shared.Core.Misc;
-using Shared.Ui.BaseDialogs.MathViews;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public class SkeletonSceneNodeViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
+    public partial class SkeletonSceneNodeViewModel : ObservableObject, ISceneNodeViewModel
     {
         SkeletonNode _meshNode;
-        public SkeletonSceneNodeViewModel()
-        {
-            BoneScale.PropertyChanged += BoneScale_PropertyChanged;
-        }
+
+        [ObservableProperty] float _boneScale = 1;
+        [ObservableProperty] int _boneCount = 0;
+        [ObservableProperty] ObservableCollection<SkeletonBoneNode> _bones = new();
+        [ObservableProperty] SkeletonBoneNode? _selectedBone;
 
         public void Initialize(ISceneNode node)
         {
-            _meshNode = node as SkeletonNode;
+            var skeletonNode = node as SkeletonNode;
+            Guard.IsNotNull(skeletonNode);
+            _meshNode = skeletonNode;
+
             CreateBoneOverview(_meshNode.Skeleton);
         }
 
+        partial void OnBoneScaleChanged(float value) => _meshNode.SkeletonScale = value;
 
-        private void BoneScale_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        partial void OnSelectedBoneChanged(SkeletonBoneNode? value)
         {
-            _meshNode.SkeletonScale = (float)BoneScale.Value;
+            if (value == null)
+                _meshNode.SelectedBoneIndex = null;
+            else
+                _meshNode.SelectedBoneIndex = value.BoneIndex;
         }
-
-        int _boneCount = 0;
-        public int BoneCount
-        {
-            get { return _boneCount; }
-            set { SetAndNotify(ref _boneCount, value); }
-        }
-
-        public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = new ObservableCollection<SkeletonBoneNode>();
-
-        public SkeletonBoneNode _selectedBone;
-        public SkeletonBoneNode SelectedBone
-        {
-            get { return _selectedBone; }
-            set
-            {
-                SetAndNotify(ref _selectedBone, value);
-                if (_selectedBone == null)
-                    _meshNode.SelectedBoneIndex = null;
-                else
-                    _meshNode.SelectedBoneIndex = _selectedBone.BoneIndex;
-            }
-        }
-
-
-        public DoubleViewModel BoneScale { get; set; } = new DoubleViewModel(1);
 
         void CreateBoneOverview(GameSkeleton skeleton)
         {
@@ -67,30 +49,19 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
                 var parentBoneId = skeleton.GetParentBoneIndex(i);
                 if (parentBoneId == -1)
                 {
-                    Bones.Add(CreateNode(i, parentBoneId, skeleton.BoneNames[i]));
+                    Bones.Add(new SkeletonBoneNode(i, parentBoneId, skeleton.BoneNames[i]));
                 }
                 else
                 {
                     var treeParent = GetParent(Bones, parentBoneId);
 
                     if (treeParent != null)
-                        treeParent.Children.Add(CreateNode(i, parentBoneId, skeleton.BoneNames[i]));
+                        treeParent.Children.Add(new SkeletonBoneNode(i, parentBoneId, skeleton.BoneNames[i]));
                 }
             }
         }
 
-        SkeletonBoneNode CreateNode(int boneId, int parentBoneId, string boneName)
-        {
-            var item = new SkeletonBoneNode
-            {
-                BoneIndex = boneId,
-                BoneName = boneName,
-                ParentBoneIndex = parentBoneId
-            };
-            return item;
-        }
-
-        SkeletonBoneNode GetParent(ObservableCollection<SkeletonBoneNode> root, int parentBoneId)
+        static SkeletonBoneNode? GetParent(ObservableCollection<SkeletonBoneNode> root, int parentBoneId)
         {
             foreach (var item in root)
             {
@@ -104,45 +75,23 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
             return null;
         }
 
-        public void Dispose()
-        {
-            BoneScale.PropertyChanged -= BoneScale_PropertyChanged;
-        }
-
-
-
-        public class SkeletonBoneNode : NotifyPropertyChangedImpl
-        {
-            string _boneName;
-            public string BoneName
-            {
-                get { return _boneName; }
-                set { SetAndNotify(ref _boneName, value); }
-            }
-
-            int _boneIndex;
-            public int BoneIndex
-            {
-                get { return _boneIndex; }
-                set { SetAndNotify(ref _boneIndex, value); }
-            }
-
-
-            int _parentBoneIndex;
-            public int ParentBoneIndex
-            {
-                get { return _parentBoneIndex; }
-                set { SetAndNotify(ref _parentBoneIndex, value); }
-            }
-
-            public override string ToString()
-            {
-                return BoneName + "[" + BoneIndex + "]";
-            }
-
-            public ObservableCollection<SkeletonBoneNode> Children { get; set; } = new ObservableCollection<SkeletonBoneNode>();
-        }
+        public void Dispose() { }
     }
 
+
+    public partial class SkeletonBoneNode : ObservableObject
+    {
+        [ObservableProperty] string _boneName;
+        [ObservableProperty] int _boneIndex;
+        [ObservableProperty] int _parentBoneIndex;
+        [ObservableProperty] ObservableCollection<SkeletonBoneNode> _children = [];
+
+        public SkeletonBoneNode(int boneId, int parentBoneId, string boneName)
+        {
+            BoneIndex = boneId;
+            BoneName = boneName;
+            ParentBoneIndex = parentBoneId;
+        }   
+    }
 
 }

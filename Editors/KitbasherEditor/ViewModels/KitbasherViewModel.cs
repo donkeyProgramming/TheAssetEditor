@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Windows;
+using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using GameWorld.Core.Components;
 using GameWorld.Core.Services;
 using GameWorld.WpfWindow;

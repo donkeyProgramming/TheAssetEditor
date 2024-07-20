@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Components;
@@ -10,7 +9,7 @@ using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 
-namespace KitbasherEditor.ViewModels
+namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
 {
     // Improve using this: https://stackoverflow.com/questions/63110566/multi-select-with-multiple-level-in-wpf-treeview
 
@@ -28,10 +27,10 @@ namespace KitbasherEditor.ViewModels
         ISceneNodeViewModel? _selectedNodeViewModel;
         public ISceneNodeViewModel? SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
 
-        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory, 
-            SelectionManager selectionManager, 
-            SceneManager sceneManager, 
-            CommandFactory commandFactory, 
+        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory,
+            SelectionManager selectionManager,
+            SceneManager sceneManager,
+            CommandFactory commandFactory,
             EventHub eventHub)
         {
             _sceneNodeViewFactory = sceneNodeViewFactory;
@@ -44,9 +43,9 @@ namespace KitbasherEditor.ViewModels
             ContextMenu.SelectedNodesChanged += OnContextMenuActionChangingSelection;
 
             SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
-            
+
             eventHub.Register<SelectionChangedEvent>(OnSceneSelectionChanged);
-            eventHub.Register<SceneObjectAddedEvent>(x=> RebuildTree());
+            eventHub.Register<SceneObjectAddedEvent>(x => RebuildTree());
             eventHub.Register<SceneObjectRemovedEvent>(x => RebuildTree());
         }
 
@@ -87,10 +86,10 @@ namespace KitbasherEditor.ViewModels
                             var min = isAscending ? newItemIndex : existingSelectionIndex;
                             var max = isAscending ? existingSelectionIndex : newItemIndex;
 
-                            for (int i = min; i < max; i++)
+                            for (var i = min; i < max; i++)
                             {
                                 var element = newItem.Parent.Children.ElementAt(i);
-                                if(SelectedObjects.Contains(element) == false)
+                                if (SelectedObjects.Contains(element) == false)
                                     SelectedObjects.Add(element);
                             }
                         }
@@ -119,7 +118,7 @@ namespace KitbasherEditor.ViewModels
                 }
 
                 var currentSelection = _selectionManager.GetState() as ObjectSelectionState;
-                bool selectionEqual = false;
+                var selectionEqual = false;
                 if (currentSelection != null)
                     selectionEqual = currentSelection.IsSelectionEqual(objectState);
 
@@ -159,7 +158,7 @@ namespace KitbasherEditor.ViewModels
             var allModelNodes = _sceneManager.GetEnumeratorConditional(x => x is Rmv2ModelNode);
             foreach (var item in allModelNodes)
             {
-                for (int i = 0; i < item.Children.Count(); i++)
+                for (var i = 0; i < item.Children.Count(); i++)
                 {
                     item.Children[i].IsVisible = i == newLodLevel;
                     item.Children[i].IsExpanded = i == newLodLevel;
@@ -187,7 +186,7 @@ namespace KitbasherEditor.ViewModels
                 var objects = objectSelection.SelectedObjects();
                 foreach (var obj in objects)
                     SelectedObjects.Add(obj);
-                
+
             }
             finally
             {

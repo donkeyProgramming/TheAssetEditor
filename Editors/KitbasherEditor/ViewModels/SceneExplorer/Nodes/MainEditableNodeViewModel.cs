@@ -1,46 +1,58 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.KitbasherEditor.UiCommands;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels;
-using Shared.Core.Misc;
-using Shared.Core.PackFiles;
+using Shared.Core.Events;
 using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public class MainEditableNodeViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
+    public partial class MainEditableNodeViewModel : ObservableObject, ISceneNodeViewModel
     {
+        static public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
+
         private readonly KitbasherRootScene _kitbasherRootScene;
-        private readonly PackFileService _pfs;
         private readonly RenderEngineComponent _renderEngineComponent;
+        private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         MainEditableNode _mainNode;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public ObservableCollection<string> SkeletonNameList { get; set; }
+        [ObservableProperty] ObservableCollection<string> _skeletonNameList;
+        [ObservableProperty] string _skeletonName;
+        [ObservableProperty] ObservableCollection<RenderFormats> _possibleRenderFormats = [RenderFormats.MetalRoughness, RenderFormats.SpecGloss];
+        [ObservableProperty] RenderFormats _selectedRenderFormat;
 
-        string _skeletonName;
-        public string SkeletonName { get { return _skeletonName; } set { SetAndNotify(ref _skeletonName, value); UpdateSkeletonName(); } }
-        public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
-
-        public ObservableCollection<RenderFormats> PossibleRenderFormats { get; set; } = new ObservableCollection<RenderFormats>() { RenderFormats.MetalRoughness, RenderFormats.SpecGloss };
-
-        RenderFormats _selectedRenderFormat;
-        public RenderFormats SelectedRenderFormat { get => _selectedRenderFormat; set { SetAndNotify(ref _selectedRenderFormat, value); _renderEngineComponent.MainRenderFormat = _selectedRenderFormat; } }
-
-        public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, PackFileService pfs, RenderEngineComponent renderEngineComponent)
+        public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene, 
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            RenderEngineComponent renderEngineComponent, 
+            IUiCommandFactory uiCommandFactory)
         {
             _kitbasherRootScene = kitbasherRootScene;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
-            _pfs = pfs;
             _renderEngineComponent = renderEngineComponent;
-            _selectedRenderFormat = _renderEngineComponent.MainRenderFormat;
-
+            _uiCommandFactory = uiCommandFactory;
+            
+            SelectedRenderFormat = _renderEngineComponent.MainRenderFormat;
             SkeletonNameList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
+        }
+
+        partial void OnSelectedRenderFormatChanged(RenderFormats value)
+        {
+            _renderEngineComponent.MainRenderFormat = value;
+        }
+
+        partial void OnSkeletonNameChanged(string value)
+        {
+            var cleanSkeletonName = "";
+            if (!string.IsNullOrWhiteSpace(value))
+                cleanSkeletonName = Path.GetFileNameWithoutExtension(value);
+            _kitbasherRootScene.SetSkeletonFromName(cleanSkeletonName);
         }
 
         public void Initialize(ISceneNode node)
@@ -52,48 +64,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
             }
         }
 
-        void UpdateSkeletonName()
-        {
-            var cleanSkeletonName = "";
-            if (!string.IsNullOrWhiteSpace(SkeletonName))
-                cleanSkeletonName = Path.GetFileNameWithoutExtension(SkeletonName);
-            _kitbasherRootScene.SetSkeletonFromName(cleanSkeletonName);
-        }
-
-        public void CopyTexturesToOutputPack()
-        {
-            var meshes = _mainNode.GetMeshesInLod(0, false);
-            var materials = meshes.Select(x => x.Material);
-            var allTextures = materials.SelectMany(x => x.GetAllTextures());
-            var distinctTextures = allTextures.DistinctBy(x => x.Path);
-
-            foreach (var tex in distinctTextures)
-            {
-                var file = _pfs.FindFile(tex.Path);
-                if (file != null)
-                {
-                    var sourcePackContainer = _pfs.GetPackFileContainer(file);
-                    _pfs.CopyFileFromOtherPackFile(sourcePackContainer, tex.Path, _pfs.GetEditablePack());
-                }
-            }
-        }
-
-        public void DeleteAllMissingTexturesAction()
-        {
-            var meshes = _mainNode.GetMeshesInLod(0, false);
-            foreach (var mesh in meshes)
-            {
-                var resolver = new MissingTextureResolver();
-                resolver.DeleteMissingTextures(mesh, _pfs);
-            }
-        }
-
-        public void Dispose()
-        {
-            _skeletonAnimationLookUpHelper = null;
-            _mainNode = null;
-        }
-
-
+        public void CopyTexturesToOutputPack() => _uiCommandFactory.Create<CopyTexturesToPackCommand>().Execute(_mainNode);
+        public void DeleteAllMissingTexturesAction() => _uiCommandFactory.Create<DeleteMissingTexturesCommand>().Execute(_mainNode);
+        public void Dispose() { }
     }
 }

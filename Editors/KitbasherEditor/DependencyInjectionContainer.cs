@@ -1,4 +1,5 @@
-﻿using Editors.KitbasherEditor.ViewModels.SaveDialog;
+﻿using Editors.KitbasherEditor.UiCommands;
+using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
 using GameWorld.Core.Services;
@@ -67,7 +68,10 @@ namespace KitbasherEditor
             // Event handlers
             serviceCollection.AddScoped<SkeletonChangedHandler>();
 
+            // Commands
             RegisterAllAsOriginalType<IKitbasherUiCommand>(serviceCollection, ServiceLifetime.Transient);
+            serviceCollection.AddTransient<CopyTexturesToPackCommand>();
+            serviceCollection.AddTransient<DeleteMissingTexturesCommand>();
         }
 
         public override void RegisterTools(IToolFactory factory)
