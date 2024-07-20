@@ -7,7 +7,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
     {
         public void Export(string outputPath, bool convertToBlenderFormat)
         {
-
+            //nothing yet, need to know the difference between the two types of material images
         }
 
         internal ExportSupportEnum CanExportFile(PackFile file)

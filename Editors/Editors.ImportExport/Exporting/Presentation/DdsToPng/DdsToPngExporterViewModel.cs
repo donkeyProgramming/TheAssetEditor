@@ -22,7 +22,7 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToPng
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
         {
-            _exporter.Export(outputPath);
+            _exporter.Export(outputPath, exportSource);
         }
     }
 }
