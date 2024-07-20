@@ -18,11 +18,13 @@ namespace Editors.KitbasherEditor.UiCommands
         {
             var meshes = mainNode.GetMeshesInLod(0, false);
             foreach (var mesh in meshes)
-            {
-                var resolver = new MissingTextureResolver();
-                resolver.DeleteMissingTextures(mesh, _packFileService);
-            }
- 
+                Execute(mesh);
+        }
+
+        internal void Execute(Rmv2MeshNode mesh)
+        {
+            var resolver = new MissingTextureResolver();
+            resolver.DeleteMissingTextures(mesh, _packFileService);
         }
     }
 }

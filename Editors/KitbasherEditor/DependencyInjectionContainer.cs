@@ -47,9 +47,9 @@ namespace KitbasherEditor
             // View models - scene node editors
             serviceCollection.AddTransient<SceneNodeEditorViewModel>();
             serviceCollection.AddTransient<MeshViewModel>();
-            //serviceCollection.AddTransient<AnimationViewModel>();
-            //serviceCollection.AddTransient<MaterialGeneralViewModel>();
-            //serviceCollection.AddTransient<WeightedMaterialViewModel>();
+            serviceCollection.AddTransient<AnimationViewModel>();
+            serviceCollection.AddTransient<MaterialGeneralViewModel>();
+            serviceCollection.AddTransient<WeightedMaterialViewModel>();
 
             // Sub tools
             serviceCollection.AddScoped<VertexDebuggerViewModel>();
@@ -81,6 +81,7 @@ namespace KitbasherEditor
             RegisterAllAsOriginalType<IKitbasherUiCommand>(serviceCollection, ServiceLifetime.Transient);
             serviceCollection.AddTransient<CopyTexturesToPackCommand>();
             serviceCollection.AddTransient<DeleteMissingTexturesCommand>();
+            serviceCollection.AddTransient<ResolveMissingTextureCommand>();   
         }
 
         public override void RegisterTools(IToolFactory factory)

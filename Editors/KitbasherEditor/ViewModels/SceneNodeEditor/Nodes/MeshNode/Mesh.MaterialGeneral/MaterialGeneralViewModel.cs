@@ -1,74 +1,52 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Editors.KitbasherEditor.UiCommands;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services;
 using Shared.Core.Events;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {
-    public partial class MaterialGeneralViewModel : NotifyPropertyChangedImpl
+    public partial class MaterialGeneralViewModel : ObservableObject
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
-        private readonly Rmv2MeshNode _meshNode;
         private readonly PackFileService _pfs;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IUiCommandFactory _uiCommandFactory;
 
-        public ICommand ResolveTexturesCommand { get; set; }
-        public ICommand DeleteMissingTexturesCommand { get; set; }
+        Rmv2MeshNode _meshNode;
 
-        public bool UseAlpha
-        {
-            get => _meshNode.Material.AlphaMode == AlphaMode.Transparent;
-            set
-            {
-                if (value)
-                    _meshNode.Material.AlphaMode = AlphaMode.Transparent;
-                else
-                    _meshNode.Material.AlphaMode = AlphaMode.Opaque;
-                NotifyPropertyChanged();
-            }
-        }
+        [ObservableProperty] ObservableCollection<TextureViewModel> _textureList = [];
+        [ObservableProperty] string _textureDirectory;
+        [ObservableProperty] bool _useAlpha;
+        [ObservableProperty] bool _onlyShowUsedTextures = true;
+        [ObservableProperty] UiVertexFormat _vertexType;
+        [ObservableProperty] IEnumerable<UiVertexFormat> _possibleVertexTypes = [UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic];
 
-        public ObservableCollection<TextureViewModel> TextureList { get; set; } = new ObservableCollection<TextureViewModel>();
-
-        public string TextureDirectory
-        {
-            get => _meshNode.Material.TextureDirectory;
-            set { _meshNode.Material.TextureDirectory = value; NotifyPropertyChanged(); }
-        }
-
-        bool _onlyShowUsedTextures = true;
-        public bool OnlyShowUsedTextures
-        {
-            get => _onlyShowUsedTextures;
-            set { SetAndNotify(ref _onlyShowUsedTextures, value); UpdateTextureListVisibility(_onlyShowUsedTextures); }
-        }
-
-        public UiVertexFormat VertexType { get { return _meshNode.Geometry.VertexFormat; } set { ChangeVertexType(value); } }
-        public IEnumerable<UiVertexFormat> PossibleVertexTypes { get; set; }
-
-        public MaterialGeneralViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode meshNode, PackFileService pfs,  ApplicationSettingsService applicationSettings, IUiCommandFactory uiCommandFactory)
+        public MaterialGeneralViewModel(KitbasherRootScene kitbasherRootScene, PackFileService pfs, ApplicationSettingsService applicationSettings, IUiCommandFactory uiCommandFactory)
         {
             _kitbasherRootScene = kitbasherRootScene;
-            _meshNode = meshNode;
+
             _pfs = pfs;
             _uiCommandFactory = uiCommandFactory;
             _applicationSettingsService = applicationSettings;
-            PossibleVertexTypes = new UiVertexFormat[] { UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic };
-            ResolveTexturesCommand = new RelayCommand(ResolveMissingTextures);
-            DeleteMissingTexturesCommand = new RelayCommand(DeleteMissingTextures);
-
-            CreateTextureList();
         }
 
-        void CreateTextureList()
+        public void Initialize(Rmv2MeshNode meshNode)
+        {
+            _meshNode = meshNode;
+
+            VertexType = _meshNode.Geometry.VertexFormat;
+            UseAlpha = _meshNode.Material.AlphaMode == AlphaMode.Transparent;
+            TextureDirectory = _meshNode.Material.TextureDirectory;
+            RefreshTextureList();
+        }
+
+        void RefreshTextureList()
         {
             var enumValues = Enum.GetValues(typeof(TextureType)).Cast<TextureType>().ToList();
             var textureEnumValues = _meshNode.Material.GetAllTextures().Select(x => x.TexureType).ToList();
@@ -82,10 +60,29 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 TextureList.Add(textureView);
             }
 
-            UpdateTextureListVisibility(OnlyShowUsedTextures);
+            OnOnlyShowUsedTexturesChanged(OnlyShowUsedTextures);
         }
 
-        void UpdateTextureListVisibility(bool onlyShowUsedTextures)
+        partial void OnUseAlphaChanged(bool value)
+        {
+            if (value)
+                _meshNode.Material.AlphaMode = AlphaMode.Transparent;
+            else
+                _meshNode.Material.AlphaMode = AlphaMode.Opaque;
+        }
+
+        partial void OnVertexTypeChanged(UiVertexFormat value)
+        {
+            var skeletonName = _kitbasherRootScene.Skeleton.SkeletonName;
+            _meshNode.Geometry.ChangeVertexType(value, skeletonName);
+        }
+
+        partial void OnTextureDirectoryChanged(string value)
+        {
+            _meshNode.Material.TextureDirectory = value;
+        }
+
+        partial void OnOnlyShowUsedTexturesChanged(bool value)
         {
             foreach (var texture in TextureList)
             {
@@ -100,31 +97,22 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                         continue;
                     }
                 }
-                if (onlyShowUsedTextures == false)
+                if (value == false)
                     texture.IsVisible.Value = true;
                 else
                     texture.IsVisible.Value = !string.IsNullOrWhiteSpace(texture.Path);
             }
         }
 
-        void ChangeVertexType(UiVertexFormat newFormat)
+        [RelayCommand]
+        void ResolveMissingTextures() => _uiCommandFactory.Create<DeleteMissingTexturesCommand>().Execute(_meshNode);
+
+        [RelayCommand]
+        void DeleteMissingTextures()
         {
-            var skeletonName = _kitbasherRootScene.Skeleton.SkeletonName;
-            _meshNode.Geometry.ChangeVertexType(newFormat, skeletonName);
-            NotifyPropertyChanged(nameof(VertexType));
+            _uiCommandFactory.Create<DeleteMissingTexturesCommand>().Execute(_meshNode);
+            RefreshTextureList();
         }
 
-        private void ResolveMissingTextures()
-        {
-            var resolver = new MissingTextureResolver();
-            resolver.ResolveMissingTextures(_meshNode, _pfs);
-        }
-
-        private void DeleteMissingTextures()
-        {
-            var resolver = new MissingTextureResolver();
-            resolver.DeleteMissingTextures(_meshNode, _pfs);
-            CreateTextureList();
-        }
     }
 }

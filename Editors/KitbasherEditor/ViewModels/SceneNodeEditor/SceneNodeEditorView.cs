@@ -37,14 +37,14 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor
             }
 
             var selectedNode = selectionChangedEvent.SelectedObjects.First();
+
+            CurrentEditor?.Dispose();
+            CurrentEditor = null;
             CurrentEditor = CreateNodeEditor(selectedNode);
         }
 
         public ISceneNodeEditor? CreateNodeEditor(ISceneNode node)
         {
-            if (node.IsEditable == false)
-                return null;
-
             // Special case where nothing should be displayed - The root node
             if (node is GroupNode groupNode)
             {
@@ -63,10 +63,10 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor
             return viewModel;
         }
 
-
         public void Dispose()
         {
             _eventHub.UnRegister<SceneNodeSelectedEvent>(OnSelectionChanged);
+            CurrentEditor?.Dispose();
         }
     }
 }

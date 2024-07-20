@@ -9,7 +9,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 {
     public class WeightedMaterialViewModel : NotifyPropertyChangedImpl
     {
-        private readonly WeightedMaterial _weightedMaterial;
+        WeightedMaterial _weightedMaterial;
 
         public NotifyAttr<string> Filters { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<int> MatrixIndex { get; set; } = new NotifyAttr<int>();
@@ -27,7 +27,13 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         public ICommand SetDefaultParentMatrixIndexCommand { get; set; }
         public ICommand SetDefaultMatrixIndexCommand { get; set; }
 
-        public WeightedMaterialViewModel(Rmv2MeshNode node)
+        public WeightedMaterialViewModel()
+        {
+            SetDefaultParentMatrixIndexCommand = new RelayCommand(SetDefaultParentMatrix);
+            SetDefaultMatrixIndexCommand = new RelayCommand(SetDefaultMatrix);
+        }
+
+        public void Initialize(Rmv2MeshNode node)
         {
             var castMaterial = node.Material as WeightedMaterial;
             if (castMaterial == null)
@@ -46,9 +52,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
             TextureParameters = new ObservableCollection<string>(_weightedMaterial.TexturesParams.Select(x => x.TexureType + " - " + x.Path));
             AttachmentPointParameters = new ObservableCollection<string>(_weightedMaterial.AttachmentPointParams.Select(x => x.BoneIndex + " - " + x.Name + " Ident:" + x.Matrix.IsIdentity()));
             VectorParameters = new ObservableCollection<string>(_weightedMaterial.Vec4Params.Select(x => $"[{x.X}] [{x.Y}] [{x.Z}] [{x.W}]"));
-
-            SetDefaultParentMatrixIndexCommand = new RelayCommand(SetDefaultParentMatrix);
-            SetDefaultMatrixIndexCommand = new RelayCommand(SetDefaultMatrix);
         }
 
         void SetDefaultMatrix()
