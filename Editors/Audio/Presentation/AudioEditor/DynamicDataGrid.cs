@@ -62,11 +62,11 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             var dataGrid = GetDataGrid();
 
-            // DataGrid settings.
-            dataGrid.CanUserAddRows = false;
+            // DataGrid settings:
+            dataGrid.CanUserAddRows = false; // Setting this bastard to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF.
             dataGrid.ItemsSource = audioEditorDataGridItems;
 
-            // Clear existing data.
+            // Clear existing data:
             dataGrid.Columns.Clear();
             audioEditorDataGridItems.Clear();
 
@@ -94,6 +94,7 @@ namespace Editors.Audio.Presentation.AudioEditor
                     states.AddRange(vanillaStates);
                 }
 
+                // Column for State Group:
                 var column = new DataGridTemplateColumn
                 {
                     Header = AddExtraUnderScoresToStateGroup(stateGroupWithQualifier),
@@ -102,10 +103,9 @@ namespace Editors.Audio.Presentation.AudioEditor
                 };
 
                 dataGrid.Columns.Add(column);
-                Debug.WriteLine($"Added column for state group: {AddExtraUnderScoresToStateGroup(stateGroupWithQualifier)}");
             }
 
-            // Add column for Audio TextBox.
+            // Column for Audio files TextBox:
             var soundsTextBoxColumn = new DataGridTemplateColumn
             {
                 Header = "Audio Files",
@@ -114,9 +114,8 @@ namespace Editors.Audio.Presentation.AudioEditor
             };
 
             dataGrid.Columns.Add(soundsTextBoxColumn);
-            Debug.WriteLine($"Added textBoxColumn for Sounds");
 
-            // Add column for ... button.
+            // Column for Audio files '...' button:
             var soundsButtonColumn = new DataGridTemplateColumn
             {
                 CellTemplate = CreateSoundsButtonTemplate(audioRepository),
@@ -125,9 +124,8 @@ namespace Editors.Audio.Presentation.AudioEditor
             };
 
             dataGrid.Columns.Add(soundsButtonColumn);
-            Debug.WriteLine($"Added '...' buttonColumn");
 
-            // Add column for Remove button.
+            // Column for Remove State Path button:
             var removeButtonColumn = new DataGridTemplateColumn
             {
                 CellTemplate = CreateRemoveButtonTemplate(viewModel),
@@ -136,7 +134,6 @@ namespace Editors.Audio.Presentation.AudioEditor
             };
 
             dataGrid.Columns.Add(removeButtonColumn);
-            Debug.WriteLine($"Added 'Remove' buttonColumn");
         }
 
         public static DataTemplate CreateStatesComboBoxTemplate(List<string> states, string stateGroupWithQualifier, bool showCustomStatesOnly)
@@ -152,26 +149,25 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             // ComboBox settings.
             factory.SetBinding(ComboBox.SelectedItemProperty, binding);
-            factory.SetValue(ComboBox.IsTextSearchEnabledProperty, true); // Enable text search.
-            factory.SetValue(ComboBox.IsEditableProperty, true); // Enable text search.
-            factory.SetValue(ComboBox.ItemsSourceProperty, showCustomStatesOnly ? new List<string>() : states); // Set ItemsSource based on showCustomStatesOnly.
+            factory.SetValue(ComboBox.IsTextSearchEnabledProperty, true);
+            factory.SetValue(ComboBox.IsEditableProperty, true);
+            factory.SetValue(ComboBox.ItemsSourceProperty, states);
 
-            // Create the Loaded event handler to initialize and attach the TextChanged event.
+            // TextChanged event for filtering items.
             factory.AddHandler(ComboBox.LoadedEvent, new RoutedEventHandler((sender, args) =>
             {
                 if (sender is ComboBox comboBox)
                 {
-                    comboBox.ItemsSource = states; // Set initial ItemsSource.
+                    comboBox.ItemsSource = states;
 
                     if (comboBox.Template.FindName("PART_EditableTextBox", comboBox) is TextBox textBox)
                     {
-                        // TextChanged event for filtering items.
                         textBox.TextChanged += (s, e) =>
                         {
                             var filterText = textBox.Text;
                             var filteredItems = states.Where(item => item.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
 
-                            comboBox.ItemsSource = filteredItems; // Set filtered list based on showCustomStatesOnly.
+                            comboBox.ItemsSource = filteredItems;
                             comboBox.IsDropDownOpen = true; // Keep the drop-down open to show filtered results.
                         };
                     }

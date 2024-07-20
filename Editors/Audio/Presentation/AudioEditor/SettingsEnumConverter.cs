@@ -18,8 +18,7 @@ namespace Editors.Audio.Presentation.AudioEditor
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool boolValue && parameter is Enum)
-                // Return the enum value if checkbox is checked, otherwise return 'None'
-                return boolValue ? parameter : Enum.Parse(parameter.GetType(), "None");
+                return boolValue ? parameter : Enum.Parse(parameter.GetType(), "None"); // Return the enum value if checkbox is checked, otherwise return 'None'
 
             return DependencyProperty.UnsetValue;
         }

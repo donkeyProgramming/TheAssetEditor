@@ -54,7 +54,13 @@ namespace Editors.Audio.Presentation.AudioEditor
             "Vocalisation"
         ];
 
-        // Unfortunately these have to be defined in the code rather than dynamically as there's no way to programatically define what is essential vs all Dialogue Events for each Dialogue Event Bnk type.
+
+
+
+
+        //NEED TO FINISH THIS
+
+        // These have to be defined in the code rather than dynamically as there's no way to programatically define what is essential vs all Dialogue Events for each Dialogue Event Bnk type.
         public static List<string> BattleIndividualMeleeAll { get; } =
         [
             "Battle_Individual_Melee_Weapon_Hit"

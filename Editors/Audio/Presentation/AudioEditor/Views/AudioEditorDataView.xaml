@@ -48,7 +48,7 @@
                       Margin="5,0"/>
         </Grid>
 
-        <!-- Buttons and CheckBox below ComboBox -->
+        <!-- Buttons and CheckBox -->
         <Grid Grid.Row="2" Margin="2.5 5 5 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />

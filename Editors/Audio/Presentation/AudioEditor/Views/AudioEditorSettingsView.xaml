@@ -44,7 +44,7 @@
         <!-- Audio Editor Settings -->
         <GroupBox DockPanel.Dock="Top" Header="Settings" Style="{StaticResource CenterHeaderGroupBoxStyle}">
             <StackPanel>
-                <!-- Audio Project Name -->
+                <!-- Audio Project File Name -->
                 <Grid Margin="5 10 5 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -59,7 +59,7 @@
                              Width="{Binding ActualWidth, ElementName=NameColumn}" />
                 </Grid>
 
-                <!-- Custom States Name -->
+                <!-- Custom States File Name -->
                 <Grid Margin="5 10 5 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -79,7 +79,7 @@
         <!-- Audio Project Configuration -->
         <GroupBox DockPanel.Dock="Top" Margin="0 10 0 0" Header="Audio Project Configuration" Style="{StaticResource CenterHeaderGroupBoxStyle}">
             <StackPanel>
-                <!-- Event Type Selection -->
+                <!-- EventType Selection -->
                 <Grid Margin="0 10 5 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="145"/>
@@ -93,7 +93,7 @@
                       VerticalAlignment="Center"/>
                 </Grid>
 
-                <!-- Event Subtype Selection -->
+                <!-- EventSubType Selection -->
                 <Grid Margin="0 5 5 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="145"/>
@@ -101,7 +101,7 @@
                     </Grid.ColumnDefinitions>
                     <Label Content="Dialogue Event Subtypes:" Margin="0,0,0,0" VerticalAlignment="Center"/>
                     <ComboBox Grid.Column="1"
-                      ItemsSource="{Binding AudioProjectSubTypes}" 
+                      ItemsSource="{Binding AudioProjectSubtypes}" 
                       SelectedItem="{Binding SelectedAudioProjectEventSubtype}" 
                       ToolTip="PLACEHOLDER TOOLTIP"
                       VerticalAlignment="Center"/>

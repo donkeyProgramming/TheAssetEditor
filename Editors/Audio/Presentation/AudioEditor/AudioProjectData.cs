@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
@@ -12,8 +14,10 @@ namespace Editors.Audio.Presentation.AudioEditor
 {
     public class AudioProjectData
     {
+        readonly static ILogger _logger = Logging.Create<AudioEditorViewModel>();
+
         public ProjectSettings Settings { get; set; } = new ProjectSettings();
-        public List<DialogueEventItems> DialogueEvents { get; set; } = new List<DialogueEventItems>();
+        public List<DialogueEventItems> DialogueEvents { get; set; } = [];
 
         public class ProjectSettings
         {
@@ -24,32 +28,31 @@ namespace Editors.Audio.Presentation.AudioEditor
         public class DialogueEventItems
         {
             public string DialogueEvent { get; set; }
-            public List<DecisionTreeItems> DecisionTree { get; set; } = new List<DecisionTreeItems>();
+            public List<DecisionTreeItems> DecisionTree { get; set; } = [];
         }
 
         public class DecisionTreeItems
         {
             public string StatePath { get; set; }
-            public List<string> AudioFiles { get; set; } = new List<string>();
+            public List<string> AudioFiles { get; set; } = [];
         }
 
-        public static void AddAudioProjectToPackFile(PackFileService packFileService, Dictionary<string, List<Dictionary<string, object>>> eventsData)
+        public static void AddAudioProjectToPackFile(PackFileService packFileService, Dictionary<string, List<Dictionary<string, object>>> eventsData, string audioProjectName)
         {
-            var audioProjectJson = ConvertEventDataToAudioProject(eventsData);
-            Debug.WriteLine($"audioProjectJson: {audioProjectJson}");
-
+            var audioProjectJson = ConvertEventsDataToAudioProject(eventsData);
             var pack = packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(audioProjectJson);
-            packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"audio_project.json", new MemorySource(byteArray)));
+            packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{audioProjectName}.json", new MemorySource(byteArray)));
+            _logger.Here().Information($"Saved Audio Project: {audioProjectName}");
         }
 
-        public static string ConvertEventDataToAudioProject(Dictionary<string, List<Dictionary<string, object>>> eventsData)
+        public static string ConvertEventsDataToAudioProject(Dictionary<string, List<Dictionary<string, object>>> eventsData)
         {
             var audioProject = new Dictionary<string, object>();
 
             var settings = new Dictionary<string, object>
             {
-                ["BnkName"] = "battle_vo_conversational__ovn_vo_actor_Albion_Dural_Durak",
+                ["BnkName"] = "battle_vo_conversational__ovn_vo_actor_Albion_Dural_Durak", // PLACEHOLDER NAME, NEED TO FINISH
                 ["Language"] = "english(uk)"
             };
 
@@ -93,7 +96,6 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             audioProject["DialogueEvents"] = dialogueEvents;
 
-            // Serialize the dictionary to JSON
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true
@@ -102,16 +104,14 @@ namespace Editors.Audio.Presentation.AudioEditor
             return JsonSerializer.Serialize(audioProject, options);
         }
 
-        public static Dictionary<string, List<Dictionary<string, object>>> ConvertAudioProjectToEventData(IAudioRepository audioRepository, string audioProjectJson)
+        public static Dictionary<string, List<Dictionary<string, object>>> ConvertAudioProjectToEventsData(IAudioRepository audioRepository, string audioProjectJson)
         {
-            var eventData = new Dictionary<string, List<Dictionary<string, object>>>();
+            var eventsData = new Dictionary<string, List<Dictionary<string, object>>>();
 
-            // Deserialize the JSON string into a dynamic object using System.Text.Json
             using (var audioProject = JsonDocument.Parse(audioProjectJson))
             {
                 var root = audioProject.RootElement;
 
-                // Deserialize Settings
                 var settingsElement = root.GetProperty("Settings");
                 var settings = new ProjectSettings
                 {
@@ -119,7 +119,6 @@ namespace Editors.Audio.Presentation.AudioEditor
                     Language = settingsElement.GetProperty("Language").GetString()
                 };
 
-                // Deserialize DialogueEvents
                 var dialogueEventsElement = root.GetProperty("DialogueEvents");
                 var dialogueEvents = new List<DialogueEventItems>();
 
@@ -148,7 +147,6 @@ namespace Editors.Audio.Presentation.AudioEditor
                     dialogueEvents.Add(dialogueEvent);
                 }
 
-                // Convert DialogueEvents to eventData dictionary
                 foreach (var dialogueEvent in dialogueEvents)
                 {
                     var eventKey = dialogueEvent.DialogueEvent;
@@ -176,11 +174,11 @@ namespace Editors.Audio.Presentation.AudioEditor
                         eventDataItems.Add(eventDataItem);
                     }
 
-                    eventData[eventKey] = eventDataItems;
+                    eventsData[eventKey] = eventDataItems;
                 }
             }
 
-            return eventData;
+            return eventsData;
         }
     }
 }
