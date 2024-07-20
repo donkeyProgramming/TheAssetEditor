@@ -7,12 +7,14 @@ using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.SceneNodes;
 using KitbasherEditor.ViewModels;
+using KitbasherEditor.Views.EditorViews;
 using Shared.Core.Events;
+using Shared.Ui.Common.DataTemplates;
 using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public partial class MainEditableNodeViewModel : ObservableObject, ISceneNodeEditor
+    public partial class MainEditableNodeViewModel : ObservableObject, ISceneNodeEditor, IViewProvider<MainEditableNodeView>
     {
         static public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 

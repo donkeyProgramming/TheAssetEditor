@@ -2,6 +2,7 @@
 using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using GameWorld.Core.Services;
 using KitbasherEditor.EventHandlers;
@@ -11,6 +12,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.SaveDialog;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using KitbasherEditor.Views.EditorViews.PinTool;
@@ -34,7 +36,6 @@ namespace KitbasherEditor
 
             // Creators
             serviceCollection.AddScoped<KitbashSceneCreator>();
-            serviceCollection.AddScoped<SceneNodeViewFactory>();
 
             // View models 
             serviceCollection.AddScoped<KitbasherView>();
@@ -44,8 +45,11 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<AnimationControllerViewModel>();
 
             // View models - scene node editors
-            serviceCollection.AddScoped<SceneNodeEditorViewModel>();
-            
+            serviceCollection.AddTransient<SceneNodeEditorViewModel>();
+            serviceCollection.AddTransient<MeshViewModel>();
+            //serviceCollection.AddTransient<AnimationViewModel>();
+            //serviceCollection.AddTransient<MaterialGeneralViewModel>();
+            //serviceCollection.AddTransient<WeightedMaterialViewModel>();
 
             // Sub tools
             serviceCollection.AddScoped<VertexDebuggerViewModel>();

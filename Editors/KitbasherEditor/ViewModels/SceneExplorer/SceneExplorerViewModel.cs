@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
@@ -16,25 +16,22 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
     public class SceneExplorerViewModel : NotifyPropertyChangedImpl
     {
         private readonly SceneManager _sceneManager;
+        private readonly EventHub _eventHub;
         private readonly SelectionManager _selectionManager;
-        private readonly SceneNodeViewFactory _sceneNodeViewFactory;
         bool _ignoreSelectionChanges = false;
 
         public ObservableCollection<ISceneNode> SceneGraphRootNodes { get; private set; } = new();
         public ObservableCollection<ISceneNode> SelectedObjects { get; private set; } = new();
         public SceneExplorerContextMenuHandler ContextMenu { get; private set; }
 
-        ISceneNodeEditor? _selectedNodeViewModel;
-        public ISceneNodeEditor? SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
-
-        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory,
+        public SceneExplorerViewModel(
             SelectionManager selectionManager,
             SceneManager sceneManager,
             CommandFactory commandFactory,
             EventHub eventHub)
         {
-            _sceneNodeViewFactory = sceneNodeViewFactory;
             _sceneManager = sceneManager;
+            _eventHub = eventHub;
             _selectionManager = selectionManager;
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
@@ -44,9 +41,9 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
 
             SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
 
-            eventHub.Register<SelectionChangedEvent>(OnSceneSelectionChanged);
-            eventHub.Register<SceneObjectAddedEvent>(x => RebuildTree());
-            eventHub.Register<SceneObjectRemovedEvent>(x => RebuildTree());
+            _eventHub.Register<SelectionChangedEvent>(OnSceneSelectionChanged);
+            _eventHub.Register<SceneObjectAddedEvent>(x => RebuildTree());
+            _eventHub.Register<SceneObjectRemovedEvent>(x => RebuildTree());
         }
 
         private void OnContextMenuActionChangingSelection(IEnumerable<ISceneNode> selectedNodes)
@@ -137,14 +134,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
 
         void UpdateViewAndContextMenu()
         {
-            if (SelectedNodeViewModel != null)
-                SelectedNodeViewModel.Dispose();
-
-            if (SelectedObjects.Count == 1)
-                SelectedNodeViewModel = _sceneNodeViewFactory.CreateEditorView(SelectedObjects.First());
-            else
-                SelectedNodeViewModel = null;
-
+            _eventHub.Publish(new SceneNodeSelectedEvent(SelectedObjects.ToList()));
             ContextMenu.Create(SelectedObjects);
         }
 

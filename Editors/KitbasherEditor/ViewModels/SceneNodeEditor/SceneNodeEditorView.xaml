@@ -7,14 +7,9 @@
              xmlns:sceneexplorer="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneExplorer"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-
-    <UserControl.Resources>
-        <sceneexplorer:NodeViewTemplateSelector x:Key="NodeContentSelector" />
-    </UserControl.Resources>
-    
     <ScrollViewer>
         <ContentControl Grid.Row="2" 
-                        Content="{Binding Path=SelectedNodeViewModel, UpdateSourceTrigger=PropertyChanged}" 
-                        ContentTemplateSelector="{StaticResource NodeContentSelector}"  />
+                        Content="{Binding Path=CurrentEditor, UpdateSourceTrigger=PropertyChanged}" 
+                        ContentTemplateSelector="{StaticResource ViewTemplateDataSelector}"/>
     </ScrollViewer>
 </UserControl>

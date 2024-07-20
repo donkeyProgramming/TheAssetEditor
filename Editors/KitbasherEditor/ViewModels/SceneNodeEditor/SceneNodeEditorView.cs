@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.KitbasherEditor.Events;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
-using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.Events;
@@ -25,30 +25,26 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor
             _map[typeof(SkeletonNode)] = typeof(SkeletonSceneNodeViewModel);
             _map[typeof(GroupNode)] = typeof(GroupNodeViewModel);
 
-            _eventHub.Register<SelectionChangedEvent>(OnSelectionChanged);
+            _eventHub.Register<SceneNodeSelectedEvent>(OnSelectionChanged);
         }
 
-        void OnSelectionChanged(SelectionChangedEvent selectionChangedEvent)
+        void OnSelectionChanged(SceneNodeSelectedEvent selectionChangedEvent)
         {
-            if (selectionChangedEvent.NewState.Mode != GeometrySelectionMode.Object)
+            if (selectionChangedEvent.SelectedObjects.Count != 1)
             {
                 CurrentEditor = null;
                 return;
             }
 
-            var objectState = selectionChangedEvent.NewState as ObjectSelectionState;
-            if (objectState!.SelectionCount() != 1)
-            {
-                CurrentEditor = null;
-                return;
-            }
-
-            var selectedNode = objectState.GetSingleSelectedObject();
+            var selectedNode = selectionChangedEvent.SelectedObjects.First();
             CurrentEditor = CreateNodeEditor(selectedNode);
         }
 
         public ISceneNodeEditor? CreateNodeEditor(ISceneNode node)
         {
+            if (node.IsEditable == false)
+                return null;
+
             // Special case where nothing should be displayed - The root node
             if (node is GroupNode groupNode)
             {
@@ -70,7 +66,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor
 
         public void Dispose()
         {
-            _eventHub.UnRegister<SelectionChangedEvent>(OnSelectionChanged);
+            _eventHub.UnRegister<SceneNodeSelectedEvent>(OnSelectionChanged);
         }
     }
 }

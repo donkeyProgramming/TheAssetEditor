@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using GameWorld.Core.SceneNodes;
+using KitbasherEditor.Views.EditorViews;
+using Shared.Ui.Common.DataTemplates;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public partial  class GroupNodeViewModel : ObservableObject, ISceneNodeEditor
+    public partial class GroupNodeViewModel : ObservableObject, ISceneNodeEditor, IViewProvider<GroupView>
     {
         ISceneNode _node;
 
@@ -11,7 +13,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 
         public void Initialize(ISceneNode node)
         {
-            GroupName = node.Name;
+            _node = node;
+            GroupName = _node.Name;
         }
 
         partial void OnGroupNameChanged(string value) => _node.Name = value;

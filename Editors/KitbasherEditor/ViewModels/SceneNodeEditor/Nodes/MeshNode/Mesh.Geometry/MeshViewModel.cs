@@ -1,19 +1,17 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.Ui.BaseDialogs.MathViews;
-using System.Windows;
-using System.Windows.Input;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 {
-    public class MeshViewModel : NotifyPropertyChangedImpl
+    public class MeshViewModel : NotifyPropertyChangedImpl, IDisposable
     {
-        readonly Rmv2MeshNode _meshNode;
+        Rmv2MeshNode _meshNode;
         private readonly SceneManager _sceneManager;
 
         public string ModelName { get { return _meshNode.Material.ModelName; } set { _meshNode.Material.ModelName = value; NotifyPropertyChanged(); } }
@@ -28,23 +26,23 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         Vector3ViewModel _pivot;
         public Vector3ViewModel Pivot { get { return _pivot; } set { SetAndNotify(ref _pivot, value); } }
 
-        public IEnumerable<ModelMaterialEnum> PossibleMaterialTypes { get; set; }
-        public ModelMaterialEnum SelectedMaterialType { get { return _meshNode.CommonHeader.ModelTypeFlag; } set { UpdateGroupType(value); NotifyPropertyChanged(); } }
+        public ModelMaterialEnum SelectedMaterialType { get { return _meshNode.CommonHeader.ModelTypeFlag; } set { NotifyPropertyChanged(); } }
 
         public ICommand CopyPivotToAllMeshesCommand { get; set; }
 
-        public MeshViewModel(Rmv2MeshNode node, SceneManager sceneManager)
+        public MeshViewModel(SceneManager sceneManager)
+        {
+            _sceneManager = sceneManager;
+            CopyPivotToAllMeshesCommand = new RelayCommand(CopyPivotToAllMeshes);
+        }
+
+        public void Initialize(Rmv2MeshNode node)
         {
             _meshNode = node;
-            _sceneManager = sceneManager;
             _meshNode.Name = _meshNode.Material.ModelName;
-
-            PossibleMaterialTypes = MaterialFactory.Create().GetSupportedMaterials();
 
             Pivot = new Vector3ViewModel(_meshNode.Material.PivotPoint);
             Pivot.OnValueChanged += Pivot_OnValueChanged;
-
-            CopyPivotToAllMeshesCommand = new RelayCommand(CopyPivotToAllMeshes);
         }
 
         private void Pivot_OnValueChanged(Vector3ViewModel newValue)
@@ -61,9 +59,9 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
                 mesh.UpdatePivotPoint(newPiv);
         }
 
-        private void UpdateGroupType(ModelMaterialEnum value)
+        public void Dispose()
         {
-            MessageBox.Show("Changing material type is currently not supported - Default/weighted swaps happen by default when saving.\nDid you mean to change vertex type?");
+            Pivot.OnValueChanged -= Pivot_OnValueChanged;
         }
     }
 }

@@ -27,7 +27,6 @@ namespace KitbasherEditor.ViewModels
         private readonly ILogger _logger = Logging.Create<KitbasherViewModel>();
 
         private readonly KitbashViewDropHandler _dropHandler;
-        private readonly PackFileService _pfs;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly FocusSelectableObjectService _focusSelectableObjectComponent;
 
@@ -51,14 +50,13 @@ namespace KitbasherEditor.ViewModels
             AnimationControllerViewModel animationControllerViewModel,
             SceneExplorerViewModel sceneExplorerViewModel,
             KitbashViewDropHandler dropHandler,
-            PackFileService pfs,
             KitbashSceneCreator kitbashSceneCreator,
             FocusSelectableObjectService focusSelectableObjectComponent,
             IComponentInserter componentInserter,
-            SkeletonChangedHandler skeletonChangedHandler, SceneNodeEditorViewModel sceneNodeEditorView)
+            SkeletonChangedHandler skeletonChangedHandler, 
+            SceneNodeEditorViewModel sceneNodeEditorView)
         {
             _dropHandler = dropHandler;
-            _pfs = pfs;
             _kitbashSceneCreator = kitbashSceneCreator;
             _focusSelectableObjectComponent = focusSelectableObjectComponent;
             Scene = gameWorld;
@@ -80,7 +78,6 @@ namespace KitbasherEditor.ViewModels
         {
             try
             {
-                var fileName = _pfs.GetFullPath(fileToLoad);
                 _kitbashSceneCreator.CreateFromPackFile(fileToLoad);
                 _focusSelectableObjectComponent.FocusScene();
                 DisplayName.Value = fileToLoad.Name;
