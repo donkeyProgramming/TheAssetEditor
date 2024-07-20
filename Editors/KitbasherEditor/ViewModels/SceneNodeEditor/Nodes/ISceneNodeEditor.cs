@@ -2,7 +2,7 @@
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public interface ISceneNodeViewModel : IDisposable
+    public interface ISceneNodeEditor : IDisposable
     {
         void Initialize(ISceneNode node);
     }

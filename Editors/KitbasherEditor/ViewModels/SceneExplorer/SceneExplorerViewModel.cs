@@ -24,8 +24,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
         public ObservableCollection<ISceneNode> SelectedObjects { get; private set; } = new();
         public SceneExplorerContextMenuHandler ContextMenu { get; private set; }
 
-        ISceneNodeViewModel? _selectedNodeViewModel;
-        public ISceneNodeViewModel? SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
+        ISceneNodeEditor? _selectedNodeViewModel;
+        public ISceneNodeEditor? SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
 
         public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory,
             SelectionManager selectionManager,

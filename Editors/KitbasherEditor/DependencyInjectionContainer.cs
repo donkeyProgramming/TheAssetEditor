@@ -2,6 +2,7 @@
 using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using GameWorld.Core.Services;
 using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;
@@ -41,6 +42,10 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<IEditorViewModel, KitbasherViewModel>();
             serviceCollection.AddScoped<SceneExplorerViewModel>();
             serviceCollection.AddScoped<AnimationControllerViewModel>();
+
+            // View models - scene node editors
+            serviceCollection.AddScoped<SceneNodeEditorViewModel>();
+            
 
             // Sub tools
             serviceCollection.AddScoped<VertexDebuggerViewModel>();

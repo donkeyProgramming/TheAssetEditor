@@ -6,7 +6,7 @@ using GameWorld.Core.SceneNodes;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public partial class SkeletonSceneNodeViewModel : ObservableObject, ISceneNodeViewModel
+    public partial class SkeletonSceneNodeViewModel : ObservableObject, ISceneNodeEditor
     {
         SkeletonNode _meshNode;
 

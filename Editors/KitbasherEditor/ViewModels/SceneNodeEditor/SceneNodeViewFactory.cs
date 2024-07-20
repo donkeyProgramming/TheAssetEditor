@@ -19,7 +19,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
             _map[typeof(GroupNode)] = typeof(GroupNodeViewModel);
         }
 
-        public ISceneNodeViewModel? CreateEditorView(ISceneNode node)
+        public ISceneNodeEditor? CreateEditorView(ISceneNode node)
         {
             // Special case where nothing should be displayed - The root node
             if(node is GroupNode groupNode) 
@@ -32,7 +32,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
             if (found == false)
                 return null;
 
-            var viewModel = _serviceProvider.GetRequiredService(viewModelType!) as ISceneNodeViewModel;
+            var viewModel = _serviceProvider.GetRequiredService(viewModelType!) as ISceneNodeEditor;
             if (viewModel == null)
                 throw new Exception($"{viewModelType} is not of type ISceneNodeViewModel");
             viewModel.Initialize(node);

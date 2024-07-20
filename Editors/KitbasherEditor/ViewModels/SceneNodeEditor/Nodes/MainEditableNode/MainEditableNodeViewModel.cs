@@ -12,7 +12,7 @@ using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public partial class MainEditableNodeViewModel : ObservableObject, ISceneNodeViewModel
+    public partial class MainEditableNodeViewModel : ObservableObject, ISceneNodeEditor
     {
         static public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 

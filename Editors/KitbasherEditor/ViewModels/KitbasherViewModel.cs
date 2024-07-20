@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Windows;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
+using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using GameWorld.Core.Components;
 using GameWorld.Core.Services;
 using GameWorld.WpfWindow;
@@ -32,6 +33,7 @@ namespace KitbasherEditor.ViewModels
 
         public IWpfGame Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
+        public SceneNodeEditorViewModel SceneNodeEditor { get; set; }
         public MenuBarViewModel MenuBar { get; set; }
         public AnimationControllerViewModel Animation { get; set; }
 
@@ -53,7 +55,7 @@ namespace KitbasherEditor.ViewModels
             KitbashSceneCreator kitbashSceneCreator,
             FocusSelectableObjectService focusSelectableObjectComponent,
             IComponentInserter componentInserter,
-            SkeletonChangedHandler skeletonChangedHandler)
+            SkeletonChangedHandler skeletonChangedHandler, SceneNodeEditorViewModel sceneNodeEditorView)
         {
             _dropHandler = dropHandler;
             _pfs = pfs;
@@ -63,6 +65,7 @@ namespace KitbasherEditor.ViewModels
             Animation = animationControllerViewModel;
             SceneExplorer = sceneExplorerViewModel;
             MenuBar = menuBarViewModel;
+            SceneNodeEditor = sceneNodeEditorView;
             
             // Events
             eventHub.Register<ScopedFileSavedEvent>(OnFileSaved);

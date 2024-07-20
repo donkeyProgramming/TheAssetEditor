@@ -12,7 +12,7 @@ using Shared.GameFormats.RigidModel.MaterialHeaders;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public class MeshEditorViewModel : NotifyPropertyChangedImpl, ISceneNodeViewModel
+    public class MeshEditorViewModel : NotifyPropertyChangedImpl, ISceneNodeEditor
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly PackFileService _pfs;

@@ -3,7 +3,7 @@ using GameWorld.Core.SceneNodes;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public partial  class GroupNodeViewModel : ObservableObject, ISceneNodeViewModel
+    public partial  class GroupNodeViewModel : ObservableObject, ISceneNodeEditor
     {
         ISceneNode _node;
 

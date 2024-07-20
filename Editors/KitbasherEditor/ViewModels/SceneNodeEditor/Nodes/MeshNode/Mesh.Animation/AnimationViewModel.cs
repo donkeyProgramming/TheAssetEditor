@@ -1,8 +1,8 @@
-﻿using Editors.Shared.Core.Services;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.Shared.Core.Services;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using KitbasherEditor.ViewModels;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Ui.Common;
 using Shared.Ui.Editors.BoneMapping;
@@ -10,27 +10,27 @@ using System.Windows;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 {
-    public class AnimationViewModel : NotifyPropertyChangedImpl
+    public partial class AnimationViewModel : ObservableObject
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly Rmv2MeshNode _meshNode;
 
-        public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>("");
-        public List<AnimatedBone> AnimatedBones { get; set; }
-        public FilterCollection<AnimatedBone> AttachableBones { get; set; } = new FilterCollection<AnimatedBone>(null);
+        [ObservableProperty] string _skeletonName = string.Empty;
+        [ObservableProperty] List<AnimatedBone> _animatedBones;
+        [ObservableProperty] FilterCollection<AnimatedBone> _attachableBones = new(null);
 
         public AnimationViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode meshNode, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp)
         {
             _kitbasherRootScene = kitbasherRootScene;
             _meshNode = meshNode;
 
-            SkeletonName.Value = _meshNode.Geometry.ParentSkeletonName;
+            SkeletonName = _meshNode.Geometry.ParentSkeletonName;
 
-            var skeletonFile = animLookUp.GetSkeletonFileFromName(pfs, SkeletonName.Value);
+            var skeletonFile = animLookUp.GetSkeletonFileFromName(pfs, SkeletonName);
             var bones = _meshNode.Geometry.GetUniqeBlendIndices();
 
             if (skeletonFile == null)
-                SkeletonName.Value = SkeletonName.Value + "[MISSING from packs]";
+                SkeletonName = SkeletonName + "[MISSING from packs]";
 
             // Make sure the bones are valid, mapping can cause issues! 
             if (bones.Count != 0 && skeletonFile != null)
