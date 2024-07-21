@@ -6,13 +6,18 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Reflection;
+using Shared.Core.Events;
+using System.Windows;
+
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
 {
     public class DdsToNormalPngExporter
     {
+        public DdsToNormalPngExporter() { }
 
-        public void Export(string outputPath, string fileName)
+        public void Export(string outputPath, string fileName, int tally)
         {
             using (Image image = Image.FromFile("C:/franz/" + fileName))
             using (Bitmap bitmap = new Bitmap(image))
@@ -46,9 +51,10 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
-
+                fileName = Path.GetFileNameWithoutExtension(fileName);
                 // Save the output image
-                bitmap.Save("C:/franz/test.png", System.Drawing.Imaging.ImageFormat.Png);
+                bitmap.Save("C:/franz/" + fileName + "_" + tally + ".png", System.Drawing.Imaging.ImageFormat.Png);
+               
             }
         }
 

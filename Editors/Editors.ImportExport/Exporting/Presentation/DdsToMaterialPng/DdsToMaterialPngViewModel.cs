@@ -4,6 +4,7 @@ using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common.DataTemplates;
+using System.IO;
 
 namespace Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng
 {
@@ -24,7 +25,7 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter) 
         {
-            _exporter.Export(outputPath, SwapBlender);
+            _exporter.Export(outputPath, SwapBlender, Path.GetFileNameWithoutExtension(exportSource.Name), 3);
         }
     }
 }
