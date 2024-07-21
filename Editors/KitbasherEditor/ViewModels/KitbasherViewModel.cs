@@ -66,8 +66,8 @@ namespace KitbasherEditor.ViewModels
             SceneNodeEditor = sceneNodeEditorView;
             
             // Events
-            eventHub.Register<ScopedFileSavedEvent>(OnFileSaved);
-            eventHub.Register<CommandStackChangedEvent>(OnCommandStackChanged);
+            eventHub.Register<ScopedFileSavedEvent>(this, OnFileSaved);
+            eventHub.Register<CommandStackChangedEvent>(this, OnCommandStackChanged);
             skeletonChangedHandler.Subscribe(eventHub);
             
             // Ensure all game components are added to the editor

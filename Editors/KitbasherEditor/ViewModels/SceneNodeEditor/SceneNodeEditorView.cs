@@ -25,7 +25,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor
             _map[typeof(SkeletonNode)] = typeof(SkeletonSceneNodeViewModel);
             _map[typeof(GroupNode)] = typeof(GroupNodeViewModel);
 
-            _eventHub.Register<SceneNodeSelectedEvent>(OnSelectionChanged);
+            _eventHub.Register<SceneNodeSelectedEvent>(this, OnSelectionChanged);
         }
 
         void OnSelectionChanged(SceneNodeSelectedEvent selectionChangedEvent)
@@ -61,11 +61,13 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor
                 throw new Exception($"{viewModelType} is not of type ISceneNodeViewModel");
             viewModel.Initialize(node);
             return viewModel;
+
+            // Todo make a switch and call directly to make it typesafe/nice
         }
 
         public void Dispose()
         {
-            _eventHub.UnRegister<SceneNodeSelectedEvent>(OnSelectionChanged);
+            _eventHub.UnRegister(this);
             CurrentEditor?.Dispose();
         }
     }

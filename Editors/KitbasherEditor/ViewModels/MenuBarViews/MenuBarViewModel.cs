@@ -39,8 +39,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             CustomButtons = CreateButtons();
             MenuItems = CreateToolbarMenu();
 
-            eventHub.Register<CommandStackChangedEvent>(OnUndoStackChanged);
-            eventHub.Register<SelectionChangedEvent>(OnSelectionChanged);
+            eventHub.Register<CommandStackChangedEvent>(this, OnUndoStackChanged);
+            eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
         }
 
         void RegisterActions()

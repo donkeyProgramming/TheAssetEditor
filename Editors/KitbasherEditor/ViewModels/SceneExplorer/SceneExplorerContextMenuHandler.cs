@@ -31,7 +31,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             _sceneManager = sceneManager;
             _commandFactory = commandFactory;
 
-            _eventHub.Register<SceneNodeSelectedEvent>(OnSelectionChanged);
+            _eventHub.Register<SceneNodeSelectedEvent>(this, OnSelectionChanged);
         }
 
         void OnSelectionChanged(SceneNodeSelectedEvent selectionChangedEvent)

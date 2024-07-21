@@ -41,9 +41,9 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
 
             SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
 
-            _eventHub.Register<SelectionChangedEvent>(OnSceneSelectionChanged);
-            _eventHub.Register<SceneObjectAddedEvent>(x => RebuildTree());
-            _eventHub.Register<SceneObjectRemovedEvent>(x => RebuildTree());
+            _eventHub.Register<SelectionChangedEvent>(this, OnSceneSelectionChanged);
+            _eventHub.Register<SceneObjectAddedEvent>(this, x => RebuildTree());
+            _eventHub.Register<SceneObjectRemovedEvent>(this, x => RebuildTree());
         }
 
         private void OnContextMenuActionChangingSelection(IEnumerable<ISceneNode> selectedNodes)

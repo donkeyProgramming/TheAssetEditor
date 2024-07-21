@@ -16,7 +16,7 @@ namespace KitbasherEditor.EventHandlers
 
         public void Subscribe(EventHub eventHub)
         {
-            eventHub.Register<KitbasherSkeletonChangedEvent>(OnSkeletonChanged);
+            eventHub.Register<KitbasherSkeletonChangedEvent>(this, OnSkeletonChanged);
         }
 
         private void OnSkeletonChanged(KitbasherSkeletonChangedEvent e)

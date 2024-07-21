@@ -83,7 +83,7 @@ namespace KitbasherEditor.ViewModels
             LastFrameCommand = new RelayCommand(OnLastFrame);
 
             IsEnabled = false;
-            eventHub.Register<KitbasherSkeletonChangedEvent>(OnSkeletonChanged);
+            eventHub.Register<KitbasherSkeletonChangedEvent>(this, OnSkeletonChanged);
         }
 
         void OnPlayPause()
