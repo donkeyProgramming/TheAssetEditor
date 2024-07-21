@@ -168,11 +168,13 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTextColumn Header="VO__Actor" Binding="{Binding CustomVOActor}"/>
-                        <DataGridTextColumn Header="VO__Culture" Binding="{Binding CustomVOCulture}"/>
-                        <DataGridTextColumn Header="VO__Battle__Selection" Binding="{Binding CustomVOBattleSelection}"/>
-                        <DataGridTextColumn Header="VO__Battle__Special__Ability" Binding="{Binding CustomVOBattleSpecialAbility}"/>
-                        <DataGridTextColumn Header="VO__Faction__Leader" Binding="{Binding CustomVOFactionLeader}" Width="*"/>
+                        <!-- State Group Columns -->
+                        <!-- Ensure that UpdateSourceTrigger is present otherwise the first data row doesn't get added until the second row is... or something like that -->
+                        <DataGridTextColumn Header="VO__Actor" Binding="{Binding CustomVOActor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <DataGridTextColumn Header="VO__Culture" Binding="{Binding CustomVOCulture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <DataGridTextColumn Header="VO__Battle__Selection" Binding="{Binding CustomVOBattleSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <DataGridTextColumn Header="VO__Battle__Special__Ability" Binding="{Binding CustomVOBattleSpecialAbility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <DataGridTextColumn Header="VO__Faction__Leader" Binding="{Binding CustomVOFactionLeader, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </StackPanel>

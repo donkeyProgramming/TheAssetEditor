@@ -18,15 +18,23 @@ using static Editors.Audio.Presentation.AudioEditor.AudioEditorViewModelHelpers;
 
 namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 {
-    public class CustomStatesDataGridProperties
+    public partial class CustomStatesDataGridProperties : ObservableObject
     {
-        public string CustomVOActor { get; set; }
-        public string CustomVOCulture { get; set; }
-        public string CustomVOBattleSelection { get; set; }
-        public string CustomVOBattleSpecialAbility { get; set; }
-        public string CustomVOFactionLeader { get; set; }
-    }
+        [ObservableProperty]
+        private string _customVOActor;
 
+        [ObservableProperty]
+        private string _customVOCulture;
+
+        [ObservableProperty]
+        private string _customVOBattleSelection;
+
+        [ObservableProperty]
+        private string _customVOBattleSpecialAbility;
+
+        [ObservableProperty]
+        private string _customVOFactionLeader;
+    }
 
     public enum DialogueEventsPreset
     {
@@ -61,10 +69,10 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         // Audio Project settings:
         public static List<string> AudioProjectEventType { get; set; } = AudioEditorSettings.EventType;
         public ObservableCollection<string> AudioProjectSubtypes { get; set; } = []; // Determined according to what Event Type is selected
-        public ObservableCollection<string> AudioProjectDialogueEvents { get; set; } = []; // The list of events in the Audio Project.
 
-        // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
-        public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData;
+        // Audio Editor DataGrid stuff:
+        public ObservableCollection<string> AudioProjectDialogueEvents { get; set; } = []; // The list of events in the Audio Project.
+        public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData; // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
 
         public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService)
         {
