@@ -3,16 +3,18 @@ using CommunityToolkit.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using GameWorld.Core.Animation;
 using GameWorld.Core.SceneNodes;
+using KitbasherEditor.Views.EditorViews;
+using Shared.Ui.Common.DataTemplates;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 {
-    public partial class SkeletonSceneNodeViewModel : ObservableObject, ISceneNodeViewModel
+    public partial class SkeletonSceneNodeViewModel : ObservableObject, ISceneNodeEditor, IViewProvider<SkeletonView>
     {
         SkeletonNode _meshNode;
 
         [ObservableProperty] float _boneScale = 1;
         [ObservableProperty] int _boneCount = 0;
-        [ObservableProperty] ObservableCollection<SkeletonBoneNode> _bones = new();
+        [ObservableProperty] ObservableCollection<SkeletonBoneNode> _bones = [];
         [ObservableProperty] SkeletonBoneNode? _selectedBone;
 
         public void Initialize(ISceneNode node)
@@ -77,21 +79,4 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 
         public void Dispose() { }
     }
-
-
-    public partial class SkeletonBoneNode : ObservableObject
-    {
-        [ObservableProperty] string _boneName;
-        [ObservableProperty] int _boneIndex;
-        [ObservableProperty] int _parentBoneIndex;
-        [ObservableProperty] ObservableCollection<SkeletonBoneNode> _children = [];
-
-        public SkeletonBoneNode(int boneId, int parentBoneId, string boneName)
-        {
-            BoneIndex = boneId;
-            BoneName = boneName;
-            ParentBoneIndex = parentBoneId;
-        }   
-    }
-
 }

@@ -56,7 +56,7 @@ namespace GameWorld.Core.Components.Rendering
             if (applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3 || applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.ThreeKingdoms)
                 MainRenderFormat = RenderFormats.MetalRoughness;
 
-            _eventHub.Register<SelectionChangedEvent>(OnSelectionChanged);
+            _eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
         }
 
         void OnSelectionChanged(SelectionChangedEvent changedEvent)
@@ -202,7 +202,7 @@ namespace GameWorld.Core.Components.Rendering
 
         public void Dispose()
         {
-            _eventHub.UnRegister<SelectionChangedEvent>(OnSelectionChanged);
+            _eventHub.UnRegister(this);
 
             _bloomFilter.Dispose();
             _defaultRenderTarget.Dispose();

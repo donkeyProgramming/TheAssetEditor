@@ -42,7 +42,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
             _selectionManager = selectionManager;
             _eventHub = eventHub;
 
-            _eventHub.Register<SelectionChangedEvent>(OnSelectionChanged);
+            _eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
         }
 
         public override void Initialize()
@@ -120,7 +120,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 
         public void Dispose()
         {
-            _eventHub.UnRegister<SelectionChangedEvent>(OnSelectionChanged);
+            _eventHub.UnRegister(this);
         }
 
         void OnSelectionChanged(SelectionChangedEvent notification) => Refresh();

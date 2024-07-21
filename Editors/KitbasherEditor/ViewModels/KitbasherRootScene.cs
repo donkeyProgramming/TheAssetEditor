@@ -16,6 +16,9 @@ namespace KitbasherEditor.ViewModels
         private readonly PackFileService _packFileService;
         private readonly EventHub _eventHub;
 
+        public GameSkeleton Skeleton { get; private set; }
+        public AnimationPlayer Player { get; private set; }
+
         public KitbasherRootScene(AnimationsContainerComponent animationsContainerComponent, PackFileService packFileService, EventHub eventHub)
         {
             _animationsContainerComponent = animationsContainerComponent;
@@ -23,9 +26,6 @@ namespace KitbasherEditor.ViewModels
             _eventHub = eventHub;
             Player = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
         }
-
-        public GameSkeleton Skeleton { get; private set; }
-        public AnimationPlayer Player { get; private set; }
 
         public void SetSkeletonFromName(string skeletonName)
         {

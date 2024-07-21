@@ -1,35 +1,43 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.Input;
+using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
-    public class SceneExplorerContextMenuHandler : NotifyPropertyChangedImpl
+    public class SceneExplorerContextMenuHandler : NotifyPropertyChangedImpl, IDisposable
     {
         ObservableCollection<ContextMenuItem> _contextMenu;
         public ObservableCollection<ContextMenuItem> Items { get => _contextMenu; set => SetAndNotify(ref _contextMenu, value); }
 
         ISceneNode _activeNode;
         IEnumerable<ISceneNode> _activeNodes;
+        private readonly EventHub _eventHub;
         private readonly SceneManager _sceneManager;
         private readonly CommandFactory _commandFactory;
 
-        public event ValueChangedDelegate<IEnumerable<ISceneNode>> SelectedNodesChanged;
+        public event ValueChangedDelegate<IEnumerable<ISceneNode>> SelectedNodesChanged; // Hack - move commands to SceneExplorer instad. Trigger commands from here 
 
-        public SceneExplorerContextMenuHandler(SceneManager sceneManager, CommandFactory commandFactory)
+        public SceneExplorerContextMenuHandler(EventHub eventHub, SceneManager sceneManager, CommandFactory commandFactory)
         {
+            _eventHub = eventHub;
             _sceneManager = sceneManager;
             _commandFactory = commandFactory;
+
+            _eventHub.Register<SceneNodeSelectedEvent>(this, OnSelectionChanged);
         }
 
-        public void Create(IEnumerable<ISceneNode> activeNodes)
+        void OnSelectionChanged(SceneNodeSelectedEvent selectionChangedEvent)
         {
+            var activeNodes = selectionChangedEvent.SelectedObjects;
+
             Items = new ObservableCollection<ContextMenuItem>();
 
             if (!activeNodes.Any())
@@ -213,6 +221,11 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
             {
                 groupNode.IsSelectable = !groupNode.IsSelectable;
             }
+        }
+
+        public void Dispose()
+        {
+            _eventHub.UnRegister(this);
         }
     }
 }

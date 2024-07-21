@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
@@ -13,40 +13,37 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
 {
     // Improve using this: https://stackoverflow.com/questions/63110566/multi-select-with-multiple-level-in-wpf-treeview
 
-    public class SceneExplorerViewModel : NotifyPropertyChangedImpl
+    public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IDisposable
     {
         private readonly SceneManager _sceneManager;
+        private readonly EventHub _eventHub;
         private readonly SelectionManager _selectionManager;
-        private readonly SceneNodeViewFactory _sceneNodeViewFactory;
         bool _ignoreSelectionChanges = false;
 
         public ObservableCollection<ISceneNode> SceneGraphRootNodes { get; private set; } = new();
         public ObservableCollection<ISceneNode> SelectedObjects { get; private set; } = new();
         public SceneExplorerContextMenuHandler ContextMenu { get; private set; }
 
-        ISceneNodeViewModel? _selectedNodeViewModel;
-        public ISceneNodeViewModel? SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
-
-        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory,
+        public SceneExplorerViewModel(
             SelectionManager selectionManager,
             SceneManager sceneManager,
-            CommandFactory commandFactory,
-            EventHub eventHub)
+            EventHub eventHub,
+            SceneExplorerContextMenuHandler contextMenuHandler)
         {
-            _sceneNodeViewFactory = sceneNodeViewFactory;
             _sceneManager = sceneManager;
+            _eventHub = eventHub;
             _selectionManager = selectionManager;
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
-            ContextMenu = new SceneExplorerContextMenuHandler(_sceneManager, commandFactory);
+            ContextMenu = contextMenuHandler;
             ContextMenu.SelectedNodesChanged += OnContextMenuActionChangingSelection;
 
             SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
 
-            eventHub.Register<SelectionChangedEvent>(OnSceneSelectionChanged);
-            eventHub.Register<SceneObjectAddedEvent>(x => RebuildTree());
-            eventHub.Register<SceneObjectRemovedEvent>(x => RebuildTree());
+            _eventHub.Register<SelectionChangedEvent>(this, OnSceneSelectionChanged);
+            _eventHub.Register<SceneObjectAddedEvent>(this, x => RebuildTree());
+            _eventHub.Register<SceneObjectRemovedEvent>(this, x => RebuildTree());
         }
 
         private void OnContextMenuActionChangingSelection(IEnumerable<ISceneNode> selectedNodes)
@@ -137,15 +134,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
 
         void UpdateViewAndContextMenu()
         {
-            if (SelectedNodeViewModel != null)
-                SelectedNodeViewModel.Dispose();
-
-            if (SelectedObjects.Count == 1)
-                SelectedNodeViewModel = _sceneNodeViewFactory.CreateEditorView(SelectedObjects.First());
-            else
-                SelectedNodeViewModel = null;
-
-            ContextMenu.Create(SelectedObjects);
+            _eventHub.Publish(new SceneNodeSelectedEvent(SelectedObjects.ToList()));
         }
 
         private void RebuildTree()
@@ -194,6 +183,13 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
             }
 
             UpdateViewAndContextMenu();
+        }
+
+        public void Dispose()
+        {
+            ContextMenu.SelectedNodesChanged -= OnContextMenuActionChangingSelection;
+            SelectedObjects.CollectionChanged -= OnSceneExplorerSelectionChanged;
+            _eventHub.UnRegister(this);
         }
     }
 }

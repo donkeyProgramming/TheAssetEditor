@@ -21,7 +21,7 @@
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Skeleton Name"/>
                 <Label>:</Label>
-                <TextBlock  Text="{Binding Animation.SkeletonName.Value}"  VerticalAlignment="Center"/>
+                <TextBlock  Text="{Binding Animation.SkeletonName}"  VerticalAlignment="Center"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">

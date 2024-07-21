@@ -55,7 +55,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             _selectionManager = selectionManager;
             _commandExecutor = commandExecutor;
             _commandFactory = commandFactory;
-            eventHub.Register<SelectionChangedEvent>(Handle);
+            eventHub.Register<SelectionChangedEvent>(this, Handle);
         }
 
         public void VertexMovementFalloffChanged(object sender, PropertyChangedEventArgs e)

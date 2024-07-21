@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Windows;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
+using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using GameWorld.Core.Components;
 using GameWorld.Core.Services;
 using GameWorld.WpfWindow;
@@ -26,12 +27,12 @@ namespace KitbasherEditor.ViewModels
         private readonly ILogger _logger = Logging.Create<KitbasherViewModel>();
 
         private readonly KitbashViewDropHandler _dropHandler;
-        private readonly PackFileService _pfs;
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly FocusSelectableObjectService _focusSelectableObjectComponent;
 
         public IWpfGame Scene { get; set; }
         public SceneExplorerViewModel SceneExplorer { get; set; }
+        public SceneNodeEditorViewModel SceneNodeEditor { get; set; }
         public MenuBarViewModel MenuBar { get; set; }
         public AnimationControllerViewModel Animation { get; set; }
 
@@ -49,24 +50,24 @@ namespace KitbasherEditor.ViewModels
             AnimationControllerViewModel animationControllerViewModel,
             SceneExplorerViewModel sceneExplorerViewModel,
             KitbashViewDropHandler dropHandler,
-            PackFileService pfs,
             KitbashSceneCreator kitbashSceneCreator,
             FocusSelectableObjectService focusSelectableObjectComponent,
             IComponentInserter componentInserter,
-            SkeletonChangedHandler skeletonChangedHandler)
+            SkeletonChangedHandler skeletonChangedHandler, 
+            SceneNodeEditorViewModel sceneNodeEditorView)
         {
             _dropHandler = dropHandler;
-            _pfs = pfs;
             _kitbashSceneCreator = kitbashSceneCreator;
             _focusSelectableObjectComponent = focusSelectableObjectComponent;
             Scene = gameWorld;
             Animation = animationControllerViewModel;
             SceneExplorer = sceneExplorerViewModel;
             MenuBar = menuBarViewModel;
+            SceneNodeEditor = sceneNodeEditorView;
             
             // Events
-            eventHub.Register<ScopedFileSavedEvent>(OnFileSaved);
-            eventHub.Register<CommandStackChangedEvent>(OnCommandStackChanged);
+            eventHub.Register<ScopedFileSavedEvent>(this, OnFileSaved);
+            eventHub.Register<CommandStackChangedEvent>(this, OnCommandStackChanged);
             skeletonChangedHandler.Subscribe(eventHub);
             
             // Ensure all game components are added to the editor
@@ -77,7 +78,6 @@ namespace KitbasherEditor.ViewModels
         {
             try
             {
-                var fileName = _pfs.GetFullPath(fileToLoad);
                 _kitbashSceneCreator.CreateFromPackFile(fileToLoad);
                 _focusSelectableObjectComponent.FocusScene();
                 DisplayName.Value = fileToLoad.Name;

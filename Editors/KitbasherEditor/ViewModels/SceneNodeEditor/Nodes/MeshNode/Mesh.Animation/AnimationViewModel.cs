@@ -1,8 +1,8 @@
-﻿using Editors.Shared.Core.Services;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.Shared.Core.Services;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using KitbasherEditor.ViewModels;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Ui.Common;
 using Shared.Ui.Editors.BoneMapping;
@@ -10,27 +10,35 @@ using System.Windows;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 {
-    public class AnimationViewModel : NotifyPropertyChangedImpl
+    public partial class AnimationViewModel : ObservableObject, IDisposable
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
-        private readonly Rmv2MeshNode _meshNode;
+        private readonly PackFileService _pfs;
+        private readonly SkeletonAnimationLookUpHelper _animLookUp;
+        Rmv2MeshNode _meshNode;
 
-        public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>("");
-        public List<AnimatedBone> AnimatedBones { get; set; }
-        public FilterCollection<AnimatedBone> AttachableBones { get; set; } = new FilterCollection<AnimatedBone>(null);
+        [ObservableProperty] string _skeletonName = string.Empty;
+        [ObservableProperty] List<AnimatedBone> _animatedBones;
+        [ObservableProperty] FilterCollection<AnimatedBone> _attachableBones = new(null);
 
-        public AnimationViewModel(KitbasherRootScene kitbasherRootScene, Rmv2MeshNode meshNode, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp)
+        public AnimationViewModel(KitbasherRootScene kitbasherRootScene, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp)
         {
             _kitbasherRootScene = kitbasherRootScene;
+            _pfs = pfs;
+            _animLookUp = animLookUp;
+        }
+
+        public void Initialize(Rmv2MeshNode meshNode)
+        {
             _meshNode = meshNode;
 
-            SkeletonName.Value = _meshNode.Geometry.ParentSkeletonName;
+            SkeletonName = _meshNode.Geometry.ParentSkeletonName;
 
-            var skeletonFile = animLookUp.GetSkeletonFileFromName(pfs, SkeletonName.Value);
+            var skeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
             var bones = _meshNode.Geometry.GetUniqeBlendIndices();
 
             if (skeletonFile == null)
-                SkeletonName.Value = SkeletonName.Value + "[MISSING from packs]";
+                SkeletonName = SkeletonName + "[MISSING from packs]";
 
             // Make sure the bones are valid, mapping can cause issues! 
             if (bones.Count != 0 && skeletonFile != null)
@@ -55,7 +63,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 
             var existingSkeletonMeshNode = _meshNode.GetParentModel();
             var existingSkeltonName = existingSkeletonMeshNode.Model.Header.SkeletonName;
-            var existingSkeletonFile = animLookUp.GetSkeletonFileFromName(pfs, existingSkeltonName);
+            var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, existingSkeltonName);
             if (existingSkeletonFile != null)
                 AttachableBones.UpdatePossibleValues(AnimatedBoneHelper.CreateFlatSkeletonList(existingSkeletonFile), new AnimatedBone(-1, "none"));
 
@@ -80,6 +88,12 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
                 _meshNode.AttachmentPointName = null;
                 _meshNode.AttachmentBoneResolver = null;
             }
+        }
+
+
+        public void Dispose()
+        {
+            AttachableBones.SelectedItemChanged -= ModelBoneList_SelectedItemChanged;
         }
 
     }
