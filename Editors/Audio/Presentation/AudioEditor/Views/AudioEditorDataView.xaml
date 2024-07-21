@@ -38,10 +38,10 @@
             <Label Grid.Column="0" Content="Audio Project Events:" VerticalAlignment="Center"/>
 
             <ComboBox Grid.Column="1"
-                      x:Name="MyComboBox"
+                      x:Name="AudioProjectEventSelection"
                       IsEditable="True"
                       IsTextSearchEnabled="True"
-                      Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                      Text="{Binding SelectedAudioProjectEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                       ItemsSource="{Binding AudioProjectDialogueEvents}"
                       SelectedItem="{Binding SelectedAudioProjectEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                       VerticalAlignment="Center"

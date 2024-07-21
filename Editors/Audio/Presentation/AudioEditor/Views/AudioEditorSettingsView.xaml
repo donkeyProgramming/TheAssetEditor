@@ -55,8 +55,7 @@
                     <TextBox Grid.Column="1"
                              x:Name="AudioProjectFileNameTextBox"
                              VerticalAlignment="Center"
-                             Text="{Binding ProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Width="{Binding ActualWidth, ElementName=NameColumn}" />
+                             Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
 
                 <!-- Custom States File Name -->
@@ -70,8 +69,7 @@
                     <TextBox Grid.Column="1"
                              x:Name="CustomStateFileNameTextBox"
                              VerticalAlignment="Center"
-                             Text="{Binding ProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Width="{Binding ActualWidth, ElementName=NameColumn}" />
+                             Text="{Binding CustomStatesFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </Grid>
             </StackPanel>
         </GroupBox>
@@ -149,7 +147,7 @@
                 <!-- Custom States DataGrid -->
                 <DataGrid x:Name="CustomStatesDataGrid" 
                   Margin="0 0 0 0"
-                  AutoGenerateColumns="False" 
+                  AutoGenerateColumns="False"
                   ItemsSource="{Binding CustomStatesDataGridItems}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="VO__Actor" Binding="{Binding CustomVOActor}"/>

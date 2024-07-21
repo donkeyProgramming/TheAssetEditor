@@ -83,7 +83,10 @@ namespace Editors.Audio.Presentation.AudioEditor
                 var vanillaStates = audioRepository.StateGroupsWithStates[stateGroup];
 
                 if (AudioEditorData.Instance.StateGroupsWithCustomStates.Count() > 0 )
-                    customStates = AudioEditorData.Instance.StateGroupsWithCustomStates[stateGroup];
+                {
+                    if (stateGroup == "VO_Actor" || stateGroup == "VO_Culture" || stateGroup == "VO_Battle_Selection" || stateGroup == "VO_Battle_Special_Ability" || stateGroup == "VO_Faction_Leader")
+                        customStates = AudioEditorData.Instance.StateGroupsWithCustomStates[stateGroup];
+                }
 
                 if (showCustomStatesOnly)
                     states.AddRange(customStates);
