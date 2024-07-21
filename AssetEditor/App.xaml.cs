@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Threading;
 using AssetEditor.Services;
@@ -24,7 +25,9 @@ namespace AssetEditor
             VersionChecker.CheckVersion();
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
-            _serviceProvider = new DependencyInjectionConfig().Build();
+
+            var forceValidateServiceScopes = Debugger.IsAttached;
+            _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes);
             _rootScope = _serviceProvider.CreateScope();
 
             // Init 3d world

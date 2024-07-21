@@ -20,9 +20,9 @@ namespace E2EVerification.Shared
         public IUiCommandFactory CommandFactory { get; private set; }
         public ScopeRepository ScopeRepository { get; private set; }
 
-        public AssetEditorTestRunner()
+        public AssetEditorTestRunner(bool forceValidateServiceScopes = false)
         {
-            _serviceProvider = new DependencyInjectionConfig().Build(MockServices);
+            _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes, MockServices);
             EditorServiceProvider = _serviceProvider.CreateScope();
 
             var game = EditorServiceProvider.ServiceProvider.GetRequiredService<IWpfGame>();
