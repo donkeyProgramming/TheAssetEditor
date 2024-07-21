@@ -61,8 +61,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor
                 throw new Exception($"{viewModelType} is not of type ISceneNodeViewModel");
             viewModel.Initialize(node);
             return viewModel;
-
-            // Todo make a switch and call directly to make it typesafe/nice
         }
 
         public void Dispose()
