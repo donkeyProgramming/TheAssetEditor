@@ -7,7 +7,7 @@
              xmlns:converters="clr-namespace:Editors.Audio.Presentation.AudioEditor"
              d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorViewModel}"
              mc:Ignorable="d"
-             d:DesignHeight="800">
+             d:DesignHeight="800" d:MinWidth="550">
 
     <!-- Resources Section -->
     <UserControl.Resources>
@@ -144,12 +144,30 @@
         <!-- Custom States Section -->
         <GroupBox DockPanel.Dock="Top" Margin="0 5 0 0" Header="Custom States Configuration" Style="{StaticResource CenterHeaderGroupBoxStyle}">
             <StackPanel>
+                <!-- Add New Row Button -->
+                <Button Content="Add Row" Margin="0 0 0 5" Command="{Binding AddCustomStatesRowCommand}"/>
+
                 <!-- Custom States DataGrid -->
                 <DataGrid x:Name="CustomStatesDataGrid" 
                   Margin="0 0 0 0"
                   AutoGenerateColumns="False"
+                  CanUserAddRows="False"
                   ItemsSource="{Binding CustomStatesDataGridItems}">
                     <DataGrid.Columns>
+                        <!-- Remove Row Button Column -->
+                        <DataGridTemplateColumn Header="" Width="20">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="✖" 
+                                            FontFamily="Segoe UI Symbol"
+                                            ToolTip="Remove Row" 
+                                            Command="{Binding DataContext.RemoveCustomStatesRowCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                            CommandParameter="{Binding}">
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
                         <DataGridTextColumn Header="VO__Actor" Binding="{Binding CustomVOActor}"/>
                         <DataGridTextColumn Header="VO__Culture" Binding="{Binding CustomVOCulture}"/>
                         <DataGridTextColumn Header="VO__Battle__Selection" Binding="{Binding CustomVOBattleSelection}"/>

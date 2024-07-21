@@ -11,7 +11,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition MinWidth="500"/>
+            <ColumnDefinition MinWidth="550"/>
         </Grid.ColumnDefinitions>
 
         <!-- AudioEditorDataView -->

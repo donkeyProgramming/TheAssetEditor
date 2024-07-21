@@ -30,6 +30,7 @@ namespace Editors.Audio.Presentation.AudioEditor
                     var stateGroupKey = AddExtraUnderScoresToStateGroup(stateGroupWithQualifier);
                     dataGridItem[stateGroupKey] = "";
                     dataGridItem["AudioFilesDisplay"] = "";
+                    dataGridItem["AudioFiles"] = "";
                 }
 
                 dataGridItems.Add(dataGridItem);

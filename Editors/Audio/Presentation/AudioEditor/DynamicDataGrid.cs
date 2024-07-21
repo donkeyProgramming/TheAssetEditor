@@ -74,7 +74,17 @@ namespace Editors.Audio.Presentation.AudioEditor
             var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[selectedAudioProjectEvent];
 
             var stateGroupsCount = stateGroups.Count();
-            var columnWidth = stateGroupsCount > 0 ? 1.0 / (stateGroupsCount + 2) : 1.0;
+            var columnWidth = stateGroupsCount > 0 ? 1.0 / (stateGroupsCount) : 1.0;
+
+            // Column for Remove State Path button:
+            var removeButtonColumn = new DataGridTemplateColumn
+            {
+                CellTemplate = CreateRemoveRowButtonTemplate(viewModel),
+                Width = 20,
+                CanUserResize = false
+            };
+
+            dataGrid.Columns.Add(removeButtonColumn);
 
             foreach (var (stateGroup, stateGroupWithQualifier) in stateGroups.Zip(stateGroupsWithQualifiers))
             {
@@ -127,16 +137,6 @@ namespace Editors.Audio.Presentation.AudioEditor
             };
 
             dataGrid.Columns.Add(soundsButtonColumn);
-
-            // Column for Remove State Path button:
-            var removeButtonColumn = new DataGridTemplateColumn
-            {
-                CellTemplate = CreateRemoveButtonTemplate(viewModel),
-                Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
-                MinWidth = 120,
-            };
-
-            dataGrid.Columns.Add(removeButtonColumn);
         }
 
         public static DataTemplate CreateStatesComboBoxTemplate(List<string> states, string stateGroupWithQualifier, bool showCustomStatesOnly)
@@ -240,11 +240,13 @@ namespace Editors.Audio.Presentation.AudioEditor
             return template;
         }
 
-        public static DataTemplate CreateRemoveButtonTemplate(AudioEditorViewModel viewModel)
+        public static DataTemplate CreateRemoveRowButtonTemplate(AudioEditorViewModel viewModel)
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(Button));
-            factory.SetValue(Button.ContentProperty, "Remove State Path");
+            factory.SetValue(Button.ContentProperty, "✖");
+            factory.SetValue(Button.FontFamilyProperty, new FontFamily("Segoe UI Symbol")); // This font supports the character.
+            factory.SetValue(Button.ToolTipProperty, "Remove State Path");
 
             // Handle button click event
             factory.AddHandler(Button.ClickEvent, new RoutedEventHandler((sender, e) =>

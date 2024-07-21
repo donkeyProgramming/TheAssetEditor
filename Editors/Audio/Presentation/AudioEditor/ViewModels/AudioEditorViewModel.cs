@@ -27,6 +27,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         public string CustomVOFactionLeader { get; set; }
     }
 
+
     public enum DialogueEventsPreset
     {
         None,
@@ -211,6 +212,18 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             AudioEditorDataGridItems.Remove(rowToRemove);
 
             UpdateEventDataWithCurrentEvent(this);
+        }
+
+        [RelayCommand] public void AddCustomStatesRow()
+        {
+            var newRow = new CustomStatesDataGridProperties();
+            CustomStatesDataGridItems.Add(newRow);
+        }
+
+        [RelayCommand] public void RemoveCustomStatesRow(CustomStatesDataGridProperties item)
+        {
+            if (item != null && CustomStatesDataGridItems.Contains(item))
+                CustomStatesDataGridItems.Remove(item);
         }
 
         public static void AddAudioFiles(Dictionary<string, object> dataGridRow, System.Windows.Controls.TextBox textBox)
