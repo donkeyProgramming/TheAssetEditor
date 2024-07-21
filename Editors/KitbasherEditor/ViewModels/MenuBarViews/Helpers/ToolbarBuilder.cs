@@ -1,16 +1,12 @@
-﻿using KitbasherEditor.ViewModels.UiCommands;
+﻿using System.Collections.ObjectModel;
 using Shared.Ui.Common.MenuSystem;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews.Helpers
 {
     public class ToolbarBuilder
     {
-        ObservableCollection<ToolbarItem> _toolBarItems { get; set; } = new ObservableCollection<ToolbarItem>();
-        Dictionary<Type, MenuAction> _actionList = new();
+        ObservableCollection<ToolbarItem> _toolBarItems { get; set; } = new();
+        private readonly Dictionary<Type, MenuAction> _actionList = new();
 
         public ToolbarBuilder(Dictionary<Type, MenuAction> actionList)
         {

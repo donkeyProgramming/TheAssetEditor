@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.Events;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.Events;
@@ -45,10 +46,12 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor
 
         public ISceneNodeEditor? CreateNodeEditor(ISceneNode node)
         {
-            // Special case where nothing should be displayed - The root node
             if (node is GroupNode groupNode)
             {
-                if (groupNode.IsEditable == true && groupNode.Parent == null)
+                if(groupNode.Name == SpecialNodes.ReferenceMeshs)
+                    return null;
+
+                if (groupNode.Name == SpecialNodes.Root)
                     return null;
             }
 

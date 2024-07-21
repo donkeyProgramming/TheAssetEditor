@@ -49,6 +49,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             RegisterUiCommand<SaveAsCommand>();
 
             RegisterUiCommand<BrowseForReferenceCommand>();
+            RegisterUiCommand<ImportGeneralHeadReferenceCommand>();
             RegisterUiCommand<ImportPaladinReferenceCommand>();
             RegisterUiCommand<ImportGoblinReferenceCommand>();
             RegisterUiCommand<ImportSlayerReferenceCommand>();
@@ -95,7 +96,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         ObservableCollection<ToolbarItem> CreateToolbarMenu()
         {
-            ToolbarBuilder builder = new ToolbarBuilder(_uiCommands);
+            var builder = new ToolbarBuilder(_uiCommands);
 
             var fileToolbar = builder.CreateRootToolBar("File");
             builder.CreateToolBarItem<SaveCommand>(fileToolbar, "Save");
@@ -104,6 +105,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateToolBarItem<BrowseForReferenceCommand>(fileToolbar, "Import Reference model");
             
             var debugToolbar = builder.CreateRootToolBar("Debug");
+            builder.CreateToolBarItem<ImportGeneralHeadReferenceCommand>(debugToolbar, "Import General Head");
             builder.CreateToolBarItem<ImportPaladinReferenceCommand>(debugToolbar, "Import Paladin");
             builder.CreateToolBarItem<ImportSlayerReferenceCommand>(debugToolbar, "Import Slayer");
             builder.CreateToolBarItem<ImportGoblinReferenceCommand>(debugToolbar, "Import Goblin");
