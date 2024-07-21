@@ -90,20 +90,26 @@ namespace Editors.Audio.Presentation.AudioEditor
             {
                 var states = new List<string>();
                 var customStates = new List<string>();
+
                 var vanillaStates = audioRepository.StateGroupsWithStates[stateGroup];
 
-                if (AudioEditorData.Instance.StateGroupsWithCustomStates.Count() > 0 )
+                if (AudioEditorData.Instance.StateGroupsWithCustomStates.Count() > 0)
                 {
                     if (stateGroup == "VO_Actor" || stateGroup == "VO_Culture" || stateGroup == "VO_Battle_Selection" || stateGroup == "VO_Battle_Special_Ability" || stateGroup == "VO_Faction_Leader")
                         customStates = AudioEditorData.Instance.StateGroupsWithCustomStates[stateGroup];
                 }
 
-                if (showCustomStatesOnly)
+                if (showCustomStatesOnly && (stateGroup == "VO_Actor" || stateGroup == "VO_Culture" || stateGroup == "VO_Battle_Selection" || stateGroup == "VO_Battle_Special_Ability" || stateGroup == "VO_Faction_Leader"))
+                {
+                    states.Add("Any"); // Still needs an Any State.
                     states.AddRange(customStates);
+                }
 
                 else
                 {
-                    states.AddRange(customStates);
+                    if (stateGroup == "VO_Actor" || stateGroup == "VO_Culture" || stateGroup == "VO_Battle_Selection" || stateGroup == "VO_Battle_Special_Ability" || stateGroup == "VO_Faction_Leader")
+                        states.AddRange(customStates);
+
                     states.AddRange(vanillaStates);
                 }
 
@@ -156,7 +162,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             factory.SetValue(ComboBox.IsEditableProperty, true);
             factory.SetValue(ComboBox.ItemsSourceProperty, states);
 
-            // TextChanged event for filtering items.
+            // Loaded event for initializing items and setting up TextChanged event.
             factory.AddHandler(ComboBox.LoadedEvent, new RoutedEventHandler((sender, args) =>
             {
                 if (sender is ComboBox comboBox)
@@ -172,6 +178,19 @@ namespace Editors.Audio.Presentation.AudioEditor
 
                             comboBox.ItemsSource = filteredItems;
                             comboBox.IsDropDownOpen = true; // Keep the drop-down open to show filtered results.
+                        };
+                            
+                        // Handle LostFocus event to ensure final text is genuinely a State and warm the user if not.
+                        textBox.LostFocus += (s, e) =>
+                        {
+                            var finalText = textBox.Text;
+
+                            if (!string.IsNullOrWhiteSpace(finalText) && !states.Contains(finalText))
+                            {
+                                MessageBox.Show("Invalid State. Select a State from the list.", "Invalid State", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                textBox.Text = string.Empty;
+                                comboBox.SelectedItem = null;
+                            }
                         };
                     }
                 }

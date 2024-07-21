@@ -43,7 +43,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             var pack = packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(audioProjectJson);
             packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{audioProjectName}.json", new MemorySource(byteArray)));
-            _logger.Here().Information($"Saved Audio Project: {audioProjectName}");
+            _logger.Here().Information($"Saved Audio Project file: {audioProjectName}");
         }
 
         public static string ConvertEventsDataToAudioProject(Dictionary<string, List<Dictionary<string, object>>> eventsData)

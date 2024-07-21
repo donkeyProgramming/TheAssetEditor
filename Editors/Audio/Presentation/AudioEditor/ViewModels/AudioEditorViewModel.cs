@@ -20,20 +20,11 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 {
     public partial class CustomStatesDataGridProperties : ObservableObject
     {
-        [ObservableProperty]
-        private string _customVOActor;
-
-        [ObservableProperty]
-        private string _customVOCulture;
-
-        [ObservableProperty]
-        private string _customVOBattleSelection;
-
-        [ObservableProperty]
-        private string _customVOBattleSpecialAbility;
-
-        [ObservableProperty]
-        private string _customVOFactionLeader;
+        [ObservableProperty] private string _customVOActor;
+        [ObservableProperty] private string _customVOCulture;
+        [ObservableProperty] private string _customVOBattleSelection;
+        [ObservableProperty] private string _customVOBattleSpecialAbility;
+        [ObservableProperty] private string _customVOFactionLeader;
     }
 
     public enum DialogueEventsPreset
@@ -52,26 +43,26 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
 
         // Audio Project settings properties:
-        [ObservableProperty] private string _audioProjectFileName = "my_audio_project.json";
-        [ObservableProperty] private string _customStatesFileName = "my_custom_states.json";
+        [ObservableProperty] private string _audioProjectFileName = "my_audio_project";
+        [ObservableProperty] private string _customStatesFileName = "my_custom_states";
         [ObservableProperty] private string _selectedAudioProjectEventType;
         [ObservableProperty] private string _selectedAudioProjectEventSubtype;
         [ObservableProperty] private DialogueEventsPreset _selectedAudioProjectEventsPreset;
 
-        // Properties for the main DataGrid:
+        // Properties for the Audio Editor DataGrid:
         [ObservableProperty] private string _selectedAudioProjectEvent;
         [ObservableProperty] private bool _showCustomStatesOnly;
 
-        // DataGrid observable collections:
-        public ObservableCollection<Dictionary<string, object>> AudioEditorDataGridItems { get; set; } = [];
-        public ObservableCollection<CustomStatesDataGridProperties> CustomStatesDataGridItems { get; set; } = [];
-
         // Audio Project settings:
-        public static List<string> AudioProjectEventType { get; set; } = AudioEditorSettings.EventType;
-        public ObservableCollection<string> AudioProjectSubtypes { get; set; } = []; // Determined according to what Event Type is selected
+        [ObservableProperty] private List<string> _audioProjectEventType = AudioEditorSettings.EventType;
+        [ObservableProperty] private ObservableCollection<string> _audioProjectSubtypes = []; // Determined according to what Event Type is selected
 
         // Audio Editor DataGrid stuff:
-        public ObservableCollection<string> AudioProjectDialogueEvents { get; set; } = []; // The list of events in the Audio Project.
+        [ObservableProperty] private ObservableCollection<string> _audioProjectDialogueEvents = []; // The list of events in the Audio Project.
+
+        // DataGrid data objects:
+        public ObservableCollection<Dictionary<string, object>> AudioEditorDataGridItems { get; set; } = [];
+        public ObservableCollection<CustomStatesDataGridProperties> CustomStatesDataGridItems { get; set; } = [];
         public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData; // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
 
         public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService)
@@ -140,7 +131,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
                 var eventData = AudioProjectData.ConvertAudioProjectToEventsData(AudioRepository, audioProjectJson);
                 AudioEditorData.Instance.EventsData = eventData;
-                _logger.Here().Information($"Loaded Audio Project: {file.Name}");
+                _logger.Here().Information($"Loaded Audio Project file: {file.Name}");
 
                 // Create the list of Events used in the Events ComboBox.
                 CreateAudioProjectEventsListFromAudioProject(this, EventsData);
@@ -171,7 +162,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
                 var bytes = file.DataSource.ReadData();
                 var str = Encoding.UTF8.GetString(bytes);
                 var customStatesFileData = JsonConvert.DeserializeObject<List<CustomStatesDataGridProperties>>(str);
-                _logger.Here().Information($"Loaded Custom States: {file.Name}");
+                _logger.Here().Information($"Loaded Custom States file: {file.Name}");
 
                 foreach (var customState in customStatesFileData)
                     CustomStatesDataGridItems.Add(customState);
@@ -190,7 +181,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             var pack = PackFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
             PackFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{CustomStatesFileName}.json", new MemorySource(byteArray)));
-            _logger.Here().Information($"Saved Custom States: {CustomStatesFileName}");
+            _logger.Here().Information($"Saved Custom States file: {CustomStatesFileName}");
         }
 
         [RelayCommand] public void AddStatePath()
