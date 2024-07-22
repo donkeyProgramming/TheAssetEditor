@@ -14,26 +14,19 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
-using SharpDX.DirectWrite;
+//using SharpDX.DirectWrite;
 using SharpGLTF.Materials;
 using SharpGLTF.Memory;
+using System.Windows;
 
 namespace MeshImportExport
 {
 
     public class TextureHelper
     {
-        private readonly DdsToNormalPngExporter _exporterNormalBlue;
-        private readonly DdsToMaterialPngExporter _exporterMaterial;
-        public TextureHelper(DdsToNormalPngExporter ddsToNormalPngExporter, DdsToMaterialPngExporter ddsToMaterialPngExporter)
+        public static MaterialBuilder BuildMaterial(PackFileService pfs, RmvModel model, PackFile inFile)
         {
-            _exporterMaterial = ddsToMaterialPngExporter;
-            _exporterNormalBlue = ddsToNormalPngExporter;
-        }
-
-        public static MaterialBuilder BuildMaterial(PackFileService pfs, RmvModel model, PackFile inFile, DdsToPngExporterSettings settings)
-        {
-            var pngBytes = FindFileAndReturnPngList(pfs, model, inFile, settings);
+            var pngBytes = FindFileAndReturnPngList(pfs, model, inFile);
             var basePng = pngBytes[0];
             var materialPng = pngBytes[1];
             var normalPng = pngBytes[2];
@@ -122,11 +115,11 @@ namespace MeshImportExport
             return material;
         }
 
-        public static List<byte[]> FindFileAndReturnPngList(PackFileService pfs, RmvModel model, PackFile inFile, DdsToPngExporterSettings settings)
+        public static List<byte[]> FindFileAndReturnPngList(PackFileService pfs, RmvModel model, PackFile inFile)
         {
-            var basePath = model.Material.GetTexture(Shared.GameFormats.RigidModel.Types.TextureType.BaseColour);
-            var materialPath = model.Material.GetTexture(Shared.GameFormats.RigidModel.Types.TextureType.MaterialMap);
-            var normalPath = model.Material.GetTexture(Shared.GameFormats.RigidModel.Types.TextureType.Normal);
+            var basePath = model.Material.GetTexture(TextureType.BaseColour);
+            var materialPath = model.Material.GetTexture(TextureType.MaterialMap);
+            var normalPath = model.Material.GetTexture(TextureType.Normal);
             var baseFile = inFile;
             var materialFile = inFile;
             var normalFile = inFile;
@@ -149,21 +142,6 @@ namespace MeshImportExport
             var baseBytes = packFileList[0].DataSource.ReadData();
             var materialBytes = packFileList[1].DataSource.ReadData();
             var normalBytes = packFileList[2].DataSource.ReadData();
-
-            if(settings.ConvertNormalTextureToBlue == true)
-            {
-                var normalMap = packFileList[2].Name;
-                //var obj = new 
-                //var normByte = _exporterNormalBlue.Export("", normalMap, 0);
-                //normalBytes = normByte;
-            }
-            if(settings.ConvertMaterialTextureToBlender == true)
-            {
-                var materialMap = packFileList[1].Name;
-                //_exporterMaterial.Export("", true, materialMap, 0);
-            }
-
-
 
             var basePng = ConvertDdsToPng(baseBytes);
             var materialPng = ConvertDdsToPng(materialBytes);

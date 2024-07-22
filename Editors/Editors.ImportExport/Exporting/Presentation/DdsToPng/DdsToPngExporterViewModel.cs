@@ -14,8 +14,6 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToPng
         public string DisplayName => "Dds_to_Png";
         public string OutputExtension => ".png";
 
-        [ObservableProperty] bool _convertMaterialTextureToBlender = true;
-        [ObservableProperty] bool _convertNormalTextureToBlue = true;
         public DdsToPngExporterViewModel(DdsToPngExporter exporter)
         {
             _exporter = exporter;
@@ -25,8 +23,7 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToPng
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
         {
-            var settings = new DdsToPngExporterSettings(ConvertMaterialTextureToBlender, ConvertNormalTextureToBlue);
-            _exporter.Export(outputPath, exportSource, settings);
+            _exporter.Export(outputPath, exportSource);
         }
     }
 }

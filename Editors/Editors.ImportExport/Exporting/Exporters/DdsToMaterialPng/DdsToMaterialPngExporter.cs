@@ -15,11 +15,11 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
     public class DdsToMaterialPngExporter
     {
         //tally is i=3 and then i=i+3
-        public void Export(string outputPath, bool convertToBlenderFormat, string fileName, int tally)
+        public void Export(string outputPath, bool convertToBlenderFormat, string fileName)
         {
             //nothing yet, need to know the difference between the two types of material images
 
-            using (Image image = Image.FromFile("C:/franz/" + fileName))
+            using (Image image = Image.FromFile(outputPath + fileName))
             using (Bitmap bitmap = new Bitmap(image))
             {
                 for (int x = 0; x < bitmap.Width; x++)
@@ -34,37 +34,8 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
                         int A = pixel.A;
 
                         //grab the red channel for metalness
-                        int R1 = R;
-                        int B1 = 0;
-                        int G1 = 0;
-                        int A1 = 255;
-
-                        // Set the new pixel color
-                        Color newColor = Color.FromArgb(A1, R1, G1, B1);
-                        bitmap.SetPixel(x, y, newColor);
-                    }
-                }
-                fileName = Path.GetFileNameWithoutExtension(fileName);
-                // Save the output image
-                bitmap.Save("C:/franz/" + fileName + "_metal_" + tally + ".png", System.Drawing.Imaging.ImageFormat.Png);
-            }
-            using (Image image = Image.FromFile("C:/franz/" + fileName + ".png"))
-            using (Bitmap bitmap = new Bitmap(image))
-            {
-                for (int x = 0; x < bitmap.Width; x++)
-                {
-                    for (int y = 0; y < bitmap.Height; y++)
-                    {
-                        Color pixel = bitmap.GetPixel(x, y);
-
-                        int R = pixel.R;
-                        int G = pixel.G;
-                        int B = pixel.B;
-                        int A = pixel.A;
-
-                        //grab the red channel for roughness
-                        int R1 = 0;
-                        int B1 = 0;
+                        int R1 = B;
+                        int B1 = R;
                         int G1 = G;
                         int A1 = 255;
 
@@ -74,8 +45,13 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
                     }
                 }
                 fileName = Path.GetFileNameWithoutExtension(fileName);
-                // Save the output image
-                bitmap.Save("C:/franz/" + fileName + "_roughness_" + tally + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                // Save the output image, delete old one so we can seamlessly integrate into gltf save
+                if (File.Exists(outputPath + fileName + ".png"))
+                {
+                    image.Dispose();
+                    File.Delete(outputPath + fileName + ".png");
+                }
+                bitmap.Save(outputPath + fileName + ".png", System.Drawing.Imaging.ImageFormat.Png);
             }
         }
 

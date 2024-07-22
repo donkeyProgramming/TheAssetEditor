@@ -113,10 +113,6 @@ namespace MeshImportExport
             return mesh;
         }
 
-        //public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> CreateStaticMesh(RmvModel rmvMesh, MaterialBuilder material)
-        //{
-        //}
-
         public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> ToStaticMeshBuilder(RmvModel rmvMesh, MaterialBuilder material)
         {
             var mesh = new MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>(rmvMesh.Material.ModelName);

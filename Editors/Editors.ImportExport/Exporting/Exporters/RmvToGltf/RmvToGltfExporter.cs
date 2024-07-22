@@ -56,56 +56,56 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         internal void Export(RmvToGltfExporterSettings settings)
         {
             var rmv2 = new ModelFactory().Load(settings.InputFile.DataSource.ReadData());
-            //need to adjust for static mesh
-            //need to have a mesh only export
-            //_ddsToPngExporter.Export(settings.OutputPath, settings.InputFile);
             int tally = 0;
             if (rmv2.Header.SkeletonName != "")
             {
-                tally = MeshWithSkeleton(settings.OutputPath, rmv2, settings.InputFile, settings);
+                tally = MeshWithSkeleton(rmv2, settings.InputFile, settings);
             }
             else
             {
-                tally = MeshWithoutSkeleton(settings.OutputPath, rmv2, settings.InputFile, settings);
+                tally = MeshWithoutSkeleton(rmv2, settings.InputFile, settings);
             }
 
             var name = Path.GetFileNameWithoutExtension(settings.InputFile.Name);
+            //checks for normal conversion and material conversion, the tally is to line up with
+            //how gltf names the exported textures so we can find the exact ones we want to convert
             if (settings.ExportTextures == true)
             {
                 for (int i = 0; i <= tally; i = i + 3)
                 {
-                    _exporterNormalBlue.Export("C:/franz/", name + "_" + i + ".png", i);
+                    _exporterNormalBlue.Export(settings.OutputPath, name + "_" + i + ".png");
                 }
             }
             if (settings.ConvertMaterialTextureToBlender == true)
             {
                 for (int i = 2; i <= tally + 1; i = i + 3)
                 {
-                    _exporterMaterial.Export("C:/franz/", true, name + "_" + i + ".png", i);
+                    _exporterMaterial.Export(settings.OutputPath, true, name + "_" + i + ".png");
                 }
             }
-            //setting for material texture conversion
-            //setting for animations export
-
-            //Have not attached the output path yet as the UI does not change that value as of now.
-            //The file will go to C:/franz/ each export currently.
-            //model.SaveGLTF(settings.OutputPath + settings.InputFile.Name);
+            MessageBox.Show("Export successful to: " + settings.OutputPath);
+            //setting for animations export still needed
         }
 
-        internal int MeshWithSkeleton(string outputPath, RmvFile rmv2, PackFile file, RmvToGltfExporterSettings settings)
+        internal int MeshWithSkeleton(RmvFile rmv2, PackFile file, RmvToGltfExporterSettings settings)
         {
             var model = ModelRoot.CreateModel();
             var scene = model.UseScene("default");
             var lodLevel = rmv2.ModelList.First();
+
             var skeletonName = rmv2.Header.SkeletonName + ".anim";
-            var skeletonPath = "animations/skeletons/" + skeletonName;
-            var invMatrixPackFilePath = "animations/skeletons/" + rmv2.Header.SkeletonName + ".bone_inv_trans_mats";
-            var invMatrixPackFile = _packFileService.FindFile(invMatrixPackFilePath);
+            var skeletonSearchList = _packFileService.SearchForFile(skeletonName);
+            var skeletonPath = _packFileService.GetFullPath(_packFileService.FindFile(skeletonSearchList[0]));
             var skeletonPackFile = _packFileService.FindFile(skeletonPath);
+
+            var invMatrixName = rmv2.Header.SkeletonName + ".bone_inv_trans_mats";
+            var invMatrixSearchList = _packFileService.SearchForFile(invMatrixName);
+            var invMatrixFilePath = _packFileService.GetFullPath(_packFileService.FindFile(invMatrixSearchList[0]));
+            var invMatrixPackFile = _packFileService.FindFile(invMatrixFilePath);
+
             var animFile = AnimationFile.Create(skeletonPackFile);
             var invMatrixFile = AnimInvMatrixFile.Create(invMatrixPackFile.DataSource.ReadDataAsChunk());
             Node bone = scene.CreateNode("Export root");
-
             var bindings = SkeletonExporter.CreateSkeletonFromGameSkeleton(animFile, invMatrixFile, bone);
             var tally = 0;
 
@@ -114,7 +114,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 var material = new MaterialBuilder();
                 if (settings.ExportTextures == true)
                 {
-                    material = _ddsToPngExporter.BuildMaterialPerMesh(rmvMesh, file, new DdsToPngExporterSettings(settings.ConvertMaterialTextureToBlender, settings.ConvertNormalTextureToBlue));
+                    material = _ddsToPngExporter.BuildMaterialPerMesh(rmvMesh, file);
                 }
                 else
                 {
@@ -123,14 +123,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 var mesh = model.CreateMesh(MeshExport.CreateMesh(rmvMesh, material));
 
                 scene.CreateNode(rmvMesh.Material.ModelName).WithSkinnedMesh(mesh, bindings.ToArray());
-                tally++;
+                tally++; //used for finding textures saved by gltf
             }
-            model.SaveGLTF("C:/franz/" + Path.GetFileNameWithoutExtension(file.Name) + ".gltf");
+            model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(file.Name) + ".gltf");
             return tally;
         }
 
 
-        internal int MeshWithoutSkeleton(string outputPath, RmvFile rmv2, PackFile file, RmvToGltfExporterSettings settings)
+        internal int MeshWithoutSkeleton(RmvFile rmv2, PackFile file, RmvToGltfExporterSettings settings)
         {
             var model = ModelRoot.CreateModel();
             var scene = model.UseScene("default");
@@ -139,12 +139,12 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var tally = 0;
             foreach (var rmvMesh in lodLevel)
             {
-                var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file, new DdsToPngExporterSettings(settings.ConvertMaterialTextureToBlender, settings.ConvertNormalTextureToBlue));
+                var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file);
                 var mesh = model.CreateMesh(MeshExport.ToStaticMeshBuilder(rmvMesh, material));
                 scene.CreateNode(rmvMesh.Material.ModelName).WithMesh(mesh);
                 tally++;
             }
-            model.SaveGLTF("C:/franz/" + Path.GetFileNameWithoutExtension(file.Name) + ".gltf");
+            model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(file.Name) + ".gltf");
             return tally;
         }
     }

@@ -22,9 +22,9 @@ using Shared.GameFormats.Animation;
 namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
 {
 
-    public record DdsToPngExporterSettings(
-    bool ConvertMaterialTextureToBlender,
-    bool ConvertNormalTextureToBlue);
+    //public record DdsToPngExporterSettings(
+    //bool ConvertMaterialTextureToBlender,
+    //bool ConvertNormalTextureToBlue);
 
     public class DdsToPngExporter
     {
@@ -42,19 +42,19 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
             return ExportSupportEnum.NotSupported;
         }
 
-        internal void Export(string outputPath, PackFile file, DdsToPngExporterSettings settings)
+        internal void Export(string outputPath, PackFile file)
         {
             var rmv2 = new ModelFactory().Load(file.DataSource.ReadData());
             var lodLevel = rmv2.ModelList.First();
             foreach (var rmvMesh in lodLevel)
             {
-                var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file, settings);
+                var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file);
             }
         }
 
-        internal MaterialBuilder BuildMaterialPerMesh(RmvModel rmvMesh, PackFile file, DdsToPngExporterSettings settings)
+        internal MaterialBuilder BuildMaterialPerMesh(RmvModel rmvMesh, PackFile file)
         {
-            var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file, settings);
+            var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file);
             return material;
         }
 

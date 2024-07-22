@@ -17,9 +17,9 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
     {
         public DdsToNormalPngExporter() { }
 
-        public void Export(string outputPath, string fileName, int tally)
+        public void Export(string outputPath, string fileName)
         {
-            using (Image image = Image.FromFile("C:/franz/" + fileName))
+            using (Image image = Image.FromFile(outputPath + fileName))
             using (Bitmap bitmap = new Bitmap(image))
             {
                 for (int x = 0; x < bitmap.Width; x++)
@@ -34,7 +34,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                         int A = pixel.A;
 
                         // Apply the conversion formulas
-                        //this goes from blue to orange
+                        //this goes from blue to orange keeping for the future importer
                         //int R1 = 255;
                         //int B1 = 0;
                         //int G1 = G;
@@ -52,8 +52,13 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                     }
                 }
                 fileName = Path.GetFileNameWithoutExtension(fileName);
-                // Save the output image
-                bitmap.Save("C:/franz/" + fileName + "_" + tally + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                // Save the output image, delete old one so we can seamlessly integrate into gltf save
+                if (File.Exists(outputPath + fileName + ".png"))
+                {
+                    image.Dispose();
+                    File.Delete(outputPath + fileName + ".png");
+                }
+                bitmap.Save(outputPath + fileName + ".png", System.Drawing.Imaging.ImageFormat.Png);
                
             }
         }
