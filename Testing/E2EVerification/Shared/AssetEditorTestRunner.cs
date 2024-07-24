@@ -1,4 +1,5 @@
 ﻿using AssetEditor.Services;
+using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
 using GameWorld.Core.Components.Input;
 using GameWorld.WpfWindow;
 using GameWorld.WpfWindow.ResourceHandling;
@@ -19,6 +20,7 @@ namespace E2EVerification.Shared
         public PackFileService PackFileService { get; private set; }
         public IUiCommandFactory CommandFactory { get; private set; }
         public ScopeRepository ScopeRepository { get; private set; }
+        public RmvToGltfExporter RmvToGltfExporterRepos {  get; private set; }
 
         public AssetEditorTestRunner()
         {
@@ -32,6 +34,7 @@ namespace E2EVerification.Shared
             PackFileService = EditorServiceProvider.ServiceProvider.GetRequiredService<PackFileService>();
             CommandFactory = EditorServiceProvider.ServiceProvider.GetRequiredService<IUiCommandFactory>();
             ScopeRepository = EditorServiceProvider.ServiceProvider.GetRequiredService<ScopeRepository>();
+            RmvToGltfExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<RmvToGltfExporter>();
         }
 
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)

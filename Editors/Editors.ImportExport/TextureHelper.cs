@@ -14,10 +14,11 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
-//using SharpDX.DirectWrite;
 using SharpGLTF.Materials;
 using SharpGLTF.Memory;
 using System.Windows;
+using SharpDX.XAudio2;
+using Shared.GameFormats.WsModel;
 
 namespace MeshImportExport
 {
@@ -124,10 +125,12 @@ namespace MeshImportExport
             var materialFile = inFile;
             var normalFile = inFile;
             List<PackFile> packFileList = new List<PackFile>();
+            MessageBox.Show(basePath.Value.Path);
 
             if (basePath == null || materialPath == null || normalPath == null)
             {
-                packFileList = FallbackIfFileNotFound(pfs, inFile);
+                var wsModelPath = pfs.SearchForFile(Path.GetFileNameWithoutExtension(inFile.Name)+".wsmodel").FirstOrDefault();
+                packFileList = FallbackTextureFinder(pfs, wsModelPath, model);
             }
             else
             {
@@ -154,26 +157,46 @@ namespace MeshImportExport
             return pngList;
         }
 
-        public static List<PackFile> FallbackIfFileNotFound(PackFileService pfs, PackFile inFile)
+        public static List<PackFile> FallbackTextureFinder(PackFileService pfs ,String wsmodelPath, RmvModel rmv)
         {
-            var fileList = pfs.SearchForFile(Path.GetFileNameWithoutExtension(pfs.GetFullPath(inFile)));
             List<PackFile> packFileList = new List<PackFile>();
-            foreach (var file in fileList)
+            var wsModelFile = pfs.FindFile(wsmodelPath);
+            if (wsModelFile != null)
             {
-                if (file.Contains("base"))
+                var wsModel = new WsModelFile(wsModelFile);
+                var wsModelMaterialList = wsModel.MaterialList.FirstOrDefault();
+                packFileList = FindTextureHelper(pfs, wsModelMaterialList, packFileList);
+            }
+            return packFileList;
+        }
+
+
+        public static List<PackFile> FindTextureHelper (PackFileService pfs, WsModelFileEntry material, List<PackFile> packFileList)
+        {
+            if (material != null)
+            {
+                var wsMaterialFile = pfs.FindFile(material.MaterialPath);
+                if (wsMaterialFile != null)
                 {
-                    var baseFile = pfs.FindFile(file);
-                    packFileList.Add(baseFile);
-                }
-                if (file.Contains("material"))
-                {
-                    var materialFile = pfs.FindFile(file);
-                    packFileList.Add(materialFile);
-                }
-                if (file.Contains("normal"))
-                {
-                    var normalFile = pfs.FindFile(file);
-                    packFileList.Add(normalFile);
+                    var wsMaterialFileContent = new WsModelMaterialFile(wsMaterialFile);
+                    foreach (var wsModelTexture in wsMaterialFileContent.Textures)
+                    {
+                        if (wsModelTexture.Value.Contains("base_colour.dds"))
+                        {
+                            var baseFile = pfs.FindFile(wsModelTexture.Value);
+                            packFileList.Add(baseFile);
+                        }
+                        if (wsModelTexture.Value.Contains("material_map.dds"))
+                        {
+                            var materialFile = pfs.FindFile(wsModelTexture.Value);
+                            packFileList.Add(materialFile);
+                        }
+                        if (wsModelTexture.Value.Contains("normal.dds"))
+                        {
+                            var normalFile = pfs.FindFile(wsModelTexture.Value);
+                            packFileList.Add(normalFile);
+                        }
+                    }
                 }
             }
             return packFileList;

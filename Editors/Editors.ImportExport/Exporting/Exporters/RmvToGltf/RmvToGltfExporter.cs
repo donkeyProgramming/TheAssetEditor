@@ -16,6 +16,7 @@ using SharpGLTF.Geometry;
 using System.Runtime.Serialization;
 using System.Diagnostics.Eventing.Reader;
 using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
+using System.ComponentModel;
 
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 {
@@ -53,7 +54,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             return ExportSupportEnum.NotSupported;
         }
 
-        internal void Export(RmvToGltfExporterSettings settings)
+        public void Export(RmvToGltfExporterSettings settings)
         {
             var rmv2 = new ModelFactory().Load(settings.InputFile.DataSource.ReadData());
             int tally = 0;
@@ -83,7 +84,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                     _exporterMaterial.Export(settings.OutputPath, true, name + "_" + i + ".png");
                 }
             }
-            MessageBox.Show("Export successful to: " + settings.OutputPath);
+            //MessageBox.Show("Export successful to: " + settings.OutputPath);
             //setting for animations export still needed
         }
 
@@ -107,7 +108,6 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var invMatrixFile = AnimInvMatrixFile.Create(invMatrixPackFile.DataSource.ReadDataAsChunk());
             Node bone = scene.CreateNode("Export root");
             var bindings = SkeletonExporter.CreateSkeletonFromGameSkeleton(animFile, invMatrixFile, bone);
-            var tally = 0;
 
             foreach (var rmvMesh in lodLevel)
             {
@@ -123,10 +123,12 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 var mesh = model.CreateMesh(MeshExport.CreateMesh(rmvMesh, material));
 
                 scene.CreateNode(rmvMesh.Material.ModelName).WithSkinnedMesh(mesh, bindings.ToArray());
-                tally++; //used for finding textures saved by gltf
             }
+
+            var tally = model.LogicalImages.Count();
+
             model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(file.Name) + ".gltf");
-            return tally;
+            return tally - 1;
         }
 
 
@@ -136,16 +138,19 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var scene = model.UseScene("default");
             var lodLevel = rmv2.ModelList.First();
             Node bone = scene.CreateNode("Export root");
-            var tally = 0;
+
+
             foreach (var rmvMesh in lodLevel)
             {
                 var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file);
                 var mesh = model.CreateMesh(MeshExport.ToStaticMeshBuilder(rmvMesh, material));
                 scene.CreateNode(rmvMesh.Material.ModelName).WithMesh(mesh);
-                tally++;
             }
+
+            var tally = model.LogicalImages.Count();
+
             model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(file.Name) + ".gltf");
-            return tally;
+            return tally - 1;
         }
     }
 }
