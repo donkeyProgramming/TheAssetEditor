@@ -2,6 +2,7 @@
 using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using GameWorld.Core.Services;
@@ -52,6 +53,7 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<AnimationViewModel>();
             serviceCollection.AddTransient<MaterialGeneralViewModel>();
             serviceCollection.AddTransient<WeightedMaterialViewModel>();
+            serviceCollection.AddTransient<WsMaterialViewModel>();
 
             // Sub tools
             serviceCollection.AddScoped<VertexDebuggerViewModel>();

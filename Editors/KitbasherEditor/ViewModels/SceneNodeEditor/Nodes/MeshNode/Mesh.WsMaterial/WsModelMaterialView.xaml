@@ -4,16 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews.WsModelMaterial" 
-             xmlns:System="clr-namespace:System;assembly=mscorlib" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
+             xmlns:System="clr-namespace:System;assembly=mscorlib" 
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
+             xmlns:wsmaterial="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="1200" d:DesignWidth="800">
     <UserControl.Resources>
-        <System:Double x:Key="labelWidth">140</System:Double>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="WsModelResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Expander DockPanel.Dock="Top" Margin="0,5,0,0" IsExpanded="True">
         <Expander.Header>
-            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Background}" >
+            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Border}" >
                 <TextBlock Text="Ws Model Material" FontWeight="Bold" Margin="3"/>
             </StackPanel>
         </Expander.Header>
@@ -40,84 +46,36 @@
             </DockPanel>
 
 
-            <DockPanel  DockPanel.Dock="Top" >
-                <Label Content="Shared" FontSize="8"/>
-                <Separator/>
-            </DockPanel> 
+            <wsmaterial:WsModelMaterialView_Shared DockPanel.Dock="Top"/>
 
-            <DockPanel DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="   Vertex Type"/>
-                <Label>:</Label>
-                <ComboBox Margin="2,0,2,0"  ItemsSource="{Binding MaterialGeneral.PossibleVertexTypes}" SelectedItem="{Binding MaterialGeneral.VertexType}" VerticalAlignment="Center"/>
-            </DockPanel>
+            <wsmaterial:WsModelMaterialView_Blood DockPanel.Dock="Top"/>
 
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="   Use Alpha"/>
-                <Label>:</Label>
-                <CheckBox Margin="2,0,2,0"  IsChecked="{Binding MaterialGeneral.UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
-            </StackPanel>
+            <wsmaterial:WsModelMaterialView_Tint DockPanel.Dock="Top"/>
 
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="   Receives blood"/>
-                <Label>:</Label>
-                <CheckBox Margin="2,0,2,0"  IsChecked="{Binding MaterialGeneral.UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
-            </StackPanel>
-
-            <DockPanel DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="   Texture - Base"/>
-                <Label>:</Label>
-                <CheckBox Margin="2,0,2,0"  IsChecked="{Binding MaterialGeneral.UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
-                <Button Content="X" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="20"/>
-                <Button Content="Browse" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                <Button Content="Preview" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                <TextBox Margin="2,2,2,2" Text="variantMeshes/hu01/karl/karl_baseColour.dds" VerticalContentAlignment="Center" IsEnabled="False"/>
-            </DockPanel>
-
-            <DockPanel DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="   Texture - Material"/>
-                <Label>:</Label>
-                <CheckBox Margin="2,0,2,0"  IsChecked="{Binding MaterialGeneral.UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
-                <Button Content="X" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="20"/>
-                <Button Content="Browse" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                <Button Content="Preview" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                <TextBox Margin="2,2,2,2" Text="variantMeshes/hu01/karl/karl_baseColour.dds" VerticalContentAlignment="Center" IsEnabled="False"/>
-            </DockPanel>
-
-            <DockPanel DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="   Texture - Normal"/>
-                <Label>:</Label>
-                <CheckBox Margin="2,0,2,0"  IsChecked="{Binding MaterialGeneral.UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
-                <Button Content="X" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="20"/>
-                <Button Content="Browse" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                <Button Content="Preview" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                <TextBox Margin="2,2,2,2" Text="variantMeshes/hu01/karl/karl_baseColour.dds" VerticalContentAlignment="Center" IsEnabled="False"/>
-            </DockPanel>
-
-            <DockPanel DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="   Texture - Mask"/>
-                <Label>:</Label>
-                <CheckBox Margin="2,0,2,0"  IsChecked="{Binding MaterialGeneral.UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
-                <Button Content="X" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="20"/>
-                <Button Content="Browse" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                <Button Content="Preview" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                <TextBox Margin="2,2,2,2" Text="variantMeshes/hu01/karl/karl_baseColour.dds" VerticalContentAlignment="Center" IsEnabled="False"/>
-            </DockPanel>
+            <wsmaterial:WsModelMaterialView_Emissive DockPanel.Dock="Top"/>
 
 
-            <DockPanel  DockPanel.Dock="Top" >
-                <Label Content="Emissive" FontSize="8"/>
-                <Separator/>
-            </DockPanel>
+            <!-- Dissolve -->
+            <ContentControl x:Name="Dissolve" DockPanel.Dock="Top">
+                <DockPanel LastChildFill="False">
+                    <DockPanel  DockPanel.Dock="Top" >
+                        <Label Content="Dissolve" FontSize="{StaticResource HeaderFontSize}" Width="{StaticResource HeaderLabelLength}"/>
+                        <Separator/>
+                    </DockPanel>
+                </DockPanel>
+            </ContentControl>
 
-            <DockPanel  DockPanel.Dock="Top" >
-                <Label Content="Dissolve" FontSize="8"/>
-                <Separator/>
-            </DockPanel>
+            <!-- Iridescence -->
+            <ContentControl x:Name="Iridescence" DockPanel.Dock="Top">
+                <DockPanel LastChildFill="False">
+                    <DockPanel  DockPanel.Dock="Top" >
+                        <Label Content="Iridescence" FontSize="{StaticResource HeaderFontSize}" Width="{StaticResource HeaderLabelLength}"/>
+                        <Separator/>
+                    </DockPanel>
+                </DockPanel>
+            </ContentControl>
 
-            <DockPanel  DockPanel.Dock="Top" >
-                <Label Content="Dissolve" FontSize="8"/>
-                <Separator/>
-            </DockPanel>
+
 
 
 

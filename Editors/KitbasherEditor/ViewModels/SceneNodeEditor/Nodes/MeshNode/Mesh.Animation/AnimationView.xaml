@@ -12,7 +12,7 @@
 
     <Expander DockPanel.Dock="Top" Margin="0,5,0,0" IsExpanded="False">
         <Expander.Header>
-            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Background}" >
+            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Border}" >
                 <TextBlock Text="Animation" FontWeight="Bold" Margin="3"/>
             </StackPanel>
         </Expander.Header>

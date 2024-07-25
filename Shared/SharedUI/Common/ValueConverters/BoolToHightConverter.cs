@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
 
 namespace Shared.Ui.Common.ValueConverters
 {
-    [ValueConversion(typeof(bool), typeof(Visibility))]
-    public sealed class BoolToVisibilityConverter : IValueConverter
+    [ValueConversion(typeof(bool), typeof(double))]
+    public sealed class BoolToHightConverter : IValueConverter
     {
-        public Visibility TrueValue { get; set; }
-        public Visibility FalseValue { get; set; }
+        public double TrueValue { get; set; }
+        public double FalseValue { get; set; }
 
-        public BoolToVisibilityConverter()
+        public BoolToHightConverter()
         {
             // set defaults
-            TrueValue = Visibility.Visible;
-            FalseValue = Visibility.Collapsed;
+            TrueValue = double.NaN;
+            FalseValue = 0;
         }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

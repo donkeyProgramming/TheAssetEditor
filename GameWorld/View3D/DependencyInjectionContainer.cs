@@ -58,6 +58,8 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<LodStrategyProvider>();
             serviceCollection.AddScoped<ILodGenerationStrategy, AssetEditorLodGeneration>();
             serviceCollection.AddScoped<ILodGenerationStrategy, Lod0ForAllLodGeneration>();
+            serviceCollection.AddScoped<ILodGenerationStrategy, NoLodGeneration>();
+            
             //serviceCollection.AddScoped<ILodGenerationStrategy, SimplygonLodGeneration>();
 
             serviceCollection.AddScoped<MaterialStrategyProvider>();

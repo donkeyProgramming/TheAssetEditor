@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GameWorld.Core.SceneNodes;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
 {
-    internal class WsMaterialViewModel
+    public class WsMaterialViewModel
     {
+        internal void Initialize(Rmv2MeshNode typedNode)
+        {
+        }
     }
 }
