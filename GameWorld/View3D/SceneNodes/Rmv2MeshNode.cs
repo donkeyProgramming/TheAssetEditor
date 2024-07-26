@@ -70,7 +70,7 @@ namespace GameWorld.Core.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, RenderEngineComponent renderEngineComponent)
+        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, RenderEngineComponent renderEngineComponent, IShader shader)
         {
             _renderEngineComponent = renderEngineComponent;
 
@@ -84,6 +84,8 @@ namespace GameWorld.Core.SceneNodes
             Position = Vector3.Zero;
             Scale = Vector3.One;
             Orientation = Quaternion.Identity;
+
+            Effect = shader;
         }
 
         public void Initialize(ResourceLibrary resourceLib)

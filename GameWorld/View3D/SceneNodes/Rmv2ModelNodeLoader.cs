@@ -3,6 +3,7 @@ using System.IO;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.Rendering.Shading;
 using GameWorld.Core.Services;
 using GameWorld.WpfWindow.ResourceHandling;
 using Serilog;
@@ -13,6 +14,7 @@ using Shared.GameFormats.RigidModel;
 
 namespace GameWorld.Core.SceneNodes
 {
+
     public class Rmv2ModelNodeLoader
     {
         private readonly ILogger _logger = Logging.Create<Rmv2ModelNodeLoader>();
@@ -22,14 +24,16 @@ namespace GameWorld.Core.SceneNodes
         private readonly PackFileService _packFileService;
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly AbstractMaterialFactory _abstractMaterialFactory;
 
-        public Rmv2ModelNodeLoader(ResourceLibrary resourceLibrary, IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService)
+        public Rmv2ModelNodeLoader(ResourceLibrary resourceLibrary, IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService, AbstractMaterialFactory abstractMaterialFactory)
         {
             _resourceLibrary = resourceLibrary;
             _contextFactory = contextFactory;
             _packFileService = packFileService;
             _renderEngineComponent = renderEngineComponent;
             _applicationSettingsService = applicationSettingsService;
+            _abstractMaterialFactory = abstractMaterialFactory;
         }
 
         public void CreateModelNodesFromFile(Rmv2ModelNode outputNode, RmvFile model, AnimationPlayer animationPlayer, string modelFullPath)
@@ -46,12 +50,16 @@ namespace GameWorld.Core.SceneNodes
                     var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, _contextFactory.Create());
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
 
+
+                    var shader = _abstractMaterialFactory.CreateFactory().CreateShader(rmvModel, "");
+
+
                     // This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
                     // from the model file path.
                     if (string.IsNullOrWhiteSpace(rmvModel.Material.ModelName))
                         rmvModel.Material.ModelName = Path.GetFileNameWithoutExtension(modelFullPath);
 
-                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, _renderEngineComponent);
+                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, _renderEngineComponent, shader);
                     node.Initialize(_resourceLibrary);
                     node.OriginalFilePath = modelFullPath;
                     node.OriginalPartIndex = modelIndex;

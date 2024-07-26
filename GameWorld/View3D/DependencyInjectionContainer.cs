@@ -10,6 +10,7 @@ using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.Rendering.Shading;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Services.SceneSaving;
@@ -68,6 +69,8 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<IMaterialStrategy, PharaohWsModelStrategy>();
             serviceCollection.AddScoped<IMaterialStrategy, NoWsModelStrategy>();
 
+            // Shader
+            serviceCollection.AddScoped<AbstractMaterialFactory>(); 
 
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolver>();
