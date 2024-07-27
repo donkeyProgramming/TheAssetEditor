@@ -22,7 +22,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             _materialCreators[ModelMaterialEnum.custom_terrain] = new CustomTerrainMaterialCreator();
         }
 
-        public IMaterial LoadMaterial(byte[] data, int offset, RmvVersionEnum rmvType, ModelMaterialEnum modelTypeEnum, long expectedMaterialSize)
+        public IRmvMaterial LoadMaterial(byte[] data, int offset, RmvVersionEnum rmvType, ModelMaterialEnum modelTypeEnum, long expectedMaterialSize)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             }
         }
 
-        public IMaterial CreateMaterial(RmvVersionEnum rmvType, ModelMaterialEnum modelTypeEnum, VertexFormat vertexFormat)
+        public IRmvMaterial CreateMaterial(RmvVersionEnum rmvType, ModelMaterialEnum modelTypeEnum, VertexFormat vertexFormat)
         {
             if (_materialCreators.ContainsKey(modelTypeEnum))
             {
@@ -78,7 +78,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             throw new Exception($"Error Creating material - {modelTypeEnum} is not a supported material");
         }
 
-        public byte[] Save(ModelMaterialEnum modelTypeEnum, IMaterial material)
+        public byte[] Save(ModelMaterialEnum modelTypeEnum, IRmvMaterial material)
         {
             return _materialCreators[modelTypeEnum].Save(material);
         }

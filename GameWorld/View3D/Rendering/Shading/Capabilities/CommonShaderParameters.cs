@@ -86,15 +86,26 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         }
     }
 
-  
-    internal class SharedCapability : ICapability
+
+    internal class AnimationCapability : ICapability
     {
-        public bool ApplyAnimation{ get; set; }
-        public bool UseAlpha { get; set; }
+        public bool ApplyAnimation { get; set; }
         public bool AnimationInformation { get; set; }
         public Matrix[]? AnimationTransforms { get; set; }
         public int AnimationWeightCount { get; set; }
 
+        public void Apply(Effect effect, ResourceLibrary _)
+        {
+            effect.Parameters["doAnimation"].SetValue(ApplyAnimation);
+            effect.Parameters["WeightCount"].SetValue(AnimationWeightCount);
+            effect.Parameters["tranforms"].SetValue(AnimationTransforms);
+        }
+    }
+
+    internal class SharedCapability : ICapability
+    {
+        public float ScaleMult { get; set; } = 1;
+        public bool UseAlpha { get; set; }
         public TextureInput BaseColour { get; set; } = new TextureInput(TextureType.BaseColour);
         public TextureInput MaterialMap{ get; set; } = new TextureInput(TextureType.MaterialMap);
         public TextureInput NormalMap { get; set; } = new TextureInput(TextureType.Normal);
@@ -110,14 +121,18 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             TextureMap[Mask.Type] = Mask;
         }
 
+        public void UpdateTexture(TextureType type, string texturePath)
+        { 
+            if(TextureMap.ContainsKey(type)) 
+            {
+                TextureMap[type].UseTexture = true;
+                TextureMap[type].TexturePath = texturePath;
+            }
+        }
+
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {
             effect.Parameters["UseAlpha"].SetValue(UseAlpha);
-
-            // Apply Animation 
-            effect.Parameters["doAnimation"].SetValue(ApplyAnimation);
-            effect.Parameters["WeightCount"].SetValue(AnimationWeightCount);
-            effect.Parameters["tranforms"].SetValue(AnimationTransforms);
 
             BaseColour.Apply(effect, resourceLibrary);
             MaterialMap.Apply(effect, resourceLibrary);

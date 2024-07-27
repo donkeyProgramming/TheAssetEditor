@@ -1,41 +1,53 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Shading.Capabilities;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.GameFormats.RigidModel.Types;
 
 
 
 namespace GameWorld.Core.Rendering.Shading
 {
-    public class DefaultPbrShaderWh3 : IShader
+    public interface ICapabilityMaterial : IShader
     {
+        public T? GetCapability<T>() where T : class, ICapability;
+
+        public ICapabilityMaterial Clone();
+    }
+
+    public class DefaultPbrShaderWh3 : ICapabilityMaterial
+    {
+        public T? GetCapability<T>() where T : class, ICapability
+        {
+            foreach (var capability in _capabilities)
+            {
+                if (capability.GetType() == typeof(T))
+                    return capability as T;
+            }
+
+            return null;
+        }
+
+        public ICapabilityMaterial Clone() 
+        {
+            throw new NotImplementedException();
+        }
+
+
         protected ResourceLibrary _resourceLibrary;
 
         private readonly CommonShaderParametersCapability _commonShaderParametersCapability = new();
         private readonly SharedCapability _sharedCapability = new();
+        private readonly AnimationCapability _animationCapability = new();
 
-        public bool UseAlpha { set; get; } = false;
-        public bool UseAnimation { set; get; } = false;
-        public Matrix[]? AnimationTransforms { get; set; }
-        public int AnimationWeightCount { get; set; }
-        public float ScaleMult { get; set; } = 1;
+        private readonly ICapability[] _capabilities;
 
         public DefaultPbrShaderWh3(ResourceLibrary resourceLibrary)
         {
+            _capabilities = [_commonShaderParametersCapability, _sharedCapability, _animationCapability];
             _resourceLibrary = resourceLibrary;
-        }
-
-        public void Apply()
-        {
-            var effect = GetEffect();
-
-            _commonShaderParametersCapability.Apply(effect);
-            _sharedCapability.Apply(effect, _resourceLibrary);
         }
 
         public void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
@@ -45,43 +57,44 @@ namespace GameWorld.Core.Rendering.Shading
 
         public void ApplyObjectParameters()
         {
-            _sharedCapability.UseAlpha = UseAlpha;
-            _sharedCapability.ApplyAnimation = UseAnimation;
-            _sharedCapability.AnimationWeightCount = AnimationWeightCount;
-            _sharedCapability.AnimationTransforms = AnimationTransforms;
+            var effect = GetEffect();
+
+            _commonShaderParametersCapability.Apply(effect);
+            _sharedCapability.Apply(effect, _resourceLibrary);
+            _animationCapability.Apply(effect, _resourceLibrary);
         }
 
-        public void SetTexture(TextureType type, string texturePath)
-        {
-            if (_sharedCapability.TextureMap.ContainsKey(type))
-            {
-                _sharedCapability.TextureMap[type].TexturePath = texturePath;
-                _sharedCapability.TextureMap[type].UseTexture = true;
-            }
-        }
+        //public void SetTexture(TextureType type, string texturePath)
+        //{
+        //    if (_sharedCapability.TextureMap.ContainsKey(type))
+        //    {
+        //        _sharedCapability.TextureMap[type].TexturePath = texturePath;
+        //        _sharedCapability.TextureMap[type].UseTexture = true;
+        //    }
+        //}
+        //
+        //public void UseTexture(TextureType type, bool value)
+        //{
+        //    if (_sharedCapability.TextureMap.ContainsKey(type))
+        //        _sharedCapability.TextureMap[type].UseTexture = value;
+        //}
 
-        public void UseTexture(TextureType type, bool value)
-        {
-            if (_sharedCapability.TextureMap.ContainsKey(type))
-                _sharedCapability.TextureMap[type].UseTexture = value;
-        }
-
-        public PbrShader Clone()
-        {
-            throw new NotImplementedException();
-
-            //var shaderClone = new DefaultPbrShaderWh3(_resourceLibrary)
-            //{
-            //    AnimationTransforms = AnimationTransforms,
-            //    AnimationWeightCount = AnimationWeightCount,
-            //    ScaleMult = ScaleMult,
-            //    UseAlpha = UseAlpha,
-            //    UseAnimation = UseAnimation,
-            //    //_textureMap = _textureMap.ToDictionary(),
-            //   // _useTextureMap = _useTextureMap.ToDictionary()
-            //};
-            //return shaderClone;
-        }
+        //public PbrShader Clone()
+        //{
+        //    throw new NotImplementedException();
+        //
+        //    //var shaderClone = new DefaultPbrShaderWh3(_resourceLibrary)
+        //    //{
+        //    //    AnimationTransforms = AnimationTransforms,
+        //    //    AnimationWeightCount = AnimationWeightCount,
+        //    //    ScaleMult = ScaleMult,
+        //    //    UseAlpha = UseAlpha,
+        //    //    UseAnimation = UseAnimation,
+        //    //    //_textureMap = _textureMap.ToDictionary(),
+        //    //   // _useTextureMap = _useTextureMap.ToDictionary()
+        //    //};
+        //    //return shaderClone;
+        //}
 
         public void SetTechnique(RenderingTechnique technique)
         {

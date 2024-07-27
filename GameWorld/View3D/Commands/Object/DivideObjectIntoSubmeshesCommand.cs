@@ -3,7 +3,6 @@ using System.Linq;
 using GameWorld.Core.Commands.Face;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
-using GameWorld.Core.Rendering.Shading;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.WpfWindow.ResourceHandling;
@@ -17,22 +16,22 @@ namespace GameWorld.Core.Commands.Object
     {
         readonly ILogger _logger = Logging.Create<FaceSelectionCommand>();
 
-        IEditableGeometry _objectToSplit;
-        bool _combineOverlappingVertexes;
-
-        private readonly List<GroupNode> _newGroupNodes = new List<GroupNode>();
+        private readonly List<GroupNode> _newGroupNodes = [];
         private readonly SelectionManager _selectionManager;
-        ISelectionState _originalSelectionState;
         private readonly ResourceLibrary _resourceLib;
         private readonly RenderEngineComponent _renderEngineComponent;
+
+        ISelectionState _originalSelectionState;
+        IEditableGeometry _objectToSplit;
+        bool _combineOverlappingVertexes;
 
         public string HintText { get => "Divide Object"; }
         public bool IsMutation { get => true; }
 
-        public DivideObjectIntoSubmeshesCommand(SelectionManager selectionManager, ResourceLibrary resourceLibary, RenderEngineComponent renderEngineComponent)
+        public DivideObjectIntoSubmeshesCommand(SelectionManager selectionManager, ResourceLibrary resourceLibrary, RenderEngineComponent renderEngineComponent)
         {
             _selectionManager = selectionManager;
-            _resourceLib = resourceLibary;
+            _resourceLib = resourceLibrary;
             _renderEngineComponent = renderEngineComponent;
         }
 
@@ -48,8 +47,7 @@ namespace GameWorld.Core.Commands.Object
 
             using (new WaitCursor())
             {
-                var meshService = new MeshSplitterService();
-                var newSplitMeshes = meshService.SplitMesh(_objectToSplit.Geometry, _combineOverlappingVertexes);
+                var newSplitMeshes = MeshSplitterService.SplitMesh(_objectToSplit.Geometry, _combineOverlappingVertexes);
                 var sortedNewMeshes = newSplitMeshes.OrderBy(x => x.VertexCount()).ToList();
 
                 _logger.Here().Information($"{newSplitMeshes.Count} meshes generated from splitting");
@@ -58,7 +56,7 @@ namespace GameWorld.Core.Commands.Object
                 if (parent is GroupNode groupNode && groupNode.IsUngroupable)
                     parent = parent.Parent;
 
-                GroupNode currentGroupNode = null;
+                GroupNode? currentGroupNode = null;
 
                 var counter = 0;
                 var createdMeshes = new List<Rmv2MeshNode>();
@@ -79,8 +77,7 @@ namespace GameWorld.Core.Commands.Object
                     }
 
                     var typedObject = _objectToSplit as Rmv2MeshNode;
-                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, _renderEngineComponent);
-                    meshNode.Initialize(_resourceLib);
+                    var meshNode = new Rmv2MeshNode(_resourceLib, typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, null);
                     meshNode.IsVisible = true;
 
                     var meshName = $"{_objectToSplit.Name}_submesh_{counter++}";

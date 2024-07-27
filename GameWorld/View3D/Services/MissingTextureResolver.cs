@@ -93,7 +93,6 @@ namespace GameWorld.Core.Services
             if (currentFile == null)
             {
                 meshNode.UpdateTexture(newPath, texureType);
-                meshNode.UseTexture(texureType, true);
             }
         }
     }

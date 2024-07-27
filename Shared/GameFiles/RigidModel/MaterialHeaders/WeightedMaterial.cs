@@ -8,7 +8,7 @@ using Shared.GameFormats.RigidModel.Types;
 
 namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
-    public class WeightedMaterial : IMaterial
+    public class WeightedMaterial : IRmvMaterial
     {
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.Unknown;
 
@@ -32,7 +32,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
         public ModelMaterialEnum MaterialId { get; set; } = ModelMaterialEnum.weighted;
 
-        public IMaterial Clone()
+        public IRmvMaterial Clone()
         {
             return new WeightedMaterial()
             {
@@ -167,7 +167,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
     public class WeighterMaterialCreator : IMaterialCreator
     {
-        public IMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset)
+        public IRmvMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset)
         {
             var Header = ByteHelper.ByteArrayToStructure<WeightedMaterialStruct>(dataArray, dataOffset);
             dataOffset += ByteHelper.GetSize<WeightedMaterialStruct>();
@@ -199,7 +199,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             return material;
         }
 
-        public IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
         {
             var material = new WeightedMaterial()
             {
@@ -222,7 +222,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             return material;
         }
 
-        public byte[] Save(IMaterial material)
+        public byte[] Save(IRmvMaterial material)
         {
             if (material is not WeightedMaterial typedMaterial)
                 throw new Exception("Incorrect material provided for WeightedMaterial::Save");

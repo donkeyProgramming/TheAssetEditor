@@ -3,7 +3,7 @@ using Shared.GameFormats.RigidModel.Types;
 
 namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
-    public interface IMaterial
+    public interface IRmvMaterial
     {
         public ModelMaterialEnum MaterialId { get; set; }
         VertexFormat BinaryVertexFormat { get; set; }
@@ -12,7 +12,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         string ModelName { get; set; }
         string TextureDirectory { get; set; }
 
-        IMaterial Clone();
+        IRmvMaterial Clone();
         uint ComputeSize();
         List<RmvTexture> GetAllTextures();
         RmvTexture? GetTexture(TextureType texureType);
@@ -24,8 +24,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
     public interface IMaterialCreator
     {
-        IMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset);
-        IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat);
-        byte[] Save(IMaterial material);
+        IRmvMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset);
+        IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat);
+        byte[] Save(IRmvMaterial material);
     }
 }

@@ -59,8 +59,7 @@ namespace GameWorld.Core.SceneNodes
                     if (string.IsNullOrWhiteSpace(rmvModel.Material.ModelName))
                         rmvModel.Material.ModelName = Path.GetFileNameWithoutExtension(modelFullPath);
 
-                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, _renderEngineComponent, shader);
-                    node.Initialize(_resourceLibrary);
+                    var node = new Rmv2MeshNode(_resourceLibrary, rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, shader);
                     node.OriginalFilePath = modelFullPath;
                     node.OriginalPartIndex = modelIndex;
                     node.LodIndex = lodIndex;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GameWorld.Core.Rendering.Shading.Capabilities
 {
-    internal interface ICapability
+    public interface ICapability
     {
        
     }

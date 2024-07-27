@@ -43,8 +43,7 @@ namespace GameWorld.Core.Services
                 selectedFaceIndecies.Add(indexBuffer[face + 2]);
             }
 
-            var meshService = new MeshSplitterService();
-            var newSelection = meshService.GrowFaceSelection(faceSelectionState.RenderObject.Geometry, selectedFaceIndecies, combineOverlappingVertexes);
+            var newSelection = MeshSplitterService.GrowFaceSelection(faceSelectionState.RenderObject.Geometry, selectedFaceIndecies, combineOverlappingVertexes);
 
             _commandFactory.Create<FaceSelectionCommand>()
                .Configure(x => x.Configure(newSelection))
