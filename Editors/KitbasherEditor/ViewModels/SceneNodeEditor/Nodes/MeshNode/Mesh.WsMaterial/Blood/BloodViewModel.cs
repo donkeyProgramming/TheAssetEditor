@@ -27,7 +27,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             Guard.IsNotNull(bloodCapability);
             _bloodCapability = bloodCapability;
 
-            _bloodMap = new ShaderTextureViewModel(TextureType.Blood, bloodCapability, packFileService, uiCommandFactory, resourceLibrary);
+            _bloodMap = new ShaderTextureViewModel(bloodCapability.BloodMask, packFileService, uiCommandFactory, resourceLibrary);
             _useBlood = _bloodCapability.UseBlood;
             _bloodUvScale = new Vector2ViewModel(_bloodCapability.UvScale.X, _bloodCapability.UvScale.Y, OnBloodUvScaleChanged);
             _bloodPreview = new FloatViewModel(_bloodCapability.PreviewBlood, OnBloodPreviewChanged);

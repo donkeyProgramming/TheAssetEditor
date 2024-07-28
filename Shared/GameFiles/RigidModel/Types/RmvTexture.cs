@@ -22,9 +22,10 @@ namespace Shared.GameFormats.RigidModel.Types
         BaseColour = 27,
         MaterialMap = 29,
 
-        Blood = 1000,
-        Distortion = 1001,
-        DistortionNoise = 1001
+        // Items below are not in the RMV2 file spec, but used by the WsModel Material system
+        Blood = 1001,
+        Distortion = 1002,
+        DistortionNoise = 1003
     }
 
     [Serializable]

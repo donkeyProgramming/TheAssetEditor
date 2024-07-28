@@ -1,18 +1,12 @@
-﻿using CommunityToolkit.Diagnostics;
-using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
 
-
 namespace GameWorld.Core.Rendering.Shading.Capabilities
 {
-
- 
-
-
-    public class DefaultCapability : BaseTextureCapability, ICapability
+    public class DefaultCapability : ICapability
     {
         public float ScaleMult { get; set; } = 1;
         public bool UseAlpha { get; set; }
@@ -23,15 +17,6 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         public TextureInput Distortion { get; set; } = new TextureInput(TextureType.Distortion);
         public TextureInput DistortionNoise { get; set; } = new TextureInput(TextureType.DistortionNoise);
 
-        public DefaultCapability()
-        {
-            _textureMap[BaseColour.Type] = BaseColour;
-            _textureMap[MaterialMap.Type] = MaterialMap;
-            _textureMap[NormalMap.Type] = NormalMap;
-            _textureMap[Mask.Type] = Mask;
-            _textureMap[Distortion.Type] = Distortion;
-            _textureMap[DistortionNoise.Type] = DistortionNoise;
-        }
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {

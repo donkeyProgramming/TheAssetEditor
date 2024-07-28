@@ -85,24 +85,24 @@ namespace GameWorld.Core.SceneNodes
        
         public void UpdateTexture(string path, TextureType textureType, bool forceRefreshTexture = false)
         {
-            Material.SetTexture(textureType, path);
-            _resourceLib.LoadTexture(path, forceRefreshTexture);
-
-            var sharedCapability = Effect.GetCapability<DefaultCapability>();
-            if (sharedCapability != null)
-            {
-                sharedCapability.SetTexturePath(textureType, path);
-                sharedCapability.SetTextureUsage(textureType, true);
-            }
+           // Material.SetTexture(textureType, path);
+           // _resourceLib.LoadTexture(path, forceRefreshTexture);
+           //
+           // var sharedCapability = Effect.GetCapability<DefaultCapability>();
+           // if (sharedCapability != null)
+           // {
+           //     sharedCapability.SetTexturePath(textureType, path);
+           //     sharedCapability.SetTextureUsage(textureType, true);
+           // }
         }
 
         public void UseTexture(TextureType textureType, bool value)
         {
-            var sharedCapability = Effect.GetCapability<DefaultCapability>();
-            if (sharedCapability != null)
-            {
-                sharedCapability.SetTextureUsage(textureType, value);
-            }
+            //var sharedCapability = Effect.GetCapability<DefaultCapability>();
+            //if (sharedCapability != null)
+            //{
+            //    sharedCapability.SetTextureUsage(textureType, value);
+            //}
         }
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)

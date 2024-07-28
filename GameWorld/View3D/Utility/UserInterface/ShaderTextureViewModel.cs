@@ -11,16 +11,13 @@ using GameWorld.Core.Rendering.Shading.Capabilities;
 using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
-using Shared.GameFormats.RigidModel.Types;
 using Shared.Ui.Events.UiCommands;
 
 namespace GameWorld.Core.Utility.UserInterface
 {
     public partial class ShaderTextureViewModel : ObservableObject, INotifyDataErrorInfo
     {
-        private readonly TextureType _textureType;
-        private readonly ITextureCapability _textureCapability;
-
+        private readonly TextureInput _shaderTextureReference;
         private readonly PackFileService _packFileService;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly ResourceLibrary _resourceLibrary;
@@ -28,29 +25,25 @@ namespace GameWorld.Core.Utility.UserInterface
         [ObservableProperty] string _path;
         [ObservableProperty] bool _shouldRenderTexture;
 
-        public ShaderTextureViewModel(TextureType textureType, ITextureCapability textureCapability, PackFileService packFileService, IUiCommandFactory uiCommandFactory, ResourceLibrary resourceLibrary) 
+        public ShaderTextureViewModel(TextureInput shaderTextureReference, PackFileService packFileService, IUiCommandFactory uiCommandFactory, ResourceLibrary resourceLibrary) 
         {
-            var supportsTexture = textureCapability.SupportsTexture(textureType);
-            if (supportsTexture == false)
-                throw new Exception($"Provided textureCapability {textureCapability.GetType()} does not support {textureType}");
-
-            _textureType = textureType;
-            _textureCapability = textureCapability;
+            _shaderTextureReference = shaderTextureReference;
             _packFileService = packFileService;
             _uiCommandFactory = uiCommandFactory;
             _resourceLibrary = resourceLibrary;
-            _path = textureCapability.GetTexturePath(textureType);
-            _shouldRenderTexture = _textureCapability.GetTextureUsage(textureType);
+
+            _path = _shaderTextureReference.TexturePath;
+            _shouldRenderTexture = _shaderTextureReference.UseTexture;
         }
 
-        partial void OnShouldRenderTextureChanged(bool value)
+        partial void OnShouldRenderTextureChanged(bool value) 
         {
-            _textureCapability.SetTextureUsage(_textureType, value);
+            _shaderTextureReference.UseTexture = value;
         }
 
         partial void OnPathChanged(string value)
         {
-            _textureCapability.SetTexturePath(_textureType, value);
+            _shaderTextureReference.TexturePath = value;
             ValidatePath();
         }
 
