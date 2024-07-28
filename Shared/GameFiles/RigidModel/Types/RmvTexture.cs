@@ -22,7 +22,9 @@ namespace Shared.GameFormats.RigidModel.Types
         BaseColour = 27,
         MaterialMap = 29,
 
-        Blood
+        Blood = 1000,
+        Distortion = 1001,
+        DistortionNoise = 1001
     }
 
     [Serializable]

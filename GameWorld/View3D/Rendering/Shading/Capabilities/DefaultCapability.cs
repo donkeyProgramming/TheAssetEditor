@@ -8,6 +8,10 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Shading.Capabilities
 {
+
+ 
+
+
     public class DefaultCapability : BaseTextureCapability, ICapability
     {
         public float ScaleMult { get; set; } = 1;
@@ -16,6 +20,8 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         public TextureInput MaterialMap{ get; set; } = new TextureInput(TextureType.MaterialMap);
         public TextureInput NormalMap { get; set; } = new TextureInput(TextureType.Normal);
         public TextureInput Mask { get; set; } = new TextureInput(TextureType.Mask);
+        public TextureInput Distortion { get; set; } = new TextureInput(TextureType.Distortion);
+        public TextureInput DistortionNoise { get; set; } = new TextureInput(TextureType.DistortionNoise);
 
         public DefaultCapability()
         {
@@ -23,6 +29,8 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             _textureMap[MaterialMap.Type] = MaterialMap;
             _textureMap[NormalMap.Type] = NormalMap;
             _textureMap[Mask.Type] = Mask;
+            _textureMap[Distortion.Type] = Distortion;
+            _textureMap[DistortionNoise.Type] = DistortionNoise;
         }
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
@@ -33,6 +41,8 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             MaterialMap.Apply(effect, resourceLibrary);
             NormalMap.Apply(effect, resourceLibrary);
             Mask.Apply(effect, resourceLibrary);
+            //Distortion.Apply(effect, resourceLibrary);
+            //DistortionNoise.Apply(effect, resourceLibrary);
         }
 
         public void Initialize(WsModelFile wsModelFile, RmvModel model)
@@ -43,11 +53,8 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             CapabilityHelper.SetTextureFromModel(model, MaterialMap);
             CapabilityHelper.SetTextureFromModel(model, NormalMap);
             CapabilityHelper.SetTextureFromModel(model, Mask);
+            CapabilityHelper.SetTextureFromModel(model, Distortion);
+            CapabilityHelper.SetTextureFromModel(model, DistortionNoise);
         }
-
-       
     }
-
-
-
 }
