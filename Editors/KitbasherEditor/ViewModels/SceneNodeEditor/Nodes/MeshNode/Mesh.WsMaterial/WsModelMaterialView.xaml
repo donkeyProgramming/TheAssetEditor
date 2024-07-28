@@ -6,7 +6,9 @@
              xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews.WsModelMaterial" 
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
-             xmlns:wsmaterial="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial"
+             xmlns:wsmaterial="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial" 
+             xmlns:blood="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Blood" 
+             xmlns:default="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Default"
              mc:Ignorable="d" 
              d:DesignHeight="1200" d:DesignWidth="800">
     <UserControl.Resources>
@@ -46,9 +48,9 @@
             </DockPanel>
 
 
-            <wsmaterial:WsModelMaterialView_Shared DockPanel.Dock="Top"/>
+            <default:DefaultView DockPanel.Dock="Top" DataContext="{Binding Default}"/>
 
-            <wsmaterial:WsModelMaterialView_Blood DockPanel.Dock="Top"/>
+            <blood:BloodView DockPanel.Dock="Top" DataContext="{Binding Blood}"/>
 
             <wsmaterial:WsModelMaterialView_Tint DockPanel.Dock="Top"/>
 

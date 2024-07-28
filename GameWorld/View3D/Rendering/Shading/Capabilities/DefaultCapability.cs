@@ -1,6 +1,9 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using CommunityToolkit.Diagnostics;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
+using Shared.GameFormats.WsModel;
 
 
 namespace GameWorld.Core.Rendering.Shading.Capabilities
@@ -31,5 +34,20 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             NormalMap.Apply(effect, resourceLibrary);
             Mask.Apply(effect, resourceLibrary);
         }
+
+        public void Initialize(WsModelFile wsModelFile, RmvModel model)
+        {
+            UseAlpha = model.Material.AlphaMode == AlphaMode.Transparent;
+
+            CapabilityHelper.SetTextureFromModel(model, BaseColour);
+            CapabilityHelper.SetTextureFromModel(model, MaterialMap);
+            CapabilityHelper.SetTextureFromModel(model, NormalMap);
+            CapabilityHelper.SetTextureFromModel(model, Mask);
+        }
+
+       
     }
+
+
+
 }

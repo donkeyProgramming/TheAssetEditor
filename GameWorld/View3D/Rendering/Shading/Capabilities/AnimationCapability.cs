@@ -1,6 +1,8 @@
 ﻿using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.WsModel;
 
 
 namespace GameWorld.Core.Rendering.Shading.Capabilities
@@ -17,6 +19,11 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             effect.Parameters["doAnimation"].SetValue(ApplyAnimation);
             effect.Parameters["WeightCount"].SetValue(AnimationWeightCount);
             effect.Parameters["tranforms"].SetValue(AnimationTransforms);
+        }
+
+        public void Initialize(WsModelFile wsModelFile, RmvModel model)
+        {
+           
         }
     }
 }

@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial
+namespace GameWorld.Core.Utility.UserInterface
 {
     /// <summary>
-    /// Interaction logic for WsModelMaterialView_Blood.xaml
+    /// Interaction logic for ShaderTextureView.xaml
     /// </summary>
-    public partial class WsModelMaterialView_Blood : UserControl
+    public partial class ShaderTextureView : UserControl
     {
-        public WsModelMaterialView_Blood()
+        public ShaderTextureView()
         {
             InitializeComponent();
         }

@@ -89,16 +89,19 @@ namespace GameWorld.Core.SceneNodes
             _resourceLib.LoadTexture(path, forceRefreshTexture);
 
             var sharedCapability = Effect.GetCapability<DefaultCapability>();
-            if(sharedCapability != null) 
-                sharedCapability.UpdateTexture(textureType, path);
+            if (sharedCapability != null)
+            {
+                sharedCapability.SetTexturePath(textureType, path);
+                sharedCapability.SetTextureUsage(textureType, true);
+            }
         }
 
         public void UseTexture(TextureType textureType, bool value)
         {
-            var animation = Effect.GetCapability<DefaultCapability>();
-            if (animation != null)
+            var sharedCapability = Effect.GetCapability<DefaultCapability>();
+            if (sharedCapability != null)
             {
-                animation.TextureMap[textureType].UseTexture = value;
+                sharedCapability.SetTextureUsage(textureType, value);
             }
         }
 

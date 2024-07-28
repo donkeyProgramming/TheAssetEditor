@@ -8,9 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GameWorld.Core.Rendering.Shading
 {
-    public interface ICapabilityMaterial : IShader
+    public abstract class ICapabilityMaterial : IShader
     {
-        public ICapability[] Capabilities { get; }
+        public ICapability[] Capabilities { get; protected set; } = [];
 
         public T GetCapability<T>() where T : class, ICapability
         {
@@ -31,12 +31,18 @@ namespace GameWorld.Core.Rendering.Shading
             return null;
         }
 
-        public ICapabilityMaterial Clone();
+  
+        public abstract ICapabilityMaterial Clone();
+        public abstract void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix);
+        public abstract void ApplyObjectParameters();
+        public abstract Effect GetEffect();
+        public abstract void SetTechnique(RenderingTechnique technique);
+        public abstract bool SupportsTechnique(RenderingTechnique technique);
     }
 
     public class DefaultCapabilityMaterialWh3 : ICapabilityMaterial
     {
-        public ICapabilityMaterial Clone()  => throw new NotImplementedException();
+        public override ICapabilityMaterial Clone()  => throw new NotImplementedException();
 
 
         protected ResourceLibrary _resourceLibrary;
@@ -46,20 +52,18 @@ namespace GameWorld.Core.Rendering.Shading
         //private readonly AnimationCapability _animationCapability = new();
         //private readonly BloodCapability _bloodCapability = new();
 
-        public ICapability[] Capabilities { get; private set; }
-
         public DefaultCapabilityMaterialWh3(ResourceLibrary resourceLibrary)
         {
             Capabilities = [_commonShaderParametersCapability, new DefaultCapability(), new AnimationCapability(), new BloodCapability()];
             _resourceLibrary = resourceLibrary;
         }
 
-        public void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
+        public override void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
         {
             _commonShaderParametersCapability.Assign(commonShaderParameters, modelMatrix);
         }
 
-        public void ApplyObjectParameters()
+        public override void ApplyObjectParameters()
         {
             var effect = GetEffect();
 
@@ -67,7 +71,7 @@ namespace GameWorld.Core.Rendering.Shading
                 capability.Apply(effect, _resourceLibrary); 
         }
 
-        public void SetTechnique(RenderingTechnique technique)
+        public override void SetTechnique(RenderingTechnique technique)
         {
             var effect = GetEffect();
             switch (technique)
@@ -85,7 +89,7 @@ namespace GameWorld.Core.Rendering.Shading
             }
         }
 
-        public bool SupportsTechnique(RenderingTechnique technique)
+        public override bool SupportsTechnique(RenderingTechnique technique)
         {
             var supported = new[] { RenderingTechnique.Normal, RenderingTechnique.Emissive };
             if (supported.Contains(technique))
@@ -93,6 +97,6 @@ namespace GameWorld.Core.Rendering.Shading
             return false;
         }
 
-        public virtual Effect GetEffect() => _resourceLibrary.GetStaticEffect(ShaderTypes.Pbs_MetalRough);
+        public override Effect GetEffect() => _resourceLibrary.GetStaticEffect(ShaderTypes.Pbs_MetalRough);
     }
 }

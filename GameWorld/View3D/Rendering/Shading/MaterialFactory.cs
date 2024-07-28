@@ -52,22 +52,8 @@ namespace GameWorld.Core.Rendering.Shading
         public ICapabilityMaterial CreateShader(RmvModel model, string wsModelFileName)
         {
             var shader = new DefaultCapabilityMaterialWh3(_resourceLibrary);
-
-            var sharedCapability = shader.GetCapability<DefaultCapability>();
-            if (sharedCapability != null)
-            {
-                sharedCapability.UseAlpha = model.Material.AlphaMode == AlphaMode.Transparent;
-
-                foreach (TextureType textureType in Enum.GetValues(typeof(TextureType)))
-                {
-                    var texture = model.Material.GetTexture(textureType);
-                    if (texture != null)
-                    {
-                        _resourceLibrary.LoadTexture(texture.Value.Path);
-                        sharedCapability.UpdateTexture(textureType, texture.Value.Path);
-                    }
-                }
-            }
+            foreach (var capability in shader.Capabilities)
+                capability.Initialize(null, model);
 
             return shader;
         }

@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
+using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Shading.Capabilities
 {
     public interface ICapability
     {
+        void Initialize(WsModelFile wsModelFile, RmvModel model);
+
         public void Apply(Effect effect, ResourceLibrary resourceLibrary);
     }
 
@@ -19,7 +19,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         public void SetTexturePath(TextureType type, string texturePath);
         public void SetTextureUsage(TextureType type, bool enable);
 
-        public string? GetTexturePath(TextureType type);
+        public string GetTexturePath(TextureType type);
         public bool GetTextureUsage(TextureType type);
         public bool SupportsTexture(TextureType type);
     }
@@ -29,7 +29,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
     {
         protected Dictionary<TextureType, TextureInput> _textureMap = [];
 
-        public string? GetTexturePath(TextureType type) => _textureMap[type].TexturePath;
+        public string GetTexturePath(TextureType type) => _textureMap[type].TexturePath;
         public bool GetTextureUsage(TextureType type) => _textureMap[type].UseTexture;
         public void SetTexturePath(TextureType type, string texturePath) => _textureMap[type].TexturePath = texturePath;
         public void SetTextureUsage(TextureType type, bool enable) => _textureMap[type].UseTexture = enable;
@@ -38,7 +38,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
 
     public class TextureInput
     {
-        public string? TexturePath { get; set; }
+        public string TexturePath { get; set; }
         public bool UseTexture { get; set; }
         public TextureType Type { get; set; }
 
@@ -72,6 +72,20 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             //    effect.Parameters[textureParam].SetValue(Texture);
             //}
 
+        }
+    }
+
+    public static class CapabilityHelper
+    {
+        public static void SetTextureFromModel(RmvModel model, TextureInput textureInput)
+        {
+            var textureType = textureInput.Type;
+            var modelTexture = model.Material.GetTexture(textureType);
+            if (modelTexture != null)
+            {
+                textureInput.TexturePath = modelTexture.Value.Path;
+                textureInput.UseTexture = true;
+            }
         }
     }
 
