@@ -13,7 +13,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 {
     public partial class MaterialGeneralViewModel : ObservableObject
     {
-        private readonly KitbasherRootScene _kitbasherRootScene;
+
         private readonly PackFileService _pfs;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -24,13 +24,9 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         [ObservableProperty] string _textureDirectory;
         [ObservableProperty] bool _useAlpha;
         [ObservableProperty] bool _onlyShowUsedTextures = true;
-        [ObservableProperty] UiVertexFormat _vertexType;
-        [ObservableProperty] IEnumerable<UiVertexFormat> _possibleVertexTypes = [UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic];
 
-        public MaterialGeneralViewModel(KitbasherRootScene kitbasherRootScene, PackFileService pfs, ApplicationSettingsService applicationSettings, IUiCommandFactory uiCommandFactory)
+        public MaterialGeneralViewModel(PackFileService pfs, ApplicationSettingsService applicationSettings, IUiCommandFactory uiCommandFactory)
         {
-            _kitbasherRootScene = kitbasherRootScene;
-
             _pfs = pfs;
             _uiCommandFactory = uiCommandFactory;
             _applicationSettingsService = applicationSettings;
@@ -40,7 +36,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         {
             _meshNode = meshNode;
 
-            VertexType = _meshNode.Geometry.VertexFormat;
             UseAlpha = _meshNode.Material.AlphaMode == AlphaMode.Transparent;
             TextureDirectory = _meshNode.Material.TextureDirectory;
             RefreshTextureList();
@@ -71,11 +66,6 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
                 _meshNode.Material.AlphaMode = AlphaMode.Opaque;
         }
 
-        partial void OnVertexTypeChanged(UiVertexFormat value)
-        {
-            var skeletonName = _kitbasherRootScene.Skeleton.SkeletonName;
-            _meshNode.Geometry.ChangeVertexType(value, skeletonName);
-        }
 
         partial void OnTextureDirectoryChanged(string value)
         {

@@ -54,15 +54,15 @@
             </DockPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Shader"/>
-                <Label>:</Label>
-                <TextBlock  Text="{Binding Mesh.ShaderName, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center" />
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Reduce Lods"/>
                 <Label>:</Label>
                 <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Mesh.ReduceMeshOnLodGeneration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Rmv2 Shader"/>
+                <Label>:</Label>
+                <TextBlock  Text="{Binding Mesh.ShaderName, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center" />
             </StackPanel>
 
             <DockPanel DockPanel.Dock="Top">
@@ -70,6 +70,12 @@
                 <Label DockPanel.Dock="Left">:</Label>
                 <TextBox Text="{Binding Mesh.SelectedMaterialType, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" IsEnabled="False"/>
             </DockPanel>
+
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Vertex Type"/>
+                <Label>:</Label>
+                <ComboBox ItemsSource="{Binding MaterialGeneral.PossibleVertexTypes}" SelectedItem="{Binding MaterialGeneral.VertexType}" VerticalAlignment="Center"/>
+            </StackPanel>
 
         </DockPanel>
     </Expander>

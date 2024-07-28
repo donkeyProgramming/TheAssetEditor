@@ -21,6 +21,8 @@ namespace Shared.GameFormats.RigidModel.Types
         Diffuse_damage = 17,
         BaseColour = 27,
         MaterialMap = 29,
+
+        Blood
     }
 
     [Serializable]

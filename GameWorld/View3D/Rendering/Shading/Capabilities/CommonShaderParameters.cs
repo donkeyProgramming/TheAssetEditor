@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.GameFormats.RigidModel.Types;
-
 
 namespace GameWorld.Core.Rendering.Shading.Capabilities
 {
-    internal class CommonShaderParametersCapability : ICapability
+    public class CommonShaderParametersCapability : ICapability
     {
         public Matrix View { get; set; }
         public Matrix Projection { get; set; }
@@ -21,7 +18,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
 
         public float LightIntensityMult { get; set; }
 
-        public void Apply(Effect effect)
+        public void Apply(Effect effect, ResourceLibrary _)
         {
             effect.Parameters["View"].SetValue(View);
             effect.Parameters["Projection"].SetValue(Projection);
@@ -44,100 +41,6 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             DirLightRotationRadians_X = parameters.DirLightRotationRadians_X;
             DirLightRotationRadians_Y = parameters.DirLightRotationRadians_Y;
             LightIntensityMult = parameters.LightIntensityMult;
-        }
-    }
-
-    public class TextureInput
-    {
-        public string? TexturePath { get; set; }
-        public bool UseTexture { get; set; }
-        public TextureType Type { get; set; }
-
-        public TextureInput(TextureType type)
-        {
-            Type = type;
-            UseTexture = false;
-            TexturePath = null;
-        }
-
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary)
-        {
-            var useTextureParam = ShaderParameterHelper.UseTextureTypeToParamName[Type];
-            var textureParam = ShaderParameterHelper.TextureTypeToParamName[Type];
-            effect.Parameters[useTextureParam].SetValue(UseTexture);
-
-            if (UseTexture)
-            {
-                var texture = resourceLibrary.LoadTexture(TexturePath);
-                effect.Parameters[textureParam].SetValue(texture);
-            }
-
-            //if (Texture == null || ApplyTexture == false)
-            //{
-            //    effect.Parameters[useTextureParam].SetValue(false);
-            //}
-            //else
-            //{
-            //    var textureParam = ShaderParameterHelper.TextureTypeToParamName[Type];
-            //    effect.Parameters[useTextureParam].SetValue(ApplyTexture);
-            //    effect.Parameters[textureParam].SetValue(Texture);
-            //}
-
-        }
-    }
-
-
-    internal class AnimationCapability : ICapability
-    {
-        public bool ApplyAnimation { get; set; }
-        public bool AnimationInformation { get; set; }
-        public Matrix[]? AnimationTransforms { get; set; }
-        public int AnimationWeightCount { get; set; }
-
-        public void Apply(Effect effect, ResourceLibrary _)
-        {
-            effect.Parameters["doAnimation"].SetValue(ApplyAnimation);
-            effect.Parameters["WeightCount"].SetValue(AnimationWeightCount);
-            effect.Parameters["tranforms"].SetValue(AnimationTransforms);
-        }
-    }
-
-    internal class SharedCapability : ICapability
-    {
-        public float ScaleMult { get; set; } = 1;
-        public bool UseAlpha { get; set; }
-        public TextureInput BaseColour { get; set; } = new TextureInput(TextureType.BaseColour);
-        public TextureInput MaterialMap{ get; set; } = new TextureInput(TextureType.MaterialMap);
-        public TextureInput NormalMap { get; set; } = new TextureInput(TextureType.Normal);
-        public TextureInput Mask { get; set; } = new TextureInput(TextureType.Mask);
-
-        public Dictionary<TextureType, TextureInput> TextureMap { get; private set; } = [];
-
-        public SharedCapability()
-        {
-            TextureMap[BaseColour.Type] = BaseColour;
-            TextureMap[MaterialMap.Type] = MaterialMap;
-            TextureMap[NormalMap.Type] = NormalMap;
-            TextureMap[Mask.Type] = Mask;
-        }
-
-        public void UpdateTexture(TextureType type, string texturePath)
-        { 
-            if(TextureMap.ContainsKey(type)) 
-            {
-                TextureMap[type].UseTexture = true;
-                TextureMap[type].TexturePath = texturePath;
-            }
-        }
-
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary)
-        {
-            effect.Parameters["UseAlpha"].SetValue(UseAlpha);
-
-            BaseColour.Apply(effect, resourceLibrary);
-            MaterialMap.Apply(effect, resourceLibrary);
-            NormalMap.Apply(effect, resourceLibrary);
-            Mask.Apply(effect, resourceLibrary);
         }
     }
 }

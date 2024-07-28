@@ -88,14 +88,14 @@ namespace GameWorld.Core.SceneNodes
             Material.SetTexture(textureType, path);
             _resourceLib.LoadTexture(path, forceRefreshTexture);
 
-            var sharedCapability = Effect.GetCapability<SharedCapability>();
+            var sharedCapability = Effect.GetCapability<DefaultCapability>();
             if(sharedCapability != null) 
                 sharedCapability.UpdateTexture(textureType, path);
         }
 
         public void UseTexture(TextureType textureType, bool value)
         {
-            var animation = Effect.GetCapability<SharedCapability>();
+            var animation = Effect.GetCapability<DefaultCapability>();
             if (animation != null)
             {
                 animation.TextureMap[textureType].UseTexture = value;
@@ -126,7 +126,7 @@ namespace GameWorld.Core.SceneNodes
                 animationCapability.ApplyAnimation = AnimationPlayer != null && AnimationPlayer.IsEnabled;
             }
 
-            var sharedCapability = Effect.GetCapability<SharedCapability>();
+            var sharedCapability = Effect.GetCapability<DefaultCapability>();
             if (sharedCapability != null)
             {
                 sharedCapability.ScaleMult = ScaleMult;

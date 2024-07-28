@@ -31,14 +31,15 @@ namespace GameWorld.Core.Rendering.Geometry
 
         public MeshObject Clone(bool includeMesh = true)
         {
-            var mesh = new MeshObject(Context, ParentSkeletonName);
-
-            mesh.Context = Context.Clone();
-            mesh.BoundingBox = BoundingBox;
-            mesh.MeshCenter = MeshCenter;
-            mesh.ParentSkeletonName = ParentSkeletonName;
-            mesh.WeightCount = WeightCount;
-            mesh.VertexFormat = VertexFormat;
+            var mesh = new MeshObject(Context, ParentSkeletonName)
+            {
+                Context = Context.Clone(),
+                BoundingBox = BoundingBox,
+                MeshCenter = MeshCenter,
+                ParentSkeletonName = ParentSkeletonName,
+                WeightCount = WeightCount,
+                VertexFormat = VertexFormat
+            };
 
             if (includeMesh)
             {

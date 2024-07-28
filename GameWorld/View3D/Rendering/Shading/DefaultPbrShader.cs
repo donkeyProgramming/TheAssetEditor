@@ -6,47 +6,51 @@ using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-
-
 namespace GameWorld.Core.Rendering.Shading
 {
     public interface ICapabilityMaterial : IShader
     {
-        public T? GetCapability<T>() where T : class, ICapability;
+        public ICapability[] Capabilities { get; }
 
-        public ICapabilityMaterial Clone();
-    }
-
-    public class DefaultPbrShaderWh3 : ICapabilityMaterial
-    {
-        public T? GetCapability<T>() where T : class, ICapability
+        public T GetCapability<T>() where T : class, ICapability
         {
-            foreach (var capability in _capabilities)
+            var cap = TryGetCapability<T>();
+            if(cap == null)
+                throw new Exception($"{typeof(T)} is not registered capability in {nameof(ICapabilityMaterial)}");
+            return cap;
+        }
+
+        public T? TryGetCapability<T>() where T : class, ICapability
+        {
+            foreach (var capability in Capabilities)
             {
                 if (capability.GetType() == typeof(T))
-                    return capability as T;
+                    return (capability as T)!;
             }
 
             return null;
         }
 
-        public ICapabilityMaterial Clone() 
-        {
-            throw new NotImplementedException();
-        }
+        public ICapabilityMaterial Clone();
+    }
+
+    public class DefaultCapabilityMaterialWh3 : ICapabilityMaterial
+    {
+        public ICapabilityMaterial Clone()  => throw new NotImplementedException();
 
 
         protected ResourceLibrary _resourceLibrary;
 
         private readonly CommonShaderParametersCapability _commonShaderParametersCapability = new();
-        private readonly SharedCapability _sharedCapability = new();
-        private readonly AnimationCapability _animationCapability = new();
+        //private readonly DefaultCapability _defaultCapability = new();
+        //private readonly AnimationCapability _animationCapability = new();
+        //private readonly BloodCapability _bloodCapability = new();
 
-        private readonly ICapability[] _capabilities;
+        public ICapability[] Capabilities { get; private set; }
 
-        public DefaultPbrShaderWh3(ResourceLibrary resourceLibrary)
+        public DefaultCapabilityMaterialWh3(ResourceLibrary resourceLibrary)
         {
-            _capabilities = [_commonShaderParametersCapability, _sharedCapability, _animationCapability];
+            Capabilities = [_commonShaderParametersCapability, new DefaultCapability(), new AnimationCapability(), new BloodCapability()];
             _resourceLibrary = resourceLibrary;
         }
 
@@ -59,53 +63,21 @@ namespace GameWorld.Core.Rendering.Shading
         {
             var effect = GetEffect();
 
-            _commonShaderParametersCapability.Apply(effect);
-            _sharedCapability.Apply(effect, _resourceLibrary);
-            _animationCapability.Apply(effect, _resourceLibrary);
+            foreach (var capability in Capabilities)
+                capability.Apply(effect, _resourceLibrary); 
         }
-
-        //public void SetTexture(TextureType type, string texturePath)
-        //{
-        //    if (_sharedCapability.TextureMap.ContainsKey(type))
-        //    {
-        //        _sharedCapability.TextureMap[type].TexturePath = texturePath;
-        //        _sharedCapability.TextureMap[type].UseTexture = true;
-        //    }
-        //}
-        //
-        //public void UseTexture(TextureType type, bool value)
-        //{
-        //    if (_sharedCapability.TextureMap.ContainsKey(type))
-        //        _sharedCapability.TextureMap[type].UseTexture = value;
-        //}
-
-        //public PbrShader Clone()
-        //{
-        //    throw new NotImplementedException();
-        //
-        //    //var shaderClone = new DefaultPbrShaderWh3(_resourceLibrary)
-        //    //{
-        //    //    AnimationTransforms = AnimationTransforms,
-        //    //    AnimationWeightCount = AnimationWeightCount,
-        //    //    ScaleMult = ScaleMult,
-        //    //    UseAlpha = UseAlpha,
-        //    //    UseAnimation = UseAnimation,
-        //    //    //_textureMap = _textureMap.ToDictionary(),
-        //    //   // _useTextureMap = _useTextureMap.ToDictionary()
-        //    //};
-        //    //return shaderClone;
-        //}
 
         public void SetTechnique(RenderingTechnique technique)
         {
+            var effect = GetEffect();
             switch (technique)
             {
                 case RenderingTechnique.Normal:
-                    GetEffect().CurrentTechnique = GetEffect().Techniques["BasicColorDrawing"];
+                    effect.CurrentTechnique = effect.Techniques["BasicColorDrawing"];
                     return;
 
                 case RenderingTechnique.Emissive:
-                    GetEffect().CurrentTechnique = GetEffect().Techniques["GlowDrawing"];
+                    effect.CurrentTechnique = effect.Techniques["GlowDrawing"];
                     return;
 
                 default:

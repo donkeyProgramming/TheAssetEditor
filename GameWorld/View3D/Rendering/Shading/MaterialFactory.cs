@@ -51,9 +51,9 @@ namespace GameWorld.Core.Rendering.Shading
 
         public ICapabilityMaterial CreateShader(RmvModel model, string wsModelFileName)
         {
-            var shader = new DefaultPbrShaderWh3(_resourceLibrary);
+            var shader = new DefaultCapabilityMaterialWh3(_resourceLibrary);
 
-            var sharedCapability = shader.GetCapability<SharedCapability>();
+            var sharedCapability = shader.GetCapability<DefaultCapability>();
             if (sharedCapability != null)
             {
                 sharedCapability.UseAlpha = model.Material.AlphaMode == AlphaMode.Transparent;

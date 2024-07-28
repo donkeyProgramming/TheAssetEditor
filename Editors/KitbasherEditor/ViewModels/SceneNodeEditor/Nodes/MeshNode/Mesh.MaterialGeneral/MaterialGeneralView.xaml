@@ -19,11 +19,7 @@
         </Expander.Header>
         
         <DockPanel LastChildFill="False">
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Vertex Type"/>
-                <Label>:</Label>
-                <ComboBox ItemsSource="{Binding MaterialGeneral.PossibleVertexTypes}" SelectedItem="{Binding MaterialGeneral.VertexType}" VerticalAlignment="Center"/>
-            </StackPanel>
+      
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Missing textures"/>
