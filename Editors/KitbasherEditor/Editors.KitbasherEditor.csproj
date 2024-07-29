@@ -15,4 +15,11 @@
     <ProjectReference Include="..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
   </ItemGroup>
 
+
+
+  <ItemGroup>
+    <Folder Include="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Iridescence\" />
+    <Folder Include="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Dissolve\" />
+  </ItemGroup>
+
 </Project>

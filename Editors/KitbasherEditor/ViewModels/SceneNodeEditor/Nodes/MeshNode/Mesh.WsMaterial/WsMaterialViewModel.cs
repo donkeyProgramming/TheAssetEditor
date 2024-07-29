@@ -38,7 +38,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             var emissiveCapability = typedNode.Effect.TryGetCapability<EmissiveCapability>();
             if (emissiveCapability != null)
                 Emissive = new EmissiveViewModel(emissiveCapability, _uiCommandFactory, _packFileService, _resourceLibrary);
-
         }
     }
 }
