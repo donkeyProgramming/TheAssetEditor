@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive" 
-             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:userinterface="clr-namespace:GameWorld.Core.Utility.UserInterface;assembly=GameWorld.Core"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:userinterface="clr-namespace:GameWorld.Core.Utility.UserInterface;assembly=GameWorld.Core" xmlns:colourpickerbutton="clr-namespace:Shared.Ui.BaseDialogs.ColourPickerButton;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -68,14 +68,15 @@
                         </b:Interaction.Behaviors>
                     </TextBox>
                     <Label Content="Colour"/>
-                    <Button Width="20" Height="20" Margin="5,0,5,0" HorizontalAlignment="Left"/>
+                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradiant0}" Margin="5,0,5,0" HorizontalAlignment="Left"/>
+
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Gradient 2" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <Label Content="Start"/>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Margin="2,2,2,2" Text="{Binding TestFloat, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                     <Label Content="Colour"/>
                     <Button Width="20" Height="20" Margin="5,0,5,0" HorizontalAlignment="Left"/>
                 </DockPanel>

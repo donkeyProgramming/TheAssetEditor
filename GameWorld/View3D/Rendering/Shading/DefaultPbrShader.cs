@@ -44,23 +44,25 @@ namespace GameWorld.Core.Rendering.Shading
     {
         public override ICapabilityMaterial Clone()  => throw new NotImplementedException();
 
-
         protected ResourceLibrary _resourceLibrary;
 
-        private readonly CommonShaderParametersCapability _commonShaderParametersCapability = new();
-        //private readonly DefaultCapability _defaultCapability = new();
-        //private readonly AnimationCapability _animationCapability = new();
-        //private readonly BloodCapability _bloodCapability = new();
 
         public DefaultCapabilityMaterialWh3(ResourceLibrary resourceLibrary)
         {
-            Capabilities = [_commonShaderParametersCapability, new DefaultCapability(), new AnimationCapability(), new BloodCapability()];
             _resourceLibrary = resourceLibrary;
+            Capabilities = 
+                [
+                    new CommonShaderParametersCapability(), 
+                    new DefaultCapability(), 
+                    new AnimationCapability(), 
+                    new BloodCapability(), 
+                    new EmissiveCapability()
+                ];
         }
 
         public override void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
         {
-            _commonShaderParametersCapability.Assign(commonShaderParameters, modelMatrix);
+            GetCapability<CommonShaderParametersCapability>().Assign(commonShaderParameters, modelMatrix);
         }
 
         public override void ApplyObjectParameters()

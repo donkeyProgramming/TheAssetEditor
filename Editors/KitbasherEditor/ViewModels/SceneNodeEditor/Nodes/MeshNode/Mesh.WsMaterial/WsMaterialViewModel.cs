@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive;
 using GameWorld.Core.Rendering.Shading.Capabilities;
 using GameWorld.Core.SceneNodes;
 using GameWorld.WpfWindow.ResourceHandling;
@@ -15,6 +16,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
 
         [ObservableProperty] DefaultViewModel? _default;
         [ObservableProperty] BloodViewModel? _blood;
+        [ObservableProperty] EmissiveViewModel? _emissive;
 
         public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
         {
@@ -32,6 +34,10 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             var bloodCapability = typedNode.Effect.TryGetCapability<BloodCapability>();
             if (bloodCapability != null)
                 Blood = new BloodViewModel(bloodCapability, _uiCommandFactory, _packFileService, _resourceLibrary);
+
+            var emissiveCapability = typedNode.Effect.TryGetCapability<EmissiveCapability>();
+            if (emissiveCapability != null)
+                Emissive = new EmissiveViewModel(emissiveCapability, _uiCommandFactory, _packFileService, _resourceLibrary);
 
         }
     }

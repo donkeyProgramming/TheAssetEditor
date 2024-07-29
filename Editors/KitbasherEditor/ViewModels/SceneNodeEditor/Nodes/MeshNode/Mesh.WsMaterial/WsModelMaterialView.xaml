@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews.WsModelMaterial" 
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
-             xmlns:wsmaterial="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial" 
              xmlns:blood="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Blood" 
              xmlns:default="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Default" 
              xmlns:tint="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Tint" 
@@ -52,7 +51,7 @@
             <default:DefaultView DockPanel.Dock="Top" DataContext="{Binding Default}"/>
             <blood:BloodView DockPanel.Dock="Top" DataContext="{Binding Blood}"/>
             <tint:TintView DockPanel.Dock="Top"/>
-            <emissive:EmissiveView DockPanel.Dock="Top"/>
+            <emissive:EmissiveView DockPanel.Dock="Top" DataContext="{Binding Emissive}"/>
 
 
             <!-- Dissolve -->
