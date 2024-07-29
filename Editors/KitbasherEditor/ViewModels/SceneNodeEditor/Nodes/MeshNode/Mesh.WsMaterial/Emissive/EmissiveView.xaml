@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive" 
-             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:userinterface="clr-namespace:GameWorld.Core.Utility.UserInterface;assembly=GameWorld.Core" xmlns:colourpickerbutton="clr-namespace:Shared.Ui.BaseDialogs.ColourPickerButton;assembly=Shared.Ui"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:userinterface="clr-namespace:GameWorld.Core.Utility.UserInterface;assembly=GameWorld.Core" xmlns:colourpickerbutton="clr-namespace:Shared.Ui.BaseDialogs.ColourPickerButton;assembly=Shared.Ui" xmlns:mathviews1="clr-namespace:Shared.Ui.BaseDialogs.MathViews;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -25,118 +25,104 @@
                 </DockPanel>
             </Expander.Header>
 
-
             <DockPanel LastChildFill="False">
-
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Texture" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <userinterface:ShaderTextureView DataContext="{Binding Mask}"/>
+                    <userinterface:ShaderTextureView DataContext="{Binding EmissiveTexture}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Distortion" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <userinterface:ShaderTextureView DataContext="{Binding Mask}"/>
+                    <userinterface:ShaderTextureView DataContext="{Binding EmissiveDistortionTexture}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Speed" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Direction" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <mathviews1:Vector2View DataContext="{Binding EmissiveDirection}" />
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Strength" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="E Distort Strength" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Margin="2,2,2,2" Text="{Binding EmissiveDistortStrength, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                </DockPanel>
+
+                <DockPanel DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="E Fresnel Strength" Margin="{StaticResource LabelMargin}"/>
+                    <Label>:</Label>
+                    <TextBox Margin="2,2,2,2" Text="{Binding EmissiveFresnelStrength, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Tint" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <mathviews:Vector3View/>
+                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding EmissiveTint}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
+                </DockPanel>
+
+                <DockPanel DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Gradient 0" Margin="{StaticResource LabelMargin}"/>
+                    <Label>:</Label>
+                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient0}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
+                    <Label Content="Time"/>
+                    <TextBox Margin="2,2,2,2" Text="{Binding GradientTime0, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Gradient 1" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <Label Content="Start"/>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right">
-                        <b:Interaction.Behaviors>
-                            <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                        </b:Interaction.Behaviors>
-                    </TextBox>
-                    <Label Content="Colour"/>
-                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradiant0}" Margin="5,0,5,0" HorizontalAlignment="Left"/>
-
+                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient1}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
+                    <Label Content="Time"/>
+                    <TextBox Margin="2,2,2,2" Text="{Binding GradientTime1, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Gradient 2" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <Label Content="Start"/>
-                    <TextBox Margin="2,2,2,2" Text="{Binding TestFloat, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
-                    <Label Content="Colour"/>
-                    <Button Width="20" Height="20" Margin="5,0,5,0" HorizontalAlignment="Left"/>
+                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient2}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
+                    <Label Content="Time"/>
+                    <TextBox Margin="2,2,2,2" Text="{Binding GradientTime2, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
-
+                
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Gradient 3" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <Label Content="Start"/>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
-                    <Label Content="Colour"/>
-                    <Button Width="20" Height="20" Margin="5,0,5,0" HorizontalAlignment="Left"/>
-                </DockPanel>
-
-
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Gradient 4" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
-                    <Label Content="Start"/>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
-                    <Label Content="Colour"/>
-                    <Button Width="20" Height="20" Margin="5,0,5,0" HorizontalAlignment="Left"/>
-                </DockPanel>
-
-
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Distort strength" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient3}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
+                    <Label Content="Time"/>
+                    <TextBox Margin="2,2,2,2" Text="{Binding GradientTime3, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Fresnel strength" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="EmissiveSpeed" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Margin="2,2,2,2" Text="{Binding EmissiveSpeed, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Pulse Speed" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="EmissivePulseSpeed" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Margin="2,2,2,2" Text="{Binding EmissivePulseSpeed, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Pulse Strength" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="EmissivePulseStrength" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <TextBox Margin="2,2,2,2" Text="{Binding EmissivePulseStrength, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
 
-
-
+                <DockPanel DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="EmissiveStrength" Margin="{StaticResource LabelMargin}"/>
+                    <Label>:</Label>
+                    <TextBox Margin="2,2,2,2" Text="{Binding EmissiveStrength, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Tiling" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    <mathviews1:Vector2View DataContext="{Binding EmissiveTiling}"/>
                 </DockPanel>
-
-
-
-
 
             </DockPanel>
         </Expander>

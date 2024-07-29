@@ -6,8 +6,7 @@ namespace GameWorld.Core.Rendering.Shading
 {
     public interface IShader
     {
-        void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix);
-        void ApplyObjectParameters();
+        void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix);// ApplyObjectParameters
         Effect GetEffect();
 
         void SetTechnique(RenderingTechnique technique);

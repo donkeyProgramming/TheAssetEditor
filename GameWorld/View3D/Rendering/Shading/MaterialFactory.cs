@@ -1,17 +1,18 @@
-﻿using System;
-using GameWorld.Core.Rendering.Shading.Capabilities;
+﻿using System.Data.SqlTypes;
+using System.IO;
+using System.Linq;
+using System.Xml;
 using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.RigidModel.Types;
+using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Shading
 {
     public interface IMaterialFactory
     {
-        ICapabilityMaterial CreateShader(RmvModel model, string wsModelFileName);
-
+        ICapabilityMaterial CreateShader(RmvModel model, string? wsModelFileName);
         string GetWsModelNameFromRmvFileName(string rmvFileName);
     }
 
@@ -42,18 +43,27 @@ namespace GameWorld.Core.Rendering.Shading
 
     public class Wh3MaterialFactory : IMaterialFactory
     {
+        private readonly PackFileService _packFileService;
         private readonly ResourceLibrary _resourceLibrary;
 
         public Wh3MaterialFactory(PackFileService packFileService, ResourceLibrary resourceLibrary) 
         {
+            _packFileService = packFileService;
             _resourceLibrary = resourceLibrary;
         }
 
-        public ICapabilityMaterial CreateShader(RmvModel model, string wsModelFileName)
+        public ICapabilityMaterial CreateShader(RmvModel model, string? wsModelMaterialPath)
         {
+            WsModelMaterialFile? wsModelMaterial = null;
+            if (wsModelMaterialPath != null)
+            {
+                var materialPackFile = _packFileService.FindFile(wsModelMaterialPath);
+                wsModelMaterial = new WsModelMaterialFile(materialPackFile);
+            }
+
             var shader = new DefaultCapabilityMaterialWh3(_resourceLibrary);
             foreach (var capability in shader.Capabilities)
-                capability.Initialize(null, model);
+                capability.Initialize(wsModelMaterial, model);
 
             return shader;
         }

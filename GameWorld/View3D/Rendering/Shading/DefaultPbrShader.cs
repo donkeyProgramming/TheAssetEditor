@@ -34,7 +34,6 @@ namespace GameWorld.Core.Rendering.Shading
   
         public abstract ICapabilityMaterial Clone();
         public abstract void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix);
-        public abstract void ApplyObjectParameters();
         public abstract Effect GetEffect();
         public abstract void SetTechnique(RenderingTechnique technique);
         public abstract bool SupportsTechnique(RenderingTechnique technique);
@@ -63,14 +62,11 @@ namespace GameWorld.Core.Rendering.Shading
         public override void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
         {
             GetCapability<CommonShaderParametersCapability>().Assign(commonShaderParameters, modelMatrix);
-        }
 
-        public override void ApplyObjectParameters()
-        {
             var effect = GetEffect();
 
             foreach (var capability in Capabilities)
-                capability.Apply(effect, _resourceLibrary); 
+                capability.Apply(effect, _resourceLibrary);
         }
 
         public override void SetTechnique(RenderingTechnique technique)

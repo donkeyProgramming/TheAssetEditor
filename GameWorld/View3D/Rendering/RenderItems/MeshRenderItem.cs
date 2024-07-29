@@ -26,7 +26,6 @@ namespace GameWorld.Core.Rendering.RenderItems
 
             _shader.SetTechnique(renderingTechnique);
             _shader.SetCommonParameters(parameters, _modelMatrix);
-            _shader.ApplyObjectParameters();
 
             ApplyMesh(_shader, device, _geometry.GetGeometryContext());
         }

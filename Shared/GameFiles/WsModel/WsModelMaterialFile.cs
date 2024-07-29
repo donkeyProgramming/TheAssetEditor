@@ -86,12 +86,14 @@ namespace Shared.GameFormats.WsModel
         void ExtractTextures(XmlDocument doc)
         {
             var textureNodes = doc.SelectNodes(@"/material/textures/texture");
+            if (textureNodes == null)
+                return;
             foreach (XmlNode node in textureNodes)
             {
                 var slotNode = node.SelectSingleNode("slot");
                 var pathNode = node.SelectSingleNode("source");
 
-                var texturePath = "";
+                string? texturePath;
                 if (pathNode == null)
                     texturePath = node.InnerText;
                 else
@@ -113,6 +115,12 @@ namespace Shared.GameFormats.WsModel
                     Textures[TextureType.BaseColour] = texturePath;
                 if (textureSlotName.Contains("material_map", StringComparison.InvariantCultureIgnoreCase))
                     Textures[TextureType.MaterialMap] = texturePath;
+                if (textureSlotName.Contains("xml_blood_map", StringComparison.InvariantCultureIgnoreCase))
+                    Textures[TextureType.Blood] = texturePath;
+                if (textureSlotName.Contains("t_xml_emissive_distortion", StringComparison.InvariantCultureIgnoreCase))
+                    Textures[TextureType.EmissiveDistortion] = texturePath;
+                if (textureSlotName.Contains("t_xml_emissive_texture", StringComparison.InvariantCultureIgnoreCase))
+                    Textures[TextureType.Emissive] = texturePath;
             }
         }
     }

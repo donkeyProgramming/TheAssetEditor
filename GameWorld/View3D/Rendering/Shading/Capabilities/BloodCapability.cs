@@ -22,9 +22,9 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             //BloodMask.Apply(effect, resourceLibrary);
         }
 
-        public void Initialize(WsModelFile wsModelFile, RmvModel model)
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
         {
-            CapabilityHelper.SetTextureFromModel(model, BloodMask);
+            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, BloodMask);
         }
     }
 }

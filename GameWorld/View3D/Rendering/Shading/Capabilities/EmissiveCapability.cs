@@ -22,10 +22,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         public float EmissivePulseStrength { get; set; } = 1;
 
         // Colour gradients, where the Alpha is used as time (0-1). RedGreenBlueTime
-        public Vector4 Gradient0 { get; set; } = new Vector4(0);
-        public Vector4 Gradient1 { get; set; } = new Vector4(0.25f);
-        public Vector4 Gradient2 { get; set; } = new Vector4(0.75f);
-        public Vector4 Gradient3 { get; set; } = new Vector4(1);
+        public Vector4[] Gradient { get; set; } = [new Vector4(0), new Vector4(0.25f), new Vector4(0.75f), new Vector4(1)];
 
         public float EmissiveStrength { get; set; } = 1;
         public Vector2 EmissiveTiling { get; set; } = new Vector2(1);
@@ -36,9 +33,22 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
            
         }
 
-        public void Initialize(WsModelFile wsModelFile, RmvModel model)
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
         {
-            
+            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, Emissive);
+            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, EmissiveDistortion);
+
+            for (var i = 0; i < 4; i++)
+            {
+                var colour = CapabilityHelper.GetParameterVector3(wsModelMaterial, "emissive_gradient_colour_stop_" + (i + 1), Vector3.One);
+                var time = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_gradient_stop_" + (i + 1), 0);
+                Gradient[i] = new Vector4(colour, time);
+            }
+
+            EmissiveDistortStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_strength", 1);
+            EmissiveTint = CapabilityHelper.GetParameterVector3(wsModelMaterial, "emissive_tint", Vector3.Zero);
+
+         
         }
     }
 }

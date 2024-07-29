@@ -24,9 +24,7 @@ namespace GameWorld.Core.Rendering.RenderItems
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
-           _shader.SetCommonParameters(parameters, _modelMatrix);
-            _shader.ApplyObjectParameters();
-
+            _shader.SetCommonParameters(parameters, _modelMatrix);
             ApplyMeshPart(_shader, device, _selectedFaces, _geometry.GetGeometryContext());
         }
 

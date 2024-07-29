@@ -21,7 +21,7 @@
         <Border x:Name="b2" Grid.Row="0" Grid.Column="0" Margin="3,0,3,0"/>
         <TextBox 
         Width="{Binding ActualWidth, ElementName=b}" 
-        Grid.Row="0" Grid.Column="0" 
+        Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Right"
         Text="{Binding X.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
         MaxLength="{Binding NumbersMaxLength, ElementName=self}">
             <b:Interaction.Behaviors>
@@ -31,7 +31,7 @@
 
         <TextBox 
         Width="{Binding ActualWidth, ElementName=b2}" 
-        Grid.Row="0" Grid.Column="1"
+        Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Right"
         Margin="3,0,0,0"
         Text="{Binding Y.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
         MaxLength="{Binding NumbersMaxLength, ElementName=self}" >

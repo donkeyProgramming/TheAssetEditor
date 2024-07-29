@@ -17,7 +17,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <colorpicker:PortableColorPicker Style="{StaticResource DefaultColorPickerStyle}" Width="20" Height="20"
+    <colorpicker:PortableColorPicker Style="{StaticResource DefaultColorPickerStyle}" 
                                                 SmallChange="5"
                                                 UseHintColor="True" HintColor="Transparent"
                                                 SelectedColor="{Binding PickedColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

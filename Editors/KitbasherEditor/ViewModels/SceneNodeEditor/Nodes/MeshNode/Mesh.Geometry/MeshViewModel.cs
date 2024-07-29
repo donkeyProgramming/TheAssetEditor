@@ -9,13 +9,13 @@ using Shared.Ui.BaseDialogs.MathViews;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 {
-    public partial class MeshViewModel : ObservableObject, IDisposable
+    public partial class MeshViewModel : ObservableObject
     {
         Rmv2MeshNode _meshNode;
         private readonly SceneManager _sceneManager;
         private readonly KitbasherRootScene _kitbasherRootScene;
 
-        public Vector3ViewModel Pivot { get; set; } = new(0);
+        public Vector3ViewModel Pivot { get; set; }
 
         [ObservableProperty] public string _modelName; 
         [ObservableProperty] public bool _drawBoundingBox; 
@@ -39,9 +39,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         {
             _meshNode = node;
 
-            Pivot.Set(_meshNode.Material.PivotPoint);
-            Pivot.OnValueChanged += Pivot_OnValueChanged;
-
+            Pivot = new Vector3ViewModel(_meshNode.Material.PivotPoint, Pivot_OnValueChanged);
             ModelName = _meshNode.Material.ModelName;
             DrawBoundingBox = _meshNode.DisplayBoundingBox;
             DrawPivotPoint = _meshNode.DisplayPivotPoint;
@@ -57,11 +55,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         partial void OnDrawPivotPointChanged(bool value) => _meshNode.DisplayBoundingBox = value;
         partial void OnReduceMeshOnLodGenerationChanged(bool value) => _meshNode.ReduceMeshOnLodGeneration = value;
         partial void OnVertexTypeChanged(UiVertexFormat value) => _meshNode.Geometry.ChangeVertexType(value, _kitbasherRootScene.Skeleton.SkeletonName);
-
-        private void Pivot_OnValueChanged(Vector3ViewModel newValue)
-        {
-            _meshNode.UpdatePivotPoint(new Vector3((float)newValue.X.Value, (float)newValue.Y.Value, (float)newValue.Z.Value));
-        }
+        private void Pivot_OnValueChanged(Vector3 newValue) => _meshNode.UpdatePivotPoint(newValue);
+        
 
         [RelayCommand]
         void CopyPivotToAllMeshes()
@@ -71,11 +66,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
             var allMeshes = root.GetMeshesInLod(0, false);
             foreach (var mesh in allMeshes)
                 mesh.UpdatePivotPoint(newPiv);
-        }
-
-        public void Dispose()
-        {
-            Pivot.OnValueChanged -= Pivot_OnValueChanged;
         }
     }
 }

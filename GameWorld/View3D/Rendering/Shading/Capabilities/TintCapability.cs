@@ -21,7 +21,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         {
         }
 
-        public void Initialize(WsModelFile wsModelFile, RmvModel model)
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
         {
         }
     }

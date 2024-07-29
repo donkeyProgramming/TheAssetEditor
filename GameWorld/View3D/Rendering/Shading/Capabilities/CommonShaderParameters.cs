@@ -45,6 +45,6 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             LightIntensityMult = parameters.LightIntensityMult;
         }
 
-        public void Initialize(WsModelFile wsModelFile, RmvModel model) { }
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model) { }
     }
 }

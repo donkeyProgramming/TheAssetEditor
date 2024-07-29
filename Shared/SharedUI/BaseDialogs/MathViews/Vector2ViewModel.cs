@@ -24,8 +24,8 @@ namespace Shared.Ui.BaseDialogs.MathViews
 
         private void OnChildValueChanged(float _) => _valueChangedCallback?.Invoke(GetAsVector2());
 
-        public Vector2ViewModel(float value = 0) : this(value, value) { }
-        public Vector2ViewModel(Vector2 vector) : this(vector.X, vector.Y) { }
+        public Vector2ViewModel(float value = 0, Action<Vector2>? valueChangedCallback = null) : this(value, value, valueChangedCallback) { }
+        public Vector2ViewModel(Vector2 vector, Action<Vector2>? valueChangedCallback = null) : this(vector.X, vector.Y, valueChangedCallback) { }
        
         public void Set(float x, float y)
         {

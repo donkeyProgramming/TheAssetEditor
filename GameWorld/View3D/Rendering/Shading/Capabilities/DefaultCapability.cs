@@ -30,16 +30,16 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             //DistortionNoise.Apply(effect, resourceLibrary);
         }
 
-        public void Initialize(WsModelFile wsModelFile, RmvModel model)
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
         {
             UseAlpha = model.Material.AlphaMode == AlphaMode.Transparent;
 
-            CapabilityHelper.SetTextureFromModel(model, BaseColour);
-            CapabilityHelper.SetTextureFromModel(model, MaterialMap);
-            CapabilityHelper.SetTextureFromModel(model, NormalMap);
-            CapabilityHelper.SetTextureFromModel(model, Mask);
-            CapabilityHelper.SetTextureFromModel(model, Distortion);
-            CapabilityHelper.SetTextureFromModel(model, DistortionNoise);
+            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, BaseColour);
+            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, MaterialMap);
+            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, NormalMap);
+            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, Mask);
+            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, Distortion);
+            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, DistortionNoise);
         }
     }
 }

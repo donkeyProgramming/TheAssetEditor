@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.WsModel;
 
-
 namespace GameWorld.Core.Rendering.Shading.Capabilities
 {
     public class AnimationCapability : ICapability
@@ -21,7 +20,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             effect.Parameters["tranforms"].SetValue(AnimationTransforms);
         }
 
-        public void Initialize(WsModelFile wsModelFile, RmvModel model)
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
         {
            
         }

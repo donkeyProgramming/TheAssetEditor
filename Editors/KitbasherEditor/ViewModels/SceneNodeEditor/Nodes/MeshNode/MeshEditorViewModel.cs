@@ -60,7 +60,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 
         public void Dispose()
         {
-            Mesh?.Dispose();
             Animation?.Dispose();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Geometry;
@@ -11,14 +12,13 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.SceneNodes
 {
 
     public class Rmv2ModelNodeLoader
     {
-        private readonly ILogger _logger = Logging.Create<Rmv2ModelNodeLoader>();
-
         private readonly ResourceLibrary _resourceLibrary;
         private readonly IGeometryGraphicsContextFactory _contextFactory;
         private readonly PackFileService _packFileService;
@@ -38,6 +38,12 @@ namespace GameWorld.Core.SceneNodes
 
         public void CreateModelNodesFromFile(Rmv2ModelNode outputNode, RmvFile model, AnimationPlayer animationPlayer, string modelFullPath)
         {
+            var wsModelPath = Path.ChangeExtension(modelFullPath, ".wsmodel");
+            var wsModelPackFile = _packFileService.FindFile(wsModelPath);
+            WsModelFile? wsModelFile = null;
+            if (wsModelPackFile != null)
+                wsModelFile = new WsModelFile(wsModelPackFile);
+
             outputNode.Model = model;
             for (var lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
             {
@@ -50,9 +56,8 @@ namespace GameWorld.Core.SceneNodes
                     var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, _contextFactory.Create());
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
 
-
-                    var shader = _abstractMaterialFactory.CreateFactory().CreateShader(rmvModel, "");
-
+                    var wsModelMaterial = wsModelFile?.MaterialList.FirstOrDefault(x => x.LodIndex == lodIndex && x.PartIndex == modelIndex);
+                    var shader = _abstractMaterialFactory.CreateFactory().CreateShader(rmvModel, wsModelMaterial?.MaterialPath);
 
                     // This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
                     // from the model file path.
@@ -64,18 +69,18 @@ namespace GameWorld.Core.SceneNodes
                     node.OriginalPartIndex = modelIndex;
                     node.LodIndex = lodIndex;
 
-                    if (_applicationSettingsService.CurrentSettings.AutoResolveMissingTextures)
-                    {
-                        try
-                        {
-                            var missingTextureResolver = new MissingTextureResolver();
-                            missingTextureResolver.ResolveMissingTextures(node, _packFileService);
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.Here().Error($"Error while trying to resolve textures from WS model while loading model, {e.Message}");
-                        }
-                    }
+                   if (_applicationSettingsService.CurrentSettings.AutoResolveMissingTextures)
+                   {
+                       try
+                       {
+                           var missingTextureResolver = new MissingTextureResolver();
+                           missingTextureResolver.ResolveMissingTextures(node, _packFileService);
+                       }
+                       catch (Exception e)
+                       {
+                           //_logger.Here().Error($"Error while trying to resolve textures from WS model while loading model, {e.Message}");
+                       }
+                   }
 
                     lodNode.AddObject(node);
                 }

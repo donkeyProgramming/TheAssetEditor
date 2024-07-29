@@ -1,73 +1,44 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Xna.Framework;
-using Shared.Core.Misc;
 using static Shared.Core.Misc.NotifyPropertyChangedImpl;
 
 namespace Shared.Ui.BaseDialogs.MathViews
 {
-    public class Vector3ViewModel : NotifyPropertyChangedImpl
+    public partial class Vector3ViewModel : ObservableObject
     {
-        virtual public event ValueChangedDelegate<Vector3ViewModel> OnValueChanged;
+        private readonly Action<Vector3>? _onValueChangedCallback;
 
-        public Vector3ViewModel(double x = 0, double y = 0, double z = 0)
+        [ObservableProperty]DoubleViewModel _x;
+        [ObservableProperty] DoubleViewModel _y;
+        [ObservableProperty] DoubleViewModel _z;
+
+        public event ValueChangedDelegate<Vector3ViewModel>? OnValueChanged;
+        public bool DisableCallbacks { get; set; } = false;
+
+        public Vector3ViewModel(double x = 0, double y = 0, double z = 0, Action<Vector3>? onValueChangedCallback = null)
         {
-            X.Value = x;
-            Y.Value = y;
-            Z.Value = z;
+            _x = new DoubleViewModel(x, OnChildChanged);
+            _y = new DoubleViewModel(y, OnChildChanged);
+            _z = new DoubleViewModel(z, OnChildChanged);
 
-            X.PropertyChanged += PropertyChanged;
-            Y.PropertyChanged += PropertyChanged;
-            Z.PropertyChanged += PropertyChanged;
+            _onValueChangedCallback = onValueChangedCallback;
         }
 
-        public Vector3ViewModel(double value = 0)
+        public Vector3ViewModel(double value = 0, Action<Vector3>? onValueChangedCallback = null) : this(value, value, value, onValueChangedCallback)
         {
-            X.Value = value;
-            Y.Value = value;
-            Z.Value = value;
-
-            X.PropertyChanged += PropertyChanged;
-            Y.PropertyChanged += PropertyChanged;
-            Z.PropertyChanged += PropertyChanged;
         }
 
-        public Vector3ViewModel(Vector3 vector)
+        public Vector3ViewModel(Vector3 vector, Action<Vector3>? onValueChangedCallback = null) : this(vector.X, vector.Y, vector.Z, onValueChangedCallback)
         {
-            X.Value = vector.X;
-            Y.Value = vector.Y;
-            Z.Value = vector.Z;
-
-            X.PropertyChanged += PropertyChanged;
-            Y.PropertyChanged += PropertyChanged;
-            Z.PropertyChanged += PropertyChanged;
         }
 
-        private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void OnChildChanged(double _)
         {
-            if (DisableCallbacks == false)
-                OnValueChanged?.Invoke(this);
-        }
-
-        DoubleViewModel _x = new DoubleViewModel();
-        public DoubleViewModel X
-        {
-            get { return _x; }
-            set { SetAndNotify(ref _x, value); OnValueChanged?.Invoke(this); }
-        }
-
-        DoubleViewModel _y = new DoubleViewModel();
-        public DoubleViewModel Y
-        {
-            get { return _y; }
-            set { SetAndNotify(ref _y, value); OnValueChanged?.Invoke(this); }
-        }
-
-        DoubleViewModel _z = new DoubleViewModel();
-        public DoubleViewModel Z
-        {
-            get { return _z; }
-            set { SetAndNotify(ref _z, value); OnValueChanged?.Invoke(this); }
+            if (DisableCallbacks == true)
+                return;
+            _onValueChangedCallback?.Invoke(GetAsVector3());
+            OnValueChanged?.Invoke(this);
         }
 
         public void Set(float x, float y, float z)
@@ -77,33 +48,10 @@ namespace Shared.Ui.BaseDialogs.MathViews
             Z.Value = z;
         }
 
-        public void Set(Vector3 value)
-        {
-            X.Value = value.X;
-            Y.Value = value.Y;
-            Z.Value = value.Z;
-        }
-
-        public void Set(float value)
-        {
-            X.Value = value;
-            Y.Value = value;
-            Z.Value = value;
-        }
-
-        public void Clear()
-        {
-            Set(0, 0, 0);
-        }
-
-        public Vector3 GetAsVector3()
-        {
-            return new Vector3((float)X.Value, (float)Y.Value, (float)Z.Value);
-        }
-
-        public override string ToString()
-        {
-            return $"{X}, {Y}, {Z}";
-        }
+        public void Set(Vector3 value) => Set(value.X, value.Y, value.Z);
+        public void Set(float value) => Set(value, value, value);
+        public void Clear() => Set(0, 0, 0);
+        public Vector3 GetAsVector3() => new((float)X.Value, (float)Y.Value, (float)Z.Value);
+        public override string ToString() => $"{X.Value}, {Y.Value}, {Z.Value}";
     }
 }
