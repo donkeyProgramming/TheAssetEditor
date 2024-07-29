@@ -21,7 +21,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         public float EmissivePulseSpeed { get; set; } = 1;
         public float EmissivePulseStrength { get; set; } = 1;
 
-        // Colour gradients, where the Alpha is used as time (0-1). RedGreenBlueTime
+        // Colents, where the Alpha is used as time (0-1). RedGreenBlueTime
         public Vector4[] Gradient { get; set; } = [new Vector4(0), new Vector4(0.25f), new Vector4(0.75f), new Vector4(1)];
 
         public float EmissiveStrength { get; set; } = 1;
@@ -31,6 +31,25 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {
            
+        }
+
+        public ICapability Clone()
+        {
+            return new EmissiveCapability()
+            {
+                Emissive = Emissive.Clone(),
+                EmissiveDistortion = EmissiveDistortion.Clone(),
+                EmissiveDirection = EmissiveDirection,
+                EmissiveDistortStrength = EmissiveDistortStrength,
+                EmissiveFresnelStrength = EmissiveFresnelStrength,
+                EmissiveSpeed = EmissiveSpeed,
+                EmissivePulseSpeed = EmissivePulseSpeed,
+                EmissivePulseStrength = EmissivePulseStrength,  
+                Gradient = new[] { Gradient[0], Gradient[1], Gradient[2], Gradient[3] },
+                EmissiveStrength = EmissiveStrength,
+                EmissiveTiling = EmissiveTiling,
+                EmissiveTint = EmissiveTint,
+            };
         }
 
         public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)

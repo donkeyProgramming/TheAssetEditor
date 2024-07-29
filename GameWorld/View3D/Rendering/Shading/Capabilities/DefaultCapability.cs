@@ -30,6 +30,22 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             //DistortionNoise.Apply(effect, resourceLibrary);
         }
 
+        public ICapability Clone()
+        {
+            return new DefaultCapability()
+            {
+                ScaleMult = ScaleMult,
+                UseAlpha = UseAlpha,
+                UseFactionColours = UseFactionColours,
+                BaseColour = BaseColour.Clone(),
+                MaterialMap = MaterialMap.Clone(),
+                NormalMap = NormalMap.Clone(),
+                Mask = Mask.Clone(),
+                Distortion = Distortion.Clone(),
+                DistortionNoise = DistortionNoise.Clone(),
+            };
+        }
+
         public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
         {
             UseAlpha = model.Material.AlphaMode == AlphaMode.Transparent;

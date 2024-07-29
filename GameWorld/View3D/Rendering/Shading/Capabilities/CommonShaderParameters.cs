@@ -45,6 +45,22 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             LightIntensityMult = parameters.LightIntensityMult;
         }
 
+        public ICapability Clone()
+        {
+            return new CommonShaderParametersCapability()
+            {
+                View = View,
+                Projection = Projection,
+                CameraPosition = CameraPosition,
+                CameraLookAt = CameraLookAt,
+                EnvLightRotationsRadians_Y = EnvLightRotationsRadians_Y,
+                DirLightRotationRadians_X = DirLightRotationRadians_X,
+                DirLightRotationRadians_Y = DirLightRotationRadians_Y,
+                ModelMatrix = ModelMatrix,
+                LightIntensityMult = LightIntensityMult,
+            };
+        }
+
         public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model) { }
     }
 }

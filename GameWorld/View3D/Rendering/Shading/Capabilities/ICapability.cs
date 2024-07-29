@@ -15,6 +15,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model);
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary);
+        public ICapability Clone();
     }
 
     public class TextureInput
@@ -28,6 +29,15 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             Type = type;
             UseTexture = false;
             TexturePath = null;
+        }
+
+        public TextureInput Clone()
+        {
+            return new TextureInput(Type)
+            {
+                UseTexture = UseTexture,
+                TexturePath = TexturePath
+            };
         }
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)

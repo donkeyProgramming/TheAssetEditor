@@ -2,13 +2,11 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace GameWorld.Core.Rendering.Shading
+namespace GameWorld.Core.Rendering.Shading.Shaders
 {
     public interface IShader
     {
-        void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix);// ApplyObjectParameters
-        Effect GetEffect();
-
+        void Apply(CommonShaderParameters commonShaderParameters, Matrix modelMatrix);
         void SetTechnique(RenderingTechnique technique);
         bool SupportsTechnique(RenderingTechnique technique);
     }

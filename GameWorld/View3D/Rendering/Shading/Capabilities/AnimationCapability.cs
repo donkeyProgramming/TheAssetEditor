@@ -24,5 +24,16 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         {
            
         }
+
+        public ICapability Clone()
+        {
+            return new AnimationCapability()
+            { 
+                ApplyAnimation = ApplyAnimation,
+                AnimationInformation = AnimationInformation,
+                AnimationTransforms = AnimationTransforms,
+                AnimationWeightCount = AnimationWeightCount,
+            };
+        }
     }
 }

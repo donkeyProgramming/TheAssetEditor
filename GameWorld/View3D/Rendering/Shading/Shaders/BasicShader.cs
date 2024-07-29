@@ -4,7 +4,7 @@ using GameWorld.Core.Components.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace GameWorld.Core.Rendering.Shading
+namespace GameWorld.Core.Rendering.Shading.Shaders
 {
     public class BasicShader : IShader, IDisposable
     {
@@ -36,22 +36,21 @@ namespace GameWorld.Core.Rendering.Shading
             };
         }
 
-        public void SetCommonParameters(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
+        public void Apply(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
         {
             _effect.Projection = commonShaderParameters.Projection;
             _effect.View = commonShaderParameters.View;
             _effect.World = modelMatrix;
-        }
 
-        public void ApplyObjectParameters()
-        {
             _effect.DiffuseColor = DiffuseColour;
             _effect.SpecularColor = SpecularColour;
             if (_enableDefaultLighting)
                 _effect.EnableDefaultLighting();
+
+            _effect.CurrentTechnique.Passes[0].Apply();
         }
 
-        public Effect GetEffect() => _effect;
+        Effect GetEffect() => _effect;
 
         public void Dispose()
         {

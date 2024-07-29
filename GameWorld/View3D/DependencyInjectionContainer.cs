@@ -10,7 +10,7 @@ using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
-using GameWorld.Core.Rendering.Shading;
+using GameWorld.Core.Rendering.Shading.Factories;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Services.SceneSaving;

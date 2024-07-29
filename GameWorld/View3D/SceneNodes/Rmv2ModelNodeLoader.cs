@@ -4,7 +4,7 @@ using System.Linq;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Geometry;
-using GameWorld.Core.Rendering.Shading;
+using GameWorld.Core.Rendering.Shading.Factories;
 using GameWorld.Core.Services;
 using GameWorld.WpfWindow.ResourceHandling;
 using Serilog;

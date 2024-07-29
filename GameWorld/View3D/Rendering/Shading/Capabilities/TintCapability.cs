@@ -21,6 +21,20 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         {
         }
 
+        public ICapability Clone()
+        {
+            return new TintCapability()
+            {
+                DiffuseTintMask = DiffuseTintMask,
+                DiffuseTintColour = DiffuseTintColour,
+                DiffuseTintVariation = DiffuseTintVariation,
+                Faction3Mask = Faction3Mask,
+                Faction1_TintVariation = Faction1_TintVariation,
+                Faction2_TintVariation = Faction2_TintVariation,
+                Faction3_TintVariation = Faction3_TintVariation,
+            };
+        }
+
         public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
         {
         }

@@ -2,7 +2,7 @@
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.RenderItems;
-using GameWorld.Core.Rendering.Shading;
+using GameWorld.Core.Rendering.Shading.Shaders;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;

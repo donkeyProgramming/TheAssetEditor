@@ -7,8 +7,8 @@ using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.Rendering.RenderItems;
-using GameWorld.Core.Rendering.Shading;
 using GameWorld.Core.Rendering.Shading.Capabilities;
+using GameWorld.Core.Rendering.Shading.Shaders;
 using GameWorld.Core.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
@@ -42,7 +42,7 @@ namespace GameWorld.Core.SceneNodes
         public bool DisplayPivotPoint { get; set; } = false;
 
         public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
-        public ICapabilityMaterial Effect { get; private set; }
+        public CapabilityMaterial Effect { get; private set; }
         public int LodIndex { get; set; } = -1;
 
         bool _isSelectable = true;
@@ -55,7 +55,7 @@ namespace GameWorld.Core.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(ResourceLibrary resourceLib, RmvCommonHeader commonHeader, MeshObject meshObject, IRmvMaterial material, AnimationPlayer animationPlayer, ICapabilityMaterial shader)
+        public Rmv2MeshNode(ResourceLibrary resourceLib, RmvCommonHeader commonHeader, MeshObject meshObject, IRmvMaterial material, AnimationPlayer animationPlayer, CapabilityMaterial shader)
         {
             _resourceLib = resourceLib;
 

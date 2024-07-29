@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Components.Rendering;
+using GameWorld.Core.Rendering.Shading.Shaders;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,6 +10,8 @@ using Shared.GameFormats.RigidModel.Types;
 
 namespace GameWorld.Core.Rendering.Shading
 {
+
+    /*
     public class PbrShader : IShader
     {
         protected ResourceLibrary _resourceLibrary;
@@ -143,5 +146,5 @@ namespace GameWorld.Core.Rendering.Shading
                 return true;
             return false;
         }
-    }
+    }*/
 }

@@ -22,6 +22,17 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             //BloodMask.Apply(effect, resourceLibrary);
         }
 
+        public ICapability Clone()
+        {
+            return new BloodCapability()
+            {
+                UseBlood = UseBlood,
+                BloodMask = BloodMask.Clone(),
+                PreviewBlood = PreviewBlood,
+                UvScale = UvScale
+            };
+        }
+
         public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
         {
             CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, BloodMask);
