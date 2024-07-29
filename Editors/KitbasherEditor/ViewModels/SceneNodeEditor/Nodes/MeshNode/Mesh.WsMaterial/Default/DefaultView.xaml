@@ -31,6 +31,12 @@
                     <CheckBox Margin="2,0,2,0"  IsChecked="{Binding UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
                 </StackPanel>
 
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Use Faction Colours" Margin="{StaticResource LabelMargin}"/>
+                    <Label>:</Label>
+                    <CheckBox Margin="2,0,2,0"  IsChecked="{Binding UseFactionColours, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
+                </StackPanel>
+
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Base Colour" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>

@@ -8,7 +8,9 @@
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
              xmlns:wsmaterial="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial" 
              xmlns:blood="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Blood" 
-             xmlns:default="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Default"
+             xmlns:default="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Default" 
+             xmlns:tint="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Tint" 
+             xmlns:emissive="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive"
              mc:Ignorable="d" 
              d:DesignHeight="1200" d:DesignWidth="800">
     <UserControl.Resources>
@@ -47,14 +49,10 @@
                 <ComboBox Margin="2,0,2,0" ItemsSource="{Binding MaterialGeneral.PossibleVertexTypes}" SelectedItem="{Binding MaterialGeneral.VertexType}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
             </DockPanel>
 
-
             <default:DefaultView DockPanel.Dock="Top" DataContext="{Binding Default}"/>
-
             <blood:BloodView DockPanel.Dock="Top" DataContext="{Binding Blood}"/>
-
-            <wsmaterial:WsModelMaterialView_Tint DockPanel.Dock="Top"/>
-
-            <wsmaterial:WsModelMaterialView_Emissive DockPanel.Dock="Top"/>
+            <tint:TintView DockPanel.Dock="Top"/>
+            <emissive:EmissiveView DockPanel.Dock="Top"/>
 
 
             <!-- Dissolve -->

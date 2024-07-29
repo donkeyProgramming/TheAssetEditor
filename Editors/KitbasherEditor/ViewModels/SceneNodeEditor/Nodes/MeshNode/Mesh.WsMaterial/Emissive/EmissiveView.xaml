@@ -1,18 +1,16 @@
-﻿<UserControl x:Class="Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.WsModelMaterialView_Emissive"
+﻿<UserControl x:Class="Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive.EmissiveView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial" 
-             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
-	         xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive" 
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" xmlns:b="http://schemas.microsoft.com/xaml/behaviors" xmlns:userinterface="clr-namespace:GameWorld.Core.Utility.UserInterface;assembly=GameWorld.Core"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="WsModelResources.xaml"/>
+                <ResourceDictionary Source="..\WsModelResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -33,21 +31,13 @@
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Texture" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <CheckBox Margin="2,0,2,0"  IsChecked="{Binding MaterialGeneral.UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
-                    <Button Content="X" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="20"/>
-                    <Button Content="Browse" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                    <Button Content="Preview" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                    <TextBox Margin="2,2,2,2" Text="variantMeshes/hu01/karl/karl_Emissive.dds" VerticalContentAlignment="Center" IsEnabled="False"/>
+                    <userinterface:ShaderTextureView DataContext="{Binding Mask}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Distortion" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <CheckBox Margin="2,0,2,0"  IsChecked="{Binding MaterialGeneral.UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
-                    <Button Content="X" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="20"/>
-                    <Button Content="Browse" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                    <Button Content="Preview" Margin="1" Command="{Binding Mesh.CopyPivotToAllMeshesCommand}" DockPanel.Dock="Right" Width="50"/>
-                    <TextBox Margin="2,2,2,2" Text="variantMeshes/hu01/karl/karl_Emissive.dds" VerticalContentAlignment="Center" IsEnabled="False"/>
+                    <userinterface:ShaderTextureView DataContext="{Binding Mask}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
@@ -60,12 +50,6 @@
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Strength" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
-                </DockPanel>
-
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Colour Mode" Margin="{StaticResource LabelMargin}"/><!--Tint or gradient mode-->
-                    <Label>:</Label>
-                    <ComboBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
@@ -144,12 +128,12 @@
 
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Tiling" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Emissive Tiling" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <TextBox Margin="2,2,2,2" Text="10" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
 
-              
+
 
 
 

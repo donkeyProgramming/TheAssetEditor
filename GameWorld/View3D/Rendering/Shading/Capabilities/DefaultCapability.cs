@@ -10,13 +10,13 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
     {
         public float ScaleMult { get; set; } = 1;
         public bool UseAlpha { get; set; }
+        public bool UseFactionColours { get; set; } = false;
         public TextureInput BaseColour { get; set; } = new TextureInput(TextureType.BaseColour);
         public TextureInput MaterialMap{ get; set; } = new TextureInput(TextureType.MaterialMap);
         public TextureInput NormalMap { get; set; } = new TextureInput(TextureType.Normal);
         public TextureInput Mask { get; set; } = new TextureInput(TextureType.Mask);
         public TextureInput Distortion { get; set; } = new TextureInput(TextureType.Distortion);
         public TextureInput DistortionNoise { get; set; } = new TextureInput(TextureType.DistortionNoise);
-
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {

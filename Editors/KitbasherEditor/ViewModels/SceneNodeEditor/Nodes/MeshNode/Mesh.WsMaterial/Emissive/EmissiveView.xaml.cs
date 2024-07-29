@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial
+namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive
 {
     /// <summary>
-    /// Interaction logic for SharedViewModel.xaml
+    /// Interaction logic for EmissiveView.xaml
     /// </summary>
-    public partial class WsModelMaterialView_Shared : UserControl
+    public partial class EmissiveView : UserControl
     {
-        public WsModelMaterialView_Shared()
+        public EmissiveView()
         {
             InitializeComponent();
         }

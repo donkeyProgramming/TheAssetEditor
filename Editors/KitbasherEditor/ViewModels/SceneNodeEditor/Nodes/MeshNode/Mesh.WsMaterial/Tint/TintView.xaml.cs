@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial
+namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Tint
 {
     /// <summary>
-    /// Interaction logic for WsModelMaterialView_Emissive.xaml
+    /// Interaction logic for TintView.xaml
     /// </summary>
-    public partial class WsModelMaterialView_Emissive : UserControl
+    public partial class TintView : UserControl
     {
-        public WsModelMaterialView_Emissive()
+        public TintView()
         {
             InitializeComponent();
         }

@@ -14,15 +14,15 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         private readonly DefaultCapability _defaultCapability;
 
         [ObservableProperty] bool _useAlpha;
+        [ObservableProperty] bool _useFactionColours;
+        
         [ObservableProperty] ShaderTextureViewModel _baseColour;
         [ObservableProperty] ShaderTextureViewModel _materialMap;
         [ObservableProperty] ShaderTextureViewModel _normalMap;
         [ObservableProperty] ShaderTextureViewModel _mask;
 
-        public DefaultViewModel(Rmv2MeshNode typedNode, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
+        public DefaultViewModel(DefaultCapability defaultCapability, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
         {
-            var defaultCapability = typedNode.Effect.GetCapability<DefaultCapability>();
-            Guard.IsNotNull(defaultCapability);
             _defaultCapability = defaultCapability;
 
             _baseColour = new ShaderTextureViewModel(defaultCapability.BaseColour, packFileService, uiCommandFactory, resourceLibrary);
@@ -31,8 +31,10 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             _mask = new ShaderTextureViewModel(defaultCapability.Mask, packFileService, uiCommandFactory, resourceLibrary);
 
             _useAlpha = defaultCapability.UseAlpha;
+            _useFactionColours = defaultCapability.UseFactionColours;
         }
 
         partial void OnUseAlphaChanged(bool value) => _defaultCapability.UseAlpha = value;
+        partial void OnUseFactionColoursChanged(bool value) => _defaultCapability.UseFactionColours = value;
     }
 }
