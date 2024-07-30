@@ -42,7 +42,7 @@ namespace GameWorld.Core.SceneNodes
         public bool DisplayPivotPoint { get; set; } = false;
 
         public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
-        public CapabilityMaterial Effect { get; private set; }
+        public CapabilityMaterial Effect { get; set; }
         public int LodIndex { get; set; } = -1;
 
         bool _isSelectable = true;

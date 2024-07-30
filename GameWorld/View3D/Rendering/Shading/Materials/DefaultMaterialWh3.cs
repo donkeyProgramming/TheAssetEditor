@@ -4,10 +4,10 @@ using GameWorld.WpfWindow.ResourceHandling;
 
 namespace GameWorld.Core.Rendering.Shading.Shaders
 {
-    public class EmissiveMaterial : CapabilityMaterial
+    public class DefaultMaterialWh3 : CapabilityMaterial
     {
-        public EmissiveMaterial(ResourceLibrary resourceLibrary)
-            : base(ShaderTypes.Pbs_MetalRough, resourceLibrary)
+        public DefaultMaterialWh3(ResourceLibrary resourceLibrary) 
+            : base(CapabilityMaterialsEnum.Normal, ShaderTypes.Pbs_MetalRough, resourceLibrary)
         {
             Capabilities =
                 [
@@ -15,16 +15,14 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
                     new DefaultCapability(),
                     new AnimationCapability(),
                     new BloodCapability(),
-                    new EmissiveCapability()
                 ];
 
             _renderingTechniqueMap[RenderingTechnique.Normal] = "BasicColorDrawing";
-            _renderingTechniqueMap[RenderingTechnique.Emissive] = "GlowDrawing";
         }
 
         public override CapabilityMaterial Clone()
         {
-            var copy = new EmissiveMaterial(_resourceLibrary)
+            var copy = new DefaultMaterialWh3(_resourceLibrary)
             {
                 Capabilities = CloneCapabilities()
             };

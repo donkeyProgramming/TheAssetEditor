@@ -1,6 +1,9 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Diagnostics;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive;
 using GameWorld.Core.Rendering.Shading.Capabilities;
+using GameWorld.Core.Rendering.Shading.Factories;
+using GameWorld.Core.Rendering.Shading.Shaders;
 using GameWorld.Core.SceneNodes;
 using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.Events;
@@ -13,31 +16,54 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly PackFileService _packFileService;
         private readonly ResourceLibrary _resourceLibrary;
+        private readonly IMaterialFactory _materialFactory;
+
+        Rmv2MeshNode? _currentNode;
+
+        [ObservableProperty] List<CapabilityMaterialsEnum> _possibleMaterialTypes;
+        [ObservableProperty] CapabilityMaterialsEnum? _currentMaterialType;
 
         [ObservableProperty] DefaultViewModel? _default;
         [ObservableProperty] BloodViewModel? _blood;
         [ObservableProperty] EmissiveViewModel? _emissive;
 
-        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
+        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary, AbstractMaterialFactory abstractMaterialFactory)
         {
             _uiCommandFactory = uiCommandFactory;
             _packFileService = packFileService;
             _resourceLibrary = resourceLibrary;
+            _materialFactory = abstractMaterialFactory.CreateFactory();
+
+            _possibleMaterialTypes = _materialFactory.GetPossibleMaterials();
         }
 
-        internal void Initialize(Rmv2MeshNode typedNode)
+        internal void Initialize(Rmv2MeshNode node)
         {
-            var defaultCapability = typedNode.Effect.TryGetCapability<DefaultCapability>();
+            _currentNode = node;
+            var material = _currentNode.Effect;
+            CurrentMaterialType = material.Type;
+
+            var defaultCapability = material.TryGetCapability<DefaultCapability>();
             if(defaultCapability != null)
                 Default = new DefaultViewModel(defaultCapability, _uiCommandFactory, _packFileService, _resourceLibrary);
 
-            var bloodCapability = typedNode.Effect.TryGetCapability<BloodCapability>();
+            var bloodCapability = material.TryGetCapability<BloodCapability>();
             if (bloodCapability != null)
                 Blood = new BloodViewModel(bloodCapability, _uiCommandFactory, _packFileService, _resourceLibrary);
 
-            var emissiveCapability = typedNode.Effect.TryGetCapability<EmissiveCapability>();
+            var emissiveCapability = material.TryGetCapability<EmissiveCapability>();
             if (emissiveCapability != null)
                 Emissive = new EmissiveViewModel(emissiveCapability, _uiCommandFactory, _packFileService, _resourceLibrary);
+        }
+
+        partial void OnCurrentMaterialTypeChanged(CapabilityMaterialsEnum? oldValue, CapabilityMaterialsEnum? newValue)
+        {
+            Guard.IsNotNull(_currentNode);
+            if (oldValue == newValue || newValue == null)
+                return;
+
+            var newMaterial = _materialFactory.ChangeMaterial(_currentNode.Effect, newValue.Value);
+            _currentNode.Effect = newMaterial;
         }
     }
 }

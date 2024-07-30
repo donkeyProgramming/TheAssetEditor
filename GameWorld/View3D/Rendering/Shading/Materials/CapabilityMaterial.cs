@@ -16,11 +16,13 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
         protected Dictionary<RenderingTechnique, string> _renderingTechniqueMap = [];
 
         public ICapability[] Capabilities { get; protected set; } = [];
-        
-        protected CapabilityMaterial(ShaderTypes shaderType, ResourceLibrary resourceLibrary)
+        public CapabilityMaterialsEnum Type { get; protected set; }
+
+        protected CapabilityMaterial(CapabilityMaterialsEnum materialType, ShaderTypes shaderType, ResourceLibrary resourceLibrary)
         {
             _shaderType = shaderType;
             _resourceLibrary = resourceLibrary;
+            Type = materialType;
         }
 
         public T GetCapability<T>() where T : class, ICapability

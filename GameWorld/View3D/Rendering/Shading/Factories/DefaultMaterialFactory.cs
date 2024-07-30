@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Rendering.Shading.Shaders;
+﻿using System.Collections.Generic;
+using GameWorld.Core.Rendering.Shading.Shaders;
 using Shared.GameFormats.RigidModel;
 
 namespace GameWorld.Core.Rendering.Shading.Factories
@@ -9,7 +10,17 @@ namespace GameWorld.Core.Rendering.Shading.Factories
         {
         }
 
-        public CapabilityMaterial CreateShader(RmvModel model, string wsModelFileName)
+        public CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterial)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public CapabilityMaterial Create(RmvModel model, string wsModelFileName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<CapabilityMaterialsEnum> GetPossibleMaterials()
         {
             throw new System.NotImplementedException();
         }
