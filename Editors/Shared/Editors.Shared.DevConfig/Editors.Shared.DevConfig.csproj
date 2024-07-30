@@ -15,6 +15,7 @@
       <ProjectReference Include="..\..\AnimationEditor\Editors.AnimationVisualEditors.csproj" />
       <ProjectReference Include="..\..\AnimationMeta\Editors.AnimationMeta.csproj" />
       <ProjectReference Include="..\..\Audio\Editors.Audio.csproj" />
+      <ProjectReference Include="..\..\KitbasherEditor\Editors.KitbasherEditor.csproj" />
       <ProjectReference Include="..\..\SimpleAnimationEditors\Editors.AnimationTextEditors.csproj" />
     </ItemGroup>
 

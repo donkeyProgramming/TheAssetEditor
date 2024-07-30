@@ -15,6 +15,7 @@ using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
+using KitbasherEditor.ViewModels.UiCommands;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using KitbasherEditor.Views.EditorViews.PinTool;
@@ -85,7 +86,8 @@ namespace KitbasherEditor
             RegisterAllAsOriginalType<IKitbasherUiCommand>(serviceCollection, ServiceLifetime.Transient);
             serviceCollection.AddTransient<CopyTexturesToPackCommand>();
             serviceCollection.AddTransient<DeleteMissingTexturesCommand>();
-            serviceCollection.AddTransient<ResolveMissingTextureCommand>();   
+            serviceCollection.AddTransient<ResolveMissingTextureCommand>();
+            serviceCollection.AddTransient<ImportReferenceMeshCommand>();
         }
 
         public override void RegisterTools(IToolFactory factory)

@@ -26,7 +26,7 @@ namespace GameWorld.Core.Rendering.Shading.Factories
                 wsModelMaterial = new WsModelMaterialFile(materialPackFile);
             }
 
-            var shader = new DefaultMaterialWh3(_resourceLibrary);
+            var shader = new EmissiveMaterial(_resourceLibrary);
             foreach (var capability in shader.Capabilities)
                 capability.Initialize(wsModelMaterial, model);
 

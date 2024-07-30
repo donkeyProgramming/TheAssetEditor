@@ -1,4 +1,7 @@
 ﻿using Editors.Shared.DevConfig.Base;
+using KitbasherEditor.ViewModels.UiCommands;
+using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -7,6 +10,31 @@ using Shared.Ui.Events.UiCommands;
 
 namespace Editors.Shared.DevConfig.Configs
 {
+    internal class Kitbash_Karl : IDeveloperConfiguration
+    {
+        private readonly PackFileService _packFileService;
+        private readonly IUiCommandFactory _uiCommandFactory;
+
+        public Kitbash_Karl(PackFileService packFileService, IUiCommandFactory uiCommandFactory)
+        {
+            _packFileService = packFileService;
+            _uiCommandFactory = uiCommandFactory;
+        }
+
+        public void OpenFileOnLoad()
+        {
+            var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2");
+            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
+        }
+
+        public void OverrideSettings(ApplicationSettings currentSettings)
+        {
+            currentSettings.LoadCaPacksByDefault = false;
+            var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
+            _packFileService.Load(packFile, false, true);
+        }
+    }
+
     internal class Kitbash_Ox : IDeveloperConfiguration
     {
         private readonly PackFileService _packFileService;
@@ -28,6 +56,40 @@ namespace Editors.Shared.DevConfig.Configs
         {
             currentSettings.LoadCaPacksByDefault = false;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\cinderbreath.pack";
+            _packFileService.Load(packFile, false, true);
+        }
+    }
+
+    internal class Kitbash_Rat : IDeveloperConfiguration
+    {
+        private readonly PackFileService _packFileService;
+        private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly ScopeRepository _scopeRepositor;
+
+        public Kitbash_Rat(PackFileService packFileService, IUiCommandFactory uiCommandFactory, ScopeRepository scopeRepositor)
+        {
+            _packFileService = packFileService;
+            _uiCommandFactory = uiCommandFactory;
+            _scopeRepositor = scopeRepositor;
+        }
+
+        public void OpenFileOnLoad()
+        {
+            var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_throt\skv_throt_body_01.rigid_model_v2");
+            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
+
+            var kitbashToolScope = _scopeRepositor.Scopes.First().Value;
+            var localCommandFactory = kitbashToolScope.ServiceProvider.GetRequiredService<IUiCommandFactory>();
+            localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_throt\\skv_throt_head_01.wsmodel");
+            localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_throt_ratcatcher_1h_rigid_01.wsmodel");
+            localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_warpstone_1h_01.rigid_model_v2");
+            localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_warpstone_1h_02.rigid_model_v2");
+        }
+
+        public void OverrideSettings(ApplicationSettings currentSettings)
+        {
+            currentSettings.LoadCaPacksByDefault = false;
+            var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Throt.pack";
             _packFileService.Load(packFile, false, true);
         }
     }
