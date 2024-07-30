@@ -59,7 +59,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         partial void OnCurrentMaterialTypeChanged(CapabilityMaterialsEnum? oldValue, CapabilityMaterialsEnum? newValue)
         {
             Guard.IsNotNull(_currentNode);
-            if (oldValue == newValue || newValue == null)
+            if (oldValue == newValue || newValue == null || oldValue == null)
                 return;
 
             var newMaterial = _materialFactory.ChangeMaterial(_currentNode.Effect, newValue.Value);

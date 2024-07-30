@@ -16,13 +16,13 @@ namespace Shared.Ui.BaseDialogs.ColourPickerButton
         {
             SelectedColour = colour;
             _onColourChangedCallback = OnColourChangedCallback;
-            _pickedColor = System.Windows.Media.Color.FromRgb((byte)(colour.X * 255), (byte)(colour.Y * 255), (byte)(colour.Z * 255));
+            _pickedColor = System.Windows.Media.Color.FromRgb((byte)(colour.X * 255f), (byte)(colour.Y * 255f), (byte)(colour.Z * 255f));
         }
 
         [RelayCommand]
         public void OnHandleColourChanged()
         {
-            SelectedColour = new Vector3(PickedColor.R, PickedColor.G, PickedColor.B);
+            SelectedColour = new Vector3(PickedColor.R / 256f, PickedColor.G / 256f, PickedColor.B / 256f);
             _onColourChangedCallback?.Invoke(SelectedColour);
         }
     }
