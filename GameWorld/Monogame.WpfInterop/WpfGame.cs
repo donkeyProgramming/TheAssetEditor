@@ -130,7 +130,7 @@ namespace GameWorld.WpfWindow
             base.Initialize();
 
             Content = new ContentManager(Services, _contentDir);
-            _resourceLibrary.Initialize(this);
+            _resourceLibrary.Initialize(GraphicsDevice, Content);
 
             foreach (var c in Components)
                 ComponentAdded(this, new GameComponentCollectionEventArgs(c));

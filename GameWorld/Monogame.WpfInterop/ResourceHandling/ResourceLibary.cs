@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.PackFiles;
 
@@ -26,51 +27,49 @@ namespace GameWorld.WpfWindow.ResourceHandling
         private readonly Dictionary<ShaderTypes, Effect> _cachedShaders = new();
 
         private readonly PackFileService _pfs;
-        private IWpfGame _gameWorld;
+        private GraphicsDevice _graphicsDevice;
+        private ContentManager _content;
         private bool _isInitialized = false;
+        private TextureCube _pbrDiffuse;
+        private TextureCube _pbrSpecular;
+        private Texture2D _pbrLut;
 
         public SpriteBatch CommonSpriteBatch { get; private set; }
         public SpriteFont DefaultFont { get; private set; }
-
-        public TextureCube PbrDiffuse { get; private set; }
-        public TextureCube PbrSpecular { get; private set; }
-        public Texture2D PbrLut { get; private set; }
 
         public ResourceLibrary(PackFileService pf)
         {
             _pfs = pf;
         }
 
-        public SpriteFont LoadFont(string path) => _gameWorld.Content.Load<SpriteFont>(path);
-
-        public void Initialize(IWpfGame game)
+        public void Initialize(GraphicsDevice graphicsDevice, ContentManager content)
         {
             if (_isInitialized)
                 return;
 
             _isInitialized = true;
-            _gameWorld = game;
+            _content = content;
+            _graphicsDevice = graphicsDevice;
+            CommonSpriteBatch = new SpriteBatch(_graphicsDevice);
 
-            // Load default shaders
+            // Load default resources
             var mr = LoadEffect("Shaders\\Phazer\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
             var sg = LoadEffect("Shaders\\Phazer\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
             LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
             LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
             LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
+            DefaultFont = _content.Load<SpriteFont>("Fonts//DefaultFont");
+           
+            _pbrDiffuse = _content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
+            _pbrSpecular = _content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
+            _pbrLut = _content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
 
-            DefaultFont = LoadFont("Fonts//DefaultFont");
-            CommonSpriteBatch = new SpriteBatch(_gameWorld.GraphicsDevice);
-
-            PbrDiffuse = _gameWorld.Content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
-            PbrSpecular = _gameWorld.Content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
-            PbrLut = _gameWorld.Content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
-
-            mr.Parameters["tex_cube_diffuse"]?.SetValue(PbrDiffuse);
-            mr.Parameters["tex_cube_specular"]?.SetValue(PbrSpecular);
-            mr.Parameters["specularBRDF_LUT"]?.SetValue(PbrLut);
-            sg.Parameters["tex_cube_diffuse"]?.SetValue(PbrDiffuse);
-            sg.Parameters["tex_cube_specular"]?.SetValue(PbrSpecular);
-            sg.Parameters["specularBRDF_LUT"]?.SetValue(PbrLut);
+            mr.Parameters["tex_cube_diffuse"]?.SetValue(_pbrDiffuse);
+            mr.Parameters["tex_cube_specular"]?.SetValue(_pbrSpecular);
+            mr.Parameters["specularBRDF_LUT"]?.SetValue(_pbrLut);
+            sg.Parameters["tex_cube_diffuse"]?.SetValue(_pbrDiffuse);
+            sg.Parameters["tex_cube_specular"]?.SetValue(_pbrSpecular);
+            sg.Parameters["specularBRDF_LUT"]?.SetValue(_pbrLut);
         }
 
         public void Reset()
@@ -83,36 +82,37 @@ namespace GameWorld.WpfWindow.ResourceHandling
                 item.Value.Dispose();
             _cachedShaders.Clear();
 
-            PbrDiffuse?.Dispose();
-            PbrDiffuse = null;
+            _pbrDiffuse?.Dispose();
+            _pbrDiffuse = null;
 
-            PbrSpecular?.Dispose();
-            PbrSpecular = null;
+            _pbrSpecular?.Dispose();
+            _pbrSpecular = null;
 
-            PbrLut?.Dispose();
-            PbrLut = null;
+            _pbrLut?.Dispose();
+            _pbrLut = null;
 
             CommonSpriteBatch?.Dispose();
             CommonSpriteBatch = null;
 
-            _gameWorld = null;
+            _graphicsDevice = null;
+            _content = null;
             _isInitialized = false;
         }
 
         public Texture2D ForceLoadImage(string imagePath, out ImageInformation imageInformation)
         {
-            return ImageLoader.ForceLoadImage(imagePath, _pfs, _gameWorld.GraphicsDevice, out imageInformation);
+            return ImageLoader.ForceLoadImage(imagePath, _pfs, _graphicsDevice, out imageInformation);
         }
 
         public Texture2D LoadTexture(string fileName, bool forceRefreshTexture = false, bool fromFile = false)
         {
             if (forceRefreshTexture == false)
             {
-                if (_cachedTextures.ContainsKey(fileName))
-                    return _cachedTextures[fileName];
+                if (_cachedTextures.TryGetValue(fileName, out var value))
+                    return value;
             }
 
-            var texture = ImageLoader.LoadTextureAsTexture2d(fileName, _pfs, _gameWorld.GraphicsDevice, out var _, fromFile);
+            var texture = ImageLoader.LoadTextureAsTexture2d(fileName, _pfs, _graphicsDevice, out var _, fromFile);
             if (texture != null)
                 _cachedTextures[fileName] = texture;
             return texture;
@@ -120,28 +120,20 @@ namespace GameWorld.WpfWindow.ResourceHandling
 
         public Effect LoadEffect(string fileName, ShaderTypes type)
         {
-            if (_cachedShaders.ContainsKey(type))
-                return _cachedShaders[type];
-            var effect = _gameWorld.Content.Load<Effect>(fileName);
+            if (_cachedShaders.TryGetValue(type, out var value))
+                return value;
+
+            var effect = _content.Load<Effect>(fileName);
             _cachedShaders[type] = effect;
             return effect;
         }
 
-        public Effect GetEffect(ShaderTypes type)
-        {
-            if (_cachedShaders.ContainsKey(type))
-                return _cachedShaders[type].Clone();
-            throw new Exception($"Shader not found: ShaderTypes::{type}");
-        }
-
         public Effect GetStaticEffect(ShaderTypes type)
         {
-            if (_cachedShaders.ContainsKey(type))
-                return _cachedShaders[type];
+            if (_cachedShaders.TryGetValue(type, out var value))
+                return value;
             throw new Exception($"Shader not found: ShaderTypes::{type}");
         }
-
-        public SpriteBatch CreateSpriteBatch() => new SpriteBatch(_gameWorld.GraphicsDevice);
 
         public Texture2D GetTexture(string textureName) => LoadTexture(textureName);
     }

@@ -27,7 +27,7 @@ namespace E2EVerification.Shared
 
             var game = EditorServiceProvider.ServiceProvider.GetRequiredService<IWpfGame>();
             var resourceLibrary = EditorServiceProvider.ServiceProvider.GetRequiredService<ResourceLibrary>();
-            resourceLibrary.Initialize(game);
+            resourceLibrary.Initialize(game.GraphicsDevice, game.Content);
 
             PackFileService = EditorServiceProvider.ServiceProvider.GetRequiredService<PackFileService>();
             CommandFactory = EditorServiceProvider.ServiceProvider.GetRequiredService<IUiCommandFactory>();
