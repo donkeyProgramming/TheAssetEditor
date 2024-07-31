@@ -1,10 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+      <TargetFramework>net8.0-windows</TargetFramework>
   </PropertyGroup>
 
+    <PropertyGroup>
+        <MonoGamePlatform>Windows</MonoGamePlatform>
+    </PropertyGroup>
 
-  <ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
+    </ItemGroup>
+
+    <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
+        <Message Text="Restoring dotnet tools" Importance="High" />
+        <Exec Command="dotnet tool restore" />
+    </Target>
+
+    <ItemGroup>
     <None Update="BuiltContent\Fonts\DefaultFont.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
