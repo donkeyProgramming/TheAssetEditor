@@ -9,17 +9,31 @@ using System.IO;
 using System.Reflection;
 using Shared.Core.Events;
 using System.Windows;
+using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
+using Pfim;
+using MeshImportExport;
 
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
 {
     public class DdsToNormalPngExporter
     {
-        public DdsToNormalPngExporter() { }
-
-        public void Export(string outputPath, string fileName)
+        private readonly PackFileService pfs;
+        public DdsToNormalPngExporter(PackFileService packFileService) 
         {
-            using (Image image = Image.FromFile(outputPath + fileName))
+            pfs = packFileService;
+        }
+
+        public void Export(string path, string outputPath, bool convert)
+        {
+            var file = pfs.FindFile(path);
+            var bytes = file.DataSource.ReadData();
+            var bmp = TextureHelper.ConvertDdsToPng(bytes);
+
+            var ms = new MemoryStream(bmp);
+
+            //using (Image image = Image.FromFile(path + file.Name))
+            using (Image image = Image.FromStream(ms))
             using (Bitmap bitmap = new Bitmap(image))
             {
                 for (int x = 0; x < bitmap.Width; x++)
@@ -33,13 +47,6 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                         int B = pixel.B;
                         int A = pixel.A;
 
-                        // Apply the conversion formulas
-                        //this goes from blue to orange keeping for the future importer
-                        //int R1 = 255;
-                        //int B1 = 0;
-                        //int G1 = G;
-                        //int A1 = R;
-
                         //this goes from orange to blue
                         int R1 = A;
                         int B1 = 255;
@@ -51,15 +58,8 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
-                fileName = Path.GetFileNameWithoutExtension(fileName);
-                // Save the output image, delete old one so we can seamlessly integrate into gltf save
-                if (File.Exists(outputPath + fileName + ".png"))
-                {
-                    image.Dispose();
-                    File.Delete(outputPath + fileName + ".png");
-                }
-                bitmap.Save(outputPath + fileName + ".png", System.Drawing.Imaging.ImageFormat.Png);
-               
+                var fileName = Path.GetFileNameWithoutExtension(path);
+                bitmap.Save(outputPath + "/" + fileName + ".png", System.Drawing.Imaging.ImageFormat.Png);
             }
         }
 
@@ -71,5 +71,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                 return ExportSupportEnum.Supported;
             return ExportSupportEnum.NotSupported;
         }
+
+
     }
 }

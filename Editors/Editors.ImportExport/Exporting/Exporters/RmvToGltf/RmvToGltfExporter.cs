@@ -64,7 +64,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             }
             else
             {
-                tally = MeshWithoutSkeleton(rmv2, settings.InputFile, settings);
+                //tally = MeshWithoutSkeleton(rmv2, settings.InputFile, settings);
             }
 
             var name = Path.GetFileNameWithoutExtension(settings.InputFile.Name);
@@ -74,14 +74,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             {
                 for (int i = 0; i <= tally; i = i + 3)
                 {
-                    _exporterNormalBlue.Export(settings.OutputPath, name + "_" + i + ".png");
+                    _exporterNormalBlue.Export(settings.OutputPath, name + "_" + i + ".png", true);
                 }
             }
             if (settings.ConvertMaterialTextureToBlender == true)
             {
                 for (int i = 2; i <= tally + 1; i = i + 3)
                 {
-                    _exporterMaterial.Export(settings.OutputPath, true, name + "_" + i + ".png");
+                    _exporterMaterial.Export(settings.OutputPath, "", true);
                 }
             }
             //MessageBox.Show("Export successful to: " + settings.OutputPath);
@@ -114,7 +114,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 var material = new MaterialBuilder();
                 if (settings.ExportTextures == true)
                 {
-                    material = _ddsToPngExporter.BuildMaterialPerMesh(rmvMesh, file);
+                    material = _ddsToPngExporter.BuildMaterialPerMesh(rmvMesh, file, settings);
                 }
                 else
                 {
@@ -132,7 +132,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         }
 
 
-        internal int MeshWithoutSkeleton(RmvFile rmv2, PackFile file, RmvToGltfExporterSettings settings)
+        /**internal int MeshWithoutSkeleton(RmvFile rmv2, PackFile file, RmvToGltfExporterSettings settings)
         {
             var model = ModelRoot.CreateModel();
             var scene = model.UseScene("default");
@@ -142,7 +142,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
             foreach (var rmvMesh in lodLevel)
             {
-                var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file);
+                var material = _ddsToPngExporter.BuildMaterial(_packFileService, rmvMesh, file, settings);
                 var mesh = model.CreateMesh(MeshExport.ToStaticMeshBuilder(rmvMesh, material));
                 scene.CreateNode(rmvMesh.Material.ModelName).WithMesh(mesh);
             }
@@ -151,6 +151,6 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
             model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(file.Name) + ".gltf");
             return tally - 1;
-        }
+        }**/
     }
 }

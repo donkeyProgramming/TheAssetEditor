@@ -9,17 +9,28 @@ using System.IO;
 using System.Reflection;
 using Shared.Core.Events;
 using System.Windows;
+using MeshImportExport;
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
 {
     public class DdsToMaterialPngExporter
     {
-        //tally is i=3 and then i=i+3
-        public void Export(string outputPath, bool convertToBlenderFormat, string fileName)
+        private readonly PackFileService pfs;
+        public DdsToMaterialPngExporter(PackFileService packFileService)
+        {
+            pfs = packFileService;
+        }
+        public void Export(string path, string outputPath, bool convertToBlenderFormat)
         {
             //nothing yet, need to know the difference between the two types of material images
 
-            using (Image image = Image.FromFile(outputPath + fileName))
+            var file = pfs.FindFile(path);
+            var bytes = file.DataSource.ReadData();
+            var bmp = TextureHelper.ConvertDdsToPng(bytes);
+
+            var ms = new MemoryStream(bmp);
+
+            using (Image image = Image.FromStream(ms))
             using (Bitmap bitmap = new Bitmap(image))
             {
                 for (int x = 0; x < bitmap.Width; x++)
@@ -44,14 +55,9 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
-                fileName = Path.GetFileNameWithoutExtension(fileName);
-                // Save the output image, delete old one so we can seamlessly integrate into gltf save
-                if (File.Exists(outputPath + fileName + ".png"))
-                {
-                    image.Dispose();
-                    File.Delete(outputPath + fileName + ".png");
-                }
-                bitmap.Save(outputPath + fileName + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                var fileName = Path.GetFileNameWithoutExtension(path);
+
+                bitmap.Save(outputPath + "/" + fileName + ".png", System.Drawing.Imaging.ImageFormat.Png);
             }
         }
 

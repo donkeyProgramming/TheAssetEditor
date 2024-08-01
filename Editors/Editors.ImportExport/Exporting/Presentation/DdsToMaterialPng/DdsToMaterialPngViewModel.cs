@@ -25,7 +25,7 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter) 
         {
-            _exporter.Export(outputPath, SwapBlender, Path.GetFileNameWithoutExtension(exportSource.Name));
+            _exporter.Export(outputPath,"", SwapBlender);
         }
     }
 }

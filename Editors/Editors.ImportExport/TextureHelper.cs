@@ -22,26 +22,44 @@ using Shared.GameFormats.WsModel;
 
 namespace MeshImportExport
 {
-
     public class TextureHelper
     {
-        public static MaterialBuilder BuildMaterial(PackFileService pfs, RmvModel model, PackFile inFile)
+        /**public static MaterialBuilder BuildMaterial(PackFileService pfs, RmvModel model, PackFile inFile, RmvToGltfExporterSettings settings)
         {
-            var pngBytes = FindFileAndReturnPngList(pfs, model, inFile);
-            var basePng = pngBytes[0];
-            var materialPng = pngBytes[1];
-            var normalPng = pngBytes[2];
+
+            var normalMapTexture = model.Material.GetTexture(TextureType.Normal);
+            var materialMapTexture = model.Material.GetTexture(TextureType.MaterialMap);
+            var baseColourTexture = model.Material.GetTexture(TextureType.BaseColour);
+
+            var baseColourFile = pfs.FindFile(baseColourTexture.Value.Path);
+            var materialMapFile = pfs.FindFile(materialMapTexture.Value.Path);
+            var normalMapFile = pfs.FindFile(normalMapTexture.Value.Path);
+
+            var basePath = pfs.GetFullPath(baseColourFile);
+            var materialMapPath = pfs.GetFullPath(materialMapFile);
+            var normalMapPath = pfs.GetFullPath(normalMapFile);
+
+            if (normalMapTexture != null && settings.ConvertNormalTextureToBlue == true) 
+            {
+
+            }
+            
+
+            //var pngBytes = FindFileAndReturnPngList(pfs, model, inFile);
+            //var basePng = pngBytes[0];
+            //var materialPng = pngBytes[1];
+            //var normalPng = pngBytes[2];
 
 
             var material = new MaterialBuilder(model.Material.ModelName + "_Material")
                .WithDoubleSide(true)
                 .WithMetallicRoughness()
-                .WithChannelImage(KnownChannel.BaseColor, new MemoryImage(basePng))
-                .WithChannelImage(KnownChannel.MetallicRoughness, new MemoryImage(materialPng))
-                .WithChannelImage(KnownChannel.Normal, new MemoryImage(normalPng));
+                .WithChannelImage(KnownChannel.BaseColor, new MemoryImage(ConvertDdsToPng(baseColourFile.DataSource.ReadData())))
+                .WithChannelImage(KnownChannel.MetallicRoughness, new MemoryImage(ConvertDdsToPng())
+                .WithChannelImage(KnownChannel.Normal, new MemoryImage(normalMapPath));
 
             return material;
-        }
+        }**/
 
         public static byte[] ConvertDdsToPng(byte[] dds)
         {
@@ -86,7 +104,6 @@ namespace MeshImportExport
                 b.Seek(0, SeekOrigin.Begin);
                 var binData = byteSteam.ReadBytes((int)b.Length);
                 return binData;
-                    
             }
         }
 

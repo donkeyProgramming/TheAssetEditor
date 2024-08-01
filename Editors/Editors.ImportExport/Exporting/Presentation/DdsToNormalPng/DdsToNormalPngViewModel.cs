@@ -25,7 +25,7 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToNormalPng
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
         {
-            _exporter.Export(outputPath, exportSource.Name);
+            _exporter.Export(outputPath, exportSource.Name, true);
         }
     }
 }

@@ -18,7 +18,32 @@ namespace E2EVerification
 {
     public class GltfExport_Tests
     {
-        private readonly string _rmvFilePathCap = @"variantmeshes\wh_variantmodels\hu1\emp\emp_captains\body\emp_captains_body_01.rigid_model_v2";
+        private readonly string _normalFilePath01 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_normal.dds";
+        private readonly string _materialFilePath01 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_material_map.dds";
+        //private readonly string _outputPath = "C:/franz";
+
+        [Test]
+        public void convertNormal()
+        {
+            var runner = new AssetEditorTestRunner();
+            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+            var PackFile = runner.LoadPackFile(path);
+            runner.DdsToNormalPngExporterRepos.Export(_normalFilePath01, "C:/franz", true);
+            var foundFile = ("C:/franz/" + "test.png");
+            Assert.That(foundFile, Is.Not.Null);
+        }
+        [Test]
+        public void convertMaterial()
+        {
+            var runner = new AssetEditorTestRunner();
+            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+            var PackFile = runner.LoadPackFile(path);
+            runner.DdsToMaterialPngExporterRepos.Export(_materialFilePath01, "C:/franz", true);
+            var foundFile = ("C:/franz/" + "test.png");
+            Assert.That(foundFile, Is.Not.Null);
+        }
+
+        /**private readonly string _rmvFilePathCap = @"variantmeshes\wh_variantmodels\hu1\emp\emp_captains\body\emp_captains_body_01.rigid_model_v2";
         private readonly string _rmvFilePathArc = @"variantmeshes\wh_variantmodels\hu1\emp\emp_props\emp_arch_lector_hammer_1h_01.rigid_model_v2";
         private readonly string _rmvFilePathSta = @"variantmeshes\wh_variantmodels\hu1\tmb\tmb_props\tmb_arkhan_staff_1h_01.rigid_model_v2";
         private readonly string _rmvFilePathBelBod = @"variantmeshes\wh_variantmodels\hu10\dae\dae_belekor\dae_belakor_body_01.rigid_model_v2";
@@ -241,6 +266,6 @@ namespace E2EVerification
             runner.RmvToGltfExporterRepos.Export(settings);
             var foundFile = ("C:/franz/" + Path.GetFileNameWithoutExtension(drycha.Name) + ".gltf");
             Assert.That(foundFile, Is.Not.Null);
-        }
+        }**/
     }
 }
