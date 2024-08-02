@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 
 namespace GameWorld.WpfWindow.ResourceHandling
@@ -21,7 +23,7 @@ namespace GameWorld.WpfWindow.ResourceHandling
 
     public class ResourceLibrary
     {
-        //private readonly  ILogger _logger = Logging.Create<ResourceLibary>();
+        private readonly  ILogger _logger = Logging.Create<ResourceLibrary>();
 
         private readonly Dictionary<string, Texture2D> _cachedTextures = new();
         private readonly Dictionary<ShaderTypes, Effect> _cachedShaders = new();
@@ -44,32 +46,40 @@ namespace GameWorld.WpfWindow.ResourceHandling
 
         public void Initialize(GraphicsDevice graphicsDevice, ContentManager content)
         {
-            if (_isInitialized)
-                return;
+            try
+            {
+                if (_isInitialized)
+                    return;
 
-            _isInitialized = true;
-            _content = content;
-            _graphicsDevice = graphicsDevice;
-            CommonSpriteBatch = new SpriteBatch(_graphicsDevice);
+                _isInitialized = true;
+                _content = content;
+                _graphicsDevice = graphicsDevice;
+                CommonSpriteBatch = new SpriteBatch(_graphicsDevice);
 
-            // Load default resources
-            var mr = LoadEffect("Shaders\\Phazer\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
-            var sg = LoadEffect("Shaders\\Phazer\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
-            LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
-            LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
-            LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
-            DefaultFont = _content.Load<SpriteFont>("Fonts//DefaultFont");
-           
-            _pbrDiffuse = _content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
-            _pbrSpecular = _content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
-            _pbrLut = _content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
+                // Load default resources
+                var mr = LoadEffect("Shaders\\Phazer\\MetalRoughness\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
+                var sg = LoadEffect("Shaders\\Phazer\\SpecGloss\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
+                LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
+                LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
+                LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
+                DefaultFont = _content.Load<SpriteFont>("Fonts//DefaultFont");
 
-            mr.Parameters["tex_cube_diffuse"]?.SetValue(_pbrDiffuse);
-            mr.Parameters["tex_cube_specular"]?.SetValue(_pbrSpecular);
-            mr.Parameters["specularBRDF_LUT"]?.SetValue(_pbrLut);
-            sg.Parameters["tex_cube_diffuse"]?.SetValue(_pbrDiffuse);
-            sg.Parameters["tex_cube_specular"]?.SetValue(_pbrSpecular);
-            sg.Parameters["specularBRDF_LUT"]?.SetValue(_pbrLut);
+                _pbrDiffuse = _content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
+                _pbrSpecular = _content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
+                _pbrLut = _content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
+
+                mr.Parameters["tex_cube_diffuse"]?.SetValue(_pbrDiffuse);
+                mr.Parameters["tex_cube_specular"]?.SetValue(_pbrSpecular);
+                mr.Parameters["specularBRDF_LUT"]?.SetValue(_pbrLut);
+                sg.Parameters["tex_cube_diffuse"]?.SetValue(_pbrDiffuse);
+                sg.Parameters["tex_cube_specular"]?.SetValue(_pbrSpecular);
+                sg.Parameters["specularBRDF_LUT"]?.SetValue(_pbrLut);
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error($"Failed to create rendering resources - {e.Message}");
+                throw;
+            }
         }
 
         public void Reset()

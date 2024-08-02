@@ -32,13 +32,13 @@
     <None Update="BuiltContent\Shaders\LineShader.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="BuiltContent\Shaders\Phazer\MetalRoughness\MetalRoughness_main.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="BuiltContent\Shaders\Phazer\MetalRoughness_main.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="BuiltContent\Shaders\Phazer\pbr_lib.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Shaders\Phazer\SpecGloss_main.xnb">
+    <None Update="BuiltContent\Shaders\Phazer\SpecGloss\SpecGloss_main.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="BuiltContent\Shaders\Phazer\tone_mapping.xnb">

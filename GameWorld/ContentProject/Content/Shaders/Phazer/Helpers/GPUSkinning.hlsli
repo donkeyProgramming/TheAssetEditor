@@ -1,19 +1,10 @@
 ﻿#ifndef GPUSKINNING_HLSLI
 #define GPUSKINNING_HLSLI
 
-#include "InputLayouts.hlsli"
-#include "const_layout.hlsli"
+#include "../InputLayouts.hlsli"
 
+#include "../Shared/AnimationConstants.hlsli"
 
-//float3 ApplyVertexWeight_Normal(float vertexWeight, float3 normal, in VertexInputType input, int weightIndex)
-//{
-//    return vertexWeight * mul(normal, (float3x3) tranforms[input.BoneIndices[weightIndex]]);
-//}
-
-//float3 ApplyVertexWeight(float vertexWeight, float position, in VertexInputType input, int weightIndex)
-//{
-//    return vertexWeight * mul(position, tranforms[input.BoneIndices[weightIndex]]);
-//}
 
 void DoSkinning(
 	in VertexInputType input,

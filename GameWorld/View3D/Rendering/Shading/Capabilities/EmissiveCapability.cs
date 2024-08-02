@@ -45,7 +45,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
                 EmissiveSpeed = EmissiveSpeed,
                 EmissivePulseSpeed = EmissivePulseSpeed,
                 EmissivePulseStrength = EmissivePulseStrength,  
-                Gradient = new[] { Gradient[0], Gradient[1], Gradient[2], Gradient[3] },
+                Gradient = [Gradient[0], Gradient[1], Gradient[2], Gradient[3]],
                 EmissiveStrength = EmissiveStrength,
                 EmissiveTiling = EmissiveTiling,
                 EmissiveTint = EmissiveTint,
@@ -64,7 +64,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
                 Gradient[i] = new Vector4(colour, time);
             }
 
-            EmissiveDistortStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_strength", 1);
+            EmissiveStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_strength", 1);
             EmissiveTint = CapabilityHelper.GetParameterVector3(wsModelMaterial, "emissive_tint", Vector3.Zero);
 
          

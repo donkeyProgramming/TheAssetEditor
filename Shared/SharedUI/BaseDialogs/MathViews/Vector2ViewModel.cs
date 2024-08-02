@@ -19,7 +19,6 @@ namespace Shared.Ui.BaseDialogs.MathViews
             _y = new(y, OnChildValueChanged);
 
             Set(x, y);
-        
         }
 
         private void OnChildValueChanged(float _) => _valueChangedCallback?.Invoke(GetAsVector2());

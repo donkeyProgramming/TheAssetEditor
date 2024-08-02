@@ -1,7 +1,7 @@
 ﻿#ifndef CONST_LAYOUT_HLSLI
 #define CONST_LAYOUT_HLSLI
 
-bool doAnimation = true;
+
 
 float4x4 World;
 float4x4 View;
@@ -14,12 +14,7 @@ float4x4 DirLightTransform;
 float LightMult = 1;
 
 bool debug = true;
-float debugVal = 0;
-int show_reflections = false;
-bool is_diffuse_linear = false;
-bool is_specular_linear = false;
 float exposure = 1;
-bool scale_by_one_over_pi = false;
 
 float light0_roughnessFactor = 1;
 float light0_radiannce = 1;
@@ -45,7 +40,6 @@ bool UseGloss = true;
 bool UseAlpha = false;
 bool UseMask = true;
 
-float4x4 tranforms[256];
-int WeightCount = 0;
+
 
 #endif // CONST_LAYOUT_HLSLI
