@@ -47,15 +47,15 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
 
             _emissiveTint = new ColourPickerViewModel(emissiveCapability.EmissiveTint, OnEmissiveTintChanged);
 
-            _gradient0 = new ColourPickerViewModel(GetGradientColour(emissiveCapability.Gradient[0]), OnGradientColour0Changed);
-            _gradient1 = new ColourPickerViewModel(GetGradientColour(emissiveCapability.Gradient[1]), OnGradientColour1Changed);
-            _gradient2 = new ColourPickerViewModel(GetGradientColour(emissiveCapability.Gradient[2]), OnGradientColour2Changed);
-            _gradient3 = new ColourPickerViewModel(GetGradientColour(emissiveCapability.Gradient[3]), OnGradientColour3Changed);
+            _gradient0 = new ColourPickerViewModel(emissiveCapability.GradientColours[0], OnGradientColour0Changed);
+            _gradient1 = new ColourPickerViewModel(emissiveCapability.GradientColours[1], OnGradientColour1Changed);
+            _gradient2 = new ColourPickerViewModel(emissiveCapability.GradientColours[2], OnGradientColour2Changed);
+            _gradient3 = new ColourPickerViewModel(emissiveCapability.GradientColours[3], OnGradientColour3Changed);
 
-            _gradientTime0 = GetGradientTime(emissiveCapability.Gradient[0]);
-            _gradientTime1 = GetGradientTime(emissiveCapability.Gradient[1]);
-            _gradientTime2 = GetGradientTime(emissiveCapability.Gradient[2]);
-            _gradientTime3 = GetGradientTime(emissiveCapability.Gradient[3]);
+            _gradientTime0 = emissiveCapability.GradientTimes[0];
+            _gradientTime1 = emissiveCapability.GradientTimes[1];
+            _gradientTime2 = emissiveCapability.GradientTimes[2];
+            _gradientTime3 = emissiveCapability.GradientTimes[3];
 
             _emissiveSpeed = emissiveCapability.EmissiveSpeed;
             _emissivePulseSpeed = emissiveCapability.EmissivePulseSpeed;
@@ -67,13 +67,19 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
 
         void OnEmissiveDirectionChanged(Vector2 value) => _emissiveCapability.EmissiveDirection = value;
         void OnEmissiveTintChanged(Vector3 value) => _emissiveCapability.EmissiveTint = value;
-        void OnEmissiveTilingChanged(Vector2 value) => _emissiveCapability.EmissiveTiling = value;
-        void OnGradientColour0Changed(Vector3 color) => _emissiveCapability.Gradient[0] = new Vector4(color, _emissiveCapability.Gradient[0].W);
-        void OnGradientColour1Changed(Vector3 color) => _emissiveCapability.Gradient[1] = new Vector4(color, _emissiveCapability.Gradient[1].W);
-        void OnGradientColour2Changed(Vector3 color) => _emissiveCapability.Gradient[2] = new Vector4(color, _emissiveCapability.Gradient[2].W);
-        void OnGradientColour3Changed(Vector3 color) => _emissiveCapability.Gradient[3] = new Vector4(color, _emissiveCapability.Gradient[3].W);
+        partial void OnEmissiveStrengthChanged(float value) => _emissiveCapability.EmissiveStrength = value;
+        partial void OnEmissiveFresnelStrengthChanged(float value) => _emissiveCapability.EmissiveFresnelStrength = value;
 
-        static Vector3 GetGradientColour(Vector4 gradient) => new(gradient.X, gradient.Y, gradient.Z);
-        static float GetGradientTime(Vector4 gradient) => gradient.W;
+        void OnEmissiveTilingChanged(Vector2 value) => _emissiveCapability.EmissiveTiling = value;
+        void OnGradientColour0Changed(Vector3 color) => _emissiveCapability.GradientColours[0] = color;
+        void OnGradientColour1Changed(Vector3 color) => _emissiveCapability.GradientColours[1] = color;
+        void OnGradientColour2Changed(Vector3 color) => _emissiveCapability.GradientColours[2] = color;
+        void OnGradientColour3Changed(Vector3 color) => _emissiveCapability.GradientColours[3] = color;
+
+        partial void OnGradientTime0Changed(float value) => _emissiveCapability.GradientTimes[0] = value;
+        partial void OnGradientTime1Changed(float value) => _emissiveCapability.GradientTimes[1] = value;
+        partial void OnGradientTime2Changed(float value) => _emissiveCapability.GradientTimes[2] = value;
+        partial void OnGradientTime3Changed(float value) => _emissiveCapability.GradientTimes[3] = value;
+
     }
 }

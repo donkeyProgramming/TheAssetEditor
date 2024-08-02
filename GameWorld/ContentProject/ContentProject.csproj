@@ -33,7 +33,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="BuiltContent\Shaders\Phazer\MetalRoughness\MetalRoughness_main.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="BuiltContent\Shaders\Phazer\MetalRoughness_main.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -57,4 +57,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="BuiltContent\Shaders\Geometry\" />
+      <Folder Include="BuiltContent\Shaders\Phazer\MetalRoughness\" />
+    </ItemGroup>
 </Project>

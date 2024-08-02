@@ -16,7 +16,8 @@ namespace GameWorld.Core.Rendering.Shading
             { TextureType.Mask, "MaskTexture"},
             { TextureType.MaterialMap, "GlossTexture"},
             { TextureType.BaseColour, "DiffuseTexture"},
-            { TextureType.Normal, "NormalTexture"}
+            { TextureType.Normal, "NormalTexture"},
+            { TextureType.Emissive, "Emissive_Texture"}
         };
 
         static public readonly Dictionary<TextureType, string> UseTextureTypeToParamName = new()
@@ -27,7 +28,8 @@ namespace GameWorld.Core.Rendering.Shading
             { TextureType.Mask, "UseMask"},
             { TextureType.MaterialMap, "UseGloss"},
             { TextureType.BaseColour, "UseDiffuse"},
-            { TextureType.Normal, "UseNormal"}
+            { TextureType.Normal, "UseNormal"},
+            { TextureType.Emissive, "Emissive_UseTexture"}
         };
     }
 }

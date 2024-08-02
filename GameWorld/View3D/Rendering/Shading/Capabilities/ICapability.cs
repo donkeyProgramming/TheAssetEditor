@@ -51,18 +51,6 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
                 var texture = resourceLibrary.LoadTexture(TexturePath);
                 effect.Parameters[textureParam].SetValue(texture);
             }
-
-            //if (Texture == null || ApplyTexture == false)
-            //{
-            //    effect.Parameters[useTextureParam].SetValue(false);
-            //}
-            //else
-            //{
-            //    var textureParam = ShaderParameterHelper.TextureTypeToParamName[Type];
-            //    effect.Parameters[useTextureParam].SetValue(ApplyTexture);
-            //    effect.Parameters[textureParam].SetValue(Texture);
-            //}
-
         }
     }
 

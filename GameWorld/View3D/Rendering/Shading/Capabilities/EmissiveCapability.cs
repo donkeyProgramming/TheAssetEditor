@@ -22,7 +22,8 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         public float EmissivePulseStrength { get; set; } = 1;
 
         // Colents, where the Alpha is used as time (0-1). RedGreenBlueTime
-        public Vector4[] Gradient { get; set; } = [new Vector4(0), new Vector4(0.25f), new Vector4(0.75f), new Vector4(1)];
+        public Vector3[] GradientColours { get; set; } = [new Vector3(0), new Vector3(0.25f), new Vector3(0.75f), new Vector3(1)];
+        public float[] GradientTimes { get; set; } = [0, 0.25f, 0.75f, 1];
 
         public float EmissiveStrength { get; set; } = 1;
         public Vector2 EmissiveTiling { get; set; } = new Vector2(1);
@@ -30,6 +31,17 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {
+            Emissive.Apply(effect, resourceLibrary);
+
+            effect.Parameters["CapabilityFlag_ApplyEmissive"].SetValue(true);
+            
+            effect.Parameters["Emissive_Tint"].SetValue(EmissiveTint);
+            effect.Parameters["Emissive_Strength"].SetValue(EmissiveStrength);
+            effect.Parameters["Emissive_Tiling"].SetValue(EmissiveTiling);
+            effect.Parameters["Emissive_GradientColours"].SetValue(GradientColours);
+            effect.Parameters["Emissive_GradientTimes"].SetValue(GradientTimes);
+            effect.Parameters["Emissive_FresnelStrength"].SetValue(EmissiveFresnelStrength);
+
            
         }
 
@@ -44,8 +56,9 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
                 EmissiveFresnelStrength = EmissiveFresnelStrength,
                 EmissiveSpeed = EmissiveSpeed,
                 EmissivePulseSpeed = EmissivePulseSpeed,
-                EmissivePulseStrength = EmissivePulseStrength,  
-                Gradient = [Gradient[0], Gradient[1], Gradient[2], Gradient[3]],
+                EmissivePulseStrength = EmissivePulseStrength,
+                GradientColours = [GradientColours[0], GradientColours[1], GradientColours[2], GradientColours[3]],
+                GradientTimes = [GradientTimes[0], GradientTimes[1], GradientTimes[2], GradientTimes[3]],
                 EmissiveStrength = EmissiveStrength,
                 EmissiveTiling = EmissiveTiling,
                 EmissiveTint = EmissiveTint,
@@ -59,15 +72,13 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
 
             for (var i = 0; i < 4; i++)
             {
-                var colour = CapabilityHelper.GetParameterVector3(wsModelMaterial, "emissive_gradient_colour_stop_" + (i + 1), Vector3.One);
-                var time = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_gradient_stop_" + (i + 1), 0);
-                Gradient[i] = new Vector4(colour, time);
+                GradientColours[i] = CapabilityHelper.GetParameterVector3(wsModelMaterial, "emissive_gradient_colour_stop_" + (i + 1), Vector3.One);
+                GradientTimes[i] = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_gradient_stop_" + (i + 1), 0);
             }
 
             EmissiveStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_strength", 1);
             EmissiveTint = CapabilityHelper.GetParameterVector3(wsModelMaterial, "emissive_tint", Vector3.Zero);
-
-         
+            EmissiveFresnelStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_fresnel_strength", 1);
         }
     }
 }

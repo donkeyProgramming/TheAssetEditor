@@ -9,6 +9,8 @@
 #include "../TextureSamplers.hlsli"
 #include "../inputlayouts.hlsli"
 
+#include "../Capabilites/Emissive.hlsli"
+#include "../Capabilites/Tint.hlsli"
 #include "Helpers.hlsli"
 
 // **************************************************************************************************************************************
@@ -63,60 +65,51 @@ GBufferMaterial GetMaterial(in PixelInputType input)
 float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
 {
     GBufferMaterial material = GetMaterial(input);        
-
+    float3 normlizedViewDirection = normalize(input.viewDirection);
+    float3 rot_lightDir = normalize(mul(light_Direction_Constant, (float3x3) DirLightTransform));
+    
+    float3 diffuseColour = ApplyTintAndFactionColours(material.diffuse.rgb, material.maskValue);
+    
     float3 envColor = getAmbientLight(
 		material.pixelNormal,
-		normalize(input.viewDirection),
-		material.diffuse.rgb,// * TintColour,
+		normlizedViewDirection,
+		diffuseColour,
 		material.roughness,
 		material.metalness,
-		float4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
-	
-    float3 rot_lightDir = normalize(mul(light_Direction_Constant, (float3x3) DirLightTransform));                         	
+		float4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));            	
 	
 	// directional ligting color    
     float3 dirColor = getDirectionalLight(
 		material.pixelNormal,
-		material.diffuse.rgb,// * TintColour,
+		diffuseColour,
 		material.roughness,
 		material.metalness,
-		normalize(input.viewDirection),
+		normlizedViewDirection,
 		rot_lightDir
 	);
 
-	// add environent (ambient) light color and directional light color
-    float3 color = envColor + dirColor;
+    float3 emissiveColour = GetEmissiveColour(input.tex, material.maskValue, normlizedViewDirection, material.pixelNormal);
     
-    // Apply emissive 
-    float3 emissiveColour = SampleGradient(material.maskValue.a) * 3;
-    color += emissiveColour;// * material.maskValue;
+    // Combine all colours
+    float3 color = envColor + dirColor + emissiveColour;
 	
 	if (UseAlpha == 1)
-	{
         alpha_test(material.diffuse.a);
-    }
     
     return DoToneMapping(color.rgb);
 }
 
-
-
-
-
 float4 EmissiveLayerPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
 {
-    //return float4(1, 0, 0, 1);
    GBufferMaterial material = GetMaterial(input);
-   
-   // Apply emissive 
-   float3 emissiveColour = SampleGradient(material.maskValue.a) * 3;
+    float3 normlizedViewDirection = normalize(input.viewDirection);
+    float3 emissiveColour = GetEmissiveColour(input.tex, material.maskValue, normlizedViewDirection, material.pixelNormal);
 	
    if (UseAlpha == 1)
        alpha_test(material.diffuse.a);
    
    return float4(emissiveColour, 1);
 }
-
 
 technique BasicColorDrawing
 {

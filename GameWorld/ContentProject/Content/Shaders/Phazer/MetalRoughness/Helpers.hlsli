@@ -1,12 +1,13 @@
 #include "../Helpers/CALib.hlsli"
 #include "../TextureSamplers.hlsli"
+#include "../Helpers/Constants.hlsli"
 
 // --------------------------------------------------------------------------------------------------------------------------------------
 //  Returns Directional Light Color
 // --------------------------------------------------------------------------------------------------------------------------------------            
-float3 getDirectionalLight(in float3 N, in float3 albedo, in float roughness, in float metalness, in float3 viewDir, in float3 lightDir)
+float3 getDirectionalLight(in float3 N, in float3 albedo, in float roughness, in float metalness, in float3 normalizedViewDir, in float3 lightDir)
 {
-    float3 Lo = normalize(viewDir);
+    float3 Lo = normalizedViewDir;
 
 	// Angle between surface normal and outgoing light direction.
     float cosLo = max(0.0, dot(N, Lo));
@@ -60,9 +61,9 @@ float3 getDirectionalLight(in float3 N, in float3 albedo, in float roughness, in
 // --------------------------------------------------------------------------------------------------------------------------------------
 //  Returns Ambient Light Color
 // --------------------------------------------------------------------------------------------------------------------------------------            
-float3 getAmbientLight(in float3 normal1, in float3 viewDir, in float3 Albedo, in float roughness, in float metalness, float4x4 envTransform)
+float3 getAmbientLight(in float3 normal1, in float3 normalizedViewDir, in float3 Albedo, in float roughness, in float metalness, float4x4 envTransform)
 {
-    float3 Lo = normalize(viewDir);
+    float3 Lo = normalizedViewDir;
 
 	// Angle between surface normal and outgoing light direction.
     float cosLo = max(0.0, dot(normal1, Lo));
