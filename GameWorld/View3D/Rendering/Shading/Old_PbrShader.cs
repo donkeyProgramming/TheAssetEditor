@@ -70,7 +70,7 @@ namespace GameWorld.Core.Rendering.Shading
             effect.Parameters["UseAlpha"].SetValue(UseAlpha);
 
             // Apply Animation 
-            effect.Parameters["doAnimation"].SetValue(UseAnimation);
+            effect.Parameters["CapabilityFlag_ApplyAnimation"].SetValue(UseAnimation);
             effect.Parameters["WeightCount"].SetValue(AnimationWeightCount);
             effect.Parameters["tranforms"].SetValue(AnimationTransforms);
         }

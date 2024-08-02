@@ -1,13 +1,10 @@
-﻿#include "../helpers/GPUSkinning.hlsli" 
-#include "../helpers/CALib.hlsli"
+﻿#include "../helpers/CALib.hlsli"
 #include "../helpers/tone_mapping.hlsli"
 #include "../helpers/constants.hlsli"
 #include "../helpers/GradientSampling.hlsli"
 
 #include "../Shared/MainVertexShader.hlsli"
-
 #include "../Shared/const_layout.hlsli"
-#include "../Shared/AnimationConstants.hlsli"
 
 #include "../TextureSamplers.hlsli"
 #include "../inputlayouts.hlsli"
@@ -63,10 +60,6 @@ GBufferMaterial GetMaterial(in PixelInputType input)
     return material;
 }
 
-
-
-
-
 float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
 {
     GBufferMaterial material = GetMaterial(input);        
@@ -77,8 +70,7 @@ float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFron
 		material.diffuse.rgb,// * TintColour,
 		material.roughness,
 		material.metalness,
-		float4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
-		);
+		float4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
 	
     float3 rot_lightDir = normalize(mul(light_Direction_Constant, (float3x3) DirLightTransform));                         	
 	
@@ -103,7 +95,7 @@ float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFron
 	{
         alpha_test(material.diffuse.a);
     }
-
+    
     return DoToneMapping(color.rgb);
 }
 

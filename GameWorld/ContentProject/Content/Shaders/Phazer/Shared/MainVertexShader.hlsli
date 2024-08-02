@@ -3,15 +3,16 @@
 
 #include "../Shared/const_layout.hlsli"
 #include "../inputlayouts.hlsli"
+#include "../Capabilites/Animation.hlsli"
 
 // **************************************************************************************************************************************
 // *		VERTEX SHADER CODE
 // **************************************************************************************************************************************
-PixelInputType MainVertexShader(in VertexInputType input) // main is the default function name
+PixelInputType MainVertexShader(in VertexInputType input)
 {
     PixelInputType output = (PixelInputType) 0;
 
-    DoSkinning(input, WeightCount, output.position, output.normal, output.tangent, output.binormal);
+    DoSkinning(input, output.position, output.normal, output.tangent, output.binormal);
 
     output.position = mul(output.position, World);
     output.worldPosition = output.position.xyz;

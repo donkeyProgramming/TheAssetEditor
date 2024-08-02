@@ -15,9 +15,9 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
 
         public void Apply(Effect effect, ResourceLibrary _)
         {
-            effect.Parameters["doAnimation"].SetValue(ApplyAnimation);
-            effect.Parameters["WeightCount"].SetValue(AnimationWeightCount);
-            effect.Parameters["tranforms"].SetValue(AnimationTransforms);
+            effect.Parameters["CapabilityFlag_ApplyAnimation"].SetValue(ApplyAnimation);
+            effect.Parameters["Animation_WeightCount"].SetValue(AnimationWeightCount);
+            effect.Parameters["Animation_Tranforms"].SetValue(AnimationTransforms);
         }
 
         public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)

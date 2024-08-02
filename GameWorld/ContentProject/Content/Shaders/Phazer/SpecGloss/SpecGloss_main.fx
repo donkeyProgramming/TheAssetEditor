@@ -1,18 +1,14 @@
 ﻿#include "../Helpers/CALib.hlsli"
 #include "../helpers/constants.hlsli"
 #include "../Helpers/tone_mapping.hlsli"
-#include "../Helpers/GPUSkinning.hlsli" 
 
 #include "../Shared/const_layout.hlsli"
-#include "../Shared/AnimationConstants.hlsli"
 #include "../Shared/MainVertexShader.hlsli"
 
 #include "../TextureSamplers.hlsli"
 #include "../inputlayouts.hlsli"
 
-
 #include "Helpers.hlsli"
-
 
 
 // -------------------------------------------------------------------------------------------------------------
