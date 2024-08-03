@@ -10,7 +10,6 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
     {
         public float ScaleMult { get; set; } = 1;
         public bool UseAlpha { get; set; }
-        public bool UseFactionColours { get; set; } = false;
         public TextureInput BaseColour { get; set; } = new TextureInput(TextureType.BaseColour);
         public TextureInput MaterialMap{ get; set; } = new TextureInput(TextureType.MaterialMap);
         public TextureInput NormalMap { get; set; } = new TextureInput(TextureType.Normal);
@@ -36,7 +35,6 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             {
                 ScaleMult = ScaleMult,
                 UseAlpha = UseAlpha,
-                UseFactionColours = UseFactionColours,
                 BaseColour = BaseColour.Clone(),
                 MaterialMap = MaterialMap.Clone(),
                 NormalMap = NormalMap.Clone(),

@@ -15,7 +15,8 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
                     new DefaultCapability(),
                     new AnimationCapability(),
                     new BloodCapability(),
-                    new EmissiveCapability()
+                    new EmissiveCapability(),
+                    new TintCapability(),
                 ];
 
             _renderingTechniqueMap[RenderingTechnique.Normal] = "BasicColorDrawing";

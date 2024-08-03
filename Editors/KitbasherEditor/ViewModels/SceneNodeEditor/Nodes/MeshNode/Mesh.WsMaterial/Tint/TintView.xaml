@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Tint" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:colourpickerbutton="clr-namespace:Shared.Ui.BaseDialogs.ColourPickerButton;assembly=Shared.Ui"
+             xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Tint" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:colourpickerbutton="clr-namespace:Shared.Ui.BaseDialogs.ColourPickerButton;assembly=Shared.Ui" xmlns:basedialogs="clr-namespace:Shared.Ui.BaseDialogs;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -16,7 +16,7 @@
 
     <ContentControl DockPanel.Dock="Top">
 
-        <Expander DockPanel.Dock="Top" IsExpanded="True">
+        <Expander DockPanel.Dock="Top" IsExpanded="True" >
             <Expander.Header>
                 <DockPanel  DockPanel.Dock="Top"  Background="{DynamicResource GroupBox.Header.Static.Background}">
                     <Label Content="Tint and Faction" FontSize="{StaticResource HeaderFontSize}" Width="{StaticResource HeaderLabelLength}"/>
@@ -24,33 +24,37 @@
                 </DockPanel>
             </Expander.Header>
 
-            <DockPanel LastChildFill="False">
+            <DockPanel LastChildFill="False" Margin="0,2,0,0">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Preview capability" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                    <CheckBox Margin="0,2,2,2" IsChecked="{Binding ApplyCapability, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </basedialogs:AeAttribute>
 
-                <DockPanel DockPanel.Dock="Top" LastChildFill="True">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Tint Mask" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
-                    <Button Content="All black mask" DockPanel.Dock="Right" Margin="2"/>
-                    <mathviews:Vector4View/>
-                </DockPanel>
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Tint Mask" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                    <DockPanel>
+                        <mathviews:Vector4View DataContext="{Binding TintMask}"/>
+                    </DockPanel>
+                </basedialogs:AeAttribute>
 
-                <DockPanel DockPanel.Dock="Top" LastChildFill="True">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Tint Colour" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
-                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient0}" HorizontalAlignment="Left" Width="20" Height="20"/>
-                    <Label>Variation:</Label>
-                    <TextBox Margin="0,2,2,2" Text="{Binding GradientTime3, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
-                </DockPanel>
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Tint Colour" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                    <DockPanel>
+                        <colourpickerbutton:ColourPickerButtonView DataContext="{Binding TintColour}" HorizontalAlignment="Left" Width="20" Height="20"/>
+                        <Label>Variation:</Label>
+                        <TextBox Margin="3" Text="{Binding TintVariation, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+                    </DockPanel>
+                </basedialogs:AeAttribute>
 
-                <DockPanel DockPanel.Dock="Top" LastChildFill="True">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Use faction colours" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
-                    <CheckBox />
-                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient0}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
-                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient0}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
-                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient0}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
-                </DockPanel>
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Use faction colours" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="Kitbash_WsMaterial_TintColour">
+                    <DockPanel>
+                        <CheckBox IsChecked="{Binding UseFactionColours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <colourpickerbutton:ColourPickerButtonView DataContext="{Binding FactionColour0}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
+                        <colourpickerbutton:ColourPickerButtonView DataContext="{Binding FactionColour1}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
+                        <colourpickerbutton:ColourPickerButtonView DataContext="{Binding FactionColour2}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
+                    </DockPanel>
+                </basedialogs:AeAttribute>
 
-
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Faction Colour 3 Mask" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                    <mathviews:Vector4View DataContext="{Binding FactionColour3Mask}"/>
+                </basedialogs:AeAttribute>
 
             </DockPanel>
         </Expander>

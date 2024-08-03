@@ -7,14 +7,15 @@
              mc:Ignorable="d" 
              d:DesignHeight="25" d:DesignWidth="800" 
              x:Name="self">
-    <DockPanel LastChildFill="true">
-        <Image x:Name="InformationImage" Width="15" Height="15" Margin="0,0,5,0"/>
+    <DockPanel LastChildFill="true" Margin="0,1,0,1">
+        <Image x:Name="InformationImage" Width="15" Height="15" Margin="0,0,5,0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
         <TextBlock x:Name="Text" HorizontalAlignment="Center" VerticalAlignment="Center"
             Text="{Binding LabelText, ElementName=self, UpdateSourceTrigger=PropertyChanged}"
             Width="{Binding LabelWidth, ElementName=self, UpdateSourceTrigger=PropertyChanged}"
+            FontSize="13" Height="23"
             DockPanel.Dock="Left"/>
-        <TextBlock>:</TextBlock>
+        <TextBlock Margin="3,0,3,0" HorizontalAlignment="Center" VerticalAlignment="Center"> : </TextBlock>
         <ContentPresenter Content="{Binding InnerContent, ElementName=self}" DockPanel.Dock="Left"/>
     </DockPanel>
 </UserControl>

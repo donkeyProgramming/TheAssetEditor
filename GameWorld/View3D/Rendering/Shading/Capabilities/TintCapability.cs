@@ -1,5 +1,5 @@
-﻿using System.Numerics;
-using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.WpfWindow.ResourceHandling;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.WsModel;
@@ -8,14 +8,18 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
 {
     public class TintCapability : ICapability
     {
-        public Vector3 DiffuseTintMask { get; set; } = Vector3.Zero;
+        public bool ApplyCapability { get; set; } = true;
+
+        public Vector4 DiffuseTintMask { get; set; } = Vector4.Zero;
         public Vector3 DiffuseTintColour { get; set; } = Vector3.Zero;
         public float DiffuseTintVariation { get; set; }
 
-        public Vector3 Faction3Mask { get; set; } = Vector3.Zero;
+        public bool UseFactionColours { get; set; } = true;
+        public Vector4 Faction3Mask { get; set; } = Vector4.Zero;
         public float Faction1_TintVariation { get; set; } = 0;  //Replace as vector3?
         public float Faction2_TintVariation { get; set; } = 0;
         public float Faction3_TintVariation { get; set; } = 0;
+        public Vector3[] FactionColours { get; set; } = [new Vector3(1,0,0), new Vector3(0, 1, 0), new Vector3(0, 0, 1)];
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {
@@ -28,10 +32,12 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
                 DiffuseTintMask = DiffuseTintMask,
                 DiffuseTintColour = DiffuseTintColour,
                 DiffuseTintVariation = DiffuseTintVariation,
+                UseFactionColours = UseFactionColours,
                 Faction3Mask = Faction3Mask,
                 Faction1_TintVariation = Faction1_TintVariation,
                 Faction2_TintVariation = Faction2_TintVariation,
                 Faction3_TintVariation = Faction3_TintVariation,
+                FactionColours = [FactionColours[0], FactionColours[1], FactionColours[2]]
             };
         }
 

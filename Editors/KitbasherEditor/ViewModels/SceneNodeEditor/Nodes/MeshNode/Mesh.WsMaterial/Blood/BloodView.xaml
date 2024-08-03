@@ -45,18 +45,6 @@
                     <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
                 </DockPanel>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Texture - Blood map" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
-                </basedialogs:AeAttribute>
-
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Texture - Blood map2" LabelWidth="{StaticResource labelWidth}" ToolTipEnumValue="Kitbash_WsMaterial_TintColour">
-                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
-                </basedialogs:AeAttribute>
-
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Texture - Blood map2" LabelWidth="{StaticResource labelWidth}" ToolTipEnumValue="Kitbash_WsMaterial_Example">
-                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
-                </basedialogs:AeAttribute>
-
             </DockPanel>
         </Expander>
     </ContentControl>

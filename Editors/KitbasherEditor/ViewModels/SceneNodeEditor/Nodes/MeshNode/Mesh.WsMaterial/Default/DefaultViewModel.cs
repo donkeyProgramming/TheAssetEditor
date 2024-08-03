@@ -1,7 +1,5 @@
-﻿using CommunityToolkit.Diagnostics;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using GameWorld.Core.Rendering.Shading.Capabilities;
-using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility.UserInterface;
 using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.Events;
@@ -14,7 +12,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         private readonly DefaultCapability _defaultCapability;
 
         [ObservableProperty] bool _useAlpha;
-        [ObservableProperty] bool _useFactionColours;
         
         [ObservableProperty] ShaderTextureViewModel _baseColour;
         [ObservableProperty] ShaderTextureViewModel _materialMap;
@@ -31,10 +28,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             _mask = new ShaderTextureViewModel(defaultCapability.Mask, packFileService, uiCommandFactory, resourceLibrary);
 
             _useAlpha = defaultCapability.UseAlpha;
-            _useFactionColours = defaultCapability.UseFactionColours;
         }
 
         partial void OnUseAlphaChanged(bool value) => _defaultCapability.UseAlpha = value;
-        partial void OnUseFactionColoursChanged(bool value) => _defaultCapability.UseFactionColours = value;
     }
 }

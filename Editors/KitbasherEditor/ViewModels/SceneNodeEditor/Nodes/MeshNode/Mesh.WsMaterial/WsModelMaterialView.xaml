@@ -52,8 +52,10 @@
             <blood:BloodView DockPanel.Dock="Top" DataContext="{Binding Blood}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
             <tint:TintView DockPanel.Dock="Top" DataContext="{Binding Tint}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
             <emissive:EmissiveView DockPanel.Dock="Top" DataContext="{Binding Emissive}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
+            <!-- 
+           
 
-            <!-- Dissolve -->
+          
             <ContentControl x:Name="Dissolve" DockPanel.Dock="Top">
                 <DockPanel LastChildFill="False">
                     <DockPanel  DockPanel.Dock="Top" >
@@ -63,7 +65,7 @@
                 </DockPanel>
             </ContentControl>
 
-            <!-- Iridescence -->
+           
             <ContentControl x:Name="Iridescence" DockPanel.Dock="Top">
                 <DockPanel LastChildFill="False">
                     <DockPanel  DockPanel.Dock="Top" >
@@ -72,6 +74,7 @@
                     </DockPanel>
                 </DockPanel>
             </ContentControl>
+            -->
 
 
 

@@ -26,6 +26,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] DefaultViewModel? _default;
         [ObservableProperty] BloodViewModel? _blood;
         [ObservableProperty] EmissiveViewModel? _emissive;
+        [ObservableProperty] TintViewModel? _tint;
 
         public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary, AbstractMaterialFactory abstractMaterialFactory)
         {
@@ -54,6 +55,10 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             var emissiveCapability = material.TryGetCapability<EmissiveCapability>();
             if (emissiveCapability != null)
                 Emissive = new EmissiveViewModel(emissiveCapability, _uiCommandFactory, _packFileService, _resourceLibrary);
+
+            var tintCapability = material.TryGetCapability<TintCapability>();
+            if (tintCapability != null)
+                Tint = new TintViewModel(tintCapability);
         }
 
         partial void OnCurrentMaterialTypeChanged(CapabilityMaterialsEnum? oldValue, CapabilityMaterialsEnum? newValue)
