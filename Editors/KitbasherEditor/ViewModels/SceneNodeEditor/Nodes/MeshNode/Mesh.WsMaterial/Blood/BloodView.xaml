@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Blood" 
              xmlns:userinterface="clr-namespace:GameWorld.Core.Utility.UserInterface;assembly=GameWorld.Core" 
-             xmlns:mathviews1="clr-namespace:Shared.Ui.BaseDialogs.MathViews;assembly=Shared.Ui"
+             xmlns:mathviews1="clr-namespace:Shared.Ui.BaseDialogs.MathViews;assembly=Shared.Ui" xmlns:basedialogs="clr-namespace:Shared.Ui.BaseDialogs;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -44,6 +44,18 @@
                     <Label>:</Label>
                     <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
                 </DockPanel>
+
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Texture - Blood map" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
+                </basedialogs:AeAttribute>
+
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Texture - Blood map2" LabelWidth="{StaticResource labelWidth}" ToolTipEnumValue="Kitbash_WsMaterial_TintColour">
+                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
+                </basedialogs:AeAttribute>
+
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Texture - Blood map2" LabelWidth="{StaticResource labelWidth}" ToolTipEnumValue="Kitbash_WsMaterial_Example">
+                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
+                </basedialogs:AeAttribute>
 
             </DockPanel>
         </Expander>

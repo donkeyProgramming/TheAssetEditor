@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Tint" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
+             xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Tint" xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:colourpickerbutton="clr-namespace:Shared.Ui.BaseDialogs.ColourPickerButton;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -27,33 +27,28 @@
             <DockPanel LastChildFill="False">
 
                 <DockPanel DockPanel.Dock="Top" LastChildFill="True">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Diffuse Tint Mask" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Tint Mask" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
+                    <Button Content="All black mask" DockPanel.Dock="Right" Margin="2"/>
                     <mathviews:Vector4View/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top" LastChildFill="True">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Diffuse Tint Colour" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Tint Colour" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <Button Width="20" Height="20" DockPanel.Dock="Right" Margin="5,0,5,0"/>
-                    <mathviews:Vector3View />
-
+                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient0}" HorizontalAlignment="Left" Width="20" Height="20"/>
+                    <Label>Variation:</Label>
+                    <TextBox Margin="0,2,2,2" Text="{Binding GradientTime3, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="50" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top" LastChildFill="True">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Use faction colours" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <CheckBox />
+                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient0}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
+                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient0}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
+                    <colourpickerbutton:ColourPickerButtonView DataContext="{Binding Gradient0}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>
                 </DockPanel>
-
-
-                <DockPanel DockPanel.Dock="Top" LastChildFill="True">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Faction Mask" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
-                    <mathviews:Vector4View/>
-                </DockPanel>
-
-
 
 
 
