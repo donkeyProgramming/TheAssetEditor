@@ -57,8 +57,8 @@ namespace GameWorld.WpfWindow.ResourceHandling
                 CommonSpriteBatch = new SpriteBatch(_graphicsDevice);
 
                 // Load default resources
-                var mr = LoadEffect("Shaders\\Phazer\\MetalRoughness\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
-                var sg = LoadEffect("Shaders\\Phazer\\SpecGloss\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
+                var mr = LoadEffect("Shaders\\Pbr\\MetalRoughness\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
+                var sg = LoadEffect("Shaders\\Pbr\\SpecGloss\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
                 LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
                 LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
                 LoadEffect("Shaders\\LineShader", ShaderTypes.Line);

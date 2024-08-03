@@ -32,16 +32,10 @@
     <None Update="BuiltContent\Shaders\LineShader.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="BuiltContent\Shaders\Phazer\MetalRoughness\MetalRoughness_main.xnb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Shaders\Phazer\MetalRoughness_main.xnb">
+    <None Update="BuiltContent\Shaders\Pbr\MetalRoughness\MetalRoughness_main.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="BuiltContent\Shaders\Phazer\SpecGloss\SpecGloss_main.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Shaders\Phazer\tone_mapping.xnb">
+    <None Update="BuiltContent\Shaders\Pbr\SpecGloss\SpecGloss_main.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="BuiltContent\Shaders\TexturePreview.xnb">
@@ -60,6 +54,5 @@
 
     <ItemGroup>
       <Folder Include="BuiltContent\Shaders\Geometry\" />
-      <Folder Include="BuiltContent\Shaders\Phazer\MetalRoughness\" />
     </ItemGroup>
 </Project>
