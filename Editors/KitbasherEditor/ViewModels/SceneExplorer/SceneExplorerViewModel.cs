@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using Editors.KitbasherEditor.ViewModels.SceneExplorer;
-using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
@@ -10,44 +9,41 @@ using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 
-namespace KitbasherEditor.ViewModels
+namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
 {
     // Improve using this: https://stackoverflow.com/questions/63110566/multi-select-with-multiple-level-in-wpf-treeview
 
-    public class SceneExplorerViewModel : NotifyPropertyChangedImpl
+    public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IDisposable
     {
         private readonly SceneManager _sceneManager;
+        private readonly EventHub _eventHub;
         private readonly SelectionManager _selectionManager;
-        private readonly SceneNodeViewFactory _sceneNodeViewFactory;
         bool _ignoreSelectionChanges = false;
 
         public ObservableCollection<ISceneNode> SceneGraphRootNodes { get; private set; } = new();
         public ObservableCollection<ISceneNode> SelectedObjects { get; private set; } = new();
         public SceneExplorerContextMenuHandler ContextMenu { get; private set; }
 
-        ISceneNodeViewModel? _selectedNodeViewModel;
-        public ISceneNodeViewModel? SelectedNodeViewModel { get { return _selectedNodeViewModel; } set { SetAndNotify(ref _selectedNodeViewModel, value); } }
-
-        public SceneExplorerViewModel(SceneNodeViewFactory sceneNodeViewFactory, 
-            SelectionManager selectionManager, 
-            SceneManager sceneManager, 
-            CommandFactory commandFactory, 
-            EventHub eventHub)
+        public SceneExplorerViewModel(
+            SelectionManager selectionManager,
+            SceneManager sceneManager,
+            EventHub eventHub,
+            SceneExplorerContextMenuHandler contextMenuHandler)
         {
-            _sceneNodeViewFactory = sceneNodeViewFactory;
             _sceneManager = sceneManager;
+            _eventHub = eventHub;
             _selectionManager = selectionManager;
 
             SceneGraphRootNodes.Add(_sceneManager.RootNode);
 
-            ContextMenu = new SceneExplorerContextMenuHandler(_sceneManager, commandFactory);
+            ContextMenu = contextMenuHandler;
             ContextMenu.SelectedNodesChanged += OnContextMenuActionChangingSelection;
 
             SelectedObjects.CollectionChanged += OnSceneExplorerSelectionChanged;
-            
-            eventHub.Register<SelectionChangedEvent>(OnSceneSelectionChanged);
-            eventHub.Register<SceneObjectAddedEvent>(x=> RebuildTree());
-            eventHub.Register<SceneObjectRemovedEvent>(x => RebuildTree());
+
+            _eventHub.Register<SelectionChangedEvent>(this, OnSceneSelectionChanged);
+            _eventHub.Register<SceneObjectAddedEvent>(this, x => RebuildTree());
+            _eventHub.Register<SceneObjectRemovedEvent>(this, x => RebuildTree());
         }
 
         private void OnContextMenuActionChangingSelection(IEnumerable<ISceneNode> selectedNodes)
@@ -87,10 +83,10 @@ namespace KitbasherEditor.ViewModels
                             var min = isAscending ? newItemIndex : existingSelectionIndex;
                             var max = isAscending ? existingSelectionIndex : newItemIndex;
 
-                            for (int i = min; i < max; i++)
+                            for (var i = min; i < max; i++)
                             {
                                 var element = newItem.Parent.Children.ElementAt(i);
-                                if(SelectedObjects.Contains(element) == false)
+                                if (SelectedObjects.Contains(element) == false)
                                     SelectedObjects.Add(element);
                             }
                         }
@@ -119,7 +115,7 @@ namespace KitbasherEditor.ViewModels
                 }
 
                 var currentSelection = _selectionManager.GetState() as ObjectSelectionState;
-                bool selectionEqual = false;
+                var selectionEqual = false;
                 if (currentSelection != null)
                     selectionEqual = currentSelection.IsSelectionEqual(objectState);
 
@@ -138,15 +134,7 @@ namespace KitbasherEditor.ViewModels
 
         void UpdateViewAndContextMenu()
         {
-            if (SelectedNodeViewModel != null)
-                SelectedNodeViewModel.Dispose();
-
-            if (SelectedObjects.Count == 1)
-                SelectedNodeViewModel = _sceneNodeViewFactory.CreateEditorView(SelectedObjects.First());
-            else
-                SelectedNodeViewModel = null;
-
-            ContextMenu.Create(SelectedObjects);
+            _eventHub.Publish(new SceneNodeSelectedEvent(SelectedObjects.ToList()));
         }
 
         private void RebuildTree()
@@ -159,7 +147,7 @@ namespace KitbasherEditor.ViewModels
             var allModelNodes = _sceneManager.GetEnumeratorConditional(x => x is Rmv2ModelNode);
             foreach (var item in allModelNodes)
             {
-                for (int i = 0; i < item.Children.Count(); i++)
+                for (var i = 0; i < item.Children.Count(); i++)
                 {
                     item.Children[i].IsVisible = i == newLodLevel;
                     item.Children[i].IsExpanded = i == newLodLevel;
@@ -187,7 +175,7 @@ namespace KitbasherEditor.ViewModels
                 var objects = objectSelection.SelectedObjects();
                 foreach (var obj in objects)
                     SelectedObjects.Add(obj);
-                
+
             }
             finally
             {
@@ -195,6 +183,13 @@ namespace KitbasherEditor.ViewModels
             }
 
             UpdateViewAndContextMenu();
+        }
+
+        public void Dispose()
+        {
+            ContextMenu.SelectedNodesChanged -= OnContextMenuActionChangingSelection;
+            SelectedObjects.CollectionChanged -= OnSceneExplorerSelectionChanged;
+            _eventHub.UnRegister(this);
         }
     }
 }

@@ -111,6 +111,6 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <local:SceneItemEditorView DataContext="{Binding SceneExplorer,Mode=OneTime}" Grid.Row="4" Grid.Column="2"/>
+        <local:SceneItemEditorView DataContext="{Binding SceneNodeEditor, Mode=OneTime}" Grid.Row="4" Grid.Column="2"/>
     </Grid>
 </UserControl>

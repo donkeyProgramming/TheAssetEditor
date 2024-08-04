@@ -20,7 +20,7 @@
             <Label Content="Node scale" Width ="{StaticResource labelWidth}"  />
             <Label Content=":" DockPanel.Dock="Left"/>
 
-            <TextBox Text="{Binding BoneScale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
+            <TextBox Text="{Binding BoneScale, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                 <TextBox.ToolTip>
                     <ToolTip Content="Scaling the skeleton will make the mesh look dragged unless the mesh is also exported"/>
                 </TextBox.ToolTip>

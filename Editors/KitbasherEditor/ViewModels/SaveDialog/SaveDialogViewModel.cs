@@ -25,12 +25,12 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         [ObservableProperty] List<ComboBoxItem<LodStrategy>> _lodStrategies;
         [ObservableProperty] List<int> _possibleLodNumbers  = [1,4,5];
 
-        [ObservableProperty] private string _outputPath;
-        [ObservableProperty] private ComboBoxItem<GeometryStrategy> _selectedMeshStrategy;
-        [ObservableProperty] private ComboBoxItem<MaterialStrategy> _selectedWsModelStrategy;
-        [ObservableProperty] private ComboBoxItem<LodStrategy> _selectedLodStrategy;
-        [ObservableProperty] private bool _onlySaveVisible = false;
-        [ObservableProperty] private int _numberOfLodsToGenerate;
+        [ObservableProperty] string _outputPath;
+        [ObservableProperty] ComboBoxItem<GeometryStrategy> _selectedMeshStrategy;
+        [ObservableProperty] ComboBoxItem<MaterialStrategy> _selectedWsModelStrategy;
+        [ObservableProperty] ComboBoxItem<LodStrategy> _selectedLodStrategy;
+        [ObservableProperty] bool _onlySaveVisible = false;
+        [ObservableProperty] int _numberOfLodsToGenerate;
 
         public SaveDialogViewModel(SceneManager sceneManager, SaveService saveService, PackFileService pfs)
         {

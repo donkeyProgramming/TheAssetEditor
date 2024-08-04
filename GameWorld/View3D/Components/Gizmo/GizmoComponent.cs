@@ -47,7 +47,7 @@ namespace GameWorld.Core.Components.Gizmo
             _commandFactory = commandFactory;
             _selectionManager = selectionManager;
 
-            _eventHub.Register<SelectionChangedEvent>(Handle);
+            _eventHub.Register<SelectionChangedEvent>(this, Handle);
         }
 
         public override void Initialize()

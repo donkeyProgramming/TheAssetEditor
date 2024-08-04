@@ -23,8 +23,8 @@ namespace GameWorld.Core.Components
             _eventHub = eventHub;
             _renderEngineComponent = renderEngineComponent;
 
-            _eventHub.Register<CommandStackUndoEvent>(Handle);
-            _eventHub.Register<CommandStackChangedEvent>(Handle);
+            _eventHub.Register<CommandStackUndoEvent>(this, Handle);
+            _eventHub.Register<CommandStackChangedEvent>(this, Handle);
         }
 
         public override void Draw(GameTime gameTime)
@@ -60,8 +60,7 @@ namespace GameWorld.Core.Components
 
         public void Dispose()
         {
-            _eventHub.UnRegister<CommandStackUndoEvent>(Handle);
-            _eventHub.UnRegister<CommandStackChangedEvent>(Handle);
+            _eventHub.UnRegister(this);
         }
     }
 }

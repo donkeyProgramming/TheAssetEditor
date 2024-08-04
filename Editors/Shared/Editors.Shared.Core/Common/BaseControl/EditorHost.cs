@@ -57,7 +57,7 @@ namespace Editors.Shared.Core.Common.BaseControl
 
             componentInserter.Execute();
 
-            eventHub.Register<SceneInitializedEvent>(Initialize);
+            eventHub.Register<SceneInitializedEvent>(this, Initialize);
 
             var typed = Editor as IHostedEditor<TEditor>;
             DisplayName.Value = typed.EditorName;

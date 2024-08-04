@@ -1,6 +1,9 @@
-﻿using Editors.KitbasherEditor.ViewModels.SaveDialog;
+﻿using Editors.KitbasherEditor.UiCommands;
+using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
+using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using GameWorld.Core.Services;
 using KitbasherEditor.EventHandlers;
 using KitbasherEditor.Services;
@@ -9,6 +12,8 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.SaveDialog;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
+using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using KitbasherEditor.Views.EditorViews.PinTool;
@@ -32,14 +37,21 @@ namespace KitbasherEditor
 
             // Creators
             serviceCollection.AddScoped<KitbashSceneCreator>();
-            serviceCollection.AddScoped<SceneNodeViewFactory>();
 
             // View models 
             serviceCollection.AddScoped<KitbasherView>();
             serviceCollection.AddScoped<KitbasherViewModel>();
             serviceCollection.AddScoped<IEditorViewModel, KitbasherViewModel>();
             serviceCollection.AddScoped<SceneExplorerViewModel>();
+            serviceCollection.AddTransient<SceneExplorerContextMenuHandler>();
             serviceCollection.AddScoped<AnimationControllerViewModel>();
+
+            // View models - scene node editors
+            serviceCollection.AddTransient<SceneNodeEditorViewModel>();
+            serviceCollection.AddTransient<MeshViewModel>();
+            serviceCollection.AddTransient<AnimationViewModel>();
+            serviceCollection.AddTransient<MaterialGeneralViewModel>();
+            serviceCollection.AddTransient<WeightedMaterialViewModel>();
 
             // Sub tools
             serviceCollection.AddScoped<VertexDebuggerViewModel>();
@@ -67,7 +79,11 @@ namespace KitbasherEditor
             // Event handlers
             serviceCollection.AddScoped<SkeletonChangedHandler>();
 
+            // Commands
             RegisterAllAsOriginalType<IKitbasherUiCommand>(serviceCollection, ServiceLifetime.Transient);
+            serviceCollection.AddTransient<CopyTexturesToPackCommand>();
+            serviceCollection.AddTransient<DeleteMissingTexturesCommand>();
+            serviceCollection.AddTransient<ResolveMissingTextureCommand>();   
         }
 
         public override void RegisterTools(IToolFactory factory)

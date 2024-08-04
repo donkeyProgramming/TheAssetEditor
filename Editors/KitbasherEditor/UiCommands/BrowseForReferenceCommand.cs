@@ -70,6 +70,16 @@ namespace KitbasherEditor.ViewModels.UiCommands
         }
     }
 
+
+    public class ImportGeneralHeadReferenceCommand : ImportReferenceCommand
+    {
+        public ImportGeneralHeadReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService) : base(kitbashSceneCreator, packFileService)
+        {
+            _filePath = @"variantmeshes\wh_variantmodels\hu1e\cth\cth_celestial_general\cth_celestial_general_head_05.wsmodel";
+            ToolTip = "Import Goblin as Reference";
+        }
+    }
+
     public class ImportSlayerReferenceCommand : ImportReferenceCommand
     {
         public ImportSlayerReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService) : base(kitbashSceneCreator, packFileService)
