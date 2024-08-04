@@ -22,7 +22,8 @@ namespace Editors.Audio.Presentation.AudioEditor
         public static List<string> CampaignVO { get; } =
         [
             "Lord",
-            "Hero"
+            "Hero",
+            "Creature"
         ];
 
         public static List<string> BattleVO { get; } =
@@ -54,13 +55,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             "Vocalisation"
         ];
 
-
-
-
-
-        //NEED TO FINISH THIS
-
-        // These have to be defined in the code rather than dynamically as there's no way to programatically define what is essential vs all Dialogue Events for each Dialogue Event Bnk type.
+        // The lists of Dialogue Events have to be defined directly rather than dynamically as there's no programatic way to determine them, I just know what is essential.
         public static List<string> BattleIndividualMeleeAll { get; } =
         [
             "Battle_Individual_Melee_Weapon_Hit"
@@ -127,6 +122,64 @@ namespace Editors.Audio.Presentation.AudioEditor
             "campaign_vo_yes_short_aggressive",
             "gotrek_felix_arrival",
             "gotrek_felix_departure"
+        ];
+
+        public static List<string> CampaignVODialogueEventsLordAll { get; } =
+        [
+            "campaign_vo_agent_action_failed", //Agent
+            "campaign_vo_agent_action_success", //Agent
+            "campaign_vo_attack", //Lord & Agent
+            "campaign_vo_cam_disband", //Lord
+            "campaign_vo_cam_disbanded_neg", //Lord
+            "campaign_vo_cam_disbanded_pos", //Lord
+            "campaign_vo_cam_skill_weapon_tree", //Lord
+            "campaign_vo_cam_skill_weapon_tree_response", //Lord
+            "campaign_vo_cam_tech_tree", //Lord
+            "campaign_vo_cam_tech_tree_response", //Lord
+            "campaign_vo_created", //Lord & Agent
+            "campaign_vo_diplomacy_negative", //Lord
+            "campaign_vo_diplomacy_positive", //Lord
+            "campaign_vo_diplomacy_selected", //Lord
+            "campaign_vo_level_up", //Lord & Agent
+            "campaign_vo_mounted_creature", // Creature
+            "campaign_vo_move", //Lord & Agent
+            "campaign_vo_move_garrisoning", //Lord
+            "campaign_vo_move_next_turn", //Lord & Agent
+            "campaign_vo_new_commander", //Lord
+            "campaign_vo_no", //Lord & Agent
+            "campaign_vo_no_short", //Lord & Agent
+            "campaign_vo_post_battle_defeat", //Lord & Agent
+            "campaign_vo_post_battle_victory", //Lord & Agent
+            "campaign_vo_recruit_units", //Lord
+            "campaign_vo_retreat", //Lord & Agent
+            "campaign_vo_selected", //Lord & Agent
+            "campaign_vo_selected_allied", //Lord & Agent
+            "campaign_vo_selected_fail", //Lord & Agent
+            "campaign_vo_selected_first_time", //Lord & Agent
+            "campaign_vo_selected_neutral", //Lord & Agent
+            "campaign_vo_selected_short", //Lord & Agent
+            "campaign_vo_ship_dock", //Lord & Agent
+            "campaign_vo_special_ability", //Lord & Agent
+            "campaign_vo_stance_ambush", //Lord
+            "campaign_vo_stance_astromancy", //Lord
+            "campaign_vo_stance_channeling", //Lord
+            "campaign_vo_stance_default", //Lord
+            "campaign_vo_stance_double_time", //Lord
+            "campaign_vo_stance_land_raid", //Lord
+            "campaign_vo_stance_march", //Lord
+            "campaign_vo_stance_muster", //Lord
+            "campaign_vo_stance_patrol", //Lord
+            "campaign_vo_stance_raise_dead", //Lord
+            "campaign_vo_stance_set_camp", //Lord
+            "campaign_vo_stance_set_camp_raiding", //Lord
+            "campaign_vo_stance_settle", //Lord
+            "campaign_vo_stance_stalking", //Lord
+            "campaign_vo_stance_tunneling", //Lord
+            "campaign_vo_yes", //Lord & Agent
+            "campaign_vo_yes_short", //Lord & Agent
+            "campaign_vo_yes_short_aggressive", //Lord & Agent
+            "gotrek_felix_arrival", //Lord
+            "gotrek_felix_departure" //Lord
         ];
 
         public static List<string> CampaignVOConversationalAll { get; } =

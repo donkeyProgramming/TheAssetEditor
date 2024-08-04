@@ -223,7 +223,7 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public class DictionaryEqualityComparer<TKey, TValue> : IEqualityComparer<Dictionary<TKey, TValue>>
         {
-            public static readonly DictionaryEqualityComparer<TKey, TValue> Default = new DictionaryEqualityComparer<TKey, TValue>();
+            public static readonly DictionaryEqualityComparer<TKey, TValue> Default = new();
 
             public bool Equals(Dictionary<TKey, TValue> x, Dictionary<TKey, TValue> y)
             {
