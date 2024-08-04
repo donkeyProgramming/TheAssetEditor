@@ -404,6 +404,12 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 {
                     var header = GetAnimationHeader(animationInstance.File, pfs);
 
+                    if(header == null)
+                    {
+                        errorList.Warning(animationSlot, $"Could not locate {animationInstance.File} while trying to validate CheckForRiderAndHisMountAnimationsVersion");
+                        continue;
+                    }
+
                     var version = header.Version;
                     var isVersionMatch = version == mainAnimationToCompareVersion;
                     if (!isVersionMatch)
