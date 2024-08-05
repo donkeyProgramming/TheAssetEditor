@@ -16,10 +16,10 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             _pfs = packFileService;
         }
 
-        public void Export(string path, string outputPath, bool convert)
+        public void Export(string filePath, string outputPath, bool convert)
         {
-            var packFile = _pfs.FindFile(path);
-            var fileName = Path.GetFileNameWithoutExtension(path);
+            var packFile = _pfs.FindFile(filePath);
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
             var fileDirectory = outputPath + "/" + fileName + ".png";
             var bytes = packFile.DataSource.ReadData();
             var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
@@ -64,7 +64,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             }
         }
 
-        private void DoNotConvertExport(byte[] imgBytes, string outputPath, string fileDirectory)
+        public void DoNotConvertExport(byte[] imgBytes, string outputPath, string fileDirectory)
         {
             var ms = new MemoryStream(imgBytes);
             using Image img = Image.FromStream(ms);

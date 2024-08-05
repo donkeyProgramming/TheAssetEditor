@@ -13,11 +13,12 @@ using System.Drawing;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel.Types;
-using SharpGLTF.Schema2;
+//using SharpGLTF.Schema2;
 using MeshImportExport;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.Animation;
 using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
+//using SharpDX.MediaFoundation.DirectX;
 
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
@@ -55,14 +56,16 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
             var lodLevel = rmv2.ModelList.First();
             foreach (var rmvMesh in lodLevel)
             {
-                var material = BuildMaterial(_packFileService, rmvMesh, file, _settings, _ddsToNormalPngExporter, _ddsToMaterialPngExporter);
+                
+                //var material = BuildMaterial(_packFileService, rmvMesh, file, _settings, _ddsToNormalPngExporter, _ddsToMaterialPngExporter);
                 //var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file, _settings);
             }
         }
 
-        internal MaterialBuilder BuildMaterialPerMesh(RmvModel rmvMesh, PackFile file, RmvToGltfExporterSettings settings)
+        internal MaterialBuilder BuildMaterialPerMesh(RmvModel rmvMesh, RmvToGltfExporterSettings settings)
         {
-            var material = BuildMaterial(_packFileService, rmvMesh, file, _settings, _ddsToNormalPngExporter, _ddsToMaterialPngExporter);
+            var material = GenerateMaterial(settings, rmvMesh);
+            //var material = BuildMaterial(_packFileService, rmvMesh, file, _settings, _ddsToNormalPngExporter, _ddsToMaterialPngExporter);
             //var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file, settings);
             return material;
         }
@@ -73,7 +76,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
             return material;
         }
 
-        public static MaterialBuilder BuildMaterial(PackFileService pfs, RmvModel model, PackFile inFile, 
+        /**public static MaterialBuilder BuildMaterial(PackFileService pfs, RmvModel model, PackFile inFile, 
             RmvToGltfExporterSettings settings, DdsToNormalPngExporter ddsToNormalPngExporter, DdsToMaterialPngExporter ddsToMaterialPngExporter)
         {
 
@@ -106,6 +109,52 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
                 .WithChannelImage(KnownChannel.Normal, new MemoryImage(normalMapPath));
 
             return material;
+        }**/
+
+        public MaterialBuilder GenerateMaterial(RmvToGltfExporterSettings settings, RmvModel rmv2Mesh)
+        {
+            var textures = rmv2Mesh.Material.GetAllTextures();
+
+            var normalMapTexture = textures.FirstOrDefault(t => t.TexureType == TextureType.Normal);
+            if(normalMapTexture.Path != null)
+            {
+                _ddsToNormalPngExporter.Export(_packFileService.GetFullPath(settings.InputFile), settings.OutputPath, settings.ConvertNormalTextureToBlue);
+            }
+
+            var materialTexture = textures.FirstOrDefault(t => t.TexureType == TextureType.MaterialMap);
+            if (materialTexture.Path != null)
+            {
+                _ddsToMaterialPngExporter.Export(_packFileService.GetFullPath(settings.InputFile), settings.OutputPath, settings.ConvertMaterialTextureToBlender);
+            }
+
+            var baseColourTexture = textures.FirstOrDefault(t => t.TexureType == TextureType.BaseColour);
+            if (baseColourTexture.Path != null)
+            {
+                var packFile = _packFileService.FindFile(_packFileService.GetFullPath(settings.InputFile));
+                var bytes = packFile.DataSource.ReadData();
+                var fileDirectory = settings.OutputPath + "/" + settings.InputFile.Name + ".png";
+                var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
+                GenericExportNoConversion(imgBytes, settings.OutputPath, fileDirectory);
+            }
+
+
+            var material = new MaterialBuilder(rmv2Mesh.Material.ModelName + "_Material")
+            .WithDoubleSide(true)
+            .WithMetallicRoughness()
+            .WithChannelImage(KnownChannel.BaseColor, baseColourTexture.Path)
+            .WithChannelImage(KnownChannel.MetallicRoughness, materialTexture.Path)
+            .WithChannelImage(KnownChannel.Normal, normalMapTexture.Path);
+
+            return material;
+        }
+
+
+        public void GenericExportNoConversion(byte[] imgBytes, string outputPath, string fileDirectory)
+        {
+            var ms = new MemoryStream(imgBytes);
+            using Image img = Image.FromStream(ms);
+            using Bitmap bitmap = new Bitmap(img);
+            bitmap.Save(fileDirectory, System.Drawing.Imaging.ImageFormat.Png);
         }
     }
 }
