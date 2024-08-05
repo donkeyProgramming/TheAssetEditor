@@ -14,7 +14,7 @@ public class OpenAnimationBatchConverterCommand : IUiCommand
 
     public void Execute()
     {
-        var window = _windowFactory.Create<AnimationBatchExportViewModel, AnimationBatchExportView>("Animation batch converter", 400, 300);
+        var window = _windowFactory.Create<AnimationBatchExportViewModel, AnimationBatchExportView>("Animation batch Converter", 400, 300);
         window.AlwaysOnTop = true;
         window.ShowWindow();
     }

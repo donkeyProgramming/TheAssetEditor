@@ -5,6 +5,7 @@ using Editors.Audio.BnkCompiler.ObjectGeneration;
 using Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3;
 using Editors.Audio.Presentation.AudioEditor;
 using Editors.Audio.Presentation.AudioEditor.ViewModels;
+using Editors.Audio.Presentation.AudioEditor.Views;
 using Editors.Audio.Presentation.AudioExplorer;
 using Editors.Audio.Presentation.Compiler;
 using Editors.Audio.Storage;
@@ -28,7 +29,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerView>();
             serviceCollection.AddScoped<CompilerViewModel>();
 
-            serviceCollection.AddScoped<AudioEditorDataViewModel>();
+            serviceCollection.AddTransient<AudioEditorSettingsView>();
             serviceCollection.AddScoped<AudioEditorSettingsViewModel>();
             serviceCollection.AddScoped<AudioEditorViewModel>();
 

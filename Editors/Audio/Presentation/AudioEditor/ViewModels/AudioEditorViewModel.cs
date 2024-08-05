@@ -6,6 +6,7 @@ using System.Text;
 using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.Presentation.AudioEditor.Views;
 using Editors.Audio.Storage;
 using Newtonsoft.Json;
 using Serilog;
@@ -14,6 +15,7 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
+using Shared.Ui.BaseDialogs.WindowHandling;
 using static Editors.Audio.Presentation.AudioEditor.AudioEditorViewModelHelpers;
 
 namespace Editors.Audio.Presentation.AudioEditor.ViewModels
@@ -36,8 +38,9 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 
     public partial class AudioEditorViewModel : ObservableObject, IEditorViewModel
     {
-        public readonly IAudioRepository AudioRepository;
-        public readonly PackFileService PackFileService;
+        private readonly IAudioRepository _audioRepository;
+        private readonly PackFileService _packFileService;
+        private readonly IWindowFactory _windowFactory;
         readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
@@ -65,10 +68,11 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         public ObservableCollection<CustomStatesDataGridProperties> CustomStatesDataGridItems { get; set; } = [];
         public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData; // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
 
-        public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService)
+        public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService, IWindowFactory windowFactory)
         {
-            AudioRepository = audioRepository;
-            PackFileService = packFileService;
+            _audioRepository = audioRepository;
+            _packFileService = packFileService;
+            _windowFactory = windowFactory;
         }
 
         partial void OnSelectedAudioProjectEventTypeChanged(string value)
@@ -82,13 +86,13 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             AudioEditorData.Instance.SelectedAudioProjectEvent = value;
 
             // Load the Event upon selection.
-            LoadEvent(this, AudioRepository, ShowCustomStatesOnly);
+            LoadEvent(this, _audioRepository, ShowCustomStatesOnly);
         }
 
         partial void OnShowCustomStatesOnlyChanged(bool value)
         {
             // Load the Event again to reset the ComboBoxes in the DataGrid.
-            LoadEvent(this, AudioRepository, ShowCustomStatesOnly);
+            LoadEvent(this, _audioRepository, ShowCustomStatesOnly);
         }
 
         [RelayCommand] public void CreateAudioProject()
@@ -99,21 +103,28 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             SelectedAudioProjectEvent = "";
 
             // Create the object for State Groups with qualifiers so that their keys in the EventsData dictionary are unique.
-            AddQualifiersToStateGroups(AudioRepository.DialogueEventsWithStateGroups);
+            AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
 
             // Initialise EventsData according to the Audio Project settings selected.
             InitialiseEventsData(this);
 
             // Add the Audio Project with empty events to the PackFile.
-            AudioProjectData.AddAudioProjectToPackFile(PackFileService, EventsData, AudioProjectFileName);
+            AudioProjectData.AddAudioProjectToPackFile(_packFileService, EventsData, AudioProjectFileName);
 
             // Load the custom States so that they can be referenced when the Event is loaded.
             PrepareCustomStatesForComboBox(this);
         }
 
+        [RelayCommand] public void NewAudioProject()
+        {
+            var window = _windowFactory.Create<AudioEditorSettingsViewModel, AudioEditorSettingsView>("Audio Editor Settings", 400, 300);
+            window.AlwaysOnTop = true;
+            window.ShowWindow();
+        }
+
         public void LoadAudioProject()
         {
-            using var browser = new PackFileBrowserWindow(PackFileService, [".json"]);
+            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
 
             if (browser.ShowDialog())
             {
@@ -123,13 +134,13 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
                 SelectedAudioProjectEvent = "";
 
                 // Create the object for State Groups with qualifiers so that their keys in the EventsData dictionary are unique.
-                AddQualifiersToStateGroups(AudioRepository.DialogueEventsWithStateGroups);
+                AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
 
-                var filePath = PackFileService.GetFullPath(browser.SelectedFile);
-                var file = PackFileService.FindFile(filePath);
+                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
+                var file = _packFileService.FindFile(filePath);
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
-                var eventData = AudioProjectData.ConvertAudioProjectToEventsData(AudioRepository, audioProjectJson);
+                var eventData = AudioProjectData.ConvertAudioProjectToEventsData(_audioRepository, audioProjectJson);
                 AudioEditorData.Instance.EventsData = eventData;
                 _logger.Here().Information($"Loaded Audio Project file: {file.Name}");
 
@@ -145,20 +156,20 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         {
             UpdateEventDataWithCurrentEvent(this);
 
-            AudioProjectData.AddAudioProjectToPackFile(PackFileService, EventsData, AudioProjectFileName);
+            AudioProjectData.AddAudioProjectToPackFile(_packFileService, EventsData, AudioProjectFileName);
         }
 
         public void LoadCustomStates()
         {
-            using var browser = new PackFileBrowserWindow(PackFileService, [".json"]);
+            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
 
             if (browser.ShowDialog())
             {
                 // Remove any pre-existing data otherwise DataGrid isn't happy.
                 CustomStatesDataGridItems.Clear();
 
-                var filePath = PackFileService.GetFullPath(browser.SelectedFile);
-                var file = PackFileService.FindFile(filePath);
+                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
+                var file = _packFileService.FindFile(filePath);
                 var bytes = file.DataSource.ReadData();
                 var str = Encoding.UTF8.GetString(bytes);
                 var customStatesFileData = JsonConvert.DeserializeObject<List<CustomStatesDataGridProperties>>(str);
@@ -171,16 +182,16 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
                 PrepareCustomStatesForComboBox(this);
 
                 // Reload the selected Event so the ComboBoxes are updated.
-                LoadEvent(this, AudioRepository, ShowCustomStatesOnly);
+                LoadEvent(this, _audioRepository, ShowCustomStatesOnly);
             }
         }
 
         public void SaveCustomStates()
         {
             var dataGridItemsJson = JsonConvert.SerializeObject(CustomStatesDataGridItems, Formatting.Indented);
-            var pack = PackFileService.GetEditablePack();
+            var pack = _packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
-            PackFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{CustomStatesFileName}.json", new MemorySource(byteArray)));
+            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{CustomStatesFileName}.json", new MemorySource(byteArray)));
             _logger.Here().Information($"Saved Custom States file: {CustomStatesFileName}");
         }
 
