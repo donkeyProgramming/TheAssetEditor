@@ -41,8 +41,6 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             effect.Parameters["Emissive_GradientColours"].SetValue(GradientColours);
             effect.Parameters["Emissive_GradientTimes"].SetValue(GradientTimes);
             effect.Parameters["Emissive_FresnelStrength"].SetValue(EmissiveFresnelStrength);
-
-           
         }
 
         public ICapability Clone()

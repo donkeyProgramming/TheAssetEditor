@@ -13,6 +13,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
     public partial class EmissiveViewModel : ObservableObject
     {
         private readonly EmissiveCapability _emissiveCapability;
+
         [ObservableProperty] ShaderTextureViewModel _emissiveTexture;
         [ObservableProperty] ShaderTextureViewModel _emissiveDistortionTexture;
         [ObservableProperty] Vector2ViewModel _emissiveDirection;
