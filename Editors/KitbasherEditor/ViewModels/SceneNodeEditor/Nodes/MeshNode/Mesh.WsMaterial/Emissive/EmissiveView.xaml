@@ -113,7 +113,7 @@
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="EmissiveStrength" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="EmissiveStrength*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <TextBox Margin="2,2,2,2" Text="{Binding EmissiveStrength, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </DockPanel>
