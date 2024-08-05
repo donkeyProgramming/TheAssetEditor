@@ -20,6 +20,9 @@ namespace E2EVerification
     {
         private readonly string _normalFilePath01 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_normal.dds";
         private readonly string _materialFilePath01 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_material_map.dds";
+        private readonly string _normalFilePath02 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_head_01_normal.dds";
+        private readonly string _materialFilePath02 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_head_01_material_map.dds";
+
         //private readonly string _outputPath = "C:/franz";
 
         [Test]
@@ -29,7 +32,7 @@ namespace E2EVerification
             var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
             var PackFile = runner.LoadPackFile(path);
             runner.DdsToNormalPngExporterRepos.Export(_normalFilePath01, "C:/franz", true);
-            var foundFile = ("C:/franz/" + "test.png");
+            var foundFile = ("C:/franz/" + "emp_karl_franz_body_01_normal.png");
             Assert.That(foundFile, Is.Not.Null);
         }
         [Test]
@@ -39,7 +42,27 @@ namespace E2EVerification
             var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
             var PackFile = runner.LoadPackFile(path);
             runner.DdsToMaterialPngExporterRepos.Export(_materialFilePath01, "C:/franz", true);
-            var foundFile = ("C:/franz/" + "test.png");
+            var foundFile = ("C:/franz/" + "emp_karl_franz_body_01_material_map.png");
+            Assert.That(foundFile, Is.Not.Null);
+        }
+        [Test]
+        public void doNotConvertNormal()
+        {
+            var runner = new AssetEditorTestRunner();
+            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+            var PackFile = runner.LoadPackFile(path);
+            runner.DdsToNormalPngExporterRepos.Export(_normalFilePath02, "C:/franz", false);
+            var foundFile = ("C:/franz/" + "emp_karl_franz_head_01_normal.png");
+            Assert.That(foundFile, Is.Not.Null);
+        }
+        [Test]
+        public void doNotConvertMaterial()
+        {
+            var runner = new AssetEditorTestRunner();
+            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+            var PackFile = runner.LoadPackFile(path);
+            runner.DdsToMaterialPngExporterRepos.Export(_materialFilePath02, "C:/franz", false);
+            var foundFile = ("C:/franz/" + "emp_karl_franz_head_01_material_map.png");
             Assert.That(foundFile, Is.Not.Null);
         }
 

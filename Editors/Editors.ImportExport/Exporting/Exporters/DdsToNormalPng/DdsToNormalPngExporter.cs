@@ -1,16 +1,8 @@
 ﻿using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using SharpDX.MediaFoundation;
-using System;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Reflection;
-using Shared.Core.Events;
-using System.Windows;
-using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
-using Pfim;
 using MeshImportExport;
 
 
@@ -18,48 +10,26 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
 {
     public class DdsToNormalPngExporter
     {
-        private readonly PackFileService pfs;
+        private readonly PackFileService _pfs;
         public DdsToNormalPngExporter(PackFileService packFileService) 
         {
-            pfs = packFileService;
+            _pfs = packFileService;
         }
 
         public void Export(string path, string outputPath, bool convert)
         {
-            var file = pfs.FindFile(path);
-            var bytes = file.DataSource.ReadData();
-            var bmp = TextureHelper.ConvertDdsToPng(bytes);
-
-            var ms = new MemoryStream(bmp);
-
-            //using (Image image = Image.FromFile(path + file.Name))
-            using (Image image = Image.FromStream(ms))
-            using (Bitmap bitmap = new Bitmap(image))
+            var packFile = _pfs.FindFile(path);
+            var fileName = Path.GetFileNameWithoutExtension(path);
+            var fileDirectory = outputPath + "/" + fileName + ".png";
+            var bytes = packFile.DataSource.ReadData();
+            var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
+            if (convert)
             {
-                for (int x = 0; x < bitmap.Width; x++)
-                {
-                    for (int y = 0; y < bitmap.Height; y++)
-                    {
-                        Color pixel = bitmap.GetPixel(x, y);
-
-                        int R = pixel.R;
-                        int G = pixel.G;
-                        int B = pixel.B;
-                        int A = pixel.A;
-
-                        //this goes from orange to blue
-                        int R1 = A;
-                        int B1 = 255;
-                        int G1 = G;
-                        int A1 = 255;
-
-                        // Set the new pixel color
-                        Color newColor = Color.FromArgb(A1, R1, G1, B1);
-                        bitmap.SetPixel(x, y, newColor);
-                    }
-                }
-                var fileName = Path.GetFileNameWithoutExtension(path);
-                bitmap.Save(outputPath + "/" + fileName + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                ConvertToBlueNormalMap(imgBytes, outputPath, fileDirectory);
+            }
+            else
+            {
+                DoNotConvertExport(imgBytes, outputPath, fileDirectory);
             }
         }
 
@@ -72,6 +42,34 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             return ExportSupportEnum.NotSupported;
         }
 
+        private void ConvertToBlueNormalMap(byte[] imgBytes, string outputPath, string fileDirectory)
+        {
+            var ms = new MemoryStream(imgBytes);
 
+            using Image img = Image.FromStream(ms);
+            using Bitmap bitmap = new Bitmap(img);
+            {
+                for (int x = 0; x < bitmap.Width; x++)
+                {
+                    for (int y = 0; y < bitmap.Height; y++)
+                    {
+                        var pixel = bitmap.GetPixel(x, y);
+                        var G = pixel.G;
+                        var A = pixel.A;
+                        var newColor = Color.FromArgb(255, A, G, 255);
+                        bitmap.SetPixel(x, y, newColor);
+                    }
+                }
+                bitmap.Save(fileDirectory, System.Drawing.Imaging.ImageFormat.Png);
+            }
+        }
+
+        private void DoNotConvertExport(byte[] imgBytes, string outputPath, string fileDirectory)
+        {
+            var ms = new MemoryStream(imgBytes);
+            using Image img = Image.FromStream(ms);
+            using Bitmap bitmap = new Bitmap(img);
+            bitmap.Save(fileDirectory, System.Drawing.Imaging.ImageFormat.Png);
+        }
     }
 }
