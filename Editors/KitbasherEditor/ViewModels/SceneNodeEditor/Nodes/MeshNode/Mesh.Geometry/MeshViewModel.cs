@@ -21,10 +21,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         [ObservableProperty] public bool _drawBoundingBox; 
         [ObservableProperty] public bool _drawPivotPoint;
         [ObservableProperty] bool _reduceMeshOnLodGeneration ;
-        [ObservableProperty] string _shaderName;
         [ObservableProperty] int _vertexCount;
         [ObservableProperty] int _indexCount;
-        [ObservableProperty] ModelMaterialEnum _selectedMaterialType;
         [ObservableProperty] UiVertexFormat _vertexType;
         [ObservableProperty] IEnumerable<UiVertexFormat> _possibleVertexTypes = [UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic];
 
@@ -43,10 +41,10 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
             ModelName = _meshNode.Material.ModelName;
             DrawBoundingBox = _meshNode.DisplayBoundingBox;
             DrawPivotPoint = _meshNode.DisplayPivotPoint;
-            ShaderName = _meshNode.CommonHeader.ShaderParams.ShaderName;
+      
             VertexCount = _meshNode.Geometry.VertexCount();
             IndexCount = _meshNode.Geometry.GetIndexCount();
-            SelectedMaterialType = _meshNode.CommonHeader.ModelTypeFlag;
+    
             ReduceMeshOnLodGeneration = _meshNode.ReduceMeshOnLodGeneration;
         }
 

@@ -17,6 +17,7 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
 
         public ICapability[] Capabilities { get; protected set; } = [];
         public CapabilityMaterialsEnum Type { get; protected set; }
+        public string TemplateName { get; internal set; }
 
         protected CapabilityMaterial(CapabilityMaterialsEnum materialType, ShaderTypes shaderType, ResourceLibrary resourceLibrary)
         {

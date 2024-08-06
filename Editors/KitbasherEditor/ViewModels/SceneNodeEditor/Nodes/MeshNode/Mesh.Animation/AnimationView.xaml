@@ -10,7 +10,7 @@
         <System:Double x:Key="labelWidth">120</System:Double>
     </UserControl.Resources>
 
-    <Expander DockPanel.Dock="Top" Margin="0,5,0,0" IsExpanded="False">
+    <Expander DockPanel.Dock="Top" IsExpanded="False">
         <Expander.Header>
             <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Border}" >
                 <TextBlock Text="Animation" FontWeight="Bold" Margin="3"/>

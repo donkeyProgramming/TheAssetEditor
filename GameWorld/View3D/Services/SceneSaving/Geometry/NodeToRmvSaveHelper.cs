@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -9,8 +8,6 @@ using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using Shared.Core.Events;
-using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
@@ -18,16 +15,14 @@ using Shared.GameFormats.RigidModel.LodHeader;
 
 namespace GameWorld.Core.Services.SceneSaving.Geometry
 {
-    public class SceneSaverService
+    public class NodeToRmvSaveHelper
     {
-        private readonly ILogger _logger = Logging.Create<SceneSaverService>();
-        private readonly EventHub _eventHub;
+        private readonly ILogger _logger = Logging.Create<NodeToRmvSaveHelper>();
         private readonly PackFileService _packFileService;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public SceneSaverService(EventHub eventHub, PackFileService packFileService,ApplicationSettingsService applicationSettingsService)
+        public NodeToRmvSaveHelper(PackFileService packFileService, ApplicationSettingsService applicationSettingsService)
         {
-            _eventHub = eventHub;
             _packFileService = packFileService;
             _applicationSettingsService = applicationSettingsService;
         }
@@ -36,10 +31,9 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
         {
             try
             {
-                var inputFile = _packFileService.FindFile(outputPath);
                 var bytes = GenerateBytes(mainNode, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, saveSettings, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
-                var res = SaveHelper.Save(_packFileService, outputPath, inputFile, bytes);
-                _eventHub.Publish(new ScopedFileSavedEvent() {NewPath = outputPath });
+                var originalFileHandle = _packFileService.FindFile(outputPath);
+                var res = SaveHelper.Save(_packFileService, outputPath, originalFileHandle, bytes);
             }
             catch (Exception e)
             {

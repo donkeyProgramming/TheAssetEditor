@@ -1,16 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using GameWorld.Core.Animation;
-using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.Rendering.Shading.Factories;
 using GameWorld.Core.Services;
 using GameWorld.WpfWindow.ResourceHandling;
-using Serilog;
-using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.WsModel;
 
@@ -22,17 +17,13 @@ namespace GameWorld.Core.SceneNodes
         private readonly ResourceLibrary _resourceLibrary;
         private readonly IGeometryGraphicsContextFactory _contextFactory;
         private readonly PackFileService _packFileService;
-        private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly AbstractMaterialFactory _abstractMaterialFactory;
 
-        public Rmv2ModelNodeLoader(ResourceLibrary resourceLibrary, IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, RenderEngineComponent renderEngineComponent, ApplicationSettingsService applicationSettingsService, AbstractMaterialFactory abstractMaterialFactory)
+        public Rmv2ModelNodeLoader(ResourceLibrary resourceLibrary, IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, AbstractMaterialFactory abstractMaterialFactory)
         {
             _resourceLibrary = resourceLibrary;
             _contextFactory = contextFactory;
             _packFileService = packFileService;
-            _renderEngineComponent = renderEngineComponent;
-            _applicationSettingsService = applicationSettingsService;
             _abstractMaterialFactory = abstractMaterialFactory;
         }
 
@@ -64,23 +55,12 @@ namespace GameWorld.Core.SceneNodes
                     if (string.IsNullOrWhiteSpace(rmvModel.Material.ModelName))
                         rmvModel.Material.ModelName = Path.GetFileNameWithoutExtension(modelFullPath);
 
-                    var node = new Rmv2MeshNode(_resourceLibrary, rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, shader);
-                    node.OriginalFilePath = modelFullPath;
-                    node.OriginalPartIndex = modelIndex;
-                    node.LodIndex = lodIndex;
-
-                   if (_applicationSettingsService.CurrentSettings.AutoResolveMissingTextures)
-                   {
-                       try
-                       {
-                           var missingTextureResolver = new MissingTextureResolver();
-                           missingTextureResolver.ResolveMissingTextures(node, _packFileService);
-                       }
-                       catch (Exception e)
-                       {
-                           //_logger.Here().Error($"Error while trying to resolve textures from WS model while loading model, {e.Message}");
-                       }
-                   }
+                    var node = new Rmv2MeshNode(_resourceLibrary, rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, shader)
+                    {
+                        OriginalFilePath = modelFullPath,
+                        OriginalPartIndex = modelIndex,
+                        LodIndex = lodIndex
+                    };
 
                     lodNode.AddObject(node);
                 }

@@ -42,13 +42,13 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<ViewOnlySelectedService>();
             serviceCollection.AddScoped<FocusSelectableObjectService>();
             serviceCollection.AddScoped<ComplexMeshLoader>();
-            serviceCollection.AddScoped<WsModelGeneratorService>();
+            serviceCollection.AddTransient<WsModelGeneratorService>();
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
             serviceCollection.AddScoped<Rmv2ModelNodeLoader>();
 
             serviceCollection.AddScoped<SaveService>();
-            serviceCollection.AddScoped<SceneSaverService>();
+            serviceCollection.AddScoped<NodeToRmvSaveHelper>();
 
             serviceCollection.AddScoped<GeometryStrategyProvider>();
             serviceCollection.AddScoped<IGeometryStrategy, NoMeshStrategy>();

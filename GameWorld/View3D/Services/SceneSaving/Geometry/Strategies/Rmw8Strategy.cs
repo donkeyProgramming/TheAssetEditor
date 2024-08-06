@@ -5,14 +5,14 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry.Strategies
 {
     public class Rmw8Strategy : IGeometryStrategy
     {
-        private readonly SceneSaverService _sceneSaverService;
+        private readonly NodeToRmvSaveHelper _sceneSaverService;
 
         public GeometryStrategy StrategyId => GeometryStrategy.Rmv8;
         public string Name => "Rmv8";
         public string Description => "";
         public bool IsAvailable => true;
 
-        public Rmw8Strategy(SceneSaverService sceneSaverService)
+        public Rmw8Strategy(NodeToRmvSaveHelper sceneSaverService)
         {
             _sceneSaverService = sceneSaverService;
         }

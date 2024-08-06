@@ -38,11 +38,8 @@ namespace GameWorld.WpfWindow.ResourceHandling
             else
             {
                 var imageFile = packFileService.FindFile(fileName);
-                if (imageFile == null)
-                {
-                    _logger.Here().Error($"Unable to find texture: {fileName}");
+                if (imageFile == null)  
                     return null;
-                }
                 var imageContent = imageFile.DataSource.ReadData();
                 return imageContent;
             }

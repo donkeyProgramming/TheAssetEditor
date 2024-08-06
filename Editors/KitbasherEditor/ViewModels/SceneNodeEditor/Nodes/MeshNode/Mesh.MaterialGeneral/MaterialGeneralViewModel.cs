@@ -24,6 +24,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
         [ObservableProperty] string _textureDirectory;
         [ObservableProperty] bool _useAlpha;
         [ObservableProperty] bool _onlyShowUsedTextures = true;
+        [ObservableProperty] ModelMaterialEnum _selectedMaterialType;
+        [ObservableProperty] string _shaderName;
 
         public MaterialGeneralViewModel(PackFileService pfs, ApplicationSettingsService applicationSettings, IUiCommandFactory uiCommandFactory)
         {
@@ -38,6 +40,8 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2
 
             UseAlpha = _meshNode.Material.AlphaMode == AlphaMode.Transparent;
             TextureDirectory = _meshNode.Material.TextureDirectory;
+            ShaderName = _meshNode.CommonHeader.ShaderParams.ShaderName;
+            SelectedMaterialType = _meshNode.CommonHeader.ModelTypeFlag;
             RefreshTextureList();
         }
 

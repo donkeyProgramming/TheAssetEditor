@@ -4,7 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using GameWorld.Core.Rendering.Shading.Capabilities;
+using GameWorld.Core.Rendering.Shading.Shaders;
 using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -16,6 +19,50 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 {
+    public class CapabilityMaterialTemplateHandler
+    {
+        public void Handle(CapabilityMaterial capabilityMaterial)
+        {
+            string templatePath = capabilityMaterial.TemplateName;
+
+            string materialTemplate = "";
+
+            AddTint(capabilityMaterial.TryGetCapability<TintCapability>());
+            AddEmissive(capabilityMaterial.TryGetCapability<EmissiveCapability>());
+        }
+
+        void AddTint(TintCapability? tint)
+        {
+            if (tint == null)
+                return;
+
+            Add("Tempalte_tintColour", tint.Faction2_TintVariation);
+            Add("Tempalte_tintGradient0", tint.Faction2_TintVariation);
+            Add("Tempalte_tintGradientTime", tint.Faction2_TintVariation);
+        }
+
+        void AddEmissive(EmissiveCapability? emissive)
+        {
+            if (emissive == null)
+                return;
+
+            Add("Tempalte_Texture", emissive.Emissive);
+            //Add("Tempalte_tintGradient0", tint.Faction2_TintVariation);
+            //Add("Tempalte_tintGradientTime", tint.Faction2_TintVariation);
+        }
+
+        void Add(string templateAttributeName, float value) { }
+        void Add(string templateAttributeName, Vector3 value) { }
+
+        void Add(string templateAttributeName, TextureInput value) { }
+    }
+
+
+
+
+
+
+
     public class WsModelGeneratorService
     {
         private readonly ILogger _logger = Logging.Create<WsModelGeneratorService>();
