@@ -1,44 +1,30 @@
 ﻿using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
-using System.Drawing.Imaging;
 using System.IO;
 using Editors.ImportExport.Misc;
-using Pfim;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 using SharpGLTF.Materials;
-using SharpGLTF.Memory;
 using System;
 using System.Drawing;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
-using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel.Types;
-//using SharpGLTF.Schema2;
 using MeshImportExport;
-using Microsoft.Xna.Framework.Graphics;
-using Shared.GameFormats.Animation;
 using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
-//using SharpDX.MediaFoundation.DirectX;
 
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
 {
 
-    //public record DdsToPngExporterSettings(
-    //bool ConvertMaterialTextureToBlender,
-    //bool ConvertNormalTextureToBlue);
-
     public class DdsToPngExporter
     {
         private readonly PackFileService _packFileService;
-        private readonly RmvToGltfExporterSettings _settings;
         private readonly DdsToNormalPngExporter _ddsToNormalPngExporter;
         private readonly DdsToMaterialPngExporter _ddsToMaterialPngExporter;
 
-        public DdsToPngExporter(PackFileService pfs, RmvToGltfExporterSettings settings, DdsToNormalPngExporter ddsToNormalPngExporter, DdsToMaterialPngExporter ddsToMaterialPngExporter)
+        public DdsToPngExporter(PackFileService pfs, DdsToNormalPngExporter ddsToNormalPngExporter, DdsToMaterialPngExporter ddsToMaterialPngExporter)
         {
             _packFileService = pfs;
-            _settings = settings;
             _ddsToNormalPngExporter = ddsToNormalPngExporter;
             _ddsToMaterialPngExporter = ddsToMaterialPngExporter;
         }
@@ -50,23 +36,20 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
             return ExportSupportEnum.NotSupported;
         }
 
-        internal void Export(string outputPath, PackFile file)
+        public void Export(string outputPath, PackFile file, RmvToGltfExporterSettings settings)
         {
             var rmv2 = new ModelFactory().Load(file.DataSource.ReadData());
             var lodLevel = rmv2.ModelList.First();
             foreach (var rmvMesh in lodLevel)
             {
-                
-                //var material = BuildMaterial(_packFileService, rmvMesh, file, _settings, _ddsToNormalPngExporter, _ddsToMaterialPngExporter);
-                //var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file, _settings);
+                var material = GenerateMaterial(settings, rmvMesh);
             }
         }
 
+        //I do not think I need these anymore, but keeping them for now until I work on the RmvToGltfExporter (BuildMaterialPerMesh and BuildFakeMaterialPerMesh)
         internal MaterialBuilder BuildMaterialPerMesh(RmvModel rmvMesh, RmvToGltfExporterSettings settings)
         {
             var material = GenerateMaterial(settings, rmvMesh);
-            //var material = BuildMaterial(_packFileService, rmvMesh, file, _settings, _ddsToNormalPngExporter, _ddsToMaterialPngExporter);
-            //var material = TextureHelper.BuildMaterial(_packFileService, rmvMesh, file, settings);
             return material;
         }
 
@@ -76,41 +59,6 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
             return material;
         }
 
-        /**public static MaterialBuilder BuildMaterial(PackFileService pfs, RmvModel model, PackFile inFile, 
-            RmvToGltfExporterSettings settings, DdsToNormalPngExporter ddsToNormalPngExporter, DdsToMaterialPngExporter ddsToMaterialPngExporter)
-        {
-
-            var normalMapTexture = model.Material.GetTexture(TextureType.Normal);
-            var materialMapTexture = model.Material.GetTexture(TextureType.MaterialMap);
-            var baseColourTexture = model.Material.GetTexture(TextureType.BaseColour);
-
-            var baseColourFile = pfs.FindFile(baseColourTexture.Value.Path);
-            var materialMapFile = pfs.FindFile(materialMapTexture.Value.Path);
-            var normalMapFile = pfs.FindFile(normalMapTexture.Value.Path);
-
-            var basePath = pfs.GetFullPath(baseColourFile);
-            var materialMapPath = pfs.GetFullPath(materialMapFile);
-            var normalMapPath = pfs.GetFullPath(normalMapFile);
-
-            if (normalMapTexture != null && settings.ConvertNormalTextureToBlue == true)
-            {
-                ddsToNormalPngExporter.Export("", "", true); //need to change this export to use path
-            }
-            if (materialMapTexture != null && settings.ConvertMaterialTextureToBlender == true)
-            {
-                ddsToMaterialPngExporter.Export("","", true); //need to change this export to use path
-            }
-
-            var material = new MaterialBuilder(model.Material.ModelName + "_Material")
-               .WithDoubleSide(true)
-                .WithMetallicRoughness()
-                .WithChannelImage(KnownChannel.BaseColor, new MemoryImage(TextureHelper.ConvertDdsToPng(baseColourFile.DataSource.ReadData())))
-                .WithChannelImage(KnownChannel.MetallicRoughness, new MemoryImage())
-                .WithChannelImage(KnownChannel.Normal, new MemoryImage(normalMapPath));
-
-            return material;
-        }**/
-
         public MaterialBuilder GenerateMaterial(RmvToGltfExporterSettings settings, RmvModel rmv2Mesh)
         {
             var textures = rmv2Mesh.Material.GetAllTextures();
@@ -118,36 +66,37 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
             var normalMapTexture = textures.FirstOrDefault(t => t.TexureType == TextureType.Normal);
             if(normalMapTexture.Path != null)
             {
-                _ddsToNormalPngExporter.Export(_packFileService.GetFullPath(settings.InputFile), settings.OutputPath, settings.ConvertNormalTextureToBlue);
+                _ddsToNormalPngExporter.Export(normalMapTexture.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
             }
 
             var materialTexture = textures.FirstOrDefault(t => t.TexureType == TextureType.MaterialMap);
             if (materialTexture.Path != null)
             {
-                _ddsToMaterialPngExporter.Export(_packFileService.GetFullPath(settings.InputFile), settings.OutputPath, settings.ConvertMaterialTextureToBlender);
+                _ddsToMaterialPngExporter.Export(materialTexture.Path, settings.OutputPath, settings.ConvertMaterialTextureToBlender);
             }
 
             var baseColourTexture = textures.FirstOrDefault(t => t.TexureType == TextureType.BaseColour);
             if (baseColourTexture.Path != null)
             {
-                var packFile = _packFileService.FindFile(_packFileService.GetFullPath(settings.InputFile));
+                var packFile = _packFileService.FindFile(baseColourTexture.Path);
                 var bytes = packFile.DataSource.ReadData();
-                var fileDirectory = settings.OutputPath + "/" + settings.InputFile.Name + ".png";
+                var fileDirectory = settings.OutputPath + "/" + Path.GetFileNameWithoutExtension(packFile.Name) + ".png";
                 var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
                 GenericExportNoConversion(imgBytes, settings.OutputPath, fileDirectory);
             }
 
-
+            var outputBaseColourTexturePath = settings.OutputPath + "/" + Path.GetFileNameWithoutExtension(baseColourTexture.Path) + ".png";
+            var outputMaterialTexturePath = settings.OutputPath + "/" + Path.GetFileNameWithoutExtension(materialTexture.Path) + ".png";
+            var outputNormalTexturePath = settings.OutputPath + "/" + Path.GetFileNameWithoutExtension(normalMapTexture.Path) + ".png";
             var material = new MaterialBuilder(rmv2Mesh.Material.ModelName + "_Material")
             .WithDoubleSide(true)
             .WithMetallicRoughness()
-            .WithChannelImage(KnownChannel.BaseColor, baseColourTexture.Path)
-            .WithChannelImage(KnownChannel.MetallicRoughness, materialTexture.Path)
-            .WithChannelImage(KnownChannel.Normal, normalMapTexture.Path);
+            .WithChannelImage(KnownChannel.BaseColor, outputBaseColourTexturePath)
+            .WithChannelImage(KnownChannel.MetallicRoughness, outputMaterialTexturePath)
+            .WithChannelImage(KnownChannel.Normal, outputNormalTexturePath);
 
             return material;
         }
-
 
         public void GenericExportNoConversion(byte[] imgBytes, string outputPath, string fileDirectory)
         {

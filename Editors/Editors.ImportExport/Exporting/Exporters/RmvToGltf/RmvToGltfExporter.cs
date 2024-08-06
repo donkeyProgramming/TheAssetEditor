@@ -114,7 +114,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 var material = new MaterialBuilder();
                 if (settings.ExportTextures == true)
                 {
-                    material = _ddsToPngExporter.BuildMaterialPerMesh(rmvMesh, file, settings);
+                    material = _ddsToPngExporter.BuildMaterialPerMesh(rmvMesh, settings);
                 }
                 else
                 {

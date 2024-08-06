@@ -1,6 +1,7 @@
 ﻿using AssetEditor.Services;
 using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
+using Editors.ImportExport.Exporting.Exporters.DdsToPng;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
 using GameWorld.Core.Components.Input;
 using GameWorld.WpfWindow;
@@ -25,6 +26,7 @@ namespace E2EVerification.Shared
         //public RmvToGltfExporter RmvToGltfExporterRepos {  get; private set; }
         public DdsToNormalPngExporter DdsToNormalPngExporterRepos { get; private set; }
         public DdsToMaterialPngExporter DdsToMaterialPngExporterRepos { get; private set; }
+        public DdsToPngExporter DdsToPngExporterRepos { get; private set; }
 
         public AssetEditorTestRunner()
         {
@@ -41,6 +43,7 @@ namespace E2EVerification.Shared
             //RmvToGltfExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<RmvToGltfExporter>();
             DdsToNormalPngExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<DdsToNormalPngExporter>();
             DdsToMaterialPngExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<DdsToMaterialPngExporter>();
+            DdsToPngExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<DdsToPngExporter>();
         }
 
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)
