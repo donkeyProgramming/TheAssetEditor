@@ -21,11 +21,11 @@
         <Menu Grid.Row="0">
             <MenuItem Header="_File" HorizontalAlignment="Left">
                 <MenuItem Header="Load Audio Project" Command="{Binding NewAudioProjectCommand}" />
-                <MenuItem Header="Load Audio Project" Click="{s:MethodBinding LoadAudioProject}" />
-                <MenuItem Header="Load Custom States" Click="{s:MethodBinding LoadCustomStates}" />
+                <MenuItem Header="Load Audio Project" Command="{Binding LoadAudioProjectCommand}" />
+                <MenuItem Header="Load Custom States" Command="{Binding LoadCustomStatesCommand}" />
                 <Separator />
-                <MenuItem Header="Save Audio Project" Click="{s:MethodBinding SaveAudioProject}" />
-                <MenuItem Header="Save Custom States" Click="{s:MethodBinding SaveCustomStates}" />
+                <MenuItem Header="Save Audio Project" Command="{Binding SaveAudioProjectCommand}" />
+                <MenuItem Header="Save Custom States" Command="{Binding SaveCustomStatesCommand}" />
             </MenuItem>
         </Menu>
 

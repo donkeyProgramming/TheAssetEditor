@@ -117,12 +117,12 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 
         [RelayCommand] public void NewAudioProject()
         {
-            var window = _windowFactory.Create<AudioEditorSettingsViewModel, AudioEditorSettingsView>("Audio Editor Settings", 400, 300);
-            window.AlwaysOnTop = true;
+            var window = _windowFactory.Create<AudioEditorSettingsViewModel, AudioEditorSettingsView>("Audio Editor Settings", 550, 500);
+            window.AlwaysOnTop = false;
             window.ShowWindow();
         }
 
-        public void LoadAudioProject()
+        [RelayCommand] public void LoadAudioProject()
         {
             using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
 
@@ -152,14 +152,14 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             }
         }
 
-        public void SaveAudioProject()
+        [RelayCommand] public void SaveAudioProject()
         {
             UpdateEventDataWithCurrentEvent(this);
 
             AudioProjectData.AddAudioProjectToPackFile(_packFileService, EventsData, AudioProjectFileName);
         }
 
-        public void LoadCustomStates()
+        [RelayCommand] public void LoadCustomStates()
         {
             using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
 
@@ -186,7 +186,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             }
         }
 
-        public void SaveCustomStates()
+        [RelayCommand] public void SaveCustomStates()
         {
             var dataGridItemsJson = JsonConvert.SerializeObject(CustomStatesDataGridItems, Formatting.Indented);
             var pack = _packFileService.GetEditablePack();
