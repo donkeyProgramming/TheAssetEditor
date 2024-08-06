@@ -14,11 +14,11 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public static Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithQualifiers { get; set; } = [];
 
-        public static void InitialiseEventsData(AudioEditorViewModel viewModel)
+        public static void InitialiseEventsData(AudioEditorSettingsViewModel viewModel)
         {
             CreateAudioProjectEventsList(viewModel);
 
-            foreach (var dialogueEvent in viewModel.AudioProjectDialogueEvents)
+            foreach (var dialogueEvent in AudioProjectDialogueEvents)
             {
                 var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[dialogueEvent];
 
@@ -36,7 +36,7 @@ namespace Editors.Audio.Presentation.AudioEditor
                 dataGridItems.Add(dataGridItem);
                 EventsData[dialogueEvent] = dataGridItems;
             }
-        }
+        }        
 
         public static void LoadEvent(AudioEditorViewModel viewModel, IAudioRepository audioRepository, bool showCustomStatesOnly)
         {
@@ -135,7 +135,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             return stateGroupWithQualifier.Replace("_", "__");
         }
 
-        public static void UpdateAudioProjectEventSubType(AudioEditorViewModel viewModel)
+        public static void UpdateAudioProjectEventSubType(AudioEditorSettingsViewModel viewModel)
         {
             viewModel.AudioProjectSubtypes.Clear();
 
@@ -156,7 +156,7 @@ namespace Editors.Audio.Presentation.AudioEditor
                     viewModel.AudioProjectSubtypes.Add(item);
         }
 
-        public static void CreateAudioProjectEventsListFromAudioProject(AudioEditorViewModel viewModel, Dictionary<string, List<Dictionary<string, object>>> eventsData)
+        public static void CreateAudioProjectEventsListFromAudioProject(AudioEditorSettingsViewModel viewModel, Dictionary<string, List<Dictionary<string, object>>> eventsData)
         {
             viewModel.AudioProjectDialogueEvents.Clear();
 
@@ -180,22 +180,22 @@ namespace Editors.Audio.Presentation.AudioEditor
 
 
         // STILL NEED TO FINISH THIS
-        public static void CreateAudioProjectEventsList(AudioEditorViewModel viewModel)
+        public static void CreateAudioProjectEventsList(AudioEditorSettingsViewModel viewModel)
         {
-            viewModel.AudioProjectDialogueEvents.Clear();
+            AudioProjectDialogueEvents.Clear();
 
             if (viewModel.SelectedAudioProjectEventType == "Frontend VO"
                 && viewModel.SelectedAudioProjectEventSubtype == "Lord"
                 && (viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.All || viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.Essential))
             {
-                AddDialogueEventAudioProjectEvents(viewModel, AudioEditorSettings.FrontendVODialogueEventsAll);
+                AddDialogueEventAudioProjectEvents(AudioEditorSettings.FrontendVODialogueEventsAll);
             }
 
 
             if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Lord")
             {
                 if (viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.All)
-                    AddDialogueEventAudioProjectEvents(viewModel, AudioEditorSettings.CampaignVODialogueEventsAll);
+                    AddDialogueEventAudioProjectEvents(AudioEditorSettings.CampaignVODialogueEventsAll);
 
                 else
                 {
@@ -206,7 +206,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Hero")
             {
                 if (viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.All)
-                    AddDialogueEventAudioProjectEvents(viewModel, AudioEditorSettings.CampaignVODialogueEventsAll);
+                    AddDialogueEventAudioProjectEvents(AudioEditorSettings.CampaignVODialogueEventsAll);
 
                 else
                 {
@@ -215,10 +215,10 @@ namespace Editors.Audio.Presentation.AudioEditor
             }
         }
 
-        public static void AddDialogueEventAudioProjectEvents(AudioEditorViewModel viewModel, List<string> displayData)
+        public static void AddDialogueEventAudioProjectEvents(List<string> dialogueEvents)
         {
-            foreach (var dialogueEvent in displayData)
-                viewModel.AudioProjectDialogueEvents.Add(dialogueEvent);
+            foreach (var dialogueEvent in dialogueEvents)
+                AudioProjectDialogueEvents.Add(dialogueEvent);
         }
 
         public class DictionaryEqualityComparer<TKey, TValue> : IEqualityComparer<Dictionary<TKey, TValue>>

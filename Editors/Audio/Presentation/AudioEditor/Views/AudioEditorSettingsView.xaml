@@ -7,7 +7,7 @@
              xmlns:converters="clr-namespace:Editors.Audio.Presentation.AudioEditor"
              d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorViewModel}"
              mc:Ignorable="d"
-             d:DesignHeight="800" d:MinWidth="500">
+             d:DesignHeight="550" d:MinWidth="450">
 
     <!-- Resources Section -->
     <UserControl.Resources>
@@ -19,7 +19,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <!-- Add this row for buttons -->
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="1" Margin="10">
@@ -29,21 +29,24 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <!-- Added Row for Buttons -->
             </Grid.RowDefinitions>
 
-            <!-- File Name -->
-            <Grid Grid.Row="0" Margin="0,0,0,5">
+            <!-- EventType Selection -->
+            <Grid Grid.Row="0" Margin="0, 0, 0, 5">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Audio Project File Name:" VerticalAlignment="Center" Margin="0,0,5,0" MinWidth="135"/>
+                <Label Content="Name:" VerticalAlignment="Center"/>
                 <TextBox Grid.Column="1" x:Name="AudioProjectFileNameTextBox" VerticalAlignment="Center"
                          Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
 
             <!-- EventType Selection -->
-            <Grid Grid.Row="1" Margin="0,0,0,5">
+            <Grid Grid.Row="1" Margin="0, 0, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
@@ -55,7 +58,7 @@
             </Grid>
 
             <!-- EventSubType Selection -->
-            <Grid Grid.Row="2" Margin="0,0,0,5">
+            <Grid Grid.Row="2" Margin="0, 0, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
@@ -66,22 +69,29 @@
                           ToolTip="PLACEHOLDER TOOLTIP" VerticalAlignment="Center"/>
             </Grid>
 
-            <!-- Dialogue Events Preset Configuration -->
-            <Grid Grid.Row="3" Margin="0,0,0,5">
+            <!-- Dialogue Events Section -->
+            <Grid Grid.Row="3" Margin="0, 0, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
+                <Label Content="Dialogue Events:" VerticalAlignment="Top"/>
+                <ListBox Grid.Column="1" Margin="0, 10, 0, 0" Height="200" VerticalAlignment="Top">
+                    <!-- Dynamically define list box items -->
+                </ListBox>
+            </Grid>
 
-                <Label Grid.Column="0" Content="Dialogue Events Preset:" VerticalAlignment="Center"/>
-                <CheckBox Grid.Column="1" Content="All" Margin="0,2.5,5,0"
-                          IsChecked="{Binding SelectedAudioProjectEventsPreset, Converter={StaticResource SettingsEnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.All}}"
-                          ToolTip="PLACEHOLDER TOOLTIP"/>
-                <CheckBox Grid.Column="2" Content="Essential" Margin="5,2.5,5,0"
-                          IsChecked="{Binding SelectedAudioProjectEventsPreset, Converter={StaticResource SettingsEnumConverter}, ConverterParameter={x:Static viewmodels:DialogueEventsPreset.Essential}}"
-                          ToolTip="PLACEHOLDER TOOLTIP"/>
+            <!-- Buttons for Dialogue Events Section -->
+            <Grid Grid.Row="4" Margin="0, 5, 0, 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="145"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Button Content="Select All" Width="100" Margin="0, 0, 5, 0" Command="{Binding SelectAllCommand}"/>
+                    <Button Content="Select Essential" Width="100" Margin="0, 0, 5, 0" Command="{Binding SelectEssentialCommand}"/>
+                    <Button Content="Select None" Width="100" Margin="0, 0, 5, 0" Command="{Binding SelectNoneCommand}"/>
+                </StackPanel>
             </Grid>
         </Grid>
 

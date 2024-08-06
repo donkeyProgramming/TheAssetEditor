@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -45,40 +46,20 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
 
-        // Audio Project settings properties:
-        [ObservableProperty] private string _audioProjectFileName = "my_audio_project";
-        [ObservableProperty] private string _customStatesFileName = "my_custom_states";
-        [ObservableProperty] private string _selectedAudioProjectEventType;
-        [ObservableProperty] private string _selectedAudioProjectEventSubtype;
-        [ObservableProperty] private DialogueEventsPreset _selectedAudioProjectEventsPreset;
-
-        // Properties for the Audio Editor DataGrid:
         [ObservableProperty] private string _selectedAudioProjectEvent;
         [ObservableProperty] private bool _showCustomStatesOnly;
-
-        // Audio Project settings:
-        [ObservableProperty] private List<string> _audioProjectEventType = AudioEditorSettings.EventType;
-        [ObservableProperty] private ObservableCollection<string> _audioProjectSubtypes = []; // Determined according to what Event Type is selected
-
-        // Audio Editor DataGrid stuff:
-        [ObservableProperty] private ObservableCollection<string> _audioProjectDialogueEvents = []; // The list of events in the Audio Project.
 
         // DataGrid data objects:
         public ObservableCollection<Dictionary<string, object>> AudioEditorDataGridItems { get; set; } = [];
         public ObservableCollection<CustomStatesDataGridProperties> CustomStatesDataGridItems { get; set; } = [];
         public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData; // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
+        public static List<string> AudioProjectDialogueEvents => AudioEditorData.Instance.AudioProjectDialogueEvents;
 
         public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService, IWindowFactory windowFactory)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;
             _windowFactory = windowFactory;
-        }
-
-        partial void OnSelectedAudioProjectEventTypeChanged(string value)
-        {
-            // Update the ComboBox for EventSubType upon EventType selection.
-            UpdateAudioProjectEventSubType(this);
         }
 
         partial void OnSelectedAudioProjectEventChanged(string value)
@@ -95,30 +76,11 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             LoadEvent(this, _audioRepository, ShowCustomStatesOnly);
         }
 
-        [RelayCommand] public void CreateAudioProject()
-        {
-            // Remove any pre-existing data.
-            EventsData.Clear();
-            AudioEditorDataGridItems.Clear();
-            SelectedAudioProjectEvent = "";
-
-            // Create the object for State Groups with qualifiers so that their keys in the EventsData dictionary are unique.
-            AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
-
-            // Initialise EventsData according to the Audio Project settings selected.
-            InitialiseEventsData(this);
-
-            // Add the Audio Project with empty events to the PackFile.
-            AudioProjectData.AddAudioProjectToPackFile(_packFileService, EventsData, AudioProjectFileName);
-
-            // Load the custom States so that they can be referenced when the Event is loaded.
-            PrepareCustomStatesForComboBox(this);
-        }
-
         [RelayCommand] public void NewAudioProject()
         {
-            var window = _windowFactory.Create<AudioEditorSettingsViewModel, AudioEditorSettingsView>("Audio Editor Settings", 550, 500);
+            var window = _windowFactory.Create<AudioEditorSettingsViewModel, AudioEditorSettingsView>("New Audio Project", 550, 450);
             window.AlwaysOnTop = false;
+            window.ResizeMode = ResizeMode.NoResize;
             window.ShowWindow();
         }
 
@@ -145,7 +107,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
                 _logger.Here().Information($"Loaded Audio Project file: {file.Name}");
 
                 // Create the list of Events used in the Events ComboBox.
-                CreateAudioProjectEventsListFromAudioProject(this, EventsData);
+                //CreateAudioProjectEventsListFromAudioProject(this, EventsData);
 
                 // Load the object which stores the custom States for use in the States ComboBox.
                 PrepareCustomStatesForComboBox(this);
@@ -156,7 +118,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         {
             UpdateEventDataWithCurrentEvent(this);
 
-            AudioProjectData.AddAudioProjectToPackFile(_packFileService, EventsData, AudioProjectFileName);
+            AudioProjectData.AddAudioProjectToPackFile(_packFileService, EventsData, "dummy_name");
         }
 
         [RelayCommand] public void LoadCustomStates()
@@ -191,8 +153,8 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             var dataGridItemsJson = JsonConvert.SerializeObject(CustomStatesDataGridItems, Formatting.Indented);
             var pack = _packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
-            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{CustomStatesFileName}.json", new MemorySource(byteArray)));
-            _logger.Here().Information($"Saved Custom States file: {CustomStatesFileName}");
+            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{"dummy_name"}.json", new MemorySource(byteArray)));
+            _logger.Here().Information($"Saved Custom States file: {"dummy_name"}");
         }
 
         [RelayCommand] public void AddStatePath()

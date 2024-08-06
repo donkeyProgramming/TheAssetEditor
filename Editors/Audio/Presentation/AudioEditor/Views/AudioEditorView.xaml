@@ -20,7 +20,7 @@
         <!-- Menu -->
         <Menu Grid.Row="0">
             <MenuItem Header="_File" HorizontalAlignment="Left">
-                <MenuItem Header="Load Audio Project" Command="{Binding NewAudioProjectCommand}" />
+                <MenuItem Header="New Audio Project" Command="{Binding NewAudioProjectCommand}" />
                 <MenuItem Header="Load Audio Project" Command="{Binding LoadAudioProjectCommand}" />
                 <MenuItem Header="Load Custom States" Command="{Binding LoadCustomStatesCommand}" />
                 <Separator />

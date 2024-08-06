@@ -8,6 +8,8 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public static AudioEditorData Instance => _instance;
 
+        public List<string> AudioProjectDialogueEvents = []; // The list of events in the Audio Project.
+
         public Dictionary<string, List<Dictionary<string, object>>> EventsData { get; set; } = [];
 
         public Dictionary<string, List<string>> StateGroupsWithCustomStates { get; set; } = [];
