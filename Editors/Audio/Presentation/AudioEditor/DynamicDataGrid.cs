@@ -116,7 +116,7 @@ namespace Editors.Audio.Presentation.AudioEditor
                 // Column for State Group:
                 var column = new DataGridTemplateColumn
                 {
-                    Header = AddExtraUnderScoresToStateGroup(stateGroupWithQualifier),
+                    Header = AddExtraUnderScoresToString(stateGroupWithQualifier),
                     CellTemplate = CreateStatesComboBoxTemplate(states, stateGroupWithQualifier, showCustomStatesOnly),
                     Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
                 };
@@ -150,7 +150,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(ComboBox));
 
-            var binding = new Binding($"[{AddExtraUnderScoresToStateGroup(stateGroupWithQualifier)}]")
+            var binding = new Binding($"[{AddExtraUnderScoresToString(stateGroupWithQualifier)}]")
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged

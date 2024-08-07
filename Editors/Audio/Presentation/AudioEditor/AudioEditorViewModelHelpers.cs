@@ -16,7 +16,7 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public static void InitialiseEventsData(AudioEditorSettingsViewModel viewModel)
         {
-            CreateAudioProjectEventsList(viewModel);
+            //CreateAudioProjectEventsList(viewModel);
 
             foreach (var dialogueEvent in AudioProjectDialogueEvents)
             {
@@ -27,7 +27,7 @@ namespace Editors.Audio.Presentation.AudioEditor
 
                 foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
                 {
-                    var stateGroupKey = AddExtraUnderScoresToStateGroup(stateGroupWithQualifier);
+                    var stateGroupKey = AddExtraUnderScoresToString(stateGroupWithQualifier);
                     dataGridItem[stateGroupKey] = "";
                     dataGridItem["AudioFilesDisplay"] = "";
                     dataGridItem["AudioFiles"] = "";
@@ -130,30 +130,9 @@ namespace Editors.Audio.Presentation.AudioEditor
         }
 
         // Apparently WPF doesn't_like_underscores so double them up in order for them to be displayed in the UI.
-        public static string AddExtraUnderScoresToStateGroup(string stateGroupWithQualifier)
+        public static string AddExtraUnderScoresToString(string wtfWPF)
         {
-            return stateGroupWithQualifier.Replace("_", "__");
-        }
-
-        public static void UpdateAudioProjectEventSubType(AudioEditorSettingsViewModel viewModel)
-        {
-            viewModel.AudioProjectSubtypes.Clear();
-
-            if (viewModel.SelectedAudioProjectEventType == "Non-VO")
-                foreach (var item in AudioEditorSettings.NonVO)
-                    viewModel.AudioProjectSubtypes.Add(item);
-
-            else if (viewModel.SelectedAudioProjectEventType == "Frontend VO")
-                foreach (var item in AudioEditorSettings.FrontendVO)
-                    viewModel.AudioProjectSubtypes.Add(item);
-
-            else if (viewModel.SelectedAudioProjectEventType == "Campaign VO")
-                foreach (var item in AudioEditorSettings.CampaignVO)
-                    viewModel.AudioProjectSubtypes.Add(item);
-
-            else if (viewModel.SelectedAudioProjectEventType == "Battle VO")
-                foreach (var item in AudioEditorSettings.BattleVO)
-                    viewModel.AudioProjectSubtypes.Add(item);
+            return wtfWPF.Replace("_", "__");
         }
 
         public static void CreateAudioProjectEventsListFromAudioProject(AudioEditorSettingsViewModel viewModel, Dictionary<string, List<Dictionary<string, object>>> eventsData)
@@ -179,47 +158,6 @@ namespace Editors.Audio.Presentation.AudioEditor
 
 
 
-        // STILL NEED TO FINISH THIS
-        public static void CreateAudioProjectEventsList(AudioEditorSettingsViewModel viewModel)
-        {
-            AudioProjectDialogueEvents.Clear();
-
-            if (viewModel.SelectedAudioProjectEventType == "Frontend VO"
-                && viewModel.SelectedAudioProjectEventSubtype == "Lord"
-                && (viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.All || viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.Essential))
-            {
-                AddDialogueEventAudioProjectEvents(AudioEditorSettings.FrontendVODialogueEventsAll);
-            }
-
-
-            if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Lord")
-            {
-                if (viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.All)
-                    AddDialogueEventAudioProjectEvents(AudioEditorSettings.CampaignVODialogueEventsAll);
-
-                else
-                {
-
-                }
-            }
-
-            if (viewModel.SelectedAudioProjectEventType == "Campaign VO" && viewModel.SelectedAudioProjectEventSubtype == "Hero")
-            {
-                if (viewModel.SelectedAudioProjectEventsPreset == DialogueEventsPreset.All)
-                    AddDialogueEventAudioProjectEvents(AudioEditorSettings.CampaignVODialogueEventsAll);
-
-                else
-                {
-
-                }
-            }
-        }
-
-        public static void AddDialogueEventAudioProjectEvents(List<string> dialogueEvents)
-        {
-            foreach (var dialogueEvent in dialogueEvents)
-                AudioProjectDialogueEvents.Add(dialogueEvent);
-        }
 
         public class DictionaryEqualityComparer<TKey, TValue> : IEqualityComparer<Dictionary<TKey, TValue>>
         {

@@ -30,13 +30,6 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         [ObservableProperty] private string _customVOFactionLeader;
     }
 
-    public enum DialogueEventsPreset
-    {
-        None,
-        All,
-        Essential
-    }
-
     public partial class AudioEditorViewModel : ObservableObject, IEditorViewModel
     {
         private readonly IAudioRepository _audioRepository;
@@ -78,7 +71,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 
         [RelayCommand] public void NewAudioProject()
         {
-            var window = _windowFactory.Create<AudioEditorSettingsViewModel, AudioEditorSettingsView>("New Audio Project", 550, 450);
+            var window = _windowFactory.Create<AudioEditorSettingsViewModel, AudioEditorSettingsView>("New Audio Project", 550, 500);
             window.AlwaysOnTop = false;
             window.ResizeMode = ResizeMode.NoResize;
             window.ShowWindow();
@@ -168,7 +161,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var stateGroupKey = AddExtraUnderScoresToStateGroup(stateGroupWithQualifier);
+                var stateGroupKey = AddExtraUnderScoresToString(stateGroupWithQualifier);
                 newRow[stateGroupKey] = "";
             }
 

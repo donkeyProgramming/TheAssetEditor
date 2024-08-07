@@ -161,7 +161,7 @@ namespace Editors.Audio.Presentation.AudioEditor
 
                         for (var i = 0; i < states.Length && i < stateGroups.Count; i++)
                         {
-                            var stateGroup = AudioEditorViewModelHelpers.AddExtraUnderScoresToStateGroup(stateGroups[i]);
+                            var stateGroup = AudioEditorViewModelHelpers.AddExtraUnderScoresToString(stateGroups[i]);
                             var state = states[i];
                             eventDataItem[stateGroup] = state;
                         }
