@@ -4,119 +4,85 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using GameWorld.Core.Rendering.Shading.Capabilities;
 using GameWorld.Core.Rendering.Shading.Shaders;
 using GameWorld.Core.SceneNodes;
-using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
-using Shared.EmbeddedResources;
 using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.RigidModel.Types;
-using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 {
-    public class CapabilityMaterialTemplateHandler
-    {
-        public void Handle(CapabilityMaterial capabilityMaterial)
-        {
-            string templatePath = capabilityMaterial.TemplateName;
-
-            string materialTemplate = "";
-
-            AddTint(capabilityMaterial.TryGetCapability<TintCapability>());
-            AddEmissive(capabilityMaterial.TryGetCapability<EmissiveCapability>());
-        }
-
-        void AddTint(TintCapability? tint)
-        {
-            if (tint == null)
-                return;
-
-            Add("Tempalte_tintColour", tint.Faction2_TintVariation);
-            Add("Tempalte_tintGradient0", tint.Faction2_TintVariation);
-            Add("Tempalte_tintGradientTime", tint.Faction2_TintVariation);
-        }
-
-        void AddEmissive(EmissiveCapability? emissive)
-        {
-            if (emissive == null)
-                return;
-
-            Add("Tempalte_Texture", emissive.Emissive);
-            //Add("Tempalte_tintGradient0", tint.Faction2_TintVariation);
-            //Add("Tempalte_tintGradientTime", tint.Faction2_TintVariation);
-        }
-
-        void Add(string templateAttributeName, float value) { }
-        void Add(string templateAttributeName, Vector3 value) { }
-
-        void Add(string templateAttributeName, TextureInput value) { }
-    }
-
-
-
-
-
-
-
     public class WsModelGeneratorService
     {
         private readonly ILogger _logger = Logging.Create<WsModelGeneratorService>();
         private readonly PackFileService _packFileService;
-        private readonly Dictionary<string, WsModelMaterialFile> _existingMaterials;
-
-        private static readonly Dictionary<string, TextureType> TemplateStringToTextureTypes = new()
-        {
-            {"BASE_COLOUR_PATH", TextureType.BaseColour},
-            {"MATERIAL_MAP", TextureType.MaterialMap},
-            {"NORMAL_PATH", TextureType.Normal},
-            {"MASK_PATH", TextureType.Mask},
-            {"DIFFUSE_PATH", TextureType.Diffuse },
-            {"GLOSS_PATH", TextureType.Gloss },
-            {"SPECULAR_PATH", TextureType.Specular },
-        };
 
         public WsModelGeneratorService(PackFileService packFileService)
         {
             _packFileService = packFileService;
-            _existingMaterials = LoadAllExistingMaterials();
         }
 
-        public void GenerateWsModel(string modelFilePath, MainEditableNode mainNode, GameTypeEnum game = GameTypeEnum.Warhammer3)
+        public string? GenerateWsModel(string modelFilePath, WsModelGeneratorInput[][] meshInformation, IWsMaterialBuilder materialBuilder)
         {
             try
             {
                 if (_packFileService.GetEditablePack() == null)
                 {
                     MessageBox.Show("No editable pack selected", "error");
-                    return;
+                    return null;
                 }
 
-                var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
+                var materialPaths = CreateMaterials(materialBuilder, meshInformation);
+                var wsModelData = CreateWsModel(modelFilePath, meshInformation, materialPaths);
 
-                var materialTemplate = game switch
-                {
-                    GameTypeEnum.Warhammer3 => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_wh3.xml.material"),
-                    GameTypeEnum.Warhammer2 => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_wh2.xml.material"),
-                    GameTypeEnum.Pharaoh => ResourceLoader.LoadString("Resources.WsModelTemplates.MaterialTemplate_pharaoh.xml.material"),
-                    _ => throw new Exception("Unknown game - unable to generate ws model")
-                };
-                var wsModelData = CreateWsModel(mainNode, game, modelFilePath, materialTemplate);
+                var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
                 SaveHelper.Save(_packFileService, wsModelPath, existingWsModelFile, Encoding.UTF8.GetBytes(wsModelData));
+
+                return wsModelPath;
             }
             catch (Exception e)
             {
                 _logger.Here().Error("Error generating ws model - " + e.Message);
                 MessageBox.Show("Generation failed!");
+                return null;
             }
         }
 
-        string CreateWsModel(MainEditableNode mainNode, GameTypeEnum game, string modelFilePath, string materialTemplate)
+        string[][] CreateMaterials(IWsMaterialBuilder materialBuilder, WsModelGeneratorInput[][] meshInformation)
+        {
+            // Load all materials
+            var repository = new WsMaterialRepository(_packFileService);
+
+            // Generate Unieq mesh names - i dont think this is needed?
+            var uniqueMeshNames = new string[meshInformation.Length][];
+            for (var lodIndex = 0; lodIndex < meshInformation.Length; lodIndex++)
+                uniqueMeshNames[lodIndex] = GenerateUniqueMeshNames(meshInformation[lodIndex]).ToArray();
+
+            var materialPaths = new string[meshInformation.Length][];
+            for (var lodIndex = 0; lodIndex < meshInformation.Length; lodIndex++)
+            {
+                materialPaths[lodIndex] = new string[meshInformation[lodIndex].Length];
+                for (var meshIndex = 0; meshIndex < meshInformation[lodIndex].Length; meshIndex++)
+                {
+                    var currentMesh = meshInformation[lodIndex][meshIndex];
+                    var uniqeMeshName = uniqueMeshNames[lodIndex][meshIndex];
+                    var materialFile = materialBuilder.Create(uniqeMeshName, currentMesh.MeshVertexFormat, currentMesh.Material);
+
+                    // Check if file is uniqe - if not use original
+                    var newMaterialPath = " " + materialFile.FileName;
+                    var materialPath = repository.GetExistingOrAddMaterial(materialFile.FileContent, newMaterialPath);
+
+
+                    materialPaths[lodIndex][meshIndex] = materialPath;
+                }
+            }
+
+            return materialPaths;
+        }
+
+        static string CreateWsModel(string modelFilePath, WsModelGeneratorInput[][] meshInformation, string[][] materialPaths)
         {
             var sb = new StringBuilder();
 
@@ -124,16 +90,12 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             sb.Append($"\t<geometry>{modelFilePath}</geometry>\n");
             sb.Append("\t\t<materials>\n");
 
-            var lodNodes = mainNode.GetLodNodes();
-            for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
+            for (var lodIndex = 0; lodIndex < meshInformation.Length; lodIndex++)
             {
-                var meshes = mainNode.GetMeshesInLod(lodIndex, false);
-                var uniqueNames = GenerateUniqueNames(meshes);
-                for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
+                for (var meshIndex = 0; meshIndex < meshInformation[lodIndex].Length; meshIndex++)
                 {
-                    var materialFile = GetOrCreateMaterial(modelFilePath, game, meshes[meshIndex], uniqueNames[meshIndex], materialTemplate);
                     sb.Append($"\t\t\t<material lod_index=\"{lodIndex}\" part_index=\"{meshIndex}\">");
-                    sb.Append(materialFile);
+                    sb.Append(materialPaths[lodIndex][meshIndex]);
                     sb.Append("</material>\n");
                 }
 
@@ -146,20 +108,12 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             return sb.ToString();
         }
 
-        private List<string> GenerateUniqueNames(List<Rmv2MeshNode> meshes)
+        static private List<string> GenerateUniqueMeshNames(WsModelGeneratorInput[] meshes)
         {
             var output = new List<string>();
             foreach (var mesh in meshes)
             {
-                var fileName = mesh.Name;
-                var modelFullPath = mesh.OriginalFilePath;
-                //if mesh name is blank, grab a mesh name from the file path, so far the only
-                //total war with this issue appears to be Pharaoh.
-                if (String.IsNullOrWhiteSpace(fileName))
-                {
-                    modelFullPath = Path.GetFileNameWithoutExtension(fileName);
-                }
-
+                var fileName = mesh.MeshName;
                 for (var index = 0; index < 1024; index++)
                 {
                     var name = index == 0 ? fileName : string.Format("{0}_{1}", fileName, index);
@@ -176,156 +130,84 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             return output;
         }
 
-        string GetOrCreateMaterial(string modelFilePath, GameTypeEnum game, Rmv2MeshNode mesh, string uniqueName, string materialTemplate)
+    }
+
+
+    public class WsMaterialRepository
+    {
+        private readonly Dictionary<string, string> _map;
+
+        public WsMaterialRepository(PackFileService packFileService)
         {
-            uniqueName = uniqueName.Trim();
-            var materialFileName = FindApplicableExistingMaterial(game, mesh);
-            if (materialFileName == null)
-                materialFileName = CreateNewMaterial(modelFilePath, mesh, uniqueName, materialTemplate, game);
-            return materialFileName;
+            _map = LoadAllExistingMaterials(packFileService);
         }
 
-        string CreateNewMaterial(string modelFilePath, Rmv2MeshNode mesh, string uniqueName, string materialTemplate, GameTypeEnum game)
+        public string GetExistingOrAddMaterial(string wsMaterialContent, string WsMaterialPath)
         {
-            var vertexType = ModelMaterialEnumHelper.GetToolVertexFormat(mesh.Material.BinaryVertexFormat);
-            var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
-
-            var shaderNamePart = (vertexType, game) switch
+            var sanitizedWsMaterial = SanatizeMaterial(wsMaterialContent);
+            var found = _map.TryGetValue(sanitizedWsMaterial, out var path);
+            if (found == false)
             {
-                (UiVertexFormat.Cinematic, GameTypeEnum.Pharaoh) => "weighted_standard_4",
-                (UiVertexFormat.Weighted, GameTypeEnum.Pharaoh) => "weighted_standard_2",
-                (UiVertexFormat.Static, _) => "rigid",
-                (UiVertexFormat.Cinematic, _) when game != GameTypeEnum.Pharaoh => "weighted4",
-                (UiVertexFormat.Weighted, _) when game != GameTypeEnum.Pharaoh => "weighted2",
-                _ => throw new Exception("Unknown vertex type")
-            };
-
-            // Update the shader name
-            var shaderAlphaStr = "";
-            if (alphaOn)
-                shaderAlphaStr = "_alpha";
-            var shaderName = "";
-            if (game != GameTypeEnum.Pharaoh)
-            {
-                shaderName = $"shaders/{shaderNamePart}_character{shaderAlphaStr}.xml.shader";
+                _map[sanitizedWsMaterial] = WsMaterialPath;
+                return WsMaterialPath;
             }
-            else
-            {
-                shaderName = $"shaders/system/{shaderNamePart}.xml.shader";
-
-            }
-            materialTemplate = materialTemplate.Replace("SHADER_PATH", shaderName);
-
-            // Update the textures
-            foreach (var (replacment, textureType) in TemplateStringToTextureTypes)
-            {
-                var texture = mesh.Material.GetTexture(textureType);
-                if (texture.HasValue)
-                {
-                    materialTemplate = materialTemplate.Replace(replacment, texture.Value.Path);
-                    Log.Write(Serilog.Events.LogEventLevel.Information, $"writing {replacment} {textureType} {texture.Value.Path}");
-                }
-                else
-                    materialTemplate.Replace(replacment, "test_mask.dds");
-            }
-
-            // Save the new file
-            var fileName = "";
-            if (game != GameTypeEnum.Pharaoh)
-            {
-                fileName = uniqueName + "_" + shaderNamePart + "_alpha_" + (alphaOn ? "on" : "off") + ".xml";
-            }
-            else
-            {
-                fileName = uniqueName + "_" + shaderNamePart + ".xml";
-            }
-
-            materialTemplate = materialTemplate.Replace("FILE_NAME", fileName);
-
-            var dir = Path.GetDirectoryName(modelFilePath);
-            var fullPath = dir + "\\materials\\" + fileName + ".material";
-            SaveHelper.Save(_packFileService, fullPath, null, Encoding.UTF8.GetBytes(materialTemplate), false);
-
-            return fullPath;
+            return path!;
         }
 
-        string FindApplicableExistingMaterial(GameTypeEnum game, Rmv2MeshNode mesh)
+        string SanatizeMaterial(string wsMaterialContent)
         {
-            foreach (var material in _existingMaterials)
-            {
-                var isMatch = IsMaterialMatch(game, mesh, material.Value);
-                if (isMatch)
-                    return material.Key;
-            }
+            var start = wsMaterialContent.IndexOf("<name>");
+            var end = wsMaterialContent.IndexOf("</name>", start);
+            var contentWithoutName = wsMaterialContent.Remove(start, end).ToLower();
 
-            return null;
+            return wsMaterialContent;
         }
 
-        static bool IsMaterialMatch(GameTypeEnum game, Rmv2MeshNode mesh, WsModelMaterialFile material)
+
+        Dictionary<string, string> LoadAllExistingMaterials(PackFileService packFileService)
         {
-            var vertexType = ModelMaterialEnumHelper.GetToolVertexFormat(mesh.Material.BinaryVertexFormat);
-            if (vertexType != material.VertexType)
-                return false;
+            var materialList = new Dictionary<string, string>();
 
-            var alphaOn = mesh.Material.AlphaMode != AlphaMode.Opaque;
-            if (alphaOn && material.Alpha == false)
-                return false;
+            var materialPacks = packFileService.FindAllWithExtentionIncludePaths(".material");
+            materialPacks = materialPacks.Where(x => x.Pack.Name.Contains(".xml.material")).ToList();
 
-            var originalTextures = mesh.GetTextures();
-            if (game == GameTypeEnum.Warhammer3)
+            foreach (var (FileName, Pack) in materialPacks)
             {
-                var tempTextureArray = new Dictionary<TextureType, string>();
-                var itemsToSkip = new TextureType[] { TextureType.Specular, TextureType.Diffuse, TextureType.Gloss };
-                foreach (var texture in originalTextures)
-                {
-                    if (itemsToSkip.Contains(texture.Key))
-                        continue;
-                    tempTextureArray[texture.Key] = texture.Value;
-                }
-                originalTextures = tempTextureArray;
-            }
+                var bytes = Pack.DataSource.ReadData();
+                var content = Encoding.UTF8.GetString(bytes);
+                var sanitizedWsMaterial = SanatizeMaterial(content);
 
-            foreach (var modelTexture in originalTextures)
-            {
-                if (TemplateStringToTextureTypes.ContainsValue(modelTexture.Key) == false)
-                    continue;
 
-                var path = modelTexture.Value;
-                var modelTextureType = modelTexture.Key;
-
-                if (path.Contains("test_mask", StringComparison.InvariantCultureIgnoreCase))
-                    continue;
-
-                var materialHasTexture = material.Textures.TryGetValue(modelTextureType, out var materialTexurePath);
-                if (materialHasTexture == false)
-                    return false;
-
-                var arePathsEqual = materialTexurePath.Contains(path, StringComparison.InvariantCultureIgnoreCase);
-                if (arePathsEqual == false)
-                    return false;
-            }
-
-            return true;
-        }
-
-        Dictionary<string, WsModelMaterialFile> LoadAllExistingMaterials()
-        {
-            var materialPacks = _packFileService.FindAllWithExtentionIncludePaths(".material");
-            materialPacks = materialPacks.Where(x => x.Item2.Name.Contains(".xml.material")).ToList();
-            var materialList = new Dictionary<string,WsModelMaterialFile>();
-            foreach (var materialPack in materialPacks)
-            {
-                try
-                {
-                    materialList[materialPack.FileName] = new WsModelMaterialFile(materialPack.Pack);
-                }
-                catch (Exception e)
-                {
-                    _logger.Here().Error($"Error loading material for wsmodel generation - {e.Message}");
-                }
+                materialList[sanitizedWsMaterial] = FileName;
             }
 
             return materialList;
         }
     }
+
+    public static class WsModelGeneratorInputHelper
+    {
+        public static WsModelGeneratorInput[][] Create(MainEditableNode node)
+        {
+            var lodNodes = node.GetLodNodes();
+            var output = new WsModelGeneratorInput[lodNodes.Count][];
+
+            for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
+            {
+                var meshes = node.GetMeshesInLod(lodIndex, false);
+                var meshIndex = 0;
+                output[lodIndex] = meshes
+                    .Select(x => new WsModelGeneratorInput(lodIndex, meshIndex++, meshes[meshIndex].Name, meshes[meshIndex].Geometry.VertexFormat, meshes[meshIndex].Effect))
+                    .ToArray();
+            }
+
+            return output;
+        }
+    }
+
+    public record WsModelGeneratorInput(
+        int LodIndex,
+        int MeshIndex, string MeshName,
+        UiVertexFormat MeshVertexFormat,
+        CapabilityMaterial Material);
 }

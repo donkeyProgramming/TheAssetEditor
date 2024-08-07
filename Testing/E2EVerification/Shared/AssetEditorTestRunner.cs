@@ -8,6 +8,7 @@ using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 
 namespace E2EVerification.Shared
 {
@@ -20,11 +21,14 @@ namespace E2EVerification.Shared
         public IUiCommandFactory CommandFactory { get; private set; }
         public ScopeRepository ScopeRepository { get; private set; }
 
-        public AssetEditorTestRunner(bool forceValidateServiceScopes = false)
+        public AssetEditorTestRunner(GameTypeEnum gameEnum = GameTypeEnum.Warhammer3, bool forceValidateServiceScopes = false)
         {
             _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes, MockServices);
             EditorServiceProvider = _serviceProvider.CreateScope();
 
+            var settings = EditorServiceProvider.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
+            settings.CurrentSettings.CurrentGame = gameEnum;
+            
             var game = EditorServiceProvider.ServiceProvider.GetRequiredService<IWpfGame>();
             var resourceLibrary = EditorServiceProvider.ServiceProvider.GetRequiredService<ResourceLibrary>();
             resourceLibrary.Initialize(game.GraphicsDevice, game.Content);

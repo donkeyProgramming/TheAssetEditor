@@ -25,17 +25,19 @@ namespace AssetEditor
             VersionChecker.CheckVersion();
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
-
             var forceValidateServiceScopes = Debugger.IsAttached;
             _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes);
             _rootScope = _serviceProvider.CreateScope();
+            
+            var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
+            settingsService.AllowSettingsUpdate = true;
+            settingsService.Load();
 
             // Init 3d world
             var gameWorld = _rootScope.ServiceProvider.GetRequiredService<IWpfGame>();
             gameWorld.ForceEnsureCreated();
 
             // Show the settings window if its the first time the tool is ran
-            var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
                 var settingsWindow = _rootScope.ServiceProvider.GetRequiredService<SettingsWindow>();

@@ -1,8 +1,10 @@
-﻿using System.Text;
+﻿using System.Data.SqlTypes;
+using System.Text;
 using System.Xml;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
+using SharpDX.Direct3D9;
 
 namespace Shared.GameFormats.WsModel
 {
@@ -28,8 +30,15 @@ namespace Shared.GameFormats.WsModel
             var buffer = pf.DataSource.ReadData();
             var xmlString = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
 
+            LoadContent(xmlString);
+        }
+
+        public WsModelMaterialFile(string fileContent) => LoadContent(fileContent);
+
+        void LoadContent(string fileContent)
+        {
             var doc = new XmlDocument();
-            doc.LoadXml(xmlString);
+            doc.LoadXml(fileContent);
 
             ExtractParameters(doc);
             ExtractShaderName(doc);

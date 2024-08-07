@@ -21,7 +21,7 @@ namespace GameWorld.Core.Rendering.Shading.Factories
 
         public CapabilityMaterial Create(RmvModel model, string? wsModelMaterialPath)
         {
-            var preferredMaterial = CapabilityMaterialsEnum.Normal;
+            var preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Default;
             WsModelMaterialFile? wsModelMaterial = null;
             if (wsModelMaterialPath != null)
             {
@@ -29,7 +29,7 @@ namespace GameWorld.Core.Rendering.Shading.Factories
                 wsModelMaterial = new WsModelMaterialFile(materialPackFile);
 
                 if(wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
-                    preferredMaterial = CapabilityMaterialsEnum.Emissive;
+                    preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
             }
 
             var material = CreateMaterial(preferredMaterial);
@@ -39,17 +39,17 @@ namespace GameWorld.Core.Rendering.Shading.Factories
             return material;
         }
 
-        CapabilityMaterial CreateMaterial(CapabilityMaterialsEnum type)
+        public CapabilityMaterial CreateMaterial(CapabilityMaterialsEnum type)
         {
             return type switch
             {
-                CapabilityMaterialsEnum.Normal => new DefaultMaterialWh3(_resourceLibrary),
-                CapabilityMaterialsEnum.Emissive => new EmissiveMaterial(_resourceLibrary),
+                CapabilityMaterialsEnum.MetalRoughPbr_Default => new DefaultMetalRoughPbrMaterial(_resourceLibrary),
+                CapabilityMaterialsEnum.MetalRoughPbr_Emissive => new EmissiveMaterial(_resourceLibrary),
                 _ => throw new Exception($"Material of type {type} is not supported by {nameof(Wh3MaterialFactory)}"),
             };
         }
 
-        public List<CapabilityMaterialsEnum> GetPossibleMaterials() => [CapabilityMaterialsEnum.Normal, CapabilityMaterialsEnum.Emissive];
+        public List<CapabilityMaterialsEnum> GetPossibleMaterials() => [CapabilityMaterialsEnum.MetalRoughPbr_Default, CapabilityMaterialsEnum.MetalRoughPbr_Emissive];
    
         public CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterial)
         {

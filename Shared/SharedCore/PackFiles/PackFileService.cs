@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -15,15 +16,20 @@ namespace Shared.Core.PackFiles
         public event FileLookUpHander? FileLookUpEvent;
 
         private readonly ILogger _logger = Logging.Create<PackFileService>();
-        private readonly GlobalEventSender _globalEventSender;
-        private readonly IAnimationFileDiscovered _skeletonAnimationLookUpHelper;
+        private readonly GlobalEventSender? _globalEventSender;
+        private readonly IAnimationFileDiscovered? _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
-        public IPackFileUiProvider UiProvider { get; }
+        public IPackFileUiProvider? UiProvider { get; }
 
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
-        public PackFileService(GlobalEventSender globalEventSender, PackFileDataBase database, IAnimationFileDiscovered skeletonAnimationLookUpHelper, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory, IPackFileUiProvider packFileUiProvider)
+        public PackFileService(PackFileDataBase database, 
+            ApplicationSettingsService settingsService, 
+            GameInformationFactory gameInformationFactory, 
+            GlobalEventSender? globalEventSender, 
+            IAnimationFileDiscovered? skeletonAnimationLookUpHelper,
+            IPackFileUiProvider? packFileUiProvider)
         {
             _globalEventSender = globalEventSender;
             Database = database;
@@ -34,6 +40,41 @@ namespace Shared.Core.PackFiles
         }
 
         public bool TriggerFileUpdates { get; set; } = true;
+
+        public PackFileContainer? LoadFolderContainer(string packFileSystemPath)
+        {
+            if (Directory.Exists(packFileSystemPath) == false)
+            {
+                var location = Assembly.GetEntryAssembly()!.Location;
+                var loactionDir = Path.GetDirectoryName(location);
+                throw new Exception($"Unable to find folder {packFileSystemPath}. Curret systempath is {loactionDir}");
+            }
+
+            var container = new PackFileContainer(packFileSystemPath);
+            AddFolderContentToPackFile(container, packFileSystemPath, packFileSystemPath.ToLower() + "\\");
+            Database.AddPackFile(container);
+            return container;
+        }
+
+        void AddFolderContentToPackFile(PackFileContainer container, string folderPath, string rootPath)
+        { 
+            var files = Directory.GetFiles(folderPath);
+            foreach (var filePath in files)
+            {
+                var sanatizedFilePath = filePath.ToLower();
+                var relativePath = sanatizedFilePath.Replace(rootPath, "");
+                var fileName = Path.GetFileName(sanatizedFilePath);
+
+                container.FileList[relativePath] = PackFile.CreateFromFileSystem(fileName, sanatizedFilePath);
+            }
+
+            var folders = Directory.GetDirectories(folderPath);
+            foreach (var folder in folders)
+            {
+                AddFolderContentToPackFile(container, folder, rootPath);  
+            }
+        }
+
 
         public PackFileContainer? Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false)
         {
@@ -62,6 +103,7 @@ namespace Shared.Core.PackFiles
                     SetEditablePack(container);
 
                 _settingsService.AddRecentlyOpenedPackFile(packFileSystemPath);
+                _settingsService.Save();
                 return container;
             }
             catch (Exception e)
@@ -379,7 +421,7 @@ namespace Shared.Core.PackFiles
                 _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
 
                 Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile });
-                _globalEventSender.TriggerEvent(new PackFileSavedEvent());
+                _globalEventSender?.TriggerEvent(new PackFileSavedEvent());
             }
         }
 
@@ -400,8 +442,8 @@ namespace Shared.Core.PackFiles
                 container.FileList[path.ToLower()] = newFiles[i];
 
             }
-            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
-            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
+            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, container);
+            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
 
             Database.TriggerPackFileAdded(container, newFiles);
         }
@@ -439,8 +481,8 @@ namespace Shared.Core.PackFiles
                 container.FileList[path.ToLower() + currentPath.ToLower()] = file;
             }
 
-            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
-            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
+            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, container);
+            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
 
             Database.TriggerPackFileAdded(container, filesAdded);
         }
@@ -451,7 +493,7 @@ namespace Shared.Core.PackFiles
             Database.TriggerContainerUpdated(pf);
         }
 
-        public PackFileContainer GetEditablePack()
+        public PackFileContainer? GetEditablePack()
         {
             return Database.PackSelectedForEdit;
         }
@@ -487,7 +529,7 @@ namespace Shared.Core.PackFiles
         // ---------------------------
         public void UnloadPackContainer(PackFileContainer pf)
         {
-            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
+            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
             Database.RemovePackFile(pf);
         }
 
@@ -535,8 +577,8 @@ namespace Shared.Core.PackFiles
 
             _logger.Here().Information($"Moving file {key}");
 
-            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
-            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
+            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
+            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, pf);
         }
 
         public void RenameDirectory(PackFileContainer pf, string currentNodeName, string newName)
@@ -561,8 +603,8 @@ namespace Shared.Core.PackFiles
                 pf.FileList[newPath] = file;
             }
 
-            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
-            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
+            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
+            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, pf);
 
             Database.TriggerPackFileFolderRenamed(pf, newNodePath);
         }
@@ -595,7 +637,7 @@ namespace Shared.Core.PackFiles
                 throw new Exception("Can not save ca pack file");
             file.DataSource = new MemorySource(data);
             Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file });
-            _globalEventSender.TriggerEvent(new PackFileSavedEvent());
+            _globalEventSender?.TriggerEvent(new PackFileSavedEvent());
         }
 
         public void Save(PackFileContainer pf, string path, bool createBackup)
@@ -619,7 +661,7 @@ namespace Shared.Core.PackFiles
                     throw new Exception("File has been changed outside of AssetEditor. Can not save the file as it will cause corruptions");
             }
 
-            _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, pf);
+            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
 
             pf.SystemFilePath = path;
             using (var memoryStream = new FileStream(path + "_temp", FileMode.OpenOrCreate))
@@ -632,10 +674,10 @@ namespace Shared.Core.PackFiles
             File.Move(path + "_temp", path);
 
             pf.OriginalLoadByteSize = new FileInfo(path).Length;
-            _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, pf);
+            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, pf);
         }
 
-        public PackFile FindFile(string path, PackFileContainer? container = null)
+        public PackFile? FindFile(string path, PackFileContainer? container = null)
         {
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
 

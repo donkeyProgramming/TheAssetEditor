@@ -1,0 +1,6 @@
+<model version="1">
+  <geometry>VariantMeshes/wh_variantmodels/hu1e/cth/cth_props/cth_celestial_general_hammer_2h_01.rigid_model_v2</geometry>
+  <materials>
+    <material part_index="0" lod_index="0">VariantMeshes/wh_variantmodels/hu1e/cth/cth_props/materials/cth_celestial_general_hammer_2h_01_alpha_off.xml.material</material>
+  </materials>
+</model>

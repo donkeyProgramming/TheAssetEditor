@@ -1,0 +1,96 @@
+<material>
+ <name>emp_karl_franz_hammer_2h_01_alpha_off.xml</name>
+ <shader>shaders/rigid_character.xml.shader</shader>
+ <sort_override>255</sort_override>
+ <textures>
+  <texture>
+   <slot version="2">t_xml_base_colour</slot>
+   <source>VariantMeshes/wh_variantmodels/hu1/emp/emp_props/tex/emp_karl_franz_hammer_2h_01_base_colour.dds</source>
+  </texture>
+  <texture>
+   <slot version="2">t_xml_blood_map</slot>
+   <source>commontextures/bloodmap.dds</source>
+  </texture>
+  <texture>
+   <slot version="2">t_xml_dither</slot>
+   <source>commontextures/dither.dds</source>
+  </texture>
+  <texture>
+   <slot version="2">t_xml_mask</slot>
+   <source>VariantMeshes/wh_variantmodels/hu1/emp/emp_props/tex/emp_karl_franz_hammer_2h_01_mask.dds</source>
+  </texture>
+  <texture>
+   <slot version="2">t_xml_material_map</slot>
+   <source>VariantMeshes/wh_variantmodels/hu1/emp/emp_props/tex/emp_karl_franz_hammer_2h_01_material_map.dds</source>
+  </texture>
+  <texture>
+   <slot version="2">t_xml_normal</slot>
+   <source>VariantMeshes/wh_variantmodels/hu1/emp/emp_props/tex/emp_karl_franz_hammer_2h_01_normal.dds</source>
+  </texture>
+  <texture>
+   <slot version="2">t_xml_distortion_noise</slot>
+   <source>commontextures/winds_of_magic_noise.dds</source>
+  </texture>
+  <texture>
+   <slot version="2">t_xml_distortion</slot>
+   <source>commontextures/winds_of_magic_specular.dds</source>
+  </texture>
+ </textures>
+ <params>
+  <param>
+   <name>blood_uv_scale</name>
+   <type>float2</type>
+   <value>1,1</value>
+  </param>
+  <param>
+   <name>diffuse_tint_colour</name>
+   <type>float3</type>
+   <value>0,0,0</value>
+  </param>
+  <param>
+   <name>diffuse_tint_mask</name>
+   <type>float4</type>
+   <value>0,0,0,0</value>
+  </param>
+  <param>
+   <name>diffuse_tint_variation</name>
+   <type>float</type>
+   <value>0</value>
+  </param>
+  <param>
+   <name>faction1_tint_variation</name>
+   <type>float</type>
+   <value>0</value>
+  </param>
+  <param>
+   <name>faction2_tint_variation</name>
+   <type>float</type>
+   <value>0</value>
+  </param>
+  <param>
+   <name>faction3_mask_channel</name>
+   <type>float4</type>
+   <value>0,0,0,0</value>
+  </param>
+  <param>
+   <name>faction3_tint_variation</name>
+   <type>float</type>
+   <value>0</value>
+  </param>
+  <param>
+   <name>faction_colours_use_overlay</name>
+   <type>float</type>
+   <value>0</value>
+  </param>
+  <param>
+   <name>metal_tint_variation</name>
+   <type>float</type>
+   <value>0</value>
+  </param>
+  <param>
+   <name>receives_blood</name>
+   <type>float</type>
+   <value>1</value>
+  </param>
+ </params>
+</material>

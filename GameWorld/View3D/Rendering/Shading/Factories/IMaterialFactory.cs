@@ -10,7 +10,7 @@ namespace GameWorld.Core.Rendering.Shading.Factories
         string GetWsModelNameFromRmvFileName(string rmvFileName);
         List<CapabilityMaterialsEnum> GetPossibleMaterials();
         CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterial);
-
+        CapabilityMaterial CreateMaterial(CapabilityMaterialsEnum type);
     }
 }
 

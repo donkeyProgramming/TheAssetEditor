@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using Shared.Core.Services;
 
 namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
@@ -19,7 +20,8 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 
         public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
         {
-            _wsModelGeneratorService.GenerateWsModel(outputPath, mainNode, GameTypeEnum.Warhammer3);
+            var input = WsModelGeneratorInputHelper.Create(mainNode);
+            _wsModelGeneratorService.GenerateWsModel(outputPath, input, CapabilityMaterialFactory.GetBuilder(GameTypeEnum.Warhammer3));
         }
     }
 }

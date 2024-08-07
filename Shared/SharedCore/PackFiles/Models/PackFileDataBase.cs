@@ -15,6 +15,8 @@ namespace Shared.Core.PackFiles.Models
 
     public class PackFileDataBase : NotifyPropertyChangedImpl
     {
+        private readonly bool _allowEvents;
+
         public event ContainerUpdatedDelegate ContainerUpdated;
         public event PackFileContainerLoadedDelegate PackFileContainerLoaded;
         public event PackFileContainerRemovedDelegate PackFileContainerRemoved;
@@ -31,25 +33,34 @@ namespace Shared.Core.PackFiles.Models
         // FileRemoved
 
         public List<PackFileContainer> PackFiles { get; set; } = new List<PackFileContainer>();
-        public PackFileContainer PackSelectedForEdit { get; set; }
+        public PackFileContainer? PackSelectedForEdit { get; set; }
+
+        public PackFileDataBase(bool allowEvents = true)
+        {
+            _allowEvents = allowEvents;
+        }
 
         public void AddPackFile(PackFileContainer pf)
         {
             PackFiles.Add(pf);
-            PackFileContainerLoaded?.Invoke(pf);
+            if(_allowEvents)
+                PackFileContainerLoaded?.Invoke(pf);
         }
 
         public void RemovePackFile(PackFileContainer pf)
         {
-            var canUnload = BeforePackFileContainerRemoved?.Invoke(pf);
+            bool? canUnload = true;
+            if(_allowEvents)
+                canUnload = BeforePackFileContainerRemoved?.Invoke(pf);
+
             if (canUnload.HasValue == false || canUnload.HasValue == true && canUnload.Value == true)
             {
                 PackFiles.Remove(pf);
 
                 if (PackSelectedForEdit == pf)
                     PackSelectedForEdit = null;
-
-                PackFileContainerRemoved?.Invoke(pf);
+                if(_allowEvents)
+                    PackFileContainerRemoved?.Invoke(pf);
             }
         }
 
@@ -60,32 +71,38 @@ namespace Shared.Core.PackFiles.Models
 
         public void TriggerContainerUpdated(PackFileContainer container)
         {
-            ContainerUpdated?.Invoke(container);
+            if (_allowEvents)
+                ContainerUpdated?.Invoke(container);
         }
 
         public void TriggerPackFilesUpdated(PackFileContainer container, List<PackFile> files)
         {
-            PackFilesUpdated?.Invoke(container, files);
+            if (_allowEvents)
+                PackFilesUpdated?.Invoke(container, files);
         }
 
         public void TriggerPackFileAdded(PackFileContainer container, List<PackFile> files)
         {
-            PackFilesAdded?.Invoke(container, files);
+            if (_allowEvents)
+                PackFilesAdded?.Invoke(container, files);
         }
 
         public void TriggerPackFileRemoved(PackFileContainer container, List<PackFile> files)
         {
-            PackFilesRemoved?.Invoke(container, files);
+            if (_allowEvents)
+                PackFilesRemoved?.Invoke(container, files);
         }
 
         public void TriggerPackFileFolderRemoved(PackFileContainer container, string path)
         {
-            PackFileFolderRemoved?.Invoke(container, path);
+            if (_allowEvents)
+                PackFileFolderRemoved?.Invoke(container, path);
         }
 
         public void TriggerPackFileFolderRenamed(PackFileContainer container, string path)
         {
-            PackFileFolderRenamed?.Invoke(container, path);
+            if (_allowEvents)
+                PackFileFolderRenamed?.Invoke(container, path);
         }
     }
 }

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using GameWorld.Core.Rendering.Shading.Shaders;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.Services;
+using Shared.GameFormats.RigidModel;
 
 namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 {
@@ -24,7 +22,11 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 
         public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
         {
-            _wsModelGeneratorService.GenerateWsModel(outputPath, mainNode, GameTypeEnum.Pharaoh);
+            var input = WsModelGeneratorInputHelper.Create(mainNode);
+            _wsModelGeneratorService.GenerateWsModel(outputPath, input, CapabilityMaterialFactory.GetBuilder(GameTypeEnum.Pharaoh));
         }
     }
+
+
+   
 }

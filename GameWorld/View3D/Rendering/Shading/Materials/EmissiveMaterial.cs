@@ -7,7 +7,7 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
     public class EmissiveMaterial : CapabilityMaterial
     {
         public EmissiveMaterial(ResourceLibrary resourceLibrary)
-            : base(CapabilityMaterialsEnum.Emissive, ShaderTypes.Pbs_MetalRough, resourceLibrary)
+            : base(CapabilityMaterialsEnum.MetalRoughPbr_Emissive, ShaderTypes.Pbs_MetalRough, resourceLibrary)
         {
             Capabilities =
                 [
