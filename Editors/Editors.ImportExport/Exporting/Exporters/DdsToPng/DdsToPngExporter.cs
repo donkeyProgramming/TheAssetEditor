@@ -21,12 +21,14 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
         private readonly PackFileService _packFileService;
         private readonly DdsToNormalPngExporter _ddsToNormalPngExporter;
         private readonly DdsToMaterialPngExporter _ddsToMaterialPngExporter;
+        private readonly IImageSaveHandler _imageSaveHandler;
 
-        public DdsToPngExporter(PackFileService pfs, DdsToNormalPngExporter ddsToNormalPngExporter, DdsToMaterialPngExporter ddsToMaterialPngExporter)
+        public DdsToPngExporter(PackFileService pfs, DdsToNormalPngExporter ddsToNormalPngExporter, DdsToMaterialPngExporter ddsToMaterialPngExporter, IImageSaveHandler imageSaveHandler)
         {
             _packFileService = pfs;
             _ddsToNormalPngExporter = ddsToNormalPngExporter;
             _ddsToMaterialPngExporter = ddsToMaterialPngExporter;
+            _imageSaveHandler = imageSaveHandler;
         }
         
         internal ExportSupportEnum CanExportFile(PackFile file)
@@ -103,7 +105,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
             var ms = new MemoryStream(imgBytes);
             using Image img = Image.FromStream(ms);
             using Bitmap bitmap = new Bitmap(img);
-            bitmap.Save(fileDirectory, System.Drawing.Imaging.ImageFormat.Png);
+            _imageSaveHandler.Save(bitmap, fileDirectory);
         }
     }
 }

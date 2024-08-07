@@ -1,4 +1,5 @@
 ﻿using AssetEditor.Services;
+using Editors.ImportExport;
 using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToPng;
@@ -27,6 +28,7 @@ namespace E2EVerification.Shared
         public DdsToNormalPngExporter DdsToNormalPngExporterRepos { get; private set; }
         public DdsToMaterialPngExporter DdsToMaterialPngExporterRepos { get; private set; }
         public DdsToPngExporter DdsToPngExporterRepos { get; private set; }
+        public IImageSaveHandler ImageSaveHandler { get; private set; }
 
         public AssetEditorTestRunner()
         {
@@ -44,6 +46,7 @@ namespace E2EVerification.Shared
             DdsToNormalPngExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<DdsToNormalPngExporter>();
             DdsToMaterialPngExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<DdsToMaterialPngExporter>();
             DdsToPngExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<DdsToPngExporter>();
+            ImageSaveHandler = EditorServiceProvider.ServiceProvider.GetRequiredService<IImageSaveHandler>();
         }
 
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)

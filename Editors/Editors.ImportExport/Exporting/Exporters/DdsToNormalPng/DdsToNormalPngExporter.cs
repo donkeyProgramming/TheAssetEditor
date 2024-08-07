@@ -4,6 +4,7 @@ using Shared.Core.PackFiles.Models;
 using System.Drawing;
 using System.IO;
 using MeshImportExport;
+using Editors.ImportExport;
 
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
@@ -11,9 +12,11 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
     public class DdsToNormalPngExporter
     {
         private readonly PackFileService _pfs;
-        public DdsToNormalPngExporter(PackFileService packFileService) 
+        private readonly IImageSaveHandler _imageSaveHandler;
+        public DdsToNormalPngExporter(PackFileService packFileService, IImageSaveHandler imageSaveHandler) 
         {
             _pfs = packFileService;
+            _imageSaveHandler = imageSaveHandler;
         }
 
         public void Export(string filePath, string outputPath, bool convert)
@@ -60,7 +63,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
-                bitmap.Save(fileDirectory, System.Drawing.Imaging.ImageFormat.Png);
+                _imageSaveHandler.Save(bitmap, fileDirectory);
             }
         }
 
@@ -69,7 +72,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             var ms = new MemoryStream(imgBytes);
             using Image img = Image.FromStream(ms);
             using Bitmap bitmap = new Bitmap(img);
-            bitmap.Save(fileDirectory, System.Drawing.Imaging.ImageFormat.Png);
+            _imageSaveHandler.Save(bitmap, fileDirectory);
         }
     }
 }

@@ -10,9 +10,11 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
     public class DdsToMaterialPngExporter
     {
         private readonly PackFileService pfs;
-        public DdsToMaterialPngExporter(PackFileService packFileService)
+        private readonly IImageSaveHandler _imageSaveHandler;
+        public DdsToMaterialPngExporter(PackFileService packFileService, IImageSaveHandler imageSaveHandler)
         {
             pfs = packFileService;
+            _imageSaveHandler = imageSaveHandler;
         }
         public void Export(string path, string outputPath, bool convertToBlenderFormat)
         {
@@ -59,7 +61,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
-                bitmap.Save(fileDirectory, System.Drawing.Imaging.ImageFormat.Png);
+                _imageSaveHandler.Save(bitmap, fileDirectory);
             }
         }
 
@@ -68,7 +70,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             var ms = new MemoryStream(imgBytes);
             using Image img = Image.FromStream(ms);
             using Bitmap bitmap = new Bitmap(img);
-            bitmap.Save(fileDirectory, System.Drawing.Imaging.ImageFormat.Png);
+            _imageSaveHandler.Save(bitmap, fileDirectory);
         }
     }
 }

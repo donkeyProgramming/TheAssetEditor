@@ -34,6 +34,9 @@ namespace Editors.ImportExport
             services.AddTransient<DdsToNormalPngExporter>();
             services.AddTransient<RmvToGltfExporter>();
 
+            // Image Save Helper
+            services.AddScoped<IImageSaveHandler, SystemImageSaveHandler>();
+
             // Helpers to ensure we can hook up to the UI
             services.AddTransient<IExportFileContextMenuHelper, ExportFileContextMenuHelper>();
             services.AddTransient<DisplayExportFileToolCommand>();
