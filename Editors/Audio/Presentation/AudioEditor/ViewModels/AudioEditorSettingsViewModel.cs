@@ -34,7 +34,7 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         [ObservableProperty] private ObservableCollection<AudioEditorSettings.EventType> _audioProjectEventTypes = new (Enum.GetValues(typeof(AudioEditorSettings.EventType)).Cast<AudioEditorSettings.EventType>());
         [ObservableProperty] private ObservableCollection<AudioEditorSettings.EventSubtype> _audioProjectSubtypes = []; // Determined according to what Event Type is selected
 
-        [ObservableProperty] private ObservableCollection<string> _audioProjectDialogueEvents = []; // The list of events in the Audio Project.
+        public static List<string> AudioProjectDialogueEvents => AudioEditorData.Instance.AudioProjectDialogueEvents;
 
         public AudioEditorSettingsViewModel(IAudioRepository audioRepository, PackFileService packFileService, AudioEditorViewModel audioEditorViewModel)
         {
@@ -73,12 +73,6 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             }
         }
 
-        public void AddDialogueEventAudioProjectEvents(List<string> dialogueEvents)
-        {
-            foreach (var dialogueEvent in dialogueEvents)
-                AudioProjectDialogueEvents.Add(dialogueEvent);
-        }
-
         public void CreateAudioProjectEventsList()
         {
             AudioProjectDialogueEvents.Clear();
@@ -92,26 +86,37 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
                         .ToList();
 
                     PopulateDialogueEventsListBox(dialogueEvents, eventSubtype);
+                    
+                    CreateAudioProjectEventsList(dialogueEvents, eventSubtype);
                 }
             }
         }
 
-
-        public void PopulateDialogueEventsListBox(List<(string EventName, AudioEditorSettings.EventType Type, AudioEditorSettings.EventSubtype[] Subtype, bool Recommended)> dialogueEvents, AudioEditorSettings.EventSubtype selectedEventSubtype)
+        public void PopulateDialogueEventsListBox(List<(string EventName, AudioEditorSettings.EventType Type, AudioEditorSettings.EventSubtype[] Subtype, bool Recommended)> dialogueEvents, AudioEditorSettings.EventSubtype eventSubtype)
         {
             DialogueEventCheckBoxes.Clear();
 
-            foreach (var (eventName, type, subtypes, _) in dialogueEvents)
+            foreach (var dialogueEvent in dialogueEvents)
             {
-                if (subtypes.Contains(selectedEventSubtype))
+                if (dialogueEvent.Subtype.Contains(eventSubtype))
                 {
                     var checkBox = new CheckBox
                     {
-                        Content = AddExtraUnderScoresToString(eventName),
+                        Content = AddExtraUnderScoresToString(dialogueEvent.EventName),
                         IsChecked = false
                     };
+
                     DialogueEventCheckBoxes.Add(checkBox);
                 }
+            }
+        }
+
+        public void CreateAudioProjectEventsList(List<(string EventName, AudioEditorSettings.EventType Type, AudioEditorSettings.EventSubtype[] Subtype, bool Recommended)> dialogueEvents, AudioEditorSettings.EventSubtype eventSubtype)
+        {
+            foreach (var dialogueEvent in dialogueEvents)
+            {
+                if (dialogueEvent.Subtype.Contains(eventSubtype))
+                    AudioProjectDialogueEvents.Add(dialogueEvent.EventName);
             }
         }
 
