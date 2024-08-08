@@ -48,7 +48,7 @@ namespace GameWorld.Core.SceneNodes
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
 
                     var wsModelMaterial = wsModelFile?.MaterialList.FirstOrDefault(x => x.LodIndex == lodIndex && x.PartIndex == modelIndex);
-                    var shader = _abstractMaterialFactory.CreateFactory().Create(rmvModel, wsModelMaterial?.MaterialPath);
+                    var shader = _abstractMaterialFactory.CreateFactoryForCurrentGame().Create(rmvModel, wsModelMaterial?.MaterialPath);
 
                     // This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
                     // from the model file path.

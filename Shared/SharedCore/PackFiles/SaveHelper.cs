@@ -78,7 +78,7 @@ namespace Shared.Core.PackFiles
             }
         }
 
-        public static PackFile Save(PackFileService packFileService, string filename, PackFile packFile, byte[] updatedData = null, bool promptSaveOverride = true)
+        public static PackFile Save(PackFileService packFileService, string filename, PackFile? packFile, byte[]? updatedData = null, bool promptSaveOverride = true)
         {
             filename = filename.ToLower();
             var selectedEditabelPackFile = packFileService.GetEditablePack();

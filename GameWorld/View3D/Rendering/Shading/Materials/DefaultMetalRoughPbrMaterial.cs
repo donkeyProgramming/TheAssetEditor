@@ -12,7 +12,7 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
             Capabilities =
                 [
                     new CommonShaderParametersCapability(),
-                    new DefaultCapability(),
+                    new DefaultCapabilityMetalRough(),
                     new AnimationCapability(),
                     new BloodCapability(),
                 ];
@@ -40,7 +40,7 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
             Capabilities =
                 [
                     new CommonShaderParametersCapability(),
-                    new DefaultCapability(),
+                    new DefaultCapabilitySpecGloss(),
                     new AnimationCapability(),
                     new BloodCapability(),
                 ];

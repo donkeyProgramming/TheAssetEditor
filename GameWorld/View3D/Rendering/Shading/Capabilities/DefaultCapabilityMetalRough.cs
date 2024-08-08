@@ -6,7 +6,7 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Shading.Capabilities
 {
-    public class DefaultCapability : ICapability
+    public class DefaultCapabilityMetalRough : ICapability
     {
         public float ScaleMult { get; set; } = 1;
         public bool UseAlpha { get; set; }
@@ -31,7 +31,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
 
         public ICapability Clone()
         {
-            return new DefaultCapability()
+            return new DefaultCapabilityMetalRough()
             {
                 ScaleMult = ScaleMult,
                 UseAlpha = UseAlpha,

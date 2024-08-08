@@ -56,10 +56,6 @@ namespace GameWorld.Core.Rendering.Shading.Factories
             throw new NotImplementedException();
         }
 
-        public string GetWsModelNameFromRmvFileName(string rmvFileName)
-        {
-            throw new NotImplementedException();
-        }
 
 
     }

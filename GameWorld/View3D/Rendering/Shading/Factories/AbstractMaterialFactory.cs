@@ -17,14 +17,16 @@ namespace GameWorld.Core.Rendering.Shading.Factories
             _resourceLibrary = resourceLibrary;
         }
 
-        public IMaterialFactory CreateFactory()
+        public IMaterialFactory CreateFactoryForCurrentGame() => CreateFactory(_applicationSettingsService.CurrentSettings.CurrentGame);
+
+        public IMaterialFactory CreateFactory(GameTypeEnum gameType)
         {
-            if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3)
+            if (gameType == GameTypeEnum.Warhammer3)
             {
                 return new Wh3MaterialFactory(_packFileService, _resourceLibrary);
             }
 
-            return new DefaultMaterialFactory();
+            return new SpecGlossMaterialFactory(_packFileService, _resourceLibrary);
         }
     }
 }

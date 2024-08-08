@@ -12,7 +12,7 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
             Capabilities =
                 [
                     new CommonShaderParametersCapability(),
-                    new DefaultCapability(),
+                    new DefaultCapabilityMetalRough(),
                     new AnimationCapability(),
                     new BloodCapability(),
                     new EmissiveCapability(),

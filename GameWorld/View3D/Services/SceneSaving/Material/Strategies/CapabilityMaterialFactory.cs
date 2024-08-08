@@ -35,41 +35,56 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
     public abstract class IWsMaterialBuilder
     {
         protected string? _templateBuffer;
+        private string? _templateName;
 
         public abstract (string FileName, string FileContent) Create(string meshName, UiVertexFormat vertexFormat, CapabilityMaterial capabilityMaterial);
 
         protected void LoadTemplate(string templatePath)
         {
+            _templateName = templatePath;
             _templateBuffer = ResourceLoader.LoadString(templatePath);
         }
 
         protected void Add(string templateAttributeName, string value)
         {
+            if (_templateBuffer!.Contains(templateAttributeName) == false)
+                throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
             _templateBuffer = _templateBuffer!.Replace(templateAttributeName, value);
         }
 
         protected void Add(string templateAttributeName, float value)
         {
+            if (_templateBuffer!.Contains(templateAttributeName) == false)
+                throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
             _templateBuffer = _templateBuffer!.Replace(templateAttributeName, value.ToString());
         }
 
         protected void Add(string templateAttributeName, Vector2 value)
         {
+            if (_templateBuffer!.Contains(templateAttributeName) == false)
+                throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
             _templateBuffer = _templateBuffer!.Replace(templateAttributeName, $"{value.X}, {value.Y}");
         }
 
         protected void Add(string templateAttributeName, Vector3 value)
         {
+            if (_templateBuffer!.Contains(templateAttributeName) == false)
+                throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
             _templateBuffer = _templateBuffer!.Replace(templateAttributeName, $"{value.X}, {value.Y}, {value.Z}");
         }
 
         protected void Add(string templateAttributeName, Vector4 value)
         {
+            if (_templateBuffer!.Contains(templateAttributeName) == false)
+                throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
             _templateBuffer = _templateBuffer!.Replace(templateAttributeName, $"{value.X}, {value.Y}, {value.Z}, {value.W}");
         }
 
         protected void Add(string templateAttributeName, TextureInput value)
         {
+            if (_templateBuffer!.Contains(templateAttributeName) == false)
+                throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
+
             if (string.IsNullOrWhiteSpace(value.TexturePath))
                 _templateBuffer = _templateBuffer!.Replace(templateAttributeName, "test_mask.dds");
             else

@@ -8,6 +8,9 @@ using GameWorld.Core.Services.SceneSaving.Material;
 using Shared.Core.Events.Scoped;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
+using GameWorld.Core.Rendering.Shading.Shaders;
+using GameWorld.Core.Rendering.Shading.Capabilities;
 
 namespace GameWorld.Core.Services.SceneSaving
 {
@@ -78,5 +81,14 @@ namespace GameWorld.Core.Services.SceneSaving
         }
 
 
+    }
+
+    public class Rmm2MaterialUpdater
+    {
+        public void UpdateRmv2(IRmvMaterial rmvMaterial, CapabilityMaterial material)
+        {
+            var specGlossMaterial = material.TryGetCapability<DefaultCapabilityMetalRough>();
+            var metalRoughMaterial = material.TryGetCapability<DefaultCapabilityMetalRough>();
+        }
     }
 }

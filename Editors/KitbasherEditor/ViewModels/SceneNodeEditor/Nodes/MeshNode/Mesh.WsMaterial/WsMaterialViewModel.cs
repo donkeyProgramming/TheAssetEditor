@@ -33,7 +33,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             _uiCommandFactory = uiCommandFactory;
             _packFileService = packFileService;
             _resourceLibrary = resourceLibrary;
-            _materialFactory = abstractMaterialFactory.CreateFactory();
+            _materialFactory = abstractMaterialFactory.CreateFactoryForCurrentGame();
 
             _possibleMaterialTypes = _materialFactory.GetPossibleMaterials();
         }
@@ -44,7 +44,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             var material = _currentNode.Effect;
             CurrentMaterialType = material.Type;
 
-            var defaultCapability = material.TryGetCapability<DefaultCapability>();
+            var defaultCapability = material.TryGetCapability<DefaultCapabilityMetalRough>();
             if(defaultCapability != null)
                 Default = new DefaultViewModel(defaultCapability, _uiCommandFactory, _packFileService, _resourceLibrary);
 

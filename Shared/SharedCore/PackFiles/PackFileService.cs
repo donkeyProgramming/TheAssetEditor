@@ -417,8 +417,8 @@ namespace Shared.Core.PackFiles
 
             if (TriggerFileUpdates)
             {
-                _skeletonAnimationLookUpHelper.UnloadAnimationFromContainer(this, container);
-                _skeletonAnimationLookUpHelper.LoadFromPackFileContainer(this, container);
+                _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, container);
+                _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
 
                 Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile });
                 _globalEventSender?.TriggerEvent(new PackFileSavedEvent());

@@ -11,8 +11,8 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
     {
         static readonly Dictionary<CapabilityMaterialsEnum, string> s_materialToTemplateMap = new()
         {
-            { CapabilityMaterialsEnum.MetalRoughPbr_Default, "Resources.WsModelTemplates.MaterialTemplate_wh3.xml.material"},
-            { CapabilityMaterialsEnum.MetalRoughPbr_Emissive, "Resources.WsModelTemplates.MaterialTemplate_wh3.xml.material"}
+            { CapabilityMaterialsEnum.MetalRoughPbr_Default,    "Resources.WsModelTemplates.MaterialTemplate_wh3_default.xml.material"},
+          //  { CapabilityMaterialsEnum.MetalRoughPbr_Emissive,   "Resources.WsModelTemplates.MaterialTemplate_wh3_emissive.xml.material"}
         };
 
         public override (string FileName, string FileContent) Create(string uniqueMeshName, UiVertexFormat vertexFormat, CapabilityMaterial capabilityMaterial)
@@ -22,21 +22,22 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
                 throw new Exception($"Tryint to create a wsmaterial using {nameof(CapabilityMaterialBuilderWarhammer3)} for {nameof(CapabilityMaterial)} of type {nameof(capabilityMaterial.Type)} which is not supported");
 
             LoadTemplate(templateName!);
-            AddShaderName(uniqueMeshName, vertexFormat, capabilityMaterial);
+            var fileName = AddShaderName(uniqueMeshName, vertexFormat, capabilityMaterial);
 
-            AddDefault(capabilityMaterial.GetCapability<DefaultCapability>());
+            AddDefault(capabilityMaterial.GetCapability<DefaultCapabilityMetalRough>());
             AddBlood(capabilityMaterial.TryGetCapability<BloodCapability>());
             AddTint(capabilityMaterial.TryGetCapability<TintCapability>());
             AddEmissive(capabilityMaterial.TryGetCapability<EmissiveCapability>());
 
-            return ("SomeFileName.xml.material", _templateBuffer!);
+            Verify();
+            return ($"{fileName}.material", _templateBuffer!);
         }
 
-        void AddShaderName(string meshName, UiVertexFormat vertexFormat, CapabilityMaterial capabilityMaterial)
+        string AddShaderName(string meshName, UiVertexFormat vertexFormat, CapabilityMaterial capabilityMaterial)
         {
             var alphaShaderPart = "";
             var alphaNamePart = "off";
-            if (capabilityMaterial.GetCapability<DefaultCapability>().UseAlpha)
+            if (capabilityMaterial.GetCapability<DefaultCapabilityMetalRough>().UseAlpha)
             {
                 alphaShaderPart = "_alpha";
                 alphaNamePart = "on";
@@ -49,13 +50,14 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
                 UiVertexFormat.Weighted => "weighted2",
                 _ => throw new Exception("Unknown vertex type")
             };
-
-            Add("TEMPLATE_ATTR_FILE_NAME", $"{meshName}_{materialVertexFormatStr}_alpha_{alphaNamePart}.xml");
+            var fileName = $"{meshName}_{materialVertexFormatStr}_alpha_{alphaNamePart}.xml";
+            Add("TEMPLATE_ATTR_FILE_NAME", fileName);
             Add("TEMPLATE_ATTR_ALPHAMODE", alphaShaderPart);
             Add("TEMPLATE_ATTR_VERTEXTYPE", materialVertexFormatStr);
+            return fileName;
         }
 
-        void AddDefault(DefaultCapability defaultCapability)
+        void AddDefault(DefaultCapabilityMetalRough defaultCapability)
         {
             Add("TEMPLATE_ATTR_BASE_COLOUR_PATH", defaultCapability.BaseColour);
             Add("TEMPLATE_ATTR_MASK_PATH", defaultCapability.Mask);
@@ -98,17 +100,17 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 
     public class CapabilityMaterialBuilderPharaoh : IWsMaterialBuilder
     {
-        public override string Create(string meshName, UiVertexFormat vertexFormat, CapabilityMaterial capabilityMaterial)
+        public override (string FileName, string FileContent) Create(string meshName, UiVertexFormat vertexFormat, CapabilityMaterial capabilityMaterial)
         {
-            return "";
+            throw new NotImplementedException();
         }
     }
 
     public class CapabilityMaterialBuilderWarhammer2 : IWsMaterialBuilder
     {
-        public override string Create(string meshName, UiVertexFormat vertexFormat, CapabilityMaterial capabilityMaterial)
+        public override (string FileName, string FileContent) Create(string meshName, UiVertexFormat vertexFormat, CapabilityMaterial capabilityMaterial)
         {
-            return "";
+            throw new NotImplementedException();
         }
     }
 }
