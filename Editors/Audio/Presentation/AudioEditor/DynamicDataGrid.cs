@@ -73,7 +73,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             var stateGroups = audioRepository.DialogueEventsWithStateGroups[selectedAudioProjectEvent];
             var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[selectedAudioProjectEvent];
 
-            var stateGroupsCount = stateGroups.Count();
+            var stateGroupsCount = stateGroups.Count() + 3;
             var columnWidth = stateGroupsCount > 0 ? 1.0 / (stateGroupsCount) : 1.0;
 
             // Column for Remove State Path button:
@@ -143,6 +143,16 @@ namespace Editors.Audio.Presentation.AudioEditor
             };
 
             dataGrid.Columns.Add(soundsButtonColumn);
+
+            // Column for Play button:
+            var playButtonColumn = new DataGridTemplateColumn
+            {
+                CellTemplate = CreatePlaySoundsButtonTemplate(audioRepository),
+                Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
+                CanUserResize = false
+            };
+
+            dataGrid.Columns.Add(playButtonColumn);
         }
 
         public static DataTemplate CreateStatesComboBoxTemplate(List<string> states, string stateGroupWithQualifier, bool showCustomStatesOnly)
@@ -252,6 +262,24 @@ namespace Editors.Audio.Presentation.AudioEditor
                             AudioEditorViewModel.AddAudioFiles(dataGridRowContext, textBox);
                     }
                 }
+            }));
+
+            template.VisualTree = factory;
+
+            return template;
+        }
+
+        public static DataTemplate CreatePlaySoundsButtonTemplate(IAudioRepository audioRepository)
+        {
+            var template = new DataTemplate();
+            var factory = new FrameworkElementFactory(typeof(Button));
+            factory.SetValue(Button.ContentProperty, "Play");
+            factory.SetValue(Button.ToolTipProperty, "Play a sound at random, to simulate the Dialogue Event being triggered in game.");
+
+            // Handle button click event
+            factory.AddHandler(Button.ClickEvent, new RoutedEventHandler((sender, e) =>
+            {
+                //Do something
             }));
 
             template.VisualTree = factory;

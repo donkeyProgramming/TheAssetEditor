@@ -7,7 +7,7 @@
              xmlns:converters="clr-namespace:Editors.Audio.Presentation.AudioEditor"
              d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorSettingsViewModel}"
              mc:Ignorable="d"
-             d:DesignHeight="550" d:MinWidth="500">
+             d:MinWidth="500" d:DesignHeight="410">
 
     <!-- Resources Section -->
     <UserControl.Resources>
@@ -101,8 +101,8 @@
 
         <!-- Buttons -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <Button Content="OK" Width="75" Margin="5" Command="{Binding OkCommand}"/>
-            <Button Content="Cancel" Width="75" Margin="5" Command="{Binding CancelCommand}"/>
+            <Button Content="OK" Width="75" Margin="5" Command="{Binding CreateAudioProjectCommand}" IsEnabled="{Binding IsAnyDialogueEventChecked}"/>
+            <Button Content="Cancel" Width="75" Margin="5" Command="{Binding CloseWindowCommand}"/>
         </StackPanel>
     </Grid>
 </UserControl>

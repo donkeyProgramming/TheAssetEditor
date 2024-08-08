@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
+using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Editors.Audio.Presentation.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
 using Serilog;
@@ -10,81 +11,7 @@ namespace Editors.Audio.Presentation.AudioEditor
 {
     public static class AudioEditorViewModelHelpers
     {
-        static readonly ILogger s_logger = Logging.Create<AudioEditorViewModel>();
-
         public static Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithQualifiers { get; set; } = [];
-
-        public static void InitialiseEventsData(AudioEditorSettingsViewModel viewModel)
-        {
-            //CreateAudioProjectEventsList(viewModel);
-
-            foreach (var dialogueEvent in AudioProjectDialogueEvents)
-            {
-                var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[dialogueEvent];
-
-                var dataGridItems = new List<Dictionary<string, object>>();
-                var dataGridItem = new Dictionary<string, object>();
-
-                foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
-                {
-                    var stateGroupKey = AddExtraUnderScoresToString(stateGroupWithQualifier);
-                    dataGridItem[stateGroupKey] = "";
-                    dataGridItem["AudioFilesDisplay"] = "";
-                    dataGridItem["AudioFiles"] = "";
-                }
-
-                dataGridItems.Add(dataGridItem);
-                EventsData[dialogueEvent] = dataGridItems;
-            }
-        }        
-
-        public static void LoadEvent(AudioEditorViewModel viewModel, IAudioRepository audioRepository, bool showCustomStatesOnly)
-        {
-            if (string.IsNullOrEmpty(AudioEditorData.Instance.SelectedAudioProjectEvent))
-                return;
-
-            s_logger.Here().Information($"Loading event: {AudioEditorData.Instance.SelectedAudioProjectEvent}");
-
-            ConfigureDataGrid(viewModel, audioRepository, showCustomStatesOnly);
-
-            if (EventsData.ContainsKey(AudioEditorData.Instance.SelectedAudioProjectEvent))
-
-                foreach (var statePath in EventsData[AudioEditorData.Instance.SelectedAudioProjectEvent])
-                    viewModel.AudioEditorDataGridItems.Add(statePath);
-        }
-
-        public static void PrepareCustomStatesForComboBox(AudioEditorViewModel viewModel)
-        {
-            if (viewModel.CustomStatesDataGridItems == null)
-                return;
-
-            var stateGroupsWithCustomStates = AudioEditorData.Instance.StateGroupsWithCustomStates;
-            stateGroupsWithCustomStates.Clear();
-
-            stateGroupsWithCustomStates["VO_Actor"] = new List<string>();
-            stateGroupsWithCustomStates["VO_Culture"] = new List<string>();
-            stateGroupsWithCustomStates["VO_Battle_Selection"] = new List<string>();
-            stateGroupsWithCustomStates["VO_Battle_Special_Ability"] = new List<string>();
-            stateGroupsWithCustomStates["VO_Faction_Leader"] = new List<string>();
-
-            foreach (var item in viewModel.CustomStatesDataGridItems)
-            {
-                stateGroupsWithCustomStates["VO_Actor"].Add(item.CustomVOActor);
-                stateGroupsWithCustomStates["VO_Culture"].Add(item.CustomVOCulture);
-                stateGroupsWithCustomStates["VO_Battle_Selection"].Add(item.CustomVOBattleSelection);
-                stateGroupsWithCustomStates["VO_Battle_Special_Ability"].Add(item.CustomVOBattleSpecialAbility);
-                stateGroupsWithCustomStates["VO_Faction_Leader"].Add(item.CustomVOFactionLeader);
-            }
-        }
-
-        public static void UpdateEventDataWithCurrentEvent(AudioEditorViewModel viewModel)
-        {
-            if (viewModel.AudioEditorDataGridItems == null)
-                return;
-
-            if (viewModel.SelectedAudioProjectEvent != null)
-                EventsData[viewModel.SelectedAudioProjectEvent] = new List<Dictionary<string, object>>(viewModel.AudioEditorDataGridItems);
-        }
 
         // Add qualifiers to State Groups so that dictionary keys are unique as some events have the same State Group twice e.g. VO_Actor
         public static void AddQualifiersToStateGroups(Dictionary<string, List<string>> dialogueEventsWithStateGroups)
@@ -129,35 +56,40 @@ namespace Editors.Audio.Presentation.AudioEditor
             }
         }
 
+        public static void PrepareCustomStatesForComboBox(AudioEditorViewModel viewModel)
+        {
+            if (viewModel.CustomStatesDataGridItems == null)
+                return;
+
+            var stateGroupsWithCustomStates = AudioEditorData.Instance.StateGroupsWithCustomStates;
+            stateGroupsWithCustomStates.Clear();
+
+            stateGroupsWithCustomStates["VO_Actor"] = new List<string>();
+            stateGroupsWithCustomStates["VO_Culture"] = new List<string>();
+            stateGroupsWithCustomStates["VO_Battle_Selection"] = new List<string>();
+            stateGroupsWithCustomStates["VO_Battle_Special_Ability"] = new List<string>();
+            stateGroupsWithCustomStates["VO_Faction_Leader"] = new List<string>();
+
+            foreach (var item in viewModel.CustomStatesDataGridItems)
+            {
+                stateGroupsWithCustomStates["VO_Actor"].Add(item.CustomVOActor);
+                stateGroupsWithCustomStates["VO_Culture"].Add(item.CustomVOCulture);
+                stateGroupsWithCustomStates["VO_Battle_Selection"].Add(item.CustomVOBattleSelection);
+                stateGroupsWithCustomStates["VO_Battle_Special_Ability"].Add(item.CustomVOBattleSpecialAbility);
+                stateGroupsWithCustomStates["VO_Faction_Leader"].Add(item.CustomVOFactionLeader);
+            }
+        }
+
         // Apparently WPF doesn't_like_underscores so double them up in order for them to be displayed in the UI.
         public static string AddExtraUnderScoresToString(string wtfWPF)
         {
             return wtfWPF.Replace("_", "__");
         }
 
-        public static void CreateAudioProjectEventsListFromAudioProject(AudioEditorSettingsViewModel viewModel, Dictionary<string, List<Dictionary<string, object>>> eventsData)
+        public static string RemoveExtraUnderScoresFromString(string wtfWPF)
         {
-            viewModel.AudioProjectDialogueEvents.Clear();
-
-            foreach (var dialogueEvent in eventsData.Keys)
-                viewModel.AudioProjectDialogueEvents.Add(dialogueEvent);
+            return wtfWPF.Replace("__", "_");
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         public class DictionaryEqualityComparer<TKey, TValue> : IEqualityComparer<Dictionary<TKey, TValue>>
         {
