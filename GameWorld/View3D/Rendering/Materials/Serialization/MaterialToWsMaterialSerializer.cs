@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using GameWorld.Core.Rendering.Materials.Shaders;
+using Octokit;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
@@ -16,7 +17,12 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             _packFileServic = packFileServic;
         }
 
-        public IMaterialToWsMaterialSerializer CreateInstance(GameTypeEnum preferedGameHint) => new MaterialToWsMaterialSerializer(_packFileServic, preferedGameHint);
+        public IMaterialToWsMaterialSerializer CreateInstance(GameTypeEnum preferedGameHint)
+        {
+            var repository = new WsMaterialRepository(_packFileServic);
+            var instance = new MaterialToWsMaterialSerializer(_packFileServic, repository, preferedGameHint);
+            return instance;
+        } 
     }
 
     public interface IMaterialToWsMaterialSerializer
@@ -28,11 +34,11 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
     {
         private readonly GameTypeEnum _preferedGameHint;
         private readonly PackFileService _packFileService;
-        private readonly WsMaterialRepository _repository;
+        private readonly IWsMaterialRepository _repository;
 
-        public MaterialToWsMaterialSerializer(PackFileService packFileService, GameTypeEnum preferedGameHint)
+        public MaterialToWsMaterialSerializer(PackFileService packFileService, IWsMaterialRepository wsMaterialRepository, GameTypeEnum preferedGameHint)
         {
-            _repository = new WsMaterialRepository(packFileService);
+            _repository = wsMaterialRepository;
             _packFileService = packFileService;
             _preferedGameHint = preferedGameHint;
         }

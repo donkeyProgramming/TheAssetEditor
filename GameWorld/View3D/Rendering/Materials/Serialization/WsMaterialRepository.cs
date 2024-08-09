@@ -5,7 +5,12 @@ using Shared.Core.PackFiles;
 
 namespace GameWorld.Core.Rendering.Materials.Serialization
 {
-    public class WsMaterialRepository
+    public interface IWsMaterialRepository
+    {
+        string GetExistingOrAddMaterial(string wsMaterialContent, string wsMaterialPath, out bool isNew);
+    }
+
+    class WsMaterialRepository : IWsMaterialRepository
     {
         private readonly Dictionary<string, string> _map;
 
