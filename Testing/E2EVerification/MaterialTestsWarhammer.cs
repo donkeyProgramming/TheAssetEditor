@@ -73,11 +73,11 @@ namespace E2EVerification
 
             List<WsModelGeneratorInput> input =  
             [
-                new WsModelGeneratorInput(0, 0, "MesheshThatShareMaterial", UiVertexFormat.Cinematic, defaultMaterielWithoutAlpha),
-                new WsModelGeneratorInput(0, 1, "MesheshThatShareMaterial", UiVertexFormat.Cinematic, defaultMaterielWithoutAlpha),
-                new WsModelGeneratorInput(1, 0, "Mesh", UiVertexFormat.Weighted, defaultMaterielWithoutAlpha),
-                new WsModelGeneratorInput(2, 0, "Mesh", UiVertexFormat.Static, defaultMaterielWithoutAlpha),
-                new WsModelGeneratorInput(2, 0, "Mesh_WithAlpha", UiVertexFormat.Static, materialWithAlpha)
+                new WsModelGeneratorInput(0, 0, "MesheshThatShareMaterial", UiVertexFormat.Cinematic, defaultMaterielWithoutAlpha, null),
+                new WsModelGeneratorInput(0, 1, "MesheshThatShareMaterial", UiVertexFormat.Cinematic, defaultMaterielWithoutAlpha, null),
+                new WsModelGeneratorInput(1, 0, "Mesh", UiVertexFormat.Weighted, defaultMaterielWithoutAlpha, null),
+                new WsModelGeneratorInput(2, 0, "Mesh", UiVertexFormat.Static, defaultMaterielWithoutAlpha, null),
+                new WsModelGeneratorInput(2, 0, "Mesh_WithAlpha", UiVertexFormat.Static, materialWithAlpha, null)
             ];
 
             var capabilityMaterialBuilder = CapabilityMaterialFactory.GetBuilder(_appSettings.CurrentSettings.CurrentGame);

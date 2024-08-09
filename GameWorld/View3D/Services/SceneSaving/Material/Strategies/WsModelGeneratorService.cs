@@ -10,6 +10,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 
 namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 {
@@ -194,7 +195,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
                 var meshes = node.GetMeshesInLod(lodIndex, false);
                 var meshIndex = 0;
                 var rows = meshes
-                    .Select(x => new WsModelGeneratorInput(lodIndex, meshIndex++, meshes[meshIndex].Name, meshes[meshIndex].Geometry.VertexFormat, meshes[meshIndex].Effect))
+                    .Select(x => new WsModelGeneratorInput(lodIndex, meshIndex++, meshes[meshIndex].Name, meshes[meshIndex].Geometry.VertexFormat, meshes[meshIndex].Effect, meshes[meshIndex].Material))
                     .ToList();
                 output.AddRange(rows);
             }
@@ -208,7 +209,8 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
         int MeshIndex, 
         string MeshName,
         UiVertexFormat MeshVertexFormat,
-        CapabilityMaterial Material);
+        CapabilityMaterial Material,
+        IRmvMaterial RmvMaterial);
 
     public record WsModelRow(
         int LodIndex,

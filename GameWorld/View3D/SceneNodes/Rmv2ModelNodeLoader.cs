@@ -14,14 +14,12 @@ namespace GameWorld.Core.SceneNodes
 
     public class Rmv2ModelNodeLoader
     {
-        private readonly ResourceLibrary _resourceLibrary;
         private readonly IGeometryGraphicsContextFactory _contextFactory;
         private readonly PackFileService _packFileService;
         private readonly AbstractMaterialFactory _abstractMaterialFactory;
 
-        public Rmv2ModelNodeLoader(ResourceLibrary resourceLibrary, IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, AbstractMaterialFactory abstractMaterialFactory)
+        public Rmv2ModelNodeLoader(IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, AbstractMaterialFactory abstractMaterialFactory)
         {
-            _resourceLibrary = resourceLibrary;
             _contextFactory = contextFactory;
             _packFileService = packFileService;
             _abstractMaterialFactory = abstractMaterialFactory;
@@ -55,7 +53,7 @@ namespace GameWorld.Core.SceneNodes
                     if (string.IsNullOrWhiteSpace(rmvModel.Material.ModelName))
                         rmvModel.Material.ModelName = Path.GetFileNameWithoutExtension(modelFullPath);
 
-                    var node = new Rmv2MeshNode(_resourceLibrary, rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, shader)
+                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, shader)
                     {
                         OriginalFilePath = modelFullPath,
                         OriginalPartIndex = modelIndex,

@@ -21,8 +21,6 @@ namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IDrawableItem
     {
-        ResourceLibrary _resourceLib;
-
         public IRmvMaterial Material { get; set; }
         public MeshObject Geometry { get; set; }
         public RmvCommonHeader CommonHeader { get; set; }
@@ -55,10 +53,8 @@ namespace GameWorld.Core.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(ResourceLibrary resourceLib, RmvCommonHeader commonHeader, MeshObject meshObject, IRmvMaterial material, AnimationPlayer animationPlayer, CapabilityMaterial shader)
+        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IRmvMaterial material, AnimationPlayer animationPlayer, CapabilityMaterial shader)
         {
-            _resourceLib = resourceLib;
-
             CommonHeader = commonHeader;
             Material = material;
             AnimationPlayer = animationPlayer;
@@ -169,7 +165,6 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.CommonHeader = CommonHeader;
             typedTarget.Material = Material.Clone();
             typedTarget.Geometry = Geometry.Clone();
-            typedTarget._resourceLib = _resourceLib;
 
             typedTarget.Effect = Effect.Clone();
             typedTarget.Geometry = Geometry.Clone();
