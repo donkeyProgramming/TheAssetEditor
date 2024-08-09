@@ -3,14 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using Editors.Audio.Presentation.AudioEditor.ViewModels;
+using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
-namespace Editors.Audio.Presentation.AudioEditor
+namespace Editors.Audio.AudioEditor
 {
     public class AudioProjectData
     {

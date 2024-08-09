@@ -10,11 +10,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using Editors.Audio.Presentation.AudioEditor.ViewModels;
+using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
-using static Editors.Audio.Presentation.AudioEditor.AudioEditorViewModelHelpers;
+using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
 
-namespace Editors.Audio.Presentation.AudioEditor
+namespace Editors.Audio.AudioEditor
 {
     public class DynamicDataGrid
     {
@@ -74,7 +74,7 @@ namespace Editors.Audio.Presentation.AudioEditor
             var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[selectedAudioProjectEvent];
 
             var stateGroupsCount = stateGroups.Count() + 3;
-            var columnWidth = stateGroupsCount > 0 ? 1.0 / (stateGroupsCount) : 1.0;
+            var columnWidth = stateGroupsCount > 0 ? 1.0 / stateGroupsCount : 1.0;
 
             // Column for Remove State Path button:
             var removeButtonColumn = new DataGridTemplateColumn
@@ -167,13 +167,13 @@ namespace Editors.Audio.Presentation.AudioEditor
             };
 
             // ComboBox settings.
-            factory.SetBinding(ComboBox.SelectedItemProperty, binding);
-            factory.SetValue(ComboBox.IsTextSearchEnabledProperty, true);
+            factory.SetBinding(System.Windows.Controls.Primitives.Selector.SelectedItemProperty, binding);
+            factory.SetValue(ItemsControl.IsTextSearchEnabledProperty, true);
             factory.SetValue(ComboBox.IsEditableProperty, true);
-            factory.SetValue(ComboBox.ItemsSourceProperty, states);
+            factory.SetValue(ItemsControl.ItemsSourceProperty, states);
 
             // Loaded event for initializing items and setting up TextChanged event.
-            factory.AddHandler(ComboBox.LoadedEvent, new RoutedEventHandler((sender, args) =>
+            factory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler((sender, args) =>
             {
                 if (sender is ComboBox comboBox)
                 {
@@ -189,7 +189,7 @@ namespace Editors.Audio.Presentation.AudioEditor
                             comboBox.ItemsSource = filteredItems;
                             comboBox.IsDropDownOpen = true; // Keep the drop-down open to show filtered results.
                         };
-                            
+
                         // Handle LostFocus event to ensure final text is genuinely a State and warm the user if not.
                         textBox.LostFocus += (s, e) =>
                         {
@@ -230,9 +230,9 @@ namespace Editors.Audio.Presentation.AudioEditor
             };
 
             factory.SetBinding(TextBox.TextProperty, binding);
-            factory.SetBinding(TextBox.ToolTipProperty, tooltipBinding);
+            factory.SetBinding(FrameworkElement.ToolTipProperty, tooltipBinding);
 
-            factory.SetValue(TextBox.IsReadOnlyProperty, true);
+            factory.SetValue(System.Windows.Controls.Primitives.TextBoxBase.IsReadOnlyProperty, true);
 
             template.VisualTree = factory;
 
@@ -243,11 +243,11 @@ namespace Editors.Audio.Presentation.AudioEditor
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(Button));
-            factory.SetValue(Button.ContentProperty, "...");
-            factory.SetValue(Button.ToolTipProperty, "Browse wav files");
+            factory.SetValue(ContentControl.ContentProperty, "...");
+            factory.SetValue(FrameworkElement.ToolTipProperty, "Browse wav files");
 
             // Handle button click event
-            factory.AddHandler(Button.ClickEvent, new RoutedEventHandler((sender, e) =>
+            factory.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler((sender, e) =>
             {
                 var button = sender as Button;
                 var dataGridRow = FindVisualParent<DataGridRow>(button);
@@ -273,11 +273,11 @@ namespace Editors.Audio.Presentation.AudioEditor
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(Button));
-            factory.SetValue(Button.ContentProperty, "Play");
-            factory.SetValue(Button.ToolTipProperty, "Play a sound at random, to simulate the Dialogue Event being triggered in game.");
+            factory.SetValue(ContentControl.ContentProperty, "Play");
+            factory.SetValue(FrameworkElement.ToolTipProperty, "Play a sound at random, to simulate the Dialogue Event being triggered in game.");
 
             // Handle button click event
-            factory.AddHandler(Button.ClickEvent, new RoutedEventHandler((sender, e) =>
+            factory.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler((sender, e) =>
             {
                 //Do something
             }));
@@ -291,12 +291,12 @@ namespace Editors.Audio.Presentation.AudioEditor
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(Button));
-            factory.SetValue(Button.ContentProperty, "✖");
-            factory.SetValue(Button.FontFamilyProperty, new FontFamily("Segoe UI Symbol")); // This font supports the character.
-            factory.SetValue(Button.ToolTipProperty, "Remove State Path");
+            factory.SetValue(ContentControl.ContentProperty, "✖");
+            factory.SetValue(Control.FontFamilyProperty, new FontFamily("Segoe UI Symbol")); // This font supports the character.
+            factory.SetValue(FrameworkElement.ToolTipProperty, "Remove State Path");
 
             // Handle button click event
-            factory.AddHandler(Button.ClickEvent, new RoutedEventHandler((sender, e) =>
+            factory.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler((sender, e) =>
             {
                 var button = sender as Button;
                 var dataGridRow = FindVisualParent<DataGridRow>(button);

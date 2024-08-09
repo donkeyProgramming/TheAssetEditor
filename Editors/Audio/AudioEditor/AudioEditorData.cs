@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Editors.Audio.Presentation.AudioEditor
+namespace Editors.Audio.AudioEditor
 {
     public class AudioEditorData
     {

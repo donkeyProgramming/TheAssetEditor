@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Editors.Audio.Presentation.AudioEditor.ViewModels;
+using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using static Editors.Audio.Presentation.AudioEditor.DynamicDataGrid;
-using static Editors.Audio.Presentation.AudioEditor.ViewModels.AudioEditorViewModel;
+using static Editors.Audio.AudioEditor.DynamicDataGrid;
+using static Editors.Audio.AudioEditor.ViewModels.AudioEditorViewModel;
 
-namespace Editors.Audio.Presentation.AudioEditor
+namespace Editors.Audio.AudioEditor
 {
     public static class AudioEditorViewModelHelpers
     {

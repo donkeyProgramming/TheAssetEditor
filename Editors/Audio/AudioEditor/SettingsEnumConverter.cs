@@ -2,9 +2,9 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using static Editors.Audio.Presentation.AudioEditor.AudioEditorSettings;
+using static Editors.Audio.AudioEditor.AudioEditorSettings;
 
-namespace Editors.Audio.Presentation.AudioEditor
+namespace Editors.Audio.AudioEditor
 {
     public class SettingsEnumConverter : IValueConverter
     {

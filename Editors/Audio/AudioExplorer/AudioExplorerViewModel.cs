@@ -16,7 +16,7 @@ using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;
 using Shared.GameFormats.WWise.Hirc.V136;
 
-namespace Editors.Audio.Presentation.AudioExplorer
+namespace Editors.Audio.AudioExplorer
 {
     public class AudioExplorerViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {

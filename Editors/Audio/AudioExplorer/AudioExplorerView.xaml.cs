@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Audio.Presentation.AudioExplorer
+namespace Audio.AudioExplorer
 {
     /// <summary>
     /// Interaction logic for AudioEditorMainView.xaml

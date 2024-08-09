@@ -11,9 +11,9 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.Presentation.AudioEditor.AudioEditorViewModelHelpers;
+using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
 
-namespace Editors.Audio.Presentation.AudioEditor.ViewModels
+namespace Editors.Audio.AudioEditor.ViewModels
 {
     public class DialogueEventCheckBox : ObservableObject
     {
@@ -131,7 +131,8 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             }
         }
 
-        [RelayCommand] public void CreateAudioProject()
+        [RelayCommand]
+        public void CreateAudioProject()
         {
             if (DialogueEventCheckBoxes.All(checkBox => checkBox.IsChecked != true))
                 return;
@@ -158,7 +159,8 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             CloseWindow();
         }
 
-        [RelayCommand] public void CloseWindow()
+        [RelayCommand]
+        public void CloseWindow()
         {
             _closeAction?.Invoke();
 
@@ -182,7 +184,8 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
             }
         }
 
-        [RelayCommand] public void SelectAll()
+        [RelayCommand]
+        public void SelectAll()
         {
             foreach (var checkBox in DialogueEventCheckBoxes)
                 checkBox.IsChecked = true;
@@ -205,7 +208,8 @@ namespace Editors.Audio.Presentation.AudioEditor.ViewModels
         }
         */
 
-        [RelayCommand]public void SelectNone()
+        [RelayCommand]
+        public void SelectNone()
         {
             foreach (var checkBox in DialogueEventCheckBoxes)
             {

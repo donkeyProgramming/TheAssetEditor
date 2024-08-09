@@ -1,10 +1,6 @@
-﻿using System;
-using System.Windows.Controls;
-using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.Presentation.AudioEditor.ViewModels;
-using Editors.Audio.Storage;
+﻿using System.Windows.Controls;
 
-namespace Editors.Audio.Presentation.AudioEditor.Views
+namespace Editors.Audio.AudioEditor.Views
 {
     /// <summary>
     /// Interaction logic for AudioEditorSettingsView.xaml

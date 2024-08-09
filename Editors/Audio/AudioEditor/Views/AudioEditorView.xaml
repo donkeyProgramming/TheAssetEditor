@@ -1,10 +1,11 @@
-﻿<UserControl x:Class="Editors.Audio.Presentation.AudioEditor.AudioEditorView"
+﻿<UserControl x:Class="Editors.Audio.AudioEditor.AudioEditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:s="http://schemas.singulink.com/xaml" 
-             xmlns:viewmodels="clr-namespace:Editors.Audio.Presentation.AudioEditor.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorViewModel}"
+             xmlns:viewmodels="clr-namespace:Editors.Audio.AudioEditor.ViewModels" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorViewModel}"
              mc:Ignorable="d" 
              d:DesignWidth="800" d:DesignHeight="450" >
 

@@ -1,6 +1,6 @@
 ﻿using Shared.GameFormats.WWise;
 
-namespace Editors.Audio.Presentation.AudioExplorer
+namespace Editors.Audio.AudioExplorer
 {
     public class SelectedHircItem
     {

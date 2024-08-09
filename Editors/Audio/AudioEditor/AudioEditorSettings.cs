@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Editors.Audio.Presentation.AudioEditor
+namespace Editors.Audio.AudioEditor
 {
     public static class AudioEditorSettings
     {
@@ -86,19 +86,19 @@ namespace Editors.Audio.Presentation.AudioEditor
 
         public static Dictionary<EventType, List<EventSubtype>> EventTypeToSubtypes { get; } = new Dictionary<EventType, List<EventSubtype>>
         {
-            { 
+            {
                 EventType.FrontendVO, new List<EventSubtype>
-                { 
-                    EventSubtype.Lord 
+                {
+                    EventSubtype.Lord
                 }
             },
 
-            { 
+            {
                 EventType.CampaignVO, new List<EventSubtype>
-                { 
-                    EventSubtype.Lord, 
-                    EventSubtype.Hero, 
-                    EventSubtype.Creature 
+                {
+                    EventSubtype.Lord,
+                    EventSubtype.Hero,
+                    EventSubtype.Creature
                 }
             },
 
@@ -109,7 +109,7 @@ namespace Editors.Audio.Presentation.AudioEditor
                 }
             },
 
-            { 
+            {
                 EventType.BattleVO, new List<EventSubtype>
                 {
                     EventSubtype.LordMelee,
@@ -140,7 +140,7 @@ namespace Editors.Audio.Presentation.AudioEditor
                 }
             },
 
-            { 
+            {
                 EventType.NonVO, new List<EventSubtype>
                 {
                     EventSubtype.Ability,

@@ -7,7 +7,8 @@ using System.Windows;
 using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.Presentation.AudioEditor.Views;
+using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.Views;
 using Editors.Audio.Storage;
 using Newtonsoft.Json;
 using Serilog;
@@ -17,10 +18,10 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.WindowHandling;
-using static Editors.Audio.Presentation.AudioEditor.AudioEditorViewModelHelpers;
-using static Editors.Audio.Presentation.AudioEditor.DynamicDataGrid;
+using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
+using static Editors.Audio.AudioEditor.DynamicDataGrid;
 
-namespace Editors.Audio.Presentation.AudioEditor.ViewModels
+namespace Editors.Audio.AudioEditor.ViewModels
 {
     public partial class CustomStatesDataGridProperties : ObservableObject
     {
