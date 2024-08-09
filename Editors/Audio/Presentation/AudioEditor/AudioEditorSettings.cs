@@ -112,7 +112,6 @@ namespace Editors.Audio.Presentation.AudioEditor
             { 
                 EventType.BattleVO, new List<EventSubtype>
                 {
-                    EventSubtype.Ability,
                     EventSubtype.LordMelee,
                     EventSubtype.LordSkirmisher,
                     EventSubtype.LordCaster,
