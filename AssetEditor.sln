@@ -43,14 +43,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.Reports", "Editors\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.TextureEditor", "Editors\TextureEditor\Editors.TextureEditor.csproj", "{8E55B123-C8E5-4D65-AAAA-C4DC4713CB8E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{1C72D5BE-BCC6-462F-B8A7-35E853DA4A83}"
-	ProjectSection(SolutionItems) = preProject
-		Data\cinderbreath.pack = Data\cinderbreath.pack
-		Data\Karl_and_celestialgeneral.pack = Data\Karl_and_celestialgeneral.pack
-		Notes.txt = Notes.txt
-		Data\Throt.pack = Data\Throt.pack
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.Shared.DevConfig", "Editors\Shared\Editors.Shared.DevConfig\Editors.Shared.DevConfig.csproj", "{A64E6963-4D30-47FF-AAAF-54533534C657}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameWorld.WpfWindow", "GameWorld\Monogame.WpfInterop\GameWorld.WpfWindow.csproj", "{DA0742FD-2538-41B9-84BB-81F93B030072}"
