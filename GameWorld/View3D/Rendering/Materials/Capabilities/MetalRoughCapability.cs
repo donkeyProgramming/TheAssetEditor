@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
@@ -8,7 +9,7 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
-    public class DefaultCapabilityMetalRough : ICapability
+    public class MetalRoughCapability : ICapability
     {
         public float ScaleMult { get; set; } = 1;
         public bool UseAlpha { get; set; }
@@ -33,7 +34,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public ICapability Clone()
         {
-            return new DefaultCapabilityMetalRough()
+            return new MetalRoughCapability()
             {
                 ScaleMult = ScaleMult,
                 UseAlpha = UseAlpha,
@@ -60,12 +61,17 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
         {
-            throw new System.NotImplementedException();
+  
         }
 
-        public void SerializeToWsModel(MaterialToWsModelSerializer templateHandler)
+        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
         {
-            throw new System.NotImplementedException();
+            templateHandler.AddAttribute("TEMPLATE_ATTR_BASE_COLOUR_PATH", BaseColour);
+            templateHandler.AddAttribute("TEMPLATE_ATTR_MASK_PATH", Mask);
+            templateHandler.AddAttribute("TEMPLATE_ATTR_MATERIAL_MAP", MaterialMap);
+            templateHandler.AddAttribute("TEMPLATE_ATTR_NORMAL_PATH", NormalMap);
+            templateHandler.AddAttribute("TEMPLATE_ATTR_DISTORTION_PATH", Distortion);
+            templateHandler.AddAttribute("TEMPLATE_ATTR_DISTORTIONNOISE_PATH", DistortionNoise);
         }
     }
 }

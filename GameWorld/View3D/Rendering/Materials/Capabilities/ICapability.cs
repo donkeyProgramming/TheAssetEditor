@@ -1,4 +1,5 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Rendering.Materials.Serialization;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
@@ -11,7 +12,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model);
         public void Apply(Effect effect, ResourceLibrary resourceLibrary);
         public ICapability Clone();
-        void SerializeToWsModel(MaterialToWsModelSerializer templateHandler);
+        void SerializeToWsModel(WsMaterialTemplateEditor templateHandler);
         void SerializeToRmvMaterial(IRmvMaterial rmvMaterial);
     }
 

@@ -1,5 +1,6 @@
 ﻿using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Rendering.Materials.Shaders.MetalRough;
 using GameWorld.Core.Services.SceneSaving.Material;
@@ -14,8 +15,10 @@ namespace E2EVerification
 {
 
 
-
-
+    //public void CreateMaterial_Wh3_Emissive()
+    //public void CreateMaterial_Wh2_Default()
+    //public void CreateMaterial_Rome2_Default()
+    //public void CreateMaterial_Rome2_Decals()
     internal class MaterialTestsWarhammer
     {
         ResourceLibrary _resourceLib;
@@ -45,50 +48,60 @@ namespace E2EVerification
 
             Assert.That(material, Is.TypeOf<DefaultMaterial>());
 
-            var defaultCapabiliy = material.TryGetCapability<DefaultCapabilityMetalRough>();
+            var defaultCapabiliy = material.TryGetCapability<MetalRoughCapability>();
             Assert.That(defaultCapabiliy, Is.Not.Null);
             Assert.That(defaultCapabiliy.MaterialMap.TexturePath, Is.EqualTo(@"variantmeshes/wh_variantmodels/hu1/emp/emp_props/tex/emp_karl_franz_hammer_2h_01_material_map.dds"));
             Assert.That(defaultCapabiliy.MaterialMap.UseTexture, Is.True);
             Assert.That(defaultCapabiliy.UseAlpha, Is.False);
         }
 
-
-
-        //public void CreateMaterial_Wh3_Emissive()
-        //public void CreateMaterial_Wh2_Default()
-        //public void CreateMaterial_Rome2_Default()
-        //public void CreateMaterial_Rome2_Decals()
-
         [Test]
         public void GenerateWsModel_Wh3_MetalRoughPbr_Default()
         {
             var abstractMaterialFactory = new CapabilityMaterialFactory(_appSettings, _pfs, _resourceLib);
-            var materialWithoutAlpha = abstractMaterialFactory.CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
-            var materialWithAlpha = abstractMaterialFactory.CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            var material = abstractMaterialFactory.CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
 
-            var defaultMaterielWithoutAlpha = materialWithoutAlpha as DefaultMaterial;
-            Assert.That(defaultMaterielWithoutAlpha, Is.Not.Null);
+            Assert.That(material, Is.TypeOf<DefaultMaterial>());
 
-            defaultMaterielWithoutAlpha.GetCapability<DefaultCapabilityMetalRough>().NormalMap.TexturePath = "customFolder/customfilename.dds";
-            materialWithAlpha.GetCapability<DefaultCapabilityMetalRough>().UseAlpha = true;
+            material.GetCapability<MetalRoughCapability>().NormalMap.TexturePath = "customFolder/customfilename.dds";
 
             List<WsModelGeneratorInput> input =  
             [
-                new WsModelGeneratorInput(0, 0, "MesheshThatShareMaterial", UiVertexFormat.Cinematic, defaultMaterielWithoutAlpha, null),
-                new WsModelGeneratorInput(0, 1, "MesheshThatShareMaterial", UiVertexFormat.Cinematic, defaultMaterielWithoutAlpha, null),
-                new WsModelGeneratorInput(1, 0, "Mesh", UiVertexFormat.Weighted, defaultMaterielWithoutAlpha, null),
-                new WsModelGeneratorInput(2, 0, "Mesh", UiVertexFormat.Static, defaultMaterielWithoutAlpha, null),
-                new WsModelGeneratorInput(2, 0, "Mesh_WithAlpha", UiVertexFormat.Static, materialWithAlpha, null)
+                new WsModelGeneratorInput(0, 0, "MesheshThatShareMaterial", UiVertexFormat.Cinematic, material),
+                new WsModelGeneratorInput(0, 1, "MesheshThatShareMaterial", UiVertexFormat.Cinematic, material),
+                new WsModelGeneratorInput(1, 0, "Mesh", UiVertexFormat.Weighted, material),
+                new WsModelGeneratorInput(2, 0, "Mesh", UiVertexFormat.Static, material),
             ];
 
-            var materialSerializerFactory = new MaterialToWsModelFactory(GameTypeEnum.Warhammer3);
+            var materialSerializerFactory = new MaterialToWsMaterialFactory(_pfs);
             var wsModelGenerator = new WsModelGeneratorService(_pfs);
-            var result = wsModelGenerator.GenerateWsModel(materialSerializerFactory, @"variantmeshes\wh_variantmodels\hu1\emp\emp_props\emp_karl_franz_hammer_2h_01.rigid_model_v2", input);
+            var result = wsModelGenerator.GenerateWsModel(materialSerializerFactory.CreateInstance(GameTypeEnum.Warhammer3), @"variantmeshes\wh_variantmodels\hu1\emp\emp_props\emp_karl_franz_hammer_2h_01.rigid_model_v2", input);
 
-            var wsModelPackFile = _pfs.FindFile(result.CreatedFilePath);
+            Assert.That(result.Status, Is.True);
+            Assert.That(result.CreatedFilePath, Is.EqualTo("variantmeshes\\wh_variantmodels\\hu1\\emp\\emp_props\\emp_karl_franz_hammer_2h_01.wsmodel"));
+
+            var wsModelPackFile = _pfs.FindFile(result.CreatedFilePath, _outputPackfile);
+            
             var wsModel = new WsModelFile(wsModelPackFile);
+            var path0 = wsModel.MaterialList.First(x => x.LodIndex == 0 && x.PartIndex == 0).MaterialPath;
+            var path1 = wsModel.MaterialList.First(x => x.LodIndex == 0 && x.PartIndex == 1).MaterialPath;
+            var path2 = wsModel.MaterialList.First(x => x.LodIndex == 1 && x.PartIndex == 0).MaterialPath;
+            var path3 = wsModel.MaterialList.First(x => x.LodIndex == 2 && x.PartIndex == 0).MaterialPath;
 
-            var wsMatrial = _pfs.FindFile("Material");
+            Assert.That(path0, Is.EqualTo(path1));
+
+
+            var wsMatrial0 = _pfs.FindFile(path0, _outputPackfile);
+            var wsMatrial1 = _pfs.FindFile(path0, _outputPackfile);
+            var wsMatrial2 = _pfs.FindFile(path0, _outputPackfile);
+        }
+
+
+        void VerifyMaterial(WsModelMaterialFile wsModelMaterialFile)
+        { 
+        
+        
+        
         }
 
     }

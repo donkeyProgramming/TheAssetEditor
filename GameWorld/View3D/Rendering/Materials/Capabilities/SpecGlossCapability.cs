@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
@@ -8,7 +9,7 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
-    public class DefaultCapabilitySpecGloss : ICapability
+    public class SpecGlossCapability : ICapability
     {
         public float ScaleMult { get; set; } = 1;
         public bool UseAlpha { get; set; }
@@ -31,7 +32,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public ICapability Clone()
         {
-            return new DefaultCapabilitySpecGloss()
+            return new SpecGlossCapability()
             {
                 ScaleMult = ScaleMult,
                 UseAlpha = UseAlpha,
@@ -56,10 +57,10 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
         {
-            throw new System.NotImplementedException();
+ 
         }
 
-        public void SerializeToWsModel(MaterialToWsModelSerializer templateHandler)
+        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
         {
 
         }

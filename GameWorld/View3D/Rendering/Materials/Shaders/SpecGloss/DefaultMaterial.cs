@@ -12,7 +12,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.SpecGloss
             Capabilities =
             [
                 new CommonShaderParametersCapability(),
-                new DefaultCapabilitySpecGloss(),
+                new SpecGlossCapability(),
                 new AnimationCapability(),
                 new BloodCapability(),
             ];

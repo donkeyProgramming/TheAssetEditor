@@ -4,16 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services.SceneSaving.Material.Strategies;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.RigidModel.MaterialHeaders;
 
 namespace GameWorld.Core.Services.SceneSaving.Material
 {
@@ -27,7 +24,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material
             _packFileService = packFileService;
         }
 
-        public (bool Status, string? CreatedFilePath) GenerateWsModel(MaterialToWsModelFactory wsModelSerializerFacotry, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
+        public (bool Status, string? CreatedFilePath) GenerateWsModel(IMaterialToWsMaterialSerializer wsMaterialGenerator, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
         {
             try
             {
@@ -36,9 +33,8 @@ namespace GameWorld.Core.Services.SceneSaving.Material
                     MessageBox.Show("No editable pack selected", "error");
                     return (false, null);
                 }
-
-                var materialPaths = CreateMaterials(wsModelSerializerFacotry, modelFilePath, meshInformation);
-                var wsModelData = CreateWsModel(modelFilePath, materialPaths);
+               
+                var wsModelData = CreateWsModel(wsMaterialGenerator, modelFilePath, meshInformation);
 
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
@@ -54,54 +50,25 @@ namespace GameWorld.Core.Services.SceneSaving.Material
             }
         }
 
-        List<WsModelRow> CreateMaterials(MaterialToWsModelFactory wsModelSerializerFacotry, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
+        static string CreateWsModel(IMaterialToWsMaterialSerializer wsMaterialGenerator, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
         {
-            // Load all materials
-            var repository = new WsMaterialRepository(_packFileService);
+            var meshesWithUniqeNames = EnsureUniqueMeshNames(meshInformation);
+            var orderedMeshInfo = meshesWithUniqeNames
+                .OrderBy(x => x.LodIndex)
+                .ToList();
 
-            var output = new List<WsModelRow>();
-            var uniqueMeshNames = GenerateUniqueMeshNames(meshInformation);
-
-            for (var i = 0; i < meshInformation.Count; i++)
-            {
-                var currentMesh = meshInformation[i];
-                var uniqeMeshName = uniqueMeshNames[i];
-
-                var materialBuilder = wsModelSerializerFacotry.CreateInstance();
-                var materialFile = materialBuilder.Create(uniqeMeshName, currentMesh.MeshVertexFormat, currentMesh.Material);
-
-                // Check if file is uniqe - if not use original. We do this to avid an explotion of materials.
-                // Kitbashed models sometimes have severl hundred meshes, we dont want that many materials if not needed
-                var newMaterialPath = Path.GetDirectoryName(modelFilePath) + "/materials/" + materialFile.FileName;
-                var materialPath = repository.GetExistingOrAddMaterial(materialFile.FileContent, newMaterialPath, out var isNew);
-                if (isNew)
-                {
-                    var existingMaterialPackFile = _packFileService.FindFile(newMaterialPath, _packFileService.GetEditablePack());
-                    SaveHelper.Save(_packFileService, newMaterialPath, existingMaterialPackFile, Encoding.UTF8.GetBytes(materialFile.FileContent));
-                }
-
-                output.Add(new WsModelRow(currentMesh.LodIndex, currentMesh.MeshIndex, materialPath));
-            }
-
-            return output;
-        }
-
-        static string CreateWsModel(string modelFilePath, List<WsModelRow> meshInformation)
-        {
             var sb = new StringBuilder();
 
             sb.Append("<model version=\"1\">\n");
             sb.Append($"\t<geometry>{modelFilePath}</geometry>\n");
             sb.Append("\t\t<materials>\n");
 
-            var orderedMeshInfo = meshInformation
-                .OrderBy(x => x.LodIndex)
-                .ToList();
-
             foreach (var meshInfo in orderedMeshInfo)
             {
+                var materialPath = wsMaterialGenerator.ProsessMaterial(modelFilePath, meshInfo.MeshName, meshInfo.MeshVertexFormat, meshInfo.Material);
+             
                 sb.Append($"\t\t\t<material lod_index=\"{meshInfo.LodIndex}\" part_index=\"{meshInfo.MeshIndex}\">");
-                sb.Append(meshInfo.MaterialFilePath);
+                sb.Append(materialPath);
                 sb.Append("</material>\n");
             }
 
@@ -111,80 +78,29 @@ namespace GameWorld.Core.Services.SceneSaving.Material
             return sb.ToString();
         }
 
-        static private List<string> GenerateUniqueMeshNames(IEnumerable<WsModelGeneratorInput> meshes)
+        static private List<WsModelGeneratorInput> EnsureUniqueMeshNames(IEnumerable<WsModelGeneratorInput> meshes)
         {
-            var output = new List<string>();
+            var meshesWithUniqeNames = new List<WsModelGeneratorInput>();
+
+            var tempNameList = new List<string>();
             foreach (var mesh in meshes)
             {
-                var fileName = mesh.MeshName;
+                var meshName = mesh.MeshName;
                 for (var index = 0; index < 1024; index++)
                 {
-                    var name = index == 0 ? fileName : string.Format("{0}_{1}", fileName, index);
-                    if (output.Contains(name))
+                    var name = index == 0 ? meshName : string.Format("{0}_{1}", meshName, index);
+                    if (tempNameList.Contains(name))
                         continue;
 
-                    fileName = name;
+                    meshName = name;
                     break;
                 }
 
-                output.Add(fileName);
+                meshesWithUniqeNames.Add(mesh with { MeshName = meshName });
+                tempNameList.Add(meshName);
             }
 
-            return output;
-        }
-    }
-
-    public class WsMaterialRepository
-    {
-        private readonly Dictionary<string, string> _map;
-
-        public WsMaterialRepository(PackFileService packFileService)
-        {
-            _map = LoadAllExistingMaterials(packFileService);
-        }
-
-        public string GetExistingOrAddMaterial(string wsMaterialContent, string wsMaterialPath, out bool isNew)
-        {
-            var sanitizedWsMaterial = SanatizeMaterial(wsMaterialContent);
-            var found = _map.TryGetValue(sanitizedWsMaterial, out var path);
-            if (found == false)
-            {
-                _map[sanitizedWsMaterial] = wsMaterialPath;
-                isNew = true;
-                return wsMaterialPath;
-            }
-            isNew = false;
-            return path!;
-        }
-
-        string SanatizeMaterial(string wsMaterialContent)
-        {
-            var start = wsMaterialContent.IndexOf("<name>");
-            var end = wsMaterialContent.IndexOf("</name>", start);
-            var contentWithoutName = wsMaterialContent.Remove(start, end).ToLower();
-
-            return contentWithoutName;
-        }
-
-
-        Dictionary<string, string> LoadAllExistingMaterials(PackFileService packFileService)
-        {
-            var materialList = new Dictionary<string, string>();
-
-            var materialPacks = packFileService.FindAllWithExtentionIncludePaths(".material");
-            materialPacks = materialPacks.Where(x => x.Pack.Name.Contains(".xml.material")).ToList();
-
-            foreach (var (FileName, Pack) in materialPacks)
-            {
-                var bytes = Pack.DataSource.ReadData();
-                var content = Encoding.UTF8.GetString(bytes);
-                var sanitizedWsMaterial = SanatizeMaterial(content);
-
-
-                materialList[sanitizedWsMaterial] = FileName;
-            }
-
-            return materialList;
+            return meshesWithUniqeNames;
         }
     }
 
@@ -200,7 +116,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material
                 var meshes = node.GetMeshesInLod(lodIndex, false);
                 var meshIndex = 0;
                 var rows = meshes
-                    .Select(x => new WsModelGeneratorInput(lodIndex, meshIndex++, meshes[meshIndex].Name, meshes[meshIndex].Geometry.VertexFormat, meshes[meshIndex].Effect, meshes[meshIndex].Material))
+                    .Select(x => new WsModelGeneratorInput(lodIndex, meshIndex++, meshes[meshIndex].Name, meshes[meshIndex].Geometry.VertexFormat, meshes[meshIndex].Effect))
                     .ToList();
                 output.AddRange(rows);
             }
@@ -214,11 +130,6 @@ namespace GameWorld.Core.Services.SceneSaving.Material
         int MeshIndex,
         string MeshName,
         UiVertexFormat MeshVertexFormat,
-        CapabilityMaterial Material,
-        IRmvMaterial RmvMaterial);
+        CapabilityMaterial Material);
 
-    public record WsModelRow(
-        int LodIndex,
-        int MeshIndex,
-        string MaterialFilePath);
 }

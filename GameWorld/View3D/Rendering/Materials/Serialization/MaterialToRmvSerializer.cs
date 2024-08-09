@@ -2,7 +2,7 @@
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 
-namespace GameWorld.Core.Rendering.Materials
+namespace GameWorld.Core.Rendering.Materials.Serialization
 {
     public class MaterialToRmvSerializer
     {

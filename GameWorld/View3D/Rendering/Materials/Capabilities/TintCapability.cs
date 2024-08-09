@@ -1,4 +1,5 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Rendering.Materials.Serialization;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
@@ -48,12 +49,12 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
         {
-            throw new System.NotImplementedException();
+         
         }
 
-        public void SerializeToWsModel(MaterialToWsModelSerializer templateHandler)
+        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
         {
-            throw new System.NotImplementedException();
+         
         }
     }
 }

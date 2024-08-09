@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -42,12 +43,14 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
         {
-            throw new System.NotImplementedException();
+           
         }
 
-        public void SerializeToWsModel(MaterialToWsModelSerializer templateHandler)
+        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
         {
-            throw new System.NotImplementedException();
+            templateHandler.AddAttribute("TEMPLATE_ATTR_BLOOOD_PATH", BloodMask);
+            templateHandler.AddAttribute("TEMPLATE_ATTR_BLOOD_UV_SCALE_VALUE", UvScale);
+            templateHandler.AddAttribute("TEMPLATE_ATTR_USE_BLOOD_VALUE", UseBlood ? 1 : 0);
         }
     }
 }

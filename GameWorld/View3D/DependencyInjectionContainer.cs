@@ -11,6 +11,7 @@ using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Services.SceneSaving;
@@ -43,6 +44,8 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<FocusSelectableObjectService>();
             serviceCollection.AddScoped<ComplexMeshLoader>();
             serviceCollection.AddTransient<WsModelGeneratorService>();
+            serviceCollection.AddTransient<MaterialToWsMaterialFactory>();
+            
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
             serviceCollection.AddScoped<Rmv2ModelNodeLoader>();

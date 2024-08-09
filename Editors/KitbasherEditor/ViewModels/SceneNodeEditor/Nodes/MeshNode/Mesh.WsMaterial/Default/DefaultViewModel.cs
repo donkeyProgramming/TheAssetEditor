@@ -9,7 +9,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
 {
     public partial class DefaultViewModel : ObservableObject
     {
-        private readonly DefaultCapabilityMetalRough _defaultCapability;
+        private readonly MetalRoughCapability _defaultCapability;
 
         [ObservableProperty] bool _useAlpha;
         
@@ -18,7 +18,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] ShaderTextureViewModel _normalMap;
         [ObservableProperty] ShaderTextureViewModel _mask;
 
-        public DefaultViewModel(DefaultCapabilityMetalRough defaultCapability, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
+        public DefaultViewModel(MetalRoughCapability defaultCapability, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
         {
             _defaultCapability = defaultCapability;
 

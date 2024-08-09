@@ -12,7 +12,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.MetalRough
             Capabilities =
                 [
                     new CommonShaderParametersCapability(),
-                    new DefaultCapabilityMetalRough(),
+                    new MetalRoughCapability(),
                     new AnimationCapability(),
                     new BloodCapability(),
                 ];

@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Rendering.Materials.Shaders.SpecGloss;
 using GameWorld.WpfWindow.ResourceHandling;

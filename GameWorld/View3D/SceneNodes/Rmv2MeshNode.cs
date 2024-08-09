@@ -125,7 +125,7 @@ namespace GameWorld.Core.SceneNodes
                 animationCapability.ApplyAnimation = AnimationPlayer != null && AnimationPlayer.IsEnabled;
             }
 
-            var sharedCapability = Effect.GetCapability<DefaultCapabilityMetalRough>();
+            var sharedCapability = Effect.GetCapability<MetalRoughCapability>();
             if (sharedCapability != null)
             {
                 sharedCapability.ScaleMult = ScaleMult;

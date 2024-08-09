@@ -44,7 +44,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             var material = _currentNode.Effect;
             CurrentMaterialType = material.Type;
 
-            var defaultCapability = material.TryGetCapability<DefaultCapabilityMetalRough>();
+            var defaultCapability = material.TryGetCapability<MetalRoughCapability>();
             if(defaultCapability != null)
                 Default = new DefaultViewModel(defaultCapability, _uiCommandFactory, _packFileService, _resourceLibrary);
 

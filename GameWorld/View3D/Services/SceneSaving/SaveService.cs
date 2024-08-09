@@ -12,6 +12,7 @@ using Shared.GameFormats.RigidModel.MaterialHeaders;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials.Serialization;
 
 namespace GameWorld.Core.Services.SceneSaving
 {
