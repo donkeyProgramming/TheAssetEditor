@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using static Editors.Audio.Presentation.AudioEditor.AudioEditorSettings;
 
 namespace Editors.Audio.Presentation.AudioEditor
 {
@@ -9,18 +10,20 @@ namespace Editors.Audio.Presentation.AudioEditor
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Enum enumValue && parameter is Enum targetValue && targetType == typeof(bool))
-                return enumValue.Equals(targetValue);
+            if (value == null) return value;
 
-            return DependencyProperty.UnsetValue;
+            if (value is EventType eventType)
+                return EventTypeMappings.TryGetValue(eventType, out var displayString) ? displayString : eventType.ToString();
+
+            if (value is EventSubtype eventSubtype)
+                return EventSubtypeMappings.TryGetValue(eventSubtype, out var displayString) ? displayString : eventSubtype.ToString();
+
+            return value.ToString();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool boolValue && parameter is Enum)
-                return boolValue ? parameter : Enum.Parse(parameter.GetType(), "None"); // Return the enum value if checkbox is checked, otherwise return 'None'
-
-            return DependencyProperty.UnsetValue;
+            return value;
         }
     }
 }

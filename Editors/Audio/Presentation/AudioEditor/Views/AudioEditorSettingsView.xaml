@@ -12,6 +12,9 @@
     <!-- Resources Section -->
     <UserControl.Resources>
         <converters:SettingsEnumConverter x:Key="SettingsEnumConverter"/>
+        <DataTemplate x:Key="EnumToStringTemplate">
+            <TextBlock Text="{Binding Converter={StaticResource SettingsEnumConverter}}"/>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
@@ -54,6 +57,7 @@
                 <Label Content="Dialogue Event Types:" VerticalAlignment="Center"/>
                 <ComboBox Grid.Column="1" ItemsSource="{Binding AudioProjectEventTypes}" 
                           SelectedItem="{Binding SelectedAudioProjectEventType}" 
+                          ItemTemplate="{StaticResource EnumToStringTemplate}" 
                           ToolTip="PLACEHOLDER TOOLTIP" VerticalAlignment="Center"/>
             </Grid>
 
@@ -66,6 +70,7 @@
                 <Label Content="Dialogue Event Subtypes:" VerticalAlignment="Center"/>
                 <ComboBox Grid.Column="1" ItemsSource="{Binding AudioProjectSubtypes}" 
                           SelectedItem="{Binding SelectedAudioProjectEventSubtype}" 
+                          ItemTemplate="{StaticResource EnumToStringTemplate}" 
                           ToolTip="PLACEHOLDER TOOLTIP" VerticalAlignment="Center"/>
             </Grid>
 

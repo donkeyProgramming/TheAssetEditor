@@ -44,6 +44,46 @@ namespace Editors.Audio.Presentation.AudioEditor
             Vocalisation
         }
 
+        public static readonly Dictionary<EventType, string> EventTypeMappings = new()
+        {
+            { EventType.FrontendVO, "Frontend VO" },
+            { EventType.CampaignVO, "Campaign VO" },
+            { EventType.CampaignConversationalVO, "Campaign Conversational VO" },
+            { EventType.BattleVO, "Battle VO" },
+            { EventType.BattleConversationalVO, "Battle Conversational VO" },
+            { EventType.BattleIndividualMelee, "Battle Individual Melee" },
+            { EventType.NonVO, "Non-VO" }
+        };
+
+        public static readonly Dictionary<EventSubtype, string> EventSubtypeMappings = new()
+        {
+            { EventSubtype.Dummy, "Dummy" },
+            { EventSubtype.Lord, "Lord" },
+            { EventSubtype.Hero, "Hero" },
+            { EventSubtype.Creature, "Creature" },
+            { EventSubtype.LordMelee, "Lord - Melee" },
+            { EventSubtype.LordSkirmisher, "Lord - Skirmisher" },
+            { EventSubtype.LordCaster, "Lord - Caster" },
+            { EventSubtype.HeroMelee, "Hero - Melee" },
+            { EventSubtype.HeroSkirmisher, "Hero - Skirmisher" },
+            { EventSubtype.HeroCaster, "Hero - Caster" },
+            { EventSubtype.UnitInfantry, "Unit - Infantry" },
+            { EventSubtype.UnitSkirmisher, "Unit - Skirmisher" },
+            { EventSubtype.UnitCavalry, "Unit - Cavalry" },
+            { EventSubtype.UnitSEM, "Unit - SEM" },
+            { EventSubtype.UnitArtillery, "Unit - Artillery" },
+            { EventSubtype.Ability, "Ability" },
+            { EventSubtype.CampaignAdvisor, "Campaign Advisor" },
+            { EventSubtype.DiplomacyLine, "Diplomacy Line" },
+            { EventSubtype.EventNarration, "Event Narration" },
+            { EventSubtype.Magic, "Magic" },
+            { EventSubtype.Movie, "Movie" },
+            { EventSubtype.QuestBattle, "Quest Battle" },
+            { EventSubtype.Ritual, "Ritual" },
+            { EventSubtype.UI, "UI" },
+            { EventSubtype.Vocalisation, "Vocalisation" }
+        };
+
         public static Dictionary<EventType, List<EventSubtype>> EventTypeToSubtypes { get; } = new Dictionary<EventType, List<EventSubtype>>
         {
             { 
