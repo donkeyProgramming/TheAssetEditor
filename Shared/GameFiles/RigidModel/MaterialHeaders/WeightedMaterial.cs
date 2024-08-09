@@ -199,7 +199,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             return material;
         }
 
-        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, VertexFormat vertexFormat)
         {
             var material = new WeightedMaterial()
             {

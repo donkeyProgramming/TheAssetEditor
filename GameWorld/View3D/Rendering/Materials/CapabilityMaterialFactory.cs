@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using GameWorld.Core.Rendering.Shading.Shaders;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.WsModel;
 
-namespace GameWorld.Core.Rendering.Shading.Factories
+namespace GameWorld.Core.Rendering.Materials
 {
-    public class Wh3MaterialFactory : IMaterialFactory
+    public class CapabilityMaterialFactory
     {
+        private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly PackFileService _packFileService;
         private readonly ResourceLibrary _resourceLibrary;
 
-        public Wh3MaterialFactory(PackFileService packFileService, ResourceLibrary resourceLibrary)
+        public CapabilityMaterialFactory(ApplicationSettingsService applicationSettingsService, PackFileService packFileService, ResourceLibrary resourceLibrary)
         {
+            _applicationSettingsService = applicationSettingsService;
             _packFileService = packFileService;
             _resourceLibrary = resourceLibrary;
         }
@@ -28,7 +31,7 @@ namespace GameWorld.Core.Rendering.Shading.Factories
                 var materialPackFile = _packFileService.FindFile(wsModelMaterialPath);
                 wsModelMaterial = new WsModelMaterialFile(materialPackFile);
 
-                if(wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
+                if (wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
                     preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
             }
 
@@ -43,14 +46,16 @@ namespace GameWorld.Core.Rendering.Shading.Factories
         {
             return type switch
             {
-                CapabilityMaterialsEnum.MetalRoughPbr_Default => new DefaultMetalRoughPbrMaterial(_resourceLibrary),
-                CapabilityMaterialsEnum.MetalRoughPbr_Emissive => new EmissiveMaterial(_resourceLibrary),
-                _ => throw new Exception($"Material of type {type} is not supported by {nameof(Wh3MaterialFactory)}"),
+                CapabilityMaterialsEnum.MetalRoughPbr_Default => new Shaders.MetalRough.DefaultMaterial(_resourceLibrary),
+                CapabilityMaterialsEnum.MetalRoughPbr_Emissive => new Shaders.MetalRough.EmissiveMaterial(_resourceLibrary),
+                CapabilityMaterialsEnum.SpecGlossPbr_Default => new Shaders.SpecGloss.DefaultMaterial(_resourceLibrary),
+
+                _ => throw new Exception($"Material of type {type} is not supported by {nameof(CapabilityMaterialFactory)}"),
             };
         }
 
         public List<CapabilityMaterialsEnum> GetPossibleMaterials() => [CapabilityMaterialsEnum.MetalRoughPbr_Default, CapabilityMaterialsEnum.MetalRoughPbr_Emissive];
-   
+
         public CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterial)
         {
             throw new NotImplementedException();

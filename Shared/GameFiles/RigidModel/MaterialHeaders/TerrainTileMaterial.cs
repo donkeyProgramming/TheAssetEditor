@@ -85,7 +85,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             };
         }
 
-        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, VertexFormat vertexFormat)
         {
             return new TerrainTileMaterial();
         }

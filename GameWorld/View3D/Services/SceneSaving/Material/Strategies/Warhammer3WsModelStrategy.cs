@@ -1,5 +1,5 @@
-﻿using GameWorld.Core.SceneNodes;
-using Microsoft.Xna.Framework;
+﻿using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.SceneNodes;
 using Shared.Core.Services;
 
 namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
@@ -9,7 +9,6 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
         private readonly WsModelGeneratorService _wsModelGeneratorService;
         public string Name => "Warhammer3";
         public string Description => "";
-        public bool IsAvailable => true;
 
         public MaterialStrategy StrategyId => MaterialStrategy.WsModel_Warhammer3;
 
@@ -21,7 +20,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
         public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
         {
             var input = WsModelGeneratorInputHelper.Create(mainNode);
-            _wsModelGeneratorService.GenerateWsModel(outputPath, input, CapabilityMaterialFactory.GetBuilder(GameTypeEnum.Warhammer3));
+            _wsModelGeneratorService.GenerateWsModel(new MaterialToWsModelFactory(GameTypeEnum.Warhammer3), outputPath, input);
         }
     }
 }

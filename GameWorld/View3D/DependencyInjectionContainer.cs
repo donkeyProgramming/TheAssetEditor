@@ -10,7 +10,7 @@ using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
-using GameWorld.Core.Rendering.Shading.Factories;
+using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Services.SceneSaving;
@@ -70,7 +70,7 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<IMaterialStrategy, NoWsModelStrategy>();
 
             // Shader
-            serviceCollection.AddScoped<AbstractMaterialFactory>(); 
+            serviceCollection.AddScoped<CapabilityMaterialFactory>(); 
 
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolver>();

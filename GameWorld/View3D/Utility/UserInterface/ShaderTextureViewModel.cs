@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using GameWorld.Core.Rendering.Shading.Capabilities;
+using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;

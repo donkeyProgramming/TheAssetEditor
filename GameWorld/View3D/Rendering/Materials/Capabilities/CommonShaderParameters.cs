@@ -2,9 +2,10 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 
-namespace GameWorld.Core.Rendering.Shading.Capabilities
+namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
     public class CommonShaderParametersCapability : ICapability
     {
@@ -16,7 +17,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         public float DirLightRotationRadians_X { get; set; }
         public float DirLightRotationRadians_Y { get; set; }
 
-        public Matrix ModelMatrix{ get; set; }
+        public Matrix ModelMatrix { get; set; }
 
         public float LightIntensityMult { get; set; }
 
@@ -62,5 +63,15 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
         }
 
         public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model) { }
+
+        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SerializeToWsModel(MaterialToWsModelSerializer templateHandler)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

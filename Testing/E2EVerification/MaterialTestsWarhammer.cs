@@ -1,7 +1,8 @@
-﻿using GameWorld.Core.Rendering.Shading.Capabilities;
-using GameWorld.Core.Rendering.Shading.Factories;
-using GameWorld.Core.Rendering.Shading.Shaders;
-using GameWorld.Core.Services.SceneSaving.Material.Strategies;
+﻿using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials.Capabilities;
+using GameWorld.Core.Rendering.Materials.Shaders;
+using GameWorld.Core.Rendering.Materials.Shaders.MetalRough;
+using GameWorld.Core.Services.SceneSaving.Material;
 using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -39,10 +40,10 @@ namespace E2EVerification
             var meshPackFile = _pfs.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_props\emp_karl_franz_hammer_2h_01.rigid_model_v2");
             var rmv2 = ModelFactory.Create().Load(meshPackFile!.DataSource.ReadData());
 
-            var abstractMaterialFactory = new AbstractMaterialFactory(_appSettings, _pfs, _resourceLib);
-            var material = abstractMaterialFactory.CreateFactory(GameTypeEnum.Warhammer3).Create(rmv2.ModelList[0][0], null);
+            var abstractMaterialFactory = new CapabilityMaterialFactory(_appSettings, _pfs, _resourceLib);
+            var material = abstractMaterialFactory.Create(rmv2.ModelList[0][0], null);
 
-            Assert.That(material, Is.TypeOf<DefaultMetalRoughPbrMaterial>());
+            Assert.That(material, Is.TypeOf<DefaultMaterial>());
 
             var defaultCapabiliy = material.TryGetCapability<DefaultCapabilityMetalRough>();
             Assert.That(defaultCapabiliy, Is.Not.Null);
@@ -61,11 +62,11 @@ namespace E2EVerification
         [Test]
         public void GenerateWsModel_Wh3_MetalRoughPbr_Default()
         {
-            var abstractMaterialFactory = new AbstractMaterialFactory(_appSettings, _pfs, _resourceLib);
-            var materialWithoutAlpha = abstractMaterialFactory.CreateFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
-            var materialWithAlpha = abstractMaterialFactory.CreateFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            var abstractMaterialFactory = new CapabilityMaterialFactory(_appSettings, _pfs, _resourceLib);
+            var materialWithoutAlpha = abstractMaterialFactory.CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            var materialWithAlpha = abstractMaterialFactory.CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
 
-            var defaultMaterielWithoutAlpha = materialWithoutAlpha as DefaultMetalRoughPbrMaterial;
+            var defaultMaterielWithoutAlpha = materialWithoutAlpha as DefaultMaterial;
             Assert.That(defaultMaterielWithoutAlpha, Is.Not.Null);
 
             defaultMaterielWithoutAlpha.GetCapability<DefaultCapabilityMetalRough>().NormalMap.TexturePath = "customFolder/customfilename.dds";
@@ -80,23 +81,15 @@ namespace E2EVerification
                 new WsModelGeneratorInput(2, 0, "Mesh_WithAlpha", UiVertexFormat.Static, materialWithAlpha, null)
             ];
 
-            var capabilityMaterialBuilder = CapabilityMaterialFactory.GetBuilder(_appSettings.CurrentSettings.CurrentGame);
+            var materialSerializerFactory = new MaterialToWsModelFactory(GameTypeEnum.Warhammer3);
             var wsModelGenerator = new WsModelGeneratorService(_pfs);
-            var result = wsModelGenerator.GenerateWsModel(@"variantmeshes\wh_variantmodels\hu1\emp\emp_props\emp_karl_franz_hammer_2h_01.rigid_model_v2", input, capabilityMaterialBuilder);
+            var result = wsModelGenerator.GenerateWsModel(materialSerializerFactory, @"variantmeshes\wh_variantmodels\hu1\emp\emp_props\emp_karl_franz_hammer_2h_01.rigid_model_v2", input);
 
             var wsModelPackFile = _pfs.FindFile(result.CreatedFilePath);
             var wsModel = new WsModelFile(wsModelPackFile);
 
             var wsMatrial = _pfs.FindFile("Material");
         }
-
-        [Test]
-        public void GenerateMaterial_Rome_SpecGlossPbr_Default()
-        { 
-        
-        }
-
-
 
     }
 }

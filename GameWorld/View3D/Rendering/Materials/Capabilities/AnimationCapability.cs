@@ -2,9 +2,10 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 
-namespace GameWorld.Core.Rendering.Shading.Capabilities
+namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
     public class AnimationCapability : ICapability
     {
@@ -22,18 +23,28 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
 
         public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
         {
-           
+
         }
 
         public ICapability Clone()
         {
             return new AnimationCapability()
-            { 
+            {
                 ApplyAnimation = ApplyAnimation,
                 AnimationInformation = AnimationInformation,
                 AnimationTransforms = AnimationTransforms,
                 AnimationWeightCount = AnimationWeightCount,
             };
+        }
+
+        public void SerializeToWsModel(MaterialToWsModelSerializer templateHandler)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -9,8 +9,9 @@ using Shared.Core.Events.Scoped;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
-using GameWorld.Core.Rendering.Shading.Shaders;
-using GameWorld.Core.Rendering.Shading.Capabilities;
+using GameWorld.Core.Rendering.Materials.Capabilities;
+using GameWorld.Core.Rendering.Materials.Shaders;
+using GameWorld.Core.Rendering.Materials;
 
 namespace GameWorld.Core.Services.SceneSaving
 {
@@ -34,9 +35,6 @@ namespace GameWorld.Core.Services.SceneSaving
             _materialStrategyProvider = materialStrategyProvider;
         }
 
-        public List<GeometryStrategyInformation> GetGeometryStrategies() => _geometryStrategyProvider.GetStrategies();
-        public List<MaterialStrategyInformation> GetMaterialStrategies() => _materialStrategyProvider.GetStrategies();
-        public List<LodStrategyInformation> GetLodStrategies() => _lodStrategyProvider.GetStrategies();
 
         public void Save(MainEditableNode mainNode, GeometrySaveSettings settings)
         {
@@ -73,22 +71,17 @@ namespace GameWorld.Core.Services.SceneSaving
 
 
                 var rmvMaterial = mesh.Material;
-                
 
+                var t = new MaterialToRmvSerializer();
+                mesh.Material = t.CreateMaterialFromCapabilityMaterial(mesh.Material, material);   //This is the place!
 
                 //rmvMaterial.SetTexture(Shared.GameFormats.RigidModel.Types.TextureType.BaseColour, material.TryGetCapability<DefaultCapability>().BaseColour.TexturePath);
             }
         }
 
 
-    }
-
-    public class Rmm2MaterialUpdater
-    {
-        public void UpdateRmv2(IRmvMaterial rmvMaterial, CapabilityMaterial material)
-        {
-            var specGlossMaterial = material.TryGetCapability<DefaultCapabilityMetalRough>();
-            var metalRoughMaterial = material.TryGetCapability<DefaultCapabilityMetalRough>();
-        }
+        public List<GeometryStrategyInformation> GetGeometryStrategies() => _geometryStrategyProvider.GetStrategies();
+        public List<MaterialStrategyInformation> GetMaterialStrategies() => _materialStrategyProvider.GetStrategies();
+        public List<LodStrategyInformation> GetLodStrategies() => _lodStrategyProvider.GetStrategies();
     }
 }

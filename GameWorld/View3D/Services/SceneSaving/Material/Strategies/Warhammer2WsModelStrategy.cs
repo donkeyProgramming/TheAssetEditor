@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.SceneNodes;
+﻿using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.SceneNodes;
 using Shared.Core.Services;
 
 namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
@@ -10,7 +11,6 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
         public MaterialStrategy StrategyId => MaterialStrategy.WsModel_Warhammer2;
         public string Name => "Warhammer2";
         public string Description => "Can also be used for Troy";
-        public bool IsAvailable => true;
 
         public Warhammer2WsModelStrategy(WsModelGeneratorService wsModelGeneratorService)
         {
@@ -20,7 +20,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
         public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
         {
             var input = WsModelGeneratorInputHelper.Create(mainNode);
-            _wsModelGeneratorService.GenerateWsModel(outputPath, input, CapabilityMaterialFactory.GetBuilder(GameTypeEnum.Warhammer2));
+            _wsModelGeneratorService.GenerateWsModel(new MaterialToWsModelFactory(GameTypeEnum.Warhammer2), outputPath, input);
         }
     }
 }

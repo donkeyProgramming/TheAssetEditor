@@ -1,10 +1,12 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
 
-namespace GameWorld.Core.Rendering.Shading.Capabilities
+namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
     public class DefaultCapabilitySpecGloss : ICapability
     {
@@ -50,6 +52,16 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, DiffuseMap);
             CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, NormalMap);
             CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, Mask);
+        }
+
+        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SerializeToWsModel(MaterialToWsModelSerializer templateHandler)
+        {
+
         }
     }
 }

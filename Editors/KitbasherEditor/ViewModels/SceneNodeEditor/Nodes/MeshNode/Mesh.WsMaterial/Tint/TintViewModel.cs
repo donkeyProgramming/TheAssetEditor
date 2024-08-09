@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using GameWorld.Core.Rendering.Shading.Capabilities;
+using GameWorld.Core.Rendering.Materials.Capabilities;
 using Shared.Ui.BaseDialogs.ColourPickerButton;
 using Shared.Ui.BaseDialogs.MathViews;
 

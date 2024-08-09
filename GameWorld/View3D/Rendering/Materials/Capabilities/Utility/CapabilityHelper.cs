@@ -1,59 +1,12 @@
 ﻿using System;
 using System.Linq;
 using CommunityToolkit.Diagnostics;
-using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
 
-namespace GameWorld.Core.Rendering.Shading.Capabilities
+namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 {
-    public interface ICapability
-    {
-        void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model);
-
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary);
-        public ICapability Clone();
-    }
-
-    public class TextureInput
-    {
-        public string TexturePath { get; set; }
-        public bool UseTexture { get; set; }
-        public TextureType Type { get; set; }
-
-        public TextureInput(TextureType type)
-        {
-            Type = type;
-            UseTexture = false;
-            TexturePath = null;
-        }
-
-        public TextureInput Clone()
-        {
-            return new TextureInput(Type)
-            {
-                UseTexture = UseTexture,
-                TexturePath = TexturePath
-            };
-        }
-
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary)
-        {
-            var useTextureParam = ShaderParameterHelper.UseTextureTypeToParamName[Type];
-            var textureParam = ShaderParameterHelper.TextureTypeToParamName[Type];
-            effect.Parameters[useTextureParam].SetValue(UseTexture);
-
-            if (UseTexture)
-            {
-                var texture = resourceLibrary.LoadTexture(TexturePath);
-                effect.Parameters[textureParam].SetValue(texture);
-            }
-        }
-    }
-
     public static class CapabilityHelper
     {
         public static void SetTextureFromModel(RmvModel model, WsModelMaterialFile? wsModelMaterial, TextureInput textureInput)
@@ -68,7 +21,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
                     return;
                 }
             }
-            
+
             var textureType = textureInput.Type;
             var modelTexture = model.Material.GetTexture(textureType);
             if (modelTexture != null)

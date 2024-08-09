@@ -25,7 +25,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
     public interface IMaterialCreator
     {
         IRmvMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset);
-        IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat);
+        IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, VertexFormat vertexFormat);
         byte[] Save(IRmvMaterial material);
     }
 }

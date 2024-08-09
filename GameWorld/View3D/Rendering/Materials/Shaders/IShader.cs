@@ -1,8 +1,7 @@
 ﻿using GameWorld.Core.Components.Rendering;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
-namespace GameWorld.Core.Rendering.Shading.Shaders
+namespace GameWorld.Core.Rendering.Materials.Shaders
 {
     public interface IShader
     {

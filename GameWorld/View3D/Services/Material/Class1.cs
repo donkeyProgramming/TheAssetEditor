@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GameWorld.Core.Rendering.Shading.Shaders;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.WsModel;

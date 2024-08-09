@@ -77,7 +77,7 @@ namespace GameWorld.Core.Commands.Object
                     }
 
                     var typedObject = _objectToSplit as Rmv2MeshNode;
-                    var meshNode = new Rmv2MeshNode(_resourceLib, typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, null);
+                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, typedObject.Effect.Clone());
                     meshNode.IsVisible = true;
 
                     var meshName = $"{_objectToSplit.Name}_submesh_{counter++}";

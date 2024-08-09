@@ -2,9 +2,8 @@
 using System.Linq;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Rendering.Geometry;
-using GameWorld.Core.Rendering.Shading.Factories;
+using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Services;
-using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.WsModel;
@@ -16,13 +15,13 @@ namespace GameWorld.Core.SceneNodes
     {
         private readonly IGeometryGraphicsContextFactory _contextFactory;
         private readonly PackFileService _packFileService;
-        private readonly AbstractMaterialFactory _abstractMaterialFactory;
+        private readonly CapabilityMaterialFactory _capabilityMaterialFactory;
 
-        public Rmv2ModelNodeLoader(IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, AbstractMaterialFactory abstractMaterialFactory)
+        public Rmv2ModelNodeLoader(IGeometryGraphicsContextFactory contextFactory, PackFileService packFileService, CapabilityMaterialFactory materialFactory)
         {
             _contextFactory = contextFactory;
             _packFileService = packFileService;
-            _abstractMaterialFactory = abstractMaterialFactory;
+            _capabilityMaterialFactory = materialFactory;
         }
 
         public void CreateModelNodesFromFile(Rmv2ModelNode outputNode, RmvFile model, AnimationPlayer animationPlayer, string modelFullPath)
@@ -46,7 +45,7 @@ namespace GameWorld.Core.SceneNodes
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
 
                     var wsModelMaterial = wsModelFile?.MaterialList.FirstOrDefault(x => x.LodIndex == lodIndex && x.PartIndex == modelIndex);
-                    var shader = _abstractMaterialFactory.CreateFactoryForCurrentGame().Create(rmvModel, wsModelMaterial?.MaterialPath);
+                    var shader = _capabilityMaterialFactory.Create(rmvModel, wsModelMaterial?.MaterialPath);
 
                     // This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
                     // from the model file path.

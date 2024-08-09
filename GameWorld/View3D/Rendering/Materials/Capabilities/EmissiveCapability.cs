@@ -1,11 +1,13 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
 
-namespace GameWorld.Core.Rendering.Shading.Capabilities
+namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
     public class EmissiveCapability : ICapability
     {
@@ -34,7 +36,7 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             Emissive.Apply(effect, resourceLibrary);
 
             effect.Parameters["CapabilityFlag_ApplyEmissive"].SetValue(true);
-            
+
             effect.Parameters["Emissive_Tint"].SetValue(EmissiveTint);
             effect.Parameters["Emissive_Strength"].SetValue(EmissiveStrength);
             effect.Parameters["Emissive_Tiling"].SetValue(EmissiveTiling);
@@ -77,6 +79,16 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             EmissiveStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_strength", 1);
             EmissiveTint = CapabilityHelper.GetParameterVector3(wsModelMaterial, "emissive_tint", Vector3.Zero);
             EmissiveFresnelStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_fresnel_strength", 1);
+        }
+
+        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SerializeToWsModel(MaterialToWsModelSerializer templateHandler)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive;
-using GameWorld.Core.Rendering.Shading.Capabilities;
-using GameWorld.Core.Rendering.Shading.Factories;
-using GameWorld.Core.Rendering.Shading.Shaders;
+using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials.Capabilities;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
 using GameWorld.WpfWindow.ResourceHandling;
 using Shared.Core.Events;
@@ -16,7 +16,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly PackFileService _packFileService;
         private readonly ResourceLibrary _resourceLibrary;
-        private readonly IMaterialFactory _materialFactory;
+        private readonly CapabilityMaterialFactory _materialFactory;
 
         Rmv2MeshNode? _currentNode;
 
@@ -28,12 +28,12 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] EmissiveViewModel? _emissive;
         [ObservableProperty] TintViewModel? _tint;
 
-        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary, AbstractMaterialFactory abstractMaterialFactory)
+        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary, CapabilityMaterialFactory abstractMaterialFactory)
         {
             _uiCommandFactory = uiCommandFactory;
             _packFileService = packFileService;
             _resourceLibrary = resourceLibrary;
-            _materialFactory = abstractMaterialFactory.CreateFactoryForCurrentGame();
+            _materialFactory = abstractMaterialFactory;
 
             _possibleMaterialTypes = _materialFactory.GetPossibleMaterials();
         }

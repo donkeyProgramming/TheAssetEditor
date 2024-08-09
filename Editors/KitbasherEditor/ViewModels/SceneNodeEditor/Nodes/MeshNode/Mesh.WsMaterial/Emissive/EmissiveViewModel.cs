@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using GameWorld.Core.Rendering.Shading.Capabilities;
+using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Utility.UserInterface;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;

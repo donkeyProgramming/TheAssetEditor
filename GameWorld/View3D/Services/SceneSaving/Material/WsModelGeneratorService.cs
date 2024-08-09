@@ -4,15 +4,18 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using GameWorld.Core.Rendering.Shading.Shaders;
+using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services.SceneSaving.Material.Strategies;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 
-namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
+namespace GameWorld.Core.Services.SceneSaving.Material
 {
     public class WsModelGeneratorService
     {
@@ -24,7 +27,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             _packFileService = packFileService;
         }
 
-        public (bool Status, string? CreatedFilePath) GenerateWsModel(string modelFilePath, List<WsModelGeneratorInput> meshInformation, IWsMaterialBuilder materialBuilder)
+        public (bool Status, string? CreatedFilePath) GenerateWsModel(MaterialToWsModelFactory wsModelSerializerFacotry, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
         {
             try
             {
@@ -34,7 +37,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
                     return (false, null);
                 }
 
-                var materialPaths = CreateMaterials(modelFilePath, materialBuilder, meshInformation);
+                var materialPaths = CreateMaterials(wsModelSerializerFacotry, modelFilePath, meshInformation);
                 var wsModelData = CreateWsModel(modelFilePath, materialPaths);
 
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
@@ -51,7 +54,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             }
         }
 
-        List<WsModelRow> CreateMaterials(string modelFilePath, IWsMaterialBuilder materialBuilder, List<WsModelGeneratorInput> meshInformation)
+        List<WsModelRow> CreateMaterials(MaterialToWsModelFactory wsModelSerializerFacotry, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
         {
             // Load all materials
             var repository = new WsMaterialRepository(_packFileService);
@@ -63,6 +66,8 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             {
                 var currentMesh = meshInformation[i];
                 var uniqeMeshName = uniqueMeshNames[i];
+
+                var materialBuilder = wsModelSerializerFacotry.CreateInstance();
                 var materialFile = materialBuilder.Create(uniqeMeshName, currentMesh.MeshVertexFormat, currentMesh.Material);
 
                 // Check if file is uniqe - if not use original. We do this to avid an explotion of materials.
@@ -90,7 +95,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             sb.Append("\t\t<materials>\n");
 
             var orderedMeshInfo = meshInformation
-                .OrderBy(x=>x.LodIndex)
+                .OrderBy(x => x.LodIndex)
                 .ToList();
 
             foreach (var meshInfo in orderedMeshInfo)
@@ -206,7 +211,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 
     public record WsModelGeneratorInput(
         int LodIndex,
-        int MeshIndex, 
+        int MeshIndex,
         string MeshName,
         UiVertexFormat MeshVertexFormat,
         CapabilityMaterial Material,
@@ -214,6 +219,6 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 
     public record WsModelRow(
         int LodIndex,
-        int MeshIndex, 
+        int MeshIndex,
         string MaterialFilePath);
 }

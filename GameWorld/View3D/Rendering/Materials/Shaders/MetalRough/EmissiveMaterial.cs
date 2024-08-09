@@ -1,8 +1,8 @@
 ﻿using GameWorld.Core.Components.Rendering;
-using GameWorld.Core.Rendering.Shading.Capabilities;
+using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.WpfWindow.ResourceHandling;
 
-namespace GameWorld.Core.Rendering.Shading.Shaders
+namespace GameWorld.Core.Rendering.Materials.Shaders.MetalRough
 {
     public class EmissiveMaterial : CapabilityMaterial
     {
@@ -23,14 +23,6 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
             _renderingTechniqueMap[RenderingTechnique.Emissive] = "GlowDrawing";
         }
 
-        public override CapabilityMaterial Clone()
-        {
-            var copy = new EmissiveMaterial(_resourceLibrary)
-            {
-                Capabilities = CloneCapabilities()
-            };
-
-            return copy;
-        }
+        public override CapabilityMaterial CreateCloneInstance() => new EmissiveMaterial(_resourceLibrary);
     }
 }

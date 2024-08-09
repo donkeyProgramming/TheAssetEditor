@@ -1,6 +1,6 @@
 ﻿using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Geometry;
-using GameWorld.Core.Rendering.Shading.Shaders;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

@@ -1,17 +1,19 @@
-﻿using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
 
-namespace GameWorld.Core.Rendering.Shading.Capabilities
+namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
     public class DefaultCapabilityMetalRough : ICapability
     {
         public float ScaleMult { get; set; } = 1;
         public bool UseAlpha { get; set; }
         public TextureInput BaseColour { get; set; } = new TextureInput(TextureType.BaseColour);
-        public TextureInput MaterialMap{ get; set; } = new TextureInput(TextureType.MaterialMap);
+        public TextureInput MaterialMap { get; set; } = new TextureInput(TextureType.MaterialMap);
         public TextureInput NormalMap { get; set; } = new TextureInput(TextureType.Normal);
         public TextureInput Mask { get; set; } = new TextureInput(TextureType.Mask);
         public TextureInput Distortion { get; set; } = new TextureInput(TextureType.Distortion);
@@ -54,6 +56,16 @@ namespace GameWorld.Core.Rendering.Shading.Capabilities
             CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, Mask);
             CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, Distortion);
             CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, DistortionNoise);
+        }
+
+        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SerializeToWsModel(MaterialToWsModelSerializer templateHandler)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

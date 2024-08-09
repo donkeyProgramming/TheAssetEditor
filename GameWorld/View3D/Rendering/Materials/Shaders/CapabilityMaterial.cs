@@ -2,13 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Components.Rendering;
-using GameWorld.Core.Rendering.Shading.Capabilities;
+using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace GameWorld.Core.Rendering.Shading.Shaders
+namespace GameWorld.Core.Rendering.Materials.Shaders
 {
+    public enum CapabilityMaterialsEnum
+    {
+        MetalRoughPbr_Default,
+        MetalRoughPbr_Emissive,
+
+
+        SpecGlossPbr_Default
+    }
+
     public abstract class CapabilityMaterial : IShader
     {
         protected readonly ResourceLibrary _resourceLibrary;
@@ -44,16 +53,10 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
             return null;
         }
 
-        protected ICapability[] CloneCapabilities()
-        {
-            var output = Capabilities.Select(x => x.Clone()).ToArray();
-            return output;
-        }
-
         public void SetTechnique(RenderingTechnique technique)
         {
             var effect = GetEffect();
-            if(SupportsTechnique(technique) == false)
+            if (SupportsTechnique(technique) == false)
                 throw new Exception($"Unsupported RenderingTechnique {technique}");
 
             var techniqueName = _renderingTechniqueMap[technique];
@@ -62,7 +65,7 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
 
         public bool SupportsTechnique(RenderingTechnique technique)
         {
-            if(_renderingTechniqueMap.ContainsKey(technique)) 
+            if (_renderingTechniqueMap.ContainsKey(technique))
                 return true;
             return false;
         }
@@ -81,6 +84,19 @@ namespace GameWorld.Core.Rendering.Shading.Shaders
             effect.CurrentTechnique.Passes[0].Apply();
         }
 
-        public abstract CapabilityMaterial Clone();
+
+        public abstract CapabilityMaterial CreateCloneInstance();
+        protected ICapability[] CloneCapabilities()
+        {
+            var output = Capabilities.Select(x => x.Clone()).ToArray();
+            return output;
+        }
+        public CapabilityMaterial Clone()
+        {
+            var copy = CreateCloneInstance();
+            copy.Capabilities = CloneCapabilities();
+            return copy;
+        }
+
     }
 }

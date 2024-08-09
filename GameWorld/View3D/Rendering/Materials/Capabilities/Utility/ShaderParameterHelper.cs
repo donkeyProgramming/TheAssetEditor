@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
-using GameWorld.WpfWindow.ResourceHandling;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel.Types;
 
-namespace GameWorld.Core.Rendering.Shading
+namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 {
     public static class ShaderParameterHelper
     {
@@ -32,6 +29,5 @@ namespace GameWorld.Core.Rendering.Shading
             { TextureType.Emissive, "Emissive_UseTexture"}
         };
     }
+
 }
-
-
