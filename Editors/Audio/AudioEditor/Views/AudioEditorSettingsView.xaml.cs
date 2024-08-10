@@ -1,8 +1,6 @@
 ﻿using System.Windows.Controls;
-using Editors.Audio.Presentation.AudioEditor.ViewModels;
-using Editors.Audio.Storage;
 
-namespace Editors.Audio.Presentation.AudioEditor.Views
+namespace Editors.Audio.AudioEditor.Views
 {
     /// <summary>
     /// Interaction logic for AudioEditorSettingsView.xaml

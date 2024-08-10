@@ -1,18 +1,20 @@
-﻿using Audio.Presentation.AudioExplorer;
-using Audio.Presentation.Compiler;
+﻿using Audio.AudioExplorer;
+using Audio.Compiler;
+using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.ViewModels;
+using Editors.Audio.AudioEditor.Views;
+using Editors.Audio.AudioExplorer;
 using Editors.Audio.BnkCompiler;
 using Editors.Audio.BnkCompiler.ObjectGeneration;
 using Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3;
-using Editors.Audio.Presentation.AudioEditor;
-using Editors.Audio.Presentation.AudioEditor.ViewModels;
-using Editors.Audio.Presentation.AudioExplorer;
-using Editors.Audio.Presentation.Compiler;
+using Editors.Audio.Compiler;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.WWise;
+
 
 namespace Editors.Audio
 {
@@ -28,7 +30,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerView>();
             serviceCollection.AddScoped<CompilerViewModel>();
 
-            serviceCollection.AddScoped<AudioEditorDataViewModel>();
+            serviceCollection.AddTransient<AudioEditorSettingsView>();
             serviceCollection.AddScoped<AudioEditorSettingsViewModel>();
             serviceCollection.AddScoped<AudioEditorViewModel>();
 
@@ -51,7 +53,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerService>();
             serviceCollection.AddScoped<ProjectLoader>();
             serviceCollection.AddScoped<AudioFileImporter>();
-            serviceCollection.AddScoped<Compiler>();
+            serviceCollection.AddScoped<Editors.Audio.BnkCompiler.Compiler>();
             serviceCollection.AddScoped<ResultHandler>();
         }
 

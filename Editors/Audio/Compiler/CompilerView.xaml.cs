@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Audio.Presentation.Compiler
+namespace Audio.Compiler
 {
     /// <summary>
     /// Interaction logic for CompilerView.xaml

@@ -4,7 +4,7 @@ using Shared.Ui.Common;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Editors.Audio.Presentation.AudioExplorer
+namespace Editors.Audio.AudioExplorer
 {
     public class EventSelectionFilter
     {
