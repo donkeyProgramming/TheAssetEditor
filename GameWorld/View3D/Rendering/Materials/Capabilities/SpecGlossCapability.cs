@@ -27,7 +27,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             GlossMap.Apply(effect, resourceLibrary);
             DiffuseMap.Apply(effect, resourceLibrary);
             NormalMap.Apply(effect, resourceLibrary);
-            Mask.Apply(effect, resourceLibrary);
+            //Mask.Apply(effect, resourceLibrary);
         }
 
         public ICapability Clone()

@@ -20,6 +20,6 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.MetalRough
             _renderingTechniqueMap[RenderingTechnique.Normal] = "BasicColorDrawing";
         }
 
-        public override CapabilityMaterial CreateCloneInstance() => new DefaultMaterial(_resourceLibrary);
+        protected override CapabilityMaterial CreateCloneInstance() => new DefaultMaterial(_resourceLibrary);
     }
 }

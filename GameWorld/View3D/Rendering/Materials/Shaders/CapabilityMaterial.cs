@@ -14,8 +14,8 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
         MetalRoughPbr_Default,
         MetalRoughPbr_Emissive,
 
-
-        SpecGlossPbr_Default
+        SpecGlossPbr_Default,
+        SpecGlossPbr_DirtAndDecal,
     }
 
     public abstract class CapabilityMaterial : IShader
@@ -84,8 +84,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
             effect.CurrentTechnique.Passes[0].Apply();
         }
 
-
-        public abstract CapabilityMaterial CreateCloneInstance();
+        protected abstract CapabilityMaterial CreateCloneInstance();
         protected ICapability[] CloneCapabilities()
         {
             var output = Capabilities.Select(x => x.Clone()).ToArray();

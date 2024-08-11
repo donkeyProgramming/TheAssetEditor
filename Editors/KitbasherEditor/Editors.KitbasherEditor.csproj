@@ -5,6 +5,16 @@
       <ImplicitUsings>enable</ImplicitUsings>
       <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Dissolve\**" />
+    <Compile Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Iridescence\**" />
+    <EmbeddedResource Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Dissolve\**" />
+    <EmbeddedResource Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Iridescence\**" />
+    <None Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Dissolve\**" />
+    <None Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Iridescence\**" />
+    <Page Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Dissolve\**" />
+    <Page Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Iridescence\**" />
+  </ItemGroup>
 
 
 
@@ -13,13 +23,6 @@
     <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
     <ProjectReference Include="..\..\Shared\SharedUI\Shared.Ui.csproj" />
     <ProjectReference Include="..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
-  </ItemGroup>
-
-
-
-  <ItemGroup>
-    <Folder Include="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Iridescence\" />
-    <Folder Include="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Dissolve\" />
   </ItemGroup>
 
 </Project>

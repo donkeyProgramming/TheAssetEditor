@@ -4,21 +4,22 @@ using GameWorld.WpfWindow.ResourceHandling;
 
 namespace GameWorld.Core.Rendering.Materials.Shaders.SpecGloss
 {
-    public class DefaultMaterial : CapabilityMaterial
+    public class DecalAndDirtMaterial : CapabilityMaterial
     {
-        public DefaultMaterial(ResourceLibrary resourceLibrary)
-            : base(CapabilityMaterialsEnum.SpecGlossPbr_Default, ShaderTypes.Pbr_SpecGloss, resourceLibrary)
+        public DecalAndDirtMaterial(ResourceLibrary resourceLibrary)
+            : base(CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal, ShaderTypes.Pbr_SpecGloss, resourceLibrary)
         {
             Capabilities =
             [
                 new CommonShaderParametersCapability(),
                 new SpecGlossCapability(),
                 new AnimationCapability(),
+                new DecalAndDirtCapability(),
             ];
 
             _renderingTechniqueMap[RenderingTechnique.Normal] = "BasicColorDrawing";
         }
 
-        protected override CapabilityMaterial CreateCloneInstance() => new DefaultMaterial(_resourceLibrary);
+        protected override CapabilityMaterial CreateCloneInstance() => new DecalAndDirtMaterial(_resourceLibrary);
     }
 }

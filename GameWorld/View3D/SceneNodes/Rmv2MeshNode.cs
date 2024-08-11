@@ -125,12 +125,12 @@ namespace GameWorld.Core.SceneNodes
                 animationCapability.ApplyAnimation = AnimationPlayer != null && AnimationPlayer.IsEnabled;
             }
 
-            var sharedCapability = Effect.GetCapability<MetalRoughCapability>();
-            if (sharedCapability != null)
-            {
-                sharedCapability.ScaleMult = ScaleMult;
-                sharedCapability.UseAlpha = Material.AlphaMode == AlphaMode.Transparent;
-            }
+            //var sharedCapability = Effect.GetCapability<MetalRoughCapability>();
+            //if (sharedCapability != null)
+            //{
+            //    sharedCapability.ScaleMult = ScaleMult;
+            //    sharedCapability.UseAlpha = Material.AlphaMode == AlphaMode.Transparent;
+            //}
 
             if (AttachmentBoneResolver != null)
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();

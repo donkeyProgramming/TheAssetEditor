@@ -14,7 +14,6 @@ using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
 using KitbasherEditor.ViewModels.UiCommands;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
@@ -52,7 +51,6 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<SceneNodeEditorViewModel>();
             serviceCollection.AddTransient<MeshViewModel>();
             serviceCollection.AddTransient<AnimationViewModel>();
-            serviceCollection.AddTransient<MaterialGeneralViewModel>();
             serviceCollection.AddTransient<WeightedMaterialViewModel>();
             serviceCollection.AddTransient<WsMaterialViewModel>();
 

@@ -29,6 +29,7 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
+            currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.LoadCaPacksByDefault = false;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
             _packFileService.Load(packFile, false, true);
@@ -54,6 +55,7 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
+            currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.LoadCaPacksByDefault = false;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\cinderbreath.pack";
             _packFileService.Load(packFile, false, true);
@@ -88,9 +90,36 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
+            currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.LoadCaPacksByDefault = false;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Throt.pack";
             _packFileService.Load(packFile, false, true);
+        }
+    }
+
+    internal class Kitbash_RomeShield : IDeveloperConfiguration
+    {
+        private readonly PackFileService _packFileService;
+        private readonly IUiCommandFactory _uiCommandFactory;
+
+        public Kitbash_RomeShield(PackFileService packFileService, IUiCommandFactory uiCommandFactory)
+        {
+            _packFileService = packFileService;
+            _uiCommandFactory = uiCommandFactory;
+        }
+
+        public void OpenFileOnLoad()
+        {
+            var file = _packFileService.FindFile(@"variantmeshes\_variantmodels\man\shield\celtic_oval_shield_a.rigid_model_v2");
+            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file!);
+        }
+
+        public void OverrideSettings(ApplicationSettings currentSettings)
+        {
+            currentSettings.LoadCaPacksByDefault = false;
+            currentSettings.CurrentGame = GameTypeEnum.Rome_2;
+            var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Rome_Man_And_Shield_Pack";
+            _packFileService.LoadFolderContainer(packFile);
         }
     }
 }

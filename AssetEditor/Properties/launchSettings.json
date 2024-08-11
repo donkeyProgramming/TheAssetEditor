@@ -19,6 +19,11 @@
       "commandLineArgs": "-devcfg Kitbash_Ox",
       "nativeDebugging": false
     },
+    "AE-KitbashRomeShield": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg Kitbash_RomeShield",
+      "nativeDebugging": false
+    },
     "AE-TextureKarl": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg Texture_Karl",

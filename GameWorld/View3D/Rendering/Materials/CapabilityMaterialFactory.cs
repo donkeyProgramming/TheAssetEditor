@@ -48,16 +48,24 @@ namespace GameWorld.Core.Rendering.Materials
                 CapabilityMaterialsEnum.MetalRoughPbr_Default => new Shaders.MetalRough.DefaultMaterial(_resourceLibrary),
                 CapabilityMaterialsEnum.MetalRoughPbr_Emissive => new Shaders.MetalRough.EmissiveMaterial(_resourceLibrary),
                 CapabilityMaterialsEnum.SpecGlossPbr_Default => new Shaders.SpecGloss.DefaultMaterial(_resourceLibrary),
+                CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal => new Shaders.SpecGloss.DecalAndDirtMaterial(_resourceLibrary),
 
                 _ => throw new Exception($"Material of type {type} is not supported by {nameof(CapabilityMaterialFactory)}"),
             };
         }
 
-        public List<CapabilityMaterialsEnum> GetPossibleMaterials() => [CapabilityMaterialsEnum.MetalRoughPbr_Default, CapabilityMaterialsEnum.MetalRoughPbr_Emissive];
+        public List<CapabilityMaterialsEnum> GetPossibleMaterials()
+        { 
+            return [CapabilityMaterialsEnum.MetalRoughPbr_Default,
+                    CapabilityMaterialsEnum.MetalRoughPbr_Emissive,
+
+                    CapabilityMaterialsEnum.SpecGlossPbr_Default,
+                    CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal];
+        } 
 
         public CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterial)
         {
-            throw new NotImplementedException();
+            return CreateMaterial(newMaterial);
         }
     }
 }

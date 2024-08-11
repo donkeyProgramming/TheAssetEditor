@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Default
+namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.MetalRough
 {
     /// <summary>
     /// Interaction logic for DefaultView.xaml
     /// </summary>
-    public partial class DefaultView : UserControl
+    public partial class MetalRoughView : UserControl
     {
-        public DefaultView()
+        public MetalRoughView()
         {
             InitializeComponent();
         }

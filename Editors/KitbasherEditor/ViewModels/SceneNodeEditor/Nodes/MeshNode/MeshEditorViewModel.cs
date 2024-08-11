@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
 using KitbasherEditor.Views.EditorViews.Rmv2;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.Services;
@@ -19,7 +18,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 
         [ObservableProperty] MeshViewModel? _mesh;
         [ObservableProperty] AnimationViewModel? _animation;
-        [ObservableProperty] MaterialGeneralViewModel? _materialGeneral;
         [ObservableProperty] WeightedMaterialViewModel? _material;
         [ObservableProperty] WsMaterialViewModel? _wsMaterial;
 
@@ -40,7 +38,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
             Animation = _serviceProvider.GetRequiredService<AnimationViewModel>();
             Animation.Initialize(typedNode);
 
-            if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3)
+           // if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3)
             {
                 WsMaterial = _serviceProvider.GetRequiredService<WsMaterialViewModel>();
                 WsMaterial.Initialize(typedNode);
@@ -49,9 +47,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
             {
                 if (typedNode.Material is WeightedMaterial)
                 {
-                    MaterialGeneral = _serviceProvider.GetRequiredService<MaterialGeneralViewModel>();
-                    MaterialGeneral.Initialize(typedNode);
-
                     Material = _serviceProvider.GetRequiredService<WeightedMaterialViewModel>();
                     Material.Initialize(typedNode);
                 }

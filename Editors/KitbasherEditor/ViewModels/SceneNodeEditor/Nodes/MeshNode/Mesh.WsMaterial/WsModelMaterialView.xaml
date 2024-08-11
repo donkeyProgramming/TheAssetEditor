@@ -7,9 +7,8 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
              xmlns:blood="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Blood" 
-             xmlns:default="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Default" 
              xmlns:tint="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Tint" 
-             xmlns:emissive="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive"
+             xmlns:emissive="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive" xmlns:metalrough="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.MetalRough" xmlns:specgloss="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.SpecGloss" xmlns:dirtanddecal="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.DirtAndDecal"
              mc:Ignorable="d" 
              d:DesignHeight="1200" d:DesignWidth="800">
     <UserControl.Resources>
@@ -23,7 +22,7 @@
     <Expander DockPanel.Dock="Top" Margin="0,5,0,0" IsExpanded="True">
         <Expander.Header>
             <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Border}" >
-                <TextBlock Text="Ws Model Material" FontWeight="Bold" Margin="3"/>
+                <TextBlock Text="Model Material" FontWeight="Bold" Margin="3"/>
             </StackPanel>
         </Expander.Header>
 
@@ -48,37 +47,12 @@
                 <ComboBox Margin="2,0,2,0" ItemsSource="{Binding PossibleMaterialTypes}" SelectedItem="{Binding CurrentMaterialType}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
             </DockPanel>
 
-            <default:DefaultView DockPanel.Dock="Top" DataContext="{Binding Default}" Visibility="{Binding  Converter={StaticResource NullToVisibilityConverter}}" />
+            <metalrough:MetalRoughView DockPanel.Dock="Top" DataContext="{Binding MetalRough}" Visibility="{Binding  Converter={StaticResource NullToVisibilityConverter}}" />
+            <specgloss:SpecGlossView DockPanel.Dock="Top" DataContext="{Binding SpecGloss}" Visibility="{Binding  Converter={StaticResource NullToVisibilityConverter}}" />
+            <dirtanddecal:DirtAndDecalView DockPanel.Dock="Top" DataContext="{Binding DecalAndDirt}" Visibility="{Binding  Converter={StaticResource NullToVisibilityConverter}}" />
             <blood:BloodView DockPanel.Dock="Top" DataContext="{Binding Blood}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
             <tint:TintView DockPanel.Dock="Top" DataContext="{Binding Tint}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
             <emissive:EmissiveView DockPanel.Dock="Top" DataContext="{Binding Emissive}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
-            <!-- 
-           
-
-          
-            <ContentControl x:Name="Dissolve" DockPanel.Dock="Top">
-                <DockPanel LastChildFill="False">
-                    <DockPanel  DockPanel.Dock="Top" >
-                        <Label Content="Dissolve" FontSize="{StaticResource HeaderFontSize}" Width="{StaticResource HeaderLabelLength}"/>
-                        <Separator/>
-                    </DockPanel>
-                </DockPanel>
-            </ContentControl>
-
-           
-            <ContentControl x:Name="Iridescence" DockPanel.Dock="Top">
-                <DockPanel LastChildFill="False">
-                    <DockPanel  DockPanel.Dock="Top" >
-                        <Label Content="Iridescence" FontSize="{StaticResource HeaderFontSize}" Width="{StaticResource HeaderLabelLength}"/>
-                        <Separator/>
-                    </DockPanel>
-                </DockPanel>
-            </ContentControl>
-            -->
-
-
-
-
 
         </DockPanel>
     </Expander>

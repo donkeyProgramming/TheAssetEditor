@@ -23,6 +23,6 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.MetalRough
             _renderingTechniqueMap[RenderingTechnique.Emissive] = "GlowDrawing";
         }
 
-        public override CapabilityMaterial CreateCloneInstance() => new EmissiveMaterial(_resourceLibrary);
+        protected override CapabilityMaterial CreateCloneInstance() => new EmissiveMaterial(_resourceLibrary);
     }
 }

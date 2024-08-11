@@ -28,6 +28,12 @@
             </DockPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Vertex Type"/>
+                <Label>:</Label>
+                <ComboBox ItemsSource="{Binding Mesh.PossibleVertexTypes}" SelectedItem="{Binding Mesh.VertexType}" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Size"/>
                 <Label>:</Label>
 
@@ -57,14 +63,6 @@
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Reduce Lods"/>
                 <Label>:</Label>
                 <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Mesh.ReduceMeshOnLodGeneration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </StackPanel>
-
-
-
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Vertex Type"/>
-                <Label>:</Label>
-                <ComboBox ItemsSource="{Binding Mesh.PossibleVertexTypes}" SelectedItem="{Binding Mesh.VertexType}" VerticalAlignment="Center"/>
             </StackPanel>
 
         </DockPanel>
