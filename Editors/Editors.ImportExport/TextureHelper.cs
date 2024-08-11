@@ -68,13 +68,8 @@ namespace MeshImportExport
             w.Write(dds);
             m.Seek(0, SeekOrigin.Begin);
             IImage image = Pfim.Pfim.FromStream(m);
-            // Load the DDS image using Pfim
 
-
-            //IImage image = Pfim.Pfim.FromStream(ddsPath);
-
-            // Create a Bitmap from the DDS image data
-            PixelFormat pixelFormat = PixelFormat.Format32bppArgb; // Adjust if needed
+            PixelFormat pixelFormat = PixelFormat.Format32bppArgb;
             if (image.Format == Pfim.ImageFormat.Rgba32)
             {
                 pixelFormat = PixelFormat.Format32bppArgb;
@@ -88,14 +83,12 @@ namespace MeshImportExport
                 throw new NotSupportedException($"Unsupported DDS format: {image.Format}");
             }
 
-            // Create a Bitmap from the raw image data
             using (Bitmap bitmap = new Bitmap(image.Width, image.Height, pixelFormat))
             {
                 BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, pixelFormat);
                 System.Runtime.InteropServices.Marshal.Copy(image.Data, 0, bitmapData.Scan0, image.DataLen);
                 bitmap.UnlockBits(bitmapData);
 
-                // Save the Bitmap as a PNG
                 var b = new MemoryStream();
               
                 bitmap.Save(b, System.Drawing.Imaging.ImageFormat.Png);
@@ -133,7 +126,7 @@ namespace MeshImportExport
             return material;
         }
 
-        public static List<byte[]> FindFileAndReturnPngList(PackFileService pfs, RmvModel model, PackFile inFile)
+        /**public static List<byte[]> FindFileAndReturnPngList(PackFileService pfs, RmvModel model, PackFile inFile)
         {
             var basePath = model.Material.GetTexture(TextureType.BaseColour);
             var materialPath = model.Material.GetTexture(TextureType.MaterialMap);
@@ -217,6 +210,6 @@ namespace MeshImportExport
                 }
             }
             return packFileList;
-        }
+        }**/
     }
 }

@@ -16,7 +16,7 @@ namespace MeshImportExport
 {
     internal class MeshExport
     {
-        public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> CreateMesh(RmvModel rmvMesh, MaterialBuilder material)
+        /**public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> CreateMesh(RmvModel rmvMesh, MaterialBuilder material)
         {
             var mesh = new MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>(rmvMesh.Material.ModelName);
             mesh.VertexPreprocessor.SetValidationPreprocessors();
@@ -127,8 +127,10 @@ namespace MeshImportExport
                 glTfvertex.Geometry.Tangent = new Vector4(vertex.Tangent.X, vertex.Tangent.Y, vertex.Tangent.Z, 1);
                 glTfvertex.Material.TexCoord = new Vector2(vertex.Uv.X, vertex.Uv.Y);
 
+
                 glTfvertex.Skinning.Weights = new Vector4(0, 1, 0, 0);
                 glTfvertex.Skinning.Joints = new Vector4(0, 1, 0, 0);
+
 
                 vertexList.Add(glTfvertex);
             }
@@ -147,6 +149,6 @@ namespace MeshImportExport
                 catch { continue; }
             }
             return mesh;
-        }
+        }**/
     }
 }

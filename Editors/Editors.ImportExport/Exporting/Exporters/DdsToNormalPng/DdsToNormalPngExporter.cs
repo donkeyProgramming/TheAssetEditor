@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using MeshImportExport;
 using Editors.ImportExport;
+using System.Windows;
 
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
@@ -21,18 +22,25 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
 
         public void Export(string filePath, string outputPath, bool convert)
         {
-            var packFile = _pfs.FindFile(filePath);
-            var fileName = Path.GetFileNameWithoutExtension(filePath);
-            var fileDirectory = outputPath + "/" + fileName + ".png";
-            var bytes = packFile.DataSource.ReadData();
-            var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
-            if (convert)
+            try
             {
-                ConvertToBlueNormalMap(imgBytes, outputPath, fileDirectory);
-            }
-            else
+                var packFile = _pfs.FindFile(filePath);
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var fileDirectory = outputPath + "/" + fileName + ".png";
+                var bytes = packFile.DataSource.ReadData();
+                var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
+                if (convert)
+                {
+                    ConvertToBlueNormalMap(imgBytes, outputPath, fileDirectory);
+                }
+                else
+                {
+                    DoNotConvertExport(imgBytes, outputPath, fileDirectory);
+                }
+            } catch(NullReferenceException exception)
             {
-                DoNotConvertExport(imgBytes, outputPath, fileDirectory);
+                MessageBox.Show(exception.Message + filePath);
+                return;
             }
         }
 
