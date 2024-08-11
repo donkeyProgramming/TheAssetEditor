@@ -133,12 +133,14 @@ namespace Editors.Audio.AudioEditor
                     var decisionTreeElement = dialogueEventElement.GetProperty("DecisionTree");
                     foreach (var decisionTreeItemElement in decisionTreeElement.EnumerateArray())
                     {
+                        var audioFilesElement = decisionTreeItemElement.GetProperty("AudioFiles");
+
                         var decisionTreeItem = new DecisionTreeItems
                         {
                             StatePath = decisionTreeItemElement.GetProperty("StatePath").GetString(),
-                            AudioFiles = decisionTreeItemElement.GetProperty("AudioFiles").EnumerateArray()
-                                .Select(file => file.GetString())
-                                .ToList()
+                            AudioFiles = audioFilesElement.EnumerateArray()
+                            .Select(file => file.GetString())
+                            .ToList()
                         };
 
                         dialogueEvent.DecisionTree.Add(decisionTreeItem);

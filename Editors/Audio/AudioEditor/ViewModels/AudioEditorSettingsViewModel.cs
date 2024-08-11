@@ -36,7 +36,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         readonly ILogger _logger = Logging.Create<AudioEditorSettingsViewModel>();
         private Action _closeAction;
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("New Audio Editor Project");
 
         [ObservableProperty] private string _audioProjectFileName = "my_audio_project";
         [ObservableProperty] private string _customStatesFileName = "my_custom_states";

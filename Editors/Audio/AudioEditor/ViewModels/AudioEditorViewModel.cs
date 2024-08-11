@@ -107,7 +107,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 _logger.Here().Information($"Loaded Audio Project file: {file.Name}");
 
                 // Create the list of Events used in the Events ComboBox.
-                //CreateAudioProjectEventsListFromAudioProject(this, EventsData);
+                CreateAudioProjectEventsListFromAudioProject(EventsData);
 
                 // Load the object which stores the custom States for use in the States ComboBox.
                 PrepareCustomStatesForComboBox(this);
@@ -291,6 +291,13 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         public void Close()
         {
+            SelectedAudioProjectEvent = "";
+            ShowCustomStatesOnly = false;
+
+            AudioProjectDialogueEvents.Clear();
+            AudioEditorDataGridItems.Clear();
+            CustomStatesDataGridItems.Clear();
+            AudioProjectDialogueEvents.Clear();
         }
 
         public bool Save() => true;
