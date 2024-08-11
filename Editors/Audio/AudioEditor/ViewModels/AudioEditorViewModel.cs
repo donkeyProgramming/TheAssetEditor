@@ -18,8 +18,9 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.WindowHandling;
-using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
+using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 using static Editors.Audio.AudioEditor.DynamicDataGrid;
+using static Editors.Audio.AudioEditor.AudioProjectConverter;
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
@@ -43,12 +44,17 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [ObservableProperty] private string _selectedAudioProjectEvent;
         [ObservableProperty] private bool _showCustomStatesOnly;
+        [ObservableProperty] private ObservableCollection<string> _audioProjectDialogueEvents = [];
 
-        // DataGrid data objects:
         public ObservableCollection<Dictionary<string, object>> AudioEditorDataGridItems { get; set; } = [];
+
         public ObservableCollection<CustomStatesDataGridProperties> CustomStatesDataGridItems { get; set; } = [];
-        public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData; // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
-        public static List<string> AudioProjectDialogueEvents => AudioEditorData.Instance.AudioProjectDialogueEvents;
+
+        public static string AudioProjectFileNameInstance => AudioEditorData.Instance.AudioProjectFileNameInstance;
+
+        public static string SelectedAudioProjectEventInstance => AudioEditorData.Instance.SelectedAudioProjectEventInstance;
+
+        public static Dictionary<string, List<Dictionary<string, object>>> AudioProjectDataInstance => AudioEditorData.Instance.AudioProjectDataInstance;
 
         public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService, IWindowFactory windowFactory)
         {
@@ -59,7 +65,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         partial void OnSelectedAudioProjectEventChanged(string value)
         {
-            AudioEditorData.Instance.SelectedAudioProjectEvent = value;
+            AudioEditorData.Instance.SelectedAudioProjectEventInstance = value;
 
             // Load the Event upon selection.
             LoadEvent(_audioRepository, ShowCustomStatesOnly);
@@ -73,12 +79,12 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void NewAudioProject()
         {
-            var window = _windowFactory.Create<AudioEditorSettingsViewModel, AudioEditorSettingsView>("New Audio Project", 500, 410);
+            var window = _windowFactory.Create<AudioEditorNewAudioProjectViewModel, AudioEditorNewAudioProjectView>("New Audio Project", 500, 410);
             window.AlwaysOnTop = false;
             window.ResizeMode = ResizeMode.NoResize;
 
             // Set the close action
-            if (window.DataContext is AudioEditorSettingsViewModel viewModel)
+            if (window.DataContext is AudioEditorNewAudioProjectViewModel viewModel)
                 viewModel.SetCloseAction(() => window.Close());
 
             window.ShowWindow();
@@ -91,23 +97,28 @@ namespace Editors.Audio.AudioEditor.ViewModels
             if (browser.ShowDialog())
             {
                 // Remove any pre-existing data otherwise DataGrid isn't happy.
-                EventsData.Clear();
+                AudioProjectDataInstance.Clear();
                 AudioEditorDataGridItems.Clear();
                 SelectedAudioProjectEvent = "";
 
-                // Create the object for State Groups with qualifiers so that their keys in the EventsData dictionary are unique.
+                // Create the object for State Groups with qualifiers so that their keys in the AudioProjectConverter dictionary are unique.
                 AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
 
                 var filePath = _packFileService.GetFullPath(browser.SelectedFile);
                 var file = _packFileService.FindFile(filePath);
+                var fileName = Path.GetFileNameWithoutExtension(file.Name);
+
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
-                var eventData = AudioProjectData.ConvertAudioProjectToEventsData(_audioRepository, audioProjectJson);
-                AudioEditorData.Instance.EventsData = eventData;
-                _logger.Here().Information($"Loaded Audio Project file: {file.Name}");
+                var audioProjectData = ConvertFromAudioProjectJson(_audioRepository, audioProjectJson);
+
+                AudioEditorData.Instance.AudioProjectDataInstance = audioProjectData;
+                AudioEditorData.Instance.AudioProjectFileNameInstance = fileName;
+
+                _logger.Here().Information($"Loaded Audio Project file: {fileName}");
 
                 // Create the list of Events used in the Events ComboBox.
-                CreateAudioProjectEventsListFromAudioProject(EventsData);
+                CreateAudioProjectEventsListFromAudioProject();
 
                 // Load the object which stores the custom States for use in the States ComboBox.
                 PrepareCustomStatesForComboBox(this);
@@ -118,7 +129,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         {
             UpdateEventDataWithCurrentEvent();
 
-            AudioProjectData.AddAudioProjectToPackFile(_packFileService, EventsData, "dummy_name");
+            AddAudioProjectToPackFile(_packFileService);
         }
 
         [RelayCommand] public void LoadCustomStates()
@@ -153,26 +164,26 @@ namespace Editors.Audio.AudioEditor.ViewModels
             var dataGridItemsJson = JsonConvert.SerializeObject(CustomStatesDataGridItems, Formatting.Indented);
             var pack = _packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
-            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{"dummy_name"}.json", new MemorySource(byteArray)));
-            _logger.Here().Information($"Saved Custom States file: {"dummy_name"}");
+            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{AudioProjectFileNameInstance}.json", new MemorySource(byteArray)));
+            _logger.Here().Information($"Saved Custom States file: {AudioProjectFileNameInstance}");
         }
 
         public void LoadEvent(IAudioRepository audioRepository, bool showCustomStatesOnly)
         {
-            if (string.IsNullOrEmpty(AudioEditorData.Instance.SelectedAudioProjectEvent))
+            if (string.IsNullOrEmpty(SelectedAudioProjectEvent))
                 return;
 
-            _logger.Here().Information($"Loading event: {AudioEditorData.Instance.SelectedAudioProjectEvent}");
+            _logger.Here().Information($"Loading event: {SelectedAudioProjectEvent}");
 
             ConfigureDataGrid(this, audioRepository, showCustomStatesOnly);
 
-            if (EventsData.ContainsKey(AudioEditorData.Instance.SelectedAudioProjectEvent))
+            if (AudioProjectDataInstance.ContainsKey(SelectedAudioProjectEvent))
 
-                foreach (var statePath in EventsData[AudioEditorData.Instance.SelectedAudioProjectEvent])
+                foreach (var statePath in AudioProjectDataInstance[SelectedAudioProjectEvent])
                     AudioEditorDataGridItems.Add(statePath);
         }
 
-        public static void InitialiseEventsData()
+        public void InitialiseAudioProjectData()
         {
             foreach (var dialogueEvent in AudioProjectDialogueEvents)
             {
@@ -190,7 +201,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 }
 
                 dataGridItems.Add(dataGridItem);
-                EventsData[dialogueEvent] = dataGridItems;
+                AudioProjectDataInstance[dialogueEvent] = dataGridItems;
             }
         }
 
@@ -229,7 +240,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 return;
 
             if (SelectedAudioProjectEvent != null)
-                EventsData[SelectedAudioProjectEvent] = new List<Dictionary<string, object>>(AudioEditorDataGridItems);
+                AudioProjectDataInstance[SelectedAudioProjectEvent] = new List<Dictionary<string, object>>(AudioEditorDataGridItems);
         }
 
         [RelayCommand] public void AddCustomStatesRow()
@@ -255,11 +266,10 @@ namespace Editors.Audio.AudioEditor.ViewModels
             if (dialog.ShowDialog() == true)
             {
                 var filePaths = dialog.FileNames;
-                var eventsData = AudioEditorData.Instance.EventsData;
 
-                if (eventsData.ContainsKey(AudioEditorData.Instance.SelectedAudioProjectEvent))
+                if (AudioProjectDataInstance.ContainsKey(SelectedAudioProjectEventInstance))
                 {
-                    var eventList = eventsData[AudioEditorData.Instance.SelectedAudioProjectEvent];
+                    var eventList = AudioProjectDataInstance[SelectedAudioProjectEventInstance];
 
                     // Find the matching row to insert the AudioFiles data.
                     var matchingRow = eventList.FirstOrDefault(context =>
@@ -281,11 +291,11 @@ namespace Editors.Audio.AudioEditor.ViewModels
             }
         }
 
-        public static void CreateAudioProjectEventsListFromAudioProject(Dictionary<string, List<Dictionary<string, object>>> eventsData)
+        public void CreateAudioProjectEventsListFromAudioProject()
         {
             AudioProjectDialogueEvents.Clear();
 
-            foreach (var dialogueEvent in eventsData.Keys)
+            foreach (var dialogueEvent in AudioProjectDataInstance.Keys)
                 AudioProjectDialogueEvents.Add(dialogueEvent);
         }
 
@@ -293,11 +303,9 @@ namespace Editors.Audio.AudioEditor.ViewModels
         {
             SelectedAudioProjectEvent = "";
             ShowCustomStatesOnly = false;
-
             AudioProjectDialogueEvents.Clear();
             AudioEditorDataGridItems.Clear();
             CustomStatesDataGridItems.Clear();
-            AudioProjectDialogueEvents.Clear();
         }
 
         public bool Save() => true;

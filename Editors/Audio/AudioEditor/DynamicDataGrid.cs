@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -12,12 +10,14 @@ using System.Windows.Data;
 using System.Windows.Media;
 using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
-using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
+using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 
 namespace Editors.Audio.AudioEditor
 {
     public class DynamicDataGrid
     {
+        public static Dictionary<string, List<string>> StateGroupsWithCustomStates => AudioEditorData.Instance.StateGroupsWithCustomStates;
+
         public static DataGrid GetDataGrid()
         {
             var mainWindow = Application.Current.MainWindow;
@@ -93,10 +93,10 @@ namespace Editors.Audio.AudioEditor
 
                 var vanillaStates = audioRepository.StateGroupsWithStates[stateGroup];
 
-                if (AudioEditorData.Instance.StateGroupsWithCustomStates.Count() > 0)
+                if (StateGroupsWithCustomStates.Count() > 0)
                 {
                     if (stateGroup == "VO_Actor" || stateGroup == "VO_Culture" || stateGroup == "VO_Battle_Selection" || stateGroup == "VO_Battle_Special_Ability" || stateGroup == "VO_Faction_Leader")
-                        customStates = AudioEditorData.Instance.StateGroupsWithCustomStates[stateGroup];
+                        customStates = StateGroupsWithCustomStates[stateGroup];
                 }
 
                 if (showCustomStatesOnly && (stateGroup == "VO_Actor" || stateGroup == "VO_Culture" || stateGroup == "VO_Battle_Selection" || stateGroup == "VO_Battle_Special_Ability" || stateGroup == "VO_Faction_Leader"))

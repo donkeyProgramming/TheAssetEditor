@@ -1,17 +1,29 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using Editors.Audio.AudioEditor.ViewModels;
-using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using static Editors.Audio.AudioEditor.DynamicDataGrid;
-using static Editors.Audio.AudioEditor.ViewModels.AudioEditorViewModel;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using static Editors.Audio.AudioEditor.AudioProjectConverter;
 
 namespace Editors.Audio.AudioEditor
 {
-    public static class AudioEditorViewModelHelpers
+    public static class AudioEditorHelpers
     {
+        readonly static ILogger _logger = Logging.Create<AudioEditorViewModel>();
+        public static string AudioProjectFileName => AudioEditorData.Instance.AudioProjectFileNameInstance;
+        public static Dictionary<string, List<Dictionary<string, object>>> AudioProjectData => AudioEditorData.Instance.AudioProjectDataInstance;
         public static Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithQualifiers { get; set; } = [];
+
+        public static void AddAudioProjectToPackFile(PackFileService packFileService)
+        {
+            var audioProjectJson = ConvertToAudioProjectJson(AudioProjectData);
+            var pack = packFileService.GetEditablePack();
+            var byteArray = Encoding.ASCII.GetBytes(audioProjectJson);
+            packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{AudioProjectFileName}.json", new MemorySource(byteArray)));
+            _logger.Here().Information($"Saved Audio Project file: {AudioProjectFileName}.json");
+        }
 
         // Add qualifiers to State Groups so that dictionary keys are unique as some events have the same State Group twice e.g. VO_Actor
         public static void AddQualifiersToStateGroups(Dictionary<string, List<string>> dialogueEventsWithStateGroups)

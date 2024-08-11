@@ -13,10 +13,10 @@ namespace Editors.Audio.AudioEditor
             if (value == null) return value;
 
             if (value is EventType eventType)
-                return EventTypeMappings.TryGetValue(eventType, out var displayString) ? displayString : eventType.ToString();
+                return EventTypeEnumToString.TryGetValue(eventType, out var displayString) ? displayString : eventType.ToString();
 
             if (value is EventSubtype eventSubtype)
-                return EventSubtypeMappings.TryGetValue(eventSubtype, out var displayString) ? displayString : eventSubtype.ToString();
+                return EventSubtypeEnumToString.TryGetValue(eventSubtype, out var displayString) ? displayString : eventSubtype.ToString();
 
             return value.ToString();
         }

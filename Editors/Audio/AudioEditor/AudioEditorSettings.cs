@@ -44,7 +44,7 @@ namespace Editors.Audio.AudioEditor
             Vocalisation
         }
 
-        public static readonly Dictionary<EventType, string> EventTypeMappings = new()
+        public static readonly Dictionary<EventType, string> EventTypeEnumToString = new()
         {
             { EventType.FrontendVO, "Frontend VO" },
             { EventType.CampaignVO, "Campaign VO" },
@@ -55,7 +55,7 @@ namespace Editors.Audio.AudioEditor
             { EventType.NonVO, "Non-VO" }
         };
 
-        public static readonly Dictionary<EventSubtype, string> EventSubtypeMappings = new()
+        public static readonly Dictionary<EventSubtype, string> EventSubtypeEnumToString = new()
         {
             { EventSubtype.Dummy, "Dummy" },
             { EventSubtype.Lord, "Lord" },

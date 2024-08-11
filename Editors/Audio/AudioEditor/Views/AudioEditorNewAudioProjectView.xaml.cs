@@ -3,11 +3,11 @@
 namespace Editors.Audio.AudioEditor.Views
 {
     /// <summary>
-    /// Interaction logic for AudioEditorSettingsView.xaml
+    /// Interaction logic for AudioEditorNewAudioProjectView.xaml
     /// </summary>
-    public partial class AudioEditorSettingsView : UserControl
+    public partial class AudioEditorNewAudioProjectView : UserControl
     {
-        public AudioEditorSettingsView( )
+        public AudioEditorNewAudioProjectView( )
         {
             InitializeComponent();
         }

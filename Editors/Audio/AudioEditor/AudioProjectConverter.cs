@@ -1,24 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
-using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
-using Serilog;
-using Shared.Core.ErrorHandling;
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
+using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 
 namespace Editors.Audio.AudioEditor
 {
-    public class AudioProjectData
+    public class AudioProjectConverter
     {
-        readonly static ILogger _logger = Logging.Create<AudioEditorViewModel>();
-
-        public ProjectSettings Settings { get; set; } = new ProjectSettings();
-        public List<DialogueEventItems> DialogueEvents { get; set; } = [];
-
         public class ProjectSettings
         {
             public string BnkName { get; set; }
@@ -37,33 +27,24 @@ namespace Editors.Audio.AudioEditor
             public List<string> AudioFiles { get; set; } = [];
         }
 
-        public static void AddAudioProjectToPackFile(PackFileService packFileService, Dictionary<string, List<Dictionary<string, object>>> eventsData, string audioProjectName)
-        {
-            var audioProjectJson = ConvertEventsDataToAudioProject(eventsData);
-            var pack = packFileService.GetEditablePack();
-            var byteArray = Encoding.ASCII.GetBytes(audioProjectJson);
-            packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{audioProjectName}.json", new MemorySource(byteArray)));
-            _logger.Here().Information($"Saved Audio Project file: {audioProjectName}");
-        }
-
-        public static string ConvertEventsDataToAudioProject(Dictionary<string, List<Dictionary<string, object>>> eventsData)
+        public static string ConvertToAudioProjectJson(Dictionary<string, List<Dictionary<string, object>>> audioProjectData)
         {
             var audioProject = new Dictionary<string, object>();
 
             var settings = new Dictionary<string, object>
             {
-                ["BnkName"] = "battle_vo_conversational__ovn_vo_actor_Albion_Dural_Durak", // PLACEHOLDER NAME, NEED TO FINISH
-                ["Language"] = "english(uk)"
+                ["BnkName"] = "PLACEHOLDER", 
+                ["Language"] = "PLACEHOLDER"
             };
 
             audioProject["Settings"] = settings;
 
             var dialogueEvents = new List<object>();
 
-            foreach (var eventData in eventsData)
+            foreach (var audioProjectItem in audioProjectData)
             {
-                var dialogueEventName = eventData.Key;
-                var eventDataItems = eventData.Value;
+                var dialogueEventName = audioProjectItem.Key;
+                var eventDataItems = audioProjectItem.Value;
                 var decisionTree = new List<object>();
 
                 foreach (var eventDataItem in eventDataItems)
@@ -104,9 +85,9 @@ namespace Editors.Audio.AudioEditor
             return JsonSerializer.Serialize(audioProject, options);
         }
 
-        public static Dictionary<string, List<Dictionary<string, object>>> ConvertAudioProjectToEventsData(IAudioRepository audioRepository, string audioProjectJson)
+        public static Dictionary<string, List<Dictionary<string, object>>> ConvertFromAudioProjectJson(IAudioRepository audioRepository, string audioProjectJson)
         {
-            var eventsData = new Dictionary<string, List<Dictionary<string, object>>>();
+            var audioProjectData = new Dictionary<string, List<Dictionary<string, object>>>();
 
             using (var audioProject = JsonDocument.Parse(audioProjectJson))
             {
@@ -131,6 +112,7 @@ namespace Editors.Audio.AudioEditor
                     };
 
                     var decisionTreeElement = dialogueEventElement.GetProperty("DecisionTree");
+
                     foreach (var decisionTreeItemElement in decisionTreeElement.EnumerateArray())
                     {
                         var audioFilesElement = decisionTreeItemElement.GetProperty("AudioFiles");
@@ -138,9 +120,9 @@ namespace Editors.Audio.AudioEditor
                         var decisionTreeItem = new DecisionTreeItems
                         {
                             StatePath = decisionTreeItemElement.GetProperty("StatePath").GetString(),
-                            AudioFiles = audioFilesElement.EnumerateArray()
-                            .Select(file => file.GetString())
-                            .ToList()
+                            AudioFiles = audioFilesElement.ValueKind == JsonValueKind.Array
+                                ? audioFilesElement.EnumerateArray().Select(file => file.GetString()).ToList()
+                                : [audioFilesElement.GetString()] // Handle case where no files are provided.
                         };
 
                         dialogueEvent.DecisionTree.Add(decisionTreeItem);
@@ -159,11 +141,11 @@ namespace Editors.Audio.AudioEditor
                         var eventDataItem = new Dictionary<string, object>();
 
                         var states = decisionTree.StatePath.Split('.');
-                        var stateGroups = AudioEditorViewModelHelpers.DialogueEventsWithStateGroupsWithQualifiers.GetValueOrDefault(dialogueEvent.DialogueEvent, new List<string>());
+                        var stateGroups = DialogueEventsWithStateGroupsWithQualifiers.GetValueOrDefault(dialogueEvent.DialogueEvent, new List<string>());
 
                         for (var i = 0; i < states.Length && i < stateGroups.Count; i++)
                         {
-                            var stateGroup = AudioEditorViewModelHelpers.AddExtraUnderScoresToString(stateGroups[i]);
+                            var stateGroup = AddExtraUnderScoresToString(stateGroups[i]);
                             var state = states[i];
                             eventDataItem[stateGroup] = state;
                         }
@@ -176,11 +158,11 @@ namespace Editors.Audio.AudioEditor
                         eventDataItems.Add(eventDataItem);
                     }
 
-                    eventsData[eventKey] = eventDataItems;
+                    audioProjectData[eventKey] = eventDataItems;
                 }
             }
 
-            return eventsData;
+            return audioProjectData;
         }
     }
 }
