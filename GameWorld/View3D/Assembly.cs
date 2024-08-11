@@ -1,2 +1,2 @@
 ﻿using System.Runtime.CompilerServices;
-[assembly: InternalsVisibleTo("E2EVerification")]
+[assembly: InternalsVisibleTo("GameWorld.Core.Test")]

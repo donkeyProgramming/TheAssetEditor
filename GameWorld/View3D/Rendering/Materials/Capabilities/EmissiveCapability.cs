@@ -1,9 +1,7 @@
 ﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
-using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
@@ -66,10 +64,10 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             };
         }
 
-        public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
         {
-            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, Emissive);
-            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, EmissiveDistortion);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Emissive);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, EmissiveDistortion);
 
             for (var i = 0; i < 4; i++)
             {
@@ -80,16 +78,6 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             EmissiveStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_strength", 1);
             EmissiveTint = CapabilityHelper.GetParameterVector3(wsModelMaterial, "emissive_tint", Vector3.Zero);
             EmissiveFresnelStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_fresnel_strength", 1);
-        }
-
-        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
-        {
-       
-        }
-
-        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
-        {
-      
         }
     }
 }

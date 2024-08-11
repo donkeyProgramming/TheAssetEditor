@@ -1,10 +1,8 @@
-﻿using System.Data.SqlTypes;
-using System.Text;
+﻿using System.Text;
 using System.Xml;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
-using SharpDX.Direct3D9;
 
 namespace Shared.GameFormats.WsModel
 {
@@ -34,6 +32,8 @@ namespace Shared.GameFormats.WsModel
         }
 
         public WsModelMaterialFile(string fileContent) => LoadContent(fileContent);
+
+        public WsModelMaterialFile() { }
 
         void LoadContent(string fileContent)
         {

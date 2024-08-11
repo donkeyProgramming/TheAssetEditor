@@ -44,25 +44,15 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             };
         }
 
-        public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
         {
-            UseAlpha = model.Material.AlphaMode == AlphaMode.Transparent;
+            UseAlpha = rmvMaterial.AlphaMode == AlphaMode.Transparent;
 
-            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, SpecularMap);
-            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, GlossMap);
-            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, DiffuseMap);
-            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, NormalMap);
-            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, Mask);
-        }
-
-        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
-        {
- 
-        }
-
-        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
-        {
-
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, SpecularMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, GlossMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, DiffuseMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, NormalMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Mask);
         }
     }
 }

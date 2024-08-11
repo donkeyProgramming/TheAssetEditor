@@ -14,7 +14,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
         {
             Type = type;
             UseTexture = false;
-            TexturePath = null;
+            TexturePath = string.Empty;
         }
 
         public TextureInput Clone()

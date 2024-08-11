@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.WpfWindow.ResourceHandling;
-using Shared.Core.PackFiles;
 using Shared.Core.Services;
-using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials
@@ -12,32 +11,32 @@ namespace GameWorld.Core.Rendering.Materials
     public class CapabilityMaterialFactory
     {
         private readonly ApplicationSettingsService _applicationSettingsService;
-        private readonly PackFileService _packFileService;
         private readonly ResourceLibrary _resourceLibrary;
 
-        public CapabilityMaterialFactory(ApplicationSettingsService applicationSettingsService, PackFileService packFileService, ResourceLibrary resourceLibrary)
+        public CapabilityMaterialFactory(ApplicationSettingsService applicationSettingsService, ResourceLibrary resourceLibrary)
         {
             _applicationSettingsService = applicationSettingsService;
-            _packFileService = packFileService;
             _resourceLibrary = resourceLibrary;
         }
 
-        public CapabilityMaterial Create(RmvModel model, string? wsModelMaterialPath)
+        public CapabilityMaterial Create(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial = null)
         {
-            var preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Default;
-            WsModelMaterialFile? wsModelMaterial = null;
-            if (wsModelMaterialPath != null)
+            var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
+            var preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_Default;
+
+            if (currentGame == GameTypeEnum.Warhammer3 || currentGame == GameTypeEnum.ThreeKingdoms)
             {
-                var materialPackFile = _packFileService.FindFile(wsModelMaterialPath);
-                wsModelMaterial = new WsModelMaterialFile(materialPackFile);
-
-                if (wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
-                    preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
+                preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Default;
+                if (wsModelMaterial != null)
+                {
+                    if (wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
+                        preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
+                }
             }
-
+            
             var material = CreateMaterial(preferredMaterial);
             foreach (var capability in material.Capabilities)
-                capability.Initialize(wsModelMaterial, model);
+                capability.Initialize(wsModelMaterial, rmvMaterial);
 
             return material;
         }
@@ -60,9 +59,6 @@ namespace GameWorld.Core.Rendering.Materials
         {
             throw new NotImplementedException();
         }
-
-
-
     }
 }
 

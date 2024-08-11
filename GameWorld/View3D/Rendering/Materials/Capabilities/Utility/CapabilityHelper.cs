@@ -3,13 +3,14 @@ using System.Linq;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 {
     public static class CapabilityHelper
     {
-        public static void SetTextureFromModel(RmvModel model, WsModelMaterialFile? wsModelMaterial, TextureInput textureInput)
+        public static void SetTextureFromModel(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial, TextureInput textureInput)
         {
             if (wsModelMaterial != null)
             {
@@ -23,7 +24,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             }
 
             var textureType = textureInput.Type;
-            var modelTexture = model.Material.GetTexture(textureType);
+            var modelTexture = rmvMaterial.GetTexture(textureType);
             if (modelTexture != null)
             {
                 textureInput.TexturePath = modelTexture.Value.Path;

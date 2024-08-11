@@ -26,11 +26,7 @@ namespace GameWorld.Core.SceneNodes
 
         public void CreateModelNodesFromFile(Rmv2ModelNode outputNode, RmvFile model, AnimationPlayer animationPlayer, string modelFullPath)
         {
-            var wsModelPath = Path.ChangeExtension(modelFullPath, ".wsmodel");
-            var wsModelPackFile = _packFileService.FindFile(wsModelPath);
-            WsModelFile? wsModelFile = null;
-            if (wsModelPackFile != null)
-                wsModelFile = new WsModelFile(wsModelPackFile);
+            var wsMaterialProvider = WsModelMaterialProvider.CreateFromModelPath(_packFileService, modelFullPath);
 
             outputNode.Model = model;
             for (var lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
@@ -44,8 +40,9 @@ namespace GameWorld.Core.SceneNodes
                     var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, _contextFactory.Create());
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
 
-                    var wsModelMaterial = wsModelFile?.MaterialList.FirstOrDefault(x => x.LodIndex == lodIndex && x.PartIndex == modelIndex);
-                    var shader = _capabilityMaterialFactory.Create(rmvModel, wsModelMaterial?.MaterialPath);
+
+                    var wsModelMaterial = wsMaterialProvider.GetModelMaterial(lodIndex, modelIndex); 
+                    var shader = _capabilityMaterialFactory.Create(rmvModel.Material, wsModelMaterial);
 
                     // This if statement is for Pharaoh Total War, the base game models do not have a model name by default so I am grabbing it
                     // from the model file path.

@@ -3,7 +3,6 @@ using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
@@ -36,14 +35,9 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             };
         }
 
-        public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
         {
-            CapabilityHelper.SetTextureFromModel(model, wsModelMaterial, BloodMask);
-        }
-
-        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
-        {
-           
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, BloodMask);
         }
 
         public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)

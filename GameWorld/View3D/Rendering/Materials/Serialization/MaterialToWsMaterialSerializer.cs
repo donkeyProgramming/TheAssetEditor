@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Net.WebSockets;
 using System.Text;
 using GameWorld.Core.Rendering.Materials.Shaders;
-using Octokit;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 
@@ -11,18 +13,20 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
     public class MaterialToWsMaterialFactory
     {
         private readonly PackFileService _packFileServic;
+        private readonly IPackFileSaveService _fileSaveService;
 
-        public MaterialToWsMaterialFactory(PackFileService packFileServic)
+        public MaterialToWsMaterialFactory(PackFileService packFileServic, IPackFileSaveService fileSaveService)
         {
             _packFileServic = packFileServic;
+            _fileSaveService = fileSaveService;
         }
 
         public IMaterialToWsMaterialSerializer CreateInstance(GameTypeEnum preferedGameHint)
         {
             var repository = new WsMaterialRepository(_packFileServic);
-            var instance = new MaterialToWsMaterialSerializer(_packFileServic, repository, preferedGameHint);
+            var instance = new MaterialToWsMaterialSerializer(_fileSaveService, repository, preferedGameHint);
             return instance;
-        } 
+        }
     }
 
     public interface IMaterialToWsMaterialSerializer
@@ -33,13 +37,13 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
     class MaterialToWsMaterialSerializer : IMaterialToWsMaterialSerializer
     {
         private readonly GameTypeEnum _preferedGameHint;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileSaveService _fileSaveService;
         private readonly IWsMaterialRepository _repository;
 
-        public MaterialToWsMaterialSerializer(PackFileService packFileService, IWsMaterialRepository wsMaterialRepository, GameTypeEnum preferedGameHint)
+        public MaterialToWsMaterialSerializer(IPackFileSaveService fileSaveService, IWsMaterialRepository wsMaterialRepository, GameTypeEnum preferedGameHint)
         {
             _repository = wsMaterialRepository;
-            _packFileService = packFileService;
+            _fileSaveService = fileSaveService;
             _preferedGameHint = preferedGameHint;
         }
 
@@ -58,13 +62,12 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             var newMaterialPath = Path.GetDirectoryName(modelFilePath) + "/materials/" + fileName;
             var materialPath = _repository.GetExistingOrAddMaterial(fileContent, newMaterialPath, out var isNew);
             if (isNew)
-            {
-                var existingMaterialPackFile = _packFileService.FindFile(newMaterialPath, _packFileService.GetEditablePack());
-                SaveHelper.Save(_packFileService, newMaterialPath, existingMaterialPackFile, Encoding.UTF8.GetBytes(fileContent));
-            }
+                _fileSaveService.SaveFileWithoutPrompt(newMaterialPath, Encoding.UTF8.GetBytes(fileContent));
 
             return materialPath;
         }
 
     }
 }
+
+

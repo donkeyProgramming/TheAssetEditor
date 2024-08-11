@@ -1,10 +1,6 @@
-﻿using GameWorld.Core.Rendering.Materials.Serialization;
-using GameWorld.WpfWindow.ResourceHandling;
+﻿using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.RigidModel.MaterialHeaders;
-using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
@@ -22,8 +18,6 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             effect.Parameters["Animation_Tranforms"].SetValue(AnimationTransforms);
         }
 
-
-
         public ICapability Clone()
         {
             return new AnimationCapability()
@@ -34,10 +28,5 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                 AnimationWeightCount = AnimationWeightCount,
             };
         }
-
-        public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model) { }
-        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler) { }
-        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial) { }
-
     }
 }

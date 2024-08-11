@@ -9,9 +9,9 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel LastChildFill="False">
         <wsmodelmaterial:WsModelMaterialView DockPanel.Dock="Top" DataContext="{Binding WsMaterial}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
+        <local:MaterialGeneralView DockPanel.Dock="Top"  Visibility="{Binding MaterialGeneral, Converter={StaticResource NullToVisibilityConverter}}" />
         <local:MeshView DockPanel.Dock="Top"/>
         <local:AnimationView DockPanel.Dock="Top"/>
-        <local:MaterialGeneralView DockPanel.Dock="Top"  Visibility="{Binding MaterialGeneral, Converter={StaticResource NullToVisibilityConverter}}" />
         <local:WeightedMaterialView DockPanel.Dock="Top" Visibility="{Binding Material, Converter={StaticResource NullToVisibilityConverter}}"/>
     </DockPanel>
 </UserControl>

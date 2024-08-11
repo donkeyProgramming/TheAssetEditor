@@ -114,11 +114,12 @@ namespace GameWorld.Core.Services.SceneSaving.Material
             for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
             {
                 var meshes = node.GetMeshesInLod(lodIndex, false);
-                var meshIndex = 0;
-                var rows = meshes
-                    .Select(x => new WsModelGeneratorInput(lodIndex, meshIndex++, meshes[meshIndex].Name, meshes[meshIndex].Geometry.VertexFormat, meshes[meshIndex].Effect))
-                    .ToList();
-                output.AddRange(rows);
+
+                for (var meshPart = 0; meshPart < meshes.Count; meshPart++)
+                {
+                    var instance = new WsModelGeneratorInput(lodIndex, meshPart, meshes[meshPart].Name, meshes[meshPart].Geometry.VertexFormat, meshes[meshPart].Effect);
+                    output.Add(instance);
+                }
             }
 
             return output;
@@ -131,5 +132,4 @@ namespace GameWorld.Core.Services.SceneSaving.Material
         string MeshName,
         UiVertexFormat MeshVertexFormat,
         CapabilityMaterial Material);
-
 }

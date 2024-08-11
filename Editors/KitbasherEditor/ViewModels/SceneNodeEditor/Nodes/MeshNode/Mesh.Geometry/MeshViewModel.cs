@@ -44,7 +44,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
       
             VertexCount = _meshNode.Geometry.VertexCount();
             IndexCount = _meshNode.Geometry.GetIndexCount();
-    
+
+            VertexType = _meshNode.Geometry.VertexFormat;
             ReduceMeshOnLodGeneration = _meshNode.ReduceMeshOnLodGeneration;
         }
 
