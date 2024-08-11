@@ -161,10 +161,10 @@ namespace Editors.Audio.AudioEditor.ViewModels
             // Load the custom States so that they can be referenced when the Event is loaded.
             //PrepareCustomStatesForComboBox(this);
 
-            CloseWindow();
+            CloseWindowAction();
         }
 
-        [RelayCommand] public void CloseWindow()
+        [RelayCommand] public void CloseWindowAction()
         {
             _closeAction?.Invoke();
 

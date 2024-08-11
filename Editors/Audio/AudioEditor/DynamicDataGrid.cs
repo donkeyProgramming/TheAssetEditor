@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
+using Editors.Audio.Utility;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 
 namespace Editors.Audio.AudioEditor
@@ -17,6 +18,13 @@ namespace Editors.Audio.AudioEditor
     public class DynamicDataGrid
     {
         public static Dictionary<string, List<string>> StateGroupsWithCustomStates => AudioEditorData.Instance.StateGroupsWithCustomStates;
+        private readonly AudioEditorViewModel _audioEditorViewModel;
+
+        public DynamicDataGrid(AudioEditorViewModel audioEditorViewModel)
+        {
+            _audioEditorViewModel = audioEditorViewModel;
+        }
+
 
         public static DataGrid GetDataGrid()
         {
@@ -273,13 +281,22 @@ namespace Editors.Audio.AudioEditor
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(Button));
-            factory.SetValue(ContentControl.ContentProperty, "Play");
-            factory.SetValue(FrameworkElement.ToolTipProperty, "Play a sound at random, to simulate the Dialogue Event being triggered in game.");
+            factory.SetValue(ContentControl.ContentProperty, "Play Audio");
+            factory.SetValue(FrameworkElement.ToolTipProperty, "Play an audio file at random to simulate the Dialogue Event being triggered in game.");
 
             // Handle button click event
             factory.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler((sender, e) =>
             {
-                //Do something
+                var button = sender as Button;
+                var dataGridRow = FindVisualParent<DataGridRow>(button);
+
+                if (dataGridRow != null)
+                {
+                    var rowDataContext = dataGridRow.DataContext;
+
+                    if (rowDataContext is Dictionary<string, object> dataGridRowContext)
+                        SoundPlayer.PlaySound(dataGridRowContext);
+                }
             }));
 
             template.VisualTree = factory;

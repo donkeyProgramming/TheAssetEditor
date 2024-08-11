@@ -123,7 +123,7 @@
             </TreeView>
         </DockPanel>
         <DockPanel Grid.Row="1" Grid.Column="3" LastChildFill="True">
-            <Button DockPanel.Dock="Bottom" Content="Play Sound" Height="20" Margin="5" Click="{s:MethodBinding PlaySelectedSoundAction}" IsEnabled="{Binding IsPlaySoundButtonEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <Button DockPanel.Dock="Bottom" Content="Play Audio" Height="20" Margin="5" Click="{s:MethodBinding PlaySelectedSoundAction}" IsEnabled="{Binding IsPlaySoundButtonEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             <ScrollViewer>
                 <TextBox  DockPanel.Dock="Top" IsReadOnly="True" Text="{Binding SelectedNodeText.Value, UpdateSourceTrigger=PropertyChanged}" />
             </ScrollViewer>

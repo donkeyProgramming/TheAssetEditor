@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -7,9 +8,9 @@ using System.Windows;
 using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.Views;
 using Editors.Audio.Storage;
+using Editors.Audio.Utility;
 using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -19,8 +20,8 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
-using static Editors.Audio.AudioEditor.DynamicDataGrid;
 using static Editors.Audio.AudioEditor.AudioProjectConverter;
+using static Editors.Audio.AudioEditor.DynamicDataGrid;
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
@@ -38,6 +39,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         private readonly IAudioRepository _audioRepository;
         private readonly PackFileService _packFileService;
         private readonly IWindowFactory _windowFactory;
+        private readonly SoundPlayer _soundPlayer;
         readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
@@ -56,11 +58,12 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         public static Dictionary<string, List<Dictionary<string, object>>> AudioProjectDataInstance => AudioEditorData.Instance.AudioProjectDataInstance;
 
-        public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService, IWindowFactory windowFactory)
+        public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService, IWindowFactory windowFactory, SoundPlayer soundPlayer)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;
             _windowFactory = windowFactory;
+            _soundPlayer = soundPlayer;
         }
 
         partial void OnSelectedAudioProjectEventChanged(string value)

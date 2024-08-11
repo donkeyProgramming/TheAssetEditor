@@ -11,7 +11,7 @@ namespace Editors.Audio.Utility
 {
     public class VgStreamWrapper
     {
-        ILogger _logger = Logging.Create<VgStreamWrapper>();
+        readonly ILogger _logger = Logging.Create<VgStreamWrapper>();
 
         string VgStreamFolderName => $"{DirectoryHelper.Temp}\\VgStream";
         string AudioFolderName => $"{DirectoryHelper.Temp}\\Audio";

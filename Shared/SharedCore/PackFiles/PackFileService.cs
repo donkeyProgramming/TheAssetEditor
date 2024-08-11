@@ -359,7 +359,6 @@ namespace Shared.Core.PackFiles
             return newPackFile;
         }
 
-
         public void AddFileToPack(PackFileContainer container, string directoryPath, PackFile newFile)
         {
             if (container.IsCaPackFile)
