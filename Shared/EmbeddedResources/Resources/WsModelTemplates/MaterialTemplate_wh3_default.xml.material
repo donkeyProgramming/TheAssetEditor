@@ -1,4 +1,4 @@
-?<material>
+<material>
   <name>TEMPLATE_ATTR_FILE_NAME</name>
   <shader>shaders/TEMPLATE_ATTR_VERTEXTYPE_characterTEMPLATE_ATTR_ALPHAMODE.xml.shader</shader>
   <sort_override>255</sort_override>

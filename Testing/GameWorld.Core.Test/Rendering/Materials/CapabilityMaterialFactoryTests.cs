@@ -62,7 +62,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
 
             var appSettings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
             var abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
-            var material = abstractMaterialFactory.Create(rmvMaterial, wsMaterial);
+            var material = abstractMaterialFactory.Create(null, wsMaterial);
 
             Assert.That(material, Is.TypeOf<Core.Rendering.Materials.Shaders.MetalRough.DefaultMaterial>());
 
@@ -133,7 +133,6 @@ namespace GameWorld.Core.Test.Rendering.Materials
         }
     }
 
-
     public static class IRmvMaterialExtentions
     {
         public static IRmvMaterial AssignMaterials(this IRmvMaterial material, TextureType[] texturesToAssign)
@@ -159,29 +158,6 @@ namespace GameWorld.Core.Test.Rendering.Materials
             return rmvMaterial;
         }
 
-
-    }
-
-
-    public static class FileHelper
-    {
-        public static byte[] GetBytes(string path)
-        {
-            var fullPath = PathHelper.FileInDataFolder(path);   
-            var bytes = File.ReadAllBytes(fullPath);
-            return bytes; ;
-        }
-    }
-
-    public static class PathHelper
-    {
-        public static string FileInDataFolder(string fileName)
-        {
-            var fullPath = Path.GetFullPath(@"..\..\..\..\..\Data\" + fileName);
-            if (File.Exists(fullPath) == false)
-                throw new Exception($"Unable to find data file {fileName}");
-            return fullPath;
-        }
 
     }
 }

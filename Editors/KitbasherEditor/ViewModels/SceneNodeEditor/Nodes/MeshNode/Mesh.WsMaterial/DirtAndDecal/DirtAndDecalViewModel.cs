@@ -8,10 +8,10 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
 {
     public partial class DirtAndDecalViewModel : ObservableObject
     {
-        private readonly DecalAndDirtCapability _capability;
+        private readonly DirtAndDecalCapability _capability;
 
 
-        public DirtAndDecalViewModel(DecalAndDirtCapability capability, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
+        public DirtAndDecalViewModel(DirtAndDecalCapability capability, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
         {
             _capability = capability;
 

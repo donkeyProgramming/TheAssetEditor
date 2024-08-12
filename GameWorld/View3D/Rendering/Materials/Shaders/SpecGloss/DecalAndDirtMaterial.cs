@@ -14,7 +14,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.SpecGloss
                 new CommonShaderParametersCapability(),
                 new SpecGlossCapability(),
                 new AnimationCapability(),
-                new DecalAndDirtCapability(),
+                new DirtAndDecalCapability(),
             ];
 
             _renderingTechniqueMap[RenderingTechnique.Normal] = "BasicColorDrawing";

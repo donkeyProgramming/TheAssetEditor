@@ -1,12 +1,10 @@
 ﻿using System.IO;
-using System.Linq;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Services;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.SceneNodes
 {

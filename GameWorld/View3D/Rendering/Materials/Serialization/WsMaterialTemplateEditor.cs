@@ -22,7 +22,6 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         private readonly string _templateName;
         private string _templateBuffer;
         
-
         public WsMaterialTemplateEditor(CapabilityMaterial material, GameTypeEnum preferedGameHint = GameTypeEnum.Unknown)
         {
             _preferedGameHint = preferedGameHint;
@@ -129,6 +128,4 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         }
 
     }
-
-
 }

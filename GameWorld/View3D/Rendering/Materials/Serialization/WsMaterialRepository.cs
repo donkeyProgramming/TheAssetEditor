@@ -19,6 +19,8 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             _map = LoadAllExistingMaterials(packFileService);
         }
 
+        public int ExistingMaterialsCount() => _map.Count;
+
         public string GetExistingOrAddMaterial(string wsMaterialContent, string wsMaterialPath, out bool isNew)
         {
             var sanitizedWsMaterial = SanatizeMaterial(wsMaterialContent);
@@ -35,9 +37,9 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
         string SanatizeMaterial(string wsMaterialContent)
         {
-            var start = wsMaterialContent.IndexOf("<name>");
-            var end = wsMaterialContent.IndexOf("</name>", start);
-            var contentWithoutName = wsMaterialContent.Remove(start, end).ToLower();
+            var start = wsMaterialContent.IndexOf("<name>", System.StringComparison.InvariantCultureIgnoreCase);
+            var end = wsMaterialContent.IndexOf("</name>", start, System.StringComparison.InvariantCultureIgnoreCase);
+            var contentWithoutName = wsMaterialContent.Remove(start, end - start + "</name>".Length).ToLower();
 
             return contentWithoutName;
         }
@@ -54,7 +56,6 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
                 var bytes = pack.DataSource.ReadData();
                 var content = Encoding.UTF8.GetString(bytes);
                 var sanitizedWsMaterial = SanatizeMaterial(content);
-
 
                 materialList[sanitizedWsMaterial] = fileName;
             }

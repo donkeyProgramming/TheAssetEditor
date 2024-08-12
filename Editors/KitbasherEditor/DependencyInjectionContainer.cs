@@ -75,7 +75,6 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<WindowKeyboard>();
             serviceCollection.AddScoped<KitbashViewDropHandler>();
             serviceCollection.AddScoped<KitbasherRootScene>();
-            serviceCollection.AddScoped<IActiveFileResolver, KitbasherRootScene>(x => x.GetRequiredService<KitbasherRootScene>());
 
             // Event handlers
             serviceCollection.AddScoped<SkeletonChangedHandler>();

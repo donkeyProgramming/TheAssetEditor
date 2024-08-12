@@ -10,7 +10,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 {
     public static class CapabilityHelper
     {
-        public static void SetTextureFromModel(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial, TextureInput textureInput)
+        public static void SetTextureFromModel(IRmvMaterial? rmvMaterial, WsModelMaterialFile? wsModelMaterial, TextureInput textureInput)
         {
             if (wsModelMaterial != null)
             {
@@ -23,13 +23,24 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
                 }
             }
 
-            var textureType = textureInput.Type;
-            var modelTexture = rmvMaterial.GetTexture(textureType);
-            if (modelTexture != null)
+            if (rmvMaterial != null)
             {
-                textureInput.TexturePath = modelTexture.Value.Path;
-                textureInput.UseTexture = true;
+                var textureType = textureInput.Type;
+                var modelTexture = rmvMaterial.GetTexture(textureType);
+                if (modelTexture != null)
+                {
+                    textureInput.TexturePath = modelTexture.Value.Path;
+                    textureInput.UseTexture = true;
+                }
             }
+        }
+
+        public static bool UseAlpha(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial)
+        {
+            if (wsModelMaterial != null)
+                return wsModelMaterial.Alpha;
+
+            return rmvMaterial.AlphaMode == AlphaMode.Transparent;
         }
 
         public static float GetParameterFloat(WsModelMaterialFile? wsModelMaterial, string parameterName, float defaultValue)

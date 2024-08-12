@@ -49,7 +49,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
         {
-            UseAlpha = rmvMaterial.AlphaMode == AlphaMode.Transparent;
+            UseAlpha = CapabilityHelper.UseAlpha(rmvMaterial, wsModelMaterial);
 
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, BaseColour);
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, MaterialMap);

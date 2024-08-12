@@ -55,7 +55,6 @@ namespace GameWorld.Core.Services.SceneSaving
                 model.LodHeaders[i].QualityLvl = settings.LodSettingsPerLod[i].QualityLvl;
             }
 
-
             UpdateRmv2MaterialFromShader(mainNode);
             _lodStrategyProvider.GetStrategy(settings.LodGenerationMethod).Generate(mainNode, settings.LodSettingsPerLod);
             _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, settings);

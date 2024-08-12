@@ -8,7 +8,7 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
-    public class DecalAndDirtCapability : ICapability
+    public class DirtAndDecalCapability : ICapability
     {
         public bool UseDirt { get; set; } = false;
         public bool UseDecal { get; set; } = false;
@@ -25,7 +25,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public ICapability Clone()
         {
-            return new DecalAndDirtCapability()
+            return new DirtAndDecalCapability()
             {
                 UseDirt = UseDirt,
                 UseDecal = UseDecal,
