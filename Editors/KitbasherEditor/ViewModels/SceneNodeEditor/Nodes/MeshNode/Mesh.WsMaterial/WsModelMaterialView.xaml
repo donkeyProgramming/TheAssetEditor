@@ -27,19 +27,6 @@
         </Expander.Header>
 
         <DockPanel LastChildFill="False">
-            <DockPanel DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="   WsModel source"/>
-                <Label>:</Label>
-                <Button Content="Refresh" Margin="1" DockPanel.Dock="Right" Width="50"/>
-                <TextBox Margin="2,2,2,2" Text="variantMeshes/hu01/karl/karl.wsmodel" VerticalContentAlignment="Center" IsEnabled="False"/>
-            </DockPanel>
-
-            <DockPanel DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="   Original Shader"/>
-                <Label>:</Label>
-                <Button Content="Preview" Margin="1"  DockPanel.Dock="Right" Width="50"/>
-                <TextBox Margin="2,2,2,2" Text="shaders/weighted4_character_emissive_ghost_alpha.xml.shader" VerticalContentAlignment="Center" IsEnabled="False"/>
-            </DockPanel>
 
             <DockPanel DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="   Selected Shader"/>

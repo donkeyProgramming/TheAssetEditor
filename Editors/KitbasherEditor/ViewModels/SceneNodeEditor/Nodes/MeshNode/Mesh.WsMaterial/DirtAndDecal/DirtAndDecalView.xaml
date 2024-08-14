@@ -28,7 +28,7 @@
 
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal DirtMap" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal DirtMap*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
                 </DockPanel>
@@ -36,33 +36,33 @@
 
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal DirtMask" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal DirtMask*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
                 </DockPanel>
 
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Mask" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Mask*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Uv Scale" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Uv Scale*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <mathviews1:Vector2View DataContext="{Binding BloodUvScale}" />
                 </DockPanel>
 
 
                 <DockPanel DockPanel.Dock="Top" Margin="0,10,0,0">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Preveiw Colour" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Preveiw Colour*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Preveiw Normal" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Preveiw Normal*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
                 </DockPanel>
