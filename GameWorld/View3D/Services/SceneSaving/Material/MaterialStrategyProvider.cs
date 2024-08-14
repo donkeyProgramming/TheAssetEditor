@@ -5,7 +5,6 @@ namespace GameWorld.Core.Services.SceneSaving.Material
 {
     public class MaterialStrategyProvider
     {
-
         private readonly IEnumerable<IMaterialStrategy> _materialStrategies;
 
         public MaterialStrategyProvider(IEnumerable<IMaterialStrategy> materialStrategies)
@@ -16,12 +15,11 @@ namespace GameWorld.Core.Services.SceneSaving.Material
         public List<MaterialStrategyInformation> GetStrategies()
         {
             var output = _materialStrategies
-                .Select(x => new MaterialStrategyInformation(x.StrategyId, x.Description, x.Name, x.IsAvailable))
+                .Select(x => new MaterialStrategyInformation(x.StrategyId, x.Description, x.Name))
                 .ToList();
 
             return output;
         }
-
 
         public IMaterialStrategy GetStrategy(MaterialStrategy strategy)
         {
@@ -29,5 +27,5 @@ namespace GameWorld.Core.Services.SceneSaving.Material
         }
     }
 
-    public record MaterialStrategyInformation(MaterialStrategy StrategyId, string Description, string Name, bool IsAvailable);
+    public record MaterialStrategyInformation(MaterialStrategy StrategyId, string Description, string Name);
 }

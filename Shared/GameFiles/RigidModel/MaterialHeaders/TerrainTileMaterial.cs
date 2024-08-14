@@ -5,7 +5,7 @@ using Shared.GameFormats.RigidModel.Types;
 
 namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
-    public class TerrainTileMaterial : IMaterial
+    public class TerrainTileMaterial : IRmvMaterial
     {
         public VertexFormat BinaryVertexFormat { get; set; }
         public Vector3 PivotPoint { get; set; } = Vector3.Zero;
@@ -24,7 +24,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         uint Unknown5 { get; set; }
 
 
-        public IMaterial Clone()
+        public IRmvMaterial Clone()
         {
             return new TerrainTileMaterial()
             {
@@ -75,7 +75,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
     public class TerrainTileMaterialCreator : IMaterialCreator
     {
-        public IMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] buffer, int offset)
+        public IRmvMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] buffer, int offset)
         {
             var header = ByteHelper.ByteArrayToStructure<TerrainTileStruct>(buffer, offset);
             return new TerrainTileMaterial()
@@ -85,12 +85,12 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             };
         }
 
-        public IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, VertexFormat vertexFormat)
         {
             return new TerrainTileMaterial();
         }
 
-        public byte[] Save(IMaterial material)
+        public byte[] Save(IRmvMaterial material)
         {
             throw new NotImplementedException();
         }

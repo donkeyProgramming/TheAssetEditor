@@ -44,22 +44,17 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/LineShader.fx
 
-#begin Shaders/Phazer/MetalRoughness_main.fx
+#begin Shaders/Pbr/MetalRoughness/MetalRoughness_main.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
-/build:Shaders/Phazer/MetalRoughness_main.fx
+/build:Shaders/Pbr/MetalRoughness/MetalRoughness_main.fx
 
-#begin Shaders/Phazer/SpecGloss_main.fx
+#begin Shaders/Pbr/SpecGloss/SpecGloss_main.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
-/build:Shaders/Phazer/SpecGloss_main.fx
-
-#begin Shaders/Phazer/tone_mapping.fx
-/importer:EffectImporter
-/processor:PassThroughProcessor
-/build:Shaders/Phazer/tone_mapping.fx
+/build:Shaders/Pbr/SpecGloss/SpecGloss_main.fx
 
 #begin Shaders/TexturePreview.fx
 /importer:EffectImporter

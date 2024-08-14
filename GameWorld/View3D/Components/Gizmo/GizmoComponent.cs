@@ -5,7 +5,7 @@ using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
-using GameWorld.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Shared.Core.Events;
@@ -52,7 +52,7 @@ namespace GameWorld.Core.Components.Gizmo
 
         public override void Initialize()
         {
-            _gizmo = new Gizmo(_camera, _mouse, _deviceResolverComponent.Device, _resourceLibary.CreateSpriteBatch(), _resourceLibary.DefaultFont);
+            _gizmo = new Gizmo(_camera, _mouse, _deviceResolverComponent.Device, _resourceLibary.CommonSpriteBatch, _resourceLibary.DefaultFont);
             _gizmo.ActivePivot = PivotType.ObjectCenter;
             _gizmo.TranslateEvent += GizmoTranslateEvent;
             _gizmo.RotateEvent += GizmoRotateEvent;

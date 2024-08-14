@@ -3,7 +3,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using System.Windows.Input;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     internal class SelectGizmoModeCommand : IKitbasherUiCommand
     {
@@ -51,7 +51,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
             _gizmoComponent.SetGizmoMode(GizmoMode.Translate);
         }
 
-     
+
     }
 
     internal class RotateGizmoModeCommand : IKitbasherUiCommand
@@ -77,7 +77,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
             _gizmoComponent.SetGizmoMode(GizmoMode.Rotate);
         }
 
-      
+
     }
 
     internal class ScaleGizmoModeCommand : IKitbasherUiCommand

@@ -12,7 +12,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             selectedFile = null;
             filePath = null;
 
-            using var browser = new SavePackFileWindow(pfs);
+            using var browser = new SavePackFileWindow(pfs as PackFileService);
             browser.ViewModel.Filter.SetExtentions(extensions);
 
             if (browser.ShowDialog() == true)

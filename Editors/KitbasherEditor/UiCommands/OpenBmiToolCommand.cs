@@ -9,7 +9,7 @@ using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     public class OpenBmiToolCommand : IKitbasherUiCommand
     {

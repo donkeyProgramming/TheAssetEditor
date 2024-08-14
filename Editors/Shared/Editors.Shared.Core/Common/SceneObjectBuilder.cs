@@ -3,14 +3,14 @@ using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Utility;
-using GameWorld.WpfWindow;
-using GameWorld.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 

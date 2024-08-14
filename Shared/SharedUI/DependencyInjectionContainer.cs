@@ -1,4 +1,5 @@
 ﻿using CommonControls.Editors.BoneMapping.View;
+using CommonControls.Editors.TextEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.PackFiles;
@@ -9,7 +10,6 @@ using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Editors.BoneMapping;
 using Shared.Ui.Editors.TextEditor;
 using Shared.Ui.Editors.VariantMeshDefinition;
-using Shared.Ui.Editors.Wtui;
 using Shared.Ui.Events.UiCommands;
 
 namespace Shared.Ui
@@ -32,17 +32,22 @@ namespace Shared.Ui
             services.AddTransient<IPackFileUiProvider, PackFileUiProvider>();
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
 
-            // Editors that should be moved into their own projects
-            TextEditor_DependencyInjectionContainer.Register(services);
-            VariantMeshDefinition_DependencyInjectionContainer.Register(services);
-            TwUi_DependencyInjectionContainer.Register(services);
+
+            services.AddTransient<VariantMeshToXmlConverter>();
+            services.AddTransient<TextEditorViewModel<VariantMeshToXmlConverter>>();
+
+            services.AddTransient<TextEditorView>();
+            services.AddTransient<DefaultTextConverter>();
+            services.AddTransient<TextEditorViewModel<DefaultTextConverter>>();
         }
 
         public override void RegisterTools(IToolFactory factory)
         {
-            TextEditor_DependencyInjectionContainer.RegisterTools(factory);
-            VariantMeshDefinition_DependencyInjectionContainer.RegisterTools(factory);
-            TwUi_DependencyInjectionContainer.RegisterTools(factory);
+            factory.RegisterTool<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(new ExtensionToTool(EditorEnums.XML_Editor, new[] { ".variantmeshdefinition" }));
+            factory.RegisterTool<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(
+                new ExtensionToTool(
+                    EditorEnums.XML_Editor,
+                    [".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv", ".bnk.xml"]));
         }
     }
 }

@@ -3,7 +3,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using System.Windows.Input;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     internal class ScaleGizmoUpCommand : IKitbasherUiCommand
     {
@@ -11,9 +11,9 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = new Hotkey(Key.Add, ModifierKeys.None);
 
-        private readonly  GizmoComponent _gizmoComponent;
+        private readonly GizmoComponent _gizmoComponent;
 
-     
+
         public ScaleGizmoUpCommand(GizmoComponent gizmoComponent)
         {
             _gizmoComponent = gizmoComponent;

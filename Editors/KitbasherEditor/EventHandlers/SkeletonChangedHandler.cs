@@ -1,9 +1,9 @@
-﻿using GameWorld.Core.Components;
+﻿using Editors.KitbasherEditor.Events;
+using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.Events;
 using Shared.Core.Events;
 
-namespace KitbasherEditor.EventHandlers
+namespace Editors.KitbasherEditor.EventHandlers
 {
     public class SkeletonChangedHandler
     {

@@ -36,14 +36,15 @@ namespace Shared.Core.Services
                 WwisePath = Path.Combine(WwisePath, "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
             }
         }
+
+
     }
 
     public class ApplicationSettingsService
     {
-        public delegate void SettingsChangedDelegate(ApplicationSettings settings);
-        public event SettingsChangedDelegate SettingsChanged;
-
         private readonly ILogger _logger = Logging.Create<ApplicationSettingsService>();
+
+        public bool AllowSettingsUpdate { get; set; } = false;
 
         string SettingsFile
         {
@@ -53,15 +54,14 @@ namespace Shared.Core.Services
             }
         }
 
-        public ApplicationSettings CurrentSettings { get; set; }
+        public ApplicationSettings CurrentSettings { get; private set; }
 
-
-        public ApplicationSettingsService()
+        public ApplicationSettingsService(GameTypeEnum currentGame = GameTypeEnum.Unknown)
         {
-            Load();
+            CurrentSettings = new ApplicationSettings() { CurrentGame = currentGame };
         }
 
-        public string GetGamePathForCurrentGame()
+        public string? GetGamePathForCurrentGame()
         {
             var game = CurrentSettings.CurrentGame;
             if (game == GameTypeEnum.Unknown)
@@ -98,10 +98,9 @@ namespace Shared.Core.Services
             {
                 recentPackFilePaths.RemoveAt(0);
             }
-            Save();
         }
 
-        public string GetGamePathForGame(GameTypeEnum game)
+        public string? GetGamePathForGame(GameTypeEnum game)
         {
             var gameDirInfo = CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game);
             return gameDirInfo?.Path;
@@ -109,15 +108,15 @@ namespace Shared.Core.Services
 
         public void Save()
         {
+            if (AllowSettingsUpdate == false)
+                return;
             _logger.Here().Information($"Saving settings file {SettingsFile}");
 
             var jsonStr = JsonSerializer.Serialize(CurrentSettings, new JsonSerializerOptions() { WriteIndented = true });
             File.WriteAllText(SettingsFile, jsonStr);
-
-            SettingsChanged?.Invoke(CurrentSettings);
         }
 
-        void Load()
+        public void Load()
         {
             if (File.Exists(SettingsFile))
             {

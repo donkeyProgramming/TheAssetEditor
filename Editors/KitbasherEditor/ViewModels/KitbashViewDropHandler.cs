@@ -1,4 +1,4 @@
-﻿using KitbasherEditor.Services;
+﻿using Editors.KitbasherEditor.Services;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using System.IO;
 

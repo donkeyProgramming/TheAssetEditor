@@ -15,7 +15,7 @@
 
     <Expander DockPanel.Dock="Top" IsExpanded="True">
         <Expander.Header>
-            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Background}" >
+            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Border}" >
                 <TextBlock Text="Mesh" FontWeight="Bold" Margin="3"/>
             </StackPanel>
         </Expander.Header>
@@ -26,6 +26,12 @@
                 <Label DockPanel.Dock="Left">:</Label>
                 <TextBox Text="{Binding Mesh.ModelName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
             </DockPanel>
+
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Vertex Type"/>
+                <Label>:</Label>
+                <ComboBox ItemsSource="{Binding Mesh.PossibleVertexTypes}" SelectedItem="{Binding Mesh.VertexType}" VerticalAlignment="Center"/>
+            </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Size"/>
@@ -54,22 +60,10 @@
             </DockPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Shader"/>
-                <Label>:</Label>
-                <TextBlock  Text="{Binding Mesh.ShaderName, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Center" />
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Reduce Lods"/>
                 <Label>:</Label>
                 <CheckBox  HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Mesh.ReduceMeshOnLodGeneration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </StackPanel>
-
-            <DockPanel DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Rmv2 Material" />
-                <Label DockPanel.Dock="Left">:</Label>
-                <TextBox Text="{Binding Mesh.SelectedMaterialType, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" IsEnabled="False"/>
-            </DockPanel>
 
         </DockPanel>
     </Expander>

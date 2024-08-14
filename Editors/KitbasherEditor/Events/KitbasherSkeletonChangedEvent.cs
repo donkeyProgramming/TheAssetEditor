@@ -1,6 +1,6 @@
 ﻿using GameWorld.Core.Animation;
 
-namespace KitbasherEditor.Events
+namespace Editors.KitbasherEditor.Events
 {
     public class KitbasherSkeletonChangedEvent
     {

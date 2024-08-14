@@ -1,6 +1,6 @@
 ﻿using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Geometry;
-using GameWorld.Core.Rendering.Shading;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -21,12 +21,11 @@ namespace GameWorld.Core.Rendering.RenderItems
 
         public void Draw(GraphicsDevice device, CommonShaderParameters parameters, RenderingTechnique renderingTechnique)
         {
-            if (_shader.SupportsTechnique(RenderingTechnique.Normal) == false)
+            if (_shader.SupportsTechnique(renderingTechnique) == false)
                 return;
 
             _shader.SetTechnique(renderingTechnique);
-            _shader.SetCommonParameters(parameters, _modelMatrix);
-            _shader.ApplyObjectParameters();
+            _shader.Apply(parameters, _modelMatrix);
 
             ApplyMesh(_shader, device, _geometry.GetGeometryContext());
         }
@@ -35,9 +34,9 @@ namespace GameWorld.Core.Rendering.RenderItems
         {
             device.Indices = geometry.IndexBuffer;
             device.SetVertexBuffer(geometry.VertexBuffer);
-            foreach (var pass in effect.GetEffect().CurrentTechnique.Passes)
+            //foreach (var pass in effect.GetEffect().CurrentTechnique.Passes)
             {
-                pass.Apply();
+              //  pass.Apply();
                 device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, geometry.IndexBuffer.IndexCount);
             }
         }

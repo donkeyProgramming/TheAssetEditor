@@ -81,7 +81,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             ExportToFolderCommand = new RelayCommand(ExportToFolder);
             AdvancedExportToFolderCommand = new RelayCommand(AdvancedExportToFolder);
             
-            OpenPack_FileNotpadPluss_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files (x86)\Notepad++\notepad++.exe", _selectedNode.Item));
+            OpenPack_FileNotpadPluss_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\Notepad++\notepad++.exe", _selectedNode.Item));
             OpenPackFile_HxD_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\HxD\HxD.exe", _selectedNode.Item));
         }
 

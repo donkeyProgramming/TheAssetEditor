@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.Rendering.Materials.Capabilities;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.ErrorHandling;
-using static Shared.Ui.BaseDialogs.ErrorListDialog.ErrorListViewModel;
 
 namespace GameWorld.Core.Utility
 {
     public class ModelCombiner
     {
-        public static bool CanCombine(Rmv2MeshNode meshA, Rmv2MeshNode meshB, out string errorMessage)
+        public static bool CanCombine(Rmv2MeshNode meshA, Rmv2MeshNode meshB, out string? errorMessage)
         {
-            // Textures
-            if (!ValidateTextures(meshA, meshA.Name, meshB, meshB.Name, out var textureErrorMsg))
-            {
-                errorMessage = "Texture - " + textureErrorMsg;
+            if (AreMaterialsEqual(meshA.Name, meshA.Effect, meshB.Effect, meshB.Name, out var textureErrorMsg) == false)
+            { 
+                errorMessage = "Material - " + textureErrorMsg;
                 return false;
             }
 
@@ -24,11 +24,46 @@ namespace GameWorld.Core.Utility
                 return false;
             }
 
-            // Alpha mode
-            if (meshA.Material.AlphaMode != meshB.Material.AlphaMode)
+            errorMessage = null;
+            return true;
+        }
+
+        static bool AreMaterialsEqual(string meshNameA, CapabilityMaterial materialA, CapabilityMaterial materialB, string meshNameB, out string? errorMessage)
+        {
+            if (materialA.Type != materialB.Type)
             {
-                errorMessage = "Alpha Mode - " + $"{meshA.Name} has a different AlphaSettings then {meshB.Name}";
+                errorMessage = $"{meshNameA} uses material {materialA.Type}, {meshNameB} uses material {materialB.Type}";
+                return false; ;
+            }
+
+            var baseCapA = materialA.GetCapability<MaterialBaseCapability>();
+            var baseCapB = materialB.GetCapability<MaterialBaseCapability>();
+            if (baseCapA.UseAlpha != baseCapB.UseAlpha)
+            {
+                errorMessage = $"{meshNameA} uses Alpha {baseCapA.UseAlpha}, {meshNameB} uses Alpha {baseCapB.UseAlpha}";
                 return false;
+            }
+
+            var specGlossA = materialA.TryGetCapability<SpecGlossCapability>();
+            var specGlossB = materialB.TryGetCapability<SpecGlossCapability>();
+            if (specGlossA != null && specGlossB != null)
+            {
+                if (SpecGlossCapability.AreEqual(specGlossA, specGlossB) == false)
+                {
+                    errorMessage = $"{meshNameA} uses different textures than {meshNameB}";
+                    return false;
+                }
+            }
+
+            var metalRoughA = materialA.TryGetCapability<MetalRoughCapability>();
+            var metalRoughB = materialB.TryGetCapability<MetalRoughCapability>();
+            if (metalRoughA != null && metalRoughB != null)
+            {
+                if (MetalRoughCapability.AreEqual(metalRoughA, metalRoughB) == false)
+                {
+                    errorMessage = $"{meshNameA} uses different textures than {meshNameB}";
+                    return false;
+                }
             }
 
             errorMessage = null;

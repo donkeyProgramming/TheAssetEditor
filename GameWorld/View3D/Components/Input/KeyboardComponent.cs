@@ -1,7 +1,7 @@
-﻿using GameWorld.WpfWindow;
-using GameWorld.WpfWindow.Input;
+﻿using GameWorld.Core.WpfWindow.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Shared.Core.Services;
 
 namespace GameWorld.Core.Components.Input
 {

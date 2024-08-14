@@ -10,6 +10,8 @@ using GameWorld.Core.Components.Input;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Services.SceneSaving;
@@ -23,6 +25,9 @@ using GameWorld.Core.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Shared.Core.DependencyInjection;
+using Shared.Core.Services;
+using GameWorld.Core.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow;
 
 namespace GameWorld.Core
 {
@@ -32,6 +37,8 @@ namespace GameWorld.Core
         {
             // Graphics scene
             serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
+            serviceCollection.AddScoped<IWpfGame, WpfGame>();
+            serviceCollection.AddSingleton<ResourceLibrary>();
 
             // Settings
             serviceCollection.AddScoped<GeometrySaveSettings>();
@@ -41,13 +48,15 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<ViewOnlySelectedService>();
             serviceCollection.AddScoped<FocusSelectableObjectService>();
             serviceCollection.AddScoped<ComplexMeshLoader>();
-            serviceCollection.AddScoped<WsModelGeneratorService>();
+            serviceCollection.AddTransient<WsModelGeneratorService>();
+            serviceCollection.AddTransient<MaterialToWsMaterialFactory>();
+            
             serviceCollection.AddScoped<FaceEditor>();
             serviceCollection.AddScoped<ObjectEditor>();
             serviceCollection.AddScoped<Rmv2ModelNodeLoader>();
 
             serviceCollection.AddScoped<SaveService>();
-            serviceCollection.AddScoped<SceneSaverService>();
+            serviceCollection.AddScoped<NodeToRmvSaveHelper>();
 
             serviceCollection.AddScoped<GeometryStrategyProvider>();
             serviceCollection.AddScoped<IGeometryStrategy, NoMeshStrategy>();
@@ -58,6 +67,8 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<LodStrategyProvider>();
             serviceCollection.AddScoped<ILodGenerationStrategy, AssetEditorLodGeneration>();
             serviceCollection.AddScoped<ILodGenerationStrategy, Lod0ForAllLodGeneration>();
+            serviceCollection.AddScoped<ILodGenerationStrategy, NoLodGeneration>();
+            
             //serviceCollection.AddScoped<ILodGenerationStrategy, SimplygonLodGeneration>();
 
             serviceCollection.AddScoped<MaterialStrategyProvider>();
@@ -66,6 +77,8 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<IMaterialStrategy, PharaohWsModelStrategy>();
             serviceCollection.AddScoped<IMaterialStrategy, NoWsModelStrategy>();
 
+            // Shader
+            serviceCollection.AddScoped<CapabilityMaterialFactory>(); 
 
             // Resolvers - sort of hacks 
             serviceCollection.AddScoped<IDeviceResolver, DeviceResolver>();

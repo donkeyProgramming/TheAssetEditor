@@ -1,9 +1,9 @@
-﻿using GameWorld.WpfWindow;
-using GameWorld.WpfWindow.Input;
+﻿using GameWorld.Core.WpfWindow.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Services;
 using System;
 
 namespace GameWorld.Core.Components.Input

@@ -4,7 +4,7 @@ using KitbasherEditor.Views.EditorViews.PinTool;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     public class OpenPinToolCommand : IKitbasherUiCommand
     {
@@ -14,7 +14,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
 
         private readonly IWindowFactory _windowFactory;
 
-        public OpenPinToolCommand( IWindowFactory windowFactory)
+        public OpenPinToolCommand(IWindowFactory windowFactory)
         {
             _windowFactory = windowFactory;
         }

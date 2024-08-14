@@ -2,7 +2,6 @@
 {
     public class PackFileContainer
     {
-
         public string Name { get; set; }
         public PFHeader Header { get; set; }
         public bool IsCaPackFile { get; set; } = false;

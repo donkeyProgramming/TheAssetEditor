@@ -1,0 +1,11 @@
+<model version="1">
+  <geometry>VariantMeshes/wh_variantmodels/hu1e/cth/cth_celestial_general/cth_celestial_general_body_02.rigid_model_v2</geometry>
+  <materials>
+    <material part_index="0" lod_index="0">VariantMeshes/wh_variantmodels/hu1e/cth/cth_celestial_general/materials/cth_celestial_general_body_01_weighted4_alpha_off.xml.material</material>
+    <material part_index="0" lod_index="1">VariantMeshes/wh_variantmodels/hu1e/cth/cth_celestial_general/materials/cth_celestial_general_body_01_weighted4_alpha_off.xml.material</material>
+    <material part_index="0" lod_index="2">VariantMeshes/wh_variantmodels/hu1e/cth/cth_celestial_general/materials/cth_celestial_general_body_01_weighted2_alpha_off.xml.material</material>
+    <material part_index="0" lod_index="3">VariantMeshes/wh_variantmodels/hu1e/cth/cth_celestial_general/materials/cth_celestial_general_body_01_weighted2_alpha_off.xml.material</material>
+    <material part_index="1" lod_index="0">VariantMeshes/wh_variantmodels/hu1e/cth/cth_celestial_general/materials/cth_celestial_general_body_01_weighted4_alpha_on.xml.material</material>
+    <material part_index="1" lod_index="1">VariantMeshes/wh_variantmodels/hu1e/cth/cth_celestial_general/materials/cth_celestial_general_body_01_weighted4_alpha_on.xml.material</material>
+  </materials>
+</model>

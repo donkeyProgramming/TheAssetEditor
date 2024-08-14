@@ -3,6 +3,7 @@ using CommonControls.Editors.BoneMapping.View;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using Shared.Core.PackFiles;
@@ -12,7 +13,7 @@ using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;
 using MessageBox = System.Windows.MessageBox;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     public class OpenReriggingToolCommand : IKitbasherUiCommand
     {
@@ -22,7 +23,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
 
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly SelectionManager _selectionManager;
-   
+
         private readonly PackFileService _packFileService;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IWindowFactory _windowFactory;
@@ -31,7 +32,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         {
             _kitbasherRootScene = kitbasherRootScene;
             _selectionManager = selectionManager;
-    
+
             _packFileService = packFileService;
             _skeletonHelper = skeletonHelper;
             _windowFactory = windowFactory;

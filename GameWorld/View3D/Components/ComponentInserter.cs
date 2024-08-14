@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using GameWorld.WpfWindow;
 using Microsoft.Xna.Framework;
+using Shared.Core.Services;
 
 namespace GameWorld.Core.Components
 {

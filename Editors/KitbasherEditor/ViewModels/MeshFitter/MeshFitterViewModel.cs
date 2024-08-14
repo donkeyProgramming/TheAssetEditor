@@ -3,7 +3,6 @@ using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
-using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.Animation;
@@ -30,12 +29,12 @@ namespace KitbasherEditor.ViewModels.MeshFitter
         public NotifyAttr<bool> RelativeScale { get; set; } = new NotifyAttr<bool>(false);
         public DoubleViewModel ScaleFactor { get; set; } = new DoubleViewModel(1);
 
-        public Vector3ViewModel SkeletonDisplayOffset { get; set; } = new Vector3ViewModel(0);
+        public Vector3ViewModel SkeletonDisplayOffset { get; set; } = new Vector3ViewModel(0, 0, 0);
 
         public NotifyAttr<bool> IsBoneSelected { get; set; } = new NotifyAttr<bool>(false);
         public DoubleViewModel BoneScaleFactor { get; set; } = new DoubleViewModel(1);
-        public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0);
-        public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0);
+        public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0,0,0);
+        public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0, 0, 0);
 
         public MeshFitterViewModel(CommandFactory commandFactory, AnimationsContainerComponent animationsContainerComponent, SceneManager sceneManager)
         {
