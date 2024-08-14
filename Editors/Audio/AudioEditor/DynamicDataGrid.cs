@@ -10,11 +10,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using Editors.Audio.Presentation.AudioEditor.ViewModels;
+using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
-using static Editors.Audio.Presentation.AudioEditor.AudioEditorViewModelHelpers;
+using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
 
-namespace Editors.Audio.Presentation.AudioEditor
+namespace Editors.Audio.AudioEditor
 {
     public class DynamicDataGrid
     {
@@ -62,50 +62,69 @@ namespace Editors.Audio.Presentation.AudioEditor
 
             var dataGrid = GetDataGrid();
 
-            // DataGrid settings.
-            dataGrid.CanUserAddRows = false;
+            // DataGrid settings:
+            dataGrid.CanUserAddRows = false; // Setting this bastard to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF.
             dataGrid.ItemsSource = audioEditorDataGridItems;
 
-            // Clear existing data.
+            // Clear existing data:
             dataGrid.Columns.Clear();
             audioEditorDataGridItems.Clear();
 
             var stateGroups = audioRepository.DialogueEventsWithStateGroups[selectedAudioProjectEvent];
             var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[selectedAudioProjectEvent];
 
-            var stateGroupsCount = stateGroups.Count();
-            var columnWidth = stateGroupsCount > 0 ? 1.0 / (stateGroupsCount + 2) : 1.0;
+            var stateGroupsCount = stateGroups.Count() + 3;
+            var columnWidth = stateGroupsCount > 0 ? 1.0 / stateGroupsCount : 1.0;
+
+            // Column for Remove State Path button:
+            var removeButtonColumn = new DataGridTemplateColumn
+            {
+                CellTemplate = CreateRemoveRowButtonTemplate(viewModel),
+                Width = 20,
+                CanUserResize = false
+            };
+
+            dataGrid.Columns.Add(removeButtonColumn);
 
             foreach (var (stateGroup, stateGroupWithQualifier) in stateGroups.Zip(stateGroupsWithQualifiers))
             {
                 var states = new List<string>();
                 var customStates = new List<string>();
+
                 var vanillaStates = audioRepository.StateGroupsWithStates[stateGroup];
 
-                if (AudioEditorData.Instance.StateGroupsWithCustomStates.Count() > 0 )
-                    customStates = AudioEditorData.Instance.StateGroupsWithCustomStates[stateGroup];
+                if (AudioEditorData.Instance.StateGroupsWithCustomStates.Count() > 0)
+                {
+                    if (stateGroup == "VO_Actor" || stateGroup == "VO_Culture" || stateGroup == "VO_Battle_Selection" || stateGroup == "VO_Battle_Special_Ability" || stateGroup == "VO_Faction_Leader")
+                        customStates = AudioEditorData.Instance.StateGroupsWithCustomStates[stateGroup];
+                }
 
-                if (showCustomStatesOnly)
+                if (showCustomStatesOnly && (stateGroup == "VO_Actor" || stateGroup == "VO_Culture" || stateGroup == "VO_Battle_Selection" || stateGroup == "VO_Battle_Special_Ability" || stateGroup == "VO_Faction_Leader"))
+                {
+                    states.Add("Any"); // Still needs an Any State.
                     states.AddRange(customStates);
+                }
 
                 else
                 {
-                    states.AddRange(customStates);
+                    if (stateGroup == "VO_Actor" || stateGroup == "VO_Culture" || stateGroup == "VO_Battle_Selection" || stateGroup == "VO_Battle_Special_Ability" || stateGroup == "VO_Faction_Leader")
+                        states.AddRange(customStates);
+
                     states.AddRange(vanillaStates);
                 }
 
+                // Column for State Group:
                 var column = new DataGridTemplateColumn
                 {
-                    Header = AddExtraUnderScoresToStateGroup(stateGroupWithQualifier),
+                    Header = AddExtraUnderScoresToString(stateGroupWithQualifier),
                     CellTemplate = CreateStatesComboBoxTemplate(states, stateGroupWithQualifier, showCustomStatesOnly),
                     Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
                 };
 
                 dataGrid.Columns.Add(column);
-                Debug.WriteLine($"Added column for state group: {AddExtraUnderScoresToStateGroup(stateGroupWithQualifier)}");
             }
 
-            // Add column for Audio TextBox.
+            // Column for Audio files TextBox:
             var soundsTextBoxColumn = new DataGridTemplateColumn
             {
                 Header = "Audio Files",
@@ -114,9 +133,8 @@ namespace Editors.Audio.Presentation.AudioEditor
             };
 
             dataGrid.Columns.Add(soundsTextBoxColumn);
-            Debug.WriteLine($"Added textBoxColumn for Sounds");
 
-            // Add column for ... button.
+            // Column for Audio files '...' button:
             var soundsButtonColumn = new DataGridTemplateColumn
             {
                 CellTemplate = CreateSoundsButtonTemplate(audioRepository),
@@ -125,18 +143,16 @@ namespace Editors.Audio.Presentation.AudioEditor
             };
 
             dataGrid.Columns.Add(soundsButtonColumn);
-            Debug.WriteLine($"Added '...' buttonColumn");
 
-            // Add column for Remove button.
-            var removeButtonColumn = new DataGridTemplateColumn
+            // Column for Play button:
+            var playButtonColumn = new DataGridTemplateColumn
             {
-                CellTemplate = CreateRemoveButtonTemplate(viewModel),
+                CellTemplate = CreatePlaySoundsButtonTemplate(audioRepository),
                 Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
-                MinWidth = 120,
+                CanUserResize = false
             };
 
-            dataGrid.Columns.Add(removeButtonColumn);
-            Debug.WriteLine($"Added 'Remove' buttonColumn");
+            dataGrid.Columns.Add(playButtonColumn);
         }
 
         public static DataTemplate CreateStatesComboBoxTemplate(List<string> states, string stateGroupWithQualifier, bool showCustomStatesOnly)
@@ -144,35 +160,47 @@ namespace Editors.Audio.Presentation.AudioEditor
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(ComboBox));
 
-            var binding = new Binding($"[{AddExtraUnderScoresToStateGroup(stateGroupWithQualifier)}]")
+            var binding = new Binding($"[{AddExtraUnderScoresToString(stateGroupWithQualifier)}]")
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             };
 
             // ComboBox settings.
-            factory.SetBinding(ComboBox.SelectedItemProperty, binding);
-            factory.SetValue(ComboBox.IsTextSearchEnabledProperty, true); // Enable text search.
-            factory.SetValue(ComboBox.IsEditableProperty, true); // Enable text search.
-            factory.SetValue(ComboBox.ItemsSourceProperty, showCustomStatesOnly ? new List<string>() : states); // Set ItemsSource based on showCustomStatesOnly.
+            factory.SetBinding(System.Windows.Controls.Primitives.Selector.SelectedItemProperty, binding);
+            factory.SetValue(ItemsControl.IsTextSearchEnabledProperty, true);
+            factory.SetValue(ComboBox.IsEditableProperty, true);
+            factory.SetValue(ItemsControl.ItemsSourceProperty, states);
 
-            // Create the Loaded event handler to initialize and attach the TextChanged event.
-            factory.AddHandler(ComboBox.LoadedEvent, new RoutedEventHandler((sender, args) =>
+            // Loaded event for initializing items and setting up TextChanged event.
+            factory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler((sender, args) =>
             {
                 if (sender is ComboBox comboBox)
                 {
-                    comboBox.ItemsSource = states; // Set initial ItemsSource.
+                    comboBox.ItemsSource = states;
 
                     if (comboBox.Template.FindName("PART_EditableTextBox", comboBox) is TextBox textBox)
                     {
-                        // TextChanged event for filtering items.
                         textBox.TextChanged += (s, e) =>
                         {
                             var filterText = textBox.Text;
                             var filteredItems = states.Where(item => item.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
 
-                            comboBox.ItemsSource = filteredItems; // Set filtered list based on showCustomStatesOnly.
+                            comboBox.ItemsSource = filteredItems;
                             comboBox.IsDropDownOpen = true; // Keep the drop-down open to show filtered results.
+                        };
+
+                        // Handle LostFocus event to ensure final text is genuinely a State and warm the user if not.
+                        textBox.LostFocus += (s, e) =>
+                        {
+                            var finalText = textBox.Text;
+
+                            if (!string.IsNullOrWhiteSpace(finalText) && !states.Contains(finalText))
+                            {
+                                MessageBox.Show("Invalid State. Select a State from the list.", "Invalid State", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                textBox.Text = string.Empty;
+                                comboBox.SelectedItem = null;
+                            }
                         };
                     }
                 }
@@ -202,9 +230,9 @@ namespace Editors.Audio.Presentation.AudioEditor
             };
 
             factory.SetBinding(TextBox.TextProperty, binding);
-            factory.SetBinding(TextBox.ToolTipProperty, tooltipBinding);
+            factory.SetBinding(FrameworkElement.ToolTipProperty, tooltipBinding);
 
-            factory.SetValue(TextBox.IsReadOnlyProperty, true);
+            factory.SetValue(System.Windows.Controls.Primitives.TextBoxBase.IsReadOnlyProperty, true);
 
             template.VisualTree = factory;
 
@@ -215,11 +243,11 @@ namespace Editors.Audio.Presentation.AudioEditor
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(Button));
-            factory.SetValue(Button.ContentProperty, "...");
-            factory.SetValue(Button.ToolTipProperty, "Browse wav files");
+            factory.SetValue(ContentControl.ContentProperty, "...");
+            factory.SetValue(FrameworkElement.ToolTipProperty, "Browse wav files");
 
             // Handle button click event
-            factory.AddHandler(Button.ClickEvent, new RoutedEventHandler((sender, e) =>
+            factory.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler((sender, e) =>
             {
                 var button = sender as Button;
                 var dataGridRow = FindVisualParent<DataGridRow>(button);
@@ -241,14 +269,34 @@ namespace Editors.Audio.Presentation.AudioEditor
             return template;
         }
 
-        public static DataTemplate CreateRemoveButtonTemplate(AudioEditorViewModel viewModel)
+        public static DataTemplate CreatePlaySoundsButtonTemplate(IAudioRepository audioRepository)
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(Button));
-            factory.SetValue(Button.ContentProperty, "Remove State Path");
+            factory.SetValue(ContentControl.ContentProperty, "Play");
+            factory.SetValue(FrameworkElement.ToolTipProperty, "Play a sound at random, to simulate the Dialogue Event being triggered in game.");
 
             // Handle button click event
-            factory.AddHandler(Button.ClickEvent, new RoutedEventHandler((sender, e) =>
+            factory.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler((sender, e) =>
+            {
+                //Do something
+            }));
+
+            template.VisualTree = factory;
+
+            return template;
+        }
+
+        public static DataTemplate CreateRemoveRowButtonTemplate(AudioEditorViewModel viewModel)
+        {
+            var template = new DataTemplate();
+            var factory = new FrameworkElementFactory(typeof(Button));
+            factory.SetValue(ContentControl.ContentProperty, "✖");
+            factory.SetValue(Control.FontFamilyProperty, new FontFamily("Segoe UI Symbol")); // This font supports the character.
+            factory.SetValue(FrameworkElement.ToolTipProperty, "Remove State Path");
+
+            // Handle button click event
+            factory.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler((sender, e) =>
             {
                 var button = sender as Button;
                 var dataGridRow = FindVisualParent<DataGridRow>(button);

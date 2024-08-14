@@ -1,4 +1,4 @@
-﻿using Editors.Audio.Presentation.AudioExplorer;
+﻿using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;

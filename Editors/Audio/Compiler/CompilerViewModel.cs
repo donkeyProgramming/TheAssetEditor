@@ -9,7 +9,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.ErrorListDialog;
 
-namespace Editors.Audio.Presentation.Compiler
+namespace Editors.Audio.Compiler
 {
     public class CompilerViewModel : NotifyPropertyChangedImpl, IEditorViewModel
     {
