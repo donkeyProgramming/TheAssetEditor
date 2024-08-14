@@ -77,7 +77,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var model = ModelRoot.CreateModel();
             var scene = model.UseScene("default");
             var lodLevel = rmv2.ModelList.First();
-            var skeletonBool = (rmv2.Header.SkeletonName != "");
+            var hasSkeleton = (rmv2.Header.SkeletonName != "");
 
             var gltfSkeletonBindings = GenerateSkeleton(rmv2, scene);
 
@@ -92,12 +92,12 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 {
                     material = _ddsToPngExporter.BuildFakeMaterialPerMesh(rmvMesh, file);
                 }
-                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, material, skeletonBool));
+                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, material, hasSkeleton));
                 scene.CreateNode(rmvMesh.Material.ModelName).WithSkinnedMesh(mesh, gltfSkeletonBindings.ToArray());
             }
             return model;
         }
-        internal ModelRoot MeshWithoutSkeleton(RmvFile rmv2, PackFile file, RmvToGltfExporterSettings settings, bool skeletonBool)
+        internal ModelRoot MeshWithoutSkeleton(RmvFile rmv2, PackFile file, RmvToGltfExporterSettings settings, bool hasSkeleton)
         {
             var model = ModelRoot.CreateModel();
             var scene = model.UseScene("default");
@@ -107,7 +107,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             foreach (var rmvMesh in lodLevel)
             {
                 var material = _ddsToPngExporter.GenerateMaterial(settings, rmvMesh);
-                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, material, skeletonBool));
+                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, material, hasSkeleton));
                 scene.CreateNode(rmvMesh.Material.ModelName).WithMesh(mesh);
             }
             return model;
@@ -135,10 +135,10 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
 
 
-        public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> GenerateMesh(RmvModel rmvMesh, MaterialBuilder material, bool skeletonBool)
+        public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> GenerateMesh(RmvModel rmvMesh, MaterialBuilder material, bool hasSkeleton)
         {
             var mesh = new MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>(rmvMesh.Material.ModelName);
-            if (skeletonBool)
+            if (hasSkeleton)
             {
                 mesh.VertexPreprocessor.SetValidationPreprocessors();
             }
@@ -154,7 +154,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 glTfvertex.Geometry.Tangent = new Vector4(vertex.Tangent.X, vertex.Tangent.Y, vertex.Tangent.Z, 1);
                 glTfvertex.Material.TexCoord = new Vector2(vertex.Uv.X, vertex.Uv.Y);
 
-                if (skeletonBool)
+                if (hasSkeleton)
                 {
                     glTfvertex = BonesAndWeight(vertex, glTfvertex);
                 }
