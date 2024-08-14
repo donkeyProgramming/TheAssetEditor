@@ -7,7 +7,6 @@ using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
 
-
 namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
     public class BloodCapability : ICapability
@@ -19,9 +18,6 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {
-            //effect.Parameters["UseBlood"].SetValue(UseBlood);
-            //
-            //BloodMask.Apply(effect, resourceLibrary);
         }
 
         public ICapability Clone()
