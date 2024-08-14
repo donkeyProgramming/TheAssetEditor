@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              x:Name="self"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid VerticalAlignment="Center">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
@@ -23,7 +23,7 @@
         <Border x:Name="b2" Grid.Row="0" Grid.Column="0" Margin="3,0,3,0"/>
         <TextBox 
             Width="{Binding ActualWidth, ElementName=b}" 
-            Grid.Row="0" Grid.Column="0" 
+            Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Right"
             Text="{Binding Vector4.X.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ElementName=self}"
             MaxLength="{Binding NumbersMaxLength, ElementName=self}">
             <b:Interaction.Behaviors>
@@ -33,7 +33,7 @@
 
         <TextBox 
             Width="{Binding ActualWidth, ElementName=b2}" 
-            Grid.Row="0" Grid.Column="1"
+            Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Right"
             Margin="3,0,3,0"
             Text="{Binding Vector4.Y.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ElementName=self}" 
             MaxLength="{Binding NumbersMaxLength, ElementName=self}" >
@@ -44,7 +44,8 @@
 
         <TextBox 
             Width="{Binding ActualWidth, ElementName=b}" 
-            Grid.Row="0" Grid.Column="2" 
+            Grid.Row="0" Grid.Column="2" HorizontalContentAlignment="Right"
+             Margin="0,0,3,0"
             Text="{Binding Vector4.Z.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ElementName=self}" 
             MaxLength="{Binding NumbersMaxLength, ElementName=self}">
             <b:Interaction.Behaviors>
@@ -54,7 +55,7 @@
 
         <TextBox 
             Width="{Binding ActualWidth, ElementName=b}" 
-            Grid.Row="0" Grid.Column="3" 
+            Grid.Row="0" Grid.Column="3" HorizontalContentAlignment="Right"
             Text="{Binding Vector4.W.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ElementName=self}" 
             MaxLength="{Binding NumbersMaxLength, ElementName=self}">
             <b:Interaction.Behaviors>

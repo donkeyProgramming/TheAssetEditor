@@ -2,6 +2,7 @@
 using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
+using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using GameWorld.Core.Services;
@@ -13,7 +14,7 @@ using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using KitbasherEditor.ViewModels.SceneExplorerNodeViews.Rmv2;
+using KitbasherEditor.ViewModels.UiCommands;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
 using KitbasherEditor.Views.EditorViews.PinTool;
@@ -50,8 +51,8 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<SceneNodeEditorViewModel>();
             serviceCollection.AddTransient<MeshViewModel>();
             serviceCollection.AddTransient<AnimationViewModel>();
-            serviceCollection.AddTransient<MaterialGeneralViewModel>();
             serviceCollection.AddTransient<WeightedMaterialViewModel>();
+            serviceCollection.AddTransient<WsMaterialViewModel>();
 
             // Sub tools
             serviceCollection.AddScoped<VertexDebuggerViewModel>();
@@ -74,7 +75,6 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<WindowKeyboard>();
             serviceCollection.AddScoped<KitbashViewDropHandler>();
             serviceCollection.AddScoped<KitbasherRootScene>();
-            serviceCollection.AddScoped<IActiveFileResolver, KitbasherRootScene>(x => x.GetRequiredService<KitbasherRootScene>());
 
             // Event handlers
             serviceCollection.AddScoped<SkeletonChangedHandler>();
@@ -83,7 +83,8 @@ namespace KitbasherEditor
             RegisterAllAsOriginalType<IKitbasherUiCommand>(serviceCollection, ServiceLifetime.Transient);
             serviceCollection.AddTransient<CopyTexturesToPackCommand>();
             serviceCollection.AddTransient<DeleteMissingTexturesCommand>();
-            serviceCollection.AddTransient<ResolveMissingTextureCommand>();   
+            serviceCollection.AddTransient<ResolveMissingTextureCommand>();
+            serviceCollection.AddTransient<ImportReferenceMeshCommand>();
         }
 
         public override void RegisterTools(IToolFactory factory)

@@ -18,7 +18,6 @@ namespace GameWorld.Core.Services.SceneSaving
         public bool OnlySaveVisible { get; set; } = true;
         public int NumberOfLodsToGenerate { get; set; } = 4;
 
-
         public void RefreshLodSettings()
         {
             LodSettingsPerLod.Clear();
@@ -31,6 +30,9 @@ namespace GameWorld.Core.Services.SceneSaving
 
         public void InitializeFromModel(Rmv2ModelNode modelNode)
         {
+            // Add stuff here to initialize based on selected game
+            //read this from model GeometryOutputType = GeometryStrategy.Rmv7
+
             LodSettingsPerLod.Clear();
 
             NumberOfLodsToGenerate = modelNode.Model.LodHeaders.Length;

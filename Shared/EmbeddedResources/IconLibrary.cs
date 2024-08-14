@@ -1,4 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.Windows.Interop;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace Shared.EmbeddedResources
@@ -49,7 +52,9 @@ namespace Shared.EmbeddedResources
         [AllowNull]public static BitmapImage GrowSelectionIcon { get; private set; } 
         [AllowNull]public static BitmapImage FaceToVertexIcon { get; private set; } 
         [AllowNull]public static BitmapImage MergeVertexIcon { get; private set; } 
-        [AllowNull]public static BitmapImage VertexDebuggerIcon { get; private set; } 
+        [AllowNull]public static BitmapImage VertexDebuggerIcon { get; private set; }
+
+        [AllowNull] public static BitmapSource InformationIcon { get; private set; }
 
         public static void Load()
         {
@@ -98,11 +103,23 @@ namespace Shared.EmbeddedResources
             FaceToVertexIcon = BitmapToImageSource(@"Kitbasher.FaceToVertex.png");
             MergeVertexIcon = BitmapToImageSource(@"Kitbasher.tool_mergeVertex.png");
             VertexDebuggerIcon = BitmapToImageSource(@"icons8-question-mark-48.png");
+
+            InformationIcon = BitmapToImageSource(SystemIcons.Information);
         }
 
         static BitmapImage BitmapToImageSource(string path)
         {
             return ResourceLoader.LoadBitmapImage(@"Resources.Icons." + path);
+        }
+
+        public static BitmapSource BitmapToImageSource(Icon icon)
+        {
+            BitmapSource imageSource = Imaging.CreateBitmapSourceFromHIcon(
+                icon.Handle,
+                Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
+
+            return imageSource;
         }
 
     }

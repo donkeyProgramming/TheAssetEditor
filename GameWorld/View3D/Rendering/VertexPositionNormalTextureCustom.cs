@@ -14,7 +14,7 @@ namespace GameWorld.Core.Rendering
         public Vector4 BlendIndices;
 
         public readonly static VertexDeclaration VertexDeclaration
-            = new VertexDeclaration(
+            = new(
                     new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.Position, 0),
                     new VertexElement(16, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
                     new VertexElement(28, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),

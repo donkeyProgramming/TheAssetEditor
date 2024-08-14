@@ -7,6 +7,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod
     {
         AssetEditor,
         Lod0ForAll,
+        NoLodGeneration,
     }
 
     public interface ILodGenerationStrategy

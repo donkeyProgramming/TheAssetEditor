@@ -1,6 +1,7 @@
 ﻿using CommonControls.PackFileBrowser;
 using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Ui.Common.MenuSystem;
 
@@ -34,7 +35,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         }
     }
 
-    public abstract class ImportReferenceCommand : IKitbasherUiCommand
+    public abstract class BaseImportReferenceCommand : IKitbasherUiCommand
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly PackFileService _packFileService;
@@ -44,14 +45,14 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public Hotkey HotKey { get; } = null;
 
 
-        public ImportReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService)
+        public BaseImportReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService)
         {
             _kitbashSceneCreator = kitbashSceneCreator;
             _packFileService = packFileService;
         }
         protected string _filePath;
 
-        public void Execute()
+        public virtual void Execute()
         {
             var packFile = _packFileService.FindFile(_filePath);
             if (packFile == null)
@@ -61,7 +62,28 @@ namespace KitbasherEditor.ViewModels.UiCommands
         }
     }
 
-    public class ImportGoblinReferenceCommand : ImportReferenceCommand
+    public class ImportReferenceMeshCommand : IUiCommand
+    {
+        private readonly KitbashSceneCreator _kitbashSceneCreator;
+        private readonly PackFileService _packFileService;
+
+        public ImportReferenceMeshCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService)
+        {
+            _kitbashSceneCreator = kitbashSceneCreator;
+            _packFileService = packFileService;
+        }
+
+        public void Execute(string path) 
+        {
+            var packFile = _packFileService.FindFile(path);
+            if (packFile == null)
+                throw new Exception($"Unable to load file {path}");
+
+            _kitbashSceneCreator.LoadReference(packFile);
+        }
+    }
+
+    public class ImportGoblinReferenceCommand : BaseImportReferenceCommand
     {
         public ImportGoblinReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService) : base(kitbashSceneCreator, packFileService)
         {
@@ -71,7 +93,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
     }
 
 
-    public class ImportGeneralHeadReferenceCommand : ImportReferenceCommand
+    public class ImportGeneralHeadReferenceCommand : BaseImportReferenceCommand
     {
         public ImportGeneralHeadReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService) : base(kitbashSceneCreator, packFileService)
         {
@@ -80,7 +102,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         }
     }
 
-    public class ImportSlayerReferenceCommand : ImportReferenceCommand
+    public class ImportSlayerReferenceCommand : BaseImportReferenceCommand
     {
         public ImportSlayerReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService) : base(kitbashSceneCreator, packFileService)
         {
@@ -89,7 +111,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         }
     }
 
-    public class ImportPaladinReferenceCommand : ImportReferenceCommand
+    public class ImportPaladinReferenceCommand : BaseImportReferenceCommand
     {
         public ImportPaladinReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService) : base(kitbashSceneCreator, packFileService)
         {

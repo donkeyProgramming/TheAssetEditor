@@ -1,0 +1,10 @@
+<VARIANT_MESH>
+	<SLOT name="helmets" >
+		<VARIANT_MESH model="VariantMeshes/_VariantModels/man/helmets/carthaginian_pylos_2.rigid_model_v2"  imposter_model="VariantMeshes/_VariantModels/man/helmets/carthaginian_pylos_2.rigid_model_v2" >
+			<SLOT name="top_crests" attach_point="crest_centre" >
+				<VARIANT_MESH model="VariantMeshes/_VariantModels/man/crests/phyrgian_crest_1_black.rigid_model_v2" />
+			</SLOT>
+			<SLOT name="side_crests" />
+		</VARIANT_MESH>
+	</SLOT>
+</VARIANT_MESH>

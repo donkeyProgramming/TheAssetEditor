@@ -15,6 +15,7 @@
 
             <!--Value converters-->
             <valueconverters:BoolToVisibilityConverter x:Key="BoolToHiddenConverter" TrueValue="Visible" FalseValue="Collapsed" />
+            <valueconverters:NullVisibilityConverter x:Key="NullToVisibilityConverter"/>
             <valueconverters:BoolToColourConverter x:Key="ColourConverter_black_red" TrueValue="Black" FalseValue="Red"/>
             <valueconverters:BoolToColourConverter x:Key="BoolToColour_white_red" TrueValue="Gray" FalseValue="Red"/>
             <valueconverters:BoolToColourConverter x:Key="BoolToColour_black_gray" TrueValue="Black" FalseValue="Gray"/>

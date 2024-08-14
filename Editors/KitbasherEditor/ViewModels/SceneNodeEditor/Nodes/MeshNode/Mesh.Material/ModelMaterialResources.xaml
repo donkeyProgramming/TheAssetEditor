@@ -1,0 +1,11 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:System="clr-namespace:System;assembly=mscorlib">
+    
+    <System:Double x:Key="labelWidth">140</System:Double>
+    <Thickness x:Key="LabelMargin">20,0,0,0</Thickness>
+
+
+    <System:Double x:Key="HeaderFontSize">10</System:Double>
+    <System:Double x:Key="HeaderLabelLength">100</System:Double>
+</ResourceDictionary>

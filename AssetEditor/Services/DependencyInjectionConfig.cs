@@ -20,11 +20,9 @@ namespace AssetEditor.Services
                 new Shared.Ui.DependencyInjectionContainer(),
                 new Shared.GameFormats.DependencyInjectionContainer(),
                 new Shared.EmbeddedResources.DependencyInjectionContainer(loadResources),
-                new GameWorld.WpfWindow.DependencyInjectionContainer(),
                 new GameWorld.Core.DependencyInjectionContainer(),
                
                 // Misc
-                new Editors.Shared.DevConfig.DependencyInjectionContainer(),
 
                 // Domains
                 new Editors.Shared.Core.DependencyInjectionContainer(),

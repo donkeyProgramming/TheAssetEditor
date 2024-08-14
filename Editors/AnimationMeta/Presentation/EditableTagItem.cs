@@ -51,7 +51,7 @@ namespace Editors.AnimationMeta.Presentation
     public class OrientationEditableTagItem : EditableTagItem
     {
         ILogger _logger = Logging.Create<OrientationEditableTagItem>();
-        public Vector3ViewModel Value { get; set; } = new Vector3ViewModel(0);
+        public Vector3ViewModel Value { get; set; } = new Vector3ViewModel(0, 0, 0);
 
         Vector4Parser _parser;
 
@@ -87,7 +87,7 @@ namespace Editors.AnimationMeta.Presentation
     public class Vector3EditableTagItem : EditableTagItem
     {
         ILogger _logger = Logging.Create<OrientationEditableTagItem>();
-        public Vector3ViewModel Value { get; set; } = new Vector3ViewModel(0);
+        public Vector3ViewModel Value { get; set; } = new Vector3ViewModel(0, 0, 0);
 
         Vector3Parser _parser;
 

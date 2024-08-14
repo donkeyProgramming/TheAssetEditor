@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="Shared.Ui.BaseDialogs.MathViews.Vector2View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Shared.Ui.BaseDialogs.MathViews"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Border x:Name="b" Grid.Row="0" Grid.Column="0" />
+        <Border x:Name="b2" Grid.Row="0" Grid.Column="0" Margin="3,0,3,0"/>
+        <TextBox 
+        Width="{Binding ActualWidth, ElementName=b}" 
+        Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Right"
+        Text="{Binding X.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+        MaxLength="{Binding NumbersMaxLength, ElementName=self}">
+            <b:Interaction.Behaviors>
+                <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+            </b:Interaction.Behaviors>
+        </TextBox>
+
+        <TextBox 
+        Width="{Binding ActualWidth, ElementName=b2}" 
+        Grid.Row="0" Grid.Column="1" HorizontalContentAlignment="Right"
+        Margin="3,0,0,0"
+        Text="{Binding Y.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+        MaxLength="{Binding NumbersMaxLength, ElementName=self}" >
+            <b:Interaction.Behaviors>
+                <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+            </b:Interaction.Behaviors>
+        </TextBox>
+    </Grid>
+</UserControl>

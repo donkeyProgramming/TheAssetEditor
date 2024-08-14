@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Globalization;
 using Shared.Core.Misc;
 
@@ -10,27 +6,27 @@ namespace Shared.Ui.BaseDialogs.MathViews
 {
     public class DoubleViewModel : NotifyPropertyChangedImpl
     {
-        virtual public event ValueChangedDelegate<double> OnValueChanged;
-        string _formatString = "{0:0.######}";
+        virtual public event ValueChangedDelegate<double>? OnValueChanged;
+        readonly string _formatString = "{0:0.######}";
+        private readonly Action<double>? _valueChangedCallback;
 
-        public DoubleViewModel(double startValue = 0)
+        public DoubleViewModel(double startValue = 0, Action<double>? valueChangedCallback = null)
         {
+            _textValue = startValue.ToString();
             Value = startValue;
+            _valueChangedCallback = valueChangedCallback;
         }
 
-        public void SetMaxDecimalNumbers(int maxDecimals)
-        {
-            throw new NotImplementedException();
-        }
 
-        public string _textvalue;
+        public string _textValue;
         public string TextValue
         {
-            get { return _textvalue; }
+            get { return _textValue; }
             set
             {
-                SetAndNotify(ref _textvalue, value);
+                SetAndNotify(ref _textValue, value);
                 OnValueChanged?.Invoke(Value);
+                _valueChangedCallback?.Invoke(Value);
             }
         }
 
@@ -39,7 +35,7 @@ namespace Shared.Ui.BaseDialogs.MathViews
         {
             get
             {
-                var valid = double.TryParse(_textvalue.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out var result);
+                var valid = double.TryParse(_textValue.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out var result);
                 if (valid)
                     return result;
                 return 0;
@@ -50,12 +46,10 @@ namespace Shared.Ui.BaseDialogs.MathViews
                 TextValue = truncValue.ToString();
                 _value = value;
                 OnValueChanged?.Invoke(value);
+                _valueChangedCallback?.Invoke(Value);
             }
         }
 
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+        public override string ToString() => Value.ToString();
     }
 }

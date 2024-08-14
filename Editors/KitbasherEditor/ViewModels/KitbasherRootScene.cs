@@ -10,7 +10,7 @@ using Shared.GameFormats.Animation;
 
 namespace KitbasherEditor.ViewModels
 {
-    public class KitbasherRootScene : ISkeletonProvider, IActiveFileResolver
+    public class KitbasherRootScene : ISkeletonProvider
     {
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly PackFileService _packFileService;

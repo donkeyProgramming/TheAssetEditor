@@ -24,8 +24,9 @@ namespace Shared.Core.PackFiles.Models
         public string Extention { get => Path.GetExtension(Name); }
 
 
-        public static PackFile CreateFromBytes(string fileName, byte[] bytes) => new PackFile(fileName, new MemorySource(bytes));
-        public static PackFile CreateFromASCII(string fileName, string str) => new PackFile(fileName, new MemorySource(System.Text.Encoding.ASCII.GetBytes(str)));
+        public static PackFile CreateFromBytes(string fileName, byte[] bytes) => new(fileName, new MemorySource(bytes));
+        public static PackFile CreateFromASCII(string fileName, string str) => new(fileName, new MemorySource(System.Text.Encoding.ASCII.GetBytes(str)));
+        public static PackFile CreateFromFileSystem(string fileName, string fullPath) => new(fileName, new FileSystemSource(fullPath));
     }
 
 

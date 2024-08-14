@@ -6,10 +6,10 @@ using GameWorld.Core.Components.Gizmo;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.Geometry;
+using GameWorld.Core.Rendering.Materials.Capabilities;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Rendering.RenderItems;
-using GameWorld.Core.Rendering.Shading;
 using GameWorld.Core.Utility;
-using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel;
@@ -20,7 +20,7 @@ namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IDrawableItem
     {
-        public IMaterial Material { get; set; }
+        public IRmvMaterial Material { get; set; }
         public MeshObject Geometry { get; set; }
         public RmvCommonHeader CommonHeader { get; set; }
 
@@ -28,83 +28,39 @@ namespace GameWorld.Core.SceneNodes
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
 
-        ResourceLibrary _resourceLib;
-        private RenderEngineComponent _renderEngineComponent;
-
         public string OriginalFilePath { get; set; }
         public int OriginalPartIndex { get; internal set; }
         public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix(); } }
         public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
         public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix(); } }
         public string AttachmentPointName { get; set; } = "";
-        public SkeletonBoneAnimationResolver AttachmentBoneResolver { get; set; } = null;
-
+     
         public bool DisplayBoundingBox { get; set; } = false;
         public bool DisplayPivotPoint { get; set; } = false;
 
         public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
-        public PbrShader Effect { get; private set; }
+        public CapabilityMaterial Effect { get; set; }
         public int LodIndex { get; set; } = -1;
-
 
         bool _isSelectable = true;
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
         public bool ReduceMeshOnLodGeneration { get; set; } = true;
 
-
-        private void UpdateModelMatrix(Matrix value)
-        {
-            base.ModelMatrix = value;
-            RenderMatrix = value;
-        }
-
-        void UpdateMatrix()
-        {
-            ModelMatrix = Matrix.CreateScale(Scale) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(Position);
-        }
-
-
-        public AnimationPlayer AnimationPlayer { get; set; }
-       
+        public AnimationPlayer? AnimationPlayer { get; set; }                               // This is a hack - remove at some point
+        public SkeletonBoneAnimationResolver? AttachmentBoneResolver { get; set; } = null;  // This is a hack - remove at some point
 
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IMaterial material, AnimationPlayer animationPlayer, RenderEngineComponent renderEngineComponent)
+        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IRmvMaterial material, AnimationPlayer animationPlayer, CapabilityMaterial shader)
         {
-            _renderEngineComponent = renderEngineComponent;
-
             CommonHeader = commonHeader;
             Material = material;
             AnimationPlayer = animationPlayer;
-           
-            Name = Material.ModelName;
             Geometry = meshObject;
+            Effect = shader;
 
-            Position = Vector3.Zero;
-            Scale = Vector3.One;
-            Orientation = Quaternion.Identity;
-        }
-
-        public void Initialize(ResourceLibrary resourceLib)
-        {
-            _resourceLib = resourceLib;
-            if (_resourceLib != null && Effect == null)
-                CreateShader();
-        }
-
-        void CreateShader()
-        {
-            Effect = new PbrShader(_resourceLib, _renderEngineComponent.MainRenderFormat);
-            foreach (TextureType textureType in Enum.GetValues(typeof(TextureType)))
-            {
-                var texture = Material.GetTexture(textureType);
-                if (texture != null)
-                {
-                    _resourceLib.LoadTexture(texture.Value.Path);
-                    Effect.SetTexture(textureType, texture.Value.Path);
-                }
-            }
+            Name = Material.ModelName;
         }
 
         public Rmv2ModelNode? GetParentModel()
@@ -120,44 +76,60 @@ namespace GameWorld.Core.SceneNodes
             return null;
         }
 
-        public Vector3 GetObjectCentre()
-        {
-            return MathUtil.GetCenter(Geometry.BoundingBox) + Position;
-        }
-
+        public Vector3 GetObjectCentre() => MathUtil.GetCenter(Geometry.BoundingBox) + Position;
+       
         public void UpdateTexture(string path, TextureType textureType, bool forceRefreshTexture = false)
         {
-            Material.SetTexture(textureType, path);
-            _resourceLib.LoadTexture(path, forceRefreshTexture);
-            Effect.SetTexture(textureType, path);
+           // Material.SetTexture(textureType, path);
+           // _resourceLib.LoadTexture(path, forceRefreshTexture);
+           //
+           // var sharedCapability = Effect.GetCapability<DefaultCapability>();
+           // if (sharedCapability != null)
+           // {
+           //     sharedCapability.SetTexturePath(textureType, path);
+           //     sharedCapability.SetTextureUsage(textureType, true);
+           // }
         }
 
-        public void UseTexture(TextureType textureType, bool value) => Effect.UseTexture(textureType, value);
+        public void UseTexture(TextureType textureType, bool value)
+        {
+            //var sharedCapability = Effect.GetCapability<DefaultCapability>();
+            //if (sharedCapability != null)
+            //{
+            //    sharedCapability.SetTextureUsage(textureType, value);
+            //}
+        }
 
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
-            if (Effect == null || renderEngine.MainRenderFormat != Effect.RenderFormat)
-                CreateShader();
-
-            var data = new Matrix[256];
-            for (var i = 0; i < 256; i++)
-                data[i] = Matrix.Identity;
-
-            if (AnimationPlayer != null)
+            var animationCapability = Effect.GetCapability<AnimationCapability>();
+            if (animationCapability != null)
             {
-                var frame = AnimationPlayer.GetCurrentAnimationFrame();
-                if (frame != null)
+                var data = new Matrix[256];
+                for (var i = 0; i < 256; i++)
+                    data[i] = Matrix.Identity;
+
+                if (AnimationPlayer != null)
                 {
-                    for (var i = 0; i < frame.BoneTransforms.Count(); i++)
-                        data[i] = frame.BoneTransforms[i].WorldTransform;
+                    var frame = AnimationPlayer.GetCurrentAnimationFrame();
+                    if (frame != null)
+                    {
+                        for (var i = 0; i < frame.BoneTransforms.Count(); i++)
+                            data[i] = frame.BoneTransforms[i].WorldTransform;
+                    }
                 }
+
+                animationCapability.AnimationTransforms = data;
+                animationCapability.AnimationWeightCount = Geometry.WeightCount;
+                animationCapability.ApplyAnimation = AnimationPlayer != null && AnimationPlayer.IsEnabled;
             }
 
-            Effect.AnimationTransforms = data;
-            Effect.AnimationWeightCount = Geometry.WeightCount;
-            Effect.UseAnimation = AnimationPlayer.IsEnabled;
-            Effect.ScaleMult = ScaleMult;
-            Effect.UseAlpha = Material.AlphaMode == AlphaMode.Transparent;
+            //var sharedCapability = Effect.GetCapability<MetalRoughCapability>();
+            //if (sharedCapability != null)
+            //{
+            //    sharedCapability.ScaleMult = ScaleMult;
+            //    sharedCapability.UseAlpha = Material.AlphaMode == AlphaMode.Transparent;
+            //}
 
             if (AttachmentBoneResolver != null)
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
@@ -192,10 +164,7 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.CommonHeader = CommonHeader;
             typedTarget.Material = Material.Clone();
             typedTarget.Geometry = Geometry.Clone();
-            typedTarget._resourceLib = _resourceLib;
-            typedTarget._renderEngineComponent = _renderEngineComponent;
-           
-    
+
             typedTarget.Effect = Effect.Clone();
             typedTarget.Geometry = Geometry.Clone();
 
@@ -226,6 +195,17 @@ namespace GameWorld.Core.SceneNodes
             }
 
             return output;
+        }
+
+        private void UpdateModelMatrix(Matrix value)
+        {
+            base.ModelMatrix = value;
+            RenderMatrix = value;
+        }
+
+        void UpdateMatrix()
+        {
+            ModelMatrix = Matrix.CreateScale(Scale) * Matrix.CreateFromQuaternion(Orientation) * Matrix.CreateTranslation(Position);
         }
     }
 }

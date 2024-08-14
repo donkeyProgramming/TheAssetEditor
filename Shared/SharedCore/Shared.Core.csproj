@@ -7,6 +7,7 @@
   </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="PixiEditor.ColorPicker" Version="3.4.1" />
         <PackageReference Include="Serilog" Version="4.0.0" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />

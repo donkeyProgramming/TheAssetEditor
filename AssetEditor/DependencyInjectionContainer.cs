@@ -1,8 +1,12 @@
-﻿using AssetEditor.Services;
+﻿using AnimationEditor.Common.BaseControl;
+using AssetEditor.Services;
 using AssetEditor.UiCommands;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
+using Editors.Shared.Core.Common.AnimationPlayer;
+using Editors.Shared.Core.Common;
+using Editors.Shared.DevConfig.Base;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
@@ -31,6 +35,16 @@ namespace AssetEditor
             serviceCollection.AddTransient<SettingsWindow>();
             serviceCollection.AddScoped<SettingsViewModel>();
             serviceCollection.AddScoped<MenuBarViewModel>();
+
+            // Dev Config stuff
+            serviceCollection.AddScoped<SceneObjectBuilder>();
+            serviceCollection.AddTransient<SceneObject>();
+            serviceCollection.AddScoped<AnimationPlayerViewModel>();
+            serviceCollection.AddScoped<SceneObjectViewModelBuilder>();
+            serviceCollection.AddScoped<EditorHostView>();
+
+            serviceCollection.AddTransient<DevelopmentConfigurationManager>();
+            RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
     }
 }

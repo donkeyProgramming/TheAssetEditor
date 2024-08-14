@@ -31,14 +31,14 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             set { SetAndNotify(ref _loopCounter, value); SettingsChanged?.Invoke(); }
         }
 
-        Vector3ViewModel _translation = new Vector3ViewModel(0);
+        Vector3ViewModel _translation = new Vector3ViewModel(0, 0, 0);
         public Vector3ViewModel Translation
         {
             get { return _translation; }
             set { SetAndNotify(ref _translation, value); SettingsChanged?.Invoke(); }
         }
 
-        Vector3ViewModel _rotation = new Vector3ViewModel(0);
+        Vector3ViewModel _rotation = new Vector3ViewModel(0, 0, 0);
         public Vector3ViewModel Rotation
         {
             get { return _rotation; }

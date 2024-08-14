@@ -6,7 +6,7 @@ namespace Shared.GameFormats.RigidModel
     public class RmvModel
     {
         public RmvCommonHeader CommonHeader { get; set; }
-        public IMaterial Material { get; set; }
+        public IRmvMaterial Material { get; set; }
         public RmvMesh Mesh { get; set; }
 
         public RmvModel()

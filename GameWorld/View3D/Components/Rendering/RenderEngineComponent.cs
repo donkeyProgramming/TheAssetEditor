@@ -4,7 +4,7 @@ using CommunityToolkit.Diagnostics;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Utility;
-using GameWorld.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;

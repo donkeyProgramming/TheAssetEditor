@@ -1,7 +1,7 @@
 ﻿using System;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.RenderItems;
-using GameWorld.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 
 namespace GameWorld.Core.Components
