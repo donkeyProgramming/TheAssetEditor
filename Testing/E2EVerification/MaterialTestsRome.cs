@@ -1,14 +1,4 @@
-﻿using GameWorld.Core.Rendering.Materials;
-using GameWorld.Core.Rendering.Materials.Serialization;
-using GameWorld.Core.Rendering.Materials.Shaders;
-using GameWorld.Core.Rendering.Materials.Shaders.SpecGloss;
-using GameWorld.WpfWindow.ResourceHandling;
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
-using Shared.GameFormats.RigidModel;
-
-namespace E2EVerification
+﻿namespace E2EVerification
 {
     //internal class MaterialTestsRome
     //{

@@ -1,17 +1,4 @@
-﻿using GameWorld.Core.Rendering.Materials;
-using GameWorld.Core.Rendering.Materials.Capabilities;
-using GameWorld.Core.Rendering.Materials.Serialization;
-using GameWorld.Core.Rendering.Materials.Shaders;
-using GameWorld.Core.Rendering.Materials.Shaders.MetalRough;
-using GameWorld.Core.Services.SceneSaving.Material;
-using GameWorld.WpfWindow.ResourceHandling;
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
-using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.WsModel;
-
-namespace E2EVerification
+﻿namespace E2EVerification
 {
 
 

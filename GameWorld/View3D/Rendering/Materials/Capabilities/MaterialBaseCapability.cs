@@ -20,7 +20,10 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public abstract ICapability Clone();
         public virtual void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
         {
-            UseAlpha = rmvMaterial.AlphaMode == AlphaMode.Transparent;
+            if (wsModelMaterial != null)
+                UseAlpha = wsModelMaterial.Alpha;
+            else
+                UseAlpha = rmvMaterial.AlphaMode == AlphaMode.Transparent;
         }
 
         public virtual void SerializeToWsModel(WsMaterialTemplateEditor templateHandler) 

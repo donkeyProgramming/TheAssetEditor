@@ -1,4 +1,5 @@
-﻿using Editors.Shared.DevConfig.Base;
+﻿using System.Linq;
+using Editors.Shared.DevConfig.Base;
 using KitbasherEditor.ViewModels.UiCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;

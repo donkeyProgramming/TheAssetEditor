@@ -23,7 +23,6 @@ namespace AssetEditor.Services
                 new GameWorld.Core.DependencyInjectionContainer(),
                
                 // Misc
-                new Editors.Shared.DevConfig.DependencyInjectionContainer(),
 
                 // Domains
                 new Editors.Shared.Core.DependencyInjectionContainer(),
