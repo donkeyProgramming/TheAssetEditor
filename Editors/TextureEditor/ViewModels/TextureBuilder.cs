@@ -6,9 +6,9 @@ using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using GameWorld.Core.Rendering;
-using GameWorld.WpfWindow;
-using GameWorld.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.Services;
 
 namespace Editors.TextureEditor.ViewModels
 {

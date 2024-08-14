@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameWorld.Core.Rendering.Materials.Shaders;
-using GameWorld.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow.ResourceHandling;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;

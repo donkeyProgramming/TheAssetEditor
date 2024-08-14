@@ -1,4 +1,4 @@
-﻿namespace GameWorld.Core.Rendering.Shading
+﻿namespace GameWorld.Core.Rendering.Materials
 {
 
     /*

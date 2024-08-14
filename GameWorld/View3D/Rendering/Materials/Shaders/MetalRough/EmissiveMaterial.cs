@@ -1,6 +1,6 @@
 ﻿using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Materials.Capabilities;
-using GameWorld.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow.ResourceHandling;
 
 namespace GameWorld.Core.Rendering.Materials.Shaders.MetalRough
 {

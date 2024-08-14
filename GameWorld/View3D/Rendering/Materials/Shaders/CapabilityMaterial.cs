@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Materials.Capabilities;
-using GameWorld.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

@@ -5,7 +5,7 @@ using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
-using GameWorld.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 

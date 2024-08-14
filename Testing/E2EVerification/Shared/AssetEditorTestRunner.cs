@@ -1,7 +1,7 @@
 ﻿using AssetEditor.Services;
 using GameWorld.Core.Components.Input;
-using GameWorld.WpfWindow;
-using GameWorld.WpfWindow.ResourceHandling;
+using GameWorld.Core.WpfWindow;
+using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Shared.Core.DependencyInjection;

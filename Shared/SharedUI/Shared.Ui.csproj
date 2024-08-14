@@ -6,7 +6,6 @@
 	</PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\GameWorld\Monogame.WpfInterop\GameWorld.WpfWindow.csproj" />
     <ProjectReference Include="..\EmbeddedResources\Shared.EmbeddedResources.csproj" />
     <ProjectReference Include="..\GameFiles\Shared.GameFormats.csproj" />
     <ProjectReference Include="..\SharedCore\Shared.Core.csproj" />

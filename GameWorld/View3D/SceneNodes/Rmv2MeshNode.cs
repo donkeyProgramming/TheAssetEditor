@@ -10,7 +10,6 @@ using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.Core.Utility;
-using GameWorld.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel;

@@ -1,5 +1,5 @@
-﻿using GameWorld.WpfWindow;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.Services;
 
 namespace GameWorld.Core.Utility
 {
