@@ -32,11 +32,6 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public virtual void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
         {
-            if (UseAlpha == false)
-            { 
-            
-            }
-
             rmvMaterial.AlphaMode = UseAlpha ? AlphaMode.Transparent : AlphaMode.Opaque;
         }
     }
