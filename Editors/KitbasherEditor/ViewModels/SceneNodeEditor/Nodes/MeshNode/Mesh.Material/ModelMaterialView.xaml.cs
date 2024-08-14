@@ -18,9 +18,9 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews.Ws
     /// <summary>
     /// Interaction logic for WsModelMaterialView.xaml
     /// </summary>
-    public partial class WsModelMaterialView : UserControl
+    public partial class ModelMaterialView : UserControl
     {
-        public WsModelMaterialView()
+        public ModelMaterialView()
         {
             InitializeComponent();
         }

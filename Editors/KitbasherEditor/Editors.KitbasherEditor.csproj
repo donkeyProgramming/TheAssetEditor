@@ -6,14 +6,14 @@
       <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Dissolve\**" />
-    <Compile Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Iridescence\**" />
-    <EmbeddedResource Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Dissolve\**" />
-    <EmbeddedResource Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Iridescence\**" />
-    <None Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Dissolve\**" />
-    <None Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Iridescence\**" />
-    <Page Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Dissolve\**" />
-    <Page Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.WsMaterial\Iridescence\**" />
+    <Compile Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Dissolve\**" />
+    <Compile Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Iridescence\**" />
+    <EmbeddedResource Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Dissolve\**" />
+    <EmbeddedResource Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Iridescence\**" />
+    <None Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Dissolve\**" />
+    <None Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Iridescence\**" />
+    <Page Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Dissolve\**" />
+    <Page Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Iridescence\**" />
   </ItemGroup>
 
 
