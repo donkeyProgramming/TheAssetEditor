@@ -3,7 +3,7 @@ using System.Windows.Input;
 using Shared.Ui.Common.MenuSystem;
 using GameWorld.Core.Services;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     public class UndoCommand : IKitbasherUiCommand
     {

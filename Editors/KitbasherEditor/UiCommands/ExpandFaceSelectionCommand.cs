@@ -4,7 +4,7 @@ using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     public class ExpandFaceSelectionCommand : IKitbasherUiCommand
     {
@@ -12,9 +12,9 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.FaceSelected;
         public Hotkey HotKey { get; } = null;
 
-        private readonly  FaceEditor _faceEditor;
-        private readonly  SelectionManager _selectionManager;
-        private readonly  WindowKeyboard _keyboard;
+        private readonly FaceEditor _faceEditor;
+        private readonly SelectionManager _selectionManager;
+        private readonly WindowKeyboard _keyboard;
 
         public ExpandFaceSelectionCommand(FaceEditor faceEditor, SelectionManager selectionManager, WindowKeyboard keyboard)
         {

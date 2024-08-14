@@ -1,11 +1,11 @@
 ﻿using System.IO;
 using System.Windows;
+using Editors.KitbasherEditor.EventHandlers;
+using Editors.KitbasherEditor.Services;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using GameWorld.Core.Components;
 using GameWorld.Core.Services;
-using KitbasherEditor.EventHandlers;
-using KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Serilog;
 using Shared.Core.ErrorHandling;

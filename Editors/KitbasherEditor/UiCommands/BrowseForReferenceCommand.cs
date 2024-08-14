@@ -1,11 +1,11 @@
 ﻿using CommonControls.PackFileBrowser;
-using KitbasherEditor.Services;
+using Editors.KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Ui.Common.MenuSystem;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     public class BrowseForReferenceCommand : IKitbasherUiCommand
     {
@@ -73,7 +73,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
             _packFileService = packFileService;
         }
 
-        public void Execute(string path) 
+        public void Execute(string path)
         {
             var packFile = _packFileService.FindFile(path);
             if (packFile == null)

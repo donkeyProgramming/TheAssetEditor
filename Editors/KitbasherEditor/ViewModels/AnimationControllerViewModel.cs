@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Editors.KitbasherEditor.Events;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
-using KitbasherEditor.Events;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;

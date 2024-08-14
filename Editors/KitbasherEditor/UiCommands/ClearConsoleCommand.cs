@@ -1,7 +1,7 @@
 ﻿using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
 
     public class ClearConsoleCommand : IKitbasherUiCommand
@@ -10,7 +10,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        public ClearConsoleCommand(){}
+        public ClearConsoleCommand() { }
 
         public void Execute() => Console.Clear();
     }

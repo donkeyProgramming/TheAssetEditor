@@ -1,6 +1,6 @@
 ﻿using System.Linq;
+using Editors.KitbasherEditor.UiCommands;
 using Editors.Shared.DevConfig.Base;
-using KitbasherEditor.ViewModels.UiCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.Events;

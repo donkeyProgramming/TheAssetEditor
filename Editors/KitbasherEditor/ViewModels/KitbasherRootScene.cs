@@ -1,9 +1,8 @@
 ﻿using System.IO;
+using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services;
-using KitbasherEditor.Events;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
