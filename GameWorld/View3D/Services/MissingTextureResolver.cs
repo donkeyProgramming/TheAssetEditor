@@ -1,11 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using GameWorld.Core.SceneNodes;
+﻿using GameWorld.Core.SceneNodes;
 using Shared.Core.PackFiles;
-using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.RigidModel.Types;
-using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Services
 {
@@ -20,7 +14,7 @@ namespace GameWorld.Core.Services
                     meshNode.UpdateTexture("", texture.Key);
             }
         }
-
+        /*
         public void ResolveMissingTextures(Rmv2MeshNode meshNode, PackFileService pfs)
         {
             var textureTypes = Enum.GetValues(typeof(TextureType)).Cast<TextureType>().ToList();
@@ -72,16 +66,16 @@ namespace GameWorld.Core.Services
                 UpdateTextureIfMissing(meshNode, pfs, TextureType.BaseColour, baseColourBasedOnSpec);
                 UpdateTextureIfMissing(meshNode, pfs, TextureType.MaterialMap, materialMapPathBasedOnSpec);
             }
-        }
+        }*/
 
-        string GetTexturePath(Rmv2MeshNode meshNode, TextureType texureType)
+       /* string GetTexturePath(Rmv2MeshNode meshNode, TextureType texureType)
         {
             var texture = meshNode.Material.GetTexture(texureType);
             if (texture == null)
                 return "";
             return texture.Value.Path;
-        }
-
+        }*/
+        /*
         void UpdateTextureIfMissing(Rmv2MeshNode meshNode, PackFileService pfs, TextureType texureType, string newPath)
         {
             var newFile = pfs.FindFile(newPath);
@@ -94,6 +88,6 @@ namespace GameWorld.Core.Services
             {
                 meshNode.UpdateTexture(newPath, texureType);
             }
-        }
+        }*/
     }
 }

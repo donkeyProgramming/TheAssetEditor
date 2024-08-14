@@ -91,15 +91,6 @@ namespace GameWorld.Core.SceneNodes
            // }
         }
 
-        public void UseTexture(TextureType textureType, bool value)
-        {
-            //var sharedCapability = Effect.GetCapability<DefaultCapability>();
-            //if (sharedCapability != null)
-            //{
-            //    sharedCapability.SetTextureUsage(textureType, value);
-            //}
-        }
-
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
             var animationCapability = Effect.GetCapability<AnimationCapability>();
@@ -124,13 +115,6 @@ namespace GameWorld.Core.SceneNodes
                 animationCapability.ApplyAnimation = AnimationPlayer != null && AnimationPlayer.IsEnabled;
             }
 
-            //var sharedCapability = Effect.GetCapability<MetalRoughCapability>();
-            //if (sharedCapability != null)
-            //{
-            //    sharedCapability.ScaleMult = ScaleMult;
-            //    sharedCapability.UseAlpha = Material.AlphaMode == AlphaMode.Transparent;
-            //}
-
             if (AttachmentBoneResolver != null)
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
 
@@ -150,6 +134,12 @@ namespace GameWorld.Core.SceneNodes
 
         public override void CopyInto(ISceneNode target)
         {
+            CopyInto(target, true);
+            base.CopyInto(target);
+        }
+
+        public void CopyInto(ISceneNode target, bool includeMesh)
+        {
             var typedTarget = target as Rmv2MeshNode;
             if (typedTarget == null)
                 throw new Exception("Error casting");
@@ -161,12 +151,12 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.LodIndex = LodIndex;
             typedTarget.ReduceMeshOnLodGeneration = ReduceMeshOnLodGeneration;
             typedTarget.AnimationPlayer = AnimationPlayer;
-            typedTarget.CommonHeader = CommonHeader;
             typedTarget.Material = Material.Clone();
             typedTarget.Geometry = Geometry.Clone();
-
             typedTarget.Effect = Effect.Clone();
-            typedTarget.Geometry = Geometry.Clone();
+           
+            if(includeMesh)
+                typedTarget.Geometry = Geometry.Clone();
 
             typedTarget.OriginalFilePath = OriginalFilePath;
             typedTarget.OriginalPartIndex = OriginalPartIndex;

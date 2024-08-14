@@ -7,7 +7,6 @@ using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
-using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
@@ -90,7 +89,5 @@ namespace KitbasherEditor
         {
             factory.RegisterTool<KitbasherViewModel, KitbasherView>(new ExtensionToTool(EditorEnums.Kitbash_Editor, [".rigid_model_v2", ".wsmodel.rigid_model_v2"]/*, new[] { ".wsmodel", ".variantmeshdefinition" }*/));
         }
-
-
     }
 }

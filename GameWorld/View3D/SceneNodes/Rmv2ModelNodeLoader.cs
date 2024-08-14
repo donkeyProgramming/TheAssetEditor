@@ -38,7 +38,6 @@ namespace GameWorld.Core.SceneNodes
                     var geometry = MeshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName, _contextFactory.Create());
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
 
-
                     var wsModelMaterial = wsMaterialProvider.GetModelMaterial(lodIndex, modelIndex); 
                     var shader = _capabilityMaterialFactory.Create(rmvModel.Material, wsModelMaterial);
 
