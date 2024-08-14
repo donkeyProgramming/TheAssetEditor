@@ -19,7 +19,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 
         public ObservableCollection<string> StringParameters { get; set; }
         public ObservableCollection<float> FloatParameters { get; set; }
-        public ObservableCollection<int> IntParameters { get; set; }
+        public ObservableCollection<(int Index, int Value)> IntParameters { get; set; }
         public ObservableCollection<string> TextureParameters { get; set; }
         public ObservableCollection<string> AttachmentPointParameters { get; set; }
         public ObservableCollection<string> VectorParameters { get; set; }
@@ -48,7 +48,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 
             StringParameters = new ObservableCollection<string>(_weightedMaterial.StringParams);
             FloatParameters = new ObservableCollection<float>(_weightedMaterial.FloatParams);
-            IntParameters = new ObservableCollection<int>(_weightedMaterial.IntParams);
+            IntParameters = new ObservableCollection<(int, int)>(_weightedMaterial.IntParams);
             TextureParameters = new ObservableCollection<string>(_weightedMaterial.TexturesParams.Select(x => x.TexureType + " - " + x.Path));
             AttachmentPointParameters = new ObservableCollection<string>(_weightedMaterial.AttachmentPointParams.Select(x => x.BoneIndex + " - " + x.Name + " Ident:" + x.Matrix.IsIdentity()));
             VectorParameters = new ObservableCollection<string>(_weightedMaterial.Vec4Params.Select(x => $"[{x.X}] [{x.Y}] [{x.Z}] [{x.W}]"));

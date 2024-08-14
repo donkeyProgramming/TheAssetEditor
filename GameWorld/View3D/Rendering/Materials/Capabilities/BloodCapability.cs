@@ -38,6 +38,8 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
         {
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, BloodMask);
+            UseBlood = CapabilityHelper.GetParameterFloat(wsModelMaterial, "receives_blood", 1) == 1;
+            UvScale = CapabilityHelper.GetParameterVector2(wsModelMaterial, "blood_uv_scale", new Vector2(1));
         }
 
         public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)

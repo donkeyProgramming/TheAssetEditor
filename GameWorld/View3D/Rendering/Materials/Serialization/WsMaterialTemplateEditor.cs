@@ -45,15 +45,8 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             var alphaShaderPart = "";
             var alphaNamePart = "off";
 
-            var metalRoughCapability = capabilityMaterial.TryGetCapability<MetalRoughCapability>();
-            if (metalRoughCapability != null && metalRoughCapability.UseAlpha)
-            {
-                alphaShaderPart = "_alpha";
-                alphaNamePart = "on";
-            }
-
-            var specGlossCapability = capabilityMaterial.TryGetCapability<SpecGlossCapability>();
-            if (specGlossCapability != null && specGlossCapability.UseAlpha)
+            var baseCapability = capabilityMaterial.TryGetCapability<MaterialBaseCapability>();
+            if (baseCapability != null && baseCapability.UseAlpha)
             {
                 alphaShaderPart = "_alpha";
                 alphaNamePart = "on";

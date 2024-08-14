@@ -44,7 +44,7 @@ namespace E2EVerification
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
-            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(7));
+            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(2));
 
             // Verify the generated RMV2 file
             uint[] expectedMeshCountPerLod = [4,4,2,2];
@@ -90,7 +90,7 @@ namespace E2EVerification
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
-            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(6));
+            Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(2));
 
             // Verify the generated RMV2 file
             uint[] expectedMeshCountPerLod = [4, 4, 4, 4];

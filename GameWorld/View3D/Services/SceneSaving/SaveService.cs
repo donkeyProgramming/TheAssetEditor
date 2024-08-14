@@ -55,7 +55,7 @@ namespace GameWorld.Core.Services.SceneSaving
                 model.LodHeaders[i].QualityLvl = settings.LodSettingsPerLod[i].QualityLvl;
             }
 
-            UpdateRmv2MaterialFromShader(mainNode);
+            
             _lodStrategyProvider.GetStrategy(settings.LodGenerationMethod).Generate(mainNode, settings.LodSettingsPerLod);
             _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, settings);
             _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, settings.OnlySaveVisible);
@@ -63,21 +63,23 @@ namespace GameWorld.Core.Services.SceneSaving
             _eventHub.Publish(new ScopedFileSavedEvent() { NewPath = outputPath });
         }
 
-        void UpdateRmv2MaterialFromShader(Rmv2ModelNode mainNode)
-        {
-            foreach (var mesh in mainNode.GetMeshesInLod(0, false))
-            {
-                var material = mesh.Effect;
-
-
-                var rmvMaterial = mesh.Material;
-
-                var t = new MaterialToRmvSerializer();
-                mesh.Material = t.CreateMaterialFromCapabilityMaterial(mesh.Material, material);   //This is the place!
-
-                //rmvMaterial.SetTexture(Shared.GameFormats.RigidModel.Types.TextureType.BaseColour, material.TryGetCapability<DefaultCapability>().BaseColour.TexturePath);
-            }
-        }
+       //void UpdateRmv2MaterialFromShader(Rmv2ModelNode mainNode)
+       //{
+       //    foreach (var mesh in mainNode.GetMeshesInLod(0, false))
+       //    {
+       //        var material = mesh.Effect;
+       //
+       //
+       //        var rmvMaterial = mesh.Material;
+       //
+       //        var t = new MaterialToRmvSerializer();
+       //        mesh.Material = t.CreateMaterialFromCapabilityMaterial(mesh.Material, material);   //This is the place!
+       //
+       //       // something goes wrong here
+       //        // Write back to the actuall rmv format
+       //        //rmvMaterial.SetTexture(Shared.GameFormats.RigidModel.Types.TextureType.BaseColour, material.TryGetCapability<DefaultCapability>().BaseColour.TexturePath);
+       //    }
+       //}
 
 
         public List<GeometryStrategyInformation> GetGeometryStrategies() => _geometryStrategyProvider.GetStrategies();

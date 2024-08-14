@@ -9,10 +9,8 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
-    public class MetalRoughCapability : ICapability
+    public class MetalRoughCapability : MaterialBaseCapability
     {
-        public float ScaleMult { get; set; } = 1;
-        public bool UseAlpha { get; set; }
         public TextureInput BaseColour { get; set; } = new TextureInput(TextureType.BaseColour);
         public TextureInput MaterialMap { get; set; } = new TextureInput(TextureType.MaterialMap);
         public TextureInput NormalMap { get; set; } = new TextureInput(TextureType.Normal);
@@ -20,19 +18,19 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public TextureInput Distortion { get; set; } = new TextureInput(TextureType.Distortion);
         public TextureInput DistortionNoise { get; set; } = new TextureInput(TextureType.DistortionNoise);
 
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary)
+        public override void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {
-            effect.Parameters["UseAlpha"].SetValue(UseAlpha);
-
             BaseColour.Apply(effect, resourceLibrary);
             MaterialMap.Apply(effect, resourceLibrary);
             NormalMap.Apply(effect, resourceLibrary);
             Mask.Apply(effect, resourceLibrary);
+
+            base.Apply(effect, resourceLibrary);
             //Distortion.Apply(effect, resourceLibrary);
             //DistortionNoise.Apply(effect, resourceLibrary);
         }
 
-        public ICapability Clone()
+        public override ICapability Clone()
         {
             return new MetalRoughCapability()
             {
@@ -47,19 +45,19 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             };
         }
 
-        public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
+        public override void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
         {
-            UseAlpha = CapabilityHelper.UseAlpha(rmvMaterial, wsModelMaterial);
-
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, BaseColour);
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, MaterialMap);
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, NormalMap);
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Mask);
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Distortion);
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, DistortionNoise);
+
+            base.Initialize(wsModelMaterial, rmvMaterial);
         }
 
-        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
+        public override void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
         {
             templateHandler.AddAttribute("TEMPLATE_ATTR_BASE_COLOUR_PATH", BaseColour);
             templateHandler.AddAttribute("TEMPLATE_ATTR_MASK_PATH", Mask);
@@ -67,6 +65,47 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             templateHandler.AddAttribute("TEMPLATE_ATTR_NORMAL_PATH", NormalMap);
             templateHandler.AddAttribute("TEMPLATE_ATTR_DISTORTION_PATH", Distortion);
             templateHandler.AddAttribute("TEMPLATE_ATTR_DISTORTIONNOISE_PATH", DistortionNoise);
+
+            base.SerializeToWsModel(templateHandler);
+        }
+
+        public override void SerializeToRmvMaterial(IRmvMaterial rmvMaterial) 
+        {
+            rmvMaterial.SetTexture(BaseColour.Type, BaseColour.TexturePath);
+            rmvMaterial.SetTexture(MaterialMap.Type, MaterialMap.TexturePath);
+            rmvMaterial.SetTexture(NormalMap.Type, NormalMap.TexturePath);
+            rmvMaterial.SetTexture(Mask.Type, Mask.TexturePath);
+
+            base.SerializeToRmvMaterial(rmvMaterial);
+        }
+
+
+        public static bool AreEqual(MetalRoughCapability a, MetalRoughCapability b)
+        {
+            if (a.UseAlpha != b.UseAlpha)
+                return false;
+
+            string[] aTextures = [
+                a.BaseColour.TexturePath,
+                a.MaterialMap.TexturePath,
+                a.NormalMap.TexturePath,
+                a.Mask.TexturePath
+            ];
+
+            string[] bTextures = [
+                b.BaseColour.TexturePath,
+                b.MaterialMap.TexturePath,
+                b.NormalMap.TexturePath,
+                b.Mask.TexturePath
+            ];
+
+            for (var i = 0; i < aTextures.Length; i++)
+            {
+                if (aTextures[i] != bTextures[i])
+                    return false;
+            }
+
+            return true;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         public List<RmvTexture> TexturesParams { get; set; }
         public List<string> StringParams { get; set; }
         public List<float> FloatParams { get; set; }
-        public List<int> IntParams { get; set; }
+        public List<(int Index, int Value)> IntParams { get; set; }
         public List<RmvVector4> Vec4Params { get; set; }
 
         public ModelMaterialEnum MaterialId { get; set; } = ModelMaterialEnum.weighted;
@@ -194,7 +194,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             // Alpha mode
             material.AlphaMode = AlphaMode.Opaque;
             if (material.IntParams.Count != 0)
-                material.AlphaMode = (AlphaMode)material.IntParams.First();
+                material.AlphaMode = (AlphaMode)material.IntParams.First().Item2;
 
             return material;
         }
@@ -210,12 +210,12 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 OriginalTransform = new RmvTransform(),
                 Filters = new string(""),
                 PivotPoint = new Vector3(0, 0, 0),
-                StringParams = new List<string>(),
-                FloatParams = new List<float>(),
-                Vec4Params = new List<RmvVector4>(),
-                IntParams = new List<int>(),
-                AttachmentPointParams = new List<RmvAttachmentPoint>(),
-                TexturesParams = new List<RmvTexture>(),
+                StringParams = [],
+                FloatParams = [],
+                Vec4Params = [],
+                IntParams = [(0,0)],
+                AttachmentPointParams = [],
+                TexturesParams = [],
                 AlphaMode = AlphaMode.Transparent, /// Alpha mode - assume that users want transpencey mode enabled by default
             };
 
@@ -226,6 +226,11 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         {
             if (material is not WeightedMaterial typedMaterial)
                 throw new Exception("Incorrect material provided for WeightedMaterial::Save");
+
+
+            // Update variables
+           //if (typedMaterial)
+           //{ }
 
             // Create the header
             var header = new WeightedMaterialStruct()
@@ -274,16 +279,14 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 writer.Write(ByteParsers.Single.EncodeValue(typedMaterial.FloatParams[floatIndex], out _));
             }
 
-            // Update alpha value in param list
-            if (typedMaterial.IntParams.Count != 0)
-                typedMaterial.IntParams[0] = (int)material.AlphaMode;
-
             for (var intIndex = 0; intIndex < typedMaterial.IntParams.Count; intIndex++)
             {
-                writer.Write(ByteParsers.Int32.EncodeValue(intIndex, out _));
-                typedMaterial.IntParams[0] = (int)material.AlphaMode;
+                var index = typedMaterial.IntParams[intIndex].Item1;
 
-                writer.Write(ByteParsers.Int32.EncodeValue(typedMaterial.IntParams[intIndex], out _));
+                writer.Write(ByteParsers.Int32.EncodeValue(index, out _));
+                var value = (int)material.AlphaMode;
+
+                writer.Write(ByteParsers.Int32.EncodeValue(value, out _));
             }
 
             for (var vec4Index = 0; vec4Index < typedMaterial.Vec4Params.Count; vec4Index++)
@@ -363,19 +366,19 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             return output;
         }
 
-        List<int> LoadIntParams(uint IntParamCount, byte[] dataArray, ref int dataOffset)
+        List<(int, int)> LoadIntParams(uint IntParamCount, byte[] dataArray, ref int dataOffset)
         {
-            var output = new List<int>();
+            var output = new List<(int, int)>();
             for (var i = 0; i < IntParamCount; i++)
             {
-                var index = ByteParsers.UInt32.TryDecode(dataArray, dataOffset, out _, out _, out _);
+                var index = ByteParsers.Int32.TryDecodeValue(dataArray, dataOffset, out var indexValue, out _, out _);
                 var result = ByteParsers.Int32.TryDecodeValue(dataArray, dataOffset + 4, out var value, out var byteLength, out var error);
                 if (!result)
                 {
                     throw new Exception("Error reading int parameter - " + error);
                 }
                 dataOffset += byteLength + 4;
-                output.Add(value);
+                output.Add((indexValue, value));
             }
             return output;
         }

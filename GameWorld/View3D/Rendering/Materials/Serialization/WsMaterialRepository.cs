@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using Shared.Core.PackFiles;
 
 namespace GameWorld.Core.Rendering.Materials.Serialization
@@ -40,8 +42,16 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             var start = wsMaterialContent.IndexOf("<name>", System.StringComparison.InvariantCultureIgnoreCase);
             var end = wsMaterialContent.IndexOf("</name>", start, System.StringComparison.InvariantCultureIgnoreCase);
             var contentWithoutName = wsMaterialContent.Remove(start, end - start + "</name>".Length).ToLower();
+            var contentWithoutNameAndWhiteSpace = ReplaceWhitespace(contentWithoutName, string.Empty);
+            var finalStr = contentWithoutNameAndWhiteSpace.ToLower();
 
-            return contentWithoutName;
+            return finalStr;
+        }
+
+        private static readonly Regex sWhitespace = new Regex(@"\s+");
+        public static string ReplaceWhitespace(string input, string replacement)
+        {
+            return sWhitespace.Replace(input, replacement);
         }
 
         Dictionary<string, string> LoadAllExistingMaterials(PackFileService packFileService)

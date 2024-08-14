@@ -130,6 +130,10 @@ namespace Shared.GameFormats.WsModel
                     Textures[TextureType.EmissiveDistortion] = texturePath;
                 if (textureSlotName.Contains("t_xml_emissive_texture", StringComparison.InvariantCultureIgnoreCase))
                     Textures[TextureType.Emissive] = texturePath;
+                if (textureSlotName.Contains("t_xml_distortion", StringComparison.InvariantCultureIgnoreCase))
+                    Textures[TextureType.Distortion] = texturePath;
+                if (textureSlotName.Contains("t_xml_distortion_noise", StringComparison.InvariantCultureIgnoreCase))
+                    Textures[TextureType.DistortionNoise] = texturePath;
             }
         }
     }

@@ -46,7 +46,8 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
         {
             foreach (var capability in Capabilities)
             {
-                if (capability.GetType() == typeof(T))
+                var isTypeOrChild = typeof(T).IsAssignableFrom(capability.GetType());
+                if (isTypeOrChild)
                     return (capability as T)!;
             }
 

@@ -71,6 +71,50 @@ namespace GameWorld.Core.Test.Rendering.Materials
         }
 
         [TestCase]
+        public void AddMaterial_ExistingAndEqualWithWhiteSpaceDiff()
+        {
+            // Arrange 
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+
+            var materialPath0 = "content/material0.xml.material";
+            var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
+
+            var materialPath1 = "content/material1.xml.material";
+            var materialContent1 = "  PreContent0  <name> customMaterialName2 </name>  PostContent0  ";
+
+            // Act
+            var repo = new WsMaterialRepository(pfs);
+            repo.GetExistingOrAddMaterial(materialContent0, materialPath0, out var _);
+            var finalPath = repo.GetExistingOrAddMaterial(materialContent1, materialPath1, out var isNew);
+
+            // Assert
+            Assert.That(finalPath, Is.EqualTo(materialPath0));
+            Assert.That(isNew, Is.False);
+        }
+
+        [TestCase]
+        public void AddMaterial_ExistingAndEqualWithCapitalization()
+        {
+            // Arrange 
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+
+            var materialPath0 = "content/material0.xml.material";
+            var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
+
+            var materialPath1 = "content/material1.xml.material";
+            var materialContent1 = "PreContenT0<name> customMaterialName </name>PostContent0";
+
+            // Act
+            var repo = new WsMaterialRepository(pfs);
+            repo.GetExistingOrAddMaterial(materialContent0, materialPath0, out var _);
+            var finalPath = repo.GetExistingOrAddMaterial(materialContent1, materialPath1, out var isNew);
+
+            // Assert
+            Assert.That(finalPath, Is.EqualTo(materialPath0));
+            Assert.That(isNew, Is.False);
+        }
+
+        [TestCase]
         public void LoadExistingMaterials()
         {
             // Arrange 

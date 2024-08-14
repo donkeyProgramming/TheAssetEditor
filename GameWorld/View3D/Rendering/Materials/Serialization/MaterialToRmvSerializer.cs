@@ -11,6 +11,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             // Create a new empty matial
             var currentVertexFormat = currentRmvMaterial.BinaryVertexFormat;
             var newMaterial = MaterialFactory.Create().CreateMaterial(ModelMaterialEnum.weighted, currentVertexFormat);
+            newMaterial.ModelName = currentRmvMaterial.ModelName;
 
             foreach (var cap in material.Capabilities)
                 cap.SerializeToRmvMaterial(newMaterial);

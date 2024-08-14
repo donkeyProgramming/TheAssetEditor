@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using GameWorld.Core.Animation;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Serilog;
@@ -91,6 +92,11 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                     if (skeleton != null)
                         boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();
 
+
+                    var materialSerializer = new MaterialToRmvSerializer();
+                    var newRmvMaterial = materialSerializer.CreateMaterialFromCapabilityMaterial(meshes[meshIndex].Material, meshes[meshIndex].Effect); 
+
+                    newModel.Material = newRmvMaterial;
                     newModel.Material.UpdateEnumsBeforeSaving(meshes[meshIndex].Geometry.VertexFormat, version);
 
                     if (enrichModel)
