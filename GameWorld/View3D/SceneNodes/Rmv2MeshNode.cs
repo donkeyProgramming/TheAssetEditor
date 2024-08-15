@@ -48,9 +48,7 @@ namespace GameWorld.Core.SceneNodes
         public AnimationPlayer? AnimationPlayer { get; set; }                               // This is a hack - remove at some point
         public SkeletonBoneAnimationResolver? AttachmentBoneResolver { get; set; } = null;  // This is a hack - remove at some point
 
-        private Rmv2MeshNode()
-        { }
-
+    
         public Rmv2MeshNode(MeshObject meshObject, IRmvMaterial material, CapabilityMaterial shader, AnimationPlayer animationPlayer)
         {
             RmvMaterial = material;
@@ -62,20 +60,7 @@ namespace GameWorld.Core.SceneNodes
             PivotPoint = material.PivotPoint;
         }
 
-        public Rmv2ModelNode? GetParentModel()
-        {
-            var parent = Parent;
-            while (parent != null)
-            {
-                if (parent is Rmv2ModelNode modelNode)
-                    return modelNode;
-                parent = parent.Parent;
-            }
-
-            return null;
-        }
-
-        public Vector3 GetObjectCentre() => MathUtil.GetCenter(Geometry.BoundingBox) + Position;
+        private Rmv2MeshNode() { }
        
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
@@ -116,6 +101,21 @@ namespace GameWorld.Core.SceneNodes
                 renderEngine.AddRenderLines(LineHelper.AddBoundingBox(Geometry.BoundingBox, Color.Red));
         }
 
+        public Rmv2ModelNode? GetParentModel()
+        {
+            var parent = Parent;
+            while (parent != null)
+            {
+                if (parent is Rmv2ModelNode modelNode)
+                    return modelNode;
+                parent = parent.Parent;
+            }
+
+            return null;
+        }
+
+        public Vector3 GetObjectCentre() => MathUtil.GetCenter(Geometry.BoundingBox) + Position;
+
         public override ISceneNode CreateCopyInstance() => new Rmv2MeshNode();
 
         public override void CopyInto(ISceneNode target)
@@ -144,11 +144,10 @@ namespace GameWorld.Core.SceneNodes
             if(includeMesh)
                 typedTarget.Geometry = Geometry.Clone();
 
-          
             base.CopyInto(target);
         }
 
-        private void UpdateModelMatrix(Matrix value)
+        void UpdateModelMatrix(Matrix value)
         {
             base.ModelMatrix = value;
             RenderMatrix = value;

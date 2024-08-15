@@ -4,6 +4,7 @@ using GameWorld.Core.Services.SceneSaving.Material;
 using System.Collections.Generic;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
+using System.Linq;
 
 namespace GameWorld.Core.Services.SceneSaving
 {
@@ -35,7 +36,7 @@ namespace GameWorld.Core.Services.SceneSaving
 
             LodSettingsPerLod.Clear();
 
-            NumberOfLodsToGenerate = modelNode.Model.LodHeaders.Length;
+            NumberOfLodsToGenerate = modelNode.GetLodNodes().Count();
 
             for (var i = 0; i < NumberOfLodsToGenerate; i++)
             {
@@ -54,7 +55,7 @@ namespace GameWorld.Core.Services.SceneSaving
 
             if (node != null)
             {
-                var numLodsInGeometry = node.Model.LodHeaders.Length;
+                var numLodsInGeometry = node.GetLodNodes().Count();
                 if (lodIndex < numLodsInGeometry)
                 { 
                     var lodHeader = node.Model.LodHeaders[lodIndex];

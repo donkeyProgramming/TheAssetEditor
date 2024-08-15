@@ -26,7 +26,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
         MainEditableNode _mainNode;
 
         [ObservableProperty] ObservableCollection<string> _skeletonNameList;
-        [ObservableProperty] string _skeletonName;
+        [ObservableProperty] string? _skeletonName;
         [ObservableProperty] ObservableCollection<RenderFormats> _possibleRenderFormats = [RenderFormats.MetalRoughness, RenderFormats.SpecGloss];
         [ObservableProperty] RenderFormats _selectedRenderFormat;
 
@@ -49,7 +49,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
             _renderEngineComponent.MainRenderFormat = value;
         }
 
-        partial void OnSkeletonNameChanged(string value)
+        partial void OnSkeletonNameChanged(string? value)
         {
             var cleanSkeletonName = "";
             if (!string.IsNullOrWhiteSpace(value))
@@ -59,10 +59,15 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 
         public void Initialize(ISceneNode node)
         {
-            _mainNode = node as MainEditableNode;
-            if (_mainNode.Model != null)
+            if (node is MainEditableNode mainEditableNode)
             {
-                SkeletonName = SkeletonNameList.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).ToLower() == _mainNode.Model.Header.SkeletonName.ToLower());
+                _mainNode = mainEditableNode;
+                if (_mainNode.SkeletonNode != null)
+                    SkeletonName = SkeletonNameList.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x).ToLower() == _mainNode.SkeletonNode.Skeleton.SkeletonName.ToLower());
+            }
+            else
+            {
+                throw new Exception($"{node} is not of type {nameof(MainEditableNode)}");
             }
         }
 
