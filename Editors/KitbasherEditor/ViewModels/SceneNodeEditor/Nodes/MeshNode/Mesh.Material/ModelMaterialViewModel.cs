@@ -45,7 +45,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         internal void Initialize(Rmv2MeshNode node)
         {
             _currentNode = node;
-            var material = _currentNode.Effect;
+            var material = _currentNode.Material;
             CurrentMaterialType = material.Type;
 
             MetalRough = CreateCapabilityView<MetalRoughCapability, MetalRoughViewModel>(material, (cap) => new MetalRoughViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary));
@@ -62,8 +62,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             if (oldValue == newValue || newValue == null || oldValue == null)
                 return;
 
-            var newMaterial = _materialFactory.ChangeMaterial(_currentNode.Effect, newValue.Value);
-            _currentNode.Effect = newMaterial;
+            var newMaterial = _materialFactory.ChangeMaterial(_currentNode.Material, newValue.Value);
+            _currentNode.Material = newMaterial;
         }
 
         TViewModel? CreateCapabilityView<T, TViewModel>(CapabilityMaterial material, Func<T, TViewModel> creator)

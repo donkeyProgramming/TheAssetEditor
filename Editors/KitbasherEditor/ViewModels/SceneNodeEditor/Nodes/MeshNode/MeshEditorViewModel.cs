@@ -41,7 +41,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
             WsMaterial = _serviceProvider.GetRequiredService<WsMaterialViewModel>();
             WsMaterial.Initialize(typedNode);
             
-            if (typedNode.Material is WeightedMaterial)
+            if (typedNode.RmvMaterial is WeightedMaterial)
             {
                 Material = _serviceProvider.GetRequiredService<WeightedMaterialViewModel>();
                 Material.Initialize(typedNode);

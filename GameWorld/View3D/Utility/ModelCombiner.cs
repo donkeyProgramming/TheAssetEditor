@@ -11,7 +11,7 @@ namespace GameWorld.Core.Utility
     {
         public static bool CanCombine(Rmv2MeshNode meshA, Rmv2MeshNode meshB, out string? errorMessage)
         {
-            if (AreMaterialsEqual(meshA.Name, meshA.Effect, meshB.Effect, meshB.Name, out var textureErrorMsg) == false)
+            if (AreMaterialsEqual(meshA.Name, meshA.Material, meshB.Material, meshB.Name, out var textureErrorMsg) == false)
             { 
                 errorMessage = "Material - " + textureErrorMsg;
                 return false;

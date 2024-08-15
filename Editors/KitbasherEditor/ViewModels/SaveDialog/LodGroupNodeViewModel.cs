@@ -23,7 +23,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
             if (_node != null)
             {
                 PolygonCount.Value = _node.GetAllModels(_saveSettings.OnlySaveVisible).Sum(x => x.Geometry.VertexCount() / 3);
-                TextureCount.Value = _node.GetAllModels(_saveSettings.OnlySaveVisible).SelectMany(x => x.Material.GetAllTextures().Select(x => x.Path)).Distinct().Count();
+                TextureCount.Value = _node.GetAllModels(_saveSettings.OnlySaveVisible).SelectMany(x => x.RmvMaterial.GetAllTextures().Select(x => x.Path)).Distinct().Count();
                 MeshCount.Value = _node.GetAllModels(_saveSettings.OnlySaveVisible).Count();
             }
         }

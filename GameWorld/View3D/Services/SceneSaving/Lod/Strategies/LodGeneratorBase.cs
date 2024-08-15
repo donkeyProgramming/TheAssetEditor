@@ -90,7 +90,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
                         mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted, mesh.Geometry.ParentSkeletonName);
 
                     if (settings.OptimizeAlpha)
-                        mesh.Effect.GetCapability<MaterialBaseCapability>().UseAlpha = false;
+                        mesh.Material.GetCapability<MaterialBaseCapability>().UseAlpha = false;
                 }
 
                 // Combine if possible 

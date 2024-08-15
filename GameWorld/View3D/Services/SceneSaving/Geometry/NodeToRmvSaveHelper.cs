@@ -77,7 +77,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                 for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
                     var modelname = meshes[meshIndex].Name;
-                    rmvFile.ModelList[lodIndex][meshIndex] = CreateRmvModel(modelname, meshes[meshIndex].PivotPoint, meshes[meshIndex].Effect, meshes[meshIndex].Geometry, skeleton, enrichModel);
+                    rmvFile.ModelList[lodIndex][meshIndex] = CreateRmvModel(modelname, meshes[meshIndex].PivotPoint, meshes[meshIndex].Material, meshes[meshIndex].Geometry, skeleton, enrichModel);
                 }
             }
 

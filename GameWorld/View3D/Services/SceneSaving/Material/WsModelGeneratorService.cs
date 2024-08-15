@@ -117,7 +117,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material
 
                 for (var meshPart = 0; meshPart < meshes.Count; meshPart++)
                 {
-                    var instance = new WsModelGeneratorInput(lodIndex, meshPart, meshes[meshPart].Name, meshes[meshPart].Geometry.VertexFormat, meshes[meshPart].Effect);
+                    var instance = new WsModelGeneratorInput(lodIndex, meshPart, meshes[meshPart].Name, meshes[meshPart].Geometry.VertexFormat, meshes[meshPart].Material);
                     output.Add(instance);
                 }
             }

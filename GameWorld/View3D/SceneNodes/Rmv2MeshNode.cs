@@ -22,7 +22,7 @@ namespace GameWorld.Core.SceneNodes
         private Vector3 _position = Vector3.Zero;
         private Vector3 _scale = Vector3.One;
 
-        public IRmvMaterial Material { get; set; }
+        public IRmvMaterial RmvMaterial { get; set; }
         public MeshObject Geometry { get; set; }
         public RmvCommonHeader CommonHeader { get; set; }
 
@@ -39,7 +39,7 @@ namespace GameWorld.Core.SceneNodes
         public bool ReduceMeshOnLodGeneration { get; set; } = true;
 
         public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
-        public CapabilityMaterial Effect { get; set; }
+        public CapabilityMaterial Material { get; set; }
        
 
         bool _isSelectable = true;
@@ -53,10 +53,10 @@ namespace GameWorld.Core.SceneNodes
 
         public Rmv2MeshNode(MeshObject meshObject, IRmvMaterial material, CapabilityMaterial shader, AnimationPlayer animationPlayer)
         {
-            Material = material;
+            RmvMaterial = material;
             AnimationPlayer = animationPlayer;
             Geometry = meshObject;
-            Effect = shader;
+            Material = shader;
 
             Name = material.ModelName;
             PivotPoint = material.PivotPoint;
@@ -79,7 +79,7 @@ namespace GameWorld.Core.SceneNodes
        
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
-            var animationCapability = Effect.GetCapability<AnimationCapability>();
+            var animationCapability = Material.GetCapability<AnimationCapability>();
             if (animationCapability != null)
             {
                 var data = new Matrix[256];
@@ -107,7 +107,7 @@ namespace GameWorld.Core.SceneNodes
             var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(PivotPoint);
             RenderMatrix = modelWithOffset;
 
-            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeometryRenderItem(Geometry, Effect, modelWithOffset * parentWorld));
+            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeometryRenderItem(Geometry, Material, modelWithOffset * parentWorld));
 
             if (DisplayPivotPoint)
                 renderEngine.AddRenderLines(LineHelper.AddLocator(PivotPoint, 1, Color.Red));
@@ -137,9 +137,9 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.ScaleMult = ScaleMult;
             typedTarget.PivotPoint = PivotPoint;
 
-            typedTarget.Material = Material.Clone();
+            typedTarget.RmvMaterial = RmvMaterial.Clone();
             typedTarget.Geometry = Geometry.Clone();
-            typedTarget.Effect = Effect.Clone();
+            typedTarget.Material = Material.Clone();
            
             if(includeMesh)
                 typedTarget.Geometry = Geometry.Clone();

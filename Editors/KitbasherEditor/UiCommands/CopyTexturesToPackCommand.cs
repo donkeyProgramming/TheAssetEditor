@@ -16,7 +16,7 @@ namespace Editors.KitbasherEditor.UiCommands
         internal void Execute(MainEditableNode mainNode)
         {
             var meshes = mainNode.GetMeshesInLod(0, false);
-            var materials = meshes.Select(x => x.Material);
+            var materials = meshes.Select(x => x.RmvMaterial);
             var allTextures = materials.SelectMany(x => x.GetAllTextures());
             var distinctTextures = allTextures.DistinctBy(x => x.Path);
 
