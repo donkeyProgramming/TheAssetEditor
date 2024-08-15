@@ -47,10 +47,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [ObservableProperty] private string _selectedAudioProjectEvent;
         [ObservableProperty] private bool _showCustomStatesOnly;
         [ObservableProperty] private ObservableCollection<string> _audioProjectDialogueEvents = [];
-
-        public ObservableCollection<Dictionary<string, object>> AudioEditorDataGridItems { get; set; } = [];
-
-        public ObservableCollection<CustomStatesDataGridProperties> CustomStatesDataGridItems { get; set; } = [];
+        [ObservableProperty] private ObservableCollection<Dictionary<string, object>> _audioEditorDataGridItems = [];
 
         public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService, IWindowFactory windowFactory, SoundPlayer soundPlayer)
         {
@@ -118,7 +115,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 CreateAudioProjectEventsListFromAudioProject();
 
                 // Load the object which stores the custom States for use in the States ComboBox.
-                PrepareCustomStatesForComboBox(this);
+                //PrepareCustomStatesForComboBox(this);
             }
         }
 
@@ -127,42 +124,6 @@ namespace Editors.Audio.AudioEditor.ViewModels
             UpdateEventDataWithCurrentEvent();
 
             AddAudioProjectToPackFile(_packFileService);
-        }
-
-        [RelayCommand] public void LoadCustomStates()
-        {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
-
-            if (browser.ShowDialog())
-            {
-                // Remove any pre-existing data otherwise DataGrid isn't happy.
-                CustomStatesDataGridItems.Clear();
-
-                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
-                var file = _packFileService.FindFile(filePath);
-                var bytes = file.DataSource.ReadData();
-                var str = Encoding.UTF8.GetString(bytes);
-                var customStatesFileData = JsonConvert.DeserializeObject<List<CustomStatesDataGridProperties>>(str);
-                _logger.Here().Information($"Loaded Custom States file: {file.Name}");
-
-                foreach (var customState in customStatesFileData)
-                    CustomStatesDataGridItems.Add(customState);
-
-                // Load the object which stores the custom States for use in the States ComboBox.
-                PrepareCustomStatesForComboBox(this);
-
-                // Reload the selected Event so the ComboBoxes are updated.
-                LoadEvent(_audioRepository, ShowCustomStatesOnly);
-            }
-        }
-
-        [RelayCommand] public void SaveCustomStates()
-        {
-            var dataGridItemsJson = JsonConvert.SerializeObject(CustomStatesDataGridItems, Formatting.Indented);
-            var pack = _packFileService.GetEditablePack();
-            var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
-            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{AudioEditorInstance.AudioProjectFileName}.json", new MemorySource(byteArray)));
-            _logger.Here().Information($"Saved Custom States file: {AudioEditorInstance.AudioProjectFileName}");
         }
 
         public void LoadEvent(IAudioRepository audioRepository, bool showCustomStatesOnly)
@@ -218,17 +179,6 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 AudioEditorInstance.AudioProjectData[SelectedAudioProjectEvent] = new List<Dictionary<string, object>>(AudioEditorDataGridItems);
         }
 
-        [RelayCommand] public void AddCustomStatesRow()
-        {
-            var newRow = new CustomStatesDataGridProperties();
-            CustomStatesDataGridItems.Add(newRow);
-        }
-
-        [RelayCommand] public void RemoveCustomStatesRow(CustomStatesDataGridProperties item)
-        {
-            if (item != null && CustomStatesDataGridItems.Contains(item))
-                CustomStatesDataGridItems.Remove(item);
-        }
 
         public static void AddAudioFiles(Dictionary<string, object> dataGridRow, System.Windows.Controls.TextBox textBox)
         {
@@ -280,7 +230,6 @@ namespace Editors.Audio.AudioEditor.ViewModels
             ShowCustomStatesOnly = false;
             AudioProjectDialogueEvents.Clear();
             AudioEditorDataGridItems.Clear();
-            CustomStatesDataGridItems.Clear();
         }
 
         public void Close()

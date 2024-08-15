@@ -83,30 +83,6 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        public static void PrepareCustomStatesForComboBox(AudioEditorViewModel viewModel)
-        {
-            if (viewModel.CustomStatesDataGridItems == null)
-                return;
-
-            var stateGroupsWithCustomStates = AudioEditorData.AudioEditorInstance.StateGroupsWithCustomStates;
-            stateGroupsWithCustomStates.Clear();
-
-            stateGroupsWithCustomStates["VO_Actor"] = new List<string>();
-            stateGroupsWithCustomStates["VO_Culture"] = new List<string>();
-            stateGroupsWithCustomStates["VO_Battle_Selection"] = new List<string>();
-            stateGroupsWithCustomStates["VO_Battle_Special_Ability"] = new List<string>();
-            stateGroupsWithCustomStates["VO_Faction_Leader"] = new List<string>();
-
-            foreach (var item in viewModel.CustomStatesDataGridItems)
-            {
-                stateGroupsWithCustomStates["VO_Actor"].Add(item.CustomVOActor);
-                stateGroupsWithCustomStates["VO_Culture"].Add(item.CustomVOCulture);
-                stateGroupsWithCustomStates["VO_Battle_Selection"].Add(item.CustomVOBattleSelection);
-                stateGroupsWithCustomStates["VO_Battle_Special_Ability"].Add(item.CustomVOBattleSpecialAbility);
-                stateGroupsWithCustomStates["VO_Faction_Leader"].Add(item.CustomVOFactionLeader);
-            }
-        }
-
         // Apparently WPF doesn't_like_underscores so double them up in order for them to be displayed in the UI.
         public static string AddExtraUnderScoresToString(string wtfWPF)
         {
