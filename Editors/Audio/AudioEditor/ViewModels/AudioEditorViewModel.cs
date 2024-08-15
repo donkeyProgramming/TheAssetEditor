@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -19,6 +18,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.WindowHandling;
+using static Editors.Audio.AudioEditor.AudioEditorData;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 using static Editors.Audio.AudioEditor.AudioProjectConverter;
 using static Editors.Audio.AudioEditor.DynamicDataGrid;
@@ -52,12 +52,6 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         public ObservableCollection<CustomStatesDataGridProperties> CustomStatesDataGridItems { get; set; } = [];
 
-        public static string AudioProjectFileNameInstance => AudioEditorData.Instance.AudioProjectFileNameInstance;
-
-        public static string SelectedAudioProjectEventInstance => AudioEditorData.Instance.SelectedAudioProjectEventInstance;
-
-        public static Dictionary<string, List<Dictionary<string, object>>> AudioProjectDataInstance => AudioEditorData.Instance.AudioProjectDataInstance;
-
         public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService, IWindowFactory windowFactory, SoundPlayer soundPlayer)
         {
             _audioRepository = audioRepository;
@@ -68,7 +62,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         partial void OnSelectedAudioProjectEventChanged(string value)
         {
-            AudioEditorData.Instance.SelectedAudioProjectEventInstance = value;
+            AudioEditorInstance.SelectedAudioProjectEvent = value;
 
             // Load the Event upon selection.
             LoadEvent(_audioRepository, ShowCustomStatesOnly);
@@ -80,9 +74,9 @@ namespace Editors.Audio.AudioEditor.ViewModels
             LoadEvent(_audioRepository, ShowCustomStatesOnly);
         }
 
-        [RelayCommand] public void NewAudioProject()
+        [RelayCommand] public void NewVOAudioProject()
         {
-            var window = _windowFactory.Create<AudioEditorNewAudioProjectViewModel, AudioEditorNewAudioProjectView>("New Audio Project", 500, 410);
+            var window = _windowFactory.Create<AudioEditorNewAudioProjectViewModel, AudioEditorNewAudioProjectView>("New Audio Project", 560, 470);
             window.AlwaysOnTop = false;
             window.ResizeMode = ResizeMode.NoResize;
 
@@ -100,7 +94,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             if (browser.ShowDialog())
             {
                 // Remove any pre-existing data otherwise DataGrid isn't happy.
-                AudioProjectDataInstance.Clear();
+                AudioEditorInstance.AudioProjectData.Clear();
                 AudioEditorDataGridItems.Clear();
                 SelectedAudioProjectEvent = "";
 
@@ -115,8 +109,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
                 var audioProjectData = ConvertFromAudioProjectJson(_audioRepository, audioProjectJson);
 
-                AudioEditorData.Instance.AudioProjectDataInstance = audioProjectData;
-                AudioEditorData.Instance.AudioProjectFileNameInstance = fileName;
+                AudioEditorInstance.AudioProjectData = audioProjectData;
+                AudioEditorInstance.AudioProjectFileName = fileName;
 
                 _logger.Here().Information($"Loaded Audio Project file: {fileName}");
 
@@ -167,8 +161,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
             var dataGridItemsJson = JsonConvert.SerializeObject(CustomStatesDataGridItems, Formatting.Indented);
             var pack = _packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
-            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{AudioProjectFileNameInstance}.json", new MemorySource(byteArray)));
-            _logger.Here().Information($"Saved Custom States file: {AudioProjectFileNameInstance}");
+            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{AudioEditorInstance.AudioProjectFileName}.json", new MemorySource(byteArray)));
+            _logger.Here().Information($"Saved Custom States file: {AudioEditorInstance.AudioProjectFileName}");
         }
 
         public void LoadEvent(IAudioRepository audioRepository, bool showCustomStatesOnly)
@@ -180,32 +174,10 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
             ConfigureDataGrid(this, audioRepository, showCustomStatesOnly);
 
-            if (AudioProjectDataInstance.ContainsKey(SelectedAudioProjectEvent))
+            if (AudioEditorInstance.AudioProjectData.ContainsKey(SelectedAudioProjectEvent))
 
-                foreach (var statePath in AudioProjectDataInstance[SelectedAudioProjectEvent])
+                foreach (var statePath in AudioEditorInstance.AudioProjectData[SelectedAudioProjectEvent])
                     AudioEditorDataGridItems.Add(statePath);
-        }
-
-        public void InitialiseAudioProjectData()
-        {
-            foreach (var dialogueEvent in AudioProjectDialogueEvents)
-            {
-                var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[dialogueEvent];
-
-                var dataGridItems = new List<Dictionary<string, object>>();
-                var dataGridItem = new Dictionary<string, object>();
-
-                foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
-                {
-                    var stateGroupKey = AddExtraUnderScoresToString(stateGroupWithQualifier);
-                    dataGridItem[stateGroupKey] = "";
-                    dataGridItem["AudioFilesDisplay"] = "";
-                    dataGridItem["AudioFiles"] = "";
-                }
-
-                dataGridItems.Add(dataGridItem);
-                AudioProjectDataInstance[dialogueEvent] = dataGridItems;
-            }
         }
 
         [RelayCommand] public void AddStatePath()
@@ -243,7 +215,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 return;
 
             if (SelectedAudioProjectEvent != null)
-                AudioProjectDataInstance[SelectedAudioProjectEvent] = new List<Dictionary<string, object>>(AudioEditorDataGridItems);
+                AudioEditorInstance.AudioProjectData[SelectedAudioProjectEvent] = new List<Dictionary<string, object>>(AudioEditorDataGridItems);
         }
 
         [RelayCommand] public void AddCustomStatesRow()
@@ -270,9 +242,9 @@ namespace Editors.Audio.AudioEditor.ViewModels
             {
                 var filePaths = dialog.FileNames;
 
-                if (AudioProjectDataInstance.ContainsKey(SelectedAudioProjectEventInstance))
+                if (AudioEditorInstance.AudioProjectData.ContainsKey(AudioEditorInstance.SelectedAudioProjectEvent))
                 {
-                    var eventList = AudioProjectDataInstance[SelectedAudioProjectEventInstance];
+                    var eventList = AudioEditorInstance.AudioProjectData[AudioEditorInstance.SelectedAudioProjectEvent];
 
                     // Find the matching row to insert the AudioFiles data.
                     var matchingRow = eventList.FirstOrDefault(context =>
@@ -298,17 +270,22 @@ namespace Editors.Audio.AudioEditor.ViewModels
         {
             AudioProjectDialogueEvents.Clear();
 
-            foreach (var dialogueEvent in AudioProjectDataInstance.Keys)
+            foreach (var dialogueEvent in AudioEditorInstance.AudioProjectData.Keys)
                 AudioProjectDialogueEvents.Add(dialogueEvent);
         }
 
-        public void Close()
+        public void ResetAudioEditorViewModelData()
         {
-            SelectedAudioProjectEvent = "";
+            SelectedAudioProjectEvent = null;
             ShowCustomStatesOnly = false;
             AudioProjectDialogueEvents.Clear();
             AudioEditorDataGridItems.Clear();
             CustomStatesDataGridItems.Clear();
+        }
+
+        public void Close()
+        {
+            ResetAudioEditorViewModelData();
         }
 
         public bool Save() => true;

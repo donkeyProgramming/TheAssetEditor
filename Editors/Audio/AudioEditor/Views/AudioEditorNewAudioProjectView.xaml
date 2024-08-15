@@ -4,23 +4,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewmodels="clr-namespace:Editors.Audio.AudioEditor.ViewModels"
-             xmlns:converters="clr-namespace:Editors.Audio.AudioEditor"
+             xmlns:converters="clr-namespace:Editors.Audio.AudioEditor" 
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
              d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorNewAudioProjectViewModel}"
              mc:Ignorable="d"
-             d:MinWidth="500" d:DesignHeight="410">
+             d:MinWidth="560" d:DesignHeight="470">
 
-    <!-- Resources Section -->
     <UserControl.Resources>
+        <!-- Enum to string converter -->
         <converters:SettingsEnumConverter x:Key="SettingsEnumConverter"/>
         <DataTemplate x:Key="EnumToStringTemplate">
             <TextBlock Text="{Binding Converter={StaticResource SettingsEnumConverter}}"/>
         </DataTemplate>
+        
+        <!-- Default height -->
+        <sys:Double x:Key="DefaultHeight">23</sys:Double>
     </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -33,55 +36,68 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <!-- Added Row for Buttons -->
             </Grid.RowDefinitions>
 
-            <!-- EventType Selection -->
+            <!-- Audio Project Name -->
             <Grid Grid.Row="0" Margin="0, 0, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Name:" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" x:Name="AudioProjectFileNameTextBox" VerticalAlignment="Center"
+                <TextBox Grid.Column="1" x:Name="AudioProjectFileNameTextBox" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
                          Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
 
+            <!-- States File Path -->
+            <Grid Grid.Row="1" Margin="0, 2, 0, 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="145"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Custom States Location:" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" x:Name="StatesFilePath" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}"  
+                         Text="{Binding StatesFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         IsReadOnly="True"/>
+                <Button Grid.Column="2" Content="..." VerticalAlignment="Center" Width="30" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding SetCustomStatesLocationCommand}"/>
+            </Grid>
+
+
             <!-- EventType Selection -->
-            <Grid Grid.Row="1" Margin="0, 0, 0, 5">
+            <Grid Grid.Row="2" Margin="0, 2, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Dialogue Event Types:" VerticalAlignment="Center"/>
-                <ComboBox Grid.Column="1" ItemsSource="{Binding AudioProjectEventTypes}" 
+                <ComboBox Grid.Column="1" ToolTip="PLACEHOLDER TOOLTIP" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
+                          ItemsSource="{Binding AudioProjectEventTypes}" 
                           SelectedItem="{Binding SelectedAudioProjectEventType}" 
-                          ItemTemplate="{StaticResource EnumToStringTemplate}" 
-                          ToolTip="PLACEHOLDER TOOLTIP" VerticalAlignment="Center"/>
+                          ItemTemplate="{StaticResource EnumToStringTemplate}"/>
             </Grid>
 
             <!-- EventSubType Selection -->
-            <Grid Grid.Row="2" Margin="0, 0, 0, 5">
+            <Grid Grid.Row="3" Margin="0, 2, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Dialogue Event Subtypes:" VerticalAlignment="Center"/>
-                <ComboBox Grid.Column="1" ItemsSource="{Binding AudioProjectSubtypes}" 
+                <ComboBox Grid.Column="1" ToolTip="PLACEHOLDER TOOLTIP" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
+                          ItemsSource="{Binding AudioProjectSubtypes}" 
                           SelectedItem="{Binding SelectedAudioProjectEventSubtype}" 
-                          ItemTemplate="{StaticResource EnumToStringTemplate}" 
-                          ToolTip="PLACEHOLDER TOOLTIP" VerticalAlignment="Center"/>
+                          ItemTemplate="{StaticResource EnumToStringTemplate}"/>
             </Grid>
 
             <!-- Dialogue Events Section -->
-            <Grid Grid.Row="3" Margin="0, 0, 0, 5">
+            <Grid Grid.Row="4" Margin="0, 4, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Dialogue Events:" VerticalAlignment="Top"/>
-                <ListBox Grid.Column="1" Margin="0, 10, 0, 0" Height="200" VerticalAlignment="Top" ItemsSource="{Binding DialogueEventCheckBoxes}">
+                <ListBox Grid.Column="1" Margin="0, 0, 0, 0" Height="200" VerticalAlignment="Top" ItemsSource="{Binding DialogueEventCheckBoxes}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <CheckBox Content="{Binding Content}" IsChecked="{Binding IsChecked, Mode=TwoWay}" />
@@ -91,23 +107,23 @@
             </Grid>
 
             <!-- Buttons for Dialogue Events Section -->
-            <Grid Grid.Row="4" Margin="0, 5, 0, 0">
+            <Grid Grid.Row="5" Margin="0, 5, 0, 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <Button Content="Select All" Width="125" Margin="0, 0, 5, 0" Command="{Binding SelectAllCommand}"/>
-                    <Button Content="Select Recommended" Width="125" Margin="0, 0, 5, 0" Command="{Binding SelectRecommendedCommand}"/>
-                    <Button Content="Select None" Width="125" Margin="0, 0, 5, 0" Command="{Binding SelectNoneCommand}"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Select All" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 5, 0" Command="{Binding SelectAllCommand}"/>
+                    <Button Content="Select Recommended" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 5, 0" Command="{Binding SelectRecommendedCommand}"/>
+                    <Button Content="Select None" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 0, 0" Command="{Binding SelectNoneCommand}"/>
                 </StackPanel>
             </Grid>
         </Grid>
 
         <!-- Buttons -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <Button Content="OK" Width="75" Margin="5" Command="{Binding CreateAudioProjectCommand}" IsEnabled="{Binding IsAnyDialogueEventChecked}"/>
-            <Button Content="Cancel" Width="75" Margin="5" Command="{Binding CloseWindowCommand}"/>
+            <Button Content="OK" Width="75" Height="{StaticResource DefaultHeight}" Margin="5" Command="{Binding CreateAudioProjectCommand}" IsEnabled="{Binding IsOkButtonIsEnabled}"/>
+            <Button Content="Cancel" Width="75" Height="{StaticResource DefaultHeight}" Margin="5" Command="{Binding CloseWindowActionCommand}"/>
         </StackPanel>
     </Grid>
 </UserControl>

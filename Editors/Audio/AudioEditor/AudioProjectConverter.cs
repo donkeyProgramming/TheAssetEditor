@@ -11,8 +11,8 @@ namespace Editors.Audio.AudioEditor
     {
         public class ProjectSettings
         {
-            public string BnkName { get; set; }
-            public string Language { get; set; }
+            public string AudioProjectFileName { get; set; }
+            public string CustomStatesFilePath { get; set; }
         }
 
         public class DialogueEventItems
@@ -31,12 +31,7 @@ namespace Editors.Audio.AudioEditor
         {
             var audioProject = new Dictionary<string, object>();
 
-            var settings = new Dictionary<string, object>
-            {
-                ["BnkName"] = "PLACEHOLDER", 
-                ["Language"] = "PLACEHOLDER"
-            };
-
+            var settings = audioProjectData["Settings"][0];
             audioProject["Settings"] = settings;
 
             var dialogueEvents = new List<object>();
@@ -44,6 +39,11 @@ namespace Editors.Audio.AudioEditor
             foreach (var audioProjectItem in audioProjectData)
             {
                 var dialogueEventName = audioProjectItem.Key;
+
+                // Skip the "Settings" key as it's not a dialogue event
+                if (dialogueEventName == "Settings")
+                    continue;
+
                 var eventDataItems = audioProjectItem.Value;
                 var decisionTree = new List<object>();
 
@@ -94,11 +94,13 @@ namespace Editors.Audio.AudioEditor
                 var root = audioProject.RootElement;
 
                 var settingsElement = root.GetProperty("Settings");
-                var settings = new ProjectSettings
+                var settings = new Dictionary<string, object>
                 {
-                    BnkName = settingsElement.GetProperty("BnkName").GetString(),
-                    Language = settingsElement.GetProperty("Language").GetString()
+                    { "AudioProjectFileName", settingsElement.GetProperty("AudioProjectFileName").GetString() },
+                    { "CustomStatesFilePath", settingsElement.GetProperty("CustomStatesFilePath").GetString() }
                 };
+
+                audioProjectData["Settings"] = new List<Dictionary<string, object>> { settings };
 
                 var dialogueEventsElement = root.GetProperty("DialogueEvents");
                 var dialogueEvents = new List<DialogueEventItems>();

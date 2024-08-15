@@ -6,23 +6,38 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using static Editors.Audio.AudioEditor.AudioProjectConverter;
+using static Editors.Audio.AudioEditor.AudioEditorData;
+
 
 namespace Editors.Audio.AudioEditor
 {
     public static class AudioEditorHelpers
     {
-        readonly static ILogger _logger = Logging.Create<AudioEditorViewModel>();
-        public static string AudioProjectFileName => AudioEditorData.Instance.AudioProjectFileNameInstance;
-        public static Dictionary<string, List<Dictionary<string, object>>> AudioProjectData => AudioEditorData.Instance.AudioProjectDataInstance;
+        readonly static ILogger s_logger = Logging.Create<AudioEditorViewModel>();
+        public static string AudioProjectFileName => AudioEditorInstance.AudioProjectFileName;
         public static Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithQualifiers { get; set; } = [];
 
         public static void AddAudioProjectToPackFile(PackFileService packFileService)
         {
-            var audioProjectJson = ConvertToAudioProjectJson(AudioProjectData);
+            var audioProjectJson = ConvertToAudioProjectJson(AudioEditorInstance.AudioProjectData);
             var pack = packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(audioProjectJson);
-            packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{AudioProjectFileName}.json", new MemorySource(byteArray)));
-            _logger.Here().Information($"Saved Audio Project file: {AudioProjectFileName}.json");
+            packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{GetAudioProjectFileName()}.json", new MemorySource(byteArray)));
+            s_logger.Here().Information($"Saved Audio Project file: {GetAudioProjectFileName()}.json");
+        }
+
+        public static string GetAudioProjectFileName()
+        {
+            var settingsList = AudioEditorInstance.AudioProjectData["Settings"];
+            var settings = settingsList[0];
+            return settings["AudioProjectFileName"].ToString();
+        }
+
+        public static string GetCustomStatesFilePath()
+        {
+            var settingsList = AudioEditorInstance.AudioProjectData["Settings"];
+            var settings = settingsList[0];
+            return settings["CustomStatesFilePath"].ToString();
         }
 
         // Add qualifiers to State Groups so that dictionary keys are unique as some events have the same State Group twice e.g. VO_Actor
@@ -73,7 +88,7 @@ namespace Editors.Audio.AudioEditor
             if (viewModel.CustomStatesDataGridItems == null)
                 return;
 
-            var stateGroupsWithCustomStates = AudioEditorData.Instance.StateGroupsWithCustomStates;
+            var stateGroupsWithCustomStates = AudioEditorData.AudioEditorInstance.StateGroupsWithCustomStates;
             stateGroupsWithCustomStates.Clear();
 
             stateGroupsWithCustomStates["VO_Actor"] = new List<string>();

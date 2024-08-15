@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
+using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.Storage;
@@ -12,8 +12,8 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
+using static Editors.Audio.AudioEditor.AudioEditorData;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
-using static Editors.Audio.AudioEditor.AudioProjectConverter;
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
@@ -41,26 +41,32 @@ namespace Editors.Audio.AudioEditor.ViewModels
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("New Audio Editor Project");
 
         [ObservableProperty] private string _audioProjectFileName;
-
+        [ObservableProperty] private string _customStatesFilePath;
         [ObservableProperty] private string _selectedAudioProjectEventType;
         [ObservableProperty] private string _selectedAudioProjectEventSubtype;
 
         [ObservableProperty] private ObservableCollection<AudioEditorSettings.EventType> _audioProjectEventTypes = new(Enum.GetValues(typeof(AudioEditorSettings.EventType)).Cast<AudioEditorSettings.EventType>());
         [ObservableProperty] private ObservableCollection<AudioEditorSettings.EventSubtype> _audioProjectSubtypes = []; // Determined according to what Event Type is selected
 
+        // The Dialogue Event CheckBoxes that are displayed in the Dialogue Events ListBox.
         [ObservableProperty] private ObservableCollection<DialogueEventCheckBox> _dialogueEventCheckBoxes = [];
+
+        // Properties to control whether OK button is enabled.
+        [ObservableProperty] private bool _isAudioProjectFileNameSet;
         [ObservableProperty] private bool _isAnyDialogueEventChecked;
-
-        public static Dictionary<string, List<Dictionary<string, object>>> AudioProjectDataInstance => AudioEditorData.Instance.AudioProjectDataInstance;
-
-        public static string AudioProjectFileNameInstance => AudioEditorData.Instance.AudioProjectFileNameInstance;
-
+        [ObservableProperty] private bool _isOkButtonIsEnabled;
 
         public AudioEditorNewAudioProjectViewModel(IAudioRepository audioRepository, PackFileService packFileService, AudioEditorViewModel audioEditorViewModel)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;
             _audioEditorViewModel = audioEditorViewModel;
+        }
+
+        partial void OnAudioProjectFileNameChanged(string value)
+        {
+            IsAudioProjectFileNameSet = !string.IsNullOrEmpty(value);
+            UpdateOkButtonIsEnabled();
         }
 
         partial void OnSelectedAudioProjectEventTypeChanged(string value)
@@ -82,14 +88,31 @@ namespace Editors.Audio.AudioEditor.ViewModels
         private void HandleDialogueEventCheckBoxChanged(DialogueEventCheckBox changedItem)
         {
             IsAnyDialogueEventChecked = DialogueEventCheckBoxes.Any(checkBox => checkBox.IsChecked);
-            _logger.Here().Information($"Dialogue Event: {changedItem.Content} IsChecked: {changedItem.IsChecked}");
+            UpdateOkButtonIsEnabled();
+        }
+
+        private void UpdateOkButtonIsEnabled()
+        {
+            IsOkButtonIsEnabled = IsAudioProjectFileNameSet && IsAnyDialogueEventChecked;
+        }
+
+        [RelayCommand] public void SetCustomStatesLocation()
+        {
+            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
+
+            if (browser.ShowDialog())
+            {
+                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
+                CustomStatesFilePath = filePath;
+                _logger.Here().Information($"Custom States file path set to: {filePath}");
+            }
         }
 
         public void UpdateAudioProjectEventSubType()
         {
             AudioProjectSubtypes.Clear();
 
-            if (Enum.TryParse(SelectedAudioProjectEventType.ToString(), out AudioEditorSettings.EventType eventType))
+            if (SelectedAudioProjectEventType != null && Enum.TryParse(SelectedAudioProjectEventType.ToString(), out AudioEditorSettings.EventType eventType))
             {
                 if (AudioEditorSettings.EventTypeToSubtypes.TryGetValue(eventType, out var subtypes))
                 {
@@ -141,19 +164,21 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 return;
 
             // Remove any pre-existing data.
-            AudioEditorData.Instance.AudioProjectDataInstance.Clear();
-            _audioEditorViewModel.AudioEditorDataGridItems.Clear();
-            _audioEditorViewModel.SelectedAudioProjectEvent = "";
+            AudioEditorInstance.ResetAudioEditorData();
+            _audioEditorViewModel.ResetAudioEditorViewModelData();
 
+            // Set the AudioEditorInstance data.
+            //AudioEditorInstance.AudioProjectFileName = AudioProjectFileName;
+            //AudioEditorInstance.CustomStatesFilePath = CustomStatesFilePath;
+
+            // Create the list of events to be displayed in the AudioEditor.
             CreateAudioProjectDialogueEventsList();
-
-            AudioEditorData.Instance.AudioProjectFileNameInstance = AudioProjectFileName;
 
             // Create the object for State Groups with qualifiers so that their keys in the AudioProjectConverter dictionary are unique.
             AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
 
             // Initialise AudioProjectConverter according to the Audio Project settings selected.
-            _audioEditorViewModel.InitialiseAudioProjectData();
+            InitialiseAudioProjectData();
 
             // Add the Audio Project with empty events to the PackFile.
             AddAudioProjectToPackFile(_packFileService);
@@ -162,17 +187,6 @@ namespace Editors.Audio.AudioEditor.ViewModels
             //PrepareCustomStatesForComboBox(this);
 
             CloseWindowAction();
-        }
-
-        [RelayCommand] public void CloseWindowAction()
-        {
-            _closeAction?.Invoke();
-
-            AudioProjectFileName = "";
-            SelectedAudioProjectEventType = "";
-            SelectedAudioProjectEventSubtype = "";
-            DialogueEventCheckBoxes.Clear();
-            IsAnyDialogueEventChecked = false;
         }
 
         public void CreateAudioProjectDialogueEventsList()
@@ -186,6 +200,38 @@ namespace Editors.Audio.AudioEditor.ViewModels
                     var dialogueEvent = checkBox.Content.ToString();
                     _audioEditorViewModel.AudioProjectDialogueEvents.Add(RemoveExtraUnderScoresFromString(dialogueEvent));
                 }
+            }
+        }
+
+        public void InitialiseAudioProjectData()
+        {
+            var settings = new Dictionary<string, object>
+            {
+                {"AudioProjectFileName", AudioProjectFileName},
+                {"CustomStatesFilePath", CustomStatesFilePath}
+            };
+
+            AudioEditorInstance.AudioProjectData["Settings"] = [settings];
+
+            foreach (var dialogueEvent in _audioEditorViewModel.AudioProjectDialogueEvents)
+            {
+                var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[dialogueEvent];
+
+                var dataGridItems = new List<Dictionary<string, object>>();
+                var dataGridItem = new Dictionary<string, object>();
+
+                foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
+                {
+                    var stateGroupKey = AddExtraUnderScoresToString(stateGroupWithQualifier);
+                    dataGridItem[stateGroupKey] = "";
+                }
+
+                dataGridItem["AudioFilesDisplay"] = "";
+                dataGridItem["AudioFiles"] = "";
+
+                dataGridItems.Add(dataGridItem);
+
+                AudioEditorInstance.AudioProjectData[dialogueEvent] = dataGridItems;
             }
         }
 
@@ -218,6 +264,24 @@ namespace Editors.Audio.AudioEditor.ViewModels
             {
                 checkBox.IsChecked = false;
             }
+        }
+
+        public void ResetAudioEditorNewAudioProjectViewModelData()
+        {
+            AudioProjectFileName = null;
+            CustomStatesFilePath = null;
+            SelectedAudioProjectEventType = null;
+            SelectedAudioProjectEventSubtype = null;
+            AudioProjectSubtypes.Clear();
+            DialogueEventCheckBoxes.Clear();
+            IsAnyDialogueEventChecked = false;
+        }
+
+        [RelayCommand] public void CloseWindowAction()
+        {
+            _closeAction?.Invoke();
+
+            ResetAudioEditorNewAudioProjectViewModelData();
         }
 
         public void SetCloseAction(Action closeAction)

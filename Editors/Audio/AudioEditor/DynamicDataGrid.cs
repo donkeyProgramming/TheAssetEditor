@@ -17,7 +17,7 @@ namespace Editors.Audio.AudioEditor
 {
     public class DynamicDataGrid
     {
-        public static Dictionary<string, List<string>> StateGroupsWithCustomStates => AudioEditorData.Instance.StateGroupsWithCustomStates;
+        public static Dictionary<string, List<string>> StateGroupsWithCustomStates => AudioEditorData.AudioEditorInstance.StateGroupsWithCustomStates;
         private readonly AudioEditorViewModel _audioEditorViewModel;
 
         public DynamicDataGrid(AudioEditorViewModel audioEditorViewModel)
