@@ -5,8 +5,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
     public interface IRmvMaterial
     {
-        public ModelMaterialEnum MaterialId { get; set; }
-        VertexFormat BinaryVertexFormat { get; set; }
+        public ModelMaterialEnum MaterialId { get; }
+        VertexFormat BinaryVertexFormat { get; }
         Vector3 PivotPoint { get; set; }
         AlphaMode AlphaMode { get; set; }
         string ModelName { get; set; }
@@ -19,7 +19,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         void SetTexture(TextureType texureType, string path);
 
         void UpdateEnumsBeforeSaving(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion);
-        void EnrichDataBeforeSaving(string[] boneNames, BoundingBox boundingBox);
+        void EnrichDataBeforeSaving(string[] boneNames);
     }
 
     public interface IMaterialCreator

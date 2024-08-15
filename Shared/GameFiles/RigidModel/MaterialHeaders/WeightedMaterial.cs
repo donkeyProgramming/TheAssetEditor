@@ -11,9 +11,14 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
     public class WeightedMaterial : IRmvMaterial
     {
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.Unknown;
+        public ModelMaterialEnum MaterialId { get; set; } = ModelMaterialEnum.weighted;
+        public UiVertexFormat ToolVertexFormat { get; set; }
 
         public Vector3 PivotPoint { get; set; }
         public AlphaMode AlphaMode { get; set; }
+        public bool UseDecal { get; set; }
+        public bool UseDirt{ get; set; }
+
         public string ModelName { get; set; }
 
         public string TextureDirectory { get; set; }
@@ -23,14 +28,12 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         public int MatrixIndex { get; set; }
         public int ParentMatrixIndex { get; set; }
 
-        public List<RmvAttachmentPoint> AttachmentPointParams { get; set; }
-        public List<RmvTexture> TexturesParams { get; set; }
-        public List<string> StringParams { get; set; }
-        public List<float> FloatParams { get; set; }
-        public List<(int Index, int Value)> IntParams { get; set; }
-        public List<RmvVector4> Vec4Params { get; set; }
-
-        public ModelMaterialEnum MaterialId { get; set; } = ModelMaterialEnum.weighted;
+        public List<RmvAttachmentPoint> AttachmentPointParams { get; set; } = [];
+        public List<RmvTexture> TexturesParams { get; set; } = [];
+        public List<string> StringParams { get; set; } = [];
+        public List<float> FloatParams { get; set; } = [];
+        public List<(int Index, int Value)> IntParams { get; set; } = [];
+        public List<RmvVector4> Vec4Params { get; set; } = [];
 
         public IRmvMaterial Clone()
         {
@@ -55,21 +58,6 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 IntParams = IntParams.Select(x => x).ToList(),
                 Vec4Params = Vec4Params.Select(x => x).ToList(),
             };
-        }
-
-        void UpdateAttachmentPointList(string[] boneNames)
-        {
-            AttachmentPointParams.Clear();
-            for (var i = 0; i < boneNames.Length; i++)
-            {
-                var a = new RmvAttachmentPoint
-                {
-                    BoneIndex = i,
-                    Name = boneNames[i],
-                    Matrix = RmvMatrix3x4.Identity()
-                };
-                AttachmentPointParams.Add(a);
-            }
         }
 
         public uint ComputeSize()
@@ -159,9 +147,19 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 MaterialId = ModelMaterialEnum.weighted;
         }
 
-        public void EnrichDataBeforeSaving(string[] boneNames, BoundingBox boundingBox)
+        public void EnrichDataBeforeSaving(string[] boneNames)
         {
-            UpdateAttachmentPointList(boneNames);
+            AttachmentPointParams.Clear();
+            for (var i = 0; i < boneNames.Length; i++)
+            {
+                var newPoint = new RmvAttachmentPoint
+                {
+                    BoneIndex = i,
+                    Name = boneNames[i],
+                    Matrix = RmvMatrix3x4.Identity()
+                };
+                AttachmentPointParams.Add(newPoint);
+            }
         }
     }
 
@@ -227,10 +225,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             if (material is not WeightedMaterial typedMaterial)
                 throw new Exception("Incorrect material provided for WeightedMaterial::Save");
 
-
-            // Update variables
-           //if (typedMaterial)
-           //{ }
+            // Update based on flags
 
             // Create the header
             var header = new WeightedMaterialStruct()

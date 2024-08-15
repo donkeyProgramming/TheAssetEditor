@@ -22,24 +22,51 @@ namespace GameWorld.Core.Rendering.Materials
         public CapabilityMaterial Create(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial = null)
         {
             var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
-            var preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_Default;
 
-            if (currentGame == GameTypeEnum.Warhammer3 || currentGame == GameTypeEnum.ThreeKingdoms)
-            {
-                preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Default;
-                if (wsModelMaterial != null)
-                {
-                    if (wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
-                        preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
-                }
-            }
-            
+            CapabilityMaterialsEnum preferredMaterial = GetDefaultMaterial(currentGame);
+            if (wsModelMaterial != null)
+                UpdateGetMaterialFromWsModelMaterial(currentGame, wsModelMaterial, ref preferredMaterial);
+            else
+                UpdateMaterialFromRmvMaterial(currentGame, rmvMaterial, ref preferredMaterial);
+
             var material = CreateMaterial(preferredMaterial);
             foreach (var capability in material.Capabilities)
                 capability.Initialize(wsModelMaterial, rmvMaterial);
 
             return material;
         }
+
+        void UpdateGetMaterialFromWsModelMaterial(GameTypeEnum currentGame, WsModelMaterialFile wsModelMaterial, ref CapabilityMaterialsEnum preferredMaterial)
+        {
+            if ((currentGame == GameTypeEnum.Warhammer3 || currentGame == GameTypeEnum.ThreeKingdoms) == false)
+                return;
+                
+            if (wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
+                preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
+        }
+
+        void UpdateMaterialFromRmvMaterial(GameTypeEnum currentGame, IRmvMaterial material, ref CapabilityMaterialsEnum preferredMaterial)
+        {
+            if (material is WeightedMaterial weighterMaterial)
+            { 
+                if (weighterMaterial.UseDecal || weighterMaterial.UseDirt)
+                    preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal;
+            }
+
+            //ModelMaterialEnum[] decalMaterials = [
+            //    ModelMaterialEnum.decal, ModelMaterialEnum.dirtmap, ModelMaterialEnum.decal_dirtmap,
+            //    ModelMaterialEnum.weighted_decal, ModelMaterialEnum.weighted_dirtmap, ModelMaterialEnum.weighted_decal_dirtmap,
+            //    ModelMaterialEnum.weighted_skin_decal, ModelMaterialEnum.weighted_skin_dirtmap, ModelMaterialEnum.weighted_skin_decal_dirtmap];
+        }
+
+
+        CapabilityMaterialsEnum GetDefaultMaterial(GameTypeEnum currentGame)
+        {
+            if (currentGame == GameTypeEnum.Warhammer3 || currentGame == GameTypeEnum.ThreeKingdoms)
+                return CapabilityMaterialsEnum.MetalRoughPbr_Default;
+            return CapabilityMaterialsEnum.SpecGlossPbr_Default;
+        }
+
 
         public CapabilityMaterial CreateMaterial(CapabilityMaterialsEnum type)
         {

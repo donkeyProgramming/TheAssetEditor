@@ -131,6 +131,41 @@ namespace GameWorld.Core.Test.Rendering.Materials
 
             Assert.That(defaultCapabiliy.UseAlpha, Is.True);
         }
+
+        [Test]
+        public void CreateMaterial_Rome_DecalAndDirt()
+        {
+           // var rmvMaterial = RmvMaterialHelper
+           //     .Create(ModelMaterialEnum.weighted_decal_dirtmap, VertexFormat.Weighted)
+           //     .SetAlpha(true)
+           //     .AssignMaterials([TextureType.Diffuse, TextureType.Decal_dirtmap, TextureType.Decal_mask, TextureType.Decal_dirtmask]);
+           //
+           // var appSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
+           // var abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
+           // var material = abstractMaterialFactory.Create(rmvMaterial, null);
+           //
+           // Assert.That(material, Is.TypeOf<Core.Rendering.Materials.Shaders.SpecGloss.DecalAndDirtMaterial>());
+           //
+           // var specGlossCap = material.TryGetCapability<SpecGlossCapability>();
+           // Assert.That(specGlossCap, Is.Not.Null);
+           //
+           // var dirtCap = material.TryGetCapability<DirtAndDecalCapability>();
+           // Assert.That(dirtCap, Is.Not.Null);
+
+
+
+
+            //Assert.That(defaultCapabiliy.GlossMap.TexturePath, Is.EqualTo($"texturePath/{TextureType.Gloss}.dds"));
+            //Assert.That(defaultCapabiliy.GlossMap.UseTexture, Is.True);
+            //
+            //Assert.That(defaultCapabiliy.NormalMap.TexturePath, Is.EqualTo($"texturePath/{TextureType.Normal}.dds"));
+            //Assert.That(defaultCapabiliy.NormalMap.UseTexture, Is.True);
+            //
+            //Assert.That(defaultCapabiliy.DiffuseMap.TexturePath, Is.EqualTo(""));
+            //Assert.That(defaultCapabiliy.DiffuseMap.UseTexture, Is.False);
+            //
+            //Assert.That(defaultCapabiliy.UseAlpha, Is.True);
+        }
     }
 
     public static class IRmvMaterialExtentions
@@ -157,7 +192,5 @@ namespace GameWorld.Core.Test.Rendering.Materials
             var rmvMaterial = MaterialFactory.Create().CreateMaterial(materialEnum, vertexFormat);
             return rmvMaterial;
         }
-
-
     }
 }

@@ -94,15 +94,12 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                     if (skeleton != null)
                         boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();
 
-
                     var materialSerializer = new MaterialToRmvSerializer();
-                    var newRmvMaterial = materialSerializer.CreateMaterialFromCapabilityMaterial(meshes[meshIndex].Material, meshes[meshIndex].Effect); 
-
+                    var newRmvMaterial = materialSerializer.CreateMaterialFromCapabilityMaterial(meshes[meshIndex].Material, meshes[meshIndex].Geometry.VertexFormat, version, meshes[meshIndex].Effect); 
                     newModel.Material = newRmvMaterial;
-                    newModel.Material.UpdateEnumsBeforeSaving(meshes[meshIndex].Geometry.VertexFormat, version);
-
+                   
                     if (enrichModel)
-                        newModel.Material.EnrichDataBeforeSaving(boneNames, BoundingBox.CreateFromPoints(newModel.Mesh.VertexList.Select(x => x.GetPosistionAsVec3())));
+                        newModel.Material.EnrichDataBeforeSaving(boneNames);
 
                     _logger.Here().Information($"Model. Lod: {currentLodIndex}, Model: {meshIndex} created.");
                     newMeshList[currentLodIndex].Add(newModel);

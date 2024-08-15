@@ -6,8 +6,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
     public class MaterialFactory
     {
-        ILogger _logger = Logging.Create<MaterialFactory>();
-        Dictionary<ModelMaterialEnum, IMaterialCreator> _materialCreators = new Dictionary<ModelMaterialEnum, IMaterialCreator>();
+        private readonly ILogger _logger = Logging.Create<MaterialFactory>();
+        private readonly Dictionary<ModelMaterialEnum, IMaterialCreator> _materialCreators = [];
 
         public static MaterialFactory Create() => new MaterialFactory();
 

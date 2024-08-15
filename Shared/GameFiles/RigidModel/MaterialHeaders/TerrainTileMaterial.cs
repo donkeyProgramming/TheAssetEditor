@@ -67,7 +67,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             throw new NotImplementedException();
         }
 
-        public void EnrichDataBeforeSaving(string[] boneNames, BoundingBox boundingBox)
+        public void EnrichDataBeforeSaving(string[] boneNames)
         {
             throw new NotImplementedException();
         }
