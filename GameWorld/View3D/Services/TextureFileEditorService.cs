@@ -1,4 +1,4 @@
-﻿using GameWorld.Core.SceneNodes;
+﻿/*using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -14,10 +14,10 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Windows;
+using System.Windows;*/
 
 namespace GameWorld.Core.Services
-{
+{/*
     public class TextureFileEditorService
     {
         ILogger _logger = Logging.Create<TextureFileEditorService>();
@@ -407,5 +407,5 @@ namespace GameWorld.Core.Services
             DirectoryHelper.EnsureCreated(outputDirectory);
             image.Save(imagePathWithoutExtention);
         }
-    }
+    }*/
 }

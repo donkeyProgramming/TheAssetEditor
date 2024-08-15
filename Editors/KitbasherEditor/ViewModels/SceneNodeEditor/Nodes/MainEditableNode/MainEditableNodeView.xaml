@@ -48,11 +48,6 @@
                     <ComboBox SelectedValue="None" VerticalAlignment="Center" Visibility="Collapsed"/>
                 </DockPanel>
 
-                <DockPanel DockPanel.Dock="Top" LastChildFill="False">
-                    <Label Width ="{StaticResource labelWidth}" Content="Missing textures" />
-                    <Label>:</Label>
-                    <Button Content="Delete" Click="{s:MethodBinding DeleteAllMissingTexturesAction}" Margin="0,2,2,2" Width="50"/>
-                </DockPanel>
             </DockPanel>
         </Expander>
 

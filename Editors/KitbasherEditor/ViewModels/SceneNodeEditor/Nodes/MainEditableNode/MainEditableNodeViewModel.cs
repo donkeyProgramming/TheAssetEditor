@@ -67,7 +67,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
         }
 
         public void CopyTexturesToOutputPack() => _uiCommandFactory.Create<CopyTexturesToPackCommand>().Execute(_mainNode);
-        public void DeleteAllMissingTexturesAction() => _uiCommandFactory.Create<DeleteMissingTexturesCommand>().Execute(_mainNode);
         public void Dispose() { }
     }
 }

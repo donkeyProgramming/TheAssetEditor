@@ -7,7 +7,6 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.WsModel;
 using Shared.Ui.Editors.VariantMeshDefinition;
@@ -131,13 +130,13 @@ namespace GameWorld.Core.Services
             }
         }
 
-        Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName)
+        Rmv2ModelNode LoadRigidMesh(PackFile file, ref SceneNode parent, AnimationPlayer player, string attachmentPointName, WsModelFile? wsModel = null)
         {
             var rmvModel = ModelFactory.Create().Load(file.DataSource.ReadData());
 
             var modelFullPath = _packFileService.GetFullPath(file);
             var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
-            _rmv2ModelNodeLoader.CreateModelNodesFromFile(modelNode, rmvModel, player, modelFullPath);
+            _rmv2ModelNodeLoader.CreateModelNodesFromFile(modelNode, rmvModel, player, modelFullPath, wsModel);
 
             foreach (var mesh in modelNode.GetMeshNodes(0))
                 mesh.AttachmentPointName = attachmentPointName;
@@ -164,41 +163,7 @@ namespace GameWorld.Core.Services
             {
                 var modelFile = _packFileService.FindFile(wsMaterial.GeometryPath);
                 var modelAsBase = wsModelNode as SceneNode;
-                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player, attachmentPointName);
-
-                foreach (var materialNode in wsMaterial.MaterialList)
-                {
-                    var materialFile = _packFileService.FindFile(materialNode.MaterialPath);
-                    var materialConfig = new WsModelMaterialFile(materialFile);
-
-                    var mesh = loadedModelNode.GetMeshNode(materialNode.LodIndex, materialNode.PartIndex);
-                    if (mesh == null)
-                    {
-                        _logger.Here().Error($"Trying to access material at index {materialNode.PartIndex} at lod {materialNode.LodIndex}, which is not found ");
-                    }
-                    else
-                    {
-                        mesh.OriginalFilePath = _packFileService.GetFullPath(file);
-                        var useAlpha = materialConfig.Alpha;
-                        if (useAlpha)
-                            mesh.Material.AlphaMode = AlphaMode.Transparent;
-                        else
-                            mesh.Material.AlphaMode = AlphaMode.Opaque;
-
-                        var allTextures = mesh.Material.GetAllTextures();
-                        for (var i = 0; i < 0; i++)
-                        {
-                            mesh.Material.SetTexture(allTextures[i].TexureType, "");
-                            mesh.UpdateTexture("", allTextures[i].TexureType);
-                        }
-
-                        foreach (var newTexture in materialConfig.Textures)
-                        {
-                            mesh.Material.SetTexture(newTexture.Key, newTexture.Value);
-                            mesh.UpdateTexture(newTexture.Value, newTexture.Key);
-                        }
-                    }
-                }
+                var loadedModelNode = LoadRigidMesh(modelFile, ref modelAsBase, player, attachmentPointName, wsMaterial);
             }
         }
     }

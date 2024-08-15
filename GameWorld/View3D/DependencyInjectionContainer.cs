@@ -43,8 +43,9 @@ namespace GameWorld.Core
             // Settings
             serviceCollection.AddScoped<GeometrySaveSettings>();
             serviceCollection.AddScoped<SceneLightParametersStore>();
-            
+
             // Services
+            serviceCollection.AddScoped<MeshBuilderService>();
             serviceCollection.AddScoped<ViewOnlySelectedService>();
             serviceCollection.AddScoped<FocusSelectableObjectService>();
             serviceCollection.AddScoped<ComplexMeshLoader>();

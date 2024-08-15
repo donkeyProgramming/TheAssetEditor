@@ -1,20 +1,19 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using CommonControls.BaseDialogs.ErrorListDialog;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel.Types;
-using MS = Microsoft.Xna.Framework;
+using MS = Microsoft.Xna.Framework;*/
 
 namespace GameWorld.Core.Services
-{
+{/*
     public class Rmv2UpdaterService
     {
         // TODO: maybe make nested inside a class, as there could be multiple options for generation the metal map too....
@@ -523,5 +522,5 @@ namespace GameWorld.Core.Services
 
         }
 
-    }
+    }*/
 }

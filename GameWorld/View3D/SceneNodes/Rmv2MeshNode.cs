@@ -28,8 +28,7 @@ namespace GameWorld.Core.SceneNodes
         Vector3 _position = Vector3.Zero;
         Vector3 _scale = Vector3.One;
 
-        public string OriginalFilePath { get; set; }
-        public int OriginalPartIndex { get; internal set; }
+      
         public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix(); } }
         public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
         public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix(); } }
@@ -37,14 +36,14 @@ namespace GameWorld.Core.SceneNodes
      
         public bool DisplayBoundingBox { get; set; } = false;
         public bool DisplayPivotPoint { get; set; } = false;
+        public bool ReduceMeshOnLodGeneration { get; set; } = true;
 
         public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
         public CapabilityMaterial Effect { get; set; }
-        public int LodIndex { get; set; } = -1;
+       
 
         bool _isSelectable = true;
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
-        public bool ReduceMeshOnLodGeneration { get; set; } = true;
 
         public AnimationPlayer? AnimationPlayer { get; set; }                               // This is a hack - remove at some point
         public SkeletonBoneAnimationResolver? AttachmentBoneResolver { get; set; } = null;  // This is a hack - remove at some point
@@ -78,19 +77,6 @@ namespace GameWorld.Core.SceneNodes
 
         public Vector3 GetObjectCentre() => MathUtil.GetCenter(Geometry.BoundingBox) + Position;
        
-        public void UpdateTexture(string path, TextureType textureType, bool forceRefreshTexture = false)
-        {
-           // Material.SetTexture(textureType, path);
-           // _resourceLib.LoadTexture(path, forceRefreshTexture);
-           //
-           // var sharedCapability = Effect.GetCapability<DefaultCapability>();
-           // if (sharedCapability != null)
-           // {
-           //     sharedCapability.SetTexturePath(textureType, path);
-           //     sharedCapability.SetTextureUsage(textureType, true);
-           // }
-        }
-
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
             var animationCapability = Effect.GetCapability<AnimationCapability>();
@@ -140,17 +126,17 @@ namespace GameWorld.Core.SceneNodes
 
         public void CopyInto(ISceneNode target, bool includeMesh)
         {
-            var typedTarget = target as Rmv2MeshNode;
-            if (typedTarget == null)
+            if (target is not Rmv2MeshNode typedTarget)
                 throw new Exception("Error casting");
-            typedTarget.Material = Material.Clone();
+
             typedTarget.CommonHeader = CommonHeader;
             typedTarget.Position = Position;
             typedTarget.Orientation = Orientation;
             typedTarget.Scale = Scale;
-            typedTarget.LodIndex = LodIndex;
             typedTarget.ReduceMeshOnLodGeneration = ReduceMeshOnLodGeneration;
             typedTarget.AnimationPlayer = AnimationPlayer;
+            typedTarget.ScaleMult = ScaleMult;
+
             typedTarget.Material = Material.Clone();
             typedTarget.Geometry = Geometry.Clone();
             typedTarget.Effect = Effect.Clone();
@@ -158,9 +144,7 @@ namespace GameWorld.Core.SceneNodes
             if(includeMesh)
                 typedTarget.Geometry = Geometry.Clone();
 
-            typedTarget.OriginalFilePath = OriginalFilePath;
-            typedTarget.OriginalPartIndex = OriginalPartIndex;
-            typedTarget.ScaleMult = ScaleMult;
+          
             base.CopyInto(target);
         }
 

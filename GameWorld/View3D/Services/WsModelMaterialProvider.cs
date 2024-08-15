@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.WsModel;
 
@@ -19,10 +20,15 @@ namespace GameWorld.Core.Services
         public static WsModelMaterialProvider CreateFromModelPath(PackFileService packFileService, string rmv2ModelPath)
         {
             var wsModelPath = Path.ChangeExtension(rmv2ModelPath, ".wsmodel");
-            return CreateFromWsModel(packFileService, wsModelPath);
+            return CreateFromWsModelPath(packFileService, wsModelPath);
         }
 
-        public static WsModelMaterialProvider CreateFromWsModel(PackFileService packFileService, string wsModelPath)
+        public static WsModelMaterialProvider CreateFromWsModel(PackFileService packFileService, WsModelFile wsModel)
+        {
+            return new WsModelMaterialProvider(packFileService, wsModel);
+        }
+
+        public static WsModelMaterialProvider CreateFromWsModelPath(PackFileService packFileService, string wsModelPath)
         {
             var packFile = packFileService.FindFile(wsModelPath);
             if (packFile == null)

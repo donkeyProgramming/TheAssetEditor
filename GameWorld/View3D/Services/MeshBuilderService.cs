@@ -10,9 +10,16 @@ namespace GameWorld.Core.Services
 {
     public class MeshBuilderService
     {
-        public static MeshObject BuildMeshFromRmvModel(RmvModel modelPart, string skeletonName, IGraphicsCardGeometry context)
+        private readonly IGeometryGraphicsContextFactory _contextFactory;
+
+        public MeshBuilderService(IGeometryGraphicsContextFactory context)
         {
-            var output = new MeshObject(context, skeletonName);
+            _contextFactory = context;
+        }
+
+        public MeshObject BuildMeshFromRmvModel(RmvModel modelPart, string skeletonName)
+        {
+            var output = new MeshObject(_contextFactory.Create(), skeletonName);
             output.ChangeVertexType(ModelMaterialEnumHelper.GetToolVertexFormat(modelPart.Material.BinaryVertexFormat), skeletonName, false);
             output.VertexArray = new VertexPositionNormalTextureCustom[modelPart.Mesh.VertexList.Length];
             output.IndexArray = (ushort[])modelPart.Mesh.IndexList.Clone();
@@ -51,7 +58,7 @@ namespace GameWorld.Core.Services
             return output;
         }
 
-        public static RmvMesh CreateRmvMeshFromGeometry(MeshObject geometry)
+        public RmvMesh CreateRmvMeshFromGeometry(MeshObject geometry)
         {
             // Ensure normalized
             for (var i = 0; i < geometry.VertexArray.Length; i++)

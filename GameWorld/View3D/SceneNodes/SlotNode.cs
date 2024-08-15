@@ -5,8 +5,6 @@
         public SlotNode(string name, string attachmentBoneName) : base(name) { AttachmentBoneName = attachmentBoneName; }
         public string AttachmentBoneName { get; set; }
 
-
-
         protected SlotNode() { }
 
         public override ISceneNode CreateCopyInstance() => new SlotNode();
@@ -18,6 +16,4 @@
             base.CopyInto(target);
         }
     }
-
-
 }

@@ -1,19 +1,7 @@
-﻿using GameWorld.Core.SceneNodes;
-using Shared.Core.PackFiles;
-
-namespace GameWorld.Core.Services
+﻿namespace GameWorld.Core.Services
 {
-    public class MissingTextureResolver
-    {
-        public void DeleteMissingTextures(Rmv2MeshNode meshNode, PackFileService pfs)
-        {
-            var textures = meshNode.GetTextures();
-            foreach (var texture in textures)
-            {
-                if (pfs.FindFile(texture.Value) == null)
-                    meshNode.UpdateTexture("", texture.Key);
-            }
-        }
+   // public class MissingTextureResolver
+//{
         /*
         public void ResolveMissingTextures(Rmv2MeshNode meshNode, PackFileService pfs)
         {
@@ -89,5 +77,5 @@ namespace GameWorld.Core.Services
                 meshNode.UpdateTexture(newPath, texureType);
             }
         }*/
-    }
+  //  }
 }

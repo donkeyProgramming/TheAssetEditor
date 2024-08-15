@@ -20,11 +20,13 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
     {
         private readonly ILogger _logger = Logging.Create<NodeToRmvSaveHelper>();
         private readonly PackFileService _packFileService;
+        private readonly MeshBuilderService _meshBuilderService;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public NodeToRmvSaveHelper(PackFileService packFileService, ApplicationSettingsService applicationSettingsService)
+        public NodeToRmvSaveHelper(PackFileService packFileService, MeshBuilderService meshBuilderService, ApplicationSettingsService applicationSettingsService)
         {
             _packFileService = packFileService;
+            _meshBuilderService = meshBuilderService;
             _applicationSettingsService = applicationSettingsService;
         }
 
@@ -83,7 +85,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                     {
                         CommonHeader = meshes[meshIndex].CommonHeader,
                         Material = meshes[meshIndex].Material,
-                        Mesh = MeshBuilderService.CreateRmvMeshFromGeometry(meshes[meshIndex].Geometry)
+                        Mesh = _meshBuilderService.CreateRmvMeshFromGeometry(meshes[meshIndex].Geometry)
                     };
 
                     newModel.UpdateBoundingBox(meshes[meshIndex].Geometry.BoundingBox);

@@ -80,8 +80,6 @@ namespace KitbasherEditor
             // Commands
             RegisterAllAsOriginalType<IKitbasherUiCommand>(serviceCollection, ServiceLifetime.Transient);
             serviceCollection.AddTransient<CopyTexturesToPackCommand>();
-            serviceCollection.AddTransient<DeleteMissingTexturesCommand>();
-            serviceCollection.AddTransient<ResolveMissingTextureCommand>();
             serviceCollection.AddTransient<ImportReferenceMeshCommand>();
         }
 
