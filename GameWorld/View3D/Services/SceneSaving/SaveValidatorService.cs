@@ -46,7 +46,7 @@ namespace GameWorld.Core.Services.SceneSaving
                 errorList.Warning("Mesh", "Model contains multiple meshes that can be merged. Consider merging them for performance reasons");
 
             // Different pivots
-            var pivots = meshes.Select(x => x.Material.PivotPoint).Distinct().ToList();
+            var pivots = meshes.Select(x => x.PivotPoint).Distinct().ToList();
             if (pivots.Count != 1)
                 errorList.Warning("Pivot Point", "Model contains multiple different pivot points, this is almost always not intended");
 

@@ -152,28 +152,5 @@ namespace GameWorld.Core.Utility
 
             return combinedMeshes;
         }
-
-        private static bool ValidateTextures(Rmv2MeshNode item0, string item0Name, Rmv2MeshNode item1, string item1Name, out string textureErrorMsg)
-        {
-            var textureList0 = item0.GetTextures();
-            var textureList1 = item1.GetTextures();
-            if (textureList0.Count != textureList1.Count())
-            {
-                textureErrorMsg = $"{item0Name} has a different number of textures then {item1Name}";
-                return false;
-            }
-
-            foreach (var item in textureList0)
-            {
-                if (textureList1.ContainsKey(item.Key) && textureList1[item.Key] == textureList0[item.Key])
-                    continue;
-
-                textureErrorMsg = $"{item1Name} does not share the same {item.Key} texture";
-                return false;
-            }
-
-            textureErrorMsg = null;
-            return true;
-        }
     }
 }

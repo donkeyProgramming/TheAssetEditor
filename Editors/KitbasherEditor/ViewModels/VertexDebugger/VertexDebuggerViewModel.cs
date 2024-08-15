@@ -98,7 +98,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
                     _renderEngineComponent.AddRenderLines(LineHelper.AddBoundingBox(bb, Color.Black));
                 }
 
-                var modelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.Material.PivotPoint);
+                var modelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.PivotPoint);
                 var vertexList = selection.SelectedVertices;
                 foreach (var vertexIndex in vertexList)
                 {

@@ -51,7 +51,7 @@ namespace GameWorld.Core.Commands.Object
 
                 for (var i = 0; i < currentMesh.Geometry.VertexCount(); i++)
                 {
-                    currentMesh.UpdatePivotPoint(Vector3.Zero);
+                    currentMesh.PivotPoint = Vector3.Zero;
                     currentMesh.Geometry.SetVertexBlendIndex(i, sourceVert.BlendIndices);
                     currentMesh.Geometry.SetVertexWeights(i, sourceVert.BlendWeights);
                 }
@@ -66,7 +66,7 @@ namespace GameWorld.Core.Commands.Object
             {
                 _meshesToPin[i].Geometry = _originalGeos[i];
                 _meshesToPin[i].Geometry.ParentSkeletonName = _originalSkeletonNames[i];
-                _meshesToPin[i].UpdatePivotPoint(Vector3.Zero);
+                _meshesToPin[i].PivotPoint = Vector3.Zero;
             }
 
             _selectionManager.SetState(_selectionOldState);

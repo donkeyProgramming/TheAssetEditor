@@ -20,7 +20,7 @@ namespace Shared.GameFormats.RigidModel
 
         public RmvFile() { }
 
-        public void UpdateOffsets()
+        public void RecalculateOffsets()
         {
             for (var lodIndex = 0; lodIndex < Header.LodCount; lodIndex++)
             {

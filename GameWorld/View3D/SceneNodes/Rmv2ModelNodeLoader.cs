@@ -38,9 +38,9 @@ namespace GameWorld.Core.SceneNodes
                 var lodNode = outputNode.Children[lodIndex];
                 for (var modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
-                    var geometry = _meshBuilderService.BuildMeshFromRmvModel(model.ModelList[lodIndex][modelIndex], model.Header.SkeletonName);
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
-
+                    var geometry = _meshBuilderService.BuildMeshFromRmvModel(rmvModel, model.Header.SkeletonName);
+                    
                     var wsModelMaterial = wsMaterialProvider.GetModelMaterial(lodIndex, modelIndex); 
                     var shader = _capabilityMaterialFactory.Create(rmvModel.Material, wsModelMaterial);
 
@@ -49,7 +49,7 @@ namespace GameWorld.Core.SceneNodes
                     if (string.IsNullOrWhiteSpace(rmvModel.Material.ModelName))
                         rmvModel.Material.ModelName = Path.GetFileNameWithoutExtension(modelFullPath);
 
-                    var node = new Rmv2MeshNode(rmvModel.CommonHeader, geometry, rmvModel.Material, animationPlayer, shader);
+                    var node = new Rmv2MeshNode(geometry, rmvModel.Material, shader, animationPlayer);
                     lodNode.AddObject(node);
                 }
             }

@@ -84,7 +84,6 @@ namespace GameWorld.Core.Commands.Object
 
                     var meshName = $"{_objectToSplit.Name}_submesh_{counter++}";
                     meshNode.Name = meshName;
-                    meshNode.Material.ModelName = meshName;
 
                     createdMeshes.Add(meshNode);
                     currentGroupNode.AddObject(meshNode);

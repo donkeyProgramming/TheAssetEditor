@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Text;
 using Shared.GameFormats.RigidModel.Transforms;
 using Shared.GameFormats.RigidModel.Types;
 
@@ -18,5 +19,17 @@ namespace Shared.GameFormats.RigidModel
 
         public RvmBoundingBox BoundingBox;
         public RmvShaderParams ShaderParams;
+
+        public static RmvCommonHeader CreateDefault()
+        {
+            return new RmvCommonHeader()
+            {
+                ModelTypeFlag = 0,
+                RenderFlag = 0,
+
+                ShaderParams = RmvShaderParams.CreateDefault()
+            };
+            
+        }
     }
 }

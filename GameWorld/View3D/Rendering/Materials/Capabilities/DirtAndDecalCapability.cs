@@ -1,5 +1,4 @@
 ﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
-using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
@@ -18,9 +17,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {
-            //effect.Parameters["UseBlood"].SetValue(UseBlood);
-            //
-            //BloodMask.Apply(effect, resourceLibrary);
+
         }
 
         public ICapability Clone()
@@ -37,14 +34,28 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
         {
-            //CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, BloodMask);
+            if (rmvMaterial is WeightedMaterial weightedMateial)
+            { 
+                UseDecal = weightedMateial.UseDecal;
+                UseDirt = weightedMateial.UseDirt;
+
+                CapabilityHelper.SetTextureFromModel(rmvMaterial, null, DecalDirtMap);
+                CapabilityHelper.SetTextureFromModel(rmvMaterial, null, DecalDirtMask);
+                CapabilityHelper.SetTextureFromModel(rmvMaterial, null, DecalMask);
+            }
         }
 
-        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
+        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial) 
         {
-           // templateHandler.AddAttribute("TEMPLATE_ATTR_BLOOOD_PATH", BloodMask);
-           // templateHandler.AddAttribute("TEMPLATE_ATTR_BLOOD_UV_SCALE_VALUE", UvScale);
-           // templateHandler.AddAttribute("TEMPLATE_ATTR_USE_BLOOD_VALUE", UseBlood ? 1 : 0);
+            if(rmvMaterial is WeightedMaterial weightedMateial)
+            {
+                weightedMateial.UseDecal = UseDecal;
+                weightedMateial.UseDirt = UseDirt;
+
+                weightedMateial.SetTexture(DecalDirtMap.Type, DecalDirtMap.TexturePath);
+                weightedMateial.SetTexture(DecalDirtMask.Type, DecalDirtMask.TexturePath);
+                weightedMateial.SetTexture(DecalMask.Type, DecalMask.TexturePath);
+            }
         }
     }
 }

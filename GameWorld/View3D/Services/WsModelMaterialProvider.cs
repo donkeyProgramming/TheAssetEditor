@@ -35,7 +35,7 @@ namespace GameWorld.Core.Services
                 return new WsModelMaterialProvider(packFileService, null);
 
             var wsModel = new WsModelFile(packFile);
-            return new WsModelMaterialProvider(packFileService, wsModel);
+            return CreateFromWsModel(packFileService, wsModel);
         }
 
         public WsModelMaterialFile? GetModelMaterial(int lodIndex, int partIndex)
@@ -53,19 +53,6 @@ namespace GameWorld.Core.Services
 
             return new WsModelMaterialFile(wsMaterialPath);
         }
-
-
-        //public WsModelMaterialFile? ResolveFromModelPath(string rmv2ModelPath, int lodIndex, int partIndex)
-        //{
-        //    
-        //    return ResolveFromWsModel(wsModelPath, lodIndex, partIndex);    
-        //}
-        //
-        //public WsModelMaterialFile? ResolveFromWsModel(string wsModelPath, int lodIndex, int partIndex)
-        //{
-        //
-        //
-        //}
     }
 }
 

@@ -8,6 +8,13 @@ using Shared.GameFormats.RigidModel.Types;
 
 namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
+    public static class ParamterIds
+    {
+        public const int Alpha_index = 0;
+        public const int Decal_index = 1;
+        public const int Dirt_index = 2;
+    }
+
     public class WeightedMaterial : IRmvMaterial
     {
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.Unknown;
@@ -15,9 +22,9 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         public UiVertexFormat ToolVertexFormat { get; set; }
 
         public Vector3 PivotPoint { get; set; }
-        public AlphaMode AlphaMode { get; set; }
-        public bool UseDecal { get; set; }
-        public bool UseDirt{ get; set; }
+        public AlphaMode AlphaMode { get; set; } = AlphaMode.Opaque;
+        public bool UseDecal { get; set; } = false;
+        public bool UseDirt { get; set; } = false;
 
         public string ModelName { get; set; }
 
@@ -130,7 +137,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             }
         }
 
-        public void UpdateEnumsBeforeSaving(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion)
+        public void UpdateInternalState(UiVertexFormat uiVertexFormat)
         {
             BinaryVertexFormat = uiVertexFormat switch
             {
@@ -142,9 +149,38 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
             // Overwrite the material type for static meshes
             if (BinaryVertexFormat == VertexFormat.Static)
-                MaterialId = ModelMaterialEnum.default_type;
+            {
+                if (UseDecal && UseDirt)
+                    MaterialId = ModelMaterialEnum.decal_dirtmap;
+                else if (UseDirt)
+                    MaterialId = ModelMaterialEnum.dirtmap;
+                else if (UseDecal)
+                    MaterialId = ModelMaterialEnum.decal;
+                else
+                    MaterialId = ModelMaterialEnum.default_type;
+            }
             else
-                MaterialId = ModelMaterialEnum.weighted;
+            {
+                if (UseDecal && UseDirt)
+                    MaterialId = ModelMaterialEnum.weighted_decal_dirtmap;
+                else if (UseDirt)
+                    MaterialId = ModelMaterialEnum.weighted_dirtmap;
+                else if (UseDecal)
+                    MaterialId = ModelMaterialEnum.weighted_decal;
+                else
+                    MaterialId = ModelMaterialEnum.weighted;
+            }
+
+            // Update int params
+            IntParams.Clear();
+            IntParams.Add((ParamterIds.Alpha_index, AlphaMode == AlphaMode.Transparent ? 1 : 0));
+
+            if (UseDecal)
+                IntParams.Add((ParamterIds.Decal_index, UseDecal ? 1 : 0));
+
+            if (UseDirt)
+                IntParams.Add((ParamterIds.Dirt_index, UseDirt ? 1 : 0));
+
         }
 
         public void EnrichDataBeforeSaving(string[] boneNames)
@@ -167,42 +203,49 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
     {
         public IRmvMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset)
         {
-            var Header = ByteHelper.ByteArrayToStructure<WeightedMaterialStruct>(dataArray, dataOffset);
+            var header = ByteHelper.ByteArrayToStructure<WeightedMaterialStruct>(dataArray, dataOffset);
             dataOffset += ByteHelper.GetSize<WeightedMaterialStruct>();
             var material = new WeightedMaterial()
             {
-                AttachmentPointParams = LoadAttachmentPoints(Header.AttachmentPointCount, dataArray, ref dataOffset),
-                TexturesParams = LoadTextures(Header.TextureCount, dataArray, ref dataOffset),
-                StringParams = LoadStringParams(Header.StringParamCount, dataArray, ref dataOffset),
-                FloatParams = LoadFloatParams(Header.FloatParamCount, dataArray, ref dataOffset),
-                IntParams = LoadIntParams(Header.IntParamCount, dataArray, ref dataOffset),
-                Vec4Params = LoadVec4Params(Header.Vec4ParamCount, dataArray, ref dataOffset),
+                AttachmentPointParams = LoadAttachmentPoints(header.AttachmentPointCount, dataArray, ref dataOffset),
+                TexturesParams = LoadTextures(header.TextureCount, dataArray, ref dataOffset),
+                StringParams = LoadStringParams(header.StringParamCount, dataArray, ref dataOffset),
+                FloatParams = LoadFloatParams(header.FloatParamCount, dataArray, ref dataOffset),
+                IntParams = LoadIntParams(header.IntParamCount, dataArray, ref dataOffset),
+                Vec4Params = LoadVec4Params(header.Vec4ParamCount, dataArray, ref dataOffset),
 
                 MaterialId = materialId,
-                BinaryVertexFormat = (VertexFormat)Header._vertexType,
-                ModelName = StringSanitizer.FixedString(Encoding.ASCII.GetString(Header._modelName)),
-                Filters = StringSanitizer.FixedString(Encoding.ASCII.GetString(Header.Filters)),
-                MatrixIndex = Header.MatrixIndex,
-                ParentMatrixIndex = Header.ParentMatrixIndex,
-                PivotPoint = Header.Transform.Pivot.ToVector3(),
-                TextureDirectory = StringSanitizer.FixedString(Encoding.ASCII.GetString(Header._textureDir)),
-                OriginalTransform = Header.Transform,
+                BinaryVertexFormat = (VertexFormat)header._vertexType,
+                ModelName = StringSanitizer.FixedString(Encoding.ASCII.GetString(header._modelName)),
+                Filters = StringSanitizer.FixedString(Encoding.ASCII.GetString(header.Filters)),
+                MatrixIndex = header.MatrixIndex,
+                ParentMatrixIndex = header.ParentMatrixIndex,
+                PivotPoint = header.Transform.Pivot.ToVector3(),
+                TextureDirectory = StringSanitizer.FixedString(Encoding.ASCII.GetString(header._textureDir)),
+                OriginalTransform = header.Transform,
             };
 
-            // Alpha mode
-            material.AlphaMode = AlphaMode.Opaque;
-            if (material.IntParams.Count != 0)
-                material.AlphaMode = (AlphaMode)material.IntParams.First().Item2;
+            foreach (var valueSet in material.IntParams)
+            {
+                if (valueSet.Index == ParamterIds.Alpha_index)
+                    material.AlphaMode = valueSet.Value == 1 ? AlphaMode.Transparent : AlphaMode.Opaque;
+
+                if (valueSet.Index == ParamterIds.Decal_index)
+                    material.UseDecal = true;
+
+                if (valueSet.Index == ParamterIds.Dirt_index)
+                    material.UseDirt = true;
+            }
 
             return material;
         }
 
-        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, VertexFormat vertexFormat)
+        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId)
         {
             var material = new WeightedMaterial()
             {
                 MaterialId = materialId,
-                BinaryVertexFormat = vertexFormat,
+                BinaryVertexFormat = VertexFormat.Unknown,
                 ModelName = "mesh1",
                 TextureDirectory = "variantmeshes\\mesh1",
                 OriginalTransform = new RmvTransform(),
@@ -215,6 +258,9 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 AttachmentPointParams = [],
                 TexturesParams = [],
                 AlphaMode = AlphaMode.Transparent, /// Alpha mode - assume that users want transpencey mode enabled by default
+                
+                UseDirt = false,
+                UseDecal = false,
             };
 
             return material;
@@ -224,8 +270,6 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         {
             if (material is not WeightedMaterial typedMaterial)
                 throw new Exception("Incorrect material provided for WeightedMaterial::Save");
-
-            // Update based on flags
 
             // Create the header
             var header = new WeightedMaterialStruct()

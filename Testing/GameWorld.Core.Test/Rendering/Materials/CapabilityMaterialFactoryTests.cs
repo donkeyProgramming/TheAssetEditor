@@ -15,7 +15,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
         public void CreateMaterial_Wh3_CreateDefault_FromRmvMaterial()
         {
             var rmvMaterial = RmvMaterialHelper
-                .Create(ModelMaterialEnum.weighted, VertexFormat.Static)
+                .Create(ModelMaterialEnum.weighted)
                 .SetAlpha(true)
                 .AssignMaterials([TextureType.Normal, TextureType.MaterialMap]);
 
@@ -44,7 +44,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
         public void CreateMaterial_Wh3_CreateDefault_FromWsMaterial()
         {
             var rmvMaterial = RmvMaterialHelper
-                .Create(ModelMaterialEnum.weighted, VertexFormat.Static)
+                .Create(ModelMaterialEnum.weighted)
                 .SetAlpha(true)
                 .AssignMaterials([TextureType.Normal, TextureType.MaterialMap]);
 
@@ -85,7 +85,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
         public void CreateMaterial_Wh3_CreateEmissive_FromWsMaterial()
         {
             var rmvMaterial = RmvMaterialHelper
-                .Create(ModelMaterialEnum.weighted, VertexFormat.Static);
+                .Create(ModelMaterialEnum.weighted);
 
             var wsMaterial = new WsModelMaterialFile()
             {
@@ -107,7 +107,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
         public void CreateMaterial_Rome_Default()
         {
             var rmvMaterial = RmvMaterialHelper
-                .Create(ModelMaterialEnum.weighted, VertexFormat.Static)
+                .Create(ModelMaterialEnum.weighted)
                 .SetAlpha(true)
                 .AssignMaterials([TextureType.Normal, TextureType.Gloss]);
 
@@ -135,36 +135,25 @@ namespace GameWorld.Core.Test.Rendering.Materials
         [Test]
         public void CreateMaterial_Rome_DecalAndDirt()
         {
-           // var rmvMaterial = RmvMaterialHelper
-           //     .Create(ModelMaterialEnum.weighted_decal_dirtmap, VertexFormat.Weighted)
-           //     .SetAlpha(true)
-           //     .AssignMaterials([TextureType.Diffuse, TextureType.Decal_dirtmap, TextureType.Decal_mask, TextureType.Decal_dirtmask]);
-           //
-           // var appSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
-           // var abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
-           // var material = abstractMaterialFactory.Create(rmvMaterial, null);
-           //
-           // Assert.That(material, Is.TypeOf<Core.Rendering.Materials.Shaders.SpecGloss.DecalAndDirtMaterial>());
-           //
-           // var specGlossCap = material.TryGetCapability<SpecGlossCapability>();
-           // Assert.That(specGlossCap, Is.Not.Null);
-           //
-           // var dirtCap = material.TryGetCapability<DirtAndDecalCapability>();
-           // Assert.That(dirtCap, Is.Not.Null);
-
-
-
-
-            //Assert.That(defaultCapabiliy.GlossMap.TexturePath, Is.EqualTo($"texturePath/{TextureType.Gloss}.dds"));
-            //Assert.That(defaultCapabiliy.GlossMap.UseTexture, Is.True);
-            //
-            //Assert.That(defaultCapabiliy.NormalMap.TexturePath, Is.EqualTo($"texturePath/{TextureType.Normal}.dds"));
-            //Assert.That(defaultCapabiliy.NormalMap.UseTexture, Is.True);
-            //
-            //Assert.That(defaultCapabiliy.DiffuseMap.TexturePath, Is.EqualTo(""));
-            //Assert.That(defaultCapabiliy.DiffuseMap.UseTexture, Is.False);
-            //
-            //Assert.That(defaultCapabiliy.UseAlpha, Is.True);
+            var rmvMaterial = RmvMaterialHelper
+                .Create(ModelMaterialEnum.weighted_decal_dirtmap)
+                .SetAlpha(true)
+                .SetDecalAndDirt(true, true)
+                .AssignMaterials([TextureType.Diffuse, TextureType.Decal_dirtmap, TextureType.Decal_mask, TextureType.Decal_dirtmask]);
+            
+            var appSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
+            var abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
+            var material = abstractMaterialFactory.Create(rmvMaterial, null);
+            
+            Assert.That(material, Is.TypeOf<Core.Rendering.Materials.Shaders.SpecGloss.DecalAndDirtMaterial>());
+            
+            var specGlossCap = material.TryGetCapability<SpecGlossCapability>();
+            Assert.That(specGlossCap, Is.Not.Null);
+            
+            var dirtCap = material.TryGetCapability<DirtAndDecalCapability>();
+            Assert.That(dirtCap, Is.Not.Null);
+            Assert.That(dirtCap.UseDirt, Is.True);
+            Assert.That(dirtCap.UseDecal, Is.True);
         }
     }
 
@@ -183,13 +172,24 @@ namespace GameWorld.Core.Test.Rendering.Materials
             material.AlphaMode = useAlpha ? AlphaMode.Transparent: AlphaMode.Opaque;
             return material;
         }
+
+        public static IRmvMaterial SetDecalAndDirt(this IRmvMaterial material, bool useDecal, bool useDirt)
+        {
+            if (material is WeightedMaterial weightedMaterial)
+            {
+                weightedMaterial.UseDecal = useDecal;
+                weightedMaterial.UseDirt = useDirt;
+            }
+
+            return material;
+        }
     }
 
     public static class RmvMaterialHelper
     {
-        public static IRmvMaterial Create(ModelMaterialEnum materialEnum, VertexFormat vertexFormat)
+        public static IRmvMaterial Create(ModelMaterialEnum materialEnum)
         {
-            var rmvMaterial = MaterialFactory.Create().CreateMaterial(materialEnum, vertexFormat);
+            var rmvMaterial = MaterialFactory.Create().CreateMaterial(materialEnum);
             return rmvMaterial;
         }
     }

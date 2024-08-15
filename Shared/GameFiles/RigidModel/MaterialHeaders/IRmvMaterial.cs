@@ -18,14 +18,14 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         RmvTexture? GetTexture(TextureType texureType);
         void SetTexture(TextureType texureType, string path);
 
-        void UpdateEnumsBeforeSaving(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion);
+        void UpdateInternalState(UiVertexFormat uiVertexFormat);
         void EnrichDataBeforeSaving(string[] boneNames);
     }
 
     public interface IMaterialCreator
     {
         IRmvMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] dataArray, int dataOffset);
-        IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, VertexFormat vertexFormat);
+        IRmvMaterial CreateEmpty(ModelMaterialEnum materialId);
         byte[] Save(IRmvMaterial material);
     }
 }

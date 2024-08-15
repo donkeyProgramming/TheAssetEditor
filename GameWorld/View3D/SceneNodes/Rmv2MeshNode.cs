@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Gizmo;
@@ -14,24 +13,25 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
-using Shared.GameFormats.RigidModel.Types;
 
 namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IDrawableItem
     {
+        private Quaternion _orientation = Quaternion.Identity;
+        private Vector3 _position = Vector3.Zero;
+        private Vector3 _scale = Vector3.One;
+
         public IRmvMaterial Material { get; set; }
         public MeshObject Geometry { get; set; }
         public RmvCommonHeader CommonHeader { get; set; }
 
-        Quaternion _orientation = Quaternion.Identity;
-        Vector3 _position = Vector3.Zero;
-        Vector3 _scale = Vector3.One;
-
-      
+ 
         public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix(); } }
         public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
         public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix(); } }
+        public Vector3 PivotPoint { get; set; }
+
         public string AttachmentPointName { get; set; } = "";
      
         public bool DisplayBoundingBox { get; set; } = false;
@@ -51,15 +51,15 @@ namespace GameWorld.Core.SceneNodes
         private Rmv2MeshNode()
         { }
 
-        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IRmvMaterial material, AnimationPlayer animationPlayer, CapabilityMaterial shader)
+        public Rmv2MeshNode(MeshObject meshObject, IRmvMaterial material, CapabilityMaterial shader, AnimationPlayer animationPlayer)
         {
-            CommonHeader = commonHeader;
             Material = material;
             AnimationPlayer = animationPlayer;
             Geometry = meshObject;
             Effect = shader;
 
-            Name = Material.ModelName;
+            Name = material.ModelName;
+            PivotPoint = material.PivotPoint;
         }
 
         public Rmv2ModelNode? GetParentModel()
@@ -104,13 +104,13 @@ namespace GameWorld.Core.SceneNodes
             if (AttachmentBoneResolver != null)
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
 
-            var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(Material.PivotPoint);
+            var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(PivotPoint);
             RenderMatrix = modelWithOffset;
 
             renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeometryRenderItem(Geometry, Effect, modelWithOffset * parentWorld));
 
             if (DisplayPivotPoint)
-                renderEngine.AddRenderLines(LineHelper.AddLocator(Material.PivotPoint, 1, Color.Red));
+                renderEngine.AddRenderLines(LineHelper.AddLocator(PivotPoint, 1, Color.Red));
 
             if (DisplayBoundingBox)
                 renderEngine.AddRenderLines(LineHelper.AddBoundingBox(Geometry.BoundingBox, Color.Red));
@@ -129,13 +129,13 @@ namespace GameWorld.Core.SceneNodes
             if (target is not Rmv2MeshNode typedTarget)
                 throw new Exception("Error casting");
 
-            typedTarget.CommonHeader = CommonHeader;
             typedTarget.Position = Position;
             typedTarget.Orientation = Orientation;
             typedTarget.Scale = Scale;
             typedTarget.ReduceMeshOnLodGeneration = ReduceMeshOnLodGeneration;
             typedTarget.AnimationPlayer = AnimationPlayer;
             typedTarget.ScaleMult = ScaleMult;
+            typedTarget.PivotPoint = PivotPoint;
 
             typedTarget.Material = Material.Clone();
             typedTarget.Geometry = Geometry.Clone();
@@ -146,29 +146,6 @@ namespace GameWorld.Core.SceneNodes
 
           
             base.CopyInto(target);
-        }
-
-        public void UpdatePivotPoint(Vector3 newPiv)
-        {
-            Material.PivotPoint = newPiv;
-        }
-
-        public Dictionary<TextureType, string> GetTextures()
-        {
-            var enumCollection = Enum.GetValues(typeof(TextureType));
-            var output = new Dictionary<TextureType, string>();
-
-            foreach (var enumValue in enumCollection)
-            {
-                var texture = Material.GetTexture((TextureType)enumValue);
-                if (texture != null && texture.HasValue)
-                {
-                    if (string.IsNullOrWhiteSpace(texture.Value.Path) == false)
-                        output[(TextureType)enumValue] = texture.Value.Path;
-                }
-            }
-
-            return output;
         }
 
         private void UpdateModelMatrix(Matrix value)

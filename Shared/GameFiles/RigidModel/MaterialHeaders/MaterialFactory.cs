@@ -66,11 +66,11 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             }
         }
 
-        public IRmvMaterial CreateMaterial(ModelMaterialEnum modelTypeEnum, VertexFormat vertexFormat)
+        public IRmvMaterial CreateMaterial(ModelMaterialEnum modelTypeEnum)
         {
             if (_materialCreators.ContainsKey(modelTypeEnum))
             {
-                var material = _materialCreators[modelTypeEnum].CreateEmpty(modelTypeEnum, vertexFormat);
+                var material = _materialCreators[modelTypeEnum].CreateEmpty(modelTypeEnum);
                 return material;
             }
 

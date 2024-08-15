@@ -81,8 +81,6 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 
             // We want to work on a clone of all the meshes
             var originalMeshClone = originalModel.Select(x => SceneNodeHelper.CloneNode(x)).ToList();
-            foreach (var mesh in originalMeshClone)
-                mesh.Name = mesh.Material.ModelName;
 
             if (optimize)
             {

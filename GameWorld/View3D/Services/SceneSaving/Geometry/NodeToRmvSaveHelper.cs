@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using GameWorld.Core.Animation;
+using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.Rendering.Materials.Serialization;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Serilog;
@@ -35,6 +36,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             try
             {
                 var bytes = GenerateBytes(mainNode, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, saveSettings, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+                
                 var originalFileHandle = _packFileService.FindFile(outputPath);
                 var res = SaveHelper.Save(_packFileService, outputPath, originalFileHandle, bytes);
             }
@@ -54,7 +56,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             if ( !(saveSettings.NumberOfLodsToGenerate == lodCount && saveSettings.LodSettingsPerLod.Count == lodCount) )
                 throw new Exception($"Error computer number of lods. saveSettings.NumberOfLodsToGenerate:{saveSettings.NumberOfLodsToGenerate}, lodCount:{lodCount}, saveSettings.LodSettingsPerLod.Count{saveSettings.LodSettingsPerLod.Count}");
 
-            var outputFile = new RmvFile()
+            var rmvFile = new RmvFile()
             {
                 Header = new RmvFileHeader()
                 {
@@ -63,65 +65,57 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                     Version = version,
                     LodCount = lodCount
                 },
-
+                ModelList = new RmvModel[lodCount][],
                 LodHeaders = CreateLodHeaders(lodCount, saveSettings, modelNode.Model.LodHeaders, version)
             };
 
             // Create all the meshes
-            _logger.Here().Information($"Creating meshes");
-            var newMeshList = new List<RmvModel>[lodCount];
-            for (var i = 0; i < lodCount; i++)
-                newMeshList[i] = [];
-
-            for (var currentLodIndex = 0; currentLodIndex < lodCount; currentLodIndex++)
+            for (var lodIndex = 0; lodIndex < lodCount; lodIndex++)
             {
-                var meshes = modelNode.GetMeshesInLod(currentLodIndex, saveSettings.OnlySaveVisible);
-
+                var meshes = modelNode.GetMeshesInLod(lodIndex, saveSettings.OnlySaveVisible);
+                rmvFile.ModelList[lodIndex] = new RmvModel[meshes.Count];
                 for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
-                    _logger.Here().Information($"Creating model. Lod: {currentLodIndex}, Model: {meshIndex}");
-
-                    var newModel = new RmvModel()
-                    {
-                        CommonHeader = meshes[meshIndex].CommonHeader,
-                        Material = meshes[meshIndex].Material,
-                        Mesh = _meshBuilderService.CreateRmvMeshFromGeometry(meshes[meshIndex].Geometry)
-                    };
-
-                    newModel.UpdateBoundingBox(meshes[meshIndex].Geometry.BoundingBox);
-
-                    var boneNames = new string[0];
-                    if (skeleton != null)
-                        boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();
-
-                    var materialSerializer = new MaterialToRmvSerializer();
-                    var newRmvMaterial = materialSerializer.CreateMaterialFromCapabilityMaterial(meshes[meshIndex].Material, meshes[meshIndex].Geometry.VertexFormat, version, meshes[meshIndex].Effect); 
-                    newModel.Material = newRmvMaterial;
-                   
-                    if (enrichModel)
-                        newModel.Material.EnrichDataBeforeSaving(boneNames);
-
-                    _logger.Here().Information($"Model. Lod: {currentLodIndex}, Model: {meshIndex} created.");
-                    newMeshList[currentLodIndex].Add(newModel);
+                    var modelname = meshes[meshIndex].Name;
+                    rmvFile.ModelList[lodIndex][meshIndex] = CreateRmvModel(modelname, meshes[meshIndex].PivotPoint, meshes[meshIndex].Effect, meshes[meshIndex].Geometry, skeleton, enrichModel);
                 }
             }
-            
-            // Convert the list to an array
-            var newMeshListArray = new RmvModel[lodCount][];
-            for (var i = 0; i < lodCount; i++)
-                newMeshListArray[i] = newMeshList[i].ToArray();
 
             // Update data in the header and reCalc offset
-            _logger.Here().Information($"Update offsets");
-            outputFile.ModelList = newMeshListArray;
-            outputFile.UpdateOffsets();
+            rmvFile.RecalculateOffsets();
 
             // Output the data
             _logger.Here().Information($"Generating bytes.");
-            var outputBytes = ModelFactory.Create().Save(outputFile);
+            var outputBytes = ModelFactory.Create().Save(rmvFile);
 
             _logger.Here().Information($"Model saved correctly");
             return outputBytes;
+        }
+
+        RmvModel CreateRmvModel(string modelName, Vector3 pivotPoint, CapabilityMaterial capabilityMaterial, MeshObject geometry, GameSkeleton? skeleton, bool enrichModel)
+        {
+            var newRmvMaterial = new MaterialToRmvSerializer().CreateMaterialFromCapabilityMaterial(capabilityMaterial);
+            newRmvMaterial.UpdateInternalState(geometry.VertexFormat);
+            newRmvMaterial.PivotPoint = pivotPoint;
+            newRmvMaterial.ModelName = modelName;
+
+            var newModel = new RmvModel()
+            {
+                CommonHeader = RmvCommonHeader.CreateDefault(),
+                Material = newRmvMaterial,
+                Mesh = _meshBuilderService.CreateRmvMeshFromGeometry(geometry)
+            };
+
+            newModel.UpdateBoundingBox(geometry.BoundingBox);
+            newModel.UpdateModelTypeFlag(newModel.Material.MaterialId);
+
+            if (enrichModel && skeleton != null)
+            {
+                var boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();
+                newModel.Material.EnrichDataBeforeSaving(boneNames);
+            }
+
+            return newModel;
         }
 
         static RmvLodHeader[] CreateLodHeaders(uint expectedLodCount, GeometrySaveSettings saveSettings, RmvLodHeader[] originalModelHeaders, RmvVersionEnum version)
