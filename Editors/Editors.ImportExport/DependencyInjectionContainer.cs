@@ -40,6 +40,7 @@ namespace Editors.ImportExport
             // Helpers to ensure we can hook up to the UI
             services.AddTransient<IExportFileContextMenuHelper, ExportFileContextMenuHelper>();
             services.AddTransient<DisplayExportFileToolCommand>();
+
         }
     }
 }
