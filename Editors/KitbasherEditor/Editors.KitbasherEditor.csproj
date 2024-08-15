@@ -5,6 +5,16 @@
       <ImplicitUsings>enable</ImplicitUsings>
       <Nullable>enable</Nullable>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Dissolve\**" />
+    <Compile Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Iridescence\**" />
+    <EmbeddedResource Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Dissolve\**" />
+    <EmbeddedResource Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Iridescence\**" />
+    <None Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Dissolve\**" />
+    <None Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Iridescence\**" />
+    <Page Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Dissolve\**" />
+    <Page Remove="ViewModels\SceneNodeEditor\Nodes\MeshNode\Mesh.Material\Iridescence\**" />
+  </ItemGroup>
 
 
 

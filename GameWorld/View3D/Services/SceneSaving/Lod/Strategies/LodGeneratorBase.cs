@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using Shared.Core.ErrorHandling;
@@ -75,46 +76,40 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 
         List<Rmv2MeshNode> CreateLods(List<Rmv2MeshNode> originalModel, LodGenerationSettings settings)
         {
-         //   var output = new List<Rmv2MeshNode>();
-            //for (var lodIndex = 1; lodIndex < settings.Count; lodIndex++)
+            var deductionRatio = settings.LodRectionFactor;
+            var optimize = settings.OptimizeAlpha || settings.OptimizeVertex;
+
+            // We want to work on a clone of all the meshes
+            var originalMeshClone = originalModel.Select(x => SceneNodeHelper.CloneNode(x)).ToList();
+            foreach (var mesh in originalMeshClone)
+                mesh.Name = mesh.Material.ModelName;
+
+            if (optimize)
             {
-                var deductionRatio = settings.LodRectionFactor;
-                var optimize = settings.OptimizeAlpha || settings.OptimizeVertex;
-
-                // We want to work on a clone of all the meshes
-                var originalMeshClone = originalModel.Select(x => SceneNodeHelper.CloneNode(x)).ToList();
-                foreach (var mesh in originalMeshClone)
-                    mesh.Name = mesh.Material.ModelName;
-
-                if (optimize)
-                {
-                    foreach (var mesh in originalMeshClone)
-                    {
-                        if (mesh.Geometry.VertexFormat != UiVertexFormat.Static)
-                            mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted, mesh.Geometry.ParentSkeletonName);
-
-                        if (settings.OptimizeAlpha)
-                            mesh.Material.AlphaMode = AlphaMode.Opaque;
-                    }
-
-                    // Combine if possible 
-                    var errorList = new ErrorList();
-                    var canCombine = ModelCombiner.HasPotentialCombineMeshes(originalMeshClone, out errorList);
-                    if (canCombine)
-                        originalMeshClone = ModelCombiner.CombineMeshes(originalMeshClone, addPrefix: false);
-                }
-
-                // Reduce the polygon count
                 foreach (var mesh in originalMeshClone)
                 {
-                    if (mesh.ReduceMeshOnLodGeneration && settings.LodRectionFactor != 1)
-                        ReduceMesh(mesh, deductionRatio);
+                    if (mesh.Geometry.VertexFormat != UiVertexFormat.Static)
+                        mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted, mesh.Geometry.ParentSkeletonName);
+
+                    if (settings.OptimizeAlpha)
+                        mesh.Effect.GetCapability<MaterialBaseCapability>().UseAlpha = false;
                 }
-                return originalMeshClone;
-                //output.Add(originalMeshClone);
+
+                // Combine if possible 
+                var errorList = new ErrorList();
+                var canCombine = ModelCombiner.HasPotentialCombineMeshes(originalMeshClone, out errorList);
+                if (canCombine)
+                    originalMeshClone = ModelCombiner.CombineMeshes(originalMeshClone, addPrefix: false);
             }
 
-            //return output;
+            // Reduce the polygon count
+            foreach (var mesh in originalMeshClone)
+            {
+                if (mesh.ReduceMeshOnLodGeneration && settings.LodRectionFactor != 1)
+                    ReduceMesh(mesh, deductionRatio);
+            }
+
+            return originalMeshClone;
         }
     }
 }

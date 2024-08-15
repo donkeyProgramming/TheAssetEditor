@@ -6,7 +6,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     public class SaveCommandBase
     {
@@ -15,7 +15,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
         private readonly IAbstractFormFactory<SaveDialogWindow> _saveWindowFactory;
         private readonly GeometrySaveSettings _settings;
 
-        public SaveCommandBase(GeometrySaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory) 
+        public SaveCommandBase(GeometrySaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory)
         {
             _settings = settings;
             _sceneManager = sceneManager;
@@ -33,7 +33,7 @@ namespace KitbasherEditor.ViewModels.UiCommands
                 if (saveScene != true)
                     return;
             }
-  
+
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             _saveService.Save(mainNode, _settings);
         }
@@ -45,8 +45,8 @@ namespace KitbasherEditor.ViewModels.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        public SaveCommand( GeometrySaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory)
-            :base(settings, sceneManager, saveService, saveWindowFactory)
+        public SaveCommand(GeometrySaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory)
+            : base(settings, sceneManager, saveService, saveWindowFactory)
         {
         }
 

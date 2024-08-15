@@ -8,7 +8,7 @@ using Shared.GameFormats.RigidModel.Types;
 namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
 
-    public class CustomTerrainMaterial : IMaterial
+    public class CustomTerrainMaterial : IRmvMaterial
     {
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.CustomTerrain;
         public ModelMaterialEnum MaterialId { get; set; } = ModelMaterialEnum.TerrainTiles;
@@ -20,7 +20,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         public string TexturePath { get; set; }
         public string TextureDirectory { get => ""; set { } }
 
-        public IMaterial Clone()
+        public IRmvMaterial Clone()
         {
             return new CustomTerrainMaterial()
             {
@@ -66,7 +66,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
     public class CustomTerrainMaterialCreator : IMaterialCreator
     {
-        public IMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] buffer, int offset)
+        public IRmvMaterial Create(ModelMaterialEnum materialId, RmvVersionEnum rmvType, byte[] buffer, int offset)
         {
             var header = ByteHelper.ByteArrayToStructure<CustomTerrainStruct>(buffer, offset);
             return new CustomTerrainMaterial()
@@ -76,12 +76,12 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             };
         }
 
-        public IMaterial CreateEmpty(ModelMaterialEnum materialId, RmvVersionEnum rmvType, VertexFormat vertexFormat)
+        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, VertexFormat vertexFormat)
         {
             return new CustomTerrainMaterial();
         }
 
-        public byte[] Save(IMaterial material)
+        public byte[] Save(IRmvMaterial material)
         {
             throw new NotImplementedException();
         }

@@ -4,7 +4,7 @@ using GameWorld.Core.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     public class SortMeshesCommand : IKitbasherUiCommand
     {

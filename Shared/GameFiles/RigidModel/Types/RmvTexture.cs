@@ -21,6 +21,13 @@ namespace Shared.GameFormats.RigidModel.Types
         Diffuse_damage = 17,
         BaseColour = 27,
         MaterialMap = 29,
+
+        // Items below are not in the RMV2 file spec, but used by the WsModel Material system
+        Blood                   = 1001,
+        Distortion              = 1002,
+        DistortionNoise         = 1003,
+        Emissive                = 1004,
+        EmissiveDistortion      = 1005
     }
 
     [Serializable]

@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Windows;
 using System.Windows.Media.Imaging;
 using Shared.Core.ErrorHandling;
 
@@ -63,12 +62,10 @@ namespace Shared.EmbeddedResources
                 foreach (var resourceName in resourceNames)
                     logger.Here().Information($"\t{resourceName}");
 
-                throw new Exception();
+                throw new Exception(errorMessage);
             }
 
             return stream;
         }
-
-
     }
 }

@@ -7,7 +7,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using MessageBox = System.Windows.MessageBox;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     public class CreateStaticMeshCommand : IKitbasherUiCommand
     {
@@ -43,9 +43,9 @@ namespace KitbasherEditor.ViewModels.UiCommands
 
             var state = _selectionManager.GetState<ObjectSelectionState>();
             var selectedObjects = state.SelectedObjects();
-            List<Rmv2MeshNode> meshes = new List<Rmv2MeshNode>();
+            var meshes = new List<Rmv2MeshNode>();
 
-            GroupNode groupNodeContainer = new GroupNode("staticMesh");
+            var groupNodeContainer = new GroupNode("staticMesh");
             var root = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var lod0 = root.GetLodNodes()[0];
             lod0.AddObject(groupNodeContainer);

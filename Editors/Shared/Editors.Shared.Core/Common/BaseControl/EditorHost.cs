@@ -5,11 +5,11 @@ using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.ReferenceModel;
 using GameWorld.Core.Components;
 using GameWorld.Core.Services;
-using GameWorld.WpfWindow;
-using GameWorld.WpfWindow.Events;
+using GameWorld.Core.WpfWindow.Events;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 
 namespace Editors.Shared.Core.Common.BaseControl

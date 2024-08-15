@@ -10,7 +10,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 
-namespace KitbasherEditor.Services
+namespace Editors.KitbasherEditor.Services
 {
     public class KitbashSceneCreator
     {

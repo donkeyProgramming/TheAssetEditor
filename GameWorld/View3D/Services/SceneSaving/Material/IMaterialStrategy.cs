@@ -14,7 +14,6 @@ namespace GameWorld.Core.Services.SceneSaving.Material
     {
         public string Name { get; }
         public string Description { get; }
-        public bool IsAvailable { get; }
         public MaterialStrategy StrategyId { get; }
         public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes);
     }

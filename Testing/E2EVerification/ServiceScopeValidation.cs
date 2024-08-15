@@ -1,4 +1,5 @@
 ﻿using E2EVerification.Shared;
+using Shared.Core.Services;
 
 namespace E2EVerification
 {
@@ -7,7 +8,7 @@ namespace E2EVerification
         [Test]
         public void EnsureDependencyInjectionConfigIsValid()
         {
-            var _ = new AssetEditorTestRunner(true);
+            var _ = new AssetEditorTestRunner(GameTypeEnum.Warhammer3, true);
         }
     }
 }

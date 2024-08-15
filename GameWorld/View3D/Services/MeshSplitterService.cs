@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace GameWorld.Core.Services
 {
-    public class MeshSplitterService
+    public static class MeshSplitterService
     {
-        public List<MeshObject> SplitMesh(MeshObject geometry, bool combineOverlappingVertexes)
+        static public List<MeshObject> SplitMesh(MeshObject geometry, bool combineOverlappingVertexes)
         {
             var output = new List<MeshObject>();
             var vertList = geometry.GetVertexList();
@@ -21,7 +21,7 @@ namespace GameWorld.Core.Services
             return output;
         }
 
-        List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, List<Vector3> vertextes, bool combineOverlappingVertexes)
+        static List<List<ushort>> SplitIntoSubModels(List<ushort> indexList, List<Vector3> vertextes, bool combineOverlappingVertexes)
         {
             var selectedSubMeshes = ConverteToSubFaceObject(indexList, vertextes, combineOverlappingVertexes);
 
@@ -43,7 +43,7 @@ namespace GameWorld.Core.Services
             return output;
         }
 
-        public List<int> GrowFaceSelection(MeshObject geometry, List<ushort> initialSelectedIndexes, bool combineOverlappingVertexes)
+        static public List<int> GrowFaceSelection(MeshObject geometry, List<ushort> initialSelectedIndexes, bool combineOverlappingVertexes)
         {
             var vertextes = geometry.GetVertexList();
             var indexList = geometry.GetIndexBuffer();
@@ -60,7 +60,7 @@ namespace GameWorld.Core.Services
         }
 
 
-        List<SubFaceObject> ConverteToSubFaceObject(List<ushort> indexList, List<Vector3> vertextes, bool combineOverlappingVertexes)
+        static List<SubFaceObject> ConverteToSubFaceObject(List<ushort> indexList, List<Vector3> vertextes, bool combineOverlappingVertexes)
         {
             var subMeshList = new List<SubFaceObject>();
 
@@ -93,7 +93,7 @@ namespace GameWorld.Core.Services
             return MergeSubMeshes(subMeshList);
         }
 
-        List<SubFaceObject> MergeSubMeshes(List<SubFaceObject> list)
+        static List<SubFaceObject> MergeSubMeshes(List<SubFaceObject> list)
         {
             for (var i = 0; i < list.Count; i++)
             {

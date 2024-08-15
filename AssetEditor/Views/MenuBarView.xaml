@@ -111,12 +111,6 @@
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Import/Export to FBX (RME download)" Command="{Binding MenuBar.DownloadRmeCommand}" />
-
-                <MenuItem Header="Animation builder" Command="{Binding MenuBar.OpenAnimationBuilderCommand}" Visibility="Collapsed" />
-                <MenuItem Header="AnimMeta Decoder" Command="{Binding MenuBar.OpenAnimMetaDecocderCommand}" IsEnabled="False" Visibility="Collapsed"/>
-                <MenuItem Header="Kitbash Editor" Command="{Binding MenuBar.OpenKitbashEditorCommand}" IsEnabled="False" Visibility="Collapsed"/>
-                <MenuItem Header="Animated prop creator" Command="{Binding MenuBar.OpenPropCreatorCommand}" IsEnabled="False" Visibility="Collapsed"/>
-                <MenuItem Header="Pose Creator" Command="{Binding MenuBar.OpenPropCreatorCommand}" IsEnabled="False" Visibility="Collapsed"/>
             </MenuItem>
 
             <MenuItem Header="Tutorials">

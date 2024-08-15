@@ -4,7 +4,7 @@ using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     public class OpenVertexDebuggerCommand : IKitbasherUiCommand
     {

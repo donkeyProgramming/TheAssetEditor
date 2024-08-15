@@ -10,7 +10,6 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
         Rmv8,
     }
 
-
     public interface IGeometryStrategy
     {
         public string Name { get; }

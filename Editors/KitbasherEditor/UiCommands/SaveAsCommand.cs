@@ -5,9 +5,9 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
-    public class SaveAsCommand :  SaveCommandBase, IKitbasherUiCommand
+    public class SaveAsCommand : SaveCommandBase, IKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "SaveAs";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;

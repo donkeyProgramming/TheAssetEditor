@@ -3,7 +3,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using System.Windows.Input;
 
-namespace KitbasherEditor.ViewModels.UiCommands
+namespace Editors.KitbasherEditor.UiCommands
 {
     abstract public class SetSelectionModeCommand : IKitbasherUiCommand
     {

@@ -39,7 +39,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
         string _text;
         public string Text { get { return _text; } set { SetAndNotify(ref _text, value); } }
 
-        Vector3ViewModel _vector3 = new Vector3ViewModel(0);
+        Vector3ViewModel _vector3 = new Vector3ViewModel(0, 0, 0);
         public Vector3ViewModel Vector3 { get { return _vector3; } set { SetAndNotify(ref _vector3, value); } }
 
         public NotifyAttr<DoubleViewModel> VertexMovementFalloff { get; set; }

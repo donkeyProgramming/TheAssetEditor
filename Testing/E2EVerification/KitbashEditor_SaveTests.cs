@@ -1,7 +1,7 @@
 ﻿using E2EVerification.Shared;
+using Editors.KitbasherEditor.UiCommands;
 using GameWorld.Core.Services.SceneSaving;
 using GameWorld.Core.Services.SceneSaving.Lod;
-using KitbasherEditor.ViewModels.UiCommands;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.Events;
 using Shared.GameFormats.RigidModel;
@@ -113,5 +113,7 @@ namespace E2EVerification
             var wsModelFile = runner.PackFileService.FindFile(_wsFilePathKarl, outputPackFile);
             WsModelHelper.AssertFile(wsModelFile);       
         }
+
+
     }
 }

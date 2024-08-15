@@ -9,9 +9,19 @@
       "commandLineArgs": "-devcfg Kitbash_Karl",
       "nativeDebugging": false
     },
+    "AE-KitbashRat": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg Kitbash_Rat",
+      "nativeDebugging": false
+    },
     "AE-KitbashOx": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg Kitbash_Ox",
+      "nativeDebugging": false
+    },
+    "AE-KitbashRomeShield": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg Kitbash_RomeShield",
       "nativeDebugging": false
     },
     "AE-TextureKarl": {

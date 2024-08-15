@@ -1,0 +1,9 @@
+<model version="1">
+  <geometry>VariantMeshes/wh_variantmodels/hu1/emp/emp_props/emp_karl_franz_hammer_2h_01.rigid_model_v2</geometry>
+  <materials>
+    <material part_index="0" lod_index="0">VariantMeshes/wh_variantmodels/hu1/emp/emp_props/materials/emp_karl_franz_hammer_2h_01_alpha_off.xml.material</material>
+    <material part_index="0" lod_index="1">VariantMeshes/wh_variantmodels/hu1/emp/emp_props/materials/emp_karl_franz_hammer_2h_01_alpha_off.xml.material</material>
+    <material part_index="0" lod_index="2">VariantMeshes/wh_variantmodels/hu1/emp/emp_props/materials/emp_karl_franz_hammer_2h_01_alpha_off.xml.material</material>
+    <material part_index="0" lod_index="3">VariantMeshes/wh_variantmodels/hu1/emp/emp_props/materials/emp_karl_franz_hammer_2h_01_alpha_off.xml.material</material>
+  </materials>
+</model>

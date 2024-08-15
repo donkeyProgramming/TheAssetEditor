@@ -1,7 +1,7 @@
 ﻿using System;
-using GameWorld.WpfWindow;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
+using Shared.Core.Services;
 
 namespace Shared.Ui.BaseDialogs.WindowHandling
 {

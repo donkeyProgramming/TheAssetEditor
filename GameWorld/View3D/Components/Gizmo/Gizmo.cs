@@ -734,7 +734,6 @@ namespace GameWorld.Core.Components.Gizmo
 
         public void Dispose()
         {
-            _spriteBatch.Dispose();
             _lineEffect.Dispose();
             _meshEffect.Dispose();
         }
