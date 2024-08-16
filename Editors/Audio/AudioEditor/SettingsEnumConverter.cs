@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Globalization;
-using System.Windows;
+using System.Linq;
 using System.Windows.Data;
 using static Editors.Audio.AudioEditor.AudioEditorSettings;
 
@@ -30,6 +30,12 @@ namespace Editors.Audio.AudioEditor
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value;
+        }
+
+        public static Language GetLanguageEnumString(string languageString)
+        {
+            return LanguageEnumToString
+                .FirstOrDefault(pair => pair.Value.Equals(languageString, StringComparison.OrdinalIgnoreCase)).Key;
         }
     }
 }

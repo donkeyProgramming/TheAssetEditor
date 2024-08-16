@@ -14,6 +14,8 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.AudioEditor.AudioEditorData;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
+using static Editors.Audio.AudioEditor.SettingsEnumConverter;
+using static Editors.Audio.AudioEditor.AudioEditorSettings;
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
@@ -48,9 +50,9 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [ObservableProperty] private string _selectedAudioProjectEventSubtype;
 
         // The data the ComboBoxes are populated with.
-        [ObservableProperty] private ObservableCollection<AudioEditorSettings.Language> _languages = new(Enum.GetValues(typeof(AudioEditorSettings.Language)).Cast<AudioEditorSettings.Language>());
-        [ObservableProperty] private ObservableCollection<AudioEditorSettings.DialogueEventType> _audioProjectEventTypes = new(Enum.GetValues(typeof(AudioEditorSettings.DialogueEventType)).Cast<AudioEditorSettings.DialogueEventType>());
-        [ObservableProperty] private ObservableCollection<AudioEditorSettings.DialogueEventSubtype> _audioProjectSubtypes = []; // Determined according to what Event Type is selected
+        [ObservableProperty] private ObservableCollection<Language> _languages = new(Enum.GetValues(typeof(Language)).Cast<Language>());
+        [ObservableProperty] private ObservableCollection<DialogueEventType> _audioProjectEventTypes = new(Enum.GetValues(typeof(DialogueEventType)).Cast<DialogueEventType>());
+        [ObservableProperty] private ObservableCollection<DialogueEventSubtype> _audioProjectSubtypes = []; // Determined according to what Event Type is selected
 
         // The Dialogue Event CheckBoxes that are displayed in the Dialogue Events ListBox.
         [ObservableProperty] private ObservableCollection<DialogueEventCheckBox> _dialogueEventCheckBoxes = [];
@@ -123,9 +125,9 @@ namespace Editors.Audio.AudioEditor.ViewModels
         {
             AudioProjectSubtypes.Clear();
 
-            if (SelectedAudioProjectEventType != null && Enum.TryParse(SelectedAudioProjectEventType.ToString(), out AudioEditorSettings.DialogueEventType eventType))
+            if (SelectedAudioProjectEventType != null && Enum.TryParse(SelectedAudioProjectEventType.ToString(), out DialogueEventType eventType))
             {
-                if (AudioEditorSettings.DialogueEventTypeToSubtypes.TryGetValue(eventType, out var subtypes))
+                if (DialogueEventTypeToSubtypes.TryGetValue(eventType, out var subtypes))
                 {
                     foreach (var subtype in subtypes)
                         AudioProjectSubtypes.Add(subtype);
@@ -135,11 +137,11 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         public void PopulateDialogueEventsListBox()
         {
-            if (Enum.TryParse(SelectedAudioProjectEventType, out AudioEditorSettings.DialogueEventType eventType))
+            if (Enum.TryParse(SelectedAudioProjectEventType, out DialogueEventType eventType))
             {
-                if (Enum.TryParse(SelectedAudioProjectEventSubtype, out AudioEditorSettings.DialogueEventSubtype eventSubtype))
+                if (Enum.TryParse(SelectedAudioProjectEventSubtype, out DialogueEventSubtype eventSubtype))
                 {
-                    var dialogueEvents = AudioEditorSettings.DialogueEvents
+                    var dialogueEvents = DialogueEvents
                         .Where(de => de.Type == eventType)
                         .ToList();
 
@@ -178,10 +180,6 @@ namespace Editors.Audio.AudioEditor.ViewModels
             AudioEditorInstance.ResetAudioEditorData();
             _audioEditorViewModel.ResetAudioEditorViewModelData();
 
-            // Set the AudioEditorInstance data.
-            //AudioEditorInstance.AudioProjectFileName = AudioProjectFileName;
-            //AudioEditorInstance.CustomStatesFilePath = CustomStatesFilePath;
-
             // Create the list of events to be displayed in the AudioEditor.
             CreateAudioProjectDialogueEventsList();
 
@@ -219,7 +217,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             var settings = new Dictionary<string, object>
             {
                 {"AudioProjectFileName", AudioProjectFileName},
-                {"Language", SelectedLanguage},
+                {"Language", LanguageEnumToString[GetLanguageEnumString(SelectedLanguage)]},
                 {"CustomStatesFilePath", CustomStatesFilePath}
             };
 
@@ -257,7 +255,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [RelayCommand] public void SelectRecommended()
         {
             // Get the list of dialogue events with the "Recommended" category
-            var recommendedEvents = AudioEditorSettings.FrontendVODialogueEvents.Where(e => e.Categories.Contains("Recommended")).Select(e => e.EventName).ToHashSet();
+            var recommendedEvents = FrontendVODialogueEvents.Where(e => e.Categories.Contains("Recommended")).Select(e => e.EventName).ToHashSet();
 
             // Iterate through the CheckBoxes and set IsChecked for those with matching EventName
             foreach (var checkBox in DialogueEventCheckBoxes)
