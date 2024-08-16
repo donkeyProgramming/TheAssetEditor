@@ -38,7 +38,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         readonly ILogger _logger = Logging.Create<AudioEditorNewAudioProjectViewModel>();
         private Action _closeAction;
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("New Audio Editor Project");
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("New VO Audio Project");
 
         // The properties for each settings.
         [ObservableProperty] private string _audioProjectFileName;
@@ -49,8 +49,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         // The data the ComboBoxes are populated with.
         [ObservableProperty] private ObservableCollection<AudioEditorSettings.Language> _languages = new(Enum.GetValues(typeof(AudioEditorSettings.Language)).Cast<AudioEditorSettings.Language>());
-        [ObservableProperty] private ObservableCollection<AudioEditorSettings.EventType> _audioProjectEventTypes = new(Enum.GetValues(typeof(AudioEditorSettings.EventType)).Cast<AudioEditorSettings.EventType>());
-        [ObservableProperty] private ObservableCollection<AudioEditorSettings.EventSubtype> _audioProjectSubtypes = []; // Determined according to what Event Type is selected
+        [ObservableProperty] private ObservableCollection<AudioEditorSettings.DialogueEventType> _audioProjectEventTypes = new(Enum.GetValues(typeof(AudioEditorSettings.DialogueEventType)).Cast<AudioEditorSettings.DialogueEventType>());
+        [ObservableProperty] private ObservableCollection<AudioEditorSettings.DialogueEventSubtype> _audioProjectSubtypes = []; // Determined according to what Event Type is selected
 
         // The Dialogue Event CheckBoxes that are displayed in the Dialogue Events ListBox.
         [ObservableProperty] private ObservableCollection<DialogueEventCheckBox> _dialogueEventCheckBoxes = [];
@@ -84,7 +84,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         {
             DialogueEventCheckBoxes.Clear();
 
-            // Update the ComboBox for EventSubType upon EventType selection.
+            // Update the ComboBox for EventSubType upon DialogueEventType selection.
             UpdateAudioProjectEventSubType();
         }
 
@@ -123,9 +123,9 @@ namespace Editors.Audio.AudioEditor.ViewModels
         {
             AudioProjectSubtypes.Clear();
 
-            if (SelectedAudioProjectEventType != null && Enum.TryParse(SelectedAudioProjectEventType.ToString(), out AudioEditorSettings.EventType eventType))
+            if (SelectedAudioProjectEventType != null && Enum.TryParse(SelectedAudioProjectEventType.ToString(), out AudioEditorSettings.DialogueEventType eventType))
             {
-                if (AudioEditorSettings.EventTypeToSubtypes.TryGetValue(eventType, out var subtypes))
+                if (AudioEditorSettings.DialogueEventTypeToSubtypes.TryGetValue(eventType, out var subtypes))
                 {
                     foreach (var subtype in subtypes)
                         AudioProjectSubtypes.Add(subtype);
@@ -135,9 +135,9 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         public void PopulateDialogueEventsListBox()
         {
-            if (Enum.TryParse(SelectedAudioProjectEventType, out AudioEditorSettings.EventType eventType))
+            if (Enum.TryParse(SelectedAudioProjectEventType, out AudioEditorSettings.DialogueEventType eventType))
             {
-                if (Enum.TryParse(SelectedAudioProjectEventSubtype, out AudioEditorSettings.EventSubtype eventSubtype))
+                if (Enum.TryParse(SelectedAudioProjectEventSubtype, out AudioEditorSettings.DialogueEventSubtype eventSubtype))
                 {
                     var dialogueEvents = AudioEditorSettings.DialogueEvents
                         .Where(de => de.Type == eventType)

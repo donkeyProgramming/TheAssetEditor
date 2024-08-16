@@ -21,13 +21,16 @@
         <!-- Menu -->
         <Menu Grid.Row="0">
             <MenuItem Header="_File" HorizontalAlignment="Left">
-                <MenuItem Header="New VO Audio Project" Command="{Binding NewVOAudioProjectCommand}" />
-                <MenuItem Header="New Non-VO Audio Project" Command="{Binding NewNonVOAudioProjectCommand}" />
-                <MenuItem Header="Load Audio Project" Command="{Binding LoadAudioProjectCommand}" />
-                <MenuItem Header="Load Custom States" Command="{Binding LoadCustomStatesCommand}" />
-                <Separator />
-                <MenuItem Header="Save Audio Project" Command="{Binding SaveAudioProjectCommand}" />
-                <MenuItem Header="Save Custom States" Command="{Binding SaveCustomStatesCommand}" />
+                <MenuItem Header="_New">
+                    <MenuItem Header="New VO Audio Project" Command="{Binding NewVOAudioProjectCommand}" />
+                    <MenuItem Header="New Non-VO Audio Project" Command="{Binding NewNonVOAudioProjectCommand}" />
+                </MenuItem>
+                <MenuItem Header="_Open">
+                    <MenuItem Header="Audio Project" Command="{Binding LoadAudioProjectCommand}" />
+                    <MenuItem Header="Custom States" Command="{Binding LoadCustomStatesCommand}" />
+                </MenuItem>
+                <MenuItem Header="Save" Command="{Binding SaveAudioProjectCommand}" />
+                <MenuItem Header="Audio Project Settings" Command="{Binding OpenAudioProjectSettings}" IsEnabled="False"/>
             </MenuItem>
         </Menu>
 
@@ -54,17 +57,16 @@
         <!-- Buttons and CheckBox -->
         <Grid Grid.Row="2" Margin="2.5 5 5 0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="70" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-
-            <Button Grid.Column="0" Content="Add State Path" Command="{Binding AddStatePathCommand}" Margin="5,0" VerticalAlignment="Center"/>
-
-            <CheckBox Grid.Column="1" Content="Show Custom States Only" Margin="5,0" VerticalAlignment="Center" IsChecked="{Binding ShowCustomStatesOnly, Mode=TwoWay}" />
+            
+            <Button Grid.Column="0" Content="Add Row" Command="{Binding AddStatePathCommand}" Margin="5, 0, 0, 0" VerticalAlignment="Center"/>
+            <CheckBox Grid.Column="1" Content="Show Custom States Only" Margin="5, 0, 0, 0" VerticalAlignment="Center" IsChecked="{Binding ShowCustomStatesOnly, Mode=TwoWay}" />
         </Grid>
 
         <!-- Dynamic DataGrid -->
-        <DataGrid Grid.Row="4" x:Name="AudioEditorDataGrid" Margin="0 10 0 5" ItemsSource="{Binding AudioEditorDataGridItems}" AutoGenerateColumns="False">
+        <DataGrid Grid.Row="4" x:Name="AudioEditorDataGrid" Margin="0, 10, 0, 5" ItemsSource="{Binding AudioEditorDataGridItems}" AutoGenerateColumns="False">
         </DataGrid>
     </Grid>
 </UserControl>

@@ -126,8 +126,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="Select All" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 5, 0" Command="{Binding SelectAllCommand}"/>
-                    <Button Content="Select Recommended" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 5, 0" Command="{Binding SelectRecommendedCommand}"/>
+                    <Button Content="Select All" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 9, 0" Command="{Binding SelectAllCommand}"/>
+                    <Button Content="Select Recommended" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 9, 0" Command="{Binding SelectRecommendedCommand}"/>
                     <Button Content="Select None" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 0, 0" Command="{Binding SelectNoneCommand}"/>
                 </StackPanel>
             </Grid>
@@ -135,8 +135,8 @@
 
         <!-- Buttons -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <Button Content="OK" Width="75" Height="{StaticResource DefaultHeight}" Margin="5" Command="{Binding CreateAudioProjectCommand}" IsEnabled="{Binding IsOkButtonIsEnabled}"/>
-            <Button Content="Cancel" Width="75" Height="{StaticResource DefaultHeight}" Margin="5" Command="{Binding CloseWindowActionCommand}"/>
+            <Button Content="OK" Width="75" Height="{StaticResource DefaultHeight}" Margin="0, 0, 5, 0" Command="{Binding CreateAudioProjectCommand}" IsEnabled="{Binding IsOkButtonIsEnabled}"/>
+            <Button Content="Cancel" Width="75" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding CloseWindowActionCommand}"/>
         </StackPanel>
     </Grid>
 </UserControl>

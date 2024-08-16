@@ -15,10 +15,13 @@ namespace Editors.Audio.AudioEditor
             if (value is Language language)
                 return LanguageEnumToString.TryGetValue(language, out var displayString) ? displayString : language.ToString();
 
-            if (value is EventType eventType)
-                return EventTypeEnumToString.TryGetValue(eventType, out var displayString) ? displayString : eventType.ToString();
+            if (value is DialogueEventType dialogueEventType)
+                return DialogueEventTypeEnumToString.TryGetValue(dialogueEventType, out var displayString) ? displayString : dialogueEventType.ToString();
 
-            if (value is EventSubtype eventSubtype)
+            if (value is DialogueEventSubtype dialogueEventSubtype)
+                return DialogueEventSubtypeEnumToString.TryGetValue(dialogueEventSubtype, out var displayString) ? displayString : dialogueEventSubtype.ToString();
+
+            if (value is EventType eventSubtype)
                 return EventSubtypeEnumToString.TryGetValue(eventSubtype, out var displayString) ? displayString : eventSubtype.ToString();
 
             return value.ToString();
