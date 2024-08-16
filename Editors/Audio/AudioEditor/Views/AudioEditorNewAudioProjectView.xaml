@@ -8,7 +8,7 @@
              xmlns:sys="clr-namespace:System;assembly=netstandard"
              d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorNewAudioProjectViewModel}"
              mc:Ignorable="d"
-             d:MinWidth="560" d:DesignHeight="470">
+             d:MinWidth="560" d:DesignHeight="500">
 
     <UserControl.Resources>
         <!-- Enum to string converter -->
@@ -36,6 +36,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- Audio Project Name -->
@@ -49,8 +50,21 @@
                          Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
 
-            <!-- States File Path -->
+            <!-- Language Selection -->
             <Grid Grid.Row="1" Margin="0, 2, 0, 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="145"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Language:" VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="1" ToolTip="PLACEHOLDER TOOLTIP" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
+                          ItemsSource="{Binding Languages}" 
+                          SelectedItem="{Binding SelectedLanguage}" 
+                          ItemTemplate="{StaticResource EnumToStringTemplate}"/>
+            </Grid>
+
+            <!-- States File Path -->
+            <Grid Grid.Row="2" Margin="0, 2, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
@@ -63,9 +77,8 @@
                 <Button Grid.Column="2" Content="..." VerticalAlignment="Center" Width="30" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding SetCustomStatesLocationCommand}"/>
             </Grid>
 
-
             <!-- EventType Selection -->
-            <Grid Grid.Row="2" Margin="0, 2, 0, 5">
+            <Grid Grid.Row="3" Margin="0, 2, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
@@ -78,7 +91,7 @@
             </Grid>
 
             <!-- EventSubType Selection -->
-            <Grid Grid.Row="3" Margin="0, 2, 0, 5">
+            <Grid Grid.Row="4" Margin="0, 2, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
@@ -91,7 +104,7 @@
             </Grid>
 
             <!-- Dialogue Events Section -->
-            <Grid Grid.Row="4" Margin="0, 4, 0, 5">
+            <Grid Grid.Row="5" Margin="0, 4, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
@@ -107,7 +120,7 @@
             </Grid>
 
             <!-- Buttons for Dialogue Events Section -->
-            <Grid Grid.Row="5" Margin="0, 5, 0, 0">
+            <Grid Grid.Row="6" Margin="0, 5, 0, 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>

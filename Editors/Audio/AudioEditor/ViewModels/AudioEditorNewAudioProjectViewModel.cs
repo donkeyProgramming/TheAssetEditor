@@ -40,11 +40,15 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("New Audio Editor Project");
 
+        // The properties for each settings.
         [ObservableProperty] private string _audioProjectFileName;
         [ObservableProperty] private string _customStatesFilePath;
+        [ObservableProperty] private string _selectedLanguage;
         [ObservableProperty] private string _selectedAudioProjectEventType;
         [ObservableProperty] private string _selectedAudioProjectEventSubtype;
 
+        // The data the ComboBoxes are populated with.
+        [ObservableProperty] private ObservableCollection<AudioEditorSettings.Language> _languages = new(Enum.GetValues(typeof(AudioEditorSettings.Language)).Cast<AudioEditorSettings.Language>());
         [ObservableProperty] private ObservableCollection<AudioEditorSettings.EventType> _audioProjectEventTypes = new(Enum.GetValues(typeof(AudioEditorSettings.EventType)).Cast<AudioEditorSettings.EventType>());
         [ObservableProperty] private ObservableCollection<AudioEditorSettings.EventSubtype> _audioProjectSubtypes = []; // Determined according to what Event Type is selected
 
@@ -53,6 +57,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         // Properties to control whether OK button is enabled.
         [ObservableProperty] private bool _isAudioProjectFileNameSet;
+        [ObservableProperty] private bool _isLanguageSelected;
         [ObservableProperty] private bool _isAnyDialogueEventChecked;
         [ObservableProperty] private bool _isOkButtonIsEnabled;
 
@@ -66,6 +71,12 @@ namespace Editors.Audio.AudioEditor.ViewModels
         partial void OnAudioProjectFileNameChanged(string value)
         {
             IsAudioProjectFileNameSet = !string.IsNullOrEmpty(value);
+            UpdateOkButtonIsEnabled();
+        }
+
+        partial void OnSelectedLanguageChanged(string value)
+        {
+            IsLanguageSelected = !string.IsNullOrEmpty(value);
             UpdateOkButtonIsEnabled();
         }
 
@@ -93,7 +104,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         private void UpdateOkButtonIsEnabled()
         {
-            IsOkButtonIsEnabled = IsAudioProjectFileNameSet && IsAnyDialogueEventChecked;
+            IsOkButtonIsEnabled = IsLanguageSelected && IsAudioProjectFileNameSet && IsAnyDialogueEventChecked;
         }
 
         [RelayCommand] public void SetCustomStatesLocation()
@@ -208,6 +219,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             var settings = new Dictionary<string, object>
             {
                 {"AudioProjectFileName", AudioProjectFileName},
+                {"Language", SelectedLanguage},
                 {"CustomStatesFilePath", CustomStatesFilePath}
             };
 

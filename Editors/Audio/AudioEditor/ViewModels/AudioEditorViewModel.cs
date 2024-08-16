@@ -25,15 +25,6 @@ using static Editors.Audio.AudioEditor.DynamicDataGrid;
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
-    public partial class CustomStatesDataGridProperties : ObservableObject
-    {
-        [ObservableProperty] private string _customVOActor;
-        [ObservableProperty] private string _customVOCulture;
-        [ObservableProperty] private string _customVOBattleSelection;
-        [ObservableProperty] private string _customVOBattleSpecialAbility;
-        [ObservableProperty] private string _customVOFactionLeader;
-    }
-
     public partial class AudioEditorViewModel : ObservableObject, IEditorViewModel
     {
         private readonly IAudioRepository _audioRepository;
@@ -46,6 +37,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [ObservableProperty] private string _selectedAudioProjectEvent;
         [ObservableProperty] private bool _showCustomStatesOnly;
+
+        // The DataGrid data.
         [ObservableProperty] private ObservableCollection<string> _audioProjectDialogueEvents = [];
         [ObservableProperty] private ObservableCollection<Dictionary<string, object>> _audioEditorDataGridItems = [];
 
@@ -73,7 +66,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void NewVOAudioProject()
         {
-            var window = _windowFactory.Create<AudioEditorNewAudioProjectViewModel, AudioEditorNewAudioProjectView>("New Audio Project", 560, 470);
+            var window = _windowFactory.Create<AudioEditorNewAudioProjectViewModel, AudioEditorNewAudioProjectView>("New Audio Project", 560, 500);
             window.AlwaysOnTop = false;
             window.ResizeMode = ResizeMode.NoResize;
 

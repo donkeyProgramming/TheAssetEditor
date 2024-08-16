@@ -4,6 +4,18 @@ namespace Editors.Audio.AudioEditor
 {
     public static class AudioEditorSettings
     {
+        public enum Language
+        {
+            Chinese,
+            EnglishUK,
+            FrenchFrance,
+            German,
+            Italian,
+            Polish,
+            Russian,
+            SpanishSpain
+        }
+
         public enum EventType
         {
             FrontendVO,
@@ -43,6 +55,18 @@ namespace Editors.Audio.AudioEditor
             UI,
             Vocalisation
         }
+
+        public static readonly Dictionary<Language, string> LanguageEnumToString = new()
+        {
+            { Language.Chinese, "chinese" },
+            { Language.EnglishUK, "english(UK)" },
+            { Language.FrenchFrance, "french(france)" },
+            { Language.German, "german" },
+            { Language.Italian, "italian" },
+            { Language.Polish, "polish" },
+            { Language.Russian, "russian" },
+            { Language.SpanishSpain, "spanish(spain)" }
+        };
 
         public static readonly Dictionary<EventType, string> EventTypeEnumToString = new()
         {

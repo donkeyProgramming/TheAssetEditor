@@ -13,6 +13,7 @@ namespace Editors.Audio.AudioEditor
         {
             public string AudioProjectFileName { get; set; }
             public string CustomStatesFilePath { get; set; }
+            public string Language { get; set; }
         }
 
         public class DialogueEventItems
@@ -94,9 +95,11 @@ namespace Editors.Audio.AudioEditor
                 var root = audioProject.RootElement;
 
                 var settingsElement = root.GetProperty("Settings");
+
                 var settings = new Dictionary<string, object>
                 {
                     { "AudioProjectFileName", settingsElement.GetProperty("AudioProjectFileName").GetString() },
+                    { "Language", settingsElement.GetProperty("Language").GetString() },
                     { "CustomStatesFilePath", settingsElement.GetProperty("CustomStatesFilePath").GetString() }
                 };
 

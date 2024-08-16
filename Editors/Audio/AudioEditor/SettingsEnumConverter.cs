@@ -12,6 +12,9 @@ namespace Editors.Audio.AudioEditor
         {
             if (value == null) return value;
 
+            if (value is Language language)
+                return LanguageEnumToString.TryGetValue(language, out var displayString) ? displayString : language.ToString();
+
             if (value is EventType eventType)
                 return EventTypeEnumToString.TryGetValue(eventType, out var displayString) ? displayString : eventType.ToString();
 
