@@ -10,7 +10,6 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Views;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
-using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
@@ -79,7 +78,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void LoadAudioProject()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
+            using var browser = new PackFileBrowserWindow(_packFileService, [".audioproject"]);
 
             if (browser.ShowDialog())
             {
@@ -97,7 +96,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
-                var audioProjectData = ConvertFromAudioProjectJson(_audioRepository, audioProjectJson);
+                var audioProjectData = ConvertFromVOAudioProject(_audioRepository, audioProjectJson);
 
                 AudioEditorInstance.AudioProjectData = audioProjectData;
                 AudioEditorInstance.AudioProjectFileName = fileName;
@@ -132,7 +131,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
                 foreach (var statePath in AudioEditorInstance.AudioProjectData[SelectedAudioProjectEvent])
                     AudioEditorDataGridItems.Add(statePath);
-        }
+                        }
 
         [RelayCommand] public void AddStatePath()
         {
@@ -170,7 +169,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
             if (SelectedAudioProjectEvent != null)
                 AudioEditorInstance.AudioProjectData[SelectedAudioProjectEvent] = new List<Dictionary<string, object>>(AudioEditorDataGridItems);
-        }
+            }
 
 
         public static void AddAudioFiles(Dictionary<string, object> dataGridRow, System.Windows.Controls.TextBox textBox)
@@ -194,20 +193,17 @@ namespace Editors.Audio.AudioEditor.ViewModels
                         DictionaryEqualityComparer<string, object>.Default.Equals(context, dataGridRow));
 
                     if (matchingRow != null)
-                    {
+                                        {
                         var fileNames = filePaths.Select(filePath => $"\"{Path.GetFileName(filePath)}\"");
                         var fileNamesString = string.Join(", ", fileNames);
-                        var filePathsString = string.Join(", ", filePaths.Select(filePath => $"\"{filePath}\""));
+                                        var filePathsString = string.Join(", ", filePaths.Select(filePath => $"\"{filePath}\""));
 
-                        matchingRow["AudioFilesDisplay"] = filePaths.ToList();
-                        matchingRow["AudioFiles"] = filePaths.ToList();
-
-                        textBox.Text = fileNamesString;
-                        textBox.ToolTip = filePathsString;
+                                        textBox.Text = fileNamesString;
+                                        textBox.ToolTip = filePathsString;
+                                    }
                     }
-                }
+                    }
             }
-        }
 
         public void CreateAudioProjectEventsListFromAudioProject()
         {

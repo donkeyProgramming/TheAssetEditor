@@ -7,6 +7,8 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using static Editors.Audio.AudioEditor.AudioProjectConverter;
 using static Editors.Audio.AudioEditor.AudioEditorData;
+using System.Linq;
+using System;
 
 
 namespace Editors.Audio.AudioEditor
@@ -19,11 +21,11 @@ namespace Editors.Audio.AudioEditor
 
         public static void AddAudioProjectToPackFile(PackFileService packFileService)
         {
-            var audioProjectJson = ConvertToAudioProjectJson(AudioEditorInstance.AudioProjectData);
+            var audioProject = ConvertToVOAudioProject(AudioEditorInstance.AudioProjectData);
             var pack = packFileService.GetEditablePack();
-            var byteArray = Encoding.ASCII.GetBytes(audioProjectJson);
-            packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{GetAudioProjectFileName()}.json", new MemorySource(byteArray)));
-            s_logger.Here().Information($"Saved Audio Project file: {GetAudioProjectFileName()}.json");
+            var byteArray = Encoding.ASCII.GetBytes(audioProject);
+            packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{GetAudioProjectFileName()}.audioproject", new MemorySource(byteArray)));
+            s_logger.Here().Information($"Saved Audio Project file: {GetAudioProjectFileName()}.audioproject");
         }
 
         public static string GetAudioProjectFileName()

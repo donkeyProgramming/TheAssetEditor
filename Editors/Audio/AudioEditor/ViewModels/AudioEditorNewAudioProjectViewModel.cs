@@ -109,7 +109,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void SetCustomStatesLocation()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
+            using var browser = new PackFileBrowserWindow(_packFileService, [".customstates"]);
 
             if (browser.ShowDialog())
             {

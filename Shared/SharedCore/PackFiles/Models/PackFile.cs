@@ -28,7 +28,4 @@ namespace Shared.Core.PackFiles.Models
         public static PackFile CreateFromASCII(string fileName, string str) => new(fileName, new MemorySource(System.Text.Encoding.ASCII.GetBytes(str)));
         public static PackFile CreateFromFileSystem(string fileName, string fullPath) => new(fileName, new FileSystemSource(fullPath));
     }
-
-
-
 }

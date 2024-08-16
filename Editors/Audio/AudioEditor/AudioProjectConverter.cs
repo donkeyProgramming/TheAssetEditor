@@ -28,7 +28,7 @@ namespace Editors.Audio.AudioEditor
             public List<string> AudioFiles { get; set; } = [];
         }
 
-        public static string ConvertToAudioProjectJson(Dictionary<string, List<Dictionary<string, object>>> audioProjectData)
+        public static string ConvertToVOAudioProject(Dictionary<string, List<Dictionary<string, object>>> audioProjectData)
         {
             var audioProject = new Dictionary<string, object>();
 
@@ -86,7 +86,7 @@ namespace Editors.Audio.AudioEditor
             return JsonSerializer.Serialize(audioProject, options);
         }
 
-        public static Dictionary<string, List<Dictionary<string, object>>> ConvertFromAudioProjectJson(IAudioRepository audioRepository, string audioProjectJson)
+        public static Dictionary<string, List<Dictionary<string, object>>> ConvertFromVOAudioProject(IAudioRepository audioRepository, string audioProjectJson)
         {
             var audioProjectData = new Dictionary<string, List<Dictionary<string, object>>>();
 
