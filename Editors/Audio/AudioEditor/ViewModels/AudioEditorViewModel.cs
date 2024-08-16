@@ -19,7 +19,7 @@ using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using static Editors.Audio.AudioEditor.AudioEditorData;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
-using static Editors.Audio.AudioEditor.AudioProjectConverter;
+using static Editors.Audio.AudioEditor.AudioProjectData;
 using static Editors.Audio.AudioEditor.DynamicDataGrid;
 
 namespace Editors.Audio.AudioEditor.ViewModels
@@ -87,7 +87,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 AudioEditorDataGridItems.Clear();
                 SelectedAudioProjectEvent = "";
 
-                // Create the object for State Groups with qualifiers so that their keys in the AudioProjectConverter dictionary are unique.
+                // Create the object for State Groups with qualifiers so that their keys in the AudioProjectData dictionary are unique.
                 AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
 
                 var filePath = _packFileService.GetFullPath(browser.SelectedFile);

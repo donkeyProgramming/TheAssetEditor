@@ -7,7 +7,7 @@ using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 
 namespace Editors.Audio.AudioEditor
 {
-    public class AudioProjectConverter
+    public class AudioProjectData
     {
         public class ProjectSettings
         {

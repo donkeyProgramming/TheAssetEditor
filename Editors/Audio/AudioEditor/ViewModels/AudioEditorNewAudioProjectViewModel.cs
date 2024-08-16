@@ -185,10 +185,10 @@ namespace Editors.Audio.AudioEditor.ViewModels
             // Create the list of events to be displayed in the AudioEditor.
             CreateAudioProjectDialogueEventsList();
 
-            // Create the object for State Groups with qualifiers so that their keys in the AudioProjectConverter dictionary are unique.
+            // Create the object for State Groups with qualifiers so that their keys in the AudioProjectData dictionary are unique.
             AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
 
-            // Initialise AudioProjectConverter according to the Audio Project settings selected.
+            // Initialise AudioProjectData according to the Audio Project settings selected.
             InitialiseAudioProjectData();
 
             // Add the Audio Project with empty events to the PackFile.
