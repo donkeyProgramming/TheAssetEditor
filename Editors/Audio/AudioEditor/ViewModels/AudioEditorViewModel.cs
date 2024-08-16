@@ -83,9 +83,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
             if (browser.ShowDialog())
             {
                 // Remove any pre-existing data otherwise DataGrid isn't happy.
-                AudioEditorInstance.AudioProjectData.Clear();
-                AudioEditorDataGridItems.Clear();
-                SelectedAudioProjectEvent = "";
+                AudioEditorInstance.ResetAudioEditorData();
+                ResetAudioEditorViewModelData();
 
                 // Create the object for State Groups with qualifiers so that their keys in the AudioProjectData dictionary are unique.
                 AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
@@ -193,17 +192,20 @@ namespace Editors.Audio.AudioEditor.ViewModels
                         DictionaryEqualityComparer<string, object>.Default.Equals(context, dataGridRow));
 
                     if (matchingRow != null)
-                                        {
+                    {
                         var fileNames = filePaths.Select(filePath => $"\"{Path.GetFileName(filePath)}\"");
                         var fileNamesString = string.Join(", ", fileNames);
-                                        var filePathsString = string.Join(", ", filePaths.Select(filePath => $"\"{filePath}\""));
+                        var filePathsString = string.Join(", ", filePaths.Select(filePath => $"\"{filePath}\""));
 
-                                        textBox.Text = fileNamesString;
-                                        textBox.ToolTip = filePathsString;
-                                    }
+                        matchingRow["AudioFilesDisplay"] = filePaths.ToList();
+                        matchingRow["AudioFiles"] = filePaths.ToList();
+
+                        textBox.Text = fileNamesString;
+                        textBox.ToolTip = filePathsString;
                     }
-                    }
+                }
             }
+        }
 
         public void CreateAudioProjectEventsListFromAudioProject()
         {
