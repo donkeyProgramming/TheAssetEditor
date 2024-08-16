@@ -56,9 +56,7 @@ namespace MeshImportExport
 
                     var newNode = (parent.CreateNode(boneInfo.Name)
                         .WithLocalRotation(new Quaternion(frame.Quaternion[boneInfo.Id].X, frame.Quaternion[boneInfo.Id].Y, frame.Quaternion[boneInfo.Id].Z, frame.Quaternion[boneInfo.Id].W))
-                        .WithLocalTranslation(new Vector3(frame.Transforms[boneInfo.Id].X, frame.Transforms[boneInfo.Id].Y, frame.Transforms[boneInfo.Id].Z))
-
-                        ,
+                        .WithLocalTranslation(new Vector3(frame.Transforms[boneInfo.Id].X, frame.Transforms[boneInfo.Id].Y, frame.Transforms[boneInfo.Id].Z)),
                         Matrix4x4.Transpose(new Matrix4x4(invMatrix.M11, invMatrix.M12, invMatrix.M13, invMatrix.M14,
                                                           invMatrix.M21, invMatrix.M22, invMatrix.M23, invMatrix.M24,
                                                           invMatrix.M31, invMatrix.M32, invMatrix.M33, invMatrix.M34,

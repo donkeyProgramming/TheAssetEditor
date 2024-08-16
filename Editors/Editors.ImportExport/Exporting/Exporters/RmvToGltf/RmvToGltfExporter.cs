@@ -60,22 +60,19 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         {
             var rmv2 = new ModelFactory().Load(settings.InputFile.DataSource.ReadData());
             var lodLevel = rmv2.ModelList.First();
-            /**var skeletonBool = (rmv2.Header.SkeletonName != "");
-            if (rmv2.Header.SkeletonName != "")
+            var hasSkeleton = (rmv2.Header.SkeletonName != "");
+            var gltfSkeleton = new List<(Node, Matrix4x4)>();
+            var model = ModelRoot.CreateModel();
+            if (hasSkeleton)
             {
-                var model = MeshWithSkeleton(rmv2, settings.InputFile, settings);
-                model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputFile.Name) + ".gltf");
+                gltfSkeleton = GenerateSkeleton(rmv2);
+                model = SharedModel.Model;
             }
             else
             {
-                var model = MeshWithoutSkeleton(rmv2, settings.InputFile, settings, skeletonBool);
-                model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputFile.Name) + ".gltf");
-            }**/
-            var hasSkeleton = (rmv2.Header.SkeletonName != "");
-            var gltfSkeleton = GenerateSkeleton(rmv2);
-            var model = SharedModel.Model;
+                SharedModel.SetModel(model);
+            }
             List<Mesh> meshes = new List<Mesh>();
-            //var scene = model.UseScene("default");
             foreach (var rmvMesh in lodLevel)
             {
                 var gltfMaterial = new MaterialBuilder();
@@ -88,10 +85,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                     gltfMaterial = _ddsToPngExporter.BuildFakeMaterialPerMesh(rmvMesh, settings.InputFile);
                 }
                 var mesh = model.CreateMesh(GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton));
-                //scene.CreateNode(rmvMesh.Material.ModelName).WithSkinnedMesh(mesh, gltfSkeleton.ToArray());
                 meshes.Add(mesh);
             }
-            // model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputFile.Name) + ".gltf");
             BuildGltf(meshes, gltfSkeleton, settings);
         }
 
@@ -101,51 +96,16 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var scene = model.UseScene("default");
             foreach (var mesh in meshes)
             {
-                scene.CreateNode(mesh.Name).WithSkinnedMesh(mesh, gltfSkeleton.ToArray());
-            }
-            model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputFile.Name) + ".gltf");
-        }
-
-        internal ModelRoot MeshWithSkeleton(RmvFile rmv2, PackFile file, RmvToGltfExporterSettings settings)
-        {
-
-            var lodLevel = rmv2.ModelList.First();
-            var hasSkeleton = (rmv2.Header.SkeletonName != "");
-
-            var gltfSkeletonBindings = GenerateSkeleton(rmv2);
-            var model = SharedModel.Model;
-            var scene = model.UseScene("default");
-            foreach (var rmvMesh in lodLevel)
-            {
-                var material = new MaterialBuilder();
-                if (settings.ExportTextures == true)
+                if (gltfSkeleton.Count != 0)
                 {
-                    material = _ddsToPngExporter.GenerateMaterial(settings, rmvMesh);
+                    scene.CreateNode(mesh.Name).WithSkinnedMesh(mesh, gltfSkeleton.ToArray());
                 }
                 else
                 {
-                    material = _ddsToPngExporter.BuildFakeMaterialPerMesh(rmvMesh, file);
+                    scene.CreateNode(mesh.Name).WithMesh(mesh);
                 }
-
-                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, material, hasSkeleton));
-                scene.CreateNode(rmvMesh.Material.ModelName).WithSkinnedMesh(mesh, gltfSkeletonBindings.ToArray());
             }
-            return model;
-        }
-        internal ModelRoot MeshWithoutSkeleton(RmvFile rmv2, PackFile file, RmvToGltfExporterSettings settings, bool hasSkeleton)
-        {
-            var model = ModelRoot.CreateModel();
-            var scene = model.UseScene("default");
-            var lodLevel = rmv2.ModelList.First();
-            Node bone = scene.CreateNode("Export root");
-
-            foreach (var rmvMesh in lodLevel)
-            {
-                var material = _ddsToPngExporter.GenerateMaterial(settings, rmvMesh);
-                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, material, hasSkeleton));
-                scene.CreateNode(rmvMesh.Material.ModelName).WithMesh(mesh);
-            }
-            return model;
+            model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputFile.Name) + ".gltf");
         }
 
         internal List<(Node, Matrix4x4)> GenerateSkeleton(RmvFile rmv2)
@@ -201,15 +161,11 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var triangleCount = rmvMesh.Mesh.IndexList.Length;
             for (var i = 0; i < triangleCount; i += 3)
             {
-                try
-                {
-                    var i0 = rmvMesh.Mesh.IndexList[i + 0];
-                    var i1 = rmvMesh.Mesh.IndexList[i + 1];
-                    var i2 = rmvMesh.Mesh.IndexList[i + 2];
+                var i0 = rmvMesh.Mesh.IndexList[i + 0];
+                var i1 = rmvMesh.Mesh.IndexList[i + 1];
+                var i2 = rmvMesh.Mesh.IndexList[i + 2];
 
-                    prim.AddTriangle(vertexList[i0], vertexList[i1], vertexList[i2]);
-                }
-                catch { continue; }
+                prim.AddTriangle(vertexList[i0], vertexList[i1], vertexList[i2]);
             }
             return mesh;
         }
