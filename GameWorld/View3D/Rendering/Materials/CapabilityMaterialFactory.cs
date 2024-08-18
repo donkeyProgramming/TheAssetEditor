@@ -47,11 +47,12 @@ namespace GameWorld.Core.Rendering.Materials
 
         void UpdatedPreferedMaterialBasedOnRmv(GameTypeEnum currentGame, IRmvMaterial material, ref CapabilityMaterialsEnum preferredMaterial)
         {
-            //if (material is WeightedMaterial weighterMaterial)
-            //{ 
-            //    if (weighterMaterial.UseDecal || weighterMaterial.UseDirt)
-            //        preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal;
-            //}
+            // Decal disabled for now, as saving is not validated! 
+            // if (material is WeightedMaterial weighterMaterial)
+            // { 
+            //     if (weighterMaterial.UseDecal || weighterMaterial.UseDirt)
+            //         preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal;
+            // }
         }
 
         CapabilityMaterialsEnum GetDefaultMaterial(GameTypeEnum currentGame)
@@ -81,11 +82,24 @@ namespace GameWorld.Core.Rendering.Materials
 
                     CapabilityMaterialsEnum.SpecGlossPbr_Default,
                     CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal];
-        } 
+        }
 
-        public CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterial)
+        public CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterialType)
         {
-            return CreateMaterial(newMaterial);
+            var newMaterial = CreateMaterial(newMaterialType);
+
+            for (var sourceCapIndex = 0; sourceCapIndex < source.Capabilities.Length; sourceCapIndex++)
+            {
+                for (var newCapIndex = 0; newCapIndex < newMaterial.Capabilities.Length; newCapIndex++)
+                {
+                    if (source.Capabilities[sourceCapIndex].GetType() == newMaterial.Capabilities[newCapIndex].GetType())
+                    {
+                        newMaterial.Capabilities[newCapIndex] = source.Capabilities[sourceCapIndex].Clone();
+                    }
+                }
+            }
+
+            return newMaterial;
         }
     }
 }
