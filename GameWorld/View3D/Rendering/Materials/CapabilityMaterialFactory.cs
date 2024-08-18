@@ -23,11 +23,11 @@ namespace GameWorld.Core.Rendering.Materials
         {
             var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
 
-            CapabilityMaterialsEnum preferredMaterial = GetDefaultMaterial(currentGame);
+            var preferredMaterial = GetDefaultMaterial(currentGame);
             if (wsModelMaterial != null)
-                UpdateGetMaterialFromWsModelMaterial(currentGame, wsModelMaterial, ref preferredMaterial);
+                UpdatedPreferedMaterialBasedOnWsMaterial(currentGame, wsModelMaterial, ref preferredMaterial);
             else
-                UpdateMaterialFromRmvMaterial(currentGame, rmvMaterial, ref preferredMaterial);
+                UpdatedPreferedMaterialBasedOnRmv(currentGame, rmvMaterial, ref preferredMaterial);
 
             var material = CreateMaterial(preferredMaterial);
             foreach (var capability in material.Capabilities)
@@ -36,7 +36,7 @@ namespace GameWorld.Core.Rendering.Materials
             return material;
         }
 
-        void UpdateGetMaterialFromWsModelMaterial(GameTypeEnum currentGame, WsModelMaterialFile wsModelMaterial, ref CapabilityMaterialsEnum preferredMaterial)
+        void UpdatedPreferedMaterialBasedOnWsMaterial(GameTypeEnum currentGame, WsModelMaterialFile wsModelMaterial, ref CapabilityMaterialsEnum preferredMaterial)
         {
             if ((currentGame == GameTypeEnum.Warhammer3 || currentGame == GameTypeEnum.ThreeKingdoms) == false)
                 return;
@@ -45,20 +45,14 @@ namespace GameWorld.Core.Rendering.Materials
                 preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
         }
 
-        void UpdateMaterialFromRmvMaterial(GameTypeEnum currentGame, IRmvMaterial material, ref CapabilityMaterialsEnum preferredMaterial)
+        void UpdatedPreferedMaterialBasedOnRmv(GameTypeEnum currentGame, IRmvMaterial material, ref CapabilityMaterialsEnum preferredMaterial)
         {
-            if (material is WeightedMaterial weighterMaterial)
-            { 
-                if (weighterMaterial.UseDecal || weighterMaterial.UseDirt)
-                    preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal;
-            }
-
-            //ModelMaterialEnum[] decalMaterials = [
-            //    ModelMaterialEnum.decal, ModelMaterialEnum.dirtmap, ModelMaterialEnum.decal_dirtmap,
-            //    ModelMaterialEnum.weighted_decal, ModelMaterialEnum.weighted_dirtmap, ModelMaterialEnum.weighted_decal_dirtmap,
-            //    ModelMaterialEnum.weighted_skin_decal, ModelMaterialEnum.weighted_skin_dirtmap, ModelMaterialEnum.weighted_skin_decal_dirtmap];
+            //if (material is WeightedMaterial weighterMaterial)
+            //{ 
+            //    if (weighterMaterial.UseDecal || weighterMaterial.UseDirt)
+            //        preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal;
+            //}
         }
-
 
         CapabilityMaterialsEnum GetDefaultMaterial(GameTypeEnum currentGame)
         {
@@ -66,7 +60,6 @@ namespace GameWorld.Core.Rendering.Materials
                 return CapabilityMaterialsEnum.MetalRoughPbr_Default;
             return CapabilityMaterialsEnum.SpecGlossPbr_Default;
         }
-
 
         public CapabilityMaterial CreateMaterial(CapabilityMaterialsEnum type)
         {
