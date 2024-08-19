@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using SharpDX;
 
 namespace Editors.Audio.Utility
 {
     public class SoundPlayer
     {
-        private static ILogger _logger = Logging.Create<SoundPlayer>();
+        private static readonly ILogger s_logger = Logging.Create<SoundPlayer>();
         private readonly string _language = "english(uk)";
 
         private readonly PackFileService _pfs;
@@ -30,27 +30,27 @@ namespace Editors.Audio.Utility
         {
             if (sourceId == null)
             {
-                _logger.Here().Warning("Input is not a valid wwise sound");
+                s_logger.Here().Warning("Input is not a valid wwise sound");
                 return false;
             }
 
-            _logger.Here().Information($"User selected {sourceId}.wem to be played");
+            s_logger.Here().Information($"User selected {sourceId}.wem to be played");
             var outputName = $"{_audioRepository.GetNameFromHash(parentEventId)}-{sourceId}";
 
             var audioFile = FindSoundFile(_language, sourceId);
 
             if (audioFile == null)
             {
-                _logger.Here().Error("Unable to find sound");
+                s_logger.Here().Error("Unable to find sound");
                 return true;
             }
 
-            _logger.Here().Information($"Trying to play Sound '{_pfs.GetFullPath(audioFile)}'");
+            s_logger.Here().Information($"Trying to play Sound '{_pfs.GetFullPath(audioFile)}'");
             var result = _vgStreamWrapper.ConvertFromWem(outputName, audioFile.DataSource.ReadData());
 
             if (result.IsSuccess)
             {
-                _logger.Here().Information($"Sound converted, playing: {result.Item}");
+                s_logger.Here().Information($"Sound converted, playing: {result.Item}");
                 using var p = new Process();
                 p.StartInfo = new ProcessStartInfo(result.Item)
                 {
@@ -61,30 +61,31 @@ namespace Editors.Audio.Utility
             }
 
             else
-                _logger.Here().Error("Unable to export sound");
+                s_logger.Here().Error("Unable to export sound");
 
             return result.IsSuccess;
         }
 
         public static void PlaySound(Dictionary<string, object> dataGridRowContext)
         {
-            if (dataGridRowContext.TryGetValue("AudioFiles", out var value) && value is List<string> audioFiles && audioFiles.Count > 0)
+            if (dataGridRowContext.TryGetValue("AudioFiles", out var audioFilesObj) && audioFilesObj is List<string> audioFiles && audioFiles.Any())
             {
                 var random = new Random();
                 var randomIndex = random.Next(audioFiles.Count);
                 var randomAudioFile = audioFiles[randomIndex];
 
-                _logger.Here().Information($"Playing: {randomAudioFile}");
+                s_logger.Here().Information($"Playing: {randomAudioFile}");
 
-                using var p = new Process();
-                p.StartInfo = new ProcessStartInfo(randomAudioFile)
+                using var process = new Process();
+                process.StartInfo = new ProcessStartInfo(randomAudioFile)
                 {
                     UseShellExecute = true
                 };
 
-                p.Start();
+                process.Start();
             }
         }
+
 
         PackFile FindSoundFile(string language, string soundId)
         {

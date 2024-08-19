@@ -14,8 +14,9 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.AudioEditor.AudioEditorData;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
-using static Editors.Audio.AudioEditor.SettingsEnumConverter;
 using static Editors.Audio.AudioEditor.AudioEditorSettings;
+using static Editors.Audio.AudioEditor.AudioProjectData;
+using static Editors.Audio.AudioEditor.SettingsEnumConverter;
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
@@ -142,7 +143,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 if (Enum.TryParse(SelectedAudioProjectEventSubtype, out DialogueEventSubtype eventSubtype))
                 {
                     var dialogueEvents = DialogueEvents
-                        .Where(de => de.Type == eventType)
+                        .Where(dialogueEvent => dialogueEvent.Type == eventType)
                         .ToList();
 
                     foreach (var dialogueEvent in dialogueEvents)
@@ -181,13 +182,13 @@ namespace Editors.Audio.AudioEditor.ViewModels
             _audioEditorViewModel.ResetAudioEditorViewModelData();
 
             // Create the list of events to be displayed in the AudioEditor.
-            CreateAudioProjectDialogueEventsList();
+            CreateAudioProjectEventsList();
 
-            // Create the object for State Groups with qualifiers so that their keys in the AudioProjectData dictionary are unique.
+            // Create the object for State Groups with qualifiers so that their keys in the AudioProject dictionary are unique.
             AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
 
-            // Initialise AudioProjectData according to the Audio Project settings selected.
-            InitialiseAudioProjectData();
+            // Initialise AudioProject according to the Audio Project settings selected.
+            InitialiseVOAudioProject();
 
             // Add the Audio Project with empty events to the PackFile.
             AddAudioProjectToPackFile(_packFileService);
@@ -198,51 +199,49 @@ namespace Editors.Audio.AudioEditor.ViewModels
             CloseWindowAction();
         }
 
-        public void CreateAudioProjectDialogueEventsList()
+        public void CreateAudioProjectEventsList()
         {
-            _audioEditorViewModel.AudioProjectDialogueEvents.Clear();
+            _audioEditorViewModel.AudioProjectEvents.Clear();
 
             foreach (var checkBox in DialogueEventCheckBoxes)
             {
                 if (checkBox.IsChecked == true)
                 {
                     var dialogueEvent = checkBox.Content.ToString();
-                    _audioEditorViewModel.AudioProjectDialogueEvents.Add(RemoveExtraUnderScoresFromString(dialogueEvent));
+                    _audioEditorViewModel.AudioProjectEvents.Add(RemoveExtraUnderScoresFromString(dialogueEvent));
                 }
             }
         }
 
-        public void InitialiseAudioProjectData()
+        public void InitialiseVOAudioProject()
         {
-            var settings = new Dictionary<string, object>
+            if (AudioEditorInstance.AudioProject == null)
+                AudioEditorInstance.AudioProject = new AudioProject();
+
+            // Create settings.
+            var settings = new Settings
             {
-                {"AudioProjectFileName", AudioProjectFileName},
-                {"Language", LanguageEnumToString[GetLanguageEnumString(SelectedLanguage)]},
-                {"CustomStatesFilePath", CustomStatesFilePath}
+                AudioProjectName = AudioProjectFileName,
+                Language = LanguageEnumToString[GetLanguageEnumString(SelectedLanguage)],
+                CustomStatesFilePath = CustomStatesFilePath
             };
 
-            AudioEditorInstance.AudioProjectData["Settings"] = [settings];
+            AudioEditorInstance.AudioProject.Settings = settings;
 
-            foreach (var dialogueEvent in _audioEditorViewModel.AudioProjectDialogueEvents)
+            // Create Dialogue Events.
+            var dialogueEvents = new List<DialogueEvent>();
+
+            foreach (var dialogueEventKey in _audioEditorViewModel.AudioProjectEvents)
             {
-                var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[dialogueEvent];
-
-                var dataGridItems = new List<Dictionary<string, object>>();
-                var dataGridItem = new Dictionary<string, object>();
-
-                foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
+                var dialogueEvent = new DialogueEvent
                 {
-                    var stateGroupKey = AddExtraUnderScoresToString(stateGroupWithQualifier);
-                    dataGridItem[stateGroupKey] = "";
-                }
+                    DialogueEventName = dialogueEventKey
+                };
 
-                dataGridItem["AudioFilesDisplay"] = "";
-                dataGridItem["AudioFiles"] = "";
-
-                dataGridItems.Add(dataGridItem);
-
-                AudioEditorInstance.AudioProjectData[dialogueEvent] = dataGridItems;
+                dialogueEvents.Add(dialogueEvent);
             }
+
+            AudioEditorInstance.AudioProject.DialogueEvents = dialogueEvents;
         }
 
         [RelayCommand] public void SelectAll()

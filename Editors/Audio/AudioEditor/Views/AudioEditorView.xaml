@@ -48,7 +48,7 @@
                       IsEditable="True"
                       IsTextSearchEnabled="True"
                       Text="{Binding SelectedAudioProjectEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                      ItemsSource="{Binding AudioProjectDialogueEvents}"
+                      ItemsSource="{Binding AudioProjectEvents}"
                       SelectedItem="{Binding SelectedAudioProjectEvent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                       VerticalAlignment="Center"
                       Margin="5,0"/>
@@ -62,11 +62,12 @@
             </Grid.ColumnDefinitions>
             
             <Button Grid.Column="0" Content="Add Row" Command="{Binding AddStatePathCommand}" Margin="5, 0, 0, 0" VerticalAlignment="Center"/>
+            <Button Grid.Column="0" Content="Add Row" Command="{Binding AddStatePathCommand}" Margin="5, 0, 0, 0" VerticalAlignment="Center"/>
             <CheckBox Grid.Column="1" Content="Show Custom States Only" Margin="5, 0, 0, 0" VerticalAlignment="Center" IsChecked="{Binding ShowCustomStatesOnly, Mode=TwoWay}" />
         </Grid>
 
         <!-- Dynamic DataGrid -->
-        <DataGrid Grid.Row="4" x:Name="AudioEditorDataGrid" Margin="0, 10, 0, 5" ItemsSource="{Binding AudioEditorDataGridItems}" AutoGenerateColumns="False">
+        <DataGrid Grid.Row="4" x:Name="AudioEditorDataGrid" Margin="0, 10, 0, 5" AutoGenerateColumns="False" >
         </DataGrid>
     </Grid>
 </UserControl>

@@ -34,8 +34,7 @@ namespace Editors.Audio.AudioEditor
 
         public static Language GetLanguageEnumString(string languageString)
         {
-            return LanguageEnumToString
-                .FirstOrDefault(pair => pair.Value.Equals(languageString, StringComparison.OrdinalIgnoreCase)).Key;
+            return LanguageEnumToString.FirstOrDefault(pair => pair.Value.Equals(languageString, StringComparison.OrdinalIgnoreCase)).Key;
         }
     }
 }

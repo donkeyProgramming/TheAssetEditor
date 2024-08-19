@@ -72,7 +72,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Custom States Location:" VerticalAlignment="Center"/>
                 <TextBox Grid.Column="1" x:Name="StatesFilePath" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}"  
-                         Text="{Binding StatesFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding CustomStatesFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          IsReadOnly="True"/>
                 <Button Grid.Column="2" Content="..." VerticalAlignment="Center" Width="30" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding SetCustomStatesLocationCommand}"/>
             </Grid>
@@ -127,7 +127,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Button Content="Select All" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 9, 0" Command="{Binding SelectAllCommand}"/>
-                    <Button Content="Select Recommended" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 9, 0" Command="{Binding SelectRecommendedCommand}"/>
+                    <Button Content="Select Recommended" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 8, 0" Command="{Binding SelectRecommendedCommand}"/>
                     <Button Content="Select None" Width="125" Height="{StaticResource DefaultHeight}" Margin="0, 0, 0, 0" Command="{Binding SelectNoneCommand}"/>
                 </StackPanel>
             </Grid>
