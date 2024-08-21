@@ -1,0 +1,167 @@
+﻿using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials.Capabilities;
+using GameWorld.Core.Rendering.Materials.Serialization;
+using GameWorld.Core.Test.Rendering.Materials;
+using Microsoft.Xna.Framework;
+using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
+using Shared.GameFormats.RigidModel.Types;
+using Shared.GameFormats.WsModel;
+
+namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
+{
+    internal class DefaultMaterialTests
+    {
+        PackFileService _pfs;
+
+        [SetUp]
+        public void Setup()
+        {
+            var selectedGame = GameTypeEnum.Warhammer3;
+            var appSettings = new ApplicationSettingsService(selectedGame);
+            _pfs = new PackFileService(new PackFileDataBase(), appSettings, new GameInformationFactory(), null, null, null);
+            var _ = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
+        }
+
+        CapabilityMaterialFactory GetMaterialFactory(GameTypeEnum gameTypeEnum)
+        {
+            var appSettings = new ApplicationSettingsService(gameTypeEnum);
+            return new CapabilityMaterialFactory(appSettings, null);
+        }
+
+        MaterialToWsMaterialSerializer CreateWsMaterialSerializer(GameTypeEnum gameTypeEnum)
+        {
+            var saveHelper = new PackFileSaveService(_pfs);
+            var materialRepo = new WsMaterialRepository(_pfs);
+            return new MaterialToWsMaterialSerializer(saveHelper, materialRepo, gameTypeEnum);
+        }
+
+        WsModelMaterialFile GetWsModelFile()
+        {
+            var wsMaterial = new WsModelMaterialFile()
+            {
+                Alpha = false,
+                Name = "cth_celestial_general_body_01_weighted4_alpha.xml",
+                ShaderPath = "shaders/weighted4_character_alpha.xml.shader",
+                Textures = new()
+                {
+                    {TextureType.Specular, $"texturePath/wsmodel/{TextureType.Specular}.dds"},
+                    {TextureType.Gloss, $"texturePath/wsmodel/{TextureType.Gloss}.dds"},
+                    {TextureType.Diffuse, $"texturePath/wsmodel/{TextureType.Diffuse}.dds"},
+                    {TextureType.Normal, $"texturePath/wsmodel/{TextureType.Normal}.dds"},
+                    {TextureType.Mask, $"texturePath/wsmodel/{TextureType.Mask}.dds"},
+                    {TextureType.Blood, $"texturePath/wsmodel/{TextureType.Blood}.dds"},
+                },
+                Parameters =
+                [
+
+                ]
+            };
+            return wsMaterial;
+        }
+
+        IRmvMaterial GetRmvMaterial()
+        {
+            var rmvMaterial = RmvMaterialHelper
+                .Create(ModelMaterialEnum.weighted)
+                .SetAlpha(true)
+                .AssignMaterials([TextureType.Diffuse, TextureType.Specular, TextureType.Gloss, TextureType.Mask, TextureType.Normal]);
+
+            return rmvMaterial;
+        }
+
+        [Test]
+        public void CreateFromWsMaterial()
+        {
+            // Arrange
+            var wsMaterial = GetWsModelFile();
+
+            // Act
+            var material = GetMaterialFactory(GameTypeEnum.Warhammer2).Create(null, wsMaterial);
+
+            // Assert
+            var specGlossCap = material.GetCapability<SpecGlossCapability>();
+            Assert.That(specGlossCap.UseAlpha, Is.EqualTo(false));
+            Assert.That(specGlossCap.SpecularMap.TexturePath, Is.EqualTo($"texturePath/wsmodel/{specGlossCap.SpecularMap.Type}.dds"));
+            Assert.That(specGlossCap.GlossMap.TexturePath, Is.EqualTo($"texturePath/wsmodel/{specGlossCap.GlossMap.Type}.dds"));
+            Assert.That(specGlossCap.DiffuseMap.TexturePath, Is.EqualTo($"texturePath/wsmodel/{specGlossCap.DiffuseMap.Type}.dds"));
+            Assert.That(specGlossCap.NormalMap.TexturePath, Is.EqualTo($"texturePath/wsmodel/{specGlossCap.NormalMap.Type}.dds"));
+            Assert.That(specGlossCap.Mask.TexturePath, Is.EqualTo($"texturePath/wsmodel/{specGlossCap.Mask.Type}.dds"));
+        }
+
+        [Test]
+        [TestCase(GameTypeEnum.Troy)]
+        [TestCase(GameTypeEnum.Warhammer2)]
+        [TestCase(GameTypeEnum.Pharaoh)]
+        public void GenerateWsMaterial(GameTypeEnum gameType)
+        {
+            // Arrange
+            var wsMaterial = GetWsModelFile();
+
+            // Act
+            var material = GetMaterialFactory(gameType).Create(null, wsMaterial);
+            var serializer = CreateWsMaterialSerializer(gameType);
+            var wsMaterialPath = serializer.ProsessMaterial("custompath/materials", "mymesh", UiVertexFormat.Cinematic, material);
+            var packfile = _pfs.FindFile(wsMaterialPath);
+            var generatedMaterial = new WsModelMaterialFile(packfile);
+
+            // Assert
+            Assert.That(generatedMaterial.VertexType, Is.EqualTo(UiVertexFormat.Cinematic));
+            Assert.That(generatedMaterial.Alpha, Is.EqualTo(false));
+
+            Assert.That(generatedMaterial.ShaderPath, Is.EqualTo("shaders/weighted4_character.xml.shader"));
+            Assert.That(generatedMaterial.Name, Is.EqualTo("mymesh_weighted4_alpha_off.xml"));
+
+            Assert.That(generatedMaterial.Textures[TextureType.Specular], Is.EqualTo($"texturePath/wsmodel/{TextureType.Specular}.dds"));
+            if(gameType != GameTypeEnum.Pharaoh)
+                Assert.That(generatedMaterial.Textures[TextureType.Gloss], Is.EqualTo($"texturePath/wsmodel/{TextureType.Gloss}.dds"));
+            Assert.That(generatedMaterial.Textures[TextureType.Diffuse], Is.EqualTo($"texturePath/wsmodel/{TextureType.Diffuse}.dds"));
+            Assert.That(generatedMaterial.Textures[TextureType.Normal], Is.EqualTo($"texturePath/wsmodel/{TextureType.Normal}.dds"));
+            Assert.That(generatedMaterial.Textures[TextureType.Mask], Is.EqualTo($"texturePath/wsmodel/{TextureType.Mask}.dds"));
+        }
+
+        [Test]
+        public void CreateFromRmvMaterial()
+        {
+            // Arrange
+            var rmvMaterial = GetRmvMaterial();
+
+            // Act
+            var material = GetMaterialFactory(GameTypeEnum.Troy).Create(rmvMaterial, null);
+
+            // Assert
+            var specGlossCap = material.GetCapability<SpecGlossCapability>();
+            Assert.That(specGlossCap.UseAlpha, Is.EqualTo(true));
+            Assert.That(specGlossCap.SpecularMap.TexturePath, Is.EqualTo($"texturePath/{specGlossCap.SpecularMap.Type}.dds"));
+            Assert.That(specGlossCap.GlossMap.TexturePath, Is.EqualTo($"texturePath/{specGlossCap.GlossMap.Type}.dds"));
+            Assert.That(specGlossCap.DiffuseMap.TexturePath, Is.EqualTo($"texturePath/{specGlossCap.DiffuseMap.Type}.dds"));
+            Assert.That(specGlossCap.NormalMap.TexturePath, Is.EqualTo($"texturePath/{specGlossCap.NormalMap.Type}.dds"));
+            Assert.That(specGlossCap.Mask.TexturePath, Is.EqualTo($"texturePath/{specGlossCap.Mask.Type}.dds"));
+        }
+
+        [Test]
+        public void GenerateRmvMaterial()
+        {
+            // Arrange
+            var rmvMaterial = GetRmvMaterial();
+
+            // Act
+            var material = GetMaterialFactory(GameTypeEnum.Pharaoh).Create(rmvMaterial, null);
+            var serializer = new MaterialToRmvSerializer();
+            var createdRmvMaterial = serializer.CreateMaterialFromCapabilityMaterial(material);
+
+            // Assert
+            Assert.That(createdRmvMaterial.AlphaMode, Is.EqualTo(AlphaMode.Transparent));
+            Assert.That(createdRmvMaterial.MaterialId, Is.EqualTo(ModelMaterialEnum.weighted));
+
+            Assert.That(createdRmvMaterial.GetTexture(TextureType.Specular).Value.Path, Is.EqualTo($"texturePath/{TextureType.Specular}.dds"));
+            Assert.That(createdRmvMaterial.GetTexture(TextureType.Gloss).Value.Path, Is.EqualTo($"texturePath/{TextureType.Gloss}.dds"));
+            Assert.That(createdRmvMaterial.GetTexture(TextureType.Diffuse).Value.Path, Is.EqualTo($"texturePath/{TextureType.Diffuse}.dds"));
+            Assert.That(createdRmvMaterial.GetTexture(TextureType.Normal).Value.Path, Is.EqualTo($"texturePath/{TextureType.Normal}.dds"));
+            Assert.That(createdRmvMaterial.GetTexture(TextureType.Mask).Value.Path, Is.EqualTo($"texturePath/{TextureType.Mask}.dds"));
+        }
+    }
+}

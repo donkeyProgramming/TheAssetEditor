@@ -10,15 +10,15 @@ using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
 
-namespace GameWorld.Core.Test.Rendering.Materials
+namespace GameWorld.Core.Test.Rendering.Materials.Serialization
 {
     internal class MaterialToWsMaterialSerializerTests
     {
-
-        CapabilityMaterialFactory _materialFactory;
         PackFileContainer _outputPack;
-        MaterialToWsMaterialSerializer _wsMaterialSerializer;
         PackFileService _pfs;
+
+        MaterialToWsMaterialSerializer _wsMaterialSerializer;
+        CapabilityMaterial _testMaterial;
 
         [SetUp]
         public void Setup()
@@ -30,29 +30,27 @@ namespace GameWorld.Core.Test.Rendering.Materials
             var saveHelper = new PackFileSaveService(_pfs);
             var materialRepo = new WsMaterialRepository(_pfs);
             _outputPack = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
-            _materialFactory = new CapabilityMaterialFactory(appSettings, null);
+            var materialFactory = new CapabilityMaterialFactory(appSettings, null);
             _wsMaterialSerializer = new MaterialToWsMaterialSerializer(saveHelper, materialRepo, selectedGame);
+
+            // Create a material and give it some textures
+            _testMaterial = materialFactory.CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            _testMaterial.GetCapability<MetalRoughCapability>().UseAlpha = false;
+            _testMaterial.GetCapability<MetalRoughCapability>().MaterialMap.TexturePath = $"texturePath/{TextureType.MaterialMap}.dds";
+            _testMaterial.GetCapability<MetalRoughCapability>().BaseColour.TexturePath = $"texturePath/{TextureType.BaseColour}.dds";
         }
 
-
         [Test]
-        public void CreateWsMaterial_Default()
+        public void ProsessMaterial()
         {
-            // Arrange
-            var material = _materialFactory.CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
-            
-            material.GetCapability<MetalRoughCapability>().UseAlpha = false;
-            material.GetCapability<MetalRoughCapability>().MaterialMap.TexturePath = $"texturePath/{TextureType.MaterialMap}.dds";
-            material.GetCapability<MetalRoughCapability>().BaseColour.TexturePath = $"texturePath/{TextureType.BaseColour}.dds";
-            
             // Act
-            var pathToCreatedMaterial = _wsMaterialSerializer.ProsessMaterial("variantmeshes/wh_variantmodels/hu1/emp/emp_karl_franz/myCustomModel.rmv2", "mymesh0", UiVertexFormat.Weighted, material);
+            var pathToCreatedMaterial = _wsMaterialSerializer.ProsessMaterial("variantmeshes/wh_variantmodels/hu1/emp/emp_karl_franz/myCustomModel.rmv2", "mymesh0", UiVertexFormat.Weighted, _testMaterial);
 
             // Assert
             Assert.That(pathToCreatedMaterial, Is.EqualTo("variantmeshes\\wh_variantmodels\\hu1\\emp\\emp_karl_franz/materials/mymesh0_weighted2_alpha_off.xml.material"));
-            
+
             var savedWsMaterialFile = _pfs.FindFile(pathToCreatedMaterial, _outputPack);
-            Assert.That(savedWsMaterialFile, Is.Not.Null);    
+            Assert.That(savedWsMaterialFile, Is.Not.Null);
 
             var createdWsMaterial = new WsModelMaterialFile(savedWsMaterialFile);
             Assert.That(createdWsMaterial.Alpha, Is.False);
@@ -62,19 +60,12 @@ namespace GameWorld.Core.Test.Rendering.Materials
         }
 
         [Test]
-        public void CreateWsMaterial_Default_AddSameTwice()
+        public void ProsessMaterial_AddSameTwice()
         {
-            // Arrange
-            var material = _materialFactory.CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
-
-            material.GetCapability<MetalRoughCapability>().UseAlpha = false;
-            material.GetCapability<MetalRoughCapability>().MaterialMap.TexturePath = $"texturePath/{TextureType.MaterialMap}.dds";
-            material.GetCapability<MetalRoughCapability>().BaseColour.TexturePath = $"texturePath/{TextureType.BaseColour}.dds";
-
             // Act
-            var pathToCreatedMaterial0 = _wsMaterialSerializer.ProsessMaterial("variantmeshes/wh_variantmodels/hu1/emp/emp_karl_franz/myCustomModel.rmv2", "mymesh0", UiVertexFormat.Weighted, material);
-            var pathToCreatedMaterial1 = _wsMaterialSerializer.ProsessMaterial("variantmeshes/wh_variantmodels/hu1/emp/emp_karl_franz/myCustomModel.rmv2", "mymesh1", UiVertexFormat.Weighted, material);
-            
+            var pathToCreatedMaterial0 = _wsMaterialSerializer.ProsessMaterial("variantmeshes/wh_variantmodels/hu1/emp/emp_karl_franz/myCustomModel.rmv2", "mymesh0", UiVertexFormat.Weighted, _testMaterial);
+            var pathToCreatedMaterial1 = _wsMaterialSerializer.ProsessMaterial("variantmeshes/wh_variantmodels/hu1/emp/emp_karl_franz/myCustomModel.rmv2", "mymesh1", UiVertexFormat.Weighted, _testMaterial);
+
             // Assert
             Assert.That(pathToCreatedMaterial0, Is.EqualTo("variantmeshes\\wh_variantmodels\\hu1\\emp\\emp_karl_franz/materials/mymesh0_weighted2_alpha_off.xml.material"));
             Assert.That(pathToCreatedMaterial0, Is.EqualTo(pathToCreatedMaterial1));

@@ -4,7 +4,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 
-namespace GameWorld.Core.Test.Rendering.Materials
+namespace GameWorld.Core.Test.Rendering.Materials.Serialization
 {
     internal class WsMaterialRepositoryTests
     {
@@ -31,7 +31,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
         {
             // Arrange 
             var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
-          
+
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
 

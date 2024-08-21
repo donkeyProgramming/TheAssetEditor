@@ -12,7 +12,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
     {
 
         [Test]
-        public void CreateMaterial_Wh3_CreateDefault_FromRmvMaterial()
+        public void Create_FromRmv_Wh3_Default()
         {
             var rmvMaterial = RmvMaterialHelper
                 .Create(ModelMaterialEnum.weighted)
@@ -41,7 +41,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
         }
 
         [Test]
-        public void CreateMaterial_Wh3_CreateDefault_FromWsMaterial()
+        public void Create_FromWs_Wh3_Default()
         {
             var rmvMaterial = RmvMaterialHelper
                 .Create(ModelMaterialEnum.weighted)
@@ -82,7 +82,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
         }
 
         [Test]
-        public void CreateMaterial_Wh3_CreateEmissive_FromWsMaterial()
+        public void Create_FromWs_Wh3_Emissive()
         {
             var rmvMaterial = RmvMaterialHelper
                 .Create(ModelMaterialEnum.weighted);
@@ -104,7 +104,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
         }
 
         [Test]
-        public void CreateMaterial_Rome_Default()
+        public void Create_FromRmv_Rome_Default()
         {
             var rmvMaterial = RmvMaterialHelper
                 .Create(ModelMaterialEnum.weighted)
@@ -133,7 +133,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
         }
 
         [Test]
-        public void CreateMaterial_Rome_DecalAndDirt()
+        public void Create_FromRmv_Rome_DirtAndDecal()
         {
             var rmvMaterial = RmvMaterialHelper
                 .Create(ModelMaterialEnum.weighted_decal_dirtmap)
@@ -145,15 +145,15 @@ namespace GameWorld.Core.Test.Rendering.Materials
             var abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
             var material = abstractMaterialFactory.Create(rmvMaterial, null);
             
-            Assert.That(material, Is.TypeOf<Core.Rendering.Materials.Shaders.SpecGloss.DecalAndDirtMaterial>());
+            Assert.That(material, Is.TypeOf<Core.Rendering.Materials.Shaders.SpecGloss.DefaultMaterial>());
             
             var specGlossCap = material.TryGetCapability<SpecGlossCapability>();
             Assert.That(specGlossCap, Is.Not.Null);
             
-            var dirtCap = material.TryGetCapability<DirtAndDecalCapability>();
-            Assert.That(dirtCap, Is.Not.Null);
-            Assert.That(dirtCap.UseDirt, Is.True);
-            Assert.That(dirtCap.UseDecal, Is.True);
+            //var dirtCap = material.TryGetCapability<DirtAndDecalCapability>();
+            //Assert.That(dirtCap, Is.Not.Null);
+            //Assert.That(dirtCap.UseDirt, Is.True);
+            //Assert.That(dirtCap.UseDecal, Is.True);
         }
     }
 

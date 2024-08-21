@@ -33,16 +33,16 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
         {
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, BloodMask);
-            UseBlood = CapabilityHelper.GetParameterFloat(wsModelMaterial, "receives_blood", 1) == 1;
-            UvScale = CapabilityHelper.GetParameterVector2(wsModelMaterial, "blood_uv_scale", new Vector2(1));
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, BloodMask, "commontextures/bloodmap.dds");
+            UseBlood = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Blood_Use, 0) == 1;
+            UvScale = CapabilityHelper.GetParameterVector2(wsModelMaterial, WsModelParamters.Blood_Scale, Vector2.One);
         }
 
         public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
         {
-            templateHandler.AddAttribute("TEMPLATE_ATTR_BLOOOD_PATH", BloodMask);
-            templateHandler.AddAttribute("TEMPLATE_ATTR_BLOOD_UV_SCALE_VALUE", UvScale);
-            templateHandler.AddAttribute("TEMPLATE_ATTR_USE_BLOOD_VALUE", UseBlood ? 1 : 0);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Blood.TemplateName, BloodMask);                                             
+            templateHandler.AddAttribute(WsModelParamters.Blood_Scale.TemplateName, UvScale);
+            templateHandler.AddAttribute(WsModelParamters.Blood_Use.TemplateName, UseBlood ? 1 : 0);
         }
     }
 }
