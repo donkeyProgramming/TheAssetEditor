@@ -152,7 +152,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                         {
                             var item = new DialogueEventCheckBox
                             {
-                                Content = AddExtraUnderScoresToString(dialogueEvent.EventName),
+                                Content = AddExtraUnderscoresToString(dialogueEvent.EventName),
                                 IsChecked = false
                             };
 
@@ -208,7 +208,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 if (checkBox.IsChecked == true)
                 {
                     var dialogueEvent = checkBox.Content.ToString();
-                    _audioEditorViewModel.AudioProjectEvents.Add(RemoveExtraUnderScoresFromString(dialogueEvent));
+                    _audioEditorViewModel.AudioProjectEvents.Add(RemoveExtraUnderscoresFromString(dialogueEvent));
                 }
             }
         }
@@ -235,7 +235,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             {
                 var dialogueEvent = new DialogueEvent
                 {
-                    DialogueEventName = dialogueEventKey
+                    Name = dialogueEventKey
                 };
 
                 dialogueEvents.Add(dialogueEvent);
@@ -254,9 +254,9 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [RelayCommand] public void SelectRecommended()
         {
             // Get the list of dialogue events with the "Recommended" category
-            var recommendedEvents = FrontendVODialogueEvents.Where(e => e.Categories.Contains("Recommended")).Select(e => e.EventName).ToHashSet();
+            var recommendedEvents = FrontendVODialogueEvents.Where(e => e.Categories.Contains("Recommended")).Select(e => e.Name).ToHashSet();
 
-            // Iterate through the CheckBoxes and set IsChecked for those with matching EventName
+            // Iterate through the CheckBoxes and set IsChecked for those with matching Name
             foreach (var checkBox in DialogueEventCheckBoxes)
             {
                 if (recommendedEvents.Contains(checkBox.Content.ToString()))

@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
-using System.Text.Json;
+using static Editors.Audio.AudioEditor.AudioEditorData;
+using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -9,8 +12,8 @@ namespace Editors.Audio.AudioEditor
         public class AudioProject
         {
             public Settings Settings { get; set; }
-            public List<Event> Events { get; set; }
-            public List<DialogueEvent> DialogueEvents { get; set; }
+            public List<Event> Events { get; set; } = [];
+            public List<DialogueEvent> DialogueEvents { get; set; } = [];
         }
 
         public class Settings
@@ -23,121 +26,113 @@ namespace Editors.Audio.AudioEditor
 
         public class Event
         {
-            public string EventName { get; set; } 
+            public string Name { get; set; }
             public List<string> AudioFiles { get; set; } = [];
             public string AudioFilesDisplay { get; set; }
         }
 
         public class DialogueEvent
         {
-            public string DialogueEventName { get; set; }
-            public List<StatePath> DecisionTree { get; set; } = new List<StatePath>();
+            public string Name { get; set; }
+            public List<DecisionNode> DecisionTree { get; set; } = [];
+        }
+
+        public class DecisionNode
+        {
+            public StatePath StatePath { get; set; }
+            public List<string> AudioFiles { get; set; } = [];
         }
 
         public class StatePath
         {
-            public string Path { get; set; }
-            public List<string> AudioFiles { get; set; } = [];
+            public List<StatePathNode> Nodes { get; set; } = [];
         }
 
-        /*
-        public static string ConvertToVOAudioProject(AudioProject audioProjectData)
+        public class StatePathNode
         {
-            var audioProject = new Dictionary<string, object>();
+            public string StateGroup { get; set; }
+            public string State { get; set; }
+        }
 
-            var settings = audioProjectData.Settings;
-            audioProject[nameof(Settings)] = new Dictionary<string, object>
+        public static void ConvertDataGridDataToAudioProject(ObservableCollection<Dictionary<string, object>> dataGridData, string audioProjectEvent)
+        {
+            if (dataGridData == null || audioProjectEvent == null)
+                return;
+
+            var audioProject = AudioEditorInstance.AudioProject;
+            var dialogueEvent = audioProject.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == audioProjectEvent); // Find the corresponding DialogueEvent in AudioProject
+            var decisionTree = dialogueEvent.DecisionTree;
+            decisionTree.Clear();
+
+            foreach (var dataGridItem in dataGridData)
             {
-                [nameof(Settings.AudioProjectName)] = settings.AudioProjectName,
-                [nameof(Settings.Language)] = settings.Language,
-                [nameof(Settings.CustomStatesFilePath)] = settings.CustomStatesFilePath
-            };
+                // Validation to ensure that the State Groups are in the correct order.
+                var orderedStateGroupsAndStates = ValidateStateGroupsOrder(dataGridItem, audioProjectEvent);
 
-            var dialogueEvents = new List<object>();
-
-            foreach (var dialogueEventItem in audioProjectData.DialogueEvents)
-            {
-                var decisionTree = new List<object>();
-
-                foreach (var decisionTreeItem in dialogueEventItem.DecisionTree)
+                var decisionNode = new DecisionNode
                 {
-                    var decisionBranchItem = new Dictionary<string, object>
-                    {
-                        [nameof(DecisionBranch.StatePath)] = decisionTreeItem.StatePath,
-                        [nameof(DecisionBranch.AudioFiles)] = decisionTreeItem.AudioFiles,
-                        [nameof(DecisionBranch.AudioFilesDisplay)] = decisionTreeItem.AudioFilesDisplay
-                    };
-
-                    decisionTree.Add(decisionBranchItem);
-                }
-
-                var dialogueEvent = new Dictionary<string, object>
-                {
-                    [nameof(DialogueEvent.DialogueEventName)] = dialogueEventItem.DialogueEventName,
-                    [nameof(DialogueEvent.DecisionTree)] = decisionTree
+                    AudioFiles = dataGridItem.ContainsKey("AudioFiles") ? dataGridItem["AudioFiles"] as List<string> : new List<string>(),
                 };
 
-                dialogueEvents.Add(dialogueEvent);
-            }
+                var statePath = new StatePath();
 
-            audioProject[nameof(DialogueEvents)] = dialogueEvents;
-
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-
-            return JsonSerializer.Serialize(audioProject, options);
-        }
-
-
-        public static AudioProject ConvertFromVOAudioProject(string audioProjectSerialised)
-        {
-            var audioProject = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(audioProjectSerialised);
-
-            var settingsElement = audioProject[nameof(Settings)];
-            var settings = new Settings
-            {
-                AudioProjectName = settingsElement.GetProperty(nameof(Settings.AudioProjectName)).GetString(),
-                Language = settingsElement.GetProperty(nameof(Settings.Language)).GetString(),
-                CustomStatesFilePath = settingsElement.GetProperty(nameof(Settings.CustomStatesFilePath)).GetString()
-            };
-
-            var dialogueEventsElement = audioProject[nameof(DialogueEvents)].EnumerateArray();
-            var dialogueEvents = new List<DialogueEvent>();
-
-            foreach (var dialogueEventElement in dialogueEventsElement)
-            {
-                var decisionTreeElement = dialogueEventElement.GetProperty(nameof(DialogueEvent.DecisionTree)).EnumerateArray();
-                var decisionTree = new List<DecisionBranch>();
-
-                foreach (var decisionTreeItemElement in decisionTreeElement)
+                foreach (var kvp in orderedStateGroupsAndStates)
                 {
-                    var decisionTreeItem = new DecisionBranch
+                    var stateGroup = kvp.Key;
+                    var state = kvp.Value;
+
+                    var statePathNode = new StatePathNode
                     {
-                        StatePath = decisionTreeItemElement.GetProperty(nameof(DecisionBranch.StatePath)).GetString(),
-                        AudioFiles = decisionTreeItemElement.GetProperty(nameof(DecisionBranch.AudioFiles)).EnumerateArray().Select(x => x.GetString()).ToList(),
-                        AudioFilesDisplay = decisionTreeItemElement.GetProperty(nameof(DecisionBranch.AudioFilesDisplay)).GetString()
+                        StateGroup = stateGroup,
+                        State = state
                     };
 
-                    decisionTree.Add(decisionTreeItem);
+                    statePath.Nodes.Add(statePathNode);
                 }
 
-                var dialogueEventItem = new DialogueEvent
-                {
-                    DialogueEventName = dialogueEventElement.GetProperty(nameof(DialogueEvent.DialogueEventName)).GetString(),
-                    DecisionTree = decisionTree
-                };
+                decisionNode.StatePath = statePath;
 
-                dialogueEvents.Add(dialogueEventItem);
+                dialogueEvent.DecisionTree.Add(decisionNode);
             }
-
-            return new AudioProject
-            {
-                Settings = settings,
-                DialogueEvents = dialogueEvents
-            };
         }
-        */
+
+        public static void ConvertAudioProjecToDataGridData(ObservableCollection<Dictionary<string, object>> dataGridData, AudioProject audioProject, string selectedAudioProjectEvent)
+        {
+            var dialogueEvent = audioProject.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == selectedAudioProjectEvent); // Find the corresponding DialogueEvent in AudioProject
+
+            foreach (var decisionNode in dialogueEvent.DecisionTree)
+            {
+                var filePaths = decisionNode.AudioFiles;
+                var fileNames = filePaths.Select(Path.GetFileName);
+                var fileNamesString = string.Join(", ", fileNames);
+
+                var dataGridRow = new Dictionary<string, object>();
+                dataGridRow["AudioFiles"] = filePaths;
+                dataGridRow["AudioFilesDisplay"] = fileNamesString;
+
+                foreach (var node in decisionNode.StatePath.Nodes)
+                {
+                    var stateGroup = node.StateGroup;
+                    var state = node.State;
+
+                    if (DialogueEventsWithStateGroupsWithQualifiers.TryGetValue(selectedAudioProjectEvent, out var stateGroupsWithQualifiers))
+                    {
+                        foreach (var kvp in stateGroupsWithQualifiers)
+                        {
+                            var stateGroupWithQualifierKey = kvp.Key;
+                            var stateGroupValue = kvp.Value;
+
+                            if (stateGroup == stateGroupValue)
+                            {
+                                dataGridRow[AddExtraUnderscoresToString(stateGroupWithQualifierKey)] = state;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                dataGridData.Add(dataGridRow);
+            }
+        }
     }
 }

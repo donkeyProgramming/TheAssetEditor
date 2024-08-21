@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -81,7 +80,7 @@ namespace Editors.Audio.AudioEditor
             var stateGroupsCount = stateGroups.Count() + 3;
             var columnWidth = stateGroupsCount > 0 ? 1.0 / stateGroupsCount : 1.0;
 
-            // Column for Remove State Path button:
+            // Column for Remove State StatePath button:
             var removeButtonColumn = new DataGridTemplateColumn
             {
                 CellTemplate = CreateRemoveRowButtonTemplate(viewModel),
@@ -91,10 +90,11 @@ namespace Editors.Audio.AudioEditor
 
             dataGrid.Columns.Add(removeButtonColumn);
 
-            // Iterate over the list of tuples
-            foreach (var (stateGroup, stateGroupWithQualifier) in stateGroupsWithQualifiers)
+            foreach (var kvp in stateGroupsWithQualifiers)
             {
-                
+                var stateGroupWithQualifier = kvp.Key;
+                var stateGroup = kvp.Value;
+
                 var states = new List<string>();
                 var customStates = new List<string>();
 
@@ -123,7 +123,7 @@ namespace Editors.Audio.AudioEditor
                 // Column for State Group:
                 var column = new DataGridTemplateColumn
                 {
-                    Header = AddExtraUnderScoresToString(stateGroupWithQualifier),
+                    Header = AddExtraUnderscoresToString(stateGroupWithQualifier),
                     CellTemplate = CreateStatesComboBoxTemplate(states, stateGroupWithQualifier, showCustomStatesOnly),
                     Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
                 };
@@ -167,7 +167,7 @@ namespace Editors.Audio.AudioEditor
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(ComboBox));
 
-            var binding = new Binding($"[{AddExtraUnderScoresToString(stateGroupWithQualifier)}]")
+            var binding = new Binding($"[{AddExtraUnderscoresToString(stateGroupWithQualifier)}]")
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
@@ -314,7 +314,7 @@ namespace Editors.Audio.AudioEditor
             var factory = new FrameworkElementFactory(typeof(Button));
             factory.SetValue(ContentControl.ContentProperty, "✖");
             factory.SetValue(Control.FontFamilyProperty, new FontFamily("Segoe UI Symbol")); // This font supports the character.
-            factory.SetValue(FrameworkElement.ToolTipProperty, "Remove State Path");
+            factory.SetValue(FrameworkElement.ToolTipProperty, "Remove State StatePath");
 
             // Handle button click event
             factory.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler((sender, e) =>
