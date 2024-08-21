@@ -79,6 +79,10 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
 
             var effect = GetEffect();
 
+            // Disable all effects, so they can be enabled later.
+            effect.Parameters["CapabilityFlag_ApplyEmissive"].SetValue(false);
+            effect.Parameters["CapabilityFlag_ApplyAnimation"].SetValue(false);
+
             foreach (var capability in Capabilities)
                 capability.Apply(effect, _resourceLibrary);
 

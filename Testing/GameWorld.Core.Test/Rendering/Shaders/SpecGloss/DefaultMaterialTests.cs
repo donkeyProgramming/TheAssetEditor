@@ -1,7 +1,7 @@
 ﻿using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Serialization;
-using GameWorld.Core.Test.Rendering.Materials;
+using GameWorld.Core.Test.TestUtility;
 using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
