@@ -81,12 +81,12 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void NewVOAudioProject()
         {
-            var window = _windowFactory.Create<AudioEditorNewAudioProjectViewModel, AudioEditorNewAudioProjectView>("New Audio Project", 560, 500);
+            var window = _windowFactory.Create<AudioEditorNewVOAudioProjectViewModel, AudioEditorNewVOAudioProjectView>("New Audio Project", 560, 500);
             window.AlwaysOnTop = false;
             window.ResizeMode = ResizeMode.NoResize;
 
             // Set the close action
-            if (window.DataContext is AudioEditorNewAudioProjectViewModel viewModel)
+            if (window.DataContext is AudioEditorNewVOAudioProjectViewModel viewModel)
                 viewModel.SetCloseAction(() => window.Close());
 
             window.ShowWindow();

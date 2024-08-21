@@ -33,12 +33,12 @@ namespace Editors.Audio.AudioEditor.ViewModels
         }
     }
 
-    public partial class AudioEditorNewAudioProjectViewModel : ObservableObject, IEditorViewModel
+    public partial class AudioEditorNewVOAudioProjectViewModel : ObservableObject, IEditorViewModel
     {
         private readonly IAudioRepository _audioRepository;
         private readonly PackFileService _packFileService;
         private readonly AudioEditorViewModel _audioEditorViewModel;
-        readonly ILogger _logger = Logging.Create<AudioEditorNewAudioProjectViewModel>();
+        readonly ILogger _logger = Logging.Create<AudioEditorNewVOAudioProjectViewModel>();
         private Action _closeAction;
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("New VO Audio Project");
@@ -64,7 +64,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [ObservableProperty] private bool _isAnyDialogueEventChecked;
         [ObservableProperty] private bool _isOkButtonIsEnabled;
 
-        public AudioEditorNewAudioProjectViewModel(IAudioRepository audioRepository, PackFileService packFileService, AudioEditorViewModel audioEditorViewModel)
+        public AudioEditorNewVOAudioProjectViewModel(IAudioRepository audioRepository, PackFileService packFileService, AudioEditorViewModel audioEditorViewModel)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;
@@ -275,7 +275,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             }
         }
 
-        public void ResetAudioEditorNewAudioProjectViewModelData()
+        public void ResetAudioEditorNewVOAudioProjectViewModelData()
         {
             AudioProjectFileName = null;
             CustomStatesFilePath = null;
@@ -290,7 +290,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         {
             _closeAction?.Invoke();
 
-            ResetAudioEditorNewAudioProjectViewModelData();
+            ResetAudioEditorNewVOAudioProjectViewModelData();
         }
 
         public void SetCloseAction(Action closeAction)
