@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Editors.Audio.AudioEditor.Views.AudioEditorNewVOAudioProjectView"
+﻿<UserControl x:Class="Editors.Audio.AudioEditor.Views.NewVOAudioProjectView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,7 +6,7 @@
              xmlns:viewmodels="clr-namespace:Editors.Audio.AudioEditor.ViewModels"
              xmlns:converters="clr-namespace:Editors.Audio.AudioEditor" 
              xmlns:sys="clr-namespace:System;assembly=netstandard"
-             d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorNewVOAudioProjectViewModel}"
+             d:DataContext="{d:DesignInstance Type=viewmodels:NewVOAudioProjectViewModel}"
              mc:Ignorable="d"
              d:MinWidth="560" d:DesignHeight="500">
 
