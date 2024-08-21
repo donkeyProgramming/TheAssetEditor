@@ -40,12 +40,20 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         string SanatizeMaterial(string wsMaterialContent)
         {
             var start = wsMaterialContent.IndexOf("<name>", System.StringComparison.InvariantCultureIgnoreCase);
-            var end = wsMaterialContent.IndexOf("</name>", start, System.StringComparison.InvariantCultureIgnoreCase);
-            var contentWithoutName = wsMaterialContent.Remove(start, end - start + "</name>".Length).ToLower();
-            var contentWithoutNameAndWhiteSpace = ReplaceWhitespace(contentWithoutName, string.Empty);
-            var finalStr = contentWithoutNameAndWhiteSpace.ToLower();
+            if (start != -1)
+            {
+                var end = wsMaterialContent.IndexOf("</name>", start, System.StringComparison.InvariantCultureIgnoreCase);
+                var contentWithoutName = wsMaterialContent.Remove(start, end - start + "</name>".Length).ToLower();
+                var contentWithoutNameAndWhiteSpace = ReplaceWhitespace(contentWithoutName, string.Empty);
+                var finalStr = contentWithoutNameAndWhiteSpace.ToLower();
 
-            return finalStr;
+                return finalStr;
+            }
+
+            // a few wsmodels are very strange, just ignore them.
+            // The result will just be more generated wsmodels. 
+            // Not a huge issue.
+            return wsMaterialContent;
         }
 
         private static readonly Regex sWhitespace = new Regex(@"\s+");
