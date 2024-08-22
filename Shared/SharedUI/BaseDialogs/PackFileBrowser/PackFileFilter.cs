@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Shared.Core.Misc;
 
@@ -48,19 +49,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             foreach (var item in _nodeCollection)
                 HasChildWithFilterMatch(item, expression);
 
-            if (AutoExapandResultsAfterLimitedCount != -1)
-            {
-                var visibleNodes = 0;
-                foreach (var item in _nodeCollection)
-                    visibleNodes += CountVisibleNodes(item);
-
-                if (visibleNodes <= AutoExapandResultsAfterLimitedCount)
-                {
-                    foreach (var item in _nodeCollection)
-                        item.ExpandIfVisible();
-                }
-            }
-
             return "";
         }
 
@@ -84,47 +72,39 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         bool HasChildWithFilterMatch(TreeNode file, Regex expression)
         {
-            if (file.NodeType == NodeType.Root && file.Children.Count == 0)
+            // Folders are always visible
+            if (file.NodeType == NodeType.Root || file.NodeType == NodeType.Directory)
             {
                 file.IsVisible = true;
-                return true;
+                bool hasVisibleChildren = false;
+                foreach (var child in file.Children)
+                {
+                    if (HasChildWithFilterMatch(child, expression))
+                        hasVisibleChildren = true;
+                }
+                return hasVisibleChildren; // Return true if any child is visible
             }
 
+            // Handle file nodes
             if (file.NodeType == NodeType.File)
             {
-                var hasValidExtention = true;
-                if (_extentionFilter != null)
-                {
-                    hasValidExtention = false;
-                    foreach (var extention in _extentionFilter)
-                    {
-                        if (file.Name.Contains(extention))
-                        {
-                            hasValidExtention = true;
-                            continue;
-                        }
-                    }
-                }
+                var hasValidExtension = _extentionFilter == null || _extentionFilter.Count == 0 || _extentionFilter.Any(ext => file.Name.Contains(ext));
 
-                if (hasValidExtention)
+                if (hasValidExtension && expression.IsMatch(file.Name))
                 {
-                    if (expression.IsMatch(file.Name))
-                    {
-                        file.IsVisible = true;
-                        return true;
-                    }
+                    file.IsVisible = true;
+                    return true;
+                }
+                else
+                {
+                    file.IsVisible = false;
+                    return false;
                 }
             }
 
-            var hasChildMatch = false;
-            foreach (var child in file.Children)
-            {
-                if (HasChildWithFilterMatch(child, expression))
-                    hasChildMatch = true;
-            }
-
-            file.IsVisible = hasChildMatch;
-            return hasChildMatch;
+            // Default case for other nodes
+            file.IsVisible = false;
+            return false;
         }
     }
 }

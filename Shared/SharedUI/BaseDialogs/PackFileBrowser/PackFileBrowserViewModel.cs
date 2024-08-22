@@ -20,6 +20,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         protected PackFileService _packFileService;
         public event FileSelectedDelegate FileOpen;
         public event NodeSelectedDelegate NodeSelected;
+        public event NodeSelectedDelegate FolderSelected;
+        private readonly bool _allowFolderSelection;
 
         public ObservableCollection<TreeNode> Files { get; set; } = new ObservableCollection<TreeNode>();
         public PackFileFilter Filter { get; private set; }
@@ -40,7 +42,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         public ContextMenuHandler ContextMenu { get; set; }
 
-        public PackFileBrowserViewModel(PackFileService packFileService, bool ignoreCaFiles = false)
+        public PackFileBrowserViewModel(PackFileService packFileService, bool ignoreCaFiles = false, bool allowFolderSelection = false)
         {
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
             ClearTextCommand = new RelayCommand(OnClearText);
@@ -55,6 +57,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             _packFileService.Database.PackFilesRemoved += Database_PackFilesRemoved;
             _packFileService.Database.PackFileFolderRemoved += Database_PackFileFolderRemoved;
             _packFileService.Database.PackFileFolderRenamed += Database_PackFileFolderRenamed;
+
+            _allowFolderSelection = allowFolderSelection;
 
             Filter = new PackFileFilter(Files);
 
@@ -127,16 +131,27 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         protected virtual void OnDoubleClick(TreeNode node)
         {
-            // using command parmeter to get node causes memory leaks, using selected node for now
             if (SelectedItem != null)
             {
                 if (SelectedItem.NodeType == NodeType.File)
                 {
                     FileOpen?.Invoke(SelectedItem.Item);
                 }
-                else if (SelectedItem.NodeType == NodeType.Directory && Keyboard.IsKeyDown(Key.LeftCtrl))
+                else if (SelectedItem.NodeType == NodeType.Directory)
                 {
-                    SelectedItem.ExpandIfVisible(true);
+
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                    {
+                        SelectedItem.ExpandIfVisible(true);
+                    }
+
+                    else
+                    {
+                        if (_allowFolderSelection)
+                        {
+                            FolderSelected?.Invoke(SelectedItem);
+                        }
+                    }
                 }
             }
         }
@@ -255,7 +270,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 return parent.Children.FirstOrDefault(x => x.Item == pf);
             }
         }
-
 
         private void ReloadTree(PackFileContainer container)
         {
