@@ -81,7 +81,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void NewVOAudioProject()
         {
-            var window = _windowFactory.Create<NewVOAudioProjectViewModel, NewVOAudioProjectView>("New Audio Project", 560, 500);
+            var window = _windowFactory.Create<NewVOAudioProjectViewModel, NewVOAudioProjectView>("New Audio Project", 560, 560);
             window.AlwaysOnTop = false;
             window.ResizeMode = ResizeMode.NoResize;
 
@@ -114,7 +114,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 // Set the data.
                 AudioEditorInstance.AudioProject = audioProject;
 
-                var audioProjectFileName = AudioEditorInstance.AudioProject.Settings.AudioProjectName;
+                var audioProjectFileName = AudioEditorInstance.AudioProjectFileName;
                 _logger.Here().Information($"Loaded Audio Project file: {audioProjectFileName}");
 
                 // Create the list of Events used in the Events ComboBox.

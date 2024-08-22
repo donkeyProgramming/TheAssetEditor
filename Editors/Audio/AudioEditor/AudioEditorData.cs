@@ -11,9 +11,11 @@ namespace Editors.Audio.AudioEditor
 
         public static Dictionary<string, Dictionary<string, string>> DialogueEventsWithStateGroupsWithQualifiers { get; set; } = new();
 
+        public AudioProject AudioProject { get; set; } = new AudioProject();
+
         public string AudioProjectFileName { get; set; }
 
-        public AudioProject AudioProject { get; set; } = new AudioProject();
+        public string AudioProjectDirectory { get; set; }
 
         public Dictionary<string, List<string>> StateGroupsWithCustomStates { get; set; } = new();
 

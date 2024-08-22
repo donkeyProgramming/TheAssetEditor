@@ -27,10 +27,11 @@ namespace Editors.Audio.AudioEditor
             var pack = packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(audioProject);
 
-            var audioProjectFileName = AudioEditorInstance.AudioProject.Settings.AudioProjectName;
-            
-            packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{audioProjectFileName}.audioproject", new MemorySource(byteArray)));
-            s_logger.Here().Information($"Saved Audio Project file: {audioProjectFileName}.audioproject");
+            var audioProjectFileName = AudioEditorInstance.AudioProjectFileName;
+            var audioProjectDirectory = AudioEditorInstance.AudioProjectDirectory;
+
+            packFileService.AddFileToPack(pack, audioProjectDirectory, new PackFile($"{audioProjectFileName}.audioproject", new MemorySource(byteArray)));
+            s_logger.Here().Information($"Saved Audio Project file: {audioProjectDirectory}/{audioProjectFileName}.audioproject");
         }
 
         public static Dictionary<string, string> ValidateStateGroupsOrder(Dictionary<string, object> dataGridItem, string selectedAudioProjectEvent)

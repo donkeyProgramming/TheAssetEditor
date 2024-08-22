@@ -8,7 +8,7 @@
              xmlns:sys="clr-namespace:System;assembly=netstandard"
              d:DataContext="{d:DesignInstance Type=viewmodels:NewVOAudioProjectViewModel}"
              mc:Ignorable="d"
-             d:MinWidth="560" d:DesignHeight="500">
+             d:MinWidth="560" d:DesignHeight="560">
 
     <UserControl.Resources>
         <!-- Enum to string converter -->
@@ -61,7 +61,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Location:" VerticalAlignment="Center"/>
                 <TextBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}"  
-                         Text="{Binding AudioProjectFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding AudioProjectDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTip="PLACEHOLDER TOOLTIP"
                          IsReadOnly="True"/>
                 <Button Grid.Column="2" Content="..." VerticalAlignment="Center" Width="30" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding SetNewFileLocationCommand}"/>

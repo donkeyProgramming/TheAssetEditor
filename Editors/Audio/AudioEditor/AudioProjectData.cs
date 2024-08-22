@@ -18,7 +18,6 @@ namespace Editors.Audio.AudioEditor
 
         public class Settings
         {
-            public string AudioProjectName { get; set; }
             public string BnkName { get; set; }
             public string Language { get; set; }
             public string ModdedStatesFilePath { get; set; }

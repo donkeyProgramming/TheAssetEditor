@@ -45,7 +45,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         // The properties for each settings.
         [ObservableProperty] private string _audioProjectFileName;
-        [ObservableProperty] private string _audioProjectFilePath;
+        [ObservableProperty] private string _audioProjectDirectory;
         [ObservableProperty] private string _moddedStatesFilePath;
         [ObservableProperty] private string _selectedLanguage;
         [ObservableProperty] private string _selectedAudioProjectEventType;
@@ -118,7 +118,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             if (browser.ShowDialog())
             {
                 var filePath = browser.SelectedPath;
-                AudioProjectFilePath = filePath;
+                AudioProjectDirectory = filePath;
                 _logger.Here().Information($"Custom States file path set to: {filePath}");
             }
         }
@@ -231,10 +231,12 @@ namespace Editors.Audio.AudioEditor.ViewModels
             if (AudioEditorInstance.AudioProject == null)
                 AudioEditorInstance.AudioProject = new AudioProject();
 
+            AudioEditorInstance.AudioProjectFileName = AudioProjectFileName;
+            AudioEditorInstance.AudioProjectDirectory = AudioProjectDirectory;
+
             // Create settings.
             var settings = new Settings
             {
-                AudioProjectName = AudioProjectFileName,
                 Language = LanguageEnumToString[GetLanguageEnumString(SelectedLanguage)],
                 ModdedStatesFilePath = ModdedStatesFilePath
             };
@@ -291,6 +293,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         public void ResetNewVOAudioProjectViewModelData()
         {
             AudioProjectFileName = null;
+            AudioProjectDirectory = null;
             ModdedStatesFilePath = null;
             SelectedAudioProjectEventType = null;
             SelectedAudioProjectEventSubtype = null;
