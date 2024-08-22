@@ -26,8 +26,6 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             Mask.Apply(effect, resourceLibrary);
 
             base.Apply(effect, resourceLibrary);
-            //Distortion.Apply(effect, resourceLibrary);
-            //DistortionNoise.Apply(effect, resourceLibrary);
         }
 
         public override ICapability Clone()
@@ -51,20 +49,20 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, MaterialMap);
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, NormalMap);
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Mask);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Distortion);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, DistortionNoise);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Distortion, "commontextures/winds_of_magic_specular.dds");
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, DistortionNoise, "commontextures/winds_of_magic_noise.dds");
 
             base.Initialize(wsModelMaterial, rmvMaterial);
         }
 
         public override void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
         {
-            templateHandler.AddAttribute("TEMPLATE_ATTR_BASE_COLOUR_PATH", BaseColour);
-            templateHandler.AddAttribute("TEMPLATE_ATTR_MASK_PATH", Mask);
-            templateHandler.AddAttribute("TEMPLATE_ATTR_MATERIAL_MAP", MaterialMap);
-            templateHandler.AddAttribute("TEMPLATE_ATTR_NORMAL_PATH", NormalMap);
-            templateHandler.AddAttribute("TEMPLATE_ATTR_DISTORTION_PATH", Distortion);
-            templateHandler.AddAttribute("TEMPLATE_ATTR_DISTORTIONNOISE_PATH", DistortionNoise);
+            templateHandler.AddAttribute(WsModelParamters.Texture_BaseColour.TemplateName, BaseColour);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Mask.TemplateName, Mask);
+            templateHandler.AddAttribute(WsModelParamters.Texture_MaterialMap.TemplateName, MaterialMap);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Normal.TemplateName, NormalMap);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Distortion.TemplateName, Distortion);
+            templateHandler.AddAttribute(WsModelParamters.Texture_DistortionNoise.TemplateName, DistortionNoise);
 
             base.SerializeToWsModel(templateHandler);
         }

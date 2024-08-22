@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameWorld.Core.Test.Utility
+namespace GameWorld.Core.Test.Rendering.Materials.Serialization
 {
-    internal class ModelCombinerTests
+    internal class MaterialToRmvSerializerTests
     {
-        [TestCase]
-        public void Test()
-        { }
     }
 }

@@ -26,8 +26,4 @@
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\SceneSaving\" />
-  </ItemGroup>
-
 </Project>

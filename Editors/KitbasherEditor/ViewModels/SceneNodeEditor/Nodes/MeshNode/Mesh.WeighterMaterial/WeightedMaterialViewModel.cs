@@ -35,9 +35,9 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 
         public void Initialize(Rmv2MeshNode node)
         {
-            var castMaterial = node.Material as WeightedMaterial;
+            var castMaterial = node.RmvMaterial as WeightedMaterial;
             if (castMaterial == null)
-                throw new Exception($"Material is not WeightedMaterial - {node.Material.GetType()}");
+                throw new Exception($"Material is not WeightedMaterial - {node.RmvMaterial.GetType()}");
             _weightedMaterial = castMaterial;
 
             Filters.Value = _weightedMaterial.Filters;

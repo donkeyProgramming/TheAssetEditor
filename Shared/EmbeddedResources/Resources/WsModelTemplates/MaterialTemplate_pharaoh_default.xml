@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" ?>
 <material>
-    <name>FILE_NAME</name>
-    <shader>SHADER_PATH</shader>
+    <name>TEMPLATE_ATTR_FILE_NAME</name>
+    <shader>shaders/TEMPLATE_ATTR_VERTEXTYPE_characterTEMPLATE_ATTR_ALPHAMODE.xml.shader</shader>
     <sort_override>255</sort_override>
     <textures>
         <texture>
@@ -10,15 +10,15 @@
         </texture>
         <texture>
             <slot>t_colour_mask_map</slot>
-            <source>MASK_PATH</source>
+            <source>TEMPLATE_ATTR_MASK_PATH</source>
         </texture>
         <texture>
             <slot>t_diffuse_map</slot>
-            <source>DIFFUSE_PATH</source>
+            <source>TEMPLATE_ATTR_DIFFUSE_PATH</source>
         </texture>
         <texture>
             <slot>t_normal_map</slot>
-            <source>NORMAL_PATH</source>
+            <source>TEMPLATE_ATTR_NORMAL_PATH</source>
         </texture>
         <texture>
             <slot>t_pixel_selection_object_id_texture</slot>
@@ -26,7 +26,7 @@
         </texture>
         <texture>
             <slot>t_specular_colour_map</slot>
-            <source>SPECULAR_PATH</source>
+            <source>TEMPLATE_ATTR_SPECULAR_PATH</source>
         </texture>
     </textures>
     <params/>

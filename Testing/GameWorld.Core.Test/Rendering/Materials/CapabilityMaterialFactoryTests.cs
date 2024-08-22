@@ -1,8 +1,8 @@
 ﻿using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
+using GameWorld.Core.Test.TestUtility;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
 
@@ -12,10 +12,10 @@ namespace GameWorld.Core.Test.Rendering.Materials
     {
 
         [Test]
-        public void CreateMaterial_Wh3_CreateDefault_FromRmvMaterial()
+        public void Create_FromRmv_Wh3_Default()
         {
             var rmvMaterial = RmvMaterialHelper
-                .Create(ModelMaterialEnum.weighted, VertexFormat.Static)
+                .Create(ModelMaterialEnum.weighted)
                 .SetAlpha(true)
                 .AssignMaterials([TextureType.Normal, TextureType.MaterialMap]);
 
@@ -41,10 +41,10 @@ namespace GameWorld.Core.Test.Rendering.Materials
         }
 
         [Test]
-        public void CreateMaterial_Wh3_CreateDefault_FromWsMaterial()
+        public void Create_FromWs_Wh3_Default()
         {
             var rmvMaterial = RmvMaterialHelper
-                .Create(ModelMaterialEnum.weighted, VertexFormat.Static)
+                .Create(ModelMaterialEnum.weighted)
                 .SetAlpha(true)
                 .AssignMaterials([TextureType.Normal, TextureType.MaterialMap]);
 
@@ -82,10 +82,10 @@ namespace GameWorld.Core.Test.Rendering.Materials
         }
 
         [Test]
-        public void CreateMaterial_Wh3_CreateEmissive_FromWsMaterial()
+        public void Create_FromWs_Wh3_Emissive()
         {
             var rmvMaterial = RmvMaterialHelper
-                .Create(ModelMaterialEnum.weighted, VertexFormat.Static);
+                .Create(ModelMaterialEnum.weighted);
 
             var wsMaterial = new WsModelMaterialFile()
             {
@@ -104,10 +104,10 @@ namespace GameWorld.Core.Test.Rendering.Materials
         }
 
         [Test]
-        public void CreateMaterial_Rome_Default()
+        public void Create_FromRmv_Rome_Default()
         {
             var rmvMaterial = RmvMaterialHelper
-                .Create(ModelMaterialEnum.weighted, VertexFormat.Static)
+                .Create(ModelMaterialEnum.weighted)
                 .SetAlpha(true)
                 .AssignMaterials([TextureType.Normal, TextureType.Gloss]);
 
@@ -131,33 +131,29 @@ namespace GameWorld.Core.Test.Rendering.Materials
 
             Assert.That(defaultCapabiliy.UseAlpha, Is.True);
         }
-    }
 
-    public static class IRmvMaterialExtentions
-    {
-        public static IRmvMaterial AssignMaterials(this IRmvMaterial material, TextureType[] texturesToAssign)
+        [Test]
+        public void Create_FromRmv_Rome_DirtAndDecal()
         {
-            foreach (var texture in texturesToAssign)
-                material.SetTexture(texture, $"texturePath/{texture}.dds");
-
-            return material;
+            var rmvMaterial = RmvMaterialHelper
+                .Create(ModelMaterialEnum.weighted_decal_dirtmap)
+                .SetAlpha(true)
+                .SetDecalAndDirt(true, true)
+                .AssignMaterials([TextureType.Diffuse, TextureType.Decal_dirtmap, TextureType.Decal_mask, TextureType.Decal_dirtmask]);
+            
+            var appSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
+            var abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
+            var material = abstractMaterialFactory.Create(rmvMaterial, null);
+            
+            Assert.That(material, Is.TypeOf<Core.Rendering.Materials.Shaders.SpecGloss.DefaultMaterial>());
+            
+            var specGlossCap = material.TryGetCapability<SpecGlossCapability>();
+            Assert.That(specGlossCap, Is.Not.Null);
+            
+            //var dirtCap = material.TryGetCapability<DirtAndDecalCapability>();
+            //Assert.That(dirtCap, Is.Not.Null);
+            //Assert.That(dirtCap.UseDirt, Is.True);
+            //Assert.That(dirtCap.UseDecal, Is.True);
         }
-
-        public static IRmvMaterial SetAlpha(this IRmvMaterial material, bool useAlpha)
-        {
-            material.AlphaMode = useAlpha ? AlphaMode.Transparent: AlphaMode.Opaque;
-            return material;
-        }
-    }
-
-    public static class RmvMaterialHelper
-    {
-        public static IRmvMaterial Create(ModelMaterialEnum materialEnum, VertexFormat vertexFormat)
-        {
-            var rmvMaterial = MaterialFactory.Create().CreateMaterial(materialEnum, vertexFormat);
-            return rmvMaterial;
-        }
-
-
     }
 }

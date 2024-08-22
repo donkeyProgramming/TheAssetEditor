@@ -108,7 +108,7 @@ namespace GameWorld.Core.Components
                 {
                     var pivotPoint = Vector3.Zero;
                     if (selectableNode is Rmv2MeshNode meshNode)
-                        pivotPoint = meshNode.Material.PivotPoint;
+                        pivotPoint = meshNode.PivotPoint;
 
                     if (IntersectionMath.IntersectObject(frustrum, selectableNode.Geometry, selectableNode.ModelMatrix * Matrix.CreateTranslation(pivotPoint)))
                         output_selectedNodes.Add(selectableNode);
@@ -131,7 +131,7 @@ namespace GameWorld.Core.Components
                 {
                     var pivotPoint = Vector3.Zero;
                     if (selectableNode is Rmv2MeshNode meshNode)
-                        pivotPoint = meshNode.Material.PivotPoint;
+                        pivotPoint = meshNode.PivotPoint;
 
                     var distance = IntersectionMath.IntersectObject(ray, selectableNode.Geometry, selectableNode.ModelMatrix * Matrix.CreateTranslation(pivotPoint));
                     if (distance != null)

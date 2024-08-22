@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.WsModel;
 
@@ -19,17 +20,22 @@ namespace GameWorld.Core.Services
         public static WsModelMaterialProvider CreateFromModelPath(PackFileService packFileService, string rmv2ModelPath)
         {
             var wsModelPath = Path.ChangeExtension(rmv2ModelPath, ".wsmodel");
-            return CreateFromWsModel(packFileService, wsModelPath);
+            return CreateFromWsModelPath(packFileService, wsModelPath);
         }
 
-        public static WsModelMaterialProvider CreateFromWsModel(PackFileService packFileService, string wsModelPath)
+        public static WsModelMaterialProvider CreateFromWsModel(PackFileService packFileService, WsModelFile wsModel)
+        {
+            return new WsModelMaterialProvider(packFileService, wsModel);
+        }
+
+        public static WsModelMaterialProvider CreateFromWsModelPath(PackFileService packFileService, string wsModelPath)
         {
             var packFile = packFileService.FindFile(wsModelPath);
             if (packFile == null)
                 return new WsModelMaterialProvider(packFileService, null);
 
             var wsModel = new WsModelFile(packFile);
-            return new WsModelMaterialProvider(packFileService, wsModel);
+            return CreateFromWsModel(packFileService, wsModel);
         }
 
         public WsModelMaterialFile? GetModelMaterial(int lodIndex, int partIndex)
@@ -47,19 +53,6 @@ namespace GameWorld.Core.Services
 
             return new WsModelMaterialFile(wsMaterialPath);
         }
-
-
-        //public WsModelMaterialFile? ResolveFromModelPath(string rmv2ModelPath, int lodIndex, int partIndex)
-        //{
-        //    
-        //    return ResolveFromWsModel(wsModelPath, lodIndex, partIndex);    
-        //}
-        //
-        //public WsModelMaterialFile? ResolveFromWsModel(string wsModelPath, int lodIndex, int partIndex)
-        //{
-        //
-        //
-        //}
     }
 }
 

@@ -38,18 +38,13 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
             Animation = _serviceProvider.GetRequiredService<AnimationViewModel>();
             Animation.Initialize(typedNode);
 
-           // if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3)
+            WsMaterial = _serviceProvider.GetRequiredService<WsMaterialViewModel>();
+            WsMaterial.Initialize(typedNode);
+            
+            if (typedNode.RmvMaterial is WeightedMaterial)
             {
-                WsMaterial = _serviceProvider.GetRequiredService<WsMaterialViewModel>();
-                WsMaterial.Initialize(typedNode);
-            }
-            //else
-            {
-                if (typedNode.Material is WeightedMaterial)
-                {
-                    Material = _serviceProvider.GetRequiredService<WeightedMaterialViewModel>();
-                    Material.Initialize(typedNode);
-                }
+                Material = _serviceProvider.GetRequiredService<WeightedMaterialViewModel>();
+                Material.Initialize(typedNode);
             }
         }
 

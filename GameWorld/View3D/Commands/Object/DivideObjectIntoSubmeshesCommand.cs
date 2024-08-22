@@ -76,13 +76,14 @@ namespace GameWorld.Core.Commands.Object
                         _newGroupNodes.Add(currentGroupNode);
                     }
 
-                    var typedObject = _objectToSplit as Rmv2MeshNode;
-                    var meshNode = new Rmv2MeshNode(typedObject.CommonHeader, mesh, typedObject.Material.Clone(), typedObject.AnimationPlayer, typedObject.Effect.Clone());
+                    var meshNode = (_objectToSplit.CreateCopyInstance() as Rmv2MeshNode)!;
+                    (_objectToSplit as Rmv2MeshNode)!.CopyInto(meshNode, false);
+
+                    meshNode.Geometry = mesh;
                     meshNode.IsVisible = true;
 
                     var meshName = $"{_objectToSplit.Name}_submesh_{counter++}";
                     meshNode.Name = meshName;
-                    meshNode.Material.ModelName = meshName;
 
                     createdMeshes.Add(meshNode);
                     currentGroupNode.AddObject(meshNode);

@@ -1,10 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Net.WebSockets;
+﻿using System.IO;
 using System.Text;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 

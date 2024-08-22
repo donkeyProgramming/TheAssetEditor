@@ -26,31 +26,31 @@
             <DockPanel LastChildFill="False">
 
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Use Alpha*" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Use Alpha" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <CheckBox Margin="2,0,2,0"  IsChecked="{Binding UseAlpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
                 </StackPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Base Colour*" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Base Colour" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <userinterface:ShaderTextureView DataContext="{Binding BaseColour}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Material Map*" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Material Map" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <userinterface:ShaderTextureView DataContext="{Binding MaterialMap}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Normal Map*" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Normal Map" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <userinterface:ShaderTextureView DataContext="{Binding NormalMap}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Mask*" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Mask" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
                     <userinterface:ShaderTextureView DataContext="{Binding Mask}"/>
                 </DockPanel>

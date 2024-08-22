@@ -1,16 +1,24 @@
 ﻿using System.Text;
 using System.Xml;
+using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 
 namespace Shared.GameFormats.WsModel
 {
+
     public class WsModelMaterialParam
     { 
-        public required string Name { get; set; }
-        public required string Type { get; set; }
-        public required string Value { get; set; }
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Value { get; set; }
+
+        public WsModelMaterialParam() { }
+        public WsModelMaterialParam(string name, string value) { Name = name; Type = "float"; Value = value; }
+        public WsModelMaterialParam(string name, float value) { Name = name; Type = "float"; Value = value.ToString(); }
+        public WsModelMaterialParam(string name, Vector2 value) { Name = name; Type = "float2"; Value = $"{value.X},{value.Y}"; }
+        public WsModelMaterialParam(string name, Vector3 value) { Name = name; Type = "float3"; Value = $"{value.X},{value.Y},{value.Z}"; }
     }
 
     public class WsModelMaterialFile
@@ -34,6 +42,9 @@ namespace Shared.GameFormats.WsModel
         public WsModelMaterialFile(string fileContent) => LoadContent(fileContent);
 
         public WsModelMaterialFile() { }
+
+        public WsModelMaterialParam GetParameter(string name) => Parameters.First(p => p.Name == name);
+        public WsModelMaterialParam GetParameter(WsModelParamters.Instance instance) => Parameters.First(p => p.Name == instance.Name);
 
         void LoadContent(string fileContent)
         {

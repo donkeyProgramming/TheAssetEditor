@@ -10,7 +10,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 {
     public static class CapabilityHelper
     {
-        public static void SetTextureFromModel(IRmvMaterial? rmvMaterial, WsModelMaterialFile? wsModelMaterial, TextureInput textureInput)
+        public static void SetTextureFromModel(IRmvMaterial? rmvMaterial, WsModelMaterialFile? wsModelMaterial, TextureInput textureInput, string defaultPath = "")
         {
             if (wsModelMaterial != null)
             {
@@ -31,8 +31,12 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
                 {
                     textureInput.TexturePath = modelTexture.Value.Path;
                     textureInput.UseTexture = true;
+                    return;
                 }
             }
+
+            textureInput.TexturePath = defaultPath;
+            textureInput.UseTexture = false;
         }
 
         public static bool UseAlpha(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial)
@@ -43,34 +47,34 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             return rmvMaterial.AlphaMode == AlphaMode.Transparent;
         }
 
-        public static float GetParameterFloat(WsModelMaterialFile? wsModelMaterial, string parameterName, float defaultValue)
+        public static float GetParameterFloat(WsModelMaterialFile? wsModelMaterial, WsModelParamters.Instance parameterInstance, float defaultValue)
         {
             if (wsModelMaterial == null)
                 return defaultValue;
 
-            var parameter = wsModelMaterial.Parameters.FirstOrDefault(x => x.Name == parameterName);
+            var parameter = wsModelMaterial.Parameters.FirstOrDefault(x => x.Name == parameterInstance.Name);
             if (parameter == null)
                 return defaultValue;
 
             if (parameter.Type != "float")
-                throw new Exception($"Parameter {parameterName} was expected to be float2, but was {parameter.Type}");
+                throw new Exception($"Parameter {parameterInstance.Name} was expected to be float2, but was {parameter.Type}");
 
             var parsedValue = float.Parse(parameter.Value);
             return parsedValue;
         }
 
 
-        public static Vector2 GetParameterVector2(WsModelMaterialFile? wsModelMaterial, string parameterName, Vector2 defaultValue)
+        public static Vector2 GetParameterVector2(WsModelMaterialFile? wsModelMaterial, WsModelParamters.Instance parameterInstance, Vector2 defaultValue)
         {
             if (wsModelMaterial == null)
                 return defaultValue;
 
-            var parameter = wsModelMaterial.Parameters.FirstOrDefault(x => x.Name == parameterName);
+            var parameter = wsModelMaterial.Parameters.FirstOrDefault(x => x.Name == parameterInstance.Name);
             if (parameter == null)
                 return defaultValue;
 
             if (parameter.Type != "float2")
-                throw new Exception($"Parameter {parameterName} was expected to be float2, but was {parameter.Type}");
+                throw new Exception($"Parameter {parameterInstance.Name} was expected to be float2, but was {parameter.Type}");
 
             var values = parameter.Value.Split(",");
             Guard.IsTrue(values.Length == 2);
@@ -81,17 +85,17 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             return new Vector2(x, y);
         }
 
-        public static Vector3 GetParameterVector3(WsModelMaterialFile? wsModelMaterial, string parameterName, Vector3 defaultValue)
+        public static Vector3 GetParameterVector3(WsModelMaterialFile? wsModelMaterial, WsModelParamters.Instance parameterInstance, Vector3 defaultValue)
         {
             if (wsModelMaterial == null)
                 return defaultValue;
 
-            var parameter = wsModelMaterial.Parameters.FirstOrDefault(x => x.Name == parameterName);
+            var parameter = wsModelMaterial.Parameters.FirstOrDefault(x => x.Name == parameterInstance.Name);
             if (parameter == null)
                 return defaultValue;
 
             if (parameter.Type != "float3")
-                throw new Exception($"Parameter {parameterName} was expected to be float3, but was {parameter.Type}");
+                throw new Exception($"Parameter {parameterInstance.Name} was expected to be float3, but was {parameter.Type}");
 
             var values = parameter.Value.Split(",");
             Guard.IsTrue(values.Length == 3);
@@ -103,17 +107,17 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             return new Vector3(x, y, z);
         }
 
-        public static Vector4 GetParameterVector4(WsModelMaterialFile? wsModelMaterial, string parameterName, Vector4 defaultValue)
+        public static Vector4 GetParameterVector4(WsModelMaterialFile? wsModelMaterial, WsModelParamters.Instance parameterInstance, Vector4 defaultValue)
         {
             if (wsModelMaterial == null)
                 return defaultValue;
 
-            var parameter = wsModelMaterial.Parameters.FirstOrDefault(x => x.Name == parameterName);
+            var parameter = wsModelMaterial.Parameters.FirstOrDefault(x => x.Name == parameterInstance.Name);
             if (parameter == null)
                 return defaultValue;
 
             if (parameter.Type != "float4")
-                throw new Exception($"Parameter {parameterName} was expected to be float4, but was {parameter.Type}");
+                throw new Exception($"Parameter {parameterInstance.Name} was expected to be float4, but was {parameter.Type}");
 
             var values = parameter.Value.Split(",");
             Guard.IsTrue(values.Length == 4);

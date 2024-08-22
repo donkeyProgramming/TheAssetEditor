@@ -5,6 +5,7 @@ using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Vertex;
+using SharpDX;
 
 namespace Shared.GameFormats.RigidModel
 {

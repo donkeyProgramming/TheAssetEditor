@@ -57,8 +57,6 @@ namespace GameWorld.Core.Commands
             var instance = _serviceProvider.GetRequiredService<T>();
             return new CommandBuilder<T>(_commandExecutor, instance); ;
         }
-
-
     }
 }
 

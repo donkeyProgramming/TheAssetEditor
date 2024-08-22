@@ -81,8 +81,6 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
 
             // We want to work on a clone of all the meshes
             var originalMeshClone = originalModel.Select(x => SceneNodeHelper.CloneNode(x)).ToList();
-            foreach (var mesh in originalMeshClone)
-                mesh.Name = mesh.Material.ModelName;
 
             if (optimize)
             {
@@ -92,7 +90,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
                         mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted, mesh.Geometry.ParentSkeletonName);
 
                     if (settings.OptimizeAlpha)
-                        mesh.Effect.GetCapability<MaterialBaseCapability>().UseAlpha = false;
+                        mesh.Material.GetCapability<MaterialBaseCapability>().UseAlpha = false;
                 }
 
                 // Combine if possible 

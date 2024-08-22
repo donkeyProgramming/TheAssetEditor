@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Gizmo;
@@ -14,95 +13,58 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
-using Shared.GameFormats.RigidModel.Types;
 
 namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2MeshNode : SceneNode, ITransformable, IEditableGeometry, ISelectable, IDrawableItem
     {
-        public IRmvMaterial Material { get; set; }
+        private Quaternion _orientation = Quaternion.Identity;
+        private Vector3 _position = Vector3.Zero;
+        private Vector3 _scale = Vector3.One;
+
+        public IRmvMaterial RmvMaterial { get; set; }
         public MeshObject Geometry { get; set; }
         public RmvCommonHeader CommonHeader { get; set; }
 
-        Quaternion _orientation = Quaternion.Identity;
-        Vector3 _position = Vector3.Zero;
-        Vector3 _scale = Vector3.One;
-
-        public string OriginalFilePath { get; set; }
-        public int OriginalPartIndex { get; internal set; }
+ 
         public Vector3 Position { get { return _position; } set { _position = value; UpdateMatrix(); } }
         public Vector3 Scale { get { return _scale; } set { _scale = value; UpdateMatrix(); } }
         public Quaternion Orientation { get { return _orientation; } set { _orientation = value; UpdateMatrix(); } }
+        public Vector3 PivotPoint { get; set; }
+
         public string AttachmentPointName { get; set; } = "";
      
         public bool DisplayBoundingBox { get; set; } = false;
         public bool DisplayPivotPoint { get; set; } = false;
+        public bool ReduceMeshOnLodGeneration { get; set; } = true;
 
         public override Matrix ModelMatrix { get => base.ModelMatrix; set => UpdateModelMatrix(value); }
-        public CapabilityMaterial Effect { get; set; }
-        public int LodIndex { get; set; } = -1;
+        public CapabilityMaterial Material { get; set; }
+       
 
         bool _isSelectable = true;
         public bool IsSelectable { get => _isSelectable; set => SetAndNotifyWhenChanged(ref _isSelectable, value); }
-        public bool ReduceMeshOnLodGeneration { get; set; } = true;
 
         public AnimationPlayer? AnimationPlayer { get; set; }                               // This is a hack - remove at some point
         public SkeletonBoneAnimationResolver? AttachmentBoneResolver { get; set; } = null;  // This is a hack - remove at some point
 
-        private Rmv2MeshNode()
-        { }
-
-        public Rmv2MeshNode(RmvCommonHeader commonHeader, MeshObject meshObject, IRmvMaterial material, AnimationPlayer animationPlayer, CapabilityMaterial shader)
+    
+        public Rmv2MeshNode(MeshObject meshObject, IRmvMaterial material, CapabilityMaterial shader, AnimationPlayer animationPlayer)
         {
-            CommonHeader = commonHeader;
-            Material = material;
+            RmvMaterial = material;
             AnimationPlayer = animationPlayer;
             Geometry = meshObject;
-            Effect = shader;
+            Material = shader;
 
-            Name = Material.ModelName;
+            Name = material.ModelName;
+            PivotPoint = material.PivotPoint;
         }
 
-        public Rmv2ModelNode? GetParentModel()
-        {
-            var parent = Parent;
-            while (parent != null)
-            {
-                if (parent is Rmv2ModelNode modelNode)
-                    return modelNode;
-                parent = parent.Parent;
-            }
-
-            return null;
-        }
-
-        public Vector3 GetObjectCentre() => MathUtil.GetCenter(Geometry.BoundingBox) + Position;
+        private Rmv2MeshNode() { }
        
-        public void UpdateTexture(string path, TextureType textureType, bool forceRefreshTexture = false)
-        {
-           // Material.SetTexture(textureType, path);
-           // _resourceLib.LoadTexture(path, forceRefreshTexture);
-           //
-           // var sharedCapability = Effect.GetCapability<DefaultCapability>();
-           // if (sharedCapability != null)
-           // {
-           //     sharedCapability.SetTexturePath(textureType, path);
-           //     sharedCapability.SetTextureUsage(textureType, true);
-           // }
-        }
-
-        public void UseTexture(TextureType textureType, bool value)
-        {
-            //var sharedCapability = Effect.GetCapability<DefaultCapability>();
-            //if (sharedCapability != null)
-            //{
-            //    sharedCapability.SetTextureUsage(textureType, value);
-            //}
-        }
-
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
-            var animationCapability = Effect.GetCapability<AnimationCapability>();
+            var animationCapability = Material.GetCapability<AnimationCapability>();
             if (animationCapability != null)
             {
                 var data = new Matrix[256];
@@ -124,80 +86,68 @@ namespace GameWorld.Core.SceneNodes
                 animationCapability.ApplyAnimation = AnimationPlayer != null && AnimationPlayer.IsEnabled;
             }
 
-            //var sharedCapability = Effect.GetCapability<MetalRoughCapability>();
-            //if (sharedCapability != null)
-            //{
-            //    sharedCapability.ScaleMult = ScaleMult;
-            //    sharedCapability.UseAlpha = Material.AlphaMode == AlphaMode.Transparent;
-            //}
-
             if (AttachmentBoneResolver != null)
                 parentWorld = parentWorld * AttachmentBoneResolver.GetWorldTransformIfAnimating();
 
-            var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(Material.PivotPoint);
+            var modelWithOffset = ModelMatrix * Matrix.CreateTranslation(PivotPoint);
             RenderMatrix = modelWithOffset;
 
-            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeometryRenderItem(Geometry, Effect, modelWithOffset * parentWorld));
+            renderEngine.AddRenderItem(RenderBuckedId.Normal, new GeometryRenderItem(Geometry, Material, modelWithOffset * parentWorld));
 
             if (DisplayPivotPoint)
-                renderEngine.AddRenderLines(LineHelper.AddLocator(Material.PivotPoint, 1, Color.Red));
+                renderEngine.AddRenderLines(LineHelper.AddLocator(PivotPoint, 1, Color.Red));
 
             if (DisplayBoundingBox)
                 renderEngine.AddRenderLines(LineHelper.AddBoundingBox(Geometry.BoundingBox, Color.Red));
         }
 
+        public Rmv2ModelNode? GetParentModel()
+        {
+            var parent = Parent;
+            while (parent != null)
+            {
+                if (parent is Rmv2ModelNode modelNode)
+                    return modelNode;
+                parent = parent.Parent;
+            }
+
+            return null;
+        }
+
+        public Vector3 GetObjectCentre() => MathUtil.GetCenter(Geometry.BoundingBox) + Position;
+
         public override ISceneNode CreateCopyInstance() => new Rmv2MeshNode();
 
         public override void CopyInto(ISceneNode target)
         {
-            var typedTarget = target as Rmv2MeshNode;
-            if (typedTarget == null)
-                throw new Exception("Error casting");
-            typedTarget.Material = Material.Clone();
-            typedTarget.CommonHeader = CommonHeader;
-            typedTarget.Position = Position;
-            typedTarget.Orientation = Orientation;
-            typedTarget.Scale = Scale;
-            typedTarget.LodIndex = LodIndex;
-            typedTarget.ReduceMeshOnLodGeneration = ReduceMeshOnLodGeneration;
-            typedTarget.AnimationPlayer = AnimationPlayer;
-            typedTarget.CommonHeader = CommonHeader;
-            typedTarget.Material = Material.Clone();
-            typedTarget.Geometry = Geometry.Clone();
-
-            typedTarget.Effect = Effect.Clone();
-            typedTarget.Geometry = Geometry.Clone();
-
-            typedTarget.OriginalFilePath = OriginalFilePath;
-            typedTarget.OriginalPartIndex = OriginalPartIndex;
-            typedTarget.ScaleMult = ScaleMult;
+            CopyInto(target, true);
             base.CopyInto(target);
         }
 
-        public void UpdatePivotPoint(Vector3 newPiv)
+        public void CopyInto(ISceneNode target, bool includeMesh)
         {
-            Material.PivotPoint = newPiv;
+            if (target is not Rmv2MeshNode typedTarget)
+                throw new Exception("Error casting");
+
+            typedTarget.Position = Position;
+            typedTarget.Orientation = Orientation;
+            typedTarget.Scale = Scale;
+            typedTarget.ReduceMeshOnLodGeneration = ReduceMeshOnLodGeneration;
+            typedTarget.AnimationPlayer = AnimationPlayer;
+            typedTarget.ScaleMult = ScaleMult;
+            typedTarget.PivotPoint = PivotPoint;
+
+            typedTarget.RmvMaterial = RmvMaterial.Clone();
+            typedTarget.Geometry = Geometry.Clone();
+            typedTarget.Material = Material.Clone();
+           
+            if(includeMesh)
+                typedTarget.Geometry = Geometry.Clone();
+
+            base.CopyInto(target);
         }
 
-        public Dictionary<TextureType, string> GetTextures()
-        {
-            var enumCollection = Enum.GetValues(typeof(TextureType));
-            var output = new Dictionary<TextureType, string>();
-
-            foreach (var enumValue in enumCollection)
-            {
-                var texture = Material.GetTexture((TextureType)enumValue);
-                if (texture != null && texture.HasValue)
-                {
-                    if (string.IsNullOrWhiteSpace(texture.Value.Path) == false)
-                        output[(TextureType)enumValue] = texture.Value.Path;
-                }
-            }
-
-            return output;
-        }
-
-        private void UpdateModelMatrix(Matrix value)
+        void UpdateModelMatrix(Matrix value)
         {
             base.ModelMatrix = value;
             RenderMatrix = value;

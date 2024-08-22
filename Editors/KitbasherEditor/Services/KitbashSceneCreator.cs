@@ -9,6 +9,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
+using static Shared.GameFormats.WWise.Hirc.Shared.AkDecisionTree;
 
 namespace Editors.KitbasherEditor.Services
 {
@@ -52,7 +53,8 @@ namespace Editors.KitbasherEditor.Services
 
             var fullPath = _packFileService.GetFullPath(file);
             _saveSettings.OutputName = fullPath;
-            _saveSettings.InitializeFromModel(mainNode);
+            var lodHeaders = mainNode.Model.LodHeaders;
+            _saveSettings.InitializeLodSettings(lodHeaders);
         }
 
         public void LoadReference(PackFile file)

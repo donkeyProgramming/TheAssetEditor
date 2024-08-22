@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Text;
 using Shared.Core.ByteParsing;
 
 namespace Shared.GameFormats.RigidModel.Types
@@ -25,6 +26,16 @@ namespace Shared.GameFormats.RigidModel.Types
                     throw new Exception();
                 return value;
             }
+        }
+
+        public static RmvShaderParams CreateDefault()
+        {
+            return new RmvShaderParams
+            {
+                _shaderName = Encoding.UTF8.GetBytes("default_dry "),
+                UnknownValues = new byte[10],
+                AllZeroValues = new byte[10]
+            };
         }
     }
 

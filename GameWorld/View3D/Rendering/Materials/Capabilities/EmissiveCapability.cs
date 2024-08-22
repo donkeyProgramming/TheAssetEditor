@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -69,15 +70,52 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Emissive);
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, EmissiveDistortion);
 
-            for (var i = 0; i < 4; i++)
-            {
-                GradientColours[i] = CapabilityHelper.GetParameterVector3(wsModelMaterial, "emissive_gradient_colour_stop_" + (i + 1), Vector3.One);
-                GradientTimes[i] = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_gradient_stop_" + (i + 1), 0);
-            }
+            EmissiveDirection = CapabilityHelper.GetParameterVector2(wsModelMaterial, WsModelParamters.Emissive_Direction, Vector2.One);
+            EmissiveDistortStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Emissive_DistortStrength, 1);
+            EmissiveFresnelStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Emissive_FesnelStrength, 1);
+            EmissivePulseSpeed = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Emissive_PulseSpeed, 1);
+            EmissivePulseStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Emissive_PulseStrength, 1);
+            EmissiveSpeed = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Emissive_Speed, 1);
+            EmissiveStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Emissive_Strength, 1);
+            EmissiveTint = CapabilityHelper.GetParameterVector3(wsModelMaterial, WsModelParamters.Emissive_Tint, Vector3.Zero);
+            EmissiveTiling = CapabilityHelper.GetParameterVector2(wsModelMaterial, WsModelParamters.Emissive_Tiling, Vector2.One);
 
-            EmissiveStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_strength", 1);
-            EmissiveTint = CapabilityHelper.GetParameterVector3(wsModelMaterial, "emissive_tint", Vector3.Zero);
-            EmissiveFresnelStrength = CapabilityHelper.GetParameterFloat(wsModelMaterial, "emissive_fresnel_strength", 1);
+            GradientColours[0] = CapabilityHelper.GetParameterVector3(wsModelMaterial, WsModelParamters.Emissive_GradientColour1, Vector3.One);
+            GradientColours[1] = CapabilityHelper.GetParameterVector3(wsModelMaterial, WsModelParamters.Emissive_GradientColour2, Vector3.One);
+            GradientColours[2] = CapabilityHelper.GetParameterVector3(wsModelMaterial, WsModelParamters.Emissive_GradientColour3, Vector3.One);
+            GradientColours[3] = CapabilityHelper.GetParameterVector3(wsModelMaterial, WsModelParamters.Emissive_GradientColour4, Vector3.One);
+
+            GradientTimes[0] = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Emissive_GradientTime1, 0);
+            GradientTimes[1] = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Emissive_GradientTime2, 0);
+            GradientTimes[2] = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Emissive_GradientTime3, 0);
+            GradientTimes[3] = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Emissive_GradientTime4, 0);
+        }
+
+        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
+        {
+            templateHandler.AddAttribute(WsModelParamters.Texture_Emissive.TemplateName, Emissive);
+            templateHandler.AddAttribute(WsModelParamters.Texture_EmissiveDistortion.TemplateName, EmissiveDistortion);
+
+            templateHandler.AddAttribute(WsModelParamters.Emissive_Direction.TemplateName, EmissiveDirection);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_DistortStrength.TemplateName, EmissiveDistortStrength);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_FesnelStrength.TemplateName, EmissiveFresnelStrength);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_Speed.TemplateName, EmissiveSpeed);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_PulseSpeed.TemplateName, EmissivePulseSpeed);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_PulseStrength.TemplateName, EmissivePulseStrength);
+
+            templateHandler.AddAttribute(WsModelParamters.Emissive_GradientColour1.TemplateName, GradientColours[0]);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_GradientColour2.TemplateName, GradientColours[1]);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_GradientColour3.TemplateName, GradientColours[2]);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_GradientColour4.TemplateName, GradientColours[3]);
+
+            templateHandler.AddAttribute(WsModelParamters.Emissive_GradientTime1.TemplateName, GradientTimes[0]);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_GradientTime2.TemplateName, GradientTimes[1]);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_GradientTime3.TemplateName, GradientTimes[2]);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_GradientTime4.TemplateName, GradientTimes[3]);
+
+            templateHandler.AddAttribute(WsModelParamters.Emissive_Strength.TemplateName, EmissiveStrength);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_Tiling.TemplateName, EmissiveTiling);
+            templateHandler.AddAttribute(WsModelParamters.Emissive_Tint.TemplateName, EmissiveTint);
         }
     }
 }

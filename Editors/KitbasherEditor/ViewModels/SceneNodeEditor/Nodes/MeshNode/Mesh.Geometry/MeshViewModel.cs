@@ -26,7 +26,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         [ObservableProperty] UiVertexFormat _vertexType;
         [ObservableProperty] IEnumerable<UiVertexFormat> _possibleVertexTypes = [UiVertexFormat.Static, UiVertexFormat.Weighted, UiVertexFormat.Cinematic];
 
-
         public MeshViewModel(KitbasherRootScene kitbasherRootScene, SceneManager sceneManager)
         {
             _kitbasherRootScene = kitbasherRootScene;
@@ -37,8 +36,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         {
             _meshNode = node;
 
-            Pivot = new Vector3ViewModel(_meshNode.Material.PivotPoint, Pivot_OnValueChanged);
-            ModelName = _meshNode.Material.ModelName;
+            Pivot = new Vector3ViewModel(_meshNode.PivotPoint, Pivot_OnValueChanged);
+            ModelName = _meshNode.Name;
             DrawBoundingBox = _meshNode.DisplayBoundingBox;
             DrawPivotPoint = _meshNode.DisplayPivotPoint;
       
@@ -49,12 +48,12 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
             ReduceMeshOnLodGeneration = _meshNode.ReduceMeshOnLodGeneration;
         }
 
-        partial void OnModelNameChanged(string value) => _meshNode.Material.ModelName = value;
+        partial void OnModelNameChanged(string value) => _meshNode.Name = value;
         partial void OnDrawBoundingBoxChanged(bool value) => _meshNode.DisplayBoundingBox = value;
-        partial void OnDrawPivotPointChanged(bool value) => _meshNode.DisplayBoundingBox = value;
+        partial void OnDrawPivotPointChanged(bool value) => _meshNode.DisplayPivotPoint = value;
         partial void OnReduceMeshOnLodGenerationChanged(bool value) => _meshNode.ReduceMeshOnLodGeneration = value;
         partial void OnVertexTypeChanged(UiVertexFormat value) => _meshNode.Geometry.ChangeVertexType(value, _kitbasherRootScene.Skeleton.SkeletonName);
-        private void Pivot_OnValueChanged(Vector3 newValue) => _meshNode.UpdatePivotPoint(newValue);
+        private void Pivot_OnValueChanged(Vector3 newValue) => _meshNode.PivotPoint = newValue;
         
 
         [RelayCommand]
@@ -64,7 +63,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
             var root = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var allMeshes = root.GetMeshesInLod(0, false);
             foreach (var mesh in allMeshes)
-                mesh.UpdatePivotPoint(newPiv);
+                mesh.PivotPoint = newPiv;
         }
     }
 }

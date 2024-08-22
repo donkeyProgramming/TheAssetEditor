@@ -217,7 +217,6 @@ namespace GameWorld.Core.Rendering.Geometry
                     newIndexArray[currentIndexIndex++] = (ushort)(geo.IndexArray[geoIndexIndex++] + geoOffset); ;
             }
 
-
             VertexArray = newVertexArray;
             IndexArray = newIndexArray;
 

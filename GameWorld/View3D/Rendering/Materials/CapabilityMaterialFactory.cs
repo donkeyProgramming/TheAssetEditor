@@ -22,23 +22,44 @@ namespace GameWorld.Core.Rendering.Materials
         public CapabilityMaterial Create(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial = null)
         {
             var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
-            var preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_Default;
 
-            if (currentGame == GameTypeEnum.Warhammer3 || currentGame == GameTypeEnum.ThreeKingdoms)
-            {
-                preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Default;
-                if (wsModelMaterial != null)
-                {
-                    if (wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
-                        preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
-                }
-            }
-            
+            var preferredMaterial = GetDefaultMaterial(currentGame);
+            if (wsModelMaterial != null)
+                UpdatedPreferedMaterialBasedOnWsMaterial(currentGame, wsModelMaterial, ref preferredMaterial);
+            else
+                UpdatedPreferedMaterialBasedOnRmv(currentGame, rmvMaterial, ref preferredMaterial);
+
             var material = CreateMaterial(preferredMaterial);
             foreach (var capability in material.Capabilities)
                 capability.Initialize(wsModelMaterial, rmvMaterial);
 
             return material;
+        }
+
+        void UpdatedPreferedMaterialBasedOnWsMaterial(GameTypeEnum currentGame, WsModelMaterialFile wsModelMaterial, ref CapabilityMaterialsEnum preferredMaterial)
+        {
+            if ((currentGame == GameTypeEnum.Warhammer3 || currentGame == GameTypeEnum.ThreeKingdoms) == false)
+                return;
+                
+            if (wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
+                preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
+        }
+
+        void UpdatedPreferedMaterialBasedOnRmv(GameTypeEnum currentGame, IRmvMaterial material, ref CapabilityMaterialsEnum preferredMaterial)
+        {
+            // Decal disabled for now, as saving is not validated! 
+            // if (material is WeightedMaterial weighterMaterial)
+            // { 
+            //     if (weighterMaterial.UseDecal || weighterMaterial.UseDirt)
+            //         preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal;
+            // }
+        }
+
+        CapabilityMaterialsEnum GetDefaultMaterial(GameTypeEnum currentGame)
+        {
+            if (currentGame == GameTypeEnum.Warhammer3 || currentGame == GameTypeEnum.ThreeKingdoms)
+                return CapabilityMaterialsEnum.MetalRoughPbr_Default;
+            return CapabilityMaterialsEnum.SpecGlossPbr_Default;
         }
 
         public CapabilityMaterial CreateMaterial(CapabilityMaterialsEnum type)
@@ -61,11 +82,24 @@ namespace GameWorld.Core.Rendering.Materials
 
                     CapabilityMaterialsEnum.SpecGlossPbr_Default,
                     CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal];
-        } 
+        }
 
-        public CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterial)
+        public CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterialType)
         {
-            return CreateMaterial(newMaterial);
+            var newMaterial = CreateMaterial(newMaterialType);
+
+            for (var sourceCapIndex = 0; sourceCapIndex < source.Capabilities.Length; sourceCapIndex++)
+            {
+                for (var newCapIndex = 0; newCapIndex < newMaterial.Capabilities.Length; newCapIndex++)
+                {
+                    if (source.Capabilities[sourceCapIndex].GetType() == newMaterial.Capabilities[newCapIndex].GetType())
+                    {
+                        newMaterial.Capabilities[newCapIndex] = source.Capabilities[sourceCapIndex].Clone();
+                    }
+                }
+            }
+
+            return newMaterial;
         }
     }
 }

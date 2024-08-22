@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.Core.Rendering.Materials.Shaders;
@@ -12,25 +13,36 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 {
     public class WsMaterialTemplateEditor 
     {
-        static readonly Dictionary<CapabilityMaterialsEnum, string> s_materialToTemplateMap = new()
-        {
-            { CapabilityMaterialsEnum.MetalRoughPbr_Default,    "Resources.WsModelTemplates.MaterialTemplate_wh3_default.xml.material"},
-            { CapabilityMaterialsEnum.MetalRoughPbr_Emissive,   "Resources.WsModelTemplates.MaterialTemplate_wh3_emissive.xml.material"}
-        };
+        record GameEntry(GameTypeEnum Game, CapabilityMaterialsEnum MaterialType, string Path);
 
-        private readonly GameTypeEnum _preferedGameHint;
+        static readonly List<GameEntry> s_materialToTemplateMap =
+        [
+            // Default - spec gloss games
+            new (GameTypeEnum.Troy,             CapabilityMaterialsEnum.SpecGlossPbr_Default,    "Resources.WsModelTemplates.MaterialTemplate_wh2_default.xml"),
+            new (GameTypeEnum.Warhammer2,       CapabilityMaterialsEnum.SpecGlossPbr_Default,    "Resources.WsModelTemplates.MaterialTemplate_wh2_default.xml"),
+            new (GameTypeEnum.Pharaoh,          CapabilityMaterialsEnum.SpecGlossPbr_Default,    "Resources.WsModelTemplates.MaterialTemplate_pharaoh_default.xml"),
+             
+            // Default - metal rough games
+            new (GameTypeEnum.Warhammer3,       CapabilityMaterialsEnum.MetalRoughPbr_Default,   "Resources.WsModelTemplates.MaterialTemplate_wh3_default.xml"),
+            new (GameTypeEnum.ThreeKingdoms,    CapabilityMaterialsEnum.MetalRoughPbr_Default,   "Resources.WsModelTemplates.MaterialTemplate_wh3_default.xml"),
+
+            // Emissive 
+            new (GameTypeEnum.Warhammer3,       CapabilityMaterialsEnum.MetalRoughPbr_Emissive,  "Resources.WsModelTemplates.MaterialTemplate_wh3_emissive.xml")
+        ];
+
+        public GameTypeEnum GameHint { get; private set; }
         private readonly string _templateName;
         private string _templateBuffer;
         
-        public WsMaterialTemplateEditor(CapabilityMaterial material, GameTypeEnum preferedGameHint = GameTypeEnum.Unknown)
+        public WsMaterialTemplateEditor(CapabilityMaterial material, GameTypeEnum gameType)
         {
-            _preferedGameHint = preferedGameHint;
+            GameHint = gameType;
 
-            var isTemplateSupported = s_materialToTemplateMap.TryGetValue(material.Type, out var templateName);
-            if (isTemplateSupported == false)
-                throw new Exception($"Tryint to create a wsmaterial using {nameof(WsMaterialTemplateEditor)} for {nameof(CapabilityMaterial)} of type {nameof(material.Type)} which is not supported. No Template registered");
+            var template = s_materialToTemplateMap.FirstOrDefault(x=> x.Game == GameHint && x.MaterialType == material.Type);
+            if (template == null)
+                throw new Exception($"Tryint to create a wsmaterial using {nameof(WsMaterialTemplateEditor)} for {nameof(CapabilityMaterial)} of type {nameof(material.Type)} which is not supported by game {GameHint}. No Template registered");
 
-            _templateName = templateName!;
+            _templateName = template.Path;
             _templateBuffer = ResourceLoader.LoadString(_templateName);
         }
 
@@ -117,7 +129,14 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         {
             var hasValue = _templateBuffer.Contains("TEMPLATE_ATTR");
             if (hasValue)
-                throw new Exception("Failed to generate material, not all template attributes are replaced!");
+            {
+                var start = _templateBuffer.IndexOf("TEMPLATE_ATTR");
+                var end = _templateBuffer.IndexOf("<", start);
+                var attr = _templateBuffer.Substring(start, end - start);
+
+                throw new Exception($"Failed to generate material, not all template attributes are replaced! {attr}");
+            }
+              
         }
 
     }

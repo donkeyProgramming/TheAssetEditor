@@ -1,15 +1,15 @@
-﻿﻿<material>
-  <name>FILE_NAME</name>
-  <shader>SHADER_PATH</shader>
+<material>
+  <name>TEMPLATE_ATTR_FILE_NAME</name>
+  <shader>shaders/TEMPLATE_ATTR_VERTEXTYPE_characterTEMPLATE_ATTR_ALPHAMODE.xml.shader</shader>
   <sort_override>255</sort_override>
  <textures>
   <texture>
    <slot version="2">t_xml_base_colour</slot>
-   <source>BASE_COLOUR_PATH</source>
+   <source>TEMPLATE_ATTR_BASE_COLOUR_PATH</source>
   </texture>
   <texture>
    <slot version="2">t_xml_blood_map</slot>
-   <source>commontextures/bloodmap.dds</source>
+   <source>TEMPLATE_ATTR_BLOOOD_PATH</source>
   </texture>
   <texture>
    <slot version="2">t_xml_dither</slot>
@@ -17,30 +17,30 @@
   </texture>
   <texture>
    <slot version="2">t_xml_mask</slot>
-   <source>MASK_PATH</source>
+   <source>TEMPLATE_ATTR_MASK_PATH</source>
   </texture>
   <texture>
    <slot version="2">t_xml_material_map</slot>
-   <source>MATERIAL_MAP</source>
+   <source>TEMPLATE_ATTR_MATERIAL_MAP_PATH</source>
   </texture>
   <texture>
    <slot version="2">t_xml_normal</slot>
-   <source>NORMAL_PATH</source>
+   <source>TEMPLATE_ATTR_NORMAL_PATH</source>
   </texture>
   <texture>
    <slot version="2">t_xml_distortion_noise</slot>
-   <source>commontextures/winds_of_magic_noise.dds</source>
+   <source>TEMPLATE_ATTR_DISTORTIONNOISE_PATH</source>
   </texture>
   <texture>
    <slot version="2">t_xml_distortion</slot>
-   <source>commontextures/winds_of_magic_specular.dds</source>
+   <source>TEMPLATE_ATTR_DISTORTION_PATH</source>
   </texture>
  </textures>
   <params>
   <param>
    <name>blood_uv_scale</name>
    <type>float2</type>
-   <value>1,1</value>
+   <value>TEMPLATE_ATTR_BLOOD_UV_SCALE</value>
   </param>
   <param>
    <name>diffuse_tint_colour</name>
@@ -90,7 +90,7 @@
   <param>
    <name>receives_blood</name>
    <type>float</type>
-   <value>1</value>
+   <value>TEMPLATE_ATTR_RECEIVES_BLOOD</value>
   </param>
  </params>
 </material>

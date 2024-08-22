@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using GameWorld.Core.Commands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
-using GameWorld.Core.Services.MeshOptimization;
+using GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration;
 
 namespace GameWorld.Core.Commands.Object
 {
@@ -37,7 +36,8 @@ namespace GameWorld.Core.Commands.Object
             foreach (var meshNode in _meshList)
             {
                 var originalMesh = meshNode.Geometry;
-                var reducedMesh = MeshOptimizerService_ThisShouldBeRemoved.CreatedReducedCopy(originalMesh, _factor);
+
+                var reducedMesh = DecimatorMeshOptimizer.GetReducedMeshCopy(originalMesh, _factor);
                 meshNode.Geometry = reducedMesh;
                 _originalGeometry.Add(originalMesh);
             }

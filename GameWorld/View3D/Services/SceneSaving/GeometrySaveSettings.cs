@@ -1,14 +1,18 @@
-﻿using GameWorld.Core.Services.SceneSaving.Lod;
+﻿using System.Collections.Generic;
+using System.Linq;
 using GameWorld.Core.Services.SceneSaving.Geometry;
+using GameWorld.Core.Services.SceneSaving.Lod;
 using GameWorld.Core.Services.SceneSaving.Material;
-using System.Collections.Generic;
-using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
+using Shared.Core.Services;
+using Shared.GameFormats.RigidModel.LodHeader;
 
 namespace GameWorld.Core.Services.SceneSaving
 {
     public class GeometrySaveSettings
     {
+        private readonly ApplicationSettingsService _applicationSettingsService;
+
         public bool IsUserInitialized { get; set; } = false;    // Initialized after the user has opened a settings window once
         public string OutputName { get; set; } = "";// Init on load
         public GeometryStrategy GeometryOutputType { get; set; } = GeometryStrategy.Rmv7;
@@ -17,6 +21,26 @@ namespace GameWorld.Core.Services.SceneSaving
         public List<LodGenerationSettings> LodSettingsPerLod { get; set; } = [];
         public bool OnlySaveVisible { get; set; } = true;
         public int NumberOfLodsToGenerate { get; set; } = 4;
+
+        public GeometrySaveSettings(ApplicationSettingsService applicationSettingsService)
+        {
+            _applicationSettingsService = applicationSettingsService;
+
+            GameTypeEnum[] rmv7Games = [
+                GameTypeEnum.Warhammer3, GameTypeEnum.ThreeKingdoms,    // Actually rmv8, but not supported by tool for now
+                GameTypeEnum.Pharaoh, GameTypeEnum.Troy, GameTypeEnum.Warhammer2, GameTypeEnum.Warhammer1];
+
+            if (rmv7Games.Contains(_applicationSettingsService.CurrentSettings.CurrentGame) == false)
+                GeometryOutputType = GeometryStrategy.Rmv6;
+
+            MaterialOutputType = _applicationSettingsService.CurrentSettings.CurrentGame switch
+            {
+                GameTypeEnum.Warhammer3 => MaterialStrategy.WsModel_Warhammer3,
+                GameTypeEnum.Warhammer2 => MaterialStrategy.WsModel_Warhammer2,
+                GameTypeEnum.Pharaoh => MaterialStrategy.WsModel_Pharaoh,
+                _ => MaterialStrategy.None,
+            };
+        }
 
         public void RefreshLodSettings()
         {
@@ -28,23 +52,19 @@ namespace GameWorld.Core.Services.SceneSaving
             }
         }
 
-        public void InitializeFromModel(Rmv2ModelNode modelNode)
+        public void InitializeLodSettings(RmvLodHeader[] lodHeaders)
         {
-            // Add stuff here to initialize based on selected game
-            //read this from model GeometryOutputType = GeometryStrategy.Rmv7
-
             LodSettingsPerLod.Clear();
-
-            NumberOfLodsToGenerate = modelNode.Model.LodHeaders.Length;
+            NumberOfLodsToGenerate = lodHeaders.Length;
 
             for (var i = 0; i < NumberOfLodsToGenerate; i++)
             {
-                var settings = GenerateLodSettingsForIndex(i, NumberOfLodsToGenerate, modelNode);
+                var settings = GenerateLodSettingsForIndex(i, NumberOfLodsToGenerate, lodHeaders);
                 LodSettingsPerLod.Add(settings);
             }
         }
 
-        LodGenerationSettings GenerateLodSettingsForIndex(int lodIndex, int lodCount, Rmv2ModelNode? node)
+        LodGenerationSettings GenerateLodSettingsForIndex(int lodIndex, int lodCount, RmvLodHeader[]? lodHeaders)
         {
             int[] possibleCameraDistances = [20, 80, 100, 10000, 10000, 10000];
             byte[] possibleQualityValues = [2, 0, 0, 0, 0, 0, 0];
@@ -52,17 +72,17 @@ namespace GameWorld.Core.Services.SceneSaving
             float cameraDistance = possibleCameraDistances[lodIndex];
             var qualityLvl = possibleQualityValues[lodIndex];
 
-            if (node != null)
+            if (lodHeaders != null)
             {
-                var numLodsInGeometry = node.Model.LodHeaders.Length;
+                var numLodsInGeometry = lodHeaders.Length;
                 if (lodIndex < numLodsInGeometry)
-                { 
-                    var lodHeader = node.Model.LodHeaders[lodIndex];
+                {
+                    var lodHeader = lodHeaders[lodIndex];
                     cameraDistance = lodHeader.LodCameraDistance;
                     qualityLvl = lodHeader.QualityLvl;
                 }
             }
-
+            
             var setting = new LodGenerationSettings()
             {
                 CameraDistance = cameraDistance,

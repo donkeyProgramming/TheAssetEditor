@@ -35,7 +35,9 @@ namespace Shared.Ui.BaseDialogs
                 owner.Text.ToolTip = null;
                 return;
             }
-            var toolTip = new ToolTip() { Content = "This is my tooltip!\n\n" + value.ToString() };
+
+            var text = ToolTips.List[value];
+            var toolTip = new ToolTip() { Content = text };
 
             owner.InformationImage.Visibility = Visibility.Visible;
             owner.InformationImage.ToolTip = toolTip;

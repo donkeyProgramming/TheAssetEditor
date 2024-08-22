@@ -43,7 +43,7 @@
                     </DockPanel>
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Use faction colours" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="Kitbash_WsMaterial_TintColour">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Use faction colours" LabelWidth="{StaticResource labelWidth}">
                     <DockPanel>
                         <CheckBox IsChecked="{Binding UseFactionColours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <colourpickerbutton:ColourPickerButtonView DataContext="{Binding FactionColour0}" Margin="5,0,5,0" HorizontalAlignment="Left" Width="20" Height="20"/>

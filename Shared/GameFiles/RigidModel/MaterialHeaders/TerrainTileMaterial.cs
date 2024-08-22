@@ -62,12 +62,12 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         {
         }
 
-        public void UpdateEnumsBeforeSaving(UiVertexFormat uiVertexFormat, RmvVersionEnum outputVersion)
+        public void UpdateInternalState(UiVertexFormat uiVertexFormat)
         {
             throw new NotImplementedException();
         }
 
-        public void EnrichDataBeforeSaving(string[] boneNames, BoundingBox boundingBox)
+        public void EnrichDataBeforeSaving(string[] boneNames)
         {
             throw new NotImplementedException();
         }
@@ -85,7 +85,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             };
         }
 
-        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId, VertexFormat vertexFormat)
+        public IRmvMaterial CreateEmpty(ModelMaterialEnum materialId)
         {
             return new TerrainTileMaterial();
         }

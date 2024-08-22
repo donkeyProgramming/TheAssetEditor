@@ -90,7 +90,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
             }
         }
 
-
         public void Dispose()
         {
             AttachableBones.SelectedItemChanged -= ModelBoneList_SelectedItemChanged;

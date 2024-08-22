@@ -4,7 +4,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 
-namespace GameWorld.Core.Test.Rendering.Materials
+namespace GameWorld.Core.Test.Rendering.Materials.Serialization
 {
     internal class WsMaterialRepositoryTests
     {
@@ -31,7 +31,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
         {
             // Arrange 
             var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
-          
+
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
 
@@ -192,6 +192,25 @@ namespace GameWorld.Core.Test.Rendering.Materials
             Assert.That(materialCount, Is.EqualTo(17));
             Assert.That(newPath, Is.EqualTo(path));
             Assert.That(isNew, Is.False);
+        }
+
+
+        [TestCase]
+        public void AddMaterial_NameMissingFromFile()
+        {
+            // Arrange 
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+
+            var materialPath0 = "content/material0.xml.material";
+            var materialContent0 = "PreContent0<nothing> customMaterialName </name>PostContent0";
+
+            // Act
+            var repo = new WsMaterialRepository(pfs);
+            var finalPath = repo.GetExistingOrAddMaterial(materialContent0, materialPath0, out var isNew);
+
+            // Assert
+            Assert.That(finalPath, Is.EqualTo(materialPath0));
+            Assert.That(isNew, Is.True);
         }
 
     }

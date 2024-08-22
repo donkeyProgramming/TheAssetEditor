@@ -12,9 +12,9 @@ namespace GameWorld.Core.SceneNodes
 
     public class SkeletonNode : GroupNode, ISkeletonProvider, IDrawableItem
     {
-        public Color NodeColour = Color.Black;
-        public Color SelectedNodeColour = Color.Red;
-        public Vector3 LineColour = new Vector3(0, 0, 0);
+        public Color NodeColour { get; set; } = Color.Black;
+        public Color SelectedNodeColour { get; set; } = Color.Red;
+        public Vector3 LineColour { get; set; } = new Vector3(0, 0, 0);
 
         public int? SelectedBoneIndex { get; set; }
         public float SkeletonScale { get; set; } = 1;

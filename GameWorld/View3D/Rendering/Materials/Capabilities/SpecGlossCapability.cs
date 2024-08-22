@@ -1,6 +1,8 @@
 ﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.Services;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
@@ -21,7 +23,6 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             GlossMap.Apply(effect, resourceLibrary);
             DiffuseMap.Apply(effect, resourceLibrary);
             NormalMap.Apply(effect, resourceLibrary);
-            //Mask.Apply(effect, resourceLibrary);
 
             base.Apply(effect, resourceLibrary);    
         }
@@ -50,6 +51,19 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Mask);
 
             base.Initialize(wsModelMaterial, rmvMaterial);
+        }
+
+        public override void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
+        {
+            
+            templateHandler.AddAttribute(WsModelParamters.Texture_Specular.TemplateName, SpecularMap);
+            if (templateHandler.GameHint != GameTypeEnum.Pharaoh)
+                templateHandler.AddAttribute(WsModelParamters.Texture_Gloss.TemplateName, GlossMap);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Diffse.TemplateName, DiffuseMap);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Normal.TemplateName, NormalMap);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Mask.TemplateName, Mask);
+
+            base.SerializeToWsModel(templateHandler);
         }
 
         public override void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)

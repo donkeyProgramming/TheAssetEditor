@@ -125,7 +125,5 @@ namespace GameWorld.Core.Services
                     SortMeshes(children[i]);
             }
         }
-
-
     }
 }
