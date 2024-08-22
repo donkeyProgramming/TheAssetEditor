@@ -5,10 +5,10 @@
             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             xmlns:viewmodels="clr-namespace:Editors.Audio.AudioEditor.ViewModels"
             xmlns:converters="clr-namespace:Editors.Audio.AudioEditor" 
-            xmlns:sys="clr-namespace:System;assembly=netstandard"
-            mc:Ignorable="d"
-            d:DesignHeight="130" d:DesignWidth="800">
-
+            xmlns:sys="clr-namespace:System;assembly=netstandard" d:DataContext="{d:DesignInstance Type=viewmodels:NewCustomStatesViewModel}"
+             mc:Ignorable="d"
+            d:DesignWidth="560" d:DesignHeight="160" >
+    
     <UserControl.Resources>
         <!-- Default height -->
         <sys:Double x:Key="DefaultHeight">23</sys:Double>
@@ -28,7 +28,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Audio Project Custom States Name -->
+            <!-- Audio Project States Name -->
             <Grid Grid.Row="0" Margin="0, 0, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
@@ -36,24 +36,28 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Name:" VerticalAlignment="Center"/>
                 <TextBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
-                            Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            Text="{Binding StatesProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
             
-            <!-- Audio Project Custom States Location -->
-            <Grid Grid.Row="1" Margin="0, 0, 0, 5">
+            <!-- Audio Project States Location -->
+            <Grid Grid.Row="1" Margin="0, 2, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Location:" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
-                            Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}"  
+                         Text="{Binding StatesProjectDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="PLACEHOLDER TOOLTIP"
+                         IsReadOnly="True"/>
+                <Button Grid.Column="2" Content="..." VerticalAlignment="Center" Width="30" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding SetNewFileLocationCommand}"/>
             </Grid>
         </Grid>
 
         <!-- Buttons -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <Button Content="OK" Width="75" Height="{StaticResource DefaultHeight}" Margin="0, 0, 5, 0" Command="{Binding CreateAudioProjectCommand}" IsEnabled="{Binding IsOkButtonIsEnabled}"/>
+            <Button Content="OK" Width="75" Height="{StaticResource DefaultHeight}" Margin="0, 0, 5, 0" Command="{Binding CreateStatesProjectCommand}" IsEnabled="{Binding IsOkButtonIsEnabled}"/>
             <Button Content="Cancel" Width="75" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding CloseWindowActionCommand}"/>
         </StackPanel>
     </Grid>

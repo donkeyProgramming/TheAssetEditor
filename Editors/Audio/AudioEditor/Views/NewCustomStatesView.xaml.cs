@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Editors.Audio.AudioEditor.ViewModels;
+using Editors.Audio.Storage;
+using Shared.Core.PackFiles;
 
 namespace Editors.Audio.AudioEditor.Views
 {
@@ -20,9 +11,32 @@ namespace Editors.Audio.AudioEditor.Views
     /// </summary>
     public partial class NewCustomStatesView : UserControl
     {
-        public NewCustomStatesView()
+        private readonly IAudioRepository _audioRepository;
+        private readonly PackFileService _packFileService;
+        private readonly AudioEditorViewModel _audioEditorViewModel;
+
+        public NewCustomStatesView(IAudioRepository audioRepository, PackFileService packFileService, AudioEditorViewModel audioEditorViewModel)
         {
+            _audioRepository = audioRepository;
+            _packFileService = packFileService;
+            _audioEditorViewModel = audioEditorViewModel;
+
             InitializeComponent();
+
+            var viewModel = new NewCustomStatesViewModel(
+                _audioRepository,
+                _packFileService,
+                _audioEditorViewModel
+            );
+
+            // Set the close action for the view model
+            viewModel.SetCloseAction(() =>
+            {
+                var window = Window.GetWindow(this);
+                window?.Close();
+            });
+
+            DataContext = viewModel;
         }
     }
 }

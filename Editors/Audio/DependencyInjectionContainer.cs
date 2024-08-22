@@ -32,6 +32,10 @@ namespace Editors.Audio
 
             serviceCollection.AddTransient<NewVOAudioProjectView>();
             serviceCollection.AddScoped<NewVOAudioProjectViewModel>();
+
+            serviceCollection.AddTransient<NewCustomStatesView>();
+            serviceCollection.AddScoped<NewCustomStatesViewModel>();
+
             serviceCollection.AddScoped<AudioEditorViewModel>();
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();

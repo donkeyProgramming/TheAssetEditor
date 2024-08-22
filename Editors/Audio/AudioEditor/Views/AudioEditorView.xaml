@@ -22,12 +22,12 @@
         <Menu Grid.Row="0">
             <MenuItem Header="_File" HorizontalAlignment="Left">
                 <MenuItem Header="_New">
-                    <MenuItem Header="New VO Audio Project" Command="{Binding NewVOAudioProjectCommand}" />
-                    <MenuItem Header="New Non-VO Audio Project" Command="{Binding NewNonVOAudioProjectCommand}" />
+                    <MenuItem Header="VO Project" Command="{Binding NewVOProjectCommand}" />
+                    <MenuItem Header="States Project" Command="{Binding NewStatesProjectCommand}" />
                 </MenuItem>
                 <MenuItem Header="_Open">
-                    <MenuItem Header="Audio Project" Command="{Binding LoadAudioProjectCommand}" />
-                    <MenuItem Header="Custom States" Command="{Binding LoadCustomStatesCommand}" />
+                    <MenuItem Header="VO Project" Command="{Binding LoadVOProjectCommand}" />
+                    <MenuItem Header="States Project" Command="{Binding LoadStatesProjectCommand}" />
                 </MenuItem>
                 <MenuItem Header="Save" Command="{Binding SaveAudioProjectCommand}" />
                 <MenuItem Header="Audio Project Settings" Command="{Binding OpenAudioProjectSettings}" IsEnabled="False"/>
@@ -61,8 +61,8 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             
-            <Button Grid.Column="0" Content="Add Row" Command="{Binding AddStatePathCommand}" Margin="5, 0, 0, 0" VerticalAlignment="Center"/>
-            <Button Grid.Column="0" Content="Add Row" Command="{Binding AddStatePathCommand}" Margin="5, 0, 0, 0" VerticalAlignment="Center"/>
+            <Button Grid.Column="0" Content="Add Row" Command="{Binding AddDataGridRowCommand}" Margin="5, 0, 0, 0" VerticalAlignment="Center"/>
+            <Button Grid.Column="0" Content="Add Row" Command="{Binding AddDataGridRowCommand}" Margin="5, 0, 0, 0" VerticalAlignment="Center"/>
             <CheckBox Grid.Column="1" Content="Show Custom States Only" Margin="5, 0, 0, 0" VerticalAlignment="Center" IsChecked="{Binding ShowCustomStatesOnly, Mode=TwoWay}" />
         </Grid>
 

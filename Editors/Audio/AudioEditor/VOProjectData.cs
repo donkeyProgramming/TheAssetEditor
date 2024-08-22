@@ -2,14 +2,14 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using static Editors.Audio.AudioEditor.AudioEditorData;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
+using static Editors.Audio.AudioEditor.AudioProject;
 
 namespace Editors.Audio.AudioEditor
 {
-    public class AudioProjectData
+    public class VOProjectData
     {
-        public class AudioProject
+        public class VOProject
         {
             public Settings Settings { get; set; }
             public List<Event> Events { get; set; } = [];
@@ -20,7 +20,7 @@ namespace Editors.Audio.AudioEditor
         {
             public string BnkName { get; set; }
             public string Language { get; set; }
-            public string ModdedStatesFilePath { get; set; }
+            public string StatesProjectFilePath { get; set; }
         }
 
         public class Event
@@ -53,13 +53,13 @@ namespace Editors.Audio.AudioEditor
             public string State { get; set; }
         }
 
-        public static void ConvertDataGridDataToAudioProject(ObservableCollection<Dictionary<string, object>> dataGridData, string audioProjectEvent)
+        public static void ConvertDataGridDataToVOProject(ObservableCollection<Dictionary<string, object>> dataGridData, string audioProjectEvent)
         {
-            if (dataGridData == null || audioProjectEvent == null)
+            if (dataGridData.Count() == 0 || audioProjectEvent == null || audioProjectEvent == "")
                 return;
 
-            var audioProject = AudioEditorInstance.AudioProject;
-            var dialogueEvent = audioProject.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == audioProjectEvent); // Find the corresponding DialogueEvent in AudioProject
+            var voProject = AudioProjectInstance.VOProject;
+            var dialogueEvent = voProject.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == audioProjectEvent); // Find the corresponding DialogueEvent in AudioProject
             var decisionTree = dialogueEvent.DecisionTree;
             decisionTree.Clear();
 
@@ -95,9 +95,9 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        public static void ConvertAudioProjecToDataGridData(ObservableCollection<Dictionary<string, object>> dataGridData, AudioProject audioProject, string selectedAudioProjectEvent)
+        public static void ConvertVOProjectToDataGridData(ObservableCollection<Dictionary<string, object>> dataGridData, VOProject voProject, string selectedAudioProjectEvent)
         {
-            var dialogueEvent = audioProject.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == selectedAudioProjectEvent); // Find the corresponding DialogueEvent in AudioProject
+            var dialogueEvent = voProject.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == selectedAudioProjectEvent); // Find the corresponding DialogueEvent in AudioProject
 
             foreach (var decisionNode in dialogueEvent.DecisionTree)
             {

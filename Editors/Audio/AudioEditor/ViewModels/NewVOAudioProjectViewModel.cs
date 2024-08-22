@@ -12,11 +12,11 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.AudioEditorData;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 using static Editors.Audio.AudioEditor.AudioEditorSettings;
-using static Editors.Audio.AudioEditor.AudioProjectData;
+using static Editors.Audio.AudioEditor.AudioProject;
 using static Editors.Audio.AudioEditor.SettingsEnumConverter;
+using static Editors.Audio.AudioEditor.VOProjectData;
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
@@ -41,13 +41,13 @@ namespace Editors.Audio.AudioEditor.ViewModels
         readonly ILogger _logger = Logging.Create<NewVOAudioProjectViewModel>();
         private Action _closeAction;
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("New VO Audio Project");
+        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("New VO Project");
 
         // The properties for each settings.
-        [ObservableProperty] private string _audioProjectFileName;
-        [ObservableProperty] private string _audioProjectDirectory;
-        [ObservableProperty] private string _moddedStatesFilePath;
-        [ObservableProperty] private string _selectedLanguage;
+        [ObservableProperty] private string _vOProjectFileName;
+        [ObservableProperty] private string _vOProjectDirectory;
+        [ObservableProperty] private string _statesProjectFilePath;
+        [ObservableProperty] private Language _selectedLanguage;
         [ObservableProperty] private string _selectedAudioProjectEventType;
         [ObservableProperty] private string _selectedAudioProjectEventSubtype;
 
@@ -60,8 +60,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [ObservableProperty] private ObservableCollection<DialogueEventCheckBox> _dialogueEventCheckBoxes = [];
 
         // Properties to control whether OK button is enabled.
-        [ObservableProperty] private bool _isAudioProjectFileNameSet;
-        [ObservableProperty] private bool _isAudioProjectDirectorySet;
+        [ObservableProperty] private bool _isVOProjectFileNameSet;
+        [ObservableProperty] private bool _isVOProjectDirectorySet;
         [ObservableProperty] private bool _isLanguageSelected;
         [ObservableProperty] private bool _isAnyDialogueEventChecked;
         [ObservableProperty] private bool _isOkButtonIsEnabled;
@@ -71,40 +71,48 @@ namespace Editors.Audio.AudioEditor.ViewModels
             _audioRepository = audioRepository;
             _packFileService = packFileService;
             _audioEditorViewModel = audioEditorViewModel;
+
+            // Default value set here
+            VOProjectDirectory = "audioprojects";  
+            SelectedLanguage = Language.EnglishUK;
         }
 
-        partial void OnAudioProjectFileNameChanged(string value)
+        partial void OnVOProjectFileNameChanged(string value)
         {
-            IsAudioProjectFileNameSet = !string.IsNullOrEmpty(value);
+            IsVOProjectFileNameSet = !string.IsNullOrEmpty(value);
             UpdateOkButtonIsEnabled();
         }
 
-        partial void OnAudioProjectDirectoryChanged(string value)
+        partial void OnVOProjectDirectoryChanged(string value)
         {
-            IsAudioProjectDirectorySet = !string.IsNullOrEmpty(value);
+            IsVOProjectDirectorySet = !string.IsNullOrEmpty(value);
             UpdateOkButtonIsEnabled();
         }
 
-        partial void OnSelectedLanguageChanged(string value)
+        partial void OnSelectedLanguageChanged(Language value)
         {
-            IsLanguageSelected = !string.IsNullOrEmpty(value);
+            IsLanguageSelected = !string.IsNullOrEmpty(value.ToString());
             UpdateOkButtonIsEnabled();
         }
 
         partial void OnSelectedAudioProjectEventTypeChanged(string value)
         {
             DialogueEventCheckBoxes.Clear();
+            IsAnyDialogueEventChecked = false;
 
             // Update the ComboBox for EventSubType upon DialogueEventType selection.
             UpdateAudioProjectEventSubType();
+            UpdateOkButtonIsEnabled();
         }
 
         partial void OnSelectedAudioProjectEventSubtypeChanged(string value)
         {
             DialogueEventCheckBoxes.Clear();
+            IsAnyDialogueEventChecked = false;
 
             // Update the ListBox with the appropriate Dialogue Events.
             PopulateDialogueEventsListBox();
+            UpdateOkButtonIsEnabled();
         }
 
         private void HandleDialogueEventCheckBoxChanged(DialogueEventCheckBox changedItem)
@@ -115,17 +123,17 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         private void UpdateOkButtonIsEnabled()
         {
-            IsOkButtonIsEnabled = IsAudioProjectFileNameSet && IsAudioProjectDirectorySet && IsLanguageSelected && IsAnyDialogueEventChecked;
+            IsOkButtonIsEnabled = IsVOProjectFileNameSet && IsVOProjectDirectorySet && IsLanguageSelected && IsAnyDialogueEventChecked;
         }
 
         [RelayCommand] public void SetNewFileLocation()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".OleIsADonkey"], true); //Set it to some non-existant file type and it will show only folders.
+            using var browser = new PackFileBrowserWindow(_packFileService, [".OleIsADonkey"], true); // Set it to some non-existant file type and it will show only folders.
 
             if (browser.ShowDialog())
             {
                 var filePath = browser.SelectedPath;
-                AudioProjectDirectory = filePath;
+                VOProjectDirectory = filePath;
                 _logger.Here().Information($"Custom States file path set to: {filePath}");
             }
         }
@@ -137,7 +145,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             if (browser.ShowDialog())
             {
                 var filePath = browser.SelectedPath;
-                ModdedStatesFilePath = filePath;
+                StatesProjectFilePath = filePath;
                 _logger.Here().Information($"Custom States file path set to: {filePath}");
             }
         }
@@ -192,13 +200,10 @@ namespace Editors.Audio.AudioEditor.ViewModels
             }
         }
 
-        [RelayCommand] public void CreateAudioProject()
+        [RelayCommand] public void CreateVOProject()
         {
-            if (DialogueEventCheckBoxes.All(checkBox => checkBox.IsChecked != true))
-                return;
-
             // Remove any pre-existing data.
-            AudioEditorInstance.ResetAudioEditorData();
+            AudioProjectInstance.ResetAudioProjectData();
             _audioEditorViewModel.ResetAudioEditorViewModelData();
 
             // Create the list of events to be displayed in the AudioEditor.
@@ -210,8 +215,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
             // Initialise AudioProject according to the Audio Project settings selected.
             InitialiseVOAudioProject();
 
-            // Add the Audio Project with empty events to the PackFile.
-            AddAudioProjectToPackFile(_packFileService);
+            // Add the VO Project with empty events to the PackFile.
+            AddToPackFile(_packFileService, AudioProjectInstance.VOProject, AudioProjectInstance.FileName, AudioProjectInstance.Directory, AudioProjectInstance.Type);
 
             // Load the custom States so that they can be referenced when the Event is loaded.
             //PrepareCustomStatesForComboBox(this);
@@ -235,20 +240,21 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         public void InitialiseVOAudioProject()
         {
-            if (AudioEditorInstance.AudioProject == null)
-                AudioEditorInstance.AudioProject = new AudioProject();
+            if (AudioProjectInstance.VOProject == null)
+                AudioProjectInstance.VOProject = new VOProject();
 
-            AudioEditorInstance.AudioProjectFileName = AudioProjectFileName;
-            AudioEditorInstance.AudioProjectDirectory = AudioProjectDirectory;
+            AudioProjectInstance.Type = ProjectType.voproject;
+            AudioProjectInstance.FileName = VOProjectFileName;
+            AudioProjectInstance.Directory = VOProjectDirectory;
 
             // Create settings.
             var settings = new Settings
             {
-                Language = LanguageEnumToString[GetLanguageEnumString(SelectedLanguage)],
-                ModdedStatesFilePath = ModdedStatesFilePath
+                Language = LanguageEnumToString[GetLanguageEnumString(SelectedLanguage.ToString())],
+                StatesProjectFilePath = StatesProjectFilePath
             };
 
-            AudioEditorInstance.AudioProject.Settings = settings;
+            AudioProjectInstance.VOProject.Settings = settings;
 
             // Create Dialogue Events.
             var dialogueEvents = new List<DialogueEvent>();
@@ -263,7 +269,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 dialogueEvents.Add(dialogueEvent);
             }
 
-            AudioEditorInstance.AudioProject.DialogueEvents = dialogueEvents;
+            AudioProjectInstance.VOProject.DialogueEvents = dialogueEvents;
         }
 
         [RelayCommand] public void SelectAll()
@@ -299,14 +305,18 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         public void ResetNewVOAudioProjectViewModelData()
         {
-            AudioProjectFileName = null;
-            AudioProjectDirectory = null;
-            ModdedStatesFilePath = null;
+            VOProjectFileName = null;
+            VOProjectDirectory = null;
+            StatesProjectFilePath = null;
             SelectedAudioProjectEventType = null;
             SelectedAudioProjectEventSubtype = null;
             AudioProjectSubtypes.Clear();
             DialogueEventCheckBoxes.Clear();
+            IsVOProjectFileNameSet = false;
+            IsVOProjectDirectorySet = false;
+            IsLanguageSelected = false;
             IsAnyDialogueEventChecked = false;
+            IsOkButtonIsEnabled = false;
         }
 
         [RelayCommand] public void CloseWindowAction()

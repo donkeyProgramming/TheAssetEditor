@@ -8,7 +8,7 @@
              xmlns:sys="clr-namespace:System;assembly=netstandard"
              d:DataContext="{d:DesignInstance Type=viewmodels:NewVOAudioProjectViewModel}"
              mc:Ignorable="d"
-             d:MinWidth="560" d:DesignHeight="560">
+             d:MinWidth="560" d:DesignHeight="540">
 
     <UserControl.Resources>
         <!-- Enum to string converter -->
@@ -48,7 +48,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Name:" VerticalAlignment="Center"/>
                 <TextBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
-                         Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding VOProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTip="PLACEHOLDER TOOLTIP"/>
             </Grid>
 
@@ -61,7 +61,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Location:" VerticalAlignment="Center"/>
                 <TextBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}"  
-                         Text="{Binding AudioProjectDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding VOProjectDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTip="PLACEHOLDER TOOLTIP"
                          IsReadOnly="True"/>
                 <Button Grid.Column="2" Content="..." VerticalAlignment="Center" Width="30" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding SetNewFileLocationCommand}"/>
@@ -76,7 +76,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Modded States Location:" VerticalAlignment="Center"/>
                 <TextBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}"  
-                         Text="{Binding ModdedStatesFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding StatesProjectFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTip="PLACEHOLDER TOOLTIP"
                          IsReadOnly="True"/>
                 <Button Grid.Column="2" Content="..." VerticalAlignment="Center" Width="30" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding SetCustomStatesLocationCommand}"/>
@@ -155,7 +155,7 @@
 
         <!-- Buttons -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <Button Content="OK" Width="75" Height="{StaticResource DefaultHeight}" Margin="0, 0, 5, 0" Command="{Binding CreateAudioProjectCommand}" IsEnabled="{Binding IsOkButtonIsEnabled}"/>
+            <Button Content="OK" Width="75" Height="{StaticResource DefaultHeight}" Margin="0, 0, 5, 0" Command="{Binding CreateVOProjectCommand}" IsEnabled="{Binding IsOkButtonIsEnabled}"/>
             <Button Content="Cancel" Width="75" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding CloseWindowActionCommand}"/>
         </StackPanel>
     </Grid>

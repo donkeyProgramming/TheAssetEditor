@@ -6,7 +6,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using static Editors.Audio.AudioEditor.AudioEditorData;
+using static Editors.Audio.AudioEditor.AudioProject;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -14,7 +14,7 @@ namespace Editors.Audio.AudioEditor
     {
         readonly static ILogger s_logger = Logging.Create<AudioEditorViewModel>();
 
-        public static void AddAudioProjectToPackFile(PackFileService packFileService)
+        public static void AddToPackFile(PackFileService packFileService, object file, string fileName, string directory, ProjectType fileType)
         {
             var options = new JsonSerializerOptions
             {
@@ -22,16 +22,12 @@ namespace Editors.Audio.AudioEditor
                 WriteIndented = true
             };
 
-            var audioProject = JsonSerializer.Serialize(AudioEditorInstance.AudioProject, options);
-
+            var fileJson = JsonSerializer.Serialize(file, options);
             var pack = packFileService.GetEditablePack();
-            var byteArray = Encoding.ASCII.GetBytes(audioProject);
+            var byteArray = Encoding.ASCII.GetBytes(fileJson);
 
-            var audioProjectFileName = AudioEditorInstance.AudioProjectFileName;
-            var audioProjectDirectory = AudioEditorInstance.AudioProjectDirectory;
-
-            packFileService.AddFileToPack(pack, audioProjectDirectory, new PackFile($"{audioProjectFileName}.audioproject", new MemorySource(byteArray)));
-            s_logger.Here().Information($"Saved Audio Project file: {audioProjectDirectory}/{audioProjectFileName}.audioproject");
+            packFileService.AddFileToPack(pack, directory, new PackFile($"{fileName}.{fileType}", new MemorySource(byteArray)));
+            s_logger.Here().Information($"Saved Audio Project file: {directory}\\{fileName}.{fileType}");
         }
 
         public static Dictionary<string, string> ValidateStateGroupsOrder(Dictionary<string, object> dataGridItem, string selectedAudioProjectEvent)

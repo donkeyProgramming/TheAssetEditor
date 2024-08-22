@@ -1,30 +1,41 @@
 ﻿using System.Collections.Generic;
-using static Editors.Audio.AudioEditor.AudioProjectData;
+using static Editors.Audio.AudioEditor.StatesProjectData;
+using static Editors.Audio.AudioEditor.VOProjectData;
 
 namespace Editors.Audio.AudioEditor
 {
-    public class AudioEditorData
+    public class AudioProject
     {
-        private static readonly AudioEditorData _instance = new();
+        public enum ProjectType
+        {
+            sfxproject,
+            voproject,
+            statesproject
+        }
 
-        public static AudioEditorData AudioEditorInstance => _instance;
+        private static readonly AudioProject _instance = new();
+
+        public static AudioProject AudioProjectInstance => _instance;
+
+        public VOProject VOProject { get; set; } = new VOProject();
+
+        public StatesProject StatesProject { get; set; } = new StatesProject();
 
         public static Dictionary<string, Dictionary<string, string>> DialogueEventsWithStateGroupsWithQualifiers { get; set; } = new();
 
-        public AudioProject AudioProject { get; set; } = new AudioProject();
-
-        public string AudioProjectFileName { get; set; }
-
-        public string AudioProjectDirectory { get; set; }
-
         public Dictionary<string, List<string>> StateGroupsWithCustomStates { get; set; } = new();
+
+        public ProjectType Type { get; set; }
+
+        public string FileName { get; set; }
+
+        public string Directory { get; set; }
 
         public string SelectedAudioProjectEvent { get; set; }
 
         public string PreviousSelectedAudioProjectEvent { get; set; }
 
-
-        private AudioEditorData()
+        private AudioProject()
         {
         }
 
@@ -70,9 +81,9 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        public void ResetAudioEditorData()
+        public void ResetAudioProjectData()
         {
-            AudioProject = null;
+            VOProject = null;
             StateGroupsWithCustomStates.Clear();
             SelectedAudioProjectEvent = null;
             PreviousSelectedAudioProjectEvent = null;
