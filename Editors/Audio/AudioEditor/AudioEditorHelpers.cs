@@ -14,7 +14,7 @@ namespace Editors.Audio.AudioEditor
     {
         readonly static ILogger s_logger = Logging.Create<AudioEditorViewModel>();
 
-        public static void AddToPackFile(PackFileService packFileService, object file, string fileName, string directory, ProjectType fileType)
+        public static void AddToPackFile(PackFileService packFileService, object file, string fileName, string directory, ProjectType? fileType)
         {
             var options = new JsonSerializerOptions
             {
@@ -60,6 +60,48 @@ namespace Editors.Audio.AudioEditor
             }
 
             return orderedStateGroupsAndStates;
+        }
+
+        // Add qualifiers to State Groups so that dictionary keys are unique as some events have the same State Group twice e.g. VO_Actor
+        public static void AddQualifiersToStateGroups(Dictionary<string, List<string>> dialogueEventsWithStateGroups)
+        {
+            DialogueEventsWithStateGroupsWithQualifiers = new Dictionary<string, Dictionary<string, string>>();
+
+            foreach (var dialogueEvent in dialogueEventsWithStateGroups)
+            {
+                var stateGroupsWithQualifiers = new Dictionary<string, string>();
+                var stateGroups = dialogueEvent.Value;
+
+                var voActorCount = 0;
+                var voCultureCount = 0;
+
+                foreach (var stateGroup in stateGroups)
+                {
+                    if (stateGroup == "VO_Actor")
+                    {
+                        voActorCount++;
+
+                        var qualifier = voActorCount > 1 ? "VO_Actor (Reference)" : "VO_Actor (Source)";
+                        stateGroupsWithQualifiers[qualifier] = "VO_Actor";
+                    }
+
+                    else if (stateGroup == "VO_Culture")
+                    {
+                        voCultureCount++;
+
+                        var qualifier = voCultureCount > 1 ? "VO_Culture (Reference)" : "VO_Culture (Source)";
+                        stateGroupsWithQualifiers[qualifier] = "VO_Culture";
+                    }
+
+                    else
+                    {
+                        // No qualifier needed, add the same state group as both original and qualified
+                        stateGroupsWithQualifiers[stateGroup] = stateGroup;
+                    }
+                }
+
+                DialogueEventsWithStateGroupsWithQualifiers[dialogueEvent.Key] = stateGroupsWithQualifiers;
+            }
         }
 
         // Apparently WPF doesn't_like_underscores so double them up in order for them to be displayed in the UI.

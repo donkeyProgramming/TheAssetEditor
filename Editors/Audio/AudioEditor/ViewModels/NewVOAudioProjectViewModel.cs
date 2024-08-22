@@ -150,6 +150,37 @@ namespace Editors.Audio.AudioEditor.ViewModels
             }
         }
 
+        [RelayCommand] public void SelectAll()
+        {
+            foreach (var checkBox in DialogueEventCheckBoxes)
+                checkBox.IsChecked = true;
+        }
+
+        /*
+        [RelayCommand] public void SelectRecommended()
+        {
+            // Get the list of dialogue events with the "Recommended" category
+            var recommendedEvents = FrontendVODialogueEvents.Where(e => e.Categories.Contains("Recommended")).Select(e => e.Name).ToHashSet();
+
+            // Iterate through the CheckBoxes and set IsChecked for those with matching Name
+            foreach (var checkBox in DialogueEventCheckBoxes)
+            {
+                if (recommendedEvents.Contains(checkBox.Content.ToString()))
+                {
+                    checkBox.IsChecked = true;
+                }
+            }
+        }
+        */
+
+        [RelayCommand] public void SelectNone()
+        {
+            foreach (var checkBox in DialogueEventCheckBoxes)
+            {
+                checkBox.IsChecked = false;
+            }
+        }
+
         public void UpdateAudioProjectEventSubType()
         {
             AudioProjectSubtypes.Clear();
@@ -270,37 +301,6 @@ namespace Editors.Audio.AudioEditor.ViewModels
             }
 
             AudioProjectInstance.VOProject.DialogueEvents = dialogueEvents;
-        }
-
-        [RelayCommand] public void SelectAll()
-        {
-            foreach (var checkBox in DialogueEventCheckBoxes)
-                checkBox.IsChecked = true;
-        }
-
-        /*
-        [RelayCommand] public void SelectRecommended()
-        {
-            // Get the list of dialogue events with the "Recommended" category
-            var recommendedEvents = FrontendVODialogueEvents.Where(e => e.Categories.Contains("Recommended")).Select(e => e.Name).ToHashSet();
-
-            // Iterate through the CheckBoxes and set IsChecked for those with matching Name
-            foreach (var checkBox in DialogueEventCheckBoxes)
-            {
-                if (recommendedEvents.Contains(checkBox.Content.ToString()))
-                {
-                    checkBox.IsChecked = true;
-                }
-            }
-        }
-        */
-
-        [RelayCommand] public void SelectNone()
-        {
-            foreach (var checkBox in DialogueEventCheckBoxes)
-            {
-                checkBox.IsChecked = false;
-            }
         }
 
         public void ResetNewVOAudioProjectViewModelData()
