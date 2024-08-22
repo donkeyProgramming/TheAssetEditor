@@ -85,9 +85,12 @@ namespace Editors.Audio.AudioEditor.ViewModels
             window.AlwaysOnTop = false;
             window.ResizeMode = ResizeMode.NoResize;
 
-            // Set the close action
             if (window.DataContext is NewVOAudioProjectViewModel viewModel)
+            {
+                viewModel.ResetNewVOAudioProjectViewModelData();
+
                 viewModel.SetCloseAction(() => window.Close());
+            }
 
             window.ShowWindow();
         }

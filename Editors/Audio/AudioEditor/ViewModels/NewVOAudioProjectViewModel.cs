@@ -61,6 +61,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         // Properties to control whether OK button is enabled.
         [ObservableProperty] private bool _isAudioProjectFileNameSet;
+        [ObservableProperty] private bool _isAudioProjectDirectorySet;
         [ObservableProperty] private bool _isLanguageSelected;
         [ObservableProperty] private bool _isAnyDialogueEventChecked;
         [ObservableProperty] private bool _isOkButtonIsEnabled;
@@ -75,6 +76,12 @@ namespace Editors.Audio.AudioEditor.ViewModels
         partial void OnAudioProjectFileNameChanged(string value)
         {
             IsAudioProjectFileNameSet = !string.IsNullOrEmpty(value);
+            UpdateOkButtonIsEnabled();
+        }
+
+        partial void OnAudioProjectDirectoryChanged(string value)
+        {
+            IsAudioProjectDirectorySet = !string.IsNullOrEmpty(value);
             UpdateOkButtonIsEnabled();
         }
 
@@ -108,7 +115,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         private void UpdateOkButtonIsEnabled()
         {
-            IsOkButtonIsEnabled = IsLanguageSelected && IsAudioProjectFileNameSet && IsAnyDialogueEventChecked;
+            IsOkButtonIsEnabled = IsAudioProjectFileNameSet && IsAudioProjectDirectorySet && IsLanguageSelected && IsAnyDialogueEventChecked;
         }
 
         [RelayCommand] public void SetNewFileLocation()
@@ -305,8 +312,6 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [RelayCommand] public void CloseWindowAction()
         {
             _closeAction?.Invoke();
-
-            ResetNewVOAudioProjectViewModelData();
         }
 
         public void SetCloseAction(Action closeAction)
