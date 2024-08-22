@@ -11,11 +11,15 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
     public class PackFileFilter : NotifyPropertyChangedImpl, IDataErrorInfo
     {
         public string Error { get; set; } = string.Empty;
+
         public string this[string columnName] => Filter(FilterText);
 
         private readonly ObservableCollection<TreeNode> _nodeCollection;
 
+        public bool _allowFolderSelection { get; set; }
+
         string _filterText = "";
+
         public string FilterText
         {
             get => _filterText;
@@ -29,27 +33,62 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         List<string> _extentionFilter;
         public int AutoExapandResultsAfterLimitedCount { get; set; } = 25;
 
-        public PackFileFilter(ObservableCollection<TreeNode> nodes)
+        public PackFileFilter(ObservableCollection<TreeNode> nodes, bool allowFolderSelection)
         {
             _nodeCollection = nodes;
+            _allowFolderSelection = allowFolderSelection;
         }
 
         string Filter(string text)
         {
             Regex expression = null;
-            try
+
+            if (!_allowFolderSelection)
             {
-                expression = new Regex(text, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            }
-            catch (Exception e)
-            {
-                return e.Message;
+                try
+                {
+                    expression = new Regex(text, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                }
+                catch (Exception e)
+                {
+                    return e.Message;
+                }
+
+                foreach (var item in _nodeCollection)
+                    HasChildWithFilterMatch(item, expression);
+
+                if (AutoExapandResultsAfterLimitedCount != -1)
+                {
+                    var visibleNodes = 0;
+                    foreach (var item in _nodeCollection)
+                        visibleNodes += CountVisibleNodes(item);
+
+                    if (visibleNodes <= AutoExapandResultsAfterLimitedCount)
+                    {
+                        foreach (var item in _nodeCollection)
+                            item.ExpandIfVisible();
+                    }
+                }
+
+                return "";
             }
 
-            foreach (var item in _nodeCollection)
-                HasChildWithFilterMatch(item, expression);
+            else
+            {
+                try
+                {
+                    expression = new Regex(text, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                }
+                catch (Exception e)
+                {
+                    return e.Message;
+                }
 
-            return "";
+                foreach (var item in _nodeCollection)
+                    HasChildWithFilterMatch(item, expression);
+
+                return "";
+            }
         }
 
         int CountVisibleNodes(TreeNode file)
@@ -72,39 +111,94 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         bool HasChildWithFilterMatch(TreeNode file, Regex expression)
         {
-            // Folders are always visible
-            if (file.NodeType == NodeType.Root || file.NodeType == NodeType.Directory)
+            if (!_allowFolderSelection)
             {
-                file.IsVisible = true;
-                bool hasVisibleChildren = false;
+                if (file.NodeType == NodeType.Root && file.Children.Count == 0)
+                {
+                    file.IsVisible = true;
+
+                    return true;
+                }
+
+                if (file.NodeType == NodeType.File)
+                {
+                    var hasValidExtention = true;
+                    if (_extentionFilter != null)
+                    {
+                        hasValidExtention = false;
+                        foreach (var extention in _extentionFilter)
+                        {
+                            if (file.Name.Contains(extention))
+                            {
+                                hasValidExtention = true;
+
+                                continue;
+                            }
+                        }
+                    }
+
+                    if (hasValidExtention)
+                    {
+                        if (expression.IsMatch(file.Name))
+                        {
+                            file.IsVisible = true;
+
+                            return true;
+                        }
+                    }
+                }
+
+                var hasChildMatch = false;
+
                 foreach (var child in file.Children)
                 {
                     if (HasChildWithFilterMatch(child, expression))
-                        hasVisibleChildren = true;
+                        hasChildMatch = true;
                 }
-                return hasVisibleChildren; // Return true if any child is visible
+
+                file.IsVisible = hasChildMatch;
+
+                return hasChildMatch;
             }
 
-            // Handle file nodes
-            if (file.NodeType == NodeType.File)
+            else // Folders are always visible
             {
-                var hasValidExtension = _extentionFilter == null || _extentionFilter.Count == 0 || _extentionFilter.Any(ext => file.Name.Contains(ext));
-
-                if (hasValidExtension && expression.IsMatch(file.Name))
+                if (file.NodeType == NodeType.Root || file.NodeType == NodeType.Directory)
                 {
                     file.IsVisible = true;
-                    return true;
-                }
-                else
-                {
-                    file.IsVisible = false;
-                    return false;
-                }
-            }
+                    bool hasVisibleChildren = false;
 
-            // Default case for other nodes
-            file.IsVisible = false;
-            return false;
+                    foreach (var child in file.Children)
+                    {
+                        if (HasChildWithFilterMatch(child, expression))
+                            hasVisibleChildren = true;
+                    }
+                    return hasVisibleChildren;
+                }
+
+                // Handle file nodes
+                if (file.NodeType == NodeType.File)
+                {
+                    var hasValidExtension = _extentionFilter == null || _extentionFilter.Count == 0 || _extentionFilter.Any(ext => file.Name.Contains(ext));
+
+                    if (hasValidExtension && expression.IsMatch(file.Name))
+                    {
+                        file.IsVisible = true;
+
+                        return true;
+                    }
+                    else
+                    {
+                        file.IsVisible = false;
+
+                        return false;
+                    }
+                }
+
+                file.IsVisible = false;
+
+                return false;
+            }
         }
     }
 }

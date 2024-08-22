@@ -15,7 +15,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
     public delegate void FileSelectedDelegate(PackFile file);
     public delegate void NodeSelectedDelegate(TreeNode node);
 
-    public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable, IDropTarget<TreeNode>
+    public partial class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable, IDropTarget<TreeNode>
     {
         protected PackFileService _packFileService;
         public event FileSelectedDelegate FileOpen;
@@ -25,8 +25,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         public ObservableCollection<TreeNode> Files { get; set; } = new ObservableCollection<TreeNode>();
         public PackFileFilter Filter { get; private set; }
-        public ICommand DoubleClickCommand { get; set; }
-        public ICommand ClearTextCommand { get; set; }
 
         TreeNode _selectedItem;
         public TreeNode SelectedItem
@@ -44,9 +42,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         public PackFileBrowserViewModel(PackFileService packFileService, bool ignoreCaFiles = false, bool allowFolderSelection = false)
         {
-            DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
-            ClearTextCommand = new RelayCommand(OnClearText);
-
             _packFileService = packFileService;
             _packFileService.Database.PackFileContainerLoaded += ReloadTree;
             _packFileService.Database.PackFileContainerRemoved += PackFileContainerRemoved;
@@ -60,7 +55,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
             _allowFolderSelection = allowFolderSelection;
 
-            Filter = new PackFileFilter(Files);
+            Filter = new PackFileFilter(Files, _allowFolderSelection);
 
             foreach (var item in _packFileService.Database.PackFiles)
             {
@@ -124,12 +119,12 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             }
         }
 
-        protected virtual void OnClearText()
+        [RelayCommand] protected virtual void OnClearText()
         {
             Filter.FilterText = "";
         }
 
-        protected virtual void OnDoubleClick(TreeNode node)
+        [RelayCommand] protected virtual void OnDoubleClick(TreeNode node)
         {
             if (SelectedItem != null)
             {
@@ -139,17 +134,25 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 }
                 else if (SelectedItem.NodeType == NodeType.Directory)
                 {
-
-                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                    if (!_allowFolderSelection)
                     {
-                        SelectedItem.ExpandIfVisible(true);
-                    }
+                        if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                        {
+                            SelectedItem.ExpandIfVisible(true);
+                        }
 
-                    else
-                    {
-                        if (_allowFolderSelection)
+                        else
                         {
                             FolderSelected?.Invoke(SelectedItem);
+                        }
+                    }
+
+                    // Removed the ability to double click to select nodes when just browsing for folders.
+                    else
+                    {
+                        if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                        {
+                            SelectedItem.ExpandIfVisible(true);
                         }
                     }
                 }
@@ -163,7 +166,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
             Files.FirstOrDefault(x => x.FileOwner == pf).IsMainEditabelPack = true;
         }
-
 
         private void AddFiles(PackFileContainer container, List<PackFile> files)
         {
