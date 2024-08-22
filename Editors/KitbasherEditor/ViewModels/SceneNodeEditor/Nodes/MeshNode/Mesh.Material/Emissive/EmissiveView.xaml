@@ -27,7 +27,7 @@
 
             <DockPanel LastChildFill="False">
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Tint Colour" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Emissive" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
                     <userinterface:ShaderTextureView DataContext="{Binding EmissiveTexture}"/>
                 </basedialogs:AeAttribute>
 

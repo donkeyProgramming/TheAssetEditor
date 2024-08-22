@@ -86,7 +86,7 @@ namespace GameWorld.Core.Utility.UserInterface
         void ValidatePath()
         {
             _errorsByPropertyName[nameof(Path)] = new List<string>();
-            if (Path == null || string.IsNullOrWhiteSpace(Path) == false)
+            if (string.IsNullOrWhiteSpace(Path))
             {
                 _errorsByPropertyName[nameof(Path)].Add("Path is required. If none is wanted, use 'test_mask.dds'");
             }

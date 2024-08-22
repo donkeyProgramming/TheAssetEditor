@@ -2,6 +2,7 @@
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Test.TestUtility;
+using GameWorld.Core.Test.TestUtility.Material;
 using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -39,31 +40,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
             return new MaterialToWsMaterialSerializer(saveHelper, materialRepo, gameTypeEnum);
         }
 
-        WsModelMaterialFile GetWsModelFile()
-        {
-            var wsMaterial = new WsModelMaterialFile()
-            {
-                Alpha = true,
-                Name = "cth_celestial_general_body_01_weighted4_alpha_on.xml",
-                ShaderPath = "shaders/weighted4_character_alpha.xml.shader",
-                Textures = new()
-                {
-                    {TextureType.BaseColour, $"texturePath/wsmodel/{TextureType.BaseColour}.dds"},
-                    {TextureType.MaterialMap, $"texturePath/wsmodel/{TextureType.MaterialMap}.dds"},
-                    {TextureType.Normal, $"texturePath/wsmodel/{TextureType.Normal}.dds"},
-                    {TextureType.Mask, $"texturePath/wsmodel/{TextureType.Mask}.dds"},
-                    {TextureType.Distortion, $"texturePath/wsmodel/{TextureType.Distortion}.dds"},
-                    {TextureType.DistortionNoise, $"texturePath/wsmodel/{TextureType.DistortionNoise}.dds"},
-                    {TextureType.Blood, $"texturePath/wsmodel/{TextureType.Blood}.dds"},
-                },
-                Parameters =
-                [
-                    new WsModelMaterialParam(WsModelParamters.Blood_Use.Name, 1),
-                    new WsModelMaterialParam(WsModelParamters.Blood_Scale.Name, new Vector2(1,2)),
-                ]
-            };
-            return wsMaterial;
-        }
+      
 
         IRmvMaterial GetRmvMaterial()
         {
@@ -79,7 +56,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
         public void CreateFromWsMaterial()
         {
             // Arrange
-            var wsMaterial = GetWsModelFile();
+            var wsMaterial = WsMaterialHelper.GetDefaultMetalRoughWsModelFile();
 
             // Act
             var material = GetMaterialFactory(GameTypeEnum.Warhammer3).Create(null, wsMaterial);
@@ -106,7 +83,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
         public void GenerateWsMaterial(GameTypeEnum gameType)
         {
             // Arrange
-            var wsMaterial = GetWsModelFile();
+            var wsMaterial = WsMaterialHelper.GetDefaultMetalRoughWsModelFile();
 
             // Act
             var material = GetMaterialFactory(gameType).Create(null, wsMaterial);
@@ -122,16 +99,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
             Assert.That(generatedMaterial.ShaderPath, Is.EqualTo("shaders/weighted4_character_alpha.xml.shader"));
             Assert.That(generatedMaterial.Name, Is.EqualTo("mymesh_weighted4_alpha_on.xml"));
 
-            Assert.That(generatedMaterial.Textures[TextureType.BaseColour], Is.EqualTo($"texturePath/wsmodel/{TextureType.BaseColour}.dds"));
-            Assert.That(generatedMaterial.Textures[TextureType.MaterialMap], Is.EqualTo($"texturePath/wsmodel/{TextureType.MaterialMap}.dds"));
-            Assert.That(generatedMaterial.Textures[TextureType.Normal], Is.EqualTo($"texturePath/wsmodel/{TextureType.Normal}.dds"));
-            Assert.That(generatedMaterial.Textures[TextureType.Mask], Is.EqualTo($"texturePath/wsmodel/{TextureType.Mask}.dds"));
-            Assert.That(generatedMaterial.Textures[TextureType.Distortion], Is.EqualTo($"texturePath/wsmodel/{TextureType.Distortion}.dds"));
-            Assert.That(generatedMaterial.Textures[TextureType.DistortionNoise], Is.EqualTo($"texturePath/wsmodel/{TextureType.DistortionNoise}.dds"));
-
-            Assert.That(generatedMaterial.Textures[TextureType.Blood], Is.EqualTo($"texturePath/wsmodel/{TextureType.Blood}.dds"));
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Blood_Use).Value, Is.EqualTo("1"));
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Blood_Scale).Value, Is.EqualTo("1, 2"));
+            WsMaterialHelper.ValidateMetalRough(generatedMaterial);
         }
 
         [Test]
