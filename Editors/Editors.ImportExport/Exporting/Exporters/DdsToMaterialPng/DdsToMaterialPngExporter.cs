@@ -4,6 +4,7 @@ using Shared.Core.PackFiles.Models;
 using System.Drawing;
 using System.IO;
 using MeshImportExport;
+using System.Windows;
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
 {
@@ -16,20 +17,29 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             pfs = packFileService;
             _imageSaveHandler = imageSaveHandler;
         }
-        public void Export(string path, string outputPath, bool convertToBlenderFormat)
+        public string Export(string filePath, string outputPath, bool convertToBlenderFormat)
         {
-            var packFile = pfs.FindFile(path);
-            var fileName = Path.GetFileNameWithoutExtension(path);
-            var fileDirectory = outputPath + "/" + fileName + ".png";
-            var bytes = packFile.DataSource.ReadData();
-            var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
-            if (convertToBlenderFormat)
+            try
             {
-                ConvertToBlenderFormat(imgBytes, outputPath, fileDirectory);
+                var packFile = pfs.FindFile(filePath);
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var fileDirectory = outputPath + "/" + fileName + ".png";
+                var bytes = packFile.DataSource.ReadData();
+                var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
+                if (convertToBlenderFormat)
+                {
+                    ConvertToBlenderFormat(imgBytes, outputPath, fileDirectory);
+                }
+                else
+                {
+                    DoNotConvertExport(imgBytes, outputPath, fileDirectory);
+                }
+                return fileDirectory;
             }
-            else
+            catch(NullReferenceException exception)
             {
-                DoNotConvertExport(imgBytes, outputPath, fileDirectory);
+                MessageBox.Show(exception.Message + filePath);
+                return "";
             }
         }
 

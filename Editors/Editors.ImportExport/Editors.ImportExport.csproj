@@ -16,7 +16,10 @@
   <ItemGroup>
     <Folder Include="Image\" />
     <Folder Include="Geometry\" />
-    <Folder Include="Importing\" />
+    <Folder Include="Importing\Importers\GltfToRmv\" />
+    <Folder Include="Importing\Importers\PngToDds\" />
+    <Folder Include="Importing\Importers\PngToNormalDds\" />
+    <Folder Include="Importing\Importers\PngToMaterialDds\" />
   </ItemGroup>
 
   <ItemGroup>

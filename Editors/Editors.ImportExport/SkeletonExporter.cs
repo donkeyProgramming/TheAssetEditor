@@ -9,22 +9,12 @@ using SharpGLTF.Schema2;
 
 namespace MeshImportExport
 {
-    public class SharedModel()
-    {
-        public static ModelRoot Model { get; private set; }
-        public static void SetModel(ModelRoot model)
-        {
-            Model = model;
-        }
-    }
     internal class SkeletonExporter
     {
         public ModelRoot Model { get; private set; }
-        public static List<(Node node, Matrix4x4 invMatrix)> CreateSkeletonFromGameSkeleton(AnimationFile file, AnimInvMatrixFile invMatrixFile)
+        public static List<(Node node, Matrix4x4 invMatrix)> CreateSkeletonFromGameSkeleton(AnimationFile file, AnimInvMatrixFile invMatrixFile, ModelRoot model)
         {
-            var model = ModelRoot.CreateModel();
             var scene = model.UseScene("default");
-            SharedModel.SetModel(model);
             var invMatrixRootBase = invMatrixFile.MatrixList[0];
             var frameBase = file.AnimationParts[0].DynamicFrames[0];
 

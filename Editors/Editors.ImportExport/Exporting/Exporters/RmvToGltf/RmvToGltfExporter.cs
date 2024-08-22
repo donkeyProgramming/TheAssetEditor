@@ -19,6 +19,7 @@ using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using System.ComponentModel;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel.Vertex;
+using Shared.GameFormats.RigidModel.Types;
 
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 {
@@ -35,16 +36,16 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
     public class RmvToGltfExporter
     {
         private readonly PackFileService _packFileService;
-        private readonly DdsToNormalPngExporter _exporterNormalBlue;
+        private readonly DdsToNormalPngExporter _ddsToNormalPngExporter;
         private readonly DdsToPngExporter _ddsToPngExporter;
-        private readonly DdsToMaterialPngExporter _exporterMaterial;
+        private readonly DdsToMaterialPngExporter _ddsToMaterialPngExporter;
 
         public RmvToGltfExporter(PackFileService packFileSerivce, DdsToNormalPngExporter ddsToNormalPngExporter, DdsToPngExporter ddsToPngExporter, DdsToMaterialPngExporter ddsToMaterialPngExporter)
         {
             _packFileService = packFileSerivce;
-            _exporterNormalBlue = ddsToNormalPngExporter;
+            _ddsToNormalPngExporter = ddsToNormalPngExporter;
             _ddsToPngExporter = ddsToPngExporter;
-            _exporterMaterial = ddsToMaterialPngExporter;
+            _ddsToMaterialPngExporter = ddsToMaterialPngExporter;
         }
 
         internal ExportSupportEnum CanExportFile(PackFile file)
@@ -65,34 +66,31 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var model = ModelRoot.CreateModel();
             if (hasSkeleton)
             {
-                gltfSkeleton = GenerateSkeleton(rmv2);
-                model = SharedModel.Model;
-            }
-            else
-            {
-                SharedModel.SetModel(model);
+                gltfSkeleton = GenerateSkeleton(rmv2, model);
             }
             List<Mesh> meshes = new List<Mesh>();
             foreach (var rmvMesh in lodLevel)
             {
-                var gltfMaterial = new MaterialBuilder();
+                var gltfMaterial = new MaterialBuilder(rmvMesh.Material.ModelName + "_Material")
+                    .WithDoubleSide(true)
+                    .WithMetallicRoughness();
                 if (settings.ExportTextures == true)
                 {
-                    gltfMaterial = _ddsToPngExporter.GenerateMaterial(settings, rmvMesh);
+                    gltfMaterial = GenerateMaterial(settings, rmvMesh, gltfMaterial);
                 }
                 else
                 {
-                    gltfMaterial = _ddsToPngExporter.BuildFakeMaterialPerMesh(rmvMesh, settings.InputFile);
+                    gltfMaterial = BuildFakeMaterialPerMesh(rmvMesh, settings.InputFile);
                 }
                 var mesh = model.CreateMesh(GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton));
                 meshes.Add(mesh);
             }
-            BuildGltf(meshes, gltfSkeleton, settings);
+            BuildGltf(meshes, gltfSkeleton, settings, model);
+            //_ddsToPngExporter.Export(settings.OutputPath, settings.InputFile, settings); works on its own test
         }
 
-        public void BuildGltf(List<Mesh> meshes, List<(Node, Matrix4x4)> gltfSkeleton, RmvToGltfExporterSettings settings)
+        public void BuildGltf(List<Mesh> meshes, List<(Node, Matrix4x4)> gltfSkeleton, RmvToGltfExporterSettings settings, ModelRoot model)
         {
-            var model = SharedModel.Model;
             var scene = model.UseScene("default");
             foreach (var mesh in meshes)
             {
@@ -108,7 +106,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputFile.Name) + ".gltf");
         }
 
-        internal List<(Node, Matrix4x4)> GenerateSkeleton(RmvFile rmv2)
+        internal List<(Node, Matrix4x4)> GenerateSkeleton(RmvFile rmv2, ModelRoot model)
         {
             var skeletonName = rmv2.Header.SkeletonName + ".anim";
             var skeletonSearchList = _packFileService.SearchForFile(skeletonName);
@@ -122,7 +120,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
             var animFile = AnimationFile.Create(skeletonPackFile);
             var invMatrixFile = AnimInvMatrixFile.Create(invMatrixPackFile.DataSource.ReadDataAsChunk());
-            var gltfSkeletonBindings = SkeletonExporter.CreateSkeletonFromGameSkeleton(animFile, invMatrixFile);
+            var gltfSkeletonBindings = SkeletonExporter.CreateSkeletonFromGameSkeleton(animFile, invMatrixFile, model);
 
             return gltfSkeletonBindings;
         }
@@ -225,6 +223,40 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 glTfvertex.Skinning.Joints = new Vector4(0, 1, 0, 0);
             }
             return glTfvertex;
+        }
+
+        internal MaterialBuilder BuildFakeMaterialPerMesh(RmvModel rmvMesh, PackFile file)
+        {
+            var material = TextureHelper.BuildFakeMaterial(_packFileService, rmvMesh);
+            return material;
+        }
+
+        internal MaterialBuilder GenerateMaterial(RmvToGltfExporterSettings settings, RmvModel rmv2Mesh, MaterialBuilder material)
+        {
+            var textures = rmv2Mesh.Material.GetAllTextures();
+            var systemPath = "";
+
+            var normalMapTexture = textures.FirstOrDefault(t => t.TexureType == TextureType.Normal);
+            if (normalMapTexture.Path != null)
+            {
+                systemPath = _ddsToNormalPngExporter.Export(normalMapTexture.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
+                material.WithChannelImage(KnownChannel.Normal, systemPath);
+            }
+
+            var materialTexture = textures.FirstOrDefault(t => t.TexureType == TextureType.MaterialMap);
+            if (materialTexture.Path != null)
+            {
+                systemPath = _ddsToMaterialPngExporter.Export(materialTexture.Path, settings.OutputPath, settings.ConvertMaterialTextureToBlender);
+                material.WithChannelImage(KnownChannel.MetallicRoughness, systemPath);
+            }
+
+            var baseColourTexture = textures.FirstOrDefault(t => t.TexureType == TextureType.BaseColour);
+            if (baseColourTexture.Path != null)
+            {
+                systemPath = _ddsToPngExporter.GenericExportNoConversion(settings.OutputPath, baseColourTexture);
+                material.WithChannelImage(KnownChannel.BaseColor, systemPath);
+            }
+            return material;
         }
     }
 }

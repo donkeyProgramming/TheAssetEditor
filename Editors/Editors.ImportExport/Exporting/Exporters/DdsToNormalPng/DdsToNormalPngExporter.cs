@@ -20,7 +20,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             _imageSaveHandler = imageSaveHandler;
         }
 
-        public void Export(string filePath, string outputPath, bool convert)
+        public string Export(string filePath, string outputPath, bool convert)
         {
             try
             {
@@ -37,10 +37,11 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                 {
                     DoNotConvertExport(imgBytes, outputPath, fileDirectory);
                 }
+                return fileDirectory;
             } catch(NullReferenceException exception)
             {
                 MessageBox.Show(exception.Message + filePath);
-                return;
+                return "";
             }
         }
 
