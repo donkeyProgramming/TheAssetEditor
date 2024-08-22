@@ -37,6 +37,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- Audio Project Name -->
@@ -46,12 +47,43 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Name:" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" x:Name="AudioProjectFileNameTextBox" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
-                         Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
+                         Text="{Binding AudioProjectFileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="PLACEHOLDER TOOLTIP"/>
+            </Grid>
+
+            <!-- Audio Project Location -->
+            <Grid Grid.Row="1" Margin="0, 2, 0, 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="145"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Location:" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}"  
+                         Text="{Binding AudioProjectFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="PLACEHOLDER TOOLTIP"
+                         IsReadOnly="True"/>
+                <Button Grid.Column="2" Content="..." VerticalAlignment="Center" Width="30" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding SetNewFileLocationCommand}"/>
+            </Grid>
+
+            <!-- States File Path -->
+            <Grid Grid.Row="2" Margin="0, 2, 0, 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="145"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Modded States Location:" VerticalAlignment="Center"/>
+                <TextBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}"  
+                         Text="{Binding ModdedStatesFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="PLACEHOLDER TOOLTIP"
+                         IsReadOnly="True"/>
+                <Button Grid.Column="2" Content="..." VerticalAlignment="Center" Width="30" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding SetCustomStatesLocationCommand}"/>
             </Grid>
 
             <!-- Language Selection -->
-            <Grid Grid.Row="1" Margin="0, 2, 0, 5">
+            <Grid Grid.Row="3" Margin="0, 2, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
@@ -63,48 +95,36 @@
                           ItemTemplate="{StaticResource EnumToStringTemplate}"/>
             </Grid>
 
-            <!-- States File Path -->
-            <Grid Grid.Row="2" Margin="0, 2, 0, 5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="145"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="Custom States Location:" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" x:Name="StatesFilePath" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}"  
-                         Text="{Binding CustomStatesFilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         IsReadOnly="True"/>
-                <Button Grid.Column="2" Content="..." VerticalAlignment="Center" Width="30" Height="{StaticResource DefaultHeight}" Margin="5, 0, 0, 0" Command="{Binding SetCustomStatesLocationCommand}"/>
-            </Grid>
-
             <!-- EventType Selection -->
-            <Grid Grid.Row="3" Margin="0, 2, 0, 5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="145"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="Dialogue Event Types:" VerticalAlignment="Center"/>
-                <ComboBox Grid.Column="1" ToolTip="PLACEHOLDER TOOLTIP" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
-                          ItemsSource="{Binding AudioProjectEventTypes}" 
-                          SelectedItem="{Binding SelectedAudioProjectEventType}" 
-                          ItemTemplate="{StaticResource EnumToStringTemplate}"/>
-            </Grid>
-
-            <!-- EventSubType Selection -->
             <Grid Grid.Row="4" Margin="0, 2, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
+                <Label Content="Dialogue Event Types:" VerticalAlignment="Center"/>
+                <ComboBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
+                          ItemsSource="{Binding AudioProjectEventTypes}" 
+                          SelectedItem="{Binding SelectedAudioProjectEventType}" 
+                          ItemTemplate="{StaticResource EnumToStringTemplate}"
+                          ToolTip="PLACEHOLDER TOOLTIP"/>
+            </Grid>
+
+            <!-- EventSubType Selection -->
+            <Grid Grid.Row="5" Margin="0, 2, 0, 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="145"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
                 <Label Content="Dialogue Event Subtypes:" VerticalAlignment="Center"/>
-                <ComboBox Grid.Column="1" ToolTip="PLACEHOLDER TOOLTIP" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
+                <ComboBox Grid.Column="1" VerticalAlignment="Center" Height="{StaticResource DefaultHeight}" 
                           ItemsSource="{Binding AudioProjectSubtypes}" 
                           SelectedItem="{Binding SelectedAudioProjectEventSubtype}" 
-                          ItemTemplate="{StaticResource EnumToStringTemplate}"/>
+                          ItemTemplate="{StaticResource EnumToStringTemplate}"
+                          ToolTip="PLACEHOLDER TOOLTIP"/>
             </Grid>
 
             <!-- Dialogue Events Section -->
-            <Grid Grid.Row="5" Margin="0, 4, 0, 5">
+            <Grid Grid.Row="6" Margin="0, 4, 0, 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>
@@ -120,7 +140,7 @@
             </Grid>
 
             <!-- Buttons for Dialogue Events Section -->
-            <Grid Grid.Row="6" Margin="0, 5, 0, 0">
+            <Grid Grid.Row="7" Margin="0, 5, 0, 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="145"/>
                     <ColumnDefinition Width="*"/>

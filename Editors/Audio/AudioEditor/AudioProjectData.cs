@@ -21,7 +21,7 @@ namespace Editors.Audio.AudioEditor
             public string AudioProjectName { get; set; }
             public string BnkName { get; set; }
             public string Language { get; set; }
-            public string CustomStatesFilePath { get; set; }
+            public string ModdedStatesFilePath { get; set; }
         }
 
         public class Event

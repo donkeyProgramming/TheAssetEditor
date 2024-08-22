@@ -45,7 +45,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         // The properties for each settings.
         [ObservableProperty] private string _audioProjectFileName;
-        [ObservableProperty] private string _customStatesFilePath;
+        [ObservableProperty] private string _audioProjectFilePath;
+        [ObservableProperty] private string _moddedStatesFilePath;
         [ObservableProperty] private string _selectedLanguage;
         [ObservableProperty] private string _selectedAudioProjectEventType;
         [ObservableProperty] private string _selectedAudioProjectEventSubtype;
@@ -110,14 +111,26 @@ namespace Editors.Audio.AudioEditor.ViewModels
             IsOkButtonIsEnabled = IsLanguageSelected && IsAudioProjectFileNameSet && IsAnyDialogueEventChecked;
         }
 
+        [RelayCommand] public void SetNewFileLocation()
+        {
+            using var browser = new PackFileBrowserWindow(_packFileService, [".OleIsADonkey"], true); //Set it to some non-existant file type and it will show only folders.
+
+            if (browser.ShowDialog())
+            {
+                var filePath = browser.SelectedPath;
+                AudioProjectFilePath = filePath;
+                _logger.Here().Information($"Custom States file path set to: {filePath}");
+            }
+        }
+
         [RelayCommand] public void SetCustomStatesLocation()
         {
             using var browser = new PackFileBrowserWindow(_packFileService, [".customstates"]);
 
             if (browser.ShowDialog())
             {
-                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
-                CustomStatesFilePath = filePath;
+                var filePath = browser.SelectedPath;
+                ModdedStatesFilePath = filePath;
                 _logger.Here().Information($"Custom States file path set to: {filePath}");
             }
         }
@@ -223,7 +236,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             {
                 AudioProjectName = AudioProjectFileName,
                 Language = LanguageEnumToString[GetLanguageEnumString(SelectedLanguage)],
-                CustomStatesFilePath = CustomStatesFilePath
+                ModdedStatesFilePath = ModdedStatesFilePath
             };
 
             AudioEditorInstance.AudioProject.Settings = settings;
@@ -278,7 +291,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         public void ResetNewVOAudioProjectViewModelData()
         {
             AudioProjectFileName = null;
-            CustomStatesFilePath = null;
+            ModdedStatesFilePath = null;
             SelectedAudioProjectEventType = null;
             SelectedAudioProjectEventSubtype = null;
             AudioProjectSubtypes.Clear();

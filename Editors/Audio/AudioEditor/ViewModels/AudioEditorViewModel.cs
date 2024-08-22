@@ -105,7 +105,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 // Create the object for State Groups with qualifiers so that their keys in the AudioProject dictionary are unique.
                 AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
 
-                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
+                var filePath = browser.SelectedPath;
                 var file = _packFileService.FindFile(filePath);
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
