@@ -43,6 +43,14 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             };
         }
 
+        public (bool Result, string Message) AreEqual(ICapability otherCap)
+        {
+            var typedCap = otherCap as TintCapability;
+            if (typedCap == null)
+                throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
+            return (true, "");
+        }
+
         public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)
         {
         }

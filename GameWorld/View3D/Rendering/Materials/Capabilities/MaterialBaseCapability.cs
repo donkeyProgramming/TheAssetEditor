@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Rendering.Materials.Serialization;
+﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
@@ -33,6 +34,18 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public virtual void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
         {
             rmvMaterial.AlphaMode = UseAlpha ? AlphaMode.Transparent : AlphaMode.Opaque;
+        }
+
+        public virtual (bool Result, string Message) AreEqual(ICapability otherCap)
+        {
+            var typedCap = otherCap as MaterialBaseCapability;
+            if (typedCap == null)
+                throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
+
+            if (CompareHelper.Compare(UseAlpha, typedCap.UseAlpha, nameof(UseAlpha), out var res))
+                return res;
+
+            return (true, "");
         }
     }
 }

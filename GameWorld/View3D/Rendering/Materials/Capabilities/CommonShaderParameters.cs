@@ -58,5 +58,13 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                 LightIntensityMult = LightIntensityMult,
             };
         }
+
+        public (bool Result, string Message) AreEqual(ICapability otherCap)
+        {
+            var typedCap = otherCap as CommonShaderParametersCapability;
+            if (typedCap == null)
+                throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
+            return (true, "");
+        }
     }
 }

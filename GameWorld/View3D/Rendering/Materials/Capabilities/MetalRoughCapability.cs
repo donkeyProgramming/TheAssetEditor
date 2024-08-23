@@ -77,33 +77,21 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             base.SerializeToRmvMaterial(rmvMaterial);
         }
 
-
-        public static bool AreEqual(MetalRoughCapability a, MetalRoughCapability b)
+        public override (bool Result, string Message) AreEqual(ICapability otherCap)
         {
-            if (a.UseAlpha != b.UseAlpha)
-                return false;
+            if (otherCap is not MetalRoughCapability typedCap)
+                throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
 
-            string[] aTextures = [
-                a.BaseColour.TexturePath,
-                a.MaterialMap.TexturePath,
-                a.NormalMap.TexturePath,
-                a.Mask.TexturePath
-            ];
+            if (CompareHelper.Compare(BaseColour, typedCap.BaseColour, nameof(BaseColour), out var res0))
+                return res0;
+            if (CompareHelper.Compare(MaterialMap, typedCap.MaterialMap, nameof(MaterialMap), out var res1))
+                return res1;
+            if (CompareHelper.Compare(NormalMap, typedCap.NormalMap, nameof(NormalMap), out var res2))
+                return res2;
+            if (CompareHelper.Compare(Mask, typedCap.Mask, nameof(Mask), out var res3))
+                return res3;
 
-            string[] bTextures = [
-                b.BaseColour.TexturePath,
-                b.MaterialMap.TexturePath,
-                b.NormalMap.TexturePath,
-                b.Mask.TexturePath
-            ];
-
-            for (var i = 0; i < aTextures.Length; i++)
-            {
-                if (aTextures[i] != bTextures[i])
-                    return false;
-            }
-
-            return true;
+            return base.AreEqual(otherCap);
         }
     }
 }

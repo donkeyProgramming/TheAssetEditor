@@ -3,6 +3,7 @@ using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Octokit;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
@@ -116,6 +117,46 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             templateHandler.AddAttribute(WsModelParamters.Emissive_Strength.TemplateName, EmissiveStrength);
             templateHandler.AddAttribute(WsModelParamters.Emissive_Tiling.TemplateName, EmissiveTiling);
             templateHandler.AddAttribute(WsModelParamters.Emissive_Tint.TemplateName, EmissiveTint);
+        }
+
+        public (bool Result, string Message) AreEqual(ICapability otherCap)
+        {
+            if (otherCap is not EmissiveCapability typedCap)
+                throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
+
+            if (CompareHelper.Compare(Emissive, typedCap.Emissive, nameof(Emissive), out var res0))
+                return res0;
+            if (CompareHelper.Compare(EmissiveDistortion, typedCap.EmissiveDistortion, nameof(EmissiveDistortion), out var res1))
+                return res1;
+            if (CompareHelper.Compare(EmissiveDirection, typedCap.EmissiveDirection, nameof(EmissiveDirection), out var res2))
+                return res2;
+            if (CompareHelper.Compare(EmissiveDistortStrength, typedCap.EmissiveDistortStrength, nameof(EmissiveDistortStrength), out var res3))
+                return res3;
+            if (CompareHelper.Compare(EmissiveFresnelStrength, typedCap.EmissiveFresnelStrength, nameof(EmissiveFresnelStrength), out var res4))
+                return res4;
+            if (CompareHelper.Compare(EmissiveSpeed, typedCap.EmissiveSpeed, nameof(EmissiveSpeed), out var res5))
+                return res5;
+            if (CompareHelper.Compare(EmissivePulseSpeed, typedCap.EmissivePulseSpeed, nameof(EmissivePulseSpeed), out var res6))
+                return res6;
+            if (CompareHelper.Compare(EmissivePulseStrength, typedCap.EmissivePulseStrength, nameof(EmissivePulseStrength), out var res7))
+                return res7;
+
+            for (var i = 0; i < 4; i++)
+            {
+                if (CompareHelper.Compare(GradientColours[i], typedCap.GradientColours[i], nameof(GradientColours), out var res8))
+                    return res8;
+                if (CompareHelper.Compare(GradientTimes[i], typedCap.GradientTimes[i], nameof(GradientTimes), out var res9))
+                    return res9;
+            }
+
+            if (CompareHelper.Compare(EmissiveStrength, typedCap.EmissiveStrength, nameof(EmissiveStrength), out var res10))
+                return res10;
+            if (CompareHelper.Compare(EmissiveTiling, typedCap.EmissiveTiling, nameof(EmissiveTiling), out var res11))
+                return res11;
+            if (CompareHelper.Compare(EmissiveTint, typedCap.EmissiveTint, nameof(EmissiveTint), out var res12))
+                return res12;
+
+            return (true, "");
         }
     }
 }

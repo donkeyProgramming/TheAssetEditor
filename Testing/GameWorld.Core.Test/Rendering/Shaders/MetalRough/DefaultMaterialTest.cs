@@ -1,6 +1,7 @@
 ﻿using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Serialization;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Test.TestUtility;
 using GameWorld.Core.Test.TestUtility.Material;
 using Microsoft.Xna.Framework;
@@ -39,8 +40,6 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
             var materialRepo = new WsMaterialRepository(_pfs);
             return new MaterialToWsMaterialSerializer(saveHelper, materialRepo, gameTypeEnum);
         }
-
-      
 
         IRmvMaterial GetRmvMaterial()
         {
@@ -148,5 +147,52 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
             Assert.That(createdRmvMaterial.GetTexture(TextureType.Mask).Value.Path, Is.EqualTo($"texturePath/{TextureType.Mask}.dds"));
         }
 
+        [Test]
+        public void EqualTest_Same()
+        {
+            // Arrange
+            var materialA = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            var materialB = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            
+            // Act
+            var (result, message) = materialA.AreEqual(materialB);
+
+            // Assert
+            Assert.That(result, Is.True);
+            Assert.That(message.Length, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void EqualTest_DiffAlpha()
+        {
+            // Arrange
+            var materialA = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            materialA.GetCapability<MetalRoughCapability>().UseAlpha = false;
+            var materialB = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            materialB.GetCapability<MetalRoughCapability>().UseAlpha = true;
+
+            // Act
+            var (result, message) = materialA.AreEqual(materialB);
+
+            // Assert
+            Assert.That(result, Is.True);
+            Assert.That(message.Length, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void EqualTest_DiffBaseColor()
+        {
+            // Arrange
+            var materialA = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            materialA.GetCapability<MetalRoughCapability>().BaseColour.TexturePath = "Custom path";
+            var materialB = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+
+            // Act
+            var (result, message) = materialA.AreEqual(materialB);
+
+            // Assert
+            Assert.That(result, Is.True);
+            Assert.That(message.Length, Is.EqualTo(0));
+        }
     }
 }

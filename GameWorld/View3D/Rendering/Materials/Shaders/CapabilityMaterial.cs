@@ -102,5 +102,24 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
             return copy;
         }
 
+        public (bool Result, string Message) AreEqual(CapabilityMaterial other)
+        {
+            if (other.Type != Type)
+                return (false, $"Different material types {Type} vs {other.Type}");
+
+            for (var i = 0; i < Capabilities.Length; i++)
+            { 
+                var ownCap = Capabilities[i];
+                var otherCap = other.Capabilities[i];
+                if (ownCap.GetType() != otherCap.GetType())
+                    throw new Exception($"Comparing material {Type} and {other.Type}. They have different caps in index {i} {ownCap.GetType()} vs {otherCap}");
+
+                var res = ownCap.AreEqual(otherCap);
+                if (res.Result == false)
+                    return res;
+            }
+
+            return (true, "");
+        }
     }
 }

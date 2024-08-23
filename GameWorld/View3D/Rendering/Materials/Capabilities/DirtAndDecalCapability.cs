@@ -57,5 +57,13 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                 weightedMateial.SetTexture(DecalMask.Type, DecalMask.TexturePath);
             }
         }
+
+        public (bool Result, string Message) AreEqual(ICapability otherCap)
+        {
+            var typedCap = otherCap as DirtAndDecalCapability;
+            if (typedCap == null)
+                throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
+            return (true, "");
+        }
     }
 }

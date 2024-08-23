@@ -14,6 +14,8 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial) { }
         void SerializeToWsModel(WsMaterialTemplateEditor templateHandler) { }
         void SerializeToRmvMaterial(IRmvMaterial rmvMaterial) { }
+
+        (bool Result, string Message) AreEqual(ICapability otherCap);
     }
 
 }
