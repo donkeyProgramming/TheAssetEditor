@@ -10,9 +10,9 @@ namespace Editors.Audio.AudioEditor
     {
         public enum ProjectType
         {
-            sfxproject,
-            voproject,
-            statesproject
+            sfxaproj,
+            voaproj,
+            statesaproj
         }
 
         private static readonly AudioProject _instance = new();
