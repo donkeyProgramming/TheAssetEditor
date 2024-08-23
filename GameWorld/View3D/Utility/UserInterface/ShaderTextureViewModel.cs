@@ -32,7 +32,7 @@ namespace GameWorld.Core.Utility.UserInterface
             _uiCommandFactory = uiCommandFactory;
             _resourceLibrary = resourceLibrary;
 
-            _path = _shaderTextureReference.TexturePath;
+            Path = _shaderTextureReference.TexturePath;
             _shouldRenderTexture = _shaderTextureReference.UseTexture;
         }
 
@@ -80,7 +80,7 @@ namespace GameWorld.Core.Utility.UserInterface
         [RelayCommand]
         void HandleClearTexture()
         {
-            Path = string.Empty;
+            Path = "test_mask.dds";
         }
 
         void ValidatePath()

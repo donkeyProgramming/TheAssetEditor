@@ -103,6 +103,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
             // Reduce the polygon count
             foreach (var mesh in originalMeshClone)
             {
+                mesh.Name = mesh.Name.Replace(" - Clone", "");
                 if (mesh.ReduceMeshOnLodGeneration && settings.LodRectionFactor != 1)
                     ReduceMesh(mesh, deductionRatio);
             }
