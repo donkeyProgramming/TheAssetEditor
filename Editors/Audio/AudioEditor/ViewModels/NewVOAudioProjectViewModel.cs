@@ -274,7 +274,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             if (AudioProjectInstance.VOProject == null)
                 AudioProjectInstance.VOProject = new VOProject();
 
-            AudioProjectInstance.Type = ProjectType.voproject;
+            AudioProjectInstance.Type = ProjectType.voaproj;
             AudioProjectInstance.FileName = VOProjectFileName;
             AudioProjectInstance.Directory = VOProjectDirectory;
 

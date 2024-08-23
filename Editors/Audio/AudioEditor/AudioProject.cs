@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using static Editors.Audio.AudioEditor.StatesProjectData;
 using static Editors.Audio.AudioEditor.VOProjectData;
 
@@ -10,9 +8,9 @@ namespace Editors.Audio.AudioEditor
     {
         public enum ProjectType
         {
-            sfxproject,
-            voproject,
-            statesproject
+            sfxaproj,
+            voaproj,
+            statesaproj
         }
 
         private static readonly AudioProject _instance = new();

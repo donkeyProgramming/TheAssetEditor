@@ -95,7 +95,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             if (AudioProjectInstance.StatesProject == null)
                 AudioProjectInstance.StatesProject = new StatesProject();
 
-            AudioProjectInstance.Type = ProjectType.statesproject;
+            AudioProjectInstance.Type = ProjectType.statesaproj;
             AudioProjectInstance.FileName = StatesProjectFileName;
             AudioProjectInstance.Directory = StatesProjectDirectory;
         }

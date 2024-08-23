@@ -72,14 +72,14 @@ namespace Editors.Audio.AudioEditor.ViewModels
             AudioProjectInstance.PreviousSelectedAudioProjectEvent = oldValue;
 
             // Load the Event upon selection.
-            if (AudioProjectInstance.Type == ProjectType.voproject)
+            if (AudioProjectInstance.Type == ProjectType.voaproj)
             {
                 ConvertDataGridDataToVOProject(DataGridData, AudioProjectInstance.PreviousSelectedAudioProjectEvent); // Save the DataGridData from the Event that was just being worked (PreviousSelectedAudioProjectEvent) on to the Audio Project.
 
                 LoadDialogueEvent(_audioRepository, ShowCustomStatesOnly);
             }
 
-            else if (AudioProjectInstance.Type == ProjectType.statesproject)
+            else if (AudioProjectInstance.Type == ProjectType.statesaproj)
             {
                 ConvertDataGridDataToStatesProject(DataGridData);
                 
@@ -111,7 +111,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void LoadVOProject()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [ProjectType.voproject.ToString()]);
+            using var browser = new PackFileBrowserWindow(_packFileService, [ProjectType.voaproj.ToString()]);
 
             if (browser.ShowDialog())
             {
@@ -144,7 +144,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void LoadStatesProject()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [ProjectType.statesproject.ToString()]);
+            using var browser = new PackFileBrowserWindow(_packFileService, [ProjectType.statesaproj.ToString()]);
 
             if (browser.ShowDialog())
             {
@@ -171,14 +171,14 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void SaveAudioProject()
         {
-            if (AudioProjectInstance.Type == ProjectType.voproject)
+            if (AudioProjectInstance.Type == ProjectType.voaproj)
             {
                 ConvertDataGridDataToVOProject(DataGridData, SelectedAudioProjectEvent);
 
                 AddToPackFile(_packFileService, AudioProjectInstance.VOProject, AudioProjectInstance.FileName, AudioProjectInstance.Directory, AudioProjectInstance.Type);
             }
 
-            else if (AudioProjectInstance.Type == ProjectType.statesproject)
+            else if (AudioProjectInstance.Type == ProjectType.statesaproj)
             {
                 ConvertDataGridDataToStatesProject(DataGridData);
 
@@ -193,7 +193,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
             var newRow = new Dictionary<string, object>();
 
-            if (AudioProjectInstance.Type == ProjectType.voproject)
+            if (AudioProjectInstance.Type == ProjectType.voaproj)
             {
                 var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[SelectedAudioProjectEvent];
 
@@ -210,7 +210,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 DataGridData.Add(newRow);
             }
 
-            else if (AudioProjectInstance.Type == ProjectType.statesproject)
+            else if (AudioProjectInstance.Type == ProjectType.statesaproj)
             {
                 var stateGroups = ModdedStateGroups;
 
