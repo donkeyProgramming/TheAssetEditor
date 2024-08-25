@@ -90,28 +90,28 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         {
             if (_templateBuffer.Contains(templateAttributeName) == false)
                 throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
-            _templateBuffer = _templateBuffer.Replace(templateAttributeName, value.ToString());
+            _templateBuffer = _templateBuffer.Replace(templateAttributeName, Str(value));
         }
 
         public void AddAttribute(string templateAttributeName, Vector2 value)
         {
             if (_templateBuffer.Contains(templateAttributeName) == false)
                 throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
-            _templateBuffer = _templateBuffer.Replace(templateAttributeName, $"{value.X}, {value.Y}");
+            _templateBuffer = _templateBuffer.Replace(templateAttributeName, $"{Str(value.X)},{Str(value.Y)}");
         }
 
         public void AddAttribute(string templateAttributeName, Vector3 value)
         {
             if (_templateBuffer.Contains(templateAttributeName) == false)
                 throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
-            _templateBuffer = _templateBuffer.Replace(templateAttributeName, $"{value.X}, {value.Y}, {value.Z}");
+            _templateBuffer = _templateBuffer.Replace(templateAttributeName, $"{Str(value.X)},{Str(value.Y)},{Str(value.Z)}");
         }
 
         public void AddAttribute(string templateAttributeName, Vector4 value)
         {
             if (_templateBuffer.Contains(templateAttributeName) == false)
                 throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
-            _templateBuffer = _templateBuffer.Replace(templateAttributeName, $"{value.X}, {value.Y}, {value.Z}, {value.W}");
+            _templateBuffer = _templateBuffer.Replace(templateAttributeName, $"{Str(value.X)},{Str(value.Y)},{Str(value.Z)},{Str(value.W)}");
         }
 
         public void AddAttribute(string templateAttributeName, TextureInput value)
@@ -136,7 +136,11 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 
                 throw new Exception($"Failed to generate material, not all template attributes are replaced! {attr}");
             }
-              
+        }
+
+        string Str(float value, int numDecimals = 5)
+        {
+            return value.ToString();
         }
 
     }

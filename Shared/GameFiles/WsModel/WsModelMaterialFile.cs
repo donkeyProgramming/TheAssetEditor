@@ -48,6 +48,12 @@ namespace Shared.GameFormats.WsModel
 
         void LoadContent(string fileContent)
         {
+            var _byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+            if (fileContent.StartsWith(_byteOrderMarkUtf8))
+            {
+                fileContent = fileContent.Remove(0, _byteOrderMarkUtf8.Length);
+            }
+
             var doc = new XmlDocument();
             doc.LoadXml(fileContent);
 

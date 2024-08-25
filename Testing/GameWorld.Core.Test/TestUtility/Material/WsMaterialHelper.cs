@@ -76,25 +76,25 @@ namespace GameWorld.Core.Test.TestUtility.Material
             Assert.That(generatedMaterial.Textures[TextureType.Emissive], Is.EqualTo($"texturePath/wsmodel/{TextureType.Emissive}.dds"));
             Assert.That(generatedMaterial.Textures[TextureType.EmissiveDistortion], Is.EqualTo($"texturePath/wsmodel/{TextureType.EmissiveDistortion}.dds"));
 
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_Direction).Value, Is.EqualTo("1, 2"));
+            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_Direction).Value, Is.EqualTo("1,2"));
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_DistortStrength).Value, Is.EqualTo("2"));
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_FesnelStrength).Value, Is.EqualTo("3"));
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_Speed).Value, Is.EqualTo("4"));
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_PulseSpeed).Value, Is.EqualTo("5"));
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_PulseStrength).Value, Is.EqualTo("6"));
 
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientColour1).Value, Is.EqualTo("1, 2, 3"));
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientColour2).Value, Is.EqualTo("4, 5, 6"));
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientColour3).Value, Is.EqualTo("7, 8, 9"));
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientColour4).Value, Is.EqualTo("10, 11, 12"));
+            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientColour1).Value, Is.EqualTo("1,2,3"));
+            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientColour2).Value, Is.EqualTo("4,5,6"));
+            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientColour3).Value, Is.EqualTo("7,8,9"));
+            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientColour4).Value, Is.EqualTo("10,11,12"));
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientTime1).Value, Is.EqualTo("0"));
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientTime2).Value, Is.EqualTo("1"));
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientTime3).Value, Is.EqualTo("2"));
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_GradientTime4).Value, Is.EqualTo("3"));
 
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_Strength).Value, Is.EqualTo("7"));
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_Tiling).Value, Is.EqualTo("4, 5"));
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_Tint).Value, Is.EqualTo("5, 6, 7"));
+            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_Tiling).Value, Is.EqualTo("4,5"));
+            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Emissive_Tint).Value, Is.EqualTo("5,6,7"));
         }
 
         public static void ValidateMetalRough(WsModelMaterialFile generatedMaterial)
@@ -108,7 +108,7 @@ namespace GameWorld.Core.Test.TestUtility.Material
 
             Assert.That(generatedMaterial.Textures[TextureType.Blood], Is.EqualTo($"texturePath/wsmodel/{TextureType.Blood}.dds"));
             Assert.That(generatedMaterial.GetParameter(WsModelParamters.Blood_Use).Value, Is.EqualTo("1"));
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Blood_Scale).Value, Is.EqualTo("1, 2"));
+            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Blood_Scale).Value, Is.EqualTo("1,2"));
         }
     }
 }

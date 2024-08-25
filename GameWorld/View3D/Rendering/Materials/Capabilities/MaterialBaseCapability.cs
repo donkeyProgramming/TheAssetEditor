@@ -42,7 +42,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             if (typedCap == null)
                 throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
 
-            if (CompareHelper.Compare(UseAlpha, typedCap.UseAlpha, nameof(UseAlpha), out var res))
+            if (!CompareHelper.Compare(UseAlpha, typedCap.UseAlpha, nameof(UseAlpha), out var res))
                 return res;
 
             return (true, "");

@@ -51,13 +51,13 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             if (otherCap is not BloodCapability typedCap)
                 throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
 
-            if (CompareHelper.Compare(UseBlood, typedCap.UseBlood, nameof(UseBlood), out var res0))
+            if (!CompareHelper.Compare(UseBlood, typedCap.UseBlood, nameof(UseBlood), out var res0))
                 return res0;
 
-            if (CompareHelper.Compare(BloodMask, typedCap.BloodMask, nameof(BloodMask), out var res1))
+            if (!CompareHelper.Compare(BloodMask, typedCap.BloodMask, nameof(BloodMask), out var res1))
                 return res1;
 
-            if (CompareHelper.Compare(UvScale, typedCap.UvScale, nameof(UvScale), out var res2))
+            if (!CompareHelper.Compare(UvScale, typedCap.UvScale, nameof(UvScale), out var res2))
                 return res2;
 
 

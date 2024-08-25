@@ -83,15 +83,15 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             if (typedCap == null)
                 throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
 
-            if (CompareHelper.Compare(SpecularMap, typedCap.SpecularMap, nameof(SpecularMap), out var res0))
+            if (!CompareHelper.Compare(SpecularMap, typedCap.SpecularMap, nameof(SpecularMap), out var res0))
                 return res0;
-            if (CompareHelper.Compare(GlossMap, typedCap.GlossMap, nameof(GlossMap), out var res1))
+            if (!CompareHelper.Compare(GlossMap, typedCap.GlossMap, nameof(GlossMap), out var res1))
                 return res1;
-            if (CompareHelper.Compare(DiffuseMap, typedCap.DiffuseMap, nameof(DiffuseMap), out var res2))
+            if (!CompareHelper.Compare(DiffuseMap, typedCap.DiffuseMap, nameof(DiffuseMap), out var res2))
                 return res2;
-            if (CompareHelper.Compare(NormalMap, typedCap.NormalMap, nameof(NormalMap), out var res3))
+            if (!CompareHelper.Compare(NormalMap, typedCap.NormalMap, nameof(NormalMap), out var res3))
                 return res3;
-            if (CompareHelper.Compare(Mask, typedCap.Mask, nameof(Mask), out var res4))
+            if (!CompareHelper.Compare(Mask, typedCap.Mask, nameof(Mask), out var res4))
                 return res4;
 
             return base.AreEqual(otherCap);
