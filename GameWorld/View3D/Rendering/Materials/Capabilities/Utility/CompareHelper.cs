@@ -31,7 +31,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
 
         static public bool Compare(TextureInput self, TextureInput other, string attributeName, out (bool Result, string Message) result)
         {
-            if (self != other)
+            if (self.TexturePath != other.TexturePath)
             {
                 result = (false, $"{attributeName} - Different values ({self} vs {other})");
                 return false;

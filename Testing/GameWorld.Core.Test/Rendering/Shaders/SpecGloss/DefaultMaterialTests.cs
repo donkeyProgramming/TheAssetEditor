@@ -193,8 +193,9 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             var (result, message) = materialA.AreEqual(materialB);
 
             // Assert
-            Assert.That(result, Is.True);
-            Assert.That(message.Length, Is.EqualTo(0));
+            // Assert
+            Assert.That(result, Is.False);
+            Assert.That(message.Length, Is.Not.EqualTo(0));
         }
 
         [Test]
@@ -209,8 +210,8 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             var (result, message) = materialA.AreEqual(materialB);
 
             // Assert
-            Assert.That(result, Is.True);
-            Assert.That(message.Length, Is.EqualTo(0));
+            Assert.That(result, Is.False);
+            Assert.That(message.Length, Is.Not.EqualTo(0));
         }
     }
 }
