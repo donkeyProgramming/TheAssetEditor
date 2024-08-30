@@ -26,7 +26,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         // Colents, where the Alpha is used as time (0-1). RedGreenBlueTime
         public Vector3[] GradientColours { get; set; } = [new Vector3(0), new Vector3(0.25f), new Vector3(0.75f), new Vector3(1)];
-        public float[] GradientTimes { get; set; } = [0, 0.25f, 0.75f, 1];
+        public float[] GradientTimes { get; set; } = [0, 0.33f, 0.66f, 1];
 
         public float EmissiveStrength { get; set; } = 1;
         public Vector2 EmissiveTiling { get; set; } = new Vector2(1);

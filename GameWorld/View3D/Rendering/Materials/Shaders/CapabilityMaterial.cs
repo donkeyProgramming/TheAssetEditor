@@ -71,23 +71,23 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
             return false;
         }
 
-        Effect GetEffect() => _resourceLibrary.GetStaticEffect(_shaderType);
+        protected Effect GetEffect() => _resourceLibrary.GetStaticEffect(_shaderType);
 
         public void Apply(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
         {
             GetCapability<CommonShaderParametersCapability>().Assign(commonShaderParameters, modelMatrix);
 
             var effect = GetEffect();
-
-            // Disable all effects, so they can be enabled later.
-            effect.Parameters["CapabilityFlag_ApplyEmissive"].SetValue(false);
-            effect.Parameters["CapabilityFlag_ApplyAnimation"].SetValue(false);
+            OnApply(effect);
 
             foreach (var capability in Capabilities)
                 capability.Apply(effect, _resourceLibrary);
 
             effect.CurrentTechnique.Passes[0].Apply();
         }
+
+        protected virtual void OnApply(Effect effect)
+        { }
 
         protected abstract CapabilityMaterial CreateCloneInstance();
         protected ICapability[] CloneCapabilities()

@@ -1,6 +1,7 @@
 ﻿using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.WpfWindow.ResourceHandling;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace GameWorld.Core.Rendering.Materials.Shaders.MetalRough
 {
@@ -21,6 +22,14 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.MetalRough
 
             _renderingTechniqueMap[RenderingTechnique.Normal] = "BasicColorDrawing";
             _renderingTechniqueMap[RenderingTechnique.Emissive] = "GlowDrawing";
+        }
+
+        protected override void OnApply(Effect effect)
+        {
+            // Disable all effects, so they can be enabled later.
+            effect.Parameters["CapabilityFlag_ApplyEmissive"].SetValue(false);
+            effect.Parameters["CapabilityFlag_ApplyAnimation"].SetValue(false);
+            base.OnApply(effect);
         }
 
         protected override CapabilityMaterial CreateCloneInstance() => new EmissiveMaterial(_resourceLibrary);

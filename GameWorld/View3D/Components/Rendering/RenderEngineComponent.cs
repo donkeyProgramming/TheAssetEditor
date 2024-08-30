@@ -35,8 +35,6 @@ namespace GameWorld.Core.Components.Rendering
         RenderTarget2D _defaultRenderTarget;
         RenderTarget2D _glowRenderTarget;
 
-        public RenderFormats MainRenderFormat { get; set; } = RenderFormats.SpecGloss;  // This should be removed!
-      
         public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneLightParametersStore sceneLightParametersStore, EventHub eventHub)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
@@ -52,9 +50,6 @@ namespace GameWorld.Core.Components.Rendering
                 _renderItems.Add(value, new List<IRenderItem>(100));
 
             _renderLines = new List<VertexPositionColor>(1000);
-            
-            if (applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Warhammer3 || applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.ThreeKingdoms)
-                MainRenderFormat = RenderFormats.MetalRoughness;
 
             _eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
         }

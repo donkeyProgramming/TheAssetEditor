@@ -86,11 +86,18 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             _templateBuffer = _templateBuffer.Replace(templateAttributeName, value);
         }
 
+        public void AddAttribute(string templateAttributeName, bool value)
+        {
+            if (_templateBuffer.Contains(templateAttributeName) == false)
+                throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
+            _templateBuffer = _templateBuffer.Replace(templateAttributeName, value ? "1" : "0");
+        }
+
         public void AddAttribute(string templateAttributeName, float value)
         {
             if (_templateBuffer.Contains(templateAttributeName) == false)
                 throw new Exception($"Attribute {templateAttributeName} not found in template {_templateName}");
-            _templateBuffer = _templateBuffer.Replace(templateAttributeName, Str(value));
+            _templateBuffer = _templateBuffer.Replace(templateAttributeName, $"{Str(value)}");
         }
 
         public void AddAttribute(string templateAttributeName, Vector2 value)
@@ -138,10 +145,6 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             }
         }
 
-        string Str(float value, int numDecimals = 5)
-        {
-            return value.ToString();
-        }
-
+        string Str(float value, int numDecimals = 4) => value.ToString(/*$"F{numDecimals}"*/); 
     }
 }

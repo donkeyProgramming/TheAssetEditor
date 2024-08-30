@@ -76,12 +76,32 @@ namespace GameWorld.Core.Rendering.Materials
         }
 
         public List<CapabilityMaterialsEnum> GetPossibleMaterials()
-        { 
-            return [CapabilityMaterialsEnum.MetalRoughPbr_Default,
-                    CapabilityMaterialsEnum.MetalRoughPbr_Emissive,
+        {
+            var currentGame = _applicationSettingsService.CurrentSettings.CurrentGame;
+            switch (currentGame)
+            {
+                case GameTypeEnum.Unknown:
+                case GameTypeEnum.Arena:
+                case GameTypeEnum.Attila:
+                case GameTypeEnum.Empire:
+                case GameTypeEnum.Napoleon:
+                case GameTypeEnum.Rome_2_Remastered:
+                case GameTypeEnum.Rome_2:
+                case GameTypeEnum.Shogun_2:
+                case GameTypeEnum.Troy:
+                case GameTypeEnum.Pharaoh:
+                case GameTypeEnum.ThronesOfBritannia:
+                case GameTypeEnum.Warhammer1:
+                case GameTypeEnum.Warhammer2:
+                    return [CapabilityMaterialsEnum.SpecGlossPbr_Default/*, CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal*/];
+                
+                case GameTypeEnum.Warhammer3:
+                case GameTypeEnum.ThreeKingdoms:
+                    return [CapabilityMaterialsEnum.MetalRoughPbr_Default, CapabilityMaterialsEnum.MetalRoughPbr_Emissive];
+                default:
+                    throw new Exception($"Unkown game { currentGame } in {nameof(GetPossibleMaterials)}");
+            }
 
-                    CapabilityMaterialsEnum.SpecGlossPbr_Default,
-                    CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal];
         }
 
         public CapabilityMaterial ChangeMaterial(CapabilityMaterial source, CapabilityMaterialsEnum newMaterialType)

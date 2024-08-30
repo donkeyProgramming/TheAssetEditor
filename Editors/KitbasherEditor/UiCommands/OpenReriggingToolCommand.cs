@@ -54,7 +54,7 @@ namespace Editors.KitbasherEditor.UiCommands
             }
 
             var selectedMeshSkeletons = selectedMeshes
-                .Select(x => x.Geometry.ParentSkeletonName)
+                .Select(x => x.Geometry.SkeletonName)
                 .Distinct();
 
             if (selectedMeshSkeletons.Count() != 1)

@@ -42,9 +42,8 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         {
             templateHandler.AddAttribute(WsModelParamters.Texture_Blood.TemplateName, BloodMask);                                             
             templateHandler.AddAttribute(WsModelParamters.Blood_Scale.TemplateName, UvScale);
-            templateHandler.AddAttribute(WsModelParamters.Blood_Use.TemplateName, UseBlood ? 1 : 0);
+            templateHandler.AddAttribute(WsModelParamters.Blood_Use.TemplateName, UseBlood);
         }
-
 
         public (bool Result, string Message) AreEqual(ICapability otherCap)
         {

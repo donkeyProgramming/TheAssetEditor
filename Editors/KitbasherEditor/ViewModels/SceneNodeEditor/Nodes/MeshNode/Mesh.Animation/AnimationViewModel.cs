@@ -32,7 +32,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         {
             _meshNode = meshNode;
 
-            SkeletonName = _meshNode.Geometry.ParentSkeletonName;
+            SkeletonName = _meshNode.Geometry.SkeletonName;
 
             var skeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
             var bones = _meshNode.Geometry.GetUniqeBlendIndices();

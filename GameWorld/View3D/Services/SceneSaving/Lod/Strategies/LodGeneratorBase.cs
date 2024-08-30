@@ -87,7 +87,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
                 foreach (var mesh in originalMeshClone)
                 {
                     if (mesh.Geometry.VertexFormat != UiVertexFormat.Static)
-                        mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted, mesh.Geometry.ParentSkeletonName);
+                        mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted);
 
                     if (settings.OptimizeAlpha)
                         mesh.Material.GetCapability<MaterialBaseCapability>().UseAlpha = false;

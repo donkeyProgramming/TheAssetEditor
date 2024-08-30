@@ -7,37 +7,49 @@ using Shared.Ui.Editors.BoneMapping;
 
 namespace GameWorld.Core.Rendering.Geometry
 {
-    public class MeshObject
+    public class MeshObject : IDisposable
     {
-        protected IGraphicsCardGeometry Context;
+        IGraphicsCardGeometry Context;
+
         public VertexPositionNormalTextureCustom[] VertexArray; // Vector3 for pos at some point
         public ushort[] IndexArray;
 
         public BoundingBox BoundingBox { get; private set; }
         public Vector3 MeshCenter { get; private set; }
 
-        public int WeightCount { get; private set; } = 0;
+        public int WeightCount { get => GetWeightCount(); } // reduce the use of this
         public UiVertexFormat VertexFormat { get; private set; } = UiVertexFormat.Unknown;
-        public string ParentSkeletonName { get; set; }
+        public string SkeletonName { get; private set; }  // SkeletonName
 
 
         public IGraphicsCardGeometry GetGeometryContext() => Context;
 
+
+
+        public int GetWeightCount() => VertexFormat switch
+        {
+            UiVertexFormat.Cinematic => 4,
+            UiVertexFormat.Weighted => 2,
+            UiVertexFormat.Static => 0,
+
+            _ => throw new Exception("Unknown vertex format for mesh")
+        };
+
+
         public MeshObject(IGraphicsCardGeometry context, string skeletonName)
         {
-            ParentSkeletonName = skeletonName;
+            SkeletonName = skeletonName;
             Context = context;
         }
 
         public MeshObject Clone(bool includeMesh = true)
         {
-            var mesh = new MeshObject(Context, ParentSkeletonName)
+            var mesh = new MeshObject(Context, SkeletonName)
             {
                 Context = Context.Clone(),
                 BoundingBox = BoundingBox,
                 MeshCenter = MeshCenter,
-                ParentSkeletonName = ParentSkeletonName,
-                WeightCount = WeightCount,
+                SkeletonName = SkeletonName,
                 VertexFormat = VertexFormat
             };
 
@@ -224,16 +236,29 @@ namespace GameWorld.Core.Rendering.Geometry
             RebuildVertexBuffer();
         }
 
-        public void ChangeVertexType(UiVertexFormat newFormat, string newSkeletonName, bool updateMesh = true)
+
+        public void UpdateSkeletonName(string newSkeletonName)
+        {
+            SkeletonName = newSkeletonName;
+        }
+
+        public void ChangeVertexType(UiVertexFormat newFormat, bool updateMesh = true)
         {
             if (!(newFormat == UiVertexFormat.Weighted || newFormat == UiVertexFormat.Static || newFormat == UiVertexFormat.Cinematic))
-                throw new Exception("Not able to change vertex format into this");
+                throw new Exception($"Not able to change vertex format into {newFormat}");
+
+            if (VertexFormat == newFormat)
+                return;
+
+            VertexFormat = newFormat;
+            if (VertexFormat == UiVertexFormat.Static)
+                UpdateSkeletonName(string.Empty);
 
             if (updateMesh)
             {
                 for (var i = 0; i < VertexArray.Length; i++)
                 {
-                    if (newFormat != UiVertexFormat.Static)
+                    if (VertexFormat != UiVertexFormat.Static)
                     {
                         var vertInfo = new (float index, float weight)[4];
                         vertInfo[0] = (VertexArray[i].BlendIndices.X, VertexArray[i].BlendWeights.X);
@@ -255,24 +280,6 @@ namespace GameWorld.Core.Rendering.Geometry
 
                 RebuildVertexBuffer();
             }
-
-            switch (newFormat)
-            {
-                case UiVertexFormat.Static:
-                    WeightCount = 0;
-                    ParentSkeletonName = "";
-                    break;
-                case UiVertexFormat.Weighted:
-                    WeightCount = 2;
-                    ParentSkeletonName = newSkeletonName;
-                    break;
-                case UiVertexFormat.Cinematic:
-                    WeightCount = 4;
-                    ParentSkeletonName = newSkeletonName;
-                    break;
-            }
-
-            VertexFormat = newFormat;
         }
 
         public VertexPositionNormalTextureCustom GetVertexExtented(int index)
@@ -324,7 +331,7 @@ namespace GameWorld.Core.Rendering.Geometry
             MeshCenter = MeshCenter / corners.Length;
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
             Context.Dispose();
         }

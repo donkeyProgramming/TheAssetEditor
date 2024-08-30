@@ -14,7 +14,6 @@ namespace GameWorld.Core.Commands.Object
         SelectionManager _selectionManager;
 
         List<MeshObject> _originalGeos;
-        List<string> _originalSkeletonNames;
 
         List<Rmv2MeshNode> _meshesToPin;
         Rmv2MeshNode _source;
@@ -40,14 +39,14 @@ namespace GameWorld.Core.Commands.Object
         {
             // Create undo state
             _originalGeos = _meshesToPin.Select(x => x.Geometry.Clone()).ToList();
-            _originalSkeletonNames = _meshesToPin.Select(x => x.Geometry.ParentSkeletonName).ToList();
             _selectionOldState = _selectionManager.GetStateCopy();
 
             // Update the meshes
             var sourceVert = _source.Geometry.GetVertexExtented(_vertexId);
             foreach (var currentMesh in _meshesToPin)
             {
-                currentMesh.Geometry.ChangeVertexType(_source.Geometry.VertexFormat, _source.Geometry.ParentSkeletonName, false);
+                currentMesh.Geometry.ChangeVertexType(_source.Geometry.VertexFormat, false);
+                currentMesh.Geometry.UpdateSkeletonName(_source.Geometry.SkeletonName);
 
                 for (var i = 0; i < currentMesh.Geometry.VertexCount(); i++)
                 {
@@ -65,7 +64,6 @@ namespace GameWorld.Core.Commands.Object
             for (var i = 0; i < _meshesToPin.Count; i++)
             {
                 _meshesToPin[i].Geometry = _originalGeos[i];
-                _meshesToPin[i].Geometry.ParentSkeletonName = _originalSkeletonNames[i];
                 _meshesToPin[i].PivotPoint = Vector3.Zero;
             }
 
