@@ -87,6 +87,7 @@ namespace AssetEditor.ViewModels
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair() { Game = item.GameType, Path = item.Path });
 
             _settingsService.Save();
+            MessageBox.Show("Please restart the tool after updating settings!");
         }
 
         void OnBrowse()
