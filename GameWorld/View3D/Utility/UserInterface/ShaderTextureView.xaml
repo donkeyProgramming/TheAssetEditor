@@ -4,13 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GameWorld.Core.Utility.UserInterface"
+             xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
         <CheckBox Margin="2,0,2,0"  IsChecked="{Binding ShouldRenderTexture, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
-        <Button Content="X" Margin="1" Command="{Binding HandleClearTextureCommand}" DockPanel.Dock="Right" Width="20"/>
-        <Button Content="Browse" Margin="1" Command="{Binding HandleBrowseTextureCommand}" DockPanel.Dock="Right" Width="50" />
-        <Button Content="Preview" Margin="1" Command="{Binding HandlePreviewTextureCommand}" DockPanel.Dock="Right" Width="50"/>
+        <Button Content="{materialIcons:MaterialIconExt Kind=Delete}" Margin="1" Command="{Binding HandleClearTextureCommand}" DockPanel.Dock="Right" Width="20" ToolTip="Remove texture and replace with default mask"/>
+        <Button Content="{materialIcons:MaterialIconExt Kind=Folder}" Margin="1" Command="{Binding HandleBrowseTextureCommand}" DockPanel.Dock="Right" Width="20" ToolTip="Browse for new file" />
+        <Button Content="{materialIcons:MaterialIconExt Kind=Eye}" Margin="1" Command="{Binding HandlePreviewTextureCommand}" DockPanel.Dock="Right" Width="20" ToolTip="Preview the texture"/>
         <TextBox Margin="2,2,2,2" Text="{Binding Path, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center"/>
     </DockPanel>
 </UserControl>
