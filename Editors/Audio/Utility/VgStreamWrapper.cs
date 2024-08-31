@@ -11,7 +11,7 @@ namespace Editors.Audio.Utility
 {
     public class VgStreamWrapper
     {
-        ILogger _logger = Logging.Create<VgStreamWrapper>();
+        readonly ILogger _logger = Logging.Create<VgStreamWrapper>();
 
         string VgStreamFolderName => $"{DirectoryHelper.Temp}\\VgStream";
         string AudioFolderName => $"{DirectoryHelper.Temp}\\Audio";
@@ -23,6 +23,7 @@ namespace Editors.Audio.Utility
             {
                 EnsureCreated();
             }
+
             catch (Exception e)
             {
                 _logger.Here().Error($"Unable to create VgStreamWrapper: {e.Message}");
@@ -76,6 +77,7 @@ namespace Editors.Audio.Utility
                     return Result<string>.FromError("VgSteam", $"Failed to convert file - File {outputSoundFilePath} no found on disk");
                 return Result<string>.FromOk(outputSoundFilePath);
             }
+
             catch (Exception e)
             {
                 _logger.Here().Error(e.Message);
@@ -92,6 +94,7 @@ namespace Editors.Audio.Utility
                 _logger.Here().Information("All bytes written to file");
                 return Result<bool>.FromOk(true);
             }
+
             catch (Exception e)
             {
                 _logger.Here().Error(e.Message);
@@ -131,7 +134,5 @@ namespace Editors.Audio.Utility
 
             return vgStreamCli;
         }
-
-
     }
 }
