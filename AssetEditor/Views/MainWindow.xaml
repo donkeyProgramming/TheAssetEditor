@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:AssetEditor.Views" 
-        xmlns:viewFacotry="clr-namespace:Shared.Ui.Common.DataTemplates;assembly=Shared.Ui"
+        xmlns:viewFactory="clr-namespace:Shared.Ui.Common.DataTemplates;assembly=Shared.Ui"
         xmlns:datatemplates="clr-namespace:Shared.Ui.Common.DataTemplates;assembly=Shared.Ui"
         xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
         xmlns:common="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
@@ -145,9 +145,9 @@
                     ItemsSource="{Binding CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}"
                     SelectedIndex="{Binding SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ContentTemplateSelector="{StaticResource EditorSelector}"
-                    viewFacotry:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}"
+                    viewFactory:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}"
                     Name="EditorsTabControl"
-                    Margin="0, 0, 8, 8">
+                    Margin="0, -2, 8, 8">
             <TabControl.Resources>
                 <common:BindingProxy x:Key="Proxy" Data="{Binding}" />
             </TabControl.Resources>
