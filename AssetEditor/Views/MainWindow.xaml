@@ -18,7 +18,7 @@
         Width="1280"
         Height="720"
         BorderThickness="{Binding RelativeSource={RelativeSource Mode=Self}, Path=WindowState, Converter={StaticResource windowStateToThicknessConverter}}"
-        Icon="/AssetEditorIcon.png"
+        Icon="pack://application:,,,/AssetEditorIcon.png"
         ResizeMode="CanResize"
         WindowStyle="None">
 
@@ -44,8 +44,9 @@
 
     <Grid x:Name="rootGrid">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.2*"/>
@@ -58,7 +59,7 @@
             x:Name="titlebar"
             Grid.Row="0"
             Grid.ColumnSpan="3"
-            MinHeight="30"
+            MinHeight="35"
             Background="{StaticResource TitleBar.Static.Background}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -73,7 +74,7 @@
                 Grid.Column="0"
                 Width="24"
                 Height="24"
-                Margin="5, 0, 3, 0"
+                Margin="10, 0, 3, 0"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 MouseDown="Icon_MouseDown"
@@ -134,25 +135,19 @@
         </Grid>
 
         <!-- Main Content Area -->
-        <views:FileTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding FileTree}"/>
+        <Border Grid.Row="1" Grid.Column="0" BorderBrush="{DynamicResource Border.Border}" BorderThickness="1" Margin="8, 0, 0, 8" Padding="3, 0, 2.5, 5">
+            <views:FileTreeView DataContext="{Binding FileTree}"/>
+        </Border>
 
-        <GridSplitter Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" HorizontalAlignment="Stretch">
-            <GridSplitter.Template>
-                <ControlTemplate TargetType="{x:Type GridSplitter}">
-                    <Grid>
-                        <Button Content="⁞" />
-                        <Rectangle Fill="#00FFFFFF" />
-                    </Grid>
-                </ControlTemplate>
-            </GridSplitter.Template>
-        </GridSplitter>
+        <GridSplitter Grid.Row="1" Grid.RowSpan="1" Grid.Column="1" HorizontalAlignment="Stretch" Width="5" Background="{DynamicResource Window.Static.Background.Alternate}" BorderBrush="{DynamicResource Border.Border}" BorderThickness="0, 1, 0, 1" Margin="0, 0, 0, 8"/>
 
         <TabControl Grid.Row="1" Grid.Column="2"  
                     ItemsSource="{Binding CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}"
                     SelectedIndex="{Binding SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     ContentTemplateSelector="{StaticResource EditorSelector}"
                     viewFacotry:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}"
-                    Name="EditorsTabControl">
+                    Name="EditorsTabControl"
+                    Margin="0, 0, 8, 8">
             <TabControl.Resources>
                 <common:BindingProxy x:Key="Proxy" Data="{Binding}" />
             </TabControl.Resources>
@@ -241,5 +236,32 @@
                 </DataTemplate>
             </TabControl.ItemTemplate>
         </TabControl>
+
+        <StatusBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="300" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="100" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Name="lblMemoryUsage" />
+            </StatusBarItem>
+            <Separator Grid.Column="1" Background="{DynamicResource StatusBar.Static.Border}" Margin="0, -1, 0, 0"/>
+            <StatusBarItem Grid.Column="2">
+                <TextBlock Text="c:\path\of\current\file.txt"  Visibility="Collapsed"/>
+            </StatusBarItem>
+            <Separator Grid.Column="3" Background="{DynamicResource StatusBar.Static.Border}" Margin="0, -1, 0, 0"/>
+            <StatusBarItem Grid.Column="4">
+                <ProgressBar Value="50" Width="90" Height="16" Visibility="Collapsed"/>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>
