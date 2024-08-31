@@ -35,6 +35,7 @@ namespace Shared.GameFormats.WWise
                 chunk.Index = computedIndex;
                 HasError = false;
             }
+
             catch (Exception e)
             {
                 _logger.Here().Error($"Failed to parse object {Id} in {OwnerFile} at index {IndexInFile}- " + e.Message);

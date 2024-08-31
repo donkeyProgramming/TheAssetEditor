@@ -2601,16 +2601,28 @@
 
     <Style TargetType="{x:Type DataGridCell}">
         <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FocusVisualStyle">
+            <Setter.Value>
+                <Style TargetType="FrameworkElement">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </Style>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type DataGridCell}">
-                    <Border x:Name="border" Background="{DynamicResource DataGrid.CellItem.Static.Background}" BorderThickness="0" SnapsToDevicePixels="True">
+                    <Border x:Name="border" Background="{DynamicResource DataGrid.CellItem.Static.Background}" BorderThickness="0" SnapsToDevicePixels="True">                        
                         <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <!-- No hover highlight, just default background -->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{DynamicResource DataGrid.CellItem.MouseOver.Background}"/>
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource DataGrid.CellItem.Static.Background}"/>
                         </Trigger>
+                        <!-- Keep row highlight when selected -->
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource DataGrid.Row.Selected.Background}"/>
                         </Trigger>
