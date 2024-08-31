@@ -11,29 +11,39 @@ namespace CommonControls.PackFileBrowser
     public partial class PackFileBrowserWindow : Window, IDisposable
     {
         public PackFile SelectedFile { get; set; }
+        public TreeNode SelectedFolder { get; set; }
         public PackFileBrowserViewModel ViewModel { get; set; }
+        public bool AllowFolderSelection { get; set; }
 
         public PackFileBrowserWindow(PackFileService packfileService) => Create(packfileService);
 
-        public PackFileBrowserWindow(PackFileService packfileService, string[] extentions)
+        public PackFileBrowserWindow(PackFileService packfileService, string[] extentions, int autoExapandResultsAfterLimitedCount = 50)
         {
+            Create(packfileService, autoExapandResultsAfterLimitedCount);
+            ViewModel.Filter.SetExtentions(extentions.ToList());
+        }
+
+        public PackFileBrowserWindow(PackFileService packfileService, string[] extentions, bool allowFolderSelection)
+        {
+            AllowFolderSelection = allowFolderSelection;
             Create(packfileService);
             ViewModel.Filter.SetExtentions(extentions.ToList());
         }
 
-        void Create(PackFileService packfileService)
+        void Create(PackFileService packfileService, int autoExapandResultsAfterLimitedCount = 50)
         {
-            ViewModel = new PackFileBrowserViewModel(packfileService);
+            ViewModel = new PackFileBrowserViewModel(packfileService, allowFolderSelection: AllowFolderSelection);
             ViewModel.ContextMenu = new OpenFileContexMenuHandler(packfileService);
             ViewModel.FileOpen += ViewModel_FileOpen;
-            ViewModel.Filter.AutoExapandResultsAfterLimitedCount = 50;
+            ViewModel.FolderSelected += ViewModel_FolderSelected;
+            ViewModel.Filter.AutoExapandResultsAfterLimitedCount = autoExapandResultsAfterLimitedCount;
             InitializeComponent();
             DataContext = this;
 
             PreviewKeyDown += HandleEsc;
         }
 
-        public new bool ShowDialog() => (this as Window).ShowDialog() == true && SelectedFile != null;
+        public new bool ShowDialog() => (this as Window).ShowDialog() == true && (SelectedFile != null || SelectedFolder != null);
 
         private void HandleEsc(object sender, KeyEventArgs e)
         {
@@ -49,9 +59,18 @@ namespace CommonControls.PackFileBrowser
             Close();
         }
 
+        private void ViewModel_FolderSelected(TreeNode folder)
+        {
+            SelectedFolder = folder;
+            if (DialogResult != true)
+                DialogResult = true;
+            Close();
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             SelectedFile = ViewModel.SelectedItem?.Item;
+            SelectedFolder = ViewModel.SelectedItem?.NodeType == NodeType.Directory ? ViewModel.SelectedItem : null;
             DialogResult = true;
             Close();
         }
@@ -63,6 +82,49 @@ namespace CommonControls.PackFileBrowser
             ViewModel.Dispose();
             ViewModel = null;
             DataContext = null;
+        }
+
+        public string SelectedPath
+        {
+            get
+            {
+                if (SelectedFile != null)
+                {
+                    var node = FindNodeForFile(SelectedFile);
+                    return node?.GetFullPath() ?? string.Empty;
+                }
+
+                else if (SelectedFolder != null)
+                    return SelectedFolder.GetFullPath();
+
+                return string.Empty;
+            }
+        }
+
+        private TreeNode FindNodeForFile(PackFile file)
+        {
+            foreach (var rootNode in ViewModel.Files)
+            {
+                var node = FindNodeInTree(rootNode, file);
+                if (node != null)
+                    return node;
+            }
+            return null;
+        }
+
+        private TreeNode FindNodeInTree(TreeNode node, PackFile file)
+        {
+            if (node.Item == file)
+                return node;
+
+            foreach (var child in node.Children)
+            {
+                var foundNode = FindNodeInTree(child, file);
+                if (foundNode != null)
+                    return foundNode;
+            }
+
+            return null;
         }
     }
 }

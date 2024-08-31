@@ -75,7 +75,6 @@ namespace Shared.Core.PackFiles
             }
         }
 
-
         public PackFileContainer? Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false)
         {
             try
@@ -400,7 +399,6 @@ namespace Shared.Core.PackFiles
                 SetEditablePack(newPackFile);
             return newPackFile;
         }
-
 
         public void AddFileToPack(PackFileContainer container, string directoryPath, PackFile newFile)
         {

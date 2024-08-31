@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework.Audio;
 
 namespace Editors.Audio.BnkCompiler
 {
