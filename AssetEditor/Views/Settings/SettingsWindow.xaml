@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AssetEditor.Views.Settings"
         mc:Ignorable="d"
-        Title="AssetEditor Settings" Height="450" Width="800"
+        Title="AssetEditor Settings" Height="435" Width="800"
         Style="{StaticResource CustomWindowStyle}"
         ResizeMode="NoResize">
     <Grid>

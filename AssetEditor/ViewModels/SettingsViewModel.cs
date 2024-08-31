@@ -28,11 +28,6 @@ namespace AssetEditor.ViewModels
         bool _LoadWemFiles;
         public bool LoadWemFiles { get => _LoadWemFiles; set => SetAndNotify(ref _LoadWemFiles, value); }
 
-        bool _autoResolveMissingTextures;
-        public bool AutoResolveMissingTextures { get => _autoResolveMissingTextures; set => SetAndNotify(ref _autoResolveMissingTextures, value); }
-
-        bool _hideWh2TextureSelectors;
-        public bool HideWh2TextureSelectors { get => _hideWh2TextureSelectors; set => SetAndNotify(ref _hideWh2TextureSelectors, value); }
 
         string _wwisepath;
         public string WwisePath { get => _wwisepath; set => SetAndNotify(ref _wwisepath, value); }
@@ -62,9 +57,7 @@ namespace AssetEditor.ViewModels
             UseTextEditorForUnknownFiles = _settingsService.CurrentSettings.UseTextEditorForUnknownFiles;
             LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
             AutoGenerateAttachmentPointsFromMeshes = _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes;
-            AutoResolveMissingTextures = _settingsService.CurrentSettings.AutoResolveMissingTextures;
             LoadWemFiles = _settingsService.CurrentSettings.LoadWemFiles;
-            HideWh2TextureSelectors = _settingsService.CurrentSettings.HideWh2TextureSelectors;
             WwisePath = _settingsService.CurrentSettings.WwisePath;
 
             SaveCommand = new RelayCommand(OnSave);
@@ -77,9 +70,7 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.UseTextEditorForUnknownFiles = UseTextEditorForUnknownFiles;
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;
             _settingsService.CurrentSettings.LoadWemFiles = LoadWemFiles;
-            _settingsService.CurrentSettings.AutoResolveMissingTextures = AutoResolveMissingTextures;
             _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes = AutoGenerateAttachmentPointsFromMeshes;
-            _settingsService.CurrentSettings.HideWh2TextureSelectors = HideWh2TextureSelectors;
             _settingsService.CurrentSettings.WwisePath = WwisePath;
 
             _settingsService.CurrentSettings.GameDirectories.Clear();
@@ -129,7 +120,7 @@ namespace AssetEditor.ViewModels
                 var packFiles = files.Count(x => System.IO.Path.GetExtension(x) == ".pack");
                 var manifest = files.Count(x => x.Contains("manifest.txt"));
 
-                if (packFiles == 0 || manifest == 0)
+                if (packFiles == 0 && manifest == 0)
                     System.Windows.MessageBox.Show($"The selected directory contains {packFiles} packfiles and {manifest} manifest files. It is probably not a game directory");
             }
         }
