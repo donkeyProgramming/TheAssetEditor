@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="TextInputWindow" 
-        SizeToContent="WidthAndHeight"
+        Width="310"
+        Height="80"
         ResizeMode="NoResize"
         Style="{StaticResource CustomWindowStyle}"
         WindowStartupLocation="CenterOwner">
