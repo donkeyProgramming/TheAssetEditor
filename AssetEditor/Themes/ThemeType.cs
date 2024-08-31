@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FramePFX.Themes {
+namespace AssetEditor.Themes {
     public enum ThemeType {
         SoftDark,
         RedBlackTheme,

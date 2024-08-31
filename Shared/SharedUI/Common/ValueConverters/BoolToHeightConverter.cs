@@ -5,12 +5,12 @@ using System.Windows.Data;
 namespace Shared.Ui.Common.ValueConverters
 {
     [ValueConversion(typeof(bool), typeof(double))]
-    public sealed class BoolToHightConverter : IValueConverter
+    public sealed class BoolToHeightConverter : IValueConverter
     {
         public double TrueValue { get; set; }
         public double FalseValue { get; set; }
 
-        public BoolToHightConverter()
+        public BoolToHeightConverter()
         {
             // set defaults
             TrueValue = double.NaN;

@@ -7,6 +7,7 @@
              xmlns:e1="http://schemas.microsoft.com/xaml/behaviors" 
              xmlns:nodevalueconverters="clr-namespace:CommonControls.PackFileBrowser" 
              xmlns:packfilebrowser="clr-namespace:Shared.Ui.BaseDialogs.PackFileBrowser"
+             xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="mystuff">
@@ -17,16 +18,23 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox x:Name="FilterTextBoxItem" KeyboardNavigation.TabIndex="0" FontSize="16" KeyboardNavigation.IsTabStop="True"  Grid.Column="1" Grid.Row="0" 
-                 Margin="2"
-                 Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350, ValidatesOnDataErrors=True}"
-                 behaviors:TextBoxExtensions.Watermark="Search filter">
-        </TextBox>
-        <Button Click="ClearButtonClick" Content="Clear" FontSize="16" Margin="2" Command="{Binding ClearTextCommand}" Padding="4,0" HorizontalAlignment="Right" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0">
+        <extendedwpftoolkit:WatermarkTextBox 
+            x:Name="FilterTextBoxItem"
+            KeyboardNavigation.TabIndex="0"
+            FontSize="12" 
+            KeyboardNavigation.IsTabStop="True"
+            Grid.Column="1" 
+            Grid.Row="0"
+            Padding="5"
+            Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350, ValidatesOnDataErrors=True}"
+            Watermark="Search PackFile Explorer">
+        </extendedwpftoolkit:WatermarkTextBox>
+        
+        <Button Click="ClearButtonClick" Content="Clear" FontSize="12" Command="{Binding ClearTextCommand}" Padding="10, 0" HorizontalAlignment="Right" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="0">
         </Button>
 
         <TreeView  x:Name="tvParameters"
@@ -56,16 +64,10 @@
                             <Setter Property="Command" Value="{Binding Command}"/>
                             <Setter Property="ItemsSource" Value="{Binding ContextMenu}"/>
 
-
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding }" Value="{x:Null}">
                                     <Setter Property="Template" Value="{StaticResource MenuSeparatorTemplate}" />
                                 </DataTrigger>
-
-
-
-
-
                             </Style.Triggers>
                         </Style>
                     </ContextMenu.ItemContainerStyle>
@@ -142,9 +144,6 @@
                     </Grid>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
-
-
-
         </TreeView>
     </Grid>
 </UserControl>

@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 
-namespace FramePFX.Themes.Attached {
+namespace AssetEditor.Themes.Attached 
+{
     public static class CornerRadiusHelper {
         public static readonly DependencyProperty ValueProperty = DependencyProperty.RegisterAttached("Value", typeof(CornerRadius), typeof(CornerRadiusHelper), new PropertyMetadata(new CornerRadius(0)));
 

@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace FramePFX.Themes {
+namespace AssetEditor.Themes {
     public static class ThemesController {
         public static ThemeType CurrentTheme { get; set; }
 

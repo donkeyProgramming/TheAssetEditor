@@ -3,7 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-namespace FramePFX.Themes.Attached {
+namespace AssetEditor.Themes.Attached 
+{
     /// <summary>
     /// An attached property class for showing a hint when a text box is empty. Set the text box's Tag property to the text
     /// </summary>

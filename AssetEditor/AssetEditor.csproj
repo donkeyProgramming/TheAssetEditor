@@ -7,6 +7,9 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
     </PropertyGroup>
+    <ItemGroup>
+      <None Remove="AssetEditorIcon.png" />
+    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Editors\AnimationEditor\Editors.AnimationVisualEditors.csproj" />
@@ -38,6 +41,10 @@
 
     <ItemGroup>
       <Folder Include="DevConfigs\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="AssetEditorIcon.png" />
     </ItemGroup>
 
 

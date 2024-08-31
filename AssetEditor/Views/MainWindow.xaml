@@ -8,32 +8,135 @@
         xmlns:datatemplates="clr-namespace:Shared.Ui.Common.DataTemplates;assembly=Shared.Ui"
         xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
         xmlns:common="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+        xmlns:local="clr-namespace:AssetEditor"
+        mc:Ignorable="d"
         behaviors:WindowCancellableClosingBehavior.Closing="{Binding ClosingCommand}"
         behaviors:WindowCancellableClosingBehavior.IsClosingWithoutPrompt="{Binding IsClosingWithoutPrompt}"
-        mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="AssetEditor v0.26" Height="1024" Width="2000">
+        x:Name="window"
+        Title="MainWindow"
+        Width="1280"
+        Height="720"
+        BorderThickness="{Binding RelativeSource={RelativeSource Mode=Self}, Path=WindowState, Converter={StaticResource windowStateToThicknessConverter}}"
+        Icon="/AssetEditorIcon.png"
+        ResizeMode="CanResize"
+        WindowStyle="None">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            CornerRadius="{x:Static SystemParameters.WindowCornerRadius}"
+            GlassFrameThickness="1,0,1,1"
+            NonClientFrameEdges="Left,Right,Bottom"
+            ResizeBorderThickness="{x:Static SystemParameters.WindowResizeBorderThickness}"
+            UseAeroCaptionButtons="False">
+            <WindowChrome.CaptionHeight>
+                <MultiBinding Converter="{StaticResource captionHeightConverter}">
+                    <Binding ElementName="titlebar" Path="ActualHeight" />
+                    <Binding ElementName="window" Path="BorderThickness.Top" />
+                </MultiBinding>
+            </WindowChrome.CaptionHeight>
+        </WindowChrome>
+    </WindowChrome.WindowChrome>
+
     <Window.Resources>
         <datatemplates:EditorTemplateSelector x:Key="EditorSelector" />
     </Window.Resources>
-    
-    <Grid>
+
+    <Grid x:Name="rootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.2*"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
 
-        <views:MenuBarView Grid.Row="0" Grid.ColumnSpan="3"/>
+        <!-- Title Bar -->
+        <Grid
+            x:Name="titlebar"
+            Grid.Row="0"
+            Grid.ColumnSpan="3"
+            MinHeight="30"
+            Background="{StaticResource TitleBar.Static.Background}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="40" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
 
+            <Image
+                x:Name="icon"
+                Grid.Column="0"
+                Width="24"
+                Height="24"
+                Margin="5, 0, 3, 0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                MouseDown="Icon_MouseDown"
+                Source="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=Icon}"
+                WindowChrome.IsHitTestVisibleInChrome="True" />
+
+            <DockPanel Grid.Column="1" HorizontalAlignment="Stretch">
+                <views:MenuBarView/>
+                <TextBlock
+                    Margin="10,0,10,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=Title}"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap" />
+            </DockPanel>
+
+            <Button
+                Grid.Column="2"
+                Click="OnMinimizeButtonClick"
+                Style="{StaticResource TitleBarButtonStyle}"
+                ToolTip="Minimize">
+                <Path
+                    Width="36"
+                    Height="32"
+                    Data="M 13,15 H 23"
+                    Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                    StrokeThickness="1" />
+            </Button>
+
+            <Button
+                x:Name="maximizeRestoreButton"
+                Grid.Column="3"
+                Click="OnMaximizeRestoreButtonClick"
+                Style="{StaticResource TitleBarButtonStyle}"
+                ToolTip="Maximize"
+                ToolTipOpening="maximizeRestoreButton_ToolTipOpening">
+                <Path
+                    Width="36"
+                    Height="32"
+                    Data="{Binding ElementName=window, Path=WindowState, Converter={StaticResource windowStateToPathConverter}}"
+                    Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                    StrokeThickness="1" />
+            </Button>
+
+            <Button
+                Grid.Column="4"
+                Click="OnCloseButtonClick"
+                Style="{StaticResource TitleBarCloseButtonStyle}"
+                ToolTip="Close">
+                <Path
+                    Width="36"
+                    Height="32"
+                    Data="M 13,11 22,20 M 13,20 22,11"
+                    Stroke="{Binding Path=Foreground, RelativeSource={RelativeSource AncestorType={x:Type Button}}}"
+                    StrokeThickness="1" />
+            </Button>
+        </Grid>
+
+        <!-- Main Content Area -->
         <views:FileTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding FileTree}"/>
 
-        <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"  HorizontalAlignment="Stretch">
+        <GridSplitter Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" HorizontalAlignment="Stretch">
             <GridSplitter.Template>
                 <ControlTemplate TargetType="{x:Type GridSplitter}">
                     <Grid>
@@ -44,12 +147,12 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <TabControl  Grid.Row="1" Grid.Column="2"  
-                     ItemsSource="{Binding CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}"
-                     SelectedIndex = "{Binding SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                     ContentTemplateSelector="{StaticResource EditorSelector}"
-                     viewFacotry:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}"
-                     Name="EditorsTabControl">
+        <TabControl Grid.Row="1" Grid.Column="2"  
+                    ItemsSource="{Binding CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedIndex="{Binding SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                    ContentTemplateSelector="{StaticResource EditorSelector}"
+                    viewFacotry:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}"
+                    Name="EditorsTabControl">
             <TabControl.Resources>
                 <common:BindingProxy x:Key="Proxy" Data="{Binding}" />
             </TabControl.Resources>
@@ -77,7 +180,7 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        
+
                         <Grid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Close"
@@ -99,7 +202,7 @@
                                 </MenuItem>
                             </ContextMenu>
                         </Grid.ContextMenu>
-                        
+
                         <TextBlock Grid.Column="0" Text="{Binding DisplayName.Value, UpdateSourceTrigger=PropertyChanged}">
                             <TextBlock.Style>
                                 <Style TargetType="{x:Type TextBlock}">
@@ -107,7 +210,7 @@
                                         <DataTrigger Binding="{Binding HasUnsavedChanges}" Value="True">
                                             <Setter Property="Foreground" Value="Red"/>
                                         </DataTrigger>
-                                    </Style.Triggers> 
+                                    </Style.Triggers>
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
@@ -138,34 +241,5 @@
                 </DataTemplate>
             </TabControl.ItemTemplate>
         </TabControl>
-
-
-        <StatusBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
-            <StatusBar.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="300" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="100" />
-                        </Grid.ColumnDefinitions>
-                    </Grid>
-                </ItemsPanelTemplate>
-            </StatusBar.ItemsPanel>
-            <StatusBarItem>
-                <TextBlock Name="lblMemoryUsage" />
-            </StatusBarItem>
-            <Separator Grid.Column="1" />
-            <StatusBarItem Grid.Column="2">
-                <TextBlock Text="c:\path\of\current\file.txt"  Visibility="Collapsed"/>
-            </StatusBarItem>
-            <Separator Grid.Column="3" />
-            <StatusBarItem Grid.Column="4">
-                <ProgressBar Value="50" Width="90" Height="16" Visibility="Collapsed"/>
-            </StatusBarItem>
-        </StatusBar>
-  
     </Grid>
 </Window>

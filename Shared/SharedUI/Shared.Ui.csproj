@@ -4,6 +4,9 @@
 		<UseWPF>true</UseWPF>
         <Nullable>enable</Nullable>
 	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.1" />
+	</ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\EmbeddedResources\Shared.EmbeddedResources.csproj" />
