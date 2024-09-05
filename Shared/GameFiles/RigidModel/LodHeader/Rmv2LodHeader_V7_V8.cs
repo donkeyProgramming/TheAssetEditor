@@ -1,4 +1,5 @@
-﻿using Shared.Core.ByteParsing;
+﻿using Microsoft.Extensions.Logging;
+using Shared.Core.ByteParsing;
 
 namespace Shared.GameFormats.RigidModel.LodHeader
 {
@@ -11,6 +12,7 @@ namespace Shared.GameFormats.RigidModel.LodHeader
             var header = ByteHelper.ByteArrayToStructure<Rmv2LodHeader_V7_V8>(buffer, offset);
             return header;
         }
+
 
         public RmvLodHeader CreateFromBase(RmvLodHeader source, uint lodLevel)
         {
@@ -43,6 +45,26 @@ namespace Shared.GameFormats.RigidModel.LodHeader
         public byte[] Save(RmvLodHeader rmvLodHeader)
         {
             return ByteHelper.GetBytes((Rmv2LodHeader_V7_V8)rmvLodHeader);
+        }
+
+
+        public RmvLodHeader CreateEmpty(float cameraDistance, uint lodLevel, byte qualityLevel)
+        {
+            var output = new Rmv2LodHeader_V7_V8()
+            {
+                _meshCount = 0,
+                _totalLodVertexSize = 0,
+                _totalLodIndexSize = 0,
+                _firstMeshOffset = 0,
+                _lodCameraDistance = cameraDistance,
+
+                _lodLevel = lodLevel,
+                _qualityLvl = qualityLevel,
+                _padding0 = 125,
+                _padding1 = 136,
+                _padding2 = 174
+            };
+            return output;
         }
     }
 

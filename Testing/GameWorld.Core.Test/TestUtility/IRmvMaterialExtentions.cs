@@ -1,5 +1,6 @@
 ﻿using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
+using Shared.GameFormats.RigidModel.Transforms;
 using Shared.GameFormats.RigidModel.Types;
 
 namespace GameWorld.Core.Test.TestUtility
@@ -24,9 +25,14 @@ namespace GameWorld.Core.Test.TestUtility
         {
             if (material is WeightedMaterial weightedMaterial)
             {
-                weightedMaterial.UseDecal = useDecal;
-                weightedMaterial.UseDirt = useDirt;
+                // Uv scale
+                weightedMaterial.FloatParams.Add(2);
+                weightedMaterial.FloatParams.Add(3);
+                weightedMaterial.Vec4Params.Add(new RmvVector4(1, 2, 3, 4));
+                weightedMaterial.IsDirtAndDecal = useDirt;
             }
+            else
+                throw new Exception("Not correct material type");
 
             return material;
         }

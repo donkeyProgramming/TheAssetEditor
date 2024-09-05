@@ -1,8 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using GameWorld.Core.Rendering.Materials.Capabilities;
+using GameWorld.Core.Utility.UserInterface;
 using GameWorld.Core.WpfWindow.ResourceHandling;
+using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Ui.BaseDialogs.MathViews;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.DirtAndDecal
 {
@@ -10,19 +13,32 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
     {
         private readonly DirtAndDecalCapability _capability;
 
+        [ObservableProperty] ShaderTextureViewModel _dirtMap;
+        [ObservableProperty] ShaderTextureViewModel _dirtMask;
+        [ObservableProperty] ShaderTextureViewModel _decalMask;
+
+        [ObservableProperty] Vector2ViewModel _uvScale;
+        [ObservableProperty] Vector4ViewModel _textureTransform;
+
+        [ObservableProperty] ShaderTextureViewModel _decalPreviewColour;
+        [ObservableProperty] ShaderTextureViewModel _decalPreviewNormal;
 
         public DirtAndDecalViewModel(DirtAndDecalCapability capability, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
         {
             _capability = capability;
 
-           //_bloodMap = new ShaderTextureViewModel(bloodCapability.BloodMask, packFileService, uiCommandFactory, resourceLibrary);
-           //_useBlood = _bloodCapability.UseBlood;
-           //_bloodUvScale = new Vector2ViewModel(_bloodCapability.UvScale, OnBloodUvScaleChanged);
-           //_bloodPreview = new FloatViewModel(_bloodCapability.PreviewBlood, OnBloodPreviewChanged);
+            _dirtMap = new ShaderTextureViewModel(_capability.DirtMap, packFileService, uiCommandFactory, resourceLibrary);
+            _dirtMask = new ShaderTextureViewModel(_capability.DirtMask, packFileService, uiCommandFactory, resourceLibrary);
+            _decalMask = new ShaderTextureViewModel(_capability.DecalMask, packFileService, uiCommandFactory, resourceLibrary);
+
+            _uvScale = new Vector2ViewModel(_capability.UvScale, OnUvScaleChanged);
+            _textureTransform = new Vector4ViewModel(_capability.TextureTransform, OnTextureTransformChanged);
+
+            _decalPreviewColour = new ShaderTextureViewModel(_capability.DecalPreviewColour, packFileService, uiCommandFactory, resourceLibrary);
+            _decalPreviewNormal = new ShaderTextureViewModel(_capability.DecalPreviewNormal, packFileService, uiCommandFactory, resourceLibrary);
         }
 
-      // void OnBloodUvScaleChanged(Vector2 value) => _bloodCapability.UvScale = value;
-      // partial void OnUseBloodChanged(bool value) => _bloodCapability.UseBlood = value;
-      // void OnBloodPreviewChanged(float value) => _bloodCapability.PreviewBlood = value;
+        void OnUvScaleChanged(Vector2 value) => _capability.UvScale = value;
+        void OnTextureTransformChanged(Vector4 value) => _capability.TextureTransform = value;
     }
 }

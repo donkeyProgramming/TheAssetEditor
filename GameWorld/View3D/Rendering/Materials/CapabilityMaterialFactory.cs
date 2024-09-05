@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.WpfWindow.ResourceHandling;
 using Shared.Core.Services;
+using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 
@@ -47,12 +48,11 @@ namespace GameWorld.Core.Rendering.Materials
 
         void UpdatedPreferedMaterialBasedOnRmv(GameTypeEnum currentGame, IRmvMaterial material, ref CapabilityMaterialsEnum preferredMaterial)
         {
-            // Decal disabled for now, as saving is not validated! 
-            // if (material is WeightedMaterial weighterMaterial)
-            // { 
-            //     if (weighterMaterial.UseDecal || weighterMaterial.UseDirt)
-            //         preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal;
-            // }
+            if (material is WeightedMaterial weighterMaterial)
+            { 
+                if (weighterMaterial.MaterialId == ModelMaterialEnum.weighted_decal_dirtmap || weighterMaterial.MaterialId == ModelMaterialEnum.decal_dirtmap)
+                    preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal;
+            }
         }
 
         CapabilityMaterialsEnum GetDefaultMaterial(GameTypeEnum currentGame)
@@ -93,7 +93,7 @@ namespace GameWorld.Core.Rendering.Materials
                 case GameTypeEnum.ThronesOfBritannia:
                 case GameTypeEnum.Warhammer1:
                 case GameTypeEnum.Warhammer2:
-                    return [CapabilityMaterialsEnum.SpecGlossPbr_Default/*, CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal*/];
+                    return [CapabilityMaterialsEnum.SpecGlossPbr_Default, CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal];
                 
                 case GameTypeEnum.Warhammer3:
                 case GameTypeEnum.ThreeKingdoms:

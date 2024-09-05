@@ -65,5 +65,17 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             return true;
         }
 
+        static public bool Compare(Vector4 self, Vector4 other, string attributeName, out (bool Result, string Message) result)
+        {
+            if (self != other)
+            {
+                result = (false, $"{attributeName} - Different values ({self} vs {other})");
+                return false;
+            }
+
+            result = (true, "");
+            return true;
+        }
+
     }
 }

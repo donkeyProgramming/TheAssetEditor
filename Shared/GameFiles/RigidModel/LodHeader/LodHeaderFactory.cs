@@ -2,13 +2,12 @@
 {
     public class LodHeaderFactory
     {
-        Dictionary<RmvVersionEnum, ILodHeaderCreator> _lodHeaderCreators = new Dictionary<RmvVersionEnum, ILodHeaderCreator>();
+        private readonly Dictionary<RmvVersionEnum, ILodHeaderCreator> _lodHeaderCreators = [];
 
-        public static LodHeaderFactory Create() => new LodHeaderFactory();
+        public static LodHeaderFactory Create() => new();
 
         public LodHeaderFactory()
         {
-            //_lodHeaderCreators[RmvVersionEnum.RMV2_V5] = new Rmv2LodHeader_V6_Creator();
             _lodHeaderCreators[RmvVersionEnum.RMV2_V6] = new Rmv2LodHeader_V6_Creator();
             _lodHeaderCreators[RmvVersionEnum.RMV2_V7] = new Rmv2LodHeader_V7_V8_Creator();
             _lodHeaderCreators[RmvVersionEnum.RMV2_V8] = new Rmv2LodHeader_V7_V8_Creator();
@@ -41,6 +40,11 @@
         public RmvLodHeader CreateFromBase(RmvVersionEnum version, RmvLodHeader source, uint lodLevel)
         {
             return _lodHeaderCreators[version].CreateFromBase(source, lodLevel);
+        }
+
+        public RmvLodHeader CreateEmpty(RmvVersionEnum version, float cameraDistance, uint lodLevel, byte qualityLevel)
+        {
+            return _lodHeaderCreators[version].CreateEmpty(cameraDistance, lodLevel, qualityLevel);
         }
     }
 }

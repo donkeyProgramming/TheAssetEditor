@@ -136,7 +136,9 @@ namespace GameWorld.Core.Services
 
             var modelFullPath = _packFileService.GetFullPath(file);
             var modelNode = new Rmv2ModelNode(Path.GetFileName(file.Name));
-            _rmv2ModelNodeLoader.CreateModelNodesFromFile(modelNode, rmvModel, player, modelFullPath, wsModel);
+            var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromFile(rmvModel, modelFullPath, player, wsModel);
+            foreach (var lodNode in lodNodes)
+                modelNode.AddObject(lodNode);
 
             foreach (var mesh in modelNode.GetMeshNodes(0))
                 mesh.AttachmentPointName = attachmentPointName;

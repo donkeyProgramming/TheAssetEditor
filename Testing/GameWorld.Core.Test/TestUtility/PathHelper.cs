@@ -15,8 +15,8 @@ namespace GameWorld.Core.Test.Utility
         public static string Folder(string fileName)
         {
             var fullPath = Path.GetFullPath(@"..\..\..\..\..\Data\" + fileName);
-            if (System.IO.Directory.Exists(fullPath) == false)
-                throw new Exception($"Unable to find data directory {fileName}");
+            if (Directory.Exists(fullPath) == false)
+                throw new Exception($"Unable to find data directory {fullPath}");
             return fullPath;
         }
 

@@ -41,9 +41,15 @@
             </DockPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="BinaryVertexFormat"/>
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Rmv Vertex format"/>
                 <Label>:</Label>
                 <TextBlock  Text="{Binding Material.BinaryVertexFormat.Value}"  VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Rmv Material Id"/>
+                <Label>:</Label>
+                <TextBlock  Text="{Binding Material.MaterialId.Value}"  VerticalAlignment="Center"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">

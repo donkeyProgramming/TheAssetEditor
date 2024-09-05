@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -11,7 +12,6 @@ using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.LodHeader;
 
@@ -22,20 +22,18 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
         private readonly ILogger _logger = Logging.Create<NodeToRmvSaveHelper>();
         private readonly PackFileService _packFileService;
         private readonly MeshBuilderService _meshBuilderService;
-        private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public NodeToRmvSaveHelper(PackFileService packFileService, MeshBuilderService meshBuilderService, ApplicationSettingsService applicationSettingsService)
+        public NodeToRmvSaveHelper(PackFileService packFileService, MeshBuilderService meshBuilderService)
         {
             _packFileService = packFileService;
             _meshBuilderService = meshBuilderService;
-            _applicationSettingsService = applicationSettingsService;
         }
 
-        public void Save(string outputPath, MainEditableNode mainNode, RmvVersionEnum rmvVersionEnum, GeometrySaveSettings saveSettings)
+        public void Save(string outputPath, Rmv2ModelNode mainNode, GameSkeleton? skeleton, RmvVersionEnum rmvVersionEnum, GeometrySaveSettings saveSettings)
         {
             try
             {
-                var bytes = GenerateBytes(mainNode, mainNode.SkeletonNode.Skeleton, rmvVersionEnum, saveSettings, _applicationSettingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes);
+                var bytes = GenerateBytes(mainNode, rmvVersionEnum, skeleton, saveSettings, true);
                 
                 var originalFileHandle = _packFileService.FindFile(outputPath);
                 var res = SaveHelper.Save(_packFileService, outputPath, originalFileHandle, bytes);
@@ -43,18 +41,18 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             catch (Exception e)
             {
                 _logger.Here().Error("Error saving model - " + e.ToString());
-                MessageBox.Show("Saving failed!");
+                MessageBox.Show($"Saving failed!\n{e.Message}" );
             }
         }
 
-        byte[] GenerateBytes(Rmv2ModelNode modelNode, GameSkeleton skeleton, RmvVersionEnum version, GeometrySaveSettings saveSettings, bool enrichModel = true)
+        byte[] GenerateBytes(Rmv2ModelNode modelNode, RmvVersionEnum version, GameSkeleton? skeleton, GeometrySaveSettings saveSettings, bool enrichModel = true)
         {
             _logger.Here().Information($"Starting to save model. Skeleton = {skeleton}, Version = {version}");
 
             var lodCount = (uint)modelNode.Children.Count;
 
-            if ( !(saveSettings.NumberOfLodsToGenerate == lodCount && saveSettings.LodSettingsPerLod.Count == lodCount) )
-                throw new Exception($"Error computer number of lods. saveSettings.NumberOfLodsToGenerate:{saveSettings.NumberOfLodsToGenerate}, lodCount:{lodCount}, saveSettings.LodSettingsPerLod.Count{saveSettings.LodSettingsPerLod.Count}");
+            if (saveSettings.LodSettingsPerLod.Count != lodCount )
+                throw new Exception($"Error computer number of lods. LodCount:{lodCount}, SaveSettings.LodSettingsPerLod.Count{saveSettings.LodSettingsPerLod.Count}");
 
             var rmvFile = new RmvFile()
             {
@@ -66,7 +64,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                     LodCount = lodCount
                 },
                 ModelList = new RmvModel[lodCount][],
-                LodHeaders = CreateLodHeaders(lodCount, saveSettings, modelNode.Model.LodHeaders, version)
+                LodHeaders = CreateLodHeaders(lodCount, saveSettings.LodSettingsPerLod, version)
             };
 
             // Create all the meshes
@@ -83,16 +81,13 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
 
             // Update data in the header and reCalc offset
             rmvFile.RecalculateOffsets();
-
-            // Output the data
-            _logger.Here().Information($"Generating bytes.");
             var outputBytes = ModelFactory.Create().Save(rmvFile);
+            _logger.Here().Information($"Model generated correctly");
 
-            _logger.Here().Information($"Model saved correctly");
             return outputBytes;
         }
 
-        RmvModel CreateRmvModel(string modelName, Vector3 pivotPoint, CapabilityMaterial capabilityMaterial, MeshObject geometry, GameSkeleton? skeleton, bool enrichModel)
+        RmvModel CreateRmvModel(string modelName, Vector3 pivotPoint, CapabilityMaterial capabilityMaterial, MeshObject geometry, GameSkeleton? skeleton, bool addBonesAsAttachmentPoints)
         {
             var newRmvMaterial = new MaterialToRmvSerializer().CreateMaterialFromCapabilityMaterial(capabilityMaterial);
             newRmvMaterial.UpdateInternalState(geometry.VertexFormat);
@@ -109,7 +104,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             newModel.UpdateBoundingBox(geometry.BoundingBox);
             newModel.UpdateModelTypeFlag(newModel.Material.MaterialId);
 
-            if (enrichModel && skeleton != null)
+            if (addBonesAsAttachmentPoints && skeleton != null)
             {
                 var boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();
                 newModel.Material.EnrichDataBeforeSaving(boneNames);
@@ -118,22 +113,14 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             return newModel;
         }
 
-        static RmvLodHeader[] CreateLodHeaders(uint expectedLodCount, GeometrySaveSettings saveSettings, RmvLodHeader[] originalModelHeaders, RmvVersionEnum version)
+        static RmvLodHeader[] CreateLodHeaders(uint expectedLodCount, List<LodGenerationSettings> lodSettingsPerLod, RmvVersionEnum version)
         {
             var factory = LodHeaderFactory.Create();
             var output = new RmvLodHeader[expectedLodCount];
             
             for (var i = 0; i < expectedLodCount; i++)
-            {
-                var hasOriginalMeshLod = originalModelHeaders.Length > i;
-                if (hasOriginalMeshLod)
-                    output[i] = factory.CreateFromBase(version, originalModelHeaders[i], (uint)i);  // Use the mesh lod header
-                else
-                    output[i] = factory.CreateFromBase(version, output[i-1], (uint)i);  // Use the last generated lod header
-
-                output[i].LodCameraDistance = saveSettings.LodSettingsPerLod[i].CameraDistance;
-                output[i].QualityLvl = saveSettings.LodSettingsPerLod[i].QualityLvl;
-            }
+                output[i] = factory.CreateEmpty(version, lodSettingsPerLod[i].CameraDistance, (uint)i, lodSettingsPerLod[i].QualityLvl);
+            
 
             return output;
         }

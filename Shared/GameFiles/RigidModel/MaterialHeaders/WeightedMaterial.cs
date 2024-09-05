@@ -23,8 +23,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
         public Vector3 PivotPoint { get; set; }
         public AlphaMode AlphaMode { get; set; } = AlphaMode.Opaque;
-        public bool UseDecal { get; set; } = false;
-        public bool UseDirt { get; set; } = false;
+        public bool IsDirtAndDecal { get; set; } = false;
 
         public string ModelName { get; set; }
 
@@ -53,6 +52,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
                 ModelName = ModelName,
                 AlphaMode = AlphaMode,
+                IsDirtAndDecal = IsDirtAndDecal,
+                ToolVertexFormat = ToolVertexFormat,
                 PivotPoint = PivotPoint,
                 TextureDirectory = TextureDirectory,
                 Filters = Filters,
@@ -150,23 +151,15 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             // Overwrite the material type for static meshes
             if (BinaryVertexFormat == VertexFormat.Static)
             {
-                if (UseDecal && UseDirt)
+                if (IsDirtAndDecal)
                     MaterialId = ModelMaterialEnum.decal_dirtmap;
-                else if (UseDirt)
-                    MaterialId = ModelMaterialEnum.dirtmap;
-                else if (UseDecal)
-                    MaterialId = ModelMaterialEnum.decal;
                 else
                     MaterialId = ModelMaterialEnum.default_type;
             }
             else
             {
-                if (UseDecal && UseDirt)
+                if (IsDirtAndDecal)
                     MaterialId = ModelMaterialEnum.weighted_decal_dirtmap;
-                else if (UseDirt)
-                    MaterialId = ModelMaterialEnum.weighted_dirtmap;
-                else if (UseDecal)
-                    MaterialId = ModelMaterialEnum.weighted_decal;
                 else
                     MaterialId = ModelMaterialEnum.weighted;
             }
@@ -175,12 +168,11 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             IntParams.Clear();
             IntParams.Add((ParamterIds.Alpha_index, AlphaMode == AlphaMode.Transparent ? 1 : 0));
 
-            if (UseDecal)
-                IntParams.Add((ParamterIds.Decal_index, UseDecal ? 1 : 0));
-
-            if (UseDirt)
-                IntParams.Add((ParamterIds.Dirt_index, UseDirt ? 1 : 0));
-
+            if (IsDirtAndDecal)
+            {
+                IntParams.Add((ParamterIds.Decal_index, 1));
+                IntParams.Add((ParamterIds.Dirt_index, 1));
+            }
         }
 
         public void EnrichDataBeforeSaving(string[] boneNames)
@@ -225,17 +217,22 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 OriginalTransform = header.Transform,
             };
 
+            var useDecal = false;
+            var useDirt = false;
             foreach (var valueSet in material.IntParams)
             {
                 if (valueSet.Index == ParamterIds.Alpha_index)
                     material.AlphaMode = valueSet.Value == 1 ? AlphaMode.Transparent : AlphaMode.Opaque;
 
                 if (valueSet.Index == ParamterIds.Decal_index)
-                    material.UseDecal = true;
+                    useDecal = true;
 
                 if (valueSet.Index == ParamterIds.Dirt_index)
-                    material.UseDirt = true;
+                    useDirt = true;
             }
+
+            if(useDecal && useDirt)
+                material.IsDirtAndDecal = true;
 
             return material;
         }
@@ -259,8 +256,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 TexturesParams = [],
                 AlphaMode = AlphaMode.Transparent, /// Alpha mode - assume that users want transpencey mode enabled by default
                 
-                UseDirt = false,
-                UseDecal = false,
+                IsDirtAndDecal = false,
             };
 
             return material;
@@ -320,12 +316,9 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
             for (var intIndex = 0; intIndex < typedMaterial.IntParams.Count; intIndex++)
             {
-                var index = typedMaterial.IntParams[intIndex].Item1;
-
-                writer.Write(ByteParsers.Int32.EncodeValue(index, out _));
-                var value = (int)material.AlphaMode;
-
-                writer.Write(ByteParsers.Int32.EncodeValue(value, out _));
+                var param = typedMaterial.IntParams[intIndex];
+                writer.Write(ByteParsers.Int32.EncodeValue(param.Index, out _));
+                writer.Write(ByteParsers.Int32.EncodeValue(param.Value, out _));
             }
 
             for (var vec4Index = 0; vec4Index < typedMaterial.Vec4Params.Count; vec4Index++)

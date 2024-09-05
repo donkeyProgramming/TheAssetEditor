@@ -5,16 +5,15 @@ using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Vertex;
-using SharpDX;
 
 namespace Shared.GameFormats.RigidModel
 {
     public class ModelFactory
     {
-        ILogger _logger = Logging.Create<ModelFactory>();
+        private readonly ILogger _logger = Logging.Create<ModelFactory>();
         public static ModelFactory Create(bool logLoadedFile = false) => new ModelFactory(logLoadedFile);
 
-        bool _logLoadedFile;
+        readonly bool _logLoadedFile;
         public ModelFactory(bool logLoadedFile = false)
         {
             _logLoadedFile = logLoadedFile;

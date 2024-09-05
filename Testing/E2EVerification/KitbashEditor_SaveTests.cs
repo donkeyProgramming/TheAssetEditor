@@ -114,6 +114,11 @@ namespace E2EVerification
             WsModelHelper.AssertFile(wsModelFile);       
         }
 
+        public void LoadAndSaveDecalAndDirtShield()
+        { 
+        
+        }
+
 
     }
 }

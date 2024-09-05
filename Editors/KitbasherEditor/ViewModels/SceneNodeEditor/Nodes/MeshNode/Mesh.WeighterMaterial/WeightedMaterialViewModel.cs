@@ -16,6 +16,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         public NotifyAttr<int> ParentMatrixIndex { get; set; } = new NotifyAttr<int>();
         public NotifyAttr<string> BinaryVertexFormat { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<string> TransformInfo { get; set; } = new NotifyAttr<string>();
+        public NotifyAttr<string> MaterialId { get; set; } = new NotifyAttr<string>();
 
         public ObservableCollection<string> StringParameters { get; set; }
         public ObservableCollection<float> FloatParameters { get; set; }
@@ -45,7 +46,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
             ParentMatrixIndex.Value = _weightedMaterial.ParentMatrixIndex;
             BinaryVertexFormat.Value = _weightedMaterial.BinaryVertexFormat.ToString();
             TransformInfo.Value = $"Piv Identity = {_weightedMaterial.OriginalTransform.IsIdentityPivot()} Matrix Identity = {_weightedMaterial.OriginalTransform.IsIdentityMatrices()}";
-
+            MaterialId.Value = _weightedMaterial.MaterialId.ToString();
             StringParameters = new ObservableCollection<string>(_weightedMaterial.StringParams);
             FloatParameters = new ObservableCollection<float>(_weightedMaterial.FloatParams);
             IntParameters = new ObservableCollection<(int, int)>(_weightedMaterial.IntParams);

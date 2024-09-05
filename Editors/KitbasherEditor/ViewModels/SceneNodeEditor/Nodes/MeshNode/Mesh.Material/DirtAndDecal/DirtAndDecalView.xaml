@@ -3,7 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.DirtAndDecal" xmlns:userinterface="clr-namespace:GameWorld.Core.Utility.UserInterface;assembly=GameWorld.Core" xmlns:mathviews1="clr-namespace:Shared.Ui.BaseDialogs.MathViews;assembly=Shared.Ui"
+             xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.DirtAndDecal"
+             xmlns:userinterface="clr-namespace:GameWorld.Core.Utility.UserInterface;assembly=GameWorld.Core" 
+             xmlns:mathviews1="clr-namespace:Shared.Ui.BaseDialogs.MathViews;assembly=Shared.Ui"
+             xmlns:mathviews11="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -26,45 +29,48 @@
 
             <DockPanel LastChildFill="False">
 
-
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal DirtMap*" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Dirt Map*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
+                    <userinterface:ShaderTextureView DataContext="{Binding DirtMap}"/>
                 </DockPanel>
 
-
-
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal DirtMask*" Margin="{StaticResource LabelMargin}"/>
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Dirt Mask*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
+                    <userinterface:ShaderTextureView DataContext="{Binding DirtMask}"/>
                 </DockPanel>
 
 
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Mask*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
+                    <userinterface:ShaderTextureView DataContext="{Binding DecalMask}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Uv Scale*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <mathviews1:Vector2View DataContext="{Binding BloodUvScale}" />
+                    <mathviews1:Vector2View DataContext="{Binding UvScale}" />
+                </DockPanel>
+
+                <DockPanel DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Texture transform*" Margin="{StaticResource LabelMargin}"/>
+                    <Label>:</Label>
+                    <mathviews11:Vector4View DataContext="{Binding TextureTransform}" />
                 </DockPanel>
 
 
                 <DockPanel DockPanel.Dock="Top" Margin="0,10,0,0">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Preveiw Colour*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
+                    <userinterface:ShaderTextureView DataContext="{Binding DecalPreviewColour}"/>
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Preveiw Normal*" Margin="{StaticResource LabelMargin}"/>
                     <Label>:</Label>
-                    <userinterface:ShaderTextureView DataContext="{Binding BloodMap}"/>
+                    <userinterface:ShaderTextureView DataContext="{Binding DecalPreviewNormal}"/>
                 </DockPanel>
 
             </DockPanel>

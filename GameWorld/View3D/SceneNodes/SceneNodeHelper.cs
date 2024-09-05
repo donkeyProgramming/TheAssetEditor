@@ -121,7 +121,7 @@ namespace GameWorld.Core.SceneNodes
                     nodeQueue.Enqueue(child);
 
                 if (item is Rmv2ModelNode modelNode)
-                    output.Add(modelNode.Model.Header.SkeletonName);
+                    output.Add(modelNode.GetMeshNodes(0).First().Geometry.SkeletonName);
             }
 
             var potentialSkeletons = output.Where(x => string.IsNullOrWhiteSpace(x) == false);
