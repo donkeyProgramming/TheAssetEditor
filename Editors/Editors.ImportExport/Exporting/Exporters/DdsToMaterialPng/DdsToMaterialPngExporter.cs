@@ -26,6 +26,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
                 var fileDirectory = outputPath + "/" + fileName + ".png";
                 var bytes = packFile.DataSource.ReadData();
                 var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
+ 
                 if (convertToBlenderFormat)
                 {
                     ConvertToBlenderFormat(imgBytes, outputPath, fileDirectory);
@@ -52,7 +53,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             return ExportSupportEnum.NotSupported;
         }
 
-        private void ConvertToBlenderFormat(byte[] imgBytes, string outputPath, string fileDirectory)
+        internal void ConvertToBlenderFormat(byte[] imgBytes, string outputPath, string fileDirectory)
         {
             var ms = new MemoryStream(imgBytes);
 
@@ -64,9 +65,9 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
                     for (int y = 0; y < bitmap.Height; y++)
                     {
                         Color pixel = bitmap.GetPixel(x, y);
-                        int R = pixel.R;
-                        int G = pixel.G;
-                        int B = pixel.B;
+                        var R = pixel.R;
+                        var G = pixel.G;
+                        var B = pixel.B;
                         Color newColor = Color.FromArgb(255, B, G, R);
                         bitmap.SetPixel(x, y, newColor);
                     }
@@ -75,7 +76,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             }
         }
 
-        private void DoNotConvertExport(byte[] imgBytes, string outputPath, string fileDirectory)
+        internal void DoNotConvertExport(byte[] imgBytes, string outputPath, string fileDirectory)
         {
             var ms = new MemoryStream(imgBytes);
             using Image img = Image.FromStream(ms);

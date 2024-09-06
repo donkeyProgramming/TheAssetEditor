@@ -100,6 +100,45 @@ namespace MeshImportExport
             }
         }
 
+        public static byte[] ConvertPngToDds(byte[] png)
+        {
+            using var m = new MemoryStream();
+            using var w = new BinaryWriter(m);
+            w.Write(png);
+            m.Seek(0, SeekOrigin.Begin);
+            using var bitmap = new Bitmap(m);
+
+            PixelFormat pixelFormat = PixelFormat.Format32bppArgb;
+            Pfim.ImageFormat imageFormat = Pfim.ImageFormat.Rgba32;
+            if (bitmap.PixelFormat == PixelFormat.Format32bppArgb)
+            {
+                pixelFormat = PixelFormat.Format32bppArgb;
+                imageFormat = Pfim.ImageFormat.Rgba32;
+            }
+            else if (bitmap.PixelFormat == PixelFormat.Format24bppRgb)
+            {
+                pixelFormat = PixelFormat.Format24bppRgb;
+                imageFormat = Pfim.ImageFormat.Rgb24;
+            }
+            else
+            {
+                throw new NotSupportedException($"Unsupported PNG format: {bitmap.PixelFormat}");
+            }
+
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly, pixelFormat);
+            byte[] imageData = new byte[bitmapData.Stride * bitmapData.Height];
+            System.Runtime.InteropServices.Marshal.Copy(bitmapData.Scan0, imageData, 0, imageData.Length);
+            bitmap.UnlockBits(bitmapData);
+
+            //var image = Pfim.Pfim.FromStream(//Create(imageData, bitmap.Width, bitmap.Height, imageFormat);
+
+            using var b = new MemoryStream();
+            var imageNew = Pfim.Pfim.FromStream(b);
+            using var writer = new BinaryWriter(b);
+            writer.Write(imageNew.Data);
+            return b.ToArray();
+        }
+
         //this will be used when a user does not want to have textures
         public static MaterialBuilder BuildFakeMaterial(PackFileService pfs, RmvModel model)
         {
