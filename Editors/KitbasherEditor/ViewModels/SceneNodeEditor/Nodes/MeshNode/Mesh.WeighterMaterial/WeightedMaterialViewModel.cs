@@ -18,8 +18,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         public NotifyAttr<string> TransformInfo { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<string> MaterialId { get; set; } = new NotifyAttr<string>();
 
-        public ObservableCollection<string> StringParameters { get; set; }
-        public ObservableCollection<float> FloatParameters { get; set; }
+        public ObservableCollection<(int Index, string Value)> StringParameters { get; set; }
+        public ObservableCollection<(int Index, float Value)> FloatParameters { get; set; }
         public ObservableCollection<(int Index, int Value)> IntParameters { get; set; }
         public ObservableCollection<string> TextureParameters { get; set; }
         public ObservableCollection<string> AttachmentPointParameters { get; set; }
@@ -36,8 +36,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 
         public void Initialize(Rmv2MeshNode node)
         {
-            var castMaterial = node.RmvMaterial as WeightedMaterial;
-            if (castMaterial == null)
+            if (node.RmvMaterial is not WeightedMaterial castMaterial)
                 throw new Exception($"Material is not WeightedMaterial - {node.RmvMaterial.GetType()}");
             _weightedMaterial = castMaterial;
 
@@ -47,12 +46,13 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
             BinaryVertexFormat.Value = _weightedMaterial.BinaryVertexFormat.ToString();
             TransformInfo.Value = $"Piv Identity = {_weightedMaterial.OriginalTransform.IsIdentityPivot()} Matrix Identity = {_weightedMaterial.OriginalTransform.IsIdentityMatrices()}";
             MaterialId.Value = _weightedMaterial.MaterialId.ToString();
-            StringParameters = new ObservableCollection<string>(_weightedMaterial.StringParams);
-            FloatParameters = new ObservableCollection<float>(_weightedMaterial.FloatParams);
-            IntParameters = new ObservableCollection<(int, int)>(_weightedMaterial.IntParams);
+            
+            StringParameters = new ObservableCollection<(int Index, string Value)>(_weightedMaterial.StringParams.Values);
+            FloatParameters = new ObservableCollection<(int Index, float Value)>(_weightedMaterial.FloatParams.Values);
+            IntParameters = new ObservableCollection<(int, int)>(_weightedMaterial.IntParams.Values);
             TextureParameters = new ObservableCollection<string>(_weightedMaterial.TexturesParams.Select(x => x.TexureType + " - " + x.Path));
             AttachmentPointParameters = new ObservableCollection<string>(_weightedMaterial.AttachmentPointParams.Select(x => x.BoneIndex + " - " + x.Name + " Ident:" + x.Matrix.IsIdentity()));
-            VectorParameters = new ObservableCollection<string>(_weightedMaterial.Vec4Params.Select(x => $"[{x.X}] [{x.Y}] [{x.Z}] [{x.W}]"));
+            VectorParameters = new ObservableCollection<string>(_weightedMaterial.Vec4Params.Values.Select(x => $"[{x.Value.X}] [{x.Value.Y}] [{x.Value.Z}] [{x.Value.W}]"));
         }
 
         void SetDefaultMatrix()
@@ -66,6 +66,5 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
             _weightedMaterial.ParentMatrixIndex = -1;
             ParentMatrixIndex.Value = _weightedMaterial.MatrixIndex;
         }
-
     }
 }

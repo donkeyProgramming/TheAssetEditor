@@ -1,8 +1,8 @@
 ﻿using GameWorld.Core.Rendering.Materials.Serialization;
-using GameWorld.Core.Test.Utility;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
+using Shared.TestUtility;
 
 namespace GameWorld.Core.Test.Rendering.Materials.Serialization
 {

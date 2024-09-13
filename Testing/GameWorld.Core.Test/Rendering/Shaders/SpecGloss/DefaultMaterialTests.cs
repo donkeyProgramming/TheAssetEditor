@@ -152,10 +152,10 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             // Act
             var material = GetMaterialFactory(GameTypeEnum.Pharaoh).Create(rmvMaterial, null);
             var serializer = new MaterialToRmvSerializer();
-            var createdRmvMaterial = serializer.CreateMaterialFromCapabilityMaterial(material);
+            var createdRmvMaterial = serializer.CreateMaterialFromCapabilityMaterial(material) as WeightedMaterial;
 
             // Assert
-            Assert.That(createdRmvMaterial.AlphaMode, Is.EqualTo(AlphaMode.Transparent));
+            Assert.That(createdRmvMaterial.IntParams.Get(WeightedParamterIds.IntParams_Alpha_index), Is.EqualTo(1));
             Assert.That(createdRmvMaterial.MaterialId, Is.EqualTo(ModelMaterialEnum.weighted));
 
             Assert.That(createdRmvMaterial.GetTexture(TextureType.Specular).Value.Path, Is.EqualTo($"texturePath/{TextureType.Specular}.dds"));

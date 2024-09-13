@@ -46,6 +46,14 @@ namespace E2EVerification.Shared
             return null;
         }
 
+        public PackFileContainer? LoadFolderPackFile(string path, bool createOutputPackFile = true)
+        {
+            PackFileService.LoadFolderContainer(path);
+            if (createOutputPackFile)
+                return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
+            return null;
+        }
+
 
         public PackFileContainer CreateEmptyPackFile(string packFileName, bool setAsEditable)
         {

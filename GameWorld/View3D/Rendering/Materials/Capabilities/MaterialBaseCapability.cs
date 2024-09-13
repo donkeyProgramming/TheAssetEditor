@@ -1,8 +1,8 @@
-﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+﻿using System;
+using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 
@@ -22,9 +22,17 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public virtual void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
         {
             if (wsModelMaterial != null)
+            {
                 UseAlpha = wsModelMaterial.Alpha;
+            }
             else
-                UseAlpha = rmvMaterial.AlphaMode == AlphaMode.Transparent;
+            {
+                if (rmvMaterial is WeightedMaterial weightedMaterial == false)
+                    throw new Exception($"Unable to convert material of type {rmvMaterial?.MaterialId} into {nameof(WeightedMaterial)}");
+              
+                weightedMaterial.IntParams.TryGet(WeightedParamterIds.IntParams_Alpha_index, out var useAlpha);
+                UseAlpha = useAlpha == 1;
+            }
         }
 
         public virtual void SerializeToWsModel(WsMaterialTemplateEditor templateHandler) 
@@ -33,14 +41,15 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public virtual void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
         {
-            rmvMaterial.AlphaMode = UseAlpha ? AlphaMode.Transparent : AlphaMode.Opaque;
+            if (rmvMaterial is WeightedMaterial weightedMaterial == false)
+                throw new Exception($"Unable to convert material of type {rmvMaterial?.MaterialId} into {nameof(WeightedMaterial)}");
+            weightedMaterial.IntParams.Set(WeightedParamterIds.IntParams_Alpha_index, UseAlpha ? 1 : 0);
         }
 
         public virtual (bool Result, string Message) AreEqual(ICapability otherCap)
         {
-            var typedCap = otherCap as MaterialBaseCapability;
-            if (typedCap == null)
-                throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
+            if (otherCap is not MaterialBaseCapability typedCap)
+                throw new Exception($"Comparing {GetType} against {otherCap?.GetType()}");
 
             if (!CompareHelper.Compare(UseAlpha, typedCap.UseAlpha, nameof(UseAlpha), out var res))
                 return res;

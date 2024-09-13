@@ -135,10 +135,12 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
             // Act
             var material = GetMaterialFactory(GameTypeEnum.ThreeKingdoms).Create(rmvMaterial, null);
             var serializer = new MaterialToRmvSerializer();
-            var createdRmvMaterial = serializer.CreateMaterialFromCapabilityMaterial(material);
+            var createdRmvMaterial = serializer.CreateMaterialFromCapabilityMaterial(material) as WeightedMaterial;
 
             // Assert
-            Assert.That(createdRmvMaterial.AlphaMode, Is.EqualTo(AlphaMode.Transparent));
+            var hasAlphaValue = createdRmvMaterial.IntParams.TryGet(WeightedParamterIds.IntParams_Alpha_index, out var alphaValue);
+            Assert.That(hasAlphaValue, Is.True);
+            Assert.That(alphaValue, Is.EqualTo(1));
             Assert.That(createdRmvMaterial.MaterialId, Is.EqualTo(ModelMaterialEnum.weighted));
 
             Assert.That(createdRmvMaterial.GetTexture(TextureType.BaseColour).Value.Path, Is.EqualTo($"texturePath/{TextureType.BaseColour}.dds"));

@@ -2,13 +2,13 @@
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Rendering.Materials.Shaders;
-using GameWorld.Core.Test.Utility;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
+using Shared.TestUtility;
 
 namespace GameWorld.Core.Test.Rendering.Materials.Serialization
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.WpfWindow.ResourceHandling;
 using Shared.Core.Services;
@@ -49,8 +50,11 @@ namespace GameWorld.Core.Rendering.Materials
         void UpdatedPreferedMaterialBasedOnRmv(GameTypeEnum currentGame, IRmvMaterial material, ref CapabilityMaterialsEnum preferredMaterial)
         {
             if (material is WeightedMaterial weighterMaterial)
-            { 
-                if (weighterMaterial.MaterialId == ModelMaterialEnum.weighted_decal_dirtmap || weighterMaterial.MaterialId == ModelMaterialEnum.decal_dirtmap)
+            {
+                var isDecal = RmvMaterialUtil.IsDecal(material);
+                var isDirt = RmvMaterialUtil.IsDirt(material);
+
+                if (isDecal || isDirt)
                     preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal;
             }
         }

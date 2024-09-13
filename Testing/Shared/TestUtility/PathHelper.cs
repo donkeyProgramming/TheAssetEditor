@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace GameWorld.Core.Test.Utility
+namespace Shared.TestUtility
 {
     public static class PathHelper
     {
@@ -31,7 +31,7 @@ namespace GameWorld.Core.Test.Utility
         public static string GetFileContentAsString(string path)
         {
             var bytes = GetFileAsBytes(path);
-            return Encoding.UTF8.GetString(bytes);  
+            return Encoding.UTF8.GetString(bytes);
         }
 
     }

@@ -1,7 +1,5 @@
 ﻿using System;
-using CommunityToolkit.Mvvm.ComponentModel;
 using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
-using GameWorld.Core.Utility.UserInterface;
 using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,6 +12,10 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
     public class DirtAndDecalCapability : ICapability
     {
+
+        public bool UseDirt { get; set; } = true;
+        public bool UseDecal { get; set; } = false;
+
         public TextureInput DirtMap { get; set; } = new TextureInput(TextureType.Decal_dirtmap);
         public TextureInput DirtMask { get; set; } = new TextureInput(TextureType.Decal_dirtmask);
         public TextureInput DecalMask { get; set; } = new TextureInput(TextureType.Decal_mask);
@@ -36,6 +38,8 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                 DirtMap = DirtMap.Clone(),
                 DirtMask = DirtMask.Clone(),
                 DecalMask = DecalMask.Clone(),
+                UseDecal = UseDecal,
+                UseDirt = UseDirt,
                 UvScale = UvScale,
                 TextureTransform = TextureTransform
             };
@@ -50,8 +54,17 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             CapabilityHelper.SetTextureFromModel(rmvMaterial, null, DirtMask);
             CapabilityHelper.SetTextureFromModel(rmvMaterial, null, DecalMask);
 
-            UvScale = new Vector2(weightedMateial.FloatParams[0], weightedMateial.FloatParams[1]);
-            TextureTransform = weightedMateial.Vec4Params[0].ToVector4();
+            UseDirt = RmvMaterialUtil.IsDirt(rmvMaterial);
+            UseDecal= RmvMaterialUtil.IsDecal(rmvMaterial);
+
+            var uvScaleX = weightedMateial.FloatParams.Get(WeightedParamterIds.FloatParams_UvScaleX);
+            var uvScaleY = weightedMateial.FloatParams.Get(WeightedParamterIds.FloatParams_UvScaleX);
+            UvScale = new Vector2(uvScaleX, uvScaleY);
+
+            if (UseDecal)
+                TextureTransform = weightedMateial.Vec4Params.Get(WeightedParamterIds.Vec4Params_TextureDecalTransform).ToVector4();
+            else
+                TextureTransform = new Vector4(0, 0, 0, 0);
         }
 
         public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
@@ -59,23 +72,23 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             if (rmvMaterial is not WeightedMaterial weightedMateial)
                 throw new Exception($"Input material '{rmvMaterial.GetType()}' is not {nameof(WeightedMaterial)}, and can not used to create a {nameof(DirtAndDecalCapability)}");
 
-            weightedMateial.IsDirtAndDecal = true;
+            weightedMateial.MaterialHint = WeightedMaterial.MaterialHintEnum.Dirt;
+            weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Dirt_index, 1);
+            weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Decal_index, 1);
 
             weightedMateial.SetTexture(DirtMap.Type, DirtMap.TexturePath);
             weightedMateial.SetTexture(DirtMask.Type, DirtMask.TexturePath);
-            weightedMateial.SetTexture(DecalMask.Type, DecalMask.TexturePath);
 
-            if (weightedMateial.Vec4Params.Count == 0)
-                weightedMateial.Vec4Params.Add(new RmvVector4());
-            weightedMateial.Vec4Params[0] = new RmvVector4(TextureTransform.X, TextureTransform.Y, TextureTransform.Z, TextureTransform.W);
+            weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleX, UvScale.X);
+            weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleY, UvScale.Y);
 
-            if (weightedMateial.FloatParams.Count == 0)
-                weightedMateial.FloatParams.Add(0);
-            if (weightedMateial.FloatParams.Count == 1)
-                weightedMateial.FloatParams.Add(0);
+            if (UseDecal)
+            {
+                weightedMateial.MaterialHint = WeightedMaterial.MaterialHintEnum.DecalAndDirt;
 
-            weightedMateial.FloatParams[0] = UvScale.X;
-            weightedMateial.FloatParams[1] = UvScale.Y;
+                weightedMateial.SetTexture(DecalMask.Type, DecalMask.TexturePath);
+                weightedMateial.Vec4Params.Set(WeightedParamterIds.Vec4Params_TextureDecalTransform, new RmvVector4(TextureTransform.X, TextureTransform.Y, TextureTransform.Z, TextureTransform.W));
+            }
         }
 
         public (bool Result, string Message) AreEqual(ICapability otherCap)
@@ -97,6 +110,12 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
             if (!CompareHelper.Compare(TextureTransform, typedCap.TextureTransform, nameof(TextureTransform), out var res4))
                 return res4;
+
+            if (!CompareHelper.Compare(UseDecal, typedCap.UseDecal, nameof(TextureTransform), out var res5))
+                return res5;
+
+            if (!CompareHelper.Compare(UseDirt, typedCap.UseDirt, nameof(TextureTransform), out var res6))
+                return res6;
 
             return (true, "");
         }

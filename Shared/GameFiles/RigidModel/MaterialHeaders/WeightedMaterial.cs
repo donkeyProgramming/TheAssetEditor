@@ -8,27 +8,27 @@ using Shared.GameFormats.RigidModel.Types;
 
 namespace Shared.GameFormats.RigidModel.MaterialHeaders
 {
-    public static class ParamterIds
-    {
-        public const int Alpha_index = 0;
-        public const int Decal_index = 1;
-        public const int Dirt_index = 2;
-    }
-
     public class WeightedMaterial : IRmvMaterial
     {
+        public enum MaterialHintEnum
+        {
+            None,
+            Decal,
+            Dirt,
+            DecalAndDirt,
+        }
+
+        public UiVertexFormat ToolVertexFormat { get; set; }
+        public MaterialHintEnum MaterialHint { get; set; } = MaterialHintEnum.None;
+
+        // Actual attributes found in the rmv material
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.Unknown;
         public ModelMaterialEnum MaterialId { get; set; } = ModelMaterialEnum.weighted;
-        public UiVertexFormat ToolVertexFormat { get; set; }
-
+       
         public Vector3 PivotPoint { get; set; }
-        public AlphaMode AlphaMode { get; set; } = AlphaMode.Opaque;
-        public bool IsDirtAndDecal { get; set; } = false;
-
-        public string ModelName { get; set; }
-
-        public string TextureDirectory { get; set; }
-        public string Filters { get; set; }
+        public string ModelName { get; set; } = "";
+        public string TextureDirectory { get; set; } = "";
+        public string Filters { get; set; } = "";
         public RmvTransform OriginalTransform { get; set; }
 
         public int MatrixIndex { get; set; }
@@ -36,10 +36,10 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
         public List<RmvAttachmentPoint> AttachmentPointParams { get; set; } = [];
         public List<RmvTexture> TexturesParams { get; set; } = [];
-        public List<string> StringParams { get; set; } = [];
-        public List<float> FloatParams { get; set; } = [];
-        public List<(int Index, int Value)> IntParams { get; set; } = [];
-        public List<RmvVector4> Vec4Params { get; set; } = [];
+        public ParamList<string> StringParams { get; set; } = new ParamList<string>();
+        public ParamList<float> FloatParams { get; set; } = new ParamList<float>();
+        public ParamList<int> IntParams { get; set; } = new ParamList<int>();
+        public ParamList<RmvVector4> Vec4Params { get; set; } = new ParamList<RmvVector4>();
 
         public IRmvMaterial Clone()
         {
@@ -51,8 +51,6 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 MaterialId = MaterialId,
 
                 ModelName = ModelName,
-                AlphaMode = AlphaMode,
-                IsDirtAndDecal = IsDirtAndDecal,
                 ToolVertexFormat = ToolVertexFormat,
                 PivotPoint = PivotPoint,
                 TextureDirectory = TextureDirectory,
@@ -61,19 +59,19 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
                 AttachmentPointParams = AttachmentPointParams.Select(x => x.Clone()).ToList(),
                 TexturesParams = TexturesParams.Select(x => x.Clone()).ToList(),
-                StringParams = StringParams.Select(x => x).ToList(),
-                FloatParams = FloatParams.Select(x => x).ToList(),
-                IntParams = IntParams.Select(x => x).ToList(),
-                Vec4Params = Vec4Params.Select(x => x).ToList(),
+                StringParams = StringParams.Clone(),
+                FloatParams = FloatParams.Clone(),
+                IntParams = IntParams.Clone(),
+                Vec4Params = Vec4Params.Clone()
             };
         }
 
         public uint ComputeSize()
         {
             var stringParamSize = 0;
-            foreach (var str in StringParams)
+            foreach (var str in StringParams.Values)
             {
-                var res = ByteParsers.String.Encode(str, out _);
+                var res = ByteParsers.String.Encode(str.Value, out _);
                 stringParamSize += res.Length;
             }
 
@@ -81,10 +79,11 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 ByteHelper.GetSize<RmvAttachmentPoint>() * AttachmentPointParams.Count +
                 ByteHelper.GetSize<RmvTexture>() * TexturesParams.Count +
                 stringParamSize +
+
                 // Variable + index
-                4 * FloatParams.Count + 4 * FloatParams.Count +
-                4 * IntParams.Count + 4 * IntParams.Count +
-                4 * 4 * Vec4Params.Count + Vec4Params.Count * 4);
+                IntParams.GetByteSize(4) +
+                FloatParams.GetByteSize(4) +
+                Vec4Params.GetByteSize(4 * 4));
 
             return headerDataSize;
         }
@@ -130,9 +129,11 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 }
 
                 // Add if missing
-                var newTexture = new RmvTexture();
-                newTexture.TexureType = texureType;
-                newTexture.Path = path;
+                var newTexture = new RmvTexture
+                {
+                    TexureType = texureType,
+                    Path = path
+                };
 
                 TexturesParams.Add(newTexture);
             }
@@ -148,31 +149,36 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 _ => throw new Exception($"Unknown vertex type - {uiVertexFormat}"),
             };
 
+            //var hasDirt = IntParams.TryGet(WeightedParamterIds.IntParams_Dirt_index, out var dirtValue);
+            //var hasDecal = IntParams.TryGet(WeightedParamterIds.IntParams_Dirt_index, out var decalValue);
+            var isDirt = MaterialHint == MaterialHintEnum.Dirt || MaterialHint == MaterialHintEnum.DecalAndDirt;
+            var isDecal = MaterialHint == MaterialHintEnum.Decal || MaterialHint == MaterialHintEnum.DecalAndDirt;
+
             // Overwrite the material type for static meshes
+            MaterialId = ModelMaterialEnum.Unkown;
             if (BinaryVertexFormat == VertexFormat.Static)
             {
-                if (IsDirtAndDecal)
-                    MaterialId = ModelMaterialEnum.decal_dirtmap;
-                else
-                    MaterialId = ModelMaterialEnum.default_type;
+                MaterialId = ModelMaterialEnum.default_type;
+                if(isDirt)
+                    MaterialId = ModelMaterialEnum.dirtmap;
+                if (isDecal)
+                    MaterialId = ModelMaterialEnum.decal;
+                if (isDirt && isDecal)
+                    MaterialId = ModelMaterialEnum.decal_dirtmap;   
             }
             else
             {
-                if (IsDirtAndDecal)
+                MaterialId = ModelMaterialEnum.weighted;
+                if (isDirt)
+                    MaterialId = ModelMaterialEnum.weighted_dirtmap;
+                if (isDecal)
+                    MaterialId = ModelMaterialEnum.weighted_decal;
+                if (isDirt && isDecal)
                     MaterialId = ModelMaterialEnum.weighted_decal_dirtmap;
-                else
-                    MaterialId = ModelMaterialEnum.weighted;
             }
 
-            // Update int params
-            IntParams.Clear();
-            IntParams.Add((ParamterIds.Alpha_index, AlphaMode == AlphaMode.Transparent ? 1 : 0));
-
-            if (IsDirtAndDecal)
-            {
-                IntParams.Add((ParamterIds.Decal_index, 1));
-                IntParams.Add((ParamterIds.Dirt_index, 1));
-            }
+            if (MaterialId == ModelMaterialEnum.Unkown)
+                throw new Exception("Unable to determine vertex format.");
         }
 
         public void EnrichDataBeforeSaving(string[] boneNames)
@@ -201,10 +207,10 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             {
                 AttachmentPointParams = LoadAttachmentPoints(header.AttachmentPointCount, dataArray, ref dataOffset),
                 TexturesParams = LoadTextures(header.TextureCount, dataArray, ref dataOffset),
-                StringParams = LoadStringParams(header.StringParamCount, dataArray, ref dataOffset),
-                FloatParams = LoadFloatParams(header.FloatParamCount, dataArray, ref dataOffset),
-                IntParams = LoadIntParams(header.IntParamCount, dataArray, ref dataOffset),
-                Vec4Params = LoadVec4Params(header.Vec4ParamCount, dataArray, ref dataOffset),
+                StringParams = ParamListHelper.LoadStringParams(header.StringParamCount, dataArray, ref dataOffset),
+                FloatParams = ParamListHelper.LoadFloatParams(header.FloatParamCount, dataArray, ref dataOffset),
+                IntParams = ParamListHelper.LoadIntParams(header.IntParamCount, dataArray, ref dataOffset),
+                Vec4Params = ParamListHelper.LoadVec4Params(header.Vec4ParamCount, dataArray, ref dataOffset),
 
                 MaterialId = materialId,
                 BinaryVertexFormat = (VertexFormat)header._vertexType,
@@ -216,23 +222,6 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 TextureDirectory = StringSanitizer.FixedString(Encoding.ASCII.GetString(header._textureDir)),
                 OriginalTransform = header.Transform,
             };
-
-            var useDecal = false;
-            var useDirt = false;
-            foreach (var valueSet in material.IntParams)
-            {
-                if (valueSet.Index == ParamterIds.Alpha_index)
-                    material.AlphaMode = valueSet.Value == 1 ? AlphaMode.Transparent : AlphaMode.Opaque;
-
-                if (valueSet.Index == ParamterIds.Decal_index)
-                    useDecal = true;
-
-                if (valueSet.Index == ParamterIds.Dirt_index)
-                    useDirt = true;
-            }
-
-            if(useDecal && useDirt)
-                material.IsDirtAndDecal = true;
 
             return material;
         }
@@ -248,15 +237,12 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 OriginalTransform = new RmvTransform(),
                 Filters = new string(""),
                 PivotPoint = new Vector3(0, 0, 0),
-                StringParams = [],
-                FloatParams = [],
-                Vec4Params = [],
-                IntParams = [(0,0)],
+                StringParams = new ParamList<string>(),
+                FloatParams = new ParamList<float>(),
+                Vec4Params = new ParamList<RmvVector4>(),
+                IntParams = new ParamList<int>(),
                 AttachmentPointParams = [],
                 TexturesParams = [],
-                AlphaMode = AlphaMode.Transparent, /// Alpha mode - assume that users want transpencey mode enabled by default
-                
-                IsDirtAndDecal = false,
             };
 
             return material;
@@ -284,10 +270,10 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 MatrixIndex = typedMaterial.MatrixIndex,
                 ParentMatrixIndex = typedMaterial.ParentMatrixIndex,
                 AttachmentPointCount = (uint)typedMaterial.AttachmentPointParams.Count,
-                FloatParamCount = (uint)typedMaterial.FloatParams.Count,
-                IntParamCount = (uint)typedMaterial.IntParams.Count,
-                StringParamCount = (uint)typedMaterial.StringParams.Count,
-                Vec4ParamCount = (uint)typedMaterial.Vec4Params.Count,
+                FloatParamCount = (uint)typedMaterial.FloatParams.Values.Count,
+                IntParamCount = (uint)typedMaterial.IntParams.Values.Count,
+                StringParamCount = (uint)typedMaterial.StringParams.Values.Count,
+                Vec4ParamCount = (uint)typedMaterial.Vec4Params.Values.Count,
                 TextureCount = (uint)typedMaterial.TexturesParams.Count,
                 PaddingArray = new byte[124],
             };
@@ -302,32 +288,36 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             for (var textureIndex = 0; textureIndex < typedMaterial.TexturesParams.Count; textureIndex++)
                 writer.Write(ByteHelper.GetBytes(typedMaterial.TexturesParams[textureIndex]));
 
-            for (var stringIndex = 0; stringIndex < typedMaterial.StringParams.Count; stringIndex++)
+            for (var stringIndex = 0; stringIndex < typedMaterial.StringParams.Values.Count; stringIndex++)
             {
-                writer.Write(ByteParsers.Int32.EncodeValue(stringIndex, out _));
-                writer.Write(ByteParsers.String.Encode(typedMaterial.StringParams[stringIndex], out _));
+                var param = typedMaterial.StringParams.Values[stringIndex];
+                writer.Write(ByteParsers.Int32.EncodeValue(param.Index, out _));
+                writer.Write(ByteParsers.String.Encode(param.Value, out _));
             }
 
-            for (var floatIndex = 0; floatIndex < typedMaterial.FloatParams.Count; floatIndex++)
+            for (var floatIndex = 0; floatIndex < typedMaterial.FloatParams.Values.Count; floatIndex++)
             {
-                writer.Write(ByteParsers.Int32.EncodeValue(floatIndex, out _));
-                writer.Write(ByteParsers.Single.EncodeValue(typedMaterial.FloatParams[floatIndex], out _));
+                var param = typedMaterial.IntParams.Values[floatIndex];
+                writer.Write(ByteParsers.Int32.EncodeValue(param.Index, out _));
+                writer.Write(ByteParsers.Single.EncodeValue(param.Value, out _));
             }
 
-            for (var intIndex = 0; intIndex < typedMaterial.IntParams.Count; intIndex++)
+            for (var intIndex = 0; intIndex < typedMaterial.IntParams.Values.Count; intIndex++)
             {
-                var param = typedMaterial.IntParams[intIndex];
+                var param = typedMaterial.IntParams.Values[intIndex];
                 writer.Write(ByteParsers.Int32.EncodeValue(param.Index, out _));
                 writer.Write(ByteParsers.Int32.EncodeValue(param.Value, out _));
             }
 
-            for (var vec4Index = 0; vec4Index < typedMaterial.Vec4Params.Count; vec4Index++)
+            for (var vec4Index = 0; vec4Index < typedMaterial.Vec4Params.Values.Count; vec4Index++)
             {
-                writer.Write(ByteParsers.Int32.EncodeValue(vec4Index, out _));
-                writer.Write(ByteParsers.Single.EncodeValue(typedMaterial.Vec4Params[vec4Index].X, out _));
-                writer.Write(ByteParsers.Single.EncodeValue(typedMaterial.Vec4Params[vec4Index].Y, out _));
-                writer.Write(ByteParsers.Single.EncodeValue(typedMaterial.Vec4Params[vec4Index].Z, out _));
-                writer.Write(ByteParsers.Single.EncodeValue(typedMaterial.Vec4Params[vec4Index].W, out _));
+                var param = typedMaterial.Vec4Params.Values[vec4Index];
+
+                writer.Write(ByteParsers.Int32.EncodeValue(param.Index, out _));
+                writer.Write(ByteParsers.Single.EncodeValue(param.Value.X, out _));
+                writer.Write(ByteParsers.Single.EncodeValue(param.Value.Y, out _));
+                writer.Write(ByteParsers.Single.EncodeValue(param.Value.Z, out _));
+                writer.Write(ByteParsers.Single.EncodeValue(param.Value.W, out _));
             }
 
             var bytes = ms.ToArray();
@@ -362,86 +352,6 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             }
 
             return textures;
-        }
-
-        List<string> LoadStringParams(uint StringParamCount, byte[] dataArray, ref int dataOffset)
-        {
-            var output = new List<string>();
-            for (var i = 0; i < StringParamCount; i++)
-            {
-                var index = ByteParsers.UInt32.TryDecode(dataArray, dataOffset, out _, out _, out _);
-                var result = ByteParsers.String.TryDecode(dataArray, dataOffset + 4, out var value, out var byteLength, out var error);
-                if (!result)
-                {
-                    throw new Exception("Error reading string parameter - " + error);
-                }
-                dataOffset += byteLength + 4;
-                output.Add(value);
-            }
-            return output;
-        }
-
-        List<float> LoadFloatParams(uint FloatParamCount, byte[] dataArray, ref int dataOffset)
-        {
-            var output = new List<float>();
-            for (var i = 0; i < FloatParamCount; i++)
-            {
-                var index = ByteParsers.UInt32.TryDecode(dataArray, dataOffset, out _, out _, out _);
-                var result = ByteParsers.Single.TryDecodeValue(dataArray, dataOffset + 4, out var value, out var byteLength, out var error);
-                if (!result)
-                {
-                    throw new Exception("Error reading float parameter - " + error);
-                }
-                dataOffset += byteLength + 4;
-                output.Add(value);
-            }
-            return output;
-        }
-
-        List<(int, int)> LoadIntParams(uint IntParamCount, byte[] dataArray, ref int dataOffset)
-        {
-            var output = new List<(int, int)>();
-            for (var i = 0; i < IntParamCount; i++)
-            {
-                var index = ByteParsers.Int32.TryDecodeValue(dataArray, dataOffset, out var indexValue, out _, out _);
-                var result = ByteParsers.Int32.TryDecodeValue(dataArray, dataOffset + 4, out var value, out var byteLength, out var error);
-                if (!result)
-                {
-                    throw new Exception("Error reading int parameter - " + error);
-                }
-                dataOffset += byteLength + 4;
-                output.Add((indexValue, value));
-            }
-            return output;
-        }
-
-        List<RmvVector4> LoadVec4Params(uint Vec4ParamCount, byte[] dataArray, ref int dataOffset)
-        {
-            var output = new List<RmvVector4>();
-            for (var i = 0; i < Vec4ParamCount; i++)
-            {
-                var index = ByteParsers.UInt32.TryDecode(dataArray, dataOffset, out _, out _, out _);
-
-                var result = ByteParsers.Single.TryDecodeValue(dataArray, dataOffset + 4, out var x, out var byteLength, out var error);
-                if (!result)
-                    throw new Exception("Error reading RmvVector4 parameter - " + error);
-
-                result = ByteParsers.Single.TryDecodeValue(dataArray, dataOffset + 8, out var y, out byteLength, out error);
-                if (!result)
-                    throw new Exception("Error reading RmvVector4 parameter - " + error);
-
-                result = ByteParsers.Single.TryDecodeValue(dataArray, dataOffset + 12, out var z, out byteLength, out error);
-                if (!result)
-                    throw new Exception("Error reading RmvVector4 parameter - " + error);
-
-                result = ByteParsers.Single.TryDecodeValue(dataArray, dataOffset + 16, out var w, out byteLength, out error);
-                if (!result)
-                    throw new Exception("Error reading RmvVector4 parameter - " + error);
-
-                dataOffset += 4 * 4 + 4;
-                output.Add(new RmvVector4(x, y, z, w));
-            }
-            return output;
         }
     }
 
