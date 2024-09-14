@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.DirtAndDecal"
              xmlns:userinterface="clr-namespace:GameWorld.Core.Utility.UserInterface;assembly=GameWorld.Core" 
              xmlns:mathviews1="clr-namespace:Shared.Ui.BaseDialogs.MathViews;assembly=Shared.Ui"
-             xmlns:mathviews11="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
+             xmlns:mathviews11="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:basedialogs="clr-namespace:Shared.Ui.BaseDialogs;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -29,49 +29,43 @@
 
             <DockPanel LastChildFill="False">
 
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Dirt Map*" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Use Dirt*" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                    <CheckBox IsChecked="{Binding UseDirt, UpdateSourceTrigger=PropertyChanged}"/>
+                </basedialogs:AeAttribute>
+
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Use Decal*" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+                    <CheckBox IsChecked="{Binding UseDecal, UpdateSourceTrigger=PropertyChanged}"/>
+                </basedialogs:AeAttribute>
+
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Dirt Map*" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
                     <userinterface:ShaderTextureView DataContext="{Binding DirtMap}"/>
-                </DockPanel>
+                </basedialogs:AeAttribute>
 
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Dirt Mask*" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Dirt Mask*" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
                     <userinterface:ShaderTextureView DataContext="{Binding DirtMask}"/>
-                </DockPanel>
+                </basedialogs:AeAttribute>
 
-
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Mask*" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Decal Mask*" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
                     <userinterface:ShaderTextureView DataContext="{Binding DecalMask}"/>
-                </DockPanel>
+                </basedialogs:AeAttribute>
 
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Uv Scale*" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Decal Uv Scale*" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
                     <mathviews1:Vector2View DataContext="{Binding UvScale}" />
-                </DockPanel>
+                </basedialogs:AeAttribute>
 
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Texture transform*" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Texture transform*" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
                     <mathviews11:Vector4View DataContext="{Binding TextureTransform}" />
-                </DockPanel>
+                </basedialogs:AeAttribute>
 
 
-                <DockPanel DockPanel.Dock="Top" Margin="0,10,0,0">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Preveiw Colour*" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
+                <basedialogs:AeAttribute Margin="0,10,0,0" DockPanel.Dock="Top" LabelText="Decal Preveiw Colour*" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
                     <userinterface:ShaderTextureView DataContext="{Binding DecalPreviewColour}"/>
-                </DockPanel>
+                </basedialogs:AeAttribute>
 
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Decal Preveiw Normal*" Margin="{StaticResource LabelMargin}"/>
-                    <Label>:</Label>
+
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Decal Preveiw Normal*" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
                     <userinterface:ShaderTextureView DataContext="{Binding DecalPreviewNormal}"/>
-                </DockPanel>
+                </basedialogs:AeAttribute>
 
             </DockPanel>
         </Expander>

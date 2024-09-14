@@ -23,6 +23,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
         [ObservableProperty] ShaderTextureViewModel _decalPreviewColour;
         [ObservableProperty] ShaderTextureViewModel _decalPreviewNormal;
 
+        [ObservableProperty] bool _useDecal;
+
         public DirtAndDecalViewModel(DirtAndDecalCapability capability, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
         {
             _capability = capability;
@@ -40,5 +42,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
 
         void OnUvScaleChanged(Vector2 value) => _capability.UvScale = value;
         void OnTextureTransformChanged(Vector4 value) => _capability.TextureTransform = value;
+        partial void OnUseDecalChanged(bool value) => _capability.UseDecal = value;
     }
 }
