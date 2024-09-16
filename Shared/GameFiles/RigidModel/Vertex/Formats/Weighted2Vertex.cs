@@ -70,7 +70,7 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
             {
                 var typedVert = new DataWithColour()
                 {
-                    position = VertexLoadHelper.CreatePositionVector4(vertex.Position),
+                    position = VertexLoadHelper.CreatePositionVector4ExtraPrecision(vertex.Position),
                     boneIndex = vertex.BoneIndex.ToArray(),
                     boneWeight = vertex.BoneWeight.Select(x => (byte)(x * 255.0f)).ToArray(),
                     normal = VertexLoadHelper.CreateNormalVector3(vertex.Normal),
