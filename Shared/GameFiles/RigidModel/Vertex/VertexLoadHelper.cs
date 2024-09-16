@@ -1,4 +1,6 @@
-﻿using Shared.Core.ByteParsing;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
+using Shared.Core.ByteParsing;
 using Shared.GameFormats.RigidModel.Transforms;
 using Half = SharpDX.Half;
 
@@ -99,10 +101,86 @@ namespace Shared.GameFormats.RigidModel.Vertex
             return (byte)Math.Round(truncatedFloat);
         }
 
+        public struct HalfVector4 { public Half X; public Half Y; public Half Z; public Half W; }
+
+        public static (Half X, Half Y, Half Z, Half W) ConvertertVertexToHalfExtraPrecision(Vector4 vertexOriginal)
+        {
+            const uint halfMantissaMax = 1024;
+
+            float bestValueForW = 0;
+            float currentSmallestError = float.MaxValue;
+
+            // Brute force, checking all 1024 half-float mantissa values for "w"
+            for (ushort iMantissaCounter = 0; iMantissaCounter < halfMantissaMax; iMantissaCounter++)
+            {
+                var halfVertex = new HalfVector4();
+
+                // Generate the current half-float w value
+                float w = (float)(1.0 + ((float)iMantissaCounter / 1024.0)); 
+
+                // Normalize the original values by dividing by w
+                float x_normalized = vertexOriginal.X / w;
+                float y_normalized = vertexOriginal.Y / w;
+                float z_normalized = vertexOriginal.Z / w;
+
+                // Convert normalized values to half-float            
+                halfVertex.X = (Half)x_normalized;
+                halfVertex.Y = (Half)y_normalized;
+                halfVertex.Z = (Half)z_normalized;
+                halfVertex.W = (Half)w;
+
+                // Recover the original values by multiplying by w
+                float x_recovered = (float)halfVertex.X * (float)halfVertex.W;
+                float y_recovered = (float)halfVertex.Y * (float)halfVertex.W;
+                float z_recovered = (float)halfVertex.Z * (float)halfVertex.W;
+
+                // "best" error metric, distance between original and recovered vertex, more meaningful?
+                float error = Vector3.Distance(new Vector3(vertexOriginal.X,vertexOriginal.Y,vertexOriginal.Z) , new Vector3(x_recovered, y_recovered, z_recovered));
+
+                // Check if this w gives a better (smaller) error
+                if (error < currentSmallestError)
+                {
+                    currentSmallestError = error;
+                    bestValueForW = w;
+                }
+            }
+
+            // Normalize the original values by dividing by the BEST w
+            float x_normalized_final = vertexOriginal.X / bestValueForW;
+            float y_normalized_final = vertexOriginal.Y / bestValueForW;
+            float z_normalized_final = vertexOriginal.Z / bestValueForW;
+
+            // Convert normalized values and W to half-float
+            var outHalfVertex = new HalfVector4();
+            outHalfVertex.X = (Half)x_normalized_final;
+            outHalfVertex.Y = (Half)y_normalized_final;
+            outHalfVertex.Z = (Half)z_normalized_final;
+            outHalfVertex.W = (Half)bestValueForW;
+
+            return (outHalfVertex.X, outHalfVertex.Y, outHalfVertex.Z, outHalfVertex.W);
+        }
+
         static public byte[] CreatePositionVector4(Microsoft.Xna.Framework.Vector4 vector)
         {
             var output = new byte[8];
             ushort[] halfs = { new Half(vector.X).RawValue, new Half(vector.Y).RawValue, new Half(vector.Z).RawValue, new Half(vector.W).RawValue };
+            for (var i = 0; i < 4; i++)
+            {
+                var bytes = BitConverter.GetBytes(halfs[i]);
+                output[i * 2] = bytes[0];
+                output[i * 2 + 1] = bytes[1];
+            }
+
+            return output;
+        }
+
+        static public byte[] CreatePositionVector4ExtraPrecision(Microsoft.Xna.Framework.Vector4 vector)
+        {
+            var output = new byte[8];
+
+            var v = ConvertertVertexToHalfExtraPrecision(vector);            
+            ushort[] halfs = { v.X.RawValue, v.Y.RawValue, v.Z.RawValue, v.W.RawValue };
+
             for (var i = 0; i < 4; i++)
             {
                 var bytes = BitConverter.GetBytes(halfs[i]);
