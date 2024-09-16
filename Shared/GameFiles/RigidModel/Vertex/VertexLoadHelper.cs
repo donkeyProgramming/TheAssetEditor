@@ -134,8 +134,8 @@ namespace Shared.GameFormats.RigidModel.Vertex
                 float y_recovered = (float)halfVertex.Y * (float)halfVertex.W;
                 float z_recovered = (float)halfVertex.Z * (float)halfVertex.W;
 
-                // "best" error metric, distance between original and recovered vertex, more meaningful?
-                float error = Vector3.Distance(new Vector3(vertexOriginal.X,vertexOriginal.Y,vertexOriginal.Z) , new Vector3(x_recovered, y_recovered, z_recovered));
+                // absolute sum of differences between original and recovered vertex
+                float error  = Math.Abs(vertexOriginal.X - x_recovered) + Math.Abs(vertexOriginal.Y - y_recovered) + Math.Abs(vertexOriginal.Z - z_recovered);                
 
                 // Check if this w gives a better (smaller) error
                 if (error < currentSmallestError)
