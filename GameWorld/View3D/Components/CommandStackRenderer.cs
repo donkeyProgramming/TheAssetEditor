@@ -2,7 +2,6 @@
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.Core.Services;
-using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 

@@ -5,7 +5,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 
-namespace GameWorld.Core.WpfWindow.ResourceHandling
+namespace GameWorld.Core.Utility
 {
     public static class ImageLoader
     {

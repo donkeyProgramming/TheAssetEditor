@@ -5,7 +5,6 @@ using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
-using GameWorld.Core.WpfWindow.ResourceHandling;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Ui.Common;

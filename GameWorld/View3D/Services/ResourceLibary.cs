@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 
-namespace GameWorld.Core.WpfWindow.ResourceHandling
+namespace GameWorld.Core.Services
 {
     public enum ShaderTypes
     {

@@ -26,7 +26,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Shared.Core.DependencyInjection;
 using Shared.Core.Services;
-using GameWorld.Core.WpfWindow.ResourceHandling;
 using GameWorld.Core.WpfWindow;
 
 namespace GameWorld.Core

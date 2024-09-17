@@ -1,6 +1,6 @@
 ﻿using System;
 using GameWorld.Core.Components.Rendering;
-using GameWorld.Core.WpfWindow.ResourceHandling;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

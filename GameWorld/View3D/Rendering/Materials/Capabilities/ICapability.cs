@@ -1,5 +1,5 @@
 ﻿using GameWorld.Core.Rendering.Materials.Serialization;
-using GameWorld.Core.WpfWindow.ResourceHandling;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
