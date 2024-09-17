@@ -1,24 +1,24 @@
-﻿using E2EVerification.Shared;
-using System.Numerics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
-using Half = SharpDX.Half;
-using SharpDX.X3DAudio;
+﻿using System.Numerics;
 using Shared.GameFormats.RigidModel.Vertex;
+using Half4 = SharpDX.Half4;
 
 namespace E2EVerification
 {
     internal class VertexPresicion_GenerateTest
-    {
-        [Test]        
-        [TestCase(-1.1123f, 0.422123f, 0.00213f, (ushort)47300, (ushort)13116, (ushort)5292, (ushort)16248)]
-        [TestCase(-110.0001f, 13213.0f, -10.00213f, (ushort)54791, (ushort)29096, (ushort)51298, (ushort)15504)]
-        [TestCase(1.0f, 2.0f, 3.0f, (ushort)15360, (ushort)16384, (ushort)16896, (ushort)15360)]
-        [TestCase(0.0001f, -1200.0f, 0.00213f, (ushort)894, (ushort)57600, (ushort)5287, (ushort)16256)]
-        [TestCase(12340.1123f, -11.422123f, -0.00123f, (ushort)28825, (ushort)51291, (ushort)37808, (ushort)15678)]
-        public void DoesCodeProduceTheExpectedVertex(float x, float y, float z, ushort x2, ushort y2, ushort z2, ushort w2)
+    {        
+        [Test] public void EncodeVertexTest_1() => EncodeVertexTest(new Vector3(-1.1123f, 0.422123f, 0.00213f), new Half4(-0.5957031f, 0.22607422f, 0.0011405945f, 1.8671875f));
+        [Test] public void EncodeVertexTest_2() => EncodeVertexTest(new Vector3(-110.0001f, 13213.0f, -10.00213f), new Half4(-96.4375f, 11584f, -8.765625f, 1.140625f));
+        [Test] public void EncodeVertexTest_3() => EncodeVertexTest(new Vector3(1.0123f, 12.0f, 333.0f), new Half4(0.6748047f, 8f, 222f, 1.5f));
+        [Test] public void EncodeVertexTest_4() => EncodeVertexTest(new Vector3(0.0001f, -1200.0f, 0.00213f), new Half4(5.3286552E-05f, -640f, 0.0011358261f,1.875f));
+        [Test] public void EncodeVertexTest_5() => EncodeVertexTest(new Vector3(12340.1123f, -11.422123f, -0.00563f), new Half4(9416f, -8.7109375f, -0.004295349f, 1.3105469f));
+        private void EncodeVertexTest(Vector3 input, Half4 expectedEncodedVertex)
         {
-            var halfVertex = VertexLoadHelper.ConvertertVertexToHalfExtraPrecision(new Vector4(x, y, z, 0));                        
-            Assert.That(x2 == halfVertex.X.RawValue && y2 == halfVertex.Y.RawValue && z2 == halfVertex.Z.RawValue && w2 == halfVertex.W.RawValue);
+            var actualEncodedVertex = VertexLoadHelper.ConvertertVertexToHalfExtraPrecision(new Vector4(input.X, input.Y, input.Z, 0));            
+
+            Assert.That(actualEncodedVertex.W, Is.EqualTo(expectedEncodedVertex.W));
+            Assert.That(actualEncodedVertex.X, Is.EqualTo(expectedEncodedVertex.X));
+            Assert.That(actualEncodedVertex.Y, Is.EqualTo(expectedEncodedVertex.Y));
+            Assert.That(actualEncodedVertex.Z, Is.EqualTo(expectedEncodedVertex.Z));            
         }
     }
 }
