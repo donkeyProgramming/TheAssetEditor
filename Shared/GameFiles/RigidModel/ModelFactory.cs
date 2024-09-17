@@ -4,6 +4,9 @@ using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Vertex;
+using SharpDX;
+using Half = SharpDX.Half;
+using Half4 = SharpDX.Half4;
 
 namespace Shared.GameFormats.RigidModel
 {

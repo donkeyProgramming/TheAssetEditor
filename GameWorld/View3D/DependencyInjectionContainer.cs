@@ -63,7 +63,7 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<IGeometryStrategy, NoMeshStrategy>();
             serviceCollection.AddScoped<IGeometryStrategy, Rmw6Strategy>();
             serviceCollection.AddScoped<IGeometryStrategy, Rmw7Strategy>();
-            //serviceCollection.AddScoped<IGeometryStrategy, Rmw8Strategy>();
+            serviceCollection.AddScoped<IGeometryStrategy, Rmw8Strategy>();
 
             serviceCollection.AddScoped<LodStrategyProvider>();
             serviceCollection.AddScoped<ILodGenerationStrategy, AssetEditorLodGeneration>();
