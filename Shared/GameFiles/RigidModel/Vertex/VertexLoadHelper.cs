@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics.PackedVector;
 using Shared.Core.ByteParsing;
 using Shared.GameFormats.RigidModel.Transforms;
 using Half = SharpDX.Half;
+using Half4 = SharpDX.Half4;
 
 namespace Shared.GameFormats.RigidModel.Vertex
 {
@@ -101,7 +102,7 @@ namespace Shared.GameFormats.RigidModel.Vertex
             return (byte)Math.Round(truncatedFloat);
         }
 
-        public static (Half X, Half Y, Half Z, Half W) ConvertertVertexToHalfExtraPrecision(Vector4 vertexOriginal)
+        public static Half4 ConvertertVertexToHalfExtraPrecision(Vector4 vertexOriginal)
         {
             const uint halfMantissaMax = 1024;
 
@@ -111,7 +112,7 @@ namespace Shared.GameFormats.RigidModel.Vertex
             // Brute force, checking all 1024 half-float mantissa values for "w"
             for (ushort iMantissaCounter = 0; iMantissaCounter < halfMantissaMax; iMantissaCounter++)
             {
-                var halfVertex = new HalfVector4();
+                var halfVertex = new Half4();
 
                 // Generate the current half-float w value
                 float w = (float)(1.0 + ((float)iMantissaCounter / 1024.0)); 
@@ -149,13 +150,13 @@ namespace Shared.GameFormats.RigidModel.Vertex
             float z_normalized_final = vertexOriginal.Z / bestValueForW;
 
             // Convert normalized values and W to half-float
-            var outHalfVertex = new HalfVector4();
+            var outHalfVertex = new Half4();
             outHalfVertex.X = (Half)x_normalized_final;
             outHalfVertex.Y = (Half)y_normalized_final;
             outHalfVertex.Z = (Half)z_normalized_final;
             outHalfVertex.W = (Half)bestValueForW;
 
-            return (outHalfVertex.X, outHalfVertex.Y, outHalfVertex.Z, outHalfVertex.W);
+            return new Half4(outHalfVertex.X, outHalfVertex.Y, outHalfVertex.Z, outHalfVertex.W);
         }
 
         static public byte[] CreatePositionVector4(Microsoft.Xna.Framework.Vector4 vector)
