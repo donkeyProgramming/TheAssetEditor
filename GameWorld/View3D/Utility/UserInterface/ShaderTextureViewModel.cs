@@ -106,7 +106,7 @@ namespace GameWorld.Core.Utility.UserInterface
         }
 
         private readonly Dictionary<string, List<string>> _errorsByPropertyName = [];
-        public bool HasErrors => _errorsByPropertyName.Any();
+        public bool HasErrors => _errorsByPropertyName.Sum(x=>x.Value.Count) != 0;
 
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
