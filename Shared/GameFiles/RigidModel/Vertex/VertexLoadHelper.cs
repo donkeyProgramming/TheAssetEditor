@@ -115,17 +115,32 @@ namespace Shared.GameFormats.RigidModel.Vertex
                 var halfVertex = new Half4();
 
                 // Generate the current half-float w value
-                float w = (float)(1.0 + ((float)iMantissaCounter / 1024.0)); 
+                float w = (float)(1.0 + ((float)iMantissaCounter / 1024.0));
+
+                if (!IsWithingFloat16Range(vertexOriginal))
+                    throw new Exception("Input vertex cannot be converted to float16");
+                
 
                 // Normalize the original values by dividing by w
-                float x_normalized = vertexOriginal.X / w;
-                float y_normalized = vertexOriginal.Y / w;
-                float z_normalized = vertexOriginal.Z / w;
+                Vector3 normalized = new Vector3
+                {
+                    X = vertexOriginal.X / w,
+                    Y = vertexOriginal.Y / w,
+                    Z = vertexOriginal.Z / w
+                };
+
+
+                float DEBUG_TEST = Math.Abs(float.NaN);
+                float DEBUG_TEST2 = Math.Abs(float.PositiveInfinity);
+                bool result = Math.Abs(float.NegativeInfinity) == Math.Abs(float.PositiveInfinity);
+
+                if (!IsResultValid(normalized))
+                    throw new Exception("Result is out range for conversin to float16");
 
                 // Convert normalized values to half-float            
-                halfVertex.X = (Half)x_normalized;
-                halfVertex.Y = (Half)y_normalized;
-                halfVertex.Z = (Half)z_normalized;
+                halfVertex.X = (Half)vertexOriginal.X;
+                halfVertex.Y = (Half)vertexOriginal.Y;
+                halfVertex.Z = (Half)vertexOriginal.Z;
                 halfVertex.W = (Half)w;
 
                 // Recover the original values by multiplying by w
@@ -134,7 +149,7 @@ namespace Shared.GameFormats.RigidModel.Vertex
                 float z_recovered = (float)halfVertex.Z * (float)halfVertex.W;
 
                 // absolute sum of differences between original and recovered vertex
-                float error  = Math.Abs(vertexOriginal.X - x_recovered) + Math.Abs(vertexOriginal.Y - y_recovered) + Math.Abs(vertexOriginal.Z - z_recovered);                
+                float error = Math.Abs(vertexOriginal.X - x_recovered) + Math.Abs(vertexOriginal.Y - y_recovered) + Math.Abs(vertexOriginal.Z - z_recovered);
 
                 // Check if this w gives a better (smaller) error
                 if (error < currentSmallestError)
@@ -157,6 +172,31 @@ namespace Shared.GameFormats.RigidModel.Vertex
             outHalfVertex.W = (Half)bestValueForW;
 
             return new Half4(outHalfVertex.X, outHalfVertex.Y, outHalfVertex.Z, outHalfVertex.W);
+        }
+
+        private static bool IsResultValid(Vector3 normalized)
+        {
+            if (
+                (Math.Abs(normalized.X) == float.NaN || Math.Abs(normalized.X) == float.PositiveInfinity) ||
+                (Math.Abs(normalized.Y) == float.NaN || Math.Abs(normalized.Y) == float.PositiveInfinity) ||
+                (Math.Abs(normalized.Z) == float.NaN || Math.Abs(normalized.Z) == float.PositiveInfinity))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsWithingFloat16Range(Vector4 vertexOriginal)
+        {
+            if ((vertexOriginal.X >= Half.MaxValue || vertexOriginal.X <= Half.MinValue) ||
+                (vertexOriginal.Y >= Half.MaxValue || vertexOriginal.Z <= Half.MinValue) ||
+                (vertexOriginal.Z >= Half.MaxValue || vertexOriginal.W <= Half.MinValue))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         static public byte[] CreatePositionVector4(Microsoft.Xna.Framework.Vector4 vector)
