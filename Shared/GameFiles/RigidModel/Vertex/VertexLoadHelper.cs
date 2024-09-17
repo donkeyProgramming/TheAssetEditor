@@ -101,8 +101,6 @@ namespace Shared.GameFormats.RigidModel.Vertex
             return (byte)Math.Round(truncatedFloat);
         }
 
-        public struct HalfVector4 { public Half X; public Half Y; public Half Z; public Half W; }
-
         public static (Half X, Half Y, Half Z, Half W) ConvertertVertexToHalfExtraPrecision(Vector4 vertexOriginal)
         {
             const uint halfMantissaMax = 1024;
