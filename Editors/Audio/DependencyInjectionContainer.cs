@@ -23,6 +23,7 @@ namespace Editors.Audio
         public override void Register(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<VgStreamWrapper>();
+            serviceCollection.AddSingleton<IAudioProjectService, AudioProjectService>();
 
             serviceCollection.AddScoped<AudioExplorerView>();
             serviceCollection.AddScoped<AudioExplorerViewModel>();
@@ -30,9 +31,11 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerView>();
             serviceCollection.AddScoped<CompilerViewModel>();
 
-            serviceCollection.AddTransient<AudioEditorSettingsView>();
-            serviceCollection.AddScoped<AudioEditorSettingsViewModel>();
+            serviceCollection.AddTransient<NewAudioProjectWindow>();
+            serviceCollection.AddScoped<NewAudioProjectViewModel>();
+
             serviceCollection.AddScoped<AudioEditorViewModel>();
+            serviceCollection.AddScoped<AudioEditorView>();
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
@@ -53,7 +56,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerService>();
             serviceCollection.AddScoped<ProjectLoader>();
             serviceCollection.AddScoped<AudioFileImporter>();
-            serviceCollection.AddScoped<Editors.Audio.BnkCompiler.Compiler>();
+            serviceCollection.AddScoped<BnkCompiler.Compiler>();
             serviceCollection.AddScoped<ResultHandler>();
         }
 
