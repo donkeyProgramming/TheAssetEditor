@@ -15,15 +15,19 @@ namespace KitbasherEditor.Views
         public static TreeViewItem ContainerFromItemRecursive(this ItemContainerGenerator root, object item)
         {
             var treeViewItem = root.ContainerFromItem(item) as TreeViewItem;
+
             if (treeViewItem != null)
                 return treeViewItem;
+
             foreach (var subItem in root.Items)
             {
                 treeViewItem = root.ContainerFromItem(subItem) as TreeViewItem;
                 var search = treeViewItem?.ItemContainerGenerator.ContainerFromItemRecursive(item);
+
                 if (search != null)
                     return search;
             }
+
             return null;
         }
     }
@@ -49,8 +53,10 @@ namespace KitbasherEditor.Views
         private static void OnSelectionCollectionAssigned(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var tb = d as MultiSelectTreeView;
+
             if (e.NewValue == null)
                 tb.UnSubscribe(e.OldValue as ObservableCollection<ISceneNode>);
+
             else
                 tb.Subscribe(e.NewValue as ObservableCollection<ISceneNode>);
         }
@@ -68,9 +74,11 @@ namespace KitbasherEditor.Views
         private void MultiSelectTreeView_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+            
             if (treeViewItem != null)
             {
                 var node = treeViewItem.DataContext as SceneNode;
+
                 if (node != null)
                     node.IsExpanded = !node.IsExpanded;
             }
@@ -93,6 +101,7 @@ namespace KitbasherEditor.Views
                 treeViewItem.Background = _notSelectedBackgroundBrush;
                 treeViewItem.Foreground = _notSelectedForegroundBrush;
             }
+
             SelectedObjects.Remove(node);
         }
 
@@ -104,6 +113,7 @@ namespace KitbasherEditor.Views
                 treeViewItem.Foreground = _selectedForegroundBrush;
                 SelectedObjects.Add(node);
             }
+
             else
             {
                 Deselect(treeViewItem, node);
@@ -139,6 +149,7 @@ namespace KitbasherEditor.Views
 
                 ChangeSelectedState(treeViewItem, snode);
             }
+
             finally
             {
                 SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
@@ -179,6 +190,7 @@ namespace KitbasherEditor.Views
                         }
                     }
                 }
+
                 else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
                 {
                     foreach (var item in e.OldItems)
@@ -192,11 +204,13 @@ namespace KitbasherEditor.Views
                         }
                     }
                 }
+
                 else
                 {
                     throw new Exception("Unknown event in MultiSelectTreeView::SelectedObjects_CollectionChanged " + e.Action);
                 }
             }
+
             finally
             {
                 SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;

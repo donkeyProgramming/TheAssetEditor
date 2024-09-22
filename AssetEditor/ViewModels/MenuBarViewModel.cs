@@ -108,11 +108,7 @@ namespace AssetEditor.ViewModels
 
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = [];
 
-        public MenuBarViewModel(
-            PackFileService packfileService,
-            ApplicationSettingsService settingsService,
-            IUiCommandFactory uiCommandFactory,
-            TouchedFilesRecorder touchedFilesRecorder)
+        public MenuBarViewModel(PackFileService packfileService, ApplicationSettingsService settingsService, IUiCommandFactory uiCommandFactory, TouchedFilesRecorder touchedFilesRecorder)
         {
             _packfileService = packfileService;
             _settingsService = settingsService;
