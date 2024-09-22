@@ -1,296 +1,137 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Windows;
-using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.Views;
 using Editors.Audio.Storage;
-using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.WindowHandling;
-using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
-using static Editors.Audio.AudioEditor.DynamicDataGrid;
+using static Editors.Audio.AudioEditor.AudioEditorSettings;
+
+// TODO:
+// Make some way of turning dialogue events into audio projects
+// Update Audio compiler 
+// Can't add row until all states and audio files are selected
+// Modify the watermark combo box controls so that it doesn't highlight the selected item
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
-    public partial class CustomStatesDataGridProperties : ObservableObject
-    {
-        [ObservableProperty] private string _customVOActor;
-        [ObservableProperty] private string _customVOCulture;
-        [ObservableProperty] private string _customVOBattleSelection;
-        [ObservableProperty] private string _customVOBattleSpecialAbility;
-        [ObservableProperty] private string _customVOFactionLeader;
-    }
-
     public partial class AudioEditorViewModel : ObservableObject, IEditorViewModel
     {
         private readonly IAudioRepository _audioRepository;
         private readonly PackFileService _packFileService;
-        private readonly IWindowFactory _windowFactory;
+        private readonly IAudioProjectService _audioProjectService;
         readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
 
         public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
+        private readonly string _dataGridBuilderName = "AudioProjectEditorDataGrid";
+        private readonly string _dataGridNameName = "AudioProjectViewerDataGrid";
 
-        [ObservableProperty] private string _selectedAudioProjectEvent;
-        [ObservableProperty] private bool _showCustomStatesOnly;
+        // Audio Editor data.
+        [ObservableProperty] private ObservableCollection<Dictionary<string, object>> _audioProjectEditorDataGrid;
+        [ObservableProperty] private ObservableCollection<Dictionary<string, object>> _audioProjectViewerDataGrid;
+        [ObservableProperty] private ObservableCollection<Dictionary<string, object>> _selectedDataGridRows;
+        [ObservableProperty] private ObservableCollection<Dictionary<string, object>> _copiedDataGridRows;
+        [ObservableProperty] public ObservableCollection<SoundBank> _soundBanks;
+        [ObservableProperty] public ObservableCollection<object> _audioProjectTreeViewItems;
 
-        // DataGrid data objects:
-        public ObservableCollection<Dictionary<string, object>> AudioEditorDataGridItems { get; set; } = [];
-        public ObservableCollection<CustomStatesDataGridProperties> CustomStatesDataGridItems { get; set; } = [];
-        public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData; // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
-        public static List<string> AudioProjectDialogueEvents => AudioEditorData.Instance.AudioProjectDialogueEvents;
+        public object _selectedAudioProjectTreeItem;
+        public object _previousSelectedAudioProjectTreeItem;
 
-        public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService, IWindowFactory windowFactory)
+        // Audio Project configuration properties.
+        [ObservableProperty] private string _selectedAudioType;
+        [ObservableProperty] private string _selectedAudioSubtype;
+
+        // Audio Project Configuration collections.
+        [ObservableProperty] private ObservableCollection<Language> _languages = new(Enum.GetValues(typeof(Language)).Cast<Language>());
+        [ObservableProperty] private ObservableCollection<AudioType> _audioProjectEventTypes = new(Enum.GetValues(typeof(AudioType)).Cast<AudioType>());
+        [ObservableProperty] private ObservableCollection<AudioSubtype> _audioProjectSubtypes; // Determined according to what Event Type is selected
+        [ObservableProperty] private ObservableCollection<DialogueEventCheckBox> _dialogueEventCheckBoxes; // The Dialogue Event CheckBoxes that are displayed in the Dialogue Events ListBox.
+        
+        // Audio Project Configuration button enablement.
+        [ObservableProperty] private bool _isAnyAudioProjectItemChecked;
+        [ObservableProperty] private bool _isAddToAudioProjectButtonEnabled;
+
+        // Audio Project Builder properties.
+        [ObservableProperty] private bool _showModdedStatesOnly;
+
+        // UI visibility controls.
+        [ObservableProperty] private bool _audioEditorVisibility = false;
+
+        // UI enablement controls.
+        [ObservableProperty] private bool _isAudioSubtypeEnabled = false;
+        [ObservableProperty] private bool _isPlayAudioButtonEnabled = false;
+        [ObservableProperty] private bool _isPasteEnabled = true;
+        [ObservableProperty] private bool _isShowModdedStatesCheckBoxEnabled = false;
+
+        public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService, IAudioProjectService audioProjectService)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;
-            _windowFactory = windowFactory;
-        }
+            _audioProjectService = audioProjectService;
 
-        partial void OnSelectedAudioProjectEventChanged(string value)
-        {
-            AudioEditorData.Instance.SelectedAudioProjectEvent = value;
+            InitialiseCollections();
 
-            // Load the Event upon selection.
-            LoadEvent(_audioRepository, ShowCustomStatesOnly);
-        }
+            AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
 
-        partial void OnShowCustomStatesOnlyChanged(bool value)
-        {
-            // Load the Event again to reset the ComboBoxes in the DataGrid.
-            LoadEvent(_audioRepository, ShowCustomStatesOnly);
+            AudioProjectViewerDataGrid.CollectionChanged += OnAudioProjectViewerDataGridChanged;
         }
 
         [RelayCommand] public void NewAudioProject()
         {
-            var window = _windowFactory.Create<AudioEditorSettingsViewModel, AudioEditorSettingsView>("New Audio Project", 500, 410);
-            window.AlwaysOnTop = false;
-            window.ResizeMode = ResizeMode.NoResize;
-
-            // Set the close action
-            if (window.DataContext is AudioEditorSettingsViewModel viewModel)
-                viewModel.SetCloseAction(() => window.Close());
-
-            window.ShowWindow();
-        }
-
-        [RelayCommand] public void LoadAudioProject()
-        {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
-
-            if (browser.ShowDialog())
-            {
-                // Remove any pre-existing data otherwise DataGrid isn't happy.
-                EventsData.Clear();
-                AudioEditorDataGridItems.Clear();
-                SelectedAudioProjectEvent = "";
-
-                // Create the object for State Groups with qualifiers so that their keys in the EventsData dictionary are unique.
-                AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
-
-                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
-                var file = _packFileService.FindFile(filePath);
-                var bytes = file.DataSource.ReadData();
-                var audioProjectJson = Encoding.UTF8.GetString(bytes);
-                var eventData = AudioProjectData.ConvertAudioProjectToEventsData(_audioRepository, audioProjectJson);
-                AudioEditorData.Instance.EventsData = eventData;
-                _logger.Here().Information($"Loaded Audio Project file: {file.Name}");
-
-                // Create the list of Events used in the Events ComboBox.
-                //CreateAudioProjectEventsListFromAudioProject(this, EventsData);
-
-                // Load the object which stores the custom States for use in the States ComboBox.
-                PrepareCustomStatesForComboBox(this);
-            }
+            NewAudioProjectWindow.Show(_packFileService, this, _audioProjectService);
         }
 
         [RelayCommand] public void SaveAudioProject()
         {
-            UpdateEventDataWithCurrentEvent();
-
-            AudioProjectData.AddAudioProjectToPackFile(_packFileService, EventsData, "dummy_name");
+            _audioProjectService.SaveAudioProject(_packFileService);
         }
 
-        [RelayCommand] public void LoadCustomStates()
+        [RelayCommand] public void LoadAudioProject()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
-
-            if (browser.ShowDialog())
-            {
-                // Remove any pre-existing data otherwise DataGrid isn't happy.
-                CustomStatesDataGridItems.Clear();
-
-                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
-                var file = _packFileService.FindFile(filePath);
-                var bytes = file.DataSource.ReadData();
-                var str = Encoding.UTF8.GetString(bytes);
-                var customStatesFileData = JsonConvert.DeserializeObject<List<CustomStatesDataGridProperties>>(str);
-                _logger.Here().Information($"Loaded Custom States file: {file.Name}");
-
-                foreach (var customState in customStatesFileData)
-                    CustomStatesDataGridItems.Add(customState);
-
-                // Load the object which stores the custom States for use in the States ComboBox.
-                PrepareCustomStatesForComboBox(this);
-
-                // Reload the selected Event so the ComboBoxes are updated.
-                LoadEvent(_audioRepository, ShowCustomStatesOnly);
-            }
+            _audioProjectService.LoadAudioProject(_packFileService, _audioRepository, this);
         }
 
-        [RelayCommand] public void SaveCustomStates()
+        public void SetAudioEditorVisibility(bool isVisible)
         {
-            var dataGridItemsJson = JsonConvert.SerializeObject(CustomStatesDataGridItems, Formatting.Indented);
-            var pack = _packFileService.GetEditablePack();
-            var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
-            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{"dummy_name"}.json", new MemorySource(byteArray)));
-            _logger.Here().Information($"Saved Custom States file: {"dummy_name"}");
+            AudioEditorVisibility = isVisible;
         }
 
-        public void LoadEvent(IAudioRepository audioRepository, bool showCustomStatesOnly)
+        public void ResetAudioEditorViewModelData()
         {
-            if (string.IsNullOrEmpty(AudioEditorData.Instance.SelectedAudioProjectEvent))
-                return;
-
-            _logger.Here().Information($"Loading event: {AudioEditorData.Instance.SelectedAudioProjectEvent}");
-
-            ConfigureDataGrid(this, audioRepository, showCustomStatesOnly);
-
-            if (EventsData.ContainsKey(AudioEditorData.Instance.SelectedAudioProjectEvent))
-
-                foreach (var statePath in EventsData[AudioEditorData.Instance.SelectedAudioProjectEvent])
-                    AudioEditorDataGridItems.Add(statePath);
+            AudioProjectEditorDataGrid = null;
+            AudioProjectViewerDataGrid = null;
+            SelectedDataGridRows = null;
+            CopiedDataGridRows = null;
+            DialogueEventCheckBoxes = null;
+            _selectedAudioProjectTreeItem = null;
+            _previousSelectedAudioProjectTreeItem = null;
         }
 
-        public static void InitialiseEventsData()
+        public void InitialiseCollections()
         {
-            foreach (var dialogueEvent in AudioProjectDialogueEvents)
-            {
-                var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[dialogueEvent];
+            AudioProjectEditorDataGrid = [];
+            AudioProjectViewerDataGrid = [];
+            SelectedDataGridRows = [];
+            CopiedDataGridRows = [];
+            AudioProjectSubtypes = [];
+            DialogueEventCheckBoxes = [];
 
-                var dataGridItems = new List<Dictionary<string, object>>();
-                var dataGridItem = new Dictionary<string, object>();
-
-                foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
-                {
-                    var stateGroupKey = AddExtraUnderScoresToString(stateGroupWithQualifier);
-                    dataGridItem[stateGroupKey] = "";
-                    dataGridItem["AudioFilesDisplay"] = "";
-                    dataGridItem["AudioFiles"] = "";
-                }
-
-                dataGridItems.Add(dataGridItem);
-                EventsData[dialogueEvent] = dataGridItems;
-            }
-        }
-
-        [RelayCommand] public void AddStatePath()
-        {
-            if (string.IsNullOrEmpty(SelectedAudioProjectEvent))
-                return;
-
-            var newRow = new Dictionary<string, object>();
-
-            var stateGroupsWithQualifiers = DialogueEventsWithStateGroupsWithQualifiers[SelectedAudioProjectEvent];
-
-            foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
-            {
-                var stateGroupKey = AddExtraUnderScoresToString(stateGroupWithQualifier);
-                newRow[stateGroupKey] = "";
-            }
-
-            newRow["AudioFilesDisplay"] = "";
-
-            AudioEditorDataGridItems.Add(newRow);
-
-            UpdateEventDataWithCurrentEvent();
-        }
-
-        public void RemoveStatePath(Dictionary<string, object> rowToRemove)
-        {
-            AudioEditorDataGridItems.Remove(rowToRemove);
-
-            UpdateEventDataWithCurrentEvent();
-        }
-
-        public void UpdateEventDataWithCurrentEvent()
-        {
-            if (AudioEditorDataGridItems == null)
-                return;
-
-            if (SelectedAudioProjectEvent != null)
-                EventsData[SelectedAudioProjectEvent] = new List<Dictionary<string, object>>(AudioEditorDataGridItems);
-        }
-
-        [RelayCommand] public void AddCustomStatesRow()
-        {
-            var newRow = new CustomStatesDataGridProperties();
-            CustomStatesDataGridItems.Add(newRow);
-        }
-
-        [RelayCommand] public void RemoveCustomStatesRow(CustomStatesDataGridProperties item)
-        {
-            if (item != null && CustomStatesDataGridItems.Contains(item))
-                CustomStatesDataGridItems.Remove(item);
-        }
-
-        public static void AddAudioFiles(Dictionary<string, object> dataGridRow, System.Windows.Controls.TextBox textBox)
-        {
-            var dialog = new Microsoft.Win32.OpenFileDialog()
-            {
-                Multiselect = true,
-                Filter = "WAV files (*.wav)|*.wav"
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                var filePaths = dialog.FileNames;
-                var eventsData = AudioEditorData.Instance.EventsData;
-
-                if (eventsData.ContainsKey(AudioEditorData.Instance.SelectedAudioProjectEvent))
-                {
-                    var eventList = eventsData[AudioEditorData.Instance.SelectedAudioProjectEvent];
-
-                    // Find the matching row to insert the AudioFiles data.
-                    var matchingRow = eventList.FirstOrDefault(context =>
-                        DictionaryEqualityComparer<string, object>.Default.Equals(context, dataGridRow));
-
-                    if (matchingRow != null)
-                    {
-                        var fileNames = filePaths.Select(filePath => $"\"{Path.GetFileName(filePath)}\"");
-                        var fileNamesString = string.Join(", ", fileNames);
-                        var filePathsString = string.Join(", ", filePaths.Select(filePath => $"\"{filePath}\""));
-
-                        matchingRow["AudioFilesDisplay"] = filePaths.ToList();
-                        matchingRow["AudioFiles"] = filePaths.ToList();
-
-                        textBox.Text = fileNamesString;
-                        textBox.ToolTip = filePathsString;
-                    }
-                }
-            }
-        }
-
-        public static void CreateAudioProjectEventsListFromAudioProject(Dictionary<string, List<Dictionary<string, object>>> eventsData)
-        {
-            AudioProjectDialogueEvents.Clear();
-
-            foreach (var dialogueEvent in eventsData.Keys)
-                AudioProjectDialogueEvents.Add(dialogueEvent);
+            AudioProjectTreeViewItems = _audioProjectService.AudioProject.AudioProjectTreeViewItems;
         }
 
         public void Close()
         {
+            // Reset and initialise data.
+            ResetAudioProjectConfiguration();
+            ResetAudioEditorViewModelData();
+            _audioProjectService.ResetAudioProject();
         }
 
         public bool Save() => true;
