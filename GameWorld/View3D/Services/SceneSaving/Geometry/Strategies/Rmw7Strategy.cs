@@ -19,7 +19,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry.Strategies
 
         public void Generate(MainEditableNode mainNode, GeometrySaveSettings saveSettings)
         {
-            _sceneSaverService.Save(saveSettings.OutputName, mainNode, RmvVersionEnum.RMV2_V7, saveSettings);
+            _sceneSaverService.Save(saveSettings.OutputName, mainNode, mainNode.SkeletonNode.Skeleton, RmvVersionEnum.RMV2_V7, saveSettings);
         }
     }
 }

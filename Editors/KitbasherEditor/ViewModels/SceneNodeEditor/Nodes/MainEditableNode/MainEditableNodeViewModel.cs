@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.UiCommands;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components.Rendering;
-using GameWorld.Core.Rendering;
 using GameWorld.Core.SceneNodes;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.Views.EditorViews;
@@ -27,8 +26,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
 
         [ObservableProperty] ObservableCollection<string> _skeletonNameList;
         [ObservableProperty] string? _skeletonName;
-        [ObservableProperty] ObservableCollection<RenderFormats> _possibleRenderFormats = [RenderFormats.MetalRoughness, RenderFormats.SpecGloss];
-        [ObservableProperty] RenderFormats _selectedRenderFormat;
+
 
         public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene, 
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
@@ -40,14 +38,9 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
             _renderEngineComponent = renderEngineComponent;
             _uiCommandFactory = uiCommandFactory;
             
-            SelectedRenderFormat = _renderEngineComponent.MainRenderFormat;
             SkeletonNameList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
         }
 
-        partial void OnSelectedRenderFormatChanged(RenderFormats value)
-        {
-            _renderEngineComponent.MainRenderFormat = value;
-        }
 
         partial void OnSkeletonNameChanged(string? value)
         {

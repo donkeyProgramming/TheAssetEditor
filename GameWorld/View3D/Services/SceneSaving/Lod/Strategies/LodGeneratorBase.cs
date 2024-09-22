@@ -87,7 +87,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
                 foreach (var mesh in originalMeshClone)
                 {
                     if (mesh.Geometry.VertexFormat != UiVertexFormat.Static)
-                        mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted, mesh.Geometry.ParentSkeletonName);
+                        mesh.Geometry.ChangeVertexType(UiVertexFormat.Weighted);
 
                     if (settings.OptimizeAlpha)
                         mesh.Material.GetCapability<MaterialBaseCapability>().UseAlpha = false;
@@ -103,6 +103,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.Strategies
             // Reduce the polygon count
             foreach (var mesh in originalMeshClone)
             {
+                mesh.Name = mesh.Name.Replace(" - Clone", "");
                 if (mesh.ReduceMeshOnLodGeneration && settings.LodRectionFactor != 1)
                     ReduceMesh(mesh, deductionRatio);
             }

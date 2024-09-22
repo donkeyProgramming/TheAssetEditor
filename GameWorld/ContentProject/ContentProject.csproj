@@ -8,51 +8,22 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="Content\obj\**" />
+      <EmbeddedResource Remove="Content\obj\**" />
+      <None Remove="Content\obj\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
+    </ItemGroup>
+
 
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High" />
         <Exec Command="dotnet tool restore" />
     </Target>
-
-    <ItemGroup>
-    <None Update="BuiltContent\Fonts\DefaultFont.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Shaders\Bloom.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Shaders\Geometry\BasicShader.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Shaders\InstancingShader.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Shaders\LineShader.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Shaders\Pbr\MetalRoughness\MetalRoughness_main.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Shaders\Pbr\SpecGloss\SpecGloss_main.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Shaders\TexturePreview.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Textures\Phazer\Brdf_rgba32f_raw.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Textures\Phazer\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="BuiltContent\Textures\Phazer\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512.xnb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="BuiltContent\Shaders\Geometry\" />
-    </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 ﻿using AssetEditor.Services;
 using GameWorld.Core.Components.Input;
+using GameWorld.Core.Services;
 using GameWorld.Core.WpfWindow;
-using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Shared.Core.DependencyInjection;
@@ -41,6 +41,14 @@ namespace E2EVerification.Shared
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)
         {
             PackFileService.Load(path, false, true);
+            if (createOutputPackFile)
+                return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
+            return null;
+        }
+
+        public PackFileContainer? LoadFolderPackFile(string path, bool createOutputPackFile = true)
+        {
+            PackFileService.LoadFolderContainer(path);
             if (createOutputPackFile)
                 return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
             return null;

@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Media;
 using CommonControls.BaseDialogs;
-using GameWorld.Core.WpfWindow.ResourceHandling;
+using GameWorld.Core.Utility;
 using Shared.Core.Misc;
 using TextureEditor.Views;
 

@@ -17,45 +17,47 @@ namespace GameWorld.Core.Services
             _contextFactory = context;
         }
 
-        public MeshObject BuildMeshFromRmvModel(RmvModel modelPart, string skeletonName)
+        public MeshObject BuildMeshFromRmvModel(RmvModel rmvModel, string skeletonName)
         {
-            var output = new MeshObject(_contextFactory.Create(), skeletonName);
-            output.ChangeVertexType(ModelMaterialEnumHelper.GetToolVertexFormat(modelPart.Material.BinaryVertexFormat), skeletonName, false);
-            output.VertexArray = new VertexPositionNormalTextureCustom[modelPart.Mesh.VertexList.Length];
-            output.IndexArray = (ushort[])modelPart.Mesh.IndexList.Clone();
+            var vertexFormat = ModelMaterialEnumHelper.GetToolVertexFormat(rmvModel.Material.BinaryVertexFormat);
 
-            for (var i = 0; i < modelPart.Mesh.VertexList.Length; i++)
+            var mesh = new MeshObject(_contextFactory.Create(), skeletonName);
+            mesh.ChangeVertexType(vertexFormat, false);
+            mesh.VertexArray = new VertexPositionNormalTextureCustom[rmvModel.Mesh.VertexList.Length];
+            mesh.IndexArray = (ushort[])rmvModel.Mesh.IndexList.Clone();
+
+            for (var i = 0; i < rmvModel.Mesh.VertexList.Length; i++)
             {
-                var vertex = modelPart.Mesh.VertexList[i];
-                output.VertexArray[i].Position = vertex.Position;
-                output.VertexArray[i].Normal = vertex.Normal;
-                output.VertexArray[i].BiNormal = vertex.BiNormal;
-                output.VertexArray[i].Tangent = vertex.Tangent;
-                output.VertexArray[i].TextureCoordinate = vertex.Uv;
+                var vertex = rmvModel.Mesh.VertexList[i];
+                mesh.VertexArray[i].Position = vertex.Position;
+                mesh.VertexArray[i].Normal = vertex.Normal;
+                mesh.VertexArray[i].BiNormal = vertex.BiNormal;
+                mesh.VertexArray[i].Tangent = vertex.Tangent;
+                mesh.VertexArray[i].TextureCoordinate = vertex.Uv;
 
-                if (output.VertexFormat == UiVertexFormat.Static)
+                if (mesh.VertexFormat == UiVertexFormat.Static)
                 {
-                    output.VertexArray[i].BlendIndices = Vector4.Zero;
-                    output.VertexArray[i].BlendWeights = Vector4.Zero;
+                    mesh.VertexArray[i].BlendIndices = Vector4.Zero;
+                    mesh.VertexArray[i].BlendWeights = Vector4.Zero;
                 }
-                else if (output.VertexFormat == UiVertexFormat.Weighted)
+                else if (mesh.VertexFormat == UiVertexFormat.Weighted)
                 {
-                    output.VertexArray[i].BlendIndices = new Vector4(vertex.BoneIndex[0], vertex.BoneIndex[1], 0, 0);
-                    output.VertexArray[i].BlendWeights = new Vector4(vertex.BoneWeight[0], vertex.BoneWeight[1], 0, 0);
+                    mesh.VertexArray[i].BlendIndices = new Vector4(vertex.BoneIndex[0], vertex.BoneIndex[1], 0, 0);
+                    mesh.VertexArray[i].BlendWeights = new Vector4(vertex.BoneWeight[0], vertex.BoneWeight[1], 0, 0);
                 }
-                else if (output.VertexFormat == UiVertexFormat.Cinematic)
+                else if (mesh.VertexFormat == UiVertexFormat.Cinematic)
                 {
-                    output.VertexArray[i].BlendIndices = new Vector4(vertex.BoneIndex[0], vertex.BoneIndex[1], vertex.BoneIndex[2], vertex.BoneIndex[3]);
-                    output.VertexArray[i].BlendWeights = new Vector4(vertex.BoneWeight[0], vertex.BoneWeight[1], vertex.BoneWeight[2], vertex.BoneWeight[3]);
+                    mesh.VertexArray[i].BlendIndices = new Vector4(vertex.BoneIndex[0], vertex.BoneIndex[1], vertex.BoneIndex[2], vertex.BoneIndex[3]);
+                    mesh.VertexArray[i].BlendWeights = new Vector4(vertex.BoneWeight[0], vertex.BoneWeight[1], vertex.BoneWeight[2], vertex.BoneWeight[3]);
                 }
                 else
                     throw new Exception("Unknown vertex format");
             }
 
-            output.RebuildVertexBuffer();
-            output.RebuildIndexBuffer();
-            output.BuildBoundingBox();
-            return output;
+            mesh.RebuildVertexBuffer();
+            mesh.RebuildIndexBuffer();
+            mesh.BuildBoundingBox();
+            return mesh;
         }
 
         public RmvMesh CreateRmvMeshFromGeometry(MeshObject geometry)

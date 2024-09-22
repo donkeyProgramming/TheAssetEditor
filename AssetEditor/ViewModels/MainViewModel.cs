@@ -8,6 +8,7 @@ using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.Common;
@@ -48,11 +49,14 @@ namespace AssetEditor.ViewModels
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
+        public string ApplicationTitle { get; set; }
+
         public MainViewModel( MenuBarViewModel menuViewModel,
             PackFileService packfileService,
             IToolFactory toolFactory,
             IUiCommandFactory uiCommandFactory,
-            IExportFileContextMenuHelper exportFileContextMenuHelper)
+            IExportFileContextMenuHelper exportFileContextMenuHelper,
+            ApplicationSettingsService applicationSettingsService)
         {
             MenuBar = menuViewModel;
             _uiCommandFactory = uiCommandFactory;
@@ -71,6 +75,8 @@ namespace AssetEditor.ViewModels
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;
+
+            ApplicationTitle = $"AssetEditor v{VersionChecker.CurrentVersion} - {applicationSettingsService.CurrentSettings.CurrentGame}";
         }
 
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);

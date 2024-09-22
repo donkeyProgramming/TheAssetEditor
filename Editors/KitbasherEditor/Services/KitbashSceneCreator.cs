@@ -9,7 +9,6 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
-using static Shared.GameFormats.WWise.Hirc.Shared.AkDecisionTree;
 
 namespace Editors.KitbasherEditor.Services
 {
@@ -45,16 +44,20 @@ namespace Editors.KitbasherEditor.Services
             var mainNode = _sceneManager.RootNode.AddObject(new MainEditableNode(SpecialNodes.EditableModel, skeletonNode, _packFileService));
             _ = _sceneManager.RootNode.AddObject(new GroupNode(SpecialNodes.ReferenceMeshs) { IsEditable = false, IsLockable = false });
 
+            // Load the opened model
             var modelFullPath = _packFileService.GetFullPath(file);
             var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
+            var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromFile(rmv, modelFullPath, _kitbasherRootScene.Player);
+            mainNode.Children.Clear();
+            foreach(var lodNode in lodNodes)
+                mainNode.AddObject(lodNode);
 
-            _rmv2ModelNodeLoader.CreateModelNodesFromFile(mainNode, rmv, _kitbasherRootScene.Player, modelFullPath);
+
             _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
 
             var fullPath = _packFileService.GetFullPath(file);
             _saveSettings.OutputName = fullPath;
-            var lodHeaders = mainNode.Model.LodHeaders;
-            _saveSettings.InitializeLodSettings(lodHeaders);
+            _saveSettings.InitializeLodSettings(rmv.LodHeaders);
         }
 
         public void LoadReference(PackFile file)

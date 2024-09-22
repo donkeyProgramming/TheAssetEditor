@@ -317,14 +317,11 @@ namespace Shared.Core.PackFiles
                     var path = gameDataFolder + "\\" + packFilePath;
                     if (File.Exists(path))
                     {
-                        using (var fileStram = File.OpenRead(path))
-                        {
-                            using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
-                            {
-                                var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.LoadWemFiles, new CaPackDuplicatePackFileResolver());
-                                packList.Add(pack);
-                            }
-                        }
+                        using var fileStram = File.OpenRead(path);
+                        using var reader = new BinaryReader(fileStram, Encoding.ASCII);
+
+                        var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.LoadWemFiles, new CaPackDuplicatePackFileResolver());
+                        packList.Add(pack);
                     }
                     else
                     {

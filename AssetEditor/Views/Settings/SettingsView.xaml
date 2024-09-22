@@ -107,12 +107,6 @@
 
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="Autogene attachment points for meshes"/>
                 <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding AutoGenerateAttachmentPointsFromMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Auto resolve missing textures"/>
-                <CheckBox Grid.Row="4" Grid.Column="2" IsChecked="{Binding AutoResolveMissingTextures, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-                <TextBlock Grid.Row="5" Grid.Column="0"><Run Text="Hide Wh2 Texture Selectors if Wh3 is selected"/><Run Language="en-gb" Text=" "/></TextBlock>
-                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding HideWh2TextureSelectors, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </Grid>
         </GroupBox>
     </Grid>

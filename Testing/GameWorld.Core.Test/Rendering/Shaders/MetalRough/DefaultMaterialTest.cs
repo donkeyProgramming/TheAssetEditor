@@ -1,7 +1,9 @@
 ﻿using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Serialization;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Test.TestUtility;
+using GameWorld.Core.Test.TestUtility.Material;
 using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -39,32 +41,6 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
             return new MaterialToWsMaterialSerializer(saveHelper, materialRepo, gameTypeEnum);
         }
 
-        WsModelMaterialFile GetWsModelFile()
-        {
-            var wsMaterial = new WsModelMaterialFile()
-            {
-                Alpha = true,
-                Name = "cth_celestial_general_body_01_weighted4_alpha_on.xml",
-                ShaderPath = "shaders/weighted4_character_alpha.xml.shader",
-                Textures = new()
-                {
-                    {TextureType.BaseColour, $"texturePath/wsmodel/{TextureType.BaseColour}.dds"},
-                    {TextureType.MaterialMap, $"texturePath/wsmodel/{TextureType.MaterialMap}.dds"},
-                    {TextureType.Normal, $"texturePath/wsmodel/{TextureType.Normal}.dds"},
-                    {TextureType.Mask, $"texturePath/wsmodel/{TextureType.Mask}.dds"},
-                    {TextureType.Distortion, $"texturePath/wsmodel/{TextureType.Distortion}.dds"},
-                    {TextureType.DistortionNoise, $"texturePath/wsmodel/{TextureType.DistortionNoise}.dds"},
-                    {TextureType.Blood, $"texturePath/wsmodel/{TextureType.Blood}.dds"},
-                },
-                Parameters =
-                [
-                    new WsModelMaterialParam(WsModelParamters.Blood_Use.Name, 1),
-                    new WsModelMaterialParam(WsModelParamters.Blood_Scale.Name, new Vector2(1,2)),
-                ]
-            };
-            return wsMaterial;
-        }
-
         IRmvMaterial GetRmvMaterial()
         {
             var rmvMaterial = RmvMaterialHelper
@@ -79,7 +55,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
         public void CreateFromWsMaterial()
         {
             // Arrange
-            var wsMaterial = GetWsModelFile();
+            var wsMaterial = WsMaterialHelper.GetDefaultMetalRoughWsModelFile();
 
             // Act
             var material = GetMaterialFactory(GameTypeEnum.Warhammer3).Create(null, wsMaterial);
@@ -106,7 +82,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
         public void GenerateWsMaterial(GameTypeEnum gameType)
         {
             // Arrange
-            var wsMaterial = GetWsModelFile();
+            var wsMaterial = WsMaterialHelper.GetDefaultMetalRoughWsModelFile();
 
             // Act
             var material = GetMaterialFactory(gameType).Create(null, wsMaterial);
@@ -122,16 +98,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
             Assert.That(generatedMaterial.ShaderPath, Is.EqualTo("shaders/weighted4_character_alpha.xml.shader"));
             Assert.That(generatedMaterial.Name, Is.EqualTo("mymesh_weighted4_alpha_on.xml"));
 
-            Assert.That(generatedMaterial.Textures[TextureType.BaseColour], Is.EqualTo($"texturePath/wsmodel/{TextureType.BaseColour}.dds"));
-            Assert.That(generatedMaterial.Textures[TextureType.MaterialMap], Is.EqualTo($"texturePath/wsmodel/{TextureType.MaterialMap}.dds"));
-            Assert.That(generatedMaterial.Textures[TextureType.Normal], Is.EqualTo($"texturePath/wsmodel/{TextureType.Normal}.dds"));
-            Assert.That(generatedMaterial.Textures[TextureType.Mask], Is.EqualTo($"texturePath/wsmodel/{TextureType.Mask}.dds"));
-            Assert.That(generatedMaterial.Textures[TextureType.Distortion], Is.EqualTo($"texturePath/wsmodel/{TextureType.Distortion}.dds"));
-            Assert.That(generatedMaterial.Textures[TextureType.DistortionNoise], Is.EqualTo($"texturePath/wsmodel/{TextureType.DistortionNoise}.dds"));
-
-            Assert.That(generatedMaterial.Textures[TextureType.Blood], Is.EqualTo($"texturePath/wsmodel/{TextureType.Blood}.dds"));
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Blood_Use).Value, Is.EqualTo("1"));
-            Assert.That(generatedMaterial.GetParameter(WsModelParamters.Blood_Scale).Value, Is.EqualTo("1, 2"));
+            WsMaterialHelper.ValidateMetalRough(generatedMaterial);
         }
 
         [Test]
@@ -168,10 +135,12 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
             // Act
             var material = GetMaterialFactory(GameTypeEnum.ThreeKingdoms).Create(rmvMaterial, null);
             var serializer = new MaterialToRmvSerializer();
-            var createdRmvMaterial = serializer.CreateMaterialFromCapabilityMaterial(material);
+            var createdRmvMaterial = serializer.CreateMaterialFromCapabilityMaterial(material) as WeightedMaterial;
 
             // Assert
-            Assert.That(createdRmvMaterial.AlphaMode, Is.EqualTo(AlphaMode.Transparent));
+            var hasAlphaValue = createdRmvMaterial.IntParams.TryGet(WeightedParamterIds.IntParams_Alpha_index, out var alphaValue);
+            Assert.That(hasAlphaValue, Is.True);
+            Assert.That(alphaValue, Is.EqualTo(1));
             Assert.That(createdRmvMaterial.MaterialId, Is.EqualTo(ModelMaterialEnum.weighted));
 
             Assert.That(createdRmvMaterial.GetTexture(TextureType.BaseColour).Value.Path, Is.EqualTo($"texturePath/{TextureType.BaseColour}.dds"));
@@ -180,5 +149,52 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
             Assert.That(createdRmvMaterial.GetTexture(TextureType.Mask).Value.Path, Is.EqualTo($"texturePath/{TextureType.Mask}.dds"));
         }
 
+        [Test]
+        public void EqualTest_Same()
+        {
+            // Arrange
+            var materialA = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            var materialB = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            
+            // Act
+            var (result, message) = materialA.AreEqual(materialB);
+
+            // Assert
+            Assert.That(result, Is.True);
+            Assert.That(message.Length, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void EqualTest_DiffAlpha()
+        {
+            // Arrange
+            var materialA = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            materialA.GetCapability<MetalRoughCapability>().UseAlpha = false;
+            var materialB = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            materialB.GetCapability<MetalRoughCapability>().UseAlpha = true;
+
+            // Act
+            var (result, message) = materialA.AreEqual(materialB);
+
+            // Assert
+            Assert.That(result, Is.False);
+            Assert.That(message.Length, Is.Not.EqualTo(0));
+        }
+
+        [Test]
+        public void EqualTest_DiffBaseColor()
+        {
+            // Arrange
+            var materialA = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            materialA.GetCapability<MetalRoughCapability>().BaseColour.TexturePath = "Custom path";
+            var materialB = GetMaterialFactory(GameTypeEnum.Warhammer3).CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+
+            // Act
+            var (result, message) = materialA.AreEqual(materialB);
+
+            // Assert
+            Assert.That(result, Is.False);
+            Assert.That(message.Length, Is.Not.EqualTo(0));
+        }
     }
 }

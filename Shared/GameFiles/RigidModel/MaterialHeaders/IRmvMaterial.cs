@@ -8,7 +8,6 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         public ModelMaterialEnum MaterialId { get; }
         VertexFormat BinaryVertexFormat { get; }
         Vector3 PivotPoint { get; set; }
-        AlphaMode AlphaMode { get; set; }
         string ModelName { get; set; }
         string TextureDirectory { get; set; }
 

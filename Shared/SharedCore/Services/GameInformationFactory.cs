@@ -49,7 +49,7 @@
             Rome2Remastered = new GameInformation() { Type = GameTypeEnum.Rome_2_Remastered, DisplayName = "Rome II - Re", DefaultPackType = "PFH5", ShortID = "Rome2Remastered" };
             Attilla = new GameInformation() { Type = GameTypeEnum.Attila, DisplayName = "Attila", DefaultPackType = "PFH5", ShortID = "Attila" };
             Pharaoh = new GameInformation() { Type = GameTypeEnum.Pharaoh, DisplayName = "Pharaoh", DefaultPackType = "PFH5", ShortID = "Pharaoh" };
-            Games = new List<GameInformation>() { Warhammer, Warhammer2, Warhammer3, Troy, ThreeKingdoms, Rome2Remastered, Attilla, Pharaoh };
+            Games = [Warhammer, Warhammer2, Warhammer3, Troy, ThreeKingdoms, Rome2Remastered, Attilla, Pharaoh];
         }
 
         public GameInformation GetGameById(GameTypeEnum type)

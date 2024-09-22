@@ -39,13 +39,13 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             textureInput.UseTexture = false;
         }
 
-        public static bool UseAlpha(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial)
+      /*  public static bool UseAlpha(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial)
         {
             if (wsModelMaterial != null)
                 return wsModelMaterial.Alpha;
 
             return rmvMaterial.AlphaMode == AlphaMode.Transparent;
-        }
+        }*/
 
         public static float GetParameterFloat(WsModelMaterialFile? wsModelMaterial, WsModelParamters.Instance parameterInstance, float defaultValue)
         {

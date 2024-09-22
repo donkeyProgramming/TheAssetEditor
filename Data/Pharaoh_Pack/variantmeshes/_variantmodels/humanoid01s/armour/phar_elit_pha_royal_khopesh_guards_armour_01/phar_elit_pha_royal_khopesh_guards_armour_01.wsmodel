@@ -1,0 +1,9 @@
+<model version="1">
+ <geometry>variantmeshes\_variantmodels\humanoid01s\armour\phar_elit_pha_royal_khopesh_guards_armour_01\phar_elit_pha_royal_khopesh_guards_armour_01.rigid_model_v2</geometry>
+ <materials>
+  <material lod_index="0" part_index="0">variantmeshes/_variantmodels/humanoid01s/armour/phar_elit_pha_royal_khopesh_guards_armour_01/materials/phar_elit_pha_royal_khopesh_guards_armour_01_part1_weighted4.xml.material</material>
+  <material lod_index="1" part_index="0">variantmeshes/_variantmodels/humanoid01s/armour/phar_elit_pha_royal_khopesh_guards_armour_01/materials/phar_elit_pha_royal_khopesh_guards_armour_01_part1_weighted4.xml.material</material>
+  <material lod_index="2" part_index="0">variantmeshes/_variantmodels/humanoid01s/armour/phar_elit_pha_royal_khopesh_guards_armour_01/materials/phar_elit_pha_royal_khopesh_guards_armour_01_part1_weighted2.xml.material</material>
+  <material lod_index="3" part_index="0">variantmeshes/_variantmodels/humanoid01s/armour/phar_elit_pha_royal_khopesh_guards_armour_01/materials/phar_elit_pha_royal_khopesh_guards_armour_01_part1_weighted2.xml.material</material>
+ </materials>
+</model>

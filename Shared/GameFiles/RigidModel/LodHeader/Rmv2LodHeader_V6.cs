@@ -28,6 +28,18 @@ namespace Shared.GameFormats.RigidModel.LodHeader
         {
             return ByteHelper.GetBytes((Rmv2LodHeader_V6)rmvLodHeader);
         }
+
+        public RmvLodHeader CreateEmpty(float cameraDistance, uint lodLevel, byte qualityLevel)
+        {
+            return new Rmv2LodHeader_V6()
+            {
+                _meshCount = 0,
+                _totalLodVertexSize = 0,
+                _totalLodIndexSize = 0,
+                _firstMeshOffset = 0,
+                _lodCameraDistance = cameraDistance,
+            };
+        }
     }
 
     public struct Rmv2LodHeader_V6 : RmvLodHeader

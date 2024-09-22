@@ -34,6 +34,7 @@
         uint HeaderSize { get; }
         RmvLodHeader Create(byte[] buffer, int offset);
         RmvLodHeader CreateFromBase(RmvLodHeader source, uint lodLevel);
+        RmvLodHeader CreateEmpty(float cameraDistance, uint lodLevel, byte qualityLevel);
         byte[] Save(RmvLodHeader rmvLodHeader);
 
     }

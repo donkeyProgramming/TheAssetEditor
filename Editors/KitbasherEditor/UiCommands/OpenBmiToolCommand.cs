@@ -37,7 +37,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
             if (meshNode != null)
             {
-                var skeletonName = meshNode.Geometry.ParentSkeletonName;
+                var skeletonName = meshNode.Geometry.SkeletonName;
                 var newSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, skeletonName);
                 var skeleton = new GameSkeleton(newSkeletonFile, null);
 

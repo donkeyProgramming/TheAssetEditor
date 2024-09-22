@@ -19,7 +19,7 @@
             <Expander.Header>
                 <DockPanel  DockPanel.Dock="Top"  Background="{DynamicResource GroupBox.Header.Static.Background}">
                     <Label Content="MetalRough" FontSize="{StaticResource HeaderFontSize}" Width="{StaticResource HeaderLabelLength}" HorizontalAlignment="Left"/>
-
+                    <Separator/>
                 </DockPanel>
             </Expander.Header>
 

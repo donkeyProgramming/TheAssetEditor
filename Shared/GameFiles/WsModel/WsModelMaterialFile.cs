@@ -48,6 +48,8 @@ namespace Shared.GameFormats.WsModel
 
         void LoadContent(string fileContent)
         {
+            fileContent = RemoveBOM(fileContent);
+
             var doc = new XmlDocument();
             doc.LoadXml(fileContent);
 
@@ -55,6 +57,17 @@ namespace Shared.GameFormats.WsModel
             ExtractShaderName(doc);
             ExtractInformationFromName(doc);
             ExtractTextures(doc);
+        }
+
+        private string RemoveBOM(string xml)
+        {
+            var index = xml.IndexOf('<');
+            if (index > 0)
+            {
+                xml = xml.Substring(index, xml.Length - index);
+            }
+
+            return xml;
         }
 
         private void ExtractShaderName(XmlDocument doc)

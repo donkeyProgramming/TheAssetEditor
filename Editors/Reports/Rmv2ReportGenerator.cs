@@ -26,7 +26,7 @@ namespace Editors.Reports
             var versionInfoRecords = new List<dynamic>();
             var weightedMaterialRecords = new List<dynamic>();
 
-            var modelFactory = ModelFactory.Create(false);
+            var modelFactory = ModelFactory.Create();
             for (var i = 0; i < fileList.Count; i++)
             {
                 var meshFile = fileList[i];
@@ -52,20 +52,20 @@ namespace Editors.Reports
 
                             if (model.Material is WeightedMaterial weightedMaterial)
                             {
-                                dynamic weightedMaterialRecord = new ExpandoObject();
-                                weightedMaterialRecord.Path = path;
-
-                                weightedMaterialRecord.Filters = weightedMaterial.Filters;
-                                weightedMaterialRecord.MatrixIndex = weightedMaterial.MatrixIndex;
-                                weightedMaterialRecord.ParentMatrixIndex = weightedMaterial.ParentMatrixIndex;
-                                weightedMaterialRecord.AttachmentPointParams = weightedMaterial.AttachmentPointParams.Count;
-                                weightedMaterialRecord.TexturesParams = weightedMaterial.TexturesParams.Count;
-                                weightedMaterialRecord.StringParams = weightedMaterial.StringParams.Count;
-                                weightedMaterialRecord.FloatParams = weightedMaterial.FloatParams.Count;
-                                weightedMaterialRecord.IntParams = weightedMaterial.IntParams.Count;
-                                weightedMaterialRecord.Vec4Params = weightedMaterial.Vec4Params.Count;
-
-                                weightedMaterialRecords.Add(weightedMaterialRecord);
+                               // dynamic weightedMaterialRecord = new ExpandoObject();
+                               // weightedMaterialRecord.Path = path;
+                               //
+                               // weightedMaterialRecord.Filters = weightedMaterial.Filters;
+                               // weightedMaterialRecord.MatrixIndex = weightedMaterial.MatrixIndex;
+                               // weightedMaterialRecord.ParentMatrixIndex = weightedMaterial.ParentMatrixIndex;
+                               // weightedMaterialRecord.AttachmentPointParams = weightedMaterial.AttachmentPointParams.Count;
+                               // weightedMaterialRecord.TexturesParams = weightedMaterial.TexturesParams.Count;
+                               // weightedMaterialRecord.StringParams = weightedMaterial.StringParams.Count;
+                               // weightedMaterialRecord.FloatParams = weightedMaterial.FloatParams.Count;
+                               // weightedMaterialRecord.IntParams = weightedMaterial.IntParams.Count;
+                               // weightedMaterialRecord.Vec4Params = weightedMaterial.Vec4Params.Count;
+                               //
+                               // weightedMaterialRecords.Add(weightedMaterialRecord);
                             }
                         }
                     }

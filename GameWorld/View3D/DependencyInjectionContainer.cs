@@ -26,7 +26,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Shared.Core.DependencyInjection;
 using Shared.Core.Services;
-using GameWorld.Core.WpfWindow.ResourceHandling;
 using GameWorld.Core.WpfWindow;
 
 namespace GameWorld.Core
@@ -63,7 +62,7 @@ namespace GameWorld.Core
             serviceCollection.AddScoped<IGeometryStrategy, NoMeshStrategy>();
             serviceCollection.AddScoped<IGeometryStrategy, Rmw6Strategy>();
             serviceCollection.AddScoped<IGeometryStrategy, Rmw7Strategy>();
-            serviceCollection.AddScoped<IGeometryStrategy, Rmw8Strategy>();
+            //serviceCollection.AddScoped<IGeometryStrategy, Rmw8Strategy>();
 
             serviceCollection.AddScoped<LodStrategyProvider>();
             serviceCollection.AddScoped<ILodGenerationStrategy, AssetEditorLodGeneration>();

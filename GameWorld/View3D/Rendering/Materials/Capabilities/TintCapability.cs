@@ -1,5 +1,5 @@
 ﻿using GameWorld.Core.Rendering.Materials.Serialization;
-using GameWorld.Core.WpfWindow.ResourceHandling;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.GameFormats.RigidModel;
@@ -41,6 +41,14 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                 Faction3_TintVariation = Faction3_TintVariation,
                 FactionColours = [FactionColours[0], FactionColours[1], FactionColours[2]]
             };
+        }
+
+        public (bool Result, string Message) AreEqual(ICapability otherCap)
+        {
+            var typedCap = otherCap as TintCapability;
+            if (typedCap == null)
+                throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
+            return (true, "");
         }
 
         public void Initialize(WsModelMaterialFile? wsModelMaterial, RmvModel model)

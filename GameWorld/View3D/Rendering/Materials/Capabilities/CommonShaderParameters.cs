@@ -1,4 +1,4 @@
-﻿using GameWorld.Core.WpfWindow.ResourceHandling;
+﻿using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -57,6 +57,14 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                 ModelMatrix = ModelMatrix,
                 LightIntensityMult = LightIntensityMult,
             };
+        }
+
+        public (bool Result, string Message) AreEqual(ICapability otherCap)
+        {
+            var typedCap = otherCap as CommonShaderParametersCapability;
+            if (typedCap == null)
+                throw new System.Exception($"Comparing {GetType} against {otherCap?.GetType()}");
+            return (true, "");
         }
     }
 }
