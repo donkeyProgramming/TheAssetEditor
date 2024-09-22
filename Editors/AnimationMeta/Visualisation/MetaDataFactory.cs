@@ -11,7 +11,6 @@ using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
-using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;

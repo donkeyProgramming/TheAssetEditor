@@ -49,7 +49,7 @@ namespace Editors.KitbasherEditor.UiCommands
                 .ToList();
 
             var allSkeltonNames = meshNodes
-                .Select(x => x.Geometry.ParentSkeletonName)
+                .Select(x => x.Geometry.SkeletonName)
                 .Distinct();
 
             if (allSkeltonNames.Count() != 1)

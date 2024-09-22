@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.Materials.Capabilities;
-using GameWorld.Core.WpfWindow.ResourceHandling;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -71,23 +71,23 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
             return false;
         }
 
-        Effect GetEffect() => _resourceLibrary.GetStaticEffect(_shaderType);
+        protected Effect GetEffect() => _resourceLibrary.GetStaticEffect(_shaderType);
 
         public void Apply(CommonShaderParameters commonShaderParameters, Matrix modelMatrix)
         {
             GetCapability<CommonShaderParametersCapability>().Assign(commonShaderParameters, modelMatrix);
 
             var effect = GetEffect();
-
-            // Disable all effects, so they can be enabled later.
-            effect.Parameters["CapabilityFlag_ApplyEmissive"].SetValue(false);
-            effect.Parameters["CapabilityFlag_ApplyAnimation"].SetValue(false);
+            OnApply(effect);
 
             foreach (var capability in Capabilities)
                 capability.Apply(effect, _resourceLibrary);
 
             effect.CurrentTechnique.Passes[0].Apply();
         }
+
+        protected virtual void OnApply(Effect effect)
+        { }
 
         protected abstract CapabilityMaterial CreateCloneInstance();
         protected ICapability[] CloneCapabilities()
@@ -102,5 +102,24 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
             return copy;
         }
 
+        public (bool Result, string Message) AreEqual(CapabilityMaterial other)
+        {
+            if (other.Type != Type)
+                return (false, $"Different material types {Type} vs {other.Type}");
+
+            for (var i = 0; i < Capabilities.Length; i++)
+            { 
+                var ownCap = Capabilities[i];
+                var otherCap = other.Capabilities[i];
+                if (ownCap.GetType() != otherCap.GetType())
+                    throw new Exception($"Comparing material {Type} and {other.Type}. They have different caps in index {i} {ownCap.GetType()} vs {otherCap}");
+
+                var res = ownCap.AreEqual(otherCap);
+                if (res.Result == false)
+                    return res;
+            }
+
+            return (true, "");
+        }
     }
 }

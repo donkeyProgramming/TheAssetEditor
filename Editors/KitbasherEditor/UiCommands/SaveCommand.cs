@@ -52,4 +52,18 @@ namespace Editors.KitbasherEditor.UiCommands
 
         public void Execute() => Save(false);
     }
+
+    public class SaveAsCommand : SaveCommandBase, IKitbasherUiCommand
+    {
+        public string ToolTip { get; set; } = "SaveAs";
+        public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
+        public Hotkey HotKey { get; } = null;
+
+        public SaveAsCommand(GeometrySaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory)
+            : base(settings, sceneManager, saveService, saveWindowFactory)
+        {
+        }
+
+        public void Execute() => Save(true);
+    }
 }

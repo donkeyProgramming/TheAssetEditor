@@ -8,7 +8,7 @@ using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
-using GameWorld.Core.WpfWindow.ResourceHandling;
+using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Ui.Events.UiCommands;
@@ -32,7 +32,7 @@ namespace GameWorld.Core.Utility.UserInterface
             _uiCommandFactory = uiCommandFactory;
             _resourceLibrary = resourceLibrary;
 
-            _path = _shaderTextureReference.TexturePath;
+            Path = _shaderTextureReference.TexturePath;
             _shouldRenderTexture = _shaderTextureReference.UseTexture;
         }
 
@@ -80,13 +80,13 @@ namespace GameWorld.Core.Utility.UserInterface
         [RelayCommand]
         void HandleClearTexture()
         {
-            Path = string.Empty;
+            Path = "test_mask.dds";
         }
 
         void ValidatePath()
         {
             _errorsByPropertyName[nameof(Path)] = new List<string>();
-            if (Path == null || string.IsNullOrWhiteSpace(Path) == false)
+            if (string.IsNullOrWhiteSpace(Path))
             {
                 _errorsByPropertyName[nameof(Path)].Add("Path is required. If none is wanted, use 'test_mask.dds'");
             }
@@ -106,7 +106,7 @@ namespace GameWorld.Core.Utility.UserInterface
         }
 
         private readonly Dictionary<string, List<string>> _errorsByPropertyName = [];
-        public bool HasErrors => _errorsByPropertyName.Any();
+        public bool HasErrors => _errorsByPropertyName.Sum(x=>x.Value.Count) != 0;
 
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 

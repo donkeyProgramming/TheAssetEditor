@@ -19,7 +19,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Expander DockPanel.Dock="Top" Margin="0,5,0,0" IsExpanded="True">
+    <Expander DockPanel.Dock="Top" IsExpanded="True">
         <Expander.Header>
             <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Border}" >
                 <TextBlock Text="Model Material" FontWeight="Bold" Margin="3"/>

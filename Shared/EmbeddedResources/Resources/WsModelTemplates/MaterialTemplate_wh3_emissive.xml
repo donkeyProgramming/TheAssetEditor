@@ -48,7 +48,7 @@
         <param>
             <name>blood_uv_scale</name>
             <type>float2</type>
-            <value>TEMPLATE_ATTR_BLOOD_UV_SCALE_VALUE</value>
+            <value>TEMPLATE_ATTR_BLOOD_UV_SCALE</value>
         </param>
         <param>
             <name>diffuse_tint_colour</name>

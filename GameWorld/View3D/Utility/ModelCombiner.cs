@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.ErrorHandling;
@@ -9,66 +8,6 @@ namespace GameWorld.Core.Utility
 {
     public class ModelCombiner
     {
-        public static bool CanCombine(Rmv2MeshNode meshA, Rmv2MeshNode meshB, out string? errorMessage)
-        {
-            if (AreMaterialsEqual(meshA.Name, meshA.Material, meshB.Material, meshB.Name, out var textureErrorMsg) == false)
-            { 
-                errorMessage = "Material - " + textureErrorMsg;
-                return false;
-            }
-
-            // Vertex type
-            if (meshA.Geometry.VertexFormat != meshB.Geometry.VertexFormat)
-            {
-                errorMessage = "VertexType - " + $"{meshA.Name} has a different vertex type then {meshB.Name}";
-                return false;
-            }
-
-            errorMessage = null;
-            return true;
-        }
-
-        static bool AreMaterialsEqual(string meshNameA, CapabilityMaterial materialA, CapabilityMaterial materialB, string meshNameB, out string? errorMessage)
-        {
-            if (materialA.Type != materialB.Type)
-            {
-                errorMessage = $"{meshNameA} uses material {materialA.Type}, {meshNameB} uses material {materialB.Type}";
-                return false; ;
-            }
-
-            var baseCapA = materialA.GetCapability<MaterialBaseCapability>();
-            var baseCapB = materialB.GetCapability<MaterialBaseCapability>();
-            if (baseCapA.UseAlpha != baseCapB.UseAlpha)
-            {
-                errorMessage = $"{meshNameA} uses Alpha {baseCapA.UseAlpha}, {meshNameB} uses Alpha {baseCapB.UseAlpha}";
-                return false;
-            }
-
-            var specGlossA = materialA.TryGetCapability<SpecGlossCapability>();
-            var specGlossB = materialB.TryGetCapability<SpecGlossCapability>();
-            if (specGlossA != null && specGlossB != null)
-            {
-                if (SpecGlossCapability.AreEqual(specGlossA, specGlossB) == false)
-                {
-                    errorMessage = $"{meshNameA} uses different textures than {meshNameB}";
-                    return false;
-                }
-            }
-
-            var metalRoughA = materialA.TryGetCapability<MetalRoughCapability>();
-            var metalRoughB = materialB.TryGetCapability<MetalRoughCapability>();
-            if (metalRoughA != null && metalRoughB != null)
-            {
-                if (MetalRoughCapability.AreEqual(metalRoughA, metalRoughB) == false)
-                {
-                    errorMessage = $"{meshNameA} uses different textures than {meshNameB}";
-                    return false;
-                }
-            }
-
-            errorMessage = null;
-            return true;
-        }
 
         public static bool HasPotentialCombineMeshes(List<Rmv2MeshNode> meshList, out ErrorList out_errors)
         {
@@ -95,33 +34,10 @@ namespace GameWorld.Core.Utility
                 return false;
             }
 
-
             return true;
         }
 
-        public static List<List<Rmv2MeshNode>> SortMeshesIntoCombinableGroups(List<Rmv2MeshNode> meshList)
-        {
-            var groupedOutput = new List<List<Rmv2MeshNode>>();
-            foreach (var currentMesh in meshList)
-            {
-                var foundMeshToCombineWith = false;
-                foreach (var potentialCombineTargetGroup in groupedOutput)
-                {
-                    var canCombine = CanCombine(potentialCombineTargetGroup.First(), currentMesh, out _);
-                    if (canCombine)
-                    {
-                        potentialCombineTargetGroup.Add(currentMesh);
-                        foundMeshToCombineWith = true;
-                    }
-                }
-
-                if (foundMeshToCombineWith == false)
-                    groupedOutput.Add(new List<Rmv2MeshNode>() { currentMesh });
-            }
-
-            return groupedOutput;
-        }
-
+   
         public static List<Rmv2MeshNode> CombineMeshes(List<Rmv2MeshNode> geometriesToCombine, bool addPrefix = false)
         {
             var combinedMeshes = new List<Rmv2MeshNode>();
@@ -151,6 +67,60 @@ namespace GameWorld.Core.Utility
             }
 
             return combinedMeshes;
+        }
+
+        static List<List<Rmv2MeshNode>> SortMeshesIntoCombinableGroups(List<Rmv2MeshNode> meshList)
+        {
+            var groupedOutput = new List<List<Rmv2MeshNode>>();
+            foreach (var currentMesh in meshList)
+            {
+                var foundMeshToCombineWith = false;
+                foreach (var potentialCombineTargetGroup in groupedOutput)
+                {
+                    var canCombine = CanCombine(potentialCombineTargetGroup.First(), currentMesh, out _);
+                    if (canCombine)
+                    {
+                        potentialCombineTargetGroup.Add(currentMesh);
+                        foundMeshToCombineWith = true;
+                    }
+                }
+
+                if (foundMeshToCombineWith == false)
+                    groupedOutput.Add(new List<Rmv2MeshNode>() { currentMesh });
+            }
+
+            return groupedOutput;
+        }
+
+        static bool CanCombine(Rmv2MeshNode meshA, Rmv2MeshNode meshB, out string? errorMessage)
+        {
+            if (AreMaterialsEqual(meshA.Name, meshA.Material, meshB.Material, meshB.Name, out var textureErrorMsg) == false)
+            {
+                errorMessage = "Material - " + textureErrorMsg;
+                return false;
+            }
+
+            if (meshA.Geometry.VertexFormat != meshB.Geometry.VertexFormat)
+            {
+                errorMessage = "VertexType - " + $"{meshA.Name} has a different vertex type then {meshB.Name}";
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
+        }
+
+        static bool AreMaterialsEqual(string meshNameA, CapabilityMaterial materialA, CapabilityMaterial materialB, string meshNameB, out string? errorMessage)
+        {
+            var res = materialA.AreEqual(materialB);
+            if (res.Result == false)
+            {
+                errorMessage = $"Comparing material for mesh {meshNameA} against {meshNameB} : {res.Message}";
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
         }
     }
 }

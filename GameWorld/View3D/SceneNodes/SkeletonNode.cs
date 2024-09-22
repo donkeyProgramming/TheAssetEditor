@@ -10,7 +10,7 @@ namespace GameWorld.Core.SceneNodes
         GameSkeleton Skeleton { get; }
     }
 
-    public class SkeletonNode : GroupNode, ISkeletonProvider, IDrawableItem
+    public class SkeletonNode : GroupNode, IDrawableItem
     {
         public Color NodeColour { get; set; } = Color.Black;
         public Color SelectedNodeColour { get; set; } = Color.Red;
@@ -20,9 +20,9 @@ namespace GameWorld.Core.SceneNodes
         public float SkeletonScale { get; set; } = 1;
         public float SelectedBoneScaleMult { get; set; } = 1.5f;
 
-        public GameSkeleton Skeleton { get; set; }
+        public GameSkeleton? Skeleton { get; set; }
 
-        public SkeletonNode(GameSkeleton skeleton, string name = "Skeleton") : base(name)
+        public SkeletonNode(GameSkeleton? skeleton, string name = "Skeleton") : base(name)
         {
             Skeleton = skeleton;
         }

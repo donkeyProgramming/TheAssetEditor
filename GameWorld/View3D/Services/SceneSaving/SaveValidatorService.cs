@@ -20,7 +20,7 @@ namespace GameWorld.Core.Services.SceneSaving
             if (skeleton != null)
             {
                 var activeSkeletonName = skeleton.SkeletonName;
-                var skeletonNames = meshes.Select(x => x.Geometry.ParentSkeletonName).Distinct().ToList();
+                var skeletonNames = meshes.Select(x => x.Geometry.SkeletonName).Distinct().ToList();
 
                 if (skeletonNames.Count != 1)
                     errorList.Error("Skeleton", "Model contains meshes with multiple skeleton references. They will not animate well in game");

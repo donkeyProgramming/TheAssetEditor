@@ -35,12 +35,6 @@
                 </DockPanel>
 
                 <DockPanel DockPanel.Dock="Top">
-                    <Label Width ="{StaticResource labelWidth}" Content="Shading Model"/>
-                    <Label>:</Label>
-                    <ComboBox ItemsSource="{Binding PossibleRenderFormats}" SelectedItem="{Binding SelectedRenderFormat}" VerticalAlignment="Center"/>
-                </DockPanel>
-
-                <DockPanel DockPanel.Dock="Top">
                     <Label Width ="{StaticResource labelWidth}" Content="Copy textures to pack" />
                     <Label>:</Label>
                     <Button Content="Copy" Click="{s:MethodBinding CopyTexturesToOutputPack}" Margin="0,2,2,2" Width="50"/>

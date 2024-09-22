@@ -1,6 +1,7 @@
 ﻿using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Serialization;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Test.TestUtility;
 using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles;
@@ -151,10 +152,10 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             // Act
             var material = GetMaterialFactory(GameTypeEnum.Pharaoh).Create(rmvMaterial, null);
             var serializer = new MaterialToRmvSerializer();
-            var createdRmvMaterial = serializer.CreateMaterialFromCapabilityMaterial(material);
+            var createdRmvMaterial = serializer.CreateMaterialFromCapabilityMaterial(material) as WeightedMaterial;
 
             // Assert
-            Assert.That(createdRmvMaterial.AlphaMode, Is.EqualTo(AlphaMode.Transparent));
+            Assert.That(createdRmvMaterial.IntParams.Get(WeightedParamterIds.IntParams_Alpha_index), Is.EqualTo(1));
             Assert.That(createdRmvMaterial.MaterialId, Is.EqualTo(ModelMaterialEnum.weighted));
 
             Assert.That(createdRmvMaterial.GetTexture(TextureType.Specular).Value.Path, Is.EqualTo($"texturePath/{TextureType.Specular}.dds"));
@@ -162,6 +163,55 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             Assert.That(createdRmvMaterial.GetTexture(TextureType.Diffuse).Value.Path, Is.EqualTo($"texturePath/{TextureType.Diffuse}.dds"));
             Assert.That(createdRmvMaterial.GetTexture(TextureType.Normal).Value.Path, Is.EqualTo($"texturePath/{TextureType.Normal}.dds"));
             Assert.That(createdRmvMaterial.GetTexture(TextureType.Mask).Value.Path, Is.EqualTo($"texturePath/{TextureType.Mask}.dds"));
+        }
+
+        [Test]
+        public void EqualTest_Same()
+        {
+            // Arrange
+            var materialA = GetMaterialFactory(GameTypeEnum.Pharaoh).CreateMaterial(CapabilityMaterialsEnum.SpecGlossPbr_Default);
+            var materialB = GetMaterialFactory(GameTypeEnum.Pharaoh).CreateMaterial(CapabilityMaterialsEnum.SpecGlossPbr_Default);
+
+            // Act
+            var (result, message) = materialA.AreEqual(materialB);
+
+            // Assert
+            Assert.That(result, Is.True);
+            Assert.That(message.Length, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void EqualTest_DiffAlpha()
+        {
+            // Arrange
+            var materialA = GetMaterialFactory(GameTypeEnum.Pharaoh).CreateMaterial(CapabilityMaterialsEnum.SpecGlossPbr_Default);
+            materialA.GetCapability<SpecGlossCapability>().UseAlpha = false;
+            var materialB = GetMaterialFactory(GameTypeEnum.Pharaoh).CreateMaterial(CapabilityMaterialsEnum.SpecGlossPbr_Default);
+            materialB.GetCapability<SpecGlossCapability>().UseAlpha = true;
+
+            // Act
+            var (result, message) = materialA.AreEqual(materialB);
+
+            // Assert
+            // Assert
+            Assert.That(result, Is.False);
+            Assert.That(message.Length, Is.Not.EqualTo(0));
+        }
+
+        [Test]
+        public void EqualTest_DiffDiffuseColor()
+        {
+            // Arrange
+            var materialA = GetMaterialFactory(GameTypeEnum.Pharaoh).CreateMaterial(CapabilityMaterialsEnum.SpecGlossPbr_Default);
+            materialA.GetCapability<SpecGlossCapability>().DiffuseMap.TexturePath = "Custom path";
+            var materialB = GetMaterialFactory(GameTypeEnum.Pharaoh).CreateMaterial(CapabilityMaterialsEnum.SpecGlossPbr_Default);
+
+            // Act
+            var (result, message) = materialA.AreEqual(materialB);
+
+            // Assert
+            Assert.That(result, Is.False);
+            Assert.That(message.Length, Is.Not.EqualTo(0));
         }
     }
 }

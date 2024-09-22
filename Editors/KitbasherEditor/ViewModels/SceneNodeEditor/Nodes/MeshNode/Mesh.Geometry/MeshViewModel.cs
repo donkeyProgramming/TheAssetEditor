@@ -52,7 +52,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         partial void OnDrawBoundingBoxChanged(bool value) => _meshNode.DisplayBoundingBox = value;
         partial void OnDrawPivotPointChanged(bool value) => _meshNode.DisplayPivotPoint = value;
         partial void OnReduceMeshOnLodGenerationChanged(bool value) => _meshNode.ReduceMeshOnLodGeneration = value;
-        partial void OnVertexTypeChanged(UiVertexFormat value) => _meshNode.Geometry.ChangeVertexType(value, _kitbasherRootScene.Skeleton.SkeletonName);
+        partial void OnVertexTypeChanged(UiVertexFormat value) => _meshNode.Geometry.ChangeVertexType(value);
         private void Pivot_OnValueChanged(Vector3 newValue) => _meshNode.PivotPoint = newValue;
         
 

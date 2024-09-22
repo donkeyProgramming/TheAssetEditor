@@ -43,7 +43,10 @@ namespace GameWorld.Core.Commands.Object
                 }
 
                 if (_convertToStaticFrame)
-                    node.Geometry.ChangeVertexType(UiVertexFormat.Static, "");
+                {
+                    node.Geometry.ChangeVertexType(UiVertexFormat.Static);
+                    node.Geometry.UpdateSkeletonName(string.Empty);
+                }
 
                 node.Geometry.RebuildVertexBuffer();
             }

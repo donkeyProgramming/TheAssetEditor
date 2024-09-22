@@ -51,7 +51,9 @@
         global_terrain = 98,
         decal_overlay = 99,
         alpha_blend = 100,
-        TerrainTiles = 101
+        TerrainTiles = 101,
+
+        Unkown = 10000,
     };
 
     public static class ModelMaterialEnumHelper

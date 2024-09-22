@@ -40,14 +40,6 @@ namespace GameWorld.Core.Services.SceneSaving
 
             var outputPath = settings.OutputName;
 
-            // Update lod values
-            var model = mainNode.Model;
-            for (var i = 0; i < model.LodHeaders.Length; i++)
-            {
-                model.LodHeaders[i].LodCameraDistance = settings.LodSettingsPerLod[i].CameraDistance;
-                model.LodHeaders[i].QualityLvl = settings.LodSettingsPerLod[i].QualityLvl;
-            }
-
             _lodStrategyProvider.GetStrategy(settings.LodGenerationMethod).Generate(mainNode, settings.LodSettingsPerLod);
             _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, settings);
             _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, settings.OnlySaveVisible);

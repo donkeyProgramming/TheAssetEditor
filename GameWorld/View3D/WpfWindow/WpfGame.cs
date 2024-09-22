@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using GameWorld.Core.Services;
 using GameWorld.Core.WpfWindow.Events;
-using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -32,7 +32,7 @@ namespace GameWorld.Core.WpfWindow
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        public WpfGame(ResourceLibrary resourceLibrary, EventHub eventHub, string contentDir = "BuiltContent")
+        public WpfGame(ResourceLibrary resourceLibrary, EventHub eventHub, string contentDir = "Content")
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));

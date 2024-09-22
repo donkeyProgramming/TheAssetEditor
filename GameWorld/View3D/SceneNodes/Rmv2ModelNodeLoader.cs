@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Services;
@@ -21,7 +22,7 @@ namespace GameWorld.Core.SceneNodes
             _capabilityMaterialFactory = materialFactory;
         }
 
-        public void CreateModelNodesFromFile(Rmv2ModelNode outputNode, RmvFile model, AnimationPlayer animationPlayer, string modelFullPath, WsModelFile? wsModel = null)
+        public List<Rmv2LodNode> CreateModelNodesFromFile(RmvFile model, string modelFullPath, AnimationPlayer animationPlayer,  WsModelFile? wsModel = null)
         {
             WsModelMaterialProvider wsMaterialProvider;
             if(wsModel != null)
@@ -29,13 +30,12 @@ namespace GameWorld.Core.SceneNodes
             else
                 wsMaterialProvider = WsModelMaterialProvider.CreateFromModelPath(_packFileService, modelFullPath);
 
-            outputNode.Model = model;
+            var output = new List<Rmv2LodNode>();
             for (var lodIndex = 0; lodIndex < model.Header.LodCount; lodIndex++)
             {
-                if (lodIndex >= outputNode.Children.Count)
-                    outputNode.AddObject(new Rmv2LodNode("Lod " + lodIndex, lodIndex));
+                var currentNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex);
+                output.Add(currentNode);
 
-                var lodNode = outputNode.Children[lodIndex];
                 for (var modelIndex = 0; modelIndex < model.LodHeaders[lodIndex].MeshCount; modelIndex++)
                 {
                     var rmvModel = model.ModelList[lodIndex][modelIndex];
@@ -50,9 +50,11 @@ namespace GameWorld.Core.SceneNodes
                         rmvModel.Material.ModelName = Path.GetFileNameWithoutExtension(modelFullPath);
 
                     var node = new Rmv2MeshNode(geometry, rmvModel.Material, shader, animationPlayer);
-                    lodNode.AddObject(node);
+                    currentNode.AddObject(node);
                 }
             }
+
+            return output;
         }
     }
 }

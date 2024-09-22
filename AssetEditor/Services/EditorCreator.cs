@@ -47,7 +47,7 @@ namespace AssetEditor.Services
             var fullFileName = _packFileService.GetFullPath(file);
             var editorViewModel = _toolFactory.Create(fullFileName);
 
-            _logger.Here().Information($"Opening {file.Name} with {editorViewModel.GetType().Name}");
+            _logger.Here().Information($"Opening {file.Name} with {editorViewModel?.GetType().Name}");
             editorViewModel.MainFile = file;
             _mainViewModel.CurrentEditorsList.Add(editorViewModel);
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;

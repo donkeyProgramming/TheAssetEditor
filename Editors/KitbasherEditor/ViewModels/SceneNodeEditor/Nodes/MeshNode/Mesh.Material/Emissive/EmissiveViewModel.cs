@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using GameWorld.Core.Rendering.Materials.Capabilities;
+using GameWorld.Core.Services;
 using GameWorld.Core.Utility.UserInterface;
-using GameWorld.Core.WpfWindow.ResourceHandling;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
@@ -66,6 +66,10 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
             _emissiveTiling = new Vector2ViewModel(emissiveCapability.EmissiveTiling, OnEmissiveTilingChanged);
         }
 
+        partial void OnEmissiveDistortStrengthChanged(float value) => _emissiveCapability.EmissiveDistortStrength = value;
+        partial void OnEmissiveSpeedChanged(float value) => _emissiveCapability.EmissiveSpeed = value;
+        partial void OnEmissivePulseStrengthChanged(float value) => _emissiveCapability.EmissivePulseStrength = value;
+        partial void OnEmissivePulseSpeedChanged(float value) => _emissiveCapability.EmissivePulseSpeed = value;
         void OnEmissiveDirectionChanged(Vector2 value) => _emissiveCapability.EmissiveDirection = value;
         void OnEmissiveTintChanged(Vector3 value) => _emissiveCapability.EmissiveTint = value;
         partial void OnEmissiveStrengthChanged(float value) => _emissiveCapability.EmissiveStrength = value;

@@ -1,0 +1,25 @@
+<?xml version="1.0" ?><PROPERTY_SET>
+	<PROPERTY attribute_file_browsedir="t:/branches/phar/dev/warhammer/working_data/" attribute_file_filter="Shaders (*.xml *.xml.shader)" attribute_filename="" name="Shader" type="string">shaders/system/weighted_standard_4.xml.shader</PROPERTY>
+	<PROPERTY attribute_uid="sort_override" name="Sort Override" type="int">255</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_amount_blendshapes" name="g_amount_blendshapes" type="float">0</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_decal_uv_rect_coords" name="g_decal_uv_rect_coords" type="vector4">0 0 1 1</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_force_snow_shader" name="g_force_snow_shader" type="float">0</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_is_second_class_object" name="g_is_second_class_object" type="float">0</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_pixel_selection_active" name="g_pixel_selection_active" type="int">0</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_pixel_selection_start_pixel_index" name="g_pixel_selection_start_pixel_index" type="int">0</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_rain" name="g_rain" type="float">0</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_snow" name="g_snow" type="float">0</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_tesselation_displacement_scale" name="g_tesselation_displacement_scale" type="float">0.400000006</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_tesselation_factor" name="g_tesselation_factor" type="float">5</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_texel_density_uv_scale" name="g_texel_density_uv_scale" type="vector2">1 1</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_unlit" name="g_unlit" type="float">0</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_untextured" name="g_untextured" type="float">0</PROPERTY>
+	<PROPERTY attribute_cbuffer="rigid_config_PS" attribute_default="" attribute_uid="g_uv2_tile_interval" name="g_uv2_tile_interval" type="vector2">1 1</PROPERTY>
+	<PROPERTY attribute_default="" attribute_file_browsedir="t:/branches/phar/dev/warhammer/working_data/" attribute_file_filter="Textures (*.dds)" attribute_filename="" attribute_texture="" attribute_uid="t_animation_map" name="t_animation_map" type="string">commontextures/default_white.dds</PROPERTY>
+	<PROPERTY attribute_file_browsedir="t:/branches/phar/dev/warhammer/working_data/" attribute_file_filter="Textures (*.dds)" attribute_filename="" attribute_texture="" attribute_uid="t_colour_mask_map" name="t_colour_mask_map" type="string">VariantMeshes/_VariantModels/humanoid01s/armour/phar_elit_pha_royal_khopesh_guards_armour_01/tex/phar_elit_pha_royal_khopesh_guards_armour_01_mask.dds</PROPERTY>
+	<PROPERTY attribute_file_browsedir="t:/branches/phar/dev/warhammer/working_data/" attribute_file_filter="Textures (*.dds)" attribute_filename="" attribute_texture="" attribute_uid="t_diffuse_map" name="t_diffuse_map" type="string">VariantMeshes/_VariantModels/humanoid01s/armour/phar_elit_pha_royal_khopesh_guards_armour_01/tex/phar_elit_pha_royal_khopesh_guards_armour_01_diffuse.dds</PROPERTY>
+	<PROPERTY attribute_default="" attribute_file_browsedir="t:/branches/phar/dev/warhammer/working_data/" attribute_file_filter="Textures (*.dds)" attribute_filename="" attribute_texture="" attribute_uid="t_dither_map" name="t_dither_map" type="string">commontextures/default_white.dds</PROPERTY>
+	<PROPERTY attribute_file_browsedir="t:/branches/phar/dev/warhammer/working_data/" attribute_file_filter="Textures (*.dds)" attribute_filename="" attribute_texture="" attribute_uid="t_normal_map" name="t_normal_map" type="string">VariantMeshes/_VariantModels/humanoid01s/armour/phar_elit_pha_royal_khopesh_guards_armour_01/tex/phar_elit_pha_royal_khopesh_guards_armour_01_normal.dds</PROPERTY>
+	<PROPERTY attribute_default="" attribute_file_browsedir="t:/branches/phar/dev/warhammer/working_data/" attribute_file_filter="Textures (*.dds)" attribute_filename="" attribute_texture="" attribute_uid="t_pixel_selection_object_id_texture" name="t_pixel_selection_object_id_texture" type="string">commontextures/default_white.dds</PROPERTY>
+	<PROPERTY attribute_file_browsedir="t:/branches/phar/dev/warhammer/working_data/" attribute_file_filter="Textures (*.dds)" attribute_filename="" attribute_texture="" attribute_uid="t_specular_colour_map" name="t_specular_colour_map" type="string">VariantMeshes/_VariantModels/humanoid01s/armour/phar_elit_pha_royal_khopesh_guards_armour_01/tex/phar_elit_pha_royal_khopesh_guards_armour_01_specular.dds</PROPERTY>
+</PROPERTY_SET>

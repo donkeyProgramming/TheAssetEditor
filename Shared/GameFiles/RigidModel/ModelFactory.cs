@@ -1,23 +1,19 @@
-﻿using System.Text;
-using Serilog;
+﻿using Serilog;
 using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Vertex;
-using SharpDX;
 
 namespace Shared.GameFormats.RigidModel
 {
     public class ModelFactory
     {
-        ILogger _logger = Logging.Create<ModelFactory>();
-        public static ModelFactory Create(bool logLoadedFile = false) => new ModelFactory(logLoadedFile);
+        private readonly ILogger _logger = Logging.Create<ModelFactory>();
+        public static ModelFactory Create() => new ModelFactory();
 
-        bool _logLoadedFile;
-        public ModelFactory(bool logLoadedFile = false)
+        public ModelFactory()
         {
-            _logLoadedFile = logLoadedFile;
         }
 
         public RmvFile Load(byte[] bytes)
@@ -30,8 +26,7 @@ namespace Shared.GameFormats.RigidModel
                 modelList[i] = LoadMeshInLod(bytes, file.LodHeaders[i], file.Header.Version);
 
             file.ModelList = modelList;
-            if (_logLoadedFile)
-                DumpToLog(file, bytes.Length);
+
 
             return file;
         }
@@ -213,88 +208,6 @@ namespace Shared.GameFormats.RigidModel
                 throw new Exception("Unexpected MeshSectionSize");
 
             return modelBytes;
-        }
-
-        public string DumpToLog(RmvFile rmvFile, int totalSize = -1)
-        {
-            var strBuilder = new StringBuilder();
-
-            strBuilder.AppendLine($"\nModel Info: Size:{totalSize}");
-
-            // File header
-            strBuilder.AppendLine("\t Header:");
-            strBuilder.AppendLine($"\t\t FileType: {rmvFile.Header.FileType}");
-
-            strBuilder.AppendLine($"\t\t Version: {rmvFile.Header.Version}");
-            strBuilder.AppendLine($"\t\t LodCount: {rmvFile.Header.LodCount}");
-            strBuilder.AppendLine();
-
-            var lodIndex = 0;
-            foreach (var lodHeader in rmvFile.LodHeaders)
-            {
-                strBuilder.AppendLine($"\t Lod Header: [{lodIndex++}] type: {lodHeader.GetType()} size: {lodHeader.GetHeaderSize()}");
-                strBuilder.AppendLine($"\t\t MeshCount: {lodHeader.MeshCount}");
-                strBuilder.AppendLine($"\t\t TotalLodVertexSize: {lodHeader.TotalLodVertexSize}");
-                strBuilder.AppendLine($"\t\t TotalLodIndexSize: {lodHeader.TotalLodIndexSize}");
-                strBuilder.AppendLine($"\t\t FirstMeshOffset: {lodHeader.FirstMeshOffset}");
-                strBuilder.AppendLine($"\t\t QualityLvl: {lodHeader.QualityLvl}");
-                strBuilder.AppendLine($"\t\t LodCameraDistance: {lodHeader.LodCameraDistance}");
-            }
-
-            strBuilder.AppendLine();
-            for (var i = 0; i < rmvFile.ModelList.Length; i++)
-            {
-                for (var j = 0; j < rmvFile.ModelList[i].Length; j++)
-                {
-                    var mesh = rmvFile.ModelList[i][j];
-                    strBuilder.AppendLine($"\t Mesh: [{i}][{j}]");
-
-                    strBuilder.AppendLine($"\t\t Common Header:");
-                    strBuilder.AppendLine($"\t\t\t ModelTypeFlag: {mesh.CommonHeader.ModelTypeFlag}");
-                    strBuilder.AppendLine($"\t\t\t RenderFlag: {mesh.CommonHeader.RenderFlag}");
-                    strBuilder.AppendLine($"\t\t\t MeshSectionSize: {mesh.CommonHeader.MeshSectionSize}");
-                    strBuilder.AppendLine($"\t\t\t VertexOffset: {mesh.CommonHeader.VertexOffset}");
-                    strBuilder.AppendLine($"\t\t\t VertexCount: {mesh.CommonHeader.VertexCount}");
-                    strBuilder.AppendLine($"\t\t\t IndexOffset: {mesh.CommonHeader.IndexOffset}");
-                    strBuilder.AppendLine($"\t\t\t IndexCount: {mesh.CommonHeader.IndexCount}");
-
-                    strBuilder.AppendLine($"\t\t\t Shader.Name: {mesh.CommonHeader.ShaderParams.ShaderName}");
-                    strBuilder.AppendLine($"\t\t\t Shader.UnknownValues: {string.Join("", mesh.CommonHeader.ShaderParams.UnknownValues.Select(x => x.ToString()))}");
-                    strBuilder.AppendLine($"\t\t\t Shader.AllZeroValues: {string.Join("", mesh.CommonHeader.ShaderParams.AllZeroValues.Select(x => x.ToString()))}");
-
-                    strBuilder.AppendLine($"\t\t\t BoundingBox: {mesh.CommonHeader.BoundingBox.MinimumX},{mesh.CommonHeader.BoundingBox.MaximumX} | {mesh.CommonHeader.BoundingBox.MinimumY},{mesh.CommonHeader.BoundingBox.MaximumY} | {mesh.CommonHeader.BoundingBox.MinimumZ},{mesh.CommonHeader.BoundingBox.MaximumZ}");
-                    strBuilder.AppendLine($"\t\t\t BoundingBox.Width {mesh.CommonHeader.BoundingBox.Width}");
-                    strBuilder.AppendLine($"\t\t\t BoundingBox.Height {mesh.CommonHeader.BoundingBox.Height}");
-                    strBuilder.AppendLine($"\t\t\t BoundingBox.Depth {mesh.CommonHeader.BoundingBox.Depth}");
-
-                    var vertexList = mesh.Mesh.VertexList.Select(x => x.GetPosistionAsVec3());
-                    var computedBB = Microsoft.Xna.Framework.BoundingBox.CreateFromPoints(vertexList);
-
-                    strBuilder.AppendLine($"\t\t\t Computed BoundingBox: {computedBB.Min.X},{computedBB.Max.X} | {computedBB.Min.Y},{computedBB.Max.Y}  | {computedBB.Min.Z},{computedBB.Max.Z} ");
-                    strBuilder.AppendLine($"\t\t\t Computed BoundingBox.Width {Math.Abs(computedBB.Min.X - computedBB.Max.X)}");
-                    strBuilder.AppendLine($"\t\t\t Computed BoundingBox.Height {Math.Abs(computedBB.Min.Y - computedBB.Max.Y)}");
-                    strBuilder.AppendLine($"\t\t\t Computed BoundingBox.Depth {Math.Abs(computedBB.Min.Z - computedBB.Max.Z)}");
-
-                    strBuilder.AppendLine($"\t\t Material: type: {mesh.Material.GetType()} size: {mesh.Material.ComputeSize()}");
-                    strBuilder.AppendLine($"\t\t\t MaterialId: {mesh.Material.MaterialId}");
-                    strBuilder.AppendLine($"\t\t\t BinaryVertexFormat: {mesh.Material.BinaryVertexFormat}");
-                    strBuilder.AppendLine($"\t\t\t PivotPoint: {mesh.Material.PivotPoint}");
-                    strBuilder.AppendLine($"\t\t\t AlphaMode: {mesh.Material.AlphaMode}");
-                    strBuilder.AppendLine($"\t\t\t ModelName: {mesh.Material.ModelName}");
-                    strBuilder.AppendLine($"\t\t\t TextureDirectory: {mesh.Material.TextureDirectory}");
-
-                    strBuilder.AppendLine($"\t\t\t Textures:");
-                    foreach (var texture in mesh.Material.GetAllTextures())
-                        strBuilder.AppendLine($"\t\t\t\t Texture: {texture.TexureType} - {texture.Path}");
-
-                    strBuilder.AppendLine($"\t\t Mesh:");
-                    strBuilder.AppendLine($"\t\t\t VertexList.Length: {mesh.Mesh.VertexList.Length}");
-                    strBuilder.AppendLine($"\t\t\t IndexList.Length: {mesh.Mesh.IndexList.Length}");
-                }
-            }
-            var output = strBuilder.ToString();
-            _logger.Here().Information(output);
-            return output;
         }
     }
 }

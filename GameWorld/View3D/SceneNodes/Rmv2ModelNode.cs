@@ -1,25 +1,13 @@
-﻿using Shared.GameFormats.RigidModel;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2ModelNode : GroupNode
     {
-        public RmvFile Model { get; set; }
-
-        public Rmv2ModelNode(string name, int lodCount = 4)
+        public Rmv2ModelNode(string name)
         {
             Name = name;
-
-            for (var lodIndex = 0; lodIndex < lodCount; lodIndex++)
-            {
-                var lodNode = new Rmv2LodNode("Lod " + lodIndex, lodIndex)
-                {
-                    IsVisible = lodIndex == 0
-                };
-                AddObject(lodNode);
-            }
         }
 
         public List<Rmv2LodNode> GetLodNodes()
@@ -27,6 +15,7 @@ namespace GameWorld.Core.SceneNodes
             return Children
                 .Where(x => x is Rmv2LodNode)
                 .Select(x => x as Rmv2LodNode)
+                .Cast<Rmv2LodNode>()
                 .ToList();
         }
 
@@ -41,6 +30,7 @@ namespace GameWorld.Core.SceneNodes
 
             if (lods[lod].Children.Count <= modelIndex)
                 return null;
+
             return lods[lod].Children[modelIndex] as Rmv2MeshNode;
         }
 
@@ -69,12 +59,6 @@ namespace GameWorld.Core.SceneNodes
 
         public override ISceneNode CreateCopyInstance() => new Rmv2ModelNode();
 
-        public override void CopyInto(ISceneNode tartet)
-        {
-            var typedTarget = tartet as Rmv2ModelNode;
-            typedTarget.Model = Model;
-            base.CopyInto(tartet);
-        }
     }
 }
 
