@@ -47,7 +47,7 @@ namespace Shared.Ui
             factory.RegisterTool<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(
                 new ExtensionToTool(
                     EditorEnums.XML_Editor,
-                    [".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv", ".bnk.xml"]));
+                    [".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv", ".bnk.xml", ".aproj"]));
         }
     }
 }
