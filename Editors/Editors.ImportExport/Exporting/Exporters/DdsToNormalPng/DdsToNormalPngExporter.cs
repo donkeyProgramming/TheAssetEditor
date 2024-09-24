@@ -55,6 +55,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             return ExportSupportEnum.NotSupported;
         }
 
+        // -- TODO: maybe remove this method? kept for reference
         private void ConvertToBlueNormalMap_pOld(byte[] imgBytes, string outputPath, string fileDirectory)
         {
             var ms = new MemoryStream(imgBytes);
