@@ -73,7 +73,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             {
                 var gltfMaterial = new MaterialBuilder(rmvMesh.Material.ModelName + "_Material")
                     .WithDoubleSide(true)
-                    .WithMetallicRoughness();
+                    .WithMetallicRoughness()
+                    .WithAlpha(SharpGLTF.Materials.AlphaMode.MASK);
+
                 if (settings.ExportTextures == true)
                 {
                     gltfMaterial = GenerateMaterial(settings, rmvMesh, gltfMaterial);
