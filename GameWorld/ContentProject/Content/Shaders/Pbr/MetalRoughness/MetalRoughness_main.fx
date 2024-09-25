@@ -56,7 +56,7 @@ GBufferMaterial GetMaterial(in PixelInputType input)
     
     if (UseMask)
     {
-        material.maskValue = MaskTexture.Sample(SampleType, texCord).a;
+        material.maskValue = MaskTexture.Sample(SampleType, texCord);
     }
     
     return material;
