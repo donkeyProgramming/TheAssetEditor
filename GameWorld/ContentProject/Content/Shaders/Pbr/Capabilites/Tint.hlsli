@@ -7,19 +7,20 @@ float3      Tint_TintColour = float3(1, 1, 1);
 float       Tint_TintVariation = 0;
 
 float3 ApplyTintAndFactionColours(float3 textureDiffuse, float4 maskValue)
-{
+{    
     if (CapabilityFlag_ApplyTint == false)
         return textureDiffuse;
-    
+ 
+    float3 diffuseResult = textureDiffuse;
     if (Tint_UseFactionColours)
     {   
-        textureDiffuse.r = lerp(textureDiffuse.r, textureDiffuse.r * (Tint_FactionsColours[0].r), maskValue.r);
-        textureDiffuse.g = lerp(textureDiffuse.g, textureDiffuse.g * (Tint_FactionsColours[1].g), maskValue.g);
-        textureDiffuse.b = lerp(textureDiffuse.b, textureDiffuse.b * (Tint_FactionsColours[2].b), maskValue.b);
+        diffuseResult = lerp(diffuseResult.rgb, diffuseResult.rgb * (Tint_FactionsColours[0]), maskValue.r);
+        diffuseResult = lerp(diffuseResult.rgb, diffuseResult.rgb * (Tint_FactionsColours[1]), maskValue.g);
+        diffuseResult = lerp(diffuseResult.rgb, diffuseResult.rgb * (Tint_FactionsColours[2]), maskValue.b);
     }
     
     float tintFactor = dot(Tint_Mask, maskValue);
     float3 tintColour = Tint_TintColour * Tint_TintVariation * tintFactor;
     
-    return textureDiffuse * tintColour;
+    return diffuseResult * tintColour;
 }
