@@ -1,5 +1,7 @@
-﻿using Shared.Core.ByteParsing;
+﻿using Microsoft.Xna.Framework;
+using Shared.Core.ByteParsing;
 using Shared.GameFormats.RigidModel.Transforms;
+
 using Half = SharpDX.Half;
 
 namespace Shared.GameFormats.RigidModel.Vertex
@@ -98,11 +100,125 @@ namespace Shared.GameFormats.RigidModel.Vertex
             var truncatedFloat = (f + 1.0f) / 2.0f * 255.0f;
             return (byte)Math.Round(truncatedFloat);
         }
+        public struct MyHalfVector4 { public Half X; public Half Y; public Half Z; public Half W; }
+
+        public static (Half X, Half Y, Half Z, Half W) ConvertertVertexToHalfExtraPrecision(Vector4 vertexOriginal)
+        {
+            const uint halfMantissaMax = 1024;
+
+            float bestValueForW = 0;
+            float currentSmallestError = float.MaxValue;
+
+            // Brute force, checking all 1024 half-float mantissa values for "w"
+            for (ushort iMantissaCounter = 0; iMantissaCounter < halfMantissaMax; iMantissaCounter++)
+            {
+                if (!IsWithingFloat16Range(vertexOriginal))
+                    throw new Exception("Input vertex cannot be converted to float16");
+
+                // fill the mantissa bits with value from 1.0 to 2.0
+                float testW = (float)(1.0 + ((float)iMantissaCounter / 1024.0f));
+                
+                // Normalize the original values by dividing by w
+                var normalizedVertex = new Vector3() {
+                    X = vertexOriginal.X / testW,
+                    Y = vertexOriginal.Y / testW,
+                    Z = vertexOriginal.Z / testW
+                };
+
+                if (!IsResultValid(normalizedVertex))
+                    throw new Exception("Result is out range for conversin to float16");
+
+                // Convert normalized values to half-float            
+                var halfVertexNormalized = new MyHalfVector4()
+                {
+                    X = (Half)normalizedVertex.X,
+                    Y = (Half)normalizedVertex.Y,
+                    Z = (Half)normalizedVertex.Z,
+                    W = (Half)testW
+                };   
+
+                // Recover the original values by multiplying by w
+                var recoveredVertex = new Vector3() {
+                    X = (float)halfVertexNormalized.X * (float)halfVertexNormalized.W, 
+                    Y = (float)halfVertexNormalized.Y * (float)halfVertexNormalized.W, 
+                    Z = (float)halfVertexNormalized.Z * (float)halfVertexNormalized.W
+                };
+                                
+                float error =
+                    Math.Abs(vertexOriginal.X - recoveredVertex.X) +
+                    Math.Abs(vertexOriginal.Y - recoveredVertex.Y) +
+                    Math.Abs(vertexOriginal.Z - recoveredVertex.Z);
+
+                // Check if this w gives a better (smaller) error
+                if (error < currentSmallestError)
+                {
+                    currentSmallestError = error;
+                    bestValueForW = testW;
+                }
+            }
+
+            // Normalize the original values by dividing by the BEST w
+            var normalizedFinal = new Vector3()
+            {
+                X = vertexOriginal.X / bestValueForW,
+                Y = vertexOriginal.Y / bestValueForW,
+                Z = vertexOriginal.Z / bestValueForW
+            };
+
+            // Convert normalized values and W to half-float
+            var outHalfVertex = new MyHalfVector4();
+            outHalfVertex.X = (Half)normalizedFinal.X;
+            outHalfVertex.Y = (Half)normalizedFinal.Y;
+            outHalfVertex.Z = (Half)normalizedFinal.Z;
+            outHalfVertex.W = (Half)bestValueForW;
+
+            return (outHalfVertex.X, outHalfVertex.Y, outHalfVertex.Z, outHalfVertex.W);
+        }
+
+        private static bool IsResultValid(Vector3 input)
+        {
+            if (
+                (Math.Abs(input.X) == float.NaN || Math.Abs(input.X) == float.PositiveInfinity) ||
+                (Math.Abs(input.Y) == float.NaN || Math.Abs(input.Y) == float.PositiveInfinity) ||
+                (Math.Abs(input.Z) == float.NaN || Math.Abs(input.Z) == float.PositiveInfinity))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsWithingFloat16Range(Vector4 vertexOriginal)
+        {
+            if (vertexOriginal.X >= Half.MaxValue || vertexOriginal.Y >= Half.MaxValue || vertexOriginal.Z >= Half.MaxValue)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         static public byte[] CreatePositionVector4(Microsoft.Xna.Framework.Vector4 vector)
         {
             var output = new byte[8];
             ushort[] halfs = { new Half(vector.X).RawValue, new Half(vector.Y).RawValue, new Half(vector.Z).RawValue, new Half(vector.W).RawValue };
+            for (var i = 0; i < 4; i++)
+            {
+                var bytes = BitConverter.GetBytes(halfs[i]);
+                output[i * 2] = bytes[0];
+                output[i * 2 + 1] = bytes[1];
+            }
+
+            return output;
+        }
+
+        static public byte[] CreatePositionVector4ExtraPrecision(Microsoft.Xna.Framework.Vector4 vector)
+        {
+            var output = new byte[8];
+
+            var v = ConvertertVertexToHalfExtraPrecision(vector);            
+            ushort[] halfs = { v.X.RawValue, v.Y.RawValue, v.Z.RawValue, v.W.RawValue };
+
             for (var i = 0; i < 4; i++)
             {
                 var bytes = BitConverter.GetBytes(halfs[i]);
@@ -145,7 +261,7 @@ namespace Shared.GameFormats.RigidModel.Vertex
             output[1] = NormalToByte(vector.Y);
             output[2] = NormalToByte(vector.Z);
             output[3] = NormalToByte(vector.W);
-            return output;
+            return output;            
         }
     }
 }
