@@ -5,7 +5,8 @@
         <Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="Material.Icons.WPF" Version="2.1.10" />
+		<PackageReference Include="Material.Icons.WPF" Version="2.1.10" />
+		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.1" />
 	</ItemGroup>
 
   <ItemGroup>

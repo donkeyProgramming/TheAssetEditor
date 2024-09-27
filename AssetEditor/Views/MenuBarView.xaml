@@ -6,21 +6,25 @@
              xmlns:local="clr-namespace:AssetEditor.Views" 
              xmlns:viewModels="clr-namespace:AssetEditor.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="30" d:DesignWidth="800">
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
+        <Menu VerticalAlignment="Center"
+              DockPanel.Dock="Left"
+              Background="Transparent"
+              WindowChrome.IsHitTestVisibleInChrome="True">
             <Menu.Resources>
                 <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}"/>
             </Menu.Resources>
 
-            <MenuItem Header="_File">
+            <MenuItem Header="_File" BorderThickness="1.5">
                 <MenuItem Header="Open" Command="{Binding MenuBar.OpenPackFileCommand}"/>
                 <MenuItem Header="Create">
                     <MenuItem Header="New Packfile"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
                     <Separator/>
                     <MenuItem Header="New AnimPack (Warhammer 3)"  Command="{Binding MenuBar.CreateAnimPackWarhammer3Command}"/>
                     <MenuItem Header="New AnimPack (3k)"  Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
+
                 </MenuItem>
                 <MenuItem Header="Recent Files" ItemsSource="{Binding MenuBar.RecentPackFiles}">
                     <MenuItem.Style>
@@ -56,7 +60,7 @@
                 <MenuItem Header="_Exit" />
             </MenuItem>
 
-            <MenuItem Header="Reports">
+            <MenuItem Header="Reports" BorderThickness="1.5">
                 <MenuItem Header="Rmv2" Command="{Binding MenuBar.GenerateRmv2ReportCommand}"/>
                 <MenuItem Header="Meta Data" Command="{Binding MenuBar.GenerateMetaDataReportCommand}"/>
                 <MenuItem Header="File List" Command="{Binding MenuBar.GenerateFileListReportCommand}"/>
@@ -73,7 +77,7 @@
                 </MenuItem>
             </MenuItem>
 
-            <MenuItem Header="Options">
+            <MenuItem Header="Options" BorderThickness="1.5">
                 <MenuItem Header="Game">
                     <MenuItem Header="Open Game Dir"/>
                     <MenuItem Header="Open Data Dir"/>
@@ -113,7 +117,7 @@
                 <MenuItem Header="Import/Export to FBX (RME download)" Command="{Binding MenuBar.DownloadRmeCommand}" />
             </MenuItem>
 
-            <MenuItem Header="Tutorials">
+            <MenuItem Header="Tutorials" BorderThickness="1.5">
                 <MenuItem Header="[YT]AssetEditor Basics 1" Command="{Binding MenuBar.OpenAssetEdBasic0TutorialCommand}"/>
                 <MenuItem Header="[YT]AssetEditor Basics 2" Command="{Binding MenuBar.OpenAssetEdBasic1TutorialCommand}"/>
                 <MenuItem Header="[YT]Example: Skag Reskin" Command="{Binding MenuBar.OpenSkragTutorialCommand}"/>
@@ -125,11 +129,11 @@
                 <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="About">
-                <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}"/>
-                <MenuItem Header="Discord" Command="{Binding MenuBar.OpenDiscordCommand}"/>
-                <MenuItem Header="About" IsEnabled="False" Visibility="Collapsed"/>
-                <MenuItem Header="Suport me on Patreon" Command="{Binding MenuBar.OpenPatreonCommand}" Visibility="Collapsed"/>
+            <MenuItem Header="About" BorderThickness="1.5">
+                <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}" BorderThickness="1.5"/>
+                <MenuItem Header="Discord" Command="{Binding MenuBar.OpenDiscordCommand}" BorderThickness="1.5"/>
+                <MenuItem Header="About" IsEnabled="False" Visibility="Collapsed" BorderThickness="1.5"/>
+                <MenuItem Header="Suport me on Patreon" Command="{Binding MenuBar.OpenPatreonCommand}" Visibility="Collapsed" BorderThickness="1.5"/>
             </MenuItem>
         </Menu>
     </DockPanel>

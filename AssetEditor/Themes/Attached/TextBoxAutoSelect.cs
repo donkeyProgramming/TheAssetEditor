@@ -1,9 +1,11 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-namespace FramePFX.Themes.Attached {
-    public static class TextBoxAutoSelect {
+namespace AssetEditor.Themes.Attached 
+{
+    public static class TextBoxAutoSelect 
+    {
         private static readonly RoutedEventHandler Handler = ControlOnLoaded;
 
         public static readonly DependencyProperty IsEnabledProperty = DependencyProperty.RegisterAttached("IsEnabled", typeof(bool), typeof(TextBoxAutoSelect), new PropertyMetadata(false, PropertyChangedCallback));

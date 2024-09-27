@@ -8,7 +8,6 @@ using System.Windows;
 using CommonControls.BaseDialogs;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
-using Newtonsoft.Json.Linq;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;

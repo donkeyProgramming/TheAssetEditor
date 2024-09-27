@@ -5,10 +5,9 @@
              xmlns:datatemplates="clr-namespace:Shared.Ui.Common.DataTemplates;assembly=Shared.Ui">
 
     <Application.Resources >
-
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Themes/ColourDictionaries/DarkGreyTheme.xaml"/>
+                <ResourceDictionary Source="Themes/ColourDictionaries/SoftDark.xaml"/>
                 <ResourceDictionary Source="Themes/ControlColours.xaml"/>
                 <ResourceDictionary Source="Themes/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -25,8 +24,6 @@
 
             <!--Common view items-->
             <datatemplates:ViewTemplateDataSelector x:Key="ViewTemplateDataSelector" />
-
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>
