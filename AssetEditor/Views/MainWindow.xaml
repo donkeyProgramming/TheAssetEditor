@@ -215,15 +215,15 @@
                                 HorizontalContentAlignment="Right">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
-                                    <Path Data="M0,0 L8,8 M8,0 L0,8" StrokeThickness="3" VerticalAlignment="Center" Margin="5,4,0,2">
+                                    <Path Data="M0,0 L8,8 M8,0 L0,8" StrokeThickness="1.5" VerticalAlignment="Center" Margin="8,4,-4,2">
                                         <Path.Style>
                                             <Style TargetType="{x:Type Path}">
                                                 <Style.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="False">
-                                                        <Setter Property="Stroke" Value="LightGray" />
+                                                        <Setter Property="Stroke" Value="{DynamicResource Button.Disabled.Foreground}" />
                                                     </Trigger>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Stroke" Value="Red" />
+                                                        <Setter Property="Stroke" Value="{DynamicResource Button.Static.Foreground}" />
                                                     </Trigger>
                                                 </Style.Triggers>
                                             </Style>
