@@ -58,15 +58,15 @@ namespace GameWorld.Core.Services
                 CommonSpriteBatch = new SpriteBatch(_graphicsDevice);
 
                 // Load default resources
-                var mr = LoadEffect("Shaders\\Pbr\\MetalRoughness\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
+                var mr = LoadEffect("Shaders\\Pbr\\MetalRoughness\\CA_MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
                 var sg = LoadEffect("Shaders\\Pbr\\SpecGloss\\SpecGloss_main", ShaderTypes.Pbr_SpecGloss);
                 LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
                 LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
                 LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
                 DefaultFont = _content.Load<SpriteFont>("Fonts//DefaultFont");
 
-                _pbrDiffuse = _content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
-                _pbrSpecular = _content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
+                _pbrDiffuse = _content.Load<TextureCube>("textures\\phazer\\SPECULAR_RADIANCE_edited_kloppenheim_06_512x512");
+                _pbrSpecular = _content.Load<TextureCube>("textures\\phazer\\DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128");
                 _pbrLut = _content.Load<Texture2D>("textures\\phazer\\Brdf_rgba32f_raw");
 
                 mr.Parameters["tex_cube_diffuse"]?.SetValue(_pbrDiffuse);

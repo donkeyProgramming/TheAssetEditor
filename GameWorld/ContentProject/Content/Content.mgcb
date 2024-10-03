@@ -44,10 +44,16 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/LineShader.fx
 
-#begin Shaders/Pbr/MetalRoughness/MetalRoughness_main.fx
+#begin Shaders/Pbr/MetalRoughness/CA_MetalRoughness_main.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
+/build:Shaders/Pbr/MetalRoughness/CA_MetalRoughness_main.fx
+
+#begin Shaders/Pbr/MetalRoughness/MetalRoughness_main.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Debug
 /build:Shaders/Pbr/MetalRoughness/MetalRoughness_main.fx
 
 #begin Shaders/Pbr/SpecGloss/SpecGloss_main.fx
@@ -59,7 +65,7 @@
 #begin Shaders/TexturePreview.fx
 /importer:EffectImporter
 /processor:EffectProcessor
-/processorParam:DebugMode=Auto
+/processorParam:DebugMode=Debug
 /build:Shaders/TexturePreview.fx
 
 #begin Textures/Phazer/Brdf_rgba32f_raw.DDS
