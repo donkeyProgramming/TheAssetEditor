@@ -20,7 +20,6 @@ namespace AssetEditor.Views
         {
             InitializeComponent();
             SourceInitialized += OnSourceInitialized;
-            Title = $"AssetEditor v{VersionChecker.CurrentVersion}";
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)
