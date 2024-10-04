@@ -153,7 +153,7 @@ namespace AssetEditor.ViewModels
             SearchCommand = new RelayCommand(() => _uiCommandFactory.Create<DeepSearchCommand>().Execute());
 
             OpenAttilaPacksCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Attila));
-            OpenRome2RePacksCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Rome_2_Remastered));
+            OpenRome2RePacksCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.RomeRemastered));
             OpenThreeKingdomsPacksCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.ThreeKingdoms));
             OpenWarhammer2PacksCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Warhammer2));
             OpenWarhammer3PacksCommand = new RelayCommand(() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Warhammer3));

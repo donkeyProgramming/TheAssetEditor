@@ -89,7 +89,7 @@ namespace GameWorld.Core.Rendering.Materials
                 case GameTypeEnum.Attila:
                 case GameTypeEnum.Empire:
                 case GameTypeEnum.Napoleon:
-                case GameTypeEnum.Rome_2_Remastered:
+                case GameTypeEnum.RomeRemastered:
                 case GameTypeEnum.Rome_2:
                 case GameTypeEnum.Shogun_2:
                 case GameTypeEnum.Troy:

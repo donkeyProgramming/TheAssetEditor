@@ -8,6 +8,8 @@ using AssetEditor.WindowsTitleMenu;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Common;
+using CommunityToolkit.Mvvm.ComponentModel;
+
 
 namespace AssetEditor.Views
 {
@@ -16,11 +18,16 @@ namespace AssetEditor.Views
         Point _lastMouseDown;
         IEditorViewModel _draggedItem;
 
-        public MainWindow()
+        private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly GameInformationFactory _gameInformationFactory;
+
+        public MainWindow(ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
         {
+            _applicationSettingsService = applicationSettingsService;
+            _gameInformationFactory = gameInformationFactory;
+
             InitializeComponent();
             SourceInitialized += OnSourceInitialized;
-            Title = $"AssetEditor v{VersionChecker.CurrentVersion}";
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)
@@ -184,7 +191,7 @@ namespace AssetEditor.Views
 
         private void NewWindowMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var w = new MainWindow();
+            var w = new MainWindow(_applicationSettingsService, _gameInformationFactory);
             w.WindowState = WindowState.Normal;
             w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             w.Show();

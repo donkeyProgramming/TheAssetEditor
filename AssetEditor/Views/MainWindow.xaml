@@ -18,7 +18,6 @@
         Width="1280"
         Height="720"
         BorderThickness="{Binding RelativeSource={RelativeSource Mode=Self}, Path=WindowState, Converter={StaticResource windowStateToThicknessConverter}}"
-        Icon="pack://application:,,,/AssetEditorIcon.png"
         ResizeMode="CanResize"
         WindowStyle="None">
 
@@ -60,7 +59,8 @@
             Grid.Row="0"
             Grid.ColumnSpan="3"
             MinHeight="35"
-            Background="{StaticResource TitleBar.Static.Background}">
+            Background="{StaticResource TitleBar.Static.Background}"
+            WindowChrome.IsHitTestVisibleInChrome="True">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" MinWidth="40" />
@@ -78,18 +78,10 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 MouseDown="Icon_MouseDown"
-                Source="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=Icon}"
-                WindowChrome.IsHitTestVisibleInChrome="True" />
+                Source="pack://application:,,,/AssetEditor;component/AssetEditorIcon.png"/>
 
             <DockPanel Grid.Column="1" HorizontalAlignment="Stretch">
                 <views:MenuBarView/>
-                <TextBlock
-                    Margin="10,0,10,0"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=Title}"
-                    TextTrimming="CharacterEllipsis"
-                    TextWrapping="NoWrap" />
             </DockPanel>
 
             <Button
@@ -242,6 +234,10 @@
                 <ItemsPanelTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="300" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
@@ -251,15 +247,32 @@
                     </Grid>
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
-            <StatusBarItem>
+
+            <StatusBarItem Grid.Column="0">
+                <TextBlock Text="{Binding ApplicationTitle}" Margin="10, 0, 10, 2"/>
+            </StatusBarItem>
+
+            <Separator Grid.Column="1" Background="{DynamicResource StatusBar.Static.Border}" Margin="0, -1, 0, 0"/>
+
+            <StatusBarItem Grid.Column="2">
+                <TextBlock Text="{Binding CurrentGame}" Margin="10, 0, 10, 2"/>
+            </StatusBarItem>
+
+            <Separator Grid.Column="3" Background="{DynamicResource StatusBar.Static.Border}" Margin="0, -1, 0, 0"/>
+
+            <StatusBarItem Grid.Column="4">
                 <TextBlock Name="lblMemoryUsage" />
             </StatusBarItem>
-            <Separator Grid.Column="1" Background="{DynamicResource StatusBar.Static.Border}" Margin="0, -1, 0, 0"/>
-            <StatusBarItem Grid.Column="2">
-                <TextBlock Text="c:\path\of\current\file.txt"  Visibility="Collapsed"/>
+
+            <Separator Grid.Column="5" Background="{DynamicResource StatusBar.Static.Border}" Margin="0, -1, 0, 0"/>
+
+            <StatusBarItem Grid.Column="6">
+                <TextBlock Text="c:\path\of\current\file.txt" Visibility="Collapsed"/>
             </StatusBarItem>
-            <Separator Grid.Column="3" Background="{DynamicResource StatusBar.Static.Border}" Margin="0, -1, 0, 0"/>
-            <StatusBarItem Grid.Column="4">
+
+            <Separator Grid.Column="7" Background="{DynamicResource StatusBar.Static.Border}" Margin="0, -1, 0, 0"/>
+
+            <StatusBarItem Grid.Column="8">
                 <ProgressBar Value="50" Width="90" Height="16" Visibility="Collapsed"/>
             </StatusBarItem>
         </StatusBar>

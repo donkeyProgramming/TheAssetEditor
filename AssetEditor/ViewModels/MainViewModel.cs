@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Events;
 using Shared.Core.Misc;
@@ -16,7 +17,7 @@ using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {
-    public class MainViewModel : NotifyPropertyChangedImpl, IDropTarget<IEditorViewModel, bool>
+    public partial class MainViewModel : ObservableObject, IDropTarget<IEditorViewModel, bool>
     {
         private readonly PackFileService _packfileService;
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -27,36 +28,21 @@ namespace AssetEditor.ViewModels
         public IToolFactory ToolsFactory { get; set; }
         public ObservableCollection<IEditorViewModel> CurrentEditorsList { get; set; } = new ObservableCollection<IEditorViewModel>();
 
-        int _selectedEditorIndex;
-        public int SelectedEditorIndex { get => _selectedEditorIndex; set => SetAndNotify(ref _selectedEditorIndex, value); }
+        [ObservableProperty] private int _selectedEditorIndex;
+
+        [ObservableProperty] private bool _isClosingWithoutPrompt;
 
         public ICommand CloseToolCommand { get; set; }
         public ICommand CloseOtherToolsCommand { get; set; }
         public ICommand ClosingCommand { get; set; }
-
-        private bool _isClosingWithoutPrompt;
-        public bool IsClosingWithoutPrompt
-        {
-            get => _isClosingWithoutPrompt;
-            set
-            {
-                _isClosingWithoutPrompt = value;
-                NotifyPropertyChanged();
-            }
-        }
-
         public ICommand CloseAllToolsCommand { get; set; }
         public ICommand CloseToolsToRightCommand { get; set; }
         public ICommand CloseToolsToLeftCommand { get; set; }
 
-        public string ApplicationTitle { get; set; }
+        [ObservableProperty] private string _applicationTitle;
+        [ObservableProperty] private string _currentGame;
 
-        public MainViewModel( MenuBarViewModel menuViewModel,
-            PackFileService packfileService,
-            IToolFactory toolFactory,
-            IUiCommandFactory uiCommandFactory,
-            IExportFileContextMenuHelper exportFileContextMenuHelper,
-            ApplicationSettingsService applicationSettingsService)
+        public MainViewModel(MenuBarViewModel menuViewModel, PackFileService packfileService, IToolFactory toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
         {
             MenuBar = menuViewModel;
             _uiCommandFactory = uiCommandFactory;
@@ -76,7 +62,9 @@ namespace AssetEditor.ViewModels
 
             ToolsFactory = toolFactory;
 
-            ApplicationTitle = $"AssetEditor v{VersionChecker.CurrentVersion} - {applicationSettingsService.CurrentSettings.CurrentGame}";
+            // Set ApplicationTitle using the setter
+            ApplicationTitle = $"AssetEditor v{VersionChecker.CurrentVersion}";
+            CurrentGame = gameInformationFactory.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame).DisplayName;
         }
 
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
@@ -90,7 +78,7 @@ namespace AssetEditor.ViewModels
 
             var hasUnsavedPackFiles = FileTree.Files.Any(node => node.UnsavedChanged);
 
-            if ( !(hasUnsavedPackFiles || hasUnsavedEditorChanges) )
+            if (!(hasUnsavedPackFiles || hasUnsavedEditorChanges))
             {
                 IsClosingWithoutPrompt = true;
                 return;
@@ -127,7 +115,7 @@ namespace AssetEditor.ViewModels
         {
             if (tool is ISaveableEditor saveableEditor && saveableEditor.HasUnsavedChanges)
             {
-                if (MessageBox.Show("Unsaved changed - Are you sure?", "Close", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
+                if (MessageBox.Show("Unsaved changes - Are you sure?", "Close", MessageBoxButton.OKCancel) == MessageBoxResult.Cancel)
                     return;
             }
 
@@ -150,7 +138,6 @@ namespace AssetEditor.ViewModels
         {
             foreach (var editorViewModel in CurrentEditorsList)
                 CloseTool(editorViewModel);
-
         }
 
         void CloseToolsToLeft(IEditorViewModel tool)
@@ -158,7 +145,7 @@ namespace AssetEditor.ViewModels
             var index = CurrentEditorsList.IndexOf(tool);
             for (int i = index - 1; i >= 0; i--)
             {
-                CloseTool(CurrentEditorsList[0]);
+                CloseTool(CurrentEditorsList[i]);
             }
         }
 
@@ -171,12 +158,12 @@ namespace AssetEditor.ViewModels
             }
         }
 
-        public bool AllowDrop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default) => true;
+        public bool AllowDrop(IEditorViewModel node, IEditorViewModel targetNode = default, bool insertAfterTargetNode = default) => true;
 
-        public bool Drop(IEditorViewModel node, IEditorViewModel targeNode = default, bool insertAfterTargetNode = default)
+        public bool Drop(IEditorViewModel node, IEditorViewModel targetNode = default, bool insertAfterTargetNode = default)
         {
             var nodeIndex = CurrentEditorsList.IndexOf(node);
-            var targetNodeIndex = CurrentEditorsList.IndexOf(targeNode);
+            var targetNodeIndex = CurrentEditorsList.IndexOf(targetNode);
 
             if (Math.Abs(nodeIndex - targetNodeIndex) == 1) // if tabs next to each other switch places
             {

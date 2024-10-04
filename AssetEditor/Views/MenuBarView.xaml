@@ -118,22 +118,17 @@
             </MenuItem>
 
             <MenuItem Header="Tutorials" BorderThickness="1.5">
-                <MenuItem Header="[YT]AssetEditor Basics 1" Command="{Binding MenuBar.OpenAssetEdBasic0TutorialCommand}"/>
-                <MenuItem Header="[YT]AssetEditor Basics 2" Command="{Binding MenuBar.OpenAssetEdBasic1TutorialCommand}"/>
-                <MenuItem Header="[YT]Example: Skag Reskin" Command="{Binding MenuBar.OpenSkragTutorialCommand}"/>
-                <MenuItem Header="[YT]Example: Tzar Guard with gun" Command="{Binding MenuBar.OpenTzarGuardTutorialCommand}"/>
-                <MenuItem Header="[YT]Example: Kostaltyn Reskin" Command="{Binding MenuBar.OpenKostalynTutorialCommand}"/>
-                <MenuItem Header="[YT]Animated Prop and custom Animation Packs" Command="{Binding MenuBar.OpenAnimatedPropTutorialCommand}"/>
-                <Separator/>
-                <MenuItem Header="Ask questions - Discord community" Command="{Binding MenuBar.OpenDiscordCommand}"/>
-                <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}"/>
+                <MenuItem Header="YouTube AssetEditor Basics 1" Command="{Binding MenuBar.OpenAssetEdBasic0TutorialCommand}"/>
+                <MenuItem Header="YouTube AssetEditor Basics 2" Command="{Binding MenuBar.OpenAssetEdBasic1TutorialCommand}"/>
+                <MenuItem Header="YouTube Example: Skag Reskin" Command="{Binding MenuBar.OpenSkragTutorialCommand}"/>
+                <MenuItem Header="YouTube Example: Tzar Guard with gun" Command="{Binding MenuBar.OpenTzarGuardTutorialCommand}"/>
+                <MenuItem Header="YouTube Example: Kostaltyn Reskin" Command="{Binding MenuBar.OpenKostalynTutorialCommand}"/>
+                <MenuItem Header="YouTube Animated Prop and custom Animation Packs" Command="{Binding MenuBar.OpenAnimatedPropTutorialCommand}"/>
             </MenuItem>
 
             <MenuItem Header="About" BorderThickness="1.5">
                 <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}" BorderThickness="1.5"/>
                 <MenuItem Header="Discord" Command="{Binding MenuBar.OpenDiscordCommand}" BorderThickness="1.5"/>
-                <MenuItem Header="About" IsEnabled="False" Visibility="Collapsed" BorderThickness="1.5"/>
-                <MenuItem Header="Suport me on Patreon" Command="{Binding MenuBar.OpenPatreonCommand}" Visibility="Collapsed" BorderThickness="1.5"/>
             </MenuItem>
         </Menu>
     </DockPanel>
