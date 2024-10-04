@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
@@ -14,9 +10,6 @@ using Shared.Ui.Common;
 
 namespace CommonControls.PackFileBrowser
 {
-    /// <summary>
-    /// Interaction logic for PackFileBrowserView.xaml
-    /// </summary>
     public partial class PackFileBrowserView : UserControl
     {
         public PackFileBrowserView()
@@ -43,6 +36,27 @@ namespace CommonControls.PackFileBrowser
         }
         Point _lastMouseDown;
         TreeNode _draggedItem;
+
+        private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) && e.Key == Key.F)
+            {
+                FilterTextBoxItem.Focus();
+                FilterTextBoxItem.SelectAll();
+
+                e.Handled = true;
+            }
+        }
+
+        public void TriggerPreviewKeyDown()
+        {
+            var args = new KeyEventArgs(InputManager.Current.PrimaryKeyboardDevice, PresentationSource.FromVisual(this), 0, Key.F)
+            {
+                RoutedEvent = Keyboard.PreviewKeyDownEvent
+            };
+
+            UserControl_PreviewKeyDown(this, args);
+        }
 
         private void treeView_MouseMove(object sender, MouseEventArgs e)
         {

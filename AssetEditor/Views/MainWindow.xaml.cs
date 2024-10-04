@@ -5,11 +5,10 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using AssetEditor.WindowsTitleMenu;
+using CommonControls.PackFileBrowser;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Common;
-using CommunityToolkit.Mvvm.ComponentModel;
-
 
 namespace AssetEditor.Views
 {
@@ -28,6 +27,30 @@ namespace AssetEditor.Views
 
             InitializeComponent();
             SourceInitialized += OnSourceInitialized;
+
+            this.KeyDown += MainWindow_KeyDown;
+        }
+
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Check if Ctrl and Shift are pressed along with F
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                {
+                    if (e.Key == Key.F)
+                    {
+                        // Find the PackFileBrowserView in your MainWindow's visual tree
+                        var packFileBrowserView = FindChild<PackFileBrowserView>(this);
+
+                        if (packFileBrowserView != null)
+                        {
+                            // Call the method to trigger UserControl_PreviewKeyDown
+                            packFileBrowserView.TriggerPreviewKeyDown();
+                        }
+                    }
+                }
+            }
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)
@@ -237,6 +260,25 @@ namespace AssetEditor.Views
                 point.Y += Top;
             }
             SystemCommands.ShowSystemMenu(this, point);
+        }
+
+        private static T FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T typedChild)
+                {
+                    return typedChild;
+                }
+
+                var childOfChild = FindChild<T>(child);
+                if (childOfChild != null)
+                {
+                    return childOfChild;
+                }
+            }
+            return null;
         }
     }
 }

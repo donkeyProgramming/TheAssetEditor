@@ -11,14 +11,14 @@
     <DockPanel>
         <Menu VerticalAlignment="Center"
               DockPanel.Dock="Left"
-              Background="Transparent"
-              WindowChrome.IsHitTestVisibleInChrome="True">
+              Background="Transparent">
             <Menu.Resources>
                 <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}"/>
             </Menu.Resources>
 
-            <MenuItem Header="_File" BorderThickness="1.5">
+            <MenuItem Header="_File" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
                 <MenuItem Header="Open" Command="{Binding MenuBar.OpenPackFileCommand}"/>
+                
                 <MenuItem Header="Create">
                     <MenuItem Header="New Packfile"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
                     <Separator/>
@@ -26,6 +26,7 @@
                     <MenuItem Header="New AnimPack (3k)"  Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
 
                 </MenuItem>
+                
                 <MenuItem Header="Recent Files" ItemsSource="{Binding MenuBar.RecentPackFiles}">
                     <MenuItem.Style>
                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
@@ -47,20 +48,24 @@
                         </HierarchicalDataTemplate>
                     </MenuItem.ItemTemplate>
                 </MenuItem>
+                
                 <Separator/>
+                
                 <MenuItem Header="Load all game packfiles">
-                    <MenuItem Header="Atilla" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
-                    <MenuItem Header="Rome2 Remastered" Command="{Binding MenuBar.OpenRome2RePacksCommand}"/>
-                    <MenuItem Header="Three Kingdoms" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
-                    <MenuItem Header="Warhammer 2" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>
-                    <MenuItem Header="Warhammer 3" Command="{Binding MenuBar.OpenWarhammer3PacksCommand}"/>
-                    <MenuItem Header="Troy" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
+                    <MenuItem Header="Total War: Attila" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
+                    <MenuItem Header="Total War: Rome Remastered" Command="{Binding MenuBar.OpenRome2RePacksCommand}"/>
+                    <MenuItem Header="Total War: Three Kingdoms" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
+                    <MenuItem Header="Total War: Warhammer II" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>
+                    <MenuItem Header="Total War: Warhammer III" Command="{Binding MenuBar.OpenWarhammer3PacksCommand}"/>
+                    <MenuItem Header="Total War: Troy" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
                 </MenuItem>
+                
                 <Separator/>
+                
                 <MenuItem Header="_Exit" />
             </MenuItem>
 
-            <MenuItem Header="Reports" BorderThickness="1.5">
+            <MenuItem Header="Reports" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
                 <MenuItem Header="Rmv2" Command="{Binding MenuBar.GenerateRmv2ReportCommand}"/>
                 <MenuItem Header="Meta Data" Command="{Binding MenuBar.GenerateMetaDataReportCommand}"/>
                 <MenuItem Header="File List" Command="{Binding MenuBar.GenerateFileListReportCommand}"/>
@@ -77,7 +82,7 @@
                 </MenuItem>
             </MenuItem>
 
-            <MenuItem Header="Options" BorderThickness="1.5">
+            <MenuItem Header="Options" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
                 <MenuItem Header="Game">
                     <MenuItem Header="Open Game Dir"/>
                     <MenuItem Header="Open Data Dir"/>
@@ -86,7 +91,7 @@
                 <MenuItem Header="Settings" Command="{Binding MenuBar.OpenSettingsWindowCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="Tools">
+            <MenuItem Header="Tools" WindowChrome.IsHitTestVisibleInChrome="True">
                 <MenuItem Header="Mount animation editor" Command="{Binding MenuBar.OpenMountCreatorCommand}"/>
                 <MenuItem Header="Campaign animation converter" Command="{Binding MenuBar.OpenCampaignAnimCreatorCommand}" IsEnabled="False"/>
                 <MenuItem Header="Animation Transfer Tool" Command="{Binding MenuBar.OpenAnimationTransferToolCommand}" IsEnabled="False" />
@@ -117,7 +122,7 @@
                 <MenuItem Header="Import/Export to FBX (RME download)" Command="{Binding MenuBar.DownloadRmeCommand}" />
             </MenuItem>
 
-            <MenuItem Header="Tutorials" BorderThickness="1.5">
+            <MenuItem Header="Tutorials" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
                 <MenuItem Header="YouTube AssetEditor Basics 1" Command="{Binding MenuBar.OpenAssetEdBasic0TutorialCommand}"/>
                 <MenuItem Header="YouTube AssetEditor Basics 2" Command="{Binding MenuBar.OpenAssetEdBasic1TutorialCommand}"/>
                 <MenuItem Header="YouTube Example: Skag Reskin" Command="{Binding MenuBar.OpenSkragTutorialCommand}"/>
@@ -126,7 +131,7 @@
                 <MenuItem Header="YouTube Animated Prop and custom Animation Packs" Command="{Binding MenuBar.OpenAnimatedPropTutorialCommand}"/>
             </MenuItem>
 
-            <MenuItem Header="About" BorderThickness="1.5">
+            <MenuItem Header="About" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
                 <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}" BorderThickness="1.5"/>
                 <MenuItem Header="Discord" Command="{Binding MenuBar.OpenDiscordCommand}" BorderThickness="1.5"/>
             </MenuItem>

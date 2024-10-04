@@ -326,11 +326,11 @@ namespace Shared.Core.PackFiles
                     }
                     else
                     {
-                        _logger.Here().Warning($"Ca packfile '{path}' not found, loading skipped");
+                        _logger.Here().Warning($"CA packfile '{path}' not found, loading skipped");
                     }
                 }
 
-                var caPackFileContainer = new PackFileContainer("All CA packs - " + gameName);
+                var caPackFileContainer = new PackFileContainer($"Game Files - {gameName}");
                 caPackFileContainer.IsCaPackFile = true;
                 var packFilesOrderedByGroup = packList
                     .GroupBy(x => x.Header.LoadOrder)
@@ -348,7 +348,7 @@ namespace Shared.Core.PackFiles
             }
             catch (Exception e)
             {
-                _logger.Here().Error($"Trying to all ca packs in {gameDataFolder}. Error : {e.ToString()}");
+                _logger.Here().Error($"Trying to get all CA packs in {gameDataFolder}. Error : {e.ToString()}");
                 return false;
             }
 
