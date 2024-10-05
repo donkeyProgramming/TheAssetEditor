@@ -2,14 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <!-- These are what controls in Controls.xaml use. Instead of having say RedBlackTheme stuff in a separate file -->
     <!-- You could put them all in here (or copy this file and edit) for more customisation (e.g "material design accents" maybe) -->
-
     <!-- The letter A is in front of the colours themselves, because it's annoying having to scroll down in visual studio's designer to "Colour" or "Brush" -->
 
-    <!-- If you fancy going the JetBrains GUI way, where the main UI is just crammed with a single 1px border, then you can use these -->
-    <SolidColorBrush x:Key="PanelBorderBrush" Color="{DynamicResource AColour.Tone1.Border.Static}"/>
-    <SolidColorBrush x:Key="PanelBackground1" Color="{DynamicResource AColour.Tone1.Background.Static}"/>
-    <SolidColorBrush x:Key="PanelBackground2" Color="{DynamicResource AColour.Tone2.Background.Static}"/>
-    <SolidColorBrush x:Key="PanelBackground3" Color="{DynamicResource AColour.Tone3.Background.Static}"/>
+    <SolidColorBrush x:Key="App.Background" Color="{DynamicResource AColour.Tone3.Background.Static}"/>
 
     <SolidColorBrush x:Key="Button.Static.Background"                      Color="{DynamicResource AColour.Tone5.Background.Static}"/>
     <SolidColorBrush x:Key="Button.Static.Border"                          Color="{DynamicResource AColour.Tone5.Border.Selected}"/>
@@ -221,7 +216,7 @@
     <SolidColorBrush x:Key="StatusBar.Static.Background"             Color="{DynamicResource AColour.Tone5.Background.Static}"/>
     <SolidColorBrush x:Key="StatusBar.Static.Border"                 Color="{DynamicResource AColour.Tone6.Border.Static}"/>
 
-    <SolidColorBrush x:Key="ToolBarTrayBackground"                   Color="{DynamicResource AColour.Tone2.Background.Static}"/>
+    <SolidColorBrush x:Key="ToolBarTrayBackground"                   Color="{DynamicResource AColour.Tone4.Background.Static}"/>
     <SolidColorBrush x:Key="ToolBarHorizontalBackground"             Color="{DynamicResource AColour.Tone5.Background.Static}"/>
     <SolidColorBrush x:Key="ToolBarHorizontalBorder"                 Color="{DynamicResource AColour.Tone5.Border.Static}"/>
     <SolidColorBrush x:Key="ToolBarToggleButtonHorizontalBackground" Color="{DynamicResource AColour.Tone6.Background.Static}"/>
@@ -280,8 +275,8 @@
     <SolidColorBrush x:Key="Window.Static.Foreground"                 Color="{DynamicResource AColour.Foreground.Static}"/>
     <SolidColorBrush x:Key="Window.Static.Title.Background"           Color="{DynamicResource AColour.Tone3.Border.Static}"/>
 
-    <SolidColorBrush x:Key="TitleBar.Static.Background"               Color="{DynamicResource AColour.Tone4.Background.Static}"/>
-    <SolidColorBrush x:Key="TitleBar.Button.Background"               Color="{DynamicResource AColour.Tone4.Background.Static}"/>
+    <SolidColorBrush x:Key="TitleBar.Static.Background"               Color="{DynamicResource AColour.Tone3.Background.Static}"/>
+    <SolidColorBrush x:Key="TitleBar.Button.Background"               Color="{DynamicResource AColour.Tone3.Background.Static}"/>
     <SolidColorBrush x:Key="TitleBar.Button.Foreground"               Color="{DynamicResource AColour.Foreground.Static}"/>
     <SolidColorBrush x:Key="TitleBar.Button.MouseOver.Background"     Color="{DynamicResource AColour.Tone5.Background.MouseOver}"/>
     <SolidColorBrush x:Key="TitleBar.Button.MouseOver.Foreground"     Color="{DynamicResource AColour.Foreground.Static}"/>
