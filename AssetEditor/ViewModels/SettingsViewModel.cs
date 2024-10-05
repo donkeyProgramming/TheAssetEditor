@@ -1,15 +1,17 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using Shared.Core.Misc;
-using Shared.Core.Services;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Xna.Framework;
+using Shared.Core.Misc;
+using Shared.Core.Services;
 
 namespace AssetEditor.ViewModels
 {
-    class SettingsViewModel : NotifyPropertyChangedImpl
+    partial class SettingsViewModel : NotifyPropertyChangedImpl
     {
         public ObservableCollection<GamePathItem> GameDirectores { get; set; } = new ObservableCollection<GamePathItem>();
 
@@ -28,13 +30,8 @@ namespace AssetEditor.ViewModels
         bool _LoadWemFiles;
         public bool LoadWemFiles { get => _LoadWemFiles; set => SetAndNotify(ref _LoadWemFiles, value); }
 
-
         string _wwisepath;
         public string WwisePath { get => _wwisepath; set => SetAndNotify(ref _wwisepath, value); }
-
-
-        public ICommand SaveCommand { get; set; }
-        public ICommand BrowseCommand { get; set; }
 
         private readonly ApplicationSettingsService _settingsService;
 
@@ -42,12 +39,12 @@ namespace AssetEditor.ViewModels
         {
             _settingsService = settingsService;
 
-            foreach (var game in gameInformationFactory.Games)
+            foreach (var game in gameInformationFactory.Games.OrderBy(g => g.DisplayName))
             {
                 GameDirectores.Add(
                     new GamePathItem()
                     {
-                        GameName = game.DisplayName,
+                        GameName = $"{game.DisplayName} Data Location",
                         GameType = game.Type,
                         Path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type)?.Path
                     });
@@ -59,12 +56,9 @@ namespace AssetEditor.ViewModels
             AutoGenerateAttachmentPointsFromMeshes = _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes;
             LoadWemFiles = _settingsService.CurrentSettings.LoadWemFiles;
             WwisePath = _settingsService.CurrentSettings.WwisePath;
-
-            SaveCommand = new RelayCommand(OnSave);
-            BrowseCommand = new RelayCommand(OnBrowse);
         }
 
-        void OnSave()
+        [RelayCommand] private void Save()
         {
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
             _settingsService.CurrentSettings.UseTextEditorForUnknownFiles = UseTextEditorForUnknownFiles;
@@ -81,7 +75,7 @@ namespace AssetEditor.ViewModels
             MessageBox.Show("Please restart the tool after updating settings!");
         }
 
-        void OnBrowse()
+        [RelayCommand] private void Browse()
         {
             var dialog = new OpenFileDialog();
             dialog.Filter = "Executable files (*.exe)|*.exe";

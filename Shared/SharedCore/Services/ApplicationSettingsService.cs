@@ -44,7 +44,7 @@ namespace Shared.Core.Services
 
         public bool AllowSettingsUpdate { get; set; } = false;
 
-        string SettingsFile
+        public static string SettingsFile
         {
             get
             {

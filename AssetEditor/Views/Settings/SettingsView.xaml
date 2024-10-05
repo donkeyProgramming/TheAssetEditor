@@ -6,24 +6,66 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
              xmlns:gameinfo="clr-namespace:Shared.Core.Services;assembly=Shared.Core" 
              xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:local="clr-namespace:AssetEditor.Views.Settings" xmlns:viewmodels="clr-namespace:AssetEditor.ViewModels" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:SettingsViewModel}"
              mc:Ignorable="d" >
+
     <UserControl.Resources>
         <ObjectDataProvider x:Key="GameTypeEnums" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="gameinfo:GameTypeEnum"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+
+        <local:GameTypeEnumConverter x:Key="GameTypeEnumConverter"/>
+        <DataTemplate x:Key="EnumToStringTemplate">
+            <TextBlock Text="{Binding Converter={StaticResource GameTypeEnumConverter}}"/>
+        </DataTemplate>
     </UserControl.Resources>
 
-    <Grid Height="auto" Width="auto">
+    <Grid Height="Auto" Width="Auto" Margin="5,0,0,0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <GroupBox Grid.Row="0" Header="Game Directories" Grid.ColumnSpan="2">
-            <ItemsControl ItemsSource="{Binding GameDirectores}">
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="Game Files" Margin="5, 5, 0, 0" FontSize="15"/>
+            <Separator Grid.Row="1" Height="1" Background="{DynamicResource Border.Border}" Margin="5, 5, 8, 10"/>
+
+            <Grid Grid.Row="2" Margin="0, 0, 0, 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Game" Margin="5, 0, 0, 5"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Width="150" Margin="0, 0, 0, 5" SelectedItem="{Binding CurrentGame, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                          ItemsSource="{Binding Source={StaticResource GameTypeEnums}}" ItemTemplate="{StaticResource EnumToStringTemplate}"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Load game files" Margin="5, 0, 0, 0"/>
+                <CheckBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" IsChecked="{Binding LoadCaPacksByDefault, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            </Grid>
+
+            <ItemsControl Grid.Row="5" ItemsSource="{Binding GameDirectores}" >
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
                         <Setter Property="VerticalAlignment" Value="Stretch" />
@@ -31,83 +73,53 @@
                     </Style >
                 </ItemsControl.ItemContainerStyle>
 
-                <ItemsControl.ItemTemplate>
+                <ItemsControl.ItemTemplate >
                     <DataTemplate>
-                        <Grid>
+                        <Grid Margin="0, 0, 0, 5">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="500"/>
-                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="600"/>
+                                <ColumnDefinition Width="40"/>
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0" Text="{Binding GameName}"/>
-                            <TextBox Grid.Column="1" 
-                                     Text="{Binding Path}" 
-                                     behaviors:TextBoxExtensions.Watermark="Path to data folder"
-                                     IsReadOnly="True"/>
-                            <Button Grid.Column="2" Content="..." Command="{Binding BrowseCommand}"/>
+                            <TextBlock Grid.Column="0" Text="{Binding GameName}" Margin="5, 0, 0, 0"/>
+                            <TextBox Grid.Column="1"
+                                        Style="{StaticResource HintedTextBox}"                                     
+                                        Text="{Binding Path}" 
+                                        Tag='Browse for game data location e.g. "C:\SteamLibrary\steamapps\common\Total War WARHAMMER III\data"'
+                                        IsReadOnly="True"
+                                        Padding="2.5, 0, 0, 0"/>
+                            <Button Grid.Column="2" Content="..." Command="{Binding BrowseCommand}" Margin="5, 0, 5, 0"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </GroupBox>
+        </Grid>
 
-        <GroupBox Grid.Row="1" Header="Audio Modding" Grid.ColumnSpan="2">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="500"/>
-                    <ColumnDefinition Width="50"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="605"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,437,16" Grid.RowSpan="2"><Run Text="Wwise"/><Run Language="en-gb" Text="CLI I"/><Run Text="nstallation Location"/></TextBlock>
-                <TextBox Grid.Row="0" Grid.Column="1" 
-                    Text="{Binding WwisePath}"
-                    behaviors:TextBoxExtensions.Watermark="Path to WwiseCLI.exe"
-                    IsReadOnly="True" Margin="63,0,0,16" Grid.RowSpan="2"/>
-                <Button Grid.Column="2" Content="..." Command="{Binding BrowseCommand}"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Load audio (.wem) files" Grid.ColumnSpan="2" Margin="0,0,476,0"/>
-                <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding LoadWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="24,0,0,0"/>
-            </Grid>
-        </GroupBox>
+            <TextBlock Grid.Row="0" Text="Audio Modding" Margin="5, 5, 0, 0" FontSize="15"/>
+            <Separator Grid.Row="1" Grid.ColumnSpan="3" Height="1" Background="{DynamicResource Border.Border}" Margin="5, 5, 0, 10"/>
 
-        <GroupBox Grid.Row="2" Header="Other" Margin="0,5,0,5" Grid.ColumnSpan="2">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Wwise CLI Location" Margin="5, 0, 0, 0"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource HintedTextBox}" Text="{Binding WwisePath}" 
+                     Tag='e.g. "C:\Program Files (x86)\Audiokinetic\Wwise2019.2.15.7667\Authoring\x64\Release\bin\WwiseCLI.exe"' IsReadOnly="True" Margin="0, 0, 5, 5" Padding="2.5, 0, 0, 0"/>
+            <Button Grid.Row="2" Grid.Column="2" Content="..." Command="{Binding BrowseCommand}" Margin="0, 0, 0, 5"/>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Current Game"/>
-                <ComboBox Grid.Row="0" Grid.Column="2" Width="100"
-                    SelectedItem="{Binding CurrentGame, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    ItemsSource="{Binding Source={StaticResource GameTypeEnums}}"/>
-
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Use TextEditor for unknown files"/>
-                <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding UseTextEditorForUnknownFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Load CA packs by default"/>
-                <CheckBox Grid.Row="2" Grid.Column="2" IsChecked="{Binding LoadCaPacksByDefault, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Autogene attachment points for meshes"/>
-                <CheckBox Grid.Row="3" Grid.Column="2" IsChecked="{Binding AutoGenerateAttachmentPointsFromMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-            </Grid>
-        </GroupBox>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Load audio (.wem) files" Margin="5, 0, 0, 0"/>
+            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding LoadWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="0, 0, 0, 5"/>
+        </Grid>
     </Grid>
 </UserControl>
