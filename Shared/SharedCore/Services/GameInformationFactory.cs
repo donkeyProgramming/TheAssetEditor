@@ -12,7 +12,7 @@
         Shogun_2,
         ThreeKingdoms,
         ThronesOfBritannia,
-        Warhammer1,
+        Warhammer,
         Warhammer2,
         Warhammer3,
         Troy,
@@ -41,20 +41,42 @@
 
         public GameInformationFactory()
         {
-            Warhammer = new GameInformation() { Type = GameTypeEnum.Warhammer1, DisplayName = "Total War: Warhammer", DefaultPackType = "PFH4", ShortID = "warhammer" };
-            Warhammer2 = new GameInformation() { Type = GameTypeEnum.Warhammer2, DisplayName = "Total War: Warhammer II", DefaultPackType = "PFH5", ShortID = "warhammer2" };
-            Warhammer3 = new GameInformation() { Type = GameTypeEnum.Warhammer3, DisplayName = "Total War: Warhammer III", DefaultPackType = "PFH5", ShortID = "warhammer3" };
-            Troy = new GameInformation() { Type = GameTypeEnum.Troy, DisplayName = "Total War: Troy", DefaultPackType = "PFH5", ShortID = "troy" };
-            ThreeKingdoms = new GameInformation() { Type = GameTypeEnum.ThreeKingdoms, DisplayName = "Total War: Three Kingdoms", DefaultPackType = "PFH5", ShortID = "ThreeKingdoms" };
-            RomeRemastered = new GameInformation() { Type = GameTypeEnum.RomeRemastered, DisplayName = "Total War: Rome Remastered", DefaultPackType = "PFH5", ShortID = "RomeRemastered" };
-            Attila = new GameInformation() { Type = GameTypeEnum.Attila, DisplayName = "Total War: Attila", DefaultPackType = "PFH5", ShortID = "Attila" };
-            Pharaoh = new GameInformation() { Type = GameTypeEnum.Pharaoh, DisplayName = "Total War: Pharaoh", DefaultPackType = "PFH5", ShortID = "Pharaoh" };
+            Warhammer = new GameInformation() { Type = GameTypeEnum.Warhammer, DisplayName = "Warhammer", DefaultPackType = "PFH4", ShortID = "Warhammer" };
+            Warhammer2 = new GameInformation() { Type = GameTypeEnum.Warhammer2, DisplayName = "Warhammer II", DefaultPackType = "PFH5", ShortID = "WarhammerII" };
+            Warhammer3 = new GameInformation() { Type = GameTypeEnum.Warhammer3, DisplayName = "Warhammer III", DefaultPackType = "PFH5", ShortID = "WarhammerIII" };
+            Troy = new GameInformation() { Type = GameTypeEnum.Troy, DisplayName = "Troy", DefaultPackType = "PFH5", ShortID = "troy" };
+            ThreeKingdoms = new GameInformation() { Type = GameTypeEnum.ThreeKingdoms, DisplayName = "Three Kingdoms", DefaultPackType = "PFH5", ShortID = "ThreeKingdoms" };
+            RomeRemastered = new GameInformation() { Type = GameTypeEnum.RomeRemastered, DisplayName = "Rome Remastered", DefaultPackType = "PFH5", ShortID = "RomeRemastered" };
+            Attila = new GameInformation() { Type = GameTypeEnum.Attila, DisplayName = "Attila", DefaultPackType = "PFH5", ShortID = "Attila" };
+            Pharaoh = new GameInformation() { Type = GameTypeEnum.Pharaoh, DisplayName = "Pharaoh", DefaultPackType = "PFH5", ShortID = "Pharaoh" };
             Games = [Warhammer, Warhammer2, Warhammer3, Troy, ThreeKingdoms, RomeRemastered, Attila, Pharaoh];
         }
 
         public GameInformation GetGameById(GameTypeEnum type)
         {
             return Games.First(x => x.Type == type);
+        }
+
+        public static string GetStringFromGameTypeEnum(GameTypeEnum game)
+        {
+            return game switch
+            {
+                GameTypeEnum.Unknown => "Unknown",
+                GameTypeEnum.Arena => "Arena",
+                GameTypeEnum.Attila => "Attila",
+                GameTypeEnum.Empire => "Empire",
+                GameTypeEnum.Napoleon => "Napoleon",
+                GameTypeEnum.RomeRemastered => "Rome Remastered",
+                GameTypeEnum.Rome_2 => "Rome 2",
+                GameTypeEnum.Shogun_2 => "Shogun 2",
+                GameTypeEnum.ThreeKingdoms => "Three Kingdoms",
+                GameTypeEnum.ThronesOfBritannia => "Thrones of Britannia",
+                GameTypeEnum.Warhammer => "Warhammer",
+                GameTypeEnum.Warhammer2 => "Warhammer II",
+                GameTypeEnum.Warhammer3 => "Warhammer III",
+                GameTypeEnum.Troy => "Troy",
+                GameTypeEnum.Pharaoh => "Pharaoh",
+            };
         }
     }
 }

@@ -95,7 +95,7 @@ namespace GameWorld.Core.Rendering.Materials
                 case GameTypeEnum.Troy:
                 case GameTypeEnum.Pharaoh:
                 case GameTypeEnum.ThronesOfBritannia:
-                case GameTypeEnum.Warhammer1:
+                case GameTypeEnum.Warhammer:
                 case GameTypeEnum.Warhammer2:
                     return [CapabilityMaterialsEnum.SpecGlossPbr_Default, CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal];
                 
