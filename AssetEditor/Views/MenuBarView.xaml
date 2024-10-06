@@ -17,17 +17,16 @@
             </Menu.Resources>
 
             <MenuItem Header="_File" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="Open" Command="{Binding MenuBar.OpenPackFileCommand}"/>
-                
-                <MenuItem Header="Create">
-                    <MenuItem Header="New Packfile"  Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
-                    <Separator/>
-                    <MenuItem Header="New AnimPack (Warhammer 3)"  Command="{Binding MenuBar.CreateAnimPackWarhammer3Command}"/>
-                    <MenuItem Header="New AnimPack (3k)"  Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
 
-                </MenuItem>
+                <MenuItem Header="New Pack" Command="{Binding MenuBar.CreateNewPackFileCommand}"/>
+                <MenuItem Header="New AnimPack (Warhammer III)" Command="{Binding MenuBar.CreateAnimPackWarhammer3Command}"/>
+                <MenuItem Header="New AnimPack (Three Kingdoms)" Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
+
+                <Separator/>
+
+                <MenuItem Header="Open Pack" Command="{Binding MenuBar.OpenPackFileCommand}"/>
                 
-                <MenuItem Header="Recent Files" ItemsSource="{Binding MenuBar.RecentPackFiles}">
+                <MenuItem Header="Open Recent Packs" ItemsSource="{Binding MenuBar.RecentPackFiles}">
                     <MenuItem.Style>
                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
                             <Style.Triggers>
@@ -49,20 +48,45 @@
                     </MenuItem.ItemTemplate>
                 </MenuItem>
                 
-                <Separator/>
-                
-                <MenuItem Header="Load all game packfiles">
-                    <MenuItem Header="Total War: Attila" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
-                    <MenuItem Header="Total War: Rome Remastered" Command="{Binding MenuBar.OpenRome2RePacksCommand}"/>
-                    <MenuItem Header="Total War: Three Kingdoms" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
-                    <MenuItem Header="Total War: Warhammer II" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>
-                    <MenuItem Header="Total War: Warhammer III" Command="{Binding MenuBar.OpenWarhammer3PacksCommand}"/>
-                    <MenuItem Header="Total War: Troy" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
+                <MenuItem Header="Open Game Packs">
+                    <MenuItem Header="Attila" Command="{Binding MenuBar.OpenAttilaPacksCommand}"/>
+                    <MenuItem Header="Rome Remastered" Command="{Binding MenuBar.OpenRome2RePacksCommand}"/>
+                    <MenuItem Header="Three Kingdoms" Command="{Binding MenuBar.OpenThreeKingdomsPacksCommand}"/>
+                    <MenuItem Header="Warhammer II" Command="{Binding MenuBar.OpenWarhammer2PacksCommand}"/>
+                    <MenuItem Header="Warhammer III" Command="{Binding MenuBar.OpenWarhammer3PacksCommand}"/>
+                    <MenuItem Header="Troy" Command="{Binding MenuBar.OpenTroyPacksCommand}"/>
                 </MenuItem>
+
+                <Separator/>
+                <MenuItem Header="Settings" Command="{Binding MenuBar.OpenSettingsWindowCommand}"/>
                 
                 <Separator/>
+
+                <MenuItem Header="Open AssetEditor Folder" Command="{Binding MenuBar.OpenAssetEditorFolderCommand}"/>
+                <MenuItem Header="Clear Cache" Command="{Binding MenuBar.ClearAssetEditorFolderCommand}"/>
                 
+                <Separator/>
+
                 <MenuItem Header="_Exit" />
+            </MenuItem>
+
+            <MenuItem Header="Tools" WindowChrome.IsHitTestVisibleInChrome="True">
+                <MenuItem Header="Mount Animation Editor" Command="{Binding MenuBar.OpenMountCreatorCommand}"/>
+                <MenuItem Header="Campaign Animation Converter" Command="{Binding MenuBar.OpenCampaignAnimCreatorCommand}" IsEnabled="False"/>
+                <MenuItem Header="Animation Transfer Tool" Command="{Binding MenuBar.OpenAnimationTransferToolCommand}" IsEnabled="False" />
+                <MenuItem Header="Super View" Command="{Binding MenuBar.OpenSuperViewToolCommand}" />
+                <MenuItem Header="Skeleton Editor" Command="{Binding MenuBar.OpenTechSkeletonEditorCommand}" IsEnabled="False"/>
+                <MenuItem Header="Animation Keyframe Editor" Command="{Binding MenuBar.OpenAnimationKeyframeCommand}" />
+                <Separator/>
+                <MenuItem Header="Animation File Batch Converter" Command="{Binding MenuBar.OpenAnimationBatchExporterCommand}" />
+                <MenuItem Header="Warhammer II Animpack Updater" Command="{Binding MenuBar.OpenWh2AnimpackUpdaterCommand}" Visibility="Collapsed"  />
+                <Separator/>
+                <MenuItem Header="Audio">
+                    <MenuItem Header="Audio Explorer" Command="{Binding MenuBar.OpenAudioExplorerCommand}"/>
+                    <MenuItem Header="Audio Editor" Command="{Binding MenuBar.OpenAudioEditorCommand}"/>
+                    <MenuItem Header="Audio Compiler" Command="{Binding MenuBar.CompileAudioCommand}"/>
+                </MenuItem>
+                <Separator/>
             </MenuItem>
 
             <MenuItem Header="Reports" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
@@ -82,58 +106,25 @@
                 </MenuItem>
             </MenuItem>
 
-            <MenuItem Header="Options" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="Game">
-                    <MenuItem Header="Open Game Dir"/>
-                    <MenuItem Header="Open Data Dir"/>
+            <MenuItem Header="Help" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
+                <MenuItem Header="Modding Wiki" Command="{Binding MenuBar.OpenHelpCommand}"/>
+
+                <Separator/>
+                
+                <MenuItem Header="Video Tutorials">
+                    <MenuItem Header="AssetEditor Basics 1 (YouTube)" Command="{Binding MenuBar.OpenAssetEdBasic0TutorialCommand}"/>
+                    <MenuItem Header="AssetEditor Basics 2 (YouTube)" Command="{Binding MenuBar.OpenAssetEdBasic1TutorialCommand}"/>
+                    <MenuItem Header="Skrag Reskin (YouTube)" Command="{Binding MenuBar.OpenSkragTutorialCommand}"/>
+                    <MenuItem Header="Tzar Guard with Gun (YouTube)" Command="{Binding MenuBar.OpenTzarGuardTutorialCommand}"/>
+                    <MenuItem Header="Kostaltyn Reskin (YouTube)" Command="{Binding MenuBar.OpenKostalynTutorialCommand}"/>
+                    <MenuItem Header="Recolouring Models (YouTube)" Command="{Binding MenuBar.OpenRecolouringModelsTutorialCommand}"/>
+                    <MenuItem Header="Animation Basics (YouTube)" Command="{Binding MenuBar.OpenAnimationBasicsTutorialCommand}"/>
+                    <MenuItem Header="Animated Props and Custom Animation Packs (YouTube)" Command="{Binding MenuBar.OpenAnimatedPropTutorialCommand}"/>
                 </MenuItem>
-                <MenuItem Header="Open AssetEditor folder" Command="{Binding MenuBar.OpenAssetEditorFolderCommand}"/>
-                <MenuItem Header="Settings" Command="{Binding MenuBar.OpenSettingsWindowCommand}"/>
-            </MenuItem>
 
-            <MenuItem Header="Tools" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="Mount animation editor" Command="{Binding MenuBar.OpenMountCreatorCommand}"/>
-                <MenuItem Header="Campaign animation converter" Command="{Binding MenuBar.OpenCampaignAnimCreatorCommand}" IsEnabled="False"/>
-                <MenuItem Header="Animation Transfer Tool" Command="{Binding MenuBar.OpenAnimationTransferToolCommand}" IsEnabled="False" />
-                <MenuItem Header="Super view" Command="{Binding MenuBar.OpenSuperViewToolCommand}" />
-                <MenuItem Header="Skeleton Editor" Command="{Binding MenuBar.OpenTechSkeletonEditorCommand}" IsEnabled="False"/>
-                <MenuItem Header="Animation Keyframe Editor" Command="{Binding MenuBar.OpenAnimationKeyframeCommand}" />
                 <Separator/>
-                <MenuItem Header="Animation File Batch converter" Command="{Binding MenuBar.OpenAnimationBatchExporterCommand}" />
-                <MenuItem Header="Warhammer 2 Animpack Updater" Command="{Binding MenuBar.OpenWh2AnimpackUpdaterCommand}" Visibility="Collapsed"  />
-                <Separator/>
-                <MenuItem Header="Audio">
-                    <MenuItem Header="Audio Explorer" Command="{Binding MenuBar.OpenAudioExplorerCommand}"/>
-                    <MenuItem Header="Audio Editor (WIP)" Command="{Binding MenuBar.OpenAudioEditorCommand}"/>
-                    <MenuItem Header="Audio Compiler" Command="{Binding MenuBar.CompileAudioCommand}"/>
-                    <MenuItem Header="Audio Templates">
-                        <MenuItem Header="Ability" Command="{Binding MenuBar.CreateAudioTemplateCommand}" CommandParameter="Audio_Template_Ability.json"/>
-                        <MenuItem Header="Advisor" Command="{Binding MenuBar.CreateAudioTemplateCommand}" CommandParameter="Audio_Template_Campaign_Advisor.json"/>
-                        <MenuItem Header="Diplomacy Line" Command="{Binding MenuBar.CreateAudioTemplateCommand}" CommandParameter="Audio_Template_Diplomacy_Line.json"/>
-                        <MenuItem Header="Event Narration" Command="{Binding MenuBar.CreateAudioTemplateCommand}" CommandParameter="Audio_Template_Event_Narration.json"/>
-                        <MenuItem Header="Magic" Command="{Binding MenuBar.CreateAudioTemplateCommand}" CommandParameter="Audio_Template_Magic.json"/>
-                        <MenuItem Header="Movie" Command="{Binding MenuBar.CreateAudioTemplateCommand}" CommandParameter="Audio_Template_Movie.json"/>
-                        <MenuItem Header="Quest Battle" Command="{Binding MenuBar.CreateAudioTemplateCommand}" CommandParameter="Audio_Template_Quest_Battle.json"/>
-                        <MenuItem Header="UI" Command="{Binding MenuBar.CreateAudioTemplateCommand}" CommandParameter="Audio_Template_UI.json"/>
-                        <MenuItem Header="Vocalisation" Command="{Binding MenuBar.CreateAudioTemplateCommand}" CommandParameter="Audio_Template_Vocalisation.json"/>
-                    </MenuItem>
-                </MenuItem>
-                <Separator/>
-                <MenuItem Header="Import/Export to FBX (RME download)" Command="{Binding MenuBar.DownloadRmeCommand}" />
-            </MenuItem>
 
-            <MenuItem Header="Tutorials" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="YouTube AssetEditor Basics 1" Command="{Binding MenuBar.OpenAssetEdBasic0TutorialCommand}"/>
-                <MenuItem Header="YouTube AssetEditor Basics 2" Command="{Binding MenuBar.OpenAssetEdBasic1TutorialCommand}"/>
-                <MenuItem Header="YouTube Example: Skag Reskin" Command="{Binding MenuBar.OpenSkragTutorialCommand}"/>
-                <MenuItem Header="YouTube Example: Tzar Guard with gun" Command="{Binding MenuBar.OpenTzarGuardTutorialCommand}"/>
-                <MenuItem Header="YouTube Example: Kostaltyn Reskin" Command="{Binding MenuBar.OpenKostalynTutorialCommand}"/>
-                <MenuItem Header="YouTube Animated Prop and custom Animation Packs" Command="{Binding MenuBar.OpenAnimatedPropTutorialCommand}"/>
-            </MenuItem>
-
-            <MenuItem Header="About" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="Manual" Command="{Binding MenuBar.OpenHelpCommand}" BorderThickness="1.5"/>
-                <MenuItem Header="Discord" Command="{Binding MenuBar.OpenDiscordCommand}" BorderThickness="1.5"/>
+                <MenuItem Header="Discord" Command="{Binding MenuBar.OpenDiscordCommand}"/>
             </MenuItem>
         </Menu>
     </DockPanel>
