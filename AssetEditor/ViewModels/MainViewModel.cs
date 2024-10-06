@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -41,6 +42,7 @@ namespace AssetEditor.ViewModels
 
         [ObservableProperty] private string _applicationTitle;
         [ObservableProperty] private string _currentGame;
+        [ObservableProperty] private string _editablePackFile;
 
         public MainViewModel(MenuBarViewModel menuViewModel, PackFileService packfileService, IToolFactory toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
         {
@@ -48,6 +50,7 @@ namespace AssetEditor.ViewModels
             _uiCommandFactory = uiCommandFactory;
             _packfileService = packfileService;
             _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
+            _packfileService.Database.ContainerUpdated += OnContainerUpdated;
 
             CloseToolCommand = new RelayCommand<IEditorViewModel>(CloseTool);
             CloseOtherToolsCommand = new RelayCommand<IEditorViewModel>(CloseOtherTools);
@@ -62,9 +65,9 @@ namespace AssetEditor.ViewModels
 
             ToolsFactory = toolFactory;
 
-            // Set ApplicationTitle using the setter
             ApplicationTitle = $"AssetEditor v{VersionChecker.CurrentVersion}";
-            CurrentGame = gameInformationFactory.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame).DisplayName;
+            CurrentGame = $"Current Game: {gameInformationFactory.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame).DisplayName}";
+            SetStatusBarEditablePackFile();
         }
 
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
@@ -186,6 +189,16 @@ namespace AssetEditor.ViewModels
 
             SelectedEditorIndex = CurrentEditorsList.IndexOf(node);
             return true;
+        }
+
+        private void OnContainerUpdated(PackFileContainer container)
+        {
+            SetStatusBarEditablePackFile();
+        }
+
+        private void SetStatusBarEditablePackFile()
+        {
+            EditablePackFile = _packfileService.Database.PackSelectedForEdit != null ? $"Editable Pack: {_packfileService.Database.PackSelectedForEdit.Name}" : "Editable Pack: None Set";
         }
     }
 }

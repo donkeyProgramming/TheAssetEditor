@@ -17,7 +17,7 @@
         <nodevalueconverters:SortedCollectionViewSource x:Key="SortedCollectionViewSource" Property0="NodeType" Property1="Name"/>
     </UserControl.Resources>
 
-    <Grid >
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -25,7 +25,7 @@
         </Grid.RowDefinitions>
 
         <!-- Title -->
-        <TextBlock Text="PackFile Explorer" 
+        <TextBlock Text="Pack Explorer" 
                         FontSize="12" 
                         HorizontalAlignment="Left" 
                         Margin="0, 5, 5, 5"
@@ -38,7 +38,7 @@
             </Grid.ColumnDefinitions>
 
             <Grid>
-                <TextBox x:Name="FilterTextBoxItem" Style="{StaticResource HintedTextBox}" KeyboardNavigation.TabIndex="0" FontSize="12" Tag="Search PackFile Explorer (Ctrl+Shift+F)"
+                <TextBox x:Name="FilterTextBoxItem" Style="{StaticResource HintedTextBox}" KeyboardNavigation.TabIndex="0" FontSize="12" Tag="Search Pack Explorer (Ctrl+Shift+F)"
                          KeyboardNavigation.IsTabStop="True" BorderThickness="1" HorizontalAlignment="Stretch" Padding="2.5, 0, 0, 0"  Height="24" VerticalContentAlignment="Center" 
                          Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350, ValidatesOnDataErrors=True}">
                 </TextBox>
@@ -73,7 +73,7 @@
         <TreeView  x:Name="tvParameters"
                 AllowDrop="True"
                 Grid.Row="2" 
-                Margin="0, 0, 0, 5"
+                Margin="-5, 2.5, 0, 5"
                 behaviors:TreeViewExtension.SelectItemOnRightClick="True"
                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 ItemsSource="{Binding Path=Files, UpdateSourceTrigger=PropertyChanged}"

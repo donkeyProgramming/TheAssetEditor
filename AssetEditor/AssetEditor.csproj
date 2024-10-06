@@ -3,12 +3,12 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
-        <ApplicationIcon>AssetEditorIcon.ico</ApplicationIcon>
+        <ApplicationIcon>AssetEditorIconVampire.ico</ApplicationIcon>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
     </PropertyGroup>
     <ItemGroup>
-      <None Remove="AssetEditorIcon.png" />
+      <None Remove="AssetEditorIconVampire.png" />
     </ItemGroup>
 
     <ItemGroup>
@@ -44,7 +44,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Resource Include="AssetEditorIcon.png" />
+      <Resource Include="AssetEditorIconVampire.png" />
     </ItemGroup>
 
 
