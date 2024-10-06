@@ -234,7 +234,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             {
                 try
                 {
-                    _packFileService.Save(_selectedNode.FileOwner, systemPath, true);
+                    _packFileService.Save(_selectedNode.FileOwner, systemPath, false);
                     _selectedNode.UnsavedChanged = false;
                     _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
                 }
@@ -258,7 +258,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
             using (new WaitCursor())
             {
-                _packFileService.Save(_selectedNode.FileOwner, saveFileDialog.FileName, true);
+                _packFileService.Save(_selectedNode.FileOwner, saveFileDialog.FileName, false);
                 _selectedNode.UnsavedChanged = false;
                 _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
             }

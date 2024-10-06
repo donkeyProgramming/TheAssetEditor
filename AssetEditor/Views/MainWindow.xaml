@@ -14,12 +14,12 @@
         behaviors:WindowCancellableClosingBehavior.IsClosingWithoutPrompt="{Binding IsClosingWithoutPrompt}"
         Style="{StaticResource CustomWindowStyle}"
         x:Name="window"
-        Title="MainWindow"
         Width="1280"
         Height="720"
         BorderThickness="{Binding RelativeSource={RelativeSource Mode=Self}, Path=WindowState, Converter={StaticResource windowStateToThicknessConverter}}"
         ResizeMode="CanResize"
-        WindowStyle="None">
+        WindowStyle="None"
+        Title="{Binding ApplicationTitle, UpdateSourceTrigger=PropertyChanged}">
 
     <WindowChrome.WindowChrome>
         <WindowChrome
