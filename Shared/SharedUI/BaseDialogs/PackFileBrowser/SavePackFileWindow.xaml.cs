@@ -27,7 +27,7 @@ namespace CommonControls.PackFileBrowser
         {
             _packfileService = packfileService;
             ViewModel = new PackFileBrowserViewModel(packfileService, true);
-            ViewModel.ContextMenu = new OpenFileContexMenuHandler(packfileService);
+            ViewModel.ContextMenu = new OpenFileContextMenuHandler(packfileService);
             ViewModel.FileOpen += ViewModel_FileOpen;
             ViewModel.NodeSelected += ViewModel_FileSelected;
             InitializeComponent();

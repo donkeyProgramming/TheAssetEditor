@@ -33,6 +33,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     Additem(ContextItems.Expand, newContextMenu);
                     Additem(ContextItems.Collapse, newContextMenu);
                     AddSeperator(newContextMenu);
+                    Additem(ContextItems.OpenInFileExplorer, newContextMenu);
                 }
                 else
                 {
@@ -57,6 +58,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     Additem(ContextItems.Save, newContextMenu);
                     Additem(ContextItems.SaveAs, newContextMenu);
                     Additem(ContextItems.Close, newContextMenu);
+                    Additem(ContextItems.OpenInFileExplorer, newContextMenu);
                 }
             }
 
