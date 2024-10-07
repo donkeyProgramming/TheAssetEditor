@@ -44,16 +44,10 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/LineShader.fx
 
-#begin Shaders/Pbr/MetalRoughness/CA_MetalRoughness_main.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Shaders/Pbr/MetalRoughness/CA_MetalRoughness_main.fx
-
 #begin Shaders/Pbr/MetalRoughness/MetalRoughness_main.fx
 /importer:EffectImporter
 /processor:EffectProcessor
-/processorParam:DebugMode=Debug
+/processorParam:DebugMode=Auto
 /build:Shaders/Pbr/MetalRoughness/MetalRoughness_main.fx
 
 #begin Shaders/Pbr/SpecGloss/SpecGloss_main.fx
@@ -65,7 +59,7 @@
 #begin Shaders/TexturePreview.fx
 /importer:EffectImporter
 /processor:EffectProcessor
-/processorParam:DebugMode=Debug
+/processorParam:DebugMode=Auto
 /build:Shaders/TexturePreview.fx
 
 #begin Textures/Phazer/Brdf_rgba32f_raw.DDS
@@ -73,13 +67,27 @@
 /processor:PassThroughProcessor
 /build:Textures/Phazer/Brdf_rgba32f_raw.DDS
 
-#begin Textures/Phazer/DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.dds
+#begin Textures/Phazer/DiffuseAmbientLightCubeMap.dds
 /importer:TextureImporter
-/processor:PassThroughProcessor
-/build:Textures/Phazer/DIFFUSE_IRRADIANCE_edited_kloppenheim_06_128x128.dds
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Phazer/DiffuseAmbientLightCubeMap.dds
 
-#begin Textures/Phazer/SPECULAR_RADIANCE_edited_kloppenheim_06_512x512.dds
+#begin Textures/Phazer/SpecularAmbientLightCubemap.dds
 /importer:TextureImporter
-/processor:PassThroughProcessor
-/build:Textures/Phazer/SPECULAR_RADIANCE_edited_kloppenheim_06_512x512.dds
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Phazer/SpecularAmbientLightCubemap.dds
 

@@ -1,7 +1,7 @@
 #include "../helpers/mathfunctions.hlsli"
 
 // Input parameters 
-bool CapabilityFlag_ApplyTinting = true; // PHAZER: dx11 global non-static consts are = 0, so values are not used
+bool CapabilityFlag_ApplyTinting = true; // D3D 11 HLSL global non-static consts are = 0, init values are not used
 bool Tint_UseFactionColours = false;
 bool Tint_UseTinting = true;
 float3 Tint_FactionsColours[3] = { float3(1, 0, 0), float3(0, 1, 0), float3(0, 0, 1) };

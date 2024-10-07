@@ -1,4 +1,4 @@
-﻿#include "../helpers/CALib.hlsli"
+#include "../helpers/CAMetalRoughnessHelper.hlsli"
 #include "../helpers/tone_mapping.hlsli"
 #include "../helpers/constants.hlsli"
 #include "../helpers/GradientSampling.hlsli"
@@ -11,7 +11,8 @@
 
 #include "../Capabilites/Emissive.hlsli"
 #include "../Capabilites/Tint.hlsli"
-#include "Helpers.hlsli"
+
+//#include "Helpers.hlsli"
 
 // **************************************************************************************************************************************
 // *		PIXEL SHADER CODE
@@ -22,17 +23,17 @@ GBufferMaterial GetMaterial(in PixelInputType input)
     
     // default values
     material.diffuse = float4(0.2f, 0.2f, 0.2f, 1);
-    material.specular = float4(0, 0, 0, 0);    
+    material.specular = float4(0, 0, 0, 0);
     material.roughness = 1.0f;
-    material.metalness = 0.0f;   
-    material.pixelNormal = input.normal;    
-    material.maskValue = float4(0,0,0,0);
+    material.metalness = 0.0f;
+    material.pixelNormal = input.normal;
+    material.maskValue = float4(0, 0, 0, 0);
 
     float2 texCord = float2(nfmod(input.tex.x, 1), nfmod(input.tex.y, 1));
     
     if (UseSpecular)
     {
-        material.specular.rgb = _linear(SpecularTexture.Sample(SampleType, texCord).rgb);		
+        material.specular.rgb = _linear(SpecularTexture.Sample(SampleType, texCord).rgb);
     }
     
     if (UseDiffuse)
@@ -40,19 +41,20 @@ GBufferMaterial GetMaterial(in PixelInputType input)
         float4 diffuseValue = DiffuseTexture.Sample(SampleType, texCord);
         material.diffuse.rgb = _linear(diffuseValue.rgb);
         material.diffuse.a = diffuseValue.a;
-    }    
+    }
     
     if (UseGloss)
     {
         float4 glossTexSample = GlossTexture.Sample(SampleType, texCord);
-        material.metalness = glossTexSample.r; // metal mask channel    
-        material.roughness = pow(glossTexSample.g, 2.2f); // roughness channel
-    }	
+        material.metalness = (glossTexSample.r); // metal mask channel    
+        material.roughness = (glossTexSample.g);
+
+    }
     
     if (UseNormal)
-    {        
+    {
         material.pixelNormal = GetPixelNormal(input);
-    }	
+    }
     
     if (UseMask)
     {
@@ -63,52 +65,58 @@ GBufferMaterial GetMaterial(in PixelInputType input)
 }
 
 float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
-{
+{    
     GBufferMaterial material = GetMaterial(input);        
-    float3 normlizedViewDirection = normalize(input.viewDirection);
-    float3 rot_lightDir = normalize(mul(light_Direction_Constant, (float3x3) DirLightTransform));
     
-    float3 diffuseColour = ApplyTintAndFactionColours(material.diffuse.rgb, material.maskValue);
+    if (UseAlpha == 1)    
+        alpha_test(material.diffuse.a);    
     
-    float3 envColor = getAmbientLight(
-		material.pixelNormal,
-		normlizedViewDirection,
-		diffuseColour,
-		material.roughness,
-		material.metalness,
-		float4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));            	
-	
-	// directional ligting color    
-    float3 dirColor = getDirectionalLight(
-		material.pixelNormal,
-		diffuseColour,
-		material.roughness,
-		material.metalness,
-		normlizedViewDirection,
-		rot_lightDir
-	);
+    float3 normalizedViewDirection = -normalize(input.viewDirection);
+    float3 rotatedNormalizedLightDirection = normalize(mul(light_Direction_Constant, (float3x3) DirLightTransform));    
+               
+    const float occlusion = 1.0f; // no SSAO yet = no occlusion
+    
+    //  Create the standard material.  This is what gets written to the gbuffer...
+    R2_5_StandardLightingModelMaterial_For_GBuffer standard_mat_compressed = 
+        R2_5_create_standard_lighting_material_for_gbuffer(
+        material.diffuse.rgb,
+        material.pixelNormal,
+        material.roughness, 
+        material.metalness,
+        occlusion);    
+    
+	//	Create the uncompressed material.  This is what is read from the gbuffer...
+    R2_5_StandardLightingModelMaterial_For_Lighting slm_uncompressed = R2_5_get_slm_for_lighting(standard_mat_compressed);
 
-    float3 emissiveColour = GetEmissiveColour(input.tex, material.maskValue, normlizedViewDirection, material.pixelNormal);
+	//	Apply faction colours...    
+    slm_uncompressed.Diffuse_Colour.rgb = ApplyTintAndFactionColours(slm_uncompressed.Diffuse_Colour.rgb, material.maskValue);
+
+    float unchartedSunFactor = 6.0f;
+    
+    //  Light the pixel...    
+    float3 hdr_linear_col = standard_lighting_model_directional_light(get_sun_colour() * unchartedSunFactor, rotatedNormalizedLightDirection, normalizedViewDirection, slm_uncompressed);
+
+    //  Tone-map the pixel...            
+    float3 ldr_linear_col = saturate(Uncharted2ToneMapping(hdr_linear_col));    
+    
+    float3 emissiveColour = GetEmissiveColour(input.tex, material.maskValue, rotatedNormalizedLightDirection, material.pixelNormal);
     
     // Combine all colours
-    float3 color = envColor + dirColor + emissiveColour;
-	
-	if (UseAlpha == 1)
-        alpha_test(material.diffuse.a);
+    float3 color = ldr_linear_col + emissiveColour;	
     
-    return DoToneMapping(color.rgb);
+    return float4(color, 1.0f);    
 }
 
 float4 EmissiveLayerPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0
 {
-   GBufferMaterial material = GetMaterial(input);
+    GBufferMaterial material = GetMaterial(input);
     float3 normlizedViewDirection = normalize(input.viewDirection);
     float3 emissiveColour = GetEmissiveColour(input.tex, material.maskValue, normlizedViewDirection, material.pixelNormal);
 	
-   if (UseAlpha == 1)
-       alpha_test(material.diffuse.a);
+    if (UseAlpha == 1)
+        alpha_test(material.diffuse.a);
    
-   return float4(emissiveColour, 1);
+    return float4(emissiveColour, 1);
 }
 
 technique BasicColorDrawing
