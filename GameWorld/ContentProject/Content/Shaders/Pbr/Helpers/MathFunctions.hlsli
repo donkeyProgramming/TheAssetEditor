@@ -1,6 +1,9 @@
 #ifndef __MATHFUNF_HLSLI__
 #define __MATHFUNF_HLSLI__
 
+#include "../inputlayouts.hlsli"
+#include "../TextureSamplers.hlsli"
+
 float nfmod(float a, float b)
 {
     return a - b * floor(a / b);
@@ -82,6 +85,26 @@ float luma(in float3 gamma_colour)
     const float3 sc_luma = float3(0.2126, 0.7152, 0.0722);
 
     return dot(gamma_colour, sc_luma);
+}
+
+float3 GetPixelNormal(PixelInputType input)
+{
+	//float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));      // TODO: some games have this, sometimes enables, sometimes as as comment,
+    float3x3 basis = float3x3(normalize(input.tangent.xyz), normalize(input.binormal.xyz), normalize(input.normal.xyz)); // works in own shader
+
+    float4 NormalTex = NormalTexture.Sample(s_normal, input.tex);
+
+    // -------------------------------------------------------------------------------------------------------------------
+    // decode the "orange 2d normal map", into a standard "blue" 3d normal map using an othogonal projection
+    // -------------------------------------------------------------------------------------------------------------------
+    float3 deQuantN;
+    deQuantN.x = NormalTex.r * NormalTex.a;
+    deQuantN.y = 1.0 - NormalTex.g;
+    
+    deQuantN = (deQuantN * 2.0f) - 1.0f;
+    deQuantN.z = sqrt(1 - deQuantN.x * deQuantN.x - deQuantN.y * deQuantN.y);
+    	
+    return normalize(mul(normalize(deQuantN.xyz), basis));
 }
 
 #endif

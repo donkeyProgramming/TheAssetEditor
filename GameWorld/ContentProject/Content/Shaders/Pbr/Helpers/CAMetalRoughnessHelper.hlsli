@@ -5,6 +5,7 @@
 #include "../inputlayouts.hlsli"
 #include "../TextureSamplers.hlsli"
 #include "../helpers/mathfunctions.hlsli"
+#include "../helpers/mathconstants.hlsli"
 
 //#define MAXTBN float3x3 ( normalize ( input.Tgt ) , normalize ( input.Nml ) , normalize ( input.Btgt ) );
 #define MAXTBN float3x3 ( normalize ( input.Tgt ) , normalize ( input.Btgt ) , normalize ( input.Nml ) );
@@ -87,25 +88,25 @@ static const float high_tones_scurve_bias = 0.2f;
 static const float g_tone_mapping_brightness = 3.0;
 static const float g_tone_mapping_burn = 0.04;
 
-float3 GetPixelNormal(PixelInputType input)
-{
-	//float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));      // TODO: some games have this, sometimes enables, sometimes as as comment,
-    float3x3 basis = float3x3(normalize(input.tangent.xyz), normalize(input.binormal.xyz), normalize(input.normal.xyz)); // works in own shader
+//float3 GetPixelNormal(PixelInputType input)
+//{
+//	//float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));      // TODO: some games have this, sometimes enables, sometimes as as comment,
+//    float3x3 basis = float3x3(normalize(input.tangent.xyz), normalize(input.binormal.xyz), normalize(input.normal.xyz)); // works in own shader
 
-    float4 NormalTex = NormalTexture.Sample(s_normal, input.tex);
+//    float4 NormalTex = NormalTexture.Sample(s_normal, input.tex);
 
-    // -------------------------------------------------------------------------------------------------------------------
-    // decode the "orange 2d normal map", into a standard "blue" 3d normal map using an othogonal projection
-    // -------------------------------------------------------------------------------------------------------------------
-    float3 deQuantN;
-    deQuantN.x = NormalTex.r * NormalTex.a;
-    deQuantN.y = 1.0 - NormalTex.g;
+//    // -------------------------------------------------------------------------------------------------------------------
+//    // decode the "orange 2d normal map", into a standard "blue" 3d normal map using an othogonal projection
+//    // -------------------------------------------------------------------------------------------------------------------
+//    float3 deQuantN;
+//    deQuantN.x = NormalTex.r * NormalTex.a;
+//    deQuantN.y = 1.0 - NormalTex.g;
     
-    deQuantN = (deQuantN * 2.0f) - 1.0f;
-    deQuantN.z = sqrt(1 - deQuantN.x * deQuantN.x - deQuantN.y * deQuantN.y);
+//    deQuantN = (deQuantN * 2.0f) - 1.0f;
+//    deQuantN.z = sqrt(1 - deQuantN.x * deQuantN.x - deQuantN.y * deQuantN.y);
     	
-    return normalize(mul(normalize(deQuantN.xyz), basis));
-}
+//    return normalize(mul(normalize(deQuantN.xyz), basis));
+//}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //	Inputs/Outputs
@@ -138,11 +139,6 @@ float3 GetPixelNormal(PixelInputType input)
 /////////////////////////
 // parameters
 /////////////////////////
-static const float pi = 3.14159265;
-static const float one_over_pi = 1 / 3.14159265;
-static const float real_approx_zero = 0.001f;
-
-static const float texture_alpha_ref = 0.5f;
 
 // sampler states
 

@@ -5,19 +5,7 @@
 #include "../inputlayouts.hlsli"
 #include "../TextureSamplers.hlsli"
 #include "../helpers/mathfunctions.hlsli"
-
-
-static const float pi = 3.14159265;
-static const float one_over_pi = 1 / 3.14159265;
-static const float real_approx_zero = 0.001f;
-
-static const float texture_alpha_ref = 0.5f;
-
-static const float Epsilon = 0.00001;
-
-
-// Constant normal incidence Fresnel factor for all dielectrics.
-static const float3 Fdielectric = 0.04;
+#include "../helpers/mathconstants.hlsli"
 
 
 float get_cube_env_scale_factor()
@@ -140,24 +128,24 @@ float3 normalSwizzle_UPDATED(in float3 ref)
 #endif
 }
 
-float3 GetPixelNormal(PixelInputType input)
-{
-	//float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));      // TODO: some games have this, sometimes enables, sometimes as as comment,
-    float3x3 basis = float3x3(normalize(input.tangent.xyz), normalize(input.binormal.xyz), normalize(input.normal.xyz)); // works in own shader
+//float3 GetPixelNormal(PixelInputType input)
+//{
+//	//float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));      // TODO: some games have this, sometimes enables, sometimes as as comment,
+//    float3x3 basis = float3x3(normalize(input.tangent.xyz), normalize(input.binormal.xyz), normalize(input.normal.xyz)); // works in own shader
 
-    float4 NormalTex = NormalTexture.Sample(s_normal, input.tex);
+//    float4 NormalTex = NormalTexture.Sample(s_normal, input.tex);
 
-    // -------------------------------------------------------------------------------------------------------------------
-    // decode the "orange 2d normal map", into a standard "blue" 3d normal map using an othogonal projection
-    // -------------------------------------------------------------------------------------------------------------------
-    float3 Np = 0;
-    Np.x = NormalTex.r * NormalTex.a;
-    Np.y = 1.0 - NormalTex.g;
-    Np = (Np * 2.0f) - 1.0f;
-    Np.z = sqrt(1 - Np.x * Np.x - Np.y * Np.y);
+//    // -------------------------------------------------------------------------------------------------------------------
+//    // decode the "orange 2d normal map", into a standard "blue" 3d normal map using an othogonal projection
+//    // -------------------------------------------------------------------------------------------------------------------
+//    float3 Np = 0;
+//    Np.x = NormalTex.r * NormalTex.a;
+//    Np.y = 1.0 - NormalTex.g;
+//    Np = (Np * 2.0f) - 1.0f;
+//    Np.z = sqrt(1 - Np.x * Np.x - Np.y * Np.y);
     	
-    return normalize(mul(normalize(Np.xyz), basis));
-}
+//    return normalize(mul(normalize(Np.xyz), basis));
+//}
 
 float3 EnvBRDFApprox(float3 SpecularColor, float Roughness, float NoV)
 {
