@@ -28,7 +28,7 @@ namespace GameWorld.Core.Services.SceneSaving
 
             GameTypeEnum[] rmv7Games = [
                 GameTypeEnum.Warhammer3, GameTypeEnum.ThreeKingdoms,    // Actually rmv8, but not supported by tool for now
-                GameTypeEnum.Pharaoh, GameTypeEnum.Troy, GameTypeEnum.Warhammer2, GameTypeEnum.Warhammer1];
+                GameTypeEnum.Pharaoh, GameTypeEnum.Troy, GameTypeEnum.Warhammer2, GameTypeEnum.Warhammer];
 
             if (rmv7Games.Contains(_applicationSettingsService.CurrentSettings.CurrentGame) == false)
                 GeometryOutputType = GeometryStrategy.Rmv6;
@@ -82,7 +82,7 @@ namespace GameWorld.Core.Services.SceneSaving
                     qualityLvl = lodHeader.QualityLvl;
                 }
             }
-            
+
             var setting = new LodGenerationSettings()
             {
                 CameraDistance = cameraDistance,

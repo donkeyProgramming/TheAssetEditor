@@ -9,12 +9,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
 using Shared.Core.Services;
+using static Shared.Core.Settings.RenderEngineBackgroundColourController;
 
 namespace GameWorld.Core.Components.Rendering
 {
     public class RenderEngineComponent : BaseComponent, IDisposable
     {
-        Color _backgroundColour = new (54, 54, 54);
+        Color _backgroundColour;
 
         private readonly Dictionary<RasterizerStateEnum, RasterizerState> _rasterStates = [];
         private readonly ArcBallCamera _camera;
@@ -24,7 +25,7 @@ namespace GameWorld.Core.Components.Rendering
         private readonly IDeviceResolver _deviceResolverComponent;
         private readonly SceneLightParametersStore _sceneLightParameters;
         private readonly EventHub _eventHub;
-        
+
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
         bool _drawGlow = true;
@@ -40,6 +41,7 @@ namespace GameWorld.Core.Components.Rendering
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
 
+            _backgroundColour = GetEnumAsColour(applicationSettingsService.CurrentSettings.RenderEngineBackgroundColour);
             _camera = camera;
             _resourceLib = resourceLib;
             _deviceResolverComponent = deviceResolverComponent;

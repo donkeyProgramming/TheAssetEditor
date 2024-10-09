@@ -14,7 +14,7 @@
 
     <Expander DockPanel.Dock="Top" IsExpanded="False">
         <Expander.Header>
-            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Border}" >
+            <StackPanel Orientation="Horizontal" >
                 <TextBlock Text="RMV2 Weighted Material - Details" FontWeight="Bold" Margin="3"/>
             </StackPanel>
         </Expander.Header>
@@ -71,7 +71,7 @@
                         </Expander.Header>
 
                         <ListView ItemsSource="{Binding Material.StringParameters}" MaxHeight="650" />
-                
+
                     </Expander>
                 </StackPanel>
             </StackPanel>
@@ -92,7 +92,7 @@
                         <ListView ItemsSource="{Binding Material.FloatParameters}"  MaxHeight="650"  >
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem">
-                                    
+
                                 </Style>
                             </ListView.ItemContainerStyle>
                         </ListView>
@@ -123,7 +123,7 @@
                                 </Style>
                             </ListView.ItemContainerStyle>
                         </ListView>
-                 
+
                     </Expander>
                 </StackPanel>
             </StackPanel>

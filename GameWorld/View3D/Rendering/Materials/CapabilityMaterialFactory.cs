@@ -42,7 +42,7 @@ namespace GameWorld.Core.Rendering.Materials
         {
             if ((currentGame == GameTypeEnum.Warhammer3 || currentGame == GameTypeEnum.ThreeKingdoms) == false)
                 return;
-                
+
             if (wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
                 preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
         }
@@ -89,21 +89,21 @@ namespace GameWorld.Core.Rendering.Materials
                 case GameTypeEnum.Attila:
                 case GameTypeEnum.Empire:
                 case GameTypeEnum.Napoleon:
-                case GameTypeEnum.Rome_2_Remastered:
+                case GameTypeEnum.RomeRemastered:
                 case GameTypeEnum.Rome_2:
                 case GameTypeEnum.Shogun_2:
                 case GameTypeEnum.Troy:
                 case GameTypeEnum.Pharaoh:
                 case GameTypeEnum.ThronesOfBritannia:
-                case GameTypeEnum.Warhammer1:
+                case GameTypeEnum.Warhammer:
                 case GameTypeEnum.Warhammer2:
                     return [CapabilityMaterialsEnum.SpecGlossPbr_Default, CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal];
-                
+
                 case GameTypeEnum.Warhammer3:
                 case GameTypeEnum.ThreeKingdoms:
                     return [CapabilityMaterialsEnum.MetalRoughPbr_Default, CapabilityMaterialsEnum.MetalRoughPbr_Emissive];
                 default:
-                    throw new Exception($"Unkown game { currentGame } in {nameof(GetPossibleMaterials)}");
+                    throw new Exception($"Unkown game {currentGame} in {nameof(GetPossibleMaterials)}");
             }
 
         }
@@ -127,5 +127,4 @@ namespace GameWorld.Core.Rendering.Materials
         }
     }
 }
-
 
