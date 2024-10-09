@@ -1,8 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
+using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
+using Shared.Core.Settings;
 
 namespace Shared.Core.Services
 {
@@ -14,14 +16,13 @@ namespace Shared.Core.Services
             public string Path { get; set; }
         }
 
-        public ObservableCollection<string> RecentPackFilePaths { get; set; } = new ObservableCollection<string>();
-
-        public List<GamePathPair> GameDirectories { get; set; } = new List<GamePathPair>();
-        public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Warhammer2;
-        public bool UseTextEditorForUnknownFiles { get; set; } = true;
+        public ObservableCollection<string> RecentPackFilePaths { get; set; } = [];
+        public ThemeType Theme { get; set; } = ThemeType.DarkTheme;
+        public BackgroundColour RenderEngineBackgroundColour { get; set; } = BackgroundColour.DarkGrey;
+        public List<GamePathPair> GameDirectories { get; set; } = [];
+        public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Warhammer3;
         public bool LoadCaPacksByDefault { get; set; } = true;
         public bool LoadWemFiles { get; set; } = true;
-        public bool AutoGenerateAttachmentPointsFromMeshes { get; set; } = true;
         public bool IsFirstTimeStartingApplication { get; set; } = true;
         public bool IsDeveloperRun { get; set; } = false;
         public string WwisePath { get; set; }
@@ -34,8 +35,6 @@ namespace Shared.Core.Services
                 WwisePath = Path.Combine(WwisePath, "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
             }
         }
-
-
     }
 
     public class ApplicationSettingsService
@@ -44,7 +43,7 @@ namespace Shared.Core.Services
 
         public bool AllowSettingsUpdate { get; set; } = false;
 
-        string SettingsFile
+        public static string SettingsFile
         {
             get
             {
