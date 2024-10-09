@@ -39,7 +39,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         public ICommand CopyNodePathCommand { get; set; }
         public ICommand ExportToFolderCommand { get; set; }
         public ICommand AdvancedExportToFolderCommand { get; set; }
-        
+
         public ICommand CopyToEditablePackCommand { get; set; }
         public ICommand DuplicateCommand { get; set; }
         public ICommand CreateFolderCommand { get; set; }
@@ -50,6 +50,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         public ICommand OpenPack_FileNotpadPluss_Command { get; set; }
         public ICommand OpenPackFile_HxD_Command { get; set; }
         public ICommand SavePackFileAsCommand { get; set; }
+        public ICommand OpenInFileExplorerCommand { get; set; }
 
         protected PackFileService _packFileService;
 
@@ -80,7 +81,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             CollapseAllChildrenCommand = new RelayCommand(CollapsAllChildren);
             ExportToFolderCommand = new RelayCommand(ExportToFolder);
             AdvancedExportToFolderCommand = new RelayCommand(AdvancedExportToFolder);
-            
+            OpenInFileExplorerCommand = new RelayCommand(OpenInFileExplorer);
+
             OpenPack_FileNotpadPluss_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\Notepad++\notepad++.exe", _selectedNode.Item));
             OpenPackFile_HxD_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\HxD\HxD.exe", _selectedNode.Item));
         }
@@ -382,8 +384,22 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 CollapsAllRecursive(child);
         }
 
-        public abstract void Create(TreeNode node);
+        void OpenInFileExplorer()
+        {
+            var systemFilePath = _selectedNode.FileOwner.SystemFilePath;
 
+            if (!Directory.Exists(systemFilePath))
+                systemFilePath = Path.GetDirectoryName(systemFilePath);
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = $"\"{systemFilePath}\"",
+                UseShellExecute = true
+            });
+        }
+
+        public abstract void Create(TreeNode node);
 
         protected ContextMenuItem Additem(ContextItems type, ContextMenuItem parent)
         {
@@ -452,6 +468,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     return new ContextMenuItem() { Name = "HxD", Command = OpenPackFile_HxD_Command }; ;
                 case ContextItems.OpenWithNodePadPluss:
                     return new ContextMenuItem() { Name = "Notepad++", Command = OpenPack_FileNotpadPluss_Command }; ;
+                case ContextItems.OpenInFileExplorer:
+                    return new ContextMenuItem() { Name = "Open In File Explorer", Command = OpenInFileExplorerCommand };
             }
 
             throw new Exception($"Unknown ContextItemType  {type} ");
@@ -484,6 +502,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             Open,
             OpenWithHxD,
             OpenWithNodePadPluss,
+            OpenInFileExplorer
         }
     }
 
