@@ -27,7 +27,7 @@ namespace AssetEditor
             var forceValidateServiceScopes = Debugger.IsAttached;
             _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes);
             _rootScope = _serviceProvider.CreateScope();
-            
+
             var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             settingsService.AllowSettingsUpdate = true;
             settingsService.Load();
@@ -36,19 +36,9 @@ namespace AssetEditor
             var gameWorld = _rootScope.ServiceProvider.GetRequiredService<IWpfGame>();
             gameWorld.ForceEnsureCreated();
 
-            // Show the settings window if its the first time the tool is ran
-            if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
-            {
-                var settingsWindow = _rootScope.ServiceProvider.GetRequiredService<SettingsWindow>();
-                settingsWindow.DataContext = _rootScope.ServiceProvider.GetRequiredService<SettingsViewModel>();
-                settingsWindow.ShowDialog();
-
-                settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
-                settingsService.Save();
-            }
             var devConfigManager = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
             devConfigManager.Initialize(e);
-            devConfigManager.OverrideSettings();        
+            devConfigManager.OverrideSettings();
 
             // Load all packfiles
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
