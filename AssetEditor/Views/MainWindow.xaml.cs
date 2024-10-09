@@ -20,6 +20,25 @@ namespace AssetEditor.Views
         {
             InitializeComponent();
             SourceInitialized += OnSourceInitialized;
+
+            this.KeyDown += MainWindow_KeyDown;
+        }
+
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                {
+                    if (e.Key == Key.F)
+                    {
+                        var packFileBrowserView = FindChild<PackFileBrowserView>(this);
+
+                        if (packFileBrowserView != null) { }
+                            packFileBrowserView.TriggerPreviewKeyDown();
+                    }
+                }
+            }
         }
 
         private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)

@@ -39,8 +39,10 @@
 
             <extendedwpftoolkit:WatermarkTextBox x:Name="FilterTextBoxItem" KeyboardNavigation.TabIndex="0" FontSize="12" Watermark="Search PackFile Explorer"
                 KeyboardNavigation.IsTabStop="True" Grid.Column="0" BorderThickness="1, 1, 1, 1" HorizontalAlignment="Stretch" Height="24" VerticalContentAlignment="Center" 
+                    <TextBox x:Name="FilterTextBoxItem" Style="{StaticResource HintedTextBox}" KeyboardNavigation.TabIndex="0" FontSize="12" Tag="Search PackFile Explorer (Ctrl+Shift+F)"
+                             KeyboardNavigation.IsTabStop="True" HorizontalAlignment="Stretch" Padding="2.5, 0, 0, 0"  Height="24" VerticalContentAlignment="Center" 
                 Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350, ValidatesOnDataErrors=True}">
-            </extendedwpftoolkit:WatermarkTextBox>
+                    </TextBox>
 
             <Button Click="ClearButtonClick" Content="x" FontSize="12" Command="{Binding ClearTextCommand}" Padding="2" Width="24" 
                     BorderThickness="0, 1, 1, 1" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"  Grid.Column="1">
