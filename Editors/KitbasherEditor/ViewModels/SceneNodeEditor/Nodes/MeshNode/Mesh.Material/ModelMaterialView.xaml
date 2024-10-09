@@ -21,7 +21,7 @@
 
     <Expander DockPanel.Dock="Top" IsExpanded="True">
         <Expander.Header>
-            <StackPanel Orientation="Horizontal" Background="{DynamicResource GroupBox.Header.Static.Border}" >
+            <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Model Material" FontWeight="Bold" Margin="3"/>
             </StackPanel>
         </Expander.Header>
