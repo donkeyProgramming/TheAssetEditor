@@ -6,6 +6,7 @@ using System.IO;
 using MeshImportExport;
 using Editors.ImportExport;
 using System.Windows;
+using System.Numerics;
 
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
@@ -54,11 +55,13 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             return ExportSupportEnum.NotSupported;
         }
 
-        private void ConvertToBlueNormalMap(byte[] imgBytes, string outputPath, string fileDirectory)
+        // -- TODO: maybe remove this method? kept for reference
+        private void ConvertToBlueNormalMap_pOld(byte[] imgBytes, string outputPath, string fileDirectory)
         {
             var ms = new MemoryStream(imgBytes);
 
             using Image img = Image.FromStream(ms);
+
             using Bitmap bitmap = new Bitmap(img);
             {
                 for (int x = 0; x < bitmap.Width; x++)
@@ -68,7 +71,62 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                         var pixel = bitmap.GetPixel(x, y);
                         var G = pixel.G;
                         var A = pixel.A;
-                        var newColor = Color.FromArgb(255, A, G, 255);
+                        var newColor = Color.FromArgb(255, A, G, 255); // here you set Z = 1.0f for ALL normals, it ruins some details
+                        bitmap.SetPixel(x, y, newColor);
+                    }
+                }
+                _imageSaveHandler.Save(bitmap, fileDirectory);
+            }
+        }
+        private void ConvertToBlueNormalMap(byte[] imgBytes, string outputPath, string fileDirectory)
+        {
+            var ms = new MemoryStream(imgBytes);
+
+            using Image img = Image.FromStream(ms);
+
+            using Bitmap bitmap = new Bitmap(img);
+            {
+                for (int x = 0; x < bitmap.Width; x++)
+                {
+                    for (int y = 0; y < bitmap.Height; y++)
+                    {
+                        // get pixel from orange map
+                        var orangeMapRawPixel = bitmap.GetPixel(x, y);
+
+                        // convert bytes to float to interval [0; 1]
+                        Vector4 orangeMapVector = new Vector4()
+                        {
+                            X = (float)orangeMapRawPixel.R / 255.0f,
+                            Y = (float)orangeMapRawPixel.G / 255.0f,
+                            Z = (float)orangeMapRawPixel.B / 255.0f,
+                            W = (float)orangeMapRawPixel.A / 255.0f,
+                        };
+
+                        // fill blue map pixels
+                        Vector3 blueMapPixel = new Vector3()
+                        {
+                            X = orangeMapVector.X * orangeMapVector.W,
+                            Y = orangeMapVector.Y,
+                            Z = 0
+                        };
+
+                        // scale bluemap into interval [-1; 1]
+                        blueMapPixel *= 2.0f;
+                        blueMapPixel -= new Vector3(1, 1, 1);
+
+
+                        // calculte z, using an orthogonal projection
+                        blueMapPixel.Z = (float)Math.Sqrt(1.0f - blueMapPixel.X * blueMapPixel.X - blueMapPixel.Y * blueMapPixel.Y);
+                                           
+
+                        // convert the float values back to bytes, interval [0; 255]
+                        var newColor = Color.FromArgb(
+                            255,
+                            (byte)((blueMapPixel.X + 1.0f) * 0.5f * 255.0f),
+                            (byte)((blueMapPixel.Y + 1.0f) * 0.5f * 255.0f),
+                            (byte)((blueMapPixel.Z + 1.0f) * 0.5f * 255.0f)                            
+                            );                                         
+                        
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
