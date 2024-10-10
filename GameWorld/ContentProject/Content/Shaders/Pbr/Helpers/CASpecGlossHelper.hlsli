@@ -1160,7 +1160,7 @@ float3 determine_surface_reflectivity(in float3 material_reflectivity, in float 
     float fresnel_curve = 10;
 
     // TODO: Fix/improve/Research this further
-    // Changed from "-view_vec", as dot product was "1" when viewed + lit from the front (UGLY), as if camera/light haf the wrong sign, but it is correct elsewhere. Looks tolerable now
+    // AE-Change: Changes from "-view_vec", as dot product was 1 when lit+viewed from the SAME direction = WRONG (+looked bad)
     float val1 = max(0, dot(light_vec, view_vec)); //  Is one when light vector and view vector are completely opposed...
 
     float val2 = pow(val1, fresnel_curve);
@@ -1248,7 +1248,7 @@ float3 determine_surface_reflectivity(in float3 material_reflectivity, in float 
     float fresnel_curve = 10;
         
     // TODO: Fix/improve/Research this further
-    // AE: Changed from "-view_vec", as dot product was 1 when lit+viewed from the SAME direction (looked bad)
+    // AE-Change: Changes from "-view_vec", as dot product was 1 when lit+viewed from the SAME direction = WRONG (+looked bad)
     float val1 = max(0, dot(light_vec, view_vec)); //  Is one when light vector and view vector are completely opposed... 
 
     float val2 = pow(val1, fresnel_curve);
