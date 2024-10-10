@@ -54,30 +54,6 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                 return ExportSupportEnum.Supported;
             return ExportSupportEnum.NotSupported;
         }
-
-        // -- TODO: maybe remove this method? kept for reference
-        private void ConvertToBlueNormalMap_pOld(byte[] imgBytes, string outputPath, string fileDirectory)
-        {
-            var ms = new MemoryStream(imgBytes);
-
-            using Image img = Image.FromStream(ms);
-
-            using Bitmap bitmap = new Bitmap(img);
-            {
-                for (int x = 0; x < bitmap.Width; x++)
-                {
-                    for (int y = 0; y < bitmap.Height; y++)
-                    {
-                        var pixel = bitmap.GetPixel(x, y);
-                        var G = pixel.G;
-                        var A = pixel.A;
-                        var newColor = Color.FromArgb(255, A, G, 255); // here you set Z = 1.0f for ALL normals, it ruins some details
-                        bitmap.SetPixel(x, y, newColor);
-                    }
-                }
-                _imageSaveHandler.Save(bitmap, fileDirectory);
-            }
-        }
         private void ConvertToBlueNormalMap(byte[] imgBytes, string outputPath, string fileDirectory)
         {
             var ms = new MemoryStream(imgBytes);
