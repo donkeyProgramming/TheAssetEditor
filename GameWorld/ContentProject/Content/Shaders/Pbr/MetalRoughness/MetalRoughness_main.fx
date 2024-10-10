@@ -46,7 +46,7 @@ GBufferMaterial GetMaterial(in PixelInputType input)
     if (UseGloss)
     {
         float4 glossTexSample = GlossTexture.Sample(SampleType, texCord);
-        material.metalness = (glossTexSample.r); // metal mask channel    
+        material.metalness = (glossTexSample.r);
         material.roughness = (glossTexSample.g);
 
     }
@@ -71,7 +71,9 @@ float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFron
     if (UseAlpha == 1)    
         alpha_test(material.diffuse.a);    
     
-    float3 normalizedViewDirection = -normalize(input.viewDirection);
+    //float3 normalizedViewDirection = -normalize(input.viewDirection);    
+    
+    float3 normalizedViewDirection = -normalize(CameraPos - input.worldPosition);    
     float3 rotatedNormalizedLightDirection = normalize(mul(light_Direction_Constant, (float3x3) DirLightTransform));    
                
     const float occlusion = 1.0f; // no SSAO yet = no occlusion
@@ -91,12 +93,13 @@ float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFron
 	//	Apply faction colours...    
     slm_uncompressed.Diffuse_Colour.rgb = ApplyTintAndFactionColours(slm_uncompressed.Diffuse_Colour.rgb, material.maskValue);
 
-    float unchartedSunFactor = 6.0f;
+    float unchartedSunFactor = 7.0f;
     
     //  Light the pixel...    
     float3 hdr_linear_col = standard_lighting_model_directional_light(get_sun_colour() * unchartedSunFactor, rotatedNormalizedLightDirection, normalizedViewDirection, slm_uncompressed);
 
     //  Tone-map the pixel...            
+    //float3 ldr_linear_col = saturate(tone_map_linear_hdr_to_linear_ldr_reinhard(hdr_linear_col));    
     float3 ldr_linear_col = saturate(Uncharted2ToneMapping(hdr_linear_col));    
     
     float3 emissiveColour = GetEmissiveColour(input.tex, material.maskValue, rotatedNormalizedLightDirection, material.pixelNormal);
@@ -104,7 +107,7 @@ float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFron
     // Combine all colours
     float3 color = ldr_linear_col + emissiveColour;	
     
-    return float4(color, 1.0f);    
+    return float4(_gamma(color), 1.0f);
 }
 
 float4 EmissiveLayerPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_TARGET0

@@ -347,14 +347,15 @@ float3 tone_map_linear_hdr_to_linear_ldr_reinhard(in float3 linear_hdr);
 float3 get_sun_colour()
 {
 	//	Substance Painter and Designer default lighting strength.
-    const float default_max_sun_colour_scale = 20000.0f/* * LightMult */;
+    const float default_max_sun_colour_scale = 20000.0f * LightMult*0.5;
     
     return default_max_sun_colour_scale;
 }
 
+
 float3 get_environment_colour(in float3 direction, in float lod)
 {
-    const float specularCubeMapBrightness = 4.0f;    
+    const float specularCubeMapBrightness = 2.0f * 0.5;
     
     return tex_cube_specular.SampleLevel(SampleType, (texcoordEnvSwizzle(direction)), lod).rgb * specularCubeMapBrightness * LightMult;
 }
@@ -362,7 +363,7 @@ float3 get_environment_colour(in float3 direction, in float lod)
 //	Ambient diffuse
 float3 cube_ambient(in float3 N)
 {	
-    const float diffuseCubeMapBrightness = 4.0f;    
+    const float diffuseCubeMapBrightness = 2.0f * 0.5;
     
     return tex_cube_diffuse.Sample(SampleType, N).rgb * diffuseCubeMapBrightness * LightMult;
 }
@@ -809,7 +810,8 @@ float3 determine_surface_reflectivity(in float3 material_reflectivity, in float3
 
 //  Determines the reflectivity of a surface given light and view vectors.  At glancing angles all materials reflect fully...
 //  Inspired by fresnel_optimized function.  Values chosen to match marmoset.
-float3 determine_surface_reflectivity(in float3 material_reflectivity, in float3 light_vec, in float3 view_vec, in float3 normal_vec)
+// AE EDIT: Added "roughness" param, to be able to use fallback "basic slick"
+float3 determine_surface_reflectivity(in float3 material_reflectivity, in float roughness, in float3 light_vec, in float3 view_vec, in float3 normal_vec)
 {
 #if 0
 	// Basic Schlick
@@ -867,34 +869,13 @@ float USER_DistributionGGX(float3 N, float3 H, float a)
 
 //  Common functionality pulled out to facilitate minor optimisations.
 float3 get_reflectivity_base(in float3 light_vec, in float3 normal_vec, in float3 view_vec, in float3 material_reflectivity, in float smoothness, in float light_vec_reflected_view_vec_angle, in float min_fraction)
-{
-    // TODO:  REMOVE DEBUGGIN CODE
+{    
+    float fraction_of_facets = determine_fraction_of_facets_at_reflection_angle(smoothness, light_vec_reflected_view_vec_angle, min_fraction);            
     
-    float fraction_of_facets = determine_fraction_of_facets_at_reflection_angle(smoothness, light_vec_reflected_view_vec_angle, min_fraction);
-
-    // TODO: DEBUGGIN CODE:
-    //float3 halfwayDir = normalize(light_vec + light_vec);
-    //float fraction_of_facets = 0;
-    //static const float EPSILON = 1e-6f;
-
-    //float alpha = 1.0f - smoothness;
-    //float NdotH = dot(normal_vec, halfwayDir);
-    //{
-    //    const float alpha2 = alpha * alpha;
-    //    const float lower = (NdotH * NdotH * (alpha2 - 1)) + 1;
-    //    fraction_of_facets = alpha2 / max(EPSILON, pi * lower * lower);
-    //}
-
-    //float fraction_of_facets = USER_DistributionGGX(normal_vec, halfwayDir, 1.0f - smoothness);
-
-    float facet_visibility = determine_facet_visibility_direct_light(1.0f - smoothness, normal_vec, light_vec, view_vec);
-
-    float3 surface_reflectivity = determine_surface_reflectivity(material_reflectivity, light_vec, view_vec, normal_vec);
-
-    // TODO: REMOVE DEBUGGING CODE
-    //return fraction_of_facets;
-    // END: DEBUGGIN CODE
-
+    float facet_visibility = determine_facet_visibility_direct_light(1.0f - smoothness, normal_vec, light_vec, view_vec);    
+        
+    float3 surface_reflectivity = determine_surface_reflectivity(material_reflectivity, 1 - smoothness, light_vec, view_vec, normal_vec);
+    
     return fraction_of_facets * facet_visibility * surface_reflectivity;
 }
 
@@ -922,7 +903,8 @@ float3 get_reflectivity_env_light(in float3 light_vec, in float3 normal_vec, in 
 
     float facet_fresnel_facets_max_amount = determine_max_fraction_env_fresnel_facets(roughness);
 
-    float3 surface_reflectivity = lerp(material_reflectivity, determine_surface_reflectivity(material_reflectivity, light_vec, view_vec, normal_vec), facet_fresnel_facets_max_amount);
+    float3 surface_reflectivity = lerp(material_reflectivity, determine_surface_reflectivity(material_reflectivity, 1 - smoothness, light_vec, view_vec, normal_vec),
+    facet_fresnel_facets_max_amount);
 
     return facet_visibility * surface_reflectivity;
 }
@@ -933,7 +915,7 @@ float get_env_map_lod(in float roughness_in)
 
     float roughness = 1.0 - smoothness;
 
-	//	This must be the number of mip-maps in the environment map!
+	//	This must be the number of mip-maps in the environment map! EDIT: set slightly lower to "simulate" SSR.
     float texture_num_lods = 7.0f;
 
     float env_map_lod = roughness * (texture_num_lods - 1.0);
@@ -953,10 +935,7 @@ float3 standard_lighting_model_environment_light_SM4_private(in const float3 nor
 	//  Specular calculations for environmental light contribution...
     float3 ambient_colour = 0.0f.xxx;
 
-    ambient_colour = cube_ambient(material.Normal);    
-
-
-    
+    ambient_colour = cube_ambient(material.Normal);        
     
     float3 env_light_diffuse = ambient_colour * material.Diffuse_Colour * (1.0f - material.Specular_Colour);        
     
@@ -1004,11 +983,7 @@ float3 standard_lighting_model_directional_light_SM4_private(in const float3 Lig
     float3 dlight_pixel_reflectivity = get_reflectivity_dir_light(normalised_light_dir, material.Normal, normalised_view_dir, reflected_view_vec, material.Specular_Colour, material.Smoothness);
 
     float3 dlight_specular_colour = dlight_pixel_reflectivity * LightColor;
-    float3 dlight_material_scattering = 1.0f - max(dlight_pixel_reflectivity, material.Specular_Colour); //  All photons not accounted for by reflectivity are accounted by scattering. From the energy difference between in-coming light and emitted light we could calculate the amount of energy turned into heat. This energy would not be enough to make a viewable difference at standard illumination levels.
-
-    // TODO: REMOVE DEBUGGING CODE:
-    //return dlight_pixel_reflectivity;
-    // END: DEBUGGIN CODE
+    float3 dlight_material_scattering = 1.0f - max(dlight_pixel_reflectivity, material.Specular_Colour); //  All photons not accounted for by reflectivity are accounted by scattering. From the energy difference between in-coming light and emitted light we could calculate the amount of energy turned into heat. This energy would not be enough to make a viewable difference at standard illumination levels. 
 
 	//  Diffuse contribution from directional light...
     float3 dlight_diffuse = material.Diffuse_Colour * normal_dot_light_vec * LightColor * dlight_material_scattering;
@@ -1051,7 +1026,7 @@ float3 standard_lighting_model_directional_light(in float3 LightColor, in float3
 {
     float normal_dot_light_vec = max(0.0f, dot(material.Normal, normalised_light_dir));
 
-    float3 reflected_view_vec = reflect(normalised_view_dir, material.Normal);
+    float3 reflected_view_vec = reflect(normalised_view_dir, material.Normal);      
         
     float3 env_light = standard_lighting_model_environment_light_SM4_private(normalised_view_dir, reflected_view_vec, material);
     float3 dir_light = standard_lighting_model_directional_light_SM4_private(LightColor, normalised_light_dir, normalised_view_dir, reflected_view_vec, material);
