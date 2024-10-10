@@ -529,21 +529,21 @@ float3 texcoordEnvSwizzle(in float3 ref)
 {
 //this should match the order of the basis
     //return float3(-ref.x, ref.z, -ref.y);
-    return float3(ref.x, ref.y, ref.y); // USER: phazer
+    return float3(ref.x, ref.y, ref.z); // USER: phazer
 }
 
 float3 normalSwizzle(in float3 ref)
 {
     //return float3(ref.y, ref.x, ref.z);
 
-    return float3(ref.x, ref.y, ref.y); // USER: phazer
+    return float3(ref.x, ref.y, ref.z); // USER: phazer
 }
 
 float3 normalSwizzle_UPDATED(in float3 ref)
 {
     //eturn float3(ref.x, ref.z, ref.y);
 
-    return float3(ref.x, ref.y, ref.y); // USER: phazer
+    return float3(ref.x, ref.y, ref.z); // USER: phazer
 }
 
 float cos2sin(float x)
@@ -579,17 +579,17 @@ float get_scurve_y_pos(const float x_coord);
 
 float3 get_environment_colour(in float3 direction, in float lod)
 {
-    const float specularCubeMapBrightness = 6.0f;
+    const float specularCubeMapBrightness = 5.0f;
     
-    return tex_cube_specular.SampleLevel(SampleType, (texcoordEnvSwizzle(direction)), lod).rgb * specularCubeMapBrightness * /*LightMult*/ 1.0f;
+    return tex_cube_specular.SampleLevel(SampleType, (texcoordEnvSwizzle(direction)), lod).rgb * specularCubeMapBrightness * LightMult;
 }
 
 //	Ambient diffuse
 float3 cube_ambient(in float3 N)
 {
-    const float diffuseCubeMapBrightness = 6.0f;
+    const float diffuseCubeMapBrightness = 5.0f;
     
-    return tex_cube_diffuse.Sample(SampleType, N).rgb * diffuseCubeMapBrightness * /*LightMult*/ 1.0f;
+    return tex_cube_diffuse.Sample(SampleType, N).rgb * diffuseCubeMapBrightness * LightMult;
 }
 
 // Diffuse
@@ -1126,7 +1126,7 @@ float determine_fraction_of_facets_at_reflection_angle(in float smoothness, in f
 
     //  This is the fraction of the facets that we expect to be in the direction of the
     //  pixel normal within the sun's angular diameter...
-    float fraction_of_facets = lerp(min_fraction_of_facets, max_fraction_of_facets, smoothness * smoothness);
+    float fraction_of_facets = lerp(min_fraction_of_facets, max_fraction_of_facets, smoothness * smoothness);    
 
     //  The fraction of the facets that this represents from negative infinity
     //  to sun_angular_radius is thus...
@@ -1159,7 +1159,9 @@ float3 determine_surface_reflectivity(in float3 material_reflectivity, in float 
 {
     float fresnel_curve = 10;
 
-    float val1 = max(0, dot(light_vec, -view_vec)); //  Is one when light vector and view vector are completely opposed...
+    // TODO: Fix/improve/Research this further
+    // Changed from "-view_vec", as dot product was "1" when viewed + lit from the front (UGLY), as if camera/light haf the wrong sign, but it is correct elsewhere. Looks tolerable now
+    float val1 = max(0, dot(light_vec, view_vec)); //  Is one when light vector and view vector are completely opposed...
 
     float val2 = pow(val1, fresnel_curve);
 
@@ -1202,7 +1204,7 @@ float3 get_reflectivity_base(in float3 light_vec, in float3 normal_vec, in float
 
     float facet_visibility = determine_facet_visibility(roughness, normal_vec, light_vec); // Looks ok
 
-    float3 surface_reflectivity = determine_surface_reflectivity(material_reflectivity, roughness, light_vec, view_vec);
+    float3 surface_reflectivity = determine_surface_reflectivity(material_reflectivity, roughness, light_vec, view_vec);    
 
     return fraction_of_facets * facet_visibility * surface_reflectivity;
 }
@@ -1244,8 +1246,10 @@ float3 determine_surface_reflectivity(in float3 material_reflectivity, in float 
 	return lerp(material_reflectivity, 1, f4 * smoothness2);
 #else
     float fresnel_curve = 10;
-
-    float val1 = max(0, dot(light_vec, -view_vec)); //  Is one when light vector and view vector are completely opposed...
+        
+    // TODO: Fix/improve/Research this further
+    // AE: Changed from "-view_vec", as dot product was 1 when lit+viewed from the SAME direction (looked bad)
+    float val1 = max(0, dot(light_vec, view_vec)); //  Is one when light vector and view vector are completely opposed... 
 
     float val2 = pow(val1, fresnel_curve);
 
@@ -1310,7 +1314,8 @@ float3 sample_environment_specular(in float roughness_in, in float3 reflected_vi
     const float env_map_lod_smoothness = adjust_linear_smoothness(1 - roughness_in);
     const float roughness = 1.0f - pow(env_map_lod_smoothness, env_lod_pow);
 
-    float texture_num_lods = 10.0f;
+    //	This must be the number of mip-maps in the environment map! EDIT: set slightly lower to "simulate" SSR.
+    float texture_num_lods = 7.0f;
     float env_map_lod = roughness * (texture_num_lods - 1);
     float3 environment_colour = get_environment_colour(reflected_view_vec, env_map_lod);
 #else
@@ -1359,12 +1364,12 @@ float3 get_reflectivity_base(in float3 light_vec, in float3 normal_vec, in float
     if (n_dot_l <= 0.0f)
         return float3(0, 0, 0);
 
-    float fraction_of_facets = determine_fraction_of_facets_at_reflection_angle(smoothness, light_vec_reflected_view_vec_angle);
-
+    float fraction_of_facets = determine_fraction_of_facets_at_reflection_angle(smoothness, light_vec_reflected_view_vec_angle);    
+    
     float facet_visibility = determine_facet_visibility(1.0f - smoothness, normal_vec, light_vec);
-
+       
     float3 surface_reflectivity = determine_surface_reflectivity(material_reflectivity, 1.0f - smoothness, light_vec, view_vec, normal_vec);
-
+    
     return fraction_of_facets * facet_visibility * surface_reflectivity;
 }
 
@@ -1382,22 +1387,22 @@ float3 standard_lighting_model_directional_light_SM4_private(in const float3 Lig
 #ifndef DEBUGGING_BIT_FLAGS
 
 	//	To match marmoset...
-    material.Smoothness = _linear(material.Smoothness);
-    material.Smoothness = adjust_linear_smoothness(material.Smoothness);
-
+   material.Smoothness = _linear(material.Smoothness);
+   material.Smoothness = adjust_linear_smoothness(material.Smoothness);    
+    
     float normal_dot_light_vec = max(0.0f, dot(material.Normal, normalised_light_dir));
 
 	//  Specular calculations for directional light contribution...
     float3 dlight_pixel_reflectivity = get_reflectivity_dir_light(normalised_light_dir, material.Normal, normalised_view_dir, reflected_view_vec, material.Specular_Colour, material.Smoothness);
     float3 dlight_specular_colour = dlight_pixel_reflectivity * LightColor;
-    float3 dlight_material_scattering = 1.0f - max(dlight_pixel_reflectivity, material.Specular_Colour); //  All photons not accounted for by reflectivity are accounted by scattering. From the energy difference between in-coming light and emitted light we could calculate the amount of energy turned into heat. This energy would not be enough to make a viewable difference at standard illumination levels.
-
+    float3 dlight_material_scattering = 1.0f - max(dlight_pixel_reflectivity, material.Specular_Colour); //  All photons not accounted for by reflectivity are accounted by scattering. From the energy difference between in-coming light and emitted light we could calculate the amount of energy turned into heat. This energy would not be enough to make a viewable difference at standard illumination levels.    																											  //  Diffuse contribution from directional light...
+    
 																											  //  Diffuse contribution from directional light...
     float3 dlight_diffuse = material.Diffuse_Colour * normal_dot_light_vec * LightColor * dlight_material_scattering / pi;
 
-	//  Scale the diffuse components in order to simulate scattering from all directions...
-    dlight_diffuse *= get_diffuse_scale_factor().xxx;
-
+	//  Scale the diffuse components in order to simulate scattering from all directions...        
+    dlight_diffuse *= get_diffuse_scale_factor().xxx;        
+    
 	// Backscattering
     float3 backscattering = 0;
 #if 0
@@ -1430,16 +1435,16 @@ float3 standard_lighting_model_directional_light_SM4_private(in const float3 Lig
 
 float3 standard_lighting_model_directional_light(in float3 LightColor, in float3 normalised_light_dir, in float3 normalised_view_dir, in R2_4_StandardLightingModelMaterial material)
 {
-    float direct_light_scale = 300.0f* LightMult; //	The game is 500 units of HDR light for each 1 unit of LDR
+    float direct_light_scale = 500.0f* LightMult; //	The game is 500 units of HDR light for each 1 unit of LDR
 
 											//  Cludges for max...
     LightColor *= direct_light_scale; //  Same as in game.
-    float3 diffuse_scale_factor = get_diffuse_scale_factor().xxx;
+//    float3 diffuse_scale_factor = get_diffuse_scale_factor().xxx;
 
     float normal_dot_light_vec = max(0.0f, dot(material.Normal, normalised_light_dir));
 
     float3 reflected_view_vec = reflect(normalised_view_dir, material.Normal);
-
+        
     const float3 env_light = standard_lighting_model_environment_light_SM4_private( /*Pws,*/normalised_view_dir, reflected_view_vec, material);
     const float3 dir_light = standard_lighting_model_directional_light_SM4_private(LightColor, normalised_light_dir, normalised_view_dir, reflected_view_vec, material);
 
@@ -2940,3 +2945,5 @@ float get_scurve_y_pos(const float x_coord)
 //        SetPixelShader(CompileShader(ps_5_0, ps30_main_BACKGROUND_CUBE()));
 //    }
 //}
+
+#endif
