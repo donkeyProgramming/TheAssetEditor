@@ -23,6 +23,7 @@ float3 Uncharted2ToneMapping(float3 color)
 
 float4 DoToneMapping(float3 hdrColor, float exposureFactor = 1.0, float gamma_value = 2.2)
 {
+    float exposure = 2.0;
     float3 hdrColorExposed = hdrColor.rgb * exposure * exposureFactor;
     float3 toneMappedColor = Uncharted2ToneMapping(hdrColorExposed);
     float3 gammmaCorrectedColor = pow(toneMappedColor, 1.0 / gamma_value);

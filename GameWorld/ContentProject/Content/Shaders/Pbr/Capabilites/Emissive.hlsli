@@ -1,6 +1,6 @@
 #include "../Helpers/GradientSampling.hlsli"
 #include "../TextureSamplers.hlsli"
-#include "../helpers/CALib.hlsli"
+#include "../helpers/MathFunctions.hlsli"
 
 // Input parameters
 bool                    CapabilityFlag_ApplyEmissive = false;

@@ -36,6 +36,33 @@ namespace Editors.Shared.DevConfig.Configs
             _packFileService.Load(packFile, false, true);
         }
     }
+    
+    internal class Kitbash_Karl_WH2
+        : IDeveloperConfiguration
+    {
+        private readonly PackFileService _packFileService;
+        private readonly IUiCommandFactory _uiCommandFactory;
+
+        public Kitbash_Karl_WH2(PackFileService packFileService, IUiCommandFactory uiCommandFactory)
+        {
+            _packFileService = packFileService;
+            _uiCommandFactory = uiCommandFactory;
+        }
+
+        public void OpenFileOnLoad()
+        {
+            var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2");
+            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
+        }
+
+        public void OverrideSettings(ApplicationSettings currentSettings)
+        {
+            currentSettings.CurrentGame = GameTypeEnum.Warhammer2;
+            currentSettings.LoadCaPacksByDefault = true;
+            //var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
+            //_packFileService.Load(packFile, false, true);
+        }
+    }
 
     internal class Kitbash_Ox : IDeveloperConfiguration
     {
