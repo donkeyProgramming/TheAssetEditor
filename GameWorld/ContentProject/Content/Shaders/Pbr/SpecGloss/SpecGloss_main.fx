@@ -8,29 +8,6 @@
 #include "../TextureSamplers.hlsli"
 #include "../inputlayouts.hlsli"
 
-
-
-float3 getPixelNormal(PixelInputType input)
-{
-    //float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));
-    float3x3 basis2 = float3x3(normalize(input.tangent.xyz), normalize(input.binormal.xyz), normalize(input.normal.xyz)); // works in own shader
-
-//    float3x3 basis2 = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));
-    
-    
-    
-    float4 NormalTex = NormalTexture.Sample(s_normal, input.tex);
-
-    float3 Np = 0;
-    Np.x = NormalTex.r * NormalTex.a;
-    Np.y = NormalTex.g;
-    Np = (Np * 2.0f) - 1.0f;
-
-    Np.z = sqrt(1 - Np.x * Np.x - Np.y * Np.y);
-
-    return normalize(mul(Np.xyz, basis2));
-}
-
 // -------------------------------------------------------------------------------------------------------------
 //  Fetch Data needed to render 1 pixel
 // -------------------------------------------------------------------------------------------------------------
@@ -67,7 +44,7 @@ GBufferMaterial GetMaterial(in PixelInputType input)
     
     if (UseNormal)
     {
-        material.pixelNormal = getPixelNormal(input);
+        material.pixelNormal = GetPixelNormal(input);
     }
     
     return material;
@@ -98,11 +75,11 @@ float4 mainPS(in PixelInputType input, bool bIsFrontFace : SV_IsFrontFace) : SV_
         shadow,
         occlusion);    
 
-    const float lightIntensity = 1.0f;
+    const float directlightIntensity = 3.0f;
     const float3 diretLightColor = float3(1, 1, 1); // TODO: make cpu side constant    
     
     // Light the pixel...
-    float3 hdr_linear_col = standard_lighting_model_directional_light(diretLightColor * lightIntensity, rotatedNormalizedLightDirection, normalizedViewDirection, standard_mat);
+    float3 hdr_linear_col = standard_lighting_model_directional_light(diretLightColor * directlightIntensity, rotatedNormalizedLightDirection, normalizedViewDirection, standard_mat);
     
     //  Tone-map the pixel...            
     float3 ldr_linear_col = saturate(tone_map_linear_hdr_pixel_value(hdr_linear_col*exposure));        

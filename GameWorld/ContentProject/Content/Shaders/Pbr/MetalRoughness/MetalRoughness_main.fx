@@ -93,7 +93,7 @@ float4 DefaultPixelShader(in PixelInputType input, bool bIsFrontFace : SV_IsFron
 	//	Apply faction colours...    
     slm_uncompressed.Diffuse_Colour.rgb = ApplyTintAndFactionColours(slm_uncompressed.Diffuse_Colour.rgb, material.maskValue);
 
-    float unchartedSunFactor = 7.0f;
+    float unchartedSunFactor = 3.0f;
     
     //  Light the pixel...    
     float3 hdr_linear_col = standard_lighting_model_directional_light(get_sun_colour() * unchartedSunFactor, rotatedNormalizedLightDirection, normalizedViewDirection, slm_uncompressed);

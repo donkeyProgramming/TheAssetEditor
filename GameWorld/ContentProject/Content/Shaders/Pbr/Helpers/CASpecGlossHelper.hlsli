@@ -579,7 +579,7 @@ float get_scurve_y_pos(const float x_coord);
 
 float3 get_environment_colour(in float3 direction, in float lod)
 {
-    const float specularCubeMapBrightness = 5.0f;
+    const float specularCubeMapBrightness = 2.0f;
     
     return tex_cube_specular.SampleLevel(SampleType, (texcoordEnvSwizzle(direction)), lod).rgb * specularCubeMapBrightness * LightMult;
 }
@@ -587,7 +587,7 @@ float3 get_environment_colour(in float3 direction, in float lod)
 //	Ambient diffuse
 float3 cube_ambient(in float3 N)
 {
-    const float diffuseCubeMapBrightness = 5.0f;
+    const float diffuseCubeMapBrightness = 2.0f;
     
     return tex_cube_diffuse.Sample(SampleType, N).rgb * diffuseCubeMapBrightness * LightMult;
 }
