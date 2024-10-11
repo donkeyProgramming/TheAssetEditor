@@ -4,15 +4,8 @@
 #include "../Shared/const_layout.hlsli"
 #include "../inputlayouts.hlsli"
 #include "../TextureSamplers.hlsli"
-
-
-
-static const float PI = 3.141592;
-static const float Epsilon = 0.00001;
-
-
-// Constant normal incidence Fresnel factor for all dielectrics.
-static const float3 Fdielectric = 0.04;
+#include "../helpers/mathfunctions.hlsli"
+#include "../helpers/mathconstants.hlsli"
 
 
 float get_cube_env_scale_factor()
@@ -85,7 +78,6 @@ float3 sample_environment_specular_new(in float roughness_in, in float3 reflecte
     return result;
 }
 
-
 float substance_smoothness_get_our_smoothness(in float substance_smoothness)
 {
 	//	This value is correct for roughnesses from second_join_pos to 1.0.  This is valid for
@@ -100,52 +92,11 @@ float substance_smoothness_get_our_smoothness(in float substance_smoothness)
     return 1.0f - saturate((28.09f * original_roughness_x5) - (64.578f * original_roughness_x4) + (48.629f * original_roughness_x3) - (12.659f * original_roughness_x2) + (1.5459f * original_roughness));
 }
 
-static const float texture_alpha_ref = 0.1f;
-
 void alpha_test(in const float pixel_alpha)
 {
     clip(pixel_alpha < 0.7f ? -1 : 1);
 	//clip(-1);
 }
-
-float nfmod(float a, float b)
-{
-    return a - b * floor(a / b);
-}
-
-
-float linear_accurate_component(in const float srgb_val)
-{
-    const float inflection_point = 0.04045;
-
-    if (srgb_val <= inflection_point)
-    {
-        return srgb_val / 12.92f;
-    }
-    else
-    {
-        const float a = 0.055f;
-
-        return pow((srgb_val + a) / (1.0f + a), 2.4f);
-    }
-}
-
-float3 linear_accurate(in const float3 fGamma)
-{
-    return float3(linear_accurate_component(fGamma.r), linear_accurate_component(fGamma.g), linear_accurate_component(fGamma.b));
-}
-
-float _linear(in float fGamma)
-{
-    return linear_accurate_component(fGamma);
-}
-
-float3 _linear(in float3 vGamma)
-{
-    return linear_accurate(vGamma);
-}
-
-
 
 void apply_faction_colours(inout float3 diffuse_colour_rgb, in Texture2D MaskText, in sampler S,
 in const float2 tex_coord,
@@ -177,98 +128,24 @@ float3 normalSwizzle_UPDATED(in float3 ref)
 #endif
 }
 
+//float3 GetPixelNormal(PixelInputType input)
+//{
+//	//float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));      // TODO: some games have this, sometimes enables, sometimes as as comment,
+//    float3x3 basis = float3x3(normalize(input.tangent.xyz), normalize(input.binormal.xyz), normalize(input.normal.xyz)); // works in own shader
 
-//  From http://en.wikipedia.org/wiki/SRGB                          //
-//                                                                  //
-//  It seems that gamma to linear and back again is not a simple    //
-//  pow function.  The functions above are just a simplification    //
-//  of what the spec is and what the hardware is doing, which is    //
-//  following this spec.                                            //
-//////////////////////////////////////////////////////////////////////
-float gamma_accurate_component(in const float linear_val)
-{
-    const float srgb_gamma_ramp_inflection_point = 0.0031308f;
+//    float4 NormalTex = NormalTexture.Sample(s_normal, input.tex);
 
-    if (linear_val <= srgb_gamma_ramp_inflection_point)
-    {
-        return 12.92f * linear_val;
-    }
-    else
-    {
-        const float a = 0.055f;
-
-        return ((1.0f + a) * pow(linear_val, 1.0f / 2.4f)) - a;
-    }
-}
-
-float3 gamma_accurate(in const float3 vLinear)
-{
-    return float3(gamma_accurate_component(vLinear.r), gamma_accurate_component(vLinear.g), gamma_accurate_component(vLinear.b));
-}
-
-
-float3 _gamma(in float3 vLinear)
-{
-    return gamma_accurate(vLinear);
-}
-
-float _gamma(in float fLinear)
-{
-    return gamma_accurate_component(fLinear);
-}
-
-
-float3 GetPixelNormal(PixelInputType input)
-{
-	//float3x3 basis = float3x3(normalize(input.tangent), normalize(input.normal), normalize(input.binormal));      // TODO: some games have this, sometimes enables, sometimes as as comment,
-    float3x3 basis = float3x3(normalize(input.tangent.xyz), normalize(input.binormal.xyz), normalize(input.normal.xyz)); // works in own shader
-
-    float4 NormalTex = NormalTexture.Sample(s_normal, input.tex);
-
-    // -------------------------------------------------------------------------------------------------------------------
-    // decode the "orange 2d normal map", into a standard "blue" 3d normal map using an othogonal projection
-    // -------------------------------------------------------------------------------------------------------------------
-    float3 Np = 0;
-    Np.x = NormalTex.r * NormalTex.a;
-    Np.y = 1.0 - NormalTex.g;
-    Np = (Np * 2.0f) - 1.0f;
-    Np.z = sqrt(1 - Np.x * Np.x - Np.y * Np.y);
+//    // -------------------------------------------------------------------------------------------------------------------
+//    // decode the "orange 2d normal map", into a standard "blue" 3d normal map using an othogonal projection
+//    // -------------------------------------------------------------------------------------------------------------------
+//    float3 Np = 0;
+//    Np.x = NormalTex.r * NormalTex.a;
+//    Np.y = 1.0 - NormalTex.g;
+//    Np = (Np * 2.0f) - 1.0f;
+//    Np.z = sqrt(1 - Np.x * Np.x - Np.y * Np.y);
     	
-    return normalize(mul(normalize(Np.xyz), basis));
-}
-
-
-
-
-
-
-
-
-float get_direct_roughness(in float roughness_in)
-{
-    float smoothness = pow(1.0 - roughness_in, 4.0);
-
-    float roughness = 1.0 - smoothness;
-
-    return roughness;
-}
-
-
-float get_env_map_lod(in float roughness_in, in float texture_num_lods)
-{
-    float smoothness = pow(1.0 - roughness_in, 4.0);
-
-    float roughness = 1.0 - smoothness;
-
-    //	This must be the number of mip-maps in the environment map!
-//	float texture_num_lods = 10.0f;
-
-    float env_map_lod = roughness * (texture_num_lods - 1);
-
-    return env_map_lod;
-}
-
-
+//    return normalize(mul(normalize(Np.xyz), basis));
+//}
 
 float3 EnvBRDFApprox(float3 SpecularColor, float Roughness, float NoV)
 {
@@ -298,7 +175,7 @@ float ndfGGX(float cosLh, float roughness)
     float alphaSq = alpha * alpha;
 
     float denom = (cosLh * cosLh) * (alphaSq - 1.0) + 1.0;
-    return alphaSq / (PI * denom * denom);
+    return alphaSq / (pi * denom * denom);
 }
 
 // Single term for separable Schlick-GGX below.
@@ -328,20 +205,5 @@ uint querySpecularTextureLevels(in TextureCube specularTexture)
     specularTexture.GetDimensions(0, width, height, levels);
     return levels;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif // CALIB_HLSLI
