@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace AssetEditor
 {
@@ -27,7 +28,7 @@ namespace AssetEditor
             var forceValidateServiceScopes = Debugger.IsAttached;
             _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes);
             _rootScope = _serviceProvider.CreateScope();
-            
+
             var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             settingsService.AllowSettingsUpdate = true;
             settingsService.Load();
@@ -46,9 +47,10 @@ namespace AssetEditor
                 settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
                 settingsService.Save();
             }
+
             var devConfigManager = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
             devConfigManager.Initialize(e);
-            devConfigManager.OverrideSettings();        
+            devConfigManager.OverrideSettings();
 
             // Load all packfiles
             if (settingsService.CurrentSettings.LoadCaPacksByDefault)
@@ -76,6 +78,9 @@ namespace AssetEditor
             var mainWindow = _rootScope.ServiceProvider.GetRequiredService<MainWindow>();
             mainWindow.DataContext = _rootScope.ServiceProvider.GetRequiredService<MainViewModel>();
             mainWindow.Show();
+
+            var applicationSettingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
+            ThemesController.SetTheme(applicationSettingsService.CurrentSettings.Theme);
         }
 
         void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)

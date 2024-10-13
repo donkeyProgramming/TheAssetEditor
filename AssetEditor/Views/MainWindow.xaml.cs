@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using AssetEditor.WindowsTitleMenu;
+using CommonControls.PackFileBrowser;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Common;
@@ -16,8 +17,14 @@ namespace AssetEditor.Views
         Point _lastMouseDown;
         IEditorViewModel _draggedItem;
 
-        public MainWindow()
+        private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly GameInformationFactory _gameInformationFactory;
+
+        public MainWindow(ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
         {
+            _applicationSettingsService = applicationSettingsService;
+            _gameInformationFactory = gameInformationFactory;
+
             InitializeComponent();
             SourceInitialized += OnSourceInitialized;
 
@@ -75,15 +82,11 @@ namespace AssetEditor.Views
                         (Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0))
                     {
                         if (_draggedItem != null)
-                        {
                             DragDrop.DoDragDrop(EditorsTabControl, EditorsTabControl.SelectedValue, DragDropEffects.Move);
-                        }
                     }
                 }
                 else
-                {
                     _draggedItem = null;
-                }
             }
             catch
             {
@@ -96,15 +99,14 @@ namespace AssetEditor.Views
             {
                 var dropTargetItem = sender as TabItem;
                 var pos = e.GetPosition(dropTargetItem);
-                bool insertAfterTargetNode = pos.X - dropTargetItem.ActualWidth / 2 > 0;
+                var insertAfterTargetNode = pos.X - dropTargetItem.ActualWidth / 2 > 0;
 
                 if (DataContext is IDropTarget<IEditorViewModel, bool> dropContainer)
                 {
                     if (_draggedItem == null)
                         return;
 
-                    var dropTargetNode = dropTargetItem?.DataContext as IEditorViewModel;
-                    if (dropTargetNode == null)
+                    if (dropTargetItem?.DataContext is not IEditorViewModel dropTargetNode)
                         return;
 
                     if (dropContainer.AllowDrop(_draggedItem, dropTargetNode, insertAfterTargetNode))
@@ -202,7 +204,7 @@ namespace AssetEditor.Views
 
         private void NewWindowMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var w = new MainWindow();
+            var w = new MainWindow(_applicationSettingsService, _gameInformationFactory);
             w.WindowState = WindowState.Normal;
             w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             w.Show();
@@ -216,25 +218,17 @@ namespace AssetEditor.Views
         private void Icon_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2 && e.ChangedButton == MouseButton.Left)
-            {
                 Close();
-            }
             else if (e.ChangedButton == MouseButton.Left || e.ChangedButton == MouseButton.Right)
-            {
                 ShowSystemMenu(e.GetPosition(this));
-            }
         }
 
         public void ToggleWindowState()
         {
             if (WindowState == WindowState.Maximized)
-            {
                 SystemCommands.RestoreWindow(this);
-            }
             else
-            {
                 SystemCommands.MaximizeWindow(this);
-            }
         }
 
         public void ShowSystemMenu(Point point)
@@ -248,6 +242,21 @@ namespace AssetEditor.Views
                 point.Y += Top;
             }
             SystemCommands.ShowSystemMenu(this, point);
+        }
+
+        private static T FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T typedChild)
+                    return typedChild;
+
+                var childOfChild = FindChild<T>(child);
+                if (childOfChild != null)
+                    return childOfChild;
+            }
+            return null;
         }
     }
 }

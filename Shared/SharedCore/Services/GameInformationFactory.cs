@@ -34,7 +34,7 @@
         public GameInformation Warhammer3 { get; private set; }
         public GameInformation Troy { get; private set; }
         public GameInformation ThreeKingdoms { get; private set; }
-        public GameInformation RomeRemastered { get; private set; }
+        public GameInformation Rome_2 { get; private set; }
         public GameInformation Attila { get; private set; }
         public GameInformation Pharaoh { get; private set; }
         public List<GameInformation> Games { get; private set; }
@@ -46,10 +46,10 @@
             Warhammer3 = new GameInformation() { Type = GameTypeEnum.Warhammer3, DisplayName = "Warhammer III", DefaultPackType = "PFH5", ShortID = "WarhammerIII" };
             Troy = new GameInformation() { Type = GameTypeEnum.Troy, DisplayName = "Troy", DefaultPackType = "PFH5", ShortID = "troy" };
             ThreeKingdoms = new GameInformation() { Type = GameTypeEnum.ThreeKingdoms, DisplayName = "Three Kingdoms", DefaultPackType = "PFH5", ShortID = "ThreeKingdoms" };
-            RomeRemastered = new GameInformation() { Type = GameTypeEnum.RomeRemastered, DisplayName = "Rome Remastered", DefaultPackType = "PFH5", ShortID = "RomeRemastered" };
+            Rome_2 = new GameInformation() { Type = GameTypeEnum.Rome_2, DisplayName = "Rome II", DefaultPackType = "PFH5", ShortID = "Rome_2" };
             Attila = new GameInformation() { Type = GameTypeEnum.Attila, DisplayName = "Attila", DefaultPackType = "PFH5", ShortID = "Attila" };
             Pharaoh = new GameInformation() { Type = GameTypeEnum.Pharaoh, DisplayName = "Pharaoh", DefaultPackType = "PFH5", ShortID = "Pharaoh" };
-            Games = [Warhammer, Warhammer2, Warhammer3, Troy, ThreeKingdoms, RomeRemastered, Attila, Pharaoh];
+            Games = [Warhammer, Warhammer2, Warhammer3, Troy, ThreeKingdoms, Rome_2, Attila, Pharaoh];
         }
 
         public GameInformation GetGameById(GameTypeEnum type)

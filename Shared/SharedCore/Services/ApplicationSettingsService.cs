@@ -31,9 +31,7 @@ namespace Shared.Core.Services
         {
             WwisePath = Environment.GetEnvironmentVariable("WWISEROOT") ?? "";
             if (!string.IsNullOrEmpty(WwisePath))
-            {
                 WwisePath = Path.Combine(WwisePath, "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
-            }
         }
     }
 
@@ -72,9 +70,7 @@ namespace Shared.Core.Services
             var invalidPacks = recentPackfilePaths.Where(path => !File.Exists(path)).ToList();
 
             foreach (var invalidPath in invalidPacks)
-            {
                 recentPackfilePaths.Remove(invalidPath);
-            }
         }
 
         public void AddRecentlyOpenedPackFile(string path)
@@ -85,16 +81,12 @@ namespace Shared.Core.Services
                 return;
 
             if (recentPackFilePaths.Contains(path))
-            {
                 recentPackFilePaths.Remove(path);
-            }
 
             recentPackFilePaths.Add(path);
 
             if (recentPackFilePaths.Count > 15)
-            {
                 recentPackFilePaths.RemoveAt(0);
-            }
         }
 
         public string? GetGamePathForGame(GameTypeEnum game)
