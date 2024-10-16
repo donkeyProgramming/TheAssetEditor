@@ -43,6 +43,10 @@
       "commandName": "Project",
       "commandLineArgs": "-devcfg AnimTransfer_DwarfArcher",
       "nativeDebugging": false
+    },
+    "AE-KitbashKarl_WH2": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg Kitbash_Karl_WH2",
+      "nativeDebugging": false
     }
   }
-}
