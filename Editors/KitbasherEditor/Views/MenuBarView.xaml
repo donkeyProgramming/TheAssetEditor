@@ -68,7 +68,6 @@
             SeperatorTemplate="{StaticResource seperatorButtonTemplate}"/>
     </UserControl.Resources>
 
-
     <DockPanel>
         <Menu ItemsSource="{Binding MenuItems}"  DockPanel.Dock="Top">
             <Menu.Resources>
@@ -95,6 +94,5 @@
         <ToolBarTray DockPanel.Dock="Top" VerticalAlignment="Center">
             <ToolBar ItemsSource="{Binding Path=CustomButtons}" ItemTemplateSelector="{StaticResource buttonStyleSelector}"  />
         </ToolBarTray>
-
     </DockPanel>
 </UserControl>

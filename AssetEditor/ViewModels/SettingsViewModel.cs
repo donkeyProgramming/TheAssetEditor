@@ -1,95 +1,92 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using Shared.Core.Misc;
-using Shared.Core.Services;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Xna.Framework;
+using Shared.Core.Misc;
+using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace AssetEditor.ViewModels
 {
-    class SettingsViewModel : NotifyPropertyChangedImpl
+    partial class SettingsViewModel : ObservableObject
     {
-        public ObservableCollection<GamePathItem> GameDirectores { get; set; } = new ObservableCollection<GamePathItem>();
-
-        GameTypeEnum _currentGame;
-        public GameTypeEnum CurrentGame { get => _currentGame; set => SetAndNotify(ref _currentGame, value); }
-
-        bool _UseTextEditorForUnknownFiles;
-        public bool UseTextEditorForUnknownFiles { get => _UseTextEditorForUnknownFiles; set => SetAndNotify(ref _UseTextEditorForUnknownFiles, value); }
-
-        bool _loadCaPacksByDefault;
-        public bool LoadCaPacksByDefault { get => _loadCaPacksByDefault; set => SetAndNotify(ref _loadCaPacksByDefault, value); }
-
-        bool _autoGenerateAttachmentPointsFromMeshes;
-        public bool AutoGenerateAttachmentPointsFromMeshes { get => _autoGenerateAttachmentPointsFromMeshes; set => SetAndNotify(ref _autoGenerateAttachmentPointsFromMeshes, value); }
-
-        bool _LoadWemFiles;
-        public bool LoadWemFiles { get => _LoadWemFiles; set => SetAndNotify(ref _LoadWemFiles, value); }
-
-
-        string _wwisepath;
-        public string WwisePath { get => _wwisepath; set => SetAndNotify(ref _wwisepath, value); }
-
-
-        public ICommand SaveCommand { get; set; }
-        public ICommand BrowseCommand { get; set; }
-
         private readonly ApplicationSettingsService _settingsService;
+
+        public ObservableCollection<ThemeType> AvailableThemes { get; set; } = [];
+        public ObservableCollection<BackgroundColour> RenderEngineBackgroundColours { get; set; } = [];
+        public ObservableCollection<GameTypeEnum> Games { get; set; } = [];
+        public ObservableCollection<GamePathItem> GameDirectores { get; set; } = [];
+
+        [ObservableProperty] private ThemeType _currentTheme;
+        [ObservableProperty] private BackgroundColour _currentRenderEngineBackgroundColour;
+        [ObservableProperty] private bool _startMaximised;
+        [ObservableProperty] private GameTypeEnum _currentGame;
+        [ObservableProperty] private bool _loadCaPacksByDefault;
+        [ObservableProperty] private bool _loadWemFiles;
+        [ObservableProperty] private string _wwisePath;
+
+        public bool IsLoadWemFilesEnabled => LoadCaPacksByDefault;
 
         public SettingsViewModel(ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _settingsService = settingsService;
-
-            foreach (var game in gameInformationFactory.Games)
+            AvailableThemes = new ObservableCollection<ThemeType>((ThemeType[])Enum.GetValues(typeof(ThemeType)));
+            CurrentTheme = _settingsService.CurrentSettings.Theme;
+            RenderEngineBackgroundColours = new ObservableCollection<BackgroundColour>((BackgroundColour[])Enum.GetValues(typeof(BackgroundColour)));
+            CurrentRenderEngineBackgroundColour = _settingsService.CurrentSettings.RenderEngineBackgroundColour;
+            StartMaximised = _settingsService.CurrentSettings.StartMaximised;
+            Games = new ObservableCollection<GameTypeEnum>(gameInformationFactory.Games.OrderBy(g => g.DisplayName).Select(g => g.Type));
+            CurrentGame = _settingsService.CurrentSettings.CurrentGame;
+            LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
+            LoadWemFiles = _settingsService.CurrentSettings.LoadWemFiles;
+            foreach (var game in gameInformationFactory.Games.OrderBy(g => g.DisplayName))
             {
                 GameDirectores.Add(
                     new GamePathItem()
                     {
-                        GameName = game.DisplayName,
+                        GameName = $"{game.DisplayName}",
                         GameType = game.Type,
                         Path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type)?.Path
                     });
             }
-
-            CurrentGame = _settingsService.CurrentSettings.CurrentGame;
-            UseTextEditorForUnknownFiles = _settingsService.CurrentSettings.UseTextEditorForUnknownFiles;
-            LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
-            AutoGenerateAttachmentPointsFromMeshes = _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes;
-            LoadWemFiles = _settingsService.CurrentSettings.LoadWemFiles;
             WwisePath = _settingsService.CurrentSettings.WwisePath;
-
-            SaveCommand = new RelayCommand(OnSave);
-            BrowseCommand = new RelayCommand(OnBrowse);
         }
 
-        void OnSave()
+        partial void OnLoadCaPacksByDefaultChanged(bool value)
         {
+            OnPropertyChanged(nameof(IsLoadWemFilesEnabled));
+            if (value == false)
+                LoadWemFiles = value;
+        }
+
+        [RelayCommand] private void Save()
+        {
+            _settingsService.CurrentSettings.Theme = CurrentTheme;
+            _settingsService.CurrentSettings.RenderEngineBackgroundColour = CurrentRenderEngineBackgroundColour;
+            _settingsService.CurrentSettings.StartMaximised = StartMaximised;
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
-            _settingsService.CurrentSettings.UseTextEditorForUnknownFiles = UseTextEditorForUnknownFiles;
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;
             _settingsService.CurrentSettings.LoadWemFiles = LoadWemFiles;
-            _settingsService.CurrentSettings.AutoGenerateAttachmentPointsFromMeshes = AutoGenerateAttachmentPointsFromMeshes;
-            _settingsService.CurrentSettings.WwisePath = WwisePath;
-
             _settingsService.CurrentSettings.GameDirectories.Clear();
             foreach (var item in GameDirectores)
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair() { Game = item.GameType, Path = item.Path });
-
+            _settingsService.CurrentSettings.WwisePath = WwisePath;
             _settingsService.Save();
             MessageBox.Show("Please restart the tool after updating settings!");
         }
 
-        void OnBrowse()
+        [RelayCommand] private void Browse()
         {
             var dialog = new OpenFileDialog();
             dialog.Filter = "Executable files (*.exe)|*.exe";
             dialog.Multiselect = false;
             if (dialog.ShowDialog() == DialogResult.OK)
-            {
                 WwisePath = dialog.FileName;
-            }
         }
     }
 

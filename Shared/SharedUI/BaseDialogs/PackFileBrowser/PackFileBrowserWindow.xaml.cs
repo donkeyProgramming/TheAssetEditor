@@ -24,7 +24,7 @@ namespace CommonControls.PackFileBrowser
         void Create(PackFileService packfileService)
         {
             ViewModel = new PackFileBrowserViewModel(packfileService);
-            ViewModel.ContextMenu = new OpenFileContexMenuHandler(packfileService);
+            ViewModel.ContextMenu = new OpenFileContextMenuHandler(packfileService);
             ViewModel.FileOpen += ViewModel_FileOpen;
             ViewModel.Filter.AutoExapandResultsAfterLimitedCount = 50;
             InitializeComponent();

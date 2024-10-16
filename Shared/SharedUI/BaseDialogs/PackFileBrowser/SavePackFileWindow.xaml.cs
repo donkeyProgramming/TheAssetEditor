@@ -27,7 +27,7 @@ namespace CommonControls.PackFileBrowser
         {
             _packfileService = packfileService;
             ViewModel = new PackFileBrowserViewModel(packfileService, true);
-            ViewModel.ContextMenu = new OpenFileContexMenuHandler(packfileService);
+            ViewModel.ContextMenu = new OpenFileContextMenuHandler(packfileService);
             ViewModel.FileOpen += ViewModel_FileOpen;
             ViewModel.NodeSelected += ViewModel_FileSelected;
             InitializeComponent();
@@ -88,8 +88,6 @@ namespace CommonControls.PackFileBrowser
                     if (string.IsNullOrWhiteSpace(_selectedNode?.Name) == false)
                     {
                         var fullPath = _selectedNode.GetFullPath();
-                        //var fullPath = _packfileService.GetFullPath(_selectedNode.Item , _selectedNode.FileOwner);
-                        //fullPath = System.IO.Path.GetDirectoryName(fullPath);
                         path = fullPath + "\\";
                     }
                 }

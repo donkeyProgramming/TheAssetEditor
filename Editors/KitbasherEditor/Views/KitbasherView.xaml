@@ -25,18 +25,15 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="0.25*"/>
             <RowDefinition Height="5"/>
             <RowDefinition Height="0.75*"/>
         </Grid.RowDefinitions>
 
-        <local:MenuBarView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" DataContext="{Binding MenuBar, Mode=OneTime}"/>
+        <local:MenuBarView Grid.Row="0" Grid.Column="0" DataContext="{Binding MenuBar, Mode=OneTime}"/>
 
-    
-        
         <!-- Main editor window, contains the 3d view, animation panel and active tools window -->
         <Grid Grid.Row="1" Grid.Column="0" Grid.RowSpan="4" >
             <Grid.RowDefinitions>
@@ -85,9 +82,7 @@
             </Grid>
         </Grid>
 
-    
-
-        <GridSplitter Grid.Row="1" Grid.RowSpan="4" Grid.Column="1"  HorizontalAlignment="Stretch">
+        <GridSplitter Grid.Row="0" Grid.RowSpan="5" Grid.Column="1"  HorizontalAlignment="Stretch">
             <GridSplitter.Template>
                 <ControlTemplate TargetType="{x:Type GridSplitter}">
                     <Grid>

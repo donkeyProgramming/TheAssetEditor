@@ -21,10 +21,7 @@ namespace AssetEditor.UiCommands
             };
 
             if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                if (_packFileService.Load(dialog.FileName, true) == null)
-                    System.Windows.MessageBox.Show($"Unable to load packfiles {dialog.FileName}");
-            }
+                _packFileService.Load(dialog.FileName, true);
         }
     }
 }
