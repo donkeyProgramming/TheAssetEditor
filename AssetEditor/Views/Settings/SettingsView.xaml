@@ -46,6 +46,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Text="Application" Margin="5, 10, 0, 0" FontSize="15"/>
@@ -59,15 +60,19 @@
             <ComboBox Grid.Row="3" Grid.Column="1" Margin="0, 0, 0, 5" SelectedItem="{Binding CurrentRenderEngineBackgroundColour, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                       ItemsSource="{Binding RenderEngineBackgroundColours}" ItemTemplate="{StaticResource SettingsEnumConverterTemplate}"/>
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Selected game" Margin="5, 0, 0, 0"/>
-            <ComboBox Grid.Row="4" Grid.Column="1" Width="150" Margin="0, 0, 0, 5" SelectedItem="{Binding CurrentGame, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Start maximised" Margin="5, 0, 0, 0"/>
+            <CheckBox Grid.Row="4" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding StartMaximised, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Loaded game" Margin="5, 0, 0, 0"/>
+            <ComboBox Grid.Row="5" Grid.Column="1" Width="150" Margin="0, 0, 0, 5" SelectedItem="{Binding CurrentGame, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                       ItemsSource="{Binding Games}" ItemTemplate="{StaticResource SettingsEnumConverterTemplate}"/>
 
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="Load game files" Margin="5, 0, 0, 0"/>
-            <CheckBox Grid.Row="5" Grid.Column="1" Margin="0, 0, 0, 5" IsChecked="{Binding LoadCaPacksByDefault, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Load game files" Margin="5, 0, 0, 0"/>
+            <CheckBox Grid.Row="6" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding LoadCaPacksByDefault, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <TextBlock Grid.Row="6" Grid.Column="0" Text="Load audio (.wem) files" Margin="5, 0, 0, 0"/>
-            <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding LoadWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding IsLoadWemFilesEnabled}"/>
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Load audio (.wem) files" Margin="5, 0, 0, 0"/>
+            <CheckBox Grid.Row="7" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding LoadWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding IsLoadWemFilesEnabled}"/>
+            
         </Grid>
 
         <Grid Grid.Row="1">

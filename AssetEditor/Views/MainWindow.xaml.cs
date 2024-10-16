@@ -28,7 +28,7 @@ namespace AssetEditor.Views
             InitializeComponent();
             SourceInitialized += OnSourceInitialized;
 
-            this.KeyDown += MainWindow_KeyDown;
+            KeyDown += MainWindow_KeyDown;
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -48,7 +48,7 @@ namespace AssetEditor.Views
             }
         }
 
-        private void tabItem_MouseDown(object sender, MouseButtonEventArgs e)
+        private void TabItem_MouseDown(object sender, MouseButtonEventArgs e)
         {
             try
             {
@@ -57,7 +57,6 @@ namespace AssetEditor.Views
                     _lastMouseDown = e.GetPosition(EditorsTabControl);
 
                     var item = (TabItem)sender;
-
                     item.Focusable = true;
                     item.Focus();
                     item.Focusable = false;
@@ -70,13 +69,13 @@ namespace AssetEditor.Views
             }
         }
 
-        private void tabItem_MouseMove(object sender, MouseEventArgs e)
+        private void TabItem_MouseMove(object sender, MouseEventArgs e)
         {
             try
             {
                 if (e.LeftButton == MouseButtonState.Pressed)
                 {
-                    Point currentPosition = e.GetPosition(EditorsTabControl);
+                    var currentPosition = e.GetPosition(EditorsTabControl);
 
                     if ((Math.Abs(currentPosition.X - _lastMouseDown.X) > 10.0) ||
                         (Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0))
@@ -93,7 +92,7 @@ namespace AssetEditor.Views
             }
         }
 
-        private void tabItem_Drop(object sender, DragEventArgs e)
+        private void TabItem_Drop(object sender, DragEventArgs e)
         {
             try
             {
@@ -192,7 +191,7 @@ namespace AssetEditor.Views
             ToggleWindowState();
         }
 
-        private void maximizeRestoreButton_ToolTipOpening(object sender, ToolTipEventArgs e)
+        private void MaximizeRestoreButton_ToolTipOpening(object sender, ToolTipEventArgs e)
         {
             maximizeRestoreButton.ToolTip = WindowState == WindowState.Normal ? "Maximize" : "Restore";
         }

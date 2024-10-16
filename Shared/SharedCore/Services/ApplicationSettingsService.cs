@@ -19,6 +19,7 @@ namespace Shared.Core.Services
         public ObservableCollection<string> RecentPackFilePaths { get; set; } = [];
         public ThemeType Theme { get; set; } = ThemeType.DarkTheme;
         public BackgroundColour RenderEngineBackgroundColour { get; set; } = BackgroundColour.DarkGrey;
+        public bool StartMaximised { get; set; } = false;
         public List<GamePathPair> GameDirectories { get; set; } = [];
         public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Warhammer3;
         public bool LoadCaPacksByDefault { get; set; } = true;

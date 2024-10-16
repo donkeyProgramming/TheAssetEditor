@@ -32,18 +32,19 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border SnapsToDevicePixels="true" BorderThickness="1">
+            <Border SnapsToDevicePixels="true" BorderBrush="{DynamicResource TextBox.Static.Border}" BorderThickness="1">
                 <Grid>
-                    <TextBox x:Name="FilterTextBoxItem" Style="{StaticResource HintedTextBox}" KeyboardNavigation.TabIndex="0" FontSize="12" Tag="Search PackFile Explorer (Ctrl+Shift+F)"
+                    <TextBox x:Name="FilterTextBoxItem" Style="{StaticResource HintedTextBox}" KeyboardNavigation.TabIndex="0" FontSize="12" BorderThickness="0"
                              KeyboardNavigation.IsTabStop="True" HorizontalAlignment="Stretch" Padding="2.5, 0, 0, 0"  Height="24" VerticalContentAlignment="Center" 
-                             Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350, ValidatesOnDataErrors=True}">
+                             Text="{Binding Filter.FilterText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350, ValidatesOnDataErrors=True}"
+                             Tag="Search PackFile Explorer (Ctrl+Shift+F)">
                     </TextBox>
 
                     <Button Click="ClearButtonClick" Command="{Binding ClearTextCommand}" Padding="2" Width="24" Height="24" HorizontalAlignment="Right" 
                             VerticalContentAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
-                                <Border SnapsToDevicePixels="true" Background="{DynamicResource TextBox.Static.Background}">
+                                <Grid SnapsToDevicePixels="true" Background="{DynamicResource TextBox.Static.Background}">
                                     <Path Data="M0,0 L8,8 M8,0 L0,8" StrokeThickness="1.5" VerticalAlignment="Center" HorizontalAlignment="Center">
                                         <Path.Style>
                                             <Style TargetType="{x:Type Path}">
@@ -58,7 +59,7 @@
                                             </Style>
                                         </Path.Style>
                                     </Path>
-                                </Border>
+                                </Grid>
                             </ControlTemplate>
                         </Button.Template>
                     </Button>

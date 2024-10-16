@@ -80,6 +80,9 @@ namespace AssetEditor
             mainWindow.Show();
 
             var applicationSettingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
+            if (applicationSettingsService.CurrentSettings.StartMaximised == true)
+                mainWindow.WindowState = WindowState.Maximized;
+
             ThemesController.SetTheme(applicationSettingsService.CurrentSettings.Theme);
         }
 

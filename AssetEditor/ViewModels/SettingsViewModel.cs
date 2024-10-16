@@ -24,6 +24,7 @@ namespace AssetEditor.ViewModels
 
         [ObservableProperty] private ThemeType _currentTheme;
         [ObservableProperty] private BackgroundColour _currentRenderEngineBackgroundColour;
+        [ObservableProperty] private bool _startMaximised;
         [ObservableProperty] private GameTypeEnum _currentGame;
         [ObservableProperty] private bool _loadCaPacksByDefault;
         [ObservableProperty] private bool _loadWemFiles;
@@ -34,19 +35,15 @@ namespace AssetEditor.ViewModels
         public SettingsViewModel(ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _settingsService = settingsService;
-
             AvailableThemes = new ObservableCollection<ThemeType>((ThemeType[])Enum.GetValues(typeof(ThemeType)));
             CurrentTheme = _settingsService.CurrentSettings.Theme;
-
             RenderEngineBackgroundColours = new ObservableCollection<BackgroundColour>((BackgroundColour[])Enum.GetValues(typeof(BackgroundColour)));
             CurrentRenderEngineBackgroundColour = _settingsService.CurrentSettings.RenderEngineBackgroundColour;
-
+            StartMaximised = _settingsService.CurrentSettings.StartMaximised;
             Games = new ObservableCollection<GameTypeEnum>(gameInformationFactory.Games.OrderBy(g => g.DisplayName).Select(g => g.Type));
             CurrentGame = _settingsService.CurrentSettings.CurrentGame;
-
             LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
             LoadWemFiles = _settingsService.CurrentSettings.LoadWemFiles;
-
             foreach (var game in gameInformationFactory.Games.OrderBy(g => g.DisplayName))
             {
                 GameDirectores.Add(
@@ -57,7 +54,6 @@ namespace AssetEditor.ViewModels
                         Path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type)?.Path
                     });
             }
-
             WwisePath = _settingsService.CurrentSettings.WwisePath;
         }
 
@@ -71,21 +67,15 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void Save()
         {
             _settingsService.CurrentSettings.Theme = CurrentTheme;
-
             _settingsService.CurrentSettings.RenderEngineBackgroundColour = CurrentRenderEngineBackgroundColour;
-
+            _settingsService.CurrentSettings.StartMaximised = StartMaximised;
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
-
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;
-
             _settingsService.CurrentSettings.LoadWemFiles = LoadWemFiles;
-
             _settingsService.CurrentSettings.GameDirectories.Clear();
             foreach (var item in GameDirectores)
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair() { Game = item.GameType, Path = item.Path });
-
             _settingsService.CurrentSettings.WwisePath = WwisePath;
-
             _settingsService.Save();
             MessageBox.Show("Please restart the tool after updating settings!");
         }
@@ -96,9 +86,7 @@ namespace AssetEditor.ViewModels
             dialog.Filter = "Executable files (*.exe)|*.exe";
             dialog.Multiselect = false;
             if (dialog.ShowDialog() == DialogResult.OK)
-            {
                 WwisePath = dialog.FileName;
-            }
         }
     }
 

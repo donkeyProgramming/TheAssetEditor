@@ -59,7 +59,7 @@
             Grid.Row="0"
             Grid.ColumnSpan="3"
             MinHeight="35"
-            Background="{StaticResource TitleBar.Static.Background}">
+            Background="{DynamicResource TitleBar.Static.Background}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" MinWidth="40" />
@@ -102,7 +102,7 @@
                 Click="OnMaximizeRestoreButtonClick"
                 Style="{StaticResource TitleBarButtonStyle}"
                 ToolTip="Maximize"
-                ToolTipOpening="maximizeRestoreButton_ToolTipOpening">
+                ToolTipOpening="MaximizeRestoreButton_ToolTipOpening">
                 <Path
                     Width="36"
                     Height="32"
@@ -148,9 +148,9 @@
 
                     <TabControl.ItemContainerStyle>
                         <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
-                            <EventSetter Event="Drop" Handler="tabItem_Drop"/>
-                            <EventSetter Event="PreviewMouseMove" Handler="tabItem_MouseMove"/>
-                            <EventSetter Event="PreviewMouseDown" Handler="tabItem_MouseDown"/>
+                            <EventSetter Event="Drop" Handler="TabItem_Drop"/>
+                            <EventSetter Event="PreviewMouseMove" Handler="TabItem_MouseMove"/>
+                            <EventSetter Event="PreviewMouseDown" Handler="TabItem_MouseDown"/>
                             <Setter Property="AllowDrop" Value="True"/>
                             <Setter Property="Focusable" Value="False"/>
                             <Setter Property="behaviors:MouseMiddleClick.Command" Value="{Binding Source={StaticResource Proxy}, Path=Data.CloseToolCommand}"/>
