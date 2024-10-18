@@ -24,10 +24,10 @@ namespace Shared.Core.PackFiles
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
-        public PackFileService(PackFileDataBase database, 
-            ApplicationSettingsService settingsService, 
-            GameInformationFactory gameInformationFactory, 
-            GlobalEventSender? globalEventSender, 
+        public PackFileService(PackFileDataBase database,
+            ApplicationSettingsService settingsService,
+            GameInformationFactory gameInformationFactory,
+            GlobalEventSender? globalEventSender,
             IAnimationFileDiscovered? skeletonAnimationLookUpHelper,
             IPackFileUiProvider? packFileUiProvider)
         {
@@ -57,7 +57,7 @@ namespace Shared.Core.PackFiles
         }
 
         void AddFolderContentToPackFile(PackFileContainer container, string folderPath, string rootPath)
-        { 
+        {
             var files = Directory.GetFiles(folderPath);
             foreach (var filePath in files)
             {
@@ -71,7 +71,7 @@ namespace Shared.Core.PackFiles
             var folders = Directory.GetDirectories(folderPath);
             foreach (var folder in folders)
             {
-                AddFolderContentToPackFile(container, folder, rootPath);  
+                AddFolderContentToPackFile(container, folder, rootPath);
             }
         }
 
@@ -83,7 +83,7 @@ namespace Shared.Core.PackFiles
                 var caPacksLoaded = Database.PackFiles.Count(x => x.IsCaPackFile);
                 if (caPacksLoaded == 0 && allowLoadWithoutCaPackFiles != true)
                 {
-                    MessageBox.Show("You are trying to load a packfile before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
+                    MessageBox.Show("You are trying to load a oack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
 
                     if (System.Diagnostics.Debugger.IsAttached == false)
                         return null;
@@ -91,8 +91,18 @@ namespace Shared.Core.PackFiles
 
                 if (!File.Exists(packFileSystemPath))
                 {
-                    _logger.Here().Error($"Trying to load file {packFileSystemPath}, which can not be located");
+                    _logger.Here().Error($"Trying to load file {packFileSystemPath}, which can not be located.", "Error");
+                    System.Windows.MessageBox.Show($"Unable to locate pack file \"{packFileSystemPath}\"");
                     return null;
+                }
+
+                foreach (var packFile in Database.PackFiles)
+                {
+                    if (packFile.SystemFilePath == packFileSystemPath)
+                    {
+                        MessageBox.Show($"Pack file \"{packFileSystemPath}\" is already loaded.", "Error");
+                        return null;
+                    }
                 }
 
                 using var fileStream = File.OpenRead(packFileSystemPath);
@@ -309,7 +319,7 @@ namespace Shared.Core.PackFiles
         {
             try
             {
-                _logger.Here().Information($"Loading all ca packfiles located in {gameDataFolder}");
+                _logger.Here().Information($"Loading pack files for {gameName} located in {gameDataFolder}");
                 var allCaPackFiles = GetPackFilesFromManifest(gameDataFolder);
 
                 var packList = new List<PackFileContainer>();
@@ -326,15 +336,14 @@ namespace Shared.Core.PackFiles
                     }
                     else
                     {
-                        _logger.Here().Warning($"Ca packfile '{path}' not found, loading skipped");
+                        _logger.Here().Warning($"{gameName} pack file '{path}' not found, loading skipped");
                     }
                 }
 
-                var caPackFileContainer = new PackFileContainer("All CA packs - " + gameName);
+                var caPackFileContainer = new PackFileContainer($"All Game Packs - {gameName}");
                 caPackFileContainer.IsCaPackFile = true;
-                var packFilesOrderedByGroup = packList
-                    .GroupBy(x => x.Header.LoadOrder)
-                    .OrderBy(x => x.Key);
+                caPackFileContainer.SystemFilePath = gameDataFolder;
+                var packFilesOrderedByGroup = packList.GroupBy(x => x.Header.LoadOrder).OrderBy(x => x.Key);
 
                 foreach (var group in packFilesOrderedByGroup)
                 {
@@ -344,11 +353,10 @@ namespace Shared.Core.PackFiles
                 }
 
                 Database.AddPackFile(caPackFileContainer);
-
             }
             catch (Exception e)
             {
-                _logger.Here().Error($"Trying to all ca packs in {gameDataFolder}. Error : {e.ToString()}");
+                _logger.Here().Error($"Trying to get all CA packs in {gameDataFolder}. Error : {e.ToString()}");
                 return false;
             }
 

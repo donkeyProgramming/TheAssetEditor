@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors" 
-             xmlns:s="http://schemas.singulink.com/xaml" xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:s="http://schemas.singulink.com/xaml" 
+             xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -67,7 +68,6 @@
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-
                             <DockPanel Grid.Column="0">
                                 <CheckBox DockPanel.Dock="Top" Content="Show ID" IsChecked="{Binding ShowIds.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="false"/>
                                 <CheckBox DockPanel.Dock="Top" Content="Show File Name" IsChecked="{Binding ShowBnkName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="false"/>
@@ -92,18 +92,66 @@
                             <Button Content="Export Dialog Event as CSV" Click="{s:MethodBinding ExportCurrrentDialogEventAsCsvAction}" IsEnabled="{Binding CanExportCurrrentDialogEventAsCsvAction.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                         </DockPanel>
                     </DockPanel>
-
-
                 </Expander>
             </DockPanel>
 
-            <TreeView  ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}"
-                        VirtualizingPanel.IsVirtualizing="True"
-                VirtualizingPanel.VirtualizationMode="Recycling"
-            VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+            <TreeView ItemsSource="{Binding TreeList, UpdateSourceTrigger=PropertyChanged}" VirtualizingPanel.IsVirtualizing="True" 
+                      VirtualizingPanel.VirtualizationMode="Recycling"  VirtualizingPanel.IsVirtualizingWhenGrouping="True">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="19" Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <ToggleButton x:Name="Expander" ClickMode="Press" 
+                                                      IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      Style="{StaticResource ExpandCollapseToggleStyle}"/>
+                                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" 
+                                                Background="{TemplateBinding Background}" Grid.Column="1"
+                                                Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                            <ContentPresenter x:Name="PART_Header" ContentSource="Header" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        </Border>
+                                        <ItemsPresenter x:Name="ItemsHost" Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1"/>
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsExpanded" Value="false">
+                                            <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
+                                        </Trigger>
+                                        <Trigger Property="HasItems" Value="false">
+                                            <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="true">
+                                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Background}"/>
+                                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Border}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Deeper}"/>
+                                        </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="true"/>
+                                                <Condition Property="IsSelectionActive" Value="false"/>
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Inactive.Background}"/>
+                                            <Setter Property="BorderBrush" TargetName="Bd" Value="{DynamicResource TreeViewItem.Selected.Inactive.Border}"/>
+                                            <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Disabled}"/>
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="false">
+                                            <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Disabled}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
                 </TreeView.ItemContainerStyle>
 
@@ -111,16 +159,17 @@
                     <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedNode, Mode=TwoWay}" />
                 </b:Interaction.Behaviors>
 
-                <TreeView.ItemTemplate >
+                <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" />
                             <TextBlock Text=""></TextBlock>
                             <TextBlock Text=""></TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
+
         </DockPanel>
         <DockPanel Grid.Row="1" Grid.Column="3" LastChildFill="True">
             <Button DockPanel.Dock="Bottom" Content="Play Audio" Height="20" Margin="5" Click="{s:MethodBinding PlaySelectedSoundAction}" IsEnabled="{Binding IsPlaySoundButtonEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>

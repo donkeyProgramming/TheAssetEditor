@@ -3,9 +3,9 @@ using Shared.Core.PackFiles;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
-    public class OpenFileContexMenuHandler : ContextMenuHandler
+    public class OpenFileContextMenuHandler : ContextMenuHandler
     {
-        public OpenFileContexMenuHandler(PackFileService service) : base(service, null, null, null)
+        public OpenFileContextMenuHandler(PackFileService service) : base(service, null, null, null)
         { }
 
         public override void Create(TreeNode node)
