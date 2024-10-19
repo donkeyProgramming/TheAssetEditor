@@ -15,13 +15,13 @@ namespace Editors.Shared.Core.Common
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly IMetaDataFactory _metaDataFactory;
         private readonly SceneObjectBuilder _assetViewModelBuilder;
-        private readonly IToolFactory _toolFactory;
+        private readonly IEditorDatabase _toolFactory;
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         public SceneObjectViewModelBuilder(AnimationPlayerViewModel animationPlayerViewModel, IMetaDataFactory metaDataFactory, SceneObjectBuilder assetViewModelBuilder,
-            IToolFactory toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, IUiCommandFactory uiCommandFactory)
+            IEditorDatabase toolFactory, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, IUiCommandFactory uiCommandFactory)
         {
             _animationPlayerViewModel = animationPlayerViewModel;
             _metaDataFactory = metaDataFactory;

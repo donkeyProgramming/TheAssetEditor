@@ -6,7 +6,6 @@ using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.ToolCreation
 {
-
     public record EditorInfo(EditorEnums EditorEnum, Type View, Type ViewModel, IPackFileToToolResolver ExtentionHandler)
    {
         public static EditorInfo Create<TViewModel, TView>(EditorEnums editorEnum, IPackFileToToolResolver extentionHandler)
@@ -17,7 +16,7 @@ namespace Shared.Core.ToolCreation
         }
     }
 
-    public interface IToolFactory
+    public interface IEditorDatabase
     {
         public void Register(EditorInfo editorInfo);
 
@@ -28,9 +27,9 @@ namespace Shared.Core.ToolCreation
         Type GetViewTypeFromViewModel(Type viewModelType);
     }
 
-    public class ToolFactory : IToolFactory
+    public class EditorDatabase : IEditorDatabase
     {
-        private readonly ILogger _logger = Logging.Create<ToolFactory>();
+        private readonly ILogger _logger = Logging.Create<EditorDatabase>();
 
         private readonly IServiceProvider _serviceProvider;
         private readonly ScopeRepository _scopeRepository;
@@ -38,7 +37,7 @@ namespace Shared.Core.ToolCreation
 
         private readonly List<EditorInfo> _editors = [];
 
-        public ToolFactory(IServiceProvider serviceProvider, ScopeRepository scopeRepository, IToolSelectorUiProvider toolSelectorUiProvider)
+        public EditorDatabase(IServiceProvider serviceProvider, ScopeRepository scopeRepository, IToolSelectorUiProvider toolSelectorUiProvider)
         {
             _serviceProvider = serviceProvider;
             _scopeRepository = scopeRepository;

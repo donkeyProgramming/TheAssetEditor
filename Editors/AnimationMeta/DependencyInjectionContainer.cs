@@ -27,7 +27,7 @@ namespace Editors.AnimationMeta
             serviceCollection.AddScoped<IMetaDataFactory, MetaDataFactory>(); // Needs heavy refactorying!
         }
 
-        public override void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IEditorDatabase factory)
         {
             factory.Register(EditorInfo.Create<EditorHost<SuperViewViewModel>, EditorHostView> (EditorEnums.SuperView_Editor, new NoExtention()));
 

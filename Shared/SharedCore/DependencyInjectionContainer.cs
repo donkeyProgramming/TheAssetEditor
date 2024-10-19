@@ -19,7 +19,7 @@ namespace Shared.Core
         public override void Register(IServiceCollection services)
         {
             services.AddSingleton<ApplicationSettingsService>();
-            services.AddSingleton<IToolFactory, ToolFactory>();
+            services.AddSingleton<IEditorDatabase, EditorDatabase>();
             services.AddSingleton<PackFileDataBase>();
 
             services.AddSingleton<CopyPasteManager>();

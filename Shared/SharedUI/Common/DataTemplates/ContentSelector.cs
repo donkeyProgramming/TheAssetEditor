@@ -14,7 +14,7 @@ namespace Shared.Ui.Common.DataTemplates
                 return base.SelectTemplate(item, container);
 
             var parent = FindParent<TabControl>(container);
-            var toolFactory = (IToolFactory)parent.GetValue(ToolFactoryParameter.ViewFactoryProperty);
+            var toolFactory = (IEditorDatabase)parent.GetValue(ToolFactoryParameter.ViewFactoryProperty);
             var viewType = toolFactory.GetViewTypeFromViewModel(item.GetType());
 
             var factory = new FrameworkElementFactory(viewType);
@@ -44,14 +44,14 @@ namespace Shared.Ui.Common.DataTemplates
 
     public class ToolFactoryParameter : DependencyObject
     {
-        public static readonly DependencyProperty ViewFactoryProperty = DependencyProperty.RegisterAttached("ViewFactory", typeof(IToolFactory), typeof(ToolFactoryParameter));
+        public static readonly DependencyProperty ViewFactoryProperty = DependencyProperty.RegisterAttached("ViewFactory", typeof(IEditorDatabase), typeof(ToolFactoryParameter));
 
-        public static IToolFactory GetViewFactory(DependencyObject obj)
+        public static IEditorDatabase GetViewFactory(DependencyObject obj)
         {
-            return (IToolFactory)obj.GetValue(ViewFactoryProperty);
+            return (IEditorDatabase)obj.GetValue(ViewFactoryProperty);
         }
 
-        public static void SetViewFactory(DependencyObject obj, IToolFactory value)
+        public static void SetViewFactory(DependencyObject obj, IEditorDatabase value)
         {
             obj.SetValue(ViewFactoryProperty, value);
         }

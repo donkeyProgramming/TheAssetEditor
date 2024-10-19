@@ -83,7 +83,7 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<ImportReferenceMeshCommand>();
         }
 
-        public override void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IEditorDatabase factory)
         {
             var editorInfo = EditorInfo.Create<KitbasherViewModel, KitbasherView>(EditorEnums.Kitbash_Editor, new ExtensionToTool([".rigid_model_v2", ".wsmodel.rigid_model_v2", ".wsmodel"]));//.variantmeshdefinition
             factory.Register(editorInfo);

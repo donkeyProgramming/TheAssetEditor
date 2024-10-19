@@ -12,7 +12,7 @@ namespace Editors.Shared.DevConfig.Configs
         private readonly IEditorCreator _editorCreator;
         private readonly PackFileService _packFileService;
 
-        public MountTool(IEditorCreator editorCreator, IToolFactory toolFactory, PackFileService packFileService)
+        public MountTool(IEditorCreator editorCreator, IEditorDatabase toolFactory, PackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileService = packFileService;

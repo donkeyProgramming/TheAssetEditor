@@ -24,7 +24,7 @@ namespace Editors.AnimationTextEditors
             RegisterBatchConverter(services);
         }
 
-        public override void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IEditorDatabase factory)
         {
             factory.Register(EditorInfo.Create<AnimPackViewModel, AnimationPackView>(EditorEnums.AnimationPack_Editor, new ExtensionToTool([".animpack"])));
             factory.Register(EditorInfo.Create<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(EditorEnums.XML_CampaginBin_Edtior, new PathToTool(".bin", @"animations\campaign\database")));

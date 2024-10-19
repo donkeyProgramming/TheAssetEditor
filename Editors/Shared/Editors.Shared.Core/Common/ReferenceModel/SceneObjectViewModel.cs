@@ -15,7 +15,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         private readonly PackFileService _pfs;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IMetaDataFactory _metaDataFactory;
-        private readonly IToolFactory _toolFactory;
+        private readonly IEditorDatabase _toolFactory;
 
         public NotifyAttr<string> HeaderName { get; set; } = new NotifyAttr<string>();
 
@@ -48,7 +48,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
         public SceneObjectViewModel(IUiCommandFactory uiCommandFactory,
             IMetaDataFactory metaDataFactory,
-            IToolFactory toolFactory,
+            IEditorDatabase toolFactory,
             PackFileService packFileService,
             SceneObject data,
             string headerName,

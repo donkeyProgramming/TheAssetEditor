@@ -16,7 +16,7 @@ namespace Editors.TextureEditor
             serviceCollection.AddTransient<IEditorViewModel, TextureEditorViewModel>();
         }
 
-        public override void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IEditorDatabase factory)
         {
             var editorInfo = EditorInfo.Create<TextureEditorViewModel, TexturePreviewView>(EditorEnums.Texture_Editor, new ExtensionToTool([".dds", ".png", ".jpeg"]));
             factory.Register(editorInfo);

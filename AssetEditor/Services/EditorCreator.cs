@@ -15,9 +15,9 @@ namespace AssetEditor.Services
         private readonly ILogger _logger = Logging.Create<EditorCreator>();
         private readonly MainViewModel _mainViewModel;
         private readonly PackFileService _packFileService;
-        private readonly IToolFactory _toolFactory;
+        private readonly IEditorDatabase _toolFactory;
 
-        public EditorCreator(MainViewModel mainEditorWindow, PackFileService packFileService, IToolFactory toolFactory)
+        public EditorCreator(MainViewModel mainEditorWindow, PackFileService packFileService, IEditorDatabase toolFactory)
         {
             _mainViewModel = mainEditorWindow;
             _packFileService = packFileService;

@@ -21,7 +21,7 @@ namespace Editors.Shared.Core.Common.BaseControl
 
     public class EditorHost<TEditor> : NotifyPropertyChangedImpl, IEditorViewModel
     {
-        public IToolFactory ToolsFactory { get; set; }
+        public IEditorDatabase ToolsFactory { get; set; }
         public string DisplayName { get; set; } ="Name missing";
 
         public NotifyAttr<IWpfGame> GameWorld { get; private set; } = new NotifyAttr<IWpfGame>();
@@ -35,7 +35,7 @@ namespace Editors.Shared.Core.Common.BaseControl
         public ICommand ResetCameraCommand { get; set; }
         public ICommand FocusCamerasCommand { get; set; }
 
-        public EditorHost(IToolFactory toolFactory,
+        public EditorHost(IEditorDatabase toolFactory,
             IComponentInserter componentInserter,
             AnimationPlayerViewModel animationPlayerViewModel,
             IWpfGame gameWorld,

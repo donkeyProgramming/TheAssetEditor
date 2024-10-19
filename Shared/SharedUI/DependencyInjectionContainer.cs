@@ -41,7 +41,7 @@ namespace Shared.Ui
             services.AddTransient<TextEditorViewModel<DefaultTextConverter>>();
         }
 
-        public override void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IEditorDatabase factory)
         {
             var variantMeshEditorInfo = EditorInfo.Create<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(EditorEnums.XML_VariantMesh_Editor, new ExtensionToTool([".variantmeshdefinition"]));
             factory.Register(variantMeshEditorInfo);

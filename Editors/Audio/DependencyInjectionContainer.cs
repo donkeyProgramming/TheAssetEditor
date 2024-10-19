@@ -57,7 +57,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<ResultHandler>();
         }
 
-        public override void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IEditorDatabase factory)
         {
             factory.Register(EditorInfo.Create<AudioExplorerViewModel, AudioExplorerView>(EditorEnums.AudioExplorer_Editor, new NoExtention()));
             factory.Register(EditorInfo.Create<CompilerViewModel, CompilerView>(EditorEnums.AudioCompiler_Editor, new NoExtention()));

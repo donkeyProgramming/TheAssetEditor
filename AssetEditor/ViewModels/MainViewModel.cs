@@ -23,7 +23,7 @@ namespace AssetEditor.ViewModels
 
         public PackFileBrowserViewModel FileTree { get; private set; }
         public MenuBarViewModel MenuBar { get; set; }
-        public IToolFactory ToolsFactory { get; set; }
+        public IEditorDatabase ToolsFactory { get; set; }
         public ObservableCollection<IEditorViewModel> CurrentEditorsList { get; set; } = new ObservableCollection<IEditorViewModel>();
 
         [ObservableProperty] private int _selectedEditorIndex;
@@ -32,7 +32,7 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private string _currentGame;
         [ObservableProperty] private string _editablePackFile;
 
-        public MainViewModel(MenuBarViewModel menuViewModel, PackFileService packfileService, IToolFactory toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
+        public MainViewModel(MenuBarViewModel menuViewModel, PackFileService packfileService, IEditorDatabase toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
         {
             MenuBar = menuViewModel;
             _uiCommandFactory = uiCommandFactory;

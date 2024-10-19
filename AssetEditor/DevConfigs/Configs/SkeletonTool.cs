@@ -10,10 +10,10 @@ namespace Editors.Shared.DevConfig.Configs
     internal class SkeletonTool : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;
-        private readonly IToolFactory _toolFactory;
+        private readonly IEditorDatabase _toolFactory;
         private readonly PackFileService _packFileService;
 
-        public SkeletonTool(IEditorCreator editorCreator, IToolFactory toolFactory, PackFileService packFileService)
+        public SkeletonTool(IEditorCreator editorCreator, IEditorDatabase toolFactory, PackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _toolFactory = toolFactory;

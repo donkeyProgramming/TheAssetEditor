@@ -10,7 +10,7 @@ namespace Shared.Core.DependencyInjection
     {
         public virtual void Register(IServiceCollection serviceCollection) { }
 
-        public virtual void RegisterTools(IToolFactory factory) { }
+        public virtual void RegisterTools(IEditorDatabase factory) { }
 
         protected void RegisterAllAsOriginalType<T>(IServiceCollection serviceCollection, ServiceLifetime scope)
         {

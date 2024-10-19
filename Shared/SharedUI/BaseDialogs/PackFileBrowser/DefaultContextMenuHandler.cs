@@ -8,7 +8,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
     public class DefaultContextMenuHandler : ContextMenuHandler
     {
-        public DefaultContextMenuHandler(PackFileService service, IToolFactory toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper)
+        public DefaultContextMenuHandler(PackFileService service, IEditorDatabase toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper) 
             : base(service, toolFactory, uiCommandFactory, exportFileContextMenuHelper)
         {
 
@@ -33,7 +33,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     Additem(ContextItems.Expand, newContextMenu);
                     Additem(ContextItems.Collapse, newContextMenu);
                     AddSeperator(newContextMenu);
-                    Additem(ContextItems.OpenInFileExplorer, newContextMenu);
                 }
                 else
                 {
@@ -58,7 +57,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     Additem(ContextItems.Save, newContextMenu);
                     Additem(ContextItems.SaveAs, newContextMenu);
                     Additem(ContextItems.Close, newContextMenu);
-                    Additem(ContextItems.OpenInFileExplorer, newContextMenu);
                 }
             }
 

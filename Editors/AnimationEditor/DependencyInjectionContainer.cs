@@ -31,7 +31,7 @@ namespace Editors.AnimationVisualEditors
             serviceCollection.AddScoped<AnimationKeyframeEditorViewModel>();
         }
 
-        public override void RegisterTools(IToolFactory factory)
+        public override void RegisterTools(IEditorDatabase factory)
         {
             factory.Register(EditorInfo.Create<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>(EditorEnums.MountTool_Editor, new NoExtention()));
             factory.Register(EditorInfo.Create<EditorHost<AnimationTransferToolViewModel>, EditorHostView>(EditorEnums.AnimationTransfer_Editor, new NoExtention()));
