@@ -1,4 +1,4 @@
-﻿using Shared.Core.Misc;
+﻿using System.Windows;
 using Shared.Core.PackFiles.Models;
 
 namespace Shared.Core.ToolCreation
@@ -24,8 +24,9 @@ namespace Shared.Core.ToolCreation
 
     public interface IEditorCreator
     {
-        void CreateFromFile(PackFile file, EditorEnums? preferedEditor);
-        void Create(IEditorViewModel editorView);
+        void CreateFromFile(PackFile file, EditorEnums? preferedEditor = null);
+        void Create(EditorEnums editor, Action<IEditorViewModel>? onInitializeCallback = null);
+        Window CreateWindow(PackFile packFile, EditorEnums? preferedEditor = null);
     }
 
     public delegate void EditorSavedDelegate(PackFile newFile);

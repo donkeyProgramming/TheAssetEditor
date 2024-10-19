@@ -2,6 +2,7 @@
 using Editors.Shared.DevConfig.Base;
 using Shared.Core.Events;
 using Shared.Core.Services;
+using Shared.Core.ToolCreation;
 using Shared.Ui.Events.UiCommands;
 
 namespace Editors.Shared.DevConfig.Configs
@@ -23,7 +24,7 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OpenFileOnLoad()
         {
-            _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioExplorerViewModel>();
+            _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AudioExplorer_Editor);
         }
     }
 }

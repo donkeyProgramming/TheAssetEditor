@@ -28,8 +28,8 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OpenFileOnLoad()
         {
-            var editorView = _toolFactory.Create<EditorHost<SkeletonEditorViewModel>>();
-            _editorCreator.Create(editorView);
+           // var editorView = _toolFactory.Create<EditorHost<SkeletonEditorViewModel>>();
+           // _editorCreator.Create(editorView);
         }
     }
 }

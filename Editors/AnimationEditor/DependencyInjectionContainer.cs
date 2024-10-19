@@ -33,11 +33,11 @@ namespace Editors.AnimationVisualEditors
 
         public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>();
-            factory.RegisterTool<EditorHost<AnimationTransferToolViewModel>, EditorHostView>();
-            factory.RegisterTool<EditorHost<SkeletonEditorViewModel>, EditorHostView>();
-            factory.RegisterTool<EditorHost<CampaignAnimationCreatorViewModel>, EditorHostView>();
-            factory.RegisterTool<EditorHost<AnimationKeyframeEditorViewModel>, EditorHostView>();
+            factory.Register(EditorInfo.Create<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>(EditorEnums.MountTool_Editor, new NoExtention()));
+            factory.Register(EditorInfo.Create<EditorHost<AnimationTransferToolViewModel>, EditorHostView>(EditorEnums.AnimationTransfer_Editor, new NoExtention()));
+            factory.Register(EditorInfo.Create<EditorHost<SkeletonEditorViewModel>, EditorHostView>(EditorEnums.Skeleton_Editor, new NoExtention()));
+            factory.Register(EditorInfo.Create<EditorHost<CampaignAnimationCreatorViewModel>, EditorHostView>(EditorEnums.CampaginAnimation_Editor, new NoExtention()));
+            factory.Register(EditorInfo.Create<EditorHost<AnimationKeyframeEditorViewModel>, EditorHostView>(EditorEnums.AnimationKeyFrame_Editor, new NoExtention()));
         }
     }
 }

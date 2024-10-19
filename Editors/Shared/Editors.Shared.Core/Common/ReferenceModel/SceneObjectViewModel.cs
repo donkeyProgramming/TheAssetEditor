@@ -6,12 +6,14 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Parsing;
+using Shared.Ui.Events.UiCommands;
 
 namespace Editors.Shared.Core.Common.ReferenceModel
 {
     public class SceneObjectViewModel : NotifyPropertyChangedImpl
     {
         private readonly PackFileService _pfs;
+        private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IMetaDataFactory _metaDataFactory;
         private readonly IToolFactory _toolFactory;
 
@@ -53,6 +55,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             SceneObjectBuilder sceneObjectBuilder,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
+            _uiCommandFactory = uiCommandFactory;
             _metaDataFactory = metaDataFactory;
             _toolFactory = toolFactory;
             _pfs = packFileService;
@@ -104,17 +107,8 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
         void ViewMetaDataFile(PackFile packFile, string windowTitlePrefix)
         {
-            // TODO: Use fileOpenCommand
             var fullFileName = _pfs.GetFullPath(_data.PersistMetaData);
-            var viewModel = _toolFactory.Create(fullFileName);
-            if (viewModel is IFileEditor fileEditor)
-                fileEditor.LoadFile(packFile);
-            var window = _toolFactory.CreateAsWindow(viewModel);
-            window.Width = 800;
-            window.Height = 450;
-            window.Title = "Persistent meta file - " + fullFileName;
-
-            window.Show();
+            _uiCommandFactory.Create<OpenEditorCommand>().ExecuteAsWindow(fullFileName, 800, 450);
         }
     }
 }

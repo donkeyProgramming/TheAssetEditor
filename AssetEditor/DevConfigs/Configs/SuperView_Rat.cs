@@ -12,13 +12,11 @@ namespace Editors.Shared.DevConfig.Configs
     internal class SuperView_Rat : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;
-        private readonly IToolFactory _toolFactory;
         private readonly PackFileService _packFileService;
 
-        public SuperView_Rat(IEditorCreator editorCreator, IToolFactory toolFactory, PackFileService packFileService)
+        public SuperView_Rat(IEditorCreator editorCreator, PackFileService packFileService)
         {
             _editorCreator = editorCreator;
-            _toolFactory = toolFactory;
             _packFileService = packFileService;
         }
 
@@ -32,20 +30,19 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OpenFileOnLoad()
         {
-            CreateThrot(_editorCreator, _toolFactory, _packFileService);
+            CreateThrot(_editorCreator, _packFileService);
         }
 
-        void CreateThrot(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        void CreateThrot(IEditorCreator creator, PackFileService packfileService)
         {
-            var editorView = toolFactory.Create<EditorHost<SuperViewViewModel>>();
             var debugInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\skv_throt.variantmeshdefinition"),
                 FragmentName = @"animations/database/battle/bin/hu17_dlc16_throt.bin",
                 AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
             };
-            editorView.Editor.SetDebugInputParameters(debugInput);
-            creator.Create(editorView);
+
+            creator.Create(EditorEnums.SuperView_Editor, x => (x as EditorHost<SuperViewViewModel>).Editor.SetDebugInputParameters(debugInput));
         }
     }
 

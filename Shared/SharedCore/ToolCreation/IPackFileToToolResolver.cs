@@ -2,10 +2,14 @@
 
 namespace Shared.Core.ToolCreation
 {
+    public class PackFileToToolSelectorResult
+    {
+        public bool CanOpen { get; set; } = false;
+    }
+
     public interface IPackFileToToolResolver
     {
         PackFileToToolSelectorResult CanOpen(string fullPath);
-        EditorEnums EditorType { get; }
     }
 
     public class PathToTool : IPackFileToToolResolver
@@ -13,14 +17,11 @@ namespace Shared.Core.ToolCreation
         private readonly string _extension;
         private readonly string _requiredPathSubString;
 
-        public PathToTool(EditorEnums editorDisplayName, string extension, string requiredPathSubString)
+        public PathToTool(string extension, string requiredPathSubString)
         {
             _extension = extension;
             _requiredPathSubString = requiredPathSubString;
-            EditorType = editorDisplayName;
         }
-
-        public EditorEnums EditorType { get; private set; }
 
         public PackFileToToolSelectorResult CanOpen(string fullPath)
         {
@@ -32,19 +33,21 @@ namespace Shared.Core.ToolCreation
         }
     }
 
+    public class NoExtention : IPackFileToToolResolver
+    {
+        public PackFileToToolSelectorResult CanOpen(string fullPath) => new() { CanOpen = false};
+    }
+
     public class ExtensionToTool : IPackFileToToolResolver
     {
         readonly string[] _validExtentionsCore;
         readonly string[] _validExtentionsOptimal;
 
-        public ExtensionToTool(EditorEnums editorDisplayName, string[] coreTools, string[] optionalTools = null)
+        public ExtensionToTool(string[] coreTools, string[] optionalTools = null)
         {
             _validExtentionsCore = coreTools;
             _validExtentionsOptimal = optionalTools;
-            EditorType = editorDisplayName;
         }
-
-        public EditorEnums EditorType { get; private set; }
 
         public PackFileToToolSelectorResult CanOpen(string fullPath)
         {

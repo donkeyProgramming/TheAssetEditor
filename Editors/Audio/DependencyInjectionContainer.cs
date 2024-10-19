@@ -53,15 +53,15 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerService>();
             serviceCollection.AddScoped<ProjectLoader>();
             serviceCollection.AddScoped<AudioFileImporter>();
-            serviceCollection.AddScoped<Editors.Audio.BnkCompiler.Compiler>();
+            serviceCollection.AddScoped<BnkCompiler.Compiler>();
             serviceCollection.AddScoped<ResultHandler>();
         }
 
         public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<AudioExplorerViewModel, AudioExplorerView>();
-            factory.RegisterTool<CompilerViewModel, CompilerView>();
-            factory.RegisterTool<AudioEditorViewModel, AudioEditorView>();
+            factory.Register(EditorInfo.Create<AudioExplorerViewModel, AudioExplorerView>(EditorEnums.AudioExplorer_Editor, new NoExtention()));
+            factory.Register(EditorInfo.Create<CompilerViewModel, CompilerView>(EditorEnums.AudioCompiler_Editor, new NoExtention()));
+            factory.Register(EditorInfo.Create<AudioEditorViewModel, AudioEditorView>(EditorEnums.Audio_Editor, new NoExtention()));
         }
     }
 }

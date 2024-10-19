@@ -10,13 +10,11 @@ namespace Editors.Shared.DevConfig.Configs
     internal class AnimTransfer_DwarfArcher : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;
-        private readonly IToolFactory _toolFactory;
         private readonly PackFileService _packFileService;
 
         public AnimTransfer_DwarfArcher(IEditorCreator editorCreator, IToolFactory toolFactory, PackFileService packFileService)
         {
             _editorCreator = editorCreator;
-            _toolFactory = toolFactory;
             _packFileService = packFileService;
         }
 
@@ -29,12 +27,11 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OpenFileOnLoad()
         {
-            CreateDwarfAndEmpArcher(_editorCreator, _toolFactory, _packFileService);
+            CreateDwarfAndEmpArcher(_editorCreator, _packFileService);
         }
 
-        static void CreateDwarfAndEmpArcher(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        static void CreateDwarfAndEmpArcher(IEditorCreator creator, PackFileService packfileService)
         {
-            var editorView = toolFactory.Create<EditorHost<AnimationTransferToolViewModel>>();
             var targetInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition")
@@ -45,8 +42,8 @@ namespace Editors.Shared.DevConfig.Configs
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\emp_archer_ror.variantmeshdefinition"),
                 Animation = packfileService.FindFile(@"animations\battle\humanoid01\sword_and_pistol\missile_attacks\hu1_swp_missile_attack_aim_to_shootready_01.anim")
             };
-            editorView.Editor.SetDebugInputParameters(targetInput, sourceInput);
-            creator.Create(editorView);
+
+            creator.Create(EditorEnums.AnimationTransfer_Editor, (x => (x as EditorHost<AnimationTransferToolViewModel>).Editor.SetDebugInputParameters(targetInput, sourceInput)));
         }
     }
 }

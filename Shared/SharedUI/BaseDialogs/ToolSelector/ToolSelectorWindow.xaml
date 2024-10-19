@@ -8,6 +8,7 @@
         Title="Tool Selector" Height="90" Width="300"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
+         Style="{StaticResource CustomWindowStyle}"
         WindowStartupLocation="CenterOwner">
     <DockPanel >
         <DockPanel  DockPanel.Dock="Top" Margin="5">

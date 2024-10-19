@@ -1,4 +1,7 @@
-﻿using AssetEditor.ViewModels;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
+using AssetEditor.ViewModels;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -19,12 +22,6 @@ namespace AssetEditor.Services
             _mainViewModel = mainEditorWindow;
             _packFileService = packFileService;
             _toolFactory = toolFactory;
-        }
-
-        public void Create(IEditorViewModel editorView)
-        {
-            _mainViewModel.CurrentEditorsList.Add(editorView);
-            _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;
         }
 
         public void CreateFromFile(PackFile file, EditorEnums? preferedEditor)
@@ -62,7 +59,43 @@ namespace AssetEditor.Services
                 fileEditor.LoadFile(file);
             }
 
-            _mainViewModel.CurrentEditorsList.Add(editorViewModel);
+            InsertEditorIntoTab(editorViewModel);
+        }
+
+        public void Create(EditorEnums editor,  Action<IEditorViewModel>? onInitializeCallback = null)
+        {
+            var editorViewModel = _toolFactory.Create(editor);
+            if (onInitializeCallback != null)
+                onInitializeCallback(editorViewModel);
+            
+            InsertEditorIntoTab(editorViewModel);
+        }
+
+        public Window CreateWindow(PackFile packFile, EditorEnums? preferedEditor = null)
+        {
+            var fullFileName = _packFileService.GetFullPath(packFile);
+            var editorViewModel = _toolFactory.Create(fullFileName, preferedEditor);
+
+            if (editorViewModel is IFileEditor fileEditor)
+                fileEditor.LoadFile(packFile);
+
+            var toolView = _toolFactory.GetViewTypeFromViewModel(editorViewModel.GetType());
+            var instance = Activator.CreateInstance(toolView) as Control;
+
+            var newWindow = new Window
+            {
+                Style = (Style)Application.Current.Resources["CustomWindowStyle"],
+                Content = instance,
+                DataContext = editorViewModel,
+                Title = editorViewModel.DisplayName
+            };
+
+            return newWindow;
+        }
+
+        void InsertEditorIntoTab(IEditorViewModel editorView)
+        {
+            _mainViewModel.CurrentEditorsList.Add(editorView);
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;
         }
     }

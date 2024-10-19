@@ -4,27 +4,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
-using AnimationEditor.AnimationKeyframeEditor;
-using AnimationEditor.AnimationTransferTool;
-using AnimationEditor.CampaignAnimationCreator;
-using AnimationEditor.MountAnimationCreator;
-using AnimationEditor.SkeletonEditor;
 using AssetEditor.UiCommands;
 using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
-using Editors.AnimationMeta.SuperView;
-using Editors.Audio.AudioEditor.ViewModels;
-using Editors.Audio.AudioExplorer;
-using Editors.Audio.Compiler;
-using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
+using Shared.Core.ToolCreation;
 using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
@@ -78,11 +69,11 @@ namespace AssetEditor.ViewModels
         }
         [RelayCommand] private void CreateAnimPackWarhammer3() => AnimationPackSampleDataCreator.CreateAnimationDbWarhammer3(_packfileService);
         [RelayCommand] private void CreateAnimPack3k() => AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService);
-        [RelayCommand] private void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<MountAnimationCreatorViewModel>>();
-        [RelayCommand] private void OpenCampaignAnimCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<CampaignAnimationCreatorViewModel>>();
-        [RelayCommand] private void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationTransferToolViewModel>>();
-        [RelayCommand] private void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SuperViewViewModel>>();
-        [RelayCommand] private void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<SkeletonEditorViewModel>>();
+        [RelayCommand] private void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.MountTool_Editor);
+        [RelayCommand] private void OpenCampaignAnimCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.CampaginAnimation_Editor);
+        [RelayCommand] private void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AnimationTransfer_Editor);
+        [RelayCommand] private void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.SuperView_Editor);
+        [RelayCommand] private void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.Skeleton_Editor);
         [RelayCommand] private void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();
         [RelayCommand] private void OpenWh2AnimpackUpdater()
         {
@@ -91,11 +82,11 @@ namespace AssetEditor.ViewModels
             service.Process(_packfileService.GetEditablePack());
         }
 
-        [RelayCommand] private void OpenAudioExplorer() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioExplorerViewModel>();
-        [RelayCommand] private void OpenAudioEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<AudioEditorViewModel>();
-        [RelayCommand] private void CompileAudio() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<CompilerViewModel>();
+        [RelayCommand] private void OpenAudioExplorer() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AudioExplorer_Editor);
+        [RelayCommand] private void OpenAudioEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.Audio_Editor);
+        [RelayCommand] private void CompileAudio() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AudioCompiler_Editor);
 
-        [RelayCommand] private void OpenAnimationKeyframe() => _uiCommandFactory.Create<OpenEditorCommand>().Execute<EditorHost<AnimationKeyframeEditorViewModel>>();
+        [RelayCommand] private void OpenAnimationKeyframe() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AnimationKeyFrame_Editor);
         [RelayCommand] private void GenerateRmv2Report() => _uiCommandFactory.Create<GenerateReportCommand>().Rmv2();
         [RelayCommand] private void GenerateMetaDataReport() => _uiCommandFactory.Create<GenerateReportCommand>().MetaData();
         [RelayCommand] private void GenerateFileListReport() => _uiCommandFactory.Create<GenerateReportCommand>().FileList();

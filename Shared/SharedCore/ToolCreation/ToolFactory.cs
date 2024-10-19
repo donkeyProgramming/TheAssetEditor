@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Shared.Core.DependencyInjection;
@@ -8,61 +7,68 @@ using Shared.Core.ErrorHandling;
 namespace Shared.Core.ToolCreation
 {
 
-   //public record ToolInfo
-   //{
-   //    Type View;
-   //    Type ViewModel;
-   //    EditorEnums EditorEnum;
-   //    IPackFileToToolResolver ExtentionHandler;
-   //}
+    public record EditorInfo(EditorEnums EditorEnum, Type View, Type ViewModel, IPackFileToToolResolver ExtentionHandler)
+   {
+        public static EditorInfo Create<TViewModel, TView>(EditorEnums editorEnum, IPackFileToToolResolver extentionHandler)
+           where TViewModel : IEditorViewModel
+           where TView : Control
+        {
+            return new EditorInfo(editorEnum, typeof(TView), typeof(TViewModel), extentionHandler); 
+        }
+    }
 
+    public interface IToolFactory
+    {
+        public void Register(EditorInfo editorInfo);
+
+        IEditorViewModel Create(string fullFileName, EditorEnums? preferedEditor = null);
+        IEditorViewModel Create(EditorEnums editorEnum);
+
+        void DestroyEditor(IEditorViewModel instance);
+        Type GetViewTypeFromViewModel(Type viewModelType);
+    }
 
     public class ToolFactory : IToolFactory
     {
         private readonly ILogger _logger = Logging.Create<ToolFactory>();
 
-        private readonly IServiceProvider _rootProvider;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ScopeRepository _scopeRepository;
         private readonly IToolSelectorUiProvider _toolSelectorUiProvider;
-        private readonly Dictionary<Type, Type> _viewModelToViewMap = new();
-        private readonly Dictionary<IPackFileToToolResolver, Type> _extensionToToolMap = new();
+
+        private readonly List<EditorInfo> _editors = [];
 
         public ToolFactory(IServiceProvider serviceProvider, ScopeRepository scopeRepository, IToolSelectorUiProvider toolSelectorUiProvider)
         {
-            _rootProvider = serviceProvider;
+            _serviceProvider = serviceProvider;
             _scopeRepository = scopeRepository;
             _toolSelectorUiProvider = toolSelectorUiProvider;
         }
 
-        public void RegisterTool<ViewModel, View>(IPackFileToToolResolver toolSelector = null)
-            where ViewModel : IEditorViewModel
-            where View : Control
+        public void Register(EditorInfo editorInfo)
         {
-            var viewModelType = typeof(ViewModel);
-            var viewType = typeof(View);
-
-            if (_viewModelToViewMap.ContainsKey(viewModelType))
+            if (_editors.Any(x => x.EditorEnum == editorInfo.EditorEnum))
             {
-                var errorMessage = $"Tool already registered - {viewModelType}";
+                var errorMessage = $"Tool already registered - {editorInfo.EditorEnum}";
                 _logger.Here().Error(errorMessage);
                 throw new Exception(errorMessage);
             }
 
-            _viewModelToViewMap[viewModelType] = viewType;
-
-            if (toolSelector != null)
-                _extensionToToolMap[toolSelector] = viewModelType;
+            _editors.Add(editorInfo);
         }
 
         public Type GetViewTypeFromViewModel(Type viewModelType)
         {
             _logger.Here().Information($"Getting view for ViewModel - {viewModelType}");
-            return _viewModelToViewMap[viewModelType];
+            
+            var instance = _editors.First(x=>x.ViewModel ==  viewModelType);
+            return instance.View;
         }
 
-        public ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel
+        public IEditorViewModel Create(EditorEnums editorEnum) 
         {
-            return (ViewModel)CreateEditorInternal(typeof(ViewModel));
+            var editor = _editors.First(x => x.EditorEnum == editorEnum);
+            return CreateEditorInternal(editor.ViewModel);
         }
 
         public IEditorViewModel Create(string fullFileName, EditorEnums? preferedEditor)
@@ -78,21 +84,21 @@ namespace Shared.Core.ToolCreation
             Type selectedEditor = null;
             if (allEditors.Count == 1)
             {
-                selectedEditor = allEditors.First().Type;
+                selectedEditor = allEditors.First().ViewModel;
             }
-            if (allEditors.Count > 1 && preferedEditor != null)
+            else if (allEditors.Count > 1 && preferedEditor != null)
             {
-                var preferedEditorType = allEditors.FirstOrDefault(x => x.EditorType == preferedEditor);
+                var preferedEditorType = allEditors.FirstOrDefault(x => x.EditorEnum == preferedEditor);
                 if(preferedEditorType == null)
                     throw new Exception($"The prefered editor {preferedEditor} can not open {fullFileName}");
-                selectedEditor = preferedEditorType.Type;
+                selectedEditor = preferedEditorType.ViewModel;
             }
             else
             {
-                var selectedToolType = _toolSelectorUiProvider.CreateAndShow(allEditors.Select(x => x.EditorType));
+                var selectedToolType = _toolSelectorUiProvider.CreateAndShow(allEditors.Select(x => x.EditorEnum));
                 if (selectedToolType == EditorEnums.None)
                     return null;
-                selectedEditor = allEditors.First(x => x.EditorType == selectedToolType).Type;
+                selectedEditor = allEditors.First(x => x.EditorEnum == selectedToolType).ViewModel;
             }
 
             return CreateEditorInternal(selectedEditor);
@@ -100,7 +106,7 @@ namespace Shared.Core.ToolCreation
 
         IEditorViewModel CreateEditorInternal(Type editorType)
         {
-            var scope = _rootProvider.CreateScope();
+            var scope = _serviceProvider.CreateScope();
             var instance = scope.ServiceProvider.GetRequiredService(editorType) as IEditorViewModel;
             if (instance == null)
                 throw new Exception($"Type '{editorType}' is not a IEditorViewModel");
@@ -108,34 +114,20 @@ namespace Shared.Core.ToolCreation
             return instance;
         }
 
-        public Window CreateAsWindow(IEditorViewModel viewModel)
+        List<EditorInfo> GetAllPossibleEditors(string filename)
         {
-            var toolView = _viewModelToViewMap[viewModel.GetType()];
-            var instance = (Control)Activator.CreateInstance(toolView);
-
-            var newWindow = new Window();
-            newWindow.Style = (Style)Application.Current.Resources["CustomWindowStyle"];
-            newWindow.Content = instance;
-            newWindow.DataContext = viewModel;
-
-            return newWindow;
-        }
-
-        List<ToolInformation> GetAllPossibleEditors(string filename)
-        {
-            var output = new List<ToolInformation>();
-            foreach (var toolLoopUp in _extensionToToolMap)
+            var output = new List<EditorInfo>();
+            foreach (var toolLookUp in _editors)
             {
-                var result = toolLoopUp.Key.CanOpen(filename);
+                var result = toolLookUp.ExtentionHandler.CanOpen(filename);
                 if (result.CanOpen)
-                    output.Add(new ToolInformation() { EditorType = toolLoopUp.Key.EditorType, Type = toolLoopUp.Value });
+                    output.Add(toolLookUp);
             }
 
             if (output.Count == 0)
             {
                 var error = $"Attempting to get view model for file {filename}, unable to find tool based on extension";
                 _logger.Here().Error(error);
-                return new List<ToolInformation>();
             }
 
             return output;

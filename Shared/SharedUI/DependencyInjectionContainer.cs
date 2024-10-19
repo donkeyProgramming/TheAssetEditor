@@ -43,11 +43,12 @@ namespace Shared.Ui
 
         public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(new ExtensionToTool(EditorEnums.XML_Editor, new[] { ".variantmeshdefinition" }));
-            factory.RegisterTool<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(
-                new ExtensionToTool(
-                    EditorEnums.XML_Editor,
-                    [".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv", ".bnk.xml"]));
+            var variantMeshEditorInfo = EditorInfo.Create<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(EditorEnums.XML_VariantMesh_Editor, new ExtensionToTool([".variantmeshdefinition"]));
+            factory.Register(variantMeshEditorInfo);
+
+            var genericXmlEditorInfo = EditorInfo.Create<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(EditorEnums.XML_Editor,
+                new ExtensionToTool([".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv", ".bnk.xml"]));
+            factory.Register(genericXmlEditorInfo);
         }
     }
 }

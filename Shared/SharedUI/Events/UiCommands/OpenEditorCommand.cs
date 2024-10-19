@@ -23,23 +23,18 @@ namespace Shared.Ui.Events.UiCommands
             _editorCreator.CreateFromFile(file, preferedEditor);
         }
 
-        public void Execute<T>() where T : IEditorViewModel
+        public void Execute(EditorEnums editorEnum)
         {
-            var editorView = _toolFactory.Create<T>();
-            _editorCreator.Create(editorView);
+            _editorCreator.Create(editorEnum);
         }
 
         public void ExecuteAsWindow(string fileName, int width, int heigh)
         {
-            
-            var viewModel = _toolFactory.Create(fileName);
-            if (viewModel is IFileEditor fileEditor)
-                fileEditor.LoadFile(_packFileService.FindFile(fileName));
+            var file = _packFileService.FindFile(fileName);
+            var window = _editorCreator.CreateWindow(file);
 
-            var window = _toolFactory.CreateAsWindow(viewModel);
             window.Width = width;
             window.Height = heigh;
-            window.Title = viewModel.DisplayName;
             window.ShowDialog();
         }
     }

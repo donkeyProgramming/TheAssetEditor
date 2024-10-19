@@ -10,13 +10,11 @@ namespace Editors.Shared.DevConfig.Configs
     internal class MountTool : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;
-        private readonly IToolFactory _toolFactory;
         private readonly PackFileService _packFileService;
 
         public MountTool(IEditorCreator editorCreator, IToolFactory toolFactory, PackFileService packFileService)
         {
             _editorCreator = editorCreator;
-            _toolFactory = toolFactory;
             _packFileService = packFileService;
         }
 
@@ -29,12 +27,11 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OpenFileOnLoad()
         {
-            CreateLionAndHu01b(_editorCreator, _toolFactory, _packFileService);
+            CreateLionAndHu01b(_editorCreator, _packFileService);
         }
 
-        static void CreateLionAndHu01b(IEditorCreator creator, IToolFactory toolFactory, PackFileService packfileService)
+        static void CreateLionAndHu01b(IEditorCreator creator, PackFileService packfileService)
         {
-            var editorView = toolFactory.Create<EditorHost<MountAnimationCreatorViewModel>>();
             var riderInput = new AnimationToolInput()
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_princess_campaign_01.variantmeshdefinition")
@@ -44,8 +41,8 @@ namespace Editors.Shared.DevConfig.Configs
             {
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_war_lion.variantmeshdefinition")
             };
-            editorView.Editor.SetDebugInputParameters(riderInput, mountInput);
-            creator.Create(editorView);
+
+            creator.Create(EditorEnums.MountTool_Editor, x => (x as EditorHost<MountAnimationCreatorViewModel>).Editor.SetDebugInputParameters(riderInput, mountInput));
         }
     }
 }

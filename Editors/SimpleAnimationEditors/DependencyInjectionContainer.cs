@@ -26,10 +26,10 @@ namespace Editors.AnimationTextEditors
 
         public override void RegisterTools(IToolFactory factory)
         {
-            factory.RegisterTool<AnimPackViewModel, AnimationPackView>(new ExtensionToTool(EditorEnums.AnimationPack_Editor, new[] { ".animpack" }));
-            factory.RegisterTool<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(new PathToTool(EditorEnums.XML_Editor, ".bin", @"animations\campaign\database"));
-            factory.RegisterTool<TextEditorViewModel<AnimFileToTextConverter>, TextEditorView>(new ExtensionToTool(EditorEnums.XML_Editor, new[] { ".anim" }));
-            factory.RegisterTool<TextEditorViewModel<InvMatrixToTextConverter>, TextEditorView>(new ExtensionToTool(EditorEnums.XML_Editor, new[] { ".bone_inv_trans_mats" }));
+            factory.Register(EditorInfo.Create<AnimPackViewModel, AnimationPackView>(EditorEnums.AnimationPack_Editor, new ExtensionToTool([".animpack"])));
+            factory.Register(EditorInfo.Create<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(EditorEnums.XML_CampaginBin_Edtior, new PathToTool(".bin", @"animations\campaign\database")));
+            factory.Register(EditorInfo.Create<TextEditorViewModel<AnimFileToTextConverter>, TextEditorView>(EditorEnums.XML_Anim_Editor, new ExtensionToTool([".anim"])));
+            factory.Register(EditorInfo.Create<TextEditorViewModel<InvMatrixToTextConverter>, TextEditorView>(EditorEnums.XML_InvBoneEditor, new ExtensionToTool([".bone_inv_trans_mats"])));
         }
 
         private static void RegisterCampaignAnimBin(IServiceCollection services)
