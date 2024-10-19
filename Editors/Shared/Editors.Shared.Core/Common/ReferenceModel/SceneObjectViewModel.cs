@@ -3,8 +3,6 @@ using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
-using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Parsing;
 using Shared.Ui.Events.UiCommands;
 
@@ -15,7 +13,6 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         private readonly PackFileService _pfs;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IMetaDataFactory _metaDataFactory;
-        private readonly IEditorDatabase _toolFactory;
 
         public NotifyAttr<string> HeaderName { get; set; } = new NotifyAttr<string>();
 
@@ -48,7 +45,6 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
         public SceneObjectViewModel(IUiCommandFactory uiCommandFactory,
             IMetaDataFactory metaDataFactory,
-            IEditorDatabase toolFactory,
             PackFileService packFileService,
             SceneObject data,
             string headerName,
@@ -57,7 +53,6 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         {
             _uiCommandFactory = uiCommandFactory;
             _metaDataFactory = metaDataFactory;
-            _toolFactory = toolFactory;
             _pfs = packFileService;
             HeaderName.Value = headerName;
             Data = data;

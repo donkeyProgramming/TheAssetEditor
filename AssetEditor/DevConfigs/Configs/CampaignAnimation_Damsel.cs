@@ -12,7 +12,7 @@ namespace Editors.Shared.DevConfig.Configs
         private readonly IEditorCreator _editorCreator;
         private readonly PackFileService _packFileService;
 
-        public CampaignAnimation_Damsel(IEditorCreator editorCreator, IEditorDatabase toolFactory, PackFileService packFileService)
+        public CampaignAnimation_Damsel(IEditorCreator editorCreator , PackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileService = packFileService;

@@ -12,7 +12,7 @@ namespace Editors.Shared.DevConfig.Configs
         private readonly IEditorCreator _editorCreator;
         private readonly PackFileService _packFileService;
 
-        public AnimTransfer_DwarfArcher(IEditorCreator editorCreator, IEditorDatabase toolFactory, PackFileService packFileService)
+        public AnimTransfer_DwarfArcher(IEditorCreator editorCreator, PackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileService = packFileService;
