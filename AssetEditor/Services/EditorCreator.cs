@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using AssetEditor.ViewModels;
+﻿using AssetEditor.ViewModels;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -36,19 +35,33 @@ namespace AssetEditor.Services
                 return;
             }
 
-            var fileAlreadyAdded = _mainViewModel.CurrentEditorsList.FirstOrDefault(x => x.MainFile == file);
-            if (fileAlreadyAdded != null)
-            {
-                _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.IndexOf(fileAlreadyAdded);
-                _logger.Here().Information($"Attempting to open file '{file.Name}', but is is already open");
-                return;
-            }
-
             var fullFileName = _packFileService.GetFullPath(file);
             var editorViewModel = _toolFactory.Create(fullFileName);
 
-            _logger.Here().Information($"Opening {file.Name} with {editorViewModel?.GetType().Name}");
-            editorViewModel.MainFile = file;
+            // Attempt to load the assigned file, if the editor is a fileEditor.
+            // TODO: Ensure we can only get here if we have a fileEditor
+            if (editorViewModel is IFileEditor fileEditor)
+            {
+                // Ensure file is not already open
+                for (var i = 0; i < _mainViewModel.CurrentEditorsList.Count; i++)
+                {
+                    var existingEditor = _mainViewModel.CurrentEditorsList[i];
+                    if (existingEditor is IFileEditor existingFileEditor)
+                    {
+                        if (existingFileEditor.CurrentFile == file)
+                        {
+                            _logger.Here().Information($"Attempting to open file '{file.Name}', but is is already open");
+                            _mainViewModel.SelectedEditorIndex = i;
+                            return;
+                        }
+                    }
+                }
+
+                // Open the file
+                _logger.Here().Information($"Opening {file.Name} with {editorViewModel?.GetType().Name}");
+                fileEditor.LoadFile(file);
+            }
+
             _mainViewModel.CurrentEditorsList.Add(editorViewModel);
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;
         }

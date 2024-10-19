@@ -192,7 +192,7 @@
                                     </ContextMenu>
                                 </Grid.ContextMenu>
 
-                                <TextBlock Grid.Column="0" Text="{Binding DisplayName.Value, UpdateSourceTrigger=PropertyChanged}">
+                                <TextBlock Grid.Column="0" Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}">
                                     <TextBlock.Style>
                                         <Style TargetType="{x:Type TextBlock}">
                                             <Style.Triggers>

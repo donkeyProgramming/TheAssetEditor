@@ -104,9 +104,11 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
         void ViewMetaDataFile(PackFile packFile, string windowTitlePrefix)
         {
+            // TODO: Use fileOpenCommand
             var fullFileName = _pfs.GetFullPath(_data.PersistMetaData);
             var viewModel = _toolFactory.Create(fullFileName);
-            viewModel.MainFile = packFile;
+            if (viewModel is IFileEditor fileEditor)
+                fileEditor.LoadFile(packFile);
             var window = _toolFactory.CreateAsWindow(viewModel);
             window.Width = 800;
             window.Height = 450;

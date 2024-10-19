@@ -37,7 +37,7 @@ namespace Editors.Audio.AudioExplorer
         public NotifyAttr<bool> ShowDialogEvents { get; set; }
         public NotifyAttr<bool> IsPlaySoundButtonEnabled { get; set; } = new NotifyAttr<bool>(false);
         public NotifyAttr<bool> CanExportCurrrentDialogEventAsCsvAction { get; set; } = new NotifyAttr<bool>(false);
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Explorer");
+        public string DisplayName { get; set; } = "Audio Explorer";
         public NotifyAttr<string> SelectedNodeText { get; set; } = new NotifyAttr<string>("");
         public PackFile MainFile { get => _mainFile; set { _mainFile = value; } }
         public bool HasUnsavedChanges { get; set; }

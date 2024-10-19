@@ -7,13 +7,11 @@ using System.Windows;
 using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.Views;
 using Editors.Audio.Storage;
 using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
@@ -39,7 +37,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         private readonly IWindowFactory _windowFactory;
         readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
+        public string DisplayName { get; set; } = "Audio Editor";
 
         [ObservableProperty] private string _selectedAudioProjectEvent;
         [ObservableProperty] private bool _showCustomStatesOnly;

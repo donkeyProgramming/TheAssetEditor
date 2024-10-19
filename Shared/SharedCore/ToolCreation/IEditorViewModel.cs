@@ -3,9 +3,10 @@ using Shared.Core.PackFiles.Models;
 
 namespace Shared.Core.ToolCreation
 {
-    public interface IEditorViewModel : IFileEditor
+    public interface IEditorViewModel
     {
-        NotifyAttr<string> DisplayName { get; set; }
+        string DisplayName { get; set; }
+        
         void Close();
     }
 
@@ -17,7 +18,8 @@ namespace Shared.Core.ToolCreation
 
     public interface IFileEditor
     {
-        PackFile MainFile { get; set; }
+        PackFile CurrentFile { get; }
+        public void LoadFile(PackFile file);
     }
 
     public interface IEditorCreator

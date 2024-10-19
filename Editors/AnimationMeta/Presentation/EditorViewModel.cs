@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.AnimationMeta.Presentation.View;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -13,7 +14,7 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.Presentation
 {
-    public class EditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ISaveableEditor
+    public partial class EditorViewModel : ObservableObject, IEditorViewModel, ISaveableEditor
     {
         public event EditorSavedDelegate EditorSavedEvent;
 
@@ -23,18 +24,18 @@ namespace Editors.AnimationMeta.Presentation
         CopyPasteManager _copyPasteManager;
         MetaDataFile _metaDataFile;
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
+        [ObservableProperty] string _displayName = "Metadata Editor";
 
         PackFile _file;
         public PackFile MainFile { get => _file; set => Initialise(value); }
 
 
-        public ObservableCollection<MetaTagViewBase> Tags { get; set; } = new ObservableCollection<MetaTagViewBase>();
+        public ObservableCollection<MetaTagViewBase> Tags { get; set; } = new();
 
-        MetaTagViewBase _selectedTag;
+
         MetaTagViewBase _prevSelectedTag;
-        readonly List<MetaTagViewBase> _selectedTags = new List<MetaTagViewBase>();
-        public MetaTagViewBase SelectedTag { get => _selectedTag; set => SetAndNotify(ref _selectedTag, value); }
+        readonly List<MetaTagViewBase> _selectedTags = new();
+        [ObservableProperty] MetaTagViewBase _selectedTag;
 
         public EditorViewModel(PackFileService pf, CopyPasteManager copyPasteManager)
         {
@@ -49,7 +50,7 @@ namespace Editors.AnimationMeta.Presentation
 
             _file = file;
             Tags.Clear();
-            DisplayName.Value = file == null ? "" : file.Name;
+            DisplayName = file == null ? "" : file.Name;
 
             if (file == null)
                 return;
@@ -291,7 +292,7 @@ namespace Editors.AnimationMeta.Presentation
             if (res != null)
             {
                 _file = res;
-                DisplayName.Value = _file.Name;
+                DisplayName = _file.Name;
             }
 
             _logger.Here().Information("Creating metadata file complete");

@@ -18,11 +18,13 @@ namespace Shared.Ui.Events.UiCommands
         public void Execute(string fileName, int width, int heigh)
         {
             var viewModel = _toolFactory.Create(fileName, true);
-            viewModel.MainFile = _packFileService.FindFile(fileName);
+            if(viewModel is IFileEditor fileEditor)
+                fileEditor.LoadFile(_packFileService.FindFile(fileName));
+
             var window = _toolFactory.CreateAsWindow(viewModel);
             window.Width = width;
             window.Height = heigh;
-            window.Title = viewModel.DisplayName.Value;
+            window.Title = viewModel.DisplayName;
             window.ShowDialog();
         }
     }

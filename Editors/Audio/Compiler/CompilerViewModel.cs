@@ -16,7 +16,7 @@ namespace Editors.Audio.Compiler
         private readonly PackFileService _pfs;
         private readonly CompilerService _compilerService;
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Compiler");
+        public string DisplayName { get; set; } = "Audio Compiler";
         public NotifyAttr<string> ProjectFilePath { get; set; } = new NotifyAttr<string>("audioprojects\\projectsimple.json");
         public NotifyAttr<ErrorListViewModel> ProjectResult { get; set; } = new NotifyAttr<ErrorListViewModel>(new ErrorListViewModel());
 

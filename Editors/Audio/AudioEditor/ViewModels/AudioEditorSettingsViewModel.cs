@@ -7,7 +7,6 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
@@ -36,7 +35,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         readonly ILogger _logger = Logging.Create<AudioEditorSettingsViewModel>();
         private Action _closeAction;
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Audio Editor");
+        [ObservableProperty] string _displayName = "Audio Editor";
 
         [ObservableProperty] private string _audioProjectFileName = "my_audio_project";
         [ObservableProperty] private string _customStatesFileName = "my_custom_states";

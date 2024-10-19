@@ -1,10 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -31,7 +25,7 @@ namespace CommonControls.Editors.AnimationPack
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         ITextConverter _activeConverter;
         ApplicationSettingsService _appSettings;
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("");
+        public string DisplayName { get; set; } = "Not set";
 
         PackFile _packFile;
         public PackFile MainFile { get => _packFile; set { _packFile = value; Load(); } }
@@ -94,7 +88,7 @@ namespace CommonControls.Editors.AnimationPack
             var animPack = AnimationPackSerializer.Load(_packFile, _pfs);
             var itemNames = animPack.Files.ToList();
             AnimationPackItems.UpdatePossibleValues(itemNames);
-            DisplayName.Value = animPack.FileName;
+            DisplayName = animPack.FileName;
         }
 
         string GetAnimSetFileName()

@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using CommonControls.Editors.TextEditor;
 using CommunityToolkit.Mvvm.Input;
@@ -23,7 +19,7 @@ namespace Shared.Ui.Editors.TextEditor
     {
         public ICommand SaveCommand { get; set; }
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
+        public string DisplayName { get; set; } = "Not set";
 
         string _text;
         public string Text { get => _text; set => SetAndNotify(ref _text, value); }
@@ -62,7 +58,7 @@ namespace Shared.Ui.Editors.TextEditor
         void SetCurrentPackFile(PackFile packedFile)
         {
             var file = packedFile;
-            DisplayName.Value = file.Name;
+            DisplayName = file.Name;
 
             var data = file.DataSource.ReadData();
             Text = _converter.GetText(data);

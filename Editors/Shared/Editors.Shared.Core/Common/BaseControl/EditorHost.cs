@@ -8,7 +8,6 @@ using GameWorld.Core.Services;
 using GameWorld.Core.WpfWindow.Events;
 using Shared.Core.Events;
 using Shared.Core.Misc;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 
@@ -23,8 +22,7 @@ namespace Editors.Shared.Core.Common.BaseControl
     public class EditorHost<TEditor> : NotifyPropertyChangedImpl, IEditorViewModel
     {
         public IToolFactory ToolsFactory { get; set; }
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("Name missing");
-        public PackFile MainFile { get; set; }
+        public string DisplayName { get; set; } ="Name missing";
 
         public NotifyAttr<IWpfGame> GameWorld { get; private set; } = new NotifyAttr<IWpfGame>();
         public ObservableCollection<SceneObjectViewModel> SceneObjects { get; set; } = new ObservableCollection<SceneObjectViewModel>();
@@ -60,7 +58,7 @@ namespace Editors.Shared.Core.Common.BaseControl
             eventHub.Register<SceneInitializedEvent>(this, Initialize);
 
             var typed = Editor as IHostedEditor<TEditor>;
-            DisplayName.Value = typed.EditorName;
+            DisplayName = typed.EditorName;
         }
 
         void Initialize(SceneInitializedEvent sceneInitializedEvent)

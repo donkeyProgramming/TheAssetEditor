@@ -5,18 +5,15 @@ using Shared.Core.ToolCreation;
 
 namespace Editors.TextureEditor.ViewModels
 {
-    public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorViewModel, IFileEditor
     {
         private readonly PackFileService _pfs;
         private readonly TextureBuilder _textureBuilder;
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>();
+        public string DisplayName { get; set; } = "Not set";
 
         PackFile _packFile;
-        public PackFile MainFile { get => _packFile; set => Load(value); }  // Change to own interface or function
-
-        public bool HasUnsavedChanges { get => false; set { } } // Move to own interface
-
+        public PackFile CurrentFile => _packFile;
 
         TexturePreviewViewModel _viewModel; // UseNotify
         public TexturePreviewViewModel ViewModel
@@ -25,17 +22,19 @@ namespace Editors.TextureEditor.ViewModels
             set => SetAndNotify(ref _viewModel, value);
         }
 
+
+
         public TextureEditorViewModel(PackFileService pfs, TextureBuilder textureBuilder)
         {
             _pfs = pfs;
             _textureBuilder = textureBuilder;
         }
 
-        private void Load(PackFile packFile)
+        public void LoadFile(PackFile packFile)
         {
             _packFile = packFile;
 
-            DisplayName.Value = _packFile.Name;
+            DisplayName = _packFile.Name;
 
             var viewModel = new TexturePreviewViewModel();
             viewModel.ImagePath.Value = _pfs.GetFullPath(_packFile);
@@ -50,7 +49,5 @@ namespace Editors.TextureEditor.ViewModels
         {
 
         }
-
-        public bool Save() => false;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -8,7 +9,6 @@ using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
-using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.Common;
@@ -71,10 +71,21 @@ namespace AssetEditor.ViewModels
 
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)
         {
-            var openFiles = CurrentEditorsList.Where(x => x.MainFile != null && _packfileService.GetPackFileContainer(x.MainFile) == container).ToList();
+
+            var openFiles = new List<IEditorViewModel>();
+            for (var i = 0; i < CurrentEditorsList.Count; i++)
+            {
+                if (CurrentEditorsList[i] is not IFileEditor fileEditor)
+                    continue;
+
+                var containterForPack = _packfileService.GetPackFileContainer(fileEditor.CurrentFile);
+                if (containterForPack == container)
+                    openFiles.Add(CurrentEditorsList[i]);
+            }
+
             if (openFiles.Any())
             {
-                if (MessageBox.Show("Closing pack file with open files, are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                if (MessageBox.Show($"Closing pack file '{container.Name}' with open files ({openFiles.First().DisplayName}), are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
                     return false;
             }
 
