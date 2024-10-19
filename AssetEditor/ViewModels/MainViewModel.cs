@@ -51,7 +51,7 @@ namespace AssetEditor.ViewModels
             SetStatusBarEditablePackFile();
         }
 
-        void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
+        void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenEditorCommand>().Execute(file);
 
         [RelayCommand] private void Closing(IEditorViewModel editor)
         {

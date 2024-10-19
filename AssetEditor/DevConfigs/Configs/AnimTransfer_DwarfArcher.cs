@@ -46,7 +46,7 @@ namespace Editors.Shared.DevConfig.Configs
                 Animation = packfileService.FindFile(@"animations\battle\humanoid01\sword_and_pistol\missile_attacks\hu1_swp_missile_attack_aim_to_shootready_01.anim")
             };
             editorView.Editor.SetDebugInputParameters(targetInput, sourceInput);
-            creator.CreateEmptyEditor(editorView);
+            creator.Create(editorView);
         }
     }
 }

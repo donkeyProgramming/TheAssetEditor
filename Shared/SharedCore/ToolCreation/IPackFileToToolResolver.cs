@@ -2,7 +2,37 @@
 
 namespace Shared.Core.ToolCreation
 {
-    public class ExtensionToTool : IPackFileToToolSelector
+    public interface IPackFileToToolResolver
+    {
+        PackFileToToolSelectorResult CanOpen(string fullPath);
+        EditorEnums EditorType { get; }
+    }
+
+    public class PathToTool : IPackFileToToolResolver
+    {
+        private readonly string _extension;
+        private readonly string _requiredPathSubString;
+
+        public PathToTool(EditorEnums editorDisplayName, string extension, string requiredPathSubString)
+        {
+            _extension = extension;
+            _requiredPathSubString = requiredPathSubString;
+            EditorType = editorDisplayName;
+        }
+
+        public EditorEnums EditorType { get; private set; }
+
+        public PackFileToToolSelectorResult CanOpen(string fullPath)
+        {
+            var extention = Regex.Match(fullPath, @"\..*").Value;
+            if (_extension == extention && fullPath.Contains(_requiredPathSubString))
+                return new PackFileToToolSelectorResult() { CanOpen = true };
+
+            return new PackFileToToolSelectorResult() { CanOpen = false };
+        }
+    }
+
+    public class ExtensionToTool : IPackFileToToolResolver
     {
         readonly string[] _validExtentionsCore;
         readonly string[] _validExtentionsOptimal;
@@ -26,8 +56,6 @@ namespace Shared.Core.ToolCreation
                 {
                     extention = "." + ext2.Groups[1].Value + "." + ext2.Groups[2].Value;
                 }
-                //var index = extention.IndexOf("}");
-                //extention = extention.Remove(0, index+1);
             }
 
             if (_validExtentionsCore != null)
@@ -35,7 +63,7 @@ namespace Shared.Core.ToolCreation
                 foreach (var validExt in _validExtentionsCore)
                 {
                     if (validExt == extention)
-                        return new PackFileToToolSelectorResult() { CanOpen = true, IsCoreTool = true };
+                        return new PackFileToToolSelectorResult() { CanOpen = true };
                 }
             }
 
@@ -44,11 +72,11 @@ namespace Shared.Core.ToolCreation
                 foreach (var validExt in _validExtentionsOptimal)
                 {
                     if (validExt == extention)
-                        return new PackFileToToolSelectorResult() { CanOpen = true, IsCoreTool = false };
+                        return new PackFileToToolSelectorResult() { CanOpen = true,  };
                 }
             }
 
-            return new PackFileToToolSelectorResult() { CanOpen = false, IsCoreTool = false };
+            return new PackFileToToolSelectorResult() { CanOpen = false };
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Shared.Core.ToolCreation
         Window CreateAsWindow(IEditorViewModel viewModel);
         void DestroyEditor(IEditorViewModel instance);
         Type GetViewTypeFromViewModel(Type viewModelType);
-        void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector = null)
+        void RegisterTool<ViewModel, View>(IPackFileToToolResolver toolSelector = null)
             where ViewModel : IEditorViewModel
             where View : Control;
     }

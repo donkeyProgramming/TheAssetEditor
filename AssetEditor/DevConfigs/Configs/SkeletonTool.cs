@@ -29,7 +29,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OpenFileOnLoad()
         {
             var editorView = _toolFactory.Create<EditorHost<SkeletonEditorViewModel>>();
-            _editorCreator.CreateEmptyEditor(editorView);
+            _editorCreator.Create(editorView);
         }
     }
 }

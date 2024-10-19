@@ -7,6 +7,16 @@ using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.ToolCreation
 {
+
+   //public record ToolInfo
+   //{
+   //    Type View;
+   //    Type ViewModel;
+   //    EditorEnums EditorEnum;
+   //    IPackFileToToolResolver ExtentionHandler;
+   //}
+
+
     public class ToolFactory : IToolFactory
     {
         private readonly ILogger _logger = Logging.Create<ToolFactory>();
@@ -15,7 +25,7 @@ namespace Shared.Core.ToolCreation
         private readonly ScopeRepository _scopeRepository;
         private readonly IToolSelectorUiProvider _toolSelectorUiProvider;
         private readonly Dictionary<Type, Type> _viewModelToViewMap = new();
-        private readonly Dictionary<IPackFileToToolSelector, Type> _extensionToToolMap = new();
+        private readonly Dictionary<IPackFileToToolResolver, Type> _extensionToToolMap = new();
 
         public ToolFactory(IServiceProvider serviceProvider, ScopeRepository scopeRepository, IToolSelectorUiProvider toolSelectorUiProvider)
         {
@@ -24,7 +34,7 @@ namespace Shared.Core.ToolCreation
             _toolSelectorUiProvider = toolSelectorUiProvider;
         }
 
-        public void RegisterTool<ViewModel, View>(IPackFileToToolSelector toolSelector = null)
+        public void RegisterTool<ViewModel, View>(IPackFileToToolResolver toolSelector = null)
             where ViewModel : IEditorViewModel
             where View : Control
         {
@@ -118,7 +128,7 @@ namespace Shared.Core.ToolCreation
             {
                 var result = toolLoopUp.Key.CanOpen(filename);
                 if (result.CanOpen)
-                    output.Add(new ToolInformation() { EditorType = toolLoopUp.Key.EditorType, IsCoreTool = result.IsCoreTool, Type = toolLoopUp.Value });
+                    output.Add(new ToolInformation() { EditorType = toolLoopUp.Key.EditorType, Type = toolLoopUp.Value });
             }
 
             if (output.Count == 0)
@@ -128,7 +138,7 @@ namespace Shared.Core.ToolCreation
                 return new List<ToolInformation>();
             }
 
-            return output.OrderBy(x => x.IsCoreTool).ToList();
+            return output;
         }
 
         public void DestroyEditor(IEditorViewModel instance) => _scopeRepository.RemoveScope(instance);

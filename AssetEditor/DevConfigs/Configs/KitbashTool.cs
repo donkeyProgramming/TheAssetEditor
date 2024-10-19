@@ -26,7 +26,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OpenFileOnLoad()
         {
             var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.wsmodel");
-            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file, EditorEnums.Kitbash_Editor);
+            _uiCommandFactory.Create<OpenEditorCommand>().Execute(file, EditorEnums.Kitbash_Editor);
         }
 
         public void OverrideSettings(ApplicationSettings currentSettings)
@@ -53,7 +53,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OpenFileOnLoad()
         {
             var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2");
-            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
+            _uiCommandFactory.Create<OpenEditorCommand>().Execute(file);
         }
 
         public void OverrideSettings(ApplicationSettings currentSettings)
@@ -79,7 +79,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OpenFileOnLoad()
         {
             var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\ox1\chd\chd_taurus\chd_taurus_cinderbreath_02.rigid_model_v2");
-            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
+            _uiCommandFactory.Create<OpenEditorCommand>().Execute(file);
         }
 
         public void OverrideSettings(ApplicationSettings currentSettings)
@@ -107,7 +107,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OpenFileOnLoad()
         {
             var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_throt\skv_throt_body_01.rigid_model_v2");
-            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
+            _uiCommandFactory.Create<OpenEditorCommand>().Execute(file);
 
             var kitbashToolScope = _scopeRepositor.Scopes.First().Value;
             var localCommandFactory = kitbashToolScope.ServiceProvider.GetRequiredService<IUiCommandFactory>();
@@ -140,7 +140,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OpenFileOnLoad()
         {
             var file = _packFileService.FindFile(@"variantmeshes\_variantmodels\man\shield\celtic_oval_shield_a.rigid_model_v2");
-            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file!);
+            _uiCommandFactory.Create<OpenEditorCommand>().Execute(file!);
         }
 
         public void OverrideSettings(ApplicationSettings currentSettings)

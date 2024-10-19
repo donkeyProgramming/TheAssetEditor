@@ -45,7 +45,7 @@ namespace Editors.Shared.DevConfig.Configs
                 Mesh = packfileService.FindFile(@"variantmeshes\variantmeshdefinitions\hef_war_lion.variantmeshdefinition")
             };
             editorView.Editor.SetDebugInputParameters(riderInput, mountInput);
-            creator.CreateEmptyEditor(editorView);
+            creator.Create(editorView);
         }
     }
 }

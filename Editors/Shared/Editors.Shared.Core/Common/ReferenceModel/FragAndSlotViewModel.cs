@@ -54,7 +54,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             if (FragmentList.SelectedItem != null && FragmentList.SelectedItem != null)
             {
                 var animPack = FragmentList.SelectedItem.PackFileReference;
-                _uiCommandFactory.Create<OpenFileInWindowedEditorCommand>().Execute(animPack.FileName, 800, 900);
+                _uiCommandFactory.Create<OpenEditorCommand>().ExecuteAsWindow(animPack.FileName, 800, 900);
             }
         }
 

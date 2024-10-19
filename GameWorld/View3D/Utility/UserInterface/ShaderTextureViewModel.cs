@@ -51,7 +51,7 @@ namespace GameWorld.Core.Utility.UserInterface
         void HandlePreviewTexture()
         {
             if (HasErrors == false)
-                _uiCommandFactory.Create<OpenFileInWindowedEditorCommand>().Execute(Path, 800, 900);
+                _uiCommandFactory.Create<OpenEditorCommand>().ExecuteAsWindow(Path, 800, 900);
         }
 
         [RelayCommand]

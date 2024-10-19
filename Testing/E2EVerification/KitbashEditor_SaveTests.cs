@@ -30,7 +30,7 @@ namespace E2EVerification
 
             // Load the a rmv2 and open the kitbash editor
             var originalRmv2File = runner.PackFileService.FindFile(_rmvFilePathKarl);
-            runner.CommandFactory.Create<OpenFileInEditorCommand>().Execute(originalRmv2File);
+            runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
             // Get the scope of the newly created kitbash editor
             var kitbashScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;
@@ -78,7 +78,7 @@ namespace E2EVerification
 
             // Load the a rmv2 and open the kitbash editor
             var originalRmv2File = runner.PackFileService.FindFile(_rmvFilePathKarl);
-            runner.CommandFactory.Create<OpenFileInEditorCommand>().Execute(originalRmv2File);
+            runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
             // Get the scope of the newly created kitbash editor
             var kitbashScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;
@@ -128,7 +128,7 @@ namespace E2EVerification
             // Load the a rmv2 and open the kitbash editor
             var meshPath = "variantmeshes/_variantmodels/man/helmets/carthaginian_pylos.rigid_model_v2";
             var originalRmv2File = runner.PackFileService.FindFile(meshPath);
-            runner.CommandFactory.Create<OpenFileInEditorCommand>().Execute(originalRmv2File);
+            runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
             // Get the scope of the newly created kitbash editor
             var kitbashScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;
@@ -162,7 +162,7 @@ namespace E2EVerification
             // Load the a rmv2 and open the kitbash editor
             var meshPath = "variantmeshes/_variantmodels/man/shield/celtic_oval_shield_a.rigid_model_v2";
             var originalRmv2File = runner.PackFileService.FindFile(meshPath);
-            runner.CommandFactory.Create<OpenFileInEditorCommand>().Execute(originalRmv2File);
+            runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
             // Get the scope of the newly created kitbash editor
             var kitbashScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;

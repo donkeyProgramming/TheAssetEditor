@@ -24,8 +24,8 @@ namespace Shared.Core.ToolCreation
 
     public interface IEditorCreator
     {
-        void OpenFile(PackFile file, EditorEnums? preferedEditor);
-        void CreateEmptyEditor(IEditorViewModel editorView);
+        void CreateFromFile(PackFile file, EditorEnums? preferedEditor);
+        void Create(IEditorViewModel editorView);
     }
 
     public delegate void EditorSavedDelegate(PackFile newFile);

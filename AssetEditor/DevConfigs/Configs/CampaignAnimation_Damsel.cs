@@ -36,7 +36,7 @@ namespace Editors.Shared.DevConfig.Configs
             };
 
             editorView.Editor.SetDebugInputParameters(debugInput);
-            _editorCreator.CreateEmptyEditor(editorView);
+            _editorCreator.Create(editorView);
         }
 
     }

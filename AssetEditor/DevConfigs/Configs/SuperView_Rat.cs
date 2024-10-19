@@ -45,7 +45,7 @@ namespace Editors.Shared.DevConfig.Configs
                 AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
             };
             editorView.Editor.SetDebugInputParameters(debugInput);
-            creator.CreateEmptyEditor(editorView);
+            creator.Create(editorView);
         }
     }
 

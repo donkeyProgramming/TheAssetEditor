@@ -21,13 +21,13 @@ namespace AssetEditor.Services
             _toolFactory = toolFactory;
         }
 
-        public void CreateEmptyEditor(IEditorViewModel editorView)
+        public void Create(IEditorViewModel editorView)
         {
             _mainViewModel.CurrentEditorsList.Add(editorView);
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;
         }
 
-        public void OpenFile(PackFile file, EditorEnums? preferedEditor)
+        public void CreateFromFile(PackFile file, EditorEnums? preferedEditor)
         {
             if (file == null)
             {

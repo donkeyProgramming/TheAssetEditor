@@ -22,7 +22,7 @@ namespace Editors.Shared.DevConfig.Configs
         {
             var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_base_colour.dds");
             //_uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
-            _uiCommandFactory.Create<OpenFileInWindowedEditorCommand>().Execute(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_base_colour.dds", 800, 500);
+            _uiCommandFactory.Create<OpenEditorCommand>().ExecuteAsWindow(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_base_colour.dds", 800, 500);
         }
 
         public void OverrideSettings(ApplicationSettings currentSettings)
