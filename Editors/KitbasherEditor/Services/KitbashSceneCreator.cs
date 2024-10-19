@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Components;
+﻿using System.IO;
+using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using GameWorld.Core.Services.SceneSaving;
@@ -9,6 +10,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.WsModel;
 
 namespace Editors.KitbasherEditor.Services
 {
@@ -46,17 +48,29 @@ namespace Editors.KitbasherEditor.Services
 
             // Load the opened model
             var modelFullPath = _packFileService.GetFullPath(file);
-            var rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
-            var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromFile(rmv, modelFullPath, _kitbasherRootScene.Player);
+
+            WsModelFile? wsModel = null;
+            RmvFile rmv;
+            if (Path.GetExtension(modelFullPath).ToLower() == ".wsmodel")
+            {
+                wsModel = new WsModelFile(file);
+                var rmvPackFile = _packFileService.FindFile(wsModel.GeometryPath);
+                rmv = ModelFactory.Create().Load(rmvPackFile.DataSource.ReadData());
+            }
+            else
+            {
+                rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
+            }
+
+            var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromFile(rmv, modelFullPath, _kitbasherRootScene.Player, wsModel);
             mainNode.Children.Clear();
             foreach(var lodNode in lodNodes)
                 mainNode.AddObject(lodNode);
 
-
             _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
 
             var fullPath = _packFileService.GetFullPath(file);
-            _saveSettings.OutputName = fullPath;
+            _saveSettings.OutputName = Path.GetFileNameWithoutExtension(fullPath) + ".rigid_model_v2";
             _saveSettings.InitializeLodSettings(rmv.LodHeaders);
         }
 

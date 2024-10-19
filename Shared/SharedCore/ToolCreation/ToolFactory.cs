@@ -55,7 +55,7 @@ namespace Shared.Core.ToolCreation
             return (ViewModel)CreateEditorInternal(typeof(ViewModel));
         }
 
-        public IEditorViewModel Create(string fullFileName, bool useDefaultTool = false)
+        public IEditorViewModel Create(string fullFileName, EditorEnums? preferedEditor)
         {
             var allEditors = GetAllPossibleEditors(fullFileName);
 
@@ -66,9 +66,16 @@ namespace Shared.Core.ToolCreation
             }
 
             Type selectedEditor = null;
-            if (allEditors.Count == 1 || useDefaultTool)
+            if (allEditors.Count == 1)
             {
                 selectedEditor = allEditors.First().Type;
+            }
+            if (allEditors.Count > 1 && preferedEditor != null)
+            {
+                var preferedEditorType = allEditors.FirstOrDefault(x => x.EditorType == preferedEditor);
+                if(preferedEditorType == null)
+                    throw new Exception($"The prefered editor {preferedEditor} can not open {fullFileName}");
+                selectedEditor = preferedEditorType.Type;
             }
             else
             {

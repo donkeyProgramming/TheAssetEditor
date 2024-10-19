@@ -27,7 +27,7 @@ namespace AssetEditor.Services
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;
         }
 
-        public void OpenFile(PackFile file)
+        public void OpenFile(PackFile file, EditorEnums? preferedEditor)
         {
             if (file == null)
             {
@@ -36,7 +36,7 @@ namespace AssetEditor.Services
             }
 
             var fullFileName = _packFileService.GetFullPath(file);
-            var editorViewModel = _toolFactory.Create(fullFileName);
+            var editorViewModel = _toolFactory.Create(fullFileName, preferedEditor);
 
             // Attempt to load the assigned file, if the editor is a fileEditor.
             // TODO: Ensure we can only get here if we have a fileEditor

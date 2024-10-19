@@ -13,9 +13,9 @@ namespace Shared.Ui.Events.UiCommands
             _editorCreator = editorCreator;
         }
 
-        public void Execute(PackFile file)
+        public void Execute(PackFile file, EditorEnums? preferedEditor = null)
         {
-            _editorCreator.OpenFile(file);
+            _editorCreator.OpenFile(file, preferedEditor);
         }
     }
 }

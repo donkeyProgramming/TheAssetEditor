@@ -5,7 +5,7 @@ namespace Shared.Core.ToolCreation
 {
     public interface IToolFactory
     {
-        IEditorViewModel Create(string fullFileName, bool useDefaultTool = false);
+        IEditorViewModel Create(string fullFileName, EditorEnums? preferedEditor = null);
         ViewModel Create<ViewModel>() where ViewModel : IEditorViewModel;
         Window CreateAsWindow(IEditorViewModel viewModel);
         void DestroyEditor(IEditorViewModel instance);

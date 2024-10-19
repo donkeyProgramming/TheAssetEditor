@@ -6,6 +6,7 @@ using Shared.Core.DependencyInjection;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.Core.ToolCreation;
 using Shared.EmbeddedResources;
 using Shared.Ui.Events.UiCommands;
 
@@ -24,8 +25,8 @@ namespace Editors.Shared.DevConfig.Configs
 
         public void OpenFileOnLoad()
         {
-            var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2");
-            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file);
+            var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.wsmodel");
+            _uiCommandFactory.Create<OpenFileInEditorCommand>().Execute(file, EditorEnums.Kitbash_Editor);
         }
 
         public void OverrideSettings(ApplicationSettings currentSettings)

@@ -17,7 +17,7 @@ namespace Shared.Ui.Events.UiCommands
 
         public void Execute(string fileName, int width, int heigh)
         {
-            var viewModel = _toolFactory.Create(fileName, true);
+            var viewModel = _toolFactory.Create(fileName);
             if(viewModel is IFileEditor fileEditor)
                 fileEditor.LoadFile(_packFileService.FindFile(fileName));
 
