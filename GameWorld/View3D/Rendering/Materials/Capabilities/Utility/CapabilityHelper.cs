@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using CommunityToolkit.Diagnostics;
 using Microsoft.Xna.Framework;
-using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 
@@ -59,7 +59,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             if (parameter.Type != "float")
                 throw new Exception($"Parameter {parameterInstance.Name} was expected to be float2, but was {parameter.Type}");
 
-            var parsedValue = float.Parse(parameter.Value);
+            var parsedValue = float.Parse(parameter.Value, CultureInfo.InvariantCulture);
             return parsedValue;
         }
 
@@ -79,8 +79,8 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             var values = parameter.Value.Split(",");
             Guard.IsTrue(values.Length == 2);
 
-            var x = float.Parse(values[0]);
-            var y = float.Parse(values[1]);
+            var x = float.Parse(values[0], CultureInfo.InvariantCulture);
+            var y = float.Parse(values[1], CultureInfo.InvariantCulture);
 
             return new Vector2(x, y);
         }
@@ -100,9 +100,9 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             var values = parameter.Value.Split(",");
             Guard.IsTrue(values.Length == 3);
 
-            var x = float.Parse(values[0]);
-            var y = float.Parse(values[1]);
-            var z = float.Parse(values[2]);
+            var x = float.Parse(values[0], CultureInfo.InvariantCulture);
+            var y = float.Parse(values[1], CultureInfo.InvariantCulture);
+            var z = float.Parse(values[2], CultureInfo.InvariantCulture);
 
             return new Vector3(x, y, z);
         }
@@ -122,10 +122,10 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             var values = parameter.Value.Split(",");
             Guard.IsTrue(values.Length == 4);
 
-            var x = float.Parse(values[0]);
-            var y = float.Parse(values[1]);
-            var z = float.Parse(values[2]);
-            var w = float.Parse(values[3]);
+            var x = float.Parse(values[0], CultureInfo.InvariantCulture);
+            var y = float.Parse(values[1], CultureInfo.InvariantCulture);
+            var z = float.Parse(values[2], CultureInfo.InvariantCulture);
+            var w = float.Parse(values[3], CultureInfo.InvariantCulture);
 
             return new Vector4(x, y, z, w);
         }
