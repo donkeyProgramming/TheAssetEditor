@@ -61,10 +61,10 @@ namespace Editors.AnimationMeta.SuperView
 
         private void UpdateMetaDataInfoFromAsset(SceneObject asset)
         {
-            PersistentMetaEditor.MainFile = asset.PersistMetaData;
+            PersistentMetaEditor.LoadFile(asset.PersistMetaData);
             PersistentMetaFilePath.Value = BuildMetaDataName(asset.PersistMetaData);
 
-            MetaEditor.MainFile = asset.MetaData;
+            MetaEditor.LoadFile(asset.MetaData);
             MetaFilePath.Value = BuildMetaDataName(asset.MetaData);
         }
 
@@ -73,8 +73,8 @@ namespace Editors.AnimationMeta.SuperView
             if (file == null)
                 return "";
 
-            var containerName = _packFileService.GetPackFileContainer(PersistentMetaEditor.MainFile).Name;
-            var filePath = PersistentMetaFilePath.Value = _packFileService.GetFullPath(PersistentMetaEditor.MainFile);
+            var containerName = _packFileService.GetPackFileContainer(PersistentMetaEditor.CurrentFile).Name;
+            var filePath = PersistentMetaFilePath.Value = _packFileService.GetFullPath(PersistentMetaEditor.CurrentFile);
             return $"[{containerName}]{filePath}";
         }
 

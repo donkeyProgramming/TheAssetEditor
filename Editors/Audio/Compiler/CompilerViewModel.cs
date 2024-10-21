@@ -5,7 +5,6 @@ using Editors.Audio.BnkCompiler;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.ErrorListDialog;
 
@@ -51,10 +50,6 @@ namespace Editors.Audio.Compiler
 
         public void DisplayDocumantationAction() => Process.Start(new ProcessStartInfo("cmd", $"/c start https://tw-modding.com/index.php/Audio_modding") { CreateNoWindow = true });
 
-
         public void Close() { }
-        public bool Save() => true;
-        public PackFile MainFile { get; set; }
-        public bool HasUnsavedChanges { get; set; } = false;
     }
 }

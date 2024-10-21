@@ -14,28 +14,25 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.Presentation
 {
-    public partial class EditorViewModel : ObservableObject, IEditorViewModel, ISaveableEditor
+    public partial class EditorViewModel : ObservableObject, IEditorViewModel, ISaveableEditor, IFileEditor
     {
         public event EditorSavedDelegate EditorSavedEvent;
 
-        ILogger _logger = Logging.Create<EditorViewModel>();
+        private readonly ILogger _logger = Logging.Create<EditorViewModel>();
+        private readonly PackFileService _pf;
+        private readonly CopyPasteManager _copyPasteManager;
 
-        PackFileService _pf;
-        CopyPasteManager _copyPasteManager;
         MetaDataFile _metaDataFile;
-
-        [ObservableProperty] string _displayName = "Metadata Editor";
-
         PackFile _file;
-        public PackFile MainFile { get => _file; set => Initialise(value); }
-
-
-        public ObservableCollection<MetaTagViewBase> Tags { get; set; } = new();
-
 
         MetaTagViewBase _prevSelectedTag;
         readonly List<MetaTagViewBase> _selectedTags = new();
+
+        [ObservableProperty] string _displayName = "Metadata Editor";
         [ObservableProperty] MetaTagViewBase _selectedTag;
+
+
+        public ObservableCollection<MetaTagViewBase> Tags { get; set; } = new();
 
         public EditorViewModel(PackFileService pf, CopyPasteManager copyPasteManager)
         {
@@ -301,9 +298,13 @@ namespace Editors.AnimationMeta.Presentation
         }
 
         public bool HasUnsavedChanges { get; set; } = false;
+
+        public PackFile CurrentFile => _file;
+
         public bool Save() => SaveAction();
         public void Close() { }
 
+        public void LoadFile(PackFile file) => Initialise(file);
     }
 }
 

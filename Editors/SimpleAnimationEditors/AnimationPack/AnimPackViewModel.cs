@@ -19,16 +19,15 @@ using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.AnimationPack
 {
-    public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ISaveableEditor
+    public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorViewModel, ISaveableEditor, IFileEditor
     {
-        PackFileService _pfs;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        ITextConverter _activeConverter;
-        ApplicationSettingsService _appSettings;
+        private readonly PackFileService _pfs;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private ITextConverter _activeConverter;
+        private readonly ApplicationSettingsService _appSettings;
         public string DisplayName { get; set; } = "Not set";
 
         PackFile _packFile;
-        public PackFile MainFile { get => _packFile; set { _packFile = value; Load(); } }
 
         public FilterCollection<IAnimationPackFile> AnimationPackItems { get; set; }
 
@@ -161,9 +160,11 @@ namespace CommonControls.Editors.AnimationPack
         public void Close() { }
         public bool HasUnsavedChanges { get; set; }
 
+        public PackFile CurrentFile => _packFile;
+
         public bool SaveActiveFile()
         {
-            if (MainFile == null)
+            if (_packFile == null)
             {
                 MessageBox.Show("Can not save in this mode - Open the file normally");
                 return false;
@@ -195,7 +196,7 @@ namespace CommonControls.Editors.AnimationPack
 
         public bool Save()
         {
-            if (MainFile == null)
+            if (_packFile == null)
             {
                 MessageBox.Show("Can not save in this mode - Open the file normally");
                 return false;
@@ -207,12 +208,12 @@ namespace CommonControls.Editors.AnimationPack
                     return false;
             }
 
-            var newAnimPack = new AnimationPackFile(_pfs.GetFullPath(MainFile));
+            var newAnimPack = new AnimationPackFile(_pfs.GetFullPath(_packFile));
 
             foreach (var file in AnimationPackItems.PossibleValues)
                 newAnimPack.AddFile(file);
 
-            var savePath = _pfs.GetFullPath(MainFile);
+            var savePath = _pfs.GetFullPath(_packFile);
 
             var result = SaveHelper.Save(_pfs, savePath, null, AnimationPackSerializer.ConvertToBytes(newAnimPack));
             if (result != null)
@@ -302,7 +303,7 @@ namespace CommonControls.Editors.AnimationPack
             }
 
             var controller = new AnimPackViewModel(pfs, skeletonAnimationLookUpHelper, applicationSettings);
-            controller.MainFile = animationPackFile;
+            controller._packFile = animationPackFile;
             controller.Load();
 
             var containingWindow = new Window();
@@ -319,6 +320,12 @@ namespace CommonControls.Editors.AnimationPack
             containingWindow.Loaded += (sender, e) => controller.SetSelectedFile(selectedFileName);
 
             containingWindow.ShowDialog();
+        }
+
+        public void LoadFile(PackFile file)
+        {
+            _packFile = file;
+            Load();
         }
     }
 }

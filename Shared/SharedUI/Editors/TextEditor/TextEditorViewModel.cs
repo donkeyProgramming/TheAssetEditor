@@ -14,7 +14,7 @@ namespace Shared.Ui.Editors.TextEditor
         void SetEditor(ITextEditor theEditor);
     }
 
-    public class TextEditorViewModel<TextConverter> : NotifyPropertyChangedImpl, ITextEditorViewModel, IEditorViewModel
+    public class TextEditorViewModel<TextConverter> : NotifyPropertyChangedImpl, ITextEditorViewModel, IEditorViewModel, IFileEditor
         where TextConverter : ITextConverter
     {
         public ICommand SaveCommand { get; set; }
@@ -55,6 +55,14 @@ namespace Shared.Ui.Editors.TextEditor
             }
         }
 
+        public void LoadFile(PackFile file)
+        {
+            _packFile = file;
+            SetCurrentPackFile(_packFile);
+        }
+        public PackFile CurrentFile => _packFile;
+
+
         void SetCurrentPackFile(PackFile packedFile)
         {
             var file = packedFile;
@@ -94,8 +102,6 @@ namespace Shared.Ui.Editors.TextEditor
         public void Close()
         {
         }
-
-        public bool HasUnsavedChanges { get; set; }
     }
 
 

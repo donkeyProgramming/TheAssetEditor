@@ -34,6 +34,11 @@ namespace AssetEditor.Services
 
             var fullFileName = _packFileService.GetFullPath(file);
             var editorViewModel = _toolFactory.Create(fullFileName, preferedEditor);
+            if (editorViewModel == null)
+            {
+                _logger.Here().Information($"No editor selected");
+                return;
+            }
 
             // Attempt to load the assigned file, if the editor is a fileEditor.
             // TODO: Ensure we can only get here if we have a fileEditor

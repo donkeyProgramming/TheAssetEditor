@@ -8,7 +8,6 @@ using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
 
@@ -225,10 +224,5 @@ namespace Editors.Audio.AudioEditor.ViewModels
         {
         }
 
-        public bool Save() => true;
-
-        public PackFile MainFile { get; set; }
-
-        public bool HasUnsavedChanges { get; set; } = false;
     }
 }

@@ -9,7 +9,6 @@ using CommonControls.BaseDialogs;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;
@@ -24,7 +23,6 @@ namespace Editors.Audio.AudioExplorer
         private readonly IAudioRepository _audioRepository;
         private readonly SoundPlayer _soundPlayer;
 
-        PackFile _mainFile;
         HircTreeItem _selectedNode;
 
         // Public attributes
@@ -39,8 +37,6 @@ namespace Editors.Audio.AudioExplorer
         public NotifyAttr<bool> CanExportCurrrentDialogEventAsCsvAction { get; set; } = new NotifyAttr<bool>(false);
         public string DisplayName { get; set; } = "Audio Explorer";
         public NotifyAttr<string> SelectedNodeText { get; set; } = new NotifyAttr<string>("");
-        public PackFile MainFile { get => _mainFile; set { _mainFile = value; } }
-        public bool HasUnsavedChanges { get; set; }
 
         public AudioExplorerViewModel(IAudioRepository audioRepository, SoundPlayer soundPlayer)
         {
@@ -61,8 +57,6 @@ namespace Editors.Audio.AudioExplorer
         {
             EventFilter.EventList.SelectedItemChanged -= OnEventSelected;
         }
-
-        public bool Save() => true;
 
         void RefreshList(bool newValue) => EventFilter.Refresh(ShowEvents.Value, ShowDialogEvents.Value);
 

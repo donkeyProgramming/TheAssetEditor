@@ -291,10 +291,5 @@ namespace Editors.Audio.AudioEditor.ViewModels
         {
         }
 
-        public bool Save() => true;
-
-        public PackFile MainFile { get; set; }
-
-        public bool HasUnsavedChanges { get; set; } = false;
     }
 }
