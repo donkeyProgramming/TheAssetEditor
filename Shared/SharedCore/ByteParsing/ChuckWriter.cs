@@ -10,11 +10,12 @@
             _bytes.AddRange(bytes);
         }
 
-        public void WriteStringTableIndex(string str, ref List<string> stringTable)
+        public void WriteStringTableIndex(string str, ref List<string> stringTable, bool forceLowercase = true)
         {
             if (string.IsNullOrEmpty(str))
                 str = "";
-            str = str.ToLower().Trim();
+            if(forceLowercase)
+                str = str.ToLower().Trim();
             var writeIndex = stringTable.IndexOf(str);
             if (writeIndex == -1)
             {
