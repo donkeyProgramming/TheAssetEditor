@@ -4,6 +4,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace Shared.Ui.Common.Behaviors
@@ -38,26 +39,35 @@ namespace Shared.Ui.Common.Behaviors
 
         private static void CommandChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
         {
-            var control = target as Control;
-            if (control != null)
+            if (target is TreeViewItem item)
             {
-                if (e.NewValue != null && e.OldValue == null)
+                if (e.NewValue != null)
                 {
-                    control.MouseDoubleClick += OnMouseDoubleClick;
+                    item.MouseDoubleClick += OnMouseDoubleClick;
                 }
-                else if (e.NewValue == null && e.OldValue != null)
+                else
                 {
-                    control.MouseDoubleClick -= OnMouseDoubleClick;
+                    item.MouseDoubleClick -= OnMouseDoubleClick;
                 }
             }
         }
 
         private static void OnMouseDoubleClick(object sender, RoutedEventArgs e)
         {
-            var control = sender as Control;
-            var command = (ICommand)control.GetValue(CommandProperty);
-            var commandParameter = control.GetValue(CommandParameterProperty);
-            command.Execute(commandParameter);
+
+            if (sender is TreeViewItem item && item.DataContext != null)
+            {
+                if (item.IsSelected == false)
+                    return;
+
+                var command = (ICommand)item.GetValue(CommandProperty);
+                var commandParameter = item.GetValue(CommandParameterProperty);
+                if (command != null && command.CanExecute(item.DataContext))
+                {
+                    command.Execute(commandParameter);
+                }
+            }
         }
+
     }
 }
