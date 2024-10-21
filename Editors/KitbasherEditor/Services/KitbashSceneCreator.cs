@@ -70,7 +70,10 @@ namespace Editors.KitbasherEditor.Services
             _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
 
             var fullPath = _packFileService.GetFullPath(file);
-            _saveSettings.OutputName = Path.GetFileNameWithoutExtension(fullPath) + ".rigid_model_v2";
+            var dirPath = Path.GetDirectoryName(fullPath);
+            if (string.IsNullOrEmpty(dirPath) == false)
+                _saveSettings.OutputName = dirPath + "\\";
+            _saveSettings.OutputName+= Path.GetFileNameWithoutExtension(fullPath) + ".rigid_model_v2";
             _saveSettings.InitializeLodSettings(rmv.LodHeaders);
         }
 
