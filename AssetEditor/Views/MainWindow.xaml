@@ -8,7 +8,7 @@
         xmlns:datatemplates="clr-namespace:Shared.Ui.Common.DataTemplates;assembly=Shared.Ui"
         xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
         xmlns:common="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
-        xmlns:local="clr-namespace:AssetEditor"
+        xmlns:local="clr-namespace:AssetEditor" xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
         mc:Ignorable="d"
         behaviors:WindowCancellableClosingBehavior.Closing="{Binding ClosingCommand}"
         behaviors:WindowCancellableClosingBehavior.IsClosingWithoutPrompt="{Binding IsClosingWithoutPrompt}"
@@ -203,28 +203,12 @@
                                         </Style>
                                     </TextBlock.Style>
                                 </TextBlock>
-                                <Button Grid.Column="1" 
+                                <Button Margin="4,0,-4,0"  Grid.Column="1" 
                                     Command="{Binding DataContext.CloseToolCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=TabControl}}" 
                                     CommandParameter="{Binding}"
-                                    HorizontalContentAlignment="Right">
-                                    <Button.Template>
-                                        <ControlTemplate TargetType="Button">
-                                            <Path Data="M0,0 L8,8 M8,0 L0,8" StrokeThickness="1.5" VerticalAlignment="Center" Margin="8,4,-4,2">
-                                                <Path.Style>
-                                                    <Style TargetType="{x:Type Path}">
-                                                        <Style.Triggers>
-                                                            <Trigger Property="IsMouseOver" Value="False">
-                                                                <Setter Property="Stroke" Value="{DynamicResource Button.Disabled.Foreground}" />
-                                                            </Trigger>
-                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Stroke" Value="{DynamicResource Button.Static.Foreground}" />
-                                                            </Trigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Path.Style>
-                                            </Path>
-                                        </ControlTemplate>
-                                    </Button.Template>
+                                    HorizontalContentAlignment="Right"
+                                    Content="{materialIcons:MaterialIconExt Kind=CloseThick, Size=13 }">
+ 
                                 </Button>
                             </Grid>
                         </DataTemplate>
