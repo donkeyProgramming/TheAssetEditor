@@ -167,6 +167,7 @@ dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:sil
 dotnet_style_parentheses_in_other_operators = never_if_unnecessary:silent
 dotnet_diagnostic.CA1823.severity = error
 dotnet_diagnostic.CA1416.severity = silent
+dotnet_style_prefer_collection_expression = when_types_loosely_match:suggestion
 
 # CSharp code style settings:
 [*.cs]

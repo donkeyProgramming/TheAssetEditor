@@ -33,7 +33,7 @@ namespace AnimationEditor.MountAnimationCreator
     {
         public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
-        private readonly SceneObjectBuilder _sceneObjectBuilder;
+        private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly PackFileService _pfs;
@@ -78,7 +78,7 @@ namespace AnimationEditor.MountAnimationCreator
             SelectionManager selectionManager,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
-            SceneObjectBuilder sceneObjectBuilder,
+            SceneObjectEditor sceneObjectBuilder,
             IUiCommandFactory uiCommandFactory)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;

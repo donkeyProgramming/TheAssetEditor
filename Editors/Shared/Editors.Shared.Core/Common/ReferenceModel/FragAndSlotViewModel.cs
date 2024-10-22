@@ -18,7 +18,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
     {
         string _currentSkeletonName = "";
         private readonly SceneObject _asset;
-        private readonly SceneObjectBuilder _assetViewModelEditor;
+        private readonly SceneObjectEditor _assetViewModelEditor;
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly SelectMetaViewModel _metaViewModel;
@@ -28,7 +28,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
         public FilterCollection<AnimationBinEntryGenericFormat> FragmentSlotList { get; set; }
 
-        public SelectFragAndSlotViewModel(SceneObjectBuilder assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject asset, SelectMetaViewModel metaViewModel, IUiCommandFactory uiCommandFactory)
+        public SelectFragAndSlotViewModel(SceneObjectEditor assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject asset, SelectMetaViewModel metaViewModel, IUiCommandFactory uiCommandFactory)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;

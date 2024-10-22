@@ -15,7 +15,7 @@ namespace Editors.AnimationVisualEditors
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<EditorHost<SkeletonEditorViewModel>>();
+            serviceCollection.AddScoped<SkeletonEditorViewModel>();
             serviceCollection.AddScoped<SkeletonEditorViewModel>();
 
             serviceCollection.AddScoped<EditorHost<CampaignAnimationCreatorViewModel>>();
@@ -35,7 +35,11 @@ namespace Editors.AnimationVisualEditors
         {
             factory.Register(EditorInfo.Create<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>(EditorEnums.MountTool_Editor, new NoExtention()));
             factory.Register(EditorInfo.Create<EditorHost<AnimationTransferToolViewModel>, EditorHostView>(EditorEnums.AnimationTransfer_Editor, new NoExtention()));
-            factory.Register(EditorInfo.Create<EditorHost<SkeletonEditorViewModel>, EditorHostView>(EditorEnums.Skeleton_Editor, new NoExtention()));
+
+
+            factory.Register(EditorInfo.Create<SkeletonEditorViewModel, EditorHostView>(EditorEnums.Skeleton_Editor, new ExtensionToTool([".anim"])));
+
+
             factory.Register(EditorInfo.Create<EditorHost<CampaignAnimationCreatorViewModel>, EditorHostView>(EditorEnums.CampaginAnimation_Editor, new NoExtention()));
             factory.Register(EditorInfo.Create<EditorHost<AnimationKeyframeEditorViewModel>, EditorHostView>(EditorEnums.AnimationKeyFrame_Editor, new NoExtention()));
         }

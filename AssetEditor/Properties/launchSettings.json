@@ -48,5 +48,10 @@
       "commandName": "Project",
       "commandLineArgs": "-devcfg Kitbash_Karl_WH2",
       "nativeDebugging": false
+    },
+    "AE-SkeletonTool": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg SkeletonTool",
+      "nativeDebugging": false
     }
   }

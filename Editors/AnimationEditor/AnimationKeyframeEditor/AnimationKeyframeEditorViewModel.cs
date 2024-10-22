@@ -29,7 +29,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
-        private readonly SceneObjectBuilder _sceneObjectBuilder;
+        private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private GizmoToolbox _gizmoToolbox;
@@ -162,7 +162,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             SelectionComponent selectionComponent,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
-            SceneObjectBuilder sceneObjectBuilder,
+            SceneObjectEditor sceneObjectBuilder,
             CommandFactory commandFactory,
             SelectionManager selectionManager,
             GizmoComponent gizmoComponent,

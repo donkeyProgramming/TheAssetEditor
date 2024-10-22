@@ -21,14 +21,14 @@ namespace AnimationEditor.CampaignAnimationCreator
         SceneObject _selectedUnit;
         AnimationClip _selectedAnimationClip;
 
-        private readonly SceneObjectBuilder _assetViewModelEditor;
+        private readonly SceneObjectEditor _assetViewModelEditor;
         private readonly PackFileService _packFileService;
         private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
 
         public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
         public string EditorName => "Campaign Animation Creator";
 
-        public CampaignAnimationCreatorViewModel(SceneObjectBuilder assetViewModelEditor, PackFileService pfs,  SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder)
+        public CampaignAnimationCreatorViewModel(SceneObjectEditor assetViewModelEditor, PackFileService pfs,  SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _packFileService = pfs;

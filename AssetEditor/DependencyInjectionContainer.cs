@@ -35,7 +35,7 @@ namespace AssetEditor
             serviceCollection.AddScoped<MenuBarViewModel>();
 
             // Dev Config stuff
-            serviceCollection.AddScoped<SceneObjectBuilder>();
+            serviceCollection.AddScoped<SceneObjectEditor>();
             serviceCollection.AddTransient<SceneObject>();
             serviceCollection.AddScoped<AnimationPlayerViewModel>();
             serviceCollection.AddScoped<SceneObjectViewModelBuilder>();

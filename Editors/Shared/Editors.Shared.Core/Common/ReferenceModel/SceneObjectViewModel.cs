@@ -48,7 +48,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             PackFileService packFileService,
             SceneObject data,
             string headerName,
-            SceneObjectBuilder sceneObjectBuilder,
+            SceneObjectEditor sceneObjectBuilder,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _uiCommandFactory = uiCommandFactory;

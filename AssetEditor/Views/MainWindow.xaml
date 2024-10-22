@@ -208,7 +208,10 @@
                                     CommandParameter="{Binding}"
                                     HorizontalContentAlignment="Right"
                                     Content="{materialIcons:MaterialIconExt Kind=CloseThick, Size=13 }">
- 
+                                        
+                                  
+                                    
+                                   
                                 </Button>
                             </Grid>
                         </DataTemplate>

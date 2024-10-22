@@ -2,6 +2,7 @@
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
+using Shared.EmbeddedResources;
 
 namespace Editors.Shared.DevConfig.Configs
 {
@@ -19,12 +20,16 @@ namespace Editors.Shared.DevConfig.Configs
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-            currentSettings.LoadWemFiles = true;
+            currentSettings.LoadWemFiles = false;
+
+            var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
+            _packFileService.Load(packFile, false, true);
         }
 
         public void OpenFileOnLoad()
         {
-            _editorCreator.Create(EditorEnums.Skeleton_Editor);
+            var file = _packFileService.FindFile("animations\\skeletons\\humanoid01.anim");
+            _editorCreator.CreateFromFile(file, EditorEnums.Skeleton_Editor);
         }
     }
 }

@@ -15,9 +15,9 @@ using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace Editors.Shared.Core.Common
 {
-    public class SceneObjectBuilder
+    public class SceneObjectEditor
     {
-        private readonly ILogger _logger = Logging.Create<SceneObjectBuilder>();
+        private readonly ILogger _logger = Logging.Create<SceneObjectEditor>();
         private readonly IWpfGame _mainScene;
         private readonly IServiceProvider _serviceProvider;
         private readonly ResourceLibrary _resourceLibrary;
@@ -26,7 +26,7 @@ namespace Editors.Shared.Core.Common
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly ComplexMeshLoader _complexMeshLoader;
 
-        public SceneObjectBuilder(IWpfGame mainScene,
+        public SceneObjectEditor(IWpfGame mainScene,
             IServiceProvider serviceProvider, ResourceLibrary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader)
         {

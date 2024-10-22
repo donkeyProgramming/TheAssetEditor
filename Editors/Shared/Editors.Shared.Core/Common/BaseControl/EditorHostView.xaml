@@ -36,7 +36,7 @@
             </MenuItem>
         </Menu>
 
-        <ContentControl Grid.Row="2" Grid.Column="0" Content="{Binding GameWorld.Value, Mode=OneTime}"/>
+        <ContentControl Grid.Row="2" Grid.Column="0" Content="{Binding GameWorld, Mode=OneTime}"/>
 
         <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1"  HorizontalAlignment="Stretch">
             <GridSplitter.Template>
@@ -75,14 +75,13 @@
 
             <ScrollViewer  Grid.Row="3" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
                 <DockPanel  DockPanel.Dock="Top">
-                    <ContentControl Content="{Binding Editor, UpdateSourceTrigger=PropertyChanged}"       
+                    <ContentControl Content="{Binding ., UpdateSourceTrigger=PropertyChanged}"       
                                     ContentTemplateSelector="{StaticResource EditorSelector}"/>
 
                 </DockPanel>
             </ScrollViewer>
         </Grid>
  
-
         <animationplayer:AnimationPlayerView Grid.Row="3" Grid.Column="0" DataContext="{Binding Player, Mode=OneTime}"/>
     </Grid>
 </UserControl>

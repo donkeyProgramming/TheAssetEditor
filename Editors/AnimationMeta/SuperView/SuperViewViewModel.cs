@@ -14,7 +14,7 @@ namespace Editors.AnimationMeta.SuperView
         SceneObject _asset;
         AnimationToolInput _debugDataToLoad;
 
-        private readonly SceneObjectBuilder _sceneObjectBuilder;
+        private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly PackFileService _packFileService;
 
@@ -30,7 +30,7 @@ namespace Editors.AnimationMeta.SuperView
 
         public SuperViewViewModel(SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             PackFileService packFileService,
-            SceneObjectBuilder sceneObjectBuilder,
+            SceneObjectEditor sceneObjectBuilder,
             CopyPasteManager copyPasteManager)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;

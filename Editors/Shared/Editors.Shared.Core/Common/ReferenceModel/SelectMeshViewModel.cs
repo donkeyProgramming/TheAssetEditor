@@ -10,9 +10,9 @@ namespace Editors.Shared.Core.Common.ReferenceModel
     {
         private readonly PackFileService _pfs;
         private readonly SceneObject _data;
-        private readonly SceneObjectBuilder _assetViewModelBuilder;
+        private readonly SceneObjectEditor _assetViewModelBuilder;
 
-        public SelectMeshViewModel(PackFileService pfs, SceneObject data, SceneObjectBuilder assetViewModelBuilder)
+        public SelectMeshViewModel(PackFileService pfs, SceneObject data, SceneObjectEditor assetViewModelBuilder)
         {
             _pfs = pfs;
             _data = data;

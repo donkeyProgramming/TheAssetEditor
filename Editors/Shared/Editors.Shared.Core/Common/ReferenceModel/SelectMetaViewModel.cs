@@ -10,7 +10,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
     public class SelectMetaViewModel : NotifyPropertyChangedImpl
     {
         private readonly PackFileService _pfs;
-        private readonly SceneObjectBuilder _assetViewModelEditor;
+        private readonly SceneObjectEditor _assetViewModelEditor;
         private readonly SceneObject _data;
 
         ObservableCollection<PackFile> _metaList = new();
@@ -30,7 +30,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
         public OnSeachDelegate FilterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
 
-        public SelectMetaViewModel(SceneObjectBuilder assetViewModelEditor, SceneObject data, PackFileService pfs)
+        public SelectMetaViewModel(SceneObjectEditor assetViewModelEditor, SceneObject data, PackFileService pfs)
         {
             _assetViewModelEditor = assetViewModelEditor;
 

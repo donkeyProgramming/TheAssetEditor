@@ -32,7 +32,7 @@ namespace AnimationEditor.AnimationTransferTool
         AnimationToolInput _inputSourceData;
 
         private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
-        private readonly SceneObjectBuilder _assetViewModelBuilder;
+        private readonly SceneObjectEditor _assetViewModelBuilder;
         private readonly IWindowFactory _windowFactory;
         private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
         private readonly PackFileService _pfs;
@@ -61,7 +61,7 @@ namespace AnimationEditor.AnimationTransferTool
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
-            SceneObjectBuilder assetViewModelBuilder,
+            SceneObjectEditor assetViewModelBuilder,
             IWindowFactory windowFactory)
         {
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;

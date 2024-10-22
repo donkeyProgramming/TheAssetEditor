@@ -41,7 +41,7 @@
 
         <TreeView DockPanel.Dock="Top" ItemsSource="{Binding Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400" Height="400" Margin="5,5,5,1">
             <b:Interaction.Behaviors>
-                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedBone.Value, Mode=TwoWay}" />
+                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedBone, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
 
             <TreeView.ItemContainerStyle>
@@ -94,11 +94,11 @@
 
                 <Label      Grid.Row="0" Grid.Column="0" Content="Source Skeleton"/>
                 <Label      Grid.Row="0" Grid.Column="1" Content=":"/>
-                <TextBox    Grid.Row="0" Grid.Column="2" Text="{Binding SourceSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2"/>
+                <TextBox    Grid.Row="0" Grid.Column="2" Text="{Binding SourceSkeletonName, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2"/>
 
                 <Label      Grid.Row="1" Grid.Column="0" Content="Selected Bone Scale"/>
                 <Label      Grid.Row="1" Grid.Column="1" Content=":"/>
-                <TextBox    Grid.Row="1" Grid.Column="2" Text="{Binding BoneVisualScale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
+                <TextBox    Grid.Row="1" Grid.Column="2" Text="{Binding BoneVisualScale, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
                     <b:Interaction.Behaviors>
                         <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
                     </b:Interaction.Behaviors>
@@ -114,7 +114,7 @@
 
                 <Label      Grid.Row="4" Grid.Column="0" Content="Is Tech skeleton"/>
                 <Label      Grid.Row="4" Grid.Column="1" Content=":"/>
-                <CheckBox   Grid.Row="4" Grid.Column="2" IsChecked="{Binding IsTechSkeleton.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
+                <CheckBox   Grid.Row="4" Grid.Column="2" IsChecked="{Binding IsTechSkeleton, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
             </Grid>
         </GroupBox>
 
@@ -150,13 +150,7 @@
                 <Label      Grid.Row="4" Grid.Column="1" Content=":"/>
                 <DockPanel Grid.Row="4" Grid.Column="2">
                     <Button Content="Bake" DockPanel.Dock="Right" Width="60"  Click="{s:MethodBinding BakeSkeletonAction}" Margin="2"/>
-
-                    <TextBox Text="{Binding BoneScale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2" DockPanel.Dock="Left">
-                        <b:Interaction.Behaviors>
-                            <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                        </b:Interaction.Behaviors>
-                    </TextBox>
-
+                    <TextBox Text="{Binding BoneScale, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2" DockPanel.Dock="Left"/>
                 </DockPanel>
            
             </Grid>
