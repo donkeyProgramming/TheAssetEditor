@@ -77,6 +77,11 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
         {
             GetCapability<CommonShaderParametersCapability>().Assign(commonShaderParameters, modelMatrix);
 
+            var tintCapability = TryGetCapability<TintCapability>();
+
+            if (tintCapability != null)
+                tintCapability.FactionColours = commonShaderParameters.FactionColours;
+
             var effect = GetEffect();
             OnApply(effect);
 
@@ -108,7 +113,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
                 return (false, $"Different material types {Type} vs {other.Type}");
 
             for (var i = 0; i < Capabilities.Length; i++)
-            { 
+            {
                 var ownCap = Capabilities[i];
                 var otherCap = other.Capabilities[i];
                 if (ownCap.GetType() != otherCap.GetType())
