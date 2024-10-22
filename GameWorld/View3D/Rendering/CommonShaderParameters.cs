@@ -2,22 +2,16 @@
 
 namespace GameWorld.Core.Rendering
 {
-    public class CommonShaderParameters
-    {
-        public Matrix View { get; set; }
-        public Matrix Projection { get; set; }
-        public Vector3 CameraPosition { get; set; }
-        public Vector3 CameraLookAt { get; set; }
-        public float EnvLightRotationsRadians_Y { get; set; }
-        public float DirLightRotationRadians_X { get; set; }
-        public float DirLightRotationRadians_Y { get; set; }
+    public record CommonShaderParameters(
+        Matrix View,
+        Matrix Projection,
+        Vector3 CameraPosition,
+        Vector3 CameraLookAt,
+        float EnvLightRotationsRadians_Y,
+        float DirLightRotationRadians_X,
+        float DirLightRotationRadians_Y,
+        float LightIntensityMult,
+        Vector3[] FactionColours
+        );
 
-        public float LightIntensityMult { get; set; }
-    }
-
-    public enum RenderFormats
-    {
-        SpecGloss,
-        MetalRoughness
-    }
 }
