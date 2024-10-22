@@ -30,7 +30,7 @@ float3 GetEmissiveColour(float2 uv, float4 maskValue, float3 normalizedViewDirec
     float fresnelTerm = pow(1.0 - dotProduct, Emissive_FresnelStrength);
     float3 gradientColour = SampleGradient(maskValue.a, Emissive_GradientColours, Emissive_GradientTimes);
     
-    float3 emissiveColour = gradientColour * emissiveTexture * Emissive_Tint * Emissive_Strength * fresnelTerm;
+    float3 emissiveColour = gradientColour * emissiveTexture * Emissive_Tint * (Emissive_Strength * 10) * fresnelTerm;
     return emissiveColour;
 }
 

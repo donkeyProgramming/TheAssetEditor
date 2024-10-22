@@ -97,7 +97,7 @@
                     <TextBox Margin="2"  Text="{Binding EmissivePulseStrength, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </basedialogs:AeAttribute>
 
-                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Emissiv Strength" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="Kitbash_WsMaterial_Emissive_Strength">
+                <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Emissiv Strength" LabelWidth="{StaticResource labelWidth}" ToolTipEnumValue="None">
                     <TextBox Margin="2" Text="{Binding EmissiveStrength, UpdateSourceTrigger=LostFocus}" VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
                 </basedialogs:AeAttribute>
 
