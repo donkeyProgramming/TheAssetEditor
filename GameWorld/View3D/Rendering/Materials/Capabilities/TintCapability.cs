@@ -15,16 +15,26 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public Vector4 DiffuseTintMask { get; set; } = Vector4.Zero;
         public Vector3 DiffuseTintColour { get; set; } = Vector3.Zero;
         public float DiffuseTintVariation { get; set; }
-
         public bool UseFactionColours { get; set; } = true;
+        public bool UseTinting { get; set; } = false;
         public Vector4 Faction3Mask { get; set; } = Vector4.Zero;
         public float Faction1_TintVariation { get; set; } = 0;  //Replace as vector3?
         public float Faction2_TintVariation { get; set; } = 0;
         public float Faction3_TintVariation { get; set; } = 0;
         public Vector3[] FactionColours { get; set; } = [new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1)];
+        public Vector3[] TintColours { get; set; } = [new Vector3(0.7f, 0.7f, 0.6f), new Vector3(0.6f, 0.6f, 0.7f), new Vector3(0.7f, 0.6f, 0.6f)];
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {
+
+            effect.Parameters["CapabilityFlag_ApplyTinting"].SetValue(ApplyCapability);
+
+            effect.Parameters["Tint_UseFactionColours"].SetValue(UseFactionColours);
+            effect.Parameters["Tint_FactionsColours"].SetValue(FactionColours);
+
+            effect.Parameters["Tint_UseTinting"].SetValue(UseTinting);
+            effect.Parameters["Tint_TintColours"].SetValue(TintColours);
+            effect.Parameters["Tint_TintColours"].SetValue(TintColours);
         }
 
         public ICapability Clone()
@@ -57,12 +67,12 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
         {
-         
+
         }
 
         public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
         {
-         
+
         }
     }
 }

@@ -16,6 +16,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.MetalRough
                     new MetalRoughCapability(),
                     new AnimationCapability(),
                     new BloodCapability(),
+                    new TintCapability(),
                 ];
 
             _renderingTechniqueMap[RenderingTechnique.Normal] = "BasicColorDrawing";
