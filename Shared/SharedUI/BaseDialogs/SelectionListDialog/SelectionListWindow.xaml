@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:CommonControls.SelectionListDialog"
         xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors"
         xmlns:s="http://schemas.singulink.com/xaml"
+             Style="{StaticResource CustomWindowStyle}"
         mc:Ignorable="d"
     Title="{Binding WindowTitle}" Height="450" Width="800">
     <Grid>

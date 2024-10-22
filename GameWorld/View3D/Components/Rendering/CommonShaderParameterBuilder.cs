@@ -5,7 +5,7 @@ namespace GameWorld.Core.Components.Rendering
 {
     internal static class CommonShaderParameterBuilder
     {
-        public static CommonShaderParameters Build(ArcBallCamera camera, SceneLightParametersStore sceneLightParameters)
+        public static CommonShaderParameters Build(ArcBallCamera camera, SceneRenderParametersStore sceneLightParameters)
         {
             var commonShaderParameters = new CommonShaderParameters()
             {

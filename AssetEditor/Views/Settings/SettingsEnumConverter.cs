@@ -5,7 +5,7 @@ using Shared.Core.Services;
 using Shared.Core.Settings;
 using static Shared.Core.Services.GameInformationFactory;
 using static Shared.Core.Settings.ThemesController;
-using static Shared.Core.Settings.RenderEngineBackgroundColourController;
+using static Shared.Core.Settings.ApplicationSettingsHelper;
 
 namespace AssetEditor.Views.Settings
 {

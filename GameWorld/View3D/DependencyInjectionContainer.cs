@@ -41,7 +41,7 @@ namespace GameWorld.Core
 
             // Settings
             serviceCollection.AddScoped<GeometrySaveSettings>();
-            serviceCollection.AddScoped<SceneLightParametersStore>();
+            serviceCollection.AddScoped<SceneRenderParametersStore>();
 
             // Services
             serviceCollection.AddScoped<MeshBuilderService>();

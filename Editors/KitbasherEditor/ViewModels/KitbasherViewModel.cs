@@ -21,7 +21,8 @@ using Shared.Ui.Common;
 namespace KitbasherEditor.ViewModels
 {
     public partial class KitbasherViewModel : ObservableObject, 
-        IEditorViewModel, IFileEditor,
+        IEditorViewModel, 
+        IFileEditor,
         ISaveableEditor,
         IDropTarget<TreeNode>
     {
@@ -86,8 +87,9 @@ namespace KitbasherEditor.ViewModels
             }
             catch (Exception e)
             {
-                _logger.Here().Error($"Error loading file {fileToLoad?.Name} - {e}");
-                MessageBox.Show($"Unable to load file\n+{e.Message}");
+                var errorMessage = $"Unable to load file '{fileToLoad?.Name}' \n {e.Message}";
+                _logger.Here().Error(errorMessage);
+                MessageBox.Show(errorMessage);
             }
         }
 

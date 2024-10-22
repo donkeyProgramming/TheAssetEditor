@@ -74,8 +74,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             RegisterUiCommand<ToggleViewSelectedCommand>();
             RegisterUiCommand<ResetCameraCommand>();
             RegisterUiCommand<FocusCameraCommand>();
-            RegisterUiCommand<ToggleBackFaceRenderingCommand>();
-            RegisterUiCommand<ToggleLargeSceneRenderingCommand>();
+            RegisterUiCommand<OpenRenderSettingsWindowCommand>();
 
             RegisterUiCommand<DivideSubMeshCommand>();
             RegisterUiCommand<MergeObjectsCommand>();
@@ -120,9 +119,8 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var renderingToolbar = builder.CreateRootToolBar("Rendering");
             builder.CreateToolBarItem<FocusCameraCommand>(renderingToolbar, "Focus camera");
             builder.CreateToolBarItem<ResetCameraCommand>(renderingToolbar, "Reset camera");
-            builder.CreateToolBarSeparator(renderingToolbar);
-            builder.CreateToolBarItem<ToggleBackFaceRenderingCommand>(renderingToolbar, "Toggle backface rendering");
-            builder.CreateToolBarItem<ToggleLargeSceneRenderingCommand>(renderingToolbar, "Toggle Big scene rendering");
+            builder.CreateToolBarItem<OpenRenderSettingsWindowCommand>(renderingToolbar, "Open render settings");
+
 
             return builder.Build();
         }

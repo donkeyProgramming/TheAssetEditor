@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
 using Shared.Core.Services;
-using static Shared.Core.Settings.RenderEngineBackgroundColourController;
+using Shared.Core.Settings;
 
 namespace GameWorld.Core.Components.Rendering
 {
@@ -23,7 +23,7 @@ namespace GameWorld.Core.Components.Rendering
         private readonly List<VertexPositionColor> _renderLines = [];
         private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
-        private readonly SceneLightParametersStore _sceneLightParameters;
+        private readonly SceneRenderParametersStore _sceneLightParameters;
         private readonly EventHub _eventHub;
 
         bool _cullingEnabled = false;
@@ -36,12 +36,12 @@ namespace GameWorld.Core.Components.Rendering
         RenderTarget2D _defaultRenderTarget;
         RenderTarget2D _glowRenderTarget;
 
-        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneLightParametersStore sceneLightParametersStore, EventHub eventHub)
+        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneRenderParametersStore sceneLightParametersStore, EventHub eventHub)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
 
-            _backgroundColour = GetEnumAsColour(applicationSettingsService.CurrentSettings.RenderEngineBackgroundColour);
+            _backgroundColour = ApplicationSettingsHelper.GetEnumAsColour(applicationSettingsService.CurrentSettings.RenderEngineBackgroundColour);
             _camera = camera;
             _resourceLib = resourceLib;
             _deviceResolverComponent = deviceResolverComponent;
@@ -88,9 +88,8 @@ namespace GameWorld.Core.Components.Rendering
             RasterStateHelper.Rebuild(_rasterStates, _cullingEnabled, _bigSceneDepthBiasMode);
         }
 
-        public void ToggleLargeSceneRendering() => RebuildRasterStates(_cullingEnabled, !_bigSceneDepthBiasMode);
-
-        public void ToggleBackFaceRendering() => RebuildRasterStates(!_cullingEnabled, _bigSceneDepthBiasMode);
+        public bool BackfaceCulling { get => _cullingEnabled; set => RebuildRasterStates(value, _bigSceneDepthBiasMode); }
+        public bool LargeSceneCulling { get => _bigSceneDepthBiasMode; set => RebuildRasterStates(_cullingEnabled, value); }
 
         public void AddRenderItem(RenderBuckedId id, IRenderItem item)
         {

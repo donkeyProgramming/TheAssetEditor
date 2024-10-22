@@ -8,7 +8,7 @@ namespace Shared.Core.Settings
         LegacyBlue,
         Green,
     }
-    public class RenderEngineBackgroundColourController
+    public class ApplicationSettingsHelper
     {
         public static string GetEnumAsString(BackgroundColour colour)
         {
@@ -17,6 +17,7 @@ namespace Shared.Core.Settings
                 BackgroundColour.DarkGrey => "Dark Grey",
                 BackgroundColour.LegacyBlue => "Legacy Blue",
                 BackgroundColour.Green => "Green",
+                _ => throw new NotImplementedException(),
             };
         }
         public static Color GetEnumAsColour(BackgroundColour colour)
@@ -26,6 +27,7 @@ namespace Shared.Core.Settings
                 BackgroundColour.DarkGrey => new Color(50, 50, 50),
                 BackgroundColour.LegacyBlue => new Color(94, 150, 239),
                 BackgroundColour.Green => new Color(0, 177, 64),
+                _ => throw new NotImplementedException(),
             };
         }
     }
