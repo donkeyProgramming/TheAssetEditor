@@ -1,5 +1,6 @@
 ﻿using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles.Models;
+using static Shared.GameFormats.AnimationPack.CampaignAnimationBin;
 
 namespace Shared.GameFormats.AnimationPack
 {
@@ -184,7 +185,7 @@ namespace Shared.GameFormats.AnimationPack
                 output.SoundMeta = byteChunk.ReadStringTableIndex(stringTable);
                 output.Weight = byteChunk.ReadSingle();
                 output.BlendTime = byteChunk.ReadSingle();
-                output.Dock = byteChunk.ReadStringTableIndex(stringTable);
+                output.Dock = byteChunk.ReadStringTableIndex(stringTable).ToUpper();
                 return output;
             }
 
@@ -197,7 +198,7 @@ namespace Shared.GameFormats.AnimationPack
                 chuck.WriteStringTableIndex(SoundMeta, ref stringTable);
                 chuck.Write(Weight, ByteParsers.Single);
                 chuck.Write(BlendTime, ByteParsers.Single);
-                chuck.WriteStringTableIndex(Dock, ref stringTable);
+                chuck.WriteStringTableIndex(Dock.ToUpper(), ref stringTable, false);
                 return chuck.GetBytes();
             }
         }
