@@ -3,7 +3,7 @@ using Shared.Core.PackFiles.Models;
 
 namespace Shared.Core.ToolCreation
 {
-    public interface IEditorViewModel
+    public interface EditorInterfaces
     {
         string DisplayName { get; set; }
         
@@ -25,7 +25,7 @@ namespace Shared.Core.ToolCreation
     public interface IEditorCreator
     {
         void CreateFromFile(PackFile file, EditorEnums? preferedEditor = null);
-        void Create(EditorEnums editor, Action<IEditorViewModel>? onInitializeCallback = null);
+        void Create(EditorEnums editor, Action<EditorInterfaces>? onInitializeCallback = null);
         Window CreateWindow(PackFile packFile, EditorEnums? preferedEditor = null);
     }
 

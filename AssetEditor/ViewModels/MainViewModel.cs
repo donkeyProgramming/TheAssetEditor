@@ -16,7 +16,7 @@ using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {
-    public partial class MainViewModel : ObservableObject, IDropTarget<IEditorViewModel, bool>
+    public partial class MainViewModel : ObservableObject, IDropTarget<EditorInterfaces, bool>
     {
         private readonly PackFileService _packfileService;
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -24,7 +24,7 @@ namespace AssetEditor.ViewModels
         public PackFileBrowserViewModel FileTree { get; private set; }
         public MenuBarViewModel MenuBar { get; set; }
         public IEditorDatabase ToolsFactory { get; set; }
-        public ObservableCollection<IEditorViewModel> CurrentEditorsList { get; set; } = new ObservableCollection<IEditorViewModel>();
+        public ObservableCollection<EditorInterfaces> CurrentEditorsList { get; set; } = new ObservableCollection<EditorInterfaces>();
 
         [ObservableProperty] private int _selectedEditorIndex;
         [ObservableProperty] private bool _isClosingWithoutPrompt;
@@ -53,7 +53,7 @@ namespace AssetEditor.ViewModels
 
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenEditorCommand>().Execute(file);
 
-        [RelayCommand] private void Closing(IEditorViewModel editor)
+        [RelayCommand] private void Closing(EditorInterfaces editor)
         {
             var hasUnsavedEditorChanges = CurrentEditorsList.Where(x => x is ISaveableEditor).Cast<ISaveableEditor>().Any(x => x.HasUnsavedChanges);
             var hasUnsavedPackFiles = FileTree.Files.Any(node => node.UnsavedChanged);
@@ -72,7 +72,7 @@ namespace AssetEditor.ViewModels
         private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)
         {
 
-            var openFiles = new List<IEditorViewModel>();
+            var openFiles = new List<EditorInterfaces>();
             for (var i = 0; i < CurrentEditorsList.Count; i++)
             {
                 if (CurrentEditorsList[i] is not IFileEditor fileEditor)
@@ -98,7 +98,7 @@ namespace AssetEditor.ViewModels
             return true;
         }
 
-        [RelayCommand] void CloseTool(IEditorViewModel tool)
+        [RelayCommand] void CloseTool(EditorInterfaces tool)
         {
             if (tool is ISaveableEditor saveableEditor && saveableEditor.HasUnsavedChanges)
             {
@@ -112,7 +112,7 @@ namespace AssetEditor.ViewModels
             tool.Close();
         }
 
-        [RelayCommand] void CloseOtherTools(IEditorViewModel tool)
+        [RelayCommand] void CloseOtherTools(EditorInterfaces tool)
         {
             foreach (var editorViewModel in CurrentEditorsList.ToList())
             {
@@ -121,29 +121,29 @@ namespace AssetEditor.ViewModels
             }
         }
 
-        [RelayCommand] void CloseAllTools(IEditorViewModel tool)
+        [RelayCommand] void CloseAllTools(EditorInterfaces tool)
         {
             foreach (var editorViewModel in CurrentEditorsList)
                 CloseTool(editorViewModel);
         }
 
-        [RelayCommand] void CloseToolsToLeft(IEditorViewModel tool)
+        [RelayCommand] void CloseToolsToLeft(EditorInterfaces tool)
         {
             var index = CurrentEditorsList.IndexOf(tool);
             for (var i = index - 1; i >= 0; i--)
                 CloseTool(CurrentEditorsList[i]);
         }
 
-        [RelayCommand] void CloseToolsToRight(IEditorViewModel tool)
+        [RelayCommand] void CloseToolsToRight(EditorInterfaces tool)
         {
             var index = CurrentEditorsList.IndexOf(tool);
             for (var i = CurrentEditorsList.Count - 1; i > index; i--)
                 CloseTool(CurrentEditorsList[i]);
         }
 
-        public bool AllowDrop(IEditorViewModel node, IEditorViewModel targetNode = default, bool insertAfterTargetNode = default) => true;
+        public bool AllowDrop(EditorInterfaces node, EditorInterfaces targetNode = default, bool insertAfterTargetNode = default) => true;
 
-        public bool Drop(IEditorViewModel node, IEditorViewModel targetNode = default, bool insertAfterTargetNode = default)
+        public bool Drop(EditorInterfaces node, EditorInterfaces targetNode = default, bool insertAfterTargetNode = default)
         {
             var nodeIndex = CurrentEditorsList.IndexOf(node);
             var targetNodeIndex = CurrentEditorsList.IndexOf(targetNode);

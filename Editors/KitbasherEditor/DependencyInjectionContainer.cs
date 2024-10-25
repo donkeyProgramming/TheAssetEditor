@@ -40,7 +40,7 @@ namespace KitbasherEditor
             // View models 
             serviceCollection.AddScoped<KitbasherView>();
             serviceCollection.AddScoped<KitbasherViewModel>();
-            serviceCollection.AddScoped<IEditorViewModel, KitbasherViewModel>();
+            serviceCollection.AddScoped<EditorInterfaces, KitbasherViewModel>();
             serviceCollection.AddScoped<SceneExplorerViewModel>();
             serviceCollection.AddTransient<SceneExplorerContextMenuHandler>();
             serviceCollection.AddScoped<AnimationControllerViewModel>();
@@ -87,9 +87,9 @@ namespace KitbasherEditor
         {
             EditorInfoBuilder
                 .Create<KitbasherViewModel, KitbasherView>(EditorEnums.Kitbash_Editor)
-                .AddExtention(".rigid_model_v2", EditorInfoPriorites.High)
+                .AddExtention(".rigid_model_v2", EditorPriorites.High)
                 //.AddExtention(".variantmeshdefinition", 0)
-                .AddExtention(".wsmodel", EditorInfoPriorites.High)
+                .AddExtention(".wsmodel", EditorPriorites.High)
                 .Build(factory);
         }
     }

@@ -36,9 +36,9 @@ namespace Editors.AnimationMeta
 
             EditorInfoBuilder
                 .Create<EditorViewModel, MainEditorView> (EditorEnums.Meta_Editor)
-                .AddExtention(".anm.meta", EditorInfoPriorites.High)
-                .AddExtention(".meta", EditorInfoPriorites.High)
-                .AddExtention(".snd.meta", EditorInfoPriorites.High)
+                .AddExtention(".anm.meta", EditorPriorites.High)
+                .AddExtention(".meta", EditorPriorites.High)
+                .AddExtention(".snd.meta", EditorPriorites.High)
                 .Build(factory);
         }
     }

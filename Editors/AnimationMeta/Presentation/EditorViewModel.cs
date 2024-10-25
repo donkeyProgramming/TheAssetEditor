@@ -14,7 +14,7 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.Presentation
 {
-    public partial class EditorViewModel : ObservableObject, IEditorViewModel, ISaveableEditor, IFileEditor
+    public partial class EditorViewModel : ObservableObject, EditorInterfaces, ISaveableEditor, IFileEditor
     {
         public event EditorSavedDelegate EditorSavedEvent;
 

@@ -45,20 +45,20 @@ namespace Shared.Ui
         {
             EditorInfoBuilder
                 .Create<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(EditorEnums.XML_VariantMesh_Editor)
-                .AddExtention(".variantmeshdefinition", EditorInfoPriorites.High)
+                .AddExtention(".variantmeshdefinition", EditorPriorites.High)
                 .Build(factory);
 
             EditorInfoBuilder
                 .Create<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(EditorEnums.XML_Editor)
-                .AddExtention(".json", EditorInfoPriorites.Default)
-                .AddExtention(".xml", EditorInfoPriorites.Default)
-                .AddExtention(".txt", EditorInfoPriorites.Default)
-                .AddExtention(".wsmodel", EditorInfoPriorites.Default)
-                .AddExtention(".xml.material", EditorInfoPriorites.Default)
-                .AddExtention(".anm.meta.xml", EditorInfoPriorites.Default)
-                .AddExtention(".bmd.xml", EditorInfoPriorites.Default)
-                .AddExtention(".csv", EditorInfoPriorites.Default)
-                .AddExtention(".bnk.xml", EditorInfoPriorites.Default)
+                .AddExtention(".json", EditorPriorites.Default)
+                .AddExtention(".xml", EditorPriorites.Default)
+                .AddExtention(".txt", EditorPriorites.Default)
+                .AddExtention(".wsmodel", EditorPriorites.Default)
+                .AddExtention(".xml.material", EditorPriorites.Default)
+                .AddExtention(".anm.meta.xml", EditorPriorites.Default)
+                .AddExtention(".bmd.xml", EditorPriorites.Default)
+                .AddExtention(".csv", EditorPriorites.Default)
+                .AddExtention(".bnk.xml", EditorPriorites.Default)
                 .Build(factory);
         }
     }

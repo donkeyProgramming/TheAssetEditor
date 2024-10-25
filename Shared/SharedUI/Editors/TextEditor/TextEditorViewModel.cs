@@ -14,7 +14,7 @@ namespace Shared.Ui.Editors.TextEditor
         void SetEditor(ITextEditor theEditor);
     }
 
-    public class TextEditorViewModel<TextConverter> : NotifyPropertyChangedImpl, ITextEditorViewModel, IEditorViewModel, IFileEditor
+    public class TextEditorViewModel<TextConverter> : NotifyPropertyChangedImpl, ITextEditorViewModel, EditorInterfaces, IFileEditor
         where TextConverter : ITextConverter
     {
         public ICommand SaveCommand { get; set; }

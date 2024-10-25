@@ -27,61 +27,21 @@ namespace Shared.Core.ToolCreation
     }
 
 
-    public static class EditorInfoPriorites
+    public static class EditorPriorites
     {
         public static int Low => 0;
         public static int Default => 50;
         public static int High => 100;
     }
 
-    public class EditorInfoBuilder
-    {
-        protected EditorInfo _instance;
-        public static EditorInfoBuilder Create<TViewModel, TView>(EditorEnums editorType) where TViewModel : IEditorViewModel
-        {
-            return new EditorInfoBuilder()
-            {
-                _instance = new EditorInfo(editorType, typeof(TView), typeof(TViewModel))
-            };
-        }
-
-        public EditorInfoBuilder AddToToolbar(string toolbarLabel, bool enabled = true)
-        {
-            _instance.ToolbarName = toolbarLabel;
-            _instance.AddToolbarButton = true;
-            _instance.IsToolbarButtonEnabled = enabled;
-            return this;
-        }
-
-        public EditorInfoBuilder AddExtention(string extention, int priority)
-        {
-            // Ensure type is IFileEditor
-
-            _instance.Extensions.Add(new EditorInfo.ExtentionInfo(extention.Trim().ToLower(), priority));
-            return this;
-        }
-
-        public EditorInfoBuilder ValidForFoldersContaining(string filter)
-        {
-            _instance.FolderRules.Add(filter.Trim().ToLower());
-            return this;
-        }
-
-        public void Build(IEditorDatabase editorDatabase)
-        {
-            _instance.Extensions = _instance.Extensions.OrderBy(x => x.Priority).ToList();
-            editorDatabase.Register(_instance);
-        }
-    }
-
     public interface IEditorDatabase
     {
         public void Register(EditorInfo editorInfo);
 
-        IEditorViewModel Create(string fullFileName, EditorEnums? preferedEditor = null);
-        IEditorViewModel Create(EditorEnums editorEnum);
+        EditorInterfaces Create(string fullFileName, EditorEnums? preferedEditor = null);
+        EditorInterfaces Create(EditorEnums editorEnum);
 
-        void DestroyEditor(IEditorViewModel instance);
+        void DestroyEditor(EditorInterfaces instance);
         Type GetViewTypeFromViewModel(Type viewModelType);
         List<EditorInfo> GetEditorInfos();
     }
@@ -123,13 +83,13 @@ namespace Shared.Core.ToolCreation
             return instance.View;
         }
 
-        public IEditorViewModel Create(EditorEnums editorEnum) 
+        public EditorInterfaces Create(EditorEnums editorEnum) 
         {
             var editor = _editors.First(x => x.EditorEnum == editorEnum);
             return CreateEditorInternal(editor.ViewModel);
         }
 
-        public IEditorViewModel Create(string fullFileName, EditorEnums? preferedEditor)
+        public EditorInterfaces Create(string fullFileName, EditorEnums? preferedEditor)
         {
             var allEditors = GetAllPossibleEditors(fullFileName);
 
@@ -162,10 +122,10 @@ namespace Shared.Core.ToolCreation
             return CreateEditorInternal(selectedEditor);
         }
 
-        IEditorViewModel CreateEditorInternal(Type editorType)
+        EditorInterfaces CreateEditorInternal(Type editorType)
         {
             var scope = _serviceProvider.CreateScope();
-            var instance = scope.ServiceProvider.GetRequiredService(editorType) as IEditorViewModel;
+            var instance = scope.ServiceProvider.GetRequiredService(editorType) as EditorInterfaces;
             if (instance == null)
                 throw new Exception($"Type '{editorType}' is not a IEditorViewModel");
             _scopeRepository.Add(instance, scope);
@@ -235,6 +195,6 @@ namespace Shared.Core.ToolCreation
 
         public List<EditorInfo> GetEditorInfos() => _editors; 
 
-        public void DestroyEditor(IEditorViewModel instance) => _scopeRepository.RemoveScope(instance);
+        public void DestroyEditor(EditorInterfaces instance) => _scopeRepository.RemoveScope(instance);
     }
 }

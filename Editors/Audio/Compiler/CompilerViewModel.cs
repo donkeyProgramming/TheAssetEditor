@@ -10,7 +10,7 @@ using Shared.Ui.BaseDialogs.ErrorListDialog;
 
 namespace Editors.Audio.Compiler
 {
-    public class CompilerViewModel : NotifyPropertyChangedImpl, IEditorViewModel
+    public class CompilerViewModel : NotifyPropertyChangedImpl, EditorInterfaces
     {
         private readonly PackFileService _pfs;
         private readonly CompilerService _compilerService;

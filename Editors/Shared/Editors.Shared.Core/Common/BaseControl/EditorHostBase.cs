@@ -10,7 +10,7 @@ using Shared.Core.ToolCreation;
 
 namespace Editors.Shared.Core.Common.BaseControl
 {
-    public abstract partial class EditorHostBase : ObservableObject, IEditorViewModel, IEditorViewModelTypeProvider
+    public abstract partial class EditorHostBase : ObservableObject, EditorInterfaces, IEditorViewModelTypeProvider
     {
         private readonly FocusSelectableObjectService _focusSelectableObjectService;
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;

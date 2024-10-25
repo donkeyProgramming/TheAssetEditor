@@ -13,16 +13,16 @@ namespace Editors.TextureEditor
             serviceCollection.AddTransient<TexturePreviewView>();
             serviceCollection.AddTransient<TextureEditorViewModel>();
             serviceCollection.AddTransient<TextureBuilder>();  
-            serviceCollection.AddTransient<IEditorViewModel, TextureEditorViewModel>();
+            serviceCollection.AddTransient<EditorInterfaces, TextureEditorViewModel>();
         }
 
         public override void RegisterTools(IEditorDatabase factory)
         {
             EditorInfoBuilder
                 .Create<TextureEditorViewModel, TexturePreviewView>(EditorEnums.Texture_Editor)
-                .AddExtention(".dds", EditorInfoPriorites.Default)
-                .AddExtention(".png", EditorInfoPriorites.Default)
-                .AddExtention(".jpeg", EditorInfoPriorites.Default)
+                .AddExtention(".dds", EditorPriorites.Default)
+                .AddExtention(".png", EditorPriorites.Default)
+                .AddExtention(".jpeg", EditorPriorites.Default)
                 .Build(factory);
         }
     }

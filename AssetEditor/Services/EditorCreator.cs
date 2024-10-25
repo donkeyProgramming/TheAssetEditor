@@ -67,7 +67,7 @@ namespace AssetEditor.Services
             InsertEditorIntoTab(editorViewModel);
         }
 
-        public void Create(EditorEnums editor,  Action<IEditorViewModel>? onInitializeCallback = null)
+        public void Create(EditorEnums editor,  Action<EditorInterfaces>? onInitializeCallback = null)
         {
             var editorViewModel = _toolFactory.Create(editor);
             if (onInitializeCallback != null)
@@ -98,7 +98,7 @@ namespace AssetEditor.Services
             return newWindow;
         }
 
-        void InsertEditorIntoTab(IEditorViewModel editorView)
+        void InsertEditorIntoTab(EditorInterfaces editorView)
         {
             _mainViewModel.CurrentEditorsList.Add(editorView);
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;
