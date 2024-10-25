@@ -29,10 +29,17 @@ namespace Editors.AnimationMeta
 
         public override void RegisterTools(IEditorDatabase factory)
         {
-            factory.Register(EditorInfo.Create<EditorHost<SuperViewViewModel>, EditorHostView> (EditorEnums.SuperView_Editor, new NoExtention()));
+            EditorInfoBuilder
+                .Create<EditorHost<SuperViewViewModel>, EditorHostView>(EditorEnums.SuperView_Editor)
+                .AddToToolbar("SuperView")
+                .Build(factory);
 
-            var editorInfo = EditorInfo.Create<EditorViewModel, MainEditorView>(EditorEnums.Meta_Editor, new ExtensionToTool([".anm.meta", ".meta", ".snd.meta"]));
-            factory.Register(editorInfo);
+            EditorInfoBuilder
+                .Create<EditorViewModel, MainEditorView> (EditorEnums.Meta_Editor)
+                .AddExtention(".anm.meta", EditorInfoPriorites.High)
+                .AddExtention(".meta", EditorInfoPriorites.High)
+                .AddExtention(".snd.meta", EditorInfoPriorites.High)
+                .Build(factory);
         }
     }
 }

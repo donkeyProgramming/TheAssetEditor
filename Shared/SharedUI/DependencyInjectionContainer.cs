@@ -43,12 +43,23 @@ namespace Shared.Ui
 
         public override void RegisterTools(IEditorDatabase factory)
         {
-            var variantMeshEditorInfo = EditorInfo.Create<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(EditorEnums.XML_VariantMesh_Editor, new ExtensionToTool([".variantmeshdefinition"]));
-            factory.Register(variantMeshEditorInfo);
+            EditorInfoBuilder
+                .Create<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(EditorEnums.XML_VariantMesh_Editor)
+                .AddExtention(".variantmeshdefinition", EditorInfoPriorites.High)
+                .Build(factory);
 
-            var genericXmlEditorInfo = EditorInfo.Create<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(EditorEnums.XML_Editor,
-                new ExtensionToTool([".json", ".xml", ".txt", ".wsmodel", ".xml.material", ".anim.meta.xml", ".anm.meta.xml", ".snd.meta.xml", ".bmd.xml", ".csv", ".bnk.xml"]));
-            factory.Register(genericXmlEditorInfo);
+            EditorInfoBuilder
+                .Create<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(EditorEnums.XML_Editor)
+                .AddExtention(".json", EditorInfoPriorites.Default)
+                .AddExtention(".xml", EditorInfoPriorites.Default)
+                .AddExtention(".txt", EditorInfoPriorites.Default)
+                .AddExtention(".wsmodel", EditorInfoPriorites.Default)
+                .AddExtention(".xml.material", EditorInfoPriorites.Default)
+                .AddExtention(".anm.meta.xml", EditorInfoPriorites.Default)
+                .AddExtention(".bmd.xml", EditorInfoPriorites.Default)
+                .AddExtention(".csv", EditorInfoPriorites.Default)
+                .AddExtention(".bnk.xml", EditorInfoPriorites.Default)
+                .Build(factory);
         }
     }
 }

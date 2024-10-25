@@ -12,20 +12,20 @@ namespace Shared.Ui.BaseDialogs.ToolSelector
             var window = new ToolSelectorWindow() { Owner = Application.Current.MainWindow };
 
             foreach (var tool in editors)
-                window.PossibleToolsComboBox.Items.Add(tool);
+                window.PossibleTools.Items.Add(tool);
 
-            window.PossibleToolsComboBox.Items.Add(EditorEnums.None);
+            window.PossibleTools.Items.Add(EditorEnums.None);
 
-            if (window.PossibleToolsComboBox.Items.Count != 0)
-                window.PossibleToolsComboBox.SelectedItem = window.PossibleToolsComboBox.Items[0];
+            if (window.PossibleTools.Items.Count != 0)
+                window.PossibleTools.SelectedItem = window.PossibleTools.Items[0];
 
             var result = window.ShowDialog();
             if (result.HasValue && result.Value)
             {
-                if (window.PossibleToolsComboBox.SelectedItem == null)
+                if (window.PossibleTools.SelectedItem == null)
                     return EditorEnums.None;
 
-                return (EditorEnums)window.PossibleToolsComboBox.SelectedItem;
+                return (EditorEnums)window.PossibleTools.SelectedItem;
             }
 
             return EditorEnums.None;

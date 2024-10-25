@@ -1,4 +1,4 @@
-﻿using System.Windows.Controls;
+﻿using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Shared.Core.DependencyInjection;
@@ -6,13 +6,71 @@ using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.ToolCreation
 {
-    public record EditorInfo(EditorEnums EditorEnum, Type View, Type ViewModel, IPackFileToToolResolver ExtentionHandler)
-   {
-        public static EditorInfo Create<TViewModel, TView>(EditorEnums editorEnum, IPackFileToToolResolver extentionHandler)
-           where TViewModel : IEditorViewModel
-           where TView : Control
+    public class EditorInfo
+    {
+        public record ExtentionInfo(string Extention, int Priority);
+
+        public EditorInfo(EditorEnums editorEnum, Type view, Type viewModel)
         {
-            return new EditorInfo(editorEnum, typeof(TView), typeof(TViewModel), extentionHandler); 
+            EditorEnum = editorEnum;
+            View = view;
+            ViewModel = viewModel;
+        }
+        public List<ExtentionInfo> Extensions { get; set; } = new List<ExtentionInfo>();
+        public List<string> FolderRules { get; set; } = new List<string>();
+        public string ToolbarName { get; set; } = "";
+        public bool AddToolbarButton { get; set; } = false;
+        public bool IsToolbarButtonEnabled { get; set; } = false;
+        public EditorEnums EditorEnum { get; }
+        public Type View { get; }
+        public Type ViewModel { get; }
+    }
+
+
+    public static class EditorInfoPriorites
+    {
+        public static int Low => 0;
+        public static int Default => 50;
+        public static int High => 100;
+    }
+
+    public class EditorInfoBuilder
+    {
+        protected EditorInfo _instance;
+        public static EditorInfoBuilder Create<TViewModel, TView>(EditorEnums editorType) where TViewModel : IEditorViewModel
+        {
+            return new EditorInfoBuilder()
+            {
+                _instance = new EditorInfo(editorType, typeof(TView), typeof(TViewModel))
+            };
+        }
+
+        public EditorInfoBuilder AddToToolbar(string toolbarLabel, bool enabled = true)
+        {
+            _instance.ToolbarName = toolbarLabel;
+            _instance.AddToolbarButton = true;
+            _instance.IsToolbarButtonEnabled = enabled;
+            return this;
+        }
+
+        public EditorInfoBuilder AddExtention(string extention, int priority)
+        {
+            // Ensure type is IFileEditor
+
+            _instance.Extensions.Add(new EditorInfo.ExtentionInfo(extention.Trim().ToLower(), priority));
+            return this;
+        }
+
+        public EditorInfoBuilder ValidForFoldersContaining(string filter)
+        {
+            _instance.FolderRules.Add(filter.Trim().ToLower());
+            return this;
+        }
+
+        public void Build(IEditorDatabase editorDatabase)
+        {
+            _instance.Extensions = _instance.Extensions.OrderBy(x => x.Priority).ToList();
+            editorDatabase.Register(_instance);
         }
     }
 
@@ -113,23 +171,65 @@ namespace Shared.Core.ToolCreation
             return instance;
         }
 
-        List<EditorInfo> GetAllPossibleEditors(string filename)
+        List<EditorInfo> GetAllPossibleEditors(string fullFileName)
         {
-            var output = new List<EditorInfo>();
+            var extention = Regex.Match(fullFileName, @"\..*").Value;
+            if (extention.Contains("{") && extention.Contains("}"))
+            {
+                var ext2 = Regex.Match(extention, @"\..*\.(.*)\.(.*)");
+                if (ext2.Success)
+                {
+                    extention = "." + ext2.Groups[1].Value + "." + ext2.Groups[2].Value;
+                }
+            }
+
+            var output = new List<(EditorInfo info, int priority)>();
             foreach (var toolLookUp in _editors)
             {
-                var result = toolLookUp.ExtentionHandler.CanOpen(filename);
-                if (result.CanOpen)
-                    output.Add(toolLookUp);
+                var hasValidExtention = false;
+         
+                var priority = -1;
+
+                foreach (var toolExtention in toolLookUp.Extensions)
+                {
+                    if (toolExtention.Extention == extention)
+                    {
+                        if (toolExtention.Priority > priority)
+                        {
+                            hasValidExtention = true;
+                            priority = toolExtention.Priority;
+                        }
+                    }
+                }
+
+                var isValidForFolder = false;
+                if (toolLookUp.FolderRules.Count == 0)
+                {
+                    isValidForFolder = true;
+                }
+                else
+                {
+                    foreach (var toolExtention in toolLookUp.FolderRules)
+                    {
+                        if (fullFileName.Contains(toolExtention))
+                            isValidForFolder = true;
+                    }
+                }
+ 
+                if (hasValidExtention && isValidForFolder)
+                    output.Add((toolLookUp, priority));
             }
 
             if (output.Count == 0)
             {
-                var error = $"Attempting to get view model for file {filename}, unable to find tool based on extension";
+                var error = $"Attempting to get view model for file {fullFileName}, unable to find tool based on rules";
                 _logger.Here().Error(error);
             }
 
-            return output;
+            return output
+                .OrderByDescending(x=>x.priority)
+                .Select(x=>x.info)
+                .ToList();
         }
 
         public void DestroyEditor(IEditorViewModel instance) => _scopeRepository.RemoveScope(instance);

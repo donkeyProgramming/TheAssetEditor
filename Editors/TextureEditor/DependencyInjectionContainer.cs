@@ -18,8 +18,12 @@ namespace Editors.TextureEditor
 
         public override void RegisterTools(IEditorDatabase factory)
         {
-            var editorInfo = EditorInfo.Create<TextureEditorViewModel, TexturePreviewView>(EditorEnums.Texture_Editor, new ExtensionToTool([".dds", ".png", ".jpeg"]));
-            factory.Register(editorInfo);
+            EditorInfoBuilder
+                .Create<TextureEditorViewModel, TexturePreviewView>(EditorEnums.Texture_Editor)
+                .AddExtention(".dds", EditorInfoPriorites.Default)
+                .AddExtention(".png", EditorInfoPriorites.Default)
+                .AddExtention(".jpeg", EditorInfoPriorites.Default)
+                .Build(factory);
         }
     }
 }

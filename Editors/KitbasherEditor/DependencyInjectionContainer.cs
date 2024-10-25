@@ -85,8 +85,12 @@ namespace KitbasherEditor
 
         public override void RegisterTools(IEditorDatabase factory)
         {
-            var editorInfo = EditorInfo.Create<KitbasherViewModel, KitbasherView>(EditorEnums.Kitbash_Editor, new ExtensionToTool([".rigid_model_v2", ".wsmodel.rigid_model_v2", ".wsmodel"]));//.variantmeshdefinition
-            factory.Register(editorInfo);
+            EditorInfoBuilder
+                .Create<KitbasherViewModel, KitbasherView>(EditorEnums.Kitbash_Editor)
+                .AddExtention(".rigid_model_v2", EditorInfoPriorites.High)
+                //.AddExtention(".variantmeshdefinition", 0)
+                .AddExtention(".wsmodel", EditorInfoPriorites.High)
+                .Build(factory);
         }
     }
 }

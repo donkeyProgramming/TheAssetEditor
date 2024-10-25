@@ -6,17 +6,22 @@
         xmlns:local="clr-namespace:CommonControls.BaseDialogs.ToolSelector"
         mc:Ignorable="d"
         Title="Tool Selector"
-   Height="100" Width="300"
+        Height="250" Width="300"
         ResizeMode="NoResize"
          Style="{StaticResource CustomWindowStyle}"
         WindowStartupLocation="CenterOwner">
-    <DockPanel >
-        <DockPanel  DockPanel.Dock="Top" Margin="5">
-            <Label DockPanel.Dock="Left">Tool:</Label>
-            <ComboBox DockPanel.Dock="Left" x:Name="PossibleToolsComboBox" Width="250"/>
-        </DockPanel>
-        <Button DockPanel.Dock="Bottom" Margin="5,5,5,5" Click="Button_Click">Open</Button>
-      
-        
+    <DockPanel  >
+     
+        <Button DockPanel.Dock="Bottom" Margin="5" Click="Button_Click">Open</Button>
+        <ListView DockPanel.Dock="Top" x:Name="PossibleTools"  Margin="5" >
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Background" Value="Transparent" />
+                   
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+
     </DockPanel>
 </Window>

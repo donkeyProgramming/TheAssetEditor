@@ -24,12 +24,28 @@ namespace Editors.AnimationTextEditors
             RegisterBatchConverter(services);
         }
 
-        public override void RegisterTools(IEditorDatabase factory)
+        public override void RegisterTools(IEditorDatabase database)
         {
-            factory.Register(EditorInfo.Create<AnimPackViewModel, AnimationPackView>(EditorEnums.AnimationPack_Editor, new ExtensionToTool([".animpack"])));
-            factory.Register(EditorInfo.Create<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(EditorEnums.XML_CampaginBin_Edtior, new PathToTool(".bin", @"animations\campaign\database")));
-            factory.Register(EditorInfo.Create<TextEditorViewModel<AnimFileToTextConverter>, TextEditorView>(EditorEnums.XML_Anim_Editor, new ExtensionToTool([".anim"])));
-            factory.Register(EditorInfo.Create<TextEditorViewModel<InvMatrixToTextConverter>, TextEditorView>(EditorEnums.XML_InvBoneEditor, new ExtensionToTool([".bone_inv_trans_mats"])));
+            EditorInfoBuilder
+                .Create<AnimPackViewModel, AnimationPackView>(EditorEnums.AnimationPack_Editor)
+                .AddExtention(".animpack", EditorInfoPriorites.High)
+                .Build(database);
+
+            EditorInfoBuilder
+                .Create<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(EditorEnums.XML_CampaginBin_Edtior)
+                .AddExtention(".bin", EditorInfoPriorites.High)
+                .ValidForFoldersContaining(@"animations\campaign\database")
+                .Build(database);
+        
+            EditorInfoBuilder
+                .Create<TextEditorViewModel<AnimFileToTextConverter>, TextEditorView>(EditorEnums.XML_Anim_Editor)
+                .AddExtention(".anim", EditorInfoPriorites.Default)
+                .Build(database);
+
+            EditorInfoBuilder
+                .Create<TextEditorViewModel<InvMatrixToTextConverter>, TextEditorView>(EditorEnums.XML_InvBoneEditor)
+                .AddExtention(".bone_inv_trans_mats", EditorInfoPriorites.Default)
+                .Build(database);
         }
 
         private static void RegisterCampaignAnimBin(IServiceCollection services)

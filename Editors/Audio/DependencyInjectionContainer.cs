@@ -15,7 +15,6 @@ using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.WWise;
 
-
 namespace Editors.Audio
 {
     public class DependencyInjectionContainer : DependencyContainer
@@ -59,9 +58,21 @@ namespace Editors.Audio
 
         public override void RegisterTools(IEditorDatabase factory)
         {
-            factory.Register(EditorInfo.Create<AudioExplorerViewModel, AudioExplorerView>(EditorEnums.AudioExplorer_Editor, new NoExtention()));
-            factory.Register(EditorInfo.Create<CompilerViewModel, CompilerView>(EditorEnums.AudioCompiler_Editor, new NoExtention()));
-            factory.Register(EditorInfo.Create<AudioEditorViewModel, AudioEditorView>(EditorEnums.Audio_Editor, new NoExtention()));
+            EditorInfoBuilder
+                .Create<AudioExplorerViewModel, AudioExplorerView>(EditorEnums.AudioExplorer_Editor)
+                .AddToToolbar("Audio Exporer")
+                .Build(factory);
+
+            EditorInfoBuilder
+                .Create<CompilerViewModel, CompilerView>(EditorEnums.AudioCompiler_Editor)
+                .AddToToolbar("Audio Compiler")
+                .Build(factory);
+
+            EditorInfoBuilder
+                .Create<AudioEditorViewModel, AudioEditorView>(EditorEnums.Audio_Editor)
+                .AddToToolbar("Audio Editor")
+                .Build(factory);
+
         }
     }
 }
