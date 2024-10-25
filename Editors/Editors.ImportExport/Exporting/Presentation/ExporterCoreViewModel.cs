@@ -26,7 +26,7 @@ namespace Editors.ImportExport.Exporting.Presentation
         [ObservableProperty] IExporterViewModel? _selectedExporterViewModel;
         [ObservableProperty] ObservableCollection<IExporterViewModel> _possibleExporters = [];
         [ObservableProperty] IExporterViewModel? _selectedExporter;
-        [ObservableProperty] string _systemPath = "C:\\myfile.dds";
+        [ObservableProperty] string _systemPath = "";
         [ObservableProperty] bool _createImportProject = true;
 
         public ExporterCoreViewModel(IEnumerable<IExporterViewModel> exporterViewModels)

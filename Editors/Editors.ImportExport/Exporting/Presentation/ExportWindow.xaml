@@ -26,7 +26,7 @@
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="System Path" HorizontalAlignment="Left"/>
         <TextBlock Grid.Row="0" Grid.Column="1" Text=": "/>
-        <TextBox Grid.Row="0" Grid.Column="2" Text="C:\temp\horser.png" HorizontalContentAlignment="Right"/>
+        <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding SystemPath}" HorizontalContentAlignment="Right"/>
         <Button Grid.Row="0" Grid.Column="3" Content="Browse" Command="{Binding BrowsePathCommand}"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Create Import project   " HorizontalAlignment="Left"/>

@@ -16,7 +16,16 @@
   <ItemGroup>
     <Folder Include="Image\" />
     <Folder Include="Geometry\" />
-    <Folder Include="Importing\" />
+    <Folder Include="Importing\Importers\GltfToRmv\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="SharpGLTF.Core" Version="1.0.0" />
+    <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.0" />
+    <PackageReference Include="Pfim" Version="0.10.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
+  </ItemGroup>
 </Project>

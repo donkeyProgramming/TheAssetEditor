@@ -1,4 +1,9 @@
 ﻿using AssetEditor.Services;
+using Editors.ImportExport;
+using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
+using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
+using Editors.ImportExport.Exporting.Exporters.DdsToPng;
+using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
 using GameWorld.Core.Components.Input;
 using GameWorld.WpfWindow;
 using GameWorld.WpfWindow.ResourceHandling;
@@ -19,6 +24,11 @@ namespace E2EVerification.Shared
         public PackFileService PackFileService { get; private set; }
         public IUiCommandFactory CommandFactory { get; private set; }
         public ScopeRepository ScopeRepository { get; private set; }
+        //public RmvToGltfExporter RmvToGltfExporterRepos {  get; private set; }
+        public DdsToNormalPngExporter DdsToNormalPngExporterRepos { get; private set; }
+        public DdsToMaterialPngExporter DdsToMaterialPngExporterRepos { get; private set; }
+        public DdsToPngExporter DdsToPngExporterRepos { get; private set; }
+        public IImageSaveHandler ImageSaveHandler { get; private set; }
 
         public AssetEditorTestRunner(bool forceValidateServiceScopes = false)
         {
@@ -32,6 +42,11 @@ namespace E2EVerification.Shared
             PackFileService = EditorServiceProvider.ServiceProvider.GetRequiredService<PackFileService>();
             CommandFactory = EditorServiceProvider.ServiceProvider.GetRequiredService<IUiCommandFactory>();
             ScopeRepository = EditorServiceProvider.ServiceProvider.GetRequiredService<ScopeRepository>();
+            //RmvToGltfExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<RmvToGltfExporter>();
+            DdsToNormalPngExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<DdsToNormalPngExporter>();
+            DdsToMaterialPngExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<DdsToMaterialPngExporter>();
+            DdsToPngExporterRepos = EditorServiceProvider.ServiceProvider.GetRequiredService<DdsToPngExporter>();
+            ImageSaveHandler = EditorServiceProvider.ServiceProvider.GetRequiredService<IImageSaveHandler>();
         }
 
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)

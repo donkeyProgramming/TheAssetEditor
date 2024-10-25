@@ -2,8 +2,10 @@
 using Editors.ImportExport.Exporting.Exporters;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
 using Editors.ImportExport.Misc;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common.DataTemplates;
+using System.IO;
 
 namespace Editors.ImportExport.Exporting.Presentation.DdsToNormalPng
 {
@@ -23,7 +25,7 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToNormalPng
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
         {
-            _exporter.Export(outputPath);
+            _exporter.Export(exportSource.Name, outputPath, true);
         }
     }
 }
