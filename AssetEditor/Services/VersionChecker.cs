@@ -1,14 +1,16 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using Octokit;
 
-namespace Shared.Core.Services
+namespace AssetEditor.Services
 {
     public class VersionChecker
     {
         private static readonly string GitHubLink = @"https://github.com/donkeyProgramming/TheAssetEditor/releases/latest";
-        public static string CurrentVersion { get => "0.48"; }
+        public static string CurrentVersion { get => "0.49"; }
 
         public static void CheckVersion()
         {
