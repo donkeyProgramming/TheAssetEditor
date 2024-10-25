@@ -18,7 +18,6 @@ using Shared.Core.ToolCreation;
 
 namespace AssetEditor.ViewModels
 {
-
     public partial class MenuBarViewModel
     {
         private readonly PackFileService _packfileService;
