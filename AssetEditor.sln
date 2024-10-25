@@ -65,6 +65,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameWorld.Core.Test", "Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Testing\Shared\Shared.csproj", "{5AF54A17-B785-46FB-A982-E0663004F603}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editor.VisualSkeletonEditor", "Editors\SkeletonEditor\Editor.VisualSkeletonEditor\Editor.VisualSkeletonEditor.csproj", "{AC667CF7-9FD6-443B-871F-56C50F4EE871}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SkeletonEditor", "SkeletonEditor", "{711AC21F-B31C-4FC8-9D38-D1F0C1FEC6C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -155,6 +159,10 @@ Global
 		{5AF54A17-B785-46FB-A982-E0663004F603}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AF54A17-B785-46FB-A982-E0663004F603}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AF54A17-B785-46FB-A982-E0663004F603}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC667CF7-9FD6-443B-871F-56C50F4EE871}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC667CF7-9FD6-443B-871F-56C50F4EE871}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC667CF7-9FD6-443B-871F-56C50F4EE871}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC667CF7-9FD6-443B-871F-56C50F4EE871}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -182,6 +190,8 @@ Global
 		{0B14A236-AAE0-4E9B-A41E-4AF9DD976BA7} = {18424B6A-CB8A-4CE1-935C-72459F31521B}
 		{E604D1EB-02AC-4E31-9161-531F8830BFDB} = {18424B6A-CB8A-4CE1-935C-72459F31521B}
 		{5AF54A17-B785-46FB-A982-E0663004F603} = {18424B6A-CB8A-4CE1-935C-72459F31521B}
+		{AC667CF7-9FD6-443B-871F-56C50F4EE871} = {711AC21F-B31C-4FC8-9D38-D1F0C1FEC6C0}
+		{711AC21F-B31C-4FC8-9D38-D1F0C1FEC6C0} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}

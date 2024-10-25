@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using CommonControls.PackFileBrowser;
@@ -20,7 +19,7 @@ using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
 
-namespace AnimationEditor.SkeletonEditor
+namespace Editor.VisualSkeletonEditor.SkeletonEditor
 {
     public partial class SkeletonEditorViewModel : EditorHostBase, IFileEditor
     {
@@ -36,12 +35,13 @@ namespace AnimationEditor.SkeletonEditor
         [ObservableProperty] string _sourceSkeletonName = "";
         [ObservableProperty] bool _showBonesAsWorldTransform  = true;
         [ObservableProperty] ObservableCollection<SkeletonBoneNode> _bones = new();
-        [ObservableProperty] SkeletonBoneNode _selectedBone = null;
+        [ObservableProperty] SkeletonBoneNode? _selectedBone = null;
         [ObservableProperty] bool _isTechSkeleton = false;
         [ObservableProperty] float _boneVisualScale = 1.5f;
         [ObservableProperty] float _boneScale = 1;
         [ObservableProperty] Vector3ViewModel _selectedBoneRotationOffset;
         [ObservableProperty] Vector3ViewModel _selectedBoneTranslationOffset;
+        [ObservableProperty] string _selectedBoneName;
 
         public bool? ShowSkeleton
         {
@@ -53,12 +53,6 @@ namespace AnimationEditor.SkeletonEditor
         {
             get => _techSkeletonNode?.ShowMesh.Value;
             set { _techSkeletonNode.ShowMesh.Value = value.Value; OnPropertyChanged(nameof(ShowRefMesh)); }
-        }
-
-        public string SelectedBoneName
-        {
-            get => SelectedBone?.BoneName;
-            set { UpdateSelectedBoneName(value); OnPropertyChanged(nameof(SelectedBoneName)); }
         }
 
         public override Type EditorViewModelType => typeof(EditorView);
@@ -81,7 +75,7 @@ namespace AnimationEditor.SkeletonEditor
             _copyPasteManager = copyPasteManager;
            
             _selectedBoneRotationOffset = new Vector3ViewModel(0, 0, 0, x=> HandleTranslationChanged());
-            SelectedBoneTranslationOffset = new Vector3ViewModel(0, 0, 0, x => HandleTranslationChanged());
+            _selectedBoneTranslationOffset = new Vector3ViewModel(0, 0, 0, x => HandleTranslationChanged());
 
             var assetNode = sceneObjectViewModelBuilder.CreateAsset(false, "SkeletonNode", Color.Black, null);
             assetNode.IsControlVisible.Value = false;
@@ -95,8 +89,9 @@ namespace AnimationEditor.SkeletonEditor
         partial void OnIsTechSkeletonChanged(bool value) => SetTechSkeletonTransform(value);
         partial void OnBoneVisualScaleChanged(float value) => _techSkeletonNode?.SelectedBoneScale(value);
         partial void OnBoneScaleChanged(float value) => BoneTransformHandler.Scale(SelectedBone, _techSkeletonNode.Skeleton, (float)BoneScale);
+        partial void OnSelectedBoneNameChanged(string value) => UpdateSelectedBoneName(value);
 
-        
+
         public PackFile CurrentFile { get; private set; }
         public void LoadFile(PackFile file)
         {
@@ -224,25 +219,25 @@ namespace AnimationEditor.SkeletonEditor
 
         public void DuplicateBoneAction()
         {
-            BoneCopyPasteHandler.Duplicate(SelectedBone, _techSkeletonNode.Skeleton);
+            BoneManipulator.Duplicate(SelectedBone, _techSkeletonNode.Skeleton);
             RefreshBoneList();
         }
 
         public void DeleteBoneAction()
         {
-            BoneCopyPasteHandler.Delete(SelectedBone, _techSkeletonNode.Skeleton);
+            BoneManipulator.Delete(SelectedBone, _techSkeletonNode.Skeleton);
             RefreshBoneList();
         }
 
         public void CopyBoneAction()
         {
-            BoneCopyPasteHandler.Copy(_copyPasteManager, SelectedBone, _techSkeletonNode.Skeleton);
+            BoneManipulator.Copy(_copyPasteManager, SelectedBone, _techSkeletonNode.Skeleton);
             RefreshBoneList();
         }
 
         public void PasteBoneAction()
         {
-            BoneCopyPasteHandler.Paste(_copyPasteManager, SelectedBone, _techSkeletonNode.Skeleton);
+            BoneManipulator.Paste(_copyPasteManager, SelectedBone, _techSkeletonNode.Skeleton);
             RefreshBoneList();
         }
 
@@ -292,6 +287,5 @@ namespace AnimationEditor.SkeletonEditor
                 Create(_techSkeletonNode, _techSkeletonNode.SkeletonName.Value);
             }
         }
-
     }
 }

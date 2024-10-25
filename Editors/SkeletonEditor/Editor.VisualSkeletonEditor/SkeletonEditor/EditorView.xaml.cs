@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace AnimationEditor.SkeletonEditor
+namespace Editor.VisualSkeletonEditor.SkeletonEditor
 {
     /// <summary>
     /// Interaction logic for EditorView.xaml

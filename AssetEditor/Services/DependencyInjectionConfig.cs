@@ -34,6 +34,7 @@ namespace AssetEditor.Services
                 new Editors.TextureEditor.DependencyInjectionContainer(),
                 new Editors.AnimationVisualEditors.DependencyInjectionContainer(),
                 new Editors.ImportExport.DependencyInjectionContainer(),
+                new Editor.VisualSkeletonEditor.DependencyInjectionContainer(),
 
                 // Host application
                 new DependencyInjectionContainer(),

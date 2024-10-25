@@ -3,7 +3,7 @@ using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 
-namespace AnimationEditor.SkeletonEditor
+namespace Editor.VisualSkeletonEditor.SkeletonEditor
 {
     class BoneTransformHandler
     {

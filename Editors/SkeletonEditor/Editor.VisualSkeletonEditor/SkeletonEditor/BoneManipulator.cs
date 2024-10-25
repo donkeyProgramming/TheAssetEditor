@@ -4,16 +4,16 @@ using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 
-namespace AnimationEditor.SkeletonEditor
+namespace Editor.VisualSkeletonEditor.SkeletonEditor
 {
-    public class BoneCopyPasteItem : ICopyPastItem
+    class BoneCopyPasteItem : ICopyPastItem
     {
         public string Description { get; set; } = "Copy object for bones";
         public GameSkeleton SourceSkeleton { get; set; }
         public int BoneIndex { get; set; }
     }
 
-    class BoneCopyPasteHandler
+    class BoneManipulator
     {
         public static void Duplicate(SkeletonBoneNode selectedBone, GameSkeleton skeleton)
         {
