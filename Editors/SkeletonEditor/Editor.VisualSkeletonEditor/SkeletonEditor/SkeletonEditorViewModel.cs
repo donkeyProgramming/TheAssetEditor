@@ -4,17 +4,13 @@ using System.Windows;
 using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Shared.Core.Common;
-using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Common.ReferenceModel;
 using GameWorld.Core.Animation;
-using GameWorld.Core.Components;
-using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
@@ -25,10 +21,8 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
     {
         SceneObject _techSkeletonNode;
 
-        private readonly FocusSelectableObjectService _focusSelectableObjectService;
         private readonly PackFileService _packFileService;
         private readonly CopyPasteManager _copyPasteManager;
-        private readonly SceneObjectEditor _sceneObjectEditor;
 
         [ObservableProperty] string _skeletonName = "";
         [ObservableProperty] string _refMeshName = "";
@@ -57,35 +51,32 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
 
         public override Type EditorViewModelType => typeof(EditorView);
 
-        public SkeletonEditorViewModel(PackFileService pfs,
+        public SkeletonEditorViewModel(
+            PackFileService pfs,
             CopyPasteManager copyPasteManager,
-            SceneObjectEditor assetViewModelBuilder,
-            SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
-            FocusSelectableObjectService focusSelectableObjectService,
-            IComponentInserter componentInserter,
-            AnimationPlayerViewModel animationPlayerViewModel,
-            IWpfGame wpfGame)
-            :base(componentInserter, animationPlayerViewModel, wpfGame, focusSelectableObjectService)
+            IEditorHostParameters editorHostParameters)
+            : base(editorHostParameters)
         {
             DisplayName = "Skeleton Editor";
 
-            _sceneObjectEditor = assetViewModelBuilder;
-            _focusSelectableObjectService = focusSelectableObjectService;
             _packFileService = pfs;
             _copyPasteManager = copyPasteManager;
            
             _selectedBoneRotationOffset = new Vector3ViewModel(0, 0, 0, x=> HandleTranslationChanged());
             _selectedBoneTranslationOffset = new Vector3ViewModel(0, 0, 0, x => HandleTranslationChanged());
+        }
 
-            var assetNode = sceneObjectViewModelBuilder.CreateAsset(false, "SkeletonNode", Color.Black, null);
+        protected override void Initialize(SceneObjectViewModelBuilder builder, IList<SceneObjectViewModel> sceneNodeList)
+        {
+            var assetNode = builder.CreateAsset(false, "SkeletonNode", Color.Black, null);
             assetNode.IsControlVisible.Value = false;
             _techSkeletonNode = assetNode.Data;
 
-            SceneObjects.Add(assetNode);
+            sceneNodeList.Add(assetNode);
         }
 
         partial void OnShowBonesAsWorldTransformChanged(bool value) => RefreshBoneInformation(SelectedBone);
-        partial void OnSelectedBoneChanged(SkeletonBoneNode value) => RefreshBoneInformation(value);
+        partial void OnSelectedBoneChanged(SkeletonBoneNode? value) => RefreshBoneInformation(value);
         partial void OnIsTechSkeletonChanged(bool value) => SetTechSkeletonTransform(value);
         partial void OnBoneVisualScaleChanged(float value) => _techSkeletonNode?.SelectedBoneScale(value);
         partial void OnBoneScaleChanged(float value) => BoneTransformHandler.Scale(SelectedBone, _techSkeletonNode.Skeleton, (float)BoneScale);
@@ -97,10 +88,10 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
         {
             CurrentFile = file;
             var skeletonPath = _packFileService.GetFullPath(file);
-            Create(_techSkeletonNode, skeletonPath);
+            LoadSkeleton(_techSkeletonNode, skeletonPath);
         }
 
-        void Create(SceneObject techSkeletonNode, string skeletonPath)
+        void LoadSkeleton(SceneObject techSkeletonNode, string skeletonPath)
         {
             try
             {
@@ -110,7 +101,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
                 RefreshBoneInformation(null);
                 var packFile = _packFileService.FindFile(skeletonPath);
                 SkeletonName = skeletonPath;
-                _sceneObjectEditor.SetSkeleton(_techSkeletonNode, packFile);
+                SceneObjectEditor.SetSkeleton(_techSkeletonNode, packFile);
                 RefreshBoneList();
                 IsTechSkeleton = skeletonPath.ToLower().Contains("tech");
                 SourceSkeletonName = _techSkeletonNode.Skeleton.SkeletonName;
@@ -205,7 +196,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
                 return;
 
             var worldPos = _techSkeletonNode.Skeleton.GetWorldTransform(SelectedBone.BoneIndex).Translation;
-            _focusSelectableObjectService.LookAt(worldPos);
+            FocusService.LookAt(worldPos);
         }
 
         public void CreateBoneAction()
@@ -272,7 +263,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
             {
                 var file = browser.SelectedFile;
                 var path = _packFileService.GetFullPath(file);
-                Create(_techSkeletonNode, path);
+                LoadSkeleton(_techSkeletonNode, path);
             }
         }
 
@@ -282,9 +273,9 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
             if (browser.ShowDialog() == true && browser.SelectedFile != null)
             {
                 var file = browser.SelectedFile;
-                _sceneObjectEditor.SetMesh(_techSkeletonNode, file);
+                SceneObjectEditor.SetMesh(_techSkeletonNode, file);
                 RefMeshName = _packFileService.GetFullPath(file);
-                Create(_techSkeletonNode, _techSkeletonNode.SkeletonName.Value);
+                LoadSkeleton(_techSkeletonNode, _techSkeletonNode.SkeletonName.Value);
             }
         }
     }

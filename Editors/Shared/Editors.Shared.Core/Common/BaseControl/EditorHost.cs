@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.ReferenceModel;
@@ -20,46 +19,7 @@ namespace Editors.Shared.Core.Common.BaseControl
         string EditorName { get; }
     }
 
-    public abstract partial class EditorHostBase : ObservableObject, IEditorViewModel, IEditorViewModelTypeProvider
-    {
-        private readonly FocusSelectableObjectService _focusSelectableObjectService;
-
-        public string DisplayName { get; set; }
-        public abstract Type EditorViewModelType { get; }
-
-        [ObservableProperty] IWpfGame _gameWorld;
-        [ObservableProperty] ObservableCollection<SceneObjectViewModel> _sceneObjects = new();
-        [ObservableProperty] AnimationPlayerViewModel _player;
-
-        [ObservableProperty] ICommand _resetCameraCommand;
-        [ObservableProperty] ICommand _focusCamerasCommand;
-
-        public EditorHostBase(
-            IComponentInserter componentInserter,
-            AnimationPlayerViewModel animationPlayerViewModel,
-            IWpfGame gameWorld,
-            FocusSelectableObjectService focusSelectableObjectService)
-        {
-            GameWorld = gameWorld;
-            Player = animationPlayerViewModel;
-
-            _focusSelectableObjectService = focusSelectableObjectService;
-
-            ResetCameraCommand = new RelayCommand(ResetCameraAction);
-            FocusCamerasCommand = new RelayCommand(FocusCameraAction);
-
-            componentInserter.Execute();
-        }
-
-        void ResetCameraAction() => _focusSelectableObjectService.ResetCamera();
-        void FocusCameraAction() => _focusSelectableObjectService.FocusSelection();
-
-        public void Close()
-        {
-            GameWorld = null;
-        }
-    }
-
+    // This is depricated - use EditorHostBase!
     public class EditorHost<TEditor> : NotifyPropertyChangedImpl, IEditorViewModel
     {
         public IEditorDatabase ToolsFactory { get; set; }

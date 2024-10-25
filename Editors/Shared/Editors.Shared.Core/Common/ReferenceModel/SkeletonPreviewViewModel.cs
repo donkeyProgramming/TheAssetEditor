@@ -1,7 +1,6 @@
-﻿using GameWorld.Core.Animation;
+﻿using System.Collections.ObjectModel;
+using GameWorld.Core.Animation;
 using Shared.Core.Misc;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Editors.Shared.Core.Common.ReferenceModel
 {

@@ -29,7 +29,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OpenFileOnLoad()
         {
             var file = _packFileService.FindFile("animations\\skeletons\\humanoid01.anim");
-            _editorCreator.CreateFromFile(file, EditorEnums.Skeleton_Editor);
+            _editorCreator.CreateFromFile(file, EditorEnums.VisualSkeletonEditor);
         }
     }
 }

@@ -10,7 +10,7 @@
         XML_Anim_Editor,
         Kitbash_Editor,
         MountTool_Editor,
-        Skeleton_Editor,
+        VisualSkeletonEditor,
         SuperView_Editor,
         AnimationTransfer_Editor,
         Texture_Editor,

@@ -73,7 +73,7 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void OpenCampaignAnimCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.CampaginAnimation_Editor);
         [RelayCommand] private void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AnimationTransfer_Editor);
         [RelayCommand] private void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.SuperView_Editor);
-        [RelayCommand] private void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.Skeleton_Editor);
+        [RelayCommand] private void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.VisualSkeletonEditor);
         [RelayCommand] private void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();
         [RelayCommand] private void OpenWh2AnimpackUpdater()
         {

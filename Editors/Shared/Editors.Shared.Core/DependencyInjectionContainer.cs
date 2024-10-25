@@ -1,4 +1,5 @@
-﻿using Editors.Shared.Core.Services;
+﻿using Editors.Shared.Core.Common.BaseControl;
+using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.PackFiles.Models;
@@ -10,9 +11,7 @@ namespace Editors.Shared.Core
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            //serviceCollection.AddTransient<TexturePreviewView>();
-            //serviceCollection.AddTransient<TextureEditorViewModel>();
-            //serviceCollection.AddTransient<IEditorViewModel, TextureEditorViewModel>();
+            serviceCollection.AddScoped<IEditorHostParameters, EditorHostParameters>();
 
             serviceCollection.AddSingleton<IAnimationFileDiscovered, SkeletonAnimationLookUpHelper>();
             serviceCollection.AddSingleton<SkeletonAnimationLookUpHelper>((x) => x.GetService<IAnimationFileDiscovered>() as SkeletonAnimationLookUpHelper);
