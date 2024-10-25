@@ -13,7 +13,6 @@ using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.ToolCreation;
 using Shared.Ui.Common;
 using Shared.Ui.Events.UiCommands;
 using Clipboard = System.Windows.Clipboard;
@@ -54,14 +53,12 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         protected PackFileService _packFileService;
 
         protected TreeNode _selectedNode;
-        protected IEditorDatabase _toolFactory;
         private readonly IUiCommandFactory _uiCommandFactory;
         protected readonly IExportFileContextMenuHelper _exportFileContextMenuHelper;
 
-        public ContextMenuHandler(PackFileService pf, IEditorDatabase toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper)
+        public ContextMenuHandler(PackFileService pf, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper)
         {
             _packFileService = pf;
-            _toolFactory = toolFactory;
             _uiCommandFactory = uiCommandFactory;
             _exportFileContextMenuHelper = exportFileContextMenuHelper;
             RenameNodeCommand = new RelayCommand(OnRenameNode);

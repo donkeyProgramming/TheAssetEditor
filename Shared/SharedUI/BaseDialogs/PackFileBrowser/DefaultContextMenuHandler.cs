@@ -8,8 +8,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
     public class DefaultContextMenuHandler : ContextMenuHandler
     {
-        public DefaultContextMenuHandler(PackFileService service, IEditorDatabase toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper) 
-            : base(service, toolFactory, uiCommandFactory, exportFileContextMenuHelper)
+        public DefaultContextMenuHandler(PackFileService service, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper) 
+            : base(service, uiCommandFactory, exportFileContextMenuHelper)
         {
 
         }

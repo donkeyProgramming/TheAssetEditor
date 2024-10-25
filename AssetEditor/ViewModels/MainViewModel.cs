@@ -41,7 +41,7 @@ namespace AssetEditor.ViewModels
             _packfileService.Database.ContainerUpdated += OnContainerUpdated;
 
             FileTree = new PackFileBrowserViewModel(_packfileService);
-            FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, toolFactory, uiCommandFactory, exportFileContextMenuHelper);
+            FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, uiCommandFactory, exportFileContextMenuHelper);
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;

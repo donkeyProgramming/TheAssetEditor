@@ -5,7 +5,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public class OpenFileContextMenuHandler : ContextMenuHandler
     {
-        public OpenFileContextMenuHandler(PackFileService service) : base(service, null, null, null)
+        public OpenFileContextMenuHandler(PackFileService service) : base(service, null, null)
         { }
 
         public override void Create(TreeNode node)
