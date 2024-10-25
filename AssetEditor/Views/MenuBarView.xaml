@@ -70,22 +70,27 @@
                 <MenuItem Header="_Exit" />
             </MenuItem>
 
-            <MenuItem Header="Tools" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="Mount Animation Editor" Command="{Binding MenuBar.OpenMountCreatorCommand}"/>
-                <MenuItem Header="Campaign Animation Converter" Command="{Binding MenuBar.OpenCampaignAnimCreatorCommand}" IsEnabled="False"/>
-                <MenuItem Header="Animation Transfer Tool" Command="{Binding MenuBar.OpenAnimationTransferToolCommand}" IsEnabled="False" />
-                <MenuItem Header="Super View" Command="{Binding MenuBar.OpenSuperViewToolCommand}" />
-                <MenuItem Header="Skeleton Editor" Command="{Binding MenuBar.OpenTechSkeletonEditorCommand}" IsEnabled="False"/>
-                <MenuItem Header="Animation Keyframe Editor" Command="{Binding MenuBar.OpenAnimationKeyframeCommand}" />
-                <Separator/>
+            <MenuItem Header="Tools" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True" ItemsSource="{Binding MenuBar.Editors}">
+
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                        <Setter Property="Command" Value="{Binding OpenEditorCommand}" />
+                        <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+
+                <MenuItem.ItemTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type viewModels:EditorTool}" ItemsSource="{Binding Path=MenuItems}">
+                        <TextBlock Text="{Binding DisplayName}"/>
+                    </HierarchicalDataTemplate>
+                </MenuItem.ItemTemplate>
+
+            </MenuItem>
+
+
+            <MenuItem Header="Misc" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
                 <MenuItem Header="Animation File Batch Converter" Command="{Binding MenuBar.OpenAnimationBatchExporterCommand}" />
                 <MenuItem Header="Warhammer II Animpack Updater" Command="{Binding MenuBar.OpenWh2AnimpackUpdaterCommand}" Visibility="Collapsed"  />
-                <Separator/>
-                <MenuItem Header="Audio">
-                    <MenuItem Header="Audio Explorer" Command="{Binding MenuBar.OpenAudioExplorerCommand}"/>
-                    <MenuItem Header="Audio Editor" Command="{Binding MenuBar.OpenAudioEditorCommand}"/>
-                    <MenuItem Header="Audio Compiler" Command="{Binding MenuBar.CompileAudioCommand}"/>
-                </MenuItem>
             </MenuItem>
 
             <MenuItem Header="Reports" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">

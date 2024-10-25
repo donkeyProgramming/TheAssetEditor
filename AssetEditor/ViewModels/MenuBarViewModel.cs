@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Windows.Input;
 using AssetEditor.UiCommands;
 using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationBatchExporter;
@@ -16,44 +15,33 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {
-    public class RecentPackFileItem
-    {
-        public RecentPackFileItem(string path, Action execute)
-        {
-            Command = new RelayCommand(execute);
-            Header = System.IO.Path.GetFileName(path);
-        }
-
-        public string Header { get; set; }
-        public string Path { get; set; }
-
-        public ICommand Command { get; }
-    }
 
     public partial class MenuBarViewModel
     {
         private readonly PackFileService _packfileService;
         private readonly ApplicationSettingsService _settingsService;
+        private readonly IEditorDatabase _editorDatabase;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly TouchedFilesRecorder _touchedFilesRecorder;
 
-
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = [];
+        public ObservableCollection<EditorTool> Editors { get; set; } = [];
 
-        public MenuBarViewModel(PackFileService packfileService, ApplicationSettingsService settingsService, IUiCommandFactory uiCommandFactory, TouchedFilesRecorder touchedFilesRecorder)
+        public MenuBarViewModel(PackFileService packfileService, ApplicationSettingsService settingsService, IEditorDatabase editorDatabase, IUiCommandFactory uiCommandFactory, TouchedFilesRecorder touchedFilesRecorder)
         {
             _packfileService = packfileService;
             _settingsService = settingsService;
+            _editorDatabase = editorDatabase;
             _uiCommandFactory = uiCommandFactory;
             _touchedFilesRecorder = touchedFilesRecorder;
 
             var settings = settingsService.CurrentSettings;
             settings.RecentPackFilePaths.CollectionChanged += (sender, args) => CreateRecentPackFilesItems();
             CreateRecentPackFilesItems();
+            CreateTools();
         }
 
         [RelayCommand] private void OpenSettingsWindow() => _uiCommandFactory.Create<OpenSettingsDialogCommand>().Execute();
@@ -69,11 +57,6 @@ namespace AssetEditor.ViewModels
         }
         [RelayCommand] private void CreateAnimPackWarhammer3() => AnimationPackSampleDataCreator.CreateAnimationDbWarhammer3(_packfileService);
         [RelayCommand] private void CreateAnimPack3k() => AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService);
-        [RelayCommand] private void OpenMountCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.MountTool_Editor);
-        [RelayCommand] private void OpenCampaignAnimCreator() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.CampaginAnimation_Editor);
-        [RelayCommand] private void OpenAnimationTransferTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AnimationTransfer_Editor);
-        [RelayCommand] private void OpenSuperViewTool() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.SuperView_Editor);
-        [RelayCommand] private void OpenTechSkeletonEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.VisualSkeletonEditor);
         [RelayCommand] private void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();
         [RelayCommand] private void OpenWh2AnimpackUpdater()
         {
@@ -82,11 +65,7 @@ namespace AssetEditor.ViewModels
             service.Process(_packfileService.GetEditablePack());
         }
 
-        [RelayCommand] private void OpenAudioExplorer() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AudioExplorer_Editor);
-        [RelayCommand] private void OpenAudioEditor() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.Audio_Editor);
-        [RelayCommand] private void CompileAudio() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AudioCompiler_Editor);
 
-        [RelayCommand] private void OpenAnimationKeyframe() => _uiCommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AnimationKeyFrame_Editor);
         [RelayCommand] private void GenerateRmv2Report() => _uiCommandFactory.Create<GenerateReportCommand>().Rmv2();
         [RelayCommand] private void GenerateMetaDataReport() => _uiCommandFactory.Create<GenerateReportCommand>().MetaData();
         [RelayCommand] private void GenerateFileListReport() => _uiCommandFactory.Create<GenerateReportCommand>().FileList();
@@ -144,6 +123,18 @@ namespace AssetEditor.ViewModels
             {
                 RecentPackFiles.Add(menuItem);
             }
+        }
+
+        void CreateTools()
+        {
+            var infos = _editorDatabase
+                .GetEditorInfos()
+                .OrderBy(x=>x.ToolbarName)
+                .Where(x=>x.AddToolbarButton)
+                .ToList();
+
+            foreach (var item in infos)
+                Editors.Add(new EditorTool(item, _uiCommandFactory));   
         }
     }
 }

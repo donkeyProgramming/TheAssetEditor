@@ -72,7 +72,6 @@ namespace Editors.Audio
                 .Create<AudioEditorViewModel, AudioEditorView>(EditorEnums.Audio_Editor)
                 .AddToToolbar("Audio Editor")
                 .Build(factory);
-
         }
     }
 }
