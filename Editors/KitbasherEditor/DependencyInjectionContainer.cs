@@ -40,7 +40,7 @@ namespace KitbasherEditor
             // View models 
             serviceCollection.AddScoped<KitbasherView>();
             serviceCollection.AddScoped<KitbasherViewModel>();
-            serviceCollection.AddScoped<EditorInterfaces, KitbasherViewModel>();
+            serviceCollection.AddScoped<IEditorInterface, KitbasherViewModel>();
             serviceCollection.AddScoped<SceneExplorerViewModel>();
             serviceCollection.AddTransient<SceneExplorerContextMenuHandler>();
             serviceCollection.AddScoped<AnimationControllerViewModel>();

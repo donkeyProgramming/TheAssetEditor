@@ -16,7 +16,7 @@ using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace Editors.Audio.AudioExplorer
 {
-    public class AudioExplorerViewModel : NotifyPropertyChangedImpl, EditorInterfaces
+    public class AudioExplorerViewModel : NotifyPropertyChangedImpl, IEditorInterface
     {
         public EventSelectionFilter EventFilter { get; set; }
 

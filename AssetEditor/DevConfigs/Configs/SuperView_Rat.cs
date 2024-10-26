@@ -42,7 +42,8 @@ namespace Editors.Shared.DevConfig.Configs
                 AnimationSlot = DefaultAnimationSlotTypeHelper.GetfromValue("ATTACK_5")
             };
 
-            creator.Create(EditorEnums.SuperView_Editor, x => (x as EditorHost<SuperViewViewModel>).Editor.SetDebugInputParameters(debugInput));
+            var editor = creator.Create(EditorEnums.SuperView_Editor) as SuperViewViewModel;
+            editor.Load(debugInput);
         }
     }
 

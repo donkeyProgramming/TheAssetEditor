@@ -24,12 +24,12 @@ namespace AssetEditor.Services
             _toolFactory = toolFactory;
         }
 
-        public void CreateFromFile(PackFile file, EditorEnums? preferedEditor)
+        public IEditorInterface CreateFromFile(PackFile file, EditorEnums? preferedEditor)
         {
             if (file == null)
             {
                 _logger.Here().Error($"Attempting to open file, but file is NULL");
-                return;
+                return null;
             }
 
             var fullFileName = _packFileService.GetFullPath(file);
@@ -37,7 +37,7 @@ namespace AssetEditor.Services
             if (editorViewModel == null)
             {
                 _logger.Here().Information($"No editor selected");
-                return;
+                return null;
             }
 
             // Attempt to load the assigned file, if the editor is a fileEditor.
@@ -54,7 +54,7 @@ namespace AssetEditor.Services
                         {
                             _logger.Here().Information($"Attempting to open file '{file.Name}', but is is already open");
                             _mainViewModel.SelectedEditorIndex = i;
-                            return;
+                            return _mainViewModel.CurrentEditorsList[i];
                         }
                     }
                 }
@@ -65,15 +65,17 @@ namespace AssetEditor.Services
             }
 
             InsertEditorIntoTab(editorViewModel);
+            return editorViewModel;
         }
 
-        public void Create(EditorEnums editor,  Action<EditorInterfaces>? onInitializeCallback = null)
+        public IEditorInterface Create(EditorEnums editor,  Action<IEditorInterface>? onInitializeCallback = null)
         {
             var editorViewModel = _toolFactory.Create(editor);
             if (onInitializeCallback != null)
                 onInitializeCallback(editorViewModel);
             
             InsertEditorIntoTab(editorViewModel);
+            return editorViewModel;
         }
 
         public Window CreateWindow(PackFile packFile, EditorEnums? preferedEditor = null)
@@ -98,7 +100,7 @@ namespace AssetEditor.Services
             return newWindow;
         }
 
-        void InsertEditorIntoTab(EditorInterfaces editorView)
+        void InsertEditorIntoTab(IEditorInterface editorView)
         {
             _mainViewModel.CurrentEditorsList.Add(editorView);
             _mainViewModel.SelectedEditorIndex = _mainViewModel.CurrentEditorsList.Count - 1;

@@ -19,6 +19,31 @@
         Pharaoh
     }
 
+   //public enum PreferedShaderGroup
+   //{ }
+   //
+   //public enum  PreferedRmvVersion
+   //{
+   //    
+   //}
+   //
+   //public enum PreferedWsModelVersion
+   //{ }
+   //
+   //public enum PreferedAnimationBinVersion
+   //{ }
+   //
+    /*
+     
+     RegisterShader(PreferedShaderGroup.Wh3)
+        .Shader("path", shaderEnum)
+        .AddCapability<TCap, TWsModelSerializer, TRmvSerializer>();
+     
+     
+     
+     
+     */
+
     public class GameInformation
     {
         public GameTypeEnum Type { get; set; }

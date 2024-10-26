@@ -30,7 +30,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [ObservableProperty] private string _customVOFactionLeader;
     }
 
-    public partial class AudioEditorViewModel : ObservableObject, EditorInterfaces
+    public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {
         private readonly IAudioRepository _audioRepository;
         private readonly PackFileService _packFileService;

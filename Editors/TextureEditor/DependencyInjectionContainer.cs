@@ -13,7 +13,7 @@ namespace Editors.TextureEditor
             serviceCollection.AddTransient<TexturePreviewView>();
             serviceCollection.AddTransient<TextureEditorViewModel>();
             serviceCollection.AddTransient<TextureBuilder>();  
-            serviceCollection.AddTransient<EditorInterfaces, TextureEditorViewModel>();
+            serviceCollection.AddTransient<IEditorInterface, TextureEditorViewModel>();
         }
 
         public override void RegisterTools(IEditorDatabase factory)

@@ -3,7 +3,7 @@
     public class EditorInfoBuilder
     {
         protected EditorInfo _instance;
-        public static EditorInfoBuilder Create<TViewModel, TView>(EditorEnums editorType) where TViewModel : EditorInterfaces
+        public static EditorInfoBuilder Create<TViewModel, TView>(EditorEnums editorType) where TViewModel : IEditorInterface
         {
             return new EditorInfoBuilder()
             {

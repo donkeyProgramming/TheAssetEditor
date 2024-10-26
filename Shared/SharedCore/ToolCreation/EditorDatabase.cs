@@ -38,10 +38,10 @@ namespace Shared.Core.ToolCreation
     {
         public void Register(EditorInfo editorInfo);
 
-        EditorInterfaces Create(string fullFileName, EditorEnums? preferedEditor = null);
-        EditorInterfaces Create(EditorEnums editorEnum);
+        IEditorInterface Create(string fullFileName, EditorEnums? preferedEditor = null);
+        IEditorInterface Create(EditorEnums editorEnum);
 
-        void DestroyEditor(EditorInterfaces instance);
+        void DestroyEditor(IEditorInterface instance);
         Type GetViewTypeFromViewModel(Type viewModelType);
         List<EditorInfo> GetEditorInfos();
     }
@@ -83,13 +83,13 @@ namespace Shared.Core.ToolCreation
             return instance.View;
         }
 
-        public EditorInterfaces Create(EditorEnums editorEnum) 
+        public IEditorInterface Create(EditorEnums editorEnum) 
         {
             var editor = _editors.First(x => x.EditorEnum == editorEnum);
             return CreateEditorInternal(editor.ViewModel);
         }
 
-        public EditorInterfaces Create(string fullFileName, EditorEnums? preferedEditor)
+        public IEditorInterface Create(string fullFileName, EditorEnums? preferedEditor)
         {
             var allEditors = GetAllPossibleEditors(fullFileName);
 
@@ -122,10 +122,10 @@ namespace Shared.Core.ToolCreation
             return CreateEditorInternal(selectedEditor);
         }
 
-        EditorInterfaces CreateEditorInternal(Type editorType)
+        IEditorInterface CreateEditorInternal(Type editorType)
         {
             var scope = _serviceProvider.CreateScope();
-            var instance = scope.ServiceProvider.GetRequiredService(editorType) as EditorInterfaces;
+            var instance = scope.ServiceProvider.GetRequiredService(editorType) as IEditorInterface;
             if (instance == null)
                 throw new Exception($"Type '{editorType}' is not a IEditorViewModel");
             _scopeRepository.Add(instance, scope);
@@ -195,6 +195,6 @@ namespace Shared.Core.ToolCreation
 
         public List<EditorInfo> GetEditorInfos() => _editors; 
 
-        public void DestroyEditor(EditorInterfaces instance) => _scopeRepository.RemoveScope(instance);
+        public void DestroyEditor(IEditorInterface instance) => _scopeRepository.RemoveScope(instance);
     }
 }

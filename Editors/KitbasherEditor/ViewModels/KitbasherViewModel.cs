@@ -21,7 +21,7 @@ using Shared.Ui.Common;
 namespace KitbasherEditor.ViewModels
 {
     public partial class KitbasherViewModel : ObservableObject, 
-        EditorInterfaces, 
+        IEditorInterface, 
         IFileEditor,
         ISaveableEditor,
         IDropTarget<TreeNode>

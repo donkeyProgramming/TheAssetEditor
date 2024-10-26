@@ -5,7 +5,7 @@ using Shared.Core.ToolCreation;
 
 namespace Editors.TextureEditor.ViewModels
 {
-    public class TextureEditorViewModel : NotifyPropertyChangedImpl, EditorInterfaces, IFileEditor
+    public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorInterface, IFileEditor
     {
         private readonly PackFileService _pfs;
         private readonly TextureBuilder _textureBuilder;

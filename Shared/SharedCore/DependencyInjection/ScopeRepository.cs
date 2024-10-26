@@ -5,9 +5,9 @@ namespace Shared.Core.DependencyInjection
 {
     public class ScopeRepository
     {
-        public Dictionary<EditorInterfaces, IServiceScope> Scopes { get; private set; } = new Dictionary<EditorInterfaces, IServiceScope>();
+        public Dictionary<IEditorInterface, IServiceScope> Scopes { get; private set; } = new Dictionary<IEditorInterface, IServiceScope>();
 
-        public void Add(EditorInterfaces owner, IServiceScope scope)
+        public void Add(IEditorInterface owner, IServiceScope scope)
         {
             if (Scopes.ContainsKey(owner))
                 throw new ArgumentException("Owner already added!");
@@ -15,7 +15,7 @@ namespace Shared.Core.DependencyInjection
             Scopes.Add(owner, scope);
         }
 
-        public void RemoveScope(EditorInterfaces owner)
+        public void RemoveScope(IEditorInterface owner)
         {
             Scopes[owner].Dispose();
             Scopes.Remove(owner);

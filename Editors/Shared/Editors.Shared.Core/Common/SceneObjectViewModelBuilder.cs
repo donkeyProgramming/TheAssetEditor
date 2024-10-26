@@ -12,7 +12,7 @@ namespace Editors.Shared.Core.Common
     {
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly IMetaDataFactory _metaDataFactory;
-        private readonly SceneObjectEditor _assetViewModelBuilder;
+        private readonly SceneObjectEditor _sceneObjectEditor;
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -22,7 +22,7 @@ namespace Editors.Shared.Core.Common
         {
             _animationPlayerViewModel = animationPlayerViewModel;
             _metaDataFactory = metaDataFactory;
-            _assetViewModelBuilder = assetViewModelBuilder;
+            _sceneObjectEditor = assetViewModelBuilder;
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _uiCommandFactory = uiCommandFactory;
@@ -30,8 +30,8 @@ namespace Editors.Shared.Core.Common
 
         public SceneObjectViewModel CreateAsset(bool createByDefault, string header, Color skeletonColour, AnimationToolInput input, bool allowMetaData = false)
         {
-            var mainAsset = _assetViewModelBuilder.CreateAsset(header, skeletonColour);
-            var returnObj = new SceneObjectViewModel(_uiCommandFactory, _metaDataFactory, _pfs, mainAsset, header + ":", _assetViewModelBuilder, _skeletonHelper);
+            var mainAsset = _sceneObjectEditor.CreateAsset(header, skeletonColour);
+            var returnObj = new SceneObjectViewModel(_uiCommandFactory, _metaDataFactory, _pfs, mainAsset, header + ":", _sceneObjectEditor, _skeletonHelper);
             returnObj.AllowMetaData.Value = allowMetaData;
 
             if (createByDefault)
@@ -41,10 +41,10 @@ namespace Editors.Shared.Core.Common
                 if (input != null)
                 {
                     if (input.Mesh != null)
-                        _assetViewModelBuilder.SetMesh(mainAsset, input.Mesh);
+                        _sceneObjectEditor.SetMesh(mainAsset, input.Mesh);
 
                     if (input.Animation != null)
-                        _assetViewModelBuilder.SetAnimation(mainAsset, _skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
+                        _sceneObjectEditor.SetAnimation(mainAsset, _skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
 
                     if (input.FragmentName != null)
                     {

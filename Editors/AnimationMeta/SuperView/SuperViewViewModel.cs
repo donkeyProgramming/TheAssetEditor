@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Editors.AnimationMeta.Presentation;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.BaseControl;
+using Editors.Shared.Core.Common.ReferenceModel;
+using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -9,13 +13,13 @@ using Shared.Core.PackFiles.Models;
 
 namespace Editors.AnimationMeta.SuperView
 {
-    public class SuperViewViewModel : IHostedEditor<SuperViewViewModel>
+    public class SuperViewViewModel : EditorHostBase
     {
-        SceneObject _asset;
-        AnimationToolInput _debugDataToLoad;
+        SceneObjectViewModel _asset;
 
         private readonly SceneObjectEditor _sceneObjectBuilder;
-        private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
+        private readonly CopyPasteManager _copyPasteManager;
+        private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly PackFileService _packFileService;
 
         public NotifyAttr<string> PersistentMetaFilePath { get; set; } = new NotifyAttr<string>("");
@@ -24,39 +28,46 @@ namespace Editors.AnimationMeta.SuperView
         public EditorViewModel PersistentMetaEditor { get; private set; }
         public EditorViewModel MetaEditor { get; private set; }
 
-        public string EditorName { get; } = "Super View";
+        public override Type EditorViewModelType => typeof(EditorView);
 
-        public Type EditorViewModelType => typeof(EditorView);
-
-        public SuperViewViewModel(SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
+        public SuperViewViewModel(
             PackFileService packFileService,
             SceneObjectEditor sceneObjectBuilder,
-            CopyPasteManager copyPasteManager)
+            CopyPasteManager copyPasteManager,
+            SkeletonAnimationLookUpHelper skeletonHelper,
+            IEditorHostParameters editorHostParameters)
+            : base(editorHostParameters)
         {
-            _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
+            DisplayName = "Super view";
+
             _packFileService = packFileService;
             _sceneObjectBuilder = sceneObjectBuilder;
+            _copyPasteManager = copyPasteManager;
+            _skeletonHelper = skeletonHelper;
+        }
 
-            PersistentMetaEditor = new EditorViewModel(_packFileService, copyPasteManager);
+        protected override void Initialize(SceneObjectViewModelBuilder builder, IList<SceneObjectViewModel> sceneNodeList)
+        {
+            PersistentMetaEditor = new EditorViewModel(_packFileService, _copyPasteManager);
             PersistentMetaEditor.EditorSavedEvent += PersistentMetaEditor_EditorSavedEvent;
 
-            MetaEditor = new EditorViewModel(_packFileService, copyPasteManager);
+            MetaEditor = new EditorViewModel(_packFileService, _copyPasteManager);
             MetaEditor.EditorSavedEvent += MetaEditor_EditorSavedEvent;
+
+            var assetViewModel = builder.CreateAsset(true, "Root", Color.Black,null, true);
+            sceneNodeList.Add(assetViewModel);
+
+            _asset = assetViewModel;
+            _asset.Data.MetaDataChanged += UpdateMetaDataInfoFromAsset;
+            UpdateMetaDataInfoFromAsset(_asset.Data);
         }
 
-        public void SetDebugInputParameters(AnimationToolInput debugDataToLoad)
+        public void Load(AnimationToolInput debugDataToLoad)
         {
-            _debugDataToLoad = debugDataToLoad;
-        }
-
-        public void Initialize(EditorHost<SuperViewViewModel> editorOwner)
-        {
-            var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset(true, "Root", Color.Black, _debugDataToLoad, true);
-            editorOwner.SceneObjects.Add(assetViewModel);
-
-            _asset = assetViewModel.Data;
-            _asset.MetaDataChanged += UpdateMetaDataInfoFromAsset;
-            UpdateMetaDataInfoFromAsset(_asset);
+            _sceneObjectBuilder.SetMesh(_asset.Data, debugDataToLoad.Mesh);
+            //_sceneObjectBuilder.SetAnimation(_asset.Data, _skeletonHelper.FindAnimationRefFromPackFile(debugDataToLoad.Animation, _packFileService));
+            _asset.FragAndSlotSelection.FragmentList.SelectedItem = _asset.FragAndSlotSelection.FragmentList.PossibleValues.FirstOrDefault(x => x.FullPath == debugDataToLoad.FragmentName);
+            //_asset.FragAndSlotSelection.FragmentSlotList.SelectedItem = _asset.FragAndSlotSelection.FragmentSlotList.PossibleValues.FirstOrDefault(x => x.SlotName == debugDataToLoad.AnimationSlot.Value);
         }
 
         private void UpdateMetaDataInfoFromAsset(SceneObject asset)
@@ -80,14 +91,14 @@ namespace Editors.AnimationMeta.SuperView
 
         private void MetaEditor_EditorSavedEvent(PackFile newFile)
         {
-            _sceneObjectBuilder.SetMetaFile(_asset, newFile, _asset.PersistMetaData);
+            _sceneObjectBuilder.SetMetaFile(_asset.Data, newFile, _asset.Data.PersistMetaData);
         }
 
         private void PersistentMetaEditor_EditorSavedEvent(PackFile newFile)
         {
-            _sceneObjectBuilder.SetMetaFile(_asset, _asset.MetaData, newFile);
+            _sceneObjectBuilder.SetMetaFile(_asset.Data, _asset.Data.MetaData, newFile);
         }
 
-        public void RefreshAction() => _asset.TriggerMeshChanged();
+        public void RefreshAction() => _asset.Data.TriggerMeshChanged();
     }
 }

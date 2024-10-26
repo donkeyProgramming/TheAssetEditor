@@ -19,7 +19,7 @@ using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.AnimationPack
 {
-    public class AnimPackViewModel : NotifyPropertyChangedImpl, EditorInterfaces, ISaveableEditor, IFileEditor
+    public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorInterface, ISaveableEditor, IFileEditor
     {
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;

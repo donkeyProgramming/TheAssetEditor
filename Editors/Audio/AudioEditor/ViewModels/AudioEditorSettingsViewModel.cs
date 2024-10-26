@@ -26,7 +26,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         }
     }
 
-    public partial class AudioEditorSettingsViewModel : ObservableObject, EditorInterfaces
+    public partial class AudioEditorSettingsViewModel : ObservableObject, IEditorInterface
     {
         private readonly IAudioRepository _audioRepository;
         private readonly PackFileService _packFileService;

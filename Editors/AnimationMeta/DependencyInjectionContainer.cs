@@ -30,7 +30,7 @@ namespace Editors.AnimationMeta
         public override void RegisterTools(IEditorDatabase factory)
         {
             EditorInfoBuilder
-                .Create<EditorHost<SuperViewViewModel>, EditorHostView>(EditorEnums.SuperView_Editor)
+                .Create<SuperViewViewModel, EditorHostView>(EditorEnums.SuperView_Editor)
                 .AddToToolbar("SuperView")
                 .Build(factory);
 

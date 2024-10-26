@@ -20,7 +20,7 @@ namespace Editors.Shared.Core.Common.BaseControl
     }
 
     // This is depricated - use EditorHostBase!
-    public class EditorHost<TEditor> : NotifyPropertyChangedImpl, EditorInterfaces
+    public class EditorHost<TEditor> : NotifyPropertyChangedImpl, IEditorInterface
     {
         public IEditorDatabase ToolsFactory { get; set; }
         public string DisplayName { get; set; } ="Name missing";
