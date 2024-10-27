@@ -1,5 +1,6 @@
 ﻿using AnimationEditor.Common.BaseControl;
 using Editors.AnimationMeta.Presentation;
+using Editors.AnimationMeta.Presentation.Commands;
 using Editors.AnimationMeta.Presentation.View;
 using Editors.AnimationMeta.SuperView;
 using Editors.AnimationMeta.Visualisation;
@@ -19,12 +20,19 @@ namespace Editors.AnimationMeta
             MetaDataTagDeSerializer.EnsureMappingTableCreated();
 
             serviceCollection.AddTransient<MainEditorView>();
-            serviceCollection.AddTransient<EditorViewModel>();
+            serviceCollection.AddTransient<MetaDataEditorViewModel>();
 
             serviceCollection.AddScoped<EditorHost<SuperViewViewModel>>();
             serviceCollection.AddScoped<SuperViewViewModel>();
 
             serviceCollection.AddScoped<IMetaDataFactory, MetaDataFactory>(); // Needs heavy refactorying!
+
+            // Commands for metadata editor
+            serviceCollection.AddTransient<CopyPastCommand>();
+            serviceCollection.AddTransient<DeleteEntryCommand>();
+            serviceCollection.AddTransient<MoveEntryCommand>();
+            serviceCollection.AddTransient<NewEntryCommand>();
+            serviceCollection.AddTransient<SaveCommand>();
         }
 
         public override void RegisterTools(IEditorDatabase factory)
@@ -35,7 +43,7 @@ namespace Editors.AnimationMeta
                 .Build(factory);
 
             EditorInfoBuilder
-                .Create<EditorViewModel, MainEditorView> (EditorEnums.Meta_Editor)
+                .Create<MetaDataEditorViewModel, MainEditorView> (EditorEnums.Meta_Editor)
                 .AddExtention(".anm.meta", EditorPriorites.High)
                 .AddExtention(".meta", EditorPriorites.High)
                 .AddExtention(".snd.meta", EditorPriorites.High)

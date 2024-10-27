@@ -25,8 +25,8 @@ namespace Editors.AnimationMeta.SuperView
         public NotifyAttr<string> PersistentMetaFilePath { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> MetaFilePath { get; set; } = new NotifyAttr<string>("");
 
-        public EditorViewModel PersistentMetaEditor { get; private set; }
-        public EditorViewModel MetaEditor { get; private set; }
+        public MetaDataEditorViewModel PersistentMetaEditor { get; private set; }
+        public MetaDataEditorViewModel MetaEditor { get; private set; }
 
         public override Type EditorViewModelType => typeof(EditorView);
 
@@ -48,18 +48,18 @@ namespace Editors.AnimationMeta.SuperView
 
         protected override void Initialize(SceneObjectViewModelBuilder builder, IList<SceneObjectViewModel> sceneNodeList)
         {
-            PersistentMetaEditor = new EditorViewModel(_packFileService, _copyPasteManager);
-            PersistentMetaEditor.EditorSavedEvent += PersistentMetaEditor_EditorSavedEvent;
-
-            MetaEditor = new EditorViewModel(_packFileService, _copyPasteManager);
-            MetaEditor.EditorSavedEvent += MetaEditor_EditorSavedEvent;
-
-            var assetViewModel = builder.CreateAsset(true, "Root", Color.Black,null, true);
-            sceneNodeList.Add(assetViewModel);
-
-            _asset = assetViewModel;
-            _asset.Data.MetaDataChanged += UpdateMetaDataInfoFromAsset;
-            UpdateMetaDataInfoFromAsset(_asset.Data);
+            //PersistentMetaEditor = new EditorViewModel(_packFileService, _copyPasteManager);
+            //PersistentMetaEditor.EditorSavedEvent += PersistentMetaEditor_EditorSavedEvent;
+            //
+            //MetaEditor = new EditorViewModel(_packFileService, _copyPasteManager);
+            //MetaEditor.EditorSavedEvent += MetaEditor_EditorSavedEvent;
+            //
+            //var assetViewModel = builder.CreateAsset(true, "Root", Color.Black,null, true);
+            //sceneNodeList.Add(assetViewModel);
+            //
+            //_asset = assetViewModel;
+            //_asset.Data.MetaDataChanged += UpdateMetaDataInfoFromAsset;
+            //UpdateMetaDataInfoFromAsset(_asset.Data);
         }
 
         public void Load(AnimationToolInput debugDataToLoad)

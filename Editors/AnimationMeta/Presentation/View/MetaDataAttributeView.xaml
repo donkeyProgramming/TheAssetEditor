@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Editors.AnimationMeta.Presentation.View.EditorValueEditor"
+﻿<UserControl x:Class="Editors.AnimationMeta.Presentation.View.MetaDataAttributeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -40,7 +40,7 @@
                 </ListView.ItemContainerStyle>
 
                 <ListView.Resources>
-                    <DataTemplate DataType="{ x:Type tags:EditableTagItem}">
+                    <DataTemplate DataType="{ x:Type tags:MetaDataAttribute}">
                         <ContentControl>
                             <ContentControl.ToolTip>
                                 <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">
@@ -57,7 +57,7 @@
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate DataType="{ x:Type tags:Vector3EditableTagItem}">
+                    <DataTemplate DataType="{ x:Type tags:VectorMetaDataAttribute}">
                         <ContentControl>
                             <ContentControl.ToolTip>
                                 <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">
@@ -75,7 +75,7 @@
                         </ContentControl>
                     </DataTemplate>
 
-                    <DataTemplate DataType="{ x:Type tags:OrientationEditableTagItem}">
+                    <DataTemplate DataType="{ x:Type tags:OrientationMetaDataAttribute}">
                         <ContentControl>
                             <ContentControl.ToolTip>
                                 <Viewbox StretchDirection="DownOnly" Stretch="Fill" HorizontalAlignment="Left">

@@ -53,5 +53,10 @@
       "commandName": "Project",
       "commandLineArgs": "-devcfg SkeletonTool",
       "nativeDebugging": false
+    },
+    "AE-AnimMeta": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg AnimMetaTool",
+      "nativeDebugging": false
     }
   }

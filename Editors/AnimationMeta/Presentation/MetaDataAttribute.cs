@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
@@ -7,31 +8,26 @@ using Shared.Ui.BaseDialogs.MathViews;
 
 namespace Editors.AnimationMeta.Presentation
 {
-    public class EditableTagItem : NotifyPropertyChangedImpl
+    public partial class MetaDataAttribute : ObservableObject
     {
-        ILogger _logger = Logging.Create<EditableTagItem>();
+        private readonly ILogger _logger = Logging.Create<MetaDataAttribute>();
+        private readonly IByteParser _parser;
 
-        IByteParser _parser { get; set; }
+        [ObservableProperty] string _valueAsString;
+        [ObservableProperty] string _fieldName;
+        [ObservableProperty] string _description;
+        [ObservableProperty] string _valueType;
+        [ObservableProperty] bool _isReadOnly = true;
+        [ObservableProperty] bool _isValid = true;
 
-        public EditableTagItem(IByteParser parser, object value)
+        public MetaDataAttribute(IByteParser parser, object value)
         {
             _parser = parser;
             _valueAsString = value.ToString();
             Validate();
         }
 
-        protected EditableTagItem() { }
-
-        string _valueAsString;
-        public string ValueAsString { get => _valueAsString; set { SetAndNotify(ref _valueAsString, value); Validate(); } }
-
-        public string FieldName { get; set; }
-        public string Description { get; set; }
-        public string ValueType { get; set; }
-        public bool IsReadOnly { get; set; } = true;
-
-        bool _isValueValid;
-        public bool IsValid { get => _isValueValid; set { SetAndNotify(ref _isValueValid, value); } }
+        partial void OnValueAsStringChanged(string value) => Validate();
 
         void Validate()
         {
@@ -47,36 +43,35 @@ namespace Editors.AnimationMeta.Presentation
         }
     }
 
-
-    public class OrientationEditableTagItem : EditableTagItem
+    public partial class OrientationMetaDataAttribute : MetaDataAttribute
     {
-        ILogger _logger = Logging.Create<OrientationEditableTagItem>();
-        public Vector3ViewModel Value { get; set; } = new Vector3ViewModel(0, 0, 0);
+        private readonly ILogger _logger = Logging.Create<OrientationMetaDataAttribute>();
+        private readonly Vector4Parser _typedParser;
 
-        Vector4Parser _parser;
+        [ObservableProperty] Vector3ViewModel _value = new Vector3ViewModel(0, 0, 0);
 
-        public OrientationEditableTagItem(Vector4Parser parser, Vector4 value)
+        public OrientationMetaDataAttribute(Vector4Parser parser, Vector4 value) 
+            : base(parser, value)
         {
-            _parser = parser;
+            _typedParser = parser;
 
             var q = new Quaternion(value);
             var eulerRotation = MathUtil.QuaternionToEulerDegree(q);
 
             Value.Set(eulerRotation);
             IsValid = true;
-
         }
 
         public override byte[] GetByteValue()
         {
-            _logger.Here().Information($"GetByteValue Orientation=>{FieldName} {_parser} {ValueAsString} {Value}");
+            _logger.Here().Information($"GetByteValue Orientation=>{FieldName} {_typedParser} {ValueAsString} {Value}");
 
             var vector3 = Value.GetAsVector3();
             var value = MathUtil.EulerDegreesToQuaternion(vector3);
             value.Normalize();
             _logger.Here().Information($"GetByteValue Orientation=>Vector computed");
 
-            var bytes = _parser.EncodeValue(value.ToVector4(), out var err);
+            var bytes = _typedParser.EncodeValue(value.ToVector4(), out var err);
 
             _logger.Here().Information($"GetByteValue Complete=>{bytes?.Length} {err}");
 
@@ -84,14 +79,14 @@ namespace Editors.AnimationMeta.Presentation
         }
     }
 
-    public class Vector3EditableTagItem : EditableTagItem
+    public partial class VectorMetaDataAttribute : MetaDataAttribute
     {
-        ILogger _logger = Logging.Create<OrientationEditableTagItem>();
-        public Vector3ViewModel Value { get; set; } = new Vector3ViewModel(0, 0, 0);
+        private readonly ILogger _logger = Logging.Create<VectorMetaDataAttribute>();
+        private readonly Vector3Parser _parser;
 
-        Vector3Parser _parser;
+        [ObservableProperty] Vector3ViewModel _value = new Vector3ViewModel(0, 0, 0);
 
-        public Vector3EditableTagItem(Vector3Parser parser, Vector3 value)
+        public VectorMetaDataAttribute(Vector3Parser parser, Vector3 value) : base(parser, value)
         {
             _parser = parser;
             Value.Set(value);

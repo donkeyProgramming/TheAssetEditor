@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Editors.AnimationMeta.Presentation.View.MetaEntriesListView"
+﻿<UserControl x:Class="Editors.AnimationMeta.Presentation.View.MetaDataEntryView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,7 +7,12 @@
              xmlns:s="http://schemas.singulink.com/xaml"
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
-        <TextBlock Grid.Row="0" FontSize="20" DockPanel.Dock="Top" Text="Meta Data Tags:"/>
+        <DockPanel DockPanel.Dock="Top" LastChildFill="False" >
+            <TextBlock Grid.Row="0" FontSize="20" DockPanel.Dock="Left" Text="Meta Data (v"/>
+            <TextBlock Grid.Row="0" FontSize="20" DockPanel.Dock="Left" Text="{Binding MetaDataFileVersion, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Grid.Row="0" FontSize="20" DockPanel.Dock="Left" Text=") Entries:"/>
+        </DockPanel>
+   
 
         <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
@@ -19,37 +24,34 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <Button Grid.Row="1" Grid.Column="0" Content="Up"  Margin="5,5,5,0"  Click="{s:MethodBinding MoveUpAction}"/>
-            <Button Grid.Row="1" Grid.Column="1" Content="Down"  Margin="5,5,5,0"  Click="{s:MethodBinding MoveDownAction}"/>
+            <Button Grid.Row="0" Grid.Column="0" Content="New"  Margin="5,5,5,0"  Command="{Binding NewActionCommand}"/>
+            <Button Grid.Row="0" Grid.Column="1" Content="Delete"  Margin="5,5,5,0"  Command="{Binding DeleteActionCommand}"/>
 
-            <Button Grid.Row="2" Grid.Column="0" Content="Copy"  Margin="5,5,5,0" Click="{s:MethodBinding CopyAction}"/>
-            <Button Grid.Row="2" Grid.Column="1" Content="Paste"  Margin="5,5,5,0" Click="{s:MethodBinding PasteAction}"/>
+            <Button Grid.Row="1" Grid.Column="0" Content="Up"  Margin="5,5,5,0"  Command="{Binding MoveUpActionCommand}"/>
+            <Button Grid.Row="1" Grid.Column="1" Content="Down"  Margin="5,5,5,0"  Command="{Binding MoveDownActionCommand}"/>
 
-            <Button Grid.Row="3" Grid.Column="0" Content="Mark to copy multiple"  Margin="5,5,5,0" Click="{s:MethodBinding PickCopyMultiple}"/>
-            <Button Grid.Row="3" Grid.Column="1" Content="Clear all copy muliple"  Margin="5,5,5,0" Click="{s:MethodBinding ClearCopyMultiple}"/>
+            <Button Grid.Row="2" Grid.Column="0" Content="Copy"  Margin="5,5,5,0" Command="{Binding CopyActionCommand}"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="Paste"  Margin="5,5,5,0" Command="{Binding PasteActionCommand}"/>
 
-            <Button Grid.Row="0" Grid.Column="0" Content="New"  Margin="5,5,5,0"  Click="{s:MethodBinding NewAction}"/>
-            <Button Grid.Row="0" Grid.Column="1" Content="Delete"  Margin="5,5,5,0"  Click="{s:MethodBinding DeleteAction}"/>
-            
-            <Button Grid.Row="4" Grid.ColumnSpan="2" Content="Save"  Margin="5,5,5,0"  Click="{s:MethodBinding SaveAction}"/>
+            <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Save"  Margin="5,5,5,0"  Command="{Binding SaveActionCommand}"/>
         </Grid>
 
         <ListView DockPanel.Dock="Bottom"
             Grid.Row="1" 
-            DisplayMemberPath="DisplayName.Value" 
+            DisplayMemberPath="DisplayName" 
             ItemsSource="{Binding Tags, UpdateSourceTrigger=PropertyChanged}" 
             SelectedItem="{Binding SelectedTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
 
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsDecodedCorrectly.Value}" Value="true">
+                        <DataTrigger Binding="{Binding IsDecodedCorrectly}" Value="true">
                             <Setter Property="Foreground" Value="Black" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding IsDecodedCorrectly.Value}" Value="false">
+                        <DataTrigger Binding="{Binding IsDecodedCorrectly}" Value="false">
                             <Setter Property="Foreground" Value="Red" />
                         </DataTrigger>
                     </Style.Triggers>

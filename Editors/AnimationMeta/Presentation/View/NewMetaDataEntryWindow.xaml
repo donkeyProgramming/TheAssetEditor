@@ -1,11 +1,11 @@
-﻿<Window x:Class="Editors.AnimationMeta.Presentation.View.NewTagWindow"
+﻿<Window x:Class="Editors.AnimationMeta.Presentation.View.NewMetaDataEntryWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="Create New Tag" Height="450" Width="400">
+        Title="Create MetaData entry" Height="450" Width="400">
     <Grid>
         <ListView
             ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged}"

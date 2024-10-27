@@ -5,9 +5,9 @@ using Shared.Core.Misc;
 
 namespace Editors.AnimationMeta.Presentation.View
 {
-    public partial class NewTagWindow : Window
+    public partial class NewMetaDataEntryWindow : Window
     {
-        public NewTagWindow()
+        public NewMetaDataEntryWindow()
         {
             InitializeComponent();
         }

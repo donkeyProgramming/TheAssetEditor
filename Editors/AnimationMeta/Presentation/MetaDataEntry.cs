@@ -3,42 +3,44 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
-using Shared.Core.Misc;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.Presentation
 {
 
-    public abstract class MetaTagViewBase : NotifyPropertyChangedImpl
+    public abstract partial class IMetaDataEntry : ObservableObject
     {
-        public ObservableCollection<EditableTagItem> Variables { get; set; } = new ObservableCollection<EditableTagItem>();
+        [ObservableProperty] ObservableCollection<MetaDataAttribute> _variables  = [];
 
-        public NotifyAttr<string> DisplayName { get; set; } = new NotifyAttr<string>("");
-        public NotifyAttr<string> Description { get; set; } = new NotifyAttr<string>("");
-        public NotifyAttr<bool> IsDecodedCorrectly { get; set; } = new NotifyAttr<bool>(false);
-        public NotifyAttr<int> Version { get; set; } = new NotifyAttr<int>();
+        [ObservableProperty] string _displayName = "";
+        [ObservableProperty] string _description = "";
+        [ObservableProperty] bool _isDecodedCorrectly = false;
+        [ObservableProperty] int _version;
+        [ObservableProperty] bool _isSelected;
 
-        public abstract MetaDataTagItem GetAsData();
+        public abstract MetaDataTagItem GetAsFileFormatData();
         public abstract string HasError();
     }
 
-    public class UnkMetaDataTagItemViewModel : MetaTagViewBase
+    public class UnkMetaDataEntry : IMetaDataEntry
     {
-        UnknownMetaEntry _input;
+        private readonly UnknownMetaEntry _input;
 
-        public UnkMetaDataTagItemViewModel(UnknownMetaEntry unknownMeta)
+        public UnkMetaDataEntry(UnknownMetaEntry unknownMeta)
         {
-            IsDecodedCorrectly.Value = false;
-            DisplayName.Value = unknownMeta.DisplayName;
-            Version.Value = unknownMeta.Version;
             _input = unknownMeta;
+
+            IsDecodedCorrectly = false;
+            DisplayName = unknownMeta.DisplayName;
+            Version = unknownMeta.Version;
         }
 
-        public override MetaDataTagItem GetAsData()
+        public override MetaDataTagItem GetAsFileFormatData()
         {
             var newItem = new MetaDataTagItem()
             {
@@ -52,17 +54,17 @@ namespace Editors.AnimationMeta.Presentation
     }
 
 
-    public class MetaDataTagItemViewModel : MetaTagViewBase
+    public class MetaDataEntry : IMetaDataEntry
     {
-        ILogger _logger = Logging.Create<MetaDataTagItemViewModel>();
-        string _originalName;
+        private readonly ILogger _logger = Logging.Create<MetaDataEntry>();
+        private readonly string _originalName;
 
-        public MetaDataTagItemViewModel(BaseMetaEntry typedMetaItem)
+        public MetaDataEntry(BaseMetaEntry typedMetaItem)
         {
-            DisplayName.Value = typedMetaItem.DisplayName;
             _originalName = typedMetaItem.Name;
-            Description.Value = MetaDataTagDeSerializer.GetDescriptionSafe(_originalName);
-            Version.Value = typedMetaItem.Version;
+            DisplayName = typedMetaItem.DisplayName;
+            Description = MetaDataTagDeSerializer.GetDescriptionSafe(_originalName);
+            Version = typedMetaItem.Version;
 
             var orderedPropertiesList = typedMetaItem.GetType().GetProperties()
                         .Where(x => x.CanWrite)
@@ -78,19 +80,19 @@ namespace Editors.AnimationMeta.Presentation
                 if (string.IsNullOrWhiteSpace(attributeInfo.Description) == false)
                     itemDiscription = attributeInfo.Description + "\n" + itemDiscription;
 
-                EditableTagItem editableItem = null;
+                MetaDataAttribute editableItem = null;
                 if (attributeInfo.DisplayOverride == MetaDataTagAttribute.DisplayType.EulerVector || value is Vector3)
                 {
                     if (value is Vector3 vector3)
-                        editableItem = new Vector3EditableTagItem(parser as Vector3Parser, vector3);
+                        editableItem = new VectorMetaDataAttribute(parser as Vector3Parser, vector3);
                     else if (value is Vector4 quaternion)
-                        editableItem = new OrientationEditableTagItem(parser as Vector4Parser, quaternion);
+                        editableItem = new OrientationMetaDataAttribute(parser as Vector4Parser, quaternion);
                     else
                         throw new Exception("Unknown item");
                 }
                 else
                 {
-                    editableItem = new EditableTagItem(parser, value.ToString());
+                    editableItem = new MetaDataAttribute(parser, value.ToString());
                 }
 
                 editableItem.Description = itemDiscription;
@@ -99,9 +101,9 @@ namespace Editors.AnimationMeta.Presentation
                 Variables.Add(editableItem);
             }
 
-            IsDecodedCorrectly.Value = true;
+            IsDecodedCorrectly = true;
 
-            if (Variables.Count() != 0)
+            if (Variables.Count != 0)
                 Variables.First().IsReadOnly = true;
         }
 
@@ -110,15 +112,15 @@ namespace Editors.AnimationMeta.Presentation
             foreach (var variable in Variables)
             {
                 if (!variable.IsValid)
-                    return $"Variable '{variable.FieldName}' in {DisplayName.Value} has an error";
+                    return $"Variable '{variable.FieldName}' in {DisplayName} has an error";
             }
 
             return null;
         }
 
-        public override MetaDataTagItem GetAsData()
+        public override MetaDataTagItem GetAsFileFormatData()
         {
-            _logger.Here().Information("Start " + DisplayName.Value);
+            _logger.Here().Information("Start " + DisplayName);
             var newItem = new MetaDataTagItem()
             {
                 Name = _originalName,
@@ -153,7 +155,7 @@ namespace Editors.AnimationMeta.Presentation
             return newItem;
         }
 
-        string FormatFieldName(string name)
+        static string FormatFieldName(string name)
         {
             var newName = "";
             for (var i = 0; i < name.Length; i++)

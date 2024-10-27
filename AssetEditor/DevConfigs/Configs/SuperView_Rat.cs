@@ -1,4 +1,5 @@
-﻿using Editors.AnimationMeta.SuperView;
+﻿using AssetEditor.Services;
+using Editors.AnimationMeta.SuperView;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.DevConfig.Base;
 using Shared.Core.PackFiles;
@@ -9,6 +10,9 @@ using Shared.GameFormats.AnimationPack;
 
 namespace Editors.Shared.DevConfig.Configs
 {
+
+
+
     internal class SuperView_Rat : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;

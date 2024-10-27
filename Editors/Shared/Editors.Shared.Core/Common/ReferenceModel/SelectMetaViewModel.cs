@@ -1,8 +1,7 @@
-﻿using Shared.Core.Misc;
+﻿using System.Collections.ObjectModel;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using System.Collections.ObjectModel;
-using System.Linq;
 using static CommonControls.FilterDialog.FilterUserControl;
 
 namespace Editors.Shared.Core.Common.ReferenceModel

@@ -2,7 +2,7 @@
 {
     public interface ICopyPastItem
     {
-        string Description { get; set; }
+        string Description { get; }
     }
 
     public class CopyPasteManager

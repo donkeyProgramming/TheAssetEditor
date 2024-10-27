@@ -41,10 +41,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="DevConfigs\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Resource Include="AssetEditorIcon.png" />
     </ItemGroup>
 

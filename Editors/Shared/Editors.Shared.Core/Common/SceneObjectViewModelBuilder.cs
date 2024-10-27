@@ -17,8 +17,13 @@ namespace Editors.Shared.Core.Common
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
 
-        public SceneObjectViewModelBuilder(AnimationPlayerViewModel animationPlayerViewModel, IMetaDataFactory metaDataFactory, SceneObjectEditor assetViewModelBuilder,
-            PackFileService pfs, SkeletonAnimationLookUpHelper skeletonHelper, IUiCommandFactory uiCommandFactory)
+        public SceneObjectViewModelBuilder(
+            AnimationPlayerViewModel animationPlayerViewModel, 
+            IMetaDataFactory metaDataFactory,
+            SceneObjectEditor assetViewModelBuilder,
+            PackFileService pfs, 
+            SkeletonAnimationLookUpHelper skeletonHelper, 
+            IUiCommandFactory uiCommandFactory)
         {
             _animationPlayerViewModel = animationPlayerViewModel;
             _metaDataFactory = metaDataFactory;

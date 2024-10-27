@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Windows;
-using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using Shared.Core.Events;
