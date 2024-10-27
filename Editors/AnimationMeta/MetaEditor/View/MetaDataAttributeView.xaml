@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:tags="clr-namespace:Editors.AnimationMeta.Presentation"
              xmlns:System="clr-namespace:System;assembly=mscorlib" 
-             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui" xmlns:materialIcons="clr-namespace:Material.Icons.WPF;assembly=Material.Icons.WPF"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -21,7 +21,7 @@
 
             <StackPanel Grid.Row="0">
                 <TextBlock FontSize="12" FontWeight="Bold" Text="Decription:" />
-                <TextBlock TextWrapping="Wrap" Text="{Binding SelectedTag.Description.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock TextWrapping="Wrap" Text="{Binding SelectedTag.Description, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
 
             <ListView Grid.Row="1" ItemsSource="{Binding SelectedTag.Variables, UpdateSourceTrigger=PropertyChanged}">
@@ -49,10 +49,14 @@
                             </ContentControl.ToolTip>
 
                             <DockPanel >
+                                <ContentControl Content="{materialIcons:MaterialIconExt Kind=Exclamation}" 
+                                                DockPanel.Dock="Left" Margin="-5" Foreground="Red" 
+                                                Visibility="{Binding IsValid, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolToHiddenConverter}}"/>
                                 <Border BorderThickness="0.5" Margin="3" BorderBrush="DarkGray" DockPanel.Dock="Bottom"/>
                                 <Label  FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}" Width ="{StaticResource labelWidth}" />
                                 <Label FontWeight="bold"  Content=":"/>
-                                <TextBox Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}" VerticalContentAlignment="Center" IsReadOnly="{Binding IsReadOnly}"/>
+                                <TextBox Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  VerticalContentAlignment="Center" IsReadOnly="{Binding IsReadOnly}"/>
+                        
                             </DockPanel>
                         </ContentControl>
                     </DataTemplate>
@@ -66,11 +70,13 @@
                             </ContentControl.ToolTip>
 
                             <DockPanel >
+                                <ContentControl Content="{materialIcons:MaterialIconExt Kind=Exclamation}" 
+                                         DockPanel.Dock="Left" Margin="-5" Foreground="Red" 
+                                         Visibility="{Binding IsValid, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolToHiddenConverter}}"/>
                                 <Border BorderThickness="0.5" Margin="3" BorderBrush="DarkGray" DockPanel.Dock="Bottom"/>
                                 <Label  FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}" Width ="{StaticResource labelWidth}" />
                                 <Label FontWeight="bold"  Content=":"/>
-                                <mathviews:Vector3View VerticalContentAlignment="Center" Vector3="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToColour_white_red}}" MinWidth="300" MaxWidth="300" HorizontalAlignment="Left"/>
-                                <CheckBox VerticalContentAlignment="Center" ToolTip="Show in worldspace" IsChecked="{Binding ShowAsWorldSpace, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CanShowAsWorldSpace, UpdateSourceTrigger=PropertyChanged}"/>
+                                <mathviews:Vector3View VerticalContentAlignment="Center" Vector3="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MinWidth="300" MaxWidth="300" HorizontalAlignment="Left"/>
                             </DockPanel>
                         </ContentControl>
                     </DataTemplate>
@@ -84,11 +90,13 @@
                             </ContentControl.ToolTip>
 
                             <DockPanel >
+                                <ContentControl Content="{materialIcons:MaterialIconExt Kind=Exclamation}" 
+                                     DockPanel.Dock="Left" Margin="-5" Foreground="Red" 
+                                     Visibility="{Binding IsValid, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvBoolToHiddenConverter}}"/>
                                 <Border BorderThickness="0.5" Margin="3" BorderBrush="DarkGray" DockPanel.Dock="Bottom"/>
                                 <Label  FontWeight="bold"  Content="{Binding FieldName, UpdateSourceTrigger=PropertyChanged}" Width ="{StaticResource labelWidth}" />
                                 <Label FontWeight="bold"  Content=":"/>
-                                <mathviews:Vector3View VerticalContentAlignment="Center" Vector3="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Background="{Binding IsValid, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToColour_white_red}}" MinWidth="300" MaxWidth="300" HorizontalAlignment="Left"/>
-                                <CheckBox VerticalContentAlignment="Center" ToolTip="Show in worldspace" IsChecked="{Binding ShowAsWorldSpace, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding CanShowAsWorldSpace, UpdateSourceTrigger=PropertyChanged}"/>
+                                <mathviews:Vector3View VerticalContentAlignment="Center" Vector3="{Binding Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MinWidth="300" MaxWidth="300" HorizontalAlignment="Left"/>
                             </DockPanel>
                         </ContentControl>
                     </DataTemplate>

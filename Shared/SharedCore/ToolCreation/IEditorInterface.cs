@@ -28,6 +28,4 @@ namespace Shared.Core.ToolCreation
         IEditorInterface Create(EditorEnums editor, Action<IEditorInterface>? onInitializeCallback = null);
         Window CreateWindow(PackFile packFile, EditorEnums? preferedEditor = null);
     }
-
-    public delegate void EditorSavedDelegate(PackFile newFile);
 }

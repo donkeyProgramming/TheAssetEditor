@@ -12,7 +12,6 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.Presentation
 {
-
     public abstract partial class IMetaDataEntry : ObservableObject
     {
         [ObservableProperty] ObservableCollection<MetaDataAttribute> _variables  = [];
@@ -52,7 +51,6 @@ namespace Editors.AnimationMeta.Presentation
 
         public override string HasError() => "";
     }
-
 
     public class MetaDataEntry : IMetaDataEntry
     {

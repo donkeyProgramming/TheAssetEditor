@@ -50,7 +50,7 @@
             <editorviews:AnimationPlayerView DataContext="{Binding Animation}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
 
             <Grid Grid.Row="0" Grid.Column="1" 
-                  Visibility="{Binding MenuBar.TransformTool.IsVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
+                  Visibility="{Binding MenuBar.TransformTool.IsVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToCollapsedConverter}}">
                 <DockPanel HorizontalAlignment="Right" VerticalAlignment="Top" >
                     <Rectangle Fill="{DynamicResource ToolBarTrayBackground}" DockPanel.Dock="Left" Width="2"/>
                     <Rectangle Fill="{DynamicResource ToolBarTrayBackground}" DockPanel.Dock="Bottom" Height="2"/>
@@ -65,7 +65,7 @@
                                     IsEnabled="{Binding MenuBar.TransformTool.ButtonEnabled, UpdateSourceTrigger=PropertyChanged}"/> 
                         </StackPanel>
 
-                        <DockPanel Margin="2" Visibility="{Binding MenuBar.TransformTool.ShowVertexFalloff.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenConverter}}">
+                        <DockPanel Margin="2" Visibility="{Binding MenuBar.TransformTool.ShowVertexFalloff.Value, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToCollapsedConverter}}">
                             <TextBlock Text="Vertex Fall-of:" DockPanel.Dock="Left" Margin="0,0,4,0"/>
                             <TextBox  DockPanel.Dock="Right"
                                          Text="{Binding MenuBar.TransformTool.VertexMovementFalloff.Value.TextValue, 

@@ -267,7 +267,7 @@
             </TreeView>
         </Grid>
 
-        <Grid Grid.Row="1" Grid.ColumnSpan="3"  Visibility="{Binding ShowTransformSection.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
+        <Grid Grid.Row="1" Grid.ColumnSpan="3"  Visibility="{Binding ShowTransformSection.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="6"/>
                 <RowDefinition/>
@@ -334,7 +334,7 @@
         </Grid>
 
         <DockPanel Grid.Row="2" Grid.ColumnSpan="3" DockPanel.Dock="Right" LastChildFill="False">
-            <Button x:Name="ApplyButtonHandle" DockPanel.Dock="Right" Width="50" Click="{s:MethodBinding OnApplyButton}" Visibility="{Binding ShowApplyButton.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">Apply</Button>
+            <Button x:Name="ApplyButtonHandle" DockPanel.Dock="Right" Width="50" Click="{s:MethodBinding OnApplyButton}" Visibility="{Binding ShowApplyButton.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}">Apply</Button>
             <Button DockPanel.Dock="Right" Width="50" Margin="5,0,5,0" Click="{s:MethodBinding OnOkButton}">Ok</Button>
             <Button DockPanel.Dock="Right" Width="50" Click="{s:MethodBinding OnCancelButton}">Cancel</Button>
         </DockPanel>

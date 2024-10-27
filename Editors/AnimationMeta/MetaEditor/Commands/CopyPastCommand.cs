@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using Shared.Core.Events;
@@ -7,11 +8,10 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.Presentation.Commands
 {
-
     public class MetaDataTagCopyItem : ICopyPastItem
     {
         public string Description => "Copy object for MetaDataTag";
-        public List<UnknownMetaEntry> Data { get; set; } = [];
+        public List<UnknownMetaEntry> Items { get; set; } = [];
     }
 
     class CopyPastCommand : IUiCommand
@@ -25,19 +25,11 @@ namespace Editors.AnimationMeta.Presentation.Commands
 
         public void ExecuteCopy(MetaDataEditorViewModel controller)
         {
-            if (controller.SelectedTag == null)
-                return;
-
             var selectedTags = controller.Tags
                 .Where(x => x.IsSelected)
                 .ToList();
 
-            selectedTags.Add(controller.SelectedTag);
-            selectedTags = selectedTags.Distinct().ToList();
-
             // Check for errors
-
-            // Create copy item
             foreach (var tag in selectedTags)
             {
                 if (string.IsNullOrWhiteSpace(tag.HasError()) == false)
@@ -51,81 +43,48 @@ namespace Editors.AnimationMeta.Presentation.Commands
             foreach (var tag in selectedTags)
             {
                 var fileFormatData = tag.GetAsFileFormatData();
-                var Data = new UnknownMetaEntry()
+                var entry = new UnknownMetaEntry()
                 {
                     Name = fileFormatData.Name,
                     Data = fileFormatData.DataItem.Bytes,
                     Version = tag.Version,
                 };
+                copyPastItem.Items.Add(entry);
             }
             _copyPasteManager.SetCopyItem(copyPastItem);
         }
 
         public void ExecutePaste(MetaDataEditorViewModel controller)
-        { }
-
-
-        /*
-            public void CopyAction()
         {
-            if (SelectedTag == null)
-                return;
-
-            if (_selectedTags.Count == 0)
+            var pastObject = _copyPasteManager.GetPasteObject<MetaDataTagCopyItem>();
+            if (pastObject != null)
             {
-                if (string.IsNullOrWhiteSpace(SelectedTag.HasError()) == false)
-                {
-                    MessageBox.Show($"Can not copy object due to: {SelectedTag.HasError()}");
+                var pasteObjects = pastObject.Items;
+                var confirm = MessageBox.Show($"Paste {pasteObjects.Count} metadata objects?", "Meta Copy Paste", MessageBoxButton.YesNo);
+                if (confirm != MessageBoxResult.Yes) 
                     return;
-                }
 
-                var tag = SelectedTag.GetAsFileFormatData();
-                var copyItem = new MetaDataTagCopyItem()
+                foreach (var item in pasteObjects)
                 {
-                    Data = new UnknownMetaEntry()
+                    try
                     {
-                        Name = tag.Name,
-                        Data = tag.DataItem.Bytes,
-                        Version = SelectedTag.Version,
+                        var typed = MetaDataTagDeSerializer.DeSerialize(item, out var errorStr);
+                        if (typed == null)
+                            throw new Exception(errorStr);
+                        controller.Tags.Add(new MetaDataEntry(typed));
                     }
-                };
-                _copyPasteManager.SetCopyItem(copyItem);
-            }
-            else
-            {
-                foreach (var item in _selectedTags)
-                {
-
-                    if (string.IsNullOrWhiteSpace(item.HasError()) == false)
+                    catch
                     {
-                        MessageBox.Show($"Can not copy object due to: {item.HasError()}");
-                        return;
+                        controller.Tags.Add(new UnkMetaDataEntry(item));
                     }
                 }
-
-                var itemsToCopy = new List<ICopyPastItem>();
-
-                foreach (var item in _selectedTags)
-                {
-                    var tag = item.GetAsFileFormatData();
-                    var copyItem = new MetaDataTagCopyItem()
-                    {
-                        Data = new UnknownMetaEntry()
-                        {
-                            Name = tag.Name,
-                            Data = tag.DataItem.Bytes,
-                            Version = SelectedTag.Version,
-                        }
-                    };
-                    itemsToCopy.Add(copyItem);
-                }
-
-                _copyPasteManager.SetCopyItems(itemsToCopy);
-                MessageBox.Show($"copied {itemsToCopy.Count} metadata tag, milord!");
+                return;
             }
 
         }
-         */
+
+
+       
 
     }
 }

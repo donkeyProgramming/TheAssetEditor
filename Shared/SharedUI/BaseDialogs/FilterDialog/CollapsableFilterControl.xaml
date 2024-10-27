@@ -23,10 +23,10 @@
 
         <Label  Grid.Row="0" Grid.Column="0" Width="{Binding LabelTotalWidth, ElementName=self}"  
                 Content="{Binding LabelText, ElementName=self}"
-                Visibility="{Binding ShowLabel,ElementName=self, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
+                Visibility="{Binding ShowLabel,ElementName=self, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}"/>
 
         <Label Grid.Row="0" Grid.Column="1" Content=":"
-                 Visibility="{Binding ShowLabel, ElementName=self, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}"/>
+                 Visibility="{Binding ShowLabel, ElementName=self, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}"/>
 
         <TextBox Grid.Row="0" Grid.Column="2" x:Name="SelectedFileName" VerticalContentAlignment="Center" IsReadOnly="True"/>
         <Button Grid.Row="0" Grid.Column="3" x:Name="BrowseButton" DockPanel.Dock="Right" Width="70">Browse</Button>

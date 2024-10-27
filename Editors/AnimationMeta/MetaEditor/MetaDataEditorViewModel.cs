@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationMeta.Presentation.Commands;
@@ -54,7 +55,7 @@ namespace Editors.AnimationMeta.Presentation
                 else if (item is BaseMetaEntry metaBase)
                     Tags.Add(new MetaDataEntry(metaBase));
                 else
-                    throw new System.Exception();
+                    throw new Exception($"{item.GetType()} is not a known type for {nameof(MetaDataEditorViewModel)}");
             }
         }
 

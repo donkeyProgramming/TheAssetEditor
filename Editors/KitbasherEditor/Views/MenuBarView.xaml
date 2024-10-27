@@ -40,7 +40,7 @@
                     Command="{Binding Path=Action.Command}" 
                     ToolTipService.ShowOnDisabled="True"
                     Style="{StaticResource NoBackgroundOnDisabledButton}"
-                    Visibility="{Binding IsVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
+                    Visibility="{Binding IsVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}">
                 <Image Style="{StaticResource ImageStyle}" Source="{Binding Image}"/>
             </Button>
         </DataTemplate>
@@ -53,7 +53,7 @@
                             Style="{StaticResource {x:Type ToggleButton}}"
                             IsEnabled="{Binding Action.IsActionEnabled.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                             ToolTipService.ShowOnDisabled="True"
-                            Visibility="{Binding IsVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToHiddenConverter}}">
+                            Visibility="{Binding IsVisible.Value, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}">
                 <Image Style="{StaticResource ImageStyle}" Source="{Binding Image}"/>
             </RadioButton>
         </DataTemplate>

@@ -7,29 +7,19 @@
 
     public class CopyPasteManager
     {
-        ICopyPastItem _activeItem;
-        IList<ICopyPastItem> _activeItems;
+        ICopyPastItem? _activeItem;
 
-        public T GetPasteObject<T>() where T : class, ICopyPastItem
+        public T? GetPasteObject<T>() where T : class, ICopyPastItem
         {
             if (_activeItem is T typedItem)
                 return typedItem;
             return null;
         }
 
-        public IList<T> GetPasteObjects<T>() where T : class, ICopyPastItem
-        {
-            if (_activeItems is IList<T> typedItem)
-                return typedItem;
-            return null;
-        }
-
         public void SetCopyItem(ICopyPastItem item) => _activeItem = item;
-        public void SetCopyItems(List<ICopyPastItem> items) => _activeItems = items;
         public void Clear()
         {
             _activeItem = null;
-            _activeItems = null;
         }
     }
 }
