@@ -9,7 +9,7 @@ using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace Editors.Shared.Core.Common.ReferenceModel
 {
-    public class SelectAnimationViewModel : NotifyPropertyChangedImpl
+    public class Depricated_SelectAnimationViewModel : NotifyPropertyChangedImpl
     {
         private readonly PackFileService _pfs;
         private readonly SceneObjectEditor _assetViewModelEditor;
@@ -23,9 +23,9 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         AnimationReference _selectedAnimation;
         public AnimationReference SelectedAnimation { get => _data.AnimationName.Value; set { SetAndNotify(ref _selectedAnimation, value); AnimationChanged(value); } }
 
-        public OnSeachDelegate FiterByFullPath { get { return (item, expression) => { return expression.Match(item.ToString()).Success; }; } }
+        public OnSeachDelegate FiterByFullPath => (item, expression) => { return expression.Match(item.ToString()).Success; };
 
-        public SelectAnimationViewModel(SceneObjectEditor assetViewModelEditor, SceneObject data, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public Depricated_SelectAnimationViewModel(SceneObjectEditor assetViewModelEditor, SceneObject data, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _data = data;
@@ -62,12 +62,6 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             AnimationsForCurrentSkeleton = new ObservableCollection<AnimationReference>();
         }
 
-        void AnimationChanged(AnimationReference animationReference)
-        {
-            if (animationReference != null)
-                _assetViewModelEditor.SetAnimation(_data, animationReference);
-            else
-                _assetViewModelEditor.SetAnimation(_data, null);
-        }
+        void AnimationChanged(AnimationReference animationReference) => _assetViewModelEditor.SetAnimation(_data, animationReference);
     }
 }

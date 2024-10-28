@@ -62,11 +62,19 @@
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                    <ContentPresenter />
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
                     </Style>
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate >
                     <DataTemplate>
-                        <referencemodel:ReferenceModelSelectionView />
+                        <referencemodel:SceneObjectView />
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

@@ -5,9 +5,9 @@ namespace AnimationEditor.Common.ReferenceModel
     /// <summary>
     /// Interaction logic for ReferenceModelView.xaml
     /// </summary>
-    public partial class ReferenceModelSelectionView : UserControl
+    public partial class SceneObjectView : UserControl
     {
-        public ReferenceModelSelectionView()
+        public SceneObjectView()
         {
             InitializeComponent();
         }

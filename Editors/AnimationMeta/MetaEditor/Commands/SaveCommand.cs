@@ -3,6 +3,7 @@ using System.Windows;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
+using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
@@ -54,8 +55,12 @@ namespace Editors.AnimationMeta.Presentation.Commands
             }
 
             _logger.Here().Information("Creating metadata file complete");
-            //EditorSavedEvent?.Invoke(_file);
-            //_eventHub.Publish<PackFileSavedEvent>
+            var saveEvent = new ScopedFileSavedEvent()
+            {
+                FileOwner = controller,
+                NewPath = path,
+            };
+            _eventHub.Publish(saveEvent);
 
             return true;
         }

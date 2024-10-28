@@ -16,7 +16,7 @@ namespace Shared.Ui.Common
         public ObservableCollection<T> Values { get => _values; set => SetAndNotify(ref _values, value); }
 
         T _selectedItem;
-        public T SelectedItem
+        public T? SelectedItem
         {
             get => _selectedItem;
             set
@@ -43,7 +43,7 @@ namespace Shared.Ui.Common
         public delegate bool FilterDelegate(T value, Regex regex);
         public delegate void FilterExtendedDelegate(FilterCollection<T> sender, Regex regex);
 
-        public FilterDelegate SearchFilter { get; set; }
+        public FilterDelegate SearchFilter { get; set; } 
         public FilterExtendedDelegate SearchFilterExtended { get; set; }
 
 
@@ -57,7 +57,7 @@ namespace Shared.Ui.Common
                 BeforeSelectedItemChanged += beforeValueChangeEvent;
         }
 
-        public void UpdatePossibleValues(IEnumerable<T> data, T emptyItem = null)
+        public void UpdatePossibleValues(IEnumerable<T>? data, T? emptyItem = null)
         {
             if (data == null)
             {

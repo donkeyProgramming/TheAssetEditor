@@ -18,7 +18,8 @@ namespace GameWorld.Core.Services.SceneSaving
         private readonly LodStrategyProvider _lodStrategyProvider;
         private readonly MaterialStrategyProvider _materialStrategyProvider;
 
-        public SaveService(PackFileService packFileService, EventHub eventHub,
+        public SaveService(PackFileService packFileService, 
+            EventHub eventHub,
             GeometryStrategyProvider geometryStrategyProvider,
             LodStrategyProvider lodStrategyProvider,
             MaterialStrategyProvider materialStrategyProvider)

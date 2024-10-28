@@ -8,25 +8,16 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
-        <Button Content="Refresh" Click="{s:MethodBinding RefreshAction}" DockPanel.Dock="Top"/>
+        <Button Margin="5" Content="Refresh" Click="{s:MethodBinding RefreshAction}" DockPanel.Dock="Top"/>
 
         <TabControl DockPanel.Dock="Top">
             <TabItem Header="Persistent">
                 <DockPanel>
-                    <TextBlock  DockPanel.Dock="Top">
-                        <Run Text="FilePath: "/>
-                         <Run Text="{Binding PersistentMetaFilePath.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                    </TextBlock>
                     <view:MainEditorView DataContext="{Binding PersistentMetaEditor}" DockPanel.Dock="Top"/>
                 </DockPanel>
             </TabItem>
             <TabItem Header="Animation">
                 <DockPanel>
-                    <TextBlock  DockPanel.Dock="Top">
-                        <Run Text="FilePath: "/>
-                         <Run Text="{Binding MetaFilePath.Value, UpdateSourceTrigger=PropertyChanged}"/>
-                    </TextBlock>
-
                     <view:MainEditorView DataContext="{Binding MetaEditor}" DockPanel.Dock="Top"/>
                 </DockPanel>
             </TabItem>

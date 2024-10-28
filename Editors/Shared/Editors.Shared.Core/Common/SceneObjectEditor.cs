@@ -20,19 +20,17 @@ namespace Editors.Shared.Core.Common
         private readonly ILogger _logger = Logging.Create<SceneObjectEditor>();
         private readonly IWpfGame _mainScene;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ResourceLibrary _resourceLibrary;
         private readonly SceneManager _sceneManager;
         private readonly PackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly ComplexMeshLoader _complexMeshLoader;
 
         public SceneObjectEditor(IWpfGame mainScene,
-            IServiceProvider serviceProvider, ResourceLibrary resourceLibary, SceneManager sceneManager, PackFileService packFileService,
+            IServiceProvider serviceProvider, SceneManager sceneManager, PackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader)
         {
             _mainScene = mainScene;
             _serviceProvider = serviceProvider;
-            _resourceLibrary = resourceLibary;
             _sceneManager = sceneManager;
             _packFileService = packFileService;
             _animationsContainerComponent = animationsContainerComponent;
@@ -59,43 +57,43 @@ namespace Editors.Shared.Core.Common
             return _mainScene.AddComponent(instance);
         }
 
-        public void SetMesh(SceneObject assetViewModel, PackFile file)
+        public void SetMesh(SceneObject sceneObject, PackFile file)
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
 
-            var loadedNode = _complexMeshLoader.Load(file, assetViewModel.Player);
+            var loadedNode = _complexMeshLoader.Load(file, sceneObject.Player);
             if (loadedNode == null)
             {
                 _logger.Here().Error("Unable to load model");
                 return;
             }
 
-            if (assetViewModel.ModelNode != null)
-                assetViewModel.ParentNode.RemoveObject(assetViewModel.ModelNode);
-            assetViewModel.ModelNode = loadedNode;
-            assetViewModel.ParentNode.AddObject(loadedNode);
+            if (sceneObject.ModelNode != null)
+                sceneObject.ParentNode.RemoveObject(sceneObject.ModelNode);
+            sceneObject.ModelNode = loadedNode;
+            sceneObject.ParentNode.AddObject(loadedNode);
 
             var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
             var fullSkeletonName = $"animations\\skeletons\\{skeletonName}.anim";
             var skeletonFile = _packFileService.FindFile(fullSkeletonName);
-            SetSkeleton(assetViewModel, skeletonFile);
-            assetViewModel.MeshName.Value = file.Name;
-            assetViewModel.ShowMesh.Value = assetViewModel.ShowMesh.Value;
-            assetViewModel.ShowSkeleton.Value = assetViewModel.ShowSkeleton.Value;
+            SetSkeleton(sceneObject, skeletonFile);
+            sceneObject.MeshName.Value = file.Name;
+            sceneObject.ShowMesh.Value = sceneObject.ShowMesh.Value;
+            sceneObject.ShowSkeleton.Value = sceneObject.ShowSkeleton.Value;
 
             loadedNode.ForeachNodeRecursive((node) =>
             {
                 if (node is Rmv2MeshNode mesh && string.IsNullOrWhiteSpace(mesh.AttachmentPointName) == false)
                 {
-                    if (assetViewModel.Skeleton != null)
+                    if (sceneObject.Skeleton != null)
                     {
-                        var boneIndex = assetViewModel.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
-                        mesh.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(assetViewModel, boneIndex);
+                        var boneIndex = sceneObject.Skeleton.GetBoneIndexByName(mesh.AttachmentPointName);
+                        mesh.AttachmentBoneResolver = new SkeletonBoneAnimationResolver(sceneObject, boneIndex);
                     }
                 }
             });
 
-            assetViewModel.TriggerMeshChanged();
+            sceneObject.TriggerMeshChanged();
         }
 
         public void CopyMeshFromOther(SceneObject assetViewModel, SceneObject other)
@@ -165,14 +163,14 @@ namespace Editors.Shared.Core.Common
             assetViewModel.TriggerSkeletonChanged();
         }
 
-        public void SetMetaFile(SceneObject assetViewModel, PackFile metaFile, PackFile persistantFile)
+        public void SetMetaFile(SceneObject sceneObject, PackFile? metaFile, PackFile? persistantFile)
         {
-            assetViewModel.MetaData = metaFile;
-            assetViewModel.PersistMetaData = persistantFile;
-            assetViewModel.TriggerMetaDataChanged();
+            sceneObject.MetaData = metaFile;
+            sceneObject.PersistMetaData = persistantFile;
+            sceneObject.TriggerMetaDataChanged();
         }
 
-        public void SetAnimation(SceneObject assetViewModel, AnimationReference animationReference)
+        public void SetAnimation(SceneObject assetViewModel, AnimationReference? animationReference)
         {
             if (animationReference != null)
             {

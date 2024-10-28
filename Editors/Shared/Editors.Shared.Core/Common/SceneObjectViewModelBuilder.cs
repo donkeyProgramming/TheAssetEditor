@@ -37,7 +37,7 @@ namespace Editors.Shared.Core.Common
         {
             var mainAsset = _sceneObjectEditor.CreateAsset(header, skeletonColour);
             var returnObj = new SceneObjectViewModel(_uiCommandFactory, _metaDataFactory, _pfs, mainAsset, header + ":", _sceneObjectEditor, _skeletonHelper);
-            returnObj.AllowMetaData.Value = allowMetaData;
+            returnObj.AllowMetaData = allowMetaData;
 
             if (createByDefault)
             {

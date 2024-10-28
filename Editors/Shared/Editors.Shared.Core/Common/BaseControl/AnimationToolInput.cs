@@ -7,7 +7,7 @@ namespace Editors.Shared.Core.Common.BaseControl
     {
         public PackFile Mesh { get; set; }
         public PackFile Animation { get; set; }
-        public string FragmentName { get; set; }
-        public AnimationSlotType AnimationSlot { get; set; }
+        public string? FragmentName { get; set; }
+        public AnimationSlotType? AnimationSlot { get; set; }
     }
 }

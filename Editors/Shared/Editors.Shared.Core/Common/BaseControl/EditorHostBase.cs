@@ -13,8 +13,8 @@ namespace Editors.Shared.Core.Common.BaseControl
     public abstract partial class EditorHostBase : ObservableObject, IEditorInterface, IEditorViewModelTypeProvider
     {
         private readonly FocusSelectableObjectService _focusSelectableObjectService;
-        private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
-        private readonly SceneObjectEditor _sceneObjectEditor;
+        protected readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
+        protected readonly SceneObjectEditor _sceneObjectEditor;
 
         protected FocusSelectableObjectService FocusService => _focusSelectableObjectService;
         protected SceneObjectEditor SceneObjectEditor => _sceneObjectEditor;
@@ -42,16 +42,14 @@ namespace Editors.Shared.Core.Common.BaseControl
             FocusCamerasCommand = new RelayCommand(FocusCameraAction);
 
             inputParams.ComponentInserter.Execute();
-            Initialize(_sceneObjectViewModelBuilder, _sceneObjects);
         }
 
-        protected virtual void Initialize(SceneObjectViewModelBuilder builder, IList<SceneObjectViewModel> sceneNodeList)
-        { }
+
 
         void ResetCameraAction() => _focusSelectableObjectService.ResetCamera();
         void FocusCameraAction() => _focusSelectableObjectService.FocusSelection();
 
-        public void Close()
+        public virtual void Close()
         {
             GameWorld = null;
         }

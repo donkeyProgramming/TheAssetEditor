@@ -6,7 +6,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 {
     public class SkeletonPreviewViewModel : NotifyPropertyChangedImpl
     {
-        SceneObject _asset;
+        private readonly SceneObject _sceneObject;
 
         int _boneCount = 0;
         public int BoneCount
@@ -21,13 +21,13 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         public SkeletonBoneNode SelectedBone
         {
             get { return _selectedBone; }
-            set { SetAndNotify(ref _selectedBone, value); _asset.SelectedBoneIndex(SelectedBone?.BoneIndex); }
+            set { SetAndNotify(ref _selectedBone, value); _sceneObject.SelectedBoneIndex(SelectedBone?.BoneIndex); }
         }
 
-        public SkeletonPreviewViewModel(SceneObject assetViewModel)
+        public SkeletonPreviewViewModel(SceneObject sceneObject)
         {
-            _asset = assetViewModel;
-            _asset.SkeletonChanged += CreateBoneOverview;
+            _sceneObject = sceneObject;
+            _sceneObject.SkeletonChanged += CreateBoneOverview;
         }
 
         void CreateBoneOverview(GameSkeleton skeleton)

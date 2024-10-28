@@ -36,18 +36,8 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
         [ObservableProperty] Vector3ViewModel _selectedBoneRotationOffset;
         [ObservableProperty] Vector3ViewModel _selectedBoneTranslationOffset;
         [ObservableProperty] string _selectedBoneName;
-
-        public bool? ShowSkeleton
-        {
-            get => _techSkeletonNode?.ShowSkeleton.Value;
-            set { _techSkeletonNode.ShowSkeleton.Value = value.Value; OnPropertyChanged(nameof(ShowSkeleton)); }
-        }
-       
-        public bool? ShowRefMesh
-        {
-            get => _techSkeletonNode?.ShowMesh.Value;
-            set { _techSkeletonNode.ShowMesh.Value = value.Value; OnPropertyChanged(nameof(ShowRefMesh)); }
-        }
+        [ObservableProperty] bool _showSkeleton = true;
+        [ObservableProperty] bool _showRefMesh = true;
 
         public override Type EditorViewModelType => typeof(EditorView);
 
@@ -64,15 +54,17 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
            
             _selectedBoneRotationOffset = new Vector3ViewModel(0, 0, 0, x=> HandleTranslationChanged());
             _selectedBoneTranslationOffset = new Vector3ViewModel(0, 0, 0, x => HandleTranslationChanged());
+
+            Initialize();
         }
 
-        protected override void Initialize(SceneObjectViewModelBuilder builder, IList<SceneObjectViewModel> sceneNodeList)
+        void Initialize()
         {
-            var assetNode = builder.CreateAsset(false, "SkeletonNode", Color.Black, null);
-            assetNode.IsControlVisible.Value = false;
+            var assetNode = _sceneObjectViewModelBuilder.CreateAsset(false, "SkeletonNode", Color.Black, null);
+            assetNode.IsControlVisible = false;
             _techSkeletonNode = assetNode.Data;
 
-            sceneNodeList.Add(assetNode);
+            SceneObjects.Add(assetNode);
         }
 
         partial void OnShowBonesAsWorldTransformChanged(bool value) => RefreshBoneInformation(SelectedBone);
@@ -81,6 +73,8 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
         partial void OnBoneVisualScaleChanged(float value) => _techSkeletonNode?.SelectedBoneScale(value);
         partial void OnBoneScaleChanged(float value) => BoneTransformHandler.Scale(SelectedBone, _techSkeletonNode.Skeleton, (float)BoneScale);
         partial void OnSelectedBoneNameChanged(string value) => UpdateSelectedBoneName(value);
+        partial void OnShowSkeletonChanged(bool value) => _techSkeletonNode.ShowSkeleton.Value = value;
+        partial void OnShowRefMeshChanged(bool value) => _techSkeletonNode.ShowMesh.Value = value;
 
 
         public PackFile CurrentFile { get; private set; }
