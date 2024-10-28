@@ -4,11 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.SaveDialog"
-         xmlns:s="http://schemas.singulink.com/xaml" 
-             xmlns:common="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
+        xmlns:s="http://schemas.singulink.com/xaml" 
+        xmlns:common="clr-namespace:Shared.Ui.Common;assembly=Shared.Ui"
         mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
-        Title="SaveDialogWindow" Height="400" Width="800">
+        Title="Save" Height="400" Width="800">
     
     <Grid Margin="2">
         <DockPanel LastChildFill="true">
