@@ -64,15 +64,6 @@ namespace Shared.Core.Services
             return GetGamePathForGame(game);
         }
 
-        public void ValidateRecentPackFilePaths()
-        {
-            var recentPackfilePaths = CurrentSettings.RecentPackFilePaths;
-            var invalidPacks = recentPackfilePaths.Where(path => !File.Exists(path)).ToList();
-
-            foreach (var invalidPath in invalidPacks)
-                recentPackfilePaths.Remove(invalidPath);
-        }
-
         public void AddRecentlyOpenedPackFile(string path)
         {
             var recentPackFilePaths = CurrentSettings.RecentPackFilePaths;
@@ -118,6 +109,7 @@ namespace Shared.Core.Services
 
                 _logger.Here().Information($"Settings loaded.");
                 ValidateRecentPackFilePaths();
+                ValidateSettings();
             }
             else
             {
@@ -125,6 +117,60 @@ namespace Shared.Core.Services
                 CurrentSettings = new ApplicationSettings();
                 Save();
             }
+        }
+
+        void ValidateRecentPackFilePaths()
+        {
+            var recentPackfilePaths = CurrentSettings.RecentPackFilePaths;
+            var invalidPacks = recentPackfilePaths.Where(path => !File.Exists(path)).ToList();
+
+            foreach (var invalidPath in invalidPacks)
+                recentPackfilePaths.Remove(invalidPath);
+        }
+
+
+        void ValidateSettings()
+        {
+            var areSettingsValid = true;
+            List<string> settingsError = [];
+
+            if (Enum.IsDefined(typeof(ThemeType), CurrentSettings.Theme) == false)
+            {
+                settingsError.Add($"Unkown theme setting - {CurrentSettings.Theme}");
+                areSettingsValid = false;
+            }
+
+            if (Enum.IsDefined(typeof(BackgroundColour), CurrentSettings.RenderEngineBackgroundColour) == false)
+            {
+                settingsError.Add($"Unkown RenderEngineBackgroundColour setting - {CurrentSettings.RenderEngineBackgroundColour}");
+                areSettingsValid = false;
+            }
+
+            if (Enum.IsDefined(typeof(GameTypeEnum), CurrentSettings.CurrentGame) == false)
+            {
+                settingsError.Add($"Unkown CurrentGame setting - {CurrentSettings.CurrentGame}");
+                areSettingsValid = false;
+            }
+
+            foreach (var currentGameDir in CurrentSettings.GameDirectories)
+            {
+                if (Enum.IsDefined(typeof(GameTypeEnum), currentGameDir.Game) == false)
+                {
+                    settingsError.Add($"Unkown GameDir setting - {currentGameDir.Game}");
+                    areSettingsValid = false;
+                }
+            }
+
+            if (areSettingsValid)
+            {
+                _logger.Here().Information("Settings validated - no errors found");
+                return;
+            }
+
+            _logger.Here().Error($"Settings contained errors:\n{string.Join("\n", settingsError)}");
+            _logger.Here().Error($"Creating new settings file");
+            CurrentSettings = new ApplicationSettings();
+            Save();
         }
     }
 }

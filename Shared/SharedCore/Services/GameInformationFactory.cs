@@ -101,6 +101,7 @@
                 GameTypeEnum.Warhammer3 => "Warhammer III",
                 GameTypeEnum.Troy => "Troy",
                 GameTypeEnum.Pharaoh => "Pharaoh",
+                _ => throw new Exception($"Unknown game - {game}"),
             };
         }
     }
