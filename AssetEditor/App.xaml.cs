@@ -22,6 +22,7 @@ namespace AssetEditor
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
             VersionChecker.CheckVersion();
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
 
@@ -75,15 +76,15 @@ namespace AssetEditor
 
         void ShowMainWindow()
         {
+            var applicationSettingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
+            ThemesController.SetTheme(applicationSettingsService.CurrentSettings.Theme);
+
             var mainWindow = _rootScope.ServiceProvider.GetRequiredService<MainWindow>();
             mainWindow.DataContext = _rootScope.ServiceProvider.GetRequiredService<MainViewModel>();
             mainWindow.Show();
 
-            var applicationSettingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             if (applicationSettingsService.CurrentSettings.StartMaximised == true)
                 mainWindow.WindowState = WindowState.Maximized;
-
-            ThemesController.SetTheme(applicationSettingsService.CurrentSettings.Theme);
         }
 
         void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)

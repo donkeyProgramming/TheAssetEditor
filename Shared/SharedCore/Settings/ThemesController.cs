@@ -11,7 +11,7 @@ namespace Shared.Core.Settings
 
     public static class ThemesController
     {
-        public static ThemeType CurrentTheme { get; set; }
+        public static ThemeType CurrentTheme { get; set; } = ThemeType.DarkTheme;
 
         private static ResourceDictionary ThemeDictionary
         {
