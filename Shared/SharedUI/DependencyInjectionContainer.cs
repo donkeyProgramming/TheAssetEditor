@@ -22,7 +22,6 @@ namespace Shared.Ui
 
         public override void Register(IServiceCollection services)
         {
-            //services.AddTransient<ImportAssetCommand>();
             services.AddTransient<DuplicateFileCommand>();
 
             services.AddTransient<IWindowFactory, WindowFactory>();

@@ -22,7 +22,7 @@ namespace Editors.ImportExport.Exporting
 
         public bool CanExportFile(PackFile packFile) 
         {
-            if(_applicationSettings.CurrentSettings.IsDeveloperRun == false)
+            if(_applicationSettings.CurrentSettings.IsDeveloperRun)
                 return true;
 
             foreach (var exporter in _exporterViewModels)

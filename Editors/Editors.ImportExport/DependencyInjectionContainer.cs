@@ -11,7 +11,6 @@ using Editors.ImportExport.Exporting.Presentation.DdsToPng;
 using Editors.ImportExport.Exporting.Presentation.RmvToGltf;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace Editors.ImportExport

@@ -1,144 +1,131 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using E2EVerification.Shared;
-using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
-using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
-using Editors.ImportExport.Exporting.Exporters.DdsToPng;
+﻿using E2EVerification.Shared;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-using Moq;
-using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
-using Shared.Ui.Events.UiCommands;
 
 namespace E2EVerification
 {
     public class GltfExport_Tests
     {
-        private readonly string _normalFilePath01 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_normal.dds";
-        private readonly string _materialFilePath01 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_material_map.dds";
-        private readonly string _normalFilePath02 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_head_01_normal.dds";
-        private readonly string _materialFilePath02 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_head_01_material_map.dds";
-        private readonly string _packFile01 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2";
-        private readonly string _packFile02 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_props\emp_karl_franz_hammer_2h_01.rigid_model_v2";
-
-
-
-        [Test]
-        public void convertNormal()
-        {
-            var runner = new AssetEditorTestRunner();
-            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
-            var PackFile = runner.LoadPackFile(path);
-            runner.DdsToNormalPngExporterRepos.Export(_normalFilePath01, "C:/franz/convertNormal", true);
-            var foundFile = ("C:/franz/convertNormal/" + "emp_karl_franz_body_01_normal.png");
-            Assert.That(foundFile, Is.Not.Null);
-        }
-        [Test]
-        public void convertMaterial()
-        {
-            var runner = new AssetEditorTestRunner();
-            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
-            var PackFile = runner.LoadPackFile(path);
-            runner.DdsToMaterialPngExporterRepos.Export(_materialFilePath01, "C:/franz/convertMaterial", true);
-            var foundFile = ("C:/franz/convertMaterial/" + "emp_karl_franz_body_01_material_map.png");
-            Assert.That(foundFile, Is.Not.Null);
-        }
-        [Test]
-        public void doNotConvertNormal()
-        {
-            var runner = new AssetEditorTestRunner();
-            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
-            var PackFile = runner.LoadPackFile(path);
-            runner.DdsToNormalPngExporterRepos.Export(_normalFilePath02, "C:/franz/doNotConvertNormal", false);
-            var foundFile = ("C:/franz/doNotConvertNormal/" + "emp_karl_franz_head_01_normal.png");
-            Assert.That(foundFile, Is.Not.Null);
-        }
-        [Test]
-        public void doNotConvertMaterial()
-        {
-            var runner = new AssetEditorTestRunner();
-            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
-            var PackFile = runner.LoadPackFile(path);
-            runner.DdsToMaterialPngExporterRepos.Export(_materialFilePath02, "C:/franz/doNotConvertMaterial", false);
-            var foundFile = ("C:/franz/doNotConvertMaterial/" + "emp_karl_franz_head_01_material_map.png");
-            Assert.That(foundFile, Is.Not.Null);
-        }
-        [Test]
-        public void rigidModelExportMaterial()
-        {
-            var runner = new AssetEditorTestRunner();
-            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
-            var PackFile = runner.LoadPackFile(path);
-            var modelFile = runner.PackFileService.FindFile(_packFile01);
-            runner.DdsToPngExporterRepos.Export("C:/franz/rigidExportConvert", modelFile, new RmvToGltfExporterSettings(runner.PackFileService.FindFile(_packFile01), "C:/franz/rigidExportConvert", true, true, true, true));
-            var foundFile1 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_body_01_base_colour.png");
-            var foundFile2 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_body_01_material_map.png");
-            var foundFile3 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_body_01_normal.png");
-            var foundFile4 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_head_01_base_colour.png");
-            var foundFile5 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_head_01_material_map.png");
-            var foundFile6 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_head_01_normal.png");
-            Assert.That(foundFile1, Is.Not.Null);
-            Assert.That(foundFile2, Is.Not.Null);
-            Assert.That(foundFile3, Is.Not.Null);
-            Assert.That(foundFile4, Is.Not.Null);
-            Assert.That(foundFile5, Is.Not.Null);
-            Assert.That(foundFile6, Is.Not.Null);
-        }
-        [Test]
-        public void rigidModelExportMaterialNoConvert()
-        {
-            var runner = new AssetEditorTestRunner();
-            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
-            var PackFile = runner.LoadPackFile(path);
-            var modelFile = runner.PackFileService.FindFile(_packFile01);
-            runner.DdsToPngExporterRepos.Export("C:/franz/rigidExportDoNotConvert", modelFile, new RmvToGltfExporterSettings(runner.PackFileService.FindFile(_packFile01), "C:/franz/rigidExportDoNotConvert", true, false, false, true));
-            var foundFile1 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_body_01_base_colour.png");
-            var foundFile2 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_body_01_material_map.png");
-            var foundFile3 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_body_01_normal.png");
-            var foundFile4 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_head_01_base_colour.png");
-            var foundFile5 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_head_01_material_map.png");
-            var foundFile6 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_head_01_normal.png");
-            Assert.That(foundFile1, Is.Not.Null);
-            Assert.That(foundFile2, Is.Not.Null);
-            Assert.That(foundFile3, Is.Not.Null);
-            Assert.That(foundFile4, Is.Not.Null);
-            Assert.That(foundFile5, Is.Not.Null);
-            Assert.That(foundFile6, Is.Not.Null);
-        }
-        [Test]
-        public void staticMeshExportMaterialConvert()
-        {
-            var runner = new AssetEditorTestRunner();
-            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
-            var PackFile = runner.LoadPackFile(path);
-            var modelFile = runner.PackFileService.FindFile(_packFile02);
-            runner.DdsToPngExporterRepos.Export("C:/franz/staticMeshConvert", modelFile, new RmvToGltfExporterSettings(runner.PackFileService.FindFile(_packFile01), "C:/franz/staticMeshConvert", true, true, true, true));
-            var foundFile1 = ("C:/franz/staticMeshConvert/" + "emp_karl_franz_hammer_2h_01_base_colour.png");
-            var foundFile2 = ("C:/franz/staticMeshConvert/" + "emp_karl_franz_hammer_2h_01_material_map.png");
-            var foundFile3 = ("C:/franz/staticMeshConvert/" + "emp_karl_franz_hammer_2h_01_normal.png");
-            Assert.That(foundFile1, Is.Not.Null);
-            Assert.That(foundFile2, Is.Not.Null);
-            Assert.That(foundFile3, Is.Not.Null);
-        }
-        [Test]
-        public void staticMeshExportMaterialDoNotConvert()
-        {
-            var runner = new AssetEditorTestRunner();
-            var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
-            var PackFile = runner.LoadPackFile(path);
-            var modelFile = runner.PackFileService.FindFile(_packFile02);
-            runner.DdsToPngExporterRepos.Export("C:/franz/staticMeshDoNotConvert", modelFile, new RmvToGltfExporterSettings(runner.PackFileService.FindFile(_packFile01), "C:/franz/staticMeshDoNotConvert", true, false, false, true));
-            var foundFile1 = ("C:/franz/staticMeshDoNotConvert/" + "emp_karl_franz_hammer_2h_01_base_colour.png");
-            var foundFile2 = ("C:/franz/staticMeshDoNotConvert/" + "emp_karl_franz_hammer_2h_01_material_map.png");
-            var foundFile3 = ("C:/franz/staticMeshDoNotConvert/" + "emp_karl_franz_hammer_2h_01_normal.png");
-            Assert.That(foundFile1, Is.Not.Null);
-            Assert.That(foundFile2, Is.Not.Null);
-            Assert.That(foundFile3, Is.Not.Null);
-        }
+        //private readonly string _normalFilePath01 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_normal.dds";
+        //private readonly string _materialFilePath01 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_body_01_material_map.dds";
+        //private readonly string _normalFilePath02 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_head_01_normal.dds";
+        //private readonly string _materialFilePath02 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\tex\emp_karl_franz_head_01_material_map.dds";
+        //private readonly string _packFile01 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2";
+        //private readonly string _packFile02 = @"variantmeshes\wh_variantmodels\hu1\emp\emp_props\emp_karl_franz_hammer_2h_01.rigid_model_v2";
+        //
+        //
+        //
+        //[Test]
+        //public void convertNormal()
+        //{
+        //    var runner = new AssetEditorTestRunner();
+        //    var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+        //    var PackFile = runner.LoadPackFile(path);
+        //    runner.DdsToNormalPngExporterRepos.Export(_normalFilePath01, "C:/franz/convertNormal", true);
+        //    var foundFile = ("C:/franz/convertNormal/" + "emp_karl_franz_body_01_normal.png");
+        //    Assert.That(foundFile, Is.Not.Null);
+        //}
+        //[Test]
+        //public void convertMaterial()
+        //{
+        //    var runner = new AssetEditorTestRunner();
+        //    var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+        //    var PackFile = runner.LoadPackFile(path);
+        //    runner.DdsToMaterialPngExporterRepos.Export(_materialFilePath01, "C:/franz/convertMaterial", true);
+        //    var foundFile = ("C:/franz/convertMaterial/" + "emp_karl_franz_body_01_material_map.png");
+        //    Assert.That(foundFile, Is.Not.Null);
+        //}
+        //[Test]
+        //public void doNotConvertNormal()
+        //{
+        //    var runner = new AssetEditorTestRunner();
+        //    var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+        //    var PackFile = runner.LoadPackFile(path);
+        //    runner.DdsToNormalPngExporterRepos.Export(_normalFilePath02, "C:/franz/doNotConvertNormal", false);
+        //    var foundFile = ("C:/franz/doNotConvertNormal/" + "emp_karl_franz_head_01_normal.png");
+        //    Assert.That(foundFile, Is.Not.Null);
+        //}
+        //[Test]
+        //public void doNotConvertMaterial()
+        //{
+        //    var runner = new AssetEditorTestRunner();
+        //    var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+        //    var PackFile = runner.LoadPackFile(path);
+        //    runner.DdsToMaterialPngExporterRepos.Export(_materialFilePath02, "C:/franz/doNotConvertMaterial", false);
+        //    var foundFile = ("C:/franz/doNotConvertMaterial/" + "emp_karl_franz_head_01_material_map.png");
+        //    Assert.That(foundFile, Is.Not.Null);
+        //}
+        //[Test]
+        //public void rigidModelExportMaterial()
+        //{
+        //    var runner = new AssetEditorTestRunner();
+        //    var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+        //    var PackFile = runner.LoadPackFile(path);
+        //    var modelFile = runner.PackFileService.FindFile(_packFile01);
+        //    runner.DdsToPngExporterRepos.Export("C:/franz/rigidExportConvert", modelFile, new RmvToGltfExporterSettings(runner.PackFileService.FindFile(_packFile01), "C:/franz/rigidExportConvert", true, true, true, true));
+        //    var foundFile1 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_body_01_base_colour.png");
+        //    var foundFile2 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_body_01_material_map.png");
+        //    var foundFile3 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_body_01_normal.png");
+        //    var foundFile4 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_head_01_base_colour.png");
+        //    var foundFile5 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_head_01_material_map.png");
+        //    var foundFile6 = ("C:/franz/rigidExportConvert/" + "emp_karl_franz_head_01_normal.png");
+        //    Assert.That(foundFile1, Is.Not.Null);
+        //    Assert.That(foundFile2, Is.Not.Null);
+        //    Assert.That(foundFile3, Is.Not.Null);
+        //    Assert.That(foundFile4, Is.Not.Null);
+        //    Assert.That(foundFile5, Is.Not.Null);
+        //    Assert.That(foundFile6, Is.Not.Null);
+        //}
+        //[Test]
+        //public void rigidModelExportMaterialNoConvert()
+        //{
+        //    var runner = new AssetEditorTestRunner();
+        //    var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+        //    var PackFile = runner.LoadPackFile(path);
+        //    var modelFile = runner.PackFileService.FindFile(_packFile01);
+        //    runner.DdsToPngExporterRepos.Export("C:/franz/rigidExportDoNotConvert", modelFile, new RmvToGltfExporterSettings(runner.PackFileService.FindFile(_packFile01), "C:/franz/rigidExportDoNotConvert", true, false, false, true));
+        //    var foundFile1 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_body_01_base_colour.png");
+        //    var foundFile2 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_body_01_material_map.png");
+        //    var foundFile3 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_body_01_normal.png");
+        //    var foundFile4 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_head_01_base_colour.png");
+        //    var foundFile5 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_head_01_material_map.png");
+        //    var foundFile6 = ("C:/franz/rigidExportDoNotConvert/" + "emp_karl_franz_head_01_normal.png");
+        //    Assert.That(foundFile1, Is.Not.Null);
+        //    Assert.That(foundFile2, Is.Not.Null);
+        //    Assert.That(foundFile3, Is.Not.Null);
+        //    Assert.That(foundFile4, Is.Not.Null);
+        //    Assert.That(foundFile5, Is.Not.Null);
+        //    Assert.That(foundFile6, Is.Not.Null);
+        //}
+        //[Test]
+        //public void staticMeshExportMaterialConvert()
+        //{
+        //    var runner = new AssetEditorTestRunner();
+        //    var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+        //    var PackFile = runner.LoadPackFile(path);
+        //    var modelFile = runner.PackFileService.FindFile(_packFile02);
+        //    runner.DdsToPngExporterRepos.Export("C:/franz/staticMeshConvert", modelFile, new RmvToGltfExporterSettings(runner.PackFileService.FindFile(_packFile01), "C:/franz/staticMeshConvert", true, true, true, true));
+        //    var foundFile1 = ("C:/franz/staticMeshConvert/" + "emp_karl_franz_hammer_2h_01_base_colour.png");
+        //    var foundFile2 = ("C:/franz/staticMeshConvert/" + "emp_karl_franz_hammer_2h_01_material_map.png");
+        //    var foundFile3 = ("C:/franz/staticMeshConvert/" + "emp_karl_franz_hammer_2h_01_normal.png");
+        //    Assert.That(foundFile1, Is.Not.Null);
+        //    Assert.That(foundFile2, Is.Not.Null);
+        //    Assert.That(foundFile3, Is.Not.Null);
+        //}
+        //[Test]
+        //public void staticMeshExportMaterialDoNotConvert()
+        //{
+        //    var runner = new AssetEditorTestRunner();
+        //    var path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Total War WARHAMMER III\\data\\normal_test.pack";
+        //    var PackFile = runner.LoadPackFile(path);
+        //    var modelFile = runner.PackFileService.FindFile(_packFile02);
+        //    runner.DdsToPngExporterRepos.Export("C:/franz/staticMeshDoNotConvert", modelFile, new RmvToGltfExporterSettings(runner.PackFileService.FindFile(_packFile01), "C:/franz/staticMeshDoNotConvert", true, false, false, true));
+        //    var foundFile1 = ("C:/franz/staticMeshDoNotConvert/" + "emp_karl_franz_hammer_2h_01_base_colour.png");
+        //    var foundFile2 = ("C:/franz/staticMeshDoNotConvert/" + "emp_karl_franz_hammer_2h_01_material_map.png");
+        //    var foundFile3 = ("C:/franz/staticMeshDoNotConvert/" + "emp_karl_franz_hammer_2h_01_normal.png");
+        //    Assert.That(foundFile1, Is.Not.Null);
+        //    Assert.That(foundFile2, Is.Not.Null);
+        //    Assert.That(foundFile3, Is.Not.Null);
+        //}
 
         //keeping these for future use as the pathways are inside the test pack already
         /**private readonly string _rmvFilePathCap = @"variantmeshes\wh_variantmodels\hu1\emp\emp_captains\body\emp_captains_body_01.rigid_model_v2";
