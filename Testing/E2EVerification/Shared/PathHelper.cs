@@ -6,7 +6,7 @@
         {
             var fullPath = Path.GetFullPath(@"..\..\..\..\..\Data\" + fileName);
             if (File.Exists(fullPath) == false)
-                throw new Exception($"Unable to find data file {fileName}_");
+                throw new Exception($"Unable to find data file {fileName}");
             return fullPath;
         }
 
