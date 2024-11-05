@@ -176,10 +176,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 {
                     glTfvertex = SetVertexInfluences(vertex, glTfvertex);
                 }
-                else
+                //else
                 {
-                    glTfvertex.Skinning.Weights = new Vector4(0, 1, 0, 0);
-                    glTfvertex.Skinning.Joints = new Vector4(0, 1, 0, 0);
+                    glTfvertex.Skinning.SetBindings((0, 1));                    
                 }
                 vertexList.Add(glTfvertex);
             }
