@@ -1,13 +1,11 @@
-﻿using Editors.ImportExport.Misc;
+﻿using System.Drawing;
+using System.IO;
+using System.Numerics;
+using System.Windows;
+using Editors.ImportExport.Misc;
+using MeshImportExport;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using System.Drawing;
-using System.IO;
-using MeshImportExport;
-using Editors.ImportExport;
-using System.Windows;
-using System.Numerics;
-
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
 {

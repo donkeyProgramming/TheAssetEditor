@@ -1,33 +1,20 @@
-﻿using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
+﻿using System.Drawing;
 using System.IO;
 using Editors.ImportExport.Misc;
+using MeshImportExport;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.GameFormats.RigidModel;
-//using SharpGLTF.Materials;
-using System;
-using System.Drawing;
-using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
-using Shared.GameFormats.RigidModel.Types;
-using MeshImportExport;
-using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
-
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
 {
-
     public class DdsToPngExporter
     {
         private readonly PackFileService _packFileService;
-        private readonly DdsToNormalPngExporter _ddsToNormalPngExporter;
-        private readonly DdsToMaterialPngExporter _ddsToMaterialPngExporter;
         private readonly IImageSaveHandler _imageSaveHandler;
 
-        public DdsToPngExporter(PackFileService pfs, DdsToNormalPngExporter ddsToNormalPngExporter, DdsToMaterialPngExporter ddsToMaterialPngExporter, IImageSaveHandler imageSaveHandler)
+        public DdsToPngExporter(PackFileService pfs, IImageSaveHandler imageSaveHandler)
         {
             _packFileService = pfs;
-            _ddsToNormalPngExporter = ddsToNormalPngExporter;
-            _ddsToMaterialPngExporter = ddsToMaterialPngExporter;
             _imageSaveHandler = imageSaveHandler;
         }
         internal ExportSupportEnum CanExportFile(PackFile file)
@@ -36,30 +23,18 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
                 return ExportSupportEnum.Supported;
             return ExportSupportEnum.NotSupported;
         }
-        public void Export(string outputPath, PackFile file, RmvToGltfExporterSettings settings)
-        {
-            var rmv2 = new ModelFactory().Load(file.DataSource.ReadData());
-            var lodLevel = rmv2.ModelList.First();
 
-            foreach (var rmvMesh in lodLevel)
-            {
-                var textures = rmvMesh.Material.GetAllTextures();
-                _ddsToNormalPngExporter.Export(textures.FirstOrDefault(t => t.TexureType == TextureType.Normal).Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
-                _ddsToMaterialPngExporter.Export(textures.FirstOrDefault(t => t.TexureType == TextureType.MaterialMap).Path, settings.OutputPath, settings.ConvertMaterialTextureToBlender);
-                GenericExportNoConversion(settings.OutputPath, textures.FirstOrDefault(t => t.TexureType == TextureType.BaseColour));
-            }
-        }
-        public string GenericExportNoConversion(string outputPath, RmvTexture texture)
+        public void Export(string outputPath, PackFile file)
         {
-            var packFile = _packFileService.FindFile(texture.Path);
-            var bytes = packFile.DataSource.ReadData();
-            var fileDirectory = outputPath + "/" + Path.GetFileNameWithoutExtension(packFile.Name) + ".png";
+            var bytes = file.DataSource.ReadData();
+            var fileDirectory = outputPath + "/" + Path.GetFileNameWithoutExtension(file.Name) + ".png";
+            
             var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
             var ms = new MemoryStream(imgBytes);
-            using Image img = Image.FromStream(ms);
-            using Bitmap bitmap = new Bitmap(img);
+            using var img = Image.FromStream(ms);
+            using var bitmap = new Bitmap(img);
             _imageSaveHandler.Save(bitmap, fileDirectory);
-            return fileDirectory;
         }
+
     }
 }

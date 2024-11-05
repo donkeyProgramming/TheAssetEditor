@@ -57,18 +57,18 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
         {
             var ms = new MemoryStream(imgBytes);
 
-            using Image image = Image.FromStream(ms);
-            using Bitmap bitmap = new Bitmap(image);
+            using var image = Image.FromStream(ms);
+            using var bitmap = new Bitmap(image);
             {
                 for (int x = 0; x < bitmap.Width; x++)
                 {
                     for (int y = 0; y < bitmap.Height; y++)
                     {
-                        Color pixel = bitmap.GetPixel(x, y);
+                        var pixel = bitmap.GetPixel(x, y);
                         var R = pixel.R;
                         var G = pixel.G;
                         var B = pixel.B;
-                        Color newColor = Color.FromArgb(255, B, G, R);
+                        var newColor = Color.FromArgb(255, B, G, R);
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
