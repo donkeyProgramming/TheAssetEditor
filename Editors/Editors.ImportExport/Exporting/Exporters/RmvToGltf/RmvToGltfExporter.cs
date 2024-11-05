@@ -1,8 +1,10 @@
 ﻿using System.IO;
 using System.Numerics;
+using Editors.ImportExport.Common;
 using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToPng;
+using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using Editors.ImportExport.Misc;
 using MeshImportExport;
 using Shared.Core.PackFiles;
@@ -19,14 +21,16 @@ using SharpGLTF.Schema2;
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 {
     public record RmvToGltfExporterSettings(
-        PackFile InputFile,
+
+        List<PackFile> InputModelFiles,
+        List<PackFile> InputAnimationFiles,
+        PackFile InputSkeletonFile,
         string OutputPath,
         bool ExportTextures,
         bool ConvertMaterialTextureToBlender,
         bool ConvertNormalTextureToBlue,
-        bool ExportAnimations
+        bool ExportAnimations        
     );
-
 
     public class RmvToGltfExporter
     {
@@ -47,22 +51,59 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         {
             if (FileExtensionHelper.IsRmvFile(file.Name))
                 return ExportSupportEnum.HighPriority;
-            if(FileExtensionHelper.IsWsModelFile(file.Name))
+            if (FileExtensionHelper.IsWsModelFile(file.Name))
                 return ExportSupportEnum.HighPriority;
             return ExportSupportEnum.NotSupported;
         }
 
+        private AnimationFile FetchAnimSkeleton(RmvFile rmv2)
+        {
+            var skeletonName = rmv2.Header.SkeletonName + ".anim";
+            var skeletonSearchList = _packFileService.SearchForFile(skeletonName);
+            var skeletonPath = _packFileService.GetFullPath(_packFileService.FindFile(skeletonSearchList[0]));
+            var skeletonPackFile = _packFileService.FindFile(skeletonPath);
+
+            var animSkeletonFile = AnimationFile.Create(skeletonPackFile);
+            return animSkeletonFile;
+        }
+
+        private void GenerateAnimations(RmvToGltfExporterSettings settings, List<(Node, Matrix4x4)> nodeData, ModelRoot modelroot, AnimationFile animSkeletonFile, bool doMirror)
+        {
+            //for (int iAnim = 0; iAnim < settings.InputAnimationFiles.Count; iAnim++)
+            {
+                var animAnimationFile = AnimationFile.Create(settings.InputAnimationFiles[0]);
+
+                var animBuilder = new GltfAnimationCreator(nodeData, animSkeletonFile);
+                animBuilder.CreateFromTWAnim(animAnimationFile, modelroot, doMirror);
+            }
+        }
+
         public void Export(RmvToGltfExporterSettings settings)
         {
-            var rmv2 = new ModelFactory().Load(settings.InputFile.DataSource.ReadData());
+            const bool doMirror = true; // TODO: put in view (CheckBox) -> settomgs
+
+            if (!settings.InputModelFiles.Any())
+                throw new Exception("No input files found");
+
+            int fileIndex = 0; // TODO: add support for multiple model export
+
+            var rmv2 = new ModelFactory().Load(settings.InputModelFiles[fileIndex].DataSource.ReadData());
             var lodLevel = rmv2.ModelList.First();
             var hasSkeleton = (rmv2.Header.SkeletonName != "");
             var gltfSkeleton = new List<(Node, Matrix4x4)>();
             var model = ModelRoot.CreateModel();
+
             if (hasSkeleton)
             {
-                gltfSkeleton = GenerateSkeleton(rmv2, model);
-            }
+                var animSkeletonFile = FetchAnimSkeleton(rmv2);
+                gltfSkeleton = GenerateSkeleton(rmv2, model, animSkeletonFile, doMirror);
+
+                if (settings.ExportAnimations && settings.InputAnimationFiles.Any())
+                {
+                    GenerateAnimations(settings, gltfSkeleton, model, animSkeletonFile, doMirror);
+                }
+            }       
+
             List<Mesh> meshes = new List<Mesh>();
             foreach (var rmvMesh in lodLevel)
             {
@@ -77,17 +118,21 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 }
                 else
                 {
-                    gltfMaterial = BuildFakeMaterialPerMesh(rmvMesh, settings.InputFile);
+                    gltfMaterial = BuildFakeMaterialPerMesh(rmvMesh, settings.InputModelFiles[fileIndex]);
                 }
-                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton));
+                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton, doMirror));
                 meshes.Add(mesh);
             }
             BuildGltf(meshes, gltfSkeleton, settings, model);
+
+            // TODO: remove this?
             //_ddsToPngExporter.Export(settings.OutputPath, settings.InputFile, settings); works on its own test
         }
 
         public void BuildGltf(List<Mesh> meshes, List<(Node, Matrix4x4)> gltfSkeleton, RmvToGltfExporterSettings settings, ModelRoot model)
         {
+            int fileIndex = 0; // TODO: add support for multiple model export
+
             var scene = model.UseScene("default");
             foreach (var mesh in meshes)
             {
@@ -100,34 +145,23 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                     scene.CreateNode(mesh.Name).WithMesh(mesh);
                 }
             }
-            model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputFile.Name) + ".gltf");
+            model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputModelFiles[fileIndex].Name) + ".gltf");
         }
 
-        internal List<(Node, Matrix4x4)> GenerateSkeleton(RmvFile rmv2, ModelRoot model)
+
+        internal List<(Node, Matrix4x4)> GenerateSkeleton(RmvFile rmv2, ModelRoot model, AnimationFile animSkeletonFile, bool doMIrror)
         {
-            var skeletonName = rmv2.Header.SkeletonName + ".anim";
-            var skeletonSearchList = _packFileService.SearchForFile(skeletonName);
-            var skeletonPath = _packFileService.GetFullPath(_packFileService.FindFile(skeletonSearchList[0]));
-            var skeletonPackFile = _packFileService.FindFile(skeletonPath);
-
-            var invMatrixName = rmv2.Header.SkeletonName + ".bone_inv_trans_mats";
-            var invMatrixSearchList = _packFileService.SearchForFile(invMatrixName);
-            var invMatrixFilePath = _packFileService.GetFullPath(_packFileService.FindFile(invMatrixSearchList[0]));
-            var invMatrixPackFile = _packFileService.FindFile(invMatrixFilePath);
-
-            var animFile = AnimationFile.Create(skeletonPackFile);
-            var invMatrixFile = AnimInvMatrixFile.Create(invMatrixPackFile.DataSource.ReadDataAsChunk());
-            var gltfSkeletonBindings = SkeletonExporter.CreateSkeletonFromGameSkeleton(animFile, invMatrixFile, model);
+            var gltfSkeletonBindings = GltfSkeletonCreator.Create(model, animSkeletonFile, doMIrror);
 
             return gltfSkeletonBindings;
         }
 
-        public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> GenerateMesh(RmvModel rmvMesh, MaterialBuilder material, bool hasSkeleton)
+        public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> GenerateMesh(RmvModel rmvMesh, MaterialBuilder material, bool hasSkeleton, bool doMirror)
         {
             var mesh = new MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>(rmvMesh.Material.ModelName);
             if (hasSkeleton)
             {
-                mesh.VertexPreprocessor.SetValidationPreprocessors();
+                mesh.VertexPreprocessor.SetValidationPreprocessors(); 
             }
 
             var prim = mesh.UsePrimitive(material);
@@ -141,14 +175,17 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 glTfvertex.Geometry.Tangent = new Vector4(vertex.Tangent.X, vertex.Tangent.Y, vertex.Tangent.Z, 1);
                 glTfvertex.Material.TexCoord = new Vector2(vertex.Uv.X, vertex.Uv.Y);
 
+                glTfvertex.Geometry.Position = VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Position), doMirror));
+                glTfvertex.Geometry.Normal = VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Normal), doMirror));
+                glTfvertex.Geometry.Tangent = VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Tangent), doMirror));
+
                 if (hasSkeleton)
                 {
-                    glTfvertex = BonesAndWeight(vertex, glTfvertex);
+                    glTfvertex = SetVertexInfluences(vertex, glTfvertex);
                 }
                 else
                 {
-                    glTfvertex.Skinning.Weights = new Vector4(0, 1, 0, 0);
-                    glTfvertex.Skinning.Joints = new Vector4(0, 1, 0, 0);
+                    glTfvertex.Skinning.SetBindings((0, 1));                    
                 }
                 vertexList.Add(glTfvertex);
             }
@@ -156,14 +193,54 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var triangleCount = rmvMesh.Mesh.IndexList.Length;
             for (var i = 0; i < triangleCount; i += 3)
             {
-                var i0 = rmvMesh.Mesh.IndexList[i + 0];
-                var i1 = rmvMesh.Mesh.IndexList[i + 1];
-                var i2 = rmvMesh.Mesh.IndexList[i + 2];
 
+                ushort i0, i1, i2;
+                if (doMirror) // if mirrored, flip the winding order
+                {
+                    i0 = rmvMesh.Mesh.IndexList[i + 0];
+                    i1 = rmvMesh.Mesh.IndexList[i + 2];
+                    i2 = rmvMesh.Mesh.IndexList[i + 1];
+                }
+                else
+                {
+                    i0 = rmvMesh.Mesh.IndexList[i + 0];
+                    i1 = rmvMesh.Mesh.IndexList[i + 1];
+                    i2 = rmvMesh.Mesh.IndexList[i + 2];
+                }
+                
                 prim.AddTriangle(vertexList[i0], vertexList[i1], vertexList[i2]);
             }
             return mesh;
         }
+
+
+        private static VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> SetVertexInfluences(CommonVertex vertex, VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> glTfvertex)
+        {
+            if (vertex.WeightCount == 2)
+            {
+                var rigging = new (int, float)[2] {
+                        (vertex.BoneIndex[0], vertex.BoneWeight[0]),
+                        (vertex.BoneIndex[1], 1.0f - vertex.BoneWeight[0])
+                        };
+
+                glTfvertex.Skinning.SetBindings(rigging);
+
+            }
+            else if (vertex.WeightCount == 4)
+            {
+                var rigging = new (int, float)[4] {
+                        (vertex.BoneIndex[0], vertex.BoneWeight[0]),
+                        (vertex.BoneIndex[1], vertex.BoneWeight[1]),
+                        (vertex.BoneIndex[2], vertex.BoneWeight[2]),
+                        (vertex.BoneIndex[3], 1.0f - (vertex.BoneWeight[0] + vertex.BoneWeight[1] + vertex.BoneWeight[2]))
+                        };
+
+                glTfvertex.Skinning.SetBindings(rigging);
+            }
+
+            return glTfvertex;
+        }
+
 
 
         internal static VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> BonesAndWeight(CommonVertex vertex,
