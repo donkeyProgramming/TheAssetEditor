@@ -1,44 +1,27 @@
-﻿using System.Collections.Generic;
-using GameWorld.Core;
-using GameWorld.Core.Components;
-using System.Windows.Input;
-using System.Windows.Navigation;
-using Shared.GameFormats.Animation;
-using Microsoft.Xna.Framework;
-using Newtonsoft.Json.Linq;
-using Shared.Core.Events;
-using Shared.Core.PackFiles;
-using SharpDX.Direct3D9;
-using SharpGLTF.Schema2;
+﻿using Editors.ImportExport.Common;
 using GameWorld.Core.Animation;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Graphics;
-using SharpGLTF.Scenes;
-using SharpGLTF.Animations;
+using Shared.GameFormats.Animation;
+using SharpGLTF.Schema2;
 using SysNum = System.Numerics;
-using Editors.ImportExport.Common;
 
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
     public class GltfAnimationCreator
     {
-        private readonly AnimationsContainerComponent _animationsContainerComponent = new AnimationsContainerComponent();
-        private readonly AnimationPlayer _animationPlayer;
+
         private readonly AnimationFile _skeletonAnimFile;
+        private readonly List<(Node, SysNum.Matrix4x4)> _skeletonNodes;
 
-        public List<(Node, SysNum.Matrix4x4)> SkeletonNodes { get; set; }
-
-        public GltfAnimationCreator(List<(Node, SysNum.Matrix4x4)> nodeData, AnimationFile skeletonAnimFile)
+        public GltfAnimationCreator(List<(Node, SysNum.Matrix4x4)> gltfSkeleton, AnimationFile skeletonAnimFile)
         {
-            SkeletonNodes = nodeData;
-            _animationPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), "MainPlayer");
+            _skeletonNodes = gltfSkeleton;
             _skeletonAnimFile = skeletonAnimFile;
         }
 
-        public void CreateFromTWAnim(AnimationFile animationFile, ModelRoot modelRoot, bool doMirror)
+        public void CreateFromTWAnim(ModelRoot outputScene, AnimationFile animationToExport, bool doMirror)
         {   
-            var gameSkeleton = new GameSkeleton(_skeletonAnimFile, _animationPlayer);
-            var animationClip = new AnimationClip(animationFile, gameSkeleton);
+            var gameSkeleton = new GameSkeleton(_skeletonAnimFile, null);
+            var animationClip = new AnimationClip(animationToExport, gameSkeleton);
 
             var secondsPerFrame = animationClip.PlayTimeInSec / animationClip.DynamicFrames.Count;
 
@@ -55,13 +38,13 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 }
 
                 // find ACTUAL nodes, as opposed to "fake/visual"? nodes
-                var boneNode = SkeletonNodes[boneIndex].Item1;
+                var boneNode = _skeletonNodes[boneIndex].Item1;
                 var logicalIndex = boneNode.LogicalIndex;
 
-                if (logicalIndex >= modelRoot.LogicalNodes.Count)
-                    throw new Exception("Fatal Error: Incorrect logical node index");
+                if (logicalIndex >= outputScene.LogicalNodes.Count)
+                    throw new Exception($"Fatal Error: Incorrect logical node index. logicalIndex={logicalIndex}, modelRoot.LogicalNodes.Count={outputScene.LogicalNodes.Count}");
 
-                var logicalNode = modelRoot.LogicalNodes[logicalIndex];
+                var logicalNode = outputScene.LogicalNodes[logicalIndex];
 
                 logicalNode.
                     WithRotationAnimation("", rotationKeyFrames).
@@ -69,7 +52,5 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                     WithScaleAnimation("", (0.0f, new SysNum.Vector3(1, 1, 1)));
             }
         }
-        static private SysNum.Vector3 ToVector3(Vector3 v) => new SysNum.Vector3(v.X, v.Y, v.Z);
-        static private SysNum.Quaternion ToQuaternion(Quaternion q) => new SysNum.Quaternion(q.X, q.Y, q.Z, q.W);
     }
 }

@@ -67,14 +67,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             return animSkeletonFile;
         }
 
-        private void GenerateAnimations(RmvToGltfExporterSettings settings, List<(Node, Matrix4x4)> nodeData, ModelRoot modelroot, AnimationFile animSkeletonFile, bool doMirror)
+        private void GenerateAnimations(RmvToGltfExporterSettings settings, List<(Node, Matrix4x4)> gltfSkeleton, ModelRoot outputScene, AnimationFile animSkeletonFile, bool doMirror)
         {
             //for (int iAnim = 0; iAnim < settings.InputAnimationFiles.Count; iAnim++)
             {
                 var animAnimationFile = AnimationFile.Create(settings.InputAnimationFiles[0]);
 
-                var animBuilder = new GltfAnimationCreator(nodeData, animSkeletonFile);
-                animBuilder.CreateFromTWAnim(animAnimationFile, modelroot, doMirror);
+                var animBuilder = new GltfAnimationCreator(gltfSkeleton, animSkeletonFile);
+                animBuilder.CreateFromTWAnim(outputScene, animAnimationFile, doMirror);
             }
         }
 
@@ -82,29 +82,30 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         {
             const bool doMirror = true; // TODO: put in view (CheckBox) -> settomgs
 
-            if (!settings.InputModelFiles.Any())
+            if (settings.InputModelFiles.Count == 0)
                 throw new Exception("No input files found");
 
-            int fileIndex = 0; // TODO: add support for multiple model export
+            var fileIndex = 0; // TODO: add support for multiple model export
 
             var rmv2 = new ModelFactory().Load(settings.InputModelFiles[fileIndex].DataSource.ReadData());
             var lodLevel = rmv2.ModelList.First();
-            var hasSkeleton = (rmv2.Header.SkeletonName != "");
+            var hasSkeleton = string.IsNullOrWhiteSpace(rmv2.Header.SkeletonName) == false;
             var gltfSkeleton = new List<(Node, Matrix4x4)>();
-            var model = ModelRoot.CreateModel();
+            
+            var outputScene = ModelRoot.CreateModel();
 
             if (hasSkeleton)
             {
                 var animSkeletonFile = FetchAnimSkeleton(rmv2);
-                gltfSkeleton = GenerateSkeleton(rmv2, model, animSkeletonFile, doMirror);
+                gltfSkeleton = GenerateSkeleton(rmv2, outputScene, animSkeletonFile, doMirror);
 
-                if (settings.ExportAnimations && settings.InputAnimationFiles.Any())
+                if (settings.ExportAnimations && settings.InputAnimationFiles.Count != 0)
                 {
-                    GenerateAnimations(settings, gltfSkeleton, model, animSkeletonFile, doMirror);
+                    GenerateAnimations(settings, gltfSkeleton, outputScene, animSkeletonFile, doMirror);
                 }
             }       
 
-            List<Mesh> meshes = new List<Mesh>();
+            var meshes = new List<Mesh>();
             foreach (var rmvMesh in lodLevel)
             {
                 var gltfMaterial = new MaterialBuilder(rmvMesh.Material.ModelName + "_Material")
@@ -120,10 +121,10 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 {
                     gltfMaterial = BuildFakeMaterialPerMesh(rmvMesh, settings.InputModelFiles[fileIndex]);
                 }
-                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton, doMirror));
+                var mesh = outputScene.CreateMesh(GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton, doMirror));
                 meshes.Add(mesh);
             }
-            BuildGltf(meshes, gltfSkeleton, settings, model);
+            BuildGltf(meshes, gltfSkeleton, settings, outputScene);
 
             // TODO: remove this?
             //_ddsToPngExporter.Export(settings.OutputPath, settings.InputFile, settings); works on its own test
@@ -131,7 +132,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
         public void BuildGltf(List<Mesh> meshes, List<(Node, Matrix4x4)> gltfSkeleton, RmvToGltfExporterSettings settings, ModelRoot model)
         {
-            int fileIndex = 0; // TODO: add support for multiple model export
+            var fileIndex = 0; // TODO: add support for multiple model export
 
             var scene = model.UseScene("default");
             foreach (var mesh in meshes)

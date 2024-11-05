@@ -1,21 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Windows.Input;
-using System.Windows.Navigation;
-using Editors.ImportExport.Exporting.Exporters.GltfSkeleton;
-using Shared.GameFormats.Animation;
+﻿using Editors.ImportExport.Common;
 using Microsoft.Xna.Framework;
-using Newtonsoft.Json.Linq;
-using Shared.Core.Events;
-using Shared.Core.PackFiles;
-using SharpDX.Direct3D9;
-using SharpGLTF.Schema2;
-using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework.Graphics;
-using SharpGLTF.Scenes;
-using SharpGLTF.Animations;
-using SysNum = System.Numerics;
-using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
-using Editors.ImportExport.Common;
+using Shared.GameFormats.Animation;
 
 namespace Editors.ImportExport.Exporting.Exporters.GltfSkeleton
 {
