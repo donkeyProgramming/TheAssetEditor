@@ -174,7 +174,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
                 if (hasSkeleton)
                 {
-                    glTfvertex = BonesAndWeight(vertex, glTfvertex);
+                    glTfvertex = SetVertexInfluences(vertex, glTfvertex);
                 }
                 else
                 {
@@ -195,6 +195,35 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             }
             return mesh;
         }
+
+
+        private static VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> SetVertexInfluences(CommonVertex vertex, VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> glTfvertex)
+        {
+            if (vertex.WeightCount == 2)
+            {
+                var rigging = new (int, float)[2] {
+                        (vertex.BoneIndex[0], vertex.BoneWeight[0]),
+                        (vertex.BoneIndex[1], 1.0f - vertex.BoneWeight[0])
+                        };
+
+                glTfvertex.Skinning.SetBindings(rigging);
+
+            }
+            else if (vertex.WeightCount == 4)
+            {
+                var rigging = new (int, float)[4] {
+                        (vertex.BoneIndex[0], vertex.BoneWeight[0]),
+                        (vertex.BoneIndex[1], vertex.BoneWeight[1]),
+                        (vertex.BoneIndex[2], vertex.BoneWeight[2]),
+                        (vertex.BoneIndex[3], 1.0f - (vertex.BoneWeight[0] + vertex.BoneWeight[1] + vertex.BoneWeight[2]))
+                        };
+
+                glTfvertex.Skinning.SetBindings(rigging);
+            }
+
+            return glTfvertex;
+        }
+
 
 
         internal static VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> BonesAndWeight(CommonVertex vertex,
