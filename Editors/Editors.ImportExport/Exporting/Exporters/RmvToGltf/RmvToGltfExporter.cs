@@ -176,7 +176,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 {
                     glTfvertex = SetVertexInfluences(vertex, glTfvertex);
                 }
-                //else
+                else
                 {
                     glTfvertex.Skinning.SetBindings((0, 1));                    
                 }
