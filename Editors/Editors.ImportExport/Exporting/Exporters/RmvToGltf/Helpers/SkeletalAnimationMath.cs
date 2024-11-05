@@ -56,7 +56,7 @@ namespace Editors.ImportExport.Exporting.Exporters.GltfSkeleton
 
         public FramePoseMatrixCalculator(AnimationFile file)
         {
-            ValidDateAnimationFIle(file);
+            ValidDateSkeletonFile(file);
 
             _animationFile = file;
             _nodeList = new SkeletonFrameNode[file.Bones.Length];
@@ -86,22 +86,25 @@ namespace Editors.ImportExport.Exporting.Exporters.GltfSkeleton
             return output;
         }
 
-        private static void ValidDateAnimationFIle(AnimationFile file)
+        /// <summary>
+        /// Checks thhat the input file is a valid skeleton file
+        /// </summary>            
+        private static void ValidDateSkeletonFile(AnimationFile file)
         {
             if (file.Bones.Length == 0)
                 throw new Exception("No bones!");
 
             if (file.AnimationParts.Count == 0)
-                throw new Exception("No anim parts!");
+                throw new Exception($"No anim parts! Bone Count: {file.Bones.Length}");
 
             if (file.AnimationParts[0].DynamicFrames.Count == 0)
-                throw new Exception("No anim frames!");
-
-            if (file.AnimationParts[0].DynamicFrames.Count == 0)
-                throw new Exception("No anim frames!");
+              throw new Exception($"No anim frames, in part 0!  Bone Count: {file.Bones.Length}, Anim Parts Count: {file.AnimationParts.Count}");                    
 
             if (file.AnimationParts[0].DynamicFrames[0].Quaternion.Count != file.Bones.Length)
-                throw new Exception("No anim frames!");
+                throw new Exception($"Not a valid skeleton file, doesn't contain quaternion values for all bones! Quat count frame 0: {file.AnimationParts[0].DynamicFrames[0].Quaternion.Count}, Bone count {file.Bones.Length}");            
+
+            if (file.AnimationParts[0].DynamicFrames[0].Transforms.Count != file.Bones.Length)
+                throw new Exception($"Not a valid skeleton file, doesn't contain translation values for all bones! Trans count frame 0: {file.AnimationParts[0].DynamicFrames[0].Transforms.Count}, Bone count {file.Bones.Length}");                        
         }
 
         private void RebuildSkeletonGlobalMatrices()
