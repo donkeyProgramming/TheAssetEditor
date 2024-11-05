@@ -66,6 +66,17 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             return animSkeletonFile;
         }
 
+        private void GenerateAnimations(RmvToGltfExporterSettings settings, List<(Node, Matrix4x4)> nodeData, ModelRoot modelroot, AnimationFile animSkeletonFiloe)
+        {
+            //for (int iAnim = 0; iAnim < settings.InputAnimationFiles.Count; iAnim++)
+            {
+                var animAnimationFile = AnimationFile.Create(settings.InputAnimationFiles[0]);
+
+                var animBuilder = new GltfAnimationCreator(nodeData, animSkeletonFiloe);
+                animBuilder.CreateFromTWAnim(animAnimationFile, modelroot);
+            }
+        }
+
         public void Export(RmvToGltfExporterSettings settings)
         {
             if (!settings.InputModelFiles.Any())
@@ -84,12 +95,11 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 var animSkeletonFile = FetchAnimSkeleton(rmv2);
                 gltfSkeleton = GenerateSkeleton(rmv2, model, animSkeletonFile);
 
-                // TODO: Disled in this commit, as existing animation code has not been added yet
-                //if (settings.ExportAnimations && settings.InputAnimationFiles.Any())
-                //{
-                //    GenerateAnimations(settings, gltfSkeleton, model, animSkeletonFile);
-                //}
-            }
+                if (settings.ExportAnimations && settings.InputAnimationFiles.Any())
+                {
+                    GenerateAnimations(settings, gltfSkeleton, model, animSkeletonFile);
+                }
+            }       
 
             List<Mesh> meshes = new List<Mesh>();
             foreach (var rmvMesh in lodLevel)
