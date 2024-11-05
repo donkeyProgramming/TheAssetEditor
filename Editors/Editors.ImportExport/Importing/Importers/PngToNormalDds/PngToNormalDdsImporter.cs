@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Shared.Core.PackFiles;
-using Editors.ImportExport.Misc;
-using Shared.Core.PackFiles.Models;
-using System.Drawing;
-using MeshImportExport;
-using Editors.ImportExport;
+﻿using System.Drawing;
 using System.Windows;
+using Shared.Core.PackFiles;
 
 namespace Editors.ImportExport.Importing.Importers.PngToNormalDds
 {
@@ -60,7 +50,8 @@ namespace Editors.ImportExport.Importing.Importers.PngToNormalDds
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
-                _imageSaveHandler.Save(bitmap, fileDirectory);
+                throw new NotImplementedException();
+                //_imageSaveHandler.Save(bitmap, fileDirectory);
             }
         }
     }

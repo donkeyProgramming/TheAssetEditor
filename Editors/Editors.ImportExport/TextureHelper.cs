@@ -1,19 +1,18 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using Pfim;
 
 namespace MeshImportExport
 {
     public class TextureHelper
     {
-        public static byte[] ConvertDdsToPng(byte[] dds)
+        public static byte[] ConvertDdsToPng(byte[] ddsbyteSteam)
         {
             using var m = new MemoryStream();
             using var w = new BinaryWriter(m);
-            w.Write(dds);
+            w.Write(ddsbyteSteam);
             m.Seek(0, SeekOrigin.Begin);
-            IImage image = Pfim.Pfim.FromStream(m);
+            var image = Pfim.Pfim.FromStream(m);
 
             PixelFormat pixelFormat = PixelFormat.Format32bppArgb;
             if (image.Format == Pfim.ImageFormat.Rgba32)
@@ -29,21 +28,19 @@ namespace MeshImportExport
                 throw new NotSupportedException($"Unsupported DDS format: {image.Format}");
             }
 
-            using (Bitmap bitmap = new Bitmap(image.Width, image.Height, pixelFormat))
-            {
-                BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, pixelFormat);
-                System.Runtime.InteropServices.Marshal.Copy(image.Data, 0, bitmapData.Scan0, image.DataLen);
-                bitmap.UnlockBits(bitmapData);
+            using var bitmap = new Bitmap(image.Width, image.Height, pixelFormat);
+            
+            var bitmapData = bitmap.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, pixelFormat);
+            System.Runtime.InteropServices.Marshal.Copy(image.Data, 0, bitmapData.Scan0, image.DataLen);
+            bitmap.UnlockBits(bitmapData);
 
-                var b = new MemoryStream();
-              
-                bitmap.Save(b, System.Drawing.Imaging.ImageFormat.Png);
+            using var b = new MemoryStream();
+            bitmap.Save(b, ImageFormat.Png);
 
-                var byteSteam = new BinaryReader(b);
-                b.Seek(0, SeekOrigin.Begin);
-                var binData = byteSteam.ReadBytes((int)b.Length);
-                return binData;
-            }
+            using var byteSteam = new BinaryReader(b);
+            b.Seek(0, SeekOrigin.Begin);
+            var binData = byteSteam.ReadBytes((int)b.Length);
+            return binData;
         }
 
         public static byte[] ConvertPngToDds(byte[] png)

@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.IO;
+﻿using System.IO;
 using Editors.ImportExport.Misc;
 using MeshImportExport;
 using Shared.Core.PackFiles;
@@ -28,12 +27,8 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
         {
             var bytes = file.DataSource.ReadData();
             var fileDirectory = outputPath + "/" + Path.GetFileNameWithoutExtension(file.Name) + ".png";
-            
             var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
-            var ms = new MemoryStream(imgBytes);
-            using var img = Image.FromStream(ms);
-            using var bitmap = new Bitmap(img);
-            _imageSaveHandler.Save(bitmap, fileDirectory);
+            _imageSaveHandler.Save(imgBytes, fileDirectory);
         }
 
     }

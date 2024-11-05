@@ -1,47 +1,39 @@
-﻿using Editors.ImportExport.Misc;
+﻿using System.Drawing;
+using System.IO;
+using Editors.ImportExport.Misc;
+using MeshImportExport;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using System.Drawing;
-using System.IO;
-using MeshImportExport;
-using System.Windows;
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
 {
     public class DdsToMaterialPngExporter
     {
-        private readonly PackFileService pfs;
+        private readonly PackFileService _pfs;
         private readonly IImageSaveHandler _imageSaveHandler;
         public DdsToMaterialPngExporter(PackFileService packFileService, IImageSaveHandler imageSaveHandler)
         {
-            pfs = packFileService;
+            _pfs = packFileService;
             _imageSaveHandler = imageSaveHandler;
         }
+
         public string Export(string filePath, string outputPath, bool convertToBlenderFormat)
         {
-            try
-            {
-                var packFile = pfs.FindFile(filePath);
-                var fileName = Path.GetFileNameWithoutExtension(filePath);
-                var fileDirectory = outputPath + "/" + fileName + ".png";
-                var bytes = packFile.DataSource.ReadData();
-                var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
+            var packFile = _pfs.FindFile(filePath);
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            var fileDirectory = outputPath + "/" + fileName + ".png";
+            var bytes = packFile.DataSource.ReadData();
+            var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
  
-                if (convertToBlenderFormat)
-                {
-                    ConvertToBlenderFormat(imgBytes, outputPath, fileDirectory);
-                }
-                else
-                {
-                    DoNotConvertExport(imgBytes, outputPath, fileDirectory);
-                }
-                return fileDirectory;
-            }
-            catch(NullReferenceException exception)
+            if (convertToBlenderFormat)
             {
-                MessageBox.Show(exception.Message + filePath);
-                return "";
+                ConvertToBlenderFormat(imgBytes, outputPath, fileDirectory);
             }
+            else
+            {
+                DoNotConvertExport(imgBytes, outputPath, fileDirectory);
+            }
+            return fileDirectory;
         }
 
         internal ExportSupportEnum CanExportFile(PackFile file)
@@ -53,7 +45,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             return ExportSupportEnum.NotSupported;
         }
 
-        internal void ConvertToBlenderFormat(byte[] imgBytes, string outputPath, string fileDirectory)
+        void ConvertToBlenderFormat(byte[] imgBytes, string outputPath, string fileDirectory)
         {
             var ms = new MemoryStream(imgBytes);
 
@@ -72,16 +64,14 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
-                _imageSaveHandler.Save(bitmap, fileDirectory);
+                //_imageSaveHandler.Save(bitmap, fileDirectory);
+                throw new NotImplementedException();
             }
         }
 
-        internal void DoNotConvertExport(byte[] imgBytes, string outputPath, string fileDirectory)
+        void DoNotConvertExport(byte[] imgBytes, string outputPath, string fileDirectory)
         {
-            var ms = new MemoryStream(imgBytes);
-            using Image img = Image.FromStream(ms);
-            using Bitmap bitmap = new Bitmap(img);
-            _imageSaveHandler.Save(bitmap, fileDirectory);
+            _imageSaveHandler.Save(imgBytes, fileDirectory);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Drawing;
 using System.IO;
 using System.Numerics;
-using System.Windows;
 using Editors.ImportExport.Misc;
 using MeshImportExport;
 using Shared.Core.PackFiles;
@@ -19,31 +18,6 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             _imageSaveHandler = imageSaveHandler;
         }
 
-        public string Export(string filePath, string outputPath, bool convert)
-        {
-            try
-            {
-                var packFile = _pfs.FindFile(filePath);
-                var fileName = Path.GetFileNameWithoutExtension(filePath);
-                var fileDirectory = outputPath + "/" + fileName + ".png";
-                var bytes = packFile.DataSource.ReadData();
-                var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
-                if (convert)
-                {
-                    ConvertToBlueNormalMap(imgBytes, outputPath, fileDirectory);
-                }
-                else
-                {
-                    DoNotConvertExport(imgBytes, outputPath, fileDirectory);
-                }
-                return fileDirectory;
-            } catch(NullReferenceException exception)
-            {
-                MessageBox.Show(exception.Message + filePath);
-                return "";
-            }
-        }
-
         internal ExportSupportEnum CanExportFile(PackFile file)
         {
             if (FileExtensionHelper.IsDdsMaterialFile(file.Name))
@@ -52,7 +26,24 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                 return ExportSupportEnum.Supported;
             return ExportSupportEnum.NotSupported;
         }
-        private void ConvertToBlueNormalMap(byte[] imgBytes, string outputPath, string fileDirectory)
+
+        public string Export(string filePath, string outputPath, bool convertToBlueNormalMap)
+        {
+            var packFile = _pfs.FindFile(filePath);
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            var fullFilePath = outputPath + "/" + fileName + ".png";
+            var bytes = packFile.DataSource.ReadData();
+            var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
+           
+            if (convertToBlueNormalMap)
+                ConvertToBlueNormalMap(imgBytes, fullFilePath);
+
+            _imageSaveHandler.Save(imgBytes, fullFilePath);
+            return fullFilePath;
+        }
+
+
+        private void ConvertToBlueNormalMap(byte[] imgBytes, string fileDirectory)
         {
             var ms = new MemoryStream(imgBytes);
 
@@ -104,16 +95,10 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
-                _imageSaveHandler.Save(bitmap, fileDirectory);
+                throw new NotImplementedException();
+                //_imageSaveHandler.Save(bitmap, fileDirectory);
             }
         }
 
-        public void DoNotConvertExport(byte[] imgBytes, string outputPath, string fileDirectory)
-        {
-            var ms = new MemoryStream(imgBytes);
-            using Image img = Image.FromStream(ms);
-            using Bitmap bitmap = new Bitmap(img);
-            _imageSaveHandler.Save(bitmap, fileDirectory);
-        }
     }
 }

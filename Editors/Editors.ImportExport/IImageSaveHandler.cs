@@ -1,17 +1,21 @@
 ﻿using System.Drawing;
+using System.IO;
 
 namespace Editors.ImportExport
 {
     public interface IImageSaveHandler
     {
-        void Save(Bitmap image, string systemFilePath);
+        void Save(byte[] pngData, string systemFilePath);
     }
 
     public class SystemImageSaveHandler : IImageSaveHandler
     {
-        public void Save(Bitmap image, string systemFilePath)
+        public void Save(byte[] pngData, string systemFilePath)
         {
-            image.Save(systemFilePath, System.Drawing.Imaging.ImageFormat.Png);
+            var ms = new MemoryStream(pngData);
+            using var img = Image.FromStream(ms);
+            using var bitmap = new Bitmap(img);
+            bitmap.Save(systemFilePath, System.Drawing.Imaging.ImageFormat.Png);
         }
     }
 }
