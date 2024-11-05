@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Numerics;
+using Editors.ImportExport.Common;
 using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToPng;
@@ -28,7 +29,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         bool ExportTextures,
         bool ConvertMaterialTextureToBlender,
         bool ConvertNormalTextureToBlue,
-        bool ExportAnimations
+        bool ExportAnimations        
     );
 
     public class RmvToGltfExporter
@@ -66,19 +67,21 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             return animSkeletonFile;
         }
 
-        private void GenerateAnimations(RmvToGltfExporterSettings settings, List<(Node, Matrix4x4)> nodeData, ModelRoot modelroot, AnimationFile animSkeletonFiloe)
+        private void GenerateAnimations(RmvToGltfExporterSettings settings, List<(Node, Matrix4x4)> nodeData, ModelRoot modelroot, AnimationFile animSkeletonFile, bool doMirror)
         {
             //for (int iAnim = 0; iAnim < settings.InputAnimationFiles.Count; iAnim++)
             {
                 var animAnimationFile = AnimationFile.Create(settings.InputAnimationFiles[0]);
 
-                var animBuilder = new GltfAnimationCreator(nodeData, animSkeletonFiloe);
-                animBuilder.CreateFromTWAnim(animAnimationFile, modelroot);
+                var animBuilder = new GltfAnimationCreator(nodeData, animSkeletonFile);
+                animBuilder.CreateFromTWAnim(animAnimationFile, modelroot, doMirror);
             }
         }
 
         public void Export(RmvToGltfExporterSettings settings)
         {
+            const bool doMirror = true; // TODO: put in view (CheckBox) -> settomgs
+
             if (!settings.InputModelFiles.Any())
                 throw new Exception("No input files found");
 
@@ -93,11 +96,11 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             if (hasSkeleton)
             {
                 var animSkeletonFile = FetchAnimSkeleton(rmv2);
-                gltfSkeleton = GenerateSkeleton(rmv2, model, animSkeletonFile);
+                gltfSkeleton = GenerateSkeleton(rmv2, model, animSkeletonFile, doMirror);
 
                 if (settings.ExportAnimations && settings.InputAnimationFiles.Any())
                 {
-                    GenerateAnimations(settings, gltfSkeleton, model, animSkeletonFile);
+                    GenerateAnimations(settings, gltfSkeleton, model, animSkeletonFile, doMirror);
                 }
             }       
 
@@ -117,7 +120,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 {
                     gltfMaterial = BuildFakeMaterialPerMesh(rmvMesh, settings.InputModelFiles[fileIndex]);
                 }
-                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton));
+                var mesh = model.CreateMesh(GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton, doMirror));
                 meshes.Add(mesh);
             }
             BuildGltf(meshes, gltfSkeleton, settings, model);
@@ -146,19 +149,19 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         }
 
 
-        internal List<(Node, Matrix4x4)> GenerateSkeleton(RmvFile rmv2, ModelRoot model, AnimationFile animSkeletonFile)
+        internal List<(Node, Matrix4x4)> GenerateSkeleton(RmvFile rmv2, ModelRoot model, AnimationFile animSkeletonFile, bool doMIrror)
         {
-            var gltfSkeletonBindings = GltfSkeletonCreator.Create(model, animSkeletonFile);
+            var gltfSkeletonBindings = GltfSkeletonCreator.Create(model, animSkeletonFile, doMIrror);
 
             return gltfSkeletonBindings;
         }
 
-        public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> GenerateMesh(RmvModel rmvMesh, MaterialBuilder material, bool hasSkeleton)
+        public static MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> GenerateMesh(RmvModel rmvMesh, MaterialBuilder material, bool hasSkeleton, bool doMirror)
         {
             var mesh = new MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>(rmvMesh.Material.ModelName);
             if (hasSkeleton)
             {
-                mesh.VertexPreprocessor.SetValidationPreprocessors();
+                mesh.VertexPreprocessor.SetValidationPreprocessors(); 
             }
 
             var prim = mesh.UsePrimitive(material);
@@ -171,6 +174,10 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 glTfvertex.Geometry.Normal = new Vector3(vertex.Normal.X, vertex.Normal.Y, vertex.Normal.Z);
                 glTfvertex.Geometry.Tangent = new Vector4(vertex.Tangent.X, vertex.Tangent.Y, vertex.Tangent.Z, 1);
                 glTfvertex.Material.TexCoord = new Vector2(vertex.Uv.X, vertex.Uv.Y);
+
+                glTfvertex.Geometry.Position = VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Position), doMirror));
+                glTfvertex.Geometry.Normal = VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Normal), doMirror));
+                glTfvertex.Geometry.Tangent = VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Tangent), doMirror));
 
                 if (hasSkeleton)
                 {
@@ -186,10 +193,21 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var triangleCount = rmvMesh.Mesh.IndexList.Length;
             for (var i = 0; i < triangleCount; i += 3)
             {
-                var i0 = rmvMesh.Mesh.IndexList[i + 0];
-                var i1 = rmvMesh.Mesh.IndexList[i + 1];
-                var i2 = rmvMesh.Mesh.IndexList[i + 2];
 
+                ushort i0, i1, i2;
+                if (doMirror) // if mirrored, flip the winding order
+                {
+                    i0 = rmvMesh.Mesh.IndexList[i + 0];
+                    i1 = rmvMesh.Mesh.IndexList[i + 2];
+                    i2 = rmvMesh.Mesh.IndexList[i + 1];
+                }
+                else
+                {
+                    i0 = rmvMesh.Mesh.IndexList[i + 0];
+                    i1 = rmvMesh.Mesh.IndexList[i + 1];
+                    i2 = rmvMesh.Mesh.IndexList[i + 2];
+                }
+                
                 prim.AddTriangle(vertexList[i0], vertexList[i1], vertexList[i2]);
             }
             return mesh;

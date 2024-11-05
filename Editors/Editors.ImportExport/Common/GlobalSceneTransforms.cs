@@ -13,12 +13,10 @@ namespace Editors.ImportExport.Common
     /// 
     /// </summary>
     public class GlobalSceneTransforms
-    {
-        static public bool DoMirror { get; set; }
-
-        static public Quaternion FlipQuaternion(Quaternion q)
-        {
-            if (DoMirror)
+    {    
+        static public Quaternion FlipQuaternion(Quaternion q, bool doMirror)
+        {            
+            if (doMirror)
             {
                 return new Quaternion(q.X, -q.Y, -q.Z, q.W);
             }
@@ -28,9 +26,9 @@ namespace Editors.ImportExport.Common
             }
         }
 
-        static public Vector3 FlipVector(Vector3 v)
+        static public Vector3 FlipVector(Vector3 v, bool doMirror)
         {
-            if (DoMirror)
+            if (doMirror)
             {
                 return new Vector3(-v.X, v.Y, v.Z);
             }
@@ -39,10 +37,9 @@ namespace Editors.ImportExport.Common
                 return v;
             }
         }
-
-        static public Vector4 FlipVector(Vector4 v)
+        static public Vector4 FlipVector(Vector4 v, bool doMirror)
         {
-            if (DoMirror)
+            if (doMirror)
             {
                 return new Vector4(-v.X, v.Y, v.Z, v.W);
             }

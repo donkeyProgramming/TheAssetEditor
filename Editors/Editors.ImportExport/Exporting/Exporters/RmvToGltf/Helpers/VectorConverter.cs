@@ -13,6 +13,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
         public static System.Numerics.Vector4 GetSys(Microsoft.Xna.Framework.Vector4 v) => new System.Numerics.Vector4(v.X, v.Y, v.Z, v.W);
         public static System.Numerics.Vector3 GetSys(Microsoft.Xna.Framework.Vector3 v) => new System.Numerics.Vector3(v.X, v.Y, v.Z);
 
+        public static Microsoft.Xna.Framework.Vector4 GetXna(System.Numerics.Vector4 v) => new Microsoft.Xna.Framework.Vector4(v.X, v.Y, v.Z, v.W);
+        public static Microsoft.Xna.Framework.Vector3 GetXna(System.Numerics.Vector3 v) => new Microsoft.Xna.Framework.Vector3(v.X, v.Y, v.Z);
+
         public static System.Numerics.Matrix4x4 Create4x4SysMatrix(Microsoft.Xna.Framework.Matrix invMatrices) =>
             new Matrix4x4(invMatrices.M11, invMatrices.M12, invMatrices.M13, invMatrices.M14,
                             invMatrices.M21, invMatrices.M22, invMatrices.M23, invMatrices.M24,

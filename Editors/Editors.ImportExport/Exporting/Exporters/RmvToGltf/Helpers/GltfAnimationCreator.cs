@@ -35,8 +35,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             _skeletonAnimFile = skeletonAnimFile;
         }
 
-        public void CreateFromTWAnim(AnimationFile animationFile, ModelRoot modelRoot)
-        {
+        public void CreateFromTWAnim(AnimationFile animationFile, ModelRoot modelRoot, bool doMirror)
+        {   
             var gameSkeleton = new GameSkeleton(_skeletonAnimFile, _animationPlayer);
             var animationClip = new AnimationClip(animationFile, gameSkeleton);
 
@@ -50,8 +50,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 // populate the bone track containers with the key frames from the .ANIM animation file
                 for (var frameIndex = 0; frameIndex < animationClip.DynamicFrames.Count; frameIndex++)
                 {
-                    translationKeyFrames.Add(secondsPerFrame * frameIndex, VecConv.GetSys(GlobalSceneTransforms.FlipVector(animationClip.DynamicFrames[frameIndex].Position[boneIndex])));
-                    rotationKeyFrames.Add(secondsPerFrame * frameIndex, VecConv.GetSys(GlobalSceneTransforms.FlipQuaternion(animationClip.DynamicFrames[frameIndex].Rotation[boneIndex])));
+                    translationKeyFrames.Add(secondsPerFrame * frameIndex, VecConv.GetSys(GlobalSceneTransforms.FlipVector(animationClip.DynamicFrames[frameIndex].Position[boneIndex], doMirror)));
+                    rotationKeyFrames.Add(secondsPerFrame * frameIndex, VecConv.GetSys(GlobalSceneTransforms.FlipQuaternion(animationClip.DynamicFrames[frameIndex].Rotation[boneIndex], doMirror)));
                 }
 
                 // find ACTUAL nodes, as opposed to "fake/visual"? nodes

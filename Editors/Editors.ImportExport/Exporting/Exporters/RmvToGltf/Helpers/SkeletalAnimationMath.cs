@@ -72,9 +72,9 @@ namespace Editors.ImportExport.Exporting.Exporters.GltfSkeleton
             }
         }
 
-        public List<Matrix> GetInverseBindPoseMatrices()
+        public List<Matrix> GetInverseBindPoseMatrices(bool doMirror)
         {
-            RebuildSkeletonGlobalMatrices();
+            RebuildSkeletonGlobalMatrices(doMirror);
 
             var output = new List<Matrix>();
             for (var i = 0; i < _worldTransform.Length; i++)
@@ -102,18 +102,18 @@ namespace Editors.ImportExport.Exporting.Exporters.GltfSkeleton
 
             if (file.AnimationParts[0].DynamicFrames[0].Quaternion.Count != file.Bones.Length)
                 throw new Exception($"Not a valid skeleton file, doesn't contain quaternion values for all bones! Quat count frame 0: {file.AnimationParts[0].DynamicFrames[0].Quaternion.Count}, Bone count {file.Bones.Length}");            
-
+            
             if (file.AnimationParts[0].DynamicFrames[0].Transforms.Count != file.Bones.Length)
                 throw new Exception($"Not a valid skeleton file, doesn't contain translation values for all bones! Trans count frame 0: {file.AnimationParts[0].DynamicFrames[0].Transforms.Count}, Bone count {file.Bones.Length}");                        
         }
 
-        private void RebuildSkeletonGlobalMatrices()
+        private void RebuildSkeletonGlobalMatrices(bool doMirror)
         {
             _worldTransform = new Matrix[_animationFile.Bones.Length];
             for (var boneIndex = 0; boneIndex < _animationFile.Bones.Length; boneIndex++)
             {
-                var translationMatrix = Matrix.CreateTranslation(GlobalSceneTransforms.FlipVector(_animationFile.AnimationParts[0].DynamicFrames[0].Transforms[boneIndex].ToVector3()));
-                var rotationMatrix = Matrix.CreateFromQuaternion(GlobalSceneTransforms.FlipQuaternion(_animationFile.AnimationParts[0].DynamicFrames[0].Quaternion[boneIndex].ToQuaternion()));
+                var translationMatrix = Matrix.CreateTranslation(GlobalSceneTransforms.FlipVector(_animationFile.AnimationParts[0].DynamicFrames[0].Transforms[boneIndex].ToVector3(), doMirror));
+                var rotationMatrix = Matrix.CreateFromQuaternion(GlobalSceneTransforms.FlipQuaternion(_animationFile.AnimationParts[0].DynamicFrames[0].Quaternion[boneIndex].ToQuaternion(), doMirror));
                 var scaleMatrix = Matrix.CreateScale(1, 1, 1);
                 var transform = scaleMatrix * rotationMatrix * translationMatrix;
                 _worldTransform[boneIndex] = transform;

@@ -26,8 +26,8 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToPng
         public ExportSupportEnum CanExportFile(PackFile file) => _exporter.CanExportFile(file);
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
-        {
-            var settings = new RmvToGltfExporterSettings(new List<PackFile>{exportSource},null, null,  outputPath, ExportTextures, ConvertMaterialTextureToBlender, ConvertNormalTextureToBlue, ExportAnimations);
+        {            
+            var settings = new RmvToGltfExporterSettings(new List<PackFile>{exportSource},null, null, outputPath, ExportTextures, ConvertMaterialTextureToBlender, ConvertNormalTextureToBlue, ExportAnimations);
             _exporter.Export(outputPath, exportSource, settings);
         }
     }
