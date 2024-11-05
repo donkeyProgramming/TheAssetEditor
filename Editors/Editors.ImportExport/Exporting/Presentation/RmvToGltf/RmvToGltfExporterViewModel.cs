@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.ImportExport.Exporting.Exporters;
-using Editors.ImportExport.Exporting.Exporters.DdsToPng;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
 using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
@@ -29,7 +28,7 @@ namespace Editors.ImportExport.Exporting.Presentation.RmvToGltf
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter)
         {
-            var settings = new RmvToGltfExporterSettings(new List<PackFile> { exportSource }, null, null, outputPath, ExportTextures, ConvertMaterialTextureToBlender, ConvertNormalTextureToBlue, ExportAnimations);
+            var settings = new RmvToGltfExporterSettings( exportSource, null, null, outputPath, ConvertMaterialTextureToBlender, ConvertNormalTextureToBlue, ExportAnimations);
             _exporter.Export(settings);
         }
     }

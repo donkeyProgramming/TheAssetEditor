@@ -1,14 +1,29 @@
 ﻿using Editors.ImportExport.Common;
 using Editors.ImportExport.Exporting.Exporters.GltfSkeleton;
+using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using SharpGLTF.Schema2;
 using Matrix4x4 = System.Numerics.Matrix4x4;
 
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
+    public class ProcessedGltfSkeleton
+    {
+        public required List<(Node, Matrix4x4)> Data { get; set; }
+    }
+
     public class GltfSkeletonCreator
     {
-        public static List<(Node node, Matrix4x4 invMatrix)> Create(ModelRoot outputScene, AnimationFile animSkeletonFil, bool doMirror)
+        private readonly PackFileService _packFileService;
+
+        public GltfSkeletonCreator(PackFileService packFileService)
+        {
+            _packFileService = packFileService;
+        }
+
+
+
+        public ProcessedGltfSkeleton Create(ModelRoot outputScene, AnimationFile animSkeletonFil, bool doMirror)
         {
             var framePoseMatrixCalculator = new FramePoseMatrixCalculator(animSkeletonFil);
             var invMatrices = framePoseMatrixCalculator.GetInverseBindPoseMatrices(doMirror);
@@ -38,7 +53,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 outputGltfBindings.Add((parentIdToGltfNode[boneIndex], invBindPoseMatrix4x4));
             }
 
-            return outputGltfBindings;
+            return new ProcessedGltfSkeleton() { Data = outputGltfBindings };
         }
     }
 }

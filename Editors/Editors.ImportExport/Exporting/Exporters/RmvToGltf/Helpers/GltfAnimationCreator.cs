@@ -9,9 +9,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
     public class GltfAnimationCreator
     {
         private readonly AnimationFile _skeletonAnimFile;
-        private readonly List<(Node, SysNum.Matrix4x4)> _skeletonNodes;
+        private readonly ProcessedGltfSkeleton _skeletonNodes;
 
-        public GltfAnimationCreator(List<(Node, SysNum.Matrix4x4)> gltfSkeleton, AnimationFile skeletonAnimFile)
+        public GltfAnimationCreator(ProcessedGltfSkeleton gltfSkeleton, AnimationFile skeletonAnimFile)
         {
             _skeletonNodes = gltfSkeleton;
             _skeletonAnimFile = skeletonAnimFile;
@@ -37,7 +37,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 }
 
                 // find ACTUAL nodes, as opposed to "fake/visual"? nodes
-                var boneNode = _skeletonNodes[boneIndex].Item1;
+                var boneNode = _skeletonNodes.Data[boneIndex].Item1;
                 var logicalIndex = boneNode.LogicalIndex;
 
                 if (logicalIndex >= outputScene.LogicalNodes.Count)

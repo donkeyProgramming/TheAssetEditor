@@ -4,6 +4,7 @@ using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToPng;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
+using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using Editors.ImportExport.Exporting.Presentation;
 using Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Presentation.DdsToNormalPng;
@@ -39,6 +40,12 @@ namespace Editors.ImportExport
             // Helpers to ensure we can hook up to the UI
             services.AddTransient<IExportFileContextMenuHelper, ExportFileContextMenuHelper>();
             services.AddTransient<DisplayExportFileToolCommand>();
+            services.AddTransient<GltfMeshBuilder>();
+            services.AddTransient<GltfSkeletonCreator>();
+            
+
+
+
 
         }
     }

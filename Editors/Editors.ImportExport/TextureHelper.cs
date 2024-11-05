@@ -140,30 +140,7 @@ namespace MeshImportExport
         }
 
         //this will be used when a user does not want to have textures
-        public static MaterialBuilder BuildFakeMaterial(PackFileService pfs, RmvModel model)
-        {
-            var baseFile = pfs.FindFile("commontextures/default_base_colour.dds");
-            var materialFile = pfs.FindFile("commontextures/default_material_map.dds");
-            var normalFile = pfs.FindFile("commontextures/default_normal.dds");
-            var baseBytes = baseFile.DataSource.ReadData();
-            var materialBytes = materialFile.DataSource.ReadData();
-            var normalBytes = normalFile.DataSource.ReadData();
 
-
-            var basePng = ConvertDdsToPng(baseBytes);
-            var materialPng = ConvertDdsToPng(materialBytes);
-            var normalPng = ConvertDdsToPng(normalBytes);
-
-            var material = new MaterialBuilder(model.Material.ModelName + "_Material")
-               .WithDoubleSide(true)
-                .WithMetallicRoughness()
-                .WithChannelImage(KnownChannel.BaseColor, new MemoryImage(basePng))
-                .WithChannelImage(KnownChannel.MetallicRoughness, new MemoryImage(materialPng))
-                .WithChannelImage(KnownChannel.Normal, new MemoryImage(normalPng));
-
-
-            return material;
-        }
 
         /**public static List<byte[]> FindFileAndReturnPngList(PackFileService pfs, RmvModel model, PackFile inFile)
         {

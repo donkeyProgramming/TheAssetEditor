@@ -189,7 +189,7 @@ namespace Editors.Shared.DevConfig.Configs
 
             System.IO.Directory.CreateDirectory(destPath);
 
-            var settings = new RmvToGltfExporterSettings(new List<PackFile>() { meshPackFile }, new List<PackFile>() { animPackFile }, null,  destPath, true, true, true, true);
+            var settings = new RmvToGltfExporterSettings(meshPackFile, new List<PackFile>() { animPackFile }, null,  destPath, true, true, true);
             _exporter.Export(settings);
         }
 
