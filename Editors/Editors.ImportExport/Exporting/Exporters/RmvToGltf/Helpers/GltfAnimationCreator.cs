@@ -8,7 +8,6 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
     public class GltfAnimationCreator
     {
-
         private readonly AnimationFile _skeletonAnimFile;
         private readonly List<(Node, SysNum.Matrix4x4)> _skeletonNodes;
 

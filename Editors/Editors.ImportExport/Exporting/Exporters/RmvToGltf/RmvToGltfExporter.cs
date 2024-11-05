@@ -22,7 +22,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 {
     public record RmvToGltfExporterSettings(
 
-        List<PackFile> InputModelFiles,
+        PackFile InputModelFile,
         List<PackFile> InputAnimationFiles,
         PackFile InputSkeletonFile,
         string OutputPath,
@@ -82,12 +82,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         {
             const bool doMirror = true; // TODO: put in view (CheckBox) -> settomgs
 
-            if (settings.InputModelFiles.Count == 0)
-                throw new Exception("No input files found");
-
-            var fileIndex = 0; // TODO: add support for multiple model export
-
-            var rmv2 = new ModelFactory().Load(settings.InputModelFiles[fileIndex].DataSource.ReadData());
+            var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
             var lodLevel = rmv2.ModelList.First();
             var hasSkeleton = string.IsNullOrWhiteSpace(rmv2.Header.SkeletonName) == false;
             var gltfSkeleton = new List<(Node, Matrix4x4)>();
@@ -119,34 +114,25 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 }
                 else
                 {
-                    gltfMaterial = BuildFakeMaterialPerMesh(rmvMesh, settings.InputModelFiles[fileIndex]);
+                    gltfMaterial = BuildFakeMaterialPerMesh(rmvMesh, settings.InputModelFile);
                 }
                 var mesh = outputScene.CreateMesh(GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton, doMirror));
                 meshes.Add(mesh);
             }
             BuildGltf(meshes, gltfSkeleton, settings, outputScene);
-
-            // TODO: remove this?
-            //_ddsToPngExporter.Export(settings.OutputPath, settings.InputFile, settings); works on its own test
         }
 
         public void BuildGltf(List<Mesh> meshes, List<(Node, Matrix4x4)> gltfSkeleton, RmvToGltfExporterSettings settings, ModelRoot model)
         {
-            var fileIndex = 0; // TODO: add support for multiple model export
-
             var scene = model.UseScene("default");
             foreach (var mesh in meshes)
             {
                 if (gltfSkeleton.Count != 0)
-                {
                     scene.CreateNode(mesh.Name).WithSkinnedMesh(mesh, gltfSkeleton.ToArray());
-                }
                 else
-                {
                     scene.CreateNode(mesh.Name).WithMesh(mesh);
-                }
             }
-            model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputModelFiles[fileIndex].Name) + ".gltf");
+            model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputModelFile.Name) + ".gltf");
         }
 
 

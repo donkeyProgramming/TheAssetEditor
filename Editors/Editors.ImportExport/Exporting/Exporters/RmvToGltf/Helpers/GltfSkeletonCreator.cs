@@ -23,7 +23,6 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             for (var boneIndex = 0; boneIndex < animSkeletonFil.Bones.Length; boneIndex++)
             {
                 var parentNode = parentIdToGltfNode[animSkeletonFil.Bones[boneIndex].ParentId];
-
                 if (parentNode == null)
                     throw new Exception($"Parent Node not found for boneIndex={boneIndex}");
 
