@@ -68,7 +68,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             BuildGltfScene(meshes, gltfSkeleton, settings, outputScene);
         }
 
-        public void BuildGltfScene(List<IMeshBuilder<MaterialBuilder>> meshBuilders, ProcessedGltfSkeleton? gltfSkeleton, RmvToGltfExporterSettings settings, ModelRoot outputScene)
+        void BuildGltfScene(List<IMeshBuilder<MaterialBuilder>> meshBuilders, ProcessedGltfSkeleton? gltfSkeleton, RmvToGltfExporterSettings settings, ModelRoot outputScene)
         {
             var scene = outputScene.UseScene("default");
             foreach (var meshBuilder in meshBuilders)
@@ -85,7 +85,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
 
         // MOve this into skeleton/animation builder
-        private void GenerateAnimations(RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene, AnimationFile animSkeletonFile, bool doMirror)
+        void GenerateAnimations(RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene, AnimationFile animSkeletonFile, bool doMirror)
         {
             //for (int iAnim = 0; iAnim < settings.InputAnimationFiles.Count; iAnim++)
             {
@@ -96,7 +96,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             }
         }
 
-        private AnimationFile FetchAnimSkeleton(RmvFile rmv2)
+        AnimationFile FetchAnimSkeleton(RmvFile rmv2)
         {
             var skeletonName = rmv2.Header.SkeletonName + ".anim";
             var skeletonSearchList = _packFileService.SearchForFile(skeletonName);
