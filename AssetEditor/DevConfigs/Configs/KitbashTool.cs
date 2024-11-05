@@ -171,8 +171,8 @@ namespace Editors.Shared.DevConfig.Configs
         public void OpenFileOnLoad()
         {
             var meshPackFile = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2");
-            var animPackFile = _packFileService.FindFile(@"animations\battle\humanoid01\subset\skeleton_warriors\sword_and_shield\combat_idles\hu1_sk_sws_combat_idle_03.anim");
-
+           var animPackFile = _packFileService.FindFile(@"animations\battle\humanoid01\subset\skeleton_warriors\sword_and_shield\combat_idles\hu1_sk_sws_combat_idle_03.anim");
+         
             // obtains user's document folder 
             var documentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var destPath = $"{documentPath}\\AE_Export_Handedness\\";
@@ -196,9 +196,7 @@ namespace Editors.Shared.DevConfig.Configs
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.LoadCaPacksByDefault = true;
-            currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-            var packFile = ResourceLoader.GetDevelopmentDataFolder();// + "\\Karl_and_celestialgeneral.pack";
-            _packFileService.Load(packFile, false, true);
+            currentSettings.CurrentGame = GameTypeEnum.Warhammer3;            
         }
     }
 }

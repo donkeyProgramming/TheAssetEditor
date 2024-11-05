@@ -3,6 +3,7 @@ using System.Numerics;
 using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
 using Editors.ImportExport.Exporting.Exporters.DdsToPng;
+using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using Editors.ImportExport.Misc;
 using MeshImportExport;
 using Shared.Core.PackFiles;
@@ -19,14 +20,16 @@ using SharpGLTF.Schema2;
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 {
     public record RmvToGltfExporterSettings(
-        PackFile InputFile,
+
+        List<PackFile> InputModelFiles,
+        List<PackFile> InputAnimationFiles,
+        PackFile InputSkeletonFile,
         string OutputPath,
         bool ExportTextures,
         bool ConvertMaterialTextureToBlender,
         bool ConvertNormalTextureToBlue,
         bool ExportAnimations
     );
-
 
     public class RmvToGltfExporter
     {
@@ -47,22 +50,47 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         {
             if (FileExtensionHelper.IsRmvFile(file.Name))
                 return ExportSupportEnum.HighPriority;
-            if(FileExtensionHelper.IsWsModelFile(file.Name))
+            if (FileExtensionHelper.IsWsModelFile(file.Name))
                 return ExportSupportEnum.HighPriority;
             return ExportSupportEnum.NotSupported;
         }
 
+        private AnimationFile FetchAnimSkeleton(RmvFile rmv2)
+        {
+            var skeletonName = rmv2.Header.SkeletonName + ".anim";
+            var skeletonSearchList = _packFileService.SearchForFile(skeletonName);
+            var skeletonPath = _packFileService.GetFullPath(_packFileService.FindFile(skeletonSearchList[0]));
+            var skeletonPackFile = _packFileService.FindFile(skeletonPath);
+
+            var animSkeletonFile = AnimationFile.Create(skeletonPackFile);
+            return animSkeletonFile;
+        }
+
         public void Export(RmvToGltfExporterSettings settings)
         {
-            var rmv2 = new ModelFactory().Load(settings.InputFile.DataSource.ReadData());
+            if (!settings.InputModelFiles.Any())
+                throw new Exception("No input files found");
+
+            int fileIndex = 0; // TODO: add support for multiple model export
+
+            var rmv2 = new ModelFactory().Load(settings.InputModelFiles[fileIndex].DataSource.ReadData());
             var lodLevel = rmv2.ModelList.First();
             var hasSkeleton = (rmv2.Header.SkeletonName != "");
             var gltfSkeleton = new List<(Node, Matrix4x4)>();
             var model = ModelRoot.CreateModel();
+
             if (hasSkeleton)
             {
-                gltfSkeleton = GenerateSkeleton(rmv2, model);
+                var animSkeletonFile = FetchAnimSkeleton(rmv2);
+                gltfSkeleton = GenerateSkeleton(rmv2, model, animSkeletonFile);
+
+                // TODO: Disled in this commit, as existing animation code has not been added yet
+                //if (settings.ExportAnimations && settings.InputAnimationFiles.Any())
+                //{
+                //    GenerateAnimations(settings, gltfSkeleton, model, animSkeletonFile);
+                //}
             }
+
             List<Mesh> meshes = new List<Mesh>();
             foreach (var rmvMesh in lodLevel)
             {
@@ -77,17 +105,21 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 }
                 else
                 {
-                    gltfMaterial = BuildFakeMaterialPerMesh(rmvMesh, settings.InputFile);
+                    gltfMaterial = BuildFakeMaterialPerMesh(rmvMesh, settings.InputModelFiles[fileIndex]);
                 }
                 var mesh = model.CreateMesh(GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton));
                 meshes.Add(mesh);
             }
             BuildGltf(meshes, gltfSkeleton, settings, model);
+
+            // TODO: remove this?
             //_ddsToPngExporter.Export(settings.OutputPath, settings.InputFile, settings); works on its own test
         }
 
         public void BuildGltf(List<Mesh> meshes, List<(Node, Matrix4x4)> gltfSkeleton, RmvToGltfExporterSettings settings, ModelRoot model)
         {
+            int fileIndex = 0; // TODO: add support for multiple model export
+
             var scene = model.UseScene("default");
             foreach (var mesh in meshes)
             {
@@ -100,24 +132,13 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                     scene.CreateNode(mesh.Name).WithMesh(mesh);
                 }
             }
-            model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputFile.Name) + ".gltf");
+            model.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputModelFiles[fileIndex].Name) + ".gltf");
         }
 
-        internal List<(Node, Matrix4x4)> GenerateSkeleton(RmvFile rmv2, ModelRoot model)
+
+        internal List<(Node, Matrix4x4)> GenerateSkeleton(RmvFile rmv2, ModelRoot model, AnimationFile animSkeletonFile)
         {
-            var skeletonName = rmv2.Header.SkeletonName + ".anim";
-            var skeletonSearchList = _packFileService.SearchForFile(skeletonName);
-            var skeletonPath = _packFileService.GetFullPath(_packFileService.FindFile(skeletonSearchList[0]));
-            var skeletonPackFile = _packFileService.FindFile(skeletonPath);
-
-            var invMatrixName = rmv2.Header.SkeletonName + ".bone_inv_trans_mats";
-            var invMatrixSearchList = _packFileService.SearchForFile(invMatrixName);
-            var invMatrixFilePath = _packFileService.GetFullPath(_packFileService.FindFile(invMatrixSearchList[0]));
-            var invMatrixPackFile = _packFileService.FindFile(invMatrixFilePath);
-
-            var animFile = AnimationFile.Create(skeletonPackFile);
-            var invMatrixFile = AnimInvMatrixFile.Create(invMatrixPackFile.DataSource.ReadDataAsChunk());
-            var gltfSkeletonBindings = SkeletonExporter.CreateSkeletonFromGameSkeleton(animFile, invMatrixFile, model);
+            var gltfSkeletonBindings = GltfSkeletonCreator.Create(model, animSkeletonFile);
 
             return gltfSkeletonBindings;
         }
