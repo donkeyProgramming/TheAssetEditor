@@ -74,11 +74,11 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
                 if (hasSkeleton)
                 {
-                    SetVertexInfluences(vertex, glTfvertex);
+                    glTfvertex = SetVertexInfluences(vertex, glTfvertex);
                 }
                 else
                 {
-                    glTfvertex.Skinning.SetBindings((0, 1));
+                    glTfvertex.Skinning.SetBindings((0, 1), (0, 0), (0, 0), (0, 0));
                 }
                 vertexList.Add(glTfvertex);
             }
@@ -107,7 +107,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
         }
 
 
-        void SetVertexInfluences(CommonVertex vertex, VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> glTfvertex)
+        VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> SetVertexInfluences(CommonVertex vertex, VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> glTfvertex)
         {
             if (vertex.WeightCount == 2)
             {
@@ -130,6 +130,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
                 glTfvertex.Skinning.SetBindings(rigging);
             }
+
+            return glTfvertex;
         }
 
         List<MaterialBuilderTextureInput> ExtractTextures(RmvModel model)
@@ -163,8 +165,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             var baseColourTexture = textures.FirstOrDefault(t => t.Type == TextureType.BaseColour);
             if (baseColourTexture.Path != null)
             {
-                //  systemPath = _ddsToPngExporter.GenericExportNoConversion(settings.OutputPath, baseColourTexture);
-                //  material.WithChannelImage(KnownChannel.BaseColor, systemPath);
+                var systemPath = _ddsToMaterialPngExporter.Export(baseColourTexture.Path, settings.OutputPath, false); // TODO: write a separate class for base colour
+                material.WithChannelImage(KnownChannel.BaseColor, systemPath);
             }
 
             return material;

@@ -36,20 +36,19 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
            
             if (convertToBlueNormalMap)
-                ConvertToBlueNormalMap(imgBytes, fullFilePath);
+                imgBytes = ConvertToBlueNormalMap(imgBytes, fullFilePath);
 
             _imageSaveHandler.Save(imgBytes, fullFilePath);
             return fullFilePath;
         }
 
 
-        private void ConvertToBlueNormalMap(byte[] imgBytes, string fileDirectory)
+        private byte[] ConvertToBlueNormalMap(byte[] imgBytes, string fileDirectory)
         {
-            var ms = new MemoryStream(imgBytes);
+            var inMs = new MemoryStream(imgBytes);
+            using Image inImg = Image.FromStream(inMs);
 
-            using Image img = Image.FromStream(ms);
-
-            using Bitmap bitmap = new Bitmap(img);
+            using Bitmap bitmap = new Bitmap(inImg);
             {
                 for (int x = 0; x < bitmap.Width; x++)
                 {
@@ -95,8 +94,12 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
-                throw new NotImplementedException();
-                //_imageSaveHandler.Save(bitmap, fileDirectory);
+
+                // get raw PNG bytes
+                using var b = new MemoryStream();
+                bitmap.Save(b, System.Drawing.Imaging.ImageFormat.Png);
+
+                return b.ToArray();
             }
         }
 

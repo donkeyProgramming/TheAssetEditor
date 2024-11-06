@@ -24,15 +24,14 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             var fileDirectory = outputPath + "/" + fileName + ".png";
             var bytes = packFile.DataSource.ReadData();
             var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
- 
+
             if (convertToBlenderFormat)
             {
-                ConvertToBlenderFormat(imgBytes, outputPath, fileDirectory);
+                imgBytes = ConvertToBlenderFormat(imgBytes, outputPath, fileDirectory);
             }
-            else
-            {
-                DoNotConvertExport(imgBytes, outputPath, fileDirectory);
-            }
+
+            _imageSaveHandler.Save(imgBytes, fileDirectory);
+
             return fileDirectory;
         }
 
@@ -45,7 +44,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             return ExportSupportEnum.NotSupported;
         }
 
-        void ConvertToBlenderFormat(byte[] imgBytes, string outputPath, string fileDirectory)
+        byte[] ConvertToBlenderFormat(byte[] imgBytes, string outputPath, string fileDirectory)
         {
             var ms = new MemoryStream(imgBytes);
 
@@ -64,8 +63,12 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
                         bitmap.SetPixel(x, y, newColor);
                     }
                 }
-                //_imageSaveHandler.Save(bitmap, fileDirectory);
-                throw new NotImplementedException();
+
+                // get raw PNG bytes
+                using var b = new MemoryStream();
+                bitmap.Save(b, System.Drawing.Imaging.ImageFormat.Png);
+
+                return b.ToArray();
             }
         }
 
