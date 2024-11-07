@@ -29,11 +29,17 @@ namespace GameWorld.Core.Rendering.Materials
             else
                 UpdatedPreferedMaterialBasedOnRmv(currentGame, rmvMaterial, ref preferredMaterial);
 
-            var material = CreateMaterial(preferredMaterial);
-            foreach (var capability in material.Capabilities)
-                capability.Initialize(wsModelMaterial, rmvMaterial);
-
-            return material;
+            try
+            {
+                var material = CreateMaterial(preferredMaterial);
+                foreach (var capability in material.Capabilities)
+                    capability.Initialize(wsModelMaterial, rmvMaterial);
+                return material;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to initialize material '{preferredMaterial}' for game {currentGame}. RmrMaterial={rmvMaterial.MaterialId} wsModelMaterial={wsModelMaterial?.Name} ", ex);
+            }
         }
 
         void UpdatedPreferedMaterialBasedOnWsMaterial(GameTypeEnum currentGame, WsModelMaterialFile wsModelMaterial, ref CapabilityMaterialsEnum preferredMaterial)
