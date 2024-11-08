@@ -40,6 +40,7 @@ namespace Shared.Core.ErrorHandling.Exceptions
             return output;
         }
 
+
         public static Exception GetInnerMostException(Exception e)
         {
             var innerE = e.InnerException;

@@ -2,14 +2,13 @@
 
 namespace Shared.Core.ErrorHandling.Exceptions
 {
+    public record ExceptionPackFileContainerInfo(bool IsMainEditable, bool IsCa, string Name, string SystemPath);
+    public record ExceptionInstance(string Message, string[] StackTrace);
+
     public class ExceptionInformation
     {
         // Info about loaded packfile
-        public record PackFileContainerInfo(bool IsMainEditable, bool IsCa, string Name, string SystemPath);
-       
-
-
-        public List<PackFileContainerInfo> ActivePackFiles { get; set; } = [];
+        public List<ExceptionPackFileContainerInfo> ActivePackFiles { get; set; } = [];
 
         // General info
         public GameTypeEnum CurrentGame { get; set; }
@@ -21,9 +20,7 @@ namespace Shared.Core.ErrorHandling.Exceptions
         public string AssetEditorVersion { get; set; } = "Not set";
 
         // Exception Info
-        public string[] ExceptionMessage { get; set; } = [];
-        public string? StackTrace { get; set; }
-        public string UserComment { get; set; } = "";
+        public ExceptionInstance[] ExceptionInfo { get; set; } = [];
 
         // Contex info
         public string? CurrentEditorName { get; set; }

@@ -29,7 +29,7 @@ namespace Shared.Core.ErrorHandling.Exceptions
             foreach (var db in _pfs.Database.PackFiles)
             {
                 var isMainEditable = _pfs.Database.PackSelectedForEdit == db;
-                var info = new ExceptionInformation.PackFileContainerInfo(isMainEditable, db.IsCaPackFile, db.Name, db.SystemFilePath);
+                var info = new ExceptionPackFileContainerInfo(isMainEditable, db.IsCaPackFile, db.Name, db.SystemFilePath);
                 extendedException.ActivePackFiles.Add(info);
             }
         }

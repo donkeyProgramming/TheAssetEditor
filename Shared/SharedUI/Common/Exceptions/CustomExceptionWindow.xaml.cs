@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Windows;
 using Shared.Core.ErrorHandling.Exceptions;
@@ -14,11 +16,23 @@ namespace Shared.Ui.Common.Exceptions
             InitializeComponent();
             _extendedExceptionInformation = extendedExceptionInformation;
 
-            ErrorTextHandle.Text = string.Join("\n", extendedExceptionInformation.ExceptionMessage);
+            var allMessages = extendedExceptionInformation.ExceptionInfo.Select(x => x.Message).ToList();
+            ErrorTextHandle.Text = string.Join("\n", allMessages);
+
+            var lastStackFrame = extendedExceptionInformation.ExceptionInfo.LastOrDefault();
+            if (lastStackFrame != null && lastStackFrame.StackTrace.Length != 0)
+            {
+                ErrorTextHandle.Text += "\n\nStackTrace:\n";
+                ErrorTextHandle.Text += string.Join("\n", lastStackFrame.StackTrace);
+            }
 
             var editorName = "";
             if (string.IsNullOrWhiteSpace(extendedExceptionInformation.CurrentEditorName) == false)
+            {
                 editorName = extendedExceptionInformation.CurrentEditorName + " : ";
+                if (editorName.Contains("ViewModel", StringComparison.InvariantCultureIgnoreCase))
+                    editorName = editorName.Replace("ViewModel", "", StringComparison.InvariantCultureIgnoreCase);
+            }
             Title = $"{editorName}Error - v{extendedExceptionInformation.AssetEditorVersion} {extendedExceptionInformation.CurrentGame}";
 
             var extraInfo = new StringBuilder();

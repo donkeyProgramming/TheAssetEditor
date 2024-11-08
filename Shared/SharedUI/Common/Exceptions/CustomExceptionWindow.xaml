@@ -34,7 +34,7 @@
         </Expander>
 
         <TextBlock DockPanel.Dock="TOp" Text="Error Message" FontWeight="Bold" Margin="3"/>
-        <TextBox x:Name="ErrorTextHandle" IsReadOnly="True" DockPanel.Dock="Top" Margin="5,0,5,5"/>
+        <TextBox x:Name="ErrorTextHandle" IsReadOnly="True"   TextWrapping="Wrap" DockPanel.Dock="Top" Margin="5,0,5,5"/>
 
     </DockPanel>
 </Window>

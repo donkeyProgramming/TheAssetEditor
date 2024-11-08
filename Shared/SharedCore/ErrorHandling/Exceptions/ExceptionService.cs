@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace Shared.Core.ErrorHandling.Exceptions
+﻿namespace Shared.Core.ErrorHandling.Exceptions
 {
-
     public interface IExceptionService
     {
         ExceptionInformation Create(Exception e);
@@ -22,13 +19,10 @@ namespace Shared.Core.ErrorHandling.Exceptions
 
         public ExceptionInformation Create(Exception e)
         {
-
-            var trace = new System.Diagnostics.StackTrace(e, true);
-
+            var exceptionList = UnrollException(e);
             var extendedException = new ExceptionInformation
             {
-                ExceptionMessage = ExceptionHelper.GetErrorStringArray(e).ToArray(),
-                StackTrace = e.StackTrace
+                ExceptionInfo = exceptionList.ToArray(),
             };
 
             foreach (var provider in _informationProviders)
@@ -41,6 +35,24 @@ namespace Shared.Core.ErrorHandling.Exceptions
         {
             var extendedException = Create(e);
             _exceptionWindowProvider.ShowDialog(extendedException);
+        }
+
+        public static List<ExceptionInstance> UnrollException(Exception e)
+        {
+            var output = new List<ExceptionInstance>();
+
+            var innerE = e;
+            while (innerE != null)
+            {
+                var splitTrace = new string[0];
+                if (innerE.StackTrace != null)
+                    splitTrace = innerE.StackTrace.Split("\n");
+
+                output.Add(new ExceptionInstance(innerE.Message, splitTrace));
+                innerE = innerE.InnerException;
+            }
+
+            return output;
         }
     }
 }

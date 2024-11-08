@@ -18,7 +18,7 @@ namespace CommonControls.PackFileBrowser
         }
 
         Point _lastMouseDown;
-        TreeNode _draggedItem;
+        TreeNode? _draggedItem;
 
         public ContextMenu CustomContextMenu
         {
@@ -55,17 +55,16 @@ namespace CommonControls.PackFileBrowser
 
         private void treeView_MouseMove(object sender, MouseEventArgs e)
         {
-
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                Point currentPosition = e.GetPosition(tvParameters);
+                var currentPosition = e.GetPosition(tvParameters);
 
                 if ((Math.Abs(currentPosition.X - _lastMouseDown.X) > 10.0) ||
                     (Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0))
                 {
                     if (_draggedItem != null)
                     {
-                        DragDropEffects finalDropEffect = DragDrop.DoDragDrop(tvParameters, tvParameters.SelectedValue, DragDropEffects.Move);
+                        DragDrop.DoDragDrop(tvParameters, tvParameters.SelectedValue, DragDropEffects.Move);
                     }
                 }
             }

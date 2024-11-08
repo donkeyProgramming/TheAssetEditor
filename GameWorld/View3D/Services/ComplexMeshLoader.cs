@@ -66,10 +66,12 @@ namespace GameWorld.Core.Services
             }
             catch (Exception e)
             {
-                _logger.Here().Error("Failed to load file : " + file.Name);
+                var packFileOwner = _packFileService.GetPackFileContainer(file);
+                var errorMessage = $"Failed to load file : '{file.Name}' from '{packFileOwner?.Name}' - IsCa:{packFileOwner?.IsCaPackFile}";
+                _logger.Here().Error(errorMessage);
                 _logger.Here().Error("Error : " + e.ToString());
 
-                throw new Exception("Failed to load file : " + file.Name, e);
+                throw new Exception(errorMessage, e);
             }
         }
 
