@@ -1,6 +1,7 @@
 ﻿using Editors.TextureEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
 using TextureEditor.Views;
 
@@ -14,6 +15,8 @@ namespace Editors.TextureEditor
             serviceCollection.AddTransient<TextureEditorViewModel>();
             serviceCollection.AddTransient<TextureBuilder>();  
             serviceCollection.AddTransient<IEditorInterface, TextureEditorViewModel>();
+
+            RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
 
         public override void RegisterTools(IEditorDatabase factory)

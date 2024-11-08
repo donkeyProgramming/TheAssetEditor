@@ -8,6 +8,7 @@ using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
@@ -33,6 +34,8 @@ namespace Editors.AnimationMeta
             serviceCollection.AddTransient<MoveEntryCommand>();
             serviceCollection.AddTransient<NewEntryCommand>();
             serviceCollection.AddTransient<SaveCommand>();
+
+            RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
 
         public override void RegisterTools(IEditorDatabase factory)

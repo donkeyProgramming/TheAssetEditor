@@ -12,6 +12,7 @@ using Editors.ImportExport.Exporting.Presentation.DdsToPng;
 using Editors.ImportExport.Exporting.Presentation.RmvToGltf;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.DevConfig;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace Editors.ImportExport
@@ -42,11 +43,9 @@ namespace Editors.ImportExport
             services.AddTransient<DisplayExportFileToolCommand>();
             services.AddTransient<GltfMeshBuilder>();
             services.AddTransient<GltfSkeletonCreator>();
-            
 
 
-
-
+            RegisterAllAsInterface<IDeveloperConfiguration>(services, ServiceLifetime.Transient);
         }
     }
 }

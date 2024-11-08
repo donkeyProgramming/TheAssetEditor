@@ -1,4 +1,4 @@
-﻿using Editors.Shared.DevConfig.Base;
+﻿using Shared.Core.DevConfig;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
@@ -6,12 +6,12 @@ using Shared.EmbeddedResources;
 
 namespace Editors.Shared.DevConfig.Configs
 {
-    internal class AnimMetaTool : IDeveloperConfiguration
+    internal class SkeletonTool : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;
         private readonly PackFileService _packFileService;
 
-        public AnimMetaTool(IEditorCreator editorCreator, PackFileService packFileService)
+        public SkeletonTool(IEditorCreator editorCreator,  PackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileService = packFileService;
@@ -20,15 +20,16 @@ namespace Editors.Shared.DevConfig.Configs
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-            currentSettings.LoadCaPacksByDefault = false;
-            var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Throt.pack";
+            currentSettings.LoadWemFiles = false;
+
+            var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
             _packFileService.Load(packFile, false, true);
         }
 
         public void OpenFileOnLoad()
         {
-            var file = _packFileService.FindFile(@"animations\battle\humanoid17\throt_whip_catcher\attacks\hu17_whip_catcher_attack_05.anm.meta");
-            _editorCreator.CreateFromFile(file);
+            var file = _packFileService.FindFile("animations\\skeletons\\humanoid01.anim");
+            _editorCreator.CreateFromFile(file, EditorEnums.VisualSkeletonEditor);
         }
     }
 }

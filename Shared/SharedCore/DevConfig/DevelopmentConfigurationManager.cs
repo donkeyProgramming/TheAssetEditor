@@ -1,14 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
-using Editors.Shared.DevConfig.Base;
+﻿using System.Windows;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 
-namespace AssetEditor.DevConfigs.Base
+namespace Shared.Core.DevConfig
 {
     public class DevelopmentConfigurationManager
     {

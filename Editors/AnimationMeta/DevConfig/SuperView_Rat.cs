@@ -1,18 +1,14 @@
-﻿using AssetEditor.Services;
-using Editors.AnimationMeta.SuperView;
+﻿using Editors.AnimationMeta.SuperView;
 using Editors.Shared.Core.Common.BaseControl;
-using Editors.Shared.DevConfig.Base;
+using Shared.Core.DevConfig;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.EmbeddedResources;
 using Shared.GameFormats.AnimationPack;
 
-namespace Editors.Shared.DevConfig.Configs
+namespace Editors.AnimationMeta.DevConfig
 {
-
-
-
     internal class SuperView_Rat : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;

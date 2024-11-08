@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
@@ -36,6 +37,8 @@ namespace Shared.Core
 
             services.AddScoped<IExceptionService, ExceptionService>();
             services.AddScoped<IExceptionInformationProvider, BasicExceptionInformationProvider>();
+
+            services.AddTransient<DevelopmentConfigurationManager>();
         }
     }
 }

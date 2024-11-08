@@ -1,11 +1,11 @@
 ﻿using AnimationEditor.MountAnimationCreator;
 using Editors.Shared.Core.Common.BaseControl;
-using Editors.Shared.DevConfig.Base;
+using Shared.Core.DevConfig;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 
-namespace Editors.Shared.DevConfig.Configs
+namespace Editors.AnimationVisualEditors.MountAnimationCreator.DevConfig
 {
     internal class MountTool : IDeveloperConfiguration
     {

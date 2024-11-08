@@ -1,11 +1,10 @@
-﻿using Editors.Audio.AudioExplorer;
-using Editors.Shared.DevConfig.Base;
+﻿using Shared.Core.DevConfig;
 using Shared.Core.Events;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Events.UiCommands;
 
-namespace Editors.Shared.DevConfig.Configs
+namespace Editors.Audio.DevConfig
 {
     internal class AudioExplorer_Attila : IDeveloperConfiguration
     {

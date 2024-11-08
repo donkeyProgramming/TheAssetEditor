@@ -59,9 +59,9 @@
       "commandLineArgs": "-devcfg AnimMetaTool",
       "nativeDebugging": false
     },
-    "AE-Kitbash-Export": {
+    "AE-Export-Karl": {
       "commandName": "Project",
-      "commandLineArgs": "-devcfg Kitbash_Export",
+      "commandLineArgs": "-devcfg Export_Karl",
       "nativeDebugging": false
     }
   }

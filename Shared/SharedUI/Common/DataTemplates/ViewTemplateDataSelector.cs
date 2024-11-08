@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Shared.Core.ToolCreation;
-using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Shared.Ui.Common.DataTemplates
 {

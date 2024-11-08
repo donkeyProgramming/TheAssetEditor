@@ -19,6 +19,7 @@ using KitbasherEditor.Views.EditorViews.PinTool;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Common.MenuSystem;
 
@@ -81,6 +82,8 @@ namespace KitbasherEditor
             RegisterAllAsOriginalType<IKitbasherUiCommand>(serviceCollection, ServiceLifetime.Transient);
             serviceCollection.AddTransient<CopyTexturesToPackCommand>();
             serviceCollection.AddTransient<ImportReferenceMeshCommand>();
+
+            RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
 
         public override void RegisterTools(IEditorDatabase factory)

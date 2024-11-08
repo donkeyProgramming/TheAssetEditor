@@ -12,6 +12,7 @@ using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.WWise;
 
@@ -54,6 +55,8 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioFileImporter>();
             serviceCollection.AddScoped<BnkCompiler.Compiler>();
             serviceCollection.AddScoped<ResultHandler>();
+
+            RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
 
         public override void RegisterTools(IEditorDatabase factory)

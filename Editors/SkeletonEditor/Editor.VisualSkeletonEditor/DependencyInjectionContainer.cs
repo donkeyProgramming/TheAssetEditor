@@ -2,6 +2,7 @@
 using Editor.VisualSkeletonEditor.SkeletonEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
 
 namespace Editor.VisualSkeletonEditor
@@ -11,6 +12,8 @@ namespace Editor.VisualSkeletonEditor
         public override void Register(IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<SkeletonEditorViewModel>();
+
+            RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
 
         public override void RegisterTools(IEditorDatabase editorDatabase)
