@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using Editors.Shared.DevConfig.Base;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 
-namespace Editors.Shared.DevConfig.Base
+namespace AssetEditor.DevConfigs.Base
 {
     public class DevelopmentConfigurationManager
     {
@@ -15,7 +16,7 @@ namespace Editors.Shared.DevConfig.Base
         private readonly PackFileService _packFileService;
         private readonly ApplicationSettingsService _settingsService;
         private readonly IEnumerable<IDeveloperConfiguration> _developerConfigurations;
-        private IDeveloperConfiguration? _activeConfig;
+        private IDeveloperConfiguration _activeConfig;
 
         public DevelopmentConfigurationManager(IEnumerable<IDeveloperConfiguration> developerConfigurations, PackFileService packFileService, ApplicationSettingsService settingsService)
         {
@@ -60,7 +61,7 @@ namespace Editors.Shared.DevConfig.Base
             _logger.Here().Information($"Dev cfg {_activeConfig.GetType().Name} selected");
         }
 
-        static string? GetDevCfg(StartupEventArgs args)
+        static string GetDevCfg(StartupEventArgs args)
         {
             if (args.Args.Length != 2)
                 return null;

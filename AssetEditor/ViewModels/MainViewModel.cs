@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using AssetEditor.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Events;
@@ -25,7 +24,7 @@ namespace AssetEditor.ViewModels
         public PackFileBrowserViewModel FileTree { get; private set; }
         public MenuBarViewModel MenuBar { get; set; }
         public IEditorDatabase ToolsFactory { get; set; }
-        public ObservableCollection<IEditorInterface> CurrentEditorsList { get; set; } = new ObservableCollection<IEditorInterface>();
+        public ObservableCollection<IEditorInterface> CurrentEditorsList { get; set; } = [];
 
         [ObservableProperty] private int _selectedEditorIndex;
         [ObservableProperty] private bool _isClosingWithoutPrompt;
