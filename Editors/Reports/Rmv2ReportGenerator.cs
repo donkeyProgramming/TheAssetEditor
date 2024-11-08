@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using CsvHelper;
-using Shared.Core.ErrorHandling;
+using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;

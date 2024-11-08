@@ -2,11 +2,13 @@
 using CommonControls.Editors.TextEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.BaseDialogs.ToolSelector;
 using Shared.Ui.BaseDialogs.WindowHandling;
+using Shared.Ui.Common.Exceptions;
 using Shared.Ui.Editors.BoneMapping;
 using Shared.Ui.Editors.TextEditor;
 using Shared.Ui.Editors.VariantMeshDefinition;
@@ -31,8 +33,8 @@ namespace Shared.Ui
             // Implement required interfaces
             services.AddTransient<IPackFileUiProvider, PackFileUiProvider>();
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
-
-
+            services.AddTransient<ICustomExceptionWindowProvider, CustomExceptionWindowProvider>();
+            
             services.AddTransient<VariantMeshToXmlConverter>();
             services.AddTransient<TextEditorViewModel<VariantMeshToXmlConverter>>();
 

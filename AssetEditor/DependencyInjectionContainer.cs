@@ -7,7 +7,7 @@ using AssetEditor.Views.Settings;
 using Editors.Shared.DevConfig.Base;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using Shared.Core.ErrorHandling;
+using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Events.UiCommands;
 
@@ -35,12 +35,9 @@ namespace AssetEditor
 
             serviceCollection.AddScoped<MainWindow>();
 
-            serviceCollection.AddTransient<ExtendedExceptionService>();
-            
+            serviceCollection.AddScoped<IExceptionInformationProvider, CurrentEditorExceptionInfoProvider>();
 
             // Dev Config stuff
-
-
             serviceCollection.AddTransient<DevelopmentConfigurationManager>();
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }

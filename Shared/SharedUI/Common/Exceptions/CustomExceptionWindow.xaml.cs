@@ -1,15 +1,15 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Windows;
-using Shared.Core.ErrorHandling;
+using Shared.Core.ErrorHandling.Exceptions;
 
-namespace AssetEditor.Services
+namespace Shared.Ui.Common.Exceptions
 {
     public partial class CustomExceptionWindow : Window
     {
-        private readonly ExtendedExceptionInformation _extendedExceptionInformation;
+        private readonly ExceptionInformation _extendedExceptionInformation;
 
-        public CustomExceptionWindow(ExtendedExceptionInformation extendedExceptionInformation)
+        public CustomExceptionWindow(ExceptionInformation extendedExceptionInformation)
         {
             InitializeComponent();
             _extendedExceptionInformation = extendedExceptionInformation;
@@ -41,8 +41,8 @@ namespace AssetEditor.Services
             {
                 WriteIndented = true,
             };
-            var text = JsonSerializer.Serialize( _extendedExceptionInformation, options);
-            Clipboard.SetText( text );
+            var text = JsonSerializer.Serialize(_extendedExceptionInformation, options);
+            Clipboard.SetText(text);
             MessageBox.Show("Error message copied to clipboard!");
         }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.Misc;
@@ -32,6 +33,10 @@ namespace Shared.Core
 
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
             services.AddScoped<EventHub>();
+
+            services.AddScoped<IExceptionService, ExceptionService>();
+            services.AddScoped<IExceptionInformationProvider, BasicExceptionInformationProvider>();
         }
     }
 }
+

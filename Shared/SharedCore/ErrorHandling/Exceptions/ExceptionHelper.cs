@@ -1,10 +1,7 @@
 ﻿using System.Text;
 using System.Windows;
-using Shared.Core.Services;
-using Shared.Core.Settings;
-using SharpDX.Direct2D1;
 
-namespace Shared.Core.ErrorHandling
+namespace Shared.Core.ErrorHandling.Exceptions
 {
     public class ExceptionHelper
     {

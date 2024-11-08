@@ -1,8 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
-using Serilog.Formatting.Display;
 using Serilog.Sinks.SystemConsole.Themes;
 using Shared.Core.Misc;
 
@@ -22,41 +20,6 @@ namespace Shared.Core.ErrorHandling
         }
     }
 
-
-
-    public class CustomSink : ILogEventSink
-    {
-        private readonly MessageTemplateTextFormatter _formater;
-        private readonly LogEventLevel _logLevel;
-        private readonly Queue<string> _queue = [];
-
-        public CustomSink(LogEventLevel logLevel, string outputTemplate)
-        {
-
-            _formater = new MessageTemplateTextFormatter(outputTemplate, null);
-            _logLevel = logLevel;
-        }
-
-
-        public void Emit(LogEvent logEvent)
-        {
-            if (logEvent.Level >= _logLevel)
-            {
-                if (_queue.Count == 30)
-                    _queue.Dequeue();
-
-                using var _textWriter = new StringWriter();
-                _formater.Format(logEvent, _textWriter);
-               
-                _queue.Enqueue(_textWriter.ToString());
-            }
-        }
-
-        public List<string> GetHistory() => _queue.ToList();
-
-    }
-
-
     public class Logging
     {
         public static ILogger Create<T>() => Log.ForContext<T>();
@@ -65,7 +28,7 @@ namespace Shared.Core.ErrorHandling
         static bool IsConfigured = false;
         public static string LogName { get; private set; }
 
-        public static CustomSink? CustomSink;
+        public static CustomLoggingSink? CustomSink;
         public static void Configure(LogEventLevel logEventLevel)
         {
             if (IsConfigured)
@@ -78,10 +41,7 @@ namespace Shared.Core.ErrorHandling
             LogName = fileName;
          
             var outputTemplate = "[{Timestamp:HH:mm:ss} {Level}] [{ThreadId}] {SourceContext}::{MemberName} : {Message} {Exception}{NewLine}";
-            var formatter = new MessageTemplateTextFormatter(outputTemplate, null);
-     
-
-            CustomSink = new CustomSink(logEventLevel, outputTemplate);
+            CustomSink = new CustomLoggingSink(logEventLevel, outputTemplate);
 
             Log.Logger = new LoggerConfiguration()
                         .MinimumLevel.Debug()

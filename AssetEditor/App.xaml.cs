@@ -9,6 +9,7 @@ using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.ErrorHandling;
+using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -93,26 +94,11 @@ namespace AssetEditor
         {
             Logging.Create<App>().Here().Fatal(args.Exception.ToString());
 
-            var exceptionService = _rootScope?.ServiceProvider.GetService<ExtendedExceptionService>();
+            var exceptionService = _rootScope?.ServiceProvider.GetService<IExceptionService>();
             if (exceptionService != null)
-            {
-                var exceptionInfo = exceptionService.Create(args.Exception);
-                var errorWindow = new CustomExceptionWindow(exceptionInfo);
-
-                if (Application.Current.MainWindow != null)
-                {
-                    if (errorWindow != Application.Current.MainWindow)
-                    {
-                        errorWindow.Owner = Application.Current.MainWindow;
-                    }
-                    //if(Application.Current.MainWindow.)
-                }
-                errorWindow.Show();
-            }
+               exceptionService.CreateDialog(args.Exception);   
             else
-            {
                 MessageBox.Show(args.Exception.ToString(), "Error");
-            }
 
             args.Handled = true;
         }

@@ -5,6 +5,7 @@ using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
 using Shared.Core.ErrorHandling;
+using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Editors.TextEditor;
