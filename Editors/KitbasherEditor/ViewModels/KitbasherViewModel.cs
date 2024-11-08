@@ -87,9 +87,8 @@ namespace KitbasherEditor.ViewModels
             }
             catch (Exception e)
             {
-                var errorMessage = $"Unable to load file '{fileToLoad?.Name}' \n {e.Message}";
-                _logger.Here().Error(errorMessage);
-                MessageBox.Show(errorMessage);
+                _logger.Here().Error($"Unable to load file '{fileToLoad?.Name}' \n {e.Message}");
+                throw new Exception($"Unable to load file '{fileToLoad?.Name}", e);
             }
         }
 

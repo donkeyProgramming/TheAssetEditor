@@ -2,11 +2,11 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Threading;
+using AssetEditor.DevConfigs.Base;
 using AssetEditor.Services;
 using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
-using Editors.Shared.DevConfig.Base;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -22,6 +22,8 @@ namespace AssetEditor
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            ApplicationStateRecorder.Initialize();
+
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
             VersionChecker.CheckVersion();
             Current.DispatcherUnhandledException += new DispatcherUnhandledExceptionEventHandler(DispatcherUnhandledExceptionHandler);
@@ -90,7 +92,28 @@ namespace AssetEditor
         void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)
         {
             Logging.Create<App>().Here().Fatal(args.Exception.ToString());
-            MessageBox.Show(args.Exception.ToString(), "Error");
+
+            var exceptionService = _rootScope?.ServiceProvider.GetService<ExtendedExceptionService>();
+            if (exceptionService != null)
+            {
+                var exceptionInfo = exceptionService.Create(args.Exception);
+                var errorWindow = new CustomExceptionWindow(exceptionInfo);
+
+                if (Application.Current.MainWindow != null)
+                {
+                    if (errorWindow != Application.Current.MainWindow)
+                    {
+                        errorWindow.Owner = Application.Current.MainWindow;
+                    }
+                    //if(Application.Current.MainWindow.)
+                }
+                errorWindow.Show();
+            }
+            else
+            {
+                MessageBox.Show(args.Exception.ToString(), "Error");
+            }
+
             args.Handled = true;
         }
     }

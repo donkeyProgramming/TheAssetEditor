@@ -55,53 +55,44 @@ namespace CommonControls.PackFileBrowser
 
         private void treeView_MouseMove(object sender, MouseEventArgs e)
         {
-            try
-            {
-                if (e.LeftButton == MouseButtonState.Pressed)
-                {
-                    Point currentPosition = e.GetPosition(tvParameters);
 
-                    if ((Math.Abs(currentPosition.X - _lastMouseDown.X) > 10.0) ||
-                        (Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0))
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Point currentPosition = e.GetPosition(tvParameters);
+
+                if ((Math.Abs(currentPosition.X - _lastMouseDown.X) > 10.0) ||
+                    (Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0))
+                {
+                    if (_draggedItem != null)
                     {
-                        if (_draggedItem != null)
-                        {
-                            DragDropEffects finalDropEffect = DragDrop.DoDragDrop(tvParameters, tvParameters.SelectedValue, DragDropEffects.Move);
-                        }
+                        DragDropEffects finalDropEffect = DragDrop.DoDragDrop(tvParameters, tvParameters.SelectedValue, DragDropEffects.Move);
                     }
                 }
-                else
-                    _draggedItem = null;
             }
-            catch (Exception)
+            else
             {
+                _draggedItem = null;
             }
         }
 
         private void treeView_Drop(object sender, DragEventArgs e)
         {
-            try
+            if (DataContext is IDropTarget<TreeNode> dropContainer)
             {
-                if (DataContext is IDropTarget<TreeNode> dropContainer)
+                if (_draggedItem == null)
+                    return;
+
+                var dropTargetItem = sender as TreeViewItem;
+                var dropTargetNode = dropTargetItem?.DataContext as TreeNode;
+                if (dropTargetNode == null)
+                    return;
+
+                if (dropContainer.AllowDrop(_draggedItem, dropTargetNode))
                 {
-                    if (_draggedItem == null)
-                        return;
-
-                    var dropTargetItem = sender as TreeViewItem;
-                    var dropTargetNode = dropTargetItem?.DataContext as TreeNode;
-                    if (dropTargetNode == null)
-                        return;
-
-                    if (dropContainer.AllowDrop(_draggedItem, dropTargetNode))
-                    {
-                        dropContainer.Drop(_draggedItem, dropTargetNode);
-                        e.Effects = DragDropEffects.None;
-                        e.Handled = true;
-                    }
+                    dropContainer.Drop(_draggedItem, dropTargetNode);
+                    e.Effects = DragDropEffects.None;
+                    e.Handled = true;
                 }
-            }
-            catch
-            {
             }
         }
 
@@ -112,7 +103,7 @@ namespace CommonControls.PackFileBrowser
 
         private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e)
         {
-            TreeViewItem item = sender as TreeViewItem;
+            var item = sender as TreeViewItem;
             if (item != null)
             {
                 item.Focus();

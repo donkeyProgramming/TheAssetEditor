@@ -38,29 +38,39 @@ namespace GameWorld.Core.Services
 
         SceneNode Load(PackFile file, SceneNode parent, AnimationPlayer player, string attachmentPointName)
         {
-            if (file == null)
-                throw new Exception("File is null in SceneLoader::Load");
-
-            _logger.Here().Information($"Attempting to load file {file.Name}");
-
-            switch (file.Extention)
+            try
             {
-                case ".variantmeshdefinition":
-                    LoadVariantMesh(file, ref parent, player, attachmentPointName);
-                    break;
+                if (file == null)
+                    throw new Exception("File is null in SceneLoader::Load");
 
-                case ".rigid_model_v2":
-                    LoadRigidMesh(file, ref parent, player, attachmentPointName);
-                    break;
+                _logger.Here().Information($"Attempting to load file {file.Name}");
 
-                case ".wsmodel":
-                    LoadWsModel(file, ref parent, player, attachmentPointName);
-                    break;
-                default:
-                    throw new Exception("Unknown mesh extention");
+                switch (file.Extention)
+                {
+                    case ".variantmeshdefinition":
+                        LoadVariantMesh(file, ref parent, player, attachmentPointName);
+                        break;
+
+                    case ".rigid_model_v2":
+                        LoadRigidMesh(file, ref parent, player, attachmentPointName);
+                        break;
+
+                    case ".wsmodel":
+                        LoadWsModel(file, ref parent, player, attachmentPointName);
+                        break;
+                    default:
+                        throw new Exception("Unknown mesh extention");
+                }
+
+                return parent;
             }
+            catch (Exception e)
+            {
+                _logger.Here().Error("Failed to load file : " + file.Name);
+                _logger.Here().Error("Error : " + e.ToString());
 
-            return parent;
+                throw new Exception("Failed to load file : " + file.Name, e);
+            }
         }
 
         void Load(string path, SceneNode parent, AnimationPlayer player, string attachmentPointName)
@@ -84,17 +94,9 @@ namespace GameWorld.Core.Services
             else
                 parent.AddObject(variantMeshElement);
 
-            try
-            {
-                var meshFile = VariantMeshToXmlConverter.Load(file);
-                LoadVariantMesh(meshFile, variantMeshElement, player, attachmentPointName);
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error("Failed to load file : " + file.Name);
-                _logger.Here().Error("Error : " + e.ToString());
-                throw;
-            }
+            
+            var meshFile = VariantMeshToXmlConverter.Load(file);
+            LoadVariantMesh(meshFile, variantMeshElement, player, attachmentPointName);
         }
 
         void LoadVariantMesh(VariantMesh mesh, SceneNode root, AnimationPlayer player, string attachmentPointName)

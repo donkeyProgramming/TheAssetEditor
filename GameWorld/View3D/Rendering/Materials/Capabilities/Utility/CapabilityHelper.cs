@@ -62,7 +62,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
                 throw new Exception($"Failed to parse {parameterInstance.Name}. Actuall value was {parameter?.Value}", e);
             }
         }
-
+        static int counter = 0;
 
         public static Vector2 GetParameterVector2(WsModelMaterialFile? wsModelMaterial, WsModelParamters.Instance parameterInstance, Vector2 defaultValue)
         {
@@ -74,7 +74,13 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
                 return defaultValue;
 
             try 
-            { 
+            {
+                counter++;
+                if(counter>30)
+                    throw new Exception("This is an test!");
+
+
+
                 if (parameter.Type != "float2")
                     throw new Exception($"Parameter {parameterInstance.Name} was expected to be float2, but was {parameter.Type}");
 

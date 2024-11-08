@@ -1,0 +1,40 @@
+﻿<Window x:Class="AssetEditor.Services.CustomExceptionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AssetEditor.Services"
+        mc:Ignorable="d"
+        Style="{StaticResource CustomWindowStyle}"
+        Title="Error" Height="450" Width="800">
+    <DockPanel>
+
+
+        <Button DockPanel.Dock="Bottom" Content="Close" Margin="5" Click="CloseButtonPressed"/>
+
+
+        <Button DockPanel.Dock="Bottom" Content="Copy to clipboard" Margin="5" Click="CopyButtonPressed" />
+
+        <TextBox 
+            IsReadOnly="True"
+            Margin="5"
+            DockPanel.Dock="Bottom"   
+            TextWrapping="Wrap"
+            HorizontalContentAlignment="Center"
+            Text="If this error was unexpected, please press the copy button and provide the text dump to the developers through discord or github.&#x0a;The Clipboard contains more information then what is displayed! &#x0a; &#x0a;Discord: https://discord.gg/moddingden &#x0a;Github: https://github.com/donkeyProgramming/TheAssetEditor/issues" />
+
+
+        <Expander DockPanel.Dock="Bottom" IsExpanded="False">
+            <Expander.Header>
+                <StackPanel Orientation="Horizontal" >
+                    <TextBlock Text="Extra information" FontWeight="Bold" Margin="3"/>
+                </StackPanel>
+            </Expander.Header>
+            <TextBox x:Name="ExtraInfoHandle" IsReadOnly="True" DockPanel.Dock="Top" Margin="5"/>
+        </Expander>
+
+        <TextBlock DockPanel.Dock="TOp" Text="Error Message" FontWeight="Bold" Margin="3"/>
+        <TextBox x:Name="ErrorTextHandle" IsReadOnly="True" DockPanel.Dock="Top" Margin="5,0,5,5"/>
+  
+    </DockPanel>
+</Window>

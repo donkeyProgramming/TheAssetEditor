@@ -29,6 +29,19 @@ namespace Shared.Core.ErrorHandling
             return ss.ToString();
         }
 
+        public static List<string> GetErrorStringArray(Exception e)
+        {
+            var output = new List<string>();
+
+            var innerE = e.InnerException;
+            while (innerE != null)
+            {
+                output.Add(innerE.Message);
+                innerE = innerE.InnerException;
+            }
+
+            return output;
+        }
 
         public static Exception GetInnerMostException(Exception e)
         {

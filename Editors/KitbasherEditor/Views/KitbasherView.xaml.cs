@@ -18,25 +18,19 @@ namespace KitbasherEditor.Views
 
         private void treeView_Drop(object sender, DragEventArgs e)
         {
-            try
+            var dropTarget = DataContext as IDropTarget<TreeNode>;
+            if (dropTarget != null)
             {
-                var dropTarget = DataContext as IDropTarget<TreeNode>;
-                if (dropTarget != null)
-                {
-                    var formats = e.Data.GetFormats();
-                    object droppedObject = e.Data.GetData(formats[0]);
-                    var node = droppedObject as TreeNode;
+                var formats = e.Data.GetFormats();
+                object droppedObject = e.Data.GetData(formats[0]);
+                var node = droppedObject as TreeNode;
 
-                    if (dropTarget.AllowDrop(node))
-                    {
-                        dropTarget.Drop(node);
-                        e.Effects = DragDropEffects.None;
-                        e.Handled = true;
-                    }
+                if (dropTarget.AllowDrop(node))
+                {
+                    dropTarget.Drop(node);
+                    e.Effects = DragDropEffects.None;
+                    e.Handled = true;
                 }
-            }
-            catch (Exception)
-            {
             }
         }
     }
