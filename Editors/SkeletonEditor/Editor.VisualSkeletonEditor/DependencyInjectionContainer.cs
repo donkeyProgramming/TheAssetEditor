@@ -23,7 +23,7 @@ namespace Editor.VisualSkeletonEditor
                 .AddExtention(".anim", EditorPriorites.High)
                 .ValidForFoldersContaining(@"animations\skeletons")
                 .ValidForFoldersContaining("tech")
-                .AddToToolbar("Skeleton Tool", false)
+                .AddToToolbar("Skeleton Tool", true)
                 .Build(editorDatabase);
         }
     }
