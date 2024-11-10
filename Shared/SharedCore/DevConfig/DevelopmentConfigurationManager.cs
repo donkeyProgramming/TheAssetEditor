@@ -55,10 +55,12 @@ namespace Shared.Core.DevConfig
             }
 
             _activeConfig = selectedCfg;
-            _logger.Here().Information($"Dev cfg {_activeConfig.GetType().Name} selected");
+            _logger.Here().Information($"Dev cfg {_activeConfig.GetType().Name} selected. Settings changed not updated to file");
+
+            _settingsService.AllowSettingsUpdate = false;
         }
 
-        static string GetDevCfg(StartupEventArgs args)
+        static string? GetDevCfg(StartupEventArgs args)
         {
             if (args.Args.Length != 2)
                 return null;
