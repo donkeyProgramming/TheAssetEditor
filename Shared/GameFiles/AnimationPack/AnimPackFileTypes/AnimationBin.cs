@@ -11,9 +11,9 @@ namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes
         public NotifyAttr<bool> IsChanged { get; set; } = new NotifyAttr<bool>(false);
 
         public int TableVersion { get; set; } = 2;
-        public List<AnimationBinEntry> AnimationTableEntries { get; set; } = new List<AnimationBinEntry>();
+        public List<AnimationBinEntry> AnimationTableEntries { get; set; } = new();
 
-        public AnimationBin(string fileName, byte[] data = null)
+        public AnimationBin(string fileName, byte[]? data = null)
         {
             FileName = fileName;
             if (data != null)

@@ -54,10 +54,11 @@ namespace CommonControls.BaseDialogs.ErrorListDialog
         public static void ShowDialog(string titel, ErrorList errorItems, bool modal = true)
         {
             var window = new ErrorListWindow();
+            var sortedErrors = errorItems.Errors.OrderByDescending(x => x.IsError).ToList();
             window.DataContext = new ErrorListViewModel()
             {
                 WindowTitle = titel + " (" + errorItems.Errors.Count(x => x.IsError) + ")",
-                ErrorItems = new ObservableCollection<ErrorListDataItem>(errorItems.Errors)
+                ErrorItems = new ObservableCollection<ErrorListDataItem>(sortedErrors)
             };
             if (modal)
                 window.ShowDialog();

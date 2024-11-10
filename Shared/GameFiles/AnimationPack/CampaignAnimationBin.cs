@@ -1,6 +1,5 @@
 ﻿using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles.Models;
-using static Shared.GameFormats.AnimationPack.CampaignAnimationBin;
 
 namespace Shared.GameFormats.AnimationPack
 {

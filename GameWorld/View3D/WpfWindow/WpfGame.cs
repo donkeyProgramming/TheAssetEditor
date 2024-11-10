@@ -6,6 +6,7 @@ using GameWorld.Core.WpfWindow.Events;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Events;
 using Shared.Core.Services;
 
@@ -19,6 +20,7 @@ namespace GameWorld.Core.WpfWindow
     {
         WpfGraphicsDeviceService _deviceServiceHandle;
         private readonly ResourceLibrary _resourceLibrary;
+        private readonly IExceptionService _exceptionService;
         private readonly EventHub _eventHub;
         private readonly string _contentDir;
 
@@ -32,11 +34,12 @@ namespace GameWorld.Core.WpfWindow
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        public WpfGame(ResourceLibrary resourceLibrary, EventHub eventHub, string contentDir = "Content")
+        public WpfGame(ResourceLibrary resourceLibrary, IExceptionService exceptionService, EventHub eventHub, string contentDir = "Content")
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));
             _resourceLibrary = resourceLibrary;
+            _exceptionService = exceptionService;
             _eventHub = eventHub;
             _contentDir = contentDir;
 
@@ -137,9 +140,21 @@ namespace GameWorld.Core.WpfWindow
         /// <param name="time"></param>
         protected sealed override void Render(GameTime time)
         {
-            // just run as fast as possible, WPF itself is limited to 60 FPS so that's the max we will get
-            Update(time);
-            Draw(time);
+            try
+            {
+                // just run as fast as possible, WPF itself is limited to 60 FPS so that's the max we will get
+                Update(time);
+                Draw(time);
+
+            }
+
+            catch(Exception ex) 
+            {
+                StopRendering();
+                _exceptionService.CreateDialog(ex);
+                StartRendering();
+            }
+
         }
 
 

@@ -15,7 +15,7 @@ namespace Shared.Ui.Common.Exceptions
                     errorWindow.Owner = Application.Current.MainWindow;
                 }
             }
-            errorWindow.Show();
+            errorWindow.ShowDialog();
         }
     }
 }

@@ -79,11 +79,9 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 var inner = ExceptionHelper.GetInnerMostException(e);
                 if (inner is XmlException xmlException)
                     error = new ITextConverter.SaveError() { Text = xmlException.Message, ErrorLineNumber = xmlException.LineNumber, ErrorPosition = xmlException.LinePosition, ErrorLength = 0 };
-                else if (inner != null)
-                    error = new ITextConverter.SaveError() { Text = e.Message + " - " + inner.Message, ErrorLineNumber = 1 };
                 else
-                    error = new ITextConverter.SaveError() { Text = e.Message, ErrorLineNumber = 1 };
-
+                    throw;
+  
                 return null;
             }
         }

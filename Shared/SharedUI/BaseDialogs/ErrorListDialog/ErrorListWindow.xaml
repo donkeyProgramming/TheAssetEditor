@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:errorlistdialog="clr-namespace:CommonControls.BaseDialogs.ErrorListDialog"
         mc:Ignorable="d"
+          Style="{StaticResource CustomWindowStyle}"
         Title="{Binding WindowTitle}" Height="450" Width="800" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
@@ -15,8 +16,8 @@
 
         <errorlistdialog:ErrorListView Grid.Row="0" />
         <StackPanel Orientation="Horizontal" Grid.Row="1">
-            <Button Content="Close" Margin="2,2,2,2" Click="Button_Click"/>
-            <Button Content="Save Report" Margin="2,2,2,2" Click="SaveReport_Click"/>
+            <Button Content="Close" Margin="5" Click="Button_Click"/>
+            <Button Content="Save Report" Margin="5" Click="SaveReport_Click"/>
         </StackPanel>
     </Grid>
 </Window>

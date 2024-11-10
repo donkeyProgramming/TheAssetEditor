@@ -6,16 +6,16 @@ using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
 
 namespace Shared.GameFormats.AnimationPack
 {
-    public class AnimationInfoDataFile
+    public class AnimationEntryMetaData
     {
         public string Name { get; set; }
         public int StartOffset { get; set; }
         public int Size { get; set; }
 
-        public AnimationInfoDataFile()
+        public AnimationEntryMetaData()
         { }
 
-        public AnimationInfoDataFile(ByteChunk data)
+        public AnimationEntryMetaData(ByteChunk data)
         {
             Name = data.ReadString();
             Size = data.ReadInt32();
@@ -94,7 +94,7 @@ namespace Shared.GameFormats.AnimationPack
             foreach (var item in animPack.Files)
             {
                 var itemByteArray = item.ToByteArray();
-                var file = new AnimationInfoDataFile()
+                var file = new AnimationEntryMetaData()
                 {
                     Name = item.FileName,
                     Size = itemByteArray.Length
@@ -106,7 +106,7 @@ namespace Shared.GameFormats.AnimationPack
             return memStream.ToArray();
         }
 
-        static IAnimationPackFile LoadFile(IAnimFileSerializer serializer, AnimationInfoDataFile animationInfoDataFile, ByteChunk data, GameTypeEnum preferedGame)
+        static IAnimationPackFile LoadFile(IAnimFileSerializer serializer, AnimationEntryMetaData animationInfoDataFile, ByteChunk data, GameTypeEnum preferedGame)
         {
             try
             {
@@ -118,13 +118,13 @@ namespace Shared.GameFormats.AnimationPack
             }
         }
 
-        static List<AnimationInfoDataFile> FindAllSubFiles(ByteChunk data)
+        static List<AnimationEntryMetaData> FindAllSubFiles(ByteChunk data)
         {
             var toalFileCount = data.ReadInt32();
-            var fileList = new List<AnimationInfoDataFile>(toalFileCount);
+            var fileList = new List<AnimationEntryMetaData>(toalFileCount);
             for (var i = 0; i < toalFileCount; i++)
             {
-                var file = new AnimationInfoDataFile(data);
+                var file = new AnimationEntryMetaData(data);
                 fileList.Add(file);
                 data.Index += file.Size;
             }
@@ -134,81 +134,38 @@ namespace Shared.GameFormats.AnimationPack
 
     public interface IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, ByteChunk data, GameTypeEnum preferedGame);
+        public IAnimationPackFile Load(AnimationEntryMetaData animFileInfo, ByteChunk data, GameTypeEnum preferedGame);
     }
 
     public class UnknownAnimFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGam) => new UnknownAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationEntryMetaData info, ByteChunk data, GameTypeEnum preferedGam) => new UnknownAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class AnimationSetFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGame) => new AnimationFragmentFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size), preferedGame);
+        public IAnimationPackFile Load(AnimationEntryMetaData info, ByteChunk data, GameTypeEnum preferedGame) => new AnimationFragmentFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size), preferedGame);
     }
 
     public class AnimationDbFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGame) => new AnimationBin(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationEntryMetaData info, ByteChunk data, GameTypeEnum preferedGame) => new AnimationBin(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class MatchedAnimFileSerializer : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGame) => new MatchedAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationEntryMetaData info, ByteChunk data, GameTypeEnum preferedGame) => new MatchedAnimFile(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
 
     public class AnimationSetSerializer_Wh3 : IAnimFileSerializer
     {
-        public IAnimationPackFile Load(AnimationInfoDataFile info, ByteChunk data, GameTypeEnum preferedGame) => new AnimPackFileTypes.Wh3.AnimationBinWh3(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
+        public IAnimationPackFile Load(AnimationEntryMetaData info, ByteChunk data, GameTypeEnum preferedGame) => new AnimPackFileTypes.Wh3.AnimationBinWh3(info.Name, data.GetBytesFromBuffer(info.StartOffset, info.Size));
     }
-
-
-    //
-    //
-    //public class AnimMatchSerializer : IAnimFileSerializer
-    //{
-    //    public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, byte[] data)
-    //    {
-    //        throw new System.NotImplementedException();
-    //    }
-    //}
-    //
-    //public class AnimMatchSerializer_3k : IAnimFileSerializer
-    //{
-    //    public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, byte[] data)
-    //    {
-    //        throw new System.NotImplementedException();
-    //    }
-    //}
-    //
-    //public class AnimTriggerDb_3k : IAnimFileSerializer
-    //{
-    //    public IAnimationPackFile Load(AnimationInfoDataFile animFileInfo, byte[] data)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
-
-
-
-    // ----------------------
-
-
-
-
-
-    public interface IAnimationBin : IAnimationPackFile
-    { }
-
-    public interface IAnimationFragment : IAnimationPackFile
-    { }
 
     public interface IMatchedCombatBin : IAnimationPackFile
     { }
 
-    public interface IAbilityBin_3k : IAnimationPackFile
-    {
-    }
+
 
 
 }

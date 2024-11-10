@@ -599,7 +599,7 @@ namespace GameWorld.Core.WpfWindow
             }
         }
 
-        private void StartRendering()
+        protected void StartRendering()
         {
             if (_isRendering)
                 return;
@@ -608,7 +608,7 @@ namespace GameWorld.Core.WpfWindow
             _isRendering = true;
         }
 
-        private void StopRendering()
+        protected void StopRendering()
         {
             if (!_isRendering)
                 return;

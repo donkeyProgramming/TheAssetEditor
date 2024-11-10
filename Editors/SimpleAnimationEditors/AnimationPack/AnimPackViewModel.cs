@@ -147,15 +147,17 @@ namespace CommonControls.Editors.AnimationPack
                 SelectedItemViewModel.TextEditor?.SetSyntaxHighlighting("XML");
                 SelectedItemViewModel.Text = "";
                 SelectedItemViewModel.ResetChangeLog();
-                return;
+            }
+            else
+            {
+                SelectedItemViewModel = new SimpleTextEditorViewModel();
+                SelectedItemViewModel.SaveCommand = new RelayCommand(() => SaveActiveFile());
+                SelectedItemViewModel.TextEditor?.ShowLineNumbers(true);
+                SelectedItemViewModel.TextEditor?.SetSyntaxHighlighting(_activeConverter.GetSyntaxType());
+                SelectedItemViewModel.Text = _activeConverter.GetText(seletedFile.ToByteArray());
+                SelectedItemViewModel.ResetChangeLog();
             }
 
-            SelectedItemViewModel = new SimpleTextEditorViewModel();
-            SelectedItemViewModel.SaveCommand = new RelayCommand(() => SaveActiveFile());
-            SelectedItemViewModel.TextEditor?.ShowLineNumbers(true);
-            SelectedItemViewModel.TextEditor?.SetSyntaxHighlighting(_activeConverter.GetSyntaxType());
-            SelectedItemViewModel.Text = _activeConverter.GetText(seletedFile.ToByteArray());
-            SelectedItemViewModel.ResetChangeLog();
         }
         public void Close() { }
         public bool HasUnsavedChanges { get; set; }

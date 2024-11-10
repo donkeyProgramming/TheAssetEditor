@@ -1,4 +1,6 @@
-﻿using GameWorld.Core.Rendering.Materials.Serialization;
+﻿using System;
+using System.Linq;
+using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,6 +10,19 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
+
+    public static class EffectExtentions
+    {
+        public static EffectParameter GetParameter(this Effect effect, string parameterName)
+        {
+            var param = effect.Parameters.FirstOrDefault(x => x.Name == parameterName);
+            if (param == null)
+                throw new Exception($"Parameter {parameterName} is not a part of {effect.Name}");
+
+            return param;
+        }
+    }
+
     public class TintCapability : ICapability
     {
         public bool ApplyCapability { get; set; } = true;
@@ -26,15 +41,14 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public void Apply(Effect effect, ResourceLibrary resourceLibrary)
         {
+            effect.GetParameter("CapabilityFlag_ApplyTinting").SetValue(ApplyCapability);
 
-            effect.Parameters["CapabilityFlag_ApplyTinting"].SetValue(ApplyCapability);
-
-            effect.Parameters["Tint_UseFactionColours"].SetValue(UseFactionColours);
-            effect.Parameters["Tint_FactionsColours"].SetValue(FactionColours);
-
-            effect.Parameters["Tint_UseTinting"].SetValue(UseTinting);
-            effect.Parameters["Tint_TintColours"].SetValue(TintColours);
-            effect.Parameters["Tint_TintColours"].SetValue(TintColours);
+            effect.GetParameter("Tint_UseFactionColours").SetValue(UseFactionColours);
+            effect.GetParameter("Tint_FactionsColours").SetValue(FactionColours);
+                                 
+            effect.GetParameter("Tint_UseTinting").SetValue(UseTinting);
+            effect.GetParameter("Tint_TintColours").SetValue(TintColours);
+            effect.GetParameter("Tint_TintColours").SetValue(TintColours);
         }
 
         public ICapability Clone()

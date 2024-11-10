@@ -158,7 +158,6 @@ namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3
         {
             get
             {
-
                 var output = new List<AnimationBinEntryGenericFormat>();
                 foreach (var item in AnimationTableEntries)
                 {

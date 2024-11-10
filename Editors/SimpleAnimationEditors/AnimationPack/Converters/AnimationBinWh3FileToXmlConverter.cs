@@ -1,8 +1,6 @@
-﻿using System.IO;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using CsvHelper;
 using Editors.Shared.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -129,104 +127,97 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override ITextConverter.SaveError Validate(XmlFormat type, string s, PackFileService pfs, string filepath)
         {
-            try
+            if (type.Data == null)
+                return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Data section of xml missing" };
+
+            if (type.Animations == null)
+                return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Animation section of xml missing" };
+
+            if (!(type.Data.TableVersion == 2 || type.Data.TableVersion == 4))
+                return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Incorrect TableVersion - must be 4 (wh3) or 2 (3k)" };
+
+            if (type.Data.TableVersion == 4 && type.Data.TableSubVersion != 3)
+                return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Incorrect TableSubVersion - must be 3 for wh3" };
+
+            if (string.IsNullOrWhiteSpace(type.Data.SkeletonName))
+                return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };
+
+            var errorList = new ErrorList();
+            if (_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(pfs, type.Data.SkeletonName) == null)
+                errorList.Error("Skeleton", $"Skeleton {type.Data.SkeletonName} is not found");
+
+            if (type.Data.TableVersion == 4)
             {
-
-                if (type.Data == null)
-                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Data section of xml missing" };
-
-                if (type.Animations == null)
-                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Animation section of xml missing" };
-
-                if (!(type.Data.TableVersion == 2 || type.Data.TableVersion == 4))
-                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Incorrect TableVersion - must be 4 (wh3) or 2 (3k)" };
-
-                if (type.Data.TableVersion == 4 && type.Data.TableSubVersion != 3)
-                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Incorrect TableSubVersion - must be 3 for wh3" };
-
-                if (string.IsNullOrWhiteSpace(type.Data.SkeletonName))
-                    return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };
-
-                var errorList = new ErrorList();
-                if (_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(pfs, type.Data.SkeletonName) == null)
-                    errorList.Error("Skeleton", $"Skeleton {type.Data.SkeletonName} is not found");
-
-                if (type.Data.TableVersion == 4)
+                if (string.IsNullOrWhiteSpace(type.Data.LocomotionGraph))
                 {
-                    if (string.IsNullOrWhiteSpace(type.Data.LocomotionGraph))
-                    {
-                        errorList.Warning("LocomotionGraph", $"LocomotionGraph not provided");
-                    }
-                    else
-                    {
-                        if (pfs.FindFile(type.Data.LocomotionGraph) == null)
-                            errorList.Error("LocomotionGraph", $"LocomotionGraph {type.Data.LocomotionGraph} is not found");
-                    }
-                }
-
-                var slotHelper = type.Data.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();
-
-                if (string.IsNullOrWhiteSpace(type.Data.Name))
-                {
-                    errorList.Error("Name", $"Name can not be empty");
+                    errorList.Warning("LocomotionGraph", $"LocomotionGraph not provided");
                 }
                 else
                 {
-                    var filename = System.IO.Path.GetFileNameWithoutExtension(filepath).ToLowerInvariant();
-                    if (filename != type.Data.Name.ToLowerInvariant())
-                        errorList.Error("Name", $"The name of the bin file has to be the same as the provided name. {filename} vs {type.Data.Name}");
+                    if (pfs.FindFile(type.Data.LocomotionGraph) == null)
+                        errorList.Error("LocomotionGraph", $"LocomotionGraph {type.Data.LocomotionGraph} is not found");
                 }
-
-
-                AnimationsVersionFoundInPersistenceMeta.Clear();
-                foreach (var animation in type.Animations)
-                {
-                    var slot = slotHelper.GetfromValue(animation.Slot);
-                    if (slot == null)
-                        errorList.Error(animation.Slot, $"Not a valid animation slot for game");
-
-                    if (animation.Ref == null || animation.Ref.Count == 0)
-                        errorList.Error(animation.Slot, "Slot does not have any animations");
-
-                    foreach (var animationRef in animation.Ref)
-                    {
-                        if (pfs.FindFile(animationRef.File) == null)
-                            errorList.Warning(animation.Slot, $"Animation file {animationRef.File} is not found");
-                        else if (!IsAnimFile(animationRef.File, pfs))
-                            errorList.Error(animation.Slot, $"Animation file {animationRef.File} does not appears to be a valid animation file");
-                        else if (String.IsNullOrWhiteSpace(animationRef.File))
-                            errorList.Error(animation.Slot, $"Animation file {animationRef.File} contain whitespace which could trigger a tpose");
-                        else
-                            ValidateAnimationVersionAgainstPersistenceMeta(animationRef.File, animation.Slot, type.Data.SkeletonName, pfs, errorList);
-
-                        if (pfs.FindFile(animationRef.Meta) == null)
-                            errorList.Warning(animation.Slot, $"Meta file {animationRef.Meta} is not found");
-                        else if (!IsAnimMetaFile(animationRef.Meta, pfs))
-                            errorList.Error(animation.Slot, $"Meta file {animationRef.Meta} does not appear to be a valid meta animation");
-                        else
-                        {
-                            CheckForAnimationVersionsInMeta(animationRef.File, animationRef.Meta, animation.Slot, type.Data.SkeletonName, pfs, errorList);
-                        }
-
-                        var mountBin = type.Data.MountBin;
-                        CheckForRiderAndHisMountAnimationsVersion(mountBin, AnimPackToValidate, animation.Slot, animationRef.File, pfs, errorList);
-
-                        if (pfs.FindFile(animationRef.Sound) == null)
-                            errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} is not found");
-                        else if (!IsSndMetaFile(animationRef.Sound, pfs))
-                            errorList.Error(animation.Slot, $"Sound file {animationRef.Sound} does not appear to be a valid meta sound");
-
-                    }
-                }
-
-                if (errorList.Errors.Count != 0)
-                    ErrorListWindow.ShowDialog("Errors", errorList, false);
             }
-            catch (Exception e)
+
+            var slotHelper = type.Data.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();
+
+            if (string.IsNullOrWhiteSpace(type.Data.Name))
             {
-                return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = $"Unknown save error - {e.Message}" };
+                errorList.Error("Name", $"Name can not be empty");
+            }
+            else
+            {
+                var filename = System.IO.Path.GetFileNameWithoutExtension(filepath).ToLowerInvariant();
+                if (filename != type.Data.Name.ToLowerInvariant())
+                    errorList.Error("Name", $"The name of the bin file has to be the same as the provided name. {filename} vs {type.Data.Name}");
             }
 
+            AnimationsVersionFoundInPersistenceMeta.Clear();
+            foreach (var animation in type.Animations)
+            {
+                var slot = slotHelper.GetfromValue(animation.Slot);
+                if (slot == null)
+                    errorList.Error(animation.Slot, $"Not a valid animation slot for game");
+
+                if (animation.Ref == null || animation.Ref.Count == 0)
+                    errorList.Error(animation.Slot, "Slot does not have any animations");
+
+                foreach (var animationRef in animation.Ref)
+                {
+                    if (pfs.FindFile(animationRef.File) == null)
+                        errorList.Warning(animation.Slot, $"Animation file {animationRef.File} is not found");
+                    else if (!IsAnimFile(animationRef.File, pfs))
+                        errorList.Error(animation.Slot, $"Animation file {animationRef.File} does not appears to be a valid animation file");
+                    else if (String.IsNullOrWhiteSpace(animationRef.File))
+                        errorList.Error(animation.Slot, $"Animation file {animationRef.File} contain whitespace which could trigger a tpose");
+                    else
+                        ValidateAnimationVersionAgainstPersistenceMeta(animationRef.File, animation.Slot, type.Data.SkeletonName, pfs, errorList);
+
+                    if (pfs.FindFile(animationRef.Meta) == null)
+                        errorList.Warning(animation.Slot, $"Meta file {animationRef.Meta} is not found");
+                    else if (!IsAnimMetaFile(animationRef.Meta, pfs))
+                        errorList.Error(animation.Slot, $"Meta file {animationRef.Meta} does not appear to be a valid meta animation");
+                    else
+                    {
+                        CheckForAnimationVersionsInMeta(animationRef.File, animationRef.Meta, animation.Slot, type.Data.SkeletonName, pfs, errorList);
+                    }
+
+                    var mountBin = type.Data.MountBin;
+                    CheckForRiderAndHisMountAnimationsVersion(mountBin, AnimPackToValidate, animation.Slot, animationRef.File, pfs, errorList);
+
+                    if (pfs.FindFile(animationRef.Sound) == null)
+                        errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} is not found");
+                    else if (!IsSndMetaFile(animationRef.Sound, pfs))
+                        errorList.Error(animation.Slot, $"Sound file {animationRef.Sound} does not appear to be a valid meta sound");
+                }
+            }
+
+            if (errorList.Errors.Count != 0)
+                ErrorListWindow.ShowDialog("Errors", errorList, false);
+
+            var hasCriticalError = errorList.Errors.Where(x => x.IsError).Any();
+            if(hasCriticalError)
+                return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Critical Error found, unable to save" };
             return null;
         }
 
