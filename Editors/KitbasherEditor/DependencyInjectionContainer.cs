@@ -1,6 +1,7 @@
 ﻿using Editors.KitbasherEditor.EventHandlers;
 using Editors.KitbasherEditor.Services;
 using Editors.KitbasherEditor.UiCommands;
+using Editors.KitbasherEditor.ViewModels.PinTool;
 using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
@@ -10,12 +11,10 @@ using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
-using KitbasherEditor.ViewModels.PinTool;
 using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
-using KitbasherEditor.Views.EditorViews.PinTool;
 using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
@@ -58,8 +57,10 @@ namespace KitbasherEditor
             serviceCollection.AddScoped<VertexDebuggerView>();
             serviceCollection.AddScoped<MeshFitterViewModel>();
             serviceCollection.AddScoped<ReRiggingViewModel>();
-            serviceCollection.AddScoped<PinToolView>();
+
+            // Pin tool
             serviceCollection.AddScoped<PinToolViewModel>();
+            RegisterWindow<PinToolWindow>(serviceCollection);
 
             // Save dialog
             serviceCollection.AddTransient<SaveDialogViewModel>();

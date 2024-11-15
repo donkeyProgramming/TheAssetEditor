@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Commands;
@@ -7,23 +8,23 @@ using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.Events;
-using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
+using static Shared.Core.Misc.NotifyPropertyChangedImpl;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
-    public class SceneExplorerContextMenuHandler : NotifyPropertyChangedImpl, IDisposable
+    public partial class SceneExplorerContextMenuHandler : ObservableObject, IDisposable
     {
-        ObservableCollection<ContextMenuItem> _contextMenu;
-        public ObservableCollection<ContextMenuItem> Items { get => _contextMenu; set => SetAndNotify(ref _contextMenu, value); }
-
-        ISceneNode _activeNode;
-        IEnumerable<ISceneNode> _activeNodes;
         private readonly EventHub _eventHub;
         private readonly SceneManager _sceneManager;
         private readonly CommandFactory _commandFactory;
 
+        ISceneNode _activeNode;
+        IEnumerable<ISceneNode> _activeNodes;
+
         public event ValueChangedDelegate<IEnumerable<ISceneNode>> SelectedNodesChanged; // Hack - move commands to SceneExplorer instad. Trigger commands from here 
+
+        [ObservableProperty] ObservableCollection<ContextMenuItem> _items = [];
 
         public SceneExplorerContextMenuHandler(EventHub eventHub, SceneManager sceneManager, CommandFactory commandFactory)
         {
@@ -38,7 +39,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         {
             var activeNodes = selectionChangedEvent.SelectedObjects;
 
-            Items = new ObservableCollection<ContextMenuItem>();
+            Items.Clear();
 
             if (!activeNodes.Any())
                 return;
@@ -50,26 +51,26 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 return;
 
             if (CanMakeEditable(_activeNode))
-                _contextMenu.Add(new ContextMenuItem("Make Editable", new RelayCommand(MakeEditable)));
+                Items.Add(new ContextMenuItem("Make Editable", new RelayCommand(MakeEditable)));
 
             if (IsUngroupable(_activeNode))
-                _contextMenu.Add(new ContextMenuItem("Ungroup", new RelayCommand(Ungroup)));
+                Items.Add(new ContextMenuItem("Ungroup", new RelayCommand(Ungroup)));
 
             if (IsLockable(_activeNode))
-                _contextMenu.Add(new ContextMenuItem("Lock", new RelayCommand(ToggleLock)));
+                Items.Add(new ContextMenuItem("Lock", new RelayCommand(ToggleLock)));
             else if (IsUnlockable(_activeNode))
-                _contextMenu.Add(new ContextMenuItem("Unlock", new RelayCommand(ToggleLock)));
+                Items.Add(new ContextMenuItem("Unlock", new RelayCommand(ToggleLock)));
 
-            if (_contextMenu.Count != 0)
-                _contextMenu.Add(null);
-            _contextMenu.Add(new ContextMenuItem("Invert Selection", new RelayCommand(InvertSelection)));
-            _contextMenu.Add(new ContextMenuItem("Select Similarly Named", new RelayCommand(SelectSimilar)));
+            if (Items.Count != 0)
+                Items.Add(null);
+            Items.Add(new ContextMenuItem("Invert Selection", new RelayCommand(InvertSelection)));
+            Items.Add(new ContextMenuItem("Select Similarly Named", new RelayCommand(SelectSimilar)));
 
             if (IsRemovable(_activeNode))
             {
-                if (_contextMenu.Count != 0)
-                    _contextMenu.Add(null);
-                _contextMenu.Add(new ContextMenuItem("Remove", new RelayCommand(RemoveNode)));
+                if (Items.Count != 0)
+                    Items.Add(null);
+                Items.Add(new ContextMenuItem("Remove", new RelayCommand(RemoveNode)));
             }
         }
 
@@ -103,7 +104,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 return false;
             if (node.Name == "Editable Model")
                 return false;
-            if (node.Name == "Reference meshs")
+            if (node.Name == "Reference meshes")
                 return false;
 
             if (node is Rmv2LodNode)

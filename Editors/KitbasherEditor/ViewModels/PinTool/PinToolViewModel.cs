@@ -1,23 +1,27 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Rendering;
+using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 
-namespace KitbasherEditor.ViewModels.PinTool
+namespace Editors.KitbasherEditor.ViewModels.PinTool
 {
-    public class PinToolViewModel
+    public class PinToolViewModel : ObservableObject
     {
         private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
 
-        public ObservableCollection<Rmv2MeshNode> AffectedMeshCollection { get; set; } = new ObservableCollection<Rmv2MeshNode>();
-        public ObservableCollection<Rmv2MeshNode> SourceMeshCollection { get; set; } = new ObservableCollection<Rmv2MeshNode>();
-
         Rmv2MeshNode _selectedVertexMesh;
         List<int> _selectedVertexList = new();
+
+        public ObservableCollection<Rmv2MeshNode> AffectedMeshCollection { get; set; } = new ObservableCollection<Rmv2MeshNode>();
+        public ObservableCollection<Rmv2MeshNode> SourceMeshCollection { get; set; } = new ObservableCollection<Rmv2MeshNode>();
 
         public NotifyAttr<string> SelectedForStaticMeshName { get; set; } = new NotifyAttr<string>();
         public NotifyAttr<string> SelectedForStaticDescription { get; set; } = new NotifyAttr<string>($"Selected vertex count : ");
@@ -93,7 +97,6 @@ namespace KitbasherEditor.ViewModels.PinTool
                 return;
             }
 
-           
             ApplyPintToPoint();
         }
 
@@ -114,4 +117,48 @@ namespace KitbasherEditor.ViewModels.PinTool
             _commandFactory.Create<PinMeshToVertexCommand>().Configure(x => x.Configure(AffectedMeshCollection, _selectedVertexMesh, _selectedVertexList.First())).BuildAndExecute();
         }
     }
+
+   //public class FindClosestPointOnMesh
+   //{
+   //
+   //    public VertexPositionNormalTextureCustom Process(Vector3 inputVertexPosition, MeshObject meshObject)
+   //    {
+   //        var minDistance = float.MaxValue;
+   //        var minPolygonIndex = -1;
+   //
+   //        var vertexList = meshObject.GetVertexList();
+   //        var polygonCount = meshObject.IndexArray.Length / 3;
+   //        for (int polygonIndex = 0; polygonIndex < polygonCount; polygonIndex += 3)
+   //        {
+   //            var i0 = meshObject.IndexArray[polygonIndex + 0];
+   //            var i1 = meshObject.IndexArray[polygonIndex + 1];
+   //            var i2 = meshObject.IndexArray[polygonIndex + 2];
+   //
+   //            var v0 = vertexList[i0];
+   //            var v1 = vertexList[i1];
+   //            var v2 = vertexList[i2];
+   //
+   //            var closetPoint = MathUtil.ClosestPtPointTriangle(inputVertexPosition, v0, v1, v2);
+   //            var dist = Math.Abs(Vector3.DistanceSquared(closetPoint, inputVertexPosition));
+   //
+   //            if (dist > minDistance)
+   //            {
+   //                minDistance = dist;
+   //                minPolygonIndex = polygonIndex;
+   //            }
+   //        }
+   //
+   //        if(minPolygonIndex == -1)
+   //        // Find closes polygon
+   //        // Find closes point on polygon
+   //        // Combyt berry cord 
+   //    
+   //    
+   //    
+   //    }
+   //
+   //
+   //
+   //
+   //}
 }

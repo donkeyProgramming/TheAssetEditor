@@ -232,19 +232,25 @@ namespace KitbasherEditor.Views
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            FrameworkElement element = container as FrameworkElement;
-
-            if (element != null && item != null && item is SceneNode)
+            try
             {
-                SceneNode sceneElement = item as SceneNode;
-                if (sceneElement.IsEditable)
-                    return element.FindResource("DefaultTreeNodeStyle") as HierarchicalDataTemplate;
-                else
-                    return element.FindResource("ReferenceTreeNodeStyle") as HierarchicalDataTemplate;
+                var element = container as FrameworkElement;
+                var sceneElement = item as SceneNode;
 
+                if (element != null && sceneElement != null)
+                {
+                    if (sceneElement.IsEditable)
+                        return element.FindResource("DefaultTreeNodeStyle") as HierarchicalDataTemplate;
+                    else
+                        return element.FindResource("ReferenceTreeNodeStyle") as HierarchicalDataTemplate;
+                }
+
+                return base.SelectTemplate(item, container);
             }
-
-            return null;
+            catch
+            {
+                return base.SelectTemplate(item, container);
+            }
         }
     }
 }

@@ -483,22 +483,4 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             OpenWithNodePadPluss,
         }
     }
-
-    public class ContextMenuItem
-    {
-        public string Name { get; set; }
-        public ICommand Command { get; set; }
-        public ObservableCollection<ContextMenuItem> ContextMenu { get; set; } = new ObservableCollection<ContextMenuItem>();
-
-        public ContextMenuItem(string name = "", ICommand command = null)
-        {
-            Name = name;
-            Command = command;
-        }
-
-        public override string ToString()
-        {
-            return Name;
-        }
-    }
 }

@@ -1,18 +1,18 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using Shared.Core.Events;
-using Shared.Core.Misc;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
 {
     // Improve using this: https://stackoverflow.com/questions/63110566/multi-select-with-multiple-level-in-wpf-treeview
 
-    public class SceneExplorerViewModel : NotifyPropertyChangedImpl, IDisposable
+    public partial class SceneExplorerViewModel : ObservableObject, IDisposable
     {
         private readonly SceneManager _sceneManager;
         private readonly EventHub _eventHub;

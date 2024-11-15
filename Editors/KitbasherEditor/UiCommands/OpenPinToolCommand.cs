@@ -1,7 +1,6 @@
-﻿using KitbasherEditor.ViewModels.MenuBarViews;
-using KitbasherEditor.ViewModels.PinTool;
-using KitbasherEditor.Views.EditorViews.PinTool;
-using Shared.Ui.BaseDialogs.WindowHandling;
+﻿using Editors.KitbasherEditor.ViewModels.PinTool;
+using KitbasherEditor.ViewModels.MenuBarViews;
+using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
@@ -12,18 +11,18 @@ namespace Editors.KitbasherEditor.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        private readonly IWindowFactory _windowFactory;
+        private readonly IAbstractFormFactory<PinToolWindow> _windowFactory;
 
-        public OpenPinToolCommand(IWindowFactory windowFactory)
+        public OpenPinToolCommand(IAbstractFormFactory<PinToolWindow> windowFactory)
         {
             _windowFactory = windowFactory;
         }
 
         public void Execute()
         {
-            var window = _windowFactory.Create<PinToolViewModel, PinToolView>("Pin tool", 360, 415);
-            window.AlwaysOnTop = true;
-            window.ShowWindow();
+            var window = _windowFactory.Create();
+            window.Topmost = true;
+            window.Show();
         }
     }
 }
