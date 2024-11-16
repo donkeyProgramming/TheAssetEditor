@@ -97,11 +97,9 @@
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" />
                     <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
                     <Setter Property="ContextMenu" Value="{StaticResource NodeContextMenu}"/>
-               
                 </Style>
             </local:MultiSelectTreeView.ItemContainerStyle>
-
-
+            
         </local:MultiSelectTreeView>
     </DockPanel>
 </UserControl>

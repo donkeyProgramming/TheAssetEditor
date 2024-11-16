@@ -62,37 +62,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
                 SelectedObjects.CollectionChanged -= OnSceneExplorerSelectionChanged;
                 _ignoreSelectionChanges = true;
 
-                try
-                {
-                    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add && Keyboard.IsKeyDown(Key.LeftShift))
-                    {
-                        // This is to handle selecting items inbetween others while holding LeftShift
-                        var newItem = e.NewItems[0] as ISceneNode;
-                        var newItemIndex = newItem.Parent.Children.IndexOf(newItem);
-                        var selectedWithoutNewItem = SelectedObjects.Except(new List<ISceneNode>() { newItem });
-
-                        if (selectedWithoutNewItem.Any())
-                        {
-                            var existingSelectionIndex = selectedWithoutNewItem
-                                .Select(obj => newItem.Parent.Children.IndexOf(obj))
-                                .OrderBy(index => Math.Abs(index - newItemIndex))
-                                .First();
-
-                            var isAscending = newItemIndex < existingSelectionIndex;
-                            var min = isAscending ? newItemIndex : existingSelectionIndex;
-                            var max = isAscending ? existingSelectionIndex : newItemIndex;
-
-                            for (var i = min; i < max; i++)
-                            {
-                                var element = newItem.Parent.Children.ElementAt(i);
-                                if (SelectedObjects.Contains(element) == false)
-                                    SelectedObjects.Add(element);
-                            }
-                        }
-                    }
-                }
-                catch { }
-
                 // Select the objects in the game world
                 var objectState = new ObjectSelectionState();
                 foreach (var item in SelectedObjects)
