@@ -1,38 +1,47 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using CommonControls.BaseDialogs;
 using MessageBox = System.Windows.MessageBox;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     /// <summary>
-    /// Shows simple value nntry dialog, for file/folder names
+    /// Shows simple value entry dialog, for file/folder names
     /// Shows error boxes on invalid input, asks the user to retry, and shows the dialog again
     /// TODO: Make neater solution? Edit-in-place; make own simple value editing dialog, with checking
     /// </summary>
     public class EditFileNameDialog
     {
-        static public string ShowDialog(TreeNode parentNode, string currentValue)
+        /// <summary>
+        /// Shows dialog for entering a new folder name
+        /// </summary>
+        /// <param name="parentNode">Parent Node for checking for folders with identical names</param>
+        /// <param name="currentValue">The Value of the property to edit</param>
+        /// <returns>Edit Name, empty string if user pressed "cancel" </returns>
+        static public string ShowDialog(TreeNode parentNode, string currentValue )
         {
-            var inputCorrect = false;
-            var dialogValue = currentValue;
+            var isInputCorrect = false;
+            var dialogTextBoxValue = currentValue;
             var newFileName = "";
 
-            while (!inputCorrect)
+            while (!isInputCorrect)
             {
-                inputCorrect = true;
-                var window = new TextInputWindow("Create folder", dialogValue, true);
-                dialogValue = window.TextValue; // store for next dialog instance (if ínput is invalud)
+                isInputCorrect = true;
+                var window = new TextInputWindow("Create folder", dialogTextBoxValue, true);
 
                 if (window.ShowDialog() == false)
-                    return ""; // exit is "cancel" pressed
+                    return ""; // exit if "cancel" pressed
 
-                inputCorrect = inputCorrect && IsStringProper(window.TextValue);
+                dialogTextBoxValue = window.TextValue; // store for next dialog instance (if ínput is invalud)
+
+                isInputCorrect = isInputCorrect && IsStringProper(window.TextValue);
                 
                 newFileName = window.TextValue.ToLower().Trim();
+                                
+                isInputCorrect = isInputCorrect && IsFileNameUniqueInFolder(parentNode, newFileName);
 
-                inputCorrect = inputCorrect && IsFileNameUniqueInFolder(parentNode, newFileName);
-                inputCorrect = inputCorrect && AreStringCharsValidForFileName(newFileName);
-                
+                isInputCorrect = isInputCorrect && AreStringCharsValidForFileName(newFileName);                
             }
 
             return newFileName;
@@ -50,6 +59,9 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         private static bool IsFileNameUniqueInFolder(TreeNode parentNode, string newFileName)
         {
+            if (parentNode == null)
+                throw new ArgumentNullException(nameof(parentNode), "Parent node can not be null!");
+
             foreach (var node in parentNode.Children)
             {
                 if (node.Name == newFileName)
