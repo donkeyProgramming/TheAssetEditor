@@ -12,7 +12,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_NotExising()
         {
             // Arrange 
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(),  null, null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
@@ -30,7 +30,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_ExistingButDifferent()
         {
             // Arrange 
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(),  null, null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
@@ -52,7 +52,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_ExistingAndEqualButDifferentName()
         {
             // Arrange 
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
@@ -74,7 +74,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_ExistingAndEqualWithWhiteSpaceDiff()
         {
             // Arrange 
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
@@ -96,7 +96,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_ExistingAndEqualWithCapitalization()
         {
             // Arrange 
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
@@ -118,7 +118,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void LoadExistingMaterials()
         {
             // Arrange 
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null);
             pfs.LoadFolderContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
 
             // Act
@@ -133,7 +133,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void LoadExistingMaterials_AddComplexEqual()
         {
             // Arrange 
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null);
             pfs.LoadFolderContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
 
             var path = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\materials\emp_karl_franz_body_01_weighted2_alpha_off.xml.material";
@@ -154,7 +154,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void LoadExistingMaterials_AddDifferent()
         {
             // Arrange 
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null);
             pfs.LoadFolderContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
 
             var path = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\materials\emp_karl_franz_body_01_weighted2_alpha_off.xml.material";
@@ -175,7 +175,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void LoadExistingMaterials_AddDifferentOnlyInName()
         {
             // Arrange 
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null);
             pfs.LoadFolderContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
 
             var path = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\materials\emp_karl_franz_body_01_weighted2_alpha_off.xml.material";
@@ -199,7 +199,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_NameMissingFromFile()
         {
             // Arrange 
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null, null);
+            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(), new GameInformationFactory(), null, null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<nothing> customMaterialName </name>PostContent0";

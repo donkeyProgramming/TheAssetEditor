@@ -21,6 +21,7 @@ namespace AssetEditor.ViewModels
     public partial class MenuBarViewModel
     {
         private readonly PackFileService _packfileService;
+        private readonly SaveHelper _saveHelper;
         private readonly ApplicationSettingsService _settingsService;
         private readonly IEditorDatabase _editorDatabase;
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -29,9 +30,10 @@ namespace AssetEditor.ViewModels
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = [];
         public ObservableCollection<EditorTool> Editors { get; set; } = [];
 
-        public MenuBarViewModel(PackFileService packfileService, ApplicationSettingsService settingsService, IEditorDatabase editorDatabase, IUiCommandFactory uiCommandFactory, TouchedFilesRecorder touchedFilesRecorder)
+        public MenuBarViewModel(PackFileService packfileService, SaveHelper saveHelper, ApplicationSettingsService settingsService, IEditorDatabase editorDatabase, IUiCommandFactory uiCommandFactory, TouchedFilesRecorder touchedFilesRecorder)
         {
             _packfileService = packfileService;
+            _saveHelper = saveHelper;
             _settingsService = settingsService;
             _editorDatabase = editorDatabase;
             _uiCommandFactory = uiCommandFactory;
@@ -54,8 +56,8 @@ namespace AssetEditor.ViewModels
                 _packfileService.SetEditablePack(newPackFile);
             }
         }
-        [RelayCommand] private void CreateAnimPackWarhammer3() => AnimationPackSampleDataCreator.CreateAnimationDbWarhammer3(_packfileService);
-        [RelayCommand] private void CreateAnimPack3k() => AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService);
+        [RelayCommand] private void CreateAnimPackWarhammer3() => AnimationPackSampleDataCreator.CreateAnimationDbWarhammer3(_saveHelper, _packfileService);
+        [RelayCommand] private void CreateAnimPack3k() => AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService, _saveHelper);
         [RelayCommand] private void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();
         [RelayCommand] private void OpenWh2AnimpackUpdater()
         {

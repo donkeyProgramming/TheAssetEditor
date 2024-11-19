@@ -22,11 +22,13 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
         private readonly ILogger _logger = Logging.Create<NodeToRmvSaveHelper>();
         private readonly PackFileService _packFileService;
         private readonly MeshBuilderService _meshBuilderService;
+        private readonly SaveHelper _saveHelper;
 
-        public NodeToRmvSaveHelper(PackFileService packFileService, MeshBuilderService meshBuilderService)
+        public NodeToRmvSaveHelper(PackFileService packFileService, MeshBuilderService meshBuilderService, SaveHelper saveHelper)
         {
             _packFileService = packFileService;
             _meshBuilderService = meshBuilderService;
+            _saveHelper = saveHelper;
         }
 
         public void Save(string outputPath, Rmv2ModelNode mainNode, GameSkeleton? skeleton, RmvVersionEnum rmvVersionEnum, GeometrySaveSettings saveSettings)
@@ -36,7 +38,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                 var bytes = GenerateBytes(mainNode, rmvVersionEnum, skeleton, saveSettings, true);
                 
                 var originalFileHandle = _packFileService.FindFile(outputPath);
-                var res = SaveHelper.Save(_packFileService, outputPath, originalFileHandle, bytes);
+                var res = _saveHelper.Save(outputPath, originalFileHandle, bytes);
             }
             catch (Exception e)
             {

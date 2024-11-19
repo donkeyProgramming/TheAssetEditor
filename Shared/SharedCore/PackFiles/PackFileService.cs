@@ -19,7 +19,6 @@ namespace Shared.Core.PackFiles
         private readonly GlobalEventSender? _globalEventSender;
         private readonly IAnimationFileDiscovered? _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
-        public IPackFileUiProvider? UiProvider { get; }
 
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
@@ -28,15 +27,13 @@ namespace Shared.Core.PackFiles
             ApplicationSettingsService settingsService,
             GameInformationFactory gameInformationFactory,
             GlobalEventSender? globalEventSender,
-            IAnimationFileDiscovered? skeletonAnimationLookUpHelper,
-            IPackFileUiProvider? packFileUiProvider)
+            IAnimationFileDiscovered? skeletonAnimationLookUpHelper)
         {
             _globalEventSender = globalEventSender;
             Database = database;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _settingsService = settingsService;
             _gameInformationFactory = gameInformationFactory;
-            UiProvider = packFileUiProvider;
         }
 
        public bool TriggerFileUpdates { get; set; } = true;

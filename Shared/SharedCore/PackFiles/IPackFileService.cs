@@ -8,7 +8,7 @@ namespace Shared.Core.PackFiles
     {
         PackFileDataBase Database { get; }
         bool TriggerFileUpdates { get; set; }
-        IPackFileUiProvider? UiProvider { get; }
+
 
         event PackFileService.FileLookUpHander? FileLookUpEvent;
 

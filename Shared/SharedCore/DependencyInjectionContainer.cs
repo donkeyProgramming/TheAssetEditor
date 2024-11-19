@@ -31,6 +31,8 @@ namespace Shared.Core
             services.AddSingleton<GlobalEventSender>();
             services.AddSingleton<ScopeRepository>();
             services.AddSingleton<TouchedFilesRecorder>();
+            services.AddSingleton<SaveHelper>();
+            
 
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
             services.AddScoped<EventHub>();
