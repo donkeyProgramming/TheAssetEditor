@@ -18,9 +18,7 @@
 
             <valueconverters:SceneNodeToImageConverter x:Key="ImageValueConverter"/>
             <valueconverters:SceneNodeToRadioButtonGroupingConverter x:Key="RadioButtonGroupConverter"/>
-            <valueconverters:SceneNodeContextMenuEnabledConverter x:Key="ContextMenuEnabledConverter"/>
-            <valueconverters:SceneNodeToLockStateConverter x:Key="LockStateConverter"/>
-            <local:TreeItemDataTemplateSelector x:Key="TreeItemDataTemplateSelector"/>
+            <local:SceneNodeDataTemplateSelector x:Key="TreeItemDataTemplateSelector"/>
 
             <HierarchicalDataTemplate x:Key="DefaultTreeNodeStyle" ItemsSource="{Binding Children, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel Orientation="Horizontal">
@@ -28,15 +26,6 @@
                         Style="{StaticResource OptionalRadioButtonStyle}"                     
                         IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         GroupName="{Binding Path=. , Converter={StaticResource RadioButtonGroupConverter}}"/>
-
-                    <Image Width="18" Margin="2,0" Source="{Binding Source={x:Static resources:IconLibrary.LockIcon}}" >
-                        <Image.Visibility>
-                            <MultiBinding Converter="{StaticResource LockStateConverter}">
-                                <Binding UpdateSourceTrigger="PropertyChanged" Path="DataContext" RelativeSource="{RelativeSource Mode=Self}"/>
-                                <Binding UpdateSourceTrigger="PropertyChanged" Path="DataContext.IsSelectable" RelativeSource="{RelativeSource Mode=Self}"/>
-                            </MultiBinding>
-                        </Image.Visibility>
-                    </Image>
 
                     <Image Width="18" Margin="2,0"  Grid.Column="0" Source="{Binding Path=. , Converter={StaticResource ImageValueConverter}}"/>
                     <TextBlock Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" Margin="2,0"/>
@@ -61,7 +50,6 @@
     <DockPanel>
         <local:MultiSelectTreeView x:Name="TheTreeView"
            behaviors:TreeViewExtension.SelectItemOnRightClick="True"
-           TreeViewItem.PreviewMouseDoubleClick="TreeViewItem_PreviewMouseDoubleClick"
            ItemsSource="{Binding Path=SceneGraphRootNodes, UpdateSourceTrigger=PropertyChanged}"
            ItemTemplateSelector="{StaticResource TreeItemDataTemplateSelector}"
            SelectedObjects="{Binding Path=SelectedObjects, UpdateSourceTrigger=PropertyChanged}">

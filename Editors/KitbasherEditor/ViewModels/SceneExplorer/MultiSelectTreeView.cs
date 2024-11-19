@@ -92,20 +92,6 @@ namespace KitbasherEditor.Views
         }
 
 
-        void ChangeSelectedState(TreeViewItem treeViewItem, ISceneNode node)
-        {
-            if (!SelectedObjects.Contains(node))
-            {
-                treeViewItem.Background = _selectedBackgroundBrush;
-                treeViewItem.Foreground = _selectedForegroundBrush;
-                SelectedObjects.Add(node);
-            }
-            else
-            {
-                Deselect(treeViewItem, node);
-            }
-        }
-
 
 
         void MyTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -256,5 +242,23 @@ namespace KitbasherEditor.Views
             get { return Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift); }
         }
 
+    }
+
+    public static class ItemContainerGeneratorHelper
+    {
+        public static TreeViewItem ContainerFromItemRecursive(this ItemContainerGenerator root, object item)
+        {
+            var treeViewItem = root.ContainerFromItem(item) as TreeViewItem;
+            if (treeViewItem != null)
+                return treeViewItem;
+            foreach (var subItem in root.Items)
+            {
+                treeViewItem = root.ContainerFromItem(subItem) as TreeViewItem;
+                var search = treeViewItem?.ItemContainerGenerator.ContainerFromItemRecursive(item);
+                if (search != null)
+                    return search;
+            }
+            return null;
+        }
     }
 }
