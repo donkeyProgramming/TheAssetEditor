@@ -32,7 +32,16 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private string _currentGame;
         [ObservableProperty] private string _editablePackFile;
 
-        public MainViewModel(MenuBarViewModel menuViewModel, PackFileService packfileService, IEditorDatabase toolFactory, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
+        public MainViewModel(
+                MenuBarViewModel menuViewModel, 
+                PackFileService packfileService, 
+                IEditorDatabase toolFactory, 
+                IUiCommandFactory uiCommandFactory, 
+                IExportFileContextMenuHelper exportFileContextMenuHelper, 
+                IImportFileContextMenuHelper importFileContextMenuHelper, 
+                ApplicationSettingsService applicationSettingsService, 
+                GameInformationFactory gameInformationFactory)
+
         {
             MenuBar = menuViewModel;
             _uiCommandFactory = uiCommandFactory;
@@ -41,7 +50,7 @@ namespace AssetEditor.ViewModels
             _packfileService.Database.ContainerUpdated += OnContainerUpdated;
 
             FileTree = new PackFileBrowserViewModel(_packfileService);
-            FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, uiCommandFactory, exportFileContextMenuHelper);
+            FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, uiCommandFactory, exportFileContextMenuHelper, importFileContextMenuHelper);
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;
