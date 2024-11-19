@@ -10,9 +10,10 @@ using Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng;
 using Editors.ImportExport.Exporting.Presentation.DdsToNormalPng;
 using Editors.ImportExport.Exporting.Presentation.DdsToPng;
 using Editors.ImportExport.Exporting.Presentation.RmvToGltf;
+using Editors.ImportExport.Importing;
+using Editors.ImportExport.Importing.Importers.GltfToRmv;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using Shared.Core.DevConfig;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace Editors.ImportExport
@@ -35,17 +36,21 @@ namespace Editors.ImportExport
             services.AddTransient<DdsToNormalPngExporter>();
             services.AddTransient<RmvToGltfExporter>();
 
+            // Importers
+            services.AddTransient<GltfImporter>();
+
             // Image Save Helper
             services.AddScoped<IImageSaveHandler, SystemImageSaveHandler>();
 
             // Helpers to ensure we can hook up to the UI
             services.AddTransient<IExportFileContextMenuHelper, ExportFileContextMenuHelper>();
             services.AddTransient<DisplayExportFileToolCommand>();
+
+            services.AddTransient<IImportFileContextMenuHelper, ImportFileContextMenuHelper>();
+            services.AddTransient<DisplayImportFileToolCommand>();
+
             services.AddTransient<GltfMeshBuilder>();
             services.AddTransient<GltfSkeletonCreator>();
-
-
-            RegisterAllAsInterface<IDeveloperConfiguration>(services, ServiceLifetime.Transient);
         }
     }
 }
