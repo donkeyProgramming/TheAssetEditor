@@ -87,7 +87,7 @@ namespace GameWorld.Core.Components.Gizmo
         // -- Modes & Selections -- //
         public GizmoAxis ActiveAxis = GizmoAxis.None;
         public GizmoMode ActiveMode = GizmoMode.Translate;
-        public TransformSpace GizmoDisplaySpace = TransformSpace.Local;
+        public TransformSpace GizmoDisplaySpace = TransformSpace.World;
         public TransformSpace GizmoValueSpace = TransformSpace.Local;
         public PivotType ActivePivot = PivotType.SelectionCenter;
 
@@ -349,10 +349,6 @@ namespace GameWorld.Core.Components.Gizmo
 
         private void HandleTranslateAndScale(Vector2 mousePosition, out Vector3 out_transformLocal, out Vector3 out_transfromWorld)
         {
-
-
-
-
             Plane plane;
             switch (ActiveAxis)
             {
@@ -431,7 +427,6 @@ namespace GameWorld.Core.Components.Gizmo
                 _rotationSnapDelta -= snapped;
                 delta = snapped;
             }
-
 
             // rotation matrix to transform - if more than one objects selected, always use world-space.
             var rot = Matrix.Identity;
