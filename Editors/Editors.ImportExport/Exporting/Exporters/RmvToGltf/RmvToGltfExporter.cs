@@ -19,7 +19,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         string OutputPath,
         bool ConvertMaterialTextureToBlender,
         bool ConvertNormalTextureToBlue,
-        bool ExportAnimations        
+        bool ExportAnimations
     );
 
     public class RmvToGltfExporter
@@ -51,7 +51,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
             var hasSkeleton = string.IsNullOrWhiteSpace(rmv2.Header.SkeletonName) == false;
             ProcessedGltfSkeleton? gltfSkeleton = null;
-            
+
             var outputScene = ModelRoot.CreateModel();
 
             if (hasSkeleton)
@@ -59,7 +59,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 var animSkeletonFile = FetchAnimSkeleton(rmv2);
                 gltfSkeleton = _gltfSkeletonCreator.Create(outputScene, animSkeletonFile, doMirror);
 
-                if (settings.ExportAnimations && settings.InputAnimationFiles.Count != 0)
+                if (settings.ExportAnimations && settings.InputAnimationFiles != null && settings.InputAnimationFiles.Any())
                     GenerateAnimations(settings, gltfSkeleton, outputScene, animSkeletonFile, doMirror);
             }
 
