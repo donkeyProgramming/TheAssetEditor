@@ -10,6 +10,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Common;
+using static Shared.Core.PackFiles.PackFileService;
 
 namespace CommonControls.Editors.AnimationBatchExporter
 {
@@ -67,9 +68,10 @@ namespace CommonControls.Editors.AnimationBatchExporter
                     var convertedAnimFiles = ConvertAnimFiles(animFiles, SelectedOutputFormat.Value, errorList);
 
                     _logger.Here().Information($"saving animation files");
-                    _pfs.AddFilesToPack(_pfs.GetEditablePack(),
-                        convertedAnimFiles.Select(x => x.directory).ToList(),
-                        convertedAnimFiles.Select(x => x.file).ToList());
+
+                    var filesToAdd = convertedAnimFiles.Select(x => new NewFileEntry(x.directory, x.file)).ToList();
+
+                    _pfs.AddFilesToPack(_pfs.GetEditablePack(), filesToAdd);
 
                     _logger.Here().Information($"Saving inv matix files");
                     var invMatrixFileList = _pfs.FindAllWithExtention(".bone_inv_trans_mats", packfile.Container);

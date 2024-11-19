@@ -10,7 +10,7 @@ using Shared.Core.Services;
 
 namespace Shared.Core.PackFiles
 {
-    public class PackFileService
+    public class PackFileService : IPackFileService
     {
         public delegate void FileLookUpHander(string fileName, PackFileContainer? container, bool found);
         public event FileLookUpHander? FileLookUpEvent;
@@ -39,7 +39,7 @@ namespace Shared.Core.PackFiles
             UiProvider = packFileUiProvider;
         }
 
-        public bool TriggerFileUpdates { get; set; } = true;
+       public bool TriggerFileUpdates { get; set; } = true;
 
         public PackFileContainer? LoadFolderContainer(string packFileSystemPath)
         {
@@ -301,7 +301,7 @@ namespace Shared.Core.PackFiles
             throw new Exception("Unknown path for " + file.Name);
         }
 
-        public PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
+        PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
             var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
             Database.AddPackFile(pack);
@@ -315,7 +315,7 @@ namespace Shared.Core.PackFiles
             return LoadAllCaFiles(path.Path, game.DisplayName);
         }
 
-        public bool LoadAllCaFiles(string gameDataFolder, string gameName)
+        bool LoadAllCaFiles(string gameDataFolder, string gameName)
         {
             try
             {
@@ -407,50 +407,42 @@ namespace Shared.Core.PackFiles
         }
 
 
-        public void AddFileToPack(PackFileContainer container, string directoryPath, PackFile newFile)
+
+
+        public record NewFileEntry(string DirectoyPath, PackFile PackFile);
+
+
+        public void AddFilesToPack(PackFileContainer container, List<NewFileEntry> newFiles)
         {
             if (container.IsCaPackFile)
                 throw new Exception("Can not add files to ca pack file");
 
-            if (string.IsNullOrWhiteSpace(newFile.Name))
-                throw new Exception("Name can not be empty");
+            foreach (var file in newFiles)
+            {
+                if (string.IsNullOrWhiteSpace(file.PackFile.Name))
+                    throw new Exception("PackFile name can not be empty");
 
-            if (!string.IsNullOrWhiteSpace(directoryPath))
-                directoryPath += "\\";
-            directoryPath += newFile.Name;
-            container.FileList[directoryPath.ToLower()] = newFile;
+                if (string.IsNullOrWhiteSpace(file.DirectoyPath))
+                    throw new Exception("Directory name can not be empty");
+            }
+
+            foreach (var file in newFiles)
+            {
+                var path = file.DirectoyPath;
+                if (!string.IsNullOrWhiteSpace(path))
+                    path += "\\";
+                path += file.PackFile.Name;
+                container.FileList[path.ToLower()] = file.PackFile;
+            }
 
             if (TriggerFileUpdates)
             {
                 _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, container);
                 _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
 
-                Database.TriggerPackFileAdded(container, new List<PackFile>() { newFile });
-                _globalEventSender?.TriggerEvent(new PackFileSavedEvent());
+                var files = newFiles.Select(x=>x.PackFile).ToList();
+                Database.TriggerPackFileAdded(container, files);
             }
-        }
-
-        public void AddFilesToPack(PackFileContainer container, List<string> directoryPaths, List<PackFile> newFiles)
-        {
-            if (container.IsCaPackFile)
-                throw new Exception("Can not add files to ca pack file");
-
-            if (directoryPaths.Count != newFiles.Count)
-                throw new Exception("Different number of directories and files");
-
-            for (var i = 0; i < directoryPaths.Count; i++)
-            {
-                var path = directoryPaths[i];
-                if (!string.IsNullOrWhiteSpace(path))
-                    path += "\\";
-                path += newFiles[i].Name;
-                container.FileList[path.ToLower()] = newFiles[i];
-
-            }
-            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, container);
-            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
-
-            Database.TriggerPackFileAdded(container, newFiles);
         }
 
         public void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target)
@@ -466,31 +458,7 @@ namespace Shared.Core.PackFiles
             }
         }
 
-        public void AddFolderContent(PackFileContainer container, string path, string folderDir)
-        {
-            var originalFilePaths = Directory.GetFiles(folderDir, "*", SearchOption.AllDirectories);
-            var filePaths = originalFilePaths.Select(x => x.Replace(folderDir + "\\", "")).ToList();
-            if (!string.IsNullOrWhiteSpace(path))
-                path += "\\";
-
-            var filesAdded = new List<PackFile>();
-            for (var i = 0; i < filePaths.Count; i++)
-            {
-                var currentPath = filePaths[i];
-                var filename = Path.GetFileName(currentPath);
-
-                var source = MemorySource.FromFile(originalFilePaths[i]);
-                var file = new PackFile(filename, source);
-                filesAdded.Add(file);
-
-                container.FileList[path.ToLower() + currentPath.ToLower()] = file;
-            }
-
-            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, container);
-            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
-
-            Database.TriggerPackFileAdded(container, filesAdded);
-        }
+      
 
         public void SetEditablePack(PackFileContainer pf)
         {

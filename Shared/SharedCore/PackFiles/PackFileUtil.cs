@@ -1,4 +1,5 @@
 ﻿using Shared.Core.PackFiles.Models;
+using static Shared.Core.PackFiles.PackFileService;
 
 namespace Shared.Core.PackFiles
 {
@@ -57,9 +58,7 @@ namespace Shared.Core.PackFiles
 
         public static List<PackFile> LoadFilesFromDisk(PackFileService pfs, IEnumerable<FileRef> fileRefs)
         {
-            var packFileList = new List<PackFile>();
-            var pathList = new List<string>();
-
+            var packFileList = new List<NewFileEntry>();
             foreach (var fileRef in fileRefs)
             {
                 var fileSource = new FileSystemSource(fileRef.SystemPath);
@@ -68,12 +67,11 @@ namespace Shared.Core.PackFiles
                     packfileName = Path.GetFileName(fileRef.SystemPath);
                 var packfile = new PackFile(packfileName, fileSource);
 
-                packFileList.Add(packfile);
-                pathList.Add(fileRef.PackFilePath);
+                packFileList.Add( new NewFileEntry(fileRef.PackFilePath, packfile));
             }
 
-            pfs.AddFilesToPack(pfs.GetEditablePack(), pathList, packFileList);
-            return packFileList;
+            pfs.AddFilesToPack(pfs.GetEditablePack(), packFileList);
+            return packFileList.Select(x=>x.PackFile).ToList();
         }
 
         public static List<PackFile> LoadFilesFromDisk(PackFileService pfs, FileRef fileRef) => LoadFilesFromDisk(pfs, new FileRef[] { fileRef });

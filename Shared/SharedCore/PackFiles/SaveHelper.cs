@@ -2,6 +2,7 @@
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using static Shared.Core.PackFiles.PackFileService;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace Shared.Core.PackFiles
@@ -67,7 +68,9 @@ namespace Shared.Core.PackFiles
             {
                 // Create new
                 var directoryPath = Path.GetDirectoryName(fullPath);
-                packFileService.AddFileToPack(editablePack, directoryPath, pf);
+                var item = new NewFileEntry(directoryPath!, pf);
+                packFileService.AddFilesToPack(editablePack, [item]);
+
                 return pf;
             }
             else
@@ -123,7 +126,10 @@ namespace Shared.Core.PackFiles
                 if (data == null)
                     data = packFile.DataSource.ReadData();
                 var newPackFile = new PackFile(justFileName, new MemorySource(data));
-                packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, newPackFile);
+
+                var item = new NewFileEntry(directoryPath!, newPackFile);
+                packFileService.AddFilesToPack(selectedEditabelPackFile, [item]);
+
                 return newPackFile;
             }
             else
@@ -182,7 +188,10 @@ namespace Shared.Core.PackFiles
                     var directoryPath = Path.GetDirectoryName(path);
                     var justFileName = Path.GetFileName(path);
                     var newPackFile = new PackFile(justFileName, new MemorySource(data));
-                    packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, newPackFile);
+        
+                    var item = new NewFileEntry(directoryPath!, newPackFile);
+                    packFileService.AddFilesToPack(selectedEditabelPackFile, [item]);
+
                     return newPackFile;
                 }
             }

@@ -42,7 +42,7 @@ namespace AssetEditor.UiCommands
 
             using (new WaitCursor())
             {
-                _packFileService.LoadAllCaFiles(gamePath.Path, _gameInformationFactory.GetGameById(game).DisplayName);
+                _packFileService.LoadAllCaFiles(game);
             }
         }
     }

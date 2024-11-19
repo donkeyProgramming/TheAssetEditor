@@ -28,7 +28,6 @@ namespace Editors.Shared.Core
 
         public override void RegisterTools(IEditorDatabase factory)
         {
-          // factory.RegisterTool<TextureEditorViewModel, TexturePreviewView>(new ExtensionToTool(EditorEnums.Texture_Editor, new[] { ".dds", ".png", ".jpeg" }));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Shared.Core.PackFiles.Models;
+using static Shared.Core.PackFiles.PackFileService;
 
 namespace Shared.Core.PackFiles
 {
@@ -34,38 +35,10 @@ namespace Shared.Core.PackFiles
             var directoryPath = Path.GetDirectoryName(fullPath);
             var justFileName = Path.GetFileName(fullPath);
             var newPackFile = new PackFile(justFileName, new MemorySource(content));
-            _packFileService.AddFileToPack(outputPack!, directoryPath!, newPackFile);
+            var item = new NewFileEntry(directoryPath!, newPackFile);
+
+            _packFileService.AddFilesToPack(outputPack!, [item]);
             return newPackFile;
-        }
-
-        void SaveFile(string fullPath, byte[] content)
-        {
-            /*
-             var existingFile = packFileService.FindFile(filename, selectedEditabelPackFile);
-     if (existingFile != null && promptSaveOverride)
-     {
-         var fullPath = packFileService.GetFullPath(existingFile, selectedEditabelPackFile);
-         if (MessageBox.Show($"Replace existing file?\n{fullPath} \nin packfile:{selectedEditabelPackFile.Name}", "", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
-         {
-             var extention = Path.GetExtension(fullPath);
-             var dialogResult = packFileService.UiProvider.DisplaySaveDialog(packFileService, new List<string>() { extention }, out _, out var filePath);
-
-             if (dialogResult == true)
-             {
-                 var path = filePath!;
-                 if (path.Contains(extention) == false)
-                     path += extention;
-
-                 filename = path;
-                 existingFile = null;
-             }
-             else
-             {
-                 return null;
-             }
-         }
-     }
-             */
         }
     }
 }

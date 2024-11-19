@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -18,6 +17,7 @@ using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
 using static Editors.Audio.AudioEditor.DynamicDataGrid;
+using static Shared.Core.PackFiles.PackFileService;
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
@@ -149,9 +149,12 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [RelayCommand] public void SaveCustomStates()
         {
             var dataGridItemsJson = JsonConvert.SerializeObject(CustomStatesDataGridItems, Formatting.Indented);
-            var pack = _packFileService.GetEditablePack();
+            var editablePack = _packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
-            _packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{"dummy_name"}.json", new MemorySource(byteArray)));
+  
+            var fileEntry = new NewFileEntry("AudioProjects", new PackFile($"{"dummy_name"}.json", new MemorySource(byteArray)));
+            _packFileService.AddFilesToPack(editablePack, [fileEntry]);
+
             _logger.Here().Information($"Saved Custom States file: {"dummy_name"}");
         }
 
@@ -265,7 +268,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
                     if (matchingRow != null)
                     {
-                        var fileNames = filePaths.Select(filePath => $"\"{Path.GetFileName(filePath)}\"");
+                        var fileNames = filePaths.Select(filePath => $"\"{System.IO.Path.GetFileName(filePath)}\"");
                         var fileNamesString = string.Join(", ", fileNames);
                         var filePathsString = string.Join(", ", filePaths.Select(filePath => $"\"{filePath}\""));
 
