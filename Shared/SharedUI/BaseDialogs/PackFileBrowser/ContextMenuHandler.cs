@@ -38,14 +38,13 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         public ICommand CopyNodePathCommand { get; set; }
         public ICommand ExportToFolderCommand { get; set; }
         public ICommand AdvancedExportToFolderCommand { get; set; }
-
+        public ICommand AdvancedImport { get; set; }
         public ICommand CopyToEditablePackCommand { get; set; }
         public ICommand DuplicateCommand { get; set; }
         public ICommand CreateFolderCommand { get; set; }
         public ICommand SetAsEditabelPackCommand { get; set; }
         public ICommand ExpandAllChildrenCommand { get; set; }
         public ICommand CollapseAllChildrenCommand { get; set; }
-
         public ICommand OpenPack_FileNotpadPluss_Command { get; set; }
         public ICommand OpenPackFile_HxD_Command { get; set; }
         public ICommand SavePackFileAsCommand { get; set; }
@@ -55,12 +54,14 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         protected TreeNode _selectedNode;
         private readonly IUiCommandFactory _uiCommandFactory;
         protected readonly IExportFileContextMenuHelper _exportFileContextMenuHelper;
+        protected readonly IImportFileContextMenuHelper _importFileContextMenuHelper;
 
-        public ContextMenuHandler(PackFileService pf, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper)
+        public ContextMenuHandler(PackFileService pf, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper, IImportFileContextMenuHelper importtFileContextMenuHelper)
         {
             _packFileService = pf;
             _uiCommandFactory = uiCommandFactory;
             _exportFileContextMenuHelper = exportFileContextMenuHelper;
+            _importFileContextMenuHelper = importtFileContextMenuHelper;
             RenameNodeCommand = new RelayCommand(OnRenameNode);
             AddFilesCommand = new RelayCommand(OnAddFilesCommand);
             AddFilesFromDirectory = new RelayCommand(OnAddFilesFromDirectory);
@@ -77,6 +78,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             CollapseAllChildrenCommand = new RelayCommand(CollapsAllChildren);
             ExportToFolderCommand = new RelayCommand(ExportToFolder);
             AdvancedExportToFolderCommand = new RelayCommand(AdvancedExportToFolder);
+            AdvancedImport = new RelayCommand(OnAdvancedImport);
 
             OpenPack_FileNotpadPluss_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\Notepad++\notepad++.exe", _selectedNode.Item));
             OpenPackFile_HxD_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\HxD\HxD.exe", _selectedNode.Item));
@@ -299,6 +301,11 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             _exportFileContextMenuHelper.ShowDialog(_selectedNode.Item);
         }
 
+        void OnAdvancedImport()
+        {
+            _importFileContextMenuHelper.ShowDialog(_selectedNode);
+        }
+
         void SaveSelfAndChildren(TreeNode node, string outputDirectory, string rootPath, ref int fileCounter)
         {
             if (node.NodeType == NodeType.Directory)
@@ -392,6 +399,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     return new ContextMenuItem() { Name = "Add" };
                 case ContextItems.Import:
                     return new ContextMenuItem() { Name = "Import" };
+                case ContextItems.AdvancedImport:
+                    return new ContextMenuItem() { Name = "Advanced Import", Command = AdvancedImport };
                 case ContextItems.Create:
                     return new ContextMenuItem() { Name = "Create" };
                 case ContextItems.AddFiles:
@@ -441,6 +450,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         {
             Add,
             Import,
+            AdvancedImport,
             AddFiles,
             AddDirectory,
             CopyToEditablePack,
