@@ -30,7 +30,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
         {
             _modelRoot = ModelRoot.Load(settings.InputGltfFile);
 
-            var importedFileName = GetImporedtPackFilePath(settings);
+            var importedFileName = GetImportedPackFileName(settings);
 
             var rmv2File = RmvMeshBuilder.Build(settings, _modelRoot);
             var bytesRmv2 = ModelFactory.Create().Save(rmv2File);
@@ -39,11 +39,10 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             _packFileService.AddFileToPack(settings.destinationPackFolder.FileOwner, settings.destinationPackFolder.GetFullPath(), packFileImported);
         }
 
-        private static string GetImporedtPackFilePath(GltfImporterSettings settings)
-        {
-            var nodePath = ""; 
+        private static string GetImportedPackFileName(GltfImporterSettings settings)
+        {            
             var fileName = Path.GetFileNameWithoutExtension(settings.InputGltfFile);
-            string importedFileName = $@"{nodePath}/{fileName}.rigid_model_v2";
+            string importedFileName = $@"{fileName}.rigid_model_v2";
 
             return importedFileName;
         }
