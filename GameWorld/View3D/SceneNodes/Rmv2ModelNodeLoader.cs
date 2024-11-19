@@ -5,6 +5,8 @@ using GameWorld.Core.Animation;
 using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Services;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
@@ -14,6 +16,7 @@ namespace GameWorld.Core.SceneNodes
 {
     public class Rmv2ModelNodeLoader
     {
+        private readonly ILogger _logger = Logging.Create<Rmv2ModelNodeLoader>();
         private readonly MeshBuilderService _meshBuilderService;
         private readonly PackFileService _packFileService;
         private readonly CapabilityMaterialFactory _capabilityMaterialFactory;
@@ -27,7 +30,7 @@ namespace GameWorld.Core.SceneNodes
             _exceptionService = exceptionService;
         }
 
-        public List<Rmv2LodNode> CreateModelNodesFromFile(RmvFile model, string modelFullPath, AnimationPlayer animationPlayer,  WsModelFile? wsModel = null)
+        public List<Rmv2LodNode> CreateModelNodesFromFile(RmvFile model, string modelFullPath, AnimationPlayer animationPlayer, bool onlyLoadRootNode, WsModelFile? wsModel = null)
         {
             WsModelMaterialProvider wsMaterialProvider;
             if(wsModel != null)
@@ -70,6 +73,12 @@ namespace GameWorld.Core.SceneNodes
 
                     var node = new Rmv2MeshNode(geometry, rmvModel.Material, shader, animationPlayer);
                     currentNode.AddObject(node);
+                }
+
+                if (onlyLoadRootNode)
+                {
+                    _logger.Here().Information($"Only loading root node for mesh - {modelFullPath}");
+                    break;
                 }
             }
 

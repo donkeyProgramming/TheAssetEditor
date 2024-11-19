@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels;
 using Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel;
 using Shared.Ui.BaseDialogs.MathViews;

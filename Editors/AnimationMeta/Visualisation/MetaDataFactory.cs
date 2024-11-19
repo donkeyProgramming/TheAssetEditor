@@ -137,7 +137,7 @@ namespace Editors.AnimationMeta.Visualisation
             var propPlayer = _animationsContainerComponent.RegisterAnimationPlayer(new AnimationPlayer(), propName + Guid.NewGuid());
 
             // Configure the mesh
-            var loadedNode = _complexMeshLoader.Load(meshPath, new GroupNode(propName), propPlayer);
+            var loadedNode = _complexMeshLoader.Load(meshPath, new GroupNode(propName), propPlayer, false); // TODO: Could last arg be true? WOuld be better
 
             // Configure animation
             if (animationPath != null)

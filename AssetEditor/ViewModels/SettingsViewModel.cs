@@ -29,6 +29,7 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private bool _loadCaPacksByDefault;
         [ObservableProperty] private bool _loadWemFiles;
         [ObservableProperty] private string _wwisePath;
+        [ObservableProperty] private bool _onlyLoadLod0ForReferenceMeshes;
 
         public bool IsLoadWemFilesEnabled => LoadCaPacksByDefault;
 
@@ -44,6 +45,7 @@ namespace AssetEditor.ViewModels
             CurrentGame = _settingsService.CurrentSettings.CurrentGame;
             LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
             LoadWemFiles = _settingsService.CurrentSettings.LoadWemFiles;
+            OnlyLoadLod0ForReferenceMeshes = _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes;
             foreach (var game in gameInformationFactory.Games.OrderBy(g => g.DisplayName))
             {
                 GameDirectores.Add(
@@ -72,6 +74,7 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;
             _settingsService.CurrentSettings.LoadWemFiles = LoadWemFiles;
+            _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes = OnlyLoadLod0ForReferenceMeshes;
             _settingsService.CurrentSettings.GameDirectories.Clear();
             foreach (var item in GameDirectores)
                 _settingsService.CurrentSettings.GameDirectories.Add(new ApplicationSettings.GamePathPair() { Game = item.GameType, Path = item.Path });

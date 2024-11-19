@@ -7,7 +7,7 @@ using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 
-namespace KitbasherEditor.ViewModels
+namespace Editors.KitbasherEditor.ViewModels
 {
     public class KitbasherRootScene : ISkeletonProvider
     {

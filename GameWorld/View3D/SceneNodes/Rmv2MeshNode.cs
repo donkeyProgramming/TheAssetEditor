@@ -64,7 +64,7 @@ namespace GameWorld.Core.SceneNodes
        
         public void Render(RenderEngineComponent renderEngine, Matrix parentWorld)
         {
-            var animationCapability = Material.GetCapability<AnimationCapability>();
+            var animationCapability = Material.TryGetCapability<AnimationCapability>();
             if (animationCapability != null)
             {
                 var data = new Matrix[256];
@@ -83,7 +83,7 @@ namespace GameWorld.Core.SceneNodes
 
                 animationCapability.AnimationTransforms = data;
                 animationCapability.AnimationWeightCount = Geometry.WeightCount;
-                animationCapability.ApplyAnimation = AnimationPlayer != null && AnimationPlayer.IsEnabled;
+                animationCapability.ApplyAnimation = AnimationPlayer != null && AnimationPlayer.IsEnabled && Geometry.VertexFormat != UiVertexFormat.Static;
             }
 
             if (AttachmentBoneResolver != null)

@@ -1,6 +1,7 @@
 ﻿using Editors.KitbasherEditor.EventHandlers;
 using Editors.KitbasherEditor.Services;
 using Editors.KitbasherEditor.UiCommands;
+using Editors.KitbasherEditor.ViewModels;
 using Editors.KitbasherEditor.ViewModels.PinTool;
 using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer;

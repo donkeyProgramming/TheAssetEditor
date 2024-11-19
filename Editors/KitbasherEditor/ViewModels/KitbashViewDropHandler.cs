@@ -1,16 +1,17 @@
-﻿using Editors.KitbasherEditor.Services;
+﻿using System.IO;
+using Editors.KitbasherEditor.UiCommands;
+using Shared.Core.Events;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
-using System.IO;
 
-namespace KitbasherEditor.ViewModels
+namespace Editors.KitbasherEditor.ViewModels
 {
     public class KitbashViewDropHandler
     {
-        private readonly KitbashSceneCreator _kitbashSceneCreator;
+        private readonly IUiCommandFactory _uiCommandFactory;
 
-        public KitbashViewDropHandler(KitbashSceneCreator kitbashSceneCreator)
+        public KitbashViewDropHandler(IUiCommandFactory uiCommandFactory)
         {
-            _kitbashSceneCreator = kitbashSceneCreator;
+            _uiCommandFactory = uiCommandFactory;
         }
 
         public bool AllowDrop(TreeNode node, TreeNode targeNode = null)
@@ -24,9 +25,9 @@ namespace KitbasherEditor.ViewModels
             return false;
         }
 
-        public bool Drop(TreeNode node, TreeNode targeNode = null)
+        public bool Drop(TreeNode node)
         {
-            _kitbashSceneCreator.LoadReference(node.Item);
+            _uiCommandFactory.Create<ImportReferenceMeshCommand>().Execute(node.Item);
             return true;
         }
     }

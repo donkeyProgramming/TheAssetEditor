@@ -26,6 +26,7 @@ namespace Shared.Core.Services
         public bool IsFirstTimeStartingApplication { get; set; } = true;
         public bool IsDeveloperRun { get; set; } = false;
         public string WwisePath { get; set; }
+        public bool OnlyLoadLod0ForReferenceMeshes { get; set; } = true;
 
         public ApplicationSettings()
         {
