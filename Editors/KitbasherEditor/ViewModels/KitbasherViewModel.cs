@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.EventHandlers;
 using Editors.KitbasherEditor.Services;
@@ -18,7 +17,7 @@ using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.Common;
 
-namespace KitbasherEditor.ViewModels
+namespace Editors.KitbasherEditor.ViewModels
 {
     public partial class KitbasherViewModel : ObservableObject, 
         IEditorInterface, 
@@ -107,7 +106,7 @@ namespace KitbasherEditor.ViewModels
         }
 
         public bool AllowDrop(TreeNode node, TreeNode targeNode = null) => _dropHandler.AllowDrop(node, targeNode);
-        public bool Drop(TreeNode node, TreeNode targeNode = null) => _dropHandler.Drop(node, targeNode);
+        public bool Drop(TreeNode node, TreeNode targeNode = null) => _dropHandler.Drop(node);
 
         void OnFileSaved(ScopedFileSavedEvent notification)
         {

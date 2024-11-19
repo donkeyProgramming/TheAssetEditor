@@ -1,9 +1,9 @@
 ﻿using System.Windows;
 using CommonControls.Editors.BoneMapping.View;
+using Editors.KitbasherEditor.ViewModels;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using Shared.Core.PackFiles;

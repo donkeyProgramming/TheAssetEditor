@@ -61,7 +61,7 @@ namespace Editors.Shared.Core.Common
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
 
-            var loadedNode = _complexMeshLoader.Load(file, sceneObject.Player);
+            var loadedNode = _complexMeshLoader.Load(file, sceneObject.Player, false);// TODO: Could last arg be true? WOuld be better
             if (loadedNode == null)
             {
                 _logger.Here().Error("Unable to load model");

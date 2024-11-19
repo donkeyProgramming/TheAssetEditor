@@ -19,7 +19,7 @@ namespace E2EVerification.Shared
             var services = new GameServiceContainer();
             services.AddService(typeof(IGraphicsDeviceService), test);
 
-            var fullPath = Path.GetFullPath(@"..\..\..\..\..\GameWorld\ContentProject\bin\Debug\net8.0-windows\Content");
+            var fullPath = Path.GetFullPath(@"..\..\..\..\..\GameWorld\ContentProject\bin\Debug\net9.0-windows\Content");
             if (Directory.Exists(fullPath) == false)
                 throw new Exception("Unable to determine full path of content folder");
 

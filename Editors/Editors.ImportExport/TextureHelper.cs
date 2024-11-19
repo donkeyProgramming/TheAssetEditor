@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using Pfim;
 
 namespace MeshImportExport
 {
@@ -12,7 +13,7 @@ namespace MeshImportExport
             using var w = new BinaryWriter(m);
             w.Write(ddsbyteSteam);
             m.Seek(0, SeekOrigin.Begin);
-            var image = Pfim.Pfim.FromStream(m);
+            var image = Pfimage.FromStream(m);
 
             PixelFormat pixelFormat = PixelFormat.Format32bppArgb;
             if (image.Format == Pfim.ImageFormat.Rgba32)
@@ -35,7 +36,7 @@ namespace MeshImportExport
             bitmap.UnlockBits(bitmapData);
 
             using var b = new MemoryStream();
-            bitmap.Save(b, ImageFormat.Png);
+            bitmap.Save(b, System.Drawing.Imaging.ImageFormat.Png);
 
             using var byteSteam = new BinaryReader(b);
             b.Seek(0, SeekOrigin.Begin);
@@ -76,7 +77,7 @@ namespace MeshImportExport
             //var image = Pfim.Pfim.FromStream(//Create(imageData, bitmap.Width, bitmap.Height, imageFormat);
 
             using var b = new MemoryStream();
-            var imageNew = Pfim.Pfim.FromStream(b);
+            var imageNew = Pfimage.FromStream(b);
             using var writer = new BinaryWriter(b);
             writer.Write(imageNew.Data);
             return b.ToArray();

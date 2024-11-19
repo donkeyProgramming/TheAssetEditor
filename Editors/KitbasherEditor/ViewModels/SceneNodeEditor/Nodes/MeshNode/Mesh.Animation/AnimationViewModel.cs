@@ -2,7 +2,6 @@
 using Editors.Shared.Core.Services;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
-using KitbasherEditor.ViewModels;
 using Shared.Core.PackFiles;
 using Shared.Ui.Common;
 using Shared.Ui.Editors.BoneMapping;

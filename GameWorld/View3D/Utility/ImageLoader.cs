@@ -48,7 +48,7 @@ namespace GameWorld.Core.Utility
         public static IImage LoadImageFromBytes(byte[] imageContent, out ImageInformation out_imageInfo)
         {
             using var stream = new MemoryStream(imageContent);
-            using var image = Pfim.Pfim.FromStream(stream);
+            var image = Pfimage.FromStream(stream);
 
             out_imageInfo = new ImageInformation();
             out_imageInfo.SetFromImage(image);

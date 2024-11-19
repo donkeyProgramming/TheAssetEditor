@@ -3,7 +3,7 @@
     public interface IExceptionService
     {
         ExceptionInformation Create(Exception e);
-        void CreateDialog(Exception e);
+        void CreateDialog(Exception e, string userMessage = "");
     }
 
     class ExceptionService : IExceptionService
@@ -31,13 +31,14 @@
             return extendedException;
         }
 
-        public void CreateDialog(Exception e)
+        public void CreateDialog(Exception e, string userMessage = "")
         {
             var extendedException = Create(e);
+            extendedException.UserMessage = userMessage;
             _exceptionWindowProvider.ShowDialog(extendedException);
         }
 
-        public static List<ExceptionInstance> UnrollException(Exception e)
+        static List<ExceptionInstance> UnrollException(Exception e)
         {
             var output = new List<ExceptionInstance>();
 

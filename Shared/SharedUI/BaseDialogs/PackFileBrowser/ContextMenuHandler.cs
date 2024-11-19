@@ -2,10 +2,10 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
-using CommonControls.BaseDialogs;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -39,8 +39,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         public ICommand ExportToFolderCommand { get; set; }
         public ICommand AdvancedExportToFolderCommand { get; set; }
 
-        public ICommand AdvancedImportCommand { get; set; }
-
         public ICommand CopyToEditablePackCommand { get; set; }
         public ICommand DuplicateCommand { get; set; }
         public ICommand CreateFolderCommand { get; set; }
@@ -57,14 +55,12 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         protected TreeNode _selectedNode;
         private readonly IUiCommandFactory _uiCommandFactory;
         protected readonly IExportFileContextMenuHelper _exportFileContextMenuHelper;
-        protected readonly IImportFileContextMenuHelper _importFileContextMenuHelper;
 
-        public ContextMenuHandler(PackFileService pf, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper, IImportFileContextMenuHelper importtFileContextMenuHelper)
+        public ContextMenuHandler(PackFileService pf, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper)
         {
             _packFileService = pf;
             _uiCommandFactory = uiCommandFactory;
             _exportFileContextMenuHelper = exportFileContextMenuHelper;
-            _importFileContextMenuHelper = importtFileContextMenuHelper;
             RenameNodeCommand = new RelayCommand(OnRenameNode);
             AddFilesCommand = new RelayCommand(OnAddFilesCommand);
             AddFilesFromDirectory = new RelayCommand(OnAddFilesFromDirectory);
@@ -81,7 +77,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             CollapseAllChildrenCommand = new RelayCommand(CollapsAllChildren);
             ExportToFolderCommand = new RelayCommand(ExportToFolder);
             AdvancedExportToFolderCommand = new RelayCommand(AdvancedExportToFolder);
-            AdvancedImportCommand = new RelayCommand(OnAdvancedImport);
 
             OpenPack_FileNotpadPluss_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\Notepad++\notepad++.exe", _selectedNode.Item));
             OpenPackFile_HxD_Command = new RelayCommand(() => OpenPackFileUsing(@"C:\Program Files\HxD\HxD.exe", _selectedNode.Item));
@@ -98,7 +93,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             if (_selectedNode.NodeType == NodeType.Directory)
             {
                 var newFolderName = EditFileNameDialog.ShowDialog(_selectedNode.Parent, _selectedNode.Name);
-                if (newFolderName.Length != 0)
+                if (newFolderName.Any())
                 {
                     _selectedNode.Name = newFolderName;
                     _packFileService.RenameDirectory(_selectedNode.FileOwner, _selectedNode.GetFullPath(), newFolderName);
@@ -108,7 +103,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             else if (_selectedNode.NodeType == NodeType.File)
             {
                 var newFileName = EditFileNameDialog.ShowDialog(_selectedNode.Parent, _selectedNode.Name);
-                if (newFileName.Length != 0)
+                if (newFileName.Any())
                     _packFileService.RenameFile(_selectedNode.FileOwner, _selectedNode.Item, newFileName);
 
             }
@@ -173,7 +168,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
             var folderName = EditFileNameDialog.ShowDialog(_selectedNode, "");
 
-            if (folderName.Length != 0)
+            if (folderName.Any())
                 _selectedNode.Children.Add(new TreeNode(folderName, NodeType.Directory, _selectedNode.FileOwner, _selectedNode));
 
         }
@@ -304,11 +299,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             _exportFileContextMenuHelper.ShowDialog(_selectedNode.Item);
         }
 
-        void OnAdvancedImport()
-        {
-            _importFileContextMenuHelper.ShowDialog(_selectedNode);
-        }
-
         void SaveSelfAndChildren(TreeNode node, string outputDirectory, string rootPath, ref int fileCounter)
         {
             if (node.NodeType == NodeType.Directory)
@@ -402,8 +392,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                     return new ContextMenuItem() { Name = "Add" };
                 case ContextItems.Import:
                     return new ContextMenuItem() { Name = "Import" };
-                case ContextItems.AdvancedImport:
-                    return new ContextMenuItem() { Name = "Advanced Import", Command = AdvancedImportCommand };
                 case ContextItems.Create:
                     return new ContextMenuItem() { Name = "Create" };
                 case ContextItems.AddFiles:
@@ -453,9 +441,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         {
             Add,
             Import,
-            AdvancedImport,
             AddFiles,
-            AddDirectory,            
+            AddDirectory,
             CopyToEditablePack,
             Duplicate,
             CreateFolder,
@@ -477,83 +464,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             Open,
             OpenWithHxD,
             OpenWithNodePadPluss,
-        }
-    }
-
-    /// <summary>
-    /// Shows simple value nntry dialog, for file/folder names
-    /// Shows error boxes on invalid input, asks the user to retry, and shows the dialog again
-    /// TODO: Make neater solution? Edit-in-place; make own simple value editing dialog, with checking
-    /// </summary>
-    public class EditFileNameDialog
-    {
-        static public string ShowDialog(TreeNode parentNode, string currentValue)
-        {
-            bool inputCorrect = false;
-            string dialogValue = currentValue;
-            string newFileName = "";
-
-            while (!inputCorrect)
-            {
-                inputCorrect = true;
-                var window = new TextInputWindow("Create folder", dialogValue, true);
-                dialogValue = window.TextValue; // store for next dialog instance (if ínput is invalud)
-
-                if (window.ShowDialog() == false)
-                    return ""; // exit is "cancel" pressed
-
-                inputCorrect = inputCorrect && IsStringProper(window.TextValue);
-
-                newFileName = window.TextValue.ToLower().Trim();
-
-                inputCorrect = inputCorrect && IsFileNameUniqueInFolder(parentNode, newFileName);
-                inputCorrect = inputCorrect && AreStringCharsValidForFileName(newFileName);
-
-            }
-
-            return newFileName;
-        }
-
-        private static bool IsStringProper(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                MessageBox.Show("Folder name can not be empty! Please Try Again.\nPlease Try Again.");
-                return false;
-            }
-            return true;
-        }
-
-        private static bool IsFileNameUniqueInFolder(TreeNode parentNode, string newFileName)
-        {
-            foreach (var node in parentNode.Children)
-            {
-                if (node.Name == newFileName)
-                {
-                    MessageBox.Show($"Folder with name '{node.Name}' already exists in this folder!\nPlease Try Again.");
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        static private bool AreStringCharsValidForFileName(string fileNameToCheck)
-        {
-            var listOfInvalidChars = Path.GetInvalidFileNameChars();
-            foreach (var c in fileNameToCheck)
-            {
-                foreach (var invalidChar in listOfInvalidChars)
-                {
-                    if (c == invalidChar)
-                    {
-                        MessageBox.Show($"Folder name contains invalid character: {c}. \nPlease Try Again.");
-                        return false;
-                    }
-                }
-            }
-
-            return true;
         }
     }
 }

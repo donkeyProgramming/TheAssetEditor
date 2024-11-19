@@ -3,6 +3,7 @@ using Editors.KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
@@ -80,6 +81,11 @@ namespace Editors.KitbasherEditor.UiCommands
                 throw new Exception($"Unable to load file {path}");
 
             _kitbashSceneCreator.LoadReference(packFile);
+        }
+
+        public void Execute(PackFile file)
+        {
+            _kitbashSceneCreator.LoadReference(file);
         }
     }
 

@@ -33,12 +33,13 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="230"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -72,7 +73,10 @@
 
             <TextBlock Grid.Row="7" Grid.Column="0" Text="Load audio (.wem) files" Margin="5, 0, 0, 0"/>
             <CheckBox Grid.Row="7" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding LoadWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding IsLoadWemFilesEnabled}"/>
-            
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Text="Only load Lod0 for Reference meshes" Margin="5, 0, 0, 0" ToolTip="When importing a reference mesh in the Kitbash tool, only import Lod0 in order to save memory."/>
+            <CheckBox Grid.Row="8" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding OnlyLoadLod0ForReferenceMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
         </Grid>
 
         <Grid Grid.Row="1">

@@ -1,4 +1,7 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using System.Collections.ObjectModel;
+using System.IO;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using Editors.KitbasherEditor.Events;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
@@ -7,13 +10,10 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Animation;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Windows.Input;
 using static CommonControls.FilterDialog.FilterUserControl;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
-namespace KitbasherEditor.ViewModels
+namespace Editors.KitbasherEditor.ViewModels
 {
     public class AnimationControllerViewModel : NotifyPropertyChangedImpl
     {
