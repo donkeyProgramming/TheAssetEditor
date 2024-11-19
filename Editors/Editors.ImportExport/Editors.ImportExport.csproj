@@ -26,11 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Importing\Importers\GltfToRmv\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="SharpGLTF.Core" Version="1.0.0" />
+          <PackageReference Include="SharpGLTF.Core" Version="1.0.0" />
     <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.0" />
     <PackageReference Include="Pfim" Version="0.10.3" />
   </ItemGroup>
