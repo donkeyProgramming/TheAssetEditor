@@ -28,6 +28,7 @@ namespace Shared.Core.ErrorHandling.Exceptions
         public string EditorInputFileFull { get; set; } = "Not set";
         public string EditorInputFilePack { get; set; } = "Not set";
         public List<string> LogHistory { get; set; } = [];
+        public string UserMessage { get; set; } = "";
 
         // System info
         public string Culture { get; internal set; } = "Not set";

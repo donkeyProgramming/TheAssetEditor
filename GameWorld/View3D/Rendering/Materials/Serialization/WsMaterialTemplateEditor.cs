@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
@@ -145,6 +146,6 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             }
         }
 
-        string Str(float value, int numDecimals = 4) => value.ToString(/*$"F{numDecimals}"*/); 
+        string Str(float value, int numDecimals = 4) => value.ToString(CultureInfo.InvariantCulture/*$"F{numDecimals}"*/); 
     }
 }

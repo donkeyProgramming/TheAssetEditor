@@ -145,7 +145,6 @@ namespace GameWorld.Core.WpfWindow
                 // just run as fast as possible, WPF itself is limited to 60 FPS so that's the max we will get
                 Update(time);
                 Draw(time);
-
             }
 
             catch(Exception ex) 
@@ -154,7 +153,6 @@ namespace GameWorld.Core.WpfWindow
                 _exceptionService.CreateDialog(ex);
                 StartRendering();
             }
-
         }
 
 

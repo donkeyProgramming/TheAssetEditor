@@ -17,7 +17,15 @@ namespace Shared.Ui.Common.Exceptions
             _extendedExceptionInformation = extendedExceptionInformation;
 
             var allMessages = extendedExceptionInformation.ExceptionInfo.Select(x => x.Message).ToList();
-            ErrorTextHandle.Text = string.Join("\n", allMessages);
+
+            ErrorTextHandle.Text = string.Empty; 
+            if (string.IsNullOrWhiteSpace(extendedExceptionInformation.UserMessage) == false)
+            {
+                ErrorTextHandle.Text += "Information:\n";
+                ErrorTextHandle.Text += extendedExceptionInformation.UserMessage + "\n\n";
+            }
+
+            ErrorTextHandle.Text += string.Join("\n", allMessages);
 
             var lastStackFrame = extendedExceptionInformation.ExceptionInfo.LastOrDefault();
             if (lastStackFrame != null && lastStackFrame.StackTrace.Length != 0)
