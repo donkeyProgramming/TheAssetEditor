@@ -10,13 +10,13 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor
 {
     public partial class SceneNodeEditorViewModel : ObservableObject, IDisposable
     {
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
         private readonly IServiceProvider _serviceProvider;
         private readonly Dictionary<Type, Type> _map = [];
 
         [ObservableProperty] ISceneNodeEditor? _currentEditor;
 
-        public SceneNodeEditorViewModel(EventHub eventHub, IServiceProvider serviceProvider)
+        public SceneNodeEditorViewModel(IEventHub eventHub, IServiceProvider serviceProvider)
         {
             _eventHub = eventHub;
             _serviceProvider = serviceProvider;

@@ -7,10 +7,9 @@ namespace Shared.Core.PackFiles
     public interface IPackFileService
     {
         PackFileDataBase Database { get; }
-        bool TriggerFileUpdates { get; set; }
+    
 
 
-        event PackFileService.FileLookUpHander? FileLookUpEvent;
 
         // Create
         void AddFilesToPack(PackFileContainer container, List<NewFileEntry> newFiles);

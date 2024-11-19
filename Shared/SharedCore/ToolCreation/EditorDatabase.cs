@@ -124,6 +124,8 @@ namespace Shared.Core.ToolCreation
 
         IEditorInterface CreateEditorInternal(Type editorType)
         {
+            ApplicationStateRecorder.EditorOpened();
+
             var scope = _serviceProvider.CreateScope();
             var instance = scope.ServiceProvider.GetRequiredService(editorType) as IEditorInterface;
             if (instance == null)

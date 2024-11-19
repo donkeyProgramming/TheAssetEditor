@@ -3,6 +3,7 @@ using System.Text;
 using System.Windows.Forms;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
@@ -12,11 +13,10 @@ namespace Shared.Core.PackFiles
 {
     public class PackFileService : IPackFileService
     {
-        public delegate void FileLookUpHander(string fileName, PackFileContainer? container, bool found);
-        public event FileLookUpHander? FileLookUpEvent;
+        public bool EnableFileLookUpEvents { get; internal set; } = false;
 
         private readonly ILogger _logger = Logging.Create<PackFileService>();
-        private readonly GlobalEventSender? _globalEventSender;
+        private readonly IGlobalEventHub? _globalEventHub;
         private readonly IAnimationFileDiscovered? _skeletonAnimationLookUpHelper;
         public PackFileDataBase Database { get; private set; }
 
@@ -26,17 +26,15 @@ namespace Shared.Core.PackFiles
         public PackFileService(PackFileDataBase database,
             ApplicationSettingsService settingsService,
             GameInformationFactory gameInformationFactory,
-            GlobalEventSender? globalEventSender,
+            IGlobalEventHub? globalEventHub,
             IAnimationFileDiscovered? skeletonAnimationLookUpHelper)
         {
-            _globalEventSender = globalEventSender;
+            _globalEventHub = globalEventHub;
             Database = database;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _settingsService = settingsService;
             _gameInformationFactory = gameInformationFactory;
         }
-
-       public bool TriggerFileUpdates { get; set; } = true;
 
         public PackFileContainer? LoadFolderContainer(string packFileSystemPath)
         {
@@ -432,14 +430,13 @@ namespace Shared.Core.PackFiles
                 container.FileList[path.ToLower()] = file.PackFile;
             }
 
-            if (TriggerFileUpdates)
-            {
-                _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, container);
-                _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
+          
+            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, container);
+            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
 
-                var files = newFiles.Select(x=>x.PackFile).ToList();
-                Database.TriggerPackFileAdded(container, files);
-            }
+            var files = newFiles.Select(x=>x.PackFile).ToList();
+            Database.TriggerPackFileAdded(container, files);
+            
         }
 
         public void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target)
@@ -607,7 +604,7 @@ namespace Shared.Core.PackFiles
                 throw new Exception("Can not save ca pack file");
             file.DataSource = new MemorySource(data);
             Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file });
-            _globalEventSender?.TriggerEvent(new PackFileSavedEvent());
+            _globalEventHub?.PublishGlobalEvent(new PackFileSavedEvent());
         }
 
         public void Save(PackFileContainer pf, string path, bool createBackup)
@@ -657,7 +654,7 @@ namespace Shared.Core.PackFiles
                 {
                     if (Database.PackFiles[i].FileList.ContainsKey(lowerPath))
                     {
-                        FileLookUpEvent?.Invoke(path, Database.PackFiles[i], true);
+                       _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, Database.PackFiles[i], true));
                         return Database.PackFiles[i].FileList[lowerPath];
                     }
                 }
@@ -666,12 +663,12 @@ namespace Shared.Core.PackFiles
             {
                 if (container.FileList.ContainsKey(lowerPath))
                 {
-                    FileLookUpEvent?.Invoke(path, container, true);
+                    _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, container, true));
                     return container.FileList[lowerPath];
                 }
             }
 
-            FileLookUpEvent?.Invoke(path, null, false);
+            _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, null, false));
             return null;
         }
     }

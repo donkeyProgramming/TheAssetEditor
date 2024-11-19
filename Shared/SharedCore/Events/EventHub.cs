@@ -1,9 +1,60 @@
-﻿namespace Shared.Core.Events
+﻿using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.DependencyInjection;
+
+namespace Shared.Core.Events
 {
-    public class EventHub : IDisposable
+    public interface IEventHub
+    {
+        void PublishGlobalEvent<T>(T e);
+        void Publish<T>(T e);
+
+        void Register<T>(object owner, Action<T> action);
+        void UnRegister(object owner);
+    }
+
+
+    public interface IGlobalEventHub
+    {
+        void PublishGlobalEvent<T>(T e);
+        void Register<T>(object owner, Action<T> action);
+        void UnRegister(object owner);
+    }
+
+    class SingletonScopeEventHub : EventHub, IGlobalEventHub
+    {
+        public SingletonScopeEventHub(ScopeRepository scopeRepository) : base(scopeRepository)
+        {
+        }
+    }
+
+    class LocalScopeEventHub : EventHub, IEventHub
+    {
+        public LocalScopeEventHub(ScopeRepository scopeRepository) : base(scopeRepository)
+        {
+        }
+    }
+
+    abstract class EventHub : IDisposable
     {
         public bool IsDisposed { get; private set; }
+        
         Dictionary<Type, List<(Delegate Callback, object Owner)>> _callbackList = new();
+        private readonly ScopeRepository _scopeRepository;
+
+        public EventHub(ScopeRepository scopeRepository)
+        {
+            _scopeRepository = scopeRepository;
+        }
+
+        public void PublishGlobalEvent<T>(T e)
+        {
+            foreach (var scope in _scopeRepository.Scopes.Values)
+            {
+                var handler = scope.ServiceProvider.GetRequiredService<EventHub>();
+                if (handler != null)
+                    handler.Publish(e);
+            }
+        }
 
         public void Publish<T>(T instance)
         {

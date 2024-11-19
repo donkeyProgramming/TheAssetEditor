@@ -13,10 +13,10 @@ namespace Editors.AnimationMeta.Presentation.Commands
     {
         private readonly ILogger _logger = Logging.Create<SaveCommand>();
         private readonly PackFileService _packFileService;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
         private readonly SaveHelper _saveHelper;
 
-        public SaveCommand(PackFileService packFileService, EventHub eventHub, SaveHelper saveHelper)
+        public SaveCommand(PackFileService packFileService, IEventHub eventHub, SaveHelper saveHelper)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;

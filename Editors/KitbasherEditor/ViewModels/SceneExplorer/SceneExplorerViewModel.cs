@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Components;
@@ -15,7 +14,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
     public partial class SceneExplorerViewModel : ObservableObject, IDisposable
     {
         private readonly SceneManager _sceneManager;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
         private readonly SelectionManager _selectionManager;
         bool _ignoreSelectionChanges = false;
 
@@ -26,7 +25,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer
         public SceneExplorerViewModel(
             SelectionManager selectionManager,
             SceneManager sceneManager,
-            EventHub eventHub,
+            IEventHub eventHub,
             SceneExplorerContextMenuHandler contextMenuHandler)
         {
             _sceneManager = sceneManager;

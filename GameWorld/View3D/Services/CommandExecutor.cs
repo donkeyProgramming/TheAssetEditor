@@ -22,9 +22,9 @@ namespace GameWorld.Core.Services
     {
         protected ILogger _logger = Logging.Create<CommandExecutor>();
         private readonly Stack<ICommand> _commands = new Stack<ICommand>();
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
 
-        public CommandExecutor(EventHub eventHub)
+        public CommandExecutor(IEventHub eventHub)
         {
             _eventHub = eventHub;
         }

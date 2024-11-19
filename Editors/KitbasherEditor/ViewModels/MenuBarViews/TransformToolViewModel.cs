@@ -46,7 +46,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
         public NotifyAttr<bool> ShowVertexFalloff { get; set; } = new NotifyAttr<bool>(false);
 
-        public TransformToolViewModel(SelectionManager selectionManager, CommandExecutor commandExecutor, CommandFactory commandFactory, EventHub eventHub)
+        public TransformToolViewModel(SelectionManager selectionManager, CommandExecutor commandExecutor, CommandFactory commandFactory, IEventHub eventHub)
         {
             ApplyCommand = new RelayCommand(ApplyTransform);
 
