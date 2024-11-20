@@ -28,7 +28,7 @@ namespace Editors.Shared.Core.Services
             if (existingPackVersion != GameTypeEnum.Warhammer2)
                 throw new Exception($"{outputFormat} selected as input, only Warhammer 2 is currently supported");
 
-            var animPackFiles = _pfs.FindAllWithExtention(".animpack", packFileContainer);
+            var animPackFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".animpack", packFileContainer);
             var animPacks = animPackFiles.Select(x => AnimationPackSerializer.Load(x, _pfs, GameTypeEnum.Warhammer2)).ToArray();
 
             if (animPacks.Length == 0)

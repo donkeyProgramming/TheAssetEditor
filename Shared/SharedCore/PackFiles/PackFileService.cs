@@ -15,7 +15,7 @@ namespace Shared.Core.PackFiles
     {
         private readonly ILogger _logger = Logging.Create<PackFileService>();
 
-        private readonly List<PackFileContainer> _packFiles  = [];
+        private readonly List<PackFileContainer> _packFiles = [];
         private PackFileContainer? _packSelectedForEdit;
 
         public bool EnableFileLookUpEvents { get; internal set; } = false;
@@ -54,7 +54,7 @@ namespace Shared.Core.PackFiles
         }
 
         void AddContainer(PackFileContainer container)
-        { 
+        {
             _packFiles.Add(container);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
         }
@@ -73,11 +73,8 @@ namespace Shared.Core.PackFiles
 
             var folders = Directory.GetDirectories(folderPath);
             foreach (var folder in folders)
-            {
                 AddFolderContentToPackFile(container, folder, rootPath);
-            }
         }
-
 
         public PackFileContainer? Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false)
         {
@@ -127,118 +124,6 @@ namespace Shared.Core.PackFiles
             }
         }
 
-        public List<string> SearchForFile(string partOfFileName)
-        {
-            var output = new List<string>();
-            foreach (var pf in _packFiles)
-            {
-                foreach (var file in pf.FileList)
-                {
-                    if (file.Key.Contains(partOfFileName, StringComparison.InvariantCultureIgnoreCase))
-                        output.Add(file.Key);
-                }
-            }
-
-            return output;
-        }
-
-        public List<PackFile> FindAllWithExtention(string extention, PackFileContainer packFileContainer = null)
-        {
-            return FindAllWithExtentionIncludePaths(extention, packFileContainer).Select(x => x.Item2).ToList();
-        }
-
-        public List<PackFile> GetAllAnimPacks()
-        {
-            var animPacks = FindAllWithExtention(@".animpack");
-            var itemsToRemove = animPacks.Where(x => GetFullPath(x).Contains("animation_culture_packs", StringComparison.InvariantCultureIgnoreCase)).ToList();
-            foreach (var item in itemsToRemove)
-                animPacks.Remove(item);
-
-            return animPacks;
-        }
-
-        public List<(string FileName, PackFile Pack)> FindAllWithExtentionIncludePaths(string extention, PackFileContainer packFileContainer = null)
-        {
-            extention = extention.ToLower();
-            var output = new List<ValueTuple<string, PackFile>>();
-            if (packFileContainer == null)
-            {
-                foreach (var pf in _packFiles)
-                {
-                    foreach (var file in pf.FileList)
-                    {
-                        var fileExtention = Path.GetExtension(file.Key);
-                        if (fileExtention == extention)
-                            output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value));
-                    }
-                }
-            }
-            else
-            {
-                foreach (var file in packFileContainer.FileList)
-                {
-                    var fileExtention = Path.GetExtension(file.Key);
-                    if (fileExtention == extention)
-                        output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value));
-                }
-            }
-
-            return output;
-        }
-
-      
-
-        public List<PackFile> FindAllFilesInDirectory(string dir, bool includeSubFolders = true)
-        {
-            dir = dir.Replace('/', '\\').ToLower();
-            var output = new List<PackFile>();
-
-            foreach (var pf in _packFiles)
-            {
-                foreach (var file in pf.FileList)
-                {
-                    var includeFile = false;
-                    if (includeSubFolders)
-                    {
-                        includeFile = file.Key.IndexOf(dir) == 0;
-                    }
-                    else
-                    {
-                        var dirName = Path.GetDirectoryName(file.Key);
-                        var compareResult = string.Compare(dirName, dir, StringComparison.InvariantCultureIgnoreCase);
-                        if (compareResult == 0)
-                            includeFile = true;
-                    }
-
-                    if (includeFile)
-                        output.Add(file.Value);
-                }
-            }
-
-
-            return output;
-        }
-
-        public string GetFullPath(PackFile file, PackFileContainer? container = null)
-        {
-            if (container == null)
-            {
-                foreach (var pf in _packFiles)
-                {
-                    var res = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
-                    if (string.IsNullOrWhiteSpace(res) == false)
-                        return res;
-                }
-            }
-            else
-            {
-                var res = container.FileList.FirstOrDefault(x => x.Value == file).Key;
-                if (string.IsNullOrWhiteSpace(res) == false)
-                    return res;
-            }
-            throw new Exception("Unknown path for " + file.Name);
-        }
-
         PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
             var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
@@ -258,7 +143,7 @@ namespace Shared.Core.PackFiles
             try
             {
                 _logger.Here().Information($"Loading pack files for {gameName} located in {gameDataFolder}");
-                var allCaPackFiles = GetPackFilesFromManifest(gameDataFolder);
+                var allCaPackFiles = ManifestHelper.GetPackFilesFromManifest(gameDataFolder);
 
                 var packList = new List<PackFileContainer>();
                 foreach (var packFilePath in allCaPackFiles)
@@ -295,7 +180,7 @@ namespace Shared.Core.PackFiles
             catch (Exception e)
             {
                 _logger.Here().Error($"Trying to get all CA packs in {gameDataFolder}. Error : {e.ToString()}");
-                
+
                 // Todo: show the sexy error window! 
 
                 return false;
@@ -304,30 +189,6 @@ namespace Shared.Core.PackFiles
             return true;
         }
 
-        List<string> GetPackFilesFromManifest(string gameDataFolder)
-        {
-            var output = new List<string>();
-            var manifestFile = gameDataFolder + "\\manifest.txt";
-            if (File.Exists(manifestFile))
-            {
-                var lines = File.ReadAllLines(manifestFile);
-                foreach (var line in lines)
-                {
-                    var items = line.Split('\t');
-                    if (items[0].Contains(".pack"))
-                        output.Add(items[0].Trim());
-                }
-                return output;
-            }
-            else
-            {
-                var files = Directory.GetFiles(gameDataFolder)
-                    .Where(x => Path.GetExtension(x) == ".pack")
-                    .Select(x => Path.GetFileName(x))
-                    .ToList();
-                return files;
-            }
-        }
 
         // Add
         // ---------------------------
@@ -376,11 +237,11 @@ namespace Shared.Core.PackFiles
                 container.FileList[path.ToLower()] = file.PackFile;
             }
 
-          
+
             _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, container);
             _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
 
-            var files = newFiles.Select(x=>x.PackFile).ToList();
+            var files = newFiles.Select(x => x.PackFile).ToList();
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(container, files));
         }
 
@@ -397,7 +258,7 @@ namespace Shared.Core.PackFiles
             }
         }
 
-      
+
 
         public void SetEditablePack(PackFileContainer? pf)
         {
@@ -405,10 +266,8 @@ namespace Shared.Core.PackFiles
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerSetAsMainEditableEvent(pf));
         }
 
-        public PackFileContainer? GetEditablePack()
-        {
-            return _packSelectedForEdit;
-        }
+        public PackFileContainer? GetEditablePack() => _packSelectedForEdit;
+
 
         public bool HasEditablePackFile()
         {
@@ -420,26 +279,16 @@ namespace Shared.Core.PackFiles
             return true;
         }
 
-        public PackFileContainer? GetPackFileContainer(PackFile file)
-        {
-            foreach (var pf in _packFiles)
-            {
-                var res = pf.FileList.FirstOrDefault(x => x.Value == file).Value;
-                if (res != null)
-                    return pf;
-            }
-            _logger.Here().Information($"Unknown packfile container for {file.Name}");
-            return null;
-        }
 
-        public List<PackFileContainer> GetAllPackfileContainers() => _packFiles.ToList();
+
+        public List<PackFileContainer> GetAllPackfileContainers() => _packFiles.ToList(); // Return a list of the list to avoid bugs!
 
         // Remove
         // ---------------------------
         public void UnloadPackContainer(PackFileContainer pf)
         {
             _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
-      
+
             var e = new BeforePackFileContainerRemovedEvent(pf);
             _globalEventHub?.PublishGlobalEvent(e);
 
@@ -599,6 +448,23 @@ namespace Shared.Core.PackFiles
             _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, pf);
         }
 
+
+
+
+        //------------------------
+        public PackFileContainer? GetPackFileContainer(PackFile file)
+        {
+            foreach (var pf in _packFiles)
+            {
+                var res = pf.FileList.FirstOrDefault(x => x.Value == file).Value;
+                if (res != null)
+                    return pf;
+            }
+            _logger.Here().Information($"Unknown packfile container for {file.Name}");
+            return null;
+        }
+
+
         public PackFile? FindFile(string path, PackFileContainer? container = null)
         {
             var lowerPath = path.Replace('/', '\\').ToLower().Trim();
@@ -609,7 +475,7 @@ namespace Shared.Core.PackFiles
                 {
                     if (_packFiles[i].FileList.ContainsKey(lowerPath))
                     {
-                       _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, _packFiles[i], true));
+                        _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, _packFiles[i], true));
                         return _packFiles[i].FileList[lowerPath];
                     }
                 }
@@ -625,6 +491,26 @@ namespace Shared.Core.PackFiles
 
             _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, null, false));
             return null;
+        }
+
+        public string GetFullPath(PackFile file, PackFileContainer? container = null)
+        {
+            if (container == null)
+            {
+                foreach (var pf in _packFiles)
+                {
+                    var res = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
+                    if (string.IsNullOrWhiteSpace(res) == false)
+                        return res;
+                }
+            }
+            else
+            {
+                var res = container.FileList.FirstOrDefault(x => x.Value == file).Key;
+                if (string.IsNullOrWhiteSpace(res) == false)
+                    return res;
+            }
+            throw new Exception("Unknown path for " + file.Name);
         }
     }
 }

@@ -76,7 +76,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         public List<IAnimationBinGenericFormat> LoadAnimationSetForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
             var outputFragments = new List<IAnimationBinGenericFormat>();
-            var animPacks = _pfs.GetAllAnimPacks();
+            var animPacks = PackFileServiceUtility.GetAllAnimPacks(_pfs);
             foreach (var animPack in animPacks)
             {
                 if (onlyPacksThatCanBeSaved == true)

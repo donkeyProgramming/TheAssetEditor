@@ -99,7 +99,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         AnimationFile FetchAnimSkeleton(RmvFile rmv2)
         {
             var skeletonName = rmv2.Header.SkeletonName + ".anim";
-            var skeletonSearchList = _packFileService.SearchForFile(skeletonName);
+            var skeletonSearchList = PackFileServiceUtility.SearchForFile(_packFileService, skeletonName);
             var skeletonPath = _packFileService.GetFullPath(_packFileService.FindFile(skeletonSearchList[0]));
             var skeletonPackFile = _packFileService.FindFile(skeletonPath);
 

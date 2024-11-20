@@ -71,7 +71,7 @@ namespace Editors.Reports
                 }
             }
 
-            var allMeta = _pfs.FindAllWithExtentionIncludePaths(".meta");
+            var allMeta = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".meta");
             foreach (var (fileName, packFile) in allMeta)
             {
                 try
@@ -90,7 +90,7 @@ namespace Editors.Reports
                 }
             }
 
-            var allAnimations = _pfs.FindAllWithExtentionIncludePaths(".anim");
+            var allAnimations = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".anim");
             foreach (var (fileName, packFile) in allAnimations)
             {
                 try

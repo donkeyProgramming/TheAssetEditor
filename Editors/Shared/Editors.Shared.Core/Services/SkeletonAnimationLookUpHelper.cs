@@ -22,7 +22,7 @@ namespace Editors.Shared.Core.Services
 
         public void LoadFromPackFileContainer(PackFileService pfs, PackFileContainer packFileContainer)
         {
-            var allAnimations = pfs.FindAllWithExtentionIncludePaths(".anim", packFileContainer);
+            var allAnimations = PackFileServiceUtility.FindAllWithExtentionIncludePaths(pfs, ".anim", packFileContainer);
             foreach (var animation in allAnimations)
                 FileDiscovered(animation.Item2, packFileContainer, pfs.GetFullPath(animation.Item2, packFileContainer));
         }

@@ -62,7 +62,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
                     _logger.Here().Information($"Processing packfile container {packfile.Name}");
 
-                    var animFiles = _pfs.FindAllWithExtention(".anim", packfile.Container);
+                    var animFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".anim", packfile.Container);
 
                     _logger.Here().Information($"Converting animations {animFiles.Count}");
                     var convertedAnimFiles = ConvertAnimFiles(animFiles, SelectedOutputFormat.Value, errorList);
@@ -74,7 +74,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
                     _pfs.AddFilesToPack(_pfs.GetEditablePack(), filesToAdd);
 
                     _logger.Here().Information($"Saving inv matix files");
-                    var invMatrixFileList = _pfs.FindAllWithExtention(".bone_inv_trans_mats", packfile.Container);
+                    var invMatrixFileList = PackFileServiceUtility.FindAllWithExtention(_pfs, ".bone_inv_trans_mats", packfile.Container);
                     foreach (var invMatrixFile in invMatrixFileList)
                         _pfs.CopyFileFromOtherPackFile(packfile.Container, _pfs.GetFullPath(invMatrixFile), _pfs.GetEditablePack());
                 }
