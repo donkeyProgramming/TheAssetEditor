@@ -2,33 +2,30 @@
 
 namespace Shared.Core.PackFiles.Models
 {
-    public delegate void ContainerUpdatedDelegate(PackFileContainer container);
-    public delegate void PackFileContainerLoadedDelegate(PackFileContainer container);
-    public delegate bool PackFileContainerRemovedDelegate(PackFileContainer container);
-
-
-    public delegate void FileUpdated(PackFileContainer container, PackFile file);
-    public delegate void PackFileUpdatedDelegate(PackFileContainer container, List<PackFile> file);
-    public delegate void PackFileFolderUpdatedDelegate(PackFileContainer container, string folder);
-    public delegate void PackFileFolderRenamedDelegate(PackFileContainer container, string folder);
+   // public delegate void ContainerUpdatedDelegate(PackFileContainer container);
+   // public delegate void PackFileContainerLoadedDelegate(PackFileContainer container);
+   // public delegate bool PackFileContainerRemovedDelegate(PackFileContainer container);
+   //
+   //
+   // public delegate void FileUpdated(PackFileContainer container, PackFile file);
+   // public delegate void PackFileUpdatedDelegate(PackFileContainer container, List<PackFile> file);
+   // public delegate void PackFileFolderUpdatedDelegate(PackFileContainer container, string folder);
+   // public delegate void PackFileFolderRenamedDelegate(PackFileContainer container, string folder);
 
 
 
 
     public class PackFileDataBase : NotifyPropertyChangedImpl
     {
-        private readonly bool _allowEvents;
-
-
         //public event PackFileContainerLoadedDelegate PackFileContainerLoaded;
         //public event PackFileContainerRemovedDelegate PackFileContainerRemoved;
 
 
-        public event PackFileUpdatedDelegate PackFilesUpdated;
-        public event PackFileUpdatedDelegate PackFilesAdded;
-        public event PackFileUpdatedDelegate PackFilesRemoved;
-        public event PackFileFolderUpdatedDelegate PackFileFolderRemoved;
-        public event PackFileFolderRenamedDelegate PackFileFolderRenamed;
+        //public event PackFileUpdatedDelegate PackFilesUpdated;
+        //public event PackFileUpdatedDelegate PackFilesAdded;
+        //public event PackFileUpdatedDelegate PackFilesRemoved;
+        //public event PackFileFolderUpdatedDelegate PackFileFolderRemoved;
+        //public event PackFileFolderRenamedDelegate PackFileFolderRenamed;
 
         // File updated
         // File added
@@ -39,7 +36,7 @@ namespace Shared.Core.PackFiles.Models
 
         public PackFileDataBase(bool allowEvents = true)
         {
-            _allowEvents = allowEvents;
+  
         }
 
        // public void AddPackFileContainer(PackFileContainer pf)
@@ -50,34 +47,34 @@ namespace Shared.Core.PackFiles.Models
        // }
 
 
-        public void TriggerPackFilesUpdated(PackFileContainer container, List<PackFile> files)
-        {
-            if (_allowEvents)
-                PackFilesUpdated?.Invoke(container, files);
-        }
+       // public void TriggerPackFilesUpdated(PackFileContainer container, List<PackFile> files)
+       // {
+       //     if (_allowEvents)
+       //         PackFilesUpdated?.Invoke(container, files);
+       // }
 
-        public void TriggerPackFileAdded(PackFileContainer container, List<PackFile> files)
-        {
-            if (_allowEvents)
-                PackFilesAdded?.Invoke(container, files);
-        }
+       // public void TriggerPackFileAdded(PackFileContainer container, List<PackFile> files)
+       // {
+       //     if (_allowEvents)
+       //         PackFilesAdded?.Invoke(container, files);
+       // }
+       //
+       //public void TriggerPackFileRemoved(PackFileContainer container, List<PackFile> files)
+       //{
+       //    if (_allowEvents)
+       //        PackFilesRemoved?.Invoke(container, files);
+       //}
 
-        public void TriggerPackFileRemoved(PackFileContainer container, List<PackFile> files)
-        {
-            if (_allowEvents)
-                PackFilesRemoved?.Invoke(container, files);
-        }
-
-        public void TriggerPackFileFolderRemoved(PackFileContainer container, string path)
-        {
-            if (_allowEvents)
-                PackFileFolderRemoved?.Invoke(container, path);
-        }
-
-        public void TriggerPackFileFolderRenamed(PackFileContainer container, string path)
-        {
-            if (_allowEvents)
-                PackFileFolderRenamed?.Invoke(container, path);
-        }
+       //public void TriggerPackFileFolderRemoved(PackFileContainer container, string path)
+       //{
+       //    if (_allowEvents)
+       //        PackFileFolderRemoved?.Invoke(container, path);
+       //}
+       //
+       //public void TriggerPackFileFolderRenamed(PackFileContainer container, string path)
+       //{
+       //    if (_allowEvents)
+       //        PackFileFolderRenamed?.Invoke(container, path);
+       //}
     }
 }

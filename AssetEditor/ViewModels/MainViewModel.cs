@@ -50,7 +50,7 @@ namespace AssetEditor.ViewModels
             _packfileService = packfileService;
 
             eventHub.Register<BeforePackFileContainerRemovedEvent>(this, Database_BeforePackFileContainerRemoved);
-            eventHub.Register<PackFileContainerSetAsMainEditable>(this, SetStatusBarEditablePackFile);
+            eventHub.Register<PackFileContainerSetAsMainEditableEvent>(this, SetStatusBarEditablePackFile);
 
             FileTree = new PackFileBrowserViewModel(_packfileService, eventHub);
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, uiCommandFactory, exportFileContextMenuHelper, importFileContextMenuHelper);
@@ -183,7 +183,7 @@ namespace AssetEditor.ViewModels
 
 
 
-        private void SetStatusBarEditablePackFile(PackFileContainerSetAsMainEditable e)
+        private void SetStatusBarEditablePackFile(PackFileContainerSetAsMainEditableEvent e)
         {
             EditablePackFile = e.Container != null ? $"Editable Pack: {e.Container.Name}" : "Editable Pack: None Set";
         }

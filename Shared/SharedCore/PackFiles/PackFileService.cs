@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Serilog;
@@ -443,7 +444,7 @@ namespace Shared.Core.PackFiles
             _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
 
             var files = newFiles.Select(x=>x.PackFile).ToList();
-            Database.TriggerPackFileAdded(container, files);
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(container, files));
         }
 
         public void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target)
@@ -455,7 +456,7 @@ namespace Shared.Core.PackFiles
                 var newFile = new PackFile(file.Name, file.DataSource);
                 target.FileList[lowerPath] = newFile;
 
-                Database.TriggerPackFileAdded(target, new List<PackFile>() { newFile });
+                _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(target, [newFile]));
             }
         }
 
@@ -464,7 +465,7 @@ namespace Shared.Core.PackFiles
         public void SetEditablePack(PackFileContainer? pf)
         {
             Database.PackSelectedForEdit = pf;
-            _globalEventHub?.PublishGlobalEvent(new PackFileContainerSetAsMainEditable(pf));
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerSetAsMainEditableEvent(pf));
         }
 
         public PackFileContainer? GetEditablePack()
@@ -528,7 +529,7 @@ namespace Shared.Core.PackFiles
                 .Where(x => string.Equals(Path.GetDirectoryName(x.Key), folder, StringComparison.InvariantCultureIgnoreCase))
                 .ToList();
 
-            Database.TriggerPackFileFolderRemoved(pf, folder);
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRemovedEvent(pf, folder));
 
             foreach (var item in itemsToDelete)
             {
@@ -545,7 +546,7 @@ namespace Shared.Core.PackFiles
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
             _logger.Here().Information($"Deleting file {key}");
 
-            Database.TriggerPackFileRemoved(pf, new List<PackFile>() { file });
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesRemovedEvent(pf, [file]));
             pf.FileList.Remove(key);
         }
 
@@ -591,7 +592,7 @@ namespace Shared.Core.PackFiles
             _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
             _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, pf);
 
-            Database.TriggerPackFileFolderRenamed(pf, newNodePath);
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRenamedEvent(pf, newNodePath));
         }
 
         // Modify
@@ -611,7 +612,7 @@ namespace Shared.Core.PackFiles
             file.Name = newName;
             pf.FileList[dir + "\\" + file.Name] = file;
 
-            Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file });
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(pf, [file]));
         }
 
         public void SaveFile(PackFile file, byte[] data)
@@ -621,8 +622,10 @@ namespace Shared.Core.PackFiles
             if (pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
             file.DataSource = new MemorySource(data);
-            Database.TriggerPackFilesUpdated(pf, new List<PackFile>() { file });
-            _globalEventHub?.PublishGlobalEvent(new PackFileSavedEvent());
+
+
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(pf, [file]));
+            _globalEventHub?.PublishGlobalEvent(new PackFileSavedEvent(file));
         }
 
         public void Save(PackFileContainer pf, string path, bool createBackup)

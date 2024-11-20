@@ -2,19 +2,11 @@
 
 namespace Shared.Core.Events.Global
 {
-    public class PackFileSavedEvent
-    {
-    }
-
+    public record PackFileSavedEvent(PackFile File);
     public record PackFileLookUpEvent(string FileName, PackFileContainer? Container, bool Found);
-
-
     public record PackFileContainerAddedEvent(PackFileContainer Container);
     public record PackFileContainerRemovedEvent(PackFileContainer Container);
-
-
-
-    public record PackFileContainerSetAsMainEditable(PackFileContainer? Container);
+    public record PackFileContainerSetAsMainEditableEvent(PackFileContainer? Container);
 
 
     public class BeforePackFileContainerRemovedEvent
@@ -28,5 +20,9 @@ namespace Shared.Core.Events.Global
         }
     }
 
-
+    public record PackFileContainerFilesUpdatedEvent(PackFileContainer Container, List<PackFile> ChangedFiles);
+    public record PackFileContainerFilesAddedEvent(PackFileContainer Container, List<PackFile> AddedFiles);
+    public record PackFileContainerFilesRemovedEvent(PackFileContainer Container, List<PackFile> RemovedFiles);
+    public record PackFileContainerFolderRemovedEvent(PackFileContainer Container, string Folder);
+    public record PackFileContainerFolderRenamedEvent(PackFileContainer Container, string NewNodePath);
 }
