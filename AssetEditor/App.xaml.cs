@@ -7,6 +7,7 @@ using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
@@ -32,6 +33,9 @@ namespace AssetEditor
             var forceValidateServiceScopes = Debugger.IsAttached;
             _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes);
             _rootScope = _serviceProvider.CreateScope();
+
+            var scopeRepo = _rootScope.ServiceProvider.GetRequiredService<ScopeRepository>();
+            scopeRepo.Root = _rootScope;
 
             var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             settingsService.AllowSettingsUpdate = true;

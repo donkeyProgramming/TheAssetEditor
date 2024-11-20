@@ -48,12 +48,21 @@ namespace Shared.Core.Events
 
         public void PublishGlobalEvent<T>(T e)
         {
+            // Send to all editors
             foreach (var scope in _scopeRepository.Scopes.Values)
             {
-                var handler = scope.ServiceProvider.GetRequiredService<EventHub>();
+                var handler = scope.ServiceProvider.GetRequiredService<IEventHub>();
                 if (handler != null)
                     handler.Publish(e);
             }
+
+            // Send to the root scope, which the main windows, packfiles and a few other things live in
+            var rootHandler = _scopeRepository.Root.ServiceProvider.GetRequiredService<IEventHub>();
+            if (rootHandler != null)
+                rootHandler.Publish(e);
+
+            // Send to other globals
+            Publish(e);
         }
 
         public void Publish<T>(T instance)

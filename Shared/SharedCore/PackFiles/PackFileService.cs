@@ -47,8 +47,14 @@ namespace Shared.Core.PackFiles
 
             var container = new PackFileContainer(packFileSystemPath);
             AddFolderContentToPackFile(container, packFileSystemPath, packFileSystemPath.ToLower() + "\\");
-            Database.AddPackFile(container);
+            AddContainer(container);
             return container;
+        }
+
+        void AddContainer(PackFileContainer container)
+        { 
+            Database.PackFiles.Add(container);
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
         }
 
         void AddFolderContentToPackFile(PackFileContainer container, string folderPath, string rootPath)
@@ -180,7 +186,6 @@ namespace Shared.Core.PackFiles
 
         public List<string> DeepSearch(string searchStr, bool caseSensetive)
         {
-
             _logger.Here().Information($"Searching for : '{searchStr}'");
 
             var filesWithResult = new List<KeyValuePair<string, string>>();
@@ -299,7 +304,7 @@ namespace Shared.Core.PackFiles
         PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
             var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
-            Database.AddPackFile(pack);
+            AddContainer(pack);
             return pack;
         }
 
@@ -347,11 +352,14 @@ namespace Shared.Core.PackFiles
                         caPackFileContainer.MergePackFileContainer(packfile);
                 }
 
-                Database.AddPackFile(caPackFileContainer);
+                AddContainer(caPackFileContainer);
             }
             catch (Exception e)
             {
                 _logger.Here().Error($"Trying to get all CA packs in {gameDataFolder}. Error : {e.ToString()}");
+                
+                // Todo: show the sexy error window! 
+
                 return false;
             }
 
@@ -395,7 +403,7 @@ namespace Shared.Core.PackFiles
                 Header = new PFHeader("PFH5", type),
 
             };
-            Database.AddPackFile(newPackFile);
+            AddContainer(newPackFile);
             if (setEditablePack)
                 SetEditablePack(newPackFile);
             return newPackFile;
@@ -436,7 +444,6 @@ namespace Shared.Core.PackFiles
 
             var files = newFiles.Select(x=>x.PackFile).ToList();
             Database.TriggerPackFileAdded(container, files);
-            
         }
 
         public void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target)
@@ -454,10 +461,10 @@ namespace Shared.Core.PackFiles
 
       
 
-        public void SetEditablePack(PackFileContainer pf)
+        public void SetEditablePack(PackFileContainer? pf)
         {
             Database.PackSelectedForEdit = pf;
-            Database.TriggerContainerUpdated(pf);
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerSetAsMainEditable(pf));
         }
 
         public PackFileContainer? GetEditablePack()
@@ -497,7 +504,18 @@ namespace Shared.Core.PackFiles
         public void UnloadPackContainer(PackFileContainer pf)
         {
             _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
-            Database.RemovePackFile(pf);
+      
+            var e = new BeforePackFileContainerRemovedEvent(pf);
+            _globalEventHub?.PublishGlobalEvent(e);
+
+            if (e.AllowClose)
+            {
+                Database.PackFiles.Remove(pf);
+                if (Database.PackSelectedForEdit == pf)
+                    SetEditablePack(null);
+
+                _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(pf));
+            }
         }
 
         public void DeleteFolder(PackFileContainer pf, string folder)

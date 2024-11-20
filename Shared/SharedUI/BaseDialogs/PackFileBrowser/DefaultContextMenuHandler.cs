@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
-using Shared.Core.ToolCreation;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
