@@ -13,16 +13,15 @@ namespace Shared.Core.PackFiles
 {
     public class PackFileService : IPackFileService
     {
+        private readonly ILogger _logger = Logging.Create<PackFileService>();
 
-        private List<PackFileContainer> PackFiles { get; set; } = new List<PackFileContainer>();
-        private PackFileContainer? PackSelectedForEdit { get; set; }
+        private readonly List<PackFileContainer> _packFiles  = [];
+        private PackFileContainer? _packSelectedForEdit;
 
         public bool EnableFileLookUpEvents { get; internal set; } = false;
 
-        private readonly ILogger _logger = Logging.Create<PackFileService>();
         private readonly IGlobalEventHub? _globalEventHub;
         private readonly IAnimationFileDiscovered? _skeletonAnimationLookUpHelper;
-
 
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
@@ -56,7 +55,7 @@ namespace Shared.Core.PackFiles
 
         void AddContainer(PackFileContainer container)
         { 
-            PackFiles.Add(container);
+            _packFiles.Add(container);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
         }
 
@@ -84,7 +83,7 @@ namespace Shared.Core.PackFiles
         {
             try
             {
-                var caPacksLoaded = PackFiles.Count(x => x.IsCaPackFile);
+                var caPacksLoaded = _packFiles.Count(x => x.IsCaPackFile);
                 if (caPacksLoaded == 0 && allowLoadWithoutCaPackFiles != true)
                 {
                     MessageBox.Show("You are trying to load a oack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
@@ -100,7 +99,7 @@ namespace Shared.Core.PackFiles
                     return null;
                 }
 
-                foreach (var packFile in PackFiles)
+                foreach (var packFile in _packFiles)
                 {
                     if (packFile.SystemFilePath == packFileSystemPath)
                     {
@@ -112,7 +111,7 @@ namespace Shared.Core.PackFiles
                 using var fileStream = File.OpenRead(packFileSystemPath);
                 using var reader = new BinaryReader(fileStream, Encoding.ASCII);
                 var container = Load(reader, packFileSystemPath);
-                var notCaPacksLoaded = PackFiles.Count(x => !x.IsCaPackFile);
+                var notCaPacksLoaded = _packFiles.Count(x => !x.IsCaPackFile);
                 if (container.IsCaPackFile == false && setToMainPackIfFirst)
                     SetEditablePack(container);
 
@@ -131,7 +130,7 @@ namespace Shared.Core.PackFiles
         public List<string> SearchForFile(string partOfFileName)
         {
             var output = new List<string>();
-            foreach (var pf in PackFiles)
+            foreach (var pf in _packFiles)
             {
                 foreach (var file in pf.FileList)
                 {
@@ -164,7 +163,7 @@ namespace Shared.Core.PackFiles
             var output = new List<ValueTuple<string, PackFile>>();
             if (packFileContainer == null)
             {
-                foreach (var pf in PackFiles)
+                foreach (var pf in _packFiles)
                 {
                     foreach (var file in pf.FileList)
                     {
@@ -187,78 +186,14 @@ namespace Shared.Core.PackFiles
             return output;
         }
 
-        public List<string> DeepSearch(string searchStr, bool caseSensetive)
-        {
-            _logger.Here().Information($"Searching for : '{searchStr}'");
-
-            var filesWithResult = new List<KeyValuePair<string, string>>();
-            var files = PackFiles.SelectMany(x => x.FileList.Select(x => (x.Value.DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
-
-            var indexLock = new object();
-            var currentPackFileIndex = 0;
-
-            Parallel.For(0, files.Count,
-              index =>
-              {
-                  var currentIndex = 0;
-
-                  lock (indexLock)
-                  {
-                      currentIndex = currentPackFileIndex;
-                      currentPackFileIndex++;
-                  }
-
-                  var packFilePath = files[currentIndex];
-                  if (packFilePath.Contains("audio", StringComparison.InvariantCultureIgnoreCase))
-                  {
-                      _logger.Here().Information($"Skipping audio file {currentIndex}/{files.Count}");
-                  }
-                  else
-                  {
-                      using (var fileStram = File.OpenRead(packFilePath))
-                      {
-                          using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
-                          {
-                              var pfc = PackFileSerializer.Load(packFilePath, reader, null, false, new CaPackDuplicatePackFileResolver());
-
-                              _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
-
-                              foreach (var packFile in pfc.FileList.Values)
-                              {
-                                  var pf = packFile;
-                                  var ds = pf.DataSource as PackedFileSource;
-                                  var bytes = ds.ReadDataForFastSearch(fileStram);
-                                  var str = Encoding.ASCII.GetString(bytes);
-
-                                  if (str.Contains(searchStr, StringComparison.InvariantCultureIgnoreCase))
-                                  {
-                                      var fillPathFile = pfc.FileList.FirstOrDefault(x => x.Value == packFile).Key;
-                                      _logger.Here().Information($"Found result in '{fillPathFile}' in '{packFilePath}'");
-
-                                      lock (filesWithResult)
-                                      {
-                                          filesWithResult.Add(new KeyValuePair<string, string>(fillPathFile, packFilePath));
-                                      }
-                                  }
-                              }
-                          }
-                      }
-                  }
-              });
-
-            _logger.Here().Information($"[{filesWithResult.Count}] Result for '{searchStr}'_________________:");
-            foreach (var item in filesWithResult)
-                _logger.Here().Information($"\t\t'{item.Key}' in '{item.Value}'");
-
-            return filesWithResult.Select(x => x.Value).ToList();
-        }
+      
 
         public List<PackFile> FindAllFilesInDirectory(string dir, bool includeSubFolders = true)
         {
             dir = dir.Replace('/', '\\').ToLower();
             var output = new List<PackFile>();
 
-            foreach (var pf in PackFiles)
+            foreach (var pf in _packFiles)
             {
                 foreach (var file in pf.FileList)
                 {
@@ -288,7 +223,7 @@ namespace Shared.Core.PackFiles
         {
             if (container == null)
             {
-                foreach (var pf in PackFiles)
+                foreach (var pf in _packFiles)
                 {
                     var res = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
                     if (string.IsNullOrWhiteSpace(res) == false)
@@ -466,13 +401,13 @@ namespace Shared.Core.PackFiles
 
         public void SetEditablePack(PackFileContainer? pf)
         {
-            PackSelectedForEdit = pf;
+            _packSelectedForEdit = pf;
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerSetAsMainEditableEvent(pf));
         }
 
         public PackFileContainer? GetEditablePack()
         {
-            return PackSelectedForEdit;
+            return _packSelectedForEdit;
         }
 
         public bool HasEditablePackFile()
@@ -487,7 +422,7 @@ namespace Shared.Core.PackFiles
 
         public PackFileContainer? GetPackFileContainer(PackFile file)
         {
-            foreach (var pf in PackFiles)
+            foreach (var pf in _packFiles)
             {
                 var res = pf.FileList.FirstOrDefault(x => x.Value == file).Value;
                 if (res != null)
@@ -497,7 +432,7 @@ namespace Shared.Core.PackFiles
             return null;
         }
 
-        public List<PackFileContainer> GetAllPackfileContainers() => PackFiles.ToList();
+        public List<PackFileContainer> GetAllPackfileContainers() => _packFiles.ToList();
 
         // Remove
         // ---------------------------
@@ -510,8 +445,8 @@ namespace Shared.Core.PackFiles
 
             if (e.AllowClose)
             {
-                PackFiles.Remove(pf);
-                if (PackSelectedForEdit == pf)
+                _packFiles.Remove(pf);
+                if (_packSelectedForEdit == pf)
                     SetEditablePack(null);
 
                 _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(pf));
@@ -670,12 +605,12 @@ namespace Shared.Core.PackFiles
 
             if (container == null)
             {
-                for (var i = PackFiles.Count - 1; i >= 0; i--)
+                for (var i = _packFiles.Count - 1; i >= 0; i--)
                 {
-                    if (PackFiles[i].FileList.ContainsKey(lowerPath))
+                    if (_packFiles[i].FileList.ContainsKey(lowerPath))
                     {
-                       _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, PackFiles[i], true));
-                        return PackFiles[i].FileList[lowerPath];
+                       _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, _packFiles[i], true));
+                        return _packFiles[i].FileList[lowerPath];
                     }
                 }
             }

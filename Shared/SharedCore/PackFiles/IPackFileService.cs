@@ -29,7 +29,7 @@ namespace Shared.Core.PackFiles
         void RenameFile(PackFileContainer pf, PackFile file, string newName);
 
         // Find - Return FileLoopupResult(Packfile file, string fullPath, PackFileContainer owner)
-        List<string> DeepSearch(string searchStr, bool caseSensetive);
+
         List<string> SearchForFile(string partOfFileName); 
         List<PackFile> FindAllFilesInDirectory(string dir, bool includeSubFolders = true);
         List<PackFile> FindAllWithExtention(string extention, PackFileContainer packFileContainer = null);

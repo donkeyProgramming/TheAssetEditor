@@ -8,6 +8,7 @@ using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Reports.DeepSearch;
 using Editors.Shared.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.Misc;
