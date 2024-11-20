@@ -12,6 +12,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
     {
         private readonly PackFileService _pfs;
         private readonly IImageSaveHandler _imageSaveHandler;
+
         public DdsToNormalPngExporter(PackFileService packFileService, IImageSaveHandler imageSaveHandler) 
         {
             _pfs = packFileService;
@@ -30,6 +31,9 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
         public string Export(string filePath, string outputPath, bool convertToBlueNormalMap)
         {
             var packFile = _pfs.FindFile(filePath);
+            if (packFile == null)
+                return "";
+
             var fileName = Path.GetFileNameWithoutExtension(filePath);
             var fullFilePath = outputPath + "/" + fileName + ".png";
             var bytes = packFile.DataSource.ReadData();

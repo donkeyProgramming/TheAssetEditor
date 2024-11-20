@@ -20,6 +20,9 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
         public string Export(string filePath, string outputPath, bool convertToBlenderFormat)
         {
             var packFile = _pfs.FindFile(filePath);
+            if (packFile == null)            
+                return "";
+            
             var fileName = Path.GetFileNameWithoutExtension(filePath);
             var fileDirectory = outputPath + "/" + fileName + ".png";
             var bytes = packFile.DataSource.ReadData();

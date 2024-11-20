@@ -152,25 +152,27 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             if (normalMapTexture.Path != null)
             {
                 var systemPath = _ddsToNormalPngExporter.Export(normalMapTexture.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
-                material.WithChannelImage(KnownChannel.Normal, systemPath);
+                if (systemPath.Any())
+                    material.WithChannelImage(KnownChannel.Normal, systemPath);
             }
 
             var materialTexture = textures.FirstOrDefault(t => t.Type == TextureType.MaterialMap);
             if (materialTexture.Path != null)
             {
                 var systemPath = _ddsToMaterialPngExporter.Export(materialTexture.Path, settings.OutputPath, settings.ConvertMaterialTextureToBlender);
-                material.WithChannelImage(KnownChannel.MetallicRoughness, systemPath);
+                if (systemPath.Any())
+                    material.WithChannelImage(KnownChannel.MetallicRoughness, systemPath);
             }
 
             var baseColourTexture = textures.FirstOrDefault(t => t.Type == TextureType.BaseColour);
             if (baseColourTexture.Path != null)
             {
                 var systemPath = _ddsToMaterialPngExporter.Export(baseColourTexture.Path, settings.OutputPath, false); // TODO: write a separate class for base colour
-                material.WithChannelImage(KnownChannel.BaseColor, systemPath);
+                if (systemPath.Any())
+                    material.WithChannelImage(KnownChannel.BaseColor, systemPath);
             }
 
             return material;
-
         }
     }
 }
