@@ -102,6 +102,8 @@ namespace KitbasherEditor.Views
             try
             {
                 SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
+                SelectedItemChanged -= MyTreeView_SelectedItemChanged;
+
                 var treeViewItem = ItemContainerGenerator.ContainerFromItemRecursive(SelectedItem);
                 if (treeViewItem == null)
                     return;
@@ -135,6 +137,7 @@ namespace KitbasherEditor.Views
             }
             finally
             {
+                SelectedItemChanged += MyTreeView_SelectedItemChanged;
                 SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
             }
         }
