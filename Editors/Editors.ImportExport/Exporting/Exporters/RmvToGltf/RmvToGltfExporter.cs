@@ -80,9 +80,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 else
                     scene.CreateNode(mesh.Name).WithMesh(mesh);
             }
-            outputScene.SaveGLTF(settings.OutputPath + Path.GetFileNameWithoutExtension(settings.InputModelFile.Name) + ".gltf");
+            outputScene.SaveGLTF(settings.OutputPath);
         }
-
 
         // MOve this into skeleton/animation builder
         void GenerateAnimations(RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene, AnimationFile animSkeletonFile, bool doMirror)
