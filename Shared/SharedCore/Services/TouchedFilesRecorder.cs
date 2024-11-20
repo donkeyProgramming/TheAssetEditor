@@ -49,7 +49,7 @@ namespace Shared.Core.Services
             foreach (var item in _files)
                 _pfs.CopyFileFromOtherPackFile(item.Container, item.FilePath, newPack);
 
-            _pfs.Save(newPack, path, false);
+            _pfs.SavePackContainer(newPack, path, false);
         }
 
         public void Stop()

@@ -119,7 +119,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         {
             // Arrange 
             var pfs = new PackFileService( new ApplicationSettingsService(), new GameInformationFactory(), null, null);
-            pfs.LoadFolderContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
+            pfs.LoadSystemFolderAsPackFileContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
 
             // Act
             var repo = new WsMaterialRepository(pfs);
@@ -134,7 +134,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         {
             // Arrange 
             var pfs = new PackFileService( new ApplicationSettingsService(), new GameInformationFactory(), null, null);
-            pfs.LoadFolderContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
+            pfs.LoadSystemFolderAsPackFileContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
 
             var path = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\materials\emp_karl_franz_body_01_weighted2_alpha_off.xml.material";
             var content = PathHelper.GetFileContentAsString("Karl_and_celestialgeneral_Pack\\" + path);
@@ -155,7 +155,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         {
             // Arrange 
             var pfs = new PackFileService( new ApplicationSettingsService(), new GameInformationFactory(), null, null);
-            pfs.LoadFolderContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
+            pfs.LoadSystemFolderAsPackFileContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
 
             var path = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\materials\emp_karl_franz_body_01_weighted2_alpha_off.xml.material";
             var content = PathHelper.GetFileContentAsString("Karl_and_celestialgeneral_Pack\\" + path) + "content is no longer equal";
@@ -176,7 +176,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         {
             // Arrange 
             var pfs = new PackFileService( new ApplicationSettingsService(), new GameInformationFactory(), null, null);
-            pfs.LoadFolderContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
+            pfs.LoadSystemFolderAsPackFileContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
 
             var path = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\materials\emp_karl_franz_body_01_weighted2_alpha_off.xml.material";
             var content = PathHelper.GetFileContentAsString("Karl_and_celestialgeneral_Pack\\" + path);

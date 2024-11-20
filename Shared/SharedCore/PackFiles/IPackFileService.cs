@@ -20,11 +20,11 @@ namespace Shared.Core.PackFiles
         bool HasEditablePackFile();
         PackFileContainer? Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false);
         bool LoadAllCaFiles(GameTypeEnum gameEnum);
-        PackFileContainer? LoadFolderContainer(string packFileSystemPath);
+        PackFileContainer? LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
         void MoveFile(PackFileContainer pf, PackFile file, string newFolderPath);
         void RenameDirectory(PackFileContainer pf, string currentNodeName, string newName);
         void RenameFile(PackFileContainer pf, PackFile file, string newName);
-        void Save(PackFileContainer pf, string path, bool createBackup);
+        void SavePackContainer(PackFileContainer pf, string path, bool createBackup);
         void SaveFile(PackFile file, byte[] data);
         void SetEditablePack(PackFileContainer? pf);
         void UnloadPackContainer(PackFileContainer pf);

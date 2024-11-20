@@ -38,7 +38,7 @@ namespace Shared.Core.PackFiles
             _gameInformationFactory = gameInformationFactory;
         }
 
-        public PackFileContainer? LoadFolderContainer(string packFileSystemPath)
+        public PackFileContainer? LoadSystemFolderAsPackFileContainer(string packFileSystemPath)
         {
             if (Directory.Exists(packFileSystemPath) == false)
             {
@@ -258,8 +258,6 @@ namespace Shared.Core.PackFiles
             }
         }
 
-
-
         public void SetEditablePack(PackFileContainer? pf)
         {
             _packSelectedForEdit = pf;
@@ -267,8 +265,6 @@ namespace Shared.Core.PackFiles
         }
 
         public PackFileContainer? GetEditablePack() => _packSelectedForEdit;
-
-
         public bool HasEditablePackFile()
         {
             if (GetEditablePack() == null)
@@ -278,8 +274,6 @@ namespace Shared.Core.PackFiles
             }
             return true;
         }
-
-
 
         public List<PackFileContainer> GetAllPackfileContainers() => _packFiles.ToList(); // Return a list of the list to avoid bugs!
 
@@ -411,7 +405,7 @@ namespace Shared.Core.PackFiles
             _globalEventHub?.PublishGlobalEvent(new PackFileSavedEvent(file));
         }
 
-        public void Save(PackFileContainer pf, string path, bool createBackup)
+        public void SavePackContainer(PackFileContainer pf, string path, bool createBackup)
         {
             if (File.Exists(path) && DirectoryHelper.IsFileLocked(path))
             {

@@ -50,7 +50,7 @@ namespace E2EVerification.Shared
 
         public PackFileContainer? LoadFolderPackFile(string path, bool createOutputPackFile = true)
         {
-            PackFileService.LoadFolderContainer(path);
+            PackFileService.LoadSystemFolderAsPackFileContainer(path);
             if (createOutputPackFile)
                 return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
             return null;

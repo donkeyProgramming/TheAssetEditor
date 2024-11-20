@@ -162,7 +162,7 @@ namespace Editors.Shared.DevConfig.Configs
             currentSettings.LoadCaPacksByDefault = false;
             currentSettings.CurrentGame = GameTypeEnum.Rome_2;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Rome_Man_And_Shield_Pack";
-            _packFileService.LoadFolderContainer(packFile);
+            _packFileService.LoadSystemFolderAsPackFileContainer(packFile);
         }
     }
 
