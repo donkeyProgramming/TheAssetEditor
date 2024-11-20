@@ -37,6 +37,7 @@ namespace E2EVerification.Shared
             PackFileService = EditorServiceProvider.ServiceProvider.GetRequiredService<PackFileService>();
             CommandFactory = EditorServiceProvider.ServiceProvider.GetRequiredService<IUiCommandFactory>();
             ScopeRepository = EditorServiceProvider.ServiceProvider.GetRequiredService<ScopeRepository>();
+            ScopeRepository.Root = EditorServiceProvider;
         }
 
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)

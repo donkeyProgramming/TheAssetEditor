@@ -6,7 +6,7 @@ namespace Shared.Core.PackFiles
 {
     public interface IPackFileService
     {
-        PackFileDataBase Database { get; }
+       
     
 
 

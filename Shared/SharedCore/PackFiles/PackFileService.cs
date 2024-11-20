@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Serilog;
@@ -14,24 +13,27 @@ namespace Shared.Core.PackFiles
 {
     public class PackFileService : IPackFileService
     {
+
+        private List<PackFileContainer> PackFiles { get; set; } = new List<PackFileContainer>();
+        private PackFileContainer? PackSelectedForEdit { get; set; }
+
         public bool EnableFileLookUpEvents { get; internal set; } = false;
 
         private readonly ILogger _logger = Logging.Create<PackFileService>();
         private readonly IGlobalEventHub? _globalEventHub;
         private readonly IAnimationFileDiscovered? _skeletonAnimationLookUpHelper;
-        public PackFileDataBase Database { get; private set; }
+
 
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
-        public PackFileService(PackFileDataBase database,
+        public PackFileService(
             ApplicationSettingsService settingsService,
             GameInformationFactory gameInformationFactory,
             IGlobalEventHub? globalEventHub,
             IAnimationFileDiscovered? skeletonAnimationLookUpHelper)
         {
             _globalEventHub = globalEventHub;
-            Database = database;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _settingsService = settingsService;
             _gameInformationFactory = gameInformationFactory;
@@ -54,7 +56,7 @@ namespace Shared.Core.PackFiles
 
         void AddContainer(PackFileContainer container)
         { 
-            Database.PackFiles.Add(container);
+            PackFiles.Add(container);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
         }
 
@@ -82,7 +84,7 @@ namespace Shared.Core.PackFiles
         {
             try
             {
-                var caPacksLoaded = Database.PackFiles.Count(x => x.IsCaPackFile);
+                var caPacksLoaded = PackFiles.Count(x => x.IsCaPackFile);
                 if (caPacksLoaded == 0 && allowLoadWithoutCaPackFiles != true)
                 {
                     MessageBox.Show("You are trying to load a oack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
@@ -98,7 +100,7 @@ namespace Shared.Core.PackFiles
                     return null;
                 }
 
-                foreach (var packFile in Database.PackFiles)
+                foreach (var packFile in PackFiles)
                 {
                     if (packFile.SystemFilePath == packFileSystemPath)
                     {
@@ -110,7 +112,7 @@ namespace Shared.Core.PackFiles
                 using var fileStream = File.OpenRead(packFileSystemPath);
                 using var reader = new BinaryReader(fileStream, Encoding.ASCII);
                 var container = Load(reader, packFileSystemPath);
-                var notCaPacksLoaded = Database.PackFiles.Count(x => !x.IsCaPackFile);
+                var notCaPacksLoaded = PackFiles.Count(x => !x.IsCaPackFile);
                 if (container.IsCaPackFile == false && setToMainPackIfFirst)
                     SetEditablePack(container);
 
@@ -129,7 +131,7 @@ namespace Shared.Core.PackFiles
         public List<string> SearchForFile(string partOfFileName)
         {
             var output = new List<string>();
-            foreach (var pf in Database.PackFiles)
+            foreach (var pf in PackFiles)
             {
                 foreach (var file in pf.FileList)
                 {
@@ -162,7 +164,7 @@ namespace Shared.Core.PackFiles
             var output = new List<ValueTuple<string, PackFile>>();
             if (packFileContainer == null)
             {
-                foreach (var pf in Database.PackFiles)
+                foreach (var pf in PackFiles)
                 {
                     foreach (var file in pf.FileList)
                     {
@@ -190,7 +192,7 @@ namespace Shared.Core.PackFiles
             _logger.Here().Information($"Searching for : '{searchStr}'");
 
             var filesWithResult = new List<KeyValuePair<string, string>>();
-            var files = Database.PackFiles.SelectMany(x => x.FileList.Select(x => (x.Value.DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
+            var files = PackFiles.SelectMany(x => x.FileList.Select(x => (x.Value.DataSource as PackedFileSource).Parent.FilePath)).Distinct().ToList();
 
             var indexLock = new object();
             var currentPackFileIndex = 0;
@@ -256,7 +258,7 @@ namespace Shared.Core.PackFiles
             dir = dir.Replace('/', '\\').ToLower();
             var output = new List<PackFile>();
 
-            foreach (var pf in Database.PackFiles)
+            foreach (var pf in PackFiles)
             {
                 foreach (var file in pf.FileList)
                 {
@@ -286,7 +288,7 @@ namespace Shared.Core.PackFiles
         {
             if (container == null)
             {
-                foreach (var pf in Database.PackFiles)
+                foreach (var pf in PackFiles)
                 {
                     var res = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
                     if (string.IsNullOrWhiteSpace(res) == false)
@@ -464,13 +466,13 @@ namespace Shared.Core.PackFiles
 
         public void SetEditablePack(PackFileContainer? pf)
         {
-            Database.PackSelectedForEdit = pf;
+            PackSelectedForEdit = pf;
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerSetAsMainEditableEvent(pf));
         }
 
         public PackFileContainer? GetEditablePack()
         {
-            return Database.PackSelectedForEdit;
+            return PackSelectedForEdit;
         }
 
         public bool HasEditablePackFile()
@@ -485,7 +487,7 @@ namespace Shared.Core.PackFiles
 
         public PackFileContainer? GetPackFileContainer(PackFile file)
         {
-            foreach (var pf in Database.PackFiles)
+            foreach (var pf in PackFiles)
             {
                 var res = pf.FileList.FirstOrDefault(x => x.Value == file).Value;
                 if (res != null)
@@ -495,10 +497,7 @@ namespace Shared.Core.PackFiles
             return null;
         }
 
-        public List<PackFileContainer> GetAllPackfileContainers()
-        {
-            return Database.PackFiles.ToList();
-        }
+        public List<PackFileContainer> GetAllPackfileContainers() => PackFiles.ToList();
 
         // Remove
         // ---------------------------
@@ -511,8 +510,8 @@ namespace Shared.Core.PackFiles
 
             if (e.AllowClose)
             {
-                Database.PackFiles.Remove(pf);
-                if (Database.PackSelectedForEdit == pf)
+                PackFiles.Remove(pf);
+                if (PackSelectedForEdit == pf)
                     SetEditablePack(null);
 
                 _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(pf));
@@ -671,12 +670,12 @@ namespace Shared.Core.PackFiles
 
             if (container == null)
             {
-                for (var i = Database.PackFiles.Count - 1; i >= 0; i--)
+                for (var i = PackFiles.Count - 1; i >= 0; i--)
                 {
-                    if (Database.PackFiles[i].FileList.ContainsKey(lowerPath))
+                    if (PackFiles[i].FileList.ContainsKey(lowerPath))
                     {
-                       _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, Database.PackFiles[i], true));
-                        return Database.PackFiles[i].FileList[lowerPath];
+                       _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, PackFiles[i], true));
+                        return PackFiles[i].FileList[lowerPath];
                     }
                 }
             }

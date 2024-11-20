@@ -31,7 +31,8 @@ namespace AssetEditor.UiCommands
                 return;
             }
 
-            foreach (var packFile in _packFileService.Database.PackFiles)
+            var packFileContainer = _packFileService.GetAllPackfileContainers();
+            foreach (var packFile in packFileContainer)
             {
                 if (packFile.SystemFilePath == gamePath.Path)
                 {

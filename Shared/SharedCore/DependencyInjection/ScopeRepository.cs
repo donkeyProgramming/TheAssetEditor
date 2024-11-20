@@ -5,7 +5,7 @@ namespace Shared.Core.DependencyInjection
 {
     public class ScopeRepository
     {
-        public IServiceScope Root { get; set; }
+        public IServiceScope Root { get; set; } // TODO: THis is a bad hack
         public Dictionary<IEditorInterface, IServiceScope> Scopes { get; private set; } = new Dictionary<IEditorInterface, IServiceScope>();
 
         public void Add(IEditorInterface owner, IServiceScope scope)

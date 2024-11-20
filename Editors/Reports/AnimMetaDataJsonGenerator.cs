@@ -55,7 +55,8 @@ namespace Editors.Reports
             DirectoryHelper.EnsureCreated(gameOutputDir);
 
             //dump animationTable
-            var animPack = _pfs.Database.PackFiles[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
+            var packFileContainer = _pfs.GetAllPackfileContainers();
+            var animPack = packFileContainer[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
             var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
 
             var converter = new AnimationBinWh3FileToXmlConverter(new SkeletonAnimationLookUpHelper());

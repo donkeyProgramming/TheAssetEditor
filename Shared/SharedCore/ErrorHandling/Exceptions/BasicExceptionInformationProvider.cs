@@ -26,9 +26,10 @@ namespace Shared.Core.ErrorHandling.Exceptions
 
         void CreatePackFileInfo(ExceptionInformation extendedException)
         {
-            foreach (var db in _pfs.Database.PackFiles)
+            var packfiles = _pfs.GetAllPackfileContainers();
+            foreach (var db in packfiles)
             {
-                var isMainEditable = _pfs.Database.PackSelectedForEdit == db;
+                var isMainEditable = _pfs.GetEditablePack() == db;
                 var info = new ExceptionPackFileContainerInfo(isMainEditable, db.IsCaPackFile, db.Name, db.SystemFilePath);
                 extendedException.ActivePackFiles.Add(info);
             }
@@ -43,39 +44,8 @@ namespace Shared.Core.ErrorHandling.Exceptions
             extendedException.AssetEditorVersion = VersionChecker.CurrentVersion;
         }
 
-
-
         void CreateContext(ExceptionInformation extendedException)
-        {     // extendedException.NumberOfOpenEditors = (uint)_mainView.CurrentEditorsList.Count;
-            /*try
-            {
-                var editorName = "";
-                var editorFileInput = "";
-                var editorFileFullName = "";
-                var editorFilePack = "";
-                if (_mainView.SelectedEditorIndex != -1 && _mainView.CurrentEditorsList.Count != 0)
-                {
-                    var editor = _mainView.CurrentEditorsList[_mainView.SelectedEditorIndex];
-                    editorName = editor.GetType().Name;
-
-                    if (editor is IFileEditor fileEditor)
-                    {
-                        editorFileInput = fileEditor.CurrentFile.Name;
-                        editorFileFullName = _pfs.GetFullPath(fileEditor.CurrentFile);
-                        editorFilePack = _pfs.GetPackFileContainer(fileEditor.CurrentFile).Name;
-                    }
-
-                }
-                extendedException.CurrentEditorName = editorName;
-                extendedException.EditorInputFile = editorFileInput;
-                extendedException.EditorInputFileFull = editorFileFullName;
-                extendedException.EditorInputFilePack = editorFilePack;
-            }
-            catch (Exception e)
-            {
-                extendedException.CurrentEditorName = "Error - " + e.Message;
-            }*/
-
+        {  
             if (Logging.CustomSink != null)
                 extendedException.LogHistory = Logging.CustomSink.GetHistory();
         }

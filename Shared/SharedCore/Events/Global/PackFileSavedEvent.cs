@@ -9,15 +9,10 @@ namespace Shared.Core.Events.Global
     public record PackFileContainerSetAsMainEditableEvent(PackFileContainer? Container);
 
 
-    public class BeforePackFileContainerRemovedEvent
+    public class BeforePackFileContainerRemovedEvent(PackFileContainer removed)
     {
-        public PackFileContainer Removed { get; internal set; }
+        public PackFileContainer Removed { get; internal set; } = removed;
         public bool AllowClose { get; set; } = true;
-
-        public BeforePackFileContainerRemovedEvent(PackFileContainer removed)
-        {
-            Removed = removed;
-        }
     }
 
     public record PackFileContainerFilesUpdatedEvent(PackFileContainer Container, List<PackFile> ChangedFiles);

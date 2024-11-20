@@ -80,7 +80,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
             Filter = new PackFileFilter(Files);
 
-            foreach (var item in _packFileService.Database.PackFiles)
+            foreach (var item in _packFileService.GetAllPackfileContainers())
             {
                 var loadFile = true;
                 if (ignoreCaFiles)
