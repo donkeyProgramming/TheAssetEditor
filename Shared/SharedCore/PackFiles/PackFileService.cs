@@ -13,22 +13,22 @@ using Shared.Core.Services;
 namespace Shared.Core.PackFiles
 {
 
-   // public class PackFileContainerLoader
-   // {
-   //     PackFileContainer LoadGameFiles()
-   //     { }
-   //
-   //     PackFileContainer LoadPack()
-   //     { 
-   //     }
-   //
-   //     PackFileContainer LoadFolderAsPack()
-   //     {
-   //     }
-   //
-   //
-   //
-   // }
+    // public class PackFileContainerLoader
+    // {
+    //     PackFileContainer LoadGameFiles()
+    //     { }
+    //
+    //     PackFileContainer LoadPack()
+    //     { 
+    //     }
+    //
+    //     PackFileContainer LoadFolderAsPack()
+    //     {
+    //     }
+    //
+    //
+    //
+    // }
 
 
 
@@ -46,15 +46,15 @@ namespace Shared.Core.PackFiles
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
-        public PackFileService(
-            ApplicationSettingsService settingsService,
-            GameInformationFactory gameInformationFactory,
-            IGlobalEventHub? globalEventHub)
+        public PackFileService(ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory, IGlobalEventHub? globalEventHub)
         {
             _globalEventHub = globalEventHub;
             _settingsService = settingsService;
             _gameInformationFactory = gameInformationFactory;
         }
+
+        public List<PackFileContainer> GetAllPackfileContainers() => _packFiles.ToList(); // Return a list of the list to avoid bugs!
+
 
         public PackFileContainer? LoadSystemFolderAsPackFileContainer(string packFileSystemPath)
         {
@@ -125,7 +125,7 @@ namespace Shared.Core.PackFiles
 
                 using var fileStream = File.OpenRead(packFileSystemPath);
                 using var reader = new BinaryReader(fileStream, Encoding.ASCII);
- 
+
                 var container = PackFileSerializer.Load(packFileSystemPath, reader, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
                 AddContainer(container);
 
@@ -192,18 +192,12 @@ namespace Shared.Core.PackFiles
             catch (Exception e)
             {
                 _logger.Here().Error($"Trying to get all CA packs in {gameDataFolder}. Error : {e.ToString()}");
-
-                // Todo: show the sexy error window! 
-
                 return false;
             }
 
             return true;
         }
 
-
-        // Add
-        // ---------------------------
         public PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type, bool setEditablePack = false)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -283,23 +277,23 @@ namespace Shared.Core.PackFiles
             return true;
         }
 
-        public List<PackFileContainer> GetAllPackfileContainers() => _packFiles.ToList(); // Return a list of the list to avoid bugs!
 
-        // Remove
-        // ---------------------------
+
+
         public void UnloadPackContainer(PackFileContainer pf)
         {
             var e = new BeforePackFileContainerRemovedEvent(pf);
             _globalEventHub?.PublishGlobalEvent(e);
 
-            if (e.AllowClose)
-            {
-                _packFiles.Remove(pf);
-                if (_packSelectedForEdit == pf)
-                    SetEditablePack(null);
+            if (e.AllowClose == false)
+                return;
 
-                _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(pf));
-            }
+            _packFiles.Remove(pf);
+            if (_packSelectedForEdit == pf)
+                SetEditablePack(null);
+
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(pf));
+
         }
 
         public void DeleteFolder(PackFileContainer pf, string folder)
@@ -374,8 +368,7 @@ namespace Shared.Core.PackFiles
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRenamedEvent(pf, newNodePath));
         }
 
-        // Modify
-        // ---------------------------
+
         public void RenameFile(PackFileContainer pf, PackFile file, string newName)
         {
             if (pf.IsCaPackFile)
@@ -394,6 +387,7 @@ namespace Shared.Core.PackFiles
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(pf, [file]));
         }
 
+        // Move to PackFileSave?
         public void SaveFile(PackFile file, byte[] data)
         {
             var pf = GetPackFileContainer(file);
@@ -401,7 +395,6 @@ namespace Shared.Core.PackFiles
             if (pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
             file.DataSource = new MemorySource(data);
-
 
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(pf, [file]));
             _globalEventHub?.PublishGlobalEvent(new PackFileSavedEvent(file));
@@ -470,7 +463,7 @@ namespace Shared.Core.PackFiles
                 {
                     if (_packFiles[i].FileList.ContainsKey(lowerPath))
                     {
-                        if(EnableFileLookUpEvents)
+                        if (EnableFileLookUpEvents)
                             _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, _packFiles[i], true));
                         return _packFiles[i].FileList[lowerPath];
                     }
@@ -480,13 +473,13 @@ namespace Shared.Core.PackFiles
             {
                 if (container.FileList.ContainsKey(lowerPath))
                 {
-                    if(EnableFileLookUpEvents)
+                    if (EnableFileLookUpEvents)
                         _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, container, true));
                     return container.FileList[lowerPath];
                 }
             }
 
-            if(EnableFileLookUpEvents)
+            if (EnableFileLookUpEvents)
                 _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, null, false));
             return null;
         }

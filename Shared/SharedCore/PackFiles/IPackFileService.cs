@@ -24,8 +24,8 @@ namespace Shared.Core.PackFiles
         void MoveFile(PackFileContainer pf, PackFile file, string newFolderPath);
         void RenameDirectory(PackFileContainer pf, string currentNodeName, string newName);
         void RenameFile(PackFileContainer pf, PackFile file, string newName);
-        void SavePackContainer(PackFileContainer pf, string path, bool createBackup);
         void SaveFile(PackFile file, byte[] data);
+        void SavePackContainer(PackFileContainer pf, string path, bool createBackup);
         void SetEditablePack(PackFileContainer? pf);
         void UnloadPackContainer(PackFileContainer pf);
     }
