@@ -26,13 +26,11 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
     {
         private readonly PackFileService _packFileService;
         private readonly GltfMeshBuilder _gltfMeshBuilder;
-        private readonly GltfSkeletonCreator _gltfSkeletonCreator;
 
-        public RmvToGltfExporter(PackFileService packFileSerivce,  GltfMeshBuilder gltfMeshBuilder, GltfSkeletonCreator gltfSkeletonCreator)
+        public RmvToGltfExporter(PackFileService packFileSerivce,  GltfMeshBuilder gltfMeshBuilder)
         {
             _packFileService = packFileSerivce;
-            _gltfMeshBuilder = gltfMeshBuilder;
-            _gltfSkeletonCreator = gltfSkeletonCreator;
+            _gltfMeshBuilder = gltfMeshBuilder;            
         }
 
         internal ExportSupportEnum CanExportFile(PackFile file)
@@ -57,7 +55,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             if (hasSkeleton)
             {
                 var animSkeletonFile = FetchAnimSkeleton(rmv2);
-                gltfSkeleton = _gltfSkeletonCreator.Create(outputScene, animSkeletonFile, doMirror);
+                gltfSkeleton = GltfSkeletonCreator.Create(outputScene, animSkeletonFile, doMirror);
 
                 if (settings.ExportAnimations && settings.InputAnimationFiles != null && settings.InputAnimationFiles.Any())
                     GenerateAnimations(settings, gltfSkeleton, outputScene, animSkeletonFile, doMirror);
