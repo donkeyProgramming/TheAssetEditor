@@ -22,20 +22,27 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             var packFile = _pfs.FindFile(filePath);
             if (packFile == null)            
                 return "";
-            
+
             var fileName = Path.GetFileNameWithoutExtension(filePath);
-            var fileDirectory = outputPath + "/" + fileName + ".png";
+            var outDirectory = Path.GetDirectoryName(outputPath);
+            var outFilePath = outDirectory + "/" + fileName + ".png";
+
             var bytes = packFile.DataSource.ReadData();
+            if (bytes == null || !bytes.Any())
+                throw new Exception($"Could not read file data. bytes.Count = {bytes?.Length}");
+
             var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
+            if (imgBytes == null || !imgBytes.Any())
+                throw new Exception($"image data invalid/empty. imgBytes.Count = {imgBytes?.Length}");
 
             if (convertToBlenderFormat)
             {
-                imgBytes = ConvertToBlenderFormat(imgBytes, outputPath, fileDirectory);
+                imgBytes = ConvertToBlenderFormat(imgBytes, outputPath, outFilePath);
             }
 
-            _imageSaveHandler.Save(imgBytes, fileDirectory);
+            _imageSaveHandler.Save(imgBytes, outFilePath);
 
-            return fileDirectory;
+            return outFilePath;
         }
 
         internal ExportSupportEnum CanExportFile(PackFile file)

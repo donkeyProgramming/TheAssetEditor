@@ -35,10 +35,17 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
                 return "";
 
             var fileName = Path.GetFileNameWithoutExtension(filePath);
-            var fullFilePath = outputPath + "/" + fileName + ".png";
+            var outDirectory = Path.GetDirectoryName(outputPath);
+            var fullFilePath = outDirectory + "/" + fileName + ".png";
+
             var bytes = packFile.DataSource.ReadData();
+            if (bytes == null || !bytes.Any())
+                throw new Exception($"Could not read file data. bytes.Count = {bytes?.Length}");
+
             var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
-           
+            if (imgBytes == null || !imgBytes.Any())
+                throw new Exception($"image data invalid/empty. imgBytes.Count = {imgBytes?.Length}");
+
             if (convertToBlueNormalMap)
                 imgBytes = ConvertToBlueNormalMap(imgBytes, fullFilePath);
 
