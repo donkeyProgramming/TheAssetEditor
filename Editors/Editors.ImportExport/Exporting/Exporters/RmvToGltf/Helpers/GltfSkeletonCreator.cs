@@ -14,26 +14,27 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
     public class GltfSkeletonCreator
     {
-        private readonly PackFileService _packFileService;
-
-        public GltfSkeletonCreator(PackFileService packFileService)
+        public static ProcessedGltfSkeleton Create(ModelRoot outputScene, AnimationFile animSkeletonFil, bool doMirror)
         {
-            _packFileService = packFileService;
-        }
+            if (animSkeletonFil.AnimationParts.Count == 0)
+                throw new Exception("No AnimationParts found in AnimationFile");
 
+            if (animSkeletonFil.AnimationParts[0].DynamicFrames.Count == 0)
+                throw new Exception("No DynamicFrames found in AnimationPart");
 
+            var frame = animSkeletonFil.AnimationParts[0].DynamicFrames[0];
 
-        public ProcessedGltfSkeleton Create(ModelRoot outputScene, AnimationFile animSkeletonFil, bool doMirror)
-        {
             var framePoseMatrixCalculator = new FramePoseMatrixCalculator(animSkeletonFil);
             var invMatrices = framePoseMatrixCalculator.GetInverseBindPoseMatrices(doMirror);
 
             var outputGltfBindings = new List<(Node node, Matrix4x4 invMatrix)>();
 
             var scene = outputScene.UseScene("default");
+
+            scene.CreateNode($"//skeleton//{animSkeletonFil.Header.SkeletonName.ToLower()}");
+
             var parentIdToGltfNode = new Dictionary<int, Node>();
-            var frame = animSkeletonFil.AnimationParts[0].DynamicFrames[0];
-            parentIdToGltfNode[-1] = scene.CreateNode(""); // bones with not parent will be children of the scene
+            parentIdToGltfNode[-1] = scene.CreateNode(""); // bones with no parent will be children of the scene
 
             for (var boneIndex = 0; boneIndex < animSkeletonFil.Bones.Length; boneIndex++)
             {

@@ -12,6 +12,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
     {
         private readonly PackFileService _pfs;
         private readonly IImageSaveHandler _imageSaveHandler;
+
         public DdsToNormalPngExporter(PackFileService packFileService, IImageSaveHandler imageSaveHandler) 
         {
             _pfs = packFileService;
@@ -30,11 +31,21 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
         public string Export(string filePath, string outputPath, bool convertToBlueNormalMap)
         {
             var packFile = _pfs.FindFile(filePath);
+            if (packFile == null)
+                return "";
+
             var fileName = Path.GetFileNameWithoutExtension(filePath);
-            var fullFilePath = outputPath + "/" + fileName + ".png";
+            var outDirectory = Path.GetDirectoryName(outputPath);
+            var fullFilePath = outDirectory + "/" + fileName + ".png";
+
             var bytes = packFile.DataSource.ReadData();
+            if (bytes == null || !bytes.Any())
+                throw new Exception($"Could not read file data. bytes.Count = {bytes?.Length}");
+
             var imgBytes = TextureHelper.ConvertDdsToPng(bytes);
-           
+            if (imgBytes == null || !imgBytes.Any())
+                throw new Exception($"image data invalid/empty. imgBytes.Count = {imgBytes?.Length}");
+
             if (convertToBlueNormalMap)
                 imgBytes = ConvertToBlueNormalMap(imgBytes, fullFilePath);
 

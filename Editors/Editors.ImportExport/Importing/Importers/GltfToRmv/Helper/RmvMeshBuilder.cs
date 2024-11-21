@@ -23,16 +23,40 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
     /// </summary>
     public class RmvMeshBuilder
     {
+        private static string FetchSkeletonIdStringFromScene(ModelRoot modelRoot)
+        {  
+            var nodeSearchResult = modelRoot.LogicalNodes.Where(node => node.Name.StartsWith("//skeleton//"));
+
+            if (nodeSearchResult == null || !nodeSearchResult.Any())
+                return "";
+
+            var skeletonName = nodeSearchResult.First().Name.TrimStart("//skeleton//".ToCharArray());            
+
+            return skeletonName;
+        }        
+
         public static RmvFile Build(GltfImporterSettings settings, ModelRoot modelRoot)
         {
-            const int lodCount = 1; // All meshes go in LOD 0, LODs are sorted later
+            if (modelRoot == null)
+                throw new ArgumentNullException(nameof(modelRoot), "Invalid Scene: ModelRoot can't be null");
 
+            if (modelRoot.LogicalNodes == null)
+                throw new ArgumentNullException(nameof(modelRoot), "Invalid Scene: root.LogicalNodes can't be null");
+
+            if (!modelRoot.LogicalNodes.Any())
+                throw new Exception("Invalid Scene: no (logical) nodes");
+
+            List<string> boneNames = new List<string>();
+            var test = boneNames?.Count;
+
+            const int lodCount = 1; // All meshes go in LOD 0, LODs are sorted later
+                        
             var rmv2File = new RmvFile()
             {
                 Header = new RmvFileHeader()
                 {
                     _fileType = Encoding.ASCII.GetBytes("RMV2"),
-                    SkeletonName = "humanoid01", // TODO: Store + get skeleton name from gltf
+                    SkeletonName = FetchSkeletonIdStringFromScene(modelRoot), // TODO: Store + get skeleton name from gltf
                     Version = RmvVersionEnum.RMV2_V7,
                     LodCount = lodCount 
                 },
@@ -59,22 +83,30 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
         }
 
         private static RmvMesh GenerateRmvMesh(SharpGLTF.Schema2.Mesh mesh)
-        {
-            var rmv2Mesh = new RmvMesh();
+        {          
+            if (mesh == null)
+                throw new ArgumentNullException(nameof(mesh), "Invalid Mesh: Mesh can't be null");
+
+            if (mesh.Primitives == null || !mesh.Primitives.Any())
+                throw new Exception($"Invalid Mesh: No Primitives found in mesh. Primitives.Count = {mesh.Primitives?.Count}");
 
             var primitive = mesh.Primitives.First();
 
             if (primitive == null)         
-                throw new Exception("Error: No primitive found in gltf mesh");
+                throw new Exception("Invalid Mesh: primitive[0] can't be null ");
 
             var vertexBufferColumns = primitive.GetVertexColumns();
 
-            if (vertexBufferColumns == null || !vertexBufferColumns.Positions.Any())
-                throw new Exception("Error: No Vertex Data in primitive");
+            if (vertexBufferColumns == null)
+                throw new ArgumentNullException(nameof(vertexBufferColumns), "Invalid Mesh: value cannot be null ");
+
+            if (vertexBufferColumns.Positions == null || !vertexBufferColumns.Positions.Any())
+                throw new Exception($"Invalid Mesh: No vertex data. Positions.Count = {vertexBufferColumns.Positions?.Count}");
 
             if (vertexBufferColumns.Positions.Count() > ushort.MaxValue + 1)
-                throw new Exception("Error: To Many Vertices in Mesh, only 65536 vertices allow per mesh");
+                throw new Exception("Unsupported Mesh (Vertex count too high): RMV2 only supports 65536 vertices per mesh");
 
+            var rmv2Mesh = new RmvMesh();
             rmv2Mesh.VertexList = new CommonVertex[vertexBufferColumns.Positions.Count()];
             for (var vertexIndex = 0; vertexIndex < vertexBufferColumns.Positions.Count(); vertexIndex++)
             {
