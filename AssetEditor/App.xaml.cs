@@ -34,6 +34,7 @@ namespace AssetEditor
             _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes);
             _rootScope = _serviceProvider.CreateScope();
 
+            _ = _rootScope.ServiceProvider.GetRequiredService<RecentFilesTracker>(); // Force instance
             var scopeRepo = _rootScope.ServiceProvider.GetRequiredService<ScopeRepository>();
             scopeRepo.Root = _rootScope;
 

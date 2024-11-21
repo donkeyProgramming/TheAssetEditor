@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Serilog;
@@ -124,13 +125,14 @@ namespace Shared.Core.PackFiles
 
                 using var fileStream = File.OpenRead(packFileSystemPath);
                 using var reader = new BinaryReader(fileStream, Encoding.ASCII);
-                var container = Load(reader, packFileSystemPath);
+ 
+                var container = PackFileSerializer.Load(packFileSystemPath, reader, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
+                AddContainer(container);
+
                 var notCaPacksLoaded = _packFiles.Count(x => !x.IsCaPackFile);
                 if (container.IsCaPackFile == false && setToMainPackIfFirst)
                     SetEditablePack(container);
 
-                _settingsService.AddRecentlyOpenedPackFile(packFileSystemPath);
-                _settingsService.Save();
                 return container;
             }
             catch (Exception e)
@@ -139,13 +141,6 @@ namespace Shared.Core.PackFiles
                 _logger.Here().Error($"Failed to load file {packFileSystemPath}. Error : {e}");
                 return null;
             }
-        }
-
-        PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
-        {
-            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
-            AddContainer(pack);
-            return pack;
         }
 
         public bool LoadAllCaFiles(GameTypeEnum gameEnum)

@@ -33,6 +33,8 @@ namespace AssetEditor
 
             serviceCollection.AddScoped<MainWindow>();
 
+            serviceCollection.AddSingleton<RecentFilesTracker>();
+
             serviceCollection.AddScoped<IExceptionInformationProvider, CurrentEditorExceptionInfoProvider>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
