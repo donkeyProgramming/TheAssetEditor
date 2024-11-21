@@ -11,6 +11,27 @@ using Shared.Core.Services;
 
 namespace Shared.Core.PackFiles
 {
+
+   // public class PackFileContainerLoader
+   // {
+   //     PackFileContainer LoadGameFiles()
+   //     { }
+   //
+   //     PackFileContainer LoadPack()
+   //     { 
+   //     }
+   //
+   //     PackFileContainer LoadFolderAsPack()
+   //     {
+   //     }
+   //
+   //
+   //
+   // }
+
+
+
+
     public class PackFileService : IPackFileService
     {
         private readonly ILogger _logger = Logging.Create<PackFileService>();
@@ -21,19 +42,15 @@ namespace Shared.Core.PackFiles
         public bool EnableFileLookUpEvents { get; internal set; } = false;
 
         private readonly IGlobalEventHub? _globalEventHub;
-        private readonly IAnimationFileDiscovered? _skeletonAnimationLookUpHelper;
-
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
         public PackFileService(
             ApplicationSettingsService settingsService,
             GameInformationFactory gameInformationFactory,
-            IGlobalEventHub? globalEventHub,
-            IAnimationFileDiscovered? skeletonAnimationLookUpHelper)
+            IGlobalEventHub? globalEventHub)
         {
             _globalEventHub = globalEventHub;
-            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _settingsService = settingsService;
             _gameInformationFactory = gameInformationFactory;
         }
@@ -126,7 +143,7 @@ namespace Shared.Core.PackFiles
 
         PackFileContainer Load(BinaryReader binaryReader, string packFileSystemPath)
         {
-            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
+            var pack = PackFileSerializer.Load(packFileSystemPath, binaryReader, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
             AddContainer(pack);
             return pack;
         }
@@ -154,7 +171,7 @@ namespace Shared.Core.PackFiles
                         using var fileStram = File.OpenRead(path);
                         using var reader = new BinaryReader(fileStram, Encoding.ASCII);
 
-                        var pack = PackFileSerializer.Load(path, reader, _skeletonAnimationLookUpHelper, _settingsService.CurrentSettings.LoadWemFiles, new CaPackDuplicatePackFileResolver());
+                        var pack = PackFileSerializer.Load(path, reader, _settingsService.CurrentSettings.LoadWemFiles, new CaPackDuplicatePackFileResolver());
                         packList.Add(pack);
                     }
                     else
@@ -237,10 +254,6 @@ namespace Shared.Core.PackFiles
                 container.FileList[path.ToLower()] = file.PackFile;
             }
 
-
-            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, container);
-            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, container);
-
             var files = newFiles.Select(x => x.PackFile).ToList();
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(container, files));
         }
@@ -281,8 +294,6 @@ namespace Shared.Core.PackFiles
         // ---------------------------
         public void UnloadPackContainer(PackFileContainer pf)
         {
-            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
-
             var e = new BeforePackFileContainerRemovedEvent(pf);
             _globalEventHub?.PublishGlobalEvent(e);
 
@@ -340,8 +351,7 @@ namespace Shared.Core.PackFiles
 
             _logger.Here().Information($"Moving file {key}");
 
-            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
-            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, pf);
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(pf, [file]));
         }
 
         public void RenameDirectory(PackFileContainer pf, string currentNodeName, string newName)
@@ -365,9 +375,6 @@ namespace Shared.Core.PackFiles
 
                 pf.FileList[newPath] = file;
             }
-
-            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
-            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, pf);
 
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRenamedEvent(pf, newNodePath));
         }
@@ -426,7 +433,7 @@ namespace Shared.Core.PackFiles
                     throw new Exception("File has been changed outside of AssetEditor. Can not save the file as it will cause corruptions");
             }
 
-            _skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
+            //_skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
 
             pf.SystemFilePath = path;
             using (var memoryStream = new FileStream(path + "_temp", FileMode.OpenOrCreate))
@@ -439,7 +446,6 @@ namespace Shared.Core.PackFiles
             File.Move(path + "_temp", path);
 
             pf.OriginalLoadByteSize = new FileInfo(path).Length;
-            _skeletonAnimationLookUpHelper?.LoadFromPackFileContainer(this, pf);
         }
 
 
@@ -469,7 +475,8 @@ namespace Shared.Core.PackFiles
                 {
                     if (_packFiles[i].FileList.ContainsKey(lowerPath))
                     {
-                        _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, _packFiles[i], true));
+                        if(EnableFileLookUpEvents)
+                            _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, _packFiles[i], true));
                         return _packFiles[i].FileList[lowerPath];
                     }
                 }
@@ -478,12 +485,14 @@ namespace Shared.Core.PackFiles
             {
                 if (container.FileList.ContainsKey(lowerPath))
                 {
-                    _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, container, true));
+                    if(EnableFileLookUpEvents)
+                        _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, container, true));
                     return container.FileList[lowerPath];
                 }
             }
 
-            _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, null, false));
+            if(EnableFileLookUpEvents)
+                _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, null, false));
             return null;
         }
 

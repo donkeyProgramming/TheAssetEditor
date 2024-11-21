@@ -24,7 +24,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
         {
             var selectedGame = GameTypeEnum.Warhammer3;
             var appSettings = new ApplicationSettingsService(selectedGame);
-            _pfs = new PackFileService(appSettings, new GameInformationFactory(), null, null);
+            _pfs = new PackFileService(appSettings, new GameInformationFactory(), null);
             var _ = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
         }
 

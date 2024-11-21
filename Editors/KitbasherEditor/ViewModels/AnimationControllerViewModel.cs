@@ -70,7 +70,7 @@ namespace Editors.KitbasherEditor.ViewModels
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _kitbasherRootScene = kitbasherRootScene;
-            SkeletonList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
+            SkeletonList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
 
             _player = _kitbasherRootScene.Player;
             _player.OnFrameChanged += (currentFrame) => CurrentFrame = currentFrame + 1;

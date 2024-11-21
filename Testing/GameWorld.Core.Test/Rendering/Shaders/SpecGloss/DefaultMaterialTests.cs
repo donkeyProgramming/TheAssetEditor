@@ -3,7 +3,6 @@ using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Test.TestUtility;
-using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
@@ -23,7 +22,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
         {
             var selectedGame = GameTypeEnum.Warhammer3;
             var appSettings = new ApplicationSettingsService(selectedGame);
-            _pfs = new PackFileService(appSettings, new GameInformationFactory(), null, null);
+            _pfs = new PackFileService(appSettings, new GameInformationFactory(), null);
             var _ = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
         }
 

@@ -144,7 +144,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
             if (_animationOutputFormat != 7)
             {
-                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animFile.Header.SkeletonName);
+                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName( animFile.Header.SkeletonName);
                 animFile.ConvertToVersion(_animationOutputFormat, skeleton, _pfs);
             }
 
@@ -228,7 +228,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         GameSkeleton LoadSkeleton(string skeletonName)
         {
-            var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, skeletonName);
+            var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(skeletonName);
             return new GameSkeleton(skeletonFile, null);
         }
 

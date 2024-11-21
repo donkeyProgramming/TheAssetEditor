@@ -124,7 +124,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             if (string.IsNullOrWhiteSpace(value?.AnimationFile) == false)
             {
                 var file = _pfs.FindFile(value.AnimationFile);
-                animationReference = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
+                animationReference = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
             }
 
             if (string.IsNullOrWhiteSpace(value?.MetaFile) == false)

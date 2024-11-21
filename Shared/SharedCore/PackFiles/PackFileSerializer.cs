@@ -25,7 +25,7 @@ namespace Shared.Core.PackFiles
     {
         static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileSerializer));
 
-        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IAnimationFileDiscovered? animationFileDiscovered, bool loadWemFiles, IDuplicatePackFileResolver dubplicatePackFileResolver)
+        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, bool loadWemFiles, IDuplicatePackFileResolver dubplicatePackFileResolver)
         {
             try
             {
@@ -67,8 +67,6 @@ namespace Shared.Core.PackFiles
                     var packFileName = Path.GetFileName(fullPackedFileName);
                     var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
 
-                    if (animationFileDiscovered != null && packFileName.EndsWith(".anim"))
-                        animationFileDiscovered.FileDiscovered(fileContent, output, fullPackedFileName);
 
                     var addFile = true;
 

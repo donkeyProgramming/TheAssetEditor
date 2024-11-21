@@ -92,7 +92,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
                 try
                 {
                     var animationFile = AnimationFile.Create(file);
-                    var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animationFile.Header.SkeletonName);
+                    var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animationFile.Header.SkeletonName);
                     animationFile.ConvertToVersion(outputAnimationFormat, skeleton, _pfs);
 
                     var bytes = AnimationFile.ConvertToBytes(animationFile);

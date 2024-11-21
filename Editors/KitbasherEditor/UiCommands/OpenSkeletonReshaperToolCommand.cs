@@ -60,7 +60,7 @@ namespace Editors.KitbasherEditor.UiCommands
             }
 
             var currentSkeletonName = allSkeltonNames.First();
-            var currentSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_pfs, currentSkeletonName);
+            var currentSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(currentSkeletonName);
 
             var usedBoneIndexes = meshNodes
                 .SelectMany(x => x.Geometry.GetUniqeBlendIndices())
@@ -70,7 +70,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
             var rootNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
             var targetSkeleton = rootNode.SkeletonNode;
-            var targetSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_pfs, targetSkeleton.Name);
+            var targetSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(targetSkeleton.Name);
 
             var config = new RemappedAnimatedBoneConfiguration();
             config.ParnetModelSkeletonName = targetSkeleton.Name;

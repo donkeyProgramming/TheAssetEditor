@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using CommonControls.Editors.AnimationPack.Converters;
-using Editors.Shared.Core.Services;
 using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -59,7 +58,7 @@ namespace Editors.Reports
             var animPack = packFileContainer[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
             var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
 
-            var converter = new AnimationBinWh3FileToXmlConverter(new SkeletonAnimationLookUpHelper());
+            var converter = new AnimationBinWh3FileToXmlConverter(null);
             foreach (var animFile in animPackFile.Files)
             {
                 if (animFile is AnimationBinWh3)

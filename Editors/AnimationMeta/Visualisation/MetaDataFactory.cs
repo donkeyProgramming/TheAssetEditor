@@ -143,7 +143,7 @@ namespace Editors.AnimationMeta.Visualisation
             if (animationPath != null)
             {
                 var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
-                var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_packFileService, skeletonName);
+                var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(skeletonName);
                 var skeleton = new GameSkeleton(skeletonFile, propPlayer);
                 var animFile = AnimationFile.Create(animationPath);
                 var clip = new AnimationClip(animFile, skeleton);
