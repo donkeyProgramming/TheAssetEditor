@@ -46,14 +46,5 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 
             return importedFileName;
         }
-
-        private static void TESTING_SaveTestFileToDisk(GltfImporterSettings settings, byte[] bytes)
-        {
-            var docsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var fileNameOnly = Path.GetFileNameWithoutExtension(settings.InputGltfFile);
-            var modelStream = File.Open($@"{docsFolder}\{fileNameOnly}.rigid_model_v2", FileMode.Create);
-            var binaryWriter = new BinaryWriter(modelStream);
-            binaryWriter.Write(bytes);
-        }
     }
 }
