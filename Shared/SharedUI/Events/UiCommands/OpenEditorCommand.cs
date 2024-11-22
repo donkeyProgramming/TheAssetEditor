@@ -31,17 +31,12 @@ namespace Shared.Ui.Events.UiCommands
         public void ExecuteAsWindow(string fileName, int width, int heigh)
         {
             var file = _packFileService.FindFile(fileName);
-            ExecuteAsWindow(file, width, heigh);
-
-        }
-
-        public void ExecuteAsWindow(PackFile file, int width, int heigh)
-        {
             var window = _editorCreator.CreateWindow(file);
 
             window.Width = width;
             window.Height = heigh;
             window.ShowDialog();
         }
+
     }
 }
