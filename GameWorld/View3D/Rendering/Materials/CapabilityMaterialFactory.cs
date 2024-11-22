@@ -47,7 +47,9 @@ namespace GameWorld.Core.Rendering.Materials
             if ((currentGame == GameTypeEnum.Warhammer3 || currentGame == GameTypeEnum.ThreeKingdoms) == false)
                 return;
 
-            if (wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase))
+            var isEmissive = wsModelMaterial.ShaderPath.Contains("emissive", StringComparison.InvariantCultureIgnoreCase);
+            var isPropEmissive = wsModelMaterial.ShaderPath.Contains("prop_emissive", StringComparison.InvariantCultureIgnoreCase);
+            if (isEmissive && !isPropEmissive)
                 preferredMaterial = CapabilityMaterialsEnum.MetalRoughPbr_Emissive;
         }
 
