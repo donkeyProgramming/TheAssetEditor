@@ -1,6 +1,7 @@
-﻿using System.IO;
-using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
+﻿using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using Editors.ImportExport.Misc;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Animation;
@@ -24,6 +25,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
     public class RmvToGltfExporter
     {
+        private readonly ILogger _logger = Logging.Create<RmvToGltfExporter>();
         private readonly PackFileService _packFileService;
         private readonly GltfMeshBuilder _gltfMeshBuilder;
 
@@ -44,6 +46,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
         public void Export(RmvToGltfExporterSettings settings)
         {
+            LogSettings(settings);
+
             const bool doMirror = true; // TODO: put in view (CheckBox) -> settomgs
 
             var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
@@ -102,6 +106,19 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 
             var animSkeletonFile = AnimationFile.Create(skeletonPackFile);
             return animSkeletonFile;
+        }
+
+        void LogSettings(RmvToGltfExporterSettings settings)
+        {
+            var str = $"Exporting using {nameof(RmvToGltfExporter)}\n";
+            str += $"\tInputModelFile:{settings.InputModelFile?.Name}\n";
+            str += $"\tInputAnimationFiles:{settings.InputAnimationFiles?.Count()}\n";
+            str += $"\tOutputPath:{settings.OutputPath}\n";
+            str += $"\tConvertMaterialTextureToBlender:{settings.ConvertMaterialTextureToBlender}\n";
+            str += $"\tConvertNormalTextureToBlue:{settings.ConvertNormalTextureToBlue}\n";
+            str += $"\tExportAnimations:{settings.ExportAnimations}\n";
+
+            _logger.Here().Information(str);
         }
 
     }
