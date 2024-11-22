@@ -59,7 +59,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             var newMaterialPath = Path.GetDirectoryName(modelFilePath) + "/materials/" + fileName;
             var materialPath = _repository.GetExistingOrAddMaterial(fileContent, newMaterialPath, out var isNew);
             if (isNew)
-                _fileSaveService.SaveFileWithoutPrompt(newMaterialPath, Encoding.UTF8.GetBytes(fileContent));
+                _fileSaveService.SaveFile_WithoutPrompt(newMaterialPath, Encoding.UTF8.GetBytes(fileContent));
 
             return materialPath;
         }
