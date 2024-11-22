@@ -31,7 +31,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             if (FileExtensionHelper.IsRmvFile(file.Name))
                 return ExportSupportEnum.HighPriority;
             if (FileExtensionHelper.IsWsModelFile(file.Name))
-                return ExportSupportEnum.HighPriority;
+                return ExportSupportEnum.NotSupported;  // This should be supported in the future
             return ExportSupportEnum.NotSupported;
         }
 
@@ -42,11 +42,12 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
             var outputScene = ModelRoot.CreateModel();
 
-            var gltfSkeleton = _gltfAnimationCreator.CreateAnimationAndSkeleton(rmv2.Header.SkeletonName, outputScene, settings);
+            var skeleton = _gltfAnimationCreator.CreateAnimationAndSkeleton(rmv2.Header.SkeletonName, outputScene, settings);
             var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);
             var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings);
 
-            BuildGltfScene(meshes, gltfSkeleton, settings, outputScene);
+            _logger.Here().Information($"MeshCount={meshes.Count()} TextureCount={textures.Count()} Skeleton={skeleton?.Data.Count}");
+            BuildGltfScene(meshes, skeleton, settings, outputScene);
         }
 
         void BuildGltfScene(List<IMeshBuilder<MaterialBuilder>> meshBuilders, ProcessedGltfSkeleton? gltfSkeleton, RmvToGltfExporterSettings settings, ModelRoot outputScene)
@@ -65,9 +66,6 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             _gltfSaver.Save(outputScene, settings.OutputPath);
         }
 
-
-
-
         void LogSettings(RmvToGltfExporterSettings settings)
         {
             var str = $"Exporting using {nameof(RmvToGltfExporter)}\n";
@@ -79,7 +77,6 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             str += $"\tExportAnimations:{settings.ExportAnimations}\n";
             str += $"\tMirrorMesh:{settings.MirrorMesh}\n";
             
-
             _logger.Here().Information(str);
         }
     }
