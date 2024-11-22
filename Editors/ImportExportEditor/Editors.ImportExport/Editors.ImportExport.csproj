@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+      <UseWPF>true</UseWPF>
+      <WarningsAsErrors>true</WarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GameWorld\View3D\GameWorld.Core.csproj" />
+    <ProjectReference Include="..\..\..\Shared\SharedCore\Shared.Core.csproj" />
+    <ProjectReference Include="..\..\..\Shared\SharedUI\Shared.Ui.csproj" />
+      <ProjectReference Include="..\..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpGLTF.Core" Version="1.0.3" />
+    <PackageReference Include="SharpGLTF.Toolkit" Version="1.0.3" />
+    <PackageReference Include="Pfim" Version="0.11.3" />
+  </ItemGroup>
+
+</Project>
