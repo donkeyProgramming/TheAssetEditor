@@ -12,27 +12,20 @@ using SharpGLTF.Schema2;
 
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
 {
-    public record RmvToGltfExporterSettings(
-
-        PackFile InputModelFile,
-        List<PackFile> InputAnimationFiles,
-        PackFile InputSkeletonFile,
-        string OutputPath,
-        bool ConvertMaterialTextureToBlender,
-        bool ConvertNormalTextureToBlue,
-        bool ExportAnimations
-    );
-
     public class RmvToGltfExporter
     {
         private readonly ILogger _logger = Logging.Create<RmvToGltfExporter>();
         private readonly PackFileService _packFileService;
+        private readonly IGltfSceneSaver _gltfSaver;
         private readonly GltfMeshBuilder _gltfMeshBuilder;
+        private readonly IGltfTextureHandler _gltfTextureHandler;
 
-        public RmvToGltfExporter(PackFileService packFileSerivce,  GltfMeshBuilder gltfMeshBuilder)
+        public RmvToGltfExporter(PackFileService packFileSerivce, IGltfSceneSaver gltfSaver, GltfMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler)
         {
             _packFileService = packFileSerivce;
-            _gltfMeshBuilder = gltfMeshBuilder;            
+            _gltfSaver = gltfSaver;
+            _gltfMeshBuilder = gltfMeshBuilder;
+            _gltfTextureHandler = gltfTextureHandler;
         }
 
         internal ExportSupportEnum CanExportFile(PackFile file)
@@ -48,8 +41,6 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         {
             LogSettings(settings);
 
-            const bool doMirror = true; // TODO: put in view (CheckBox) -> settomgs
-
             var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
             var hasSkeleton = string.IsNullOrWhiteSpace(rmv2.Header.SkeletonName) == false;
             ProcessedGltfSkeleton? gltfSkeleton = null;
@@ -59,13 +50,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             if (hasSkeleton)
             {
                 var animSkeletonFile = FetchAnimSkeleton(rmv2);
-                gltfSkeleton = GltfSkeletonCreator.Create(outputScene, animSkeletonFile, doMirror);
+                gltfSkeleton = GltfSkeletonCreator.Create(outputScene, animSkeletonFile, settings.MirrorMesh);
 
-                if (settings.ExportAnimations && settings.InputAnimationFiles != null && settings.InputAnimationFiles.Any())
-                    GenerateAnimations(settings, gltfSkeleton, outputScene, animSkeletonFile, doMirror);
+                if (settings.ExportAnimations && settings.InputAnimationFiles.Any())
+                    GenerateAnimations(settings, gltfSkeleton, outputScene, animSkeletonFile);
             }
 
-            var meshes = _gltfMeshBuilder.Build(rmv2, settings, doMirror);
+            var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);
+            var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings);
 
             BuildGltfScene(meshes, gltfSkeleton, settings, outputScene);
         }
@@ -82,18 +74,19 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
                 else
                     scene.CreateNode(mesh.Name).WithMesh(mesh);
             }
-            outputScene.SaveGLTF(settings.OutputPath);
+
+            _gltfSaver.Save(outputScene, settings.OutputPath);
         }
 
         // MOve this into skeleton/animation builder
-        void GenerateAnimations(RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene, AnimationFile animSkeletonFile, bool doMirror)
+        void GenerateAnimations(RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene, AnimationFile animSkeletonFile)
         {
             //for (int iAnim = 0; iAnim < settings.InputAnimationFiles.Count; iAnim++)
             {
                 var animAnimationFile = AnimationFile.Create(settings.InputAnimationFiles[0]);
 
                 var animBuilder = new GltfAnimationCreator(gltfSkeleton, animSkeletonFile);
-                animBuilder.CreateFromTWAnim(outputScene, animAnimationFile, doMirror);
+                animBuilder.CreateFromTWAnim(outputScene, animAnimationFile, settings.MirrorMesh);
             }
         }
 
@@ -117,9 +110,10 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             str += $"\tConvertMaterialTextureToBlender:{settings.ConvertMaterialTextureToBlender}\n";
             str += $"\tConvertNormalTextureToBlue:{settings.ConvertNormalTextureToBlue}\n";
             str += $"\tExportAnimations:{settings.ExportAnimations}\n";
+            str += $"\tMirrorMesh:{settings.MirrorMesh}\n";
+            
 
             _logger.Here().Information(str);
         }
-
     }
 }

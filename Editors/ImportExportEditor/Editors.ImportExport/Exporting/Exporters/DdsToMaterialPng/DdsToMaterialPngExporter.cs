@@ -7,7 +7,14 @@ using Shared.Core.PackFiles.Models;
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
 {
-    public class DdsToMaterialPngExporter
+
+    public interface IDdsToMaterialPngExporter
+    {
+        public string Export(string filePath, string outputPath, bool convertToBlenderFormat);
+        public ExportSupportEnum CanExportFile(PackFile file);
+    }
+
+    public class DdsToMaterialPngExporter : IDdsToMaterialPngExporter
     {
         private readonly PackFileService _pfs;
         private readonly IImageSaveHandler _imageSaveHandler;
@@ -45,7 +52,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             return outFilePath;
         }
 
-        internal ExportSupportEnum CanExportFile(PackFile file)
+        public ExportSupportEnum CanExportFile(PackFile file)
         {
             if (FileExtensionHelper.IsDdsMaterialFile(file.Name))
                 return ExportSupportEnum.HighPriority;

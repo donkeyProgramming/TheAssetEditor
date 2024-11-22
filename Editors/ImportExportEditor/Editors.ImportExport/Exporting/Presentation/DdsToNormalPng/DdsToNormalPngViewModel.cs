@@ -11,12 +11,12 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToNormalPng
 {
     internal class DdsToNormalPngViewModel : ObservableObject, IExporterViewModel, IViewProvider<DdsToNormalPngView>
     {
-        private readonly DdsToNormalPngExporter _exporter;
+        private readonly IDdsToNormalPngExporter _exporter;
 
         public string DisplayName => "Dds_to_NormalPng";
         public string OutputExtension => ".png";
 
-        public DdsToNormalPngViewModel(DdsToNormalPngExporter exporter)
+        public DdsToNormalPngViewModel(IDdsToNormalPngExporter exporter)
         {
             _exporter = exporter;
         }

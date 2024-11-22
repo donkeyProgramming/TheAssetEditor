@@ -14,6 +14,7 @@ using Editors.ImportExport.Importing;
 using Editors.ImportExport.Importing.Importers.GltfToRmv;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
+using Shared.Core.DevConfig;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace Editors.ImportExport
@@ -31,9 +32,9 @@ namespace Editors.ImportExport
             services.AddTransient<IExporterViewModel, RmvToGltfExporterViewModel>();
 
             // Exporters
-            services.AddTransient<DdsToMaterialPngExporter>();
+            services.AddTransient<IDdsToMaterialPngExporter, DdsToMaterialPngExporter>();
             services.AddTransient<DdsToPngExporter>();
-            services.AddTransient<DdsToNormalPngExporter>();
+            services.AddTransient<IDdsToNormalPngExporter, DdsToNormalPngExporter>();
             services.AddTransient<RmvToGltfExporter>();
 
             // Importers
@@ -51,6 +52,10 @@ namespace Editors.ImportExport
 
             services.AddTransient<GltfMeshBuilder>();
             services.AddTransient<GltfSkeletonCreator>();
+            services.AddTransient<IGltfTextureHandler, GltfTextureHandler>();
+            services.AddTransient<IGltfSceneSaver, GltfSceneSaver>();
+
+            RegisterAllAsInterface<IDeveloperConfiguration>(services, ServiceLifetime.Transient);
         }
     }
 }

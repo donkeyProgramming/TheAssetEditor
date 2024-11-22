@@ -8,7 +8,14 @@ using Shared.Core.PackFiles.Models;
 
 namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
 {
-    public class DdsToNormalPngExporter
+
+    public interface IDdsToNormalPngExporter
+    {
+        public string Export(string filePath, string outputPath, bool convertToBlueNormalMap);
+        public ExportSupportEnum CanExportFile(PackFile file);
+    }
+
+    public class DdsToNormalPngExporter : IDdsToNormalPngExporter
     {
         private readonly PackFileService _pfs;
         private readonly IImageSaveHandler _imageSaveHandler;
@@ -19,7 +26,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             _imageSaveHandler = imageSaveHandler;
         }
 
-        internal ExportSupportEnum CanExportFile(PackFile file)
+        public ExportSupportEnum CanExportFile(PackFile file)
         {
             if (FileExtensionHelper.IsDdsMaterialFile(file.Name))
                 return ExportSupportEnum.HighPriority;

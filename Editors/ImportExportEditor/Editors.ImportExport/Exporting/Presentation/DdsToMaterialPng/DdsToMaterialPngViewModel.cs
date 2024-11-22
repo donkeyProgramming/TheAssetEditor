@@ -4,7 +4,6 @@ using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
 using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common.DataTemplates;
-using System.IO;
 
 namespace Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng
 {
@@ -14,9 +13,9 @@ namespace Editors.ImportExport.Exporting.Presentation.DdsToMaterialPng
         public string OutputExtension => ".png";
 
         [ObservableProperty] bool _swapBlender = true;
-        private readonly DdsToMaterialPngExporter _exporter;
+        private readonly IDdsToMaterialPngExporter _exporter;
 
-        public DdsToMaterialPngViewModel(DdsToMaterialPngExporter exporter)
+        public DdsToMaterialPngViewModel(IDdsToMaterialPngExporter exporter)
         {
             _exporter = exporter;
         }

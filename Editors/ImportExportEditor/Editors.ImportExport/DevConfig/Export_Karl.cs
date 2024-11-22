@@ -7,7 +7,7 @@ using Shared.Core.Services;
 
 namespace Editors.ImportExport.DevConfig
 {
-    internal class Export_Karl : IDeveloperConfiguration
+    public class Export_Karl : IDeveloperConfiguration
    {
        private readonly PackFileService _packFileService;
        private readonly RmvToGltfExporter _exporter;
@@ -28,7 +28,7 @@ namespace Editors.ImportExport.DevConfig
            var destPath = $"{documentPath}\\AE_Export_Handedness\\";
 
            // clear folder, if it exists
-           DirectoryInfo dir = new DirectoryInfo(destPath);
+           var dir = new DirectoryInfo(destPath);
            if (dir.Exists)
            {
                foreach (FileInfo file in dir.GetFiles())
@@ -37,9 +37,9 @@ namespace Editors.ImportExport.DevConfig
                }
            }
 
-           System.IO.Directory.CreateDirectory(destPath);
+           Directory.CreateDirectory(destPath);
 
-           var settings = new RmvToGltfExporterSettings(meshPackFile, new List<PackFile>() { animPackFile }, null,  destPath, true, true, true);
+           var settings = new RmvToGltfExporterSettings(meshPackFile, new List<PackFile>() { animPackFile },  destPath + "myKarl.gltf", true, true, true, true);
            _exporter.Export(settings);
        }
 

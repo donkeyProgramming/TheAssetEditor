@@ -1,11 +1,6 @@
 ﻿using System.Numerics;
 using Editors.ImportExport.Common;
-using Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng;
-using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
-using Editors.ImportExport.Exporting.Exporters.DdsToPng;
-using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
-using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.RigidModel.Vertex;
 using SharpGLTF.Geometry;
 using SharpGLTF.Geometry.VertexTypes;
@@ -14,53 +9,35 @@ using AlphaMode = SharpGLTF.Materials.AlphaMode;
 
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
-    public record MaterialBuilderTextureInput(string Path, TextureType Type);
-
     public class GltfMeshBuilder
     {
-
-        private readonly PackFileService _packFileService;
-        private readonly DdsToNormalPngExporter _ddsToNormalPngExporter;
-        private readonly DdsToPngExporter _ddsToPngExporter;
-        private readonly DdsToMaterialPngExporter _ddsToMaterialPngExporter;
-
-        public GltfMeshBuilder(PackFileService packFileSerivce, DdsToNormalPngExporter ddsToNormalPngExporter, DdsToPngExporter ddsToPngExporter, DdsToMaterialPngExporter ddsToMaterialPngExporter)
-        {
-            _packFileService = packFileSerivce;
-            _ddsToNormalPngExporter = ddsToNormalPngExporter;
-            _ddsToPngExporter = ddsToPngExporter;
-            _ddsToMaterialPngExporter = ddsToMaterialPngExporter;
-        }
-
-
-        public List<IMeshBuilder<MaterialBuilder>> Build(RmvFile rmv2, RmvToGltfExporterSettings settings, bool doMirror)
+        public List<IMeshBuilder<MaterialBuilder>> Build(RmvFile rmv2, List<TextureResult> textures, RmvToGltfExporterSettings settings)
         {
             var lodLevel = rmv2.ModelList.First();
             var hasSkeleton = string.IsNullOrWhiteSpace(rmv2.Header.SkeletonName) == false;
 
             var meshes = new List<IMeshBuilder<MaterialBuilder>>();
-            foreach (var rmvMesh in lodLevel)
+            for(var i = 0; i < lodLevel.Length; i++)
             {
-                var textures = ExtractTextures(rmvMesh);
+                var rmvMesh = lodLevel[i];
+                var meshTextures = textures.Where(x=>x.MeshIndex == i).ToList();
                 var gltfMaterial = Create(settings, rmvMesh.Material.ModelName + "_Material", textures);
-                var gltfMesh = GenerateMesh(rmvMesh, gltfMaterial, hasSkeleton, doMirror);
+                var gltfMesh = GenerateMesh(rmvMesh.Mesh, rmvMesh.Material.ModelName, gltfMaterial, hasSkeleton, settings.MirrorMesh);
                 meshes.Add(gltfMesh);
             }
             return meshes;
         }
 
-        MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> GenerateMesh(RmvModel rmvMesh, MaterialBuilder material, bool hasSkeleton, bool doMirror)
+        MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> GenerateMesh(RmvMesh rmvMesh, string modelName, MaterialBuilder material, bool hasSkeleton, bool doMirror)
         {
-            var mesh = new MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>(rmvMesh.Material.ModelName);
+            var mesh = new MeshBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>(modelName);
             if (hasSkeleton)
-            {
                 mesh.VertexPreprocessor.SetValidationPreprocessors();
-            }
 
             var prim = mesh.UsePrimitive(material);
 
             var vertexList = new List<VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>>();
-            foreach (var vertex in rmvMesh.Mesh.VertexList)
+            foreach (var vertex in rmvMesh.VertexList)
             {
                 var glTfvertex = new VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4>();
                 glTfvertex.Geometry.Position = new Vector3(vertex.Position.X, vertex.Position.Y, vertex.Position.Z);
@@ -83,22 +60,22 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 vertexList.Add(glTfvertex);
             }
 
-            var triangleCount = rmvMesh.Mesh.IndexList.Length;
+            var triangleCount = rmvMesh.IndexList.Length;
             for (var i = 0; i < triangleCount; i += 3)
             {
 
                 ushort i0, i1, i2;
                 if (doMirror) // if mirrored, flip the winding order
                 {
-                    i0 = rmvMesh.Mesh.IndexList[i + 0];
-                    i1 = rmvMesh.Mesh.IndexList[i + 2];
-                    i2 = rmvMesh.Mesh.IndexList[i + 1];
+                    i0 = rmvMesh.IndexList[i + 0];
+                    i1 = rmvMesh.IndexList[i + 2];
+                    i2 = rmvMesh.IndexList[i + 1];
                 }
                 else
                 {
-                    i0 = rmvMesh.Mesh.IndexList[i + 0];
-                    i1 = rmvMesh.Mesh.IndexList[i + 1];
-                    i2 = rmvMesh.Mesh.IndexList[i + 2];
+                    i0 = rmvMesh.IndexList[i + 0];
+                    i1 = rmvMesh.IndexList[i + 1];
+                    i2 = rmvMesh.IndexList[i + 2];
                 }
 
                 prim.AddTriangle(vertexList[i0], vertexList[i1], vertexList[i2]);
@@ -134,43 +111,15 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             return glTfvertex;
         }
 
-        List<MaterialBuilderTextureInput> ExtractTextures(RmvModel model)
-        {
-            var textures = model.Material.GetAllTextures();
-            var output = textures.Select(x => new MaterialBuilderTextureInput(x.Path, x.TexureType)).ToList();
-            return output;
-        }
-
-        MaterialBuilder Create(RmvToGltfExporterSettings settings, string materialName, List<MaterialBuilderTextureInput> textures)
+        MaterialBuilder Create(RmvToGltfExporterSettings settings, string materialName, List<TextureResult> texturesForModel)
         {
             var material = new MaterialBuilder(materialName)
                   .WithDoubleSide(true)
                   .WithMetallicRoughness()
                   .WithAlpha(AlphaMode.MASK);
 
-            var normalMapTexture = textures.FirstOrDefault(t => t.Type == TextureType.Normal);
-            if (normalMapTexture.Path != null)
-            {
-                var systemPath = _ddsToNormalPngExporter.Export(normalMapTexture.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
-                if (systemPath.Any())
-                    material.WithChannelImage(KnownChannel.Normal, systemPath);
-            }
-
-            var materialTexture = textures.FirstOrDefault(t => t.Type == TextureType.MaterialMap);
-            if (materialTexture.Path != null)
-            {
-                var systemPath = _ddsToMaterialPngExporter.Export(materialTexture.Path, settings.OutputPath, settings.ConvertMaterialTextureToBlender);
-                if (systemPath.Any())
-                    material.WithChannelImage(KnownChannel.MetallicRoughness, systemPath);
-            }
-
-            var baseColourTexture = textures.FirstOrDefault(t => t.Type == TextureType.BaseColour);
-            if (baseColourTexture.Path != null)
-            {
-                var systemPath = _ddsToMaterialPngExporter.Export(baseColourTexture.Path, settings.OutputPath, false); // TODO: write a separate class for base colour
-                if (systemPath.Any())
-                    material.WithChannelImage(KnownChannel.BaseColor, systemPath);
-            }
+            foreach (var texture in texturesForModel)
+                material.WithChannelImage(texture.GlftTexureType, texture.SystemFilePath);
 
             return material;
         }
