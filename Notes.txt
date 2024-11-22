@@ -5,3 +5,6 @@ https://youtu.be/sr8oVx7TkwQ?t=157
 MainViewModel - all editor stuff should be moved out! Use events to sync! 
 Enforce enditable pack can never be ca pack
 All report generators should be dependency created!
+Clean up packfile saving
+Refactor materials
+Add editor for attachmentpoints for meshes. 
