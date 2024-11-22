@@ -28,7 +28,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
 
             _abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
 
-            var saveHelper = new PackFileSaveService(_pfs);
+            var saveHelper = new PackFileSaveService(_pfs, null);
             var materialRepo = new WsMaterialRepository(_pfs);
             _wsMaterialSerializer = new MaterialToWsMaterialSerializer(saveHelper, materialRepo, selectedGame);
         }
