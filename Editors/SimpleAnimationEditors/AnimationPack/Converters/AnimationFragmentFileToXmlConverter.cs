@@ -67,7 +67,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             }
 
             var errorList = new ErrorList();
-            if (_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(pfs, xmlAnimation.Skeleton) == null)
+            if (_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(xmlAnimation.Skeleton) == null)
                 errorList.Warning("Root", $"Skeleton {xmlAnimation.Skeleton} is not found");
 
             foreach (var item in xmlAnimation.AnimationFragmentEntry)

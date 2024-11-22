@@ -143,7 +143,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };
 
             var errorList = new ErrorList();
-            if (_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(pfs, type.Data.SkeletonName) == null)
+            if (_skeletonAnimationLookUpHelper.GetSkeletonFileFromName(type.Data.SkeletonName) == null)
                 errorList.Error("Skeleton", $"Skeleton {type.Data.SkeletonName} is not found");
 
             if (type.Data.TableVersion == 4)

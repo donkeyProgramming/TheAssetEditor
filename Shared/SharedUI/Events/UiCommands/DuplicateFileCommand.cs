@@ -2,6 +2,7 @@
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using System.IO;
+using static Shared.Core.PackFiles.PackFileService;
 
 namespace Shared.Ui.Events.UiCommands
 {
@@ -36,7 +37,8 @@ namespace Shared.Ui.Events.UiCommands
             var path = Path.GetDirectoryName(parentPath);
             var editablePack = _packFileService.GetEditablePack();
 
-            _packFileService.AddFileToPack(editablePack, path, packFile);
+            var fileEntry = new NewFileEntry(path, packFile);
+            _packFileService.AddFilesToPack(editablePack, [fileEntry]);
         }
     }
 }

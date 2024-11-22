@@ -23,12 +23,12 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
         {
             var selectedGame = GameTypeEnum.Warhammer3;
             var appSettings = new ApplicationSettingsService(selectedGame);
-            _pfs = new PackFileService(new PackFileDataBase(), appSettings, new GameInformationFactory(), null, null, null);
+            _pfs = new PackFileService( appSettings, new GameInformationFactory(), null);
             var _outputPack = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
 
             _abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
 
-            var saveHelper = new PackFileSaveService(_pfs);
+            var saveHelper = new PackFileSaveService(_pfs, null);
             var materialRepo = new WsMaterialRepository(_pfs);
             _wsMaterialSerializer = new MaterialToWsMaterialSerializer(saveHelper, materialRepo, selectedGame);
         }

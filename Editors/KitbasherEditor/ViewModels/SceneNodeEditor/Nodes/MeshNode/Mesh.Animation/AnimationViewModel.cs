@@ -12,7 +12,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
     public partial class AnimationViewModel : ObservableObject, IDisposable
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
-        private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _animLookUp;
         Rmv2MeshNode _meshNode;
 
@@ -20,10 +19,9 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         [ObservableProperty] List<AnimatedBone> _animatedBones;
         [ObservableProperty] FilterCollection<AnimatedBone> _attachableBones = new(null);
 
-        public AnimationViewModel(KitbasherRootScene kitbasherRootScene, PackFileService pfs, SkeletonAnimationLookUpHelper animLookUp)
+        public AnimationViewModel(KitbasherRootScene kitbasherRootScene, SkeletonAnimationLookUpHelper animLookUp)
         {
             _kitbasherRootScene = kitbasherRootScene;
-            _pfs = pfs;
             _animLookUp = animLookUp;
         }
 
@@ -33,7 +31,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 
             SkeletonName = _meshNode.Geometry.SkeletonName;
 
-            var skeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, SkeletonName);
+            var skeletonFile = _animLookUp.GetSkeletonFileFromName(SkeletonName);
             var bones = _meshNode.Geometry.GetUniqeBlendIndices();
 
             if (skeletonFile == null)
@@ -62,7 +60,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
 
             var existingSkeletonMeshNode = _meshNode.GetParentModel();
             var existingSkeltonName = existingSkeletonMeshNode.GetMeshNode(0,0).Geometry.SkeletonName;
-            var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(_pfs, existingSkeltonName);
+            var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(existingSkeltonName);
             if (existingSkeletonFile != null)
                 AttachableBones.UpdatePossibleValues(AnimatedBoneHelper.CreateFlatSkeletonList(existingSkeletonFile), new AnimatedBone(-1, "none"));
 

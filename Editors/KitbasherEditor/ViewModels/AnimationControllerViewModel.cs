@@ -63,14 +63,14 @@ namespace Editors.KitbasherEditor.ViewModels
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
 
         public AnimationControllerViewModel(PackFileService pf, 
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
-            EventHub eventHub,
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            IEventHub eventHub,
             KitbasherRootScene kitbasherRootScene)
         {
             _packFileService = pf;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _kitbasherRootScene = kitbasherRootScene;
-            SkeletonList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
+            SkeletonList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
 
             _player = _kitbasherRootScene.Player;
             _player.OnFrameChanged += (currentFrame) => CurrentFrame = currentFrame + 1;

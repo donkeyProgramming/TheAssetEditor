@@ -21,6 +21,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         MountAnimationGeneratorService _animationGenerator;
         BatchProcessOptions _batchProcessOptions;
+        private readonly SaveHelper _saveHelper;
         IAnimationBinGenericFormat _mountFragment;
         IAnimationBinGenericFormat _riderFragment;
 
@@ -32,12 +33,19 @@ namespace AnimationEditor.MountAnimationCreator.Services
         string _animPackName = "test_tables.animpack";
         string _animBinName = "test_tables.bin";
 
-        public BatchProcessorService(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, MountAnimationGeneratorService animationGenerator, BatchProcessOptions batchProcessOptions, uint animationOutputFormat)
+        public BatchProcessorService(
+            PackFileService pfs, 
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            MountAnimationGeneratorService animationGenerator, 
+            BatchProcessOptions batchProcessOptions,
+            SaveHelper saveHelper,
+            uint animationOutputFormat)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _animationGenerator = animationGenerator;
             _batchProcessOptions = batchProcessOptions;
+            _saveHelper = saveHelper;
             _animationOutputFormat = animationOutputFormat;
 
 
@@ -136,12 +144,12 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
             if (_animationOutputFormat != 7)
             {
-                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animFile.Header.SkeletonName);
+                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName( animFile.Header.SkeletonName);
                 animFile.ConvertToVersion(_animationOutputFormat, skeleton, _pfs);
             }
 
             var bytes = AnimationFile.ConvertToBytes(animFile);
-            SaveHelper.Save(_pfs, newAnimationName, null, bytes);
+            _saveHelper.Save(newAnimationName, null, bytes);
 
             return newAnimationName;
         }
@@ -208,7 +216,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         void SaveFiles()
         {
             var bytes = AnimationPackSerializer.ConvertToBytes(_outAnimPack);
-            SaveHelper.Save(_pfs, "animations\\database\\battle\\bin\\" + _animPackName, null, bytes);
+            _saveHelper.Save("animations\\database\\battle\\bin\\" + _animPackName, null, bytes);
         }
 
         AnimationClip LoadAnimation(string path, GameSkeleton skeleton)
@@ -220,7 +228,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         GameSkeleton LoadSkeleton(string skeletonName)
         {
-            var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, skeletonName);
+            var skeletonFile = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(skeletonName);
             return new GameSkeleton(skeletonFile, null);
         }
 

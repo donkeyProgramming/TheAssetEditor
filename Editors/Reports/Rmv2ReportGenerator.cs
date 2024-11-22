@@ -20,7 +20,7 @@ namespace Editors.Reports
 
         public void Create(string gameDirectory, string outputDir = @"c:\temp\AssReports\rmv\")
         {
-            var fileList = _pfs.FindAllWithExtention(".rigid_model_v2");
+            var fileList = PackFileServiceUtility.FindAllWithExtention(_pfs, ".rigid_model_v2");
 
             var failedMeshRecords = new List<dynamic>();
             var versionInfoRecords = new List<dynamic>();

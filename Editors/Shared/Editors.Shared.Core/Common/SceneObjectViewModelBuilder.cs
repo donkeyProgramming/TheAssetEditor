@@ -49,7 +49,7 @@ namespace Editors.Shared.Core.Common
                         _sceneObjectEditor.SetMesh(mainAsset, input.Mesh);
 
                     if (input.Animation != null)
-                        _sceneObjectEditor.SetAnimation(mainAsset, _skeletonHelper.FindAnimationRefFromPackFile(input.Animation, _pfs));
+                        _sceneObjectEditor.SetAnimation(mainAsset, _skeletonHelper.FindAnimationRefFromPackFile(input.Animation));
 
                     if (input.FragmentName != null)
                     {

@@ -21,7 +21,7 @@ namespace GameWorld.Core.WpfWindow
         WpfGraphicsDeviceService _deviceServiceHandle;
         private readonly ResourceLibrary _resourceLibrary;
         private readonly IExceptionService _exceptionService;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
         private readonly string _contentDir;
 
         private ContentManager _content;
@@ -34,7 +34,7 @@ namespace GameWorld.Core.WpfWindow
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        public WpfGame(ResourceLibrary resourceLibrary, IExceptionService exceptionService, EventHub eventHub, string contentDir = "Content")
+        public WpfGame(ResourceLibrary resourceLibrary, IExceptionService exceptionService, IEventHub eventHub, string contentDir = "Content")
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));

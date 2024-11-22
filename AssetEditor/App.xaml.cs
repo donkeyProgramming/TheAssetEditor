@@ -7,6 +7,7 @@ using AssetEditor.ViewModels;
 using AssetEditor.Views;
 using AssetEditor.Views.Settings;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
@@ -32,6 +33,10 @@ namespace AssetEditor
             var forceValidateServiceScopes = Debugger.IsAttached;
             _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes);
             _rootScope = _serviceProvider.CreateScope();
+
+            _ = _rootScope.ServiceProvider.GetRequiredService<RecentFilesTracker>(); // Force instance
+            var scopeRepo = _rootScope.ServiceProvider.GetRequiredService<ScopeRepository>();
+            scopeRepo.Root = _rootScope;
 
             var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             settingsService.AllowSettingsUpdate = true;
@@ -64,8 +69,7 @@ namespace AssetEditor
                 {
                     var gameInformationFactory = _rootScope.ServiceProvider.GetRequiredService<GameInformationFactory>();
                     var packfileService = _rootScope.ServiceProvider.GetRequiredService<PackFileService>();
-                    var gameName = gameInformationFactory.GetGameById(settingsService.CurrentSettings.CurrentGame).DisplayName;
-                    var loadRes = packfileService.LoadAllCaFiles(gamePath, gameName);
+                    var loadRes = packfileService.LoadAllCaFiles(settingsService.CurrentSettings.CurrentGame);
                     if (!loadRes)
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
                 }

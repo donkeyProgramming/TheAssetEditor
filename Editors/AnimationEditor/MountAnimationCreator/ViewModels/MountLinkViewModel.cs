@@ -76,7 +76,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         public List<IAnimationBinGenericFormat> LoadAnimationSetForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
             var outputFragments = new List<IAnimationBinGenericFormat>();
-            var animPacks = _pfs.GetAllAnimPacks();
+            var animPacks = PackFileServiceUtility.GetAllAnimPacks(_pfs);
             foreach (var animPack in animPacks)
             {
                 if (onlyPacksThatCanBeSaved == true)
@@ -119,7 +119,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
             if (value != null)
             {
                 var file = _pfs.FindFile(value.AnimationFile);
-                var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
+                var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
                 _assetViewModelEditor.SetAnimation(_mount, animationRef);
 
                 var lookUp = "RIDER_" + value.SlotName;
@@ -140,7 +140,7 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
                 }
                 else
                 {
-                    var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
+                    var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
                     _assetViewModelEditor.SetAnimation(_rider, animationRef);
                 }
             }

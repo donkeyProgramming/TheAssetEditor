@@ -32,11 +32,12 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
 
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly SelectionManager _selectionManager;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
 
-        public VertexDebuggerViewModel(RenderEngineComponent renderEngineComponent,
+        public VertexDebuggerViewModel(
+            RenderEngineComponent renderEngineComponent,
             SelectionManager selectionManager,
-            EventHub eventHub)
+            IEventHub eventHub)
         {
             _renderEngineComponent = renderEngineComponent;
             _selectionManager = selectionManager;

@@ -70,7 +70,7 @@ namespace Shared.GameFormats.AnimationPack
             foreach (var slot in Values)
                 data[slot.Value] = new List<string>();
 
-            var animPacks = pfs.GetAllAnimPacks();
+            var animPacks = PackFileServiceUtility.GetAllAnimPacks(pfs);
             foreach (var animPack in animPacks)
             {
                 var animPackFile = AnimationPackSerializer.Load(animPack, pfs);

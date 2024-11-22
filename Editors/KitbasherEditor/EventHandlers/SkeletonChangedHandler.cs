@@ -14,7 +14,7 @@ namespace Editors.KitbasherEditor.EventHandlers
             _sceneManager = sceneManager;
         }
 
-        public void Subscribe(EventHub eventHub)
+        public void Subscribe(IEventHub eventHub)
         {
             eventHub.Register<KitbasherSkeletonChangedEvent>(this, OnSkeletonChanged);
         }

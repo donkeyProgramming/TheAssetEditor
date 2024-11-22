@@ -45,7 +45,7 @@ namespace Editors.KitbasherEditor.ViewModels
         private bool _hasUnsavedChanges;
 
         public KitbasherViewModel(
-            EventHub eventHub,
+            IEventHub eventHub,
             IWpfGame gameWorld,
             MenuBarViewModel menuBarViewModel,
             AnimationControllerViewModel animationControllerViewModel,

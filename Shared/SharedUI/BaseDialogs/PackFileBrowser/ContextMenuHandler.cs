@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -15,6 +16,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common;
 using Shared.Ui.Events.UiCommands;
+using static Shared.Core.PackFiles.PackFileService;
 using Clipboard = System.Windows.Clipboard;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
@@ -132,7 +134,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 {
                     var fileName = Path.GetFileName(file);
                     var packFile = new PackFile(fileName, new MemorySource(File.ReadAllBytes(file)));
-                    _packFileService.AddFileToPack(_selectedNode.FileOwner, parentPath, packFile);
+                    var item = new NewFileEntry(parentPath, packFile);
+                    _packFileService.AddFilesToPack(_selectedNode.FileOwner, [item]);
                 }
             }
         }
@@ -149,7 +152,24 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 var parentPath = _selectedNode.GetFullPath();
-                _packFileService.AddFolderContent(_selectedNode.FileOwner, parentPath, dialog.SelectedPath);
+                var originalFilePaths = Directory.GetFiles(parentPath, "*", SearchOption.AllDirectories);
+                var filePaths = originalFilePaths.Select(x => x.Replace(dialog.SelectedPath + "\\", "")).ToList();
+                if (!string.IsNullOrWhiteSpace(parentPath))
+                    parentPath += "\\";
+               
+                var filesAdded = new List<NewFileEntry>();
+                for (var i = 0; i < filePaths.Count; i++)
+                {
+                    var currentPath = filePaths[i];
+                    var filename = System.IO.Path.GetFileName(currentPath);
+           
+                    var source = MemorySource.FromFile(originalFilePaths[i]);
+                    var file = new PackFile(filename, source);
+                    filesAdded.Add(new NewFileEntry(parentPath.ToLower(), file));
+       
+               }
+
+                _packFileService.AddFilesToPack(_selectedNode.FileOwner, filesAdded);
             }
 
         }
@@ -216,7 +236,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             {
                 try
                 {
-                    _packFileService.Save(_selectedNode.FileOwner, systemPath, false);
+                    _packFileService.SavePackContainer(_selectedNode.FileOwner, systemPath, false);
                     _selectedNode.UnsavedChanged = false;
                     _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
                 }
@@ -239,7 +259,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
             using (new WaitCursor())
             {
-                _packFileService.Save(_selectedNode.FileOwner, saveFileDialog.FileName, false);
+                _packFileService.SavePackContainer(_selectedNode.FileOwner, saveFileDialog.FileName, false);
                 _selectedNode.UnsavedChanged = false;
                 _selectedNode.ForeachNode((node) => node.UnsavedChanged = false);
             }

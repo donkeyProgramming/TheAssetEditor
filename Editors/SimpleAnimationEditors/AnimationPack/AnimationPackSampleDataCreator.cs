@@ -10,11 +10,11 @@ namespace CommonControls.Editors.AnimationPack
 {
     public class AnimationPackSampleDataCreator
     {
-        public static PackFile CreateAnimationDbWarhammer3(PackFileService pfs)
+        public static PackFile CreateAnimationDbWarhammer3(SaveHelper saveHelper, PackFileService pfs)
         {
             TextInputWindow window = new TextInputWindow("New AnimPack name", "");
             if (window.ShowDialog() == true)
-                return CreateAnimationDbWarhammer3(pfs, window.TextValue);
+                return CreateAnimationDbWarhammer3(saveHelper, pfs, window.TextValue);
             return null;
         }
 
@@ -25,7 +25,7 @@ namespace CommonControls.Editors.AnimationPack
             return filePath;
         }
 
-        public static PackFile CreateAnimationDbWarhammer3(PackFileService pfs, string name)
+        public static PackFile CreateAnimationDbWarhammer3(SaveHelper saveHelper, PackFileService pfs, string name)
         {
             var filePath = GenerateWh3AnimPackName(name);
 
@@ -36,10 +36,10 @@ namespace CommonControls.Editors.AnimationPack
             }
 
             var animPack = new AnimationPackFile("Placeholder");
-            return SaveHelper.Save(pfs, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
+            return saveHelper.Save(filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
         }
 
-        public static void CreateAnimationDb3k(PackFileService pfs)
+        public static void CreateAnimationDb3k(PackFileService pfs, SaveHelper saveHelper)
         {
             TextInputWindow window = new TextInputWindow("New AnimPack name", "");
             if (window.ShowDialog() == true)
@@ -54,7 +54,7 @@ namespace CommonControls.Editors.AnimationPack
 
                 // Create dummy data
                 var animPack = new AnimationPackFile("Placeholder");
-                SaveHelper.Save(pfs, filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
+                saveHelper.Save(filePath, null, AnimationPackSerializer.ConvertToBytes(animPack));
             }
         }
 

@@ -5,10 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using Shared.Core.Events;
+using Shared.Core.Events.Global;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common;
+using Shared.Ui.Events.UiCommands;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
@@ -18,6 +21,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
     public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable, IDropTarget<TreeNode>
     {
         protected PackFileService _packFileService;
+        private readonly IEventHub? _eventHub;
+
         public event FileSelectedDelegate FileOpen;
         public event NodeSelectedDelegate NodeSelected;
 
@@ -40,25 +45,42 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         public ContextMenuHandler ContextMenu { get; set; }
 
-        public PackFileBrowserViewModel(PackFileService packFileService, bool ignoreCaFiles = false)
+        public PackFileBrowserViewModel(PackFileService packFileService, IEventHub? eventHub, bool ignoreCaFiles = false)
         {
+
+            // Allow doubleclick 
+            // Show Ca files
+            // ContentMenu
+
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
             ClearTextCommand = new RelayCommand(OnClearText);
 
             _packFileService = packFileService;
-            _packFileService.Database.PackFileContainerLoaded += ReloadTree;
-            _packFileService.Database.PackFileContainerRemoved += PackFileContainerRemoved;
-            _packFileService.Database.ContainerUpdated += ContainerUpdated;
+            _eventHub = eventHub;
 
-            _packFileService.Database.PackFilesUpdated += Database_PackFilesUpdated;
-            _packFileService.Database.PackFilesAdded += Database_PackFilesAdded;
-            _packFileService.Database.PackFilesRemoved += Database_PackFilesRemoved;
-            _packFileService.Database.PackFileFolderRemoved += Database_PackFileFolderRemoved;
-            _packFileService.Database.PackFileFolderRenamed += Database_PackFileFolderRenamed;
+
+            if (_eventHub != null)
+            {
+                _eventHub.Register<PackFileContainerSetAsMainEditableEvent>(this, ContainerUpdated);
+                _eventHub.Register<PackFileContainerRemovedEvent>(this, PackFileContainerRemoved);
+                _eventHub.Register<PackFileContainerAddedEvent>(this, x => ReloadTree(x.Container));
+                _eventHub.Register<PackFileContainerFilesUpdatedEvent>(this, Database_PackFilesUpdated);
+                _eventHub.Register<PackFileContainerFilesAddedEvent>(this, x=> AddFiles(x.Container, x.AddedFiles));
+                _eventHub.Register<PackFileContainerFilesRemovedEvent>(this, x => Database_PackFilesRemoved(x.Container, x.RemovedFiles));
+
+                _eventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => Database_PackFileFolderRemoved(x.Container, x.Folder));
+                _eventHub.Register<PackFileContainerFolderRenamedEvent>(this, x => Database_PackFileFolderRenamed(x.Container, x.NewNodePath));
+            }
+            //_packFileService.Database.PackFileContainerLoaded += ReloadTree;
+            //_packFileService.Database.PackFilesUpdated += Database_PackFilesUpdated;
+            //_packFileService.Database.PackFilesAdded += Database_PackFilesAdded;
+            //_packFileService.Database.PackFilesRemoved += Database_PackFilesRemoved;
+            //_packFileService.Database.PackFileFolderRemoved += Database_PackFileFolderRemoved;
+            //_packFileService.Database.PackFileFolderRenamed += Database_PackFileFolderRenamed;
 
             Filter = new PackFileFilter(Files);
 
-            foreach (var item in _packFileService.Database.PackFiles)
+            foreach (var item in _packFileService.GetAllPackfileContainers())
             {
                 var loadFile = true;
                 if (ignoreCaFiles)
@@ -101,13 +123,13 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             AddFiles(container, files);
         }
 
-        private void Database_PackFilesUpdated(PackFileContainer container, List<PackFile> files)
+        private void Database_PackFilesUpdated(PackFileContainerFilesUpdatedEvent e)
         {
-            foreach (var file in files)
+            foreach (var file in e.ChangedFiles)
             {
-                var rootNode = GetPackFileCollectionRootNode(container);
+                var rootNode = GetPackFileCollectionRootNode(e.Container);
                 rootNode.UnsavedChanged = true;
-                var node = GetNodeFromPackFile(container, file);
+                var node = GetNodeFromPackFile(e.Container, file);
                 node.Name = file.Name;
                 node.UnsavedChanged = true;
 
@@ -141,12 +163,14 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             }
         }
 
-        private void ContainerUpdated(PackFileContainer pf)
+        private void ContainerUpdated(PackFileContainerSetAsMainEditableEvent e)
         {
             foreach (var item in Files)
                 item.IsMainEditabelPack = false;
 
-            Files.FirstOrDefault(x => x.FileOwner == pf).IsMainEditabelPack = true;
+            var newContiner = Files.FirstOrDefault(x => x.FileOwner == e.Container);
+            if(newContiner != null)
+                newContiner.IsMainEditabelPack = true;
         }
 
 
@@ -317,23 +341,15 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             Files.Add(root);
         }
 
-        private bool PackFileContainerRemoved(PackFileContainer container)
+        private void PackFileContainerRemoved(PackFileContainerRemovedEvent e)
         {
-            var node = Files.FirstOrDefault(x => x.FileOwner == container);
+            var node = Files.FirstOrDefault(x => x.FileOwner == e.Container);
             Files.Remove(node);
-            return true;
         }
 
         public void Dispose()
         {
-            _packFileService.Database.PackFileContainerLoaded -= ReloadTree;
-            _packFileService.Database.PackFileContainerRemoved -= PackFileContainerRemoved;
-            _packFileService.Database.ContainerUpdated -= ContainerUpdated;
-
-            _packFileService.Database.PackFilesUpdated -= Database_PackFilesUpdated;
-            _packFileService.Database.PackFilesAdded -= Database_PackFilesAdded;
-            _packFileService.Database.PackFilesRemoved -= Database_PackFilesRemoved;
-            _packFileService.Database.PackFileFolderRemoved -= Database_PackFileFolderRemoved;
+            _eventHub?.UnRegister(this);
         }
 
         public bool AllowDrop(TreeNode node, TreeNode targetNode = null)

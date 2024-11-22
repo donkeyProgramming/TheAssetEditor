@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -9,6 +8,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using static Shared.Core.PackFiles.PackFileService;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -40,9 +40,12 @@ namespace Editors.Audio.AudioEditor
         public static void AddAudioProjectToPackFile(PackFileService packFileService, Dictionary<string, List<Dictionary<string, object>>> eventsData, string audioProjectName)
         {
             var audioProjectJson = ConvertEventsDataToAudioProject(eventsData);
-            var pack = packFileService.GetEditablePack();
+            var editablePack = packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(audioProjectJson);
-            packFileService.AddFileToPack(pack, "AudioProjects", new PackFile($"{audioProjectName}.json", new MemorySource(byteArray)));
+
+            var fileEntry = new NewFileEntry("AudioProjects", new PackFile($"{audioProjectName}.json", new MemorySource(byteArray)));
+            packFileService.AddFilesToPack(editablePack, [fileEntry]);
+
             _logger.Here().Information($"Saved Audio Project file: {audioProjectName}");
         }
 
@@ -166,7 +169,7 @@ namespace Editors.Audio.AudioEditor
                             eventDataItem[stateGroup] = state;
                         }
 
-                        var fileNames = decisionTree.AudioFiles.Select(filePath => Path.GetFileName(filePath));
+                        var fileNames = decisionTree.AudioFiles.Select(filePath => System.IO.Path.GetFileName(filePath));
                         var fileNamesString = string.Join(", ", fileNames);
 
                         eventDataItem["AudioFilesDisplay"] = fileNamesString;

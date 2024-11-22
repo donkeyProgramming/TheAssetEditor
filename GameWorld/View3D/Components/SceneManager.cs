@@ -38,9 +38,9 @@ namespace GameWorld.Core.Components
 
 
         private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
 
-        public SceneManager(RenderEngineComponent renderEngineComponent, EventHub eventHub)
+        public SceneManager(RenderEngineComponent renderEngineComponent, IEventHub eventHub)
         {
             _renderEngineComponent = renderEngineComponent;
             _eventHub = eventHub;

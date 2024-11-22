@@ -44,7 +44,7 @@
      
      */
 
-    public class GameInformation
+    public class GameInformation // Convert to record
     {
         public GameTypeEnum Type { get; set; }
         public string DisplayName { get; set; }

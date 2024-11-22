@@ -8,8 +8,8 @@ namespace Shared.TestUtility
     {
         public static PackFileService Create(string path, GameTypeEnum gameTypeEnum = GameTypeEnum.Warhammer3)
         {
-            var pfs = new PackFileService(new PackFileDataBase(), new ApplicationSettingsService(gameTypeEnum), new GameInformationFactory(), null, null, null);
-            pfs.LoadFolderContainer(path);
+            var pfs = new PackFileService(new ApplicationSettingsService(gameTypeEnum), new GameInformationFactory(), null);
+            pfs.LoadSystemFolderAsPackFileContainer(path);
             return pfs;
         }
     }

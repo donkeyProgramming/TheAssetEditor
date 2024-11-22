@@ -51,7 +51,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public CommandExecutor CommandExecutor { get => _commandExecutor; private set { _commandExecutor = value; } }
         private CommandExecutor _commandExecutor;
-
+        private readonly SaveHelper _saveHelper;
         private SceneObject _newAnimation;
 
         public SceneObject Mount { get => _mount; private set { _mount = value; } }
@@ -166,7 +166,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
             CommandFactory commandFactory,
             SelectionManager selectionManager,
             GizmoComponent gizmoComponent,
-            CommandExecutor commandExecutor)
+            CommandExecutor commandExecutor,
+            SaveHelper saveHelper)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
             _animationPlayerViewModel = animationPlayerViewModel;
@@ -181,7 +182,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             _gizmoComponent = gizmoComponent;
             _commandExecutor = commandExecutor;
-
+            _saveHelper = saveHelper;
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
 
             ActiveOutputFragment = new FilterCollection<IAnimationBinGenericFormat>(null, OutputAnimationSetSelected);
@@ -700,7 +701,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             var path = _rider.AnimationName.Value.AnimationFile;
             MessageBox.Show($"this will save with anim version {animFile.Header.Version}\n"+
                             $"on this path {path}\n", "warn", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            SaveHelper.Save(_pfs, path, null, AnimationFile.ConvertToBytes(animFile), true);
+            _saveHelper.Save(path, null, AnimationFile.ConvertToBytes(animFile), true);
             IsDirty.Value = false;
         }
         public void SaveAs()
@@ -715,7 +716,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             MessageBox.Show($"this will save with anim version {animFile.Header.Version}", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             var bytes = AnimationFile.ConvertToBytes(animFile);
-            SaveHelper.SaveAs(_pfs, bytes, ".anim");
+            _saveHelper.SaveAs(bytes, ".anim");
             IsDirty.Value = false;
         }
     }

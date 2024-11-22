@@ -15,7 +15,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
     public partial class SceneExplorerContextMenuHandler : ObservableObject, IDisposable
     {
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
         private readonly SceneManager _sceneManager;
         private readonly CommandFactory _commandFactory;
 
@@ -26,7 +26,7 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         [ObservableProperty] ObservableCollection<ContextMenuItem> _items = [];
 
-        public SceneExplorerContextMenuHandler(EventHub eventHub, SceneManager sceneManager, CommandFactory commandFactory)
+        public SceneExplorerContextMenuHandler(IEventHub eventHub, SceneManager sceneManager, CommandFactory commandFactory)
         {
             _eventHub = eventHub;
             _sceneManager = sceneManager;

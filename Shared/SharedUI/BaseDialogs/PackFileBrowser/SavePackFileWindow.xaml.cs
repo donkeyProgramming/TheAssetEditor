@@ -7,7 +7,6 @@ using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace CommonControls.PackFileBrowser
 {
-
     public partial class SavePackFileWindow : Window, IDisposable, INotifyPropertyChanged
     {
         public PackFile SelectedFile { get; set; }
@@ -26,7 +25,7 @@ namespace CommonControls.PackFileBrowser
         public SavePackFileWindow(PackFileService packfileService)
         {
             _packfileService = packfileService;
-            ViewModel = new PackFileBrowserViewModel(packfileService, true);
+            ViewModel = new PackFileBrowserViewModel(packfileService, null, true);
             ViewModel.ContextMenu = new OpenFileContextMenuHandler(packfileService);
             ViewModel.FileOpen += ViewModel_FileOpen;
             ViewModel.NodeSelected += ViewModel_FileSelected;

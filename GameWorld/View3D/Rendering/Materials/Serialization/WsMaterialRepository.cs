@@ -65,7 +65,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         {
             var materialList = new Dictionary<string, string>();
 
-            var materialPacks = packFileService.FindAllWithExtentionIncludePaths(".material");
+            var materialPacks = PackFileServiceUtility.FindAllWithExtentionIncludePaths(packFileService, ".material");
             materialPacks = materialPacks.Where(x => x.Pack.Name.Contains(".xml.material")).ToList();
 
             foreach (var (fileName, pack) in materialPacks)

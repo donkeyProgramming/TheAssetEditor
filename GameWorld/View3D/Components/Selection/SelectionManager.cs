@@ -19,7 +19,7 @@ namespace GameWorld.Core.Components.Selection
     public class SelectionManager : BaseComponent, IDisposable
     {
         ISelectionState _currentState;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
         private readonly RenderEngineComponent _renderEngine;
         BasicShader _wireframeEffect;
         BasicShader _selectedFacesEffect;
@@ -29,7 +29,7 @@ namespace GameWorld.Core.Components.Selection
         private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
 
-        public SelectionManager(EventHub eventHub, RenderEngineComponent renderEngine, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent)
+        public SelectionManager(IEventHub eventHub, RenderEngineComponent renderEngine, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent)
         {
             _eventHub = eventHub;
             _renderEngine = renderEngine;

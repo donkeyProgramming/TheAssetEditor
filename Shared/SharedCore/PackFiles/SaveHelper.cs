@@ -2,16 +2,25 @@
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using static Shared.Core.PackFiles.PackFileService;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace Shared.Core.PackFiles
 {
-    public static class SaveHelper
+    public class SaveHelper // merge with PackFileSaveService
     {
-        public static string BackupFolderPath = "Backup";
-        static readonly ILogger _logger = Logging.CreateStatic(typeof(SaveHelper));
+        private static string _backupFolderPath = "Backup";
+        private readonly ILogger _logger = Logging.Create< SaveHelper>();
+        private readonly PackFileService packFileService;
+        private readonly IPackFileUiProvider _packFileUiProvider;
 
-        static bool PrompOverrideOrNew(PackFileService packFileService, PackFile existingFile, out string newFullPath)
+        public SaveHelper(PackFileService packFileService, IPackFileUiProvider packFileUiProvider)
+        {
+            this.packFileService = packFileService;
+            _packFileUiProvider = packFileUiProvider;
+        }
+
+        bool PrompOverrideOrNew(PackFile existingFile, out string newFullPath)
         {
             var owningPack = packFileService.GetPackFileContainer(existingFile);
             var fullPath = packFileService.GetFullPath(existingFile, owningPack);
@@ -21,7 +30,7 @@ namespace Shared.Core.PackFiles
             {
                 var extention = Path.GetExtension(fullPath);
 
-                var dialogResult = packFileService.UiProvider.DisplaySaveDialog(packFileService, new List<string>() { extention }, out _, out var filePath);
+                var dialogResult = _packFileUiProvider.DisplaySaveDialog(packFileService, [extention], out _, out var filePath);
                 if (dialogResult == true)
                 {
                     var path = filePath!;
@@ -45,7 +54,7 @@ namespace Shared.Core.PackFiles
             return true;
         }
 
-        public static PackFile SavePackFile(PackFileService packFileService, string folder, PackFile pf, bool promptSaveOverride = true)
+        public PackFile SavePackFile(string folder, PackFile pf, bool promptSaveOverride = true)
         {
             if (packFileService.HasEditablePackFile() == false)
                 return null;
@@ -56,7 +65,7 @@ namespace Shared.Core.PackFiles
 
             if (existingFile != null && promptSaveOverride == false)
             {
-                var prompResult = PrompOverrideOrNew(packFileService, existingFile, out var newFullPath);
+                var prompResult = PrompOverrideOrNew(existingFile, out var newFullPath);
                 if (prompResult == false)
                     return null;    // User did not want to save
                 fullPath = newFullPath;
@@ -67,7 +76,9 @@ namespace Shared.Core.PackFiles
             {
                 // Create new
                 var directoryPath = Path.GetDirectoryName(fullPath);
-                packFileService.AddFileToPack(editablePack, directoryPath, pf);
+                var item = new NewFileEntry(directoryPath!, pf);
+                packFileService.AddFilesToPack(editablePack, [item]);
+
                 return pf;
             }
             else
@@ -78,7 +89,7 @@ namespace Shared.Core.PackFiles
             }
         }
 
-        public static PackFile Save(PackFileService packFileService, string filename, PackFile? packFile, byte[]? updatedData = null, bool promptSaveOverride = true)
+        public PackFile Save(string filename, PackFile? packFile, byte[]? updatedData = null, bool promptSaveOverride = true)
         {
             filename = filename.ToLower();
             var selectedEditabelPackFile = packFileService.GetEditablePack();
@@ -95,7 +106,7 @@ namespace Shared.Core.PackFiles
                 if (MessageBox.Show($"Replace existing file?\n{fullPath} \nin packfile:{selectedEditabelPackFile.Name}", "", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
                 {
                     var extention = Path.GetExtension(fullPath);
-                    var dialogResult = packFileService.UiProvider.DisplaySaveDialog(packFileService, new List<string>() { extention }, out _, out var filePath);
+                    var dialogResult = _packFileUiProvider.DisplaySaveDialog(packFileService, new List<string>() { extention }, out _, out var filePath);
 
                     if (dialogResult == true)
                     {
@@ -123,7 +134,10 @@ namespace Shared.Core.PackFiles
                 if (data == null)
                     data = packFile.DataSource.ReadData();
                 var newPackFile = new PackFile(justFileName, new MemorySource(data));
-                packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, newPackFile);
+
+                var item = new NewFileEntry(directoryPath!, newPackFile);
+                packFileService.AddFilesToPack(selectedEditabelPackFile, [item]);
+
                 return newPackFile;
             }
             else
@@ -157,9 +171,9 @@ namespace Shared.Core.PackFiles
             return text;
         }
 
-        public static PackFile SaveAs(PackFileService packFileService, byte[] data, string extention)
+        public PackFile SaveAs(byte[] data, string extention)
         {
-            var dialogResult = packFileService.UiProvider.DisplaySaveDialog(packFileService, new List<string>() { extention }, out var selectedFile, out var filePath);
+            var dialogResult = _packFileUiProvider.DisplaySaveDialog(packFileService, new List<string>() { extention }, out var selectedFile, out var filePath);
             if (dialogResult == true)
             {
                 var path = filePath!;
@@ -182,7 +196,10 @@ namespace Shared.Core.PackFiles
                     var directoryPath = Path.GetDirectoryName(path);
                     var justFileName = Path.GetFileName(path);
                     var newPackFile = new PackFile(justFileName, new MemorySource(data));
-                    packFileService.AddFileToPack(selectedEditabelPackFile, directoryPath, newPackFile);
+        
+                    var item = new NewFileEntry(directoryPath!, newPackFile);
+                    packFileService.AddFilesToPack(selectedEditabelPackFile, [item]);
+
                     return newPackFile;
                 }
             }
@@ -197,9 +214,9 @@ namespace Shared.Core.PackFiles
                 var dirName = Path.GetDirectoryName(originalFileName);
                 var fileName = Path.GetFileNameWithoutExtension(originalFileName);
                 var extention = Path.GetExtension(originalFileName);
-                var uniqeFileName = IndexedFilename(Path.Combine(dirName, BackupFolderPath, fileName), extention);
+                var uniqeFileName = IndexedFilename(Path.Combine(dirName, _backupFolderPath, fileName), extention);
 
-                Directory.CreateDirectory(Path.Combine(dirName, BackupFolderPath));
+                Directory.CreateDirectory(Path.Combine(dirName, _backupFolderPath));
                 File.Copy(originalFileName, uniqeFileName);
             }
         }

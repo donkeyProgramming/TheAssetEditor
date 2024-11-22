@@ -31,7 +31,8 @@ namespace AssetEditor.UiCommands
                 return;
             }
 
-            foreach (var packFile in _packFileService.Database.PackFiles)
+            var packFileContainer = _packFileService.GetAllPackfileContainers();
+            foreach (var packFile in packFileContainer)
             {
                 if (packFile.SystemFilePath == gamePath.Path)
                 {
@@ -42,7 +43,7 @@ namespace AssetEditor.UiCommands
 
             using (new WaitCursor())
             {
-                _packFileService.LoadAllCaFiles(gamePath.Path, _gameInformationFactory.GetGameById(game).DisplayName);
+                _packFileService.LoadAllCaFiles(game);
             }
         }
     }

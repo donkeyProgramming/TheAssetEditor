@@ -23,7 +23,7 @@ namespace CommonControls.PackFileBrowser
 
         void Create(PackFileService packfileService)
         {
-            ViewModel = new PackFileBrowserViewModel(packfileService);
+            ViewModel = new PackFileBrowserViewModel(packfileService, null);
             ViewModel.ContextMenu = new OpenFileContextMenuHandler(packfileService);
             ViewModel.FileOpen += ViewModel_FileOpen;
             ViewModel.Filter.AutoExapandResultsAfterLimitedCount = 50;

@@ -37,7 +37,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
             _renderEngineComponent = renderEngineComponent;
             _uiCommandFactory = uiCommandFactory;
             
-            SkeletonNameList = _skeletonAnimationLookUpHelper.SkeletonFileNames;
+            SkeletonNameList = _skeletonAnimationLookUpHelper.GetAllSkeletonFileNames();
         }
 
 
