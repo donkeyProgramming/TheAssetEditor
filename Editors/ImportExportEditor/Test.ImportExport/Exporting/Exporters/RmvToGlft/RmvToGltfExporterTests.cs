@@ -21,12 +21,13 @@ namespace Test.ImportExport.Exporting.Exporters.RmvToGlft
             var meshBuilder = new GltfMeshBuilder();
             var normalExporter = new Mock<IDdsToNormalPngExporter>();
             var materialExporter = new Mock<IDdsToMaterialPngExporter>();
+            var animationCreator = new GltfAnimationCreator(pfs);
             var textureHandler = new GltfTextureHandler(normalExporter.Object, materialExporter.Object);
             var sceneSaver = new TestGltfSceneSaver();
 
             // Act
             var mesh = pfs.FindFile(_rmvFilePathKarl);
-            var exporter = new RmvToGltfExporter(pfs, sceneSaver, meshBuilder, textureHandler);
+            var exporter = new RmvToGltfExporter(sceneSaver, meshBuilder, textureHandler, animationCreator);
             var settings = new RmvToGltfExporterSettings(mesh!, [], @"C:\test\myExport.gltf", true, true, true, true);
             exporter.Export(settings);
 

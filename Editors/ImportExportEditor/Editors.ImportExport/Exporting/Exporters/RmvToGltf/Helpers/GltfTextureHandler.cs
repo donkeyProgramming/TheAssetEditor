@@ -8,12 +8,10 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
     public record TextureResult(int MeshIndex, string SystemFilePath, KnownChannel GlftTexureType);
 
-
     public interface IGltfTextureHandler
     {
         public List<TextureResult> HandleTextures(RmvFile rmvFile, RmvToGltfExporterSettings settings);
     }
-
 
     public class GltfTextureHandler : IGltfTextureHandler
     {

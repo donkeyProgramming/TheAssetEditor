@@ -2,9 +2,7 @@
 using Editors.ImportExport.Misc;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.GameFormats.Animation;
 using Shared.GameFormats.RigidModel;
 using SharpGLTF.Geometry;
 using SharpGLTF.Materials;
@@ -15,17 +13,17 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
     public class RmvToGltfExporter
     {
         private readonly ILogger _logger = Logging.Create<RmvToGltfExporter>();
-        private readonly PackFileService _packFileService;
         private readonly IGltfSceneSaver _gltfSaver;
         private readonly GltfMeshBuilder _gltfMeshBuilder;
         private readonly IGltfTextureHandler _gltfTextureHandler;
+        private readonly GltfAnimationCreator _gltfAnimationCreator;
 
-        public RmvToGltfExporter(PackFileService packFileSerivce, IGltfSceneSaver gltfSaver, GltfMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler)
+        public RmvToGltfExporter(IGltfSceneSaver gltfSaver, GltfMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler, GltfAnimationCreator gltfAnimationCreator)
         {
-            _packFileService = packFileSerivce;
             _gltfSaver = gltfSaver;
             _gltfMeshBuilder = gltfMeshBuilder;
             _gltfTextureHandler = gltfTextureHandler;
+            _gltfAnimationCreator = gltfAnimationCreator;
         }
 
         internal ExportSupportEnum CanExportFile(PackFile file)
@@ -42,20 +40,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             LogSettings(settings);
 
             var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
-            var hasSkeleton = string.IsNullOrWhiteSpace(rmv2.Header.SkeletonName) == false;
-            ProcessedGltfSkeleton? gltfSkeleton = null;
-
             var outputScene = ModelRoot.CreateModel();
 
-            if (hasSkeleton)
-            {
-                var animSkeletonFile = FetchAnimSkeleton(rmv2);
-                gltfSkeleton = GltfSkeletonCreator.Create(outputScene, animSkeletonFile, settings.MirrorMesh);
-
-                if (settings.ExportAnimations && settings.InputAnimationFiles.Any())
-                    GenerateAnimations(settings, gltfSkeleton, outputScene, animSkeletonFile);
-            }
-
+            var gltfSkeleton = _gltfAnimationCreator.CreateAnimationAndSkeleton(rmv2.Header.SkeletonName, outputScene, settings);
             var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);
             var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings);
 
@@ -78,28 +65,8 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             _gltfSaver.Save(outputScene, settings.OutputPath);
         }
 
-        // MOve this into skeleton/animation builder
-        void GenerateAnimations(RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene, AnimationFile animSkeletonFile)
-        {
-            //for (int iAnim = 0; iAnim < settings.InputAnimationFiles.Count; iAnim++)
-            {
-                var animAnimationFile = AnimationFile.Create(settings.InputAnimationFiles[0]);
 
-                var animBuilder = new GltfAnimationCreator(gltfSkeleton, animSkeletonFile);
-                animBuilder.CreateFromTWAnim(outputScene, animAnimationFile, settings.MirrorMesh);
-            }
-        }
 
-        AnimationFile FetchAnimSkeleton(RmvFile rmv2)
-        {
-            var skeletonName = rmv2.Header.SkeletonName + ".anim";
-            var skeletonSearchList = _packFileService.SearchForFile(skeletonName);
-            var skeletonPath = _packFileService.GetFullPath(_packFileService.FindFile(skeletonSearchList[0]));
-            var skeletonPackFile = _packFileService.FindFile(skeletonPath);
-
-            var animSkeletonFile = AnimationFile.Create(skeletonPackFile);
-            return animSkeletonFile;
-        }
 
         void LogSettings(RmvToGltfExporterSettings settings)
         {

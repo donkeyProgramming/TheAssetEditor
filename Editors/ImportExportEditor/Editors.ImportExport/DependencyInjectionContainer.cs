@@ -51,9 +51,10 @@ namespace Editors.ImportExport
             services.AddTransient<DisplayImportFileToolCommand>();
 
             services.AddTransient<GltfMeshBuilder>();
-            services.AddTransient<GltfSkeletonCreator>();
             services.AddTransient<IGltfTextureHandler, GltfTextureHandler>();
             services.AddTransient<IGltfSceneSaver, GltfSceneSaver>();
+            services.AddTransient<GltfAnimationCreator>();
+            
 
             RegisterAllAsInterface<IDeveloperConfiguration>(services, ServiceLifetime.Transient);
         }
