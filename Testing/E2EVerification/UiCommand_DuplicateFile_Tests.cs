@@ -1,6 +1,7 @@
 ﻿using E2EVerification.Shared;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Events.UiCommands;
+using static Shared.Core.PackFiles.PackFileService;
 
 namespace E2EVerification
 {
@@ -15,7 +16,9 @@ namespace E2EVerification
             var runner = new AssetEditorTestRunner();
             var sourcePackFile = runner.CreateEmptyPackFile("SourcePack", false);
             var outputPackFile = runner.CreateEmptyPackFile("OutputPack", true);
-            runner.PackFileService.AddFileToPack(sourcePackFile, "Animation\\Meta", PackFile.CreateFromASCII(fileName, "DummyContent"));
+
+            var fileEntry = new NewFileEntry("Animation\\Meta", PackFile.CreateFromASCII(fileName, "DummyContent"));
+            runner.PackFileService.AddFilesToPack(sourcePackFile, [fileEntry]);
             var fileToCopy = runner.PackFileService.FindFile("Animation\\Meta\\" + fileName, sourcePackFile);
 
             runner.CommandFactory.Create<DuplicateFileCommand>().Execute(fileToCopy);

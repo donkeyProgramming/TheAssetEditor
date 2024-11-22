@@ -42,7 +42,7 @@ namespace Editors.KitbasherEditor.UiCommands
             var targetSkeletonName = _kitbasherRootScene.Skeleton.SkeletonName;
             var state = _selectionManager.GetState<ObjectSelectionState>();
 
-            var existingSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, targetSkeletonName);
+            var existingSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(targetSkeletonName);
             if (existingSkeletonFile == null)
                 throw new Exception("TargetSkeleton not found -" + targetSkeletonName);
 
@@ -64,7 +64,7 @@ namespace Editors.KitbasherEditor.UiCommands
             }
 
             var selectedMeshSkeleton = selectedMeshSkeletons.First();
-            var newSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(_packFileService, selectedMeshSkeleton);
+            var newSkeletonFile = _skeletonHelper.GetSkeletonFileFromName(selectedMeshSkeleton);
 
             // Ensure all the bones have valid stuff
             var allUsedBoneIndexes = new List<byte>();

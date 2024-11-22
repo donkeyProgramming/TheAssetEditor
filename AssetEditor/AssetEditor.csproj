@@ -40,6 +40,8 @@
         <None Include="..\.editorconfig" />
     </ItemGroup>
 
+
+
     <ItemGroup>
       <Resource Include="AssetEditorIcon.png" />
     </ItemGroup>

@@ -1,16 +1,15 @@
 ﻿using CommonControls.BaseDialogs;
 using Shared.Core.Events;
-using Shared.Core.PackFiles;
 
-namespace AssetEditor.UiCommands
+namespace Editors.Reports.DeepSearch
 {
     public class DeepSearchCommand : IUiCommand
     {
-        private readonly PackFileService _packFileService;
+        private readonly DeepSearchReport _deepSearchReport;
 
-        public DeepSearchCommand(PackFileService packFileService)
+        public DeepSearchCommand(DeepSearchReport deepSearchReport)
         {
-            _packFileService = packFileService;
+            _deepSearchReport = deepSearchReport;
         }
 
         public void Execute()
@@ -23,9 +22,8 @@ namespace AssetEditor.UiCommands
                     System.Windows.MessageBox.Show("Invalid input");
                     return;
                 }
-                _packFileService.DeepSearch(window.TextValue, false);
+                _deepSearchReport.DeepSearch(window.TextValue, false);
             }
         }
     }
 }
-

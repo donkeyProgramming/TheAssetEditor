@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using CommonControls.Editors.AnimationPack.Converters;
-using Editors.Shared.Core.Services;
 using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -55,10 +54,11 @@ namespace Editors.Reports
             DirectoryHelper.EnsureCreated(gameOutputDir);
 
             //dump animationTable
-            var animPack = _pfs.Database.PackFiles[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
+            var packFileContainer = _pfs.GetAllPackfileContainers();
+            var animPack = packFileContainer[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
             var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
 
-            var converter = new AnimationBinWh3FileToXmlConverter(new SkeletonAnimationLookUpHelper());
+            var converter = new AnimationBinWh3FileToXmlConverter(null);
             foreach (var animFile in animPackFile.Files)
             {
                 if (animFile is AnimationBinWh3)
@@ -70,7 +70,7 @@ namespace Editors.Reports
                 }
             }
 
-            var allMeta = _pfs.FindAllWithExtentionIncludePaths(".meta");
+            var allMeta = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".meta");
             foreach (var (fileName, packFile) in allMeta)
             {
                 try
@@ -89,7 +89,7 @@ namespace Editors.Reports
                 }
             }
 
-            var allAnimations = _pfs.FindAllWithExtentionIncludePaths(".anim");
+            var allAnimations = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".anim");
             foreach (var (fileName, packFile) in allAnimations)
             {
                 try

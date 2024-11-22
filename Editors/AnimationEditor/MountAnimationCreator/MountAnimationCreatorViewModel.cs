@@ -34,6 +34,7 @@ namespace AnimationEditor.MountAnimationCreator
         public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly SceneObjectEditor _sceneObjectBuilder;
+        private readonly SaveHelper _saveHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly PackFileService _pfs;
@@ -79,11 +80,13 @@ namespace AnimationEditor.MountAnimationCreator
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
             SceneObjectEditor sceneObjectBuilder,
+            SaveHelper saveHelper,
             IUiCommandFactory uiCommandFactory)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
             _animationPlayerViewModel = animationPlayerViewModel;
             _sceneObjectBuilder = sceneObjectBuilder;
+            _saveHelper = saveHelper;
             _uiCommandFactory = uiCommandFactory;
             _pfs = pfs;
 
@@ -296,7 +299,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void SaveCurrentAnimationAction()
         {
-            var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), new BatchProcessOptions { SavePrefix = SavePrefixText.Value }, SelectedAnimationOutputFormat.Value);
+            var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), new BatchProcessOptions { SavePrefix = SavePrefixText.Value }, _saveHelper, SelectedAnimationOutputFormat.Value);
             service.SaveSingleAnim(_mount.AnimationClip, _rider.AnimationClip, _rider.AnimationName.Value.AnimationFile);
         }
 
@@ -309,7 +312,7 @@ namespace AnimationEditor.MountAnimationCreator
             var batchSettings = BatchProcessOptionsWindow.ShowDialog(newFileName, SavePrefixText.Value);
             if (batchSettings != null)
             {
-                var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), batchSettings, SelectedAnimationOutputFormat.Value);
+                var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), batchSettings, _saveHelper, SelectedAnimationOutputFormat.Value);
                 service.Process(mountFrag, riderFrag);
                 MountLinkController.ReloadFragments(true, false);
 

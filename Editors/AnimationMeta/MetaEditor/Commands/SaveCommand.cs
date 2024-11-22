@@ -13,12 +13,14 @@ namespace Editors.AnimationMeta.Presentation.Commands
     {
         private readonly ILogger _logger = Logging.Create<SaveCommand>();
         private readonly PackFileService _packFileService;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
+        private readonly SaveHelper _saveHelper;
 
-        public SaveCommand(PackFileService packFileService, EventHub eventHub)
+        public SaveCommand(PackFileService packFileService, IEventHub eventHub, SaveHelper saveHelper)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;
+            _saveHelper = saveHelper;
         }
 
         public bool Execute(MetaDataEditorViewModel controller)
@@ -47,7 +49,7 @@ namespace Editors.AnimationMeta.Presentation.Commands
             var parser = new MetaDataFileParser();
             var bytes = parser.GenerateBytes(controller.MetaDataFileVersion, tagDataItems);
             _logger.Here().Information("Saving");
-            var res = SaveHelper.Save(_packFileService, path, null, bytes);
+            var res = _saveHelper.Save(path, null, bytes);
             if (res != null)
             {
                 controller.CurrentFile = res;

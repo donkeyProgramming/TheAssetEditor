@@ -14,7 +14,7 @@ namespace GameWorld.Core.Components.Gizmo
     public class GizmoComponent : BaseComponent, IDisposable
     {
         private readonly IMouseComponent _mouse;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
 
         private readonly IKeyboardComponent _keyboard;
         private readonly SelectionManager _selectionManager;
@@ -29,7 +29,7 @@ namespace GameWorld.Core.Components.Gizmo
         bool _isCtrlPressed = false;
 
 
-        public GizmoComponent(EventHub eventHub,
+        public GizmoComponent(IEventHub eventHub,
             IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
             ResourceLibrary resourceLibary, IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
             SelectionManager selectionManager)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.AnimationMeta.Presentation;
@@ -21,7 +20,7 @@ namespace Editors.AnimationMeta.SuperView
         private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly PackFileService _packFileService;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         [ObservableProperty] string _persistentMetaFilePath = "";
@@ -34,7 +33,7 @@ namespace Editors.AnimationMeta.SuperView
         public SuperViewViewModel(
             PackFileService packFileService,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
-            EventHub eventHub,
+            IEventHub eventHub,
             IUiCommandFactory uiCommandFactory,
             SceneObjectEditor sceneObjectBuilder,
             IEditorHostParameters editorHostParameters)

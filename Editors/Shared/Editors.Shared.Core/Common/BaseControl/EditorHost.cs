@@ -42,7 +42,7 @@ namespace Editors.Shared.Core.Common.BaseControl
             IWpfGame gameWorld,
             FocusSelectableObjectService focusSelectableObjectService,
             TEditor editor,
-            EventHub eventHub)
+            IEventHub eventHub)
         {
             ToolsFactory = toolFactory;
             Editor = editor;

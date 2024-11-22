@@ -5,6 +5,7 @@ using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
 using System.IO;
 using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
+using static Shared.Core.PackFiles.PackFileService;
 
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv
@@ -36,7 +37,8 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             var bytesRmv2 = ModelFactory.Create().Save(rmv2File);
             var packFileImported = new PackFile(importedFileName, new MemorySource(bytesRmv2));
 
-            _packFileService.AddFileToPack(settings.destinationPackFolder.FileOwner, settings.destinationPackFolder.GetFullPath(), packFileImported);
+            var newFile = new NewFileEntry(settings.destinationPackFolder.GetFullPath(), packFileImported);
+            _packFileService.AddFilesToPack(settings.destinationPackFolder.FileOwner, [newFile]);
         }
 
         private static string GetImportedPackFileName(GltfImporterSettings settings)

@@ -24,7 +24,7 @@ namespace GameWorld.Core.Components.Rendering
         private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
         private readonly SceneRenderParametersStore _sceneLightParameters;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
 
         bool _cullingEnabled = false;
         bool _bigSceneDepthBiasMode = false;
@@ -36,7 +36,7 @@ namespace GameWorld.Core.Components.Rendering
         RenderTarget2D _defaultRenderTarget;
         RenderTarget2D _glowRenderTarget;
 
-        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneRenderParametersStore sceneLightParametersStore, EventHub eventHub)
+        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneRenderParametersStore sceneLightParametersStore, IEventHub eventHub)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;

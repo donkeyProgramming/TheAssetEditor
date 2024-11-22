@@ -20,7 +20,6 @@ namespace AssetEditor
             serviceCollection.AddScoped<MainViewModel>();
             serviceCollection.AddScoped<IEditorCreator, EditorCreator>();
 
-            serviceCollection.AddTransient<DeepSearchCommand>();
             serviceCollection.AddTransient<GenerateReportCommand>();
             serviceCollection.AddTransient<OpenGamePackCommand>();
             serviceCollection.AddTransient<OpenPackFileCommand>();
@@ -33,6 +32,8 @@ namespace AssetEditor
             serviceCollection.AddScoped<MenuBarViewModel>();
 
             serviceCollection.AddScoped<MainWindow>();
+
+            serviceCollection.AddSingleton<RecentFilesTracker>();
 
             serviceCollection.AddScoped<IExceptionInformationProvider, CurrentEditorExceptionInfoProvider>();
 

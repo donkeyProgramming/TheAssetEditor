@@ -10,6 +10,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Common;
+using static Shared.Core.PackFiles.PackFileService;
 
 namespace CommonControls.Editors.AnimationBatchExporter
 {
@@ -61,18 +62,19 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
                     _logger.Here().Information($"Processing packfile container {packfile.Name}");
 
-                    var animFiles = _pfs.FindAllWithExtention(".anim", packfile.Container);
+                    var animFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".anim", packfile.Container);
 
                     _logger.Here().Information($"Converting animations {animFiles.Count}");
                     var convertedAnimFiles = ConvertAnimFiles(animFiles, SelectedOutputFormat.Value, errorList);
 
                     _logger.Here().Information($"saving animation files");
-                    _pfs.AddFilesToPack(_pfs.GetEditablePack(),
-                        convertedAnimFiles.Select(x => x.directory).ToList(),
-                        convertedAnimFiles.Select(x => x.file).ToList());
+
+                    var filesToAdd = convertedAnimFiles.Select(x => new NewFileEntry(x.directory, x.file)).ToList();
+
+                    _pfs.AddFilesToPack(_pfs.GetEditablePack(), filesToAdd);
 
                     _logger.Here().Information($"Saving inv matix files");
-                    var invMatrixFileList = _pfs.FindAllWithExtention(".bone_inv_trans_mats", packfile.Container);
+                    var invMatrixFileList = PackFileServiceUtility.FindAllWithExtention(_pfs, ".bone_inv_trans_mats", packfile.Container);
                     foreach (var invMatrixFile in invMatrixFileList)
                         _pfs.CopyFileFromOtherPackFile(packfile.Container, _pfs.GetFullPath(invMatrixFile), _pfs.GetEditablePack());
                 }
@@ -90,7 +92,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
                 try
                 {
                     var animationFile = AnimationFile.Create(file);
-                    var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animationFile.Header.SkeletonName);
+                    var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animationFile.Header.SkeletonName);
                     animationFile.ConvertToVersion(outputAnimationFormat, skeleton, _pfs);
 
                     var bytes = AnimationFile.ConvertToBytes(animationFile);

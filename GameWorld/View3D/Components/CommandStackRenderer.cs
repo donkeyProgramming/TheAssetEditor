@@ -13,10 +13,10 @@ namespace GameWorld.Core.Components
         GameTime? _animationStart;
         bool _startAnimation;
         private readonly ResourceLibrary _resourceLibrary;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
         private readonly RenderEngineComponent _renderEngineComponent;
 
-        public CommandStackRenderer(ResourceLibrary resourceLibrary, EventHub eventHub, RenderEngineComponent renderEngineComponent)
+        public CommandStackRenderer(ResourceLibrary resourceLibrary, IEventHub eventHub, RenderEngineComponent renderEngineComponent)
         {
             _resourceLibrary = resourceLibrary;
             _eventHub = eventHub;

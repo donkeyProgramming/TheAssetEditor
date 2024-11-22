@@ -78,7 +78,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         List<IAnimationBinGenericFormat> LoadFragmentsForSkeleton(string skeletonName, bool onlyPacksThatCanBeSaved = false)
         {
             var outputFragments = new List<IAnimationBinGenericFormat>();
-            var animPacks = _pfs.GetAllAnimPacks();
+            var animPacks = PackFileServiceUtility.GetAllAnimPacks(_pfs);
             foreach (var animPack in animPacks)
             {
                 if (onlyPacksThatCanBeSaved == true)
@@ -124,7 +124,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             if (string.IsNullOrWhiteSpace(value?.AnimationFile) == false)
             {
                 var file = _pfs.FindFile(value.AnimationFile);
-                animationReference = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file, _pfs);
+                animationReference = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
             }
 
             if (string.IsNullOrWhiteSpace(value?.MetaFile) == false)

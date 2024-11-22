@@ -6,6 +6,7 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Events;
+using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
@@ -37,6 +38,7 @@ namespace AssetEditor.ViewModels
                 PackFileService packfileService, 
                 IEditorDatabase toolFactory, 
                 IUiCommandFactory uiCommandFactory, 
+                IEventHub eventHub,
                 IExportFileContextMenuHelper exportFileContextMenuHelper, 
                 IImportFileContextMenuHelper importFileContextMenuHelper, 
                 ApplicationSettingsService applicationSettingsService, 
@@ -46,10 +48,11 @@ namespace AssetEditor.ViewModels
             MenuBar = menuViewModel;
             _uiCommandFactory = uiCommandFactory;
             _packfileService = packfileService;
-            _packfileService.Database.BeforePackFileContainerRemoved += Database_BeforePackFileContainerRemoved;
-            _packfileService.Database.ContainerUpdated += OnContainerUpdated;
 
-            FileTree = new PackFileBrowserViewModel(_packfileService);
+            eventHub.Register<BeforePackFileContainerRemovedEvent>(this, Database_BeforePackFileContainerRemoved);
+            eventHub.Register<PackFileContainerSetAsMainEditableEvent>(this, SetStatusBarEditablePackFile);
+
+            FileTree = new PackFileBrowserViewModel(_packfileService, eventHub);
             FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, uiCommandFactory, exportFileContextMenuHelper, importFileContextMenuHelper);
             FileTree.FileOpen += OpenFile;
 
@@ -57,7 +60,6 @@ namespace AssetEditor.ViewModels
 
             ApplicationTitle = $"AssetEditor v{VersionChecker.CurrentVersion}";
             CurrentGame = $"Current Game: {gameInformationFactory.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame).DisplayName}";
-            SetStatusBarEditablePackFile();
         }
 
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenEditorCommand>().Execute(file);
@@ -78,9 +80,10 @@ namespace AssetEditor.ViewModels
                 MessageBoxButton.YesNo) == MessageBoxResult.Yes;
         }
 
-        private bool Database_BeforePackFileContainerRemoved(PackFileContainer container)
+        private void Database_BeforePackFileContainerRemoved(BeforePackFileContainerRemovedEvent e)
         {
-
+            // Can this be moved into the IEditorDatabase/tool creator something something?
+            var container = e.Removed;
             var openFiles = new List<IEditorInterface>();
             for (var i = 0; i < CurrentEditorsList.Count; i++)
             {
@@ -95,7 +98,9 @@ namespace AssetEditor.ViewModels
             if (openFiles.Any())
             {
                 if (MessageBox.Show($"Closing pack file '{container.Name}' with open files ({openFiles.First().DisplayName}), are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                    return false;
+                {
+                    e.AllowClose = false;
+                }
             }
 
             foreach (var editor in openFiles)
@@ -103,8 +108,6 @@ namespace AssetEditor.ViewModels
                 CurrentEditorsList.Remove(editor);
                 editor.Close();
             }
-
-            return true;
         }
 
         [RelayCommand] void CloseTool(IEditorInterface tool)
@@ -178,14 +181,11 @@ namespace AssetEditor.ViewModels
             return true;
         }
 
-        private void OnContainerUpdated(PackFileContainer container)
-        {
-            SetStatusBarEditablePackFile();
-        }
 
-        private void SetStatusBarEditablePackFile()
+
+        private void SetStatusBarEditablePackFile(PackFileContainerSetAsMainEditableEvent e)
         {
-            EditablePackFile = _packfileService.Database.PackSelectedForEdit != null ? $"Editable Pack: {_packfileService.Database.PackSelectedForEdit.Name}" : "Editable Pack: None Set";
+            EditablePackFile = e.Container != null ? $"Editable Pack: {e.Container.Name}" : "Editable Pack: None Set";
         }
     }
 }

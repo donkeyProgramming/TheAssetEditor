@@ -34,6 +34,7 @@ namespace AnimationEditor.AnimationTransferTool
         private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
         private readonly SceneObjectEditor _assetViewModelBuilder;
         private readonly IWindowFactory _windowFactory;
+        private readonly SaveHelper _saveHelper;
         private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -62,11 +63,13 @@ namespace AnimationEditor.AnimationTransferTool
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
             SceneObjectEditor assetViewModelBuilder,
-            IWindowFactory windowFactory)
+            IWindowFactory windowFactory,
+            SaveHelper saveHelper)
         {
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
             _assetViewModelBuilder = assetViewModelBuilder;
             _windowFactory = windowFactory;
+            _saveHelper = saveHelper;
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _player = player;
@@ -181,8 +184,8 @@ namespace AnimationEditor.AnimationTransferTool
                 return;
             }
 
-            var targetSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyTo.SkeletonName.Value);
-            var sourceSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, _copyFrom.SkeletonName.Value);
+            var targetSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_copyTo.SkeletonName.Value);
+            var sourceSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_copyFrom.SkeletonName.Value);
 
             if (_config == null)
             {
@@ -359,7 +362,7 @@ namespace AnimationEditor.AnimationTransferTool
 
             if (AnimationSettings.AnimationOutputFormat.Value != 7)
             {
-                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_pfs, animFile.Header.SkeletonName);
+                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animFile.Header.SkeletonName);
                 animFile.ConvertToVersion(AnimationSettings.AnimationOutputFormat.Value, skeleton, _pfs);
             }
 
@@ -373,7 +376,7 @@ namespace AnimationEditor.AnimationTransferTool
             newPath = newPath.Replace(currentFileName, AnimationSettings.SavePrefix.Value + currentFileName);
             newPath = SaveHelper.EnsureEnding(newPath, ".anim");
 
-            SaveHelper.Save(_pfs, newPath, null, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
+            _saveHelper.Save(newPath, null, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
         }
 
         public void ClearAllSettings()

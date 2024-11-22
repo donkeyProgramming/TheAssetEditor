@@ -25,6 +25,8 @@ namespace CommonControls.Editors.AnimationPack
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private ITextConverter _activeConverter;
         private readonly ApplicationSettingsService _appSettings;
+        private readonly SaveHelper _saveHelper;
+
         public string DisplayName { get; set; } = "Not set";
 
         PackFile _packFile;
@@ -39,12 +41,12 @@ namespace CommonControls.Editors.AnimationPack
         public ICommand RenameCommand { get; set; }
         public ICommand CopyFullPathCommand { get; set; }
 
-        public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings)
+        public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings, SaveHelper saveHelper)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _appSettings = appSettings;
-
+            _saveHelper = saveHelper;
             AnimationPackItems = new FilterCollection<IAnimationPackFile>(new List<IAnimationPackFile>(), ItemSelected, BeforeItemSelected)
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
@@ -217,7 +219,7 @@ namespace CommonControls.Editors.AnimationPack
 
             var savePath = _pfs.GetFullPath(_packFile);
 
-            var result = SaveHelper.Save(_pfs, savePath, null, AnimationPackSerializer.ConvertToBytes(newAnimPack));
+            var result = _saveHelper.Save(savePath, null, AnimationPackSerializer.ConvertToBytes(newAnimPack));
             if (result != null)
             {
                 HasUnsavedChanges = false;
@@ -296,33 +298,33 @@ namespace CommonControls.Editors.AnimationPack
             File.WriteAllText(path, sb.ToString());
         }
 
-        public static void ShowPreviewWinodow(PackFile animationPackFile, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, string selectedFileName, ApplicationSettingsService applicationSettings)
-        {
-            if (animationPackFile == null)
-            {
-                MessageBox.Show("Unable to resolve packfile");
-                return;
-            }
-
-            var controller = new AnimPackViewModel(pfs, skeletonAnimationLookUpHelper, applicationSettings);
-            controller._packFile = animationPackFile;
-            controller.Load();
-
-            var containingWindow = new Window();
-            containingWindow.Title = animationPackFile.Name;
-
-
-            containingWindow.DataContext = controller;
-            containingWindow.Content = new AnimationPackView();
-
-            containingWindow.Width = 1200;
-            containingWindow.Height = 1100;
-
-
-            containingWindow.Loaded += (sender, e) => controller.SetSelectedFile(selectedFileName);
-
-            containingWindow.ShowDialog();
-        }
+       //public static void ShowPreviewWinodow(PackFile animationPackFile, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, string selectedFileName, ApplicationSettingsService applicationSettings)
+       //{
+       //    if (animationPackFile == null)
+       //    {
+       //        MessageBox.Show("Unable to resolve packfile");
+       //        return;
+       //    }
+       //
+       //    var controller = new AnimPackViewModel(pfs, skeletonAnimationLookUpHelper, applicationSettings);
+       //    controller._packFile = animationPackFile;
+       //    controller.Load();
+       //
+       //    var containingWindow = new Window();
+       //    containingWindow.Title = animationPackFile.Name;
+       //
+       //
+       //    containingWindow.DataContext = controller;
+       //    containingWindow.Content = new AnimationPackView();
+       //
+       //    containingWindow.Width = 1200;
+       //    containingWindow.Height = 1100;
+       //
+       //
+       //    containingWindow.Loaded += (sender, e) => controller.SetSelectedFile(selectedFileName);
+       //
+       //    containingWindow.ShowDialog();
+       //}
 
         public void LoadFile(PackFile file)
         {

@@ -13,12 +13,12 @@ namespace Editors.KitbasherEditor.ViewModels
     {
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly PackFileService _packFileService;
-        private readonly EventHub _eventHub;
+        private readonly IEventHub _eventHub;
 
         public GameSkeleton Skeleton { get; private set; }
         public AnimationPlayer Player { get; private set; }
 
-        public KitbasherRootScene(AnimationsContainerComponent animationsContainerComponent, PackFileService packFileService, EventHub eventHub)
+        public KitbasherRootScene(AnimationsContainerComponent animationsContainerComponent, PackFileService packFileService, IEventHub eventHub)
         {
             _animationsContainerComponent = animationsContainerComponent;
             _packFileService = packFileService;

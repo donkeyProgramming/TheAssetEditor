@@ -37,6 +37,7 @@ namespace E2EVerification.Shared
             PackFileService = EditorServiceProvider.ServiceProvider.GetRequiredService<PackFileService>();
             CommandFactory = EditorServiceProvider.ServiceProvider.GetRequiredService<IUiCommandFactory>();
             ScopeRepository = EditorServiceProvider.ServiceProvider.GetRequiredService<ScopeRepository>();
+            ScopeRepository.Root = EditorServiceProvider;
         }
 
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)
@@ -49,7 +50,7 @@ namespace E2EVerification.Shared
 
         public PackFileContainer? LoadFolderPackFile(string path, bool createOutputPackFile = true)
         {
-            PackFileService.LoadFolderContainer(path);
+            PackFileService.LoadSystemFolderAsPackFileContainer(path);
             if (createOutputPackFile)
                 return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
             return null;
