@@ -140,7 +140,7 @@ namespace Shared.GameFormats.Animation
             }
         }
 
-        static AnimationHeader GetAnimationHeader(ByteChunk chunk)
+        public static AnimationHeader GetAnimationHeader(ByteChunk chunk)
         {
             if (chunk.BytesLeft == 0)
                 throw new Exception("Trying to load animation header with no data, chunk size = 0");

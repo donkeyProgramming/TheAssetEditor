@@ -2,6 +2,8 @@ Link to cinterbreath
 https://youtu.be/sr8oVx7TkwQ?t=157
 
 
+SkeletonAnimationLookUpHelper - improve loading speed by reusing packfile handle sorted by container - fastMemePack type
+make packfile loading multuthreaded
 MainViewModel - all editor stuff should be moved out! Use events to sync! 
 Enforce enditable pack can never be ca pack
 All report generators should be dependency created!

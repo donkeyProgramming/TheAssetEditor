@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using Serilog;
+using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
@@ -58,16 +60,49 @@ namespace Editors.Shared.Core.Services
 
         void LoadFromPackFileContainer(PackFileContainer packFileContainer)
         {
-            var allAnimations = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_packFileService, ".anim", packFileContainer);
-
             List<string> skeletonFileNameList = [];
             Dictionary<string, List<AnimationReference>> animationList = [];
 
-            Parallel.For(0, allAnimations.Count, index =>
-              {
-                  var animation = allAnimations[index]; ;
-                  FileDiscovered(animation.Item2, packFileContainer, _packFileService.GetFullPath(animation.Item2, packFileContainer), ref skeletonFileNameList, ref animationList);
-              });
+            var allAnimations = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_packFileService, ".anim", packFileContainer);
+
+            // Split animations in to two categories.
+            var allAnimsInSavedPackedFiles = new List<(string FullPath, PackedFileSource DataSource)>();
+            var allAnimsOtherFiles = new List<(string FullPath, IDataSource DataSource)>();
+            for (var i = 0; i < allAnimations.Count; i++)
+            {
+                var currentAnimFile = allAnimations[i].Pack.DataSource as PackedFileSource;
+                if (currentAnimFile != null)
+                    allAnimsInSavedPackedFiles.Add((allAnimations[i].FileName, currentAnimFile));
+                else
+                    allAnimsOtherFiles.Add((allAnimations[i].FileName, allAnimations[i].Pack.DataSource));
+            }
+
+            // Handle packfile which are stored in a saved file.
+            // This is done for performance reasons. Opening all the animations files from disk is very slow
+            // creating stream which is reused goes a lot faster!
+            var groupedAnims = allAnimsInSavedPackedFiles
+                .GroupBy(x => x.DataSource.Parent.FilePath)
+                .ToList();
+
+            Parallel.For(0, groupedAnims.Count, index =>
+            {
+                var fileStream = File.OpenRead(groupedAnims[index].Key);
+                var buffer = new byte[100];
+
+                foreach (var file in groupedAnims[index])
+                {    
+                    fileStream.Seek(file.DataSource.Offset, SeekOrigin.Begin);
+                    fileStream.ReadExactly(buffer);
+                    FileDiscovered(new ByteChunk(buffer), packFileContainer, file.FullPath, ref skeletonFileNameList, ref animationList);
+                }
+            });
+
+            // Handle all others
+            Parallel.For(0, allAnimsOtherFiles.Count, index =>
+            {
+                var animation = allAnimations[index];
+                FileDiscovered(animation.Pack, packFileContainer, animation.FileName, ref skeletonFileNameList, ref animationList);
+            });
 
             foreach(var skeleton in  skeletonFileNameList)
                 _skeletonFileNames.Add(skeleton);
@@ -83,11 +118,14 @@ namespace Editors.Shared.Core.Services
 
         void FileDiscovered(PackFile file, PackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
         {
-            var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
-            if (brokenAnims.Contains(fullPath))
+            if (Debugger.IsAttached)
             {
-                _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
-                return;
+                var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
+                if (brokenAnims.Contains(fullPath))
+                {
+                    _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
+                    return;
+                }
             }
 
             var animationSkeletonName = "Unkown";
@@ -113,6 +151,44 @@ namespace Editors.Shared.Core.Services
                     skeletonFileNameList.Add(fullPath);
             }
         }
+
+
+        void FileDiscovered(ByteChunk byteChunk, PackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
+        {
+            var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
+            if (brokenAnims.Contains(fullPath))
+            {
+                _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
+                return;
+            }
+
+            var animationSkeletonName = "Unkown";
+            try
+            {
+                animationSkeletonName = AnimationFile.GetAnimationHeader(byteChunk).SkeletonName;
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
+            }
+
+            lock (_threadLock)
+            {
+                var newEntry = new ObservableCollection<AnimationReference>() { new AnimationReference(fullPath, container) };
+                if (animationList.ContainsKey(animationSkeletonName) == false)
+                    animationList[animationSkeletonName] = [];
+                animationList[animationSkeletonName].Add(new AnimationReference(fullPath, container));
+
+                if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
+                    skeletonFileNameList.Add(fullPath);
+                else if (fullPath.Contains("tech", StringComparison.InvariantCultureIgnoreCase))
+                    skeletonFileNameList.Add(fullPath);
+            }
+        }
+
+
+
+
 
         void UnloadAnimationFromContainer(PackFileContainer packFileContainer)
         {
