@@ -5,7 +5,7 @@ using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {
-    public partial class EditorTool
+    public partial class EditorShortcutViewModel
     {
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly EditorEnums _editor;
@@ -13,7 +13,7 @@ namespace AssetEditor.ViewModels
         public string DisplayName { get; set; }
         public bool IsEnabled{ get; set; }
 
-        public EditorTool(EditorInfo editorInfo, IUiCommandFactory commandFactory)
+        public EditorShortcutViewModel(EditorInfo editorInfo, IUiCommandFactory commandFactory)
         {
             _uiCommandFactory = commandFactory;
             _editor = editorInfo.EditorEnum;

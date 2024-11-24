@@ -5,17 +5,9 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
 
 namespace Shared.Core.PackFiles
 {
-    public interface IPackFileContainerLoader
-    {
-        PackFileContainer Load(string packFileSystemPath);
-        PackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum);
-        PackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
-    }
-
     public class PackFileService : IPackFileService
     {
         private readonly ILogger _logger = Logging.Create<PackFileService>();
@@ -53,7 +45,10 @@ namespace Shared.Core.PackFiles
             foreach (var packFile in _packFileContainers)
             {
                 if (packFile.SystemFilePath == container.SystemFilePath)
-                    MessageBox.Show($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");             
+                {
+                    MessageBox.Show($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
+                    return;
+                }
             }
 
             _packFileContainers.Add(container);

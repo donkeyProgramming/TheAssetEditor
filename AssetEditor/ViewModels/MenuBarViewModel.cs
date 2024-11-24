@@ -30,7 +30,7 @@ namespace AssetEditor.ViewModels
         private readonly IPackFileContainerLoader _packFileContainerLoader;
 
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = [];
-        public ObservableCollection<EditorTool> Editors { get; set; } = [];
+        public ObservableCollection<EditorShortcutViewModel> Editors { get; set; } = [];
 
         public MenuBarViewModel(PackFileService packfileService, 
             ApplicationSettingsService settingsService, 
@@ -143,7 +143,7 @@ namespace AssetEditor.ViewModels
                 .ToList();
 
             foreach (var item in infos)
-                Editors.Add(new EditorTool(item, _uiCommandFactory));   
+                Editors.Add(new EditorShortcutViewModel(item, _uiCommandFactory));   
         }
     }
 }

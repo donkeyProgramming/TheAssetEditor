@@ -80,7 +80,7 @@
                 </MenuItem.ItemContainerStyle>
 
                 <MenuItem.ItemTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type viewModels:EditorTool}" ItemsSource="{Binding Path=MenuItems}">
+                    <HierarchicalDataTemplate DataType="{x:Type viewModels:EditorShortcutViewModel}" ItemsSource="{Binding Path=MenuItems}">
                         <TextBlock Text="{Binding DisplayName}"/>
                     </HierarchicalDataTemplate>
                 </MenuItem.ItemTemplate>

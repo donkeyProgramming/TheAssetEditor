@@ -2,12 +2,10 @@
 
 namespace Shared.Core.PackFiles
 {
-
     public interface IFileSaveService
     {
         PackFile? Save(string fullPathWithExtention, byte[] content, bool prompOnConflict);
         PackFile? SaveAs(string fullPathWithExtention, byte[] content);
-    
     }
 
     public class FileSaveService : IFileSaveService

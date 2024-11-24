@@ -7,22 +7,12 @@ using Shared.Core.Services;
 
 namespace Shared.Core.PackFiles
 {
-    // public class PackFileContainerLoader
-    // {
-    //     PackFileContainer LoadGameFiles()
-    //     { }
-    //
-    //     PackFileContainer LoadPack()
-    //     { 
-    //     }
-    //
-    //     PackFileContainer LoadFolderAsPack()
-    //     {
-    //     }
-    //
-    //
-    //
-    // }
+    public interface IPackFileContainerLoader
+    {
+        PackFileContainer Load(string packFileSystemPath);
+        PackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum);
+        PackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
+    }
 
 
     public class PackFileContainerLoader : IPackFileContainerLoader

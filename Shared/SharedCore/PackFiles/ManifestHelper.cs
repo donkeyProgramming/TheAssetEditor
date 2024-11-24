@@ -2,8 +2,6 @@
 {
     static class ManifestHelper
     {
-
-
         public static List<string> GetPackFilesFromManifest(string gameDataFolder)
         {
             var output = new List<string>();

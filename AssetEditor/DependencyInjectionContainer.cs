@@ -18,7 +18,9 @@ namespace AssetEditor
         {
             serviceCollection.AddScoped<MainWindow>();
             serviceCollection.AddScoped<MainViewModel>();
-            serviceCollection.AddScoped<IEditorCreator, EditorCreator>();
+            serviceCollection.AddSingleton<IEditorCreator>( x=> x.GetRequiredService<IEditorManager>());
+            serviceCollection.AddSingleton<IEditorManager, EditorManager>();
+
 
             serviceCollection.AddTransient<GenerateReportCommand>();
             serviceCollection.AddTransient<OpenGamePackCommand>();

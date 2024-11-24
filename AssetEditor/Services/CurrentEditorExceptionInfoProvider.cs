@@ -8,37 +8,40 @@ namespace AssetEditor.Services
 {
     internal class CurrentEditorExceptionInfoProvider : IExceptionInformationProvider
     {
-        private readonly MainViewModel _mainView;
+        private readonly IEditorManager _editorManager;
         private readonly PackFileService _pfs;
 
-        public CurrentEditorExceptionInfoProvider( MainViewModel mainView, PackFileService pfs)
+        public CurrentEditorExceptionInfoProvider(IEditorManager editorManager, PackFileService pfs)
         {
-            _mainView = mainView;
+            _editorManager = editorManager;
             _pfs = pfs;
         }
 
         public void HydrateExcetion(ExceptionInformation extendedException)
         {
-            extendedException.NumberOfOpenEditors = (uint)_mainView.CurrentEditorsList.Count;
-
             try
             {
+                var allEditors = _editorManager.GetAllEditors();
+                var currentEditorIndex = _editorManager.GetCurrentEditor();
+
+                extendedException.NumberOfOpenEditors = (uint)allEditors.Count;
+
                 var editorName = "";
                 var editorFileInput = "";
                 var editorFileFullName = "";
                 var editorFilePack = "";
-                if (_mainView.SelectedEditorIndex != -1 && _mainView.CurrentEditorsList.Count != 0)
+                if (currentEditorIndex != -1 && allEditors.Count != 0)
                 {
-                    var editor = _mainView.CurrentEditorsList[_mainView.SelectedEditorIndex];
+                    var editor = allEditors[currentEditorIndex];
                     editorName = editor.GetType().Name;
-
+            
                     if (editor is IFileEditor fileEditor)
                     {
                         editorFileInput = fileEditor.CurrentFile.Name;
                         editorFileFullName = _pfs.GetFullPath(fileEditor.CurrentFile);
                         editorFilePack = _pfs.GetPackFileContainer(fileEditor.CurrentFile).Name;
                     }
-
+            
                 }
                 extendedException.CurrentEditorName = editorName;
                 extendedException.EditorInputFile = editorFileInput;

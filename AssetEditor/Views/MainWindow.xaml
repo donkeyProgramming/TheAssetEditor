@@ -137,8 +137,8 @@
 
                 <GridSplitter Grid.Row="1" Grid.RowSpan="1" Grid.Column="1" Width="2.9" HorizontalAlignment="Stretch" Background="{DynamicResource App.Border}"/>
 
-                <TabControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}" 
-                            SelectedIndex="{Binding SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                <TabControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding EditorManager.CurrentEditorsList, UpdateSourceTrigger=PropertyChanged}" 
+                            SelectedIndex="{Binding EditorManager.SelectedEditorIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                             ContentTemplateSelector="{StaticResource EditorSelector}" viewFactory:ToolFactoryParameter.ViewFactory="{Binding ToolsFactory}"
                             Name="EditorsTabControl" BorderThickness="1, 1, 0, 0" >
 

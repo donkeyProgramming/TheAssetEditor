@@ -38,7 +38,7 @@ namespace Shared.Core.ToolCreation
     {
         public void Register(EditorInfo editorInfo);
 
-        IEditorInterface Create(string fullFileName, EditorEnums? preferedEditor = null);
+        IEditorInterface? Create(string fullFileName, EditorEnums? preferedEditor = null);
         IEditorInterface Create(EditorEnums editorEnum);
 
         void DestroyEditor(IEditorInterface instance);
@@ -89,7 +89,7 @@ namespace Shared.Core.ToolCreation
             return CreateEditorInternal(editor.ViewModel);
         }
 
-        public IEditorInterface Create(string fullFileName, EditorEnums? preferedEditor)
+        public IEditorInterface? Create(string fullFileName, EditorEnums? preferedEditor)
         {
             var allEditors = GetAllPossibleEditors(fullFileName);
 

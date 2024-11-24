@@ -27,7 +27,6 @@
             return text;
         }
 
-
         public static void CreateFileBackup(string originalFileName)
         {
             if (File.Exists(originalFileName))

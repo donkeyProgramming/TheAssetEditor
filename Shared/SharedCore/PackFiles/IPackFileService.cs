@@ -1,5 +1,4 @@
 ﻿using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
 
 namespace Shared.Core.PackFiles
 {
@@ -17,9 +16,6 @@ namespace Shared.Core.PackFiles
         PackFileContainer? GetEditablePack();
         string GetFullPath(PackFile file, PackFileContainer? container = null);
         PackFileContainer? GetPackFileContainer(PackFile file);
-        //PackFileContainer? Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false);
-        //bool LoadAllCaFiles(GameTypeEnum gameEnum);
-       // PackFileContainer? LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
         void MoveFile(PackFileContainer pf, PackFile file, string newFolderPath);
         void RenameDirectory(PackFileContainer pf, string currentNodeName, string newName);
         void RenameFile(PackFileContainer pf, PackFile file, string newName);
