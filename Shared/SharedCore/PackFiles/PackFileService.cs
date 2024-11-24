@@ -51,6 +51,11 @@ namespace Shared.Core.PackFiles
                 }
             }
 
+            AddContainerInternal(container, setToMainPackIfFirst);  
+        }
+
+        void AddContainerInternal(PackFileContainer container, bool setToMainPackIfFirst = false)
+        {
             _packFileContainers.Add(container);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
 
@@ -67,11 +72,10 @@ namespace Shared.Core.PackFiles
             var newPackFile = new PackFileContainer(name)
             {
                 Header = new PFHeader("PFH5", type),
-
             };
-            AddContainer(newPackFile);
-            if (setEditablePack)
-                SetEditablePack(newPackFile);
+
+            AddContainerInternal(newPackFile, setEditablePack);
+
             return newPackFile;
         }
 

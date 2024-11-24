@@ -46,7 +46,7 @@ namespace E2EVerification.Shared
             var loader = EditorServiceProvider.ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
             var container = loader.Load(path);
             container.IsCaPackFile = true;
-            PackFileService.AddContainer(container, false);
+            PackFileService.AddContainer(container);
 
             if (createOutputPackFile)
                 return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
@@ -58,7 +58,7 @@ namespace E2EVerification.Shared
             var loader = EditorServiceProvider.ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
             var container = loader.LoadSystemFolderAsPackFileContainer(path);
             container.IsCaPackFile = true;
-            PackFileService.AddContainer(container, false);
+            PackFileService.AddContainer(container);
 
             if (createOutputPackFile)
                 return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
