@@ -34,7 +34,6 @@ namespace AssetEditor.Services
     {
         private readonly ILogger _logger = Logging.Create<EditorManager>();
 
-        private readonly PackFileService _packfileService;
         private readonly PackFileService _packFileService;
         private readonly IEditorDatabase _editorDatabase;
 
@@ -46,7 +45,7 @@ namespace AssetEditor.Services
             _packFileService = packFileService;
             _editorDatabase = editorDatabase;
 
-            eventHub.Register<BeforePackFileContainerRemovedEvent>(this, Database_BeforePackFileContainerRemoved);
+            eventHub.Register<BeforePackFileContainerRemovedEvent>(this, OnBeforeRemoved);
         }
 
         public IList<IEditorInterface> GetAllEditors() => CurrentEditorsList;
@@ -133,8 +132,7 @@ namespace AssetEditor.Services
             SelectedEditorIndex = CurrentEditorsList.Count - 1;
         }
 
-
-        private void Database_BeforePackFileContainerRemoved(BeforePackFileContainerRemovedEvent e)
+        private void OnBeforeRemoved(BeforePackFileContainerRemovedEvent e)
         {
             var container = e.Removed;
             var openFiles = new List<IEditorInterface>();
@@ -143,7 +141,7 @@ namespace AssetEditor.Services
                 if (CurrentEditorsList[i] is not IFileEditor fileEditor)
                     continue;
 
-                var containterForPack = _packfileService.GetPackFileContainer(fileEditor.CurrentFile);
+                var containterForPack = _packFileService.GetPackFileContainer(fileEditor.CurrentFile);
                 if (containterForPack == container)
                     openFiles.Add(CurrentEditorsList[i]);
             }
@@ -216,6 +214,7 @@ namespace AssetEditor.Services
             return false;
         }
 
+        // Move to a drop handler 
         public bool Drop(IEditorInterface node, IEditorInterface targetNode = default, bool insertAfterTargetNode = default)
         {
             var nodeIndex = CurrentEditorsList.IndexOf(node);

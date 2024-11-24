@@ -17,15 +17,14 @@ namespace AssetEditor.ViewModels
 {
     public partial class MainViewModel : ObservableObject, IDropTarget<IEditorInterface, bool>
     {
-        private readonly IEditorManager _editorManager;
         private readonly PackFileService _packfileService;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         public PackFileBrowserViewModel FileTree { get; private set; }
         public MenuBarViewModel MenuBar { get; set; }
         public IEditorDatabase ToolsFactory { get; set; }
-        public IEditorManager EditorManager { get => _editorManager; } 
 
+        [ObservableProperty] IEditorManager _editorManager;
         [ObservableProperty] private bool _isClosingWithoutPrompt;
         [ObservableProperty] private string _applicationTitle;
         [ObservableProperty] private string _currentGame;
@@ -79,7 +78,6 @@ namespace AssetEditor.ViewModels
         }
 
         [RelayCommand] void CloseTool(IEditorInterface tool) => _editorManager.CloseTool(tool);
-
         [RelayCommand] void CloseOtherTools(IEditorInterface tool) => _editorManager.CloseOtherTools(tool);
         [RelayCommand] void CloseAllTools(IEditorInterface tool) => _editorManager.CloseAllTools(tool);
         [RelayCommand] void CloseToolsToLeft(IEditorInterface tool) => _editorManager.CloseToolsToLeft(tool);
