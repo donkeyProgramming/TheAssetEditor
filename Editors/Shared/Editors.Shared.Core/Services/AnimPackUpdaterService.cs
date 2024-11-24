@@ -1,7 +1,7 @@
 ﻿using System.IO;
+using System.Windows;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
@@ -18,8 +18,14 @@ namespace Editors.Shared.Core.Services
             _pfs = pfs;
         }
 
-        public void Process(PackFileContainer packFileContainer, GameTypeEnum existingPackVersion = GameTypeEnum.Warhammer2, GameTypeEnum outputFormat = GameTypeEnum.Warhammer3)
+        public void Process(GameTypeEnum existingPackVersion = GameTypeEnum.Warhammer2, GameTypeEnum outputFormat = GameTypeEnum.Warhammer3)
         {
+            var packFileContainer = _pfs.GetEditablePack();
+            if (packFileContainer == null)
+            {
+                MessageBox.Show("No editable pack selected");
+                return;
+            }
             var errorList = new ErrorList();
 
             if (outputFormat != GameTypeEnum.Warhammer3)

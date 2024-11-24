@@ -6,7 +6,8 @@
 
         public static bool IsFilenameUnique(PackFileService pfs, string path)
         {
-            if (pfs.HasEditablePackFile() == false)
+            var editablePack = pfs.GetEditablePack();
+            if (editablePack == null)
                 throw new Exception("Can not check if filename is unique if no out packfile is selected");
 
             var file = pfs.FindFile(path, pfs.GetEditablePack());

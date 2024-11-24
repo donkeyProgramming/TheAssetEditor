@@ -17,7 +17,6 @@ namespace Shared.Core.PackFiles
         PackFileContainer? GetEditablePack();
         string GetFullPath(PackFile file, PackFileContainer? container = null);
         PackFileContainer? GetPackFileContainer(PackFile file);
-        bool HasEditablePackFile();
         PackFileContainer? Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false);
         bool LoadAllCaFiles(GameTypeEnum gameEnum);
         PackFileContainer? LoadSystemFolderAsPackFileContainer(string packFileSystemPath);

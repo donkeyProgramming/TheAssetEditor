@@ -36,8 +36,8 @@ namespace Shared.Core.PackFiles
     {
         private readonly ILogger _logger = Logging.Create<PackFileService>();
 
-        private readonly List<PackFileContainer> _packFiles = [];
-        private PackFileContainer? _packSelectedForEdit;
+        private readonly List<PackFileContainer> _packFileContainers = [];
+        private PackFileContainer? _packFileContainerSelectedForEdit;
 
         public bool EnableFileLookUpEvents { get; internal set; } = false;
 
@@ -52,7 +52,7 @@ namespace Shared.Core.PackFiles
             _gameInformationFactory = gameInformationFactory;
         }
 
-        public List<PackFileContainer> GetAllPackfileContainers() => _packFiles.ToList(); // Return a list of the list to avoid bugs!
+        public List<PackFileContainer> GetAllPackfileContainers() => _packFileContainers.ToList(); // Return a list of the list to avoid bugs!
 
 
         public PackFileContainer? LoadSystemFolderAsPackFileContainer(string packFileSystemPath)
@@ -72,7 +72,7 @@ namespace Shared.Core.PackFiles
 
         void AddContainer(PackFileContainer container)
         {
-            _packFiles.Add(container);
+            _packFileContainers.Add(container);
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
         }
 
@@ -97,7 +97,7 @@ namespace Shared.Core.PackFiles
         {
             try
             {
-                var caPacksLoaded = _packFiles.Count(x => x.IsCaPackFile);
+                var caPacksLoaded = _packFileContainers.Count(x => x.IsCaPackFile);
                 if (caPacksLoaded == 0 && allowLoadWithoutCaPackFiles != true)
                 {
                     MessageBox.Show("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
@@ -113,7 +113,7 @@ namespace Shared.Core.PackFiles
                     return null;
                 }
 
-                foreach (var packFile in _packFiles)
+                foreach (var packFile in _packFileContainers)
                 {
                     if (packFile.SystemFilePath == packFileSystemPath)
                     {
@@ -128,7 +128,7 @@ namespace Shared.Core.PackFiles
                 var container = PackFileSerializer.Load(packFileSystemPath, reader, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
                 AddContainer(container);
 
-                var notCaPacksLoaded = _packFiles.Count(x => !x.IsCaPackFile);
+                var notCaPacksLoaded = _packFileContainers.Count(x => !x.IsCaPackFile);
                 if (container.IsCaPackFile == false && setToMainPackIfFirst)
                     SetEditablePack(container);
 
@@ -255,19 +255,11 @@ namespace Shared.Core.PackFiles
         {
             if (pf != null && pf.IsCaPackFile)
                 throw new Exception("Trying to set CA packfile container to be editable - this is not legal!");
-            _packSelectedForEdit = pf;
+            _packFileContainerSelectedForEdit = pf;
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerSetAsMainEditableEvent(pf));
         }
 
-        public PackFileContainer? GetEditablePack() => _packSelectedForEdit;
-        public bool HasEditablePackFile()
-        {
-            if (GetEditablePack() != null)
-                return true;
-            
-            MessageBox.Show("Unable to complete operation, Editable packfile not set.", "Error");
-            return false;
-        }
+        public PackFileContainer? GetEditablePack() => _packFileContainerSelectedForEdit;
 
         public void UnloadPackContainer(PackFileContainer pf)
         {
@@ -277,8 +269,8 @@ namespace Shared.Core.PackFiles
             if (e.AllowClose == false)
                 return;
 
-            _packFiles.Remove(pf);
-            if (_packSelectedForEdit == pf)
+            _packFileContainers.Remove(pf);
+            if (_packFileContainerSelectedForEdit == pf)
                 SetEditablePack(null);
 
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(pf));
@@ -422,7 +414,7 @@ namespace Shared.Core.PackFiles
 
         public PackFileContainer? GetPackFileContainer(PackFile file)
         {
-            foreach (var pf in _packFiles)
+            foreach (var pf in _packFileContainers)
             {
                 var res = pf.FileList.FirstOrDefault(x => x.Value == file).Value;
                 if (res != null)
@@ -438,23 +430,23 @@ namespace Shared.Core.PackFiles
 
             if (container == null)
             {
-                for (var i = _packFiles.Count - 1; i >= 0; i--)
+                for (var i = _packFileContainers.Count - 1; i >= 0; i--)
                 {
-                    if (_packFiles[i].FileList.ContainsKey(lowerPath))
+                    if (_packFileContainers[i].FileList.TryGetValue(lowerPath, out var value))
                     {
                         if (EnableFileLookUpEvents)
-                            _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, _packFiles[i], true));
-                        return _packFiles[i].FileList[lowerPath];
+                            _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, _packFileContainers[i], true));
+                        return value;
                     }
                 }
             }
             else
             {
-                if (container.FileList.ContainsKey(lowerPath))
+                if (container.FileList.TryGetValue(lowerPath, out var value))
                 {
                     if (EnableFileLookUpEvents)
                         _globalEventHub?.PublishGlobalEvent(new PackFileLookUpEvent(path, container, true));
-                    return container.FileList[lowerPath];
+                    return value;
                 }
             }
 
@@ -467,7 +459,7 @@ namespace Shared.Core.PackFiles
         {
             if (container == null)
             {
-                foreach (var pf in _packFiles)
+                foreach (var pf in _packFileContainers)
                 {
                     var res = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
                     if (string.IsNullOrWhiteSpace(res) == false)
@@ -480,6 +472,7 @@ namespace Shared.Core.PackFiles
                 if (string.IsNullOrWhiteSpace(res) == false)
                     return res;
             }
+
             throw new Exception("Unknown path for " + file.Name);
         }
     }
