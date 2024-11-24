@@ -118,66 +118,58 @@ namespace Editors.Shared.Core.Services
 
         void FileDiscovered(PackFile file, PackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
         {
+            if(IsKnownBrokenAnimation(fullPath))
+                return;
+
+            try
+            {
+                var animationSkeletonName = AnimationFile.GetAnimationHeader(file).SkeletonName;
+                AddAnimation(animationSkeletonName, fullPath, container, ref skeletonFileNameList, ref animationList);
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
+            }
+        }
+
+        void FileDiscovered(ByteChunk byteChunk, PackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
+        {
+            if (IsKnownBrokenAnimation(fullPath))
+                return;
+
+            try
+            {
+                var animationSkeletonName = AnimationFile.GetAnimationHeader(byteChunk).SkeletonName;
+                AddAnimation(animationSkeletonName, fullPath, container, ref skeletonFileNameList, ref animationList);
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
+            }
+        }
+
+        bool IsKnownBrokenAnimation(string fullPath)
+        {
             if (Debugger.IsAttached)
             {
                 var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
                 if (brokenAnims.Contains(fullPath))
                 {
                     _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
-                    return;
+                    return true;
                 }
             }
-
-            var animationSkeletonName = "Unkown";
-            try
-            {
-                animationSkeletonName = AnimationFile.GetAnimationHeader(file).SkeletonName;
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
-            }
-
-            lock (_threadLock)
-            {
-                var newEntry = new ObservableCollection<AnimationReference>() { new AnimationReference(fullPath, container) };
-                if (animationList.ContainsKey(animationSkeletonName) == false)
-                    animationList[animationSkeletonName] = [];
-                animationList[animationSkeletonName].Add(new AnimationReference(fullPath, container));
-
-                if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
-                    skeletonFileNameList.Add(fullPath);
-                else if (fullPath.Contains("tech", StringComparison.InvariantCultureIgnoreCase))
-                    skeletonFileNameList.Add(fullPath);
-            }
+            return false;
         }
 
-
-        void FileDiscovered(ByteChunk byteChunk, PackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
+        void AddAnimation(string skeletonName, string fullPath, PackFileContainer container, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
         {
-            var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
-            if (brokenAnims.Contains(fullPath))
-            {
-                _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
-                return;
-            }
-
-            var animationSkeletonName = "Unkown";
-            try
-            {
-                animationSkeletonName = AnimationFile.GetAnimationHeader(byteChunk).SkeletonName;
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
-            }
-
             lock (_threadLock)
             {
                 var newEntry = new ObservableCollection<AnimationReference>() { new AnimationReference(fullPath, container) };
-                if (animationList.ContainsKey(animationSkeletonName) == false)
-                    animationList[animationSkeletonName] = [];
-                animationList[animationSkeletonName].Add(new AnimationReference(fullPath, container));
+                if (animationList.ContainsKey(skeletonName) == false)
+                    animationList[skeletonName] = [];
+                animationList[skeletonName].Add(new AnimationReference(fullPath, container));
 
                 if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
                     skeletonFileNameList.Add(fullPath);
@@ -185,10 +177,6 @@ namespace Editors.Shared.Core.Services
                     skeletonFileNameList.Add(fullPath);
             }
         }
-
-
-
-
 
         void UnloadAnimationFromContainer(PackFileContainer packFileContainer)
         {
