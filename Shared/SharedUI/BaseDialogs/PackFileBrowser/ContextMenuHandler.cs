@@ -134,7 +134,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 {
                     var fileName = Path.GetFileName(file);
                     var packFile = new PackFile(fileName, new MemorySource(File.ReadAllBytes(file)));
-                    var item = new NewFileEntry(parentPath, packFile);
+                    var item = new NewPackFileEntry(parentPath, packFile);
                     _packFileService.AddFilesToPack(_selectedNode.FileOwner, [item]);
                 }
             }
@@ -157,7 +157,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 if (!string.IsNullOrWhiteSpace(parentPath))
                     parentPath += "\\";
                
-                var filesAdded = new List<NewFileEntry>();
+                var filesAdded = new List<NewPackFileEntry>();
                 for (var i = 0; i < filePaths.Count; i++)
                 {
                     var currentPath = filePaths[i];
@@ -165,7 +165,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
            
                     var source = MemorySource.FromFile(originalFilePaths[i]);
                     var file = new PackFile(filename, source);
-                    filesAdded.Add(new NewFileEntry(parentPath.ToLower(), file));
+                    filesAdded.Add(new NewPackFileEntry(parentPath.ToLower(), file));
        
                }
 

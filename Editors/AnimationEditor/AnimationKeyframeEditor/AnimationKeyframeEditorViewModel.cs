@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using AnimationEditor.AnimationKeyframeEditor;
 using AnimationEditor.MountAnimationCreator.ViewModels;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
@@ -22,7 +23,7 @@ using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
 using SkeletonBoneNode = Editors.Shared.Core.Common.ReferenceModel.SkeletonBoneNode;
 
-namespace AnimationEditor.AnimationKeyframeEditor
+namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 {
     public class AnimationKeyframeEditorViewModel : NotifyPropertyChangedImpl, IHostedEditor<AnimationKeyframeEditorViewModel>
     {
@@ -51,7 +52,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public CommandExecutor CommandExecutor { get => _commandExecutor; private set { _commandExecutor = value; } }
         private CommandExecutor _commandExecutor;
-        private readonly SaveHelper _saveHelper;
+        private readonly IFileSaveService _packFileSaveService;
         private SceneObject _newAnimation;
 
         public SceneObject Mount { get => _mount; private set { _mount = value; } }
@@ -81,15 +82,15 @@ namespace AnimationEditor.AnimationKeyframeEditor
         bool _copyMoreThanSingleFrame = false;
 
         public NotifyAttr<bool> DontWarnDifferentSkeletons { get; set; } = new(false);
-        public NotifyAttr<bool> DontWarnIncomingFramesBigger { get; set;  } = new(false);
-        public bool PasteUsingFormBelow 
-        { 
-            get => _pasteUsingFormBelow; 
-            set 
+        public NotifyAttr<bool> DontWarnIncomingFramesBigger { get; set; } = new(false);
+        public bool PasteUsingFormBelow
+        {
+            get => _pasteUsingFormBelow;
+            set
             {
                 SetAndNotify(ref _pasteUsingFormBelow, value);
                 EnableFrameNrStartTextboxOnPaste.Value = !value && CopyMoreThanSingleFrame;
-            } 
+            }
         }
         bool _pasteUsingFormBelow = false;
 
@@ -121,11 +122,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public NotifyAttr<string> SelectedFrameAInterpolation { get; set; } = new("Not set");
         public NotifyAttr<string> SelectedFrameBInterpolation { get; set; } = new("Not set");
 
-        public bool PreviewInterpolation { 
-            get => _previewInterpolation; 
-            set 
+        public bool PreviewInterpolation
+        {
+            get => _previewInterpolation;
+            set
             {
-                SetAndNotify(ref _previewInterpolation, value);                
+                SetAndNotify(ref _previewInterpolation, value);
             }
         }
         private bool _previewInterpolation;
@@ -135,7 +137,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             get => _interpolationOnlyOnSelectedBones;
             set
             {
-                SetAndNotify(ref _interpolationOnlyOnSelectedBones, value);                
+                SetAndNotify(ref _interpolationOnlyOnSelectedBones, value);
             }
         }
         private bool _interpolationOnlyOnSelectedBones;
@@ -146,7 +148,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             set
             {
                 SetAndNotify(ref _interpolationValue, value);
-                if(PreviewInterpolation) ApplyInterpolationOnCurrentFrame();
+                if (PreviewInterpolation) ApplyInterpolationOnCurrentFrame();
             }
         }
         private float _interpolationValue;
@@ -155,7 +157,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public FilterCollection<SkeletonBoneNode> ModelBoneListForIKEndBone { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
         public AnimationSettingsViewModel AnimationSettings { get; set; } = new AnimationSettingsViewModel();
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
-        public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set;  }
+        public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
 
         public AnimationKeyframeEditorViewModel(PackFileService pfs,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
@@ -167,7 +169,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             SelectionManager selectionManager,
             GizmoComponent gizmoComponent,
             CommandExecutor commandExecutor,
-            SaveHelper saveHelper)
+            IFileSaveService packFileSaveService)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
             _animationPlayerViewModel = animationPlayerViewModel;
@@ -182,7 +184,8 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             _gizmoComponent = gizmoComponent;
             _commandExecutor = commandExecutor;
-            _saveHelper = saveHelper;
+            _packFileSaveService = packFileSaveService;
+
             SelectedRiderBone = new FilterCollection<SkeletonBoneNode>(null, (x) => UpdateCanSaveAndPreviewStates());
 
             ActiveOutputFragment = new FilterCollection<IAnimationBinGenericFormat>(null, OutputAnimationSetSelected);
@@ -190,12 +193,12 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             ActiveFragmentSlot = new FilterCollection<AnimationBinEntryGenericFormat>(null, (x) => UpdateCanSaveAndPreviewStates());
             ActiveFragmentSlot.SearchFilter = (value, rx) => { return rx.Match(value.SlotName).Success; };
-            
+
         }
 
         private void OutputAnimationSetSelected(IAnimationBinGenericFormat newValue)
         {
-            
+
         }
 
         public string EditorName => "Keyedframing Editor";
@@ -237,17 +240,17 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             MountSkeletonChanged(_mount.Skeleton);
             RiderSkeletonChanges(_rider.Skeleton);
-            _rider.Player.OnFrameChanged += RiderOnFrameChanged;            
+            _rider.Player.OnFrameChanged += RiderOnFrameChanged;
         }
 
         private void UpdateCanSaveAndPreviewStates()
         {
-            
+
         }
 
         private void RiderOnFrameChanged(int currentFrame)
-        {            
-            if(_rider.Player.AnimationClip != null)
+        {
+            if (_rider.Player.AnimationClip != null)
             {
                 CurrentFrameNumber.Value = _rider.Player.CurrentFrame.ToString();
                 TotalFrameNumber.Value = _rider.Player.AnimationClip.DynamicFrames.Count.ToString();
@@ -264,7 +267,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             if (_newAnimation != null)
                 _sceneObjectBuilder.SetAnimation(_newAnimation, null);
 
-            if(newValue != null)
+            if (newValue != null)
             {
                 _originalClip = newValue.Clone();
                 FramesDurationInSeconds = _originalClip.PlayTimeInSec.ToString();
@@ -311,9 +314,9 @@ namespace AnimationEditor.AnimationKeyframeEditor
         }
 
         public List<int> GetSelectedBones() => _gizmoToolbox.PreviousSelectedBones;
-        
+
         public List<int> GetModifiedBones() => _gizmoToolbox.ModifiedBones;
-        
+
         public int GetModifiedFrameNr() => _gizmoToolbox.ModifiedFrameNr;
 
         public void DuplicateFrame()
@@ -326,7 +329,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             Pause();
             var currentFrame = _rider.Player.CurrentFrame;
-             _commandFactory.Create<DuplicateFrameBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, currentFrame)).BuildAndExecute();
+            _commandFactory.Create<DuplicateFrameBoneCommand>().Configure(x => x.Configure(_rider.AnimationClip, currentFrame)).BuildAndExecute();
             _selectionComponent.SetBoneSelectionMode();
             _rider.Player.CurrentFrame++;
         }
@@ -390,14 +393,14 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public void ResetPose()
         {
             var currentFrame = _rider.Player.CurrentFrame;
-            if(_rider.AnimationClip == null || _originalClip == null)
+            if (_rider.AnimationClip == null || _originalClip == null)
             {
                 MessageBox.Show("animation not loaded!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             var maximumFramesOriginal = _originalClip.DynamicFrames.Count;
 
-            if(currentFrame > maximumFramesOriginal - 1)
+            if (currentFrame > maximumFramesOriginal - 1)
             {
                 MessageBox.Show("cannot reset the frame as this is a new frame!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -426,7 +429,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
         public void PastePreviousEditedNodesIntoCurrentPose()
         {
             _copyPastePose.PastePreviousEditedNodesIntoCurrentPose();
-        }       
+        }
         private void CopyASingleFrameClipboard()
         {
             _copyPasteClipboardPose.CopySingle();
@@ -439,7 +442,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public void CopyPoseInRangeToClipboard()
         {
-            if(CopyMoreThanSingleFrame)
+            if (CopyMoreThanSingleFrame)
             {
                 CopyMultipleFramesClipboard();
             }
@@ -447,7 +450,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
             {
                 CopyASingleFrameClipboard();
             }
-           
+
         }
 
         public void PasteASingleFrameClipboard()
@@ -468,7 +471,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
         public void PastePoseInRangeFromClipboard()
         {
-            if(PasteUsingFormBelow)
+            if (PasteUsingFormBelow)
             {
                 PasteMultipleFramesClipboardInRanges();
             }
@@ -691,17 +694,17 @@ namespace AnimationEditor.AnimationKeyframeEditor
                 return;
             }
 
-            if(!IsDirty.Value)
+            if (!IsDirty.Value)
             {
                 MessageBox.Show("there is nothing to save!", "warn", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             var animFile = _rider.AnimationClip.ConvertToFileFormat(_rider.Skeleton);
             var path = _rider.AnimationName.Value.AnimationFile;
-            MessageBox.Show($"this will save with anim version {animFile.Header.Version}\n"+
+            MessageBox.Show($"this will save with anim version {animFile.Header.Version}\n" +
                             $"on this path {path}\n", "warn", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            _saveHelper.Save(path, null, AnimationFile.ConvertToBytes(animFile), true);
+            _packFileSaveService.Save(path, AnimationFile.ConvertToBytes(animFile), true);
             IsDirty.Value = false;
         }
         public void SaveAs()
@@ -716,7 +719,7 @@ namespace AnimationEditor.AnimationKeyframeEditor
 
             MessageBox.Show($"this will save with anim version {animFile.Header.Version}", "info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             var bytes = AnimationFile.ConvertToBytes(animFile);
-            _saveHelper.SaveAs(bytes, ".anim");
+            _packFileSaveService.SaveAs(".anim", bytes);
             IsDirty.Value = false;
         }
     }

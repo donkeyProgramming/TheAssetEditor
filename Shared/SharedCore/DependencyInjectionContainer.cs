@@ -20,28 +20,18 @@ namespace Shared.Core
         {
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<IEditorDatabase, EditorDatabase>();
-
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
             services.AddSingleton<PackFileService>();
-            services.AddSingleton<IPackFileSaveService, PackFileSaveService>();
+            services.AddSingleton<IFileSaveService, FileSaveService>();
             services.AddSingleton<ScopeRepository>();
             services.AddSingleton<TouchedFilesRecorder>();
-            services.AddSingleton<SaveHelper>();
-            
-
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
-            
-            
             services.AddScoped<IEventHub, LocalScopeEventHub>();
             services.AddSingleton<IGlobalEventHub, SingletonScopeEventHub>();
-
             services.AddScoped<IExceptionService, ExceptionService>();
             services.AddScoped<IExceptionInformationProvider, BasicExceptionInformationProvider>();
-
             services.AddTransient<DevelopmentConfigurationManager>();
-
-
         }
     }
 

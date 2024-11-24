@@ -20,15 +20,13 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
     public class NodeToRmvSaveHelper
     {
         private readonly ILogger _logger = Logging.Create<NodeToRmvSaveHelper>();
-        private readonly PackFileService _packFileService;
+        private readonly IFileSaveService _packFileSaveService;
         private readonly MeshBuilderService _meshBuilderService;
-        private readonly SaveHelper _saveHelper;
-
-        public NodeToRmvSaveHelper(PackFileService packFileService, MeshBuilderService meshBuilderService, SaveHelper saveHelper)
+       
+        public NodeToRmvSaveHelper(IFileSaveService packFileSaveService, MeshBuilderService meshBuilderService)
         {
-            _packFileService = packFileService;
+            _packFileSaveService = packFileSaveService;
             _meshBuilderService = meshBuilderService;
-            _saveHelper = saveHelper;
         }
 
         public void Save(string outputPath, Rmv2ModelNode mainNode, GameSkeleton? skeleton, RmvVersionEnum rmvVersionEnum, GeometrySaveSettings saveSettings)
@@ -36,9 +34,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             try
             {
                 var bytes = GenerateBytes(mainNode, rmvVersionEnum, skeleton, saveSettings, true);
-                
-                var originalFileHandle = _packFileService.FindFile(outputPath);
-                var res = _saveHelper.Save(outputPath, originalFileHandle, bytes);
+                _packFileSaveService.Save(outputPath, bytes, false);
             }
             catch (Exception e)
             {
@@ -52,7 +48,6 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             _logger.Here().Information($"Starting to save model. Skeleton = {skeleton}, Version = {version}");
 
             var lodCount = (uint)modelNode.Children.Count;
-
             if (saveSettings.LodSettingsPerLod.Count != lodCount )
                 throw new Exception($"Error computer number of lods. LodCount:{lodCount}, SaveSettings.LodSettingsPerLod.Count{saveSettings.LodSettingsPerLod.Count}");
 

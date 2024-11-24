@@ -1,4 +1,5 @@
 ﻿using AnimationEditor.Common.BaseControl;
+using Editors.AnimationMeta.MetaEditor.Commands;
 using Editors.AnimationMeta.Presentation;
 using Editors.AnimationMeta.Presentation.Commands;
 using Editors.AnimationMeta.Presentation.View;

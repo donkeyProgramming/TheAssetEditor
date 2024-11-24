@@ -69,7 +69,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
                     _logger.Here().Information($"saving animation files");
 
-                    var filesToAdd = convertedAnimFiles.Select(x => new NewFileEntry(x.directory, x.file)).ToList();
+                    var filesToAdd = convertedAnimFiles.Select(x => new NewPackFileEntry(x.directory, x.file)).ToList();
 
                     _pfs.AddFilesToPack(_pfs.GetEditablePack(), filesToAdd);
 

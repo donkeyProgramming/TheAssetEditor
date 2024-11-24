@@ -7,7 +7,7 @@ namespace Shared.Core.PackFiles
     {
         bool EnableFileLookUpEvents { get; }
 
-        void AddFilesToPack(PackFileContainer container, List<PackFileService.NewFileEntry> newFiles);
+        void AddFilesToPack(PackFileContainer container, List<NewPackFileEntry> newFiles);
         void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target);
         PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type, bool setEditablePack = false);
         void DeleteFile(PackFileContainer pf, PackFile file);

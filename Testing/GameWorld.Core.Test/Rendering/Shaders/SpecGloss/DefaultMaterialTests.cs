@@ -34,7 +34,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
 
         MaterialToWsMaterialSerializer CreateWsMaterialSerializer(GameTypeEnum gameTypeEnum)
         {
-            var saveHelper = new PackFileSaveService(_pfs, null);
+            var saveHelper = new FileSaveService(_pfs, null);
             var materialRepo = new WsMaterialRepository(_pfs);
             return new MaterialToWsMaterialSerializer(saveHelper, materialRepo, gameTypeEnum);
         }

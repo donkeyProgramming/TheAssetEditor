@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.AnimationMeta.MetaEditor.Commands;
 using Editors.AnimationMeta.Presentation.Commands;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;

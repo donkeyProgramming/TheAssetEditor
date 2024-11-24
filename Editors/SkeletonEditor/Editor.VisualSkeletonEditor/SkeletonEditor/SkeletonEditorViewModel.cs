@@ -23,7 +23,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
 
         private readonly PackFileService _packFileService;
         private readonly CopyPasteManager _copyPasteManager;
-        private readonly SaveHelper _saveHelper;
+        private readonly IFileSaveService _packFileSaveService;
         [ObservableProperty] string _skeletonName = "";
         [ObservableProperty] string _refMeshName = "";
         [ObservableProperty] string _sourceSkeletonName = "";
@@ -45,14 +45,14 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
             PackFileService pfs,
             CopyPasteManager copyPasteManager,
             IEditorHostParameters editorHostParameters,
-            SaveHelper saveHelper)
+            IFileSaveService packFileSaveService)
             : base(editorHostParameters)
         {
             DisplayName = "Skeleton Editor";
 
             _packFileService = pfs;
             _copyPasteManager = copyPasteManager;
-            _saveHelper = saveHelper;
+            _packFileSaveService = packFileSaveService;
             _selectedBoneRotationOffset = new Vector3ViewModel(0, 0, 0, x=> HandleTranslationChanged());
             _selectedBoneTranslationOffset = new Vector3ViewModel(0, 0, 0, x => HandleTranslationChanged());
 
@@ -243,12 +243,12 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
             animFile.Header.SkeletonName = SourceSkeletonName;
             var animationBytes = AnimationFile.ConvertToBytes(animFile);
 
-            var result = _saveHelper.Save(SkeletonName, null, animationBytes);
+            var result = _packFileSaveService.Save(SkeletonName, animationBytes, false);
             SkeletonName = _packFileService.GetFullPath(result);
 
             var invMatrixFile = _techSkeletonNode.Skeleton.CreateInvMatrixFile();
             var invMatrixPath = Path.ChangeExtension(SkeletonName, ".bone_inv_trans_mats");
-            _saveHelper.Save(invMatrixPath, null, invMatrixFile.GetBytes(), false);
+            _packFileSaveService.Save(invMatrixPath, invMatrixFile.GetBytes(), false);
         }
 
         public void LoadSkeletonAction()

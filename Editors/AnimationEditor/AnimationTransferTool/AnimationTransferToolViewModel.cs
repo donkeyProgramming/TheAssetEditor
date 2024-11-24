@@ -34,7 +34,7 @@ namespace AnimationEditor.AnimationTransferTool
         private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
         private readonly SceneObjectEditor _assetViewModelBuilder;
         private readonly IWindowFactory _windowFactory;
-        private readonly SaveHelper _saveHelper;
+        private readonly IFileSaveService _packFileSaveService;
         private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
         private readonly PackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -64,12 +64,13 @@ namespace AnimationEditor.AnimationTransferTool
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
             SceneObjectEditor assetViewModelBuilder,
             IWindowFactory windowFactory,
-            SaveHelper saveHelper)
+            IFileSaveService packFileSaveService)
         {
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
             _assetViewModelBuilder = assetViewModelBuilder;
             _windowFactory = windowFactory;
-            _saveHelper = saveHelper;
+            _packFileSaveService = packFileSaveService;
+     
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _player = player;
@@ -374,9 +375,9 @@ namespace AnimationEditor.AnimationTransferTool
             var newPath = animationName.Replace(orgSkeleton, newSkeleton);
             var currentFileName = Path.GetFileName(newPath);
             newPath = newPath.Replace(currentFileName, AnimationSettings.SavePrefix.Value + currentFileName);
-            newPath = SaveHelper.EnsureEnding(newPath, ".anim");
+            newPath = SaveUtility.EnsureEnding(newPath, ".anim");
 
-            _saveHelper.Save(newPath, null, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
+            _packFileSaveService.Save(newPath, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
         }
 
         public void ClearAllSettings()

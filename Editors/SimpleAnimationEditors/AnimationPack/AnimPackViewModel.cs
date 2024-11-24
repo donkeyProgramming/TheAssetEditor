@@ -25,7 +25,8 @@ namespace CommonControls.Editors.AnimationPack
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private ITextConverter _activeConverter;
         private readonly ApplicationSettingsService _appSettings;
-        private readonly SaveHelper _saveHelper;
+        private readonly IFileSaveService _packFileSaveService;
+ 
 
         public string DisplayName { get; set; } = "Not set";
 
@@ -41,12 +42,13 @@ namespace CommonControls.Editors.AnimationPack
         public ICommand RenameCommand { get; set; }
         public ICommand CopyFullPathCommand { get; set; }
 
-        public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings, SaveHelper saveHelper)
+        public AnimPackViewModel(PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings, IFileSaveService packFileSaveService)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _appSettings = appSettings;
-            _saveHelper = saveHelper;
+            _packFileSaveService = packFileSaveService;
+ 
             AnimationPackItems = new FilterCollection<IAnimationPackFile>(new List<IAnimationPackFile>(), ItemSelected, BeforeItemSelected)
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
@@ -97,7 +99,7 @@ namespace CommonControls.Editors.AnimationPack
             var window = new TextInputWindow("Fragment name", "");
             if (window.ShowDialog() == true)
             {
-                var filename = SaveHelper.EnsureEnding(window.TextValue, ".frg");
+                var filename = SaveUtility.EnsureEnding(window.TextValue, ".frg");
                 return filename;
             }
 
@@ -219,7 +221,7 @@ namespace CommonControls.Editors.AnimationPack
 
             var savePath = _pfs.GetFullPath(_packFile);
 
-            var result = _saveHelper.Save(savePath, null, AnimationPackSerializer.ConvertToBytes(newAnimPack));
+            var result = _packFileSaveService.Save(savePath, AnimationPackSerializer.ConvertToBytes(newAnimPack), false);
             if (result != null)
             {
                 HasUnsavedChanges = false;

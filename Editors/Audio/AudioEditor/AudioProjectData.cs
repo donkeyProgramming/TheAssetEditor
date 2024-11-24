@@ -43,7 +43,7 @@ namespace Editors.Audio.AudioEditor
             var editablePack = packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(audioProjectJson);
 
-            var fileEntry = new NewFileEntry("AudioProjects", new PackFile($"{audioProjectName}.json", new MemorySource(byteArray)));
+            var fileEntry = new NewPackFileEntry("AudioProjects", new PackFile($"{audioProjectName}.json", new MemorySource(byteArray)));
             packFileService.AddFilesToPack(editablePack, [fileEntry]);
 
             _logger.Here().Information($"Saved Audio Project file: {audioProjectName}");

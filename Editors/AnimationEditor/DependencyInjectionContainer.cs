@@ -1,8 +1,8 @@
-﻿using AnimationEditor.AnimationKeyframeEditor;
-using AnimationEditor.AnimationTransferTool;
+﻿using AnimationEditor.AnimationTransferTool;
 using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.Common.BaseControl;
 using AnimationEditor.MountAnimationCreator;
+using Editors.AnimationVisualEditors.AnimationKeyframeEditor;
 using Editors.Shared.Core.Common.BaseControl;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;

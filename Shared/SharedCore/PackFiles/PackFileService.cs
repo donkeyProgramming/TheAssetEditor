@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Serilog;
@@ -101,7 +100,7 @@ namespace Shared.Core.PackFiles
                 var caPacksLoaded = _packFiles.Count(x => x.IsCaPackFile);
                 if (caPacksLoaded == 0 && allowLoadWithoutCaPackFiles != true)
                 {
-                    MessageBox.Show("You are trying to load a oack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
+                    MessageBox.Show("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
 
                     if (System.Diagnostics.Debugger.IsAttached == false)
                         return null;
@@ -146,12 +145,10 @@ namespace Shared.Core.PackFiles
         public bool LoadAllCaFiles(GameTypeEnum gameEnum)
         {
             var game = _gameInformationFactory.GetGameById(gameEnum);
-            var path = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type);
-            return LoadAllCaFiles(path.Path, game.DisplayName);
-        }
+            var gamePathInfo = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type);
+            var gameDataFolder = gamePathInfo!.Path;
+            var gameName = game.DisplayName;
 
-        bool LoadAllCaFiles(string gameDataFolder, string gameName)
-        {
             try
             {
                 _logger.Here().Information($"Loading pack files for {gameName} located in {gameDataFolder}");
@@ -214,13 +211,7 @@ namespace Shared.Core.PackFiles
             return newPackFile;
         }
 
-
-
-
-        public record NewFileEntry(string DirectoyPath, PackFile PackFile);
-
-
-        public void AddFilesToPack(PackFileContainer container, List<NewFileEntry> newFiles)
+        public void AddFilesToPack(PackFileContainer container, List<NewPackFileEntry> newFiles)
         {
             if (container.IsCaPackFile)
                 throw new Exception("Can not add files to ca pack file");
@@ -262,6 +253,8 @@ namespace Shared.Core.PackFiles
 
         public void SetEditablePack(PackFileContainer? pf)
         {
+            if (pf != null && pf.IsCaPackFile)
+                throw new Exception("Trying to set CA packfile container to be editable - this is not legal!");
             _packSelectedForEdit = pf;
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerSetAsMainEditableEvent(pf));
         }
@@ -269,16 +262,12 @@ namespace Shared.Core.PackFiles
         public PackFileContainer? GetEditablePack() => _packSelectedForEdit;
         public bool HasEditablePackFile()
         {
-            if (GetEditablePack() == null)
-            {
-                MessageBox.Show("Unable to complete operation, Editable packfile not set.", "Error");
-                return false;
-            }
-            return true;
+            if (GetEditablePack() != null)
+                return true;
+            
+            MessageBox.Show("Unable to complete operation, Editable packfile not set.", "Error");
+            return false;
         }
-
-
-
 
         public void UnloadPackContainer(PackFileContainer pf)
         {
@@ -293,7 +282,6 @@ namespace Shared.Core.PackFiles
                 SetEditablePack(null);
 
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerRemovedEvent(pf));
-
         }
 
         public void DeleteFolder(PackFileContainer pf, string folder)
@@ -387,11 +375,9 @@ namespace Shared.Core.PackFiles
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(pf, [file]));
         }
 
-        // Move to PackFileSave?
         public void SaveFile(PackFile file, byte[] data)
         {
-            var pf = GetPackFileContainer(file);
-
+            var pf = GetEditablePack();
             if (pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
             file.DataSource = new MemorySource(data);
@@ -410,7 +396,7 @@ namespace Shared.Core.PackFiles
             if (pf.IsCaPackFile)
                 throw new Exception("Can not save ca pack file");
             if (createBackup)
-                SaveHelper.CreateFileBackup(path);
+                SaveUtility.CreateFileBackup(path);
 
             // Check if file has changed in size
             if (pf.OriginalLoadByteSize != -1)
@@ -421,13 +407,11 @@ namespace Shared.Core.PackFiles
                     throw new Exception("File has been changed outside of AssetEditor. Can not save the file as it will cause corruptions");
             }
 
-            //_skeletonAnimationLookUpHelper?.UnloadAnimationFromContainer(this, pf);
-
             pf.SystemFilePath = path;
             using (var memoryStream = new FileStream(path + "_temp", FileMode.OpenOrCreate))
             {
-                using (var writer = new BinaryWriter(memoryStream))
-                    pf.SaveToByteArray(writer);
+                using var writer = new BinaryWriter(memoryStream);
+                pf.SaveToByteArray(writer);
             }
 
             File.Delete(path);
@@ -436,10 +420,6 @@ namespace Shared.Core.PackFiles
             pf.OriginalLoadByteSize = new FileInfo(path).Length;
         }
 
-
-
-
-        //------------------------
         public PackFileContainer? GetPackFileContainer(PackFile file)
         {
             foreach (var pf in _packFiles)
@@ -451,7 +431,6 @@ namespace Shared.Core.PackFiles
             _logger.Here().Information($"Unknown packfile container for {file.Name}");
             return null;
         }
-
 
         public PackFile? FindFile(string path, PackFileContainer? container = null)
         {
@@ -504,4 +483,6 @@ namespace Shared.Core.PackFiles
             throw new Exception("Unknown path for " + file.Name);
         }
     }
+
+    public record NewPackFileEntry(string DirectoyPath, PackFile PackFile);
 }

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AnimationEditor.MountAnimationCreator;
+using AnimationEditor.MountAnimationCreator.Services;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
@@ -11,7 +13,7 @@ using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 using static Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
 
-namespace AnimationEditor.MountAnimationCreator.Services
+namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
 {
     class BatchProcessorService
     {
@@ -21,7 +23,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         MountAnimationGeneratorService _animationGenerator;
         BatchProcessOptions _batchProcessOptions;
-        private readonly SaveHelper _saveHelper;
+        private readonly IFileSaveService _packFileSaveService;
         IAnimationBinGenericFormat _mountFragment;
         IAnimationBinGenericFormat _riderFragment;
 
@@ -34,26 +36,26 @@ namespace AnimationEditor.MountAnimationCreator.Services
         string _animBinName = "test_tables.bin";
 
         public BatchProcessorService(
-            PackFileService pfs, 
+            PackFileService pfs,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
-            MountAnimationGeneratorService animationGenerator, 
+            MountAnimationGeneratorService animationGenerator,
             BatchProcessOptions batchProcessOptions,
-            SaveHelper saveHelper,
+            IFileSaveService packFileSaveService,
             uint animationOutputFormat)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _animationGenerator = animationGenerator;
             _batchProcessOptions = batchProcessOptions;
-            _saveHelper = saveHelper;
+            _packFileSaveService = packFileSaveService;
             _animationOutputFormat = animationOutputFormat;
 
 
 
             if (_batchProcessOptions != null)
             {
-                _animPackName = SaveHelper.EnsureEnding(batchProcessOptions.AnimPackName, ".animpack");
-                _animBinName = SaveHelper.EnsureEnding(batchProcessOptions.AnimPackName, "_tables.bin");
+                _animPackName = SaveUtility.EnsureEnding(batchProcessOptions.AnimPackName, ".animpack");
+                _animBinName = SaveUtility.EnsureEnding(batchProcessOptions.AnimPackName, "_tables.bin");
             }
         }
 
@@ -144,12 +146,12 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
             if (_animationOutputFormat != 7)
             {
-                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName( animFile.Header.SkeletonName);
+                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animFile.Header.SkeletonName);
                 animFile.ConvertToVersion(_animationOutputFormat, skeleton, _pfs);
             }
 
             var bytes = AnimationFile.ConvertToBytes(animFile);
-            _saveHelper.Save(newAnimationName, null, bytes);
+            _packFileSaveService.Save(newAnimationName, bytes, false);
 
             return newAnimationName;
         }
@@ -216,7 +218,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         void SaveFiles()
         {
             var bytes = AnimationPackSerializer.ConvertToBytes(_outAnimPack);
-            _saveHelper.Save("animations\\database\\battle\\bin\\" + _animPackName, null, bytes);
+            _packFileSaveService.Save("animations\\database\\battle\\bin\\" + _animPackName, bytes, false);
         }
 
         AnimationClip LoadAnimation(string path, GameSkeleton skeleton)
@@ -234,7 +236,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
 
         string GenerateNewAnimationName(string fullPath, string prefix, int numberId = 0)
         {
-            string numberPostFix = "";
+            var numberPostFix = "";
             if (numberId != 0)
                 numberPostFix = "_" + numberId;
 

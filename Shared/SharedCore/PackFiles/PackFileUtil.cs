@@ -58,7 +58,7 @@ namespace Shared.Core.PackFiles
 
         public static List<PackFile> LoadFilesFromDisk(PackFileService pfs, IEnumerable<FileRef> fileRefs)
         {
-            var packFileList = new List<NewFileEntry>();
+            var packFileList = new List<NewPackFileEntry>();
             foreach (var fileRef in fileRefs)
             {
                 var fileSource = new FileSystemSource(fileRef.SystemPath);
@@ -67,7 +67,7 @@ namespace Shared.Core.PackFiles
                     packfileName = Path.GetFileName(fileRef.SystemPath);
                 var packfile = new PackFile(packfileName, fileSource);
 
-                packFileList.Add( new NewFileEntry(fileRef.PackFilePath, packfile));
+                packFileList.Add( new NewPackFileEntry(fileRef.PackFilePath, packfile));
             }
 
             pfs.AddFilesToPack(pfs.GetEditablePack(), packFileList);

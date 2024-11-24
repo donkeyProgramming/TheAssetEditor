@@ -18,12 +18,12 @@ namespace GameWorld.Core.Services.SceneSaving.Material
     {
         private readonly ILogger _logger = Logging.Create<WsModelGeneratorService>();
         private readonly PackFileService _packFileService;
-        private readonly SaveHelper _saveHelper;
+        private readonly IFileSaveService _packFileSaveService;
 
-        public WsModelGeneratorService(PackFileService packFileService, SaveHelper saveHelper)
+        public WsModelGeneratorService(PackFileService packFileService, IFileSaveService packFileSaveService)
         {
             _packFileService = packFileService;
-            _saveHelper = saveHelper;
+            _packFileSaveService = packFileSaveService;
         }
 
         public (bool Status, string? CreatedFilePath) GenerateWsModel(IMaterialToWsMaterialSerializer wsMaterialGenerator, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
@@ -40,7 +40,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material
 
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
-                _saveHelper.Save(wsModelPath, existingWsModelFile, Encoding.UTF8.GetBytes(wsModelData));
+                _packFileSaveService.Save(wsModelPath, Encoding.UTF8.GetBytes(wsModelData), false);
 
                 return (true, wsModelPath);
             }

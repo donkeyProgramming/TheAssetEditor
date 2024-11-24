@@ -80,14 +80,15 @@ namespace GameWorld.Core.Utility
             return Path.ChangeExtension(fileToConvert, ".png");
         }
 
-        public static PackFile LoadTexture(SaveHelper saveHelper, string packFilePath, string systemFilePath, TextureType texureType)
+        public static PackFile LoadTexture(string packFilePath, string systemFilePath, TextureType texureType)
         {
-            var ddsPath = SaveTextureAsDDS(systemFilePath, texureType);
-            var data = File.ReadAllBytes(ddsPath);
-            var correctPath = Path.ChangeExtension(packFilePath, "dds");
-            var result = saveHelper.Save(correctPath, null, data, false);
-            File.Delete(ddsPath);
-            return result;
+            throw new NotImplementedException();
+           //var ddsPath = SaveTextureAsDDS(systemFilePath, texureType);
+           //var data = File.ReadAllBytes(ddsPath);
+           //var correctPath = Path.ChangeExtension(packFilePath, "dds");
+           //var result = saveHelper.Save(correctPath, null, data, false);
+           //File.Delete(ddsPath);
+           //return result;
         }
 
         public static string SaveTextureAsDDS(string systemFilePath, TextureType texureType)

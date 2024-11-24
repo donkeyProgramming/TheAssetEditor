@@ -25,6 +25,7 @@ using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.ReferenceModel;
+using Editors.AnimationVisualEditors.MountAnimationCreator.Services;
 
 
 namespace AnimationEditor.MountAnimationCreator
@@ -34,7 +35,7 @@ namespace AnimationEditor.MountAnimationCreator
         public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly SceneObjectEditor _sceneObjectBuilder;
-        private readonly SaveHelper _saveHelper;
+        private readonly IFileSaveService _fileSaveService;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly PackFileService _pfs;
@@ -74,19 +75,19 @@ namespace AnimationEditor.MountAnimationCreator
         public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
         public FilterCollection<AnimationBinEntryGenericFormat> ActiveFragmentSlot { get; set; }
 
-        public MountAnimationCreatorViewModel( PackFileService pfs, 
+        public MountAnimationCreatorViewModel(PackFileService pfs, 
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
             SelectionManager selectionManager,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
             SceneObjectEditor sceneObjectBuilder,
-            SaveHelper saveHelper,
+            IFileSaveService fileSaveService,
             IUiCommandFactory uiCommandFactory)
         {
             _sceneObjectViewModelBuilder = sceneObjectViewModelBuilder;
             _animationPlayerViewModel = animationPlayerViewModel;
             _sceneObjectBuilder = sceneObjectBuilder;
-            _saveHelper = saveHelper;
+            _fileSaveService = fileSaveService;
             _uiCommandFactory = uiCommandFactory;
             _pfs = pfs;
 
@@ -299,7 +300,7 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void SaveCurrentAnimationAction()
         {
-            var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), new BatchProcessOptions { SavePrefix = SavePrefixText.Value }, _saveHelper, SelectedAnimationOutputFormat.Value);
+            var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), new BatchProcessOptions { SavePrefix = SavePrefixText.Value }, _fileSaveService, SelectedAnimationOutputFormat.Value);
             service.SaveSingleAnim(_mount.AnimationClip, _rider.AnimationClip, _rider.AnimationName.Value.AnimationFile);
         }
 
@@ -312,7 +313,7 @@ namespace AnimationEditor.MountAnimationCreator
             var batchSettings = BatchProcessOptionsWindow.ShowDialog(newFileName, SavePrefixText.Value);
             if (batchSettings != null)
             {
-                var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), batchSettings, _saveHelper, SelectedAnimationOutputFormat.Value);
+                var service = new BatchProcessorService(_pfs, _skeletonAnimationLookUpHelper, CreateAnimationGenerator(), batchSettings, _fileSaveService, SelectedAnimationOutputFormat.Value);
                 service.Process(mountFrag, riderFrag);
                 MountLinkController.ReloadFragments(true, false);
 

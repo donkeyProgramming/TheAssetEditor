@@ -102,7 +102,7 @@ namespace Editors.Audio.BnkCompiler
                 var outputName = $"{fileNameWithoutExtension}_generated.json";
 
                 // Add file to pack
-                var fileEntry = new NewFileEntry(directory, PackFile.CreateFromASCII(outputName, compilerDataAsStr));
+                var fileEntry = new NewPackFileEntry(directory, PackFile.CreateFromASCII(outputName, compilerDataAsStr));
                 _packFileService.AddFilesToPack(_packFileService.GetEditablePack(), [fileEntry]);
             }
         }

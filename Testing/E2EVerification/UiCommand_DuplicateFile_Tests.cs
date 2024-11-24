@@ -1,7 +1,7 @@
 ﻿using E2EVerification.Shared;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Events.UiCommands;
-using static Shared.Core.PackFiles.PackFileService;
 
 namespace E2EVerification
 {
@@ -17,7 +17,7 @@ namespace E2EVerification
             var sourcePackFile = runner.CreateEmptyPackFile("SourcePack", false);
             var outputPackFile = runner.CreateEmptyPackFile("OutputPack", true);
 
-            var fileEntry = new NewFileEntry("Animation\\Meta", PackFile.CreateFromASCII(fileName, "DummyContent"));
+            var fileEntry = new NewPackFileEntry("Animation\\Meta", PackFile.CreateFromASCII(fileName, "DummyContent"));
             runner.PackFileService.AddFilesToPack(sourcePackFile, [fileEntry]);
             var fileToCopy = runner.PackFileService.FindFile("Animation\\Meta\\" + fileName, sourcePackFile);
 

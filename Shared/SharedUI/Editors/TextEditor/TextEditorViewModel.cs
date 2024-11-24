@@ -25,16 +25,17 @@ namespace Shared.Ui.Editors.TextEditor
         public string Text { get => _text; set => SetAndNotify(ref _text, value); }
 
         PackFile _packFile;
-        private readonly SaveHelper _saveHelper;
+        private readonly IFileSaveService _packFileSaveService;
         private readonly PackFileService _pf;
 
         ITextEditor _textEditor;
         TextConverter _converter;
 
-        public TextEditorViewModel(SaveHelper saveHelper, PackFileService pf, TextConverter converter)
+        public TextEditorViewModel(IFileSaveService packFileSaveService, PackFileService pf, TextConverter converter)
         {
             _converter = converter;
-            _saveHelper = saveHelper;
+      
+            _packFileSaveService = packFileSaveService;
             _pf = pf;
             SaveCommand = new RelayCommand(() => Save());
         }
@@ -95,7 +96,7 @@ namespace Shared.Ui.Editors.TextEditor
                 }
             }
 
-            var res = _saveHelper.Save(path, MainFile, bytes);
+            var res = _packFileSaveService.Save(path, bytes, false);
             if (res != null)
                 MainFile = res;
             return false;

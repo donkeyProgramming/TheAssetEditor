@@ -37,7 +37,7 @@ namespace Shared.Ui.Events.UiCommands
             var path = Path.GetDirectoryName(parentPath);
             var editablePack = _packFileService.GetEditablePack();
 
-            var fileEntry = new NewFileEntry(path, packFile);
+            var fileEntry = new NewPackFileEntry(path, packFile);
             _packFileService.AddFilesToPack(editablePack, [fileEntry]);
         }
     }

@@ -37,7 +37,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             var bytesRmv2 = ModelFactory.Create().Save(rmv2File);
             var packFileImported = new PackFile(importedFileName, new MemorySource(bytesRmv2));
 
-            var newFile = new NewFileEntry(settings.destinationPackFolder.GetFullPath(), packFileImported);
+            var newFile = new NewPackFileEntry(settings.destinationPackFolder.GetFullPath(), packFileImported);
             _packFileService.AddFilesToPack(settings.destinationPackFolder.FileOwner, [newFile]);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
+using Editors.AnimationMeta.Presentation;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -7,20 +8,20 @@ using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace Editors.AnimationMeta.Presentation.Commands
+namespace Editors.AnimationMeta.MetaEditor.Commands
 {
     class SaveCommand : IUiCommand
     {
         private readonly ILogger _logger = Logging.Create<SaveCommand>();
         private readonly PackFileService _packFileService;
         private readonly IEventHub _eventHub;
-        private readonly SaveHelper _saveHelper;
+        private readonly IFileSaveService _packFileSaveService;
 
-        public SaveCommand(PackFileService packFileService, IEventHub eventHub, SaveHelper saveHelper)
+        public SaveCommand(PackFileService packFileService, IEventHub eventHub, IFileSaveService packFileSaveService)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;
-            _saveHelper = saveHelper;
+            _packFileSaveService = packFileSaveService;
         }
 
         public bool Execute(MetaDataEditorViewModel controller)
@@ -49,7 +50,7 @@ namespace Editors.AnimationMeta.Presentation.Commands
             var parser = new MetaDataFileParser();
             var bytes = parser.GenerateBytes(controller.MetaDataFileVersion, tagDataItems);
             _logger.Here().Information("Saving");
-            var res = _saveHelper.Save(path, null, bytes);
+            var res = _packFileSaveService.Save(path, bytes, false);
             if (res != null)
             {
                 controller.CurrentFile = res;

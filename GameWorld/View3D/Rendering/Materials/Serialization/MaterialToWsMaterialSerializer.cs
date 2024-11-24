@@ -10,9 +10,9 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
     public class MaterialToWsMaterialFactory
     {
         private readonly PackFileService _packFileServic;
-        private readonly IPackFileSaveService _fileSaveService;
+        private readonly IFileSaveService _fileSaveService;
 
-        public MaterialToWsMaterialFactory(PackFileService packFileServic, IPackFileSaveService fileSaveService)
+        public MaterialToWsMaterialFactory(PackFileService packFileServic, IFileSaveService fileSaveService)
         {
             _packFileServic = packFileServic;
             _fileSaveService = fileSaveService;
@@ -34,10 +34,10 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
     class MaterialToWsMaterialSerializer : IMaterialToWsMaterialSerializer
     {
         private readonly GameTypeEnum _preferedGameHint;
-        private readonly IPackFileSaveService _fileSaveService;
+        private readonly IFileSaveService _fileSaveService;
         private readonly IWsMaterialRepository _repository;
 
-        public MaterialToWsMaterialSerializer(IPackFileSaveService fileSaveService, IWsMaterialRepository wsMaterialRepository, GameTypeEnum preferedGameHint)
+        public MaterialToWsMaterialSerializer(IFileSaveService fileSaveService, IWsMaterialRepository wsMaterialRepository, GameTypeEnum preferedGameHint)
         {
             _repository = wsMaterialRepository;
             _fileSaveService = fileSaveService;
@@ -59,7 +59,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             var newMaterialPath = Path.GetDirectoryName(modelFilePath) + "/materials/" + fileName;
             var materialPath = _repository.GetExistingOrAddMaterial(fileContent, newMaterialPath, out var isNew);
             if (isNew)
-                _fileSaveService.SaveFile_WithoutPrompt(newMaterialPath, Encoding.UTF8.GetBytes(fileContent));
+                _fileSaveService.Save(newMaterialPath, Encoding.UTF8.GetBytes(fileContent), false);
 
             return materialPath;
         }

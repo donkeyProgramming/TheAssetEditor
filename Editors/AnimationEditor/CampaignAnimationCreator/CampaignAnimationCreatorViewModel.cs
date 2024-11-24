@@ -22,23 +22,21 @@ namespace AnimationEditor.CampaignAnimationCreator
         AnimationClip _selectedAnimationClip;
 
         private readonly SceneObjectEditor _assetViewModelEditor;
-        private readonly PackFileService _packFileService;
+
         private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
-        private readonly SaveHelper _saveHelper;
+        private readonly IFileSaveService _packFileSaveService;
 
         public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
         public string EditorName => "Campaign Animation Creator";
 
         public CampaignAnimationCreatorViewModel(
             SceneObjectEditor assetViewModelEditor, 
-            PackFileService pfs,  
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
-            SaveHelper saveHelper)
+            IFileSaveService packFileSaveService)
         {
             _assetViewModelEditor = assetViewModelEditor;
-            _packFileService = pfs;
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
-            _saveHelper = saveHelper;
+            _packFileSaveService = packFileSaveService;
         }
 
         public void SetDebugInputParameters(AnimationToolInput debugDataToLoad)
@@ -67,7 +65,7 @@ namespace AnimationEditor.CampaignAnimationCreator
         {
             var animFile = _selectedUnit.AnimationClip.ConvertToFileFormat(_selectedUnit.Skeleton);
             var bytes = AnimationFile.ConvertToBytes(animFile);
-            _saveHelper.SaveAs(bytes, ".anim");
+            _packFileSaveService.SaveAs(".anim", bytes);
         }
 
         public void Convert()

@@ -152,7 +152,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             var editablePack = _packFileService.GetEditablePack();
             var byteArray = Encoding.ASCII.GetBytes(dataGridItemsJson);
   
-            var fileEntry = new NewFileEntry("AudioProjects", new PackFile($"{"dummy_name"}.json", new MemorySource(byteArray)));
+            var fileEntry = new NewPackFileEntry("AudioProjects", new PackFile($"{"dummy_name"}.json", new MemorySource(byteArray)));
             _packFileService.AddFilesToPack(editablePack, [fileEntry]);
 
             _logger.Here().Information($"Saved Custom States file: {"dummy_name"}");
