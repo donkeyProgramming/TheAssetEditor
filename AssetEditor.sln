@@ -67,6 +67,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editors.ImportExport", "Edi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.ImportExport", "Editors\ImportExportEditor\Test.ImportExport\Test.ImportExport.csproj", "{95A59789-08A8-4917-A252-B6E14BC18C6A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Core.Test", "Testing\Shared.Core.Test\Shared.Core.Test.csproj", "{13904B63-D942-41A9-863D-B977B33205E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -161,6 +163,10 @@ Global
 		{95A59789-08A8-4917-A252-B6E14BC18C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95A59789-08A8-4917-A252-B6E14BC18C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95A59789-08A8-4917-A252-B6E14BC18C6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13904B63-D942-41A9-863D-B977B33205E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13904B63-D942-41A9-863D-B977B33205E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13904B63-D942-41A9-863D-B977B33205E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13904B63-D942-41A9-863D-B977B33205E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -190,6 +196,7 @@ Global
 		{3DC5AC01-2C79-484D-A9FD-4EB3F7EC4960} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 		{0EF858E9-A17B-40E0-BBED-97F5D1A6A8D4} = {3DC5AC01-2C79-484D-A9FD-4EB3F7EC4960}
 		{95A59789-08A8-4917-A252-B6E14BC18C6A} = {3DC5AC01-2C79-484D-A9FD-4EB3F7EC4960}
+		{13904B63-D942-41A9-863D-B977B33205E8} = {18424B6A-CB8A-4CE1-935C-72459F31521B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}
