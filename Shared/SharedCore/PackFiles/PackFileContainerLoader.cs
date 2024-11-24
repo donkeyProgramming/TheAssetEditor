@@ -9,7 +9,7 @@ namespace Shared.Core.PackFiles
 {
     public interface IPackFileContainerLoader
     {
-        PackFileContainer Load(string packFileSystemPath);
+        PackFileContainer? Load(string packFileSystemPath);
         PackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum);
         PackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
     }
@@ -58,7 +58,7 @@ namespace Shared.Core.PackFiles
                 AddFolderContentToPackFile(container, folder, rootPath);
         }
 
-        public PackFileContainer Load(string packFileSystemPath)
+        public PackFileContainer? Load(string packFileSystemPath)
         {
             try
             {
