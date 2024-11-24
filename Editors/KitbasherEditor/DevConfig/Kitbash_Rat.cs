@@ -13,12 +13,14 @@ namespace Editors.KitbasherEditor.DevConfig
     internal class Kitbash_Rat : IDeveloperConfiguration
     {
         private readonly PackFileService _packFileService;
+        private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly ScopeRepository _scopeRepositor;
 
-        public Kitbash_Rat(PackFileService packFileService, IUiCommandFactory uiCommandFactory, ScopeRepository scopeRepositor)
+        public Kitbash_Rat(PackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory, ScopeRepository scopeRepositor)
         {
             _packFileService = packFileService;
+            _packFileContainerLoader = packFileContainerLoader;
             _uiCommandFactory = uiCommandFactory;
             _scopeRepositor = scopeRepositor;
         }
@@ -41,7 +43,10 @@ namespace Editors.KitbasherEditor.DevConfig
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.LoadCaPacksByDefault = false;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Throt.pack";
-            _packFileService.Load(packFile, false, true);
+
+            var container = _packFileContainerLoader.Load(packFile);
+            container.IsCaPackFile = true;
+            _packFileService.AddContainer(container);
         }
     }
     /*

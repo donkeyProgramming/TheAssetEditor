@@ -9,11 +9,13 @@ namespace Editors.AnimationMeta.DevConfig
     internal class AnimMetaTool : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;
+        private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly PackFileService _packFileService;
 
-        public AnimMetaTool(IEditorCreator editorCreator, PackFileService packFileService)
+        public AnimMetaTool(IEditorCreator editorCreator, IPackFileContainerLoader packFileContainerLoader, PackFileService packFileService)
         {
             _editorCreator = editorCreator;
+            _packFileContainerLoader = packFileContainerLoader;
             _packFileService = packFileService;
         }
 
@@ -22,7 +24,10 @@ namespace Editors.AnimationMeta.DevConfig
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.LoadCaPacksByDefault = false;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Throt.pack";
-            _packFileService.Load(packFile, false, true);
+  
+            var container = _packFileContainerLoader.Load(packFile);
+            container.IsCaPackFile = true;
+            _packFileService.AddContainer(container);
         }
 
         public void OpenFileOnLoad()

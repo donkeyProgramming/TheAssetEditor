@@ -9,6 +9,7 @@ using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
+using Shared.TestUtility;
 
 namespace E2EVerification.Shared
 {
@@ -42,7 +43,11 @@ namespace E2EVerification.Shared
 
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)
         {
-            PackFileService.Load(path, false, true);
+            var loader = EditorServiceProvider.ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
+            var container = loader.Load(path);
+            container.IsCaPackFile = true;
+            PackFileService.AddContainer(container, false);
+
             if (createOutputPackFile)
                 return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
             return null;
@@ -50,7 +55,11 @@ namespace E2EVerification.Shared
 
         public PackFileContainer? LoadFolderPackFile(string path, bool createOutputPackFile = true)
         {
-            PackFileService.LoadSystemFolderAsPackFileContainer(path);
+            var loader = EditorServiceProvider.ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
+            var container = loader.LoadSystemFolderAsPackFileContainer(path);
+            container.IsCaPackFile = true;
+            PackFileService.AddContainer(container, false);
+
             if (createOutputPackFile)
                 return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
             return null;

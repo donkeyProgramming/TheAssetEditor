@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using AssetEditor.UiCommands;
 using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationBatchExporter;
@@ -28,11 +27,18 @@ namespace AssetEditor.ViewModels
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly TouchedFilesRecorder _touchedFilesRecorder;
         private readonly IFileSaveService _packFileSaveService;
+        private readonly IPackFileContainerLoader _packFileContainerLoader;
 
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = [];
         public ObservableCollection<EditorTool> Editors { get; set; } = [];
 
-        public MenuBarViewModel(PackFileService packfileService, ApplicationSettingsService settingsService, IEditorDatabase editorDatabase, IUiCommandFactory uiCommandFactory, TouchedFilesRecorder touchedFilesRecorder, IFileSaveService packFileSaveService)
+        public MenuBarViewModel(PackFileService packfileService, 
+            ApplicationSettingsService settingsService, 
+            IEditorDatabase editorDatabase, 
+            IUiCommandFactory uiCommandFactory,
+            TouchedFilesRecorder touchedFilesRecorder, 
+            IFileSaveService packFileSaveService,
+            IPackFileContainerLoader packFileContainerLoader)
         {
             _packfileService = packfileService;
             _settingsService = settingsService;
@@ -40,6 +46,7 @@ namespace AssetEditor.ViewModels
             _uiCommandFactory = uiCommandFactory;
             _touchedFilesRecorder = touchedFilesRecorder;
             _packFileSaveService = packFileSaveService;
+            _packFileContainerLoader = packFileContainerLoader;
             var settings = settingsService.CurrentSettings;
             settings.RecentPackFilePaths.CollectionChanged += (sender, args) => CreateRecentPackFilesItems();
             CreateRecentPackFilesItems();
@@ -110,8 +117,15 @@ namespace AssetEditor.ViewModels
                 path,
                 () =>
                 {
-                    if (_packfileService.Load(path, true) == null)
+                    var container = _packFileContainerLoader.Load(path);
+                    if (container == null)
+                    {
                         System.Windows.MessageBox.Show($"Unable to load packfiles {path}");
+                        return;
+                    }
+
+                    _packfileService.AddContainer(container, true);
+                        
                 }
             ));
             foreach (var menuItem in menuItemViewModels.Reverse())

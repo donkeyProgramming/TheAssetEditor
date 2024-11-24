@@ -10,11 +10,13 @@ namespace Editors.KitbasherEditor.DevConfig
     internal class Kitbash_RomeShield : IDeveloperConfiguration
     {
         private readonly PackFileService _packFileService;
+        private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IUiCommandFactory _uiCommandFactory;
 
-        public Kitbash_RomeShield(PackFileService packFileService, IUiCommandFactory uiCommandFactory)
+        public Kitbash_RomeShield(PackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory)
         {
             _packFileService = packFileService;
+            _packFileContainerLoader = packFileContainerLoader;
             _uiCommandFactory = uiCommandFactory;
         }
 
@@ -29,7 +31,10 @@ namespace Editors.KitbasherEditor.DevConfig
             currentSettings.LoadCaPacksByDefault = false;
             currentSettings.CurrentGame = GameTypeEnum.Rome_2;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Rome_Man_And_Shield_Pack";
-            _packFileService.LoadSystemFolderAsPackFileContainer(packFile);
+
+            var container = _packFileContainerLoader.LoadSystemFolderAsPackFileContainer(packFile);
+            container.IsCaPackFile = true;
+            _packFileService.AddContainer(container);
         }
     }
     /*

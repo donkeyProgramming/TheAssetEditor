@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -11,26 +9,12 @@ using Shared.Core.Services;
 
 namespace Shared.Core.PackFiles
 {
-
-    // public class PackFileContainerLoader
-    // {
-    //     PackFileContainer LoadGameFiles()
-    //     { }
-    //
-    //     PackFileContainer LoadPack()
-    //     { 
-    //     }
-    //
-    //     PackFileContainer LoadFolderAsPack()
-    //     {
-    //     }
-    //
-    //
-    //
-    // }
-
-
-
+    public interface IPackFileContainerLoader
+    {
+        PackFileContainer Load(string packFileSystemPath);
+        PackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum);
+        PackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath);
+    }
 
     public class PackFileService : IPackFileService
     {
@@ -39,160 +23,45 @@ namespace Shared.Core.PackFiles
         private readonly List<PackFileContainer> _packFileContainers = [];
         private PackFileContainer? _packFileContainerSelectedForEdit;
 
-        public bool EnableFileLookUpEvents { get; internal set; } = false;
+        public bool EnableFileLookUpEvents { get; set; } = false;
+        public bool EnforceGameFilesMustBeLoaded { get; set; } = true;
 
         private readonly IGlobalEventHub? _globalEventHub;
-        private readonly ApplicationSettingsService _settingsService;
-        private readonly GameInformationFactory _gameInformationFactory;
 
-        public PackFileService(ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory, IGlobalEventHub? globalEventHub)
+        public PackFileService(IGlobalEventHub? globalEventHub)
         {
             _globalEventHub = globalEventHub;
-            _settingsService = settingsService;
-            _gameInformationFactory = gameInformationFactory;
         }
 
         public List<PackFileContainer> GetAllPackfileContainers() => _packFileContainers.ToList(); // Return a list of the list to avoid bugs!
 
-
-        public PackFileContainer? LoadSystemFolderAsPackFileContainer(string packFileSystemPath)
+        public void AddContainer(PackFileContainer container, bool setToMainPackIfFirst = false)
         {
-            if (Directory.Exists(packFileSystemPath) == false)
-            {
-                var location = Assembly.GetEntryAssembly()!.Location;
-                var loactionDir = Path.GetDirectoryName(location);
-                throw new Exception($"Unable to find folder {packFileSystemPath}. Curret systempath is {loactionDir}");
-            }
-
-            var container = new PackFileContainer(packFileSystemPath);
-            AddFolderContentToPackFile(container, packFileSystemPath, packFileSystemPath.ToLower() + "\\");
-            AddContainer(container);
-            return container;
-        }
-
-        void AddContainer(PackFileContainer container)
-        {
-            _packFileContainers.Add(container);
-            _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
-        }
-
-        void AddFolderContentToPackFile(PackFileContainer container, string folderPath, string rootPath)
-        {
-            var files = Directory.GetFiles(folderPath);
-            foreach (var filePath in files)
-            {
-                var sanatizedFilePath = filePath.ToLower();
-                var relativePath = sanatizedFilePath.Replace(rootPath, "");
-                var fileName = Path.GetFileName(sanatizedFilePath);
-
-                container.FileList[relativePath] = PackFile.CreateFromFileSystem(fileName, sanatizedFilePath);
-            }
-
-            var folders = Directory.GetDirectories(folderPath);
-            foreach (var folder in folders)
-                AddFolderContentToPackFile(container, folder, rootPath);
-        }
-
-        public PackFileContainer? Load(string packFileSystemPath, bool setToMainPackIfFirst = false, bool allowLoadWithoutCaPackFiles = false)
-        {
-            try
+            if (EnforceGameFilesMustBeLoaded)
             {
                 var caPacksLoaded = _packFileContainers.Count(x => x.IsCaPackFile);
-                if (caPacksLoaded == 0 && allowLoadWithoutCaPackFiles != true)
+                if (caPacksLoaded == 0 && container.IsCaPackFile == false)
                 {
                     MessageBox.Show("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
 
                     if (System.Diagnostics.Debugger.IsAttached == false)
-                        return null;
+                        return;
                 }
-
-                if (!File.Exists(packFileSystemPath))
-                {
-                    _logger.Here().Error($"Trying to load file {packFileSystemPath}, which can not be located.", "Error");
-                    System.Windows.MessageBox.Show($"Unable to locate pack file \"{packFileSystemPath}\"");
-                    return null;
-                }
-
-                foreach (var packFile in _packFileContainers)
-                {
-                    if (packFile.SystemFilePath == packFileSystemPath)
-                    {
-                        MessageBox.Show($"Pack file \"{packFileSystemPath}\" is already loaded.", "Error");
-                        return null;
-                    }
-                }
-
-                using var fileStream = File.OpenRead(packFileSystemPath);
-                using var reader = new BinaryReader(fileStream, Encoding.ASCII);
-
-                var container = PackFileSerializer.Load(packFileSystemPath, reader, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
-                AddContainer(container);
-
-                var notCaPacksLoaded = _packFileContainers.Count(x => !x.IsCaPackFile);
-                if (container.IsCaPackFile == false && setToMainPackIfFirst)
-                    SetEditablePack(container);
-
-                return container;
             }
-            catch (Exception e)
+
+            // Check if already added!
+            foreach (var packFile in _packFileContainers)
             {
-                MessageBox.Show($"Failed to load file {packFileSystemPath}. Error : {e.Message}", "Error");
-                _logger.Here().Error($"Failed to load file {packFileSystemPath}. Error : {e}");
-                return null;
-            }
-        }
-
-        public bool LoadAllCaFiles(GameTypeEnum gameEnum)
-        {
-            var game = _gameInformationFactory.GetGameById(gameEnum);
-            var gamePathInfo = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type);
-            var gameDataFolder = gamePathInfo!.Path;
-            var gameName = game.DisplayName;
-
-            try
-            {
-                _logger.Here().Information($"Loading pack files for {gameName} located in {gameDataFolder}");
-                var allCaPackFiles = ManifestHelper.GetPackFilesFromManifest(gameDataFolder);
-
-                var packList = new List<PackFileContainer>();
-                foreach (var packFilePath in allCaPackFiles)
-                {
-                    var path = gameDataFolder + "\\" + packFilePath;
-                    if (File.Exists(path))
-                    {
-                        using var fileStram = File.OpenRead(path);
-                        using var reader = new BinaryReader(fileStram, Encoding.ASCII);
-
-                        var pack = PackFileSerializer.Load(path, reader, _settingsService.CurrentSettings.LoadWemFiles, new CaPackDuplicatePackFileResolver());
-                        packList.Add(pack);
-                    }
-                    else
-                    {
-                        _logger.Here().Warning($"{gameName} pack file '{path}' not found, loading skipped");
-                    }
-                }
-
-                var caPackFileContainer = new PackFileContainer($"All Game Packs - {gameName}");
-                caPackFileContainer.IsCaPackFile = true;
-                caPackFileContainer.SystemFilePath = gameDataFolder;
-                var packFilesOrderedByGroup = packList.GroupBy(x => x.Header.LoadOrder).OrderBy(x => x.Key);
-
-                foreach (var group in packFilesOrderedByGroup)
-                {
-                    var packFilesOrderedByName = group.OrderBy(x => x.Name);
-                    foreach (var packfile in packFilesOrderedByName)
-                        caPackFileContainer.MergePackFileContainer(packfile);
-                }
-
-                AddContainer(caPackFileContainer);
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error($"Trying to get all CA packs in {gameDataFolder}. Error : {e.ToString()}");
-                return false;
+                if (packFile.SystemFilePath == container.SystemFilePath)
+                    MessageBox.Show($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");             
             }
 
-            return true;
+            _packFileContainers.Add(container);
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerAddedEvent(container));
+
+            var notCaPacksLoaded = _packFileContainers.Count(x => !x.IsCaPackFile);
+            if (container.IsCaPackFile == false && setToMainPackIfFirst)
+                SetEditablePack(container);
         }
 
         public PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type, bool setEditablePack = false)
@@ -347,7 +216,6 @@ namespace Shared.Core.PackFiles
 
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRenamedEvent(pf, newNodePath));
         }
-
 
         public void RenameFile(PackFileContainer pf, PackFile file, string newName)
         {

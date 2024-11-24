@@ -7,10 +7,12 @@ namespace AssetEditor.UiCommands
     public class OpenPackFileCommand : IUiCommand
     {
         private readonly PackFileService _packFileService;
+        private readonly IPackFileContainerLoader _packFileContainerLoader;
 
-        public OpenPackFileCommand(PackFileService packFileService)
+        public OpenPackFileCommand(PackFileService packFileService, IPackFileContainerLoader packFileContainerLoader)
         {
             _packFileService = packFileService;
+            _packFileContainerLoader = packFileContainerLoader;
         }
 
         public void Execute()
@@ -20,8 +22,10 @@ namespace AssetEditor.UiCommands
                 Filter = "Pack files (*.pack)|*.pack|All files (*.*)|*.*"
             };
 
-            if (dialog.ShowDialog() == DialogResult.OK)
-                _packFileService.Load(dialog.FileName, true);
+            if (dialog.ShowDialog() != DialogResult.OK)
+                return;
+            var container = _packFileContainerLoader.Load(dialog.FileName);
+            _packFileService.AddContainer(container, true);
         }
     }
 }

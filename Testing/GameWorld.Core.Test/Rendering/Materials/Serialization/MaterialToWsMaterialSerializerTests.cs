@@ -25,8 +25,8 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         {
             var selectedGame = GameTypeEnum.Warhammer3;
             var appSettings = new ApplicationSettingsService(selectedGame);
-            _pfs = new PackFileService(appSettings, new GameInformationFactory(), null);
-            _pfs.LoadSystemFolderAsPackFileContainer(PathHelper.Folder("Karl_and_celestialgeneral_Pack"));
+            _pfs = PackFileSerivceTestHelper.CreateFromFolder(selectedGame, "Karl_and_celestialgeneral_Pack");
+
             var saveHelper = new FileSaveService(_pfs, null);
             var materialRepo = new WsMaterialRepository(_pfs);
             _outputPack = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
@@ -39,6 +39,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
             _testMaterial.GetCapability<MetalRoughCapability>().MaterialMap.TexturePath = $"texturePath/{TextureType.MaterialMap}.dds";
             _testMaterial.GetCapability<MetalRoughCapability>().BaseColour.TexturePath = $"texturePath/{TextureType.BaseColour}.dds";
         }
+
 
         [Test]
         public void ProsessMaterial()

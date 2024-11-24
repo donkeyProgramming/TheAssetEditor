@@ -67,11 +67,14 @@ namespace AssetEditor
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
-                    var gameInformationFactory = _rootScope.ServiceProvider.GetRequiredService<GameInformationFactory>();
                     var packfileService = _rootScope.ServiceProvider.GetRequiredService<PackFileService>();
-                    var loadRes = packfileService.LoadAllCaFiles(settingsService.CurrentSettings.CurrentGame);
-                    if (!loadRes)
+                    var containerLoader = _rootScope.ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
+                    var loadRes = containerLoader.LoadAllCaFiles(settingsService.CurrentSettings.CurrentGame);
+
+                    if (loadRes == null)
                         MessageBox.Show($"Unable to load all CA packfiles in {gamePath}");
+                    else
+                        packfileService.AddContainer(loadRes);
                 }
             }
 

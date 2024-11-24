@@ -14,6 +14,7 @@ namespace E2EVerification
         public void DuplicateFileCommand(string fileName, string result)
         {
             var runner = new AssetEditorTestRunner();
+            runner.PackFileService.EnforceGameFilesMustBeLoaded = false;
             var sourcePackFile = runner.CreateEmptyPackFile("SourcePack", false);
             var outputPackFile = runner.CreateEmptyPackFile("OutputPack", true);
 

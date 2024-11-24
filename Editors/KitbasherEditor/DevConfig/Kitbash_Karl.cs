@@ -11,11 +11,13 @@ namespace Editors.KitbasherEditor.DevConfig
     internal class Kitbash_Karl : IDeveloperConfiguration
     {
         private readonly PackFileService _packFileService;
+        private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IUiCommandFactory _uiCommandFactory;
 
-        public Kitbash_Karl(PackFileService packFileService, IUiCommandFactory uiCommandFactory)
+        public Kitbash_Karl(PackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory)
         {
             _packFileService = packFileService;
+            _packFileContainerLoader = packFileContainerLoader;
             _uiCommandFactory = uiCommandFactory;
         }
 
@@ -30,7 +32,10 @@ namespace Editors.KitbasherEditor.DevConfig
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.LoadCaPacksByDefault = false;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
-            _packFileService.Load(packFile, false, true);
+
+            var container = _packFileContainerLoader.Load(packFile);
+            container.IsCaPackFile = true;
+            _packFileService.AddContainer(container);
         }
     }
 }

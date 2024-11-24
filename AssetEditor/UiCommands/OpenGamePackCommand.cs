@@ -9,12 +9,14 @@ namespace AssetEditor.UiCommands
     internal class OpenGamePackCommand : IUiCommand
     {
         private readonly PackFileService _packFileService;
+        private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
-        public OpenGamePackCommand(PackFileService packFileService, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
+        public OpenGamePackCommand(PackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
         {
             _packFileService = packFileService;
+            _packFileContainerLoader = packFileContainerLoader;
             _applicationSettingsService = applicationSettingsService;
             _gameInformationFactory = gameInformationFactory;
         }
@@ -43,7 +45,8 @@ namespace AssetEditor.UiCommands
 
             using (new WaitCursor())
             {
-                _packFileService.LoadAllCaFiles(game);
+                var res = _packFileContainerLoader.LoadAllCaFiles(game);
+                _packFileService.AddContainer(res);
             }
         }
     }

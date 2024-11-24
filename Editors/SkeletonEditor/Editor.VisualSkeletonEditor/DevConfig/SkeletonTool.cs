@@ -4,16 +4,18 @@ using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.EmbeddedResources;
 
-namespace Editors.Shared.DevConfig.Configs
+namespace Editor.VisualSkeletonEditor.DevConfig
 {
     internal class SkeletonTool : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;
+        private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly PackFileService _packFileService;
 
-        public SkeletonTool(IEditorCreator editorCreator,  PackFileService packFileService)
+        public SkeletonTool(IEditorCreator editorCreator, IPackFileContainerLoader packFileContainerLoader, PackFileService packFileService)
         {
             _editorCreator = editorCreator;
+            _packFileContainerLoader = packFileContainerLoader;
             _packFileService = packFileService;
         }
 
@@ -23,7 +25,9 @@ namespace Editors.Shared.DevConfig.Configs
             currentSettings.LoadWemFiles = false;
 
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
-            _packFileService.Load(packFile, false, true);
+            var container = _packFileContainerLoader.Load(packFile);
+            container.IsCaPackFile = true;
+            _packFileService.AddContainer(container);
         }
 
         public void OpenFileOnLoad()
