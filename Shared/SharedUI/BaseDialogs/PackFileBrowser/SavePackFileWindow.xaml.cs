@@ -18,11 +18,11 @@ namespace CommonControls.PackFileBrowser
         public event PropertyChangedEventHandler PropertyChanged;
 
         public string CurrentFileName { get => _currentFileName; set { _currentFileName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentFileName")); SelectedFile = null; } }
-        PackFileService _packfileService;
+        IPackFileService _packfileService;
 
 
         public string FilePath { get; private set; }
-        public SavePackFileWindow(PackFileService packfileService)
+        public SavePackFileWindow(IPackFileService packfileService)
         {
             _packfileService = packfileService;
             ViewModel = new PackFileBrowserViewModel(packfileService, null, true);

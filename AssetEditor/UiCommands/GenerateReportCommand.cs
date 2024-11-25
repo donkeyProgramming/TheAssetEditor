@@ -7,11 +7,11 @@ namespace AssetEditor.UiCommands
 {
     public class GenerateReportCommand : IUiCommand
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
-        public GenerateReportCommand(PackFileService packFileService, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
+        public GenerateReportCommand(IPackFileService packFileService, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
         {
             _packFileService = packFileService;
             _applicationSettingsService = applicationSettingsService;

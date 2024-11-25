@@ -10,9 +10,9 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.DevConfig
     internal class MountTool : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public MountTool(IEditorCreator editorCreator, PackFileService packFileService)
+        public MountTool(IEditorCreator editorCreator, IPackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileService = packFileService;
@@ -30,7 +30,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.DevConfig
             CreateLionAndHu01b(_editorCreator, _packFileService);
         }
 
-        static void CreateLionAndHu01b(IEditorCreator creator, PackFileService packfileService)
+        static void CreateLionAndHu01b(IEditorCreator creator, IPackFileService packfileService)
         {
             var riderInput = new AnimationToolInput()
             {

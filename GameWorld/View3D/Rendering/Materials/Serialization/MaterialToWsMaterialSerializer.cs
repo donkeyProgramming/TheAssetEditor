@@ -9,10 +9,10 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
 {
     public class MaterialToWsMaterialFactory
     {
-        private readonly PackFileService _packFileServic;
+        private readonly IPackFileService _packFileServic;
         private readonly IFileSaveService _fileSaveService;
 
-        public MaterialToWsMaterialFactory(PackFileService packFileServic, IFileSaveService fileSaveService)
+        public MaterialToWsMaterialFactory(IPackFileService packFileServic, IFileSaveService fileSaveService)
         {
             _packFileServic = packFileServic;
             _fileSaveService = fileSaveService;

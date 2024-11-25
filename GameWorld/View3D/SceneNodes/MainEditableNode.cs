@@ -7,7 +7,7 @@ namespace GameWorld.Core.SceneNodes
     {
         public SkeletonNode SkeletonNode { get; private set; }
 
-        public MainEditableNode(string name, SkeletonNode skeletonNode, PackFileService pfs) : base(name)
+        public MainEditableNode(string name, SkeletonNode skeletonNode, IPackFileService pfs) : base(name)
         {
             SkeletonNode = skeletonNode;
         }

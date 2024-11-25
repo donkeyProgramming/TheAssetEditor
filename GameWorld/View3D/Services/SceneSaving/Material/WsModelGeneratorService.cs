@@ -17,10 +17,10 @@ namespace GameWorld.Core.Services.SceneSaving.Material
     public class WsModelGeneratorService
     {
         private readonly ILogger _logger = Logging.Create<WsModelGeneratorService>();
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IFileSaveService _packFileSaveService;
 
-        public WsModelGeneratorService(PackFileService packFileService, IFileSaveService packFileSaveService)
+        public WsModelGeneratorService(IPackFileService packFileService, IFileSaveService packFileSaveService)
         {
             _packFileService = packFileService;
             _packFileSaveService = packFileSaveService;

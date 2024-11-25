@@ -10,9 +10,9 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool.DevConfig
     internal class AnimTransfer_DwarfArcher : IDeveloperConfiguration
     {
         private readonly IEditorCreator _editorCreator;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public AnimTransfer_DwarfArcher(IEditorCreator editorCreator, PackFileService packFileService)
+        public AnimTransfer_DwarfArcher(IEditorCreator editorCreator, IPackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileService = packFileService;
@@ -30,7 +30,7 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool.DevConfig
             CreateDwarfAndEmpArcher(_editorCreator, _packFileService);
         }
 
-        static void CreateDwarfAndEmpArcher(IEditorCreator creator, PackFileService packfileService)
+        static void CreateDwarfAndEmpArcher(IEditorCreator creator, IPackFileService packfileService)
         {
             var targetInput = new AnimationToolInput()
             {

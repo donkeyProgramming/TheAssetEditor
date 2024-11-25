@@ -26,12 +26,12 @@ namespace Editors.Reports
         }
 
         private readonly ILogger _logger = Logging.Create<FileListReportGenerator>();
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
         private readonly HashAlgorithm _md5Instance;
 
-        public FileListReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public FileListReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _pfs = pfs;
             _settingsService = settingsService;
@@ -39,7 +39,7 @@ namespace Editors.Reports
             _md5Instance = MD5.Create();
         }
 
-        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             var instance = new FileListReportGenerator(pfs, settingsService, gameInformationFactory);
             instance.Create();

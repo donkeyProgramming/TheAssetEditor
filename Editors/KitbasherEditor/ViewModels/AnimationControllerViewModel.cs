@@ -17,7 +17,7 @@ namespace Editors.KitbasherEditor.ViewModels
 {
     public class AnimationControllerViewModel : NotifyPropertyChangedImpl
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
         PackFile _skeletonPackFile;
         PackFile Animation;
@@ -62,7 +62,7 @@ namespace Editors.KitbasherEditor.ViewModels
         bool _isEnabled;
         public bool IsEnabled { get { return _isEnabled; } set { SetAndNotify(ref _isEnabled, value); OnEnableChanged(IsEnabled); } }
 
-        public AnimationControllerViewModel(PackFileService pf, 
+        public AnimationControllerViewModel(IPackFileService pf, 
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             IEventHub eventHub,
             KitbasherRootScene kitbasherRootScene)

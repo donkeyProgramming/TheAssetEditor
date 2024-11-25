@@ -23,7 +23,7 @@ namespace Shared.Ui.Editors.TextEditor
         public string GetSyntaxType() => "XML";
         public bool CanSaveOnError() => true;
 
-        public byte[] ToBytes(string text, string fileName, PackFileService pfs, out ITextConverter.SaveError error)
+        public byte[] ToBytes(string text, string fileName, IPackFileService pfs, out ITextConverter.SaveError error)
         {
             error = null;
             return Encoding.ASCII.GetBytes(text);

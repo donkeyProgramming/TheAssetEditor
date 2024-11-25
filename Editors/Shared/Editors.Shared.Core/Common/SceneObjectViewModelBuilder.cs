@@ -13,7 +13,7 @@ namespace Editors.Shared.Core.Common
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly IMetaDataFactory _metaDataFactory;
         private readonly SceneObjectEditor _sceneObjectEditor;
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
 
@@ -21,7 +21,7 @@ namespace Editors.Shared.Core.Common
             AnimationPlayerViewModel animationPlayerViewModel, 
             IMetaDataFactory metaDataFactory,
             SceneObjectEditor assetViewModelBuilder,
-            PackFileService pfs, 
+            IPackFileService pfs, 
             SkeletonAnimationLookUpHelper skeletonHelper, 
             IUiCommandFactory uiCommandFactory)
         {

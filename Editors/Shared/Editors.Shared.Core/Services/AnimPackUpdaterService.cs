@@ -11,9 +11,9 @@ namespace Editors.Shared.Core.Services
 {
     public class AnimPackUpdaterService
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
 
-        public AnimPackUpdaterService(PackFileService pfs)
+        public AnimPackUpdaterService(IPackFileService pfs)
         {
             _pfs = pfs;
         }

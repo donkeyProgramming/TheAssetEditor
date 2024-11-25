@@ -6,10 +6,10 @@ namespace AssetEditor.UiCommands
 {
     public class OpenPackFileCommand : IUiCommand
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
 
-        public OpenPackFileCommand(PackFileService packFileService, IPackFileContainerLoader packFileContainerLoader)
+        public OpenPackFileCommand(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader)
         {
             _packFileService = packFileService;
             _packFileContainerLoader = packFileContainerLoader;

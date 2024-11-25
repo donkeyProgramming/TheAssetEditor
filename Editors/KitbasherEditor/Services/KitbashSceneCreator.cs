@@ -19,7 +19,7 @@ namespace Editors.KitbasherEditor.Services
     public class KitbashSceneCreator
     {
         private readonly ILogger _logger = Logging.Create<KitbashSceneCreator>();
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly ApplicationSettingsService _settingsService;
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly ComplexMeshLoader _complexMeshLoader;
@@ -32,7 +32,7 @@ namespace Editors.KitbasherEditor.Services
             KitbasherRootScene kitbasherRootScene,
             ComplexMeshLoader complexMeshLoader,
             SceneManager sceneManager,
-            PackFileService packFileService,
+            IPackFileService packFileService,
             Rmv2ModelNodeLoader rmv2ModelNodeLoader,
             GeometrySaveSettings saveSettings)
         {

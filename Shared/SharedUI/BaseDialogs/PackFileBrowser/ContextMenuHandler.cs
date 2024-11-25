@@ -16,7 +16,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common;
 using Shared.Ui.Events.UiCommands;
-using static Shared.Core.PackFiles.PackFileService;
+using static Shared.Core.PackFiles.IPackFileService;
 using Clipboard = System.Windows.Clipboard;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
@@ -51,14 +51,14 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         public ICommand OpenPackFile_HxD_Command { get; set; }
         public ICommand SavePackFileAsCommand { get; set; }
 
-        protected PackFileService _packFileService;
+        protected IPackFileService _packFileService;
 
         protected TreeNode _selectedNode;
         private readonly IUiCommandFactory _uiCommandFactory;
         protected readonly IExportFileContextMenuHelper _exportFileContextMenuHelper;
         protected readonly IImportFileContextMenuHelper _importFileContextMenuHelper;
 
-        public ContextMenuHandler(PackFileService pf, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper, IImportFileContextMenuHelper importtFileContextMenuHelper)
+        public ContextMenuHandler(IPackFileService pf, IUiCommandFactory uiCommandFactory, IExportFileContextMenuHelper exportFileContextMenuHelper, IImportFileContextMenuHelper importtFileContextMenuHelper)
         {
             _packFileService = pf;
             _uiCommandFactory = uiCommandFactory;

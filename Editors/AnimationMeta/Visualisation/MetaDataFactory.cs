@@ -30,13 +30,13 @@ namespace Editors.AnimationMeta.Visualisation
         private readonly ComplexMeshLoader _complexMeshLoader;
         private readonly ResourceLibrary _resourceLibrary;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
 
         public MetaDataFactory(ComplexMeshLoader complexMeshLoader,
             ResourceLibrary resourceLibrary,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
-            PackFileService packFileService,
+            IPackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent)
         {
             _complexMeshLoader = complexMeshLoader;

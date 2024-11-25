@@ -17,7 +17,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
     {
         private readonly SceneObject _sceneObject;
         private readonly SceneObjectEditor _sceneObjectEditor;
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
 
@@ -27,7 +27,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         [ObservableProperty] string? _metaDataPersistName;
         [ObservableProperty] string? _animationFileName;
 
-        public BinAnimationViewModel(SceneObjectEditor sceneObjectEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject sceneObject, IUiCommandFactory uiCommandFactory)
+        public BinAnimationViewModel(SceneObjectEditor sceneObjectEditor, IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject sceneObject, IUiCommandFactory uiCommandFactory)
         {
             _sceneObjectEditor = sceneObjectEditor;
             _pfs = pfs;

@@ -11,13 +11,13 @@ namespace Editors.KitbasherEditor.UiCommands
     public class BrowseForReferenceCommand : IKitbasherUiCommand
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
         public string ToolTip { get; set; } = "Import Reference model";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        public BrowseForReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService)
+        public BrowseForReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService)
         {
             _kitbashSceneCreator = kitbashSceneCreator;
             _packFileService = packFileService;
@@ -39,14 +39,14 @@ namespace Editors.KitbasherEditor.UiCommands
     public abstract class BaseImportReferenceCommand : IKitbasherUiCommand
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
         public string ToolTip { get; set; }
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
 
-        public BaseImportReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService)
+        public BaseImportReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService)
         {
             _kitbashSceneCreator = kitbashSceneCreator;
             _packFileService = packFileService;
@@ -66,9 +66,9 @@ namespace Editors.KitbasherEditor.UiCommands
     public class ImportReferenceMeshCommand : IUiCommand
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public ImportReferenceMeshCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService)
+        public ImportReferenceMeshCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService)
         {
             _kitbashSceneCreator = kitbashSceneCreator;
             _packFileService = packFileService;
@@ -91,7 +91,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
     public class ImportGoblinReferenceCommand : BaseImportReferenceCommand
     {
-        public ImportGoblinReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService) : base(kitbashSceneCreator, packFileService)
+        public ImportGoblinReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
         {
             _filePath = @"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition";
             ToolTip = "Import Goblin as Reference";
@@ -101,7 +101,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
     public class ImportGeneralHeadReferenceCommand : BaseImportReferenceCommand
     {
-        public ImportGeneralHeadReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService) : base(kitbashSceneCreator, packFileService)
+        public ImportGeneralHeadReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
         {
             _filePath = @"variantmeshes\wh_variantmodels\hu1e\cth\cth_celestial_general\cth_celestial_general_head_05.wsmodel";
             ToolTip = "Import Goblin as Reference";
@@ -110,7 +110,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
     public class ImportSlayerReferenceCommand : BaseImportReferenceCommand
     {
-        public ImportSlayerReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService) : base(kitbashSceneCreator, packFileService)
+        public ImportSlayerReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
         {
             _filePath = @"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition";
             ToolTip = "Import Slayer as Reference";
@@ -119,7 +119,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
     public class ImportPaladinReferenceCommand : BaseImportReferenceCommand
     {
-        public ImportPaladinReferenceCommand(KitbashSceneCreator kitbashSceneCreator, PackFileService packFileService) : base(kitbashSceneCreator, packFileService)
+        public ImportPaladinReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
         {
             _filePath = @"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition";
             ToolTip = "Import Paladin as Reference";

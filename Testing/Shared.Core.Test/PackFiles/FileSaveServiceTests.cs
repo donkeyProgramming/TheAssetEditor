@@ -9,7 +9,7 @@ namespace Test.Shared.Core.PackFiles
 {
     internal class FileSaveServiceTests
     {
-        PackFileService _pfs;
+        IPackFileService _pfs;
         PackFileContainer _container;
         Mock<IPackFileUiProvider> _uiProvider = new();
         Mock<IGlobalEventHub> _eventHub = new();

@@ -13,11 +13,11 @@ namespace Editors.AnimationMeta.MetaEditor.Commands
     class SaveCommand : IUiCommand
     {
         private readonly ILogger _logger = Logging.Create<SaveCommand>();
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IEventHub _eventHub;
         private readonly IFileSaveService _packFileSaveService;
 
-        public SaveCommand(PackFileService packFileService, IEventHub eventHub, IFileSaveService packFileSaveService)
+        public SaveCommand(IPackFileService packFileService, IEventHub eventHub, IFileSaveService packFileSaveService)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;

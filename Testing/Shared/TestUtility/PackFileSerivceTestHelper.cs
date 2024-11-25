@@ -5,7 +5,7 @@ namespace Shared.TestUtility
 {
     public static class PackFileSerivceTestHelper
     {
-        public static PackFileService Create(string path, GameTypeEnum gameTypeEnum = GameTypeEnum.Warhammer3)
+        public static IPackFileService Create(string path, GameTypeEnum gameTypeEnum = GameTypeEnum.Warhammer3)
         {
             var pfs = new PackFileService(new StandardDialogProvider(), null);
             var loader = new PackFileContainerLoader(new ApplicationSettingsService(gameTypeEnum), new GameInformationFactory());
@@ -16,7 +16,7 @@ namespace Shared.TestUtility
             return pfs;
         }
 
-        public static PackFileService CreateFromFolder(GameTypeEnum selectedGame, string path )
+        public static IPackFileService CreateFromFolder(GameTypeEnum selectedGame, string path )
         {
             var pfs = new PackFileService(new StandardDialogProvider(), null);
             var loader = new PackFileContainerLoader(new ApplicationSettingsService(selectedGame), new GameInformationFactory());

@@ -14,12 +14,12 @@ namespace Editors.Audio.Storage
 {
     public class DatLoader
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
         private Dictionary<uint, string> _nameLookUp { get; set; } = new Dictionary<uint, string>();
 
-        public DatLoader(PackFileService pfs, ApplicationSettingsService applicationSettingsService)
+        public DatLoader(IPackFileService pfs, ApplicationSettingsService applicationSettingsService)
         {
             _pfs = pfs;
             _applicationSettingsService = applicationSettingsService;
@@ -60,7 +60,7 @@ namespace Editors.Audio.Storage
             return _nameLookUp;
         }
 
-        SoundDatFile LoadDatFiles(PackFileService pfs, out List<string> failedFiles)
+        SoundDatFile LoadDatFiles(IPackFileService pfs, out List<string> failedFiles)
         {
             var datDumpsFolderName = $"{DirectoryHelper.Temp}\\DatDumps";
             DirectoryHelper.EnsureCreated(datDumpsFolderName);

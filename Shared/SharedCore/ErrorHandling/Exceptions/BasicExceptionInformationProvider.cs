@@ -7,9 +7,9 @@ namespace Shared.Core.ErrorHandling.Exceptions
     class BasicExceptionInformationProvider : IExceptionInformationProvider
     {
         private readonly ApplicationSettingsService _settingsService;
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
 
-        public BasicExceptionInformationProvider(ApplicationSettingsService service, PackFileService pfs)
+        public BasicExceptionInformationProvider(ApplicationSettingsService service, IPackFileService pfs)
         {
             _settingsService = service;
             _pfs = pfs;

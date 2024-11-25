@@ -18,7 +18,7 @@ namespace Editors.AnimationMeta.SuperView
         SceneObjectViewModel _asset;
 
         private readonly SceneObjectEditor _sceneObjectBuilder;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IEventHub _eventHub;
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -31,7 +31,7 @@ namespace Editors.AnimationMeta.SuperView
         public override Type EditorViewModelType => typeof(EditorView);
 
         public SuperViewViewModel(
-            PackFileService packFileService,
+            IPackFileService packFileService,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             IEventHub eventHub,
             IUiCommandFactory uiCommandFactory,

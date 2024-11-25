@@ -16,7 +16,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
     {
         CapabilityMaterialFactory _abstractMaterialFactory;
         MaterialToWsMaterialSerializer _wsMaterialSerializer;
-        PackFileService _pfs;
+        IPackFileService _pfs;
 
         [SetUp]
         public void Setup()

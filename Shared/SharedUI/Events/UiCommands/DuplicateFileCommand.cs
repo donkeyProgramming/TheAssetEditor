@@ -2,15 +2,15 @@
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using System.IO;
-using static Shared.Core.PackFiles.PackFileService;
+using static Shared.Core.PackFiles.IPackFileService;
 
 namespace Shared.Ui.Events.UiCommands
 {
     public class DuplicateFileCommand: IUiCommand
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public DuplicateFileCommand(PackFileService packFileService) 
+        public DuplicateFileCommand(IPackFileService packFileService) 
         {
             _packFileService = packFileService;
         }

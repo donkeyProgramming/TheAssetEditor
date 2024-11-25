@@ -17,13 +17,13 @@ namespace Editors.Shared.Core.Services
         private readonly ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
         private readonly object _threadLock = new object();
 
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IGlobalEventHub _globalEventHub;
 
         private readonly Dictionary<string, ObservableCollection<AnimationReference>> _skeletonNameToAnimationMap = [];
         private readonly ObservableCollection<string> _skeletonFileNames = [];
 
-        public SkeletonAnimationLookUpHelper(PackFileService packFileService, IGlobalEventHub globalEventHub)
+        public SkeletonAnimationLookUpHelper(IPackFileService packFileService, IGlobalEventHub globalEventHub)
         {
             _packFileService = packFileService;
             _globalEventHub = globalEventHub;

@@ -11,7 +11,7 @@ namespace Editors.Audio.BnkCompiler.Validation
 {
     public class AudioProjectXmlValidator : AbstractValidator<CompilerData>
     {
-        public AudioProjectXmlValidator(PackFileService pfs, CompilerData projectXml)
+        public AudioProjectXmlValidator(IPackFileService pfs, CompilerData projectXml)
         {
             var allItems = GetAllItems(projectXml);
 
@@ -94,7 +94,7 @@ namespace Editors.Audio.BnkCompiler.Validation
 
     public class GameSoundValidator : AbstractValidator<Sound>
     {
-        public GameSoundValidator(PackFileService pfs)
+        public GameSoundValidator(IPackFileService pfs)
         {
             RuleFor(x => x).NotNull().WithMessage("Item is null");
             RuleFor(x => x.Id).NotEmpty().WithMessage("Item is missing ID");

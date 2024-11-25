@@ -34,13 +34,13 @@ namespace AssetEditor.Services
     {
         private readonly ILogger _logger = Logging.Create<EditorManager>();
 
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IEditorDatabase _editorDatabase;
 
         public ObservableCollection<IEditorInterface> CurrentEditorsList { get; set; } = [];
         [ObservableProperty] private int _selectedEditorIndex = -1;
 
-        public EditorManager(IGlobalEventHub eventHub, PackFileService packFileService, IEditorDatabase editorDatabase)
+        public EditorManager(IGlobalEventHub eventHub, IPackFileService packFileService, IEditorDatabase editorDatabase)
         {
             _packFileService = packFileService;
             _editorDatabase = editorDatabase;

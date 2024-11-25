@@ -4,7 +4,7 @@ namespace Shared.Core.PackFiles
 {
     public static class PackFileUtil
     {
-        public static List<PackFile> FilterUnvantedFiles(PackFileService pfs, List<PackFile> files, string[] removeFilters, out PackFile[] removedFiles)
+        public static List<PackFile> FilterUnvantedFiles(IPackFileService pfs, List<PackFile> files, string[] removeFilters, out PackFile[] removedFiles)
         {
             var tempRemoveFiles = new List<PackFile>();
             var fileList = files.ToList();
@@ -55,7 +55,7 @@ namespace Shared.Core.PackFiles
             return fileList;
         }
 
-        public static List<PackFile> LoadFilesFromDisk(PackFileService pfs, IEnumerable<FileRef> fileRefs)
+        public static List<PackFile> LoadFilesFromDisk(IPackFileService pfs, IEnumerable<FileRef> fileRefs)
         {
             var packFileList = new List<NewPackFileEntry>();
             foreach (var fileRef in fileRefs)
@@ -73,7 +73,7 @@ namespace Shared.Core.PackFiles
             return packFileList.Select(x=>x.PackFile).ToList();
         }
 
-        public static List<PackFile> LoadFilesFromDisk(PackFileService pfs, FileRef fileRef) => LoadFilesFromDisk(pfs, new FileRef[] { fileRef });
+        public static List<PackFile> LoadFilesFromDisk(IPackFileService pfs, FileRef fileRef) => LoadFilesFromDisk(pfs, new FileRef[] { fileRef });
 
         public class FileRef
         {

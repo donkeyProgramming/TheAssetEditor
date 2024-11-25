@@ -16,9 +16,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
     public class GltfAnimationCreator
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public GltfAnimationCreator(PackFileService packFileService)
+        public GltfAnimationCreator(IPackFileService packFileService)
         {
             _packFileService = packFileService;
         }

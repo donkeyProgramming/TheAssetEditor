@@ -29,7 +29,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
     public partial class AudioEditorSettingsViewModel : ObservableObject, IEditorInterface
     {
         private readonly IAudioRepository _audioRepository;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly AudioEditorViewModel _audioEditorViewModel;
         readonly ILogger _logger = Logging.Create<AudioEditorSettingsViewModel>();
         private Action _closeAction;
@@ -50,7 +50,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         public static List<string> AudioProjectDialogueEvents => AudioEditorData.Instance.AudioProjectDialogueEvents;
 
-        public AudioEditorSettingsViewModel(IAudioRepository audioRepository, PackFileService packFileService, AudioEditorViewModel audioEditorViewModel)
+        public AudioEditorSettingsViewModel(IAudioRepository audioRepository, IPackFileService packFileService, AudioEditorViewModel audioEditorViewModel)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;

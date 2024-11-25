@@ -23,18 +23,18 @@ namespace Editors.Reports
             public List<string> Headers { get; set; } = new List<string>() { "FileName", "Error" };
         }
 
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
-        public AnimMetaDataReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public AnimMetaDataReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _pfs = pfs;
             _settingsService = settingsService;
             _gameInformationFactory = gameInformationFactory;
         }
 
-        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             var instance = new AnimMetaDataReportGenerator(pfs, settingsService, gameInformationFactory);
             instance.Create();

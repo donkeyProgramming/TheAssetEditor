@@ -8,9 +8,9 @@ namespace Shared.Ui.Events.UiCommands
     public class OpenEditorCommand : IUiCommand
     {
         private readonly IEditorCreator _editorCreator;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public OpenEditorCommand(IEditorCreator editorCreator, PackFileService packFileService)
+        public OpenEditorCommand(IEditorCreator editorCreator, IPackFileService packFileService)
         {
             _packFileService = packFileService;
             _editorCreator = editorCreator;

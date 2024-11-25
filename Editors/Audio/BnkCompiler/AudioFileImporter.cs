@@ -13,10 +13,10 @@ namespace Editors.Audio.BnkCompiler
 
     public class AudioFileImporter
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly VgStreamWrapper _vgStreamWrapper;
 
-        public AudioFileImporter(PackFileService pfs, VgStreamWrapper vgStreamWrapper)
+        public AudioFileImporter(IPackFileService pfs, VgStreamWrapper vgStreamWrapper)
         {
             _pfs = pfs;
             _vgStreamWrapper = vgStreamWrapper;

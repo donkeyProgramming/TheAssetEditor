@@ -36,7 +36,7 @@ namespace AnimationEditor.AnimationTransferTool
         private readonly IWindowFactory _windowFactory;
         private readonly IFileSaveService _packFileSaveService;
         private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly AnimationPlayerViewModel _player;
 
@@ -58,7 +58,7 @@ namespace AnimationEditor.AnimationTransferTool
         public string EditorName => "Animation transfer tool";
 
 
-        public AnimationTransferToolViewModel(PackFileService pfs, 
+        public AnimationTransferToolViewModel(IPackFileService pfs, 
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,

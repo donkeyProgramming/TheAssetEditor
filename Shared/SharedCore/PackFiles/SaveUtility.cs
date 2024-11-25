@@ -4,7 +4,7 @@
     {
         private static readonly string s_backupFolderPath = "Backup";
 
-        public static bool IsFilenameUnique(PackFileService pfs, string path)
+        public static bool IsFilenameUnique(IPackFileService pfs, string path)
         {
             var editablePack = pfs.GetEditablePack();
             if (editablePack == null)

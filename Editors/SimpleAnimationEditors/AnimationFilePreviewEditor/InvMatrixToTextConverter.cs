@@ -45,7 +45,7 @@ namespace CommonControls.Editors.AnimationFilePreviewEditor
             return string.Format("{0,12:0.00000000}", value);
         }
 
-        public byte[] ToBytes(string text, string filePath, PackFileService pfs, out ITextConverter.SaveError error)
+        public byte[] ToBytes(string text, string filePath, IPackFileService pfs, out ITextConverter.SaveError error)
         {
             error = new ITextConverter.SaveError() { Text = "This file type can not be saved" };
             return null;

@@ -12,14 +12,14 @@ namespace Editors.Audio.Compiler
 {
     public class CompilerViewModel : NotifyPropertyChangedImpl, IEditorInterface
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly CompilerService _compilerService;
 
         public string DisplayName { get; set; } = "Audio Compiler";
         public NotifyAttr<string> ProjectFilePath { get; set; } = new NotifyAttr<string>("audioprojects\\projectsimple.json");
         public NotifyAttr<ErrorListViewModel> ProjectResult { get; set; } = new NotifyAttr<ErrorListViewModel>(new ErrorListViewModel());
 
-        public CompilerViewModel(PackFileService pfs, CompilerService compilerService)
+        public CompilerViewModel(IPackFileService pfs, CompilerService compilerService)
         {
             _pfs = pfs;
             _compilerService = compilerService;

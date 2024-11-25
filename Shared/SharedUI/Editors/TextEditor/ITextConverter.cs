@@ -17,7 +17,7 @@ namespace Shared.Ui.Editors.TextEditor
         bool ShouldShowLineNumbers();
         string GetSyntaxType();
         bool CanSaveOnError();
-        byte[] ToBytes(string text, string filePath, PackFileService pfs, out SaveError error);
+        byte[] ToBytes(string text, string filePath, IPackFileService pfs, out SaveError error);
     }
 
 

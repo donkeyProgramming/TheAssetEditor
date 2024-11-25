@@ -28,7 +28,7 @@ namespace Shared.Ui.Editors.VariantMeshDefinition
             }
         }
 
-        public byte[] ToBytes(string text, string filePath, PackFileService pfs, out ITextConverter.SaveError error)
+        public byte[] ToBytes(string text, string filePath, IPackFileService pfs, out ITextConverter.SaveError error)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Shared.Ui.Editors.VariantMeshDefinition
             }
         }
 
-        ITextConverter.SaveError ValidateFilePaths(VariantMesh mesh, PackFileService pfs)
+        ITextConverter.SaveError ValidateFilePaths(VariantMesh mesh, IPackFileService pfs)
         {
             if (string.IsNullOrWhiteSpace(mesh.ModelReference) == false)
             {

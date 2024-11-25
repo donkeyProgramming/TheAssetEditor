@@ -25,7 +25,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
 
         [ObservableProperty] bool _useDecal;
 
-        public DirtAndDecalViewModel(DirtAndDecalCapability capability, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
+        public DirtAndDecalViewModel(DirtAndDecalCapability capability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary)
         {
             _capability = capability;
 

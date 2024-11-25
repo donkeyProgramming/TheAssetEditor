@@ -134,7 +134,7 @@ namespace AnimationEditor.MountAnimationCreator.Services
         //    return SaveHelper.Save(pfs, savePath, null, bytes);
         //}
 
-        static string GenerateNewAnimationName(PackFileService pfs, string fullPath, string prefix, int numberId = 0)
+        static string GenerateNewAnimationName(IPackFileService pfs, string fullPath, string prefix, int numberId = 0)
         {
             string numberPostFix = "";
             if (numberId != 0)

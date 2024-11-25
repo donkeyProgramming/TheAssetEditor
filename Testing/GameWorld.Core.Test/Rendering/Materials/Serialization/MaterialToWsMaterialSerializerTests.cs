@@ -15,7 +15,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
     internal class MaterialToWsMaterialSerializerTests
     {
         PackFileContainer _outputPack;
-        PackFileService _pfs;
+        IPackFileService _pfs;
 
         MaterialToWsMaterialSerializer _wsMaterialSerializer;
         CapabilityMaterial _testMaterial;

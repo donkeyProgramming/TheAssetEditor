@@ -23,11 +23,11 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
         private readonly SceneObject _rider;
         private readonly SceneObject _mount;
         private readonly SceneObjectEditor _assetViewModelEditor;
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly Action _validateAction;
 
-        public MountLinkViewModel(SceneObjectEditor assetViewModelEditor, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject rider, SceneObject mount, Action validate)
+        public MountLinkViewModel(SceneObjectEditor assetViewModelEditor, IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject rider, SceneObject mount, Action validate)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _pfs = pfs;

@@ -9,9 +9,9 @@ namespace Editors.Reports.DeepSearch
     public class DeepSearchReport
     {
         private readonly ILogger _logger = Logging.Create<DeepSearchReport>();
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public DeepSearchReport(PackFileService packFileService)
+        public DeepSearchReport(IPackFileService packFileService)
         {
             _packFileService = packFileService;
         }

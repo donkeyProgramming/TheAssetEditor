@@ -20,7 +20,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         public PackFile AnimPackToValidate = null;
 
-        protected abstract ITextConverter.SaveError Validate(XmlType type, string s, PackFileService pfs, string filepath);
+        protected abstract ITextConverter.SaveError Validate(XmlType type, string s, IPackFileService pfs, string filepath);
         protected abstract XmlType ConvertBytesToXmlClass(byte[] bytes);
         protected abstract byte[] ConvertToAnimClassBytes(XmlType xmlType, string path);
         protected virtual string CleanUpXml(string xmlText) => xmlText;
@@ -51,7 +51,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             }
         }
 
-        public byte[] ToBytes(string text, string filePath, PackFileService pfs, out ITextConverter.SaveError error)
+        public byte[] ToBytes(string text, string filePath, IPackFileService pfs, out ITextConverter.SaveError error)
         {
             var xmlserializer = new XmlSerializer(typeof(XmlType));
             using var sr = new StringReader(text);

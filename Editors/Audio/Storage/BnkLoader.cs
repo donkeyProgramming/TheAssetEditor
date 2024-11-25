@@ -26,11 +26,11 @@ namespace Editors.Audio.Storage
             public Dictionary<uint, List<DidxAudio>> DidxAudioList { get; internal set; } = new();
         }
 
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly BnkParser _bnkParser;
         readonly ILogger _logger = Logging.Create<BnkLoader>();
 
-        public BnkLoader(PackFileService pfs, BnkParser bnkParser)
+        public BnkLoader(IPackFileService pfs, BnkParser bnkParser)
         {
             _pfs = pfs;
             _bnkParser = bnkParser;

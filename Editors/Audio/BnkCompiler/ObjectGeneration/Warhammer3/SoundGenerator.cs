@@ -16,9 +16,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(Sound);
 
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
 
-        public SoundGenerator(PackFileService pfs)
+        public SoundGenerator(IPackFileService pfs)
         {
             _pfs = pfs;
         }

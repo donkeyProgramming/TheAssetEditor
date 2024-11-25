@@ -6,9 +6,9 @@ namespace Editors.KitbasherEditor.UiCommands
 {
     public class CopyTexturesToPackCommand : IUiCommand
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public CopyTexturesToPackCommand(PackFileService packFileService)
+        public CopyTexturesToPackCommand(IPackFileService packFileService)
         {
             _packFileService = packFileService;
         }

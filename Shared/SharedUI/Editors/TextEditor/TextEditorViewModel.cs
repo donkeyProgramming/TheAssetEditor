@@ -26,12 +26,12 @@ namespace Shared.Ui.Editors.TextEditor
 
         PackFile _packFile;
         private readonly IFileSaveService _packFileSaveService;
-        private readonly PackFileService _pf;
+        private readonly IPackFileService _pf;
 
         ITextEditor _textEditor;
         TextConverter _converter;
 
-        public TextEditorViewModel(IFileSaveService packFileSaveService, PackFileService pf, TextConverter converter)
+        public TextEditorViewModel(IFileSaveService packFileSaveService, IPackFileService pf, TextConverter converter)
         {
             _converter = converter;
       

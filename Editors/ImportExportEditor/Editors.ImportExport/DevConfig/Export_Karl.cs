@@ -9,10 +9,10 @@ namespace Editors.ImportExport.DevConfig
 {
     public class Export_Karl : IDeveloperConfiguration
    {
-       private readonly PackFileService _packFileService;
+       private readonly IPackFileService _packFileService;
        private readonly RmvToGltfExporter _exporter;
 
-       public Export_Karl(PackFileService packFileService, RmvToGltfExporter exporter)
+       public Export_Karl(IPackFileService packFileService, RmvToGltfExporter exporter)
        {
            _packFileService = packFileService;
            _exporter = exporter;

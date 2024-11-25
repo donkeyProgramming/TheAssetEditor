@@ -35,7 +35,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
         [ObservableProperty] float _emissiveStrength;
         [ObservableProperty] Vector2ViewModel _emissiveTiling;
 
-        public EmissiveViewModel(EmissiveCapability emissiveCapability, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
+        public EmissiveViewModel(EmissiveCapability emissiveCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary)
         {
             _emissiveCapability = emissiveCapability;
 

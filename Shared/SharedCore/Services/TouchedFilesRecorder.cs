@@ -11,11 +11,11 @@ namespace Shared.Core.Services
     {
         readonly ILogger _logger = Logging.Create<TouchedFilesRecorder>();
         readonly List<(string FilePath, PackFileContainer Container)> _files = new();
-        readonly PackFileService _pfs;
+        readonly IPackFileService _pfs;
         private readonly IGlobalEventHub _eventHub;
         bool _isStarted = false;
 
-        public TouchedFilesRecorder(PackFileService pfs, IGlobalEventHub eventHub)
+        public TouchedFilesRecorder(IPackFileService pfs, IGlobalEventHub eventHub)
         {
             _pfs = pfs;
             _eventHub = eventHub;

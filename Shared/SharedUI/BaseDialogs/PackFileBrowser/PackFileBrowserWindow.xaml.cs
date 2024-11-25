@@ -13,15 +13,15 @@ namespace CommonControls.PackFileBrowser
         public PackFile SelectedFile { get; set; }
         public PackFileBrowserViewModel ViewModel { get; set; }
 
-        public PackFileBrowserWindow(PackFileService packfileService) => Create(packfileService);
+        public PackFileBrowserWindow(IPackFileService packfileService) => Create(packfileService);
 
-        public PackFileBrowserWindow(PackFileService packfileService, string[] extentions)
+        public PackFileBrowserWindow(IPackFileService packfileService, string[] extentions)
         {
             Create(packfileService);
             ViewModel.Filter.SetExtentions(extentions.ToList());
         }
 
-        void Create(PackFileService packfileService)
+        void Create(IPackFileService packfileService)
         {
             ViewModel = new PackFileBrowserViewModel(packfileService, null);
             ViewModel.ContextMenu = new OpenFileContextMenuHandler(packfileService);

@@ -7,7 +7,7 @@ namespace Editors.TextureEditor.ViewModels
 {
     public class TextureEditorViewModel : NotifyPropertyChangedImpl, IEditorInterface, IFileEditor
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly TextureBuilder _textureBuilder;
 
         public string DisplayName { get; set; } = "Not set";
@@ -24,7 +24,7 @@ namespace Editors.TextureEditor.ViewModels
 
 
 
-        public TextureEditorViewModel(PackFileService pfs, TextureBuilder textureBuilder)
+        public TextureEditorViewModel(IPackFileService pfs, TextureBuilder textureBuilder)
         {
             _pfs = pfs;
             _textureBuilder = textureBuilder;

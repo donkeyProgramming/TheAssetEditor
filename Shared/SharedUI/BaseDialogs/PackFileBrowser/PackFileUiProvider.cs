@@ -6,7 +6,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public class PackFileUiProvider : IPackFileUiProvider
     {
-        public SaveDialogResult DisplaySaveDialog(PackFileService pfs, List<string> extensions)
+        public SaveDialogResult DisplaySaveDialog(IPackFileService pfs, List<string> extensions)
         {
             using var browser = new SavePackFileWindow(pfs);
             browser.ViewModel.Filter.SetExtentions(extensions);

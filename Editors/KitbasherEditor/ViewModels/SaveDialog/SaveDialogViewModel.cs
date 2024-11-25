@@ -16,7 +16,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
     {
         private readonly SceneManager _sceneManager;
         private readonly GameWorld.Core.Services.SceneSaving.SaveService _saveService;
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly IPackFileUiProvider _packFileUiProvider;
         private GeometrySaveSettings? _saveSettings;
 
@@ -33,7 +33,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         [ObservableProperty] bool _onlySaveVisible = false;
         [ObservableProperty] int _numberOfLodsToGenerate;
 
-        public SaveDialogViewModel(SceneManager sceneManager, GameWorld.Core.Services.SceneSaving.SaveService saveService, PackFileService pfs, IPackFileUiProvider packFileUiProvider)
+        public SaveDialogViewModel(SceneManager sceneManager, GameWorld.Core.Services.SceneSaving.SaveService saveService, IPackFileService pfs, IPackFileUiProvider packFileUiProvider)
         {
             _sceneManager = sceneManager;
             _saveService = saveService;

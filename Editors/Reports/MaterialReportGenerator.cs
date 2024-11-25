@@ -8,9 +8,9 @@ namespace Editors.Reports
 {
     public class MaterialReportGenerator
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         
-        public MaterialReportGenerator(PackFileService pfs)
+        public MaterialReportGenerator(IPackFileService pfs)
         {
             _pfs = pfs;
         }

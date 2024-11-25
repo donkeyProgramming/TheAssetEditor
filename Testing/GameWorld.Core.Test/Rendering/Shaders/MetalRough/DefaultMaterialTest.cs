@@ -17,7 +17,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
 {
     internal class DefaultMaterialTest
     {
-        PackFileService _pfs;
+        IPackFileService _pfs;
 
         [SetUp]
         public void Setup()

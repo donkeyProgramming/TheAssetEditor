@@ -17,10 +17,10 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
 
     public class DdsToNormalPngExporter : IDdsToNormalPngExporter
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly IImageSaveHandler _imageSaveHandler;
 
-        public DdsToNormalPngExporter(PackFileService packFileService, IImageSaveHandler imageSaveHandler) 
+        public DdsToNormalPngExporter(IPackFileService packFileService, IImageSaveHandler imageSaveHandler) 
         {
             _pfs = packFileService;
             _imageSaveHandler = imageSaveHandler;

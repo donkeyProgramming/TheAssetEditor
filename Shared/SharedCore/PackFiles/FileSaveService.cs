@@ -10,10 +10,10 @@ namespace Shared.Core.PackFiles
 
     public class FileSaveService : IFileSaveService
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IPackFileUiProvider _packFileUiProvider;
 
-        public FileSaveService(PackFileService packFileService, IPackFileUiProvider packFileUiProvider)
+        public FileSaveService(IPackFileService packFileService, IPackFileUiProvider packFileUiProvider)
         {
             _packFileService = packFileService;
             _packFileUiProvider = packFileUiProvider;

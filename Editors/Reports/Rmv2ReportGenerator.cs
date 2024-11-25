@@ -12,8 +12,8 @@ namespace Editors.Reports
 {
     public class Rmv2ReportGenerator
     {
-        private readonly PackFileService _pfs;
-        public Rmv2ReportGenerator(PackFileService pfs)
+        private readonly IPackFileService _pfs;
+        public Rmv2ReportGenerator(IPackFileService pfs)
         {
             _pfs = pfs;
         }

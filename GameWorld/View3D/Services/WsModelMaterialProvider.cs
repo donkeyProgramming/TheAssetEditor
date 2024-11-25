@@ -8,27 +8,27 @@ namespace GameWorld.Core.Services
 {
     public class WsModelMaterialProvider
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly WsModelFile? _wsModelFile;
 
-        private WsModelMaterialProvider(PackFileService packFileService, WsModelFile? wsModelFile)
+        private WsModelMaterialProvider(IPackFileService packFileService, WsModelFile? wsModelFile)
         {
             _packFileService = packFileService;
             _wsModelFile = wsModelFile;
         }
 
-        public static WsModelMaterialProvider CreateFromModelPath(PackFileService packFileService, string rmv2ModelPath)
+        public static WsModelMaterialProvider CreateFromModelPath(IPackFileService packFileService, string rmv2ModelPath)
         {
             var wsModelPath = Path.ChangeExtension(rmv2ModelPath, ".wsmodel");
             return CreateFromWsModelPath(packFileService, wsModelPath);
         }
 
-        public static WsModelMaterialProvider CreateFromWsModel(PackFileService packFileService, WsModelFile wsModel)
+        public static WsModelMaterialProvider CreateFromWsModel(IPackFileService packFileService, WsModelFile wsModel)
         {
             return new WsModelMaterialProvider(packFileService, wsModel);
         }
 
-        public static WsModelMaterialProvider CreateFromWsModelPath(PackFileService packFileService, string wsModelPath)
+        public static WsModelMaterialProvider CreateFromWsModelPath(IPackFileService packFileService, string wsModelPath)
         {
             var packFile = packFileService.FindFile(wsModelPath);
             if (packFile == null)

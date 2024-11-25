@@ -31,7 +31,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly SceneObjectEditor _sceneObjectBuilder;
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private GizmoToolbox _gizmoToolbox;
         private CopyPastePose _copyPastePose;
@@ -159,7 +159,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public FilterCollection<SkeletonBoneNode> SelectedRiderBone { get; set; }
         public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
 
-        public AnimationKeyframeEditorViewModel(PackFileService pfs,
+        public AnimationKeyframeEditorViewModel(IPackFileService pfs,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             SelectionComponent selectionComponent,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,

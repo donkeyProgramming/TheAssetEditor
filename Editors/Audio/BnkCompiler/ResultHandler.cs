@@ -6,10 +6,10 @@ namespace Editors.Audio.BnkCompiler
 {
     public class ResultHandler
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly IFileSaveService _packFileSaveService;
 
-        public ResultHandler(PackFileService pfs, IFileSaveService packFileSaveService)
+        public ResultHandler(IPackFileService pfs, IFileSaveService packFileSaveService)
         {
             _pfs = pfs;
             _packFileSaveService = packFileSaveService;

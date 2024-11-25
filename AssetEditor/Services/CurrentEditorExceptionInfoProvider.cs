@@ -9,9 +9,9 @@ namespace AssetEditor.Services
     internal class CurrentEditorExceptionInfoProvider : IExceptionInformationProvider
     {
         private readonly IEditorManager _editorManager;
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
 
-        public CurrentEditorExceptionInfoProvider(IEditorManager editorManager, PackFileService pfs)
+        public CurrentEditorExceptionInfoProvider(IEditorManager editorManager, IPackFileService pfs)
         {
             _editorManager = editorManager;
             _pfs = pfs;

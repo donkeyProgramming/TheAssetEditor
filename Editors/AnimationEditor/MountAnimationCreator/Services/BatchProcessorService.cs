@@ -17,7 +17,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
 {
     class BatchProcessorService
     {
-        PackFileService _pfs;
+        IPackFileService _pfs;
         GameSkeleton _riderSkeleton;
         GameSkeleton _mountSkeleton;
         SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -36,7 +36,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
         string _animBinName = "test_tables.bin";
 
         public BatchProcessorService(
-            PackFileService pfs,
+            IPackFileService pfs,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             MountAnimationGeneratorService animationGenerator,
             BatchProcessOptions batchProcessOptions,

@@ -24,11 +24,11 @@ namespace Editors.KitbasherEditor.UiCommands
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly SelectionManager _selectionManager;
 
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IWindowFactory _windowFactory;
 
-        public OpenReriggingToolCommand(KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, IWindowFactory windowFactory)
+        public OpenReriggingToolCommand(KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, IPackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, IWindowFactory windowFactory)
         {
             _kitbasherRootScene = kitbasherRootScene;
             _selectionManager = selectionManager;

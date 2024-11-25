@@ -21,7 +21,7 @@ namespace AssetEditor.ViewModels
 {
     public partial class MenuBarViewModel
     {
-        private readonly PackFileService _packfileService;
+        private readonly IPackFileService _packfileService;
         private readonly ApplicationSettingsService _settingsService;
         private readonly IEditorDatabase _editorDatabase;
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -32,7 +32,7 @@ namespace AssetEditor.ViewModels
         public ObservableCollection<RecentPackFileItem> RecentPackFiles { get; set; } = [];
         public ObservableCollection<EditorShortcutViewModel> Editors { get; set; } = [];
 
-        public MenuBarViewModel(PackFileService packfileService, 
+        public MenuBarViewModel(IPackFileService packfileService, 
             ApplicationSettingsService settingsService, 
             IEditorDatabase editorDatabase, 
             IUiCommandFactory uiCommandFactory,
@@ -57,7 +57,7 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void OpenPackFile() => _uiCommandFactory.Create<OpenPackFileCommand>().Execute();
         [RelayCommand] private void CreateNewPackFile()
         {
-            var window = new TextInputWindow("New Pack Name", "", true);
+            var window = new TextInputWindow("New Pack Name", "");
             if (window.ShowDialog() == true)
             {
                 var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue, PackFileCAType.MOD);

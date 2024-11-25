@@ -10,11 +10,11 @@ namespace Editors.KitbasherEditor.DevConfig
 {
     internal class Kitbash_Karl : IDeveloperConfiguration
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IUiCommandFactory _uiCommandFactory;
 
-        public Kitbash_Karl(PackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory)
+        public Kitbash_Karl(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory)
         {
             _packFileService = packFileService;
             _packFileContainerLoader = packFileContainerLoader;
