@@ -3,7 +3,6 @@ using Shared.GameFormats.RigidModel;
 using SharpGLTF.Schema2;
 using Shared.GameFormats.RigidModel.Vertex;
 using SharpGLTF.Geometry.VertexTypes;
-using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using SharpGLTF.Geometry;
 using GameWorld.Core.Animation;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
@@ -15,6 +14,7 @@ using System.Windows.Forms.VisualStyles;
 using System.Drawing.Printing;
 using System;
 using System.Text;
+using Editors.ImportExport.Common;
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
 {

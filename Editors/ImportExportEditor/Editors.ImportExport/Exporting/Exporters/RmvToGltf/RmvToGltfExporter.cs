@@ -16,14 +16,16 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         private readonly IGltfSceneSaver _gltfSaver;
         private readonly GltfMeshBuilder _gltfMeshBuilder;
         private readonly IGltfTextureHandler _gltfTextureHandler;
-        private readonly GltfAnimationCreator _gltfAnimationCreator;
+        private readonly GltfSkeletonBuilder _gltfSkeletonBuilder;
+        private readonly GltfAnimationBuilder _gltfAnimationBuilder;
 
-        public RmvToGltfExporter(IGltfSceneSaver gltfSaver, GltfMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler, GltfAnimationCreator gltfAnimationCreator)
+        public RmvToGltfExporter(IGltfSceneSaver gltfSaver, GltfMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler, GltfSkeletonBuilder gltfSkeletonsBuilder, GltfAnimationBuilder gltfAnimationCreator)
         {
             _gltfSaver = gltfSaver;
             _gltfMeshBuilder = gltfMeshBuilder;
             _gltfTextureHandler = gltfTextureHandler;
-            _gltfAnimationCreator = gltfAnimationCreator;
+            _gltfSkeletonBuilder = gltfSkeletonsBuilder;
+            _gltfAnimationBuilder = gltfAnimationCreator;
         }
 
         internal ExportSupportEnum CanExportFile(PackFile file)
@@ -42,7 +44,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
             var outputScene = ModelRoot.CreateModel();
 
-            var skeleton = _gltfAnimationCreator.CreateAnimationAndSkeleton(rmv2.Header.SkeletonName, outputScene, settings);
+            var skeleton = _gltfSkeletonBuilder.CreateSkeleton(rmv2.Header.SkeletonName, outputScene, settings);
+            var animatedSkeleton = _gltfAnimationBuilder.Build(settings, skeleton, outputScene);
+
             var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);
             var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings);
 
