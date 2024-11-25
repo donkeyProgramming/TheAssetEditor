@@ -4,8 +4,10 @@ namespace Shared.Core.PackFiles
 {
     public interface IPackFileService
     {
-        bool EnableFileLookUpEvents { get; }
+        bool EnableFileLookUpEvents { get; set; }
+        bool EnforceGameFilesMustBeLoaded { get; set; }
 
+        void AddContainer(PackFileContainer container, bool setToMainPackIfFirst = false);
         void AddFilesToPack(PackFileContainer container, List<NewPackFileEntry> newFiles);
         void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target);
         PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type, bool setEditablePack = false);

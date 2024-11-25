@@ -67,7 +67,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editors.ImportExport", "Edi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.ImportExport", "Editors\ImportExportEditor\Test.ImportExport\Test.ImportExport.csproj", "{95A59789-08A8-4917-A252-B6E14BC18C6A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Core.Test", "Testing\Shared.Core.Test\Shared.Core.Test.csproj", "{13904B63-D942-41A9-863D-B977B33205E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Shared.Core", "Testing\Shared.Core.Test\Test.Shared.Core.csproj", "{13904B63-D942-41A9-863D-B977B33205E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

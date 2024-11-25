@@ -103,11 +103,11 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         void HandleBrowseLocation()
         {
             var extension = ".rigid_model_v2";
-            var dialogResult = _packFileUiProvider.DisplaySaveDialog(_pfs, [extension], out _, out var filePath);
+            var dialogResult = _packFileUiProvider.DisplaySaveDialog(_pfs, [extension]);
 
-            if (dialogResult == true)
+            if (dialogResult.Result == true)
             {
-                var path = filePath!;
+                var path = dialogResult.SelectedFilePath!;
                 if (path.Contains(extension) == false)
                     path += extension;
 

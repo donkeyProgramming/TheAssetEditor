@@ -25,17 +25,17 @@ namespace Shared.Core.PackFiles
             if (editablePack == null)
                 throw new Exception($"Unable to save file. No Editable PackFile selected");
 
-            var doSave = _packFileUiProvider.DisplaySaveDialog(_packFileService, [extention], out _, out var selectedPath);
-            if (doSave == false)
+            var saveDialogResult = _packFileUiProvider.DisplaySaveDialog(_packFileService, [extention]);
+            if (saveDialogResult.Result == false)
                 return null;
 
-            var isExistingFile = _packFileService.FindFile(selectedPath!, editablePack);
+            var isExistingFile = _packFileService.FindFile(saveDialogResult.SelectedFilePath!, editablePack);
             if (isExistingFile == null)
             {
-                var fileName = Path.GetFileName(selectedPath);
+                var fileName = Path.GetFileName(saveDialogResult.SelectedFilePath);
                 var newPackFile = new PackFile(fileName, new MemorySource(content));
   
-                var directoryPath = Path.GetDirectoryName(selectedPath);
+                var directoryPath = Path.GetDirectoryName(saveDialogResult.SelectedFilePath);
                 var item = new NewPackFileEntry(directoryPath!, newPackFile);
                 _packFileService.AddFilesToPack(editablePack, [item]);
 
@@ -54,21 +54,15 @@ namespace Shared.Core.PackFiles
                 throw new Exception($"Unable to save file {fullPathWithExtention}. No Editable PackFile selected");
 
             var isExistingFile = _packFileService.FindFile(fullPathWithExtention, editablePack);
-            if (isExistingFile == null && prompOnConflict)
+            if (isExistingFile != null && prompOnConflict)
             {
                 var extention = Path.GetExtension(fullPathWithExtention);
-                var doSave = _packFileUiProvider.DisplaySaveDialog(_packFileService, [extention], out _, out var selectedPath);
-                if (doSave == false)
+                var saveDialogResult = _packFileUiProvider.DisplaySaveDialog(_packFileService, [extention]);
+                if (saveDialogResult.Result == false)
                     return null;
 
-                var fileName = Path.GetFileName(selectedPath);
-                var newPackFile = new PackFile(fileName, new MemorySource(content));
-
-                var directoryPath = Path.GetDirectoryName(selectedPath);
-                var item = new NewPackFileEntry(directoryPath!, newPackFile);
-                _packFileService.AddFilesToPack(editablePack, [item]);
-
-                return newPackFile;
+                fullPathWithExtention = saveDialogResult.SelectedFilePath!;
+                isExistingFile = _packFileService.FindFile(fullPathWithExtention, editablePack);
             }
 
             if (isExistingFile == null)
@@ -78,6 +72,7 @@ namespace Shared.Core.PackFiles
                 var directoryPath = Path.GetDirectoryName(fullPathWithExtention);
                 var item = new NewPackFileEntry(directoryPath!, newPackFile);
                 _packFileService.AddFilesToPack(editablePack, [item]);
+                return newPackFile;
             }
             else
             {
