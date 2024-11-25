@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace CommonControls.BaseDialogs
 {
@@ -41,6 +42,21 @@ namespace CommonControls.BaseDialogs
         {
             DialogResult = false;
             Close();
+        }
+
+        private void Key_Down(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                DialogResult = true;
+                Close();
+            }
+
+            if (e.Key == Key.Escape)
+            {
+                DialogResult = false;
+                Close();
+            }
         }
     }
 }

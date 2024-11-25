@@ -57,7 +57,7 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void OpenPackFile() => _uiCommandFactory.Create<OpenPackFileCommand>().Execute();
         [RelayCommand] private void CreateNewPackFile()
         {
-            var window = new TextInputWindow("New Pack Name", "");
+            var window = new TextInputWindow("New Pack Name", "", true);
             if (window.ShowDialog() == true)
             {
                 var newPackFile = _packfileService.CreateNewPackFileContainer(window.TextValue, PackFileCAType.MOD);
