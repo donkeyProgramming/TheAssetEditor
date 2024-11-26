@@ -37,4 +37,4 @@ jobs:
       run: dotnet test Testing\E2EVerification\Test.E2EVerification.csproj --no-restore --verbosity normal
 
     - name: Run Editors.ImportExport Tests
-      run: dotnet test Editors\Test.ImportExport\Test.ImportExport.csproj --no-restore --verbosity normal
+      run: dotnet test Editors\ImportExportEditor\Test.ImportExport.csproj --no-restore --verbosity normal
