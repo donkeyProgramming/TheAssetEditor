@@ -1,11 +1,31 @@
 ﻿using System.Text;
+using CommonControls.BaseDialogs;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
 namespace Editors.Reports.DeepSearch
 {
+
+    public class DeepSearchCommand(DeepSearchReport deepSearchReport) : IUiCommand
+    {
+        public void Execute()
+        {
+            var window = new TextInputWindow("Deep search - Output in console", "");
+            if (window.ShowDialog() == true)
+            {
+                if (string.IsNullOrWhiteSpace(window.TextValue))
+                {
+                    System.Windows.MessageBox.Show("Invalid input");
+                    return;
+                }
+                deepSearchReport.DeepSearch(window.TextValue, false);
+            }
+        }
+    }
+
     public class DeepSearchReport
     {
         private readonly ILogger _logger = Logging.Create<DeepSearchReport>();

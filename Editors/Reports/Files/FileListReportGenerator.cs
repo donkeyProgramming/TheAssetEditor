@@ -3,15 +3,22 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using Editors.Reports.Animation;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 
-namespace Editors.Reports
+namespace Editors.Reports.Files
 {
+    public class FileListReportCommand(FileListReportGenerator generator) : IUiCommand
+    {
+        public void Execute() => generator.Create();
+    }
+
     public class FileListReportGenerator
     {
         class FileItem

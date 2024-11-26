@@ -4,13 +4,19 @@ using System.Windows;
 using CsvHelper;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace Editors.Reports
+namespace Editors.Reports.Animation
 {
+    public class GenerateMetaDataReportCommand(AnimMetaDataReportGenerator generator) : IUiCommand
+    {
+        public void Execute() => generator.Create();
+    }
+
     public class AnimMetaDataReportGenerator
     {
         private readonly ILogger _logger = Logging.Create<AnimMetaDataReportGenerator>();

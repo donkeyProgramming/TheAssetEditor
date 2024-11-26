@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\AssetEditor\AssetEditor.csproj" />
-    <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\Shared\Test.TestingUtility.csproj" />
   </ItemGroup>
 
   <ItemGroup>

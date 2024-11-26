@@ -21,8 +21,6 @@ namespace AssetEditor
             serviceCollection.AddSingleton<IEditorCreator>( x=> x.GetRequiredService<IEditorManager>());
             serviceCollection.AddSingleton<IEditorManager, EditorManager>();
 
-
-            serviceCollection.AddTransient<GenerateReportCommand>();
             serviceCollection.AddTransient<OpenGamePackCommand>();
             serviceCollection.AddTransient<OpenPackFileCommand>();
             serviceCollection.AddTransient<OpenSettingsDialogCommand>();

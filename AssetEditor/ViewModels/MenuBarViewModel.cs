@@ -8,7 +8,10 @@ using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Reports.Animation;
 using Editors.Reports.DeepSearch;
+using Editors.Reports.Files;
+using Editors.Reports.Geometry;
 using Editors.Shared.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.Misc;
@@ -68,11 +71,11 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void CreateAnimPack3k() => AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService, _packFileSaveService);
         [RelayCommand] private void OpenAnimationBatchExporter() => _uiCommandFactory.Create<OpenAnimationBatchConverterCommand>().Execute();
         [RelayCommand] private void OpenWh2AnimpackUpdater() => new AnimPackUpdaterService(_packfileService).Process();
-        [RelayCommand] private void GenerateRmv2Report() => _uiCommandFactory.Create<GenerateReportCommand>().Rmv2();
-        [RelayCommand] private void GenerateMetaDataReport() => _uiCommandFactory.Create<GenerateReportCommand>().MetaData();
-        [RelayCommand] private void GenerateFileListReport() => _uiCommandFactory.Create<GenerateReportCommand>().FileList();
-        [RelayCommand] private void GenerateMetaDataJsonsReport() => _uiCommandFactory.Create<GenerateReportCommand>().MetaDataJson();
-        [RelayCommand] private void GenerateMaterialReport() => _uiCommandFactory.Create<GenerateReportCommand>().Material();
+        [RelayCommand] private void GenerateRmv2Report() => _uiCommandFactory.Create<Rmv2ReportCommand>().Execute();
+        [RelayCommand] private void GenerateMetaDataReport() => _uiCommandFactory.Create<GenerateMetaDataReportCommand>().Execute();
+        [RelayCommand] private void GenerateFileListReport() => _uiCommandFactory.Create<FileListReportCommand>().Execute();
+        [RelayCommand] private void GenerateMetaDataJsonsReport() => _uiCommandFactory.Create<GenerateMetaJsonDataReportCommand>().Execute();
+        [RelayCommand] private void GenerateMaterialReport() => _uiCommandFactory.Create<MaterialReportCommand>().Execute();
 
         [RelayCommand] private void TouchedFileRecorderStart() => _touchedFilesRecorder.Start();
         [RelayCommand] private void TouchedFileRecorderPrint() => _touchedFilesRecorder.Print();

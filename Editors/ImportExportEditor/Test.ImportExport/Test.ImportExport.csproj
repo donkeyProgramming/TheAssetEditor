@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Testing\Shared\Shared.csproj" />
+    <ProjectReference Include="..\..\..\Testing\Shared\Test.TestingUtility.csproj" />
     <ProjectReference Include="..\Editors.ImportExport\Editors.ImportExport.csproj" />
   </ItemGroup>
 

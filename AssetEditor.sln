@@ -43,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.AnimationMeta", "Ed
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editors.AnimationVisualEditors", "Editors\AnimationEditor\Editors.AnimationVisualEditors.csproj", "{F513A090-CC3F-4DB4-8332-50EB3FDA5A37}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E2EVerification", "Testing\E2EVerification\E2EVerification.csproj", "{0B14A236-AAE0-4E9B-A41E-4AF9DD976BA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.E2EVerification", "Testing\E2EVerification\Test.E2EVerification.csproj", "{0B14A236-AAE0-4E9B-A41E-4AF9DD976BA7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CA5272EF-16DE-49A6-BAE8-58DC9EE7BDE5}"
 	ProjectSection(SolutionItems) = preProject
@@ -51,9 +51,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CA5272EF
 		.github\workflows\pr-test.yml = .github\workflows\pr-test.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameWorld.Core.Test", "Testing\GameWorld.Core.Test\GameWorld.Core.Test.csproj", "{E604D1EB-02AC-4E31-9161-531F8830BFDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.GameWorld.Core", "Testing\GameWorld.Core.Test\Test.GameWorld.Core.csproj", "{E604D1EB-02AC-4E31-9161-531F8830BFDB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Testing\Shared\Shared.csproj", "{5AF54A17-B785-46FB-A982-E0663004F603}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.TestingUtility", "Testing\Shared\Test.TestingUtility.csproj", "{5AF54A17-B785-46FB-A982-E0663004F603}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editor.VisualSkeletonEditor", "Editors\SkeletonEditor\Editor.VisualSkeletonEditor\Editor.VisualSkeletonEditor.csproj", "{AC667CF7-9FD6-443B-871F-56C50F4EE871}"
 EndProject
