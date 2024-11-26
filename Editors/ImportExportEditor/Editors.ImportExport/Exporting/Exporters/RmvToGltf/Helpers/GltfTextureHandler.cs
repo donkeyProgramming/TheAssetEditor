@@ -26,52 +26,36 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
         public List<TextureResult> HandleTextures(RmvFile rmvFile, RmvToGltfExporterSettings settings)
         {
-            var lodLevel = rmvFile.ModelList.First();
             var output = new List<TextureResult>();
 
             var exportedTextures = new Dictionary<string, string>();    // To avoid exporting same texture multiple times
 
-            for(var i = 0; i < lodLevel.Length; i++) 
+            int lodICounnt = 1;
+            for (var lodIndex = 0; lodIndex < lodICounnt; lodIndex++)
             {
-                var model = lodLevel[i];
-                var textures = ExtractTextures(model);
-
-                var normalMapTexture = textures.FirstOrDefault(t => t.Type == TextureType.Normal);
-                if (normalMapTexture?.Path != null)
+                for (var meshIndex = 0; meshIndex < rmvFile.ModelList[lodIndex].Length; meshIndex++)
                 {
-                    if (exportedTextures.ContainsKey(normalMapTexture.Path) == false)
-                        exportedTextures[normalMapTexture.Path] = _ddsToNormalPngExporter.Export(normalMapTexture.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
+                    var model = rmvFile.ModelList[lodIndex][meshIndex];
+                    var textures = ExtractTextures(model);
 
-                    var systemPath = exportedTextures[normalMapTexture.Path];
-                    if (systemPath != null)
-                        output.Add(new TextureResult(i, systemPath, KnownChannel.Normal));
-                }
-
-                var materialTexture = textures.FirstOrDefault(t => t.Type == TextureType.MaterialMap);
-                if (materialTexture?.Path != null)
-                {
-                    if (exportedTextures.ContainsKey(materialTexture.Path) == false)
-                        exportedTextures[materialTexture.Path] = _ddsToMaterialPngExporter.Export(materialTexture.Path, settings.OutputPath, settings.ConvertMaterialTextureToBlender);
-
-                    var systemPath = exportedTextures[materialTexture.Path];
-                    if (systemPath != null)
-                        output.Add(new TextureResult(i, systemPath, KnownChannel.MetallicRoughness));
-                }
-
-                var baseColourTexture = textures.FirstOrDefault(t => t.Type == TextureType.BaseColour);
-                if (baseColourTexture?.Path != null)
-                {
-                    if (exportedTextures.ContainsKey(baseColourTexture.Path) == false)
-                        exportedTextures[baseColourTexture.Path] = _ddsToMaterialPngExporter.Export(baseColourTexture.Path, settings.OutputPath, false);
-                    
-                    var systemPath = exportedTextures[baseColourTexture.Path];
-                    if (systemPath != null)
-                        output.Add(new TextureResult(i, systemPath, KnownChannel.BaseColor));
+                    foreach (var tex in textures)
+                    {
+                        switch (tex.Type)
+                        {
+                            case TextureType.Normal: DoTextureConversionNormalMap(settings, output, exportedTextures, meshIndex, tex); break;
+                            case TextureType.MaterialMap: DoTextureConversionMaterialMap(settings, output, exportedTextures, meshIndex, tex); break;
+                            case TextureType.BaseColour: DoTextureDefault(KnownChannel.BaseColor, settings, output, exportedTextures, meshIndex, tex); break;
+                            case TextureType.Diffuse: DoTextureDefault(KnownChannel.BaseColor, settings, output, exportedTextures, meshIndex, tex); break;
+                            case TextureType.Specular: DoTextureDefault(KnownChannel.SpecularColor, settings, output, exportedTextures, meshIndex, tex); break;
+                            case TextureType.Gloss: DoTextureDefault(KnownChannel., settings, output, exportedTextures, meshIndex, tex); break;
+                        }
+                    }
                 }
             }
 
             return output;
         }
+
 
         List<MaterialBuilderTextureInput> ExtractTextures(RmvModel model)
         {
@@ -81,5 +65,35 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
         }
 
         record MaterialBuilderTextureInput(string Path, TextureType Type);
+
+        private void DoTextureConversionMaterialMap(RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput text)
+        {
+            if (exportedTextures.ContainsKey(text.Path) == false)
+                exportedTextures[text.Path] = _ddsToMaterialPngExporter.Export(text.Path, settings.OutputPath, settings.ConvertMaterialTextureToBlender);
+
+            var systemPath = exportedTextures[text.Path];
+            if (systemPath != null)
+                output.Add(new TextureResult(meshIndex, systemPath, KnownChannel.MetallicRoughness));
+        }
+
+        private void DoTextureDefault(KnownChannel textureType, RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput text)
+        {
+            if (exportedTextures.ContainsKey(text.Path) == false)
+                exportedTextures[text.Path] = _ddsToMaterialPngExporter.Export(text.Path, settings.OutputPath, false); // TODO: exchange export with a default one
+
+            var systemPath = exportedTextures[text.Path];
+            if (systemPath != null)
+                output.Add(new TextureResult(meshIndex, systemPath, textureType));
+        }
+
+        private void DoTextureConversionNormalMap(RmvToGltfExporterSettings settings, List<TextureResult> output, Dictionary<string, string> exportedTextures, int meshIndex, MaterialBuilderTextureInput text)
+        {
+            if (exportedTextures.ContainsKey(text.Path) == false)
+                exportedTextures[text.Path] = _ddsToNormalPngExporter.Export(text.Path, settings.OutputPath, settings.ConvertNormalTextureToBlue);
+
+            var systemPath = exportedTextures[text.Path];
+            if (systemPath != null)
+                output.Add(new TextureResult(meshIndex, systemPath, KnownChannel.Normal));
+        }
     }
 }
