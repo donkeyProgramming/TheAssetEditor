@@ -44,14 +44,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
             var outputScene = ModelRoot.CreateModel();
 
-            var skeleton = _gltfSkeletonBuilder.CreateSkeleton(rmv2.Header.SkeletonName, outputScene, settings);
-            var animatedSkeleton = _gltfAnimationBuilder.Build(settings, skeleton, outputScene);
+            var gltfSkeleton = _gltfSkeletonBuilder.CreateSkeleton(rmv2.Header.SkeletonName, outputScene, settings);
+            _gltfAnimationBuilder.Build(rmv2.Header.SkeletonName, settings, gltfSkeleton, outputScene);
 
             var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);
             var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings);
 
-            _logger.Here().Information($"MeshCount={meshes.Count()} TextureCount={textures.Count()} Skeleton={skeleton?.Data.Count}");
-            BuildGltfScene(meshes, skeleton, settings, outputScene);
+            _logger.Here().Information($"MeshCount={meshes.Count()} TextureCount={textures.Count()} Skeleton={gltfSkeleton?.Data.Count}");
+            BuildGltfScene(meshes, gltfSkeleton, settings, outputScene);
         }
 
         void BuildGltfScene(List<IMeshBuilder<MaterialBuilder>> meshBuilders, ProcessedGltfSkeleton? gltfSkeleton, RmvToGltfExporterSettings settings, ModelRoot outputScene)
