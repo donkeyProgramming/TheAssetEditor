@@ -47,7 +47,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.E2EVerification", "Tes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{CA5272EF-16DE-49A6-BAE8-58DC9EE7BDE5}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\pr-build.yml = .github\workflows\pr-build.yml
 		.github\workflows\pr-test.yml = .github\workflows\pr-test.yml
 	EndProjectSection
 EndProject
