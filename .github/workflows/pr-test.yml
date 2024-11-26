@@ -26,5 +26,15 @@ jobs:
     - name: Build the project
       run: dotnet build AssetEditor\AssetEditor.csproj --no-restore
 
-    - name: Run tests
+
+    - name: Run Shared.Core Tests
+      run: dotnet test Testing\Shared.Core.Test\Test.Shared.Core.csproj --no-restore --verbosity normal
+
+    - name: Run GameWorld.Core Tests
+      run: dotnet test Testing\GameWorld.Core.Test\Test.GameWorld.Core.csproj --no-restore --verbosity normal
+
+    - name: Run E2E Verification Tests
       run: dotnet test Testing\E2EVerification\Test.E2EVerification.csproj --no-restore --verbosity normal
+
+    - name: Run Editors.ImportExport Tests
+      run: dotnet test Editors\Test.ImportExport\Test.ImportExport.csproj --no-restore --verbosity normal
