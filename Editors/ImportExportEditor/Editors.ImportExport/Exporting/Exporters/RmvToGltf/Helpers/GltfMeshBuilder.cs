@@ -21,7 +21,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             {
                 var rmvMesh = lodLevel[i];
                 var meshTextures = textures.Where(x=>x.MeshIndex == i).ToList();
-                var gltfMaterial = Create(settings, rmvMesh.Material.ModelName + "_Material", textures);
+                var gltfMaterial = Create(settings, rmvMesh.Material.ModelName + "_Material", meshTextures);
                 var gltfMesh = GenerateMesh(rmvMesh.Mesh, rmvMesh.Material.ModelName, gltfMaterial, hasSkeleton, settings.MirrorMesh);
                 meshes.Add(gltfMesh);
             }
