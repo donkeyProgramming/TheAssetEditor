@@ -53,8 +53,8 @@ namespace Editors.ImportExport
             services.AddTransient<GltfMeshBuilder>();
             services.AddTransient<IGltfTextureHandler, GltfTextureHandler>();
             services.AddTransient<IGltfSceneSaver, GltfSceneSaver>();
-            services.AddTransient<GltfAnimationCreator>();
-            
+            services.AddTransient<GltfSkeletonBuilder>();
+            services.AddTransient<GltfAnimationBuilder>();            
 
             RegisterAllAsInterface<IDeveloperConfiguration>(services, ServiceLifetime.Transient);
         }
