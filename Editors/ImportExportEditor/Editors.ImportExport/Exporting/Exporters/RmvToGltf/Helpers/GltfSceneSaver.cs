@@ -1,4 +1,5 @@
-﻿using SharpGLTF.Schema2;
+﻿using System.Windows;
+using SharpGLTF.Schema2;
 
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
@@ -12,7 +13,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
     {
         public void Save(ModelRoot modelRoot, string fullSystemPath)
         {
-            modelRoot.SaveGLTF(fullSystemPath);
+            try
+            {
+                modelRoot.SaveGLTF(fullSystemPath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Error saving GLTF file. SharpGLTF Error:\n{e.Message}");
+            }
         }
     }
 }
