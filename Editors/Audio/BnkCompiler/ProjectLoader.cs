@@ -9,19 +9,19 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using static Editors.Audio.BnkCompiler.ProjectLoaderHelpers;
-using static Shared.Core.PackFiles.PackFileService;
+using static Shared.Core.PackFiles.IPackFileService;
 
 namespace Editors.Audio.BnkCompiler
 {
     public class ProjectLoader
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         public static readonly Dictionary<uint, uint> EventMixers = new Dictionary<uint, uint>();
         public static readonly Dictionary<uint, uint> DialogueEventMixers = new Dictionary<uint, uint>();
         public static readonly IVanillaObjectIds VanillaObjectIds = new WwiseIdProvider();
         private readonly IAudioRepository _audioRepository;
 
-        public ProjectLoader(PackFileService packFileService, IAudioRepository audioRepository)
+        public ProjectLoader(IPackFileService packFileService, IAudioRepository audioRepository)
         {
             _packFileService = packFileService;
             _audioRepository = audioRepository;

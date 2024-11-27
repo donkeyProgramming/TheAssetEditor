@@ -5,7 +5,7 @@ using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
 using System.IO;
 using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
-using static Shared.Core.PackFiles.PackFileService;
+using static Shared.Core.PackFiles.IPackFileService;
 
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv
@@ -19,9 +19,9 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 
     public class GltfImporter
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public GltfImporter(PackFileService packFileSerivce)
+        public GltfImporter(IPackFileService packFileSerivce)
         {
             _packFileService = packFileSerivce;
         }

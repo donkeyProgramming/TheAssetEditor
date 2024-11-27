@@ -17,14 +17,14 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
 {
     internal class DefaultMaterialTest
     {
-        PackFileService _pfs;
+        IPackFileService _pfs;
 
         [SetUp]
         public void Setup()
         {
             var selectedGame = GameTypeEnum.Warhammer3;
             var appSettings = new ApplicationSettingsService(selectedGame);
-            _pfs = new PackFileService(null);
+            _pfs = new PackFileService(new StandardDialogProvider(), null);
             _pfs.EnforceGameFilesMustBeLoaded = false;
             var _ = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
         }

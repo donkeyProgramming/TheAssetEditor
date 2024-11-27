@@ -21,11 +21,11 @@ namespace Editors.KitbasherEditor.UiCommands
 
         private readonly SelectionManager _selectionManager;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly IWindowFactory _windowFactory;
         private readonly SceneManager _sceneManager;
 
-        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, PackFileService pfs, IWindowFactory windowFactory, SceneManager sceneManager)
+        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IPackFileService pfs, IWindowFactory windowFactory, SceneManager sceneManager)
         {
             _selectionManager = selectionManager;
             _skeletonHelper = skeletonHelper;

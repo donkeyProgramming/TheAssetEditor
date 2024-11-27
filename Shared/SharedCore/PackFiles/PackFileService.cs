@@ -1,10 +1,10 @@
-﻿using System.Windows.Forms;
-using Serilog;
+﻿using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 
 namespace Shared.Core.PackFiles
 {
@@ -18,10 +18,12 @@ namespace Shared.Core.PackFiles
         public bool EnableFileLookUpEvents { get; set; } = false;
         public bool EnforceGameFilesMustBeLoaded { get; set; } = true;
 
+        private readonly IStandardDialogProvider _standardDialogProvider;
         private readonly IGlobalEventHub? _globalEventHub;
 
-        public PackFileService(IGlobalEventHub? globalEventHub)
+        public PackFileService(IStandardDialogProvider standardDialogProvider, IGlobalEventHub? globalEventHub)
         {
+            _standardDialogProvider = standardDialogProvider;
             _globalEventHub = globalEventHub;
         }
 
@@ -34,10 +36,8 @@ namespace Shared.Core.PackFiles
                 var caPacksLoaded = _packFileContainers.Count(x => x.IsCaPackFile);
                 if (caPacksLoaded == 0 && container.IsCaPackFile == false)
                 {
-                    MessageBox.Show("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
-
-                    if (System.Diagnostics.Debugger.IsAttached == false)
-                        return;
+                    _standardDialogProvider.ShowDialogBox("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
+                    return;
                 }
             }
 
@@ -46,12 +46,12 @@ namespace Shared.Core.PackFiles
             {
                 if (packFile.SystemFilePath == container.SystemFilePath)
                 {
-                    MessageBox.Show($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
+                    _standardDialogProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
                     return;
                 }
             }
 
-            AddContainerInternal(container, setToMainPackIfFirst);  
+            AddContainerInternal(container, setToMainPackIfFirst);
         }
 
         void AddContainerInternal(PackFileContainer container, bool setToMainPackIfFirst = false)

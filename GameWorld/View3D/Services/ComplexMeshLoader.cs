@@ -17,10 +17,10 @@ namespace GameWorld.Core.Services
     public class ComplexMeshLoader
     {
         private readonly ILogger _logger = Logging.Create<ComplexMeshLoader>();
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly Rmv2ModelNodeLoader _rmv2ModelNodeLoader;
 
-        public ComplexMeshLoader(Rmv2ModelNodeLoader rmv2ModelNodeLoader, PackFileService packFileService)
+        public ComplexMeshLoader(Rmv2ModelNodeLoader rmv2ModelNodeLoader, IPackFileService packFileService)
         {
             _packFileService = packFileService;
             _rmv2ModelNodeLoader = rmv2ModelNodeLoader;

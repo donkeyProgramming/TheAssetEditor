@@ -10,9 +10,9 @@ namespace Editors.AnimationMeta.DevConfig
     {
         private readonly IEditorCreator _editorCreator;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public AnimMetaTool(IEditorCreator editorCreator, IPackFileContainerLoader packFileContainerLoader, PackFileService packFileService)
+        public AnimMetaTool(IEditorCreator editorCreator, IPackFileContainerLoader packFileContainerLoader, IPackFileService packFileService)
         {
             _editorCreator = editorCreator;
             _packFileContainerLoader = packFileContainerLoader;

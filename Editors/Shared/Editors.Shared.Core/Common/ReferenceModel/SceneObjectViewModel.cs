@@ -9,7 +9,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 {
     public partial class SceneObjectViewModel : ObservableObject
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IMetaDataFactory _metaDataFactory;
@@ -28,7 +28,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         public SceneObjectViewModel(
             IUiCommandFactory uiCommandFactory,
             IMetaDataFactory metaDataFactory,
-            PackFileService packFileService,
+            IPackFileService packFileService,
             SceneObject data,
             string headerName,
             SceneObjectEditor sceneObjectBuilder,

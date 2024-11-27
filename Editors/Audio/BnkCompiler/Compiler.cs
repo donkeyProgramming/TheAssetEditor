@@ -26,9 +26,9 @@ namespace Editors.Audio.BnkCompiler
         private readonly HircBuilder _hircBuilder;
         private readonly BnkHeaderBuilder _headerBuilder;
         private readonly IAudioRepository _audioRepository;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
 
-        public Compiler(HircBuilder hircBuilder, BnkHeaderBuilder headerBuilder, IAudioRepository audioRepository, PackFileService packFileService)
+        public Compiler(HircBuilder hircBuilder, BnkHeaderBuilder headerBuilder, IAudioRepository audioRepository, IPackFileService packFileService)
         {
             _hircBuilder = hircBuilder;
             _headerBuilder = headerBuilder;

@@ -38,7 +38,7 @@ namespace AnimationEditor.MountAnimationCreator
         private readonly IFileSaveService _fileSaveService;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly SelectionManager _selectionManager;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
@@ -75,7 +75,7 @@ namespace AnimationEditor.MountAnimationCreator
         public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
         public FilterCollection<AnimationBinEntryGenericFormat> ActiveFragmentSlot { get; set; }
 
-        public MountAnimationCreatorViewModel(PackFileService pfs, 
+        public MountAnimationCreatorViewModel(IPackFileService pfs, 
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
             SelectionManager selectionManager,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,

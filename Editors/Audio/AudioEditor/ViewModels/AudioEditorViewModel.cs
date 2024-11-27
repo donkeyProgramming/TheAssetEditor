@@ -17,7 +17,7 @@ using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
 using static Editors.Audio.AudioEditor.DynamicDataGrid;
-using static Shared.Core.PackFiles.PackFileService;
+using static Shared.Core.PackFiles.IPackFileService;
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
@@ -33,7 +33,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
     public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {
         private readonly IAudioRepository _audioRepository;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IWindowFactory _windowFactory;
         readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
 
@@ -48,7 +48,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData; // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
         public static List<string> AudioProjectDialogueEvents => AudioEditorData.Instance.AudioProjectDialogueEvents;
 
-        public AudioEditorViewModel(IAudioRepository audioRepository, PackFileService packFileService, IWindowFactory windowFactory)
+        public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IWindowFactory windowFactory)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;

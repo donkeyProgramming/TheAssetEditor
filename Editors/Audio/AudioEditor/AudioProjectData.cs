@@ -8,7 +8,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using static Shared.Core.PackFiles.PackFileService;
+using static Shared.Core.PackFiles.IPackFileService;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -37,7 +37,7 @@ namespace Editors.Audio.AudioEditor
             public List<string> AudioFiles { get; set; } = [];
         }
 
-        public static void AddAudioProjectToPackFile(PackFileService packFileService, Dictionary<string, List<Dictionary<string, object>>> eventsData, string audioProjectName)
+        public static void AddAudioProjectToPackFile(IPackFileService packFileService, Dictionary<string, List<Dictionary<string, object>>> eventsData, string audioProjectName)
         {
             var audioProjectJson = ConvertEventsDataToAudioProject(eventsData);
             var editablePack = packFileService.GetEditablePack();

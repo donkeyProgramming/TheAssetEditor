@@ -17,12 +17,12 @@ namespace Editors.KitbasherEditor.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.OneObjectSelected;
         public Hotkey HotKey { get; } = null;
 
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly SelectionManager _selectionManager;
         private readonly IWindowFactory _windowFactory;
 
-        public OpenBmiToolCommand(PackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, SelectionManager selectionManager, IWindowFactory windowFactory)
+        public OpenBmiToolCommand(IPackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, SelectionManager selectionManager, IWindowFactory windowFactory)
         {
             _packFileService = packFileService;
             _skeletonHelper = skeletonHelper;

@@ -11,7 +11,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 {
     public class Depricated_SelectAnimationViewModel : NotifyPropertyChangedImpl
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly SceneObjectEditor _assetViewModelEditor;
         private readonly SceneObject _data;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
@@ -25,7 +25,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
         public OnSeachDelegate FiterByFullPath => (item, expression) => { return expression.Match(item.ToString()).Success; };
 
-        public Depricated_SelectAnimationViewModel(SceneObjectEditor assetViewModelEditor, SceneObject data, PackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public Depricated_SelectAnimationViewModel(SceneObjectEditor assetViewModelEditor, SceneObject data, IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _assetViewModelEditor = assetViewModelEditor;
             _data = data;

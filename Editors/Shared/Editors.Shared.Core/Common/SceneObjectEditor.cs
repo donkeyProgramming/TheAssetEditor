@@ -21,12 +21,12 @@ namespace Editors.Shared.Core.Common
         private readonly IWpfGame _mainScene;
         private readonly IServiceProvider _serviceProvider;
         private readonly SceneManager _sceneManager;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly ComplexMeshLoader _complexMeshLoader;
 
         public SceneObjectEditor(IWpfGame mainScene,
-            IServiceProvider serviceProvider, SceneManager sceneManager, PackFileService packFileService,
+            IServiceProvider serviceProvider, SceneManager sceneManager, IPackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader)
         {
             _mainScene = mainScene;

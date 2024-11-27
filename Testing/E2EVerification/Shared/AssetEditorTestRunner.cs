@@ -18,7 +18,7 @@ namespace E2EVerification.Shared
         private readonly IServiceProvider _serviceProvider;
 
         public IServiceScope EditorServiceProvider { get; private set; }
-        public PackFileService PackFileService { get; private set; }
+        public IPackFileService PackFileService { get; private set; }
         public IUiCommandFactory CommandFactory { get; private set; }
         public ScopeRepository ScopeRepository { get; private set; }
 
@@ -35,7 +35,7 @@ namespace E2EVerification.Shared
             var resourceLibrary = EditorServiceProvider.ServiceProvider.GetRequiredService<ResourceLibrary>();
             resourceLibrary.Initialize(game.GraphicsDevice, game.Content);
 
-            PackFileService = EditorServiceProvider.ServiceProvider.GetRequiredService<PackFileService>();
+            PackFileService = EditorServiceProvider.ServiceProvider.GetRequiredService<IPackFileService>();
             CommandFactory = EditorServiceProvider.ServiceProvider.GetRequiredService<IUiCommandFactory>();
             ScopeRepository = EditorServiceProvider.ServiceProvider.GetRequiredService<ScopeRepository>();
             ScopeRepository.Root = EditorServiceProvider;

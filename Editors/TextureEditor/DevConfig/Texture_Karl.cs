@@ -9,11 +9,11 @@ namespace Editors.TextureEditor.DevConfig
 {
     internal class Texture_Karl : IDeveloperConfiguration
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IUiCommandFactory _uiCommandFactory;
 
-        public Texture_Karl(PackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory)
+        public Texture_Karl(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory)
         {
             _packFileService = packFileService;
             _packFileContainerLoader = packFileContainerLoader;

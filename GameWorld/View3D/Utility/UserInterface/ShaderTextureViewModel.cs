@@ -18,14 +18,14 @@ namespace GameWorld.Core.Utility.UserInterface
     public partial class ShaderTextureViewModel : ObservableObject, INotifyDataErrorInfo
     {
         private readonly TextureInput _shaderTextureReference;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly ResourceLibrary _resourceLibrary;
 
         [ObservableProperty] string _path;
         [ObservableProperty] bool _shouldRenderTexture;
 
-        public ShaderTextureViewModel(TextureInput shaderTextureReference, PackFileService packFileService, IUiCommandFactory uiCommandFactory, ResourceLibrary resourceLibrary) 
+        public ShaderTextureViewModel(TextureInput shaderTextureReference, IPackFileService packFileService, IUiCommandFactory uiCommandFactory, ResourceLibrary resourceLibrary) 
         {
             _shaderTextureReference = shaderTextureReference;
             _packFileService = packFileService;

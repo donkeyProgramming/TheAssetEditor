@@ -12,11 +12,11 @@ namespace Editors.Audio.Utility
         ILogger _logger = Logging.Create<SoundPlayer>();
         private readonly string _language = "english(uk)";
 
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly IAudioRepository _audioRepository;
         private readonly VgStreamWrapper _vgStreamWrapper;
 
-        public SoundPlayer(PackFileService pfs, IAudioRepository audioRepository, VgStreamWrapper vgStreamWrapper)
+        public SoundPlayer(IPackFileService pfs, IAudioRepository audioRepository, VgStreamWrapper vgStreamWrapper)
         {
             _pfs = pfs;
             _audioRepository = audioRepository;

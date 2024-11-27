@@ -11,7 +11,7 @@ namespace GameWorld.Core.Utility
     {
         private static readonly ILogger _logger = Logging.CreateStatic(typeof(ImageLoader));
 
-        public static Texture2D ForceLoadImage(string fileName, PackFileService packFileService, GraphicsDevice graphicsDevice, out ImageInformation imageInfo, bool fromFile = false)
+        public static Texture2D ForceLoadImage(string fileName, IPackFileService packFileService, GraphicsDevice graphicsDevice, out ImageInformation imageInfo, bool fromFile = false)
         {
             return LoadTextureAsTexture2d(fileName, packFileService, graphicsDevice, out imageInfo, fromFile);
         }
@@ -22,7 +22,7 @@ namespace GameWorld.Core.Utility
             texture.SaveAsPng(stream, texture.Width, texture.Height);
         }
 
-        private static byte[] GetFileBytes(PackFileService packFileService, string fileName, bool fromFile)
+        private static byte[] GetFileBytes(IPackFileService packFileService, string fileName, bool fromFile)
         {
             if (fromFile)
             {
@@ -96,7 +96,7 @@ namespace GameWorld.Core.Utility
             return texture;
         }
 
-        public static Texture2D LoadTextureAsTexture2d(string fileName, PackFileService pfs, GraphicsDevice device, out ImageInformation out_imageInfo, bool fromFile)
+        public static Texture2D LoadTextureAsTexture2d(string fileName, IPackFileService pfs, GraphicsDevice device, out ImageInformation out_imageInfo, bool fromFile)
         {
             out_imageInfo = null;
             var imageContent = GetFileBytes(pfs, fileName, fromFile);

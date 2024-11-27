@@ -4,13 +4,19 @@ using System.Windows;
 using CsvHelper;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace Editors.Reports
+namespace Editors.Reports.Animation
 {
+    public class GenerateMetaDataReportCommand(AnimMetaDataReportGenerator generator) : IUiCommand
+    {
+        public void Execute() => generator.Create();
+    }
+
     public class AnimMetaDataReportGenerator
     {
         private readonly ILogger _logger = Logging.Create<AnimMetaDataReportGenerator>();
@@ -23,18 +29,18 @@ namespace Editors.Reports
             public List<string> Headers { get; set; } = new List<string>() { "FileName", "Error" };
         }
 
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
-        public AnimMetaDataReportGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public AnimMetaDataReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _pfs = pfs;
             _settingsService = settingsService;
             _gameInformationFactory = gameInformationFactory;
         }
 
-        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             var instance = new AnimMetaDataReportGenerator(pfs, settingsService, gameInformationFactory);
             instance.Create();

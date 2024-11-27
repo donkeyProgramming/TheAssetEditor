@@ -15,7 +15,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
     {
         private readonly Dictionary<string, string> _map;
 
-        public WsMaterialRepository(PackFileService packFileService)
+        public WsMaterialRepository(IPackFileService packFileService)
         {
             _map = LoadAllExistingMaterials(packFileService);
         }
@@ -61,7 +61,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
             return sWhitespace.Replace(input, replacement);
         }
 
-        Dictionary<string, string> LoadAllExistingMaterials(PackFileService packFileService)
+        Dictionary<string, string> LoadAllExistingMaterials(IPackFileService packFileService)
         {
             var materialList = new Dictionary<string, string>();
 

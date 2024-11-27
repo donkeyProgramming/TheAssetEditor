@@ -1,9 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Windows;
+using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationPack.Converters;
+using Editors.Reports.DeepSearch;
 using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -12,17 +15,22 @@ using Shared.GameFormats.AnimationMeta.Parsing;
 using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 
-namespace Editors.Reports
+namespace Editors.Reports.Animation
 {
+    public class GenerateMetaJsonDataReportCommand(AnimMetaDataJsonGenerator generator) : IUiCommand
+    {
+        public void Execute() => generator.Create();
+    }
+
     public class AnimMetaDataJsonGenerator
     {
         private readonly ILogger _logger = Logging.Create<AnimMetaDataJsonGenerator>();
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
         private readonly GameInformationFactory _gameInformationFactory;
         private readonly JsonSerializerSettings _jsonOptions;
 
-        public AnimMetaDataJsonGenerator(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public AnimMetaDataJsonGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             _pfs = pfs;
             _settingsService = settingsService;
@@ -30,7 +38,7 @@ namespace Editors.Reports
             _jsonOptions = new JsonSerializerSettings { Formatting = Formatting.Indented };
         }
 
-        public static void Generate(PackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
             var instance = new AnimMetaDataJsonGenerator(pfs, settingsService, gameInformationFactory);
             instance.Create();

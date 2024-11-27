@@ -1,16 +1,22 @@
 ﻿using System.Text;
 using System.Windows;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.WsModel;
 
-namespace Editors.Reports
+namespace Editors.Reports.Geometry
 {
+    public class MaterialReportCommand(MaterialReportGenerator generator) : IUiCommand
+    {
+        public void Execute() => generator.Create();
+    }
+
     public class MaterialReportGenerator
     {
-        private readonly PackFileService _pfs;
-        
-        public MaterialReportGenerator(PackFileService pfs)
+        private readonly IPackFileService _pfs;
+
+        public MaterialReportGenerator(IPackFileService pfs)
         {
             _pfs = pfs;
         }
@@ -26,7 +32,7 @@ namespace Editors.Reports
             var fileList = PackFileServiceUtility.FindAllWithExtention(_pfs, ".wsmodel");
             var notFoundFiles = new List<string>();
             var errorFiles = new List<(string, Exception)>();
-            foreach ( var file in fileList ) 
+            foreach (var file in fileList)
             {
                 try
                 {
@@ -46,7 +52,8 @@ namespace Editors.Reports
                             shaderMap[material.ShaderPath] = new List<WsModelMaterialFile>();
                         shaderMap[material.ShaderPath].Add(material);
                     }
-                }catch (Exception ex) 
+                }
+                catch (Exception ex)
                 {
                     errorFiles.Add((file.Name, ex));
                 }
@@ -75,13 +82,13 @@ namespace Editors.Reports
                 // Add instances
                 foreach (var instance in instances)
                 {
-                    sb.Append(instance.Name+"|");
+                    sb.Append(instance.Name + "|");
                     sb.Append(string.Join("|", instance.Parameters.OrderBy(x => x.Name).Select(x => x.Value)));
                     sb.AppendLine();
                 }
 
                 var outputFileName = path.Replace(".", "_").Replace("/", "_");
-                File.WriteAllText(dirPath + "\\" + outputFileName + "_" + instances .Count + ".csv", sb.ToString());
+                File.WriteAllText(dirPath + "\\" + outputFileName + "_" + instances.Count + ".csv", sb.ToString());
             }
 
             // Create a summary
@@ -106,7 +113,7 @@ namespace Editors.Reports
                         error = "Unable to process - different number of parameters";
                 }
 
-                bool differentParameters = false;
+                var differentParameters = false;
                 foreach (var instance in instances)
                 {
                     if (instance.Parameters.Count != instances.First().Parameters.Count)
@@ -132,7 +139,7 @@ namespace Editors.Reports
 
             File.WriteAllText(dirPath + "\\Summary.csv", summarySb.ToString());
             MessageBox.Show("Report completed");
-                
+
         }
     }
 }

@@ -29,7 +29,7 @@ namespace GameWorld.Core.Services
         private readonly Dictionary<string, Texture2D> _cachedTextures = new();
         private readonly Dictionary<ShaderTypes, Effect> _cachedShaders = new();
 
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private GraphicsDevice _graphicsDevice;
         private ContentManager _content;
         private bool _isInitialized = false;
@@ -40,7 +40,7 @@ namespace GameWorld.Core.Services
         public SpriteBatch CommonSpriteBatch { get; private set; }
         public SpriteFont DefaultFont { get; private set; }
 
-        public ResourceLibrary(PackFileService pf)
+        public ResourceLibrary(IPackFileService pf)
         {
             _pfs = pf;
         }

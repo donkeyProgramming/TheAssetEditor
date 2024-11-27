@@ -17,7 +17,7 @@ namespace AssetEditor.ViewModels
 {
     public partial class MainViewModel : ObservableObject, IDropTarget<IEditorInterface, bool>
     {
-        private readonly PackFileService _packfileService;
+        private readonly IPackFileService _packfileService;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         public PackFileBrowserViewModel FileTree { get; private set; }
@@ -33,7 +33,7 @@ namespace AssetEditor.ViewModels
         public MainViewModel(
                 IEditorManager editorManager,
                 MenuBarViewModel menuViewModel, 
-                PackFileService packfileService, 
+                IPackFileService packfileService, 
                 IEditorDatabase toolFactory, 
                 IUiCommandFactory uiCommandFactory, 
                 IEventHub eventHub,

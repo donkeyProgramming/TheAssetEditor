@@ -6,10 +6,10 @@ namespace Editors.ImportExport.Importing.Importers.PngToMaterialDds
 {
     internal class PngToMaterialDdsImporter
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly IImageSaveHandler _imageSaveHandler;
 
-        public PngToMaterialDdsImporter(PackFileService pfs, IImageSaveHandler imageSaveHandler)
+        public PngToMaterialDdsImporter(IPackFileService pfs, IImageSaveHandler imageSaveHandler)
         {
             _pfs = pfs;
             _imageSaveHandler = imageSaveHandler;

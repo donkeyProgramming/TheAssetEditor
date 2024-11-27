@@ -67,7 +67,7 @@ namespace AssetEditor
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
-                    var packfileService = _rootScope.ServiceProvider.GetRequiredService<PackFileService>();
+                    var packfileService = _rootScope.ServiceProvider.GetRequiredService<IPackFileService>();
                     var containerLoader = _rootScope.ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
                     var loadRes = containerLoader.LoadAllCaFiles(settingsService.CurrentSettings.CurrentGame);
 

@@ -18,11 +18,11 @@ namespace GameWorld.Core.SceneNodes
     {
         private readonly ILogger _logger = Logging.Create<Rmv2ModelNodeLoader>();
         private readonly MeshBuilderService _meshBuilderService;
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly CapabilityMaterialFactory _capabilityMaterialFactory;
         private readonly IExceptionService _exceptionService;
 
-        public Rmv2ModelNodeLoader(MeshBuilderService meshBuilderService, PackFileService packFileService, CapabilityMaterialFactory materialFactory, IExceptionService exceptionService)
+        public Rmv2ModelNodeLoader(MeshBuilderService meshBuilderService, IPackFileService packFileService, CapabilityMaterialFactory materialFactory, IExceptionService exceptionService)
         {
             _meshBuilderService = meshBuilderService;
             _packFileService = packFileService;

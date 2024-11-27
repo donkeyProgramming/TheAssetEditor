@@ -16,9 +16,9 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
 
     public class DdsToMaterialPngExporter : IDdsToMaterialPngExporter
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly IImageSaveHandler _imageSaveHandler;
-        public DdsToMaterialPngExporter(PackFileService packFileService, IImageSaveHandler imageSaveHandler)
+        public DdsToMaterialPngExporter(IPackFileService packFileService, IImageSaveHandler imageSaveHandler)
         {
             _pfs = packFileService;
             _imageSaveHandler = imageSaveHandler;

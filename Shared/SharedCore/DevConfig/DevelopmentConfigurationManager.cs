@@ -10,12 +10,12 @@ namespace Shared.Core.DevConfig
     public class DevelopmentConfigurationManager
     {
         private readonly ILogger _logger = Logging.Create<DevelopmentConfigurationManager>();
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly ApplicationSettingsService _settingsService;
         private readonly IEnumerable<IDeveloperConfiguration> _developerConfigurations;
         private IDeveloperConfiguration _activeConfig;
 
-        public DevelopmentConfigurationManager(IEnumerable<IDeveloperConfiguration> developerConfigurations, PackFileService packFileService, ApplicationSettingsService settingsService)
+        public DevelopmentConfigurationManager(IEnumerable<IDeveloperConfiguration> developerConfigurations, IPackFileService packFileService, ApplicationSettingsService settingsService)
         {
             _developerConfigurations = developerConfigurations;
             _packFileService = packFileService;

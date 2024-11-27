@@ -10,7 +10,7 @@ namespace CommonControls.Editors.AnimationPack
 {
     public class AnimationPackSampleDataCreator
     {
-        public static PackFile? CreateAnimationDbWarhammer3(IFileSaveService saveHelper, PackFileService pfs)
+        public static PackFile? CreateAnimationDbWarhammer3(IFileSaveService saveHelper, IPackFileService pfs)
         {
             TextInputWindow window = new TextInputWindow("New AnimPack name", "");
             if (window.ShowDialog() == true)
@@ -25,7 +25,7 @@ namespace CommonControls.Editors.AnimationPack
             return filePath;
         }
 
-        public static PackFile? CreateAnimationDbWarhammer3(IFileSaveService saveHelper, PackFileService pfs, string name)
+        public static PackFile? CreateAnimationDbWarhammer3(IFileSaveService saveHelper, IPackFileService pfs, string name)
         {
             var filePath = GenerateWh3AnimPackName(name);
 
@@ -39,7 +39,7 @@ namespace CommonControls.Editors.AnimationPack
             return saveHelper.Save(filePath, AnimationPackSerializer.ConvertToBytes(animPack), false);
         }
 
-        public static void CreateAnimationDb3k(PackFileService pfs, IFileSaveService saveHelper)
+        public static void CreateAnimationDb3k(IPackFileService pfs, IFileSaveService saveHelper)
         {
             TextInputWindow window = new TextInputWindow("New AnimPack name", "");
             if (window.ShowDialog() == true)

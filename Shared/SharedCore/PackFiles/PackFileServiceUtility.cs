@@ -4,7 +4,7 @@ namespace Shared.Core.PackFiles
 {
     public static class PackFileServiceUtility
     {
-        public static List<PackFile> FindAllFilesInDirectory(PackFileService pfs, string dir, bool includeSubFolders = true)
+        public static List<PackFile> FindAllFilesInDirectory(IPackFileService pfs, string dir, bool includeSubFolders = true)
         {
             dir = dir.Replace('/', '\\').ToLower();
             var output = new List<PackFile>();
@@ -35,7 +35,7 @@ namespace Shared.Core.PackFiles
             return output;
         }
 
-        public static List<string> SearchForFile(PackFileService pfs, string partOfFileName)
+        public static List<string> SearchForFile(IPackFileService pfs, string partOfFileName)
         {
             var output = new List<string>();
             foreach (var pf in pfs.GetAllPackfileContainers())
@@ -50,7 +50,7 @@ namespace Shared.Core.PackFiles
             return output;
         }
 
-        public static List<PackFile> GetAllAnimPacks(PackFileService pfs)
+        public static List<PackFile> GetAllAnimPacks(IPackFileService pfs)
         {
             var animPacks = FindAllWithExtention(pfs, @".animpack");
             var itemsToRemove = animPacks.Where(x => pfs.GetFullPath(x).Contains("animation_culture_packs", StringComparison.InvariantCultureIgnoreCase)).ToList();
@@ -61,13 +61,13 @@ namespace Shared.Core.PackFiles
         }
 
 
-        public static List<PackFile> FindAllWithExtention(PackFileService pfs, string extention, PackFileContainer? packFileContainer = null)
+        public static List<PackFile> FindAllWithExtention(IPackFileService pfs, string extention, PackFileContainer? packFileContainer = null)
         {
             return FindAllWithExtentionIncludePaths(pfs, extention, packFileContainer).Select(x => x.Item2).ToList();
         }
 
 
-        public static List<(string FileName, PackFile Pack)> FindAllWithExtentionIncludePaths(PackFileService pfs, string extention, PackFileContainer? packFileContainer = null)
+        public static List<(string FileName, PackFile Pack)> FindAllWithExtentionIncludePaths(IPackFileService pfs, string extention, PackFileContainer? packFileContainer = null)
         {
             extention = extention.ToLower();
             var output = new List<ValueTuple<string, PackFile>>();

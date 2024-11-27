@@ -25,7 +25,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             _preferedGame = preferedGame;
         }
 
-        protected override ITextConverter.SaveError Validate(Animation xmlAnimation, string text, PackFileService pfs, string filepath)
+        protected override ITextConverter.SaveError Validate(Animation xmlAnimation, string text, IPackFileService pfs, string filepath)
         {
             if (string.IsNullOrWhiteSpace(xmlAnimation.Skeleton))
                 return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Missing skeleton item on root" };

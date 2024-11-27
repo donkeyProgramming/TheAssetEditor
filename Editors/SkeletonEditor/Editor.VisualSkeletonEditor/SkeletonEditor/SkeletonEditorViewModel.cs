@@ -21,7 +21,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
     {
         SceneObject _techSkeletonNode;
 
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly CopyPasteManager _copyPasteManager;
         private readonly IFileSaveService _packFileSaveService;
         [ObservableProperty] string _skeletonName = "";
@@ -42,7 +42,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
         public override Type EditorViewModelType => typeof(EditorView);
 
         public SkeletonEditorViewModel(
-            PackFileService pfs,
+            IPackFileService pfs,
             CopyPasteManager copyPasteManager,
             IEditorHostParameters editorHostParameters,
             IFileSaveService packFileSaveService)

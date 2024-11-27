@@ -8,12 +8,12 @@ namespace AssetEditor.UiCommands
 {
     internal class OpenGamePackCommand : IUiCommand
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly GameInformationFactory _gameInformationFactory;
 
-        public OpenGamePackCommand(PackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
+        public OpenGamePackCommand(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
         {
             _packFileService = packFileService;
             _packFileContainerLoader = packFileContainerLoader;

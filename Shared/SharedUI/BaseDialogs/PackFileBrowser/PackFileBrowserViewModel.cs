@@ -20,7 +20,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
     public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable, IDropTarget<TreeNode>
     {
-        protected PackFileService _packFileService;
+        protected IPackFileService _packFileService;
         private readonly IEventHub? _eventHub;
 
         public event FileSelectedDelegate FileOpen;
@@ -45,7 +45,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         public ContextMenuHandler ContextMenu { get; set; }
 
-        public PackFileBrowserViewModel(PackFileService packFileService, IEventHub? eventHub, bool ignoreCaFiles = false)
+        public PackFileBrowserViewModel(IPackFileService packFileService, IEventHub? eventHub, bool ignoreCaFiles = false)
         {
 
             // Allow doubleclick 

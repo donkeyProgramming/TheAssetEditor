@@ -7,9 +7,9 @@ namespace Editors.ImportExport.Importing.Importers.PngToNormalDds
 
     internal class PngToNormalDdsImporter
     {
-        private readonly PackFileService _pfs;
+        private readonly IPackFileService _pfs;
         private readonly IImageSaveHandler _imageSaveHandler;
-        public PngToNormalDdsImporter(PackFileService pfs, IImageSaveHandler imageSaveHandler)
+        public PngToNormalDdsImporter(IPackFileService pfs, IImageSaveHandler imageSaveHandler)
         {
             _pfs = pfs;
             _imageSaveHandler = imageSaveHandler;

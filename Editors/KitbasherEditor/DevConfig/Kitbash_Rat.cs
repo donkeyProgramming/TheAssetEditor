@@ -12,12 +12,12 @@ namespace Editors.KitbasherEditor.DevConfig
 {
     internal class Kitbash_Rat : IDeveloperConfiguration
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly ScopeRepository _scopeRepositor;
 
-        public Kitbash_Rat(PackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory, ScopeRepository scopeRepositor)
+        public Kitbash_Rat(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory, ScopeRepository scopeRepositor)
         {
             _packFileService = packFileService;
             _packFileContainerLoader = packFileContainerLoader;

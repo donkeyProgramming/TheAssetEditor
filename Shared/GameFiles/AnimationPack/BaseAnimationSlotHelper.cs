@@ -63,7 +63,7 @@ namespace Shared.GameFormats.AnimationPack
                 Values.Add(new AnimationSlotType(i, strings[i].Trim()));
         }
 
-        public void ExportAnimationDebugList(PackFileService pfs, string outputName)
+        public void ExportAnimationDebugList(IPackFileService pfs, string outputName)
         {
             var data = new Dictionary<string, List<string>>();
             var indexList = new Dictionary<string, int>();

@@ -18,7 +18,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] Vector2ViewModel _bloodUvScale;
         [ObservableProperty] FloatViewModel _bloodPreview;
 
-        public BloodViewModel(BloodCapability bloodCapability, IUiCommandFactory uiCommandFactory, PackFileService packFileService, ResourceLibrary resourceLibrary)
+        public BloodViewModel(BloodCapability bloodCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary)
         {
             _bloodCapability = bloodCapability;
 
