@@ -86,14 +86,15 @@ namespace Editors.Shared.Core.Services
 
             Parallel.For(0, groupedAnims.Count, index =>
             {
-  
+                using var handle = File.OpenHandle(groupedAnims[index].Key);
+
+                //https://www.jacksondunstan.com/articles/3568
                 var fileStream = File.OpenRead(groupedAnims[index].Key);
                 var buffer = new byte[100];
 
                 foreach (var file in groupedAnims[index])
-                {    
-                    fileStream.Seek(file.DataSource.Offset, SeekOrigin.Begin);
-                    fileStream.ReadExactly(buffer);
+                {
+                    RandomAccess.Read(handle, buffer, file.DataSource.Offset);
                     FileDiscovered(buffer, packFileContainer, file.FullPath, ref skeletonFileNameList, ref animationList);
                 }
             });
@@ -167,10 +168,10 @@ namespace Editors.Shared.Core.Services
         {
             lock (_threadLock)
             {
-                var newEntry = new ObservableCollection<AnimationReference>() { new AnimationReference(fullPath, container) };
-                if (animationList.ContainsKey(skeletonName) == false)
-                    animationList[skeletonName] = [];
-                animationList[skeletonName].Add(new AnimationReference(fullPath, container));
+               var newEntry = new ObservableCollection<AnimationReference>() { new AnimationReference(fullPath, container) };
+               if (animationList.ContainsKey(skeletonName) == false)
+                   animationList[skeletonName] = [];
+               animationList[skeletonName].Add(new AnimationReference(fullPath, container));
 
                 if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
                     skeletonFileNameList.Add(fullPath);
