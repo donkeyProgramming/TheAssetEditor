@@ -95,9 +95,10 @@ namespace Shared.Core.PackFiles
             {
                 _logger.Here().Information($"Loading pack files for {gameName} located in {gameDataFolder}");
                 var allCaPackFiles = ManifestHelper.GetPackFilesFromManifest(gameDataFolder);
+           
 
                 var packList = new List<PackFileContainer>();
-                foreach (var packFilePath in allCaPackFiles)
+                Parallel.ForEach(allCaPackFiles, packFilePath =>
                 {
                     var path = gameDataFolder + "\\" + packFilePath;
                     if (File.Exists(path))
@@ -112,7 +113,8 @@ namespace Shared.Core.PackFiles
                     {
                         _logger.Here().Warning($"{gameName} pack file '{path}' not found, loading skipped");
                     }
-                }
+                
+                });
 
                 var caPackFileContainer = new PackFileContainer($"All Game Packs - {gameName}");
                 caPackFileContainer.IsCaPackFile = true;
@@ -133,6 +135,6 @@ namespace Shared.Core.PackFiles
                 _logger.Here().Error($"Trying to get all CA packs in {gameDataFolder}. Error : {e.ToString()}");
                 return null;
             }
-        }
+        } // 2000
     }
 }

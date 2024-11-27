@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -138,6 +139,13 @@ namespace Shared.GameFormats.Animation
                 logger.Here().Information($"Loading animation failed: {file} Size:{data.Length} Error:\n{e.ToString()}");
                 throw;
             }
+        }
+
+       public static string GetAnimationName(byte[] animationFileByteBuffer)
+       {
+            var offsetToName = 12;
+            var stringLenth = BitConverter.ToInt16(animationFileByteBuffer, offsetToName);
+            return Encoding.UTF8.GetString(animationFileByteBuffer, 12+2, stringLenth);
         }
 
         public static AnimationHeader GetAnimationHeader(ByteChunk chunk)

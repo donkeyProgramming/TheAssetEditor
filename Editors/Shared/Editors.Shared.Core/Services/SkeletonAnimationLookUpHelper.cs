@@ -86,6 +86,7 @@ namespace Editors.Shared.Core.Services
 
             Parallel.For(0, groupedAnims.Count, index =>
             {
+  
                 var fileStream = File.OpenRead(groupedAnims[index].Key);
                 var buffer = new byte[100];
 
@@ -93,7 +94,7 @@ namespace Editors.Shared.Core.Services
                 {    
                     fileStream.Seek(file.DataSource.Offset, SeekOrigin.Begin);
                     fileStream.ReadExactly(buffer);
-                    FileDiscovered(new ByteChunk(buffer), packFileContainer, file.FullPath, ref skeletonFileNameList, ref animationList);
+                    FileDiscovered(buffer, packFileContainer, file.FullPath, ref skeletonFileNameList, ref animationList);
                 }
             });
 
@@ -132,14 +133,14 @@ namespace Editors.Shared.Core.Services
             }
         }
 
-        void FileDiscovered(ByteChunk byteChunk, PackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
+        void FileDiscovered(byte[] byteChunk, PackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
         {
             if (IsKnownBrokenAnimation(fullPath))
                 return;
 
             try
             {
-                var animationSkeletonName = AnimationFile.GetAnimationHeader(byteChunk).SkeletonName;
+                var animationSkeletonName = AnimationFile.GetAnimationName(byteChunk);
                 AddAnimation(animationSkeletonName, fullPath, container, ref skeletonFileNameList, ref animationList);
             }
             catch (Exception e)

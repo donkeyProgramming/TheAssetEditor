@@ -81,7 +81,7 @@ namespace Shared.Core.PackFiles.Models
         }
     }
 
-    public class PackedFileSource : IDataSource
+    public record PackedFileSource : IDataSource
     {
         public long Size { get; private set; }
 
