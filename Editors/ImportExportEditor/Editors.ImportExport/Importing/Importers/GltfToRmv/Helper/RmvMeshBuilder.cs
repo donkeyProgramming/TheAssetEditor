@@ -128,7 +128,8 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
 
         private static CommonVertex ConvertToRmvVertex(VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> vertexBuilder)
         {
-            var rmv2Vertex = new Shared.GameFormats.RigidModel.Vertex.CommonVertex();
+
+            var rmv2Vertex = new CommonVertex();
 
             rmv2Vertex.Position = new XNA.Vector4(-vertexBuilder.Geometry.Position.X, vertexBuilder.Geometry.Position.Y, vertexBuilder.Geometry.Position.Z, 1);
             rmv2Vertex.Uv = VecConv.GetXna(vertexBuilder.Material.TexCoord);
