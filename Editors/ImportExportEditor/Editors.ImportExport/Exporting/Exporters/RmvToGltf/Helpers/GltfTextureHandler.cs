@@ -50,15 +50,14 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                             case TextureType.Gloss: DoTextureDefault(KnownChannel.MetallicRoughness, settings, output, exportedTextures, meshIndex, tex); break;
                         }
                     }
-                }
+                }                
 
                 
             }
 
             return output;
-        }
-
-        class IDDsToPngExporter
+        }        
+        interface IDDsToPngExporter
         {
             public string Export(string path, string outputPath, bool convertToBlender)
             {
