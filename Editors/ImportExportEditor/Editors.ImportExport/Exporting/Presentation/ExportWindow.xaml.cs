@@ -27,7 +27,10 @@ namespace Editors.ImportExport.Exporting.Presentation
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             if (!PathValidator.IsValid(_viewModel.SystemPath))
+            {
+                MessageBox.Show("Invalid or empty path", "Error");
                 return;
+            }
 
             _viewModel.Export();
             Close();
