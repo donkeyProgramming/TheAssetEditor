@@ -18,31 +18,18 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
     public class GltfSkeletonBuilder
     {
-        private readonly IPackFileService _packFileService;
-        private readonly SkeletonAnimationLookUpHelper _skeletonLookUpHelper;
+        private readonly IPackFileService _packFileService;        
 
-        public GltfSkeletonBuilder(IPackFileService packFileService, SkeletonAnimationLookUpHelper skeletonLookUpHelper)
+        public GltfSkeletonBuilder(IPackFileService packFileService)
         {
-            _packFileService = packFileService;
-            _skeletonLookUpHelper = skeletonLookUpHelper;
+            _packFileService = packFileService;            
         }
 
-        public ProcessedGltfSkeleton CreateSkeleton(string? skeletonNameFromRmv2, ModelRoot outputScene, RmvToGltfExporterSettings settings)
-        {
-            if(string.IsNullOrWhiteSpace(skeletonNameFromRmv2))
-                return null;
-
-            var skeletonAnimFile = _skeletonLookUpHelper.GetSkeletonFileFromName(skeletonNameFromRmv2);            
-            if (skeletonAnimFile == null)
-            {
-                // TODO: make this a user reaction
-                throw new ArgumentNullException(nameof(skeletonAnimFile), "should not be null");
-            }
-
+        public ProcessedGltfSkeleton CreateSkeleton(AnimationFile skeletonAnimFile, ModelRoot outputScene, RmvToGltfExporterSettings settings)
+        {           
             var gltfSkeleton = CreateSkeleton(outputScene, skeletonAnimFile, settings.MirrorMesh);
                         
-            return gltfSkeleton;
-            
+            return gltfSkeleton;            
         }
 
         ProcessedGltfSkeleton CreateSkeleton(ModelRoot outputScene, AnimationFile animSkeletonFil, bool doMirror)
