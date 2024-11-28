@@ -1,8 +1,11 @@
-﻿using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
+﻿using System.Windows;
+using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using Editors.ImportExport.Misc;
+using Editors.Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Animation;
 using Shared.GameFormats.RigidModel;
 using SharpGLTF.Geometry;
 using SharpGLTF.Materials;
@@ -18,14 +21,16 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         private readonly IGltfTextureHandler _gltfTextureHandler;
         private readonly GltfSkeletonBuilder _gltfSkeletonBuilder;
         private readonly GltfAnimationBuilder _gltfAnimationBuilder;
+        private readonly SkeletonAnimationLookUpHelper _skeletonLookUpHelper;
 
-        public RmvToGltfExporter(IGltfSceneSaver gltfSaver, GltfMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler, GltfSkeletonBuilder gltfSkeletonsBuilder, GltfAnimationBuilder gltfAnimationCreator)
+        public RmvToGltfExporter(IGltfSceneSaver gltfSaver, GltfMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler, GltfSkeletonBuilder gltfSkeletonsBuilder, GltfAnimationBuilder gltfAnimationCreator, SkeletonAnimationLookUpHelper skeletonLookUpHelper)
         {
             _gltfSaver = gltfSaver;
             _gltfMeshBuilder = gltfMeshBuilder;
             _gltfTextureHandler = gltfTextureHandler;
             _gltfSkeletonBuilder = gltfSkeletonsBuilder;
             _gltfAnimationBuilder = gltfAnimationCreator;
+            _skeletonLookUpHelper = skeletonLookUpHelper;
         }
 
         internal ExportSupportEnum CanExportFile(PackFile file)
@@ -44,8 +49,24 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
             var rmv2 = new ModelFactory().Load(settings.InputModelFile.DataSource.ReadData());
             var outputScene = ModelRoot.CreateModel();
 
-            var gltfSkeleton = _gltfSkeletonBuilder.CreateSkeleton(rmv2.Header.SkeletonName, outputScene, settings);
-            _gltfAnimationBuilder.Build(rmv2.Header.SkeletonName, settings, gltfSkeleton, outputScene);
+            ProcessedGltfSkeleton? gltfSkeleton = null;
+            if (settings.ExportAnimations && !string.IsNullOrEmpty(rmv2.Header.SkeletonName))
+            {
+                var skeletonAnimFile = _skeletonLookUpHelper.GetSkeletonFileFromName(rmv2.Header.SkeletonName);
+                if (skeletonAnimFile == null)
+                {
+                    if (MessageBox.Show(
+                        "Skeleton file not found, \n(Have you loaded all CA pakcs for the right game?)\n Do you want to continue exporting without skeleton/animations?",
+                        "Warning!",
+                        MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+                        return;
+                }
+                else                
+                {
+                    gltfSkeleton = _gltfSkeletonBuilder.CreateSkeleton(skeletonAnimFile, outputScene, settings);
+                    _gltfAnimationBuilder.Build(skeletonAnimFile, settings, gltfSkeleton, outputScene);
+                }
+            }
 
             var textures = _gltfTextureHandler.HandleTextures(rmv2, settings);
             var meshes = _gltfMeshBuilder.Build(rmv2, textures, settings);
