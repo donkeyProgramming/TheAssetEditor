@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Automation;
 using Editors.ImportExport.Common;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -20,29 +19,19 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
     public class GltfAnimationBuilder
     {
         private readonly IPackFileService _packFileService;
-        private readonly SkeletonAnimationLookUpHelper _skeletonLookUpHelper;
+        
 
-        public GltfAnimationBuilder(IPackFileService packFileServoce, SkeletonAnimationLookUpHelper skeletonLookUpHelper)
+        public GltfAnimationBuilder(IPackFileService packFileServoce)
         {
-            _packFileService = packFileServoce;
-            _skeletonLookUpHelper = skeletonLookUpHelper;
+            _packFileService = packFileServoce;            
         }
 
-        public void Build(string skeletonName, RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene)
-        {
-            if (settings.ExportAnimations == false)
-                return;
-
-            var animationSkeleton = _skeletonLookUpHelper.GetSkeletonFileFromName(skeletonName);
-            if (animationSkeleton == null)
-            {                
-                return;
-            }
-            
+        public void Build(AnimationFile animSkeleton, RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene)
+        {                     
             foreach (var animationPackFile in settings.InputAnimationFiles)
             {
                 var animationToExport = AnimationFile.Create(animationPackFile);                
-                CreateFromTWAnim(animationPackFile.Name, gltfSkeleton, animationSkeleton, animationToExport, outputScene, settings);
+                CreateFromTWAnim(animationPackFile.Name, gltfSkeleton, animSkeleton, animationToExport, outputScene, settings);
             }            
         }
 
