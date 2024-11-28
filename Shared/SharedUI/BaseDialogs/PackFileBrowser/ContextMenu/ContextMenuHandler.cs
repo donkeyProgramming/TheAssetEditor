@@ -22,7 +22,7 @@ using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
 {
     public abstract class ContextMenuHandler : NotifyPropertyChangedImpl
     {
@@ -94,7 +94,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 return;
             }
 
-            if (_selectedNode.NodeType == NodeType.Directory)
+            if (_selectedNode.GetNodeType() == NodeType.Directory)
             {
                 var newFolderName = EditFileNameDialog.ShowDialog(_selectedNode.Parent, _selectedNode.Name);
                 if (newFolderName.Any())
@@ -104,7 +104,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 }
 
             }
-            else if (_selectedNode.NodeType == NodeType.File)
+            else if (_selectedNode.GetNodeType() == NodeType.File)
             {
                 var newFileName = EditFileNameDialog.ShowDialog(_selectedNode.Parent, _selectedNode.Name);
                 if (newFileName.Any())
@@ -156,18 +156,18 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 var filePaths = originalFilePaths.Select(x => x.Replace(dialog.SelectedPath + "\\", "")).ToList();
                 if (!string.IsNullOrWhiteSpace(parentPath))
                     parentPath += "\\";
-               
+
                 var filesAdded = new List<NewPackFileEntry>();
                 for (var i = 0; i < filePaths.Count; i++)
                 {
                     var currentPath = filePaths[i];
-                    var filename = System.IO.Path.GetFileName(currentPath);
-           
+                    var filename = Path.GetFileName(currentPath);
+
                     var source = MemorySource.FromFile(originalFilePaths[i]);
                     var file = new PackFile(filename, source);
                     filesAdded.Add(new NewPackFileEntry(parentPath.ToLower(), file));
-       
-               }
+
+                }
 
                 _packFileService.AddFilesToPack(_selectedNode.FileOwner, filesAdded);
             }
@@ -205,9 +205,9 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
             if (MessageBox.Show("Are you sure you want to delete the file?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                if (_selectedNode.NodeType == NodeType.File)
+                if (_selectedNode.GetNodeType() == NodeType.File)
                     _packFileService.DeleteFile(_selectedNode.FileOwner, _selectedNode.Item);
-                else if (_selectedNode.NodeType == NodeType.Directory)
+                else if (_selectedNode.GetNodeType() == NodeType.Directory)
                     _packFileService.DeleteFolder(_selectedNode.FileOwner, _selectedNode.GetFullPath());
             }
         }
@@ -328,7 +328,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         void SaveSelfAndChildren(TreeNode node, string outputDirectory, string rootPath, ref int fileCounter)
         {
-            if (node.NodeType == NodeType.Directory)
+            if (node.GetNodeType() == NodeType.Directory)
             {
                 foreach (var item in node.Children)
                     SaveSelfAndChildren(item, outputDirectory, rootPath, ref fileCounter);

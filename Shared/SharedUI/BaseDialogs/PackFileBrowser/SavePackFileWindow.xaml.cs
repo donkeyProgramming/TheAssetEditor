@@ -4,6 +4,7 @@ using System.Windows;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
 
 namespace CommonControls.PackFileBrowser
 {
@@ -77,7 +78,7 @@ namespace CommonControls.PackFileBrowser
                     path = "";
                 }
                 else
-                if (_selectedNode.NodeType == NodeType.File)
+                if (_selectedNode.GetNodeType() == NodeType.File)
                 {
                     var fullPath = _selectedNode.GetFullPath();
                     path = System.IO.Path.GetDirectoryName(fullPath) + "\\";

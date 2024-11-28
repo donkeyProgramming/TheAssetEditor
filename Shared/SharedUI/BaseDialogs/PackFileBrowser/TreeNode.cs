@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Shared.Core.Misc;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser
@@ -14,58 +14,44 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         File
     }
 
-    public class TreeNode : NotifyPropertyChangedImpl
+    public partial class TreeNode : ObservableObject
     {
         public PackFileContainer FileOwner { get; set; }
-        public PackFile Item { get; set; }
-
-        bool _isNodeExpanded = false;
-        public bool IsNodeExpanded
-        {
-            get => _isNodeExpanded;
-            set
-            {
-                SetAndNotify(ref _isNodeExpanded, value);
-            }
-        }
-
-        public NodeType NodeType { get; set; }
+        public PackFile? Item { get; set; }
         public TreeNode Parent { get; set; }
-        public ObservableCollection<TreeNode> Children { get; set; } = new ObservableCollection<TreeNode>();
 
-        bool _unsavedChanged;
-        public bool UnsavedChanged { get => _unsavedChanged; set => SetAndNotify(ref _unsavedChanged, value); }
-
-        bool _isMainEditabelPack;
-        public bool IsMainEditabelPack { get => _isMainEditabelPack; set => SetAndNotify(ref _isMainEditabelPack, value); }
-
-        bool _Visibility = true;
-        public bool IsVisible { get => _Visibility; set => SetAndNotify(ref _Visibility, value); }
-
-        string _name = "";
-        public string Name { get => _name; set => SetAndNotify(ref _name, value); }
-        public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode parent, PackFile packFile = null)
+        [ObservableProperty] ObservableCollection<TreeNode> _children = [];
+        [ObservableProperty] bool _unsavedChanged;
+        [ObservableProperty] bool _isMainEditabelPack;
+        [ObservableProperty] bool _isVisible = true;
+        [ObservableProperty] string _name = "";
+        [ObservableProperty] bool _isNodeExpanded = false;
+        [ObservableProperty] NodeType _nodeType;
+        
+        public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode parent, PackFile? packFile = null)
         {
             Name = name;
-            NodeType = type;
             Item = packFile;
             FileOwner = ower;
             Parent = parent;
+            NodeType = type;
 
             if (string.IsNullOrWhiteSpace(name))
                 throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
         }
 
+        public NodeType GetNodeType() => NodeType;
+
         public string GetFullPath()
         {
-            if (NodeType == NodeType.Root)
+            if (GetNodeType() == NodeType.Root)
                 return "";
 
             var currentParent = Parent;
             var path = Name;
             while (currentParent != null)
             {
-                if (currentParent.NodeType == NodeType.Root)
+                if (currentParent.GetNodeType() == NodeType.Root)
                     break;
 
                 path = currentParent.Name + "\\" + path;
@@ -89,7 +75,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             while (nodes.Any())
             {
                 var node = nodes.Pop();
-                if (node.NodeType == NodeType.File)
+                if (node.GetNodeType() == NodeType.File)
                     output.Add(node);
 
                 foreach (var n in node.Children)

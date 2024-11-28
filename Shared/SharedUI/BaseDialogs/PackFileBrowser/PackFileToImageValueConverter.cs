@@ -12,11 +12,11 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         {
             if (value is TreeNode node)
             {
-                if (node.NodeType == NodeType.Root)
+                if (node.GetNodeType() == NodeType.Root)
                     return IconLibrary.CollectionIcon;
-                else if (node.NodeType == NodeType.Directory)
+                else if (node.GetNodeType() == NodeType.Directory)
                     return IconLibrary.FolderIcon;
-                if (node.NodeType == NodeType.File)
+                if (node.GetNodeType() == NodeType.File)
                     return IconLibrary.FileIcon;
             }
 

@@ -10,8 +10,8 @@ using Shared.Core.Events.Global;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
 using Shared.Ui.Common;
-using Shared.Ui.Events.UiCommands;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
@@ -47,36 +47,22 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         public PackFileBrowserViewModel(IPackFileService packFileService, IEventHub? eventHub, bool ignoreCaFiles = false)
         {
-
-            // Allow doubleclick 
-            // Show Ca files
-            // ContentMenu
-
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
             ClearTextCommand = new RelayCommand(OnClearText);
 
             _packFileService = packFileService;
             _eventHub = eventHub;
 
-
-            if (_eventHub != null)
-            {
-                _eventHub.Register<PackFileContainerSetAsMainEditableEvent>(this, ContainerUpdated);
-                _eventHub.Register<PackFileContainerRemovedEvent>(this, PackFileContainerRemoved);
-                _eventHub.Register<PackFileContainerAddedEvent>(this, x => ReloadTree(x.Container));
-                _eventHub.Register<PackFileContainerFilesUpdatedEvent>(this, Database_PackFilesUpdated);
-                _eventHub.Register<PackFileContainerFilesAddedEvent>(this, x=> AddFiles(x.Container, x.AddedFiles));
-                _eventHub.Register<PackFileContainerFilesRemovedEvent>(this, x => Database_PackFilesRemoved(x.Container, x.RemovedFiles));
-
-                _eventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => Database_PackFileFolderRemoved(x.Container, x.Folder));
-                _eventHub.Register<PackFileContainerFolderRenamedEvent>(this, x => Database_PackFileFolderRenamed(x.Container, x.NewNodePath));
-            }
-            //_packFileService.Database.PackFileContainerLoaded += ReloadTree;
-            //_packFileService.Database.PackFilesUpdated += Database_PackFilesUpdated;
-            //_packFileService.Database.PackFilesAdded += Database_PackFilesAdded;
-            //_packFileService.Database.PackFilesRemoved += Database_PackFilesRemoved;
-            //_packFileService.Database.PackFileFolderRemoved += Database_PackFileFolderRemoved;
-            //_packFileService.Database.PackFileFolderRenamed += Database_PackFileFolderRenamed;
+            _eventHub?.Register<PackFileContainerSetAsMainEditableEvent>(this, ContainerUpdated);
+            _eventHub?.Register<PackFileContainerRemovedEvent>(this, PackFileContainerRemoved);
+            _eventHub?.Register<PackFileContainerAddedEvent>(this, x => ReloadTree(x.Container));
+            _eventHub?.Register<PackFileContainerFilesUpdatedEvent>(this, Database_PackFilesUpdated);
+            _eventHub?.Register<PackFileContainerFilesAddedEvent>(this, x=> AddFiles(x.Container, x.AddedFiles));
+            _eventHub?.Register<PackFileContainerFilesRemovedEvent>(this, x => Database_PackFilesRemoved(x.Container, x.RemovedFiles));
+                         
+            _eventHub?.Register<PackFileContainerFolderRemovedEvent>(this, x => Database_PackFileFolderRemoved(x.Container, x.Folder));
+            _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => Database_PackFileFolderRenamed(x.Container, x.NewNodePath));
+       
 
             Filter = new PackFileFilter(Files);
 
@@ -152,11 +138,11 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             // using command parmeter to get node causes memory leaks, using selected node for now
             if (SelectedItem != null)
             {
-                if (SelectedItem.NodeType == NodeType.File)
+                if (SelectedItem.GetNodeType() == NodeType.File)
                 {
                     FileOpen?.Invoke(SelectedItem.Item);
                 }
-                else if (SelectedItem.NodeType == NodeType.Directory && Keyboard.IsKeyDown(Key.LeftCtrl))
+                else if (SelectedItem.GetNodeType() == NodeType.Directory && Keyboard.IsKeyDown(Key.LeftCtrl))
                 {
                     SelectedItem.ExpandIfVisible(true);
                 }
@@ -279,7 +265,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 return parent.Children.FirstOrDefault(x => x.Item == pf);
             }
         }
-
 
         private void ReloadTree(PackFileContainer container)
         {

@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
 
 namespace CommonControls.PackFileBrowser
 {

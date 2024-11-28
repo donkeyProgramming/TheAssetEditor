@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Shared.Core.PackFiles;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
 {
     public class OpenFileContextMenuHandler : ContextMenuHandler
     {
@@ -15,7 +15,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             if (node == null)
                 return;
 
-            if (node.NodeType != NodeType.File)
+            if (node.GetNodeType() != NodeType.File)
             {
                 Additem(ContextItems.Expand, Items);
                 Additem(ContextItems.Collapse, Items);
