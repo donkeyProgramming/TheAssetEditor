@@ -25,14 +25,14 @@ namespace Test.ImportExport.Exporting.Exporters.RmvToGlft
             var materialExporter = new Mock<IDdsToMaterialPngExporter>();
             var eventHub = new Mock<IGlobalEventHub>();
             var skeletontonLookupHelper = new SkeletonAnimationLookUpHelper(pfs, eventHub.Object);            
-            var skeletontonBuilder = new GltfSkeletonBuilder(pfs, skeletontonLookupHelper);
-            var animationBuilder = new GltfAnimationBuilder(pfs, skeletontonLookupHelper);
+            var skeletontonBuilder = new GltfSkeletonBuilder(pfs);
+            var animationBuilder = new GltfAnimationBuilder(pfs);
             var textureHandler = new GltfTextureHandler(normalExporter.Object, materialExporter.Object);
             var sceneSaver = new TestGltfSceneSaver();
 
             // Act
             var mesh = pfs.FindFile(_rmvFilePathKarl);
-            var exporter = new RmvToGltfExporter(sceneSaver, meshBuilder, textureHandler, skeletontonBuilder, animationBuilder);
+            var exporter = new RmvToGltfExporter(sceneSaver, meshBuilder, textureHandler, skeletontonBuilder, animationBuilder, skeletontonLookupHelper);
             var settings = new RmvToGltfExporterSettings(mesh!, [], @"C:\test\myExport.gltf", true, true, true, true);
             exporter.Export(settings);
 
