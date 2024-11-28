@@ -1,7 +1,9 @@
 ﻿using System.Numerics;
 using Editors.ImportExport.Common;
 using Editors.ImportExport.Exporting.Exporters.GltfSkeleton;
+using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using SharpGLTF.Schema2;
@@ -16,11 +18,13 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
     public class GltfSkeletonBuilder
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
+        private readonly SkeletonAnimationLookUpHelper _skeletonLookUpHelper;
 
-        public GltfSkeletonBuilder(PackFileService packFileService)
+        public GltfSkeletonBuilder(IPackFileService packFileService, SkeletonAnimationLookUpHelper skeletonLookUpHelper)
         {
             _packFileService = packFileService;
+            _skeletonLookUpHelper = skeletonLookUpHelper;
         }
 
         public ProcessedGltfSkeleton CreateSkeleton(string? skeletonNameFromRmv2, ModelRoot outputScene, RmvToGltfExporterSettings settings)
@@ -28,8 +32,12 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             if(string.IsNullOrWhiteSpace(skeletonNameFromRmv2))
                 return null;
 
-            var skeletonAnimPackFile = AnimationCommon.FetchSkeletonFileFromId(skeletonNameFromRmv2, _packFileService);
-            var skeletonAnimFile = AnimationFile.Create(skeletonAnimPackFile);
+            var skeletonAnimFile = _skeletonLookUpHelper.GetSkeletonFileFromName(skeletonNameFromRmv2);            
+            if (skeletonAnimFile == null)
+            {
+                // TODO: make this a user reaction
+                throw new ArgumentNullException(nameof(skeletonAnimFile), "should not be null");
+            }
 
             var gltfSkeleton = CreateSkeleton(outputScene, skeletonAnimFile, settings.MirrorMesh);
                         
