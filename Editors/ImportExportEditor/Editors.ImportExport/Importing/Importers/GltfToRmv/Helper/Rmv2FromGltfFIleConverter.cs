@@ -70,8 +70,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
         {
             var rmv2Mesh = new RmvMesh();
 
-            var prim = mesh.Primitives.First();
-            var tEST_triangleIndices = prim.GetTriangleIndices(); // TODO: TESTING CODE
+            var prim = mesh.Primitives.First();            
             var vertexBufferColumns = prim.GetVertexColumns();
 
             rmv2Mesh.VertexList = new CommonVertex[vertexBufferColumns.Positions.Count()];
