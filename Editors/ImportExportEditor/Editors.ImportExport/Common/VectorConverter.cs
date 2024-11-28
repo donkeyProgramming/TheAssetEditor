@@ -4,6 +4,13 @@ namespace Editors.ImportExport.Common
 {
     class VecConv
     {
+        public static Vector4 NormalizeTangentVector4(Vector4 tangent)
+        {
+            // normalize only the xyz components of the tangent, the w component is the handedness (1 or -1) in sharpGLTF
+            var tempTangent = Vector3.Normalize(new Vector3(tangent.X, tangent.Y, tangent.Z));
+            return new Vector4(tempTangent.X, tempTangent.Y, tempTangent.Z, tangent.W);
+        }
+
         public static Quaternion GetSys(Microsoft.Xna.Framework.Quaternion q) => new Quaternion(q.X, q.Y, q.Z, q.W);
         public static Vector4 GetSys(Microsoft.Xna.Framework.Vector4 v) => new Vector4(v.X, v.Y, v.Z, v.W);
         public static Vector3 GetSys(Microsoft.Xna.Framework.Vector3 v) => new Vector3(v.X, v.Y, v.Z);
