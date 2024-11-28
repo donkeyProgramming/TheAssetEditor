@@ -9,14 +9,14 @@ using System.Windows.Forms.Design;
 namespace Editors.ImportExport.Importing
 {
     public class DisplayImportFileToolCommand : IUiCommand
-    {
+    {   
         // TODO: ?
    
-        private readonly GltfImporter _importer;
-        
+        private readonly GltfImporter _importer;     
+
 
         public DisplayImportFileToolCommand(GltfImporter importer)
-        {
+        {            
             // TODO: ?
             //_ImportWindowFactory = importWindowFactory;
             _importer = importer;
@@ -25,6 +25,8 @@ namespace Editors.ImportExport.Importing
         public void Execute(TreeNode clickedNode)
         {
             var glftFilePath = GetFileFromDiskDialog();
+            if (string.IsNullOrEmpty(glftFilePath))
+                return;
 
             var settings = new GltfImporterSettings(glftFilePath, true, clickedNode);
             _importer.Import(settings);
@@ -42,10 +44,15 @@ namespace Editors.ImportExport.Importing
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    //Get the path of specified file
+                    // Get the path of specified file
                     filePath = openFileDialog.FileName;
                 }
+                else
+                {
+                    filePath = "";
+                }
             }
+
             return filePath;
         }
     }

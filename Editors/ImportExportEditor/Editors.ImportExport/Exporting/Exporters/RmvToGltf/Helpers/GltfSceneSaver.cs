@@ -1,4 +1,6 @@
-﻿using SharpGLTF.Schema2;
+﻿using System.Windows;
+using Shared.Core.ErrorHandling.Exceptions;
+using SharpGLTF.Schema2;
 
 namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
@@ -10,9 +12,23 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 
     public class GltfSceneSaver : IGltfSceneSaver
     {
-        public void Save(ModelRoot modelRoot, string fullSystemPath)
+        private readonly IExceptionService _exceptionService;
+
+        public GltfSceneSaver(IExceptionService exceptionService)
         {
-            modelRoot.SaveGLTF(fullSystemPath);
+            _exceptionService = exceptionService;
+        }
+
+        public void Save(ModelRoot modelRoot, string fullSystemPath)
+        {        
+            try
+            {
+                modelRoot.SaveGLTF(fullSystemPath);
+            }
+            catch (Exception ex)
+            {
+                _exceptionService.CreateDialog(ex);
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
+using TreeNode = Shared.Ui.BaseDialogs.PackFileBrowser.TreeNode;
 
 namespace Editors.ImportExport.Importing
 {
@@ -37,7 +38,7 @@ namespace Editors.ImportExport.Importing
             return false;
         }
 
-        public void ShowDialog(Shared.Ui.BaseDialogs.PackFileBrowser.TreeNode clickedNode) =>
+        public void ShowDialog(TreeNode clickedNode) =>
                 _uiCommandFactory.Create<DisplayImportFileToolCommand>().Execute(clickedNode);
     }
 }

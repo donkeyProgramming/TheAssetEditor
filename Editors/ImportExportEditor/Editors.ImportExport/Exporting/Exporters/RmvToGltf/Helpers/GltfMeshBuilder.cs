@@ -21,7 +21,7 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
             {
                 var rmvMesh = lodLevel[i];
                 var meshTextures = textures.Where(x=>x.MeshIndex == i).ToList();
-                var gltfMaterial = Create(settings, rmvMesh.Material.ModelName + "_Material", textures);
+                var gltfMaterial = Create(settings, rmvMesh.Material.ModelName + "_Material", meshTextures);
                 var gltfMesh = GenerateMesh(rmvMesh.Mesh, rmvMesh.Material.ModelName, gltfMaterial, hasSkeleton, settings.MirrorMesh);
                 meshes.Add(gltfMesh);
             }
@@ -46,8 +46,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                 glTfvertex.Material.TexCoord = new Vector2(vertex.Uv.X, vertex.Uv.Y);
 
                 glTfvertex.Geometry.Position = VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Position), doMirror));
-                glTfvertex.Geometry.Normal = VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Normal), doMirror));
-                glTfvertex.Geometry.Tangent = VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Tangent), doMirror));
+
+                glTfvertex.Geometry.Normal = Vector3.Normalize(VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Normal), doMirror)));
+                glTfvertex.Geometry.Tangent = VecConv.NormalizeTangentVector4(VecConv.GetSys(GlobalSceneTransforms.FlipVector(VecConv.GetXna(glTfvertex.Geometry.Tangent), doMirror)));
 
                 if (hasSkeleton)
                 {
