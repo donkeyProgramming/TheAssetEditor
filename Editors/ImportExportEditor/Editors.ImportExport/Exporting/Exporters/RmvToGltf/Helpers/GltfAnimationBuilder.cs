@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Automation;
 using Editors.ImportExport.Common;
+using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -18,49 +19,31 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
 {
     public class GltfAnimationBuilder
     {
-        private readonly PackFileService _packFileService;
+        private readonly IPackFileService _packFileService;
+        private readonly SkeletonAnimationLookUpHelper _skeletonLookUpHelper;
 
-
-        public GltfAnimationBuilder(PackFileService packFileServoce)
+        public GltfAnimationBuilder(IPackFileService packFileServoce, SkeletonAnimationLookUpHelper skeletonLookUpHelper)
         {
             _packFileService = packFileServoce;
+            _skeletonLookUpHelper = skeletonLookUpHelper;
         }
 
-
-        public ProcessedGltfSkeleton Build(string skeletonName, RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene)
+        public void Build(string skeletonName, RmvToGltfExporterSettings settings, ProcessedGltfSkeleton gltfSkeleton, ModelRoot outputScene)
         {
             if (settings.ExportAnimations == false)
-                return null;
+                return;
 
-            // TODO: REMOVE THIS:
-            ///////////////   TESTING   /////////////////////
-            /// lOAD WALKING ANIMATION TO TEST
-            //var foundAnimFile = _packFileService.FindFile(@"animations\battle\humanoid01\2handed_hammer\combat_idles\hu1_2hh_combat_idle_02.anim");
-            //settings.InputAnimationFiles.Add(foundAnimFile);
-
-            var testAnimList = AnimationCommon.FetchAnimationsFromSkeletonId("humanoid01", _packFileService);
-
-            foreach (var animPackFile in testAnimList)
-            {
-                settings.InputAnimationFiles.Add(animPackFile);
+            var animationSkeleton = _skeletonLookUpHelper.GetSkeletonFileFromName(skeletonName);
+            if (animationSkeleton == null)
+            {                
+                return;
             }
-
-            const int maxAnimations = 50;
-            settings.InputAnimationFiles.RemoveRange(maxAnimations, settings.InputAnimationFiles.Count - maxAnimations - 1);
-            // TODO: REMOVE
-            //settings.InputAnimationFiles.RemoveRange(7, settings.InputAnimationFiles.Count-8);
-
-            ///////////////   END: TESTING   ///////////////////
-
-            var animationSkeletonPackFile = AnimationCommon.FetchSkeletonFileFromId(skeletonName, _packFileService);
-            var animationSkeleton = AnimationFile.Create(animationSkeletonPackFile);
-            foreach (var animation in settings.InputAnimationFiles)
+            
+            foreach (var animationPackFile in settings.InputAnimationFiles)
             {
-                var animationToExport = AnimationFile.Create(animation);                
-                CreateFromTWAnim(animation.Name, gltfSkeleton, animationSkeleton, animationToExport, outputScene, settings);
-            }
-
-            return gltfSkeleton;
+                var animationToExport = AnimationFile.Create(animationPackFile);                
+                CreateFromTWAnim(animationPackFile.Name, gltfSkeleton, animationSkeleton, animationToExport, outputScene, settings);
+            }            
         }
 
         private void CreateFromTWAnim(string animationName, ProcessedGltfSkeleton gltfSkeleton, AnimationFile skeletonAnimFile, AnimationFile animationToExport, ModelRoot modelRoot, RmvToGltfExporterSettings settings)
