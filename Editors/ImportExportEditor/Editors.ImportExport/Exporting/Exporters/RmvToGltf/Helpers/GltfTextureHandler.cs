@@ -47,13 +47,23 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers
                             case TextureType.BaseColour: DoTextureDefault(KnownChannel.BaseColor, settings, output, exportedTextures, meshIndex, tex); break;
                             case TextureType.Diffuse: DoTextureDefault(KnownChannel.BaseColor, settings, output, exportedTextures, meshIndex, tex); break;
                             case TextureType.Specular: DoTextureDefault(KnownChannel.SpecularColor, settings, output, exportedTextures, meshIndex, tex); break;
-                            case TextureType.Gloss: DoTextureDefault(KnownChannel., settings, output, exportedTextures, meshIndex, tex); break;
+                            case TextureType.Gloss: DoTextureDefault(KnownChannel.MetallicRoughness, settings, output, exportedTextures, meshIndex, tex); break;
                         }
                     }
                 }
+
+                
             }
 
             return output;
+        }
+
+        class IDDsToPngExporter
+        {
+            public string Export(string path, string outputPath, bool convertToBlender)
+            {
+                throw new System.NotImplementedException();
+            }
         }
 
 
