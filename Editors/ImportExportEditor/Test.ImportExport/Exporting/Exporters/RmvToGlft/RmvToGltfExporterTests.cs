@@ -2,7 +2,9 @@
 using Editors.ImportExport.Exporting.Exporters.DdsToNormalPng;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
+using Editors.Shared.Core.Services;
 using Moq;
+using Shared.Core.Events;
 using Shared.TestUtility;
 
 namespace Test.ImportExport.Exporting.Exporters.RmvToGlft
@@ -21,13 +23,16 @@ namespace Test.ImportExport.Exporting.Exporters.RmvToGlft
             var meshBuilder = new GltfMeshBuilder();
             var normalExporter = new Mock<IDdsToNormalPngExporter>();
             var materialExporter = new Mock<IDdsToMaterialPngExporter>();
-            var animationCreator = new GltfAnimationCreator(pfs);
+            var eventHub = new Mock<IGlobalEventHub>();
+            var skeletontonLookupHelper = new SkeletonAnimationLookUpHelper(pfs, eventHub.Object);            
+            var skeletontonBuilder = new GltfSkeletonBuilder(pfs);
+            var animationBuilder = new GltfAnimationBuilder(pfs);
             var textureHandler = new GltfTextureHandler(normalExporter.Object, materialExporter.Object);
             var sceneSaver = new TestGltfSceneSaver();
 
             // Act
             var mesh = pfs.FindFile(_rmvFilePathKarl);
-            var exporter = new RmvToGltfExporter(sceneSaver, meshBuilder, textureHandler, animationCreator);
+            var exporter = new RmvToGltfExporter(sceneSaver, meshBuilder, textureHandler, skeletontonBuilder, animationBuilder, skeletontonLookupHelper);
             var settings = new RmvToGltfExporterSettings(mesh!, [], @"C:\test\myExport.gltf", true, true, true, true);
             exporter.Export(settings);
 
