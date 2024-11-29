@@ -35,6 +35,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         private readonly IAudioRepository _audioRepository;
         private readonly IPackFileService _packFileService;
         private readonly IWindowFactory _windowFactory;
+        private readonly IPackFileUiProvider _packFileUiProvider;
         readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
 
         public string DisplayName { get; set; } = "Audio Editor";
@@ -48,11 +49,12 @@ namespace Editors.Audio.AudioEditor.ViewModels
         public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData; // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
         public static List<string> AudioProjectDialogueEvents => AudioEditorData.Instance.AudioProjectDialogueEvents;
 
-        public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IWindowFactory windowFactory)
+        public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IWindowFactory windowFactory, IPackFileUiProvider packFileUiProvider)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;
             _windowFactory = windowFactory;
+            _packFileUiProvider = packFileUiProvider;
         }
 
         partial void OnSelectedAudioProjectEventChanged(string value)
@@ -84,9 +86,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void LoadAudioProject()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
-
-            if (browser.ShowDialog())
+            var result = _packFileUiProvider.DisplayBrowseDialog([".json"]);
+            if (result.Result)
             {
                 // Remove any pre-existing data otherwise DataGrid isn't happy.
                 EventsData.Clear();
@@ -96,7 +97,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
                 // Create the object for State Groups with qualifiers so that their keys in the EventsData dictionary are unique.
                 AddQualifiersToStateGroups(_audioRepository.DialogueEventsWithStateGroups);
 
-                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
+                var filePath = _packFileService.GetFullPath(result.File);
                 var file = _packFileService.FindFile(filePath);
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
@@ -121,14 +122,13 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void LoadCustomStates()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".json"]);
-
-            if (browser.ShowDialog())
+            var result = _packFileUiProvider.DisplayBrowseDialog([".json"]);
+            if (result.Result)
             {
                 // Remove any pre-existing data otherwise DataGrid isn't happy.
                 CustomStatesDataGridItems.Clear();
 
-                var filePath = _packFileService.GetFullPath(browser.SelectedFile);
+                var filePath = _packFileService.GetFullPath(result.File);
                 var file = _packFileService.FindFile(filePath);
                 var bytes = file.DataSource.ReadData();
                 var str = Encoding.UTF8.GetString(bytes);

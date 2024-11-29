@@ -18,14 +18,14 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] ShaderTextureViewModel _normalMap;
         [ObservableProperty] ShaderTextureViewModel _mask;
 
-        public MetalRoughViewModel(MetalRoughCapability defaultCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary)
+        public MetalRoughViewModel(MetalRoughCapability defaultCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IPackFileUiProvider packFileUiProvider)
         {
             _defaultCapability = defaultCapability;
 
-            _baseColour = new ShaderTextureViewModel(defaultCapability.BaseColour, packFileService, uiCommandFactory, resourceLibrary);
-            _materialMap = new ShaderTextureViewModel(defaultCapability.MaterialMap, packFileService, uiCommandFactory, resourceLibrary);
-            _normalMap = new ShaderTextureViewModel(defaultCapability.NormalMap, packFileService, uiCommandFactory, resourceLibrary);
-            _mask = new ShaderTextureViewModel(defaultCapability.Mask, packFileService, uiCommandFactory, resourceLibrary);
+            _baseColour = new ShaderTextureViewModel(defaultCapability.BaseColour, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _materialMap = new ShaderTextureViewModel(defaultCapability.MaterialMap, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _normalMap = new ShaderTextureViewModel(defaultCapability.NormalMap, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _mask = new ShaderTextureViewModel(defaultCapability.Mask, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
 
             _useAlpha = defaultCapability.UseAlpha;
         }

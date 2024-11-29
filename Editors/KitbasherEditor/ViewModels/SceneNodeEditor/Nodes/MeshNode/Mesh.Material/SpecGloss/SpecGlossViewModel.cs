@@ -19,15 +19,15 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
         [ObservableProperty] ShaderTextureViewModel _normalMap;
         [ObservableProperty] ShaderTextureViewModel _mask;
 
-        public SpecGlossViewModel(SpecGlossCapability capability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary)
+        public SpecGlossViewModel(SpecGlossCapability capability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IPackFileUiProvider packFileUiProvider)
         {
             _capability = capability;
 
-            _specularMap = new ShaderTextureViewModel(capability.SpecularMap, packFileService, uiCommandFactory, resourceLibrary);
-            _glossMap = new ShaderTextureViewModel(capability.GlossMap, packFileService, uiCommandFactory, resourceLibrary);
-            _diffuseMap = new ShaderTextureViewModel(capability.DiffuseMap, packFileService, uiCommandFactory, resourceLibrary);
-            _normalMap = new ShaderTextureViewModel(capability.NormalMap, packFileService, uiCommandFactory, resourceLibrary);
-            _mask = new ShaderTextureViewModel(capability.Mask, packFileService, uiCommandFactory, resourceLibrary);
+            _specularMap = new ShaderTextureViewModel(capability.SpecularMap, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _glossMap = new ShaderTextureViewModel(capability.GlossMap, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _diffuseMap = new ShaderTextureViewModel(capability.DiffuseMap, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _normalMap = new ShaderTextureViewModel(capability.NormalMap, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _mask = new ShaderTextureViewModel(capability.Mask, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
 
             _useAlpha = _capability.UseAlpha;
         }

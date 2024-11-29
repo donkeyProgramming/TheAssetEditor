@@ -35,12 +35,12 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
         [ObservableProperty] float _emissiveStrength;
         [ObservableProperty] Vector2ViewModel _emissiveTiling;
 
-        public EmissiveViewModel(EmissiveCapability emissiveCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary)
+        public EmissiveViewModel(EmissiveCapability emissiveCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IPackFileUiProvider packFileUiProvider)
         {
             _emissiveCapability = emissiveCapability;
 
-            _emissiveTexture = new ShaderTextureViewModel(emissiveCapability.Emissive, packFileService, uiCommandFactory, resourceLibrary);
-            _emissiveDistortionTexture = new ShaderTextureViewModel(emissiveCapability.EmissiveDistortion, packFileService, uiCommandFactory, resourceLibrary);
+            _emissiveTexture = new ShaderTextureViewModel(emissiveCapability.Emissive, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _emissiveDistortionTexture = new ShaderTextureViewModel(emissiveCapability.EmissiveDistortion, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
 
             _emissiveDirection = new Vector2ViewModel(emissiveCapability.EmissiveDirection, OnEmissiveDirectionChanged);
             _emissiveDistortStrength = emissiveCapability.EmissiveDistortStrength;

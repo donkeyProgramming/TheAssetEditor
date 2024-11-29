@@ -4,10 +4,10 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
@@ -18,40 +18,31 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
     public delegate void FileSelectedDelegate(PackFile file);
     public delegate void NodeSelectedDelegate(TreeNode node);
 
-    public class PackFileBrowserViewModel : NotifyPropertyChangedImpl, IDisposable, IDropTarget<TreeNode>
+    public partial class PackFileBrowserViewModel : ObservableObject, IDisposable, IDropTarget<TreeNode>
     {
         protected IPackFileService _packFileService;
         private readonly IEventHub? _eventHub;
+        private readonly IContextMenuBuilder _contextMenuBuilder;
 
         public event FileSelectedDelegate FileOpen;
         public event NodeSelectedDelegate NodeSelected;
 
-        public ObservableCollection<TreeNode> Files { get; set; } = new ObservableCollection<TreeNode>();
+        public ObservableCollection<TreeNode> Files { get; set; } = [];
         public PackFileFilter Filter { get; private set; }
         public ICommand DoubleClickCommand { get; set; }
         public ICommand ClearTextCommand { get; set; }
 
-        TreeNode _selectedItem;
-        public TreeNode SelectedItem
-        {
-            get => _selectedItem;
-            set
-            {
-                SetAndNotify(ref _selectedItem, value);
-                ContextMenu?.Create(value);
-                NodeSelected?.Invoke(_selectedItem);
-            }
-        }
+        [ObservableProperty] TreeNode _selectedItem;
+        [ObservableProperty] ObservableCollection<ContextMenuItem2> _contextMenu = [];
 
-        public ContextMenuHandler ContextMenu { get; set; }
-
-        public PackFileBrowserViewModel(IPackFileService packFileService, IEventHub? eventHub, bool ignoreCaFiles = false)
+        public PackFileBrowserViewModel(IContextMenuBuilder contextMenuBuilder, IPackFileService packFileService, IEventHub? eventHub, bool showCaFiles)
         {
             DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
             ClearTextCommand = new RelayCommand(OnClearText);
 
             _packFileService = packFileService;
             _eventHub = eventHub;
+            _contextMenuBuilder = contextMenuBuilder;
 
             _eventHub?.Register<PackFileContainerSetAsMainEditableEvent>(this, ContainerUpdated);
             _eventHub?.Register<PackFileContainerRemovedEvent>(this, PackFileContainerRemoved);
@@ -63,18 +54,23 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             _eventHub?.Register<PackFileContainerFolderRemovedEvent>(this, x => Database_PackFileFolderRemoved(x.Container, x.Folder));
             _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => Database_PackFileFolderRenamed(x.Container, x.NewNodePath));
        
-
             Filter = new PackFileFilter(Files);
 
             foreach (var item in _packFileService.GetAllPackfileContainers())
             {
                 var loadFile = true;
-                if (ignoreCaFiles)
+                if (!showCaFiles)
                     loadFile = !item.IsCaPackFile;
 
                 if (loadFile)
                     ReloadTree(item);
             }
+        }
+
+        partial void OnSelectedItemChanged(TreeNode value)
+        {
+            ContextMenu = _contextMenuBuilder.Build(value);
+            NodeSelected?.Invoke(_selectedItem);
         }
 
         private void Database_PackFileFolderRemoved(PackFileContainer container, string folder)

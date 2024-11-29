@@ -74,7 +74,7 @@
                   BorderBrush="Transparent" Background="Transparent">
 
             <TreeView.Resources>
-                <ContextMenu x:Key="NodeContextMenu" ItemsSource="{Binding DataContext.ContextMenu.Items, UpdateSourceTrigger=PropertyChanged,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" DisplayMemberPath="Name">
+                <ContextMenu x:Key="NodeContextMenu" ItemsSource="{Binding DataContext.ContextMenu, UpdateSourceTrigger=PropertyChanged,  RelativeSource={RelativeSource FindAncestor, AncestorType=UserControl}}" DisplayMemberPath="Name">
                     <ContextMenu.Resources>
                         <ControlTemplate x:Key="MenuSeparatorTemplate">
                             <Separator />

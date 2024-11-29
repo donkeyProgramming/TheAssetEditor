@@ -18,7 +18,6 @@ namespace AssetEditor.ViewModels
 {
     public partial class MainViewModel : ObservableObject, IDropTarget<IEditorInterface, bool>
     {
-        private readonly IPackFileService _packfileService;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         public PackFileBrowserViewModel FileTree { get; private set; }
@@ -33,13 +32,12 @@ namespace AssetEditor.ViewModels
 
         public MainViewModel(
                 IEditorManager editorManager,
+                PackFileTreeViewBuilder packFileBrowserBuilder,
                 MenuBarViewModel menuViewModel, 
                 IPackFileService packfileService, 
                 IEditorDatabase toolFactory, 
                 IUiCommandFactory uiCommandFactory, 
                 IEventHub eventHub,
-                IExportFileContextMenuHelper exportFileContextMenuHelper, 
-                IImportFileContextMenuHelper importFileContextMenuHelper, 
                 ApplicationSettingsService applicationSettingsService, 
                 GameInformationFactory gameInformationFactory)
         {
@@ -47,12 +45,10 @@ namespace AssetEditor.ViewModels
 
             _editorManager = editorManager;
             _uiCommandFactory = uiCommandFactory;
-            _packfileService = packfileService;
 
             eventHub.Register<PackFileContainerSetAsMainEditableEvent>(this, SetStatusBarEditablePackFile);
 
-            FileTree = new PackFileBrowserViewModel(_packfileService, eventHub);
-            FileTree.ContextMenu = new DefaultContextMenuHandler(_packfileService, uiCommandFactory, exportFileContextMenuHelper, importFileContextMenuHelper);
+            FileTree = packFileBrowserBuilder.Create(ContextMenuType.MainApplication, true);
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
-using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
@@ -14,23 +13,22 @@ namespace CommonControls.PackFileBrowser
         public PackFile SelectedFile { get; set; }
         public PackFileBrowserViewModel ViewModel { get; set; }
 
-        public PackFileBrowserWindow(IPackFileService packfileService) => Create(packfileService);
+        public PackFileBrowserWindow(PackFileTreeViewBuilder packFileBrowserBuilder) => Create(packFileBrowserBuilder);
 
-        public PackFileBrowserWindow(IPackFileService packfileService, string[] extentions)
+        public PackFileBrowserWindow(PackFileTreeViewBuilder packFileBrowserBuilder, List<string> extentions)
         {
-            Create(packfileService);
-            ViewModel.Filter.SetExtentions(extentions.ToList());
+            Create(packFileBrowserBuilder);
+            ViewModel.Filter.SetExtentions(extentions);
         }
 
-        void Create(IPackFileService packfileService)
+        void Create(PackFileTreeViewBuilder packFileBrowserBuilder)
         {
-            ViewModel = new PackFileBrowserViewModel(packfileService, null);
-            ViewModel.ContextMenu = new OpenFileContextMenuHandler(packfileService);
+            ViewModel = packFileBrowserBuilder.Create(ContextMenuType.None, true);
             ViewModel.FileOpen += ViewModel_FileOpen;
             ViewModel.Filter.AutoExapandResultsAfterLimitedCount = 50;
+            
             InitializeComponent();
             DataContext = this;
-
             PreviewKeyDown += HandleEsc;
         }
 

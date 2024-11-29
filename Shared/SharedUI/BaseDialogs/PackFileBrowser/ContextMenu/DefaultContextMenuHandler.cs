@@ -1,9 +1,12 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
-{
+{/*
     public class DefaultContextMenuHandler : ContextMenuHandler
     {
         public DefaultContextMenuHandler(IPackFileService service,
@@ -17,6 +20,13 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
 
         public override void Create(TreeNode node)
         {
+
+
+
+
+
+
+
             _selectedNode = node;
             if (node == null)
             {
@@ -25,6 +35,22 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
             }
 
             var newContextMenu = new ObservableCollection<ContextMenuItem>();
+
+
+           ///////-
+           /////
+           //var placeholderRoot = new ContextMenuItem2("", null);
+           //
+           //Add<OnRenameNodeCommand>(node, placeholderRoot);
+           //
+           //
+           //foreach(var item in placeholderRoot.ContextMenu)
+           //    newContextMenu.Add(item);
+           //
+           //////--
+
+
+
 
             if (node.GetNodeType() == NodeType.Root)
                 CreateForRoot(node, newContextMenu);
@@ -124,5 +150,5 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
                 Additem(ContextItems.Close, newContextMenu);
             }
         }
-    }
+    }*/
 }

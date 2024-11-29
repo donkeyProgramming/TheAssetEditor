@@ -18,11 +18,11 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] Vector2ViewModel _bloodUvScale;
         [ObservableProperty] FloatViewModel _bloodPreview;
 
-        public BloodViewModel(BloodCapability bloodCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary)
+        public BloodViewModel(BloodCapability bloodCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IPackFileUiProvider packFileUiProvider)
         {
             _bloodCapability = bloodCapability;
 
-            _bloodMap = new ShaderTextureViewModel(bloodCapability.BloodMask, packFileService, uiCommandFactory, resourceLibrary);
+            _bloodMap = new ShaderTextureViewModel(bloodCapability.BloodMask, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
             _useBlood = _bloodCapability.UseBlood;
             _bloodUvScale = new Vector2ViewModel(_bloodCapability.UvScale, OnBloodUvScaleChanged);
             _bloodPreview = new FloatViewModel(_bloodCapability.PreviewBlood, OnBloodPreviewChanged);

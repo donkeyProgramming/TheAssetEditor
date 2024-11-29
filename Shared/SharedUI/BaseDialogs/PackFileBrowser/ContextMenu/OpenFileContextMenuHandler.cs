@@ -1,8 +1,11 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using Shared.Core.PackFiles;
+using Shared.Core.PackFiles.Models;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
-{
+{/*
     public class OpenFileContextMenuHandler : ContextMenuHandler
     {
         public OpenFileContextMenuHandler(IPackFileService service) : base(service, null, null, null)
@@ -22,6 +25,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
                 AddSeperator(Items);
                 Additem(ContextItems.CreateFolder, Items);
             }
+
         }
-    }
+    }*/
 }

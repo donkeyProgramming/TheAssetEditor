@@ -16,14 +16,13 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.Common;
 using Shared.Ui.Events.UiCommands;
-using static Shared.Core.PackFiles.IPackFileService;
 using Clipboard = System.Windows.Clipboard;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
-{
+{/*
     public abstract class ContextMenuHandler : NotifyPropertyChangedImpl
     {
         private readonly ILogger _logger = Logging.Create<ContextMenuHandler>();
@@ -113,6 +112,11 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
             }
         }
 
+
+
+
+
+
         void OnAddFilesCommand()
         {
             if (_selectedNode.FileOwner.IsCaPackFile)
@@ -176,7 +180,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
 
         void DuplicateNode()
         {
-            _uiCommandFactory.Create<DuplicateFileCommand>().Execute(_selectedNode.Item);
+            //_uiCommandFactory.Create<DuplicateFileCommand>().Execute(_selectedNode.Item);
         }
 
         void CreateFolder()
@@ -495,5 +499,5 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
             OpenWithHxD,
             OpenWithNodePadPluss,
         }
-    }
+    }*/
 }

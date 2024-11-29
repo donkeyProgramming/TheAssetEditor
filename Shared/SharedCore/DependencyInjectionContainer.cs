@@ -25,7 +25,7 @@ namespace Shared.Core
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
             services.AddSingleton<IPackFileService, PackFileService>();
-            services.AddSingleton<IFileSaveService, FileSaveService>();
+            services.AddScoped<IFileSaveService, FileSaveService>();
             services.AddSingleton<ScopeRepository>();
             services.AddSingleton<TouchedFilesRecorder>();
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();

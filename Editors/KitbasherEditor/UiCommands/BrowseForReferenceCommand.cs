@@ -1,5 +1,4 @@
-﻿using CommonControls.PackFileBrowser;
-using Editors.KitbasherEditor.Services;
+﻿using Editors.KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
@@ -11,28 +10,23 @@ namespace Editors.KitbasherEditor.UiCommands
     public class BrowseForReferenceCommand : IKitbasherUiCommand
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
-        private readonly IPackFileService _packFileService;
+        private readonly IPackFileUiProvider _packFileUiProvider;
 
         public string ToolTip { get; set; } = "Import Reference model";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        public BrowseForReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService)
+        public BrowseForReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileUiProvider packFileUiProvider)
         {
             _kitbashSceneCreator = kitbashSceneCreator;
-            _packFileService = packFileService;
+            _packFileUiProvider = packFileUiProvider;
         }
 
         public void Execute()
         {
-            using (var browser = new PackFileBrowserWindow(_packFileService))
-            {
-                browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
-                if (browser.ShowDialog() == true && browser.SelectedFile != null)
-                {
-                    _kitbashSceneCreator.LoadReference(browser.SelectedFile);
-                }
-            }
+            var result = _packFileUiProvider.DisplayBrowseDialog(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
+            if (result.Result == true && result.File != null)
+                _kitbashSceneCreator.LoadReference(result.File);
         }
     }
 

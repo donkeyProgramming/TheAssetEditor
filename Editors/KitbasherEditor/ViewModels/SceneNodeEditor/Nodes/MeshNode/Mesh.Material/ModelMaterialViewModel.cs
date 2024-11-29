@@ -11,6 +11,7 @@ using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
 {
@@ -21,7 +22,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         private readonly IPackFileService _packFileService;
         private readonly ResourceLibrary _resourceLibrary;
         private readonly CapabilityMaterialFactory _materialFactory;
-
+        private readonly IPackFileUiProvider _packFileUiProvider;
         Rmv2MeshNode? _currentNode;
 
         [ObservableProperty] List<CapabilityMaterialsEnum> _possibleMaterialTypes;
@@ -34,14 +35,14 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] EmissiveViewModel? _emissive;
         [ObservableProperty] TintViewModel? _tint;
 
-        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, SelectionManager selectionManager, IPackFileService packFileService, ResourceLibrary resourceLibrary, CapabilityMaterialFactory abstractMaterialFactory)
+        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, SelectionManager selectionManager, IPackFileService packFileService, ResourceLibrary resourceLibrary, CapabilityMaterialFactory abstractMaterialFactory, IPackFileUiProvider packFileUiProvider)
         {
             _uiCommandFactory = uiCommandFactory;
             _selectionManager = selectionManager;
             _packFileService = packFileService;
             _resourceLibrary = resourceLibrary;
             _materialFactory = abstractMaterialFactory;
-
+            _packFileUiProvider = packFileUiProvider;
             _possibleMaterialTypes = _materialFactory.GetPossibleMaterials();
         }
 
@@ -51,11 +52,11 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
             var material = _currentNode.Material;
             CurrentMaterialType = material.Type;
 
-            MetalRough = CreateCapabilityView<MetalRoughCapability, MetalRoughViewModel>(material, (cap) => new MetalRoughViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary));
-            SpecGloss = CreateCapabilityView<SpecGlossCapability, SpecGlossViewModel>(material, (cap) => new SpecGlossViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary));
-            DecalAndDirt = CreateCapabilityView<DirtAndDecalCapability, DirtAndDecalViewModel>(material, (cap) => new DirtAndDecalViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary));
-            Blood = CreateCapabilityView<BloodCapability, BloodViewModel>(material, (cap) => new BloodViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary));
-            Emissive = CreateCapabilityView<EmissiveCapability, EmissiveViewModel>(material, (cap) => new EmissiveViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary));
+            MetalRough = CreateCapabilityView<MetalRoughCapability, MetalRoughViewModel>(material, (cap) => new MetalRoughViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
+            SpecGloss = CreateCapabilityView<SpecGlossCapability, SpecGlossViewModel>(material, (cap) => new SpecGlossViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
+            DecalAndDirt = CreateCapabilityView<DirtAndDecalCapability, DirtAndDecalViewModel>(material, (cap) => new DirtAndDecalViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
+            Blood = CreateCapabilityView<BloodCapability, BloodViewModel>(material, (cap) => new BloodViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
+            Emissive = CreateCapabilityView<EmissiveCapability, EmissiveViewModel>(material, (cap) => new EmissiveViewModel(cap, _uiCommandFactory, _packFileService, _resourceLibrary, _packFileUiProvider));
             Tint = CreateCapabilityView<TintCapability, TintViewModel>(material, (cap) => new TintViewModel(cap));
         }
 

@@ -6,9 +6,18 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public class PackFileUiProvider : IPackFileUiProvider
     {
-        public SaveDialogResult DisplaySaveDialog(IPackFileService pfs, List<string> extensions)
+        private readonly IPackFileService _pfs;
+        private readonly PackFileTreeViewBuilder _packFileBrowserBuilder;
+
+        public PackFileUiProvider(IPackFileService pfs, PackFileTreeViewBuilder packFileBrowserBuilder)
         {
-            using var browser = new SavePackFileWindow(pfs);
+            _pfs = pfs;
+            _packFileBrowserBuilder = packFileBrowserBuilder;
+        }
+
+        public SaveDialogResult DisplaySaveDialog(IPackFileService remove, List<string> extensions)
+        { 
+            using var browser = new SavePackFileWindow(_pfs, _packFileBrowserBuilder);
             browser.ViewModel.Filter.SetExtentions(extensions);
 
             if (browser.ShowDialog() == true)
@@ -16,5 +25,19 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
             return new SaveDialogResult(false, null, null);
         }
+
+        public BrowseDialogResult DisplayBrowseDialog(List<string> extensions)
+        {
+            using var browser = new PackFileBrowserWindow(_packFileBrowserBuilder, extensions);
+
+            var saveResult = browser.ShowDialog();
+            var output = new BrowseDialogResult(saveResult, browser.SelectedFile);
+            return output;
+        }
+
+        // ExceptionWindow
+        // Messagebox
+        // ErrorWindow
+        // Tool?
     }
 }

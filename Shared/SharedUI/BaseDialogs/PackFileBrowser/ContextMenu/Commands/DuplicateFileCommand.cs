@@ -1,25 +1,21 @@
-﻿using Shared.Core.Events;
+﻿using System.IO;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using System.IO;
-using static Shared.Core.PackFiles.IPackFileService;
 
-namespace Shared.Ui.Events.UiCommands
+namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
 {
-    public class DuplicateFileCommand: IUiCommand
+    public class DuplicateFileCommand(IPackFileService packFileService) : IContextMenuCommand
     {
-        private readonly IPackFileService _packFileService;
+        public string GetDisplayName(TreeNode node) => "Duplicate";
+        public bool IsEnabled(TreeNode node) => true;
 
-        public DuplicateFileCommand(IPackFileService packFileService) 
-        {
-            _packFileService = packFileService;
-        }
+        public void Execute(TreeNode _selectedNode) => Execute(_selectedNode.Item);
 
         public void Execute(PackFile item)
         {
             var fileName = item.Name;
             var extension = "";
-            if(Path.HasExtension(item.Name) == true)
+            if (Path.HasExtension(item.Name) == true)
             {
                 var index = item.Name.IndexOf('.');
                 fileName = item.Name.Substring(0, index);
@@ -33,12 +29,15 @@ namespace Shared.Ui.Events.UiCommands
         {
             var bytes = item.DataSource.ReadData();
             var packFile = new PackFile(newName, new MemorySource(bytes));
-            var parentPath = _packFileService.GetFullPath(item);
+            var parentPath = packFileService.GetFullPath(item);
             var path = Path.GetDirectoryName(parentPath);
-            var editablePack = _packFileService.GetEditablePack();
+            var editablePack = packFileService.GetEditablePack();
 
             var fileEntry = new NewPackFileEntry(path, packFile);
-            _packFileService.AddFilesToPack(editablePack, [fileEntry]);
+            packFileService.AddFilesToPack(editablePack, [fileEntry]);
         }
     }
+
+
 }
+//_uiCommandFactory.Create<DuplicateFileCommand>().Execute(_selectedNode.Item);

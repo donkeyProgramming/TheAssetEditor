@@ -25,19 +25,19 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
 
         [ObservableProperty] bool _useDecal;
 
-        public DirtAndDecalViewModel(DirtAndDecalCapability capability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary)
+        public DirtAndDecalViewModel(DirtAndDecalCapability capability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IPackFileUiProvider packFileUiProvider)
         {
             _capability = capability;
 
-            _dirtMap = new ShaderTextureViewModel(_capability.DirtMap, packFileService, uiCommandFactory, resourceLibrary);
-            _dirtMask = new ShaderTextureViewModel(_capability.DirtMask, packFileService, uiCommandFactory, resourceLibrary);
-            _decalMask = new ShaderTextureViewModel(_capability.DecalMask, packFileService, uiCommandFactory, resourceLibrary);
+            _dirtMap = new ShaderTextureViewModel(_capability.DirtMap, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _dirtMask = new ShaderTextureViewModel(_capability.DirtMask, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _decalMask = new ShaderTextureViewModel(_capability.DecalMask, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
 
             _uvScale = new Vector2ViewModel(_capability.UvScale, OnUvScaleChanged);
             _textureTransform = new Vector4ViewModel(_capability.TextureTransform, OnTextureTransformChanged);
 
-            _decalPreviewColour = new ShaderTextureViewModel(_capability.DecalPreviewColour, packFileService, uiCommandFactory, resourceLibrary);
-            _decalPreviewNormal = new ShaderTextureViewModel(_capability.DecalPreviewNormal, packFileService, uiCommandFactory, resourceLibrary);
+            _decalPreviewColour = new ShaderTextureViewModel(_capability.DecalPreviewColour, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
+            _decalPreviewNormal = new ShaderTextureViewModel(_capability.DecalPreviewNormal, packFileService, uiCommandFactory, resourceLibrary, packFileUiProvider);
         }
 
         void OnUvScaleChanged(Vector2 value) => _capability.UvScale = value;
