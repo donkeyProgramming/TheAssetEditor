@@ -14,7 +14,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/Shared.Ui;component/Resources/OptionalRadioButtonStyle.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Shared.Ui;component/BaseDialogs/OptionalRadioButtonStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <valueconverters:SceneNodeToImageConverter x:Key="ImageValueConverter"/>
