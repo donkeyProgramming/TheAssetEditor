@@ -23,7 +23,7 @@ namespace CommonControls.PackFileBrowser
 
 
         public string FilePath { get; private set; }
-        public SavePackFileWindow(IPackFileService packfileService, PackFileTreeViewBuilder packFileBrowserBuilder)
+        public SavePackFileWindow(IPackFileService packfileService, PackFileTreeViewFactory packFileBrowserBuilder)
         {
             _packfileService = packfileService;
             ViewModel = packFileBrowserBuilder.Create(ContextMenuType.Simple, false);

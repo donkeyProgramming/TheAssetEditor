@@ -1,6 +1,6 @@
 ﻿using Shared.Core.PackFiles.Models;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.External
 {
     public interface IExportFileContextMenuHelper
     {

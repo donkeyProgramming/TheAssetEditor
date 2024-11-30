@@ -61,10 +61,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             return path;
         }
 
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
 
 
         public List<TreeNode> GetAllChildFileNodes()

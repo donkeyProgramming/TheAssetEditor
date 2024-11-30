@@ -43,7 +43,7 @@ namespace Shared.Ui
             services.AddTransient<TextEditorViewModel<DefaultTextConverter>>();
 
 
-            services.AddScoped<PackFileTreeViewBuilder>();
+            services.AddScoped<PackFileTreeViewFactory>();
 
             // Context menu
             services.AddScoped<ContextMenuFactory>();

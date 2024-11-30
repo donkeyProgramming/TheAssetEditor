@@ -7,9 +7,9 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
     public class PackFileUiProvider : IPackFileUiProvider
     {
         private readonly IPackFileService _pfs;
-        private readonly PackFileTreeViewBuilder _packFileBrowserBuilder;
+        private readonly PackFileTreeViewFactory _packFileBrowserBuilder;
 
-        public PackFileUiProvider(IPackFileService pfs, PackFileTreeViewBuilder packFileBrowserBuilder)
+        public PackFileUiProvider(IPackFileService pfs, PackFileTreeViewFactory packFileBrowserBuilder)
         {
             _pfs = pfs;
             _packFileBrowserBuilder = packFileBrowserBuilder;

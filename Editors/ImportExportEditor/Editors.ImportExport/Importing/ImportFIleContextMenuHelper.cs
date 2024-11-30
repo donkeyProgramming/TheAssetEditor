@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Shared.Core.Events;
 using Shared.Core.Services;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.External;
 using TreeNode = Shared.Ui.BaseDialogs.PackFileBrowser.TreeNode;
 
 namespace Editors.ImportExport.Importing

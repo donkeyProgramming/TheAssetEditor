@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles.Models;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.External
 {
     public interface IImportFileContextMenuHelper
     {

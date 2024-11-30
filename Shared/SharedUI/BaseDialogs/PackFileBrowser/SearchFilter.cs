@@ -7,7 +7,7 @@ using Shared.Core.Misc;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
-    public class PackFileFilter : NotifyPropertyChangedImpl, IDataErrorInfo
+    public class SearchFilter : NotifyPropertyChangedImpl, IDataErrorInfo
     {
         public string Error { get; set; } = string.Empty;
         public string this[string columnName] => Filter(FilterText);
@@ -28,7 +28,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         List<string> _extentionFilter;
         public int AutoExapandResultsAfterLimitedCount { get; set; } = 25;
 
-        public PackFileFilter(ObservableCollection<TreeNode> nodes)
+        public SearchFilter(ObservableCollection<TreeNode> nodes)
         {
             _nodeCollection = nodes;
         }

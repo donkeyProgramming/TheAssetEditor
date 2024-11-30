@@ -1,9 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.Common;
@@ -111,25 +108,5 @@ namespace CommonControls.PackFileBrowser
         }
 
         public static readonly DependencyProperty CustomContextMenuProperty = DependencyProperty.Register("CustomContextMenu", typeof(ContextMenu), typeof(PackFileBrowserView), new UIPropertyMetadata(null));
-    }
-
-
-    public class SortedCollectionViewSource : IValueConverter
-    {
-        public string Property0 { get; set; }
-        public string Property1 { get; set; }
-
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var s = CollectionViewSource.GetDefaultView(value);
-            s.SortDescriptions.Add(new SortDescription(Property0, ListSortDirection.Ascending));
-            s.SortDescriptions.Add(new SortDescription(Property1, ListSortDirection.Ascending));
-            return s;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

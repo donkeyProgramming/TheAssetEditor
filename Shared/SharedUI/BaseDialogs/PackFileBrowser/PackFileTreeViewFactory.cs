@@ -4,13 +4,13 @@ using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
-    public class PackFileTreeViewBuilder
+    public class PackFileTreeViewFactory
     {
         private readonly IPackFileService _packFileService;
         private readonly IEventHub _eventHub;
         private readonly ContextMenuFactory _contextMenuFactory;
 
-        public PackFileTreeViewBuilder(IPackFileService packFileService, IEventHub eventHub, ContextMenuFactory contextMenuFactory)
+        public PackFileTreeViewFactory(IPackFileService packFileService, IEventHub eventHub, ContextMenuFactory contextMenuFactory)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;

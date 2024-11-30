@@ -32,7 +32,7 @@ namespace AssetEditor.ViewModels
 
         public MainViewModel(
                 IEditorManager editorManager,
-                PackFileTreeViewBuilder packFileBrowserBuilder,
+                PackFileTreeViewFactory packFileBrowserBuilder,
                 MenuBarViewModel menuViewModel, 
                 IPackFileService packfileService, 
                 IEditorDatabase toolFactory, 

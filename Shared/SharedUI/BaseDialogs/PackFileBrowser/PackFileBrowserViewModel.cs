@@ -28,7 +28,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         public event NodeSelectedDelegate NodeSelected;
 
         public ObservableCollection<TreeNode> Files { get; set; } = [];
-        public PackFileFilter Filter { get; private set; }
+        public SearchFilter Filter { get; private set; }
         public ICommand DoubleClickCommand { get; set; }
         public ICommand ClearTextCommand { get; set; }
 
@@ -54,7 +54,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             _eventHub?.Register<PackFileContainerFolderRemovedEvent>(this, x => Database_PackFileFolderRemoved(x.Container, x.Folder));
             _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => Database_PackFileFolderRenamed(x.Container, x.NewNodePath));
        
-            Filter = new PackFileFilter(Files);
+            Filter = new SearchFilter(Files);
 
             foreach (var item in _packFileService.GetAllPackfileContainers())
             {
