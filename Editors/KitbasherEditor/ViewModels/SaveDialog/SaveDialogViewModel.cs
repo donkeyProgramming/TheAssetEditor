@@ -9,6 +9,7 @@ using GameWorld.Core.Services.SceneSaving.Geometry;
 using GameWorld.Core.Services.SceneSaving.Lod;
 using GameWorld.Core.Services.SceneSaving.Material;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 
 namespace KitbasherEditor.ViewModels.SaveDialog
 {
@@ -17,7 +18,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         private readonly SceneManager _sceneManager;
         private readonly GameWorld.Core.Services.SceneSaving.SaveService _saveService;
         private readonly IPackFileService _pfs;
-        private readonly IPackFileUiProvider _packFileUiProvider;
+        private readonly IStandardDialogs _packFileUiProvider;
         private GeometrySaveSettings? _saveSettings;
 
         [ObservableProperty] ObservableCollection<LodGroupNodeViewModel> _lodNodes = [];
@@ -33,7 +34,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         [ObservableProperty] bool _onlySaveVisible = false;
         [ObservableProperty] int _numberOfLodsToGenerate;
 
-        public SaveDialogViewModel(SceneManager sceneManager, GameWorld.Core.Services.SceneSaving.SaveService saveService, IPackFileService pfs, IPackFileUiProvider packFileUiProvider)
+        public SaveDialogViewModel(SceneManager sceneManager, GameWorld.Core.Services.SceneSaving.SaveService saveService, IPackFileService pfs, IStandardDialogs packFileUiProvider)
         {
             _sceneManager = sceneManager;
             _saveService = saveService;

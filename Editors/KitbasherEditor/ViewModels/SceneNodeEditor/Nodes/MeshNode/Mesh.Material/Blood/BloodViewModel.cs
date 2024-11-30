@@ -5,6 +5,7 @@ using GameWorld.Core.Utility.UserInterface;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.MathViews;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
@@ -18,7 +19,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] Vector2ViewModel _bloodUvScale;
         [ObservableProperty] FloatViewModel _bloodPreview;
 
-        public BloodViewModel(BloodCapability bloodCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IPackFileUiProvider packFileUiProvider)
+        public BloodViewModel(BloodCapability bloodCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IStandardDialogs packFileUiProvider)
         {
             _bloodCapability = bloodCapability;
 

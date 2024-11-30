@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
@@ -23,7 +24,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
 
         private readonly IPackFileService _packFileService;
         private readonly CopyPasteManager _copyPasteManager;
-        private readonly IPackFileUiProvider _packFileUiProvider;
+        private readonly IStandardDialogs _packFileUiProvider;
         private readonly IFileSaveService _packFileSaveService;
         [ObservableProperty] string _skeletonName = "";
         [ObservableProperty] string _refMeshName = "";
@@ -46,7 +47,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
             IPackFileService pfs,
             CopyPasteManager copyPasteManager,
             IEditorHostParameters editorHostParameters,
-            IPackFileUiProvider packFileUiProvider,
+            IStandardDialogs packFileUiProvider,
             IFileSaveService packFileSaveService)
             : base(editorHostParameters)
         {

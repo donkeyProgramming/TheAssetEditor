@@ -3,18 +3,17 @@
     public interface IExceptionService
     {
         ExceptionInformation Create(Exception e);
-        void CreateDialog(Exception e, string userMessage = "");
     }
 
     class ExceptionService : IExceptionService
     {
         private readonly IEnumerable<IExceptionInformationProvider> _informationProviders;
-        private readonly ICustomExceptionWindowProvider _exceptionWindowProvider;
 
-        public ExceptionService(IEnumerable<IExceptionInformationProvider> informationProviders, ICustomExceptionWindowProvider exceptionWindowProvider)
+
+        public ExceptionService(IEnumerable<IExceptionInformationProvider> informationProviders)
         {
             _informationProviders = informationProviders;
-            _exceptionWindowProvider = exceptionWindowProvider;
+
         }
 
         public ExceptionInformation Create(Exception e)
@@ -31,12 +30,6 @@
             return extendedException;
         }
 
-        public void CreateDialog(Exception e, string userMessage = "")
-        {
-            var extendedException = Create(e);
-            extendedException.UserMessage = userMessage;
-            _exceptionWindowProvider.ShowDialog(extendedException);
-        }
 
         static List<ExceptionInstance> UnrollException(Exception e)
         {

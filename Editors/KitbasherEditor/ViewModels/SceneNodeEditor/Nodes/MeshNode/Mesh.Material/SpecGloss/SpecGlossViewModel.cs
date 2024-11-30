@@ -4,6 +4,7 @@ using GameWorld.Core.Services;
 using GameWorld.Core.Utility.UserInterface;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.SpecGloss
 {
@@ -19,7 +20,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
         [ObservableProperty] ShaderTextureViewModel _normalMap;
         [ObservableProperty] ShaderTextureViewModel _mask;
 
-        public SpecGlossViewModel(SpecGlossCapability capability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IPackFileUiProvider packFileUiProvider)
+        public SpecGlossViewModel(SpecGlossCapability capability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IStandardDialogs packFileUiProvider)
         {
             _capability = capability;
 

@@ -5,6 +5,7 @@ using GameWorld.Core.Utility.UserInterface;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.ColourPickerButton;
 using Shared.Ui.BaseDialogs.MathViews;
 
@@ -35,7 +36,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh
         [ObservableProperty] float _emissiveStrength;
         [ObservableProperty] Vector2ViewModel _emissiveTiling;
 
-        public EmissiveViewModel(EmissiveCapability emissiveCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IPackFileUiProvider packFileUiProvider)
+        public EmissiveViewModel(EmissiveCapability emissiveCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IStandardDialogs packFileUiProvider)
         {
             _emissiveCapability = emissiveCapability;
 

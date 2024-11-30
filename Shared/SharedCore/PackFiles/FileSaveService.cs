@@ -1,4 +1,5 @@
 ﻿using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 
 namespace Shared.Core.PackFiles
 {
@@ -11,9 +12,9 @@ namespace Shared.Core.PackFiles
     public class FileSaveService : IFileSaveService
     {
         private readonly IPackFileService _packFileService;
-        private readonly IPackFileUiProvider _packFileUiProvider;
+        private readonly IStandardDialogs _packFileUiProvider;
 
-        public FileSaveService(IPackFileService packFileService, IPackFileUiProvider packFileUiProvider)
+        public FileSaveService(IPackFileService packFileService, IStandardDialogs packFileUiProvider)
         {
             _packFileService = packFileService;
             _packFileUiProvider = packFileUiProvider;

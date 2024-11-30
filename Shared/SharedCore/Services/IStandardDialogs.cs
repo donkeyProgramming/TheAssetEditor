@@ -1,30 +1,10 @@
 ﻿using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
-namespace Shared.Core.PackFiles
+namespace Shared.Core.Services
 {
-
-   /* public interface IDialogProvider
-    {
-        IPackFileUiProvider Dialogs { get; }
-    }
-
-
-    public class DialogProvider : IDialogProvider
-    {
-        private readonly IPackFileUiProvider _packFileUiProvider;
-
-        public DialogProvider(IPackFileUiProvider packFileUiProvider)
-        {
-            _packFileUiProvider = packFileUiProvider;
-        }
-
-        public IPackFileUiProvider Dialogs { get => _packFileUiProvider; }
-    }*/
-
-
-
-    public interface IPackFileUiProvider
+    public interface IStandardDialogs
     {
         SaveDialogResult DisplaySaveDialog(IPackFileService pfs, List<string> extensions);
         BrowseDialogResult DisplayBrowseDialog(List<string> extensions);
@@ -42,7 +22,7 @@ namespace Shared.Core.PackFiles
     public record TextInputDialogResult(bool Result, string Text);
 
     public enum ShowMessageBoxResult
-    { 
+    {
         OK,
         Cancel,
     }

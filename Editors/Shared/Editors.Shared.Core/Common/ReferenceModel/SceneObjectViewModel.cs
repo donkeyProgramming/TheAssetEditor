@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Shared.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.Shared.Core.Common.ReferenceModel
@@ -10,7 +11,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
     public partial class SceneObjectViewModel : ObservableObject
     {
         private readonly IPackFileService _pfs;
-        private readonly IPackFileUiProvider _uiProvider;
+        private readonly IStandardDialogs _uiProvider;
         private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IMetaDataFactory _metaDataFactory;
@@ -30,7 +31,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             IUiCommandFactory uiCommandFactory,
             IMetaDataFactory metaDataFactory,
             IPackFileService packFileService,
-            IPackFileUiProvider uiProvider,
+            IStandardDialogs uiProvider,
             SceneObject data,
             string headerName,
             SceneObjectEditor sceneObjectBuilder,

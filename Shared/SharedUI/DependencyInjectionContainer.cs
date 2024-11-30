@@ -2,8 +2,7 @@
 using CommonControls.Editors.TextEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
-using Shared.Core.ErrorHandling.Exceptions;
-using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
@@ -11,11 +10,9 @@ using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands;
 using Shared.Ui.BaseDialogs.StandardDialog;
 using Shared.Ui.BaseDialogs.ToolSelector;
 using Shared.Ui.BaseDialogs.WindowHandling;
-using Shared.Ui.Common.Exceptions;
 using Shared.Ui.Editors.BoneMapping;
 using Shared.Ui.Editors.TextEditor;
 using Shared.Ui.Editors.VariantMeshDefinition;
-using Shared.Ui.Events.UiCommands;
 
 namespace Shared.Ui
 {
@@ -32,9 +29,9 @@ namespace Shared.Ui
             services.AddScoped<BoneMappingViewModel>();
 
             // Implement required interfaces
-            services.AddScoped<IPackFileUiProvider, StandardDialogs>();
+            services.AddScoped<IStandardDialogs, StandardDialogs>();
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
-            services.AddTransient<ICustomExceptionWindowProvider, CustomExceptionWindowProvider>();
+
             
             services.AddTransient<VariantMeshToXmlConverter>();
             services.AddTransient<TextEditorViewModel<VariantMeshToXmlConverter>>();

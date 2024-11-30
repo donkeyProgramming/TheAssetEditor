@@ -4,6 +4,7 @@ using GameWorld.Core.Services;
 using GameWorld.Core.Utility.UserInterface;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
 {
@@ -18,7 +19,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] ShaderTextureViewModel _normalMap;
         [ObservableProperty] ShaderTextureViewModel _mask;
 
-        public MetalRoughViewModel(MetalRoughCapability defaultCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IPackFileUiProvider packFileUiProvider)
+        public MetalRoughViewModel(MetalRoughCapability defaultCapability, IUiCommandFactory uiCommandFactory, IPackFileService packFileService, ResourceLibrary resourceLibrary, IStandardDialogs packFileUiProvider)
         {
             _defaultCapability = defaultCapability;
 

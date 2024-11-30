@@ -11,6 +11,7 @@ using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
@@ -22,7 +23,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         private readonly IPackFileService _packFileService;
         private readonly ResourceLibrary _resourceLibrary;
         private readonly CapabilityMaterialFactory _materialFactory;
-        private readonly IPackFileUiProvider _packFileUiProvider;
+        private readonly IStandardDialogs _packFileUiProvider;
         Rmv2MeshNode? _currentNode;
 
         [ObservableProperty] List<CapabilityMaterialsEnum> _possibleMaterialTypes;
@@ -35,7 +36,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] EmissiveViewModel? _emissive;
         [ObservableProperty] TintViewModel? _tint;
 
-        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, SelectionManager selectionManager, IPackFileService packFileService, ResourceLibrary resourceLibrary, CapabilityMaterialFactory abstractMaterialFactory, IPackFileUiProvider packFileUiProvider)
+        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, SelectionManager selectionManager, IPackFileService packFileService, ResourceLibrary resourceLibrary, CapabilityMaterialFactory abstractMaterialFactory, IStandardDialogs packFileUiProvider)
         {
             _uiCommandFactory = uiCommandFactory;
             _selectionManager = selectionManager;

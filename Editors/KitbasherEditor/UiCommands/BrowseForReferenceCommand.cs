@@ -3,6 +3,7 @@ using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
@@ -10,13 +11,13 @@ namespace Editors.KitbasherEditor.UiCommands
     public class BrowseForReferenceCommand : IKitbasherUiCommand
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
-        private readonly IPackFileUiProvider _packFileUiProvider;
+        private readonly IStandardDialogs _packFileUiProvider;
 
         public string ToolTip { get; set; } = "Import Reference model";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        public BrowseForReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileUiProvider packFileUiProvider)
+        public BrowseForReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IStandardDialogs packFileUiProvider)
         {
             _kitbashSceneCreator = kitbashSceneCreator;
             _packFileUiProvider = packFileUiProvider;

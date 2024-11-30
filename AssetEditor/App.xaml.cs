@@ -101,9 +101,9 @@ namespace AssetEditor
         {
             Logging.Create<App>().Here().Fatal(args.Exception.ToString());
 
-            var exceptionService = _rootScope?.ServiceProvider.GetService<IExceptionService>();
+            var exceptionService = _rootScope?.ServiceProvider.GetService<IStandardDialogs>();
             if (exceptionService != null)
-               exceptionService.CreateDialog(args.Exception);   
+               exceptionService.ShowExceptionWindow(args.Exception);   
             else
                 MessageBox.Show(args.Exception.ToString(), "Error");
 

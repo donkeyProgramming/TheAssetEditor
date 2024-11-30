@@ -14,8 +14,7 @@ namespace Test.Shared.Core.PackFiles
         {
             // Arrenge
             var eventHub = new Mock<IGlobalEventHub>();
-            var dialogProvider = new Mock<IStandardDialogProvider>();
-            var pfs = new PackFileService(dialogProvider.Object, eventHub.Object);
+            var pfs = new PackFileService(eventHub.Object);
             var container = new PackFileContainer("MyTest");
             container.SystemFilePath = "SystemPath";
             container.IsCaPackFile = true;
@@ -36,8 +35,8 @@ namespace Test.Shared.Core.PackFiles
         {
             // Arrenge
             var eventHub = new Mock<IGlobalEventHub>();
-            var dialogProvider = new Mock<IStandardDialogProvider>();
-            var pfs = new PackFileService(dialogProvider.Object, eventHub.Object);
+            var dialogProvider = new Mock<IStandardDialogs>();
+            var pfs = new PackFileService(eventHub.Object);
             var container = new PackFileContainer("MyTest");
             container.SystemFilePath = "SystemPath";
             container.IsCaPackFile = false;
@@ -59,8 +58,8 @@ namespace Test.Shared.Core.PackFiles
         {
             // Arrenge
             var eventHub = new Mock<IGlobalEventHub>();
-            var dialogProvider = new Mock<IStandardDialogProvider>();
-            var pfs = new PackFileService(dialogProvider.Object, eventHub.Object);
+
+            var pfs = new PackFileService(eventHub.Object);
             var caContainer = new PackFileContainer("MyTest");
             caContainer.SystemFilePath = "SystemPath";
             caContainer.IsCaPackFile = true;
@@ -88,8 +87,8 @@ namespace Test.Shared.Core.PackFiles
         {
             // Arrenge
             var eventHub = new Mock<IGlobalEventHub>();
-            var dialogProvider = new Mock<IStandardDialogProvider>();
-            var pfs = new PackFileService(dialogProvider.Object, eventHub.Object);
+            var dialogProvider = new Mock<IStandardDialogs>();
+            var pfs = new PackFileService( eventHub.Object);
             var caContainer = new PackFileContainer("MyTest");
             caContainer.SystemFilePath = "SystemPath";
             caContainer.IsCaPackFile = true;
@@ -116,8 +115,7 @@ namespace Test.Shared.Core.PackFiles
         {
             // Arrenge
             var eventHub = new Mock<IGlobalEventHub>();
-            var dialogProvider = new Mock<IStandardDialogProvider>();
-            var pfs = new PackFileService(dialogProvider.Object, eventHub.Object);
+            var pfs = new PackFileService(eventHub.Object);
             var container = new PackFileContainer("MyTest");
             container.SystemFilePath = "SystemPath";
             container.IsCaPackFile = true;

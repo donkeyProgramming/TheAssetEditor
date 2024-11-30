@@ -15,10 +15,4 @@
     <ProjectReference Include="..\SharedCore\Shared.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="BaseDialogs\StandardDialog\ErrorDialog\" />
-    <Folder Include="BaseDialogs\StandardDialog\Exception\" />
-    <Folder Include="BaseDialogs\StandardDialog\PackFile\" />
-  </ItemGroup>
-
 </Project>

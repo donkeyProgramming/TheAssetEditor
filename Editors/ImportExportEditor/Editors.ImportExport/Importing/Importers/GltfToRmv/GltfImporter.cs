@@ -7,6 +7,7 @@ using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using static Shared.Core.PackFiles.IPackFileService;
 using Shared.Core.ErrorHandling.Exceptions;
+using Shared.Core.Services;
 
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv
@@ -21,9 +22,9 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
     public class GltfImporter
     {
         private readonly IPackFileService _packFileService;
-        private readonly IExceptionService _exceptionService;
+        private readonly IStandardDialogs _exceptionService;
 
-        public GltfImporter(IPackFileService packFileSerivce, IExceptionService exceptionService)
+        public GltfImporter(IPackFileService packFileSerivce, IStandardDialogs exceptionService)
         {
             _packFileService = packFileSerivce;
             _exceptionService = exceptionService;
@@ -39,7 +40,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             }
             catch (Exception ex)
             {
-                _exceptionService.CreateDialog(ex);
+                _exceptionService.ShowExceptionWindow(ex);
                 return;
             }
 

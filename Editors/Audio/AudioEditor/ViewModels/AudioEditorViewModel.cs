@@ -13,6 +13,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
@@ -35,7 +36,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         private readonly IAudioRepository _audioRepository;
         private readonly IPackFileService _packFileService;
         private readonly IWindowFactory _windowFactory;
-        private readonly IPackFileUiProvider _packFileUiProvider;
+        private readonly IStandardDialogs _packFileUiProvider;
         readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
 
         public string DisplayName { get; set; } = "Audio Editor";
@@ -49,7 +50,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData; // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
         public static List<string> AudioProjectDialogueEvents => AudioEditorData.Instance.AudioProjectDialogueEvents;
 
-        public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IWindowFactory windowFactory, IPackFileUiProvider packFileUiProvider)
+        public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IWindowFactory windowFactory, IStandardDialogs packFileUiProvider)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;

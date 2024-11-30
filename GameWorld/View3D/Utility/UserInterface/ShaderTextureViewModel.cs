@@ -10,6 +10,7 @@ using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Ui.Events.UiCommands;
 
 namespace GameWorld.Core.Utility.UserInterface
@@ -20,12 +21,12 @@ namespace GameWorld.Core.Utility.UserInterface
         private readonly IPackFileService _packFileService;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly ResourceLibrary _resourceLibrary;
-        private readonly IPackFileUiProvider _packFileUiProvider;
+        private readonly IStandardDialogs _packFileUiProvider;
 
         [ObservableProperty] string _path;
         [ObservableProperty] bool _shouldRenderTexture;
 
-        public ShaderTextureViewModel(TextureInput shaderTextureReference, IPackFileService packFileService, IUiCommandFactory uiCommandFactory, ResourceLibrary resourceLibrary, IPackFileUiProvider packFileUiProvider) 
+        public ShaderTextureViewModel(TextureInput shaderTextureReference, IPackFileService packFileService, IUiCommandFactory uiCommandFactory, ResourceLibrary resourceLibrary, IStandardDialogs packFileUiProvider) 
         {
             _shaderTextureReference = shaderTextureReference;
             _packFileService = packFileService;

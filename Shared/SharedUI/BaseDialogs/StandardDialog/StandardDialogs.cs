@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
+using System.Windows;
 using CommonControls.BaseDialogs;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.PackFileBrowser;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.Common.Exceptions;
 
 namespace Shared.Ui.BaseDialogs.StandardDialog
 {
-
-
-
-
-    internal class StandardDialogs : IPackFileUiProvider
+    internal class StandardDialogs : IStandardDialogs
     {
         private readonly IPackFileService _pfs;
         private readonly PackFileTreeViewFactory _packFileBrowserBuilder;
@@ -50,7 +48,16 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
 
         public void ShowExceptionWindow(Exception e, string userInfo = "")
         {
-            _exceptionService.CreateDialog(e, userInfo);
+            var extendedException = _exceptionService.Create(e);
+            var errorWindow = new CustomExceptionWindow(extendedException);
+            if (Application.Current.MainWindow != null)
+            {
+                if (errorWindow != Application.Current.MainWindow)
+                {
+                    errorWindow.Owner = Application.Current.MainWindow;
+                }
+            }
+            errorWindow.ShowDialog();
         }
 
         public void ShowErrorViewDialog(string title, ErrorList errorItems, bool modal = true)
@@ -73,8 +80,8 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
 
         public ShowMessageBoxResult ShowYesNoBox(string message, string title)
         {
-            var result = MessageBox.Show(message, title, MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes)
+            var result = MessageBox.Show(message, title, MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
                 return ShowMessageBoxResult.OK;
             return ShowMessageBoxResult.Cancel;
         }

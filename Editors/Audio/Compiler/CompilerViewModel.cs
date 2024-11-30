@@ -4,6 +4,7 @@ using Editors.Audio.BnkCompiler;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.ErrorListDialog;
 
@@ -13,13 +14,13 @@ namespace Editors.Audio.Compiler
     {
         private readonly IPackFileService _pfs;
         private readonly CompilerService _compilerService;
-        private readonly IPackFileUiProvider _packFileUiProvider;
+        private readonly IStandardDialogs _packFileUiProvider;
 
         public string DisplayName { get; set; } = "Audio Compiler";
         public NotifyAttr<string> ProjectFilePath { get; set; } = new NotifyAttr<string>("audioprojects\\projectsimple.json");
         public NotifyAttr<ErrorListViewModel> ProjectResult { get; set; } = new NotifyAttr<ErrorListViewModel>(new ErrorListViewModel());
 
-        public CompilerViewModel(IPackFileService pfs, CompilerService compilerService, IPackFileUiProvider packFileUiProvider)
+        public CompilerViewModel(IPackFileService pfs, CompilerService compilerService, IStandardDialogs packFileUiProvider)
         {
             _pfs = pfs;
             _compilerService = compilerService;

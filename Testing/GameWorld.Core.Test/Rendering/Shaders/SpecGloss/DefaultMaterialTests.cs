@@ -20,7 +20,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
         [SetUp]
         public void Setup()
         {
-            _pfs = new PackFileService(new StandardDialogProvider(), null);
+            _pfs = new PackFileService(null);
             _pfs.EnforceGameFilesMustBeLoaded = false;
             var _ = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
         }
