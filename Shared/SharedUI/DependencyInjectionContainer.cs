@@ -1,5 +1,4 @@
-﻿using CommonControls.Editors.TextEditor;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
@@ -9,7 +8,6 @@ using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands;
 using Shared.Ui.BaseDialogs.StandardDialog;
 using Shared.Ui.BaseDialogs.ToolSelector;
 using Shared.Ui.BaseDialogs.WindowHandling;
-using Shared.Ui.Editors.TextEditor;
 
 namespace Shared.Ui
 {
@@ -30,9 +28,7 @@ namespace Shared.Ui
 
 
 
-            services.AddTransient<TextEditorView>();
-            services.AddTransient<DefaultTextConverter>();
-            services.AddTransient<TextEditorViewModel<DefaultTextConverter>>();
+
 
 
             services.AddScoped<PackFileTreeViewFactory>();
@@ -67,18 +63,6 @@ namespace Shared.Ui
         {
 
 
-            EditorInfoBuilder
-                .Create<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(EditorEnums.XML_Editor)
-                .AddExtention(".json", EditorPriorites.Default)
-                .AddExtention(".xml", EditorPriorites.Default)
-                .AddExtention(".txt", EditorPriorites.Default)
-                .AddExtention(".wsmodel", EditorPriorites.Default)
-                .AddExtention(".xml.material", EditorPriorites.Default)
-                .AddExtention(".anm.meta.xml", EditorPriorites.Default)
-                .AddExtention(".bmd.xml", EditorPriorites.Default)
-                .AddExtention(".csv", EditorPriorites.Default)
-                .AddExtention(".bnk.xml", EditorPriorites.Default)
-                .Build(factory);
         }
     }
 }

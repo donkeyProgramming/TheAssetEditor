@@ -22,6 +22,10 @@ namespace Editors.Shared.Core
             serviceCollection.AddTransient<VariantMeshToXmlConverter>();
             serviceCollection.AddTransient<TextEditorViewModel<VariantMeshToXmlConverter>>();
 
+            serviceCollection.AddTransient<TextEditorView>();
+            serviceCollection.AddTransient<DefaultTextConverter>();
+            serviceCollection.AddTransient<TextEditorViewModel<DefaultTextConverter>>();
+
 
             serviceCollection.AddScoped<BoneMappingView>();
             serviceCollection.AddScoped<BoneMappingViewModel>();
@@ -44,6 +48,20 @@ namespace Editors.Shared.Core
             EditorInfoBuilder
                 .Create<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(EditorEnums.XML_VariantMesh_Editor)
                 .AddExtention(".variantmeshdefinition", EditorPriorites.High)
+                .Build(factory);
+
+
+            EditorInfoBuilder
+                .Create<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(EditorEnums.XML_Editor)
+                .AddExtention(".json", EditorPriorites.Default)
+                .AddExtention(".xml", EditorPriorites.Default)
+                .AddExtention(".txt", EditorPriorites.Default)
+                .AddExtention(".wsmodel", EditorPriorites.Default)
+                .AddExtention(".xml.material", EditorPriorites.Default)
+                .AddExtention(".anm.meta.xml", EditorPriorites.Default)
+                .AddExtention(".bmd.xml", EditorPriorites.Default)
+                .AddExtention(".csv", EditorPriorites.Default)
+                .AddExtention(".bnk.xml", EditorPriorites.Default)
                 .Build(factory);
         }
     }

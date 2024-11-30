@@ -1,6 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using static Shared.Core.Misc.NotifyPropertyChangedImpl;
-using System;
+﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Xna.Framework;
 
 namespace Shared.Ui.BaseDialogs.MathViews
@@ -13,8 +12,6 @@ namespace Shared.Ui.BaseDialogs.MathViews
         [ObservableProperty] DoubleViewModel _y;
         [ObservableProperty] DoubleViewModel _z;
         [ObservableProperty] DoubleViewModel _w;
-
-        public event ValueChangedDelegate<Vector4ViewModel>? OnValueChanged;
 
         public Vector4ViewModel(double x = 0, double y = 0, double z = 0, double w = 0, Action<Vector4>? onValueChangedCallback = null)
         {
@@ -37,7 +34,6 @@ namespace Shared.Ui.BaseDialogs.MathViews
         void OnChildChanged(double _)
         {
             _onValueChangedCallback?.Invoke(GetAsVector4());
-            OnValueChanged?.Invoke(this);
         }
 
         public void Set(float x, float y, float z, float w )
