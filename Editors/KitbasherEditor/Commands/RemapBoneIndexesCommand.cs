@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using GameWorld.Core.Rendering.Geometry;
+﻿using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using Shared.Ui.Editors.BoneMapping;
 

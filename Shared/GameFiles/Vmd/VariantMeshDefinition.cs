@@ -1,8 +1,42 @@
-﻿using System.Xml;
+﻿using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
+using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles.Models;
+using static Shared.GameFormats.Vmd.VariantMeshDefinition;
 
 namespace Shared.GameFormats.Vmd
 {
+    public static class VariantMeshDefinitionLoader
+    {
+
+        public static VariantMesh Load(string fileContent, bool strict = false)
+        {
+            var xRoot = new XmlRootAttribute("VARIANT_MESH");
+
+            var xmlserializer = new XmlSerializer(typeof(VariantMesh), xRoot);
+            using var stringReader = new StringReader(fileContent);
+            var reader = XmlReader.Create(stringReader);
+
+            object result = null;
+            if (strict)
+                result = xmlserializer.Deserialize(reader, new UnknownXmlDataThrower().EventHandler);
+            else
+                result = xmlserializer.Deserialize(reader);
+
+            var typedObject = result as VariantMesh;
+            typedObject.FixStrings();
+            return typedObject;
+        }
+
+        public static VariantMesh Load(PackFile pf, bool strict = false)
+        {
+            var vmdContent = Encoding.UTF8.GetString(pf.DataSource.ReadData());
+            return Load(vmdContent, strict);
+        }
+    }
+
+
     public class VariantMeshDefinition
     {
         public class VariantMesh

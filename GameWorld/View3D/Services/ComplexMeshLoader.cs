@@ -8,9 +8,10 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.Vmd;
 using Shared.GameFormats.WsModel;
-using Shared.Ui.Editors.VariantMeshDefinition;
 using static Shared.GameFormats.Vmd.VariantMeshDefinition;
+
 
 namespace GameWorld.Core.Services
 {
@@ -97,7 +98,7 @@ namespace GameWorld.Core.Services
                 parent.AddObject(variantMeshElement);
 
             
-            var meshFile = VariantMeshToXmlConverter.Load(file);
+            var meshFile = VariantMeshDefinitionLoader.Load(file);
             LoadVariantMesh(meshFile, variantMeshElement, player, attachmentPointName, onlyLoadRootNode);
         }
 

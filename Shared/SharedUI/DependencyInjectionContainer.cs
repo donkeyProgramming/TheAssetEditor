@@ -1,5 +1,4 @@
-﻿using CommonControls.Editors.BoneMapping.View;
-using CommonControls.Editors.TextEditor;
+﻿using CommonControls.Editors.TextEditor;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.Services;
@@ -10,9 +9,7 @@ using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands;
 using Shared.Ui.BaseDialogs.StandardDialog;
 using Shared.Ui.BaseDialogs.ToolSelector;
 using Shared.Ui.BaseDialogs.WindowHandling;
-using Shared.Ui.Editors.BoneMapping;
 using Shared.Ui.Editors.TextEditor;
-using Shared.Ui.Editors.VariantMeshDefinition;
 
 namespace Shared.Ui
 {
@@ -25,16 +22,13 @@ namespace Shared.Ui
         public override void Register(IServiceCollection services)
         {
             services.AddTransient<IWindowFactory, WindowFactory>();
-            services.AddScoped<BoneMappingView>();
-            services.AddScoped<BoneMappingViewModel>();
+
 
             // Implement required interfaces
             services.AddScoped<IStandardDialogs, StandardDialogs>();
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
 
-            
-            services.AddTransient<VariantMeshToXmlConverter>();
-            services.AddTransient<TextEditorViewModel<VariantMeshToXmlConverter>>();
+
 
             services.AddTransient<TextEditorView>();
             services.AddTransient<DefaultTextConverter>();
@@ -71,10 +65,7 @@ namespace Shared.Ui
 
         public override void RegisterTools(IEditorDatabase factory)
         {
-            EditorInfoBuilder
-                .Create<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(EditorEnums.XML_VariantMesh_Editor)
-                .AddExtention(".variantmeshdefinition", EditorPriorites.High)
-                .Build(factory);
+
 
             EditorInfoBuilder
                 .Create<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(EditorEnums.XML_Editor)

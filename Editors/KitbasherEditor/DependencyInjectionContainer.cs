@@ -9,6 +9,7 @@ using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
+using GameWorld.Core.Commands.Object;
 using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
@@ -86,6 +87,9 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<ImportReferenceMeshCommand>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
+
+            // Commands
+            serviceCollection.AddTransient<RemapBoneIndexesCommand>();
         }
 
         public override void RegisterTools(IEditorDatabase factory)
