@@ -1,5 +1,5 @@
-﻿using GameWorld.Core.Commands;
-using GameWorld.Core.Commands.Object;
+﻿using Editors.KitbasherEditor.Commands;
+using GameWorld.Core.Commands;
 using GameWorld.Core.SceneNodes;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Editors.BoneMapping;

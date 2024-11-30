@@ -1,8 +1,9 @@
-﻿using GameWorld.Core.Rendering.Geometry;
+﻿using GameWorld.Core.Commands;
+using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace GameWorld.Core.Commands.Object
+namespace Editors.KitbasherEditor.Commands
 {
     public class RemapBoneIndexesCommand : ICommand
     {

@@ -48,7 +48,5 @@ namespace Shared.Core.ErrorHandling
                 Errors.Add(item);
             }
         }
-
-
     }
 }
