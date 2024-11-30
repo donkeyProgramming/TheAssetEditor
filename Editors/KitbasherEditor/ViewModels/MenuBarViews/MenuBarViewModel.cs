@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows.Input;
 using Editors.KitbasherEditor.UiCommands;
 using GameWorld.Core.Components.Selection;
@@ -46,10 +47,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             RegisterUiCommand<SaveAsCommand>();
 
             RegisterUiCommand<BrowseForReferenceCommand>();
-            RegisterUiCommand<ImportGeneralHeadReferenceCommand>();
-            RegisterUiCommand<ImportPaladinReferenceCommand>();
-            RegisterUiCommand<ImportGoblinReferenceCommand>();
-            RegisterUiCommand<ImportSlayerReferenceCommand>();
+            RegisterUiCommand<ImportGeneralReferenceCommand>();
             
             RegisterUiCommand<DeleteLodsCommand>();
             RegisterUiCommand<ClearConsoleCommand>();
@@ -100,11 +98,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateToolBarSeparator(fileToolbar);
             builder.CreateToolBarItem<BrowseForReferenceCommand>(fileToolbar, "Import Reference model");
             
+
             var debugToolbar = builder.CreateRootToolBar("Debug");
-            builder.CreateToolBarItem<ImportGeneralHeadReferenceCommand>(debugToolbar, "Import General Head");
-            builder.CreateToolBarItem<ImportPaladinReferenceCommand>(debugToolbar, "Import Paladin");
-            builder.CreateToolBarItem<ImportSlayerReferenceCommand>(debugToolbar, "Import Slayer");
-            builder.CreateToolBarItem<ImportGoblinReferenceCommand>(debugToolbar, "Import Goblin");
+            builder.CreateToolBarItem<ImportGeneralReferenceCommand>(debugToolbar, "Import General");
             builder.CreateToolBarItem<DeleteLodsCommand>(debugToolbar, "Delete lods");
             builder.CreateToolBarItem<ClearConsoleCommand>(debugToolbar, "Clear console");
 

@@ -84,40 +84,12 @@ namespace Editors.KitbasherEditor.UiCommands
         }
     }
 
-    public class ImportGoblinReferenceCommand : BaseImportReferenceCommand
+    public class ImportGeneralReferenceCommand : BaseImportReferenceCommand
     {
-        public ImportGoblinReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
+        public ImportGeneralReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
         {
-            _filePath = @"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition";
-            ToolTip = "Import Goblin as Reference";
-        }
-    }
-
-
-    public class ImportGeneralHeadReferenceCommand : BaseImportReferenceCommand
-    {
-        public ImportGeneralHeadReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
-        {
-            _filePath = @"variantmeshes\wh_variantmodels\hu1e\cth\cth_celestial_general\cth_celestial_general_head_05.wsmodel";
-            ToolTip = "Import Goblin as Reference";
-        }
-    }
-
-    public class ImportSlayerReferenceCommand : BaseImportReferenceCommand
-    {
-        public ImportSlayerReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
-        {
-            _filePath = @"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition";
-            ToolTip = "Import Slayer as Reference";
-        }
-    }
-
-    public class ImportPaladinReferenceCommand : BaseImportReferenceCommand
-    {
-        public ImportPaladinReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
-        {
-            _filePath = @"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition";
-            ToolTip = "Import Paladin as Reference";
+            _filePath = @"variantmeshes\wh_variantmodels\hu1e\cth\cth_celestial_general\cth_celestial_general_body_02.wsmodel";
+            ToolTip = "Import General as Reference";
         }
     }
 }
