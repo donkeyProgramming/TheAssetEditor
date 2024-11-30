@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
-using Shared.Core.Services;
 using Shared.Core.Settings;
-using static Shared.Core.Services.GameInformationFactory;
+using static Shared.Core.Settings.GameInformationFactory;
 using static Shared.Core.Settings.ThemesController;
 using static Shared.Core.Settings.ApplicationSettingsHelper;
 

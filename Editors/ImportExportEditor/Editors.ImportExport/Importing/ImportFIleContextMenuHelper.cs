@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using Shared.Core.Events;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.External;
 using TreeNode = Shared.Ui.BaseDialogs.PackFileBrowser.TreeNode;
 

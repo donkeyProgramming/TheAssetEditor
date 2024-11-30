@@ -3,9 +3,8 @@ using System.Text.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
-using Shared.Core.Settings;
 
-namespace Shared.Core.Services
+namespace Shared.Core.Settings
 {
     public class ApplicationSettings
     {

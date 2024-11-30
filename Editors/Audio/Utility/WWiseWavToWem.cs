@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using Shared.Core.Misc;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace Editors.Audio.Utility
 {

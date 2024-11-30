@@ -8,7 +8,6 @@ using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
-using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace GameWorld.Core.Components.Rendering

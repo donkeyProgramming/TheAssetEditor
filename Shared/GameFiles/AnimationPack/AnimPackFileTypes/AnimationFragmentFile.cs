@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Shared.Core.ByteParsing;
 using Shared.Core.Misc;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.DB;
 
 namespace Shared.GameFormats.AnimationPack.AnimPackFileTypes

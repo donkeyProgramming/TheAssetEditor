@@ -7,7 +7,7 @@ using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.Dat;
 
 namespace Editors.Audio.Storage

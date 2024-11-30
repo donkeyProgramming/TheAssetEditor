@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace Shared.Core.ErrorHandling.Exceptions
 {

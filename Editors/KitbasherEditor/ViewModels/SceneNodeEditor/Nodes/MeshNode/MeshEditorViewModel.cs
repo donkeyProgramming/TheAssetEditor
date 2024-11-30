@@ -5,7 +5,7 @@ using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using GameWorld.Core.SceneNodes;
 using KitbasherEditor.Views.EditorViews.Rmv2;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.Ui.Common.DataTemplates;
 

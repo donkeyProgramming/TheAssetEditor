@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.EmbeddedResources;
 
 namespace Shared.GameFormats.AnimationPack

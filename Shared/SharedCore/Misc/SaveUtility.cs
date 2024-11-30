@@ -1,6 +1,8 @@
-﻿namespace Shared.Core.PackFiles
+﻿using Shared.Core.PackFiles;
+
+namespace Shared.Core.Misc
 {
-    public static class SaveUtility 
+    public static class SaveUtility
     {
         private static readonly string s_backupFolderPath = "Backup";
 

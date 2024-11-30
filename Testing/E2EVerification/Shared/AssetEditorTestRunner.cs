@@ -9,6 +9,7 @@ using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.TestUtility;
 
 namespace E2EVerification.Shared

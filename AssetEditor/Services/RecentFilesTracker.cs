@@ -1,7 +1,7 @@
 ﻿using System;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace AssetEditor.Services
 {

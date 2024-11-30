@@ -4,7 +4,7 @@ using GameWorld.Core.Services.SceneSaving;
 using GameWorld.Core.Services.SceneSaving.Lod;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.Events;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
 using Shared.TestUtility;
 using Shared.Ui.Events.UiCommands;

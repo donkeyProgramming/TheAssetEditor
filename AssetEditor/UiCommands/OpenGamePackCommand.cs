@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.Ui.Common;
 namespace AssetEditor.UiCommands
 {

@@ -2,7 +2,7 @@
 using Editors.Shared.Core.Common.BaseControl;
 using Shared.Core.DevConfig;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 
 namespace Editors.AnimationVisualEditors.CampaignAnimationCreator.DevConfig

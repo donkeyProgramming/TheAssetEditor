@@ -1,7 +1,7 @@
 ﻿using Shared.Core.DevConfig;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using Shared.EmbeddedResources;
 using Shared.Ui.Events.UiCommands;

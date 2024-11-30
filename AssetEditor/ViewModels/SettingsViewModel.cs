@@ -8,7 +8,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
-using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace AssetEditor.ViewModels

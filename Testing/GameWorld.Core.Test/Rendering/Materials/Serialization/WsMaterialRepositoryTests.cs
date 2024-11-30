@@ -1,6 +1,6 @@
 ﻿using GameWorld.Core.Rendering.Materials.Serialization;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.TestUtility;
 
 namespace GameWorld.Core.Test.Rendering.Materials.Serialization

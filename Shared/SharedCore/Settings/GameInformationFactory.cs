@@ -1,4 +1,4 @@
-﻿namespace Shared.Core.Services
+﻿namespace Shared.Core.Settings
 {
     public enum GameTypeEnum
     {
@@ -19,20 +19,20 @@
         Pharaoh
     }
 
-   //public enum PreferedShaderGroup
-   //{ }
-   //
-   //public enum  PreferedRmvVersion
-   //{
-   //    
-   //}
-   //
-   //public enum PreferedWsModelVersion
-   //{ }
-   //
-   //public enum PreferedAnimationBinVersion
-   //{ }
-   //
+    //public enum PreferedShaderGroup
+    //{ }
+    //
+    //public enum  PreferedRmvVersion
+    //{
+    //    
+    //}
+    //
+    //public enum PreferedWsModelVersion
+    //{ }
+    //
+    //public enum PreferedAnimationBinVersion
+    //{ }
+    //
     /*
      
      RegisterShader(PreferedShaderGroup.Wh3)
