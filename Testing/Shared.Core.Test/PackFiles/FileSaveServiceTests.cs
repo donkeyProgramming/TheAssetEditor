@@ -20,7 +20,7 @@ namespace Test.Shared.Core.PackFiles
         {
             var dialogProvider = new Mock<ISimpleMessageBox>();
             _pfs = new PackFileService(_eventHub.Object);
-            (_pfs as PackFileService).StandardDialogProvider = dialogProvider.Object;
+            (_pfs as PackFileService).MessageBoxProvider = dialogProvider.Object;
             var container = new PackFileContainer("MyTest");
             container.SystemFilePath = "SystemPath";
             container.IsCaPackFile = true;

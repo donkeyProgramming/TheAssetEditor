@@ -43,7 +43,7 @@ namespace Shared.Core.PackFiles
         private PackFileContainer? _packFileContainerSelectedForEdit;
 
         // We use this instead of the standard dialog helper, to avaid a circular dependency
-        public ISimpleMessageBox StandardDialogProvider { get; set; } = new SimpleMessageBox();
+        public ISimpleMessageBox MessageBoxProvider { get; set; } = new SimpleMessageBox();
         public bool EnableFileLookUpEvents { get; set; } = false;
         public bool EnforceGameFilesMustBeLoaded { get; set; } = true;
 
@@ -61,7 +61,7 @@ namespace Shared.Core.PackFiles
                 var caPacksLoaded = _packFileContainers.Count(x => x.IsCaPackFile);
                 if (caPacksLoaded == 0 && container.IsCaPackFile == false)
                 {
-                    StandardDialogProvider.ShowDialogBox("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
+                    MessageBoxProvider.ShowDialogBox("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
                     return;
                 }
             }
@@ -71,7 +71,7 @@ namespace Shared.Core.PackFiles
             {
                 if (packFile.SystemFilePath == container.SystemFilePath)
                 {
-                    StandardDialogProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
+                    MessageBoxProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
                     return;
                 }
             }

@@ -15,4 +15,9 @@
     <ProjectReference Include="..\..\..\Shared\SharedUI\Shared.Ui.csproj" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Folder Include="Editors\" />
+  </ItemGroup>
+
 </Project>
