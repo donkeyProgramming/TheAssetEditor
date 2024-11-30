@@ -1,29 +1,28 @@
-﻿using Serilog;
+﻿using System.Windows;
+using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
 
 namespace Shared.Core.PackFiles
 {
     public class PackFileService : IPackFileService
     {
         private readonly ILogger _logger = Logging.Create<PackFileService>();
+        private readonly IGlobalEventHub? _globalEventHub;
 
         private readonly List<PackFileContainer> _packFileContainers = [];
         private PackFileContainer? _packFileContainerSelectedForEdit;
 
+        // We use this instead of the standard dialog helper, to avaid a circular dependency
+        public ISimpleMessageBox StandardDialogProvider { get; set; } = new SimpleMessageBox();
         public bool EnableFileLookUpEvents { get; set; } = false;
         public bool EnforceGameFilesMustBeLoaded { get; set; } = true;
 
-        private readonly IStandardDialogProvider _standardDialogProvider;
-        private readonly IGlobalEventHub? _globalEventHub;
-
-        public PackFileService(IStandardDialogProvider standardDialogProvider, IGlobalEventHub? globalEventHub)
+        public PackFileService(IGlobalEventHub? globalEventHub)
         {
-            _standardDialogProvider = standardDialogProvider;
             _globalEventHub = globalEventHub;
         }
 
@@ -36,7 +35,7 @@ namespace Shared.Core.PackFiles
                 var caPacksLoaded = _packFileContainers.Count(x => x.IsCaPackFile);
                 if (caPacksLoaded == 0 && container.IsCaPackFile == false)
                 {
-                    _standardDialogProvider.ShowDialogBox("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
+                    StandardDialogProvider.ShowDialogBox("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
                     return;
                 }
             }
@@ -46,7 +45,7 @@ namespace Shared.Core.PackFiles
             {
                 if (packFile.SystemFilePath == container.SystemFilePath)
                 {
-                    _standardDialogProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
+                    StandardDialogProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
                     return;
                 }
             }
@@ -345,4 +344,15 @@ namespace Shared.Core.PackFiles
     }
 
     public record NewPackFileEntry(string DirectoyPath, PackFile PackFile);
+
+    public interface ISimpleMessageBox
+    {
+        void ShowDialogBox(string message, string title);
+    }
+
+    public class SimpleMessageBox : ISimpleMessageBox
+    {
+        public void ShowDialogBox(string message, string title) => MessageBox.Show(message, title);
+    }
+
 }

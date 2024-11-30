@@ -18,8 +18,6 @@ namespace Shared.Core
 
         public override void Register(IServiceCollection services)
         {
-            services.AddSingleton<IStandardDialogProvider, StandardDialogProvider>();
-
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<IEditorDatabase, EditorDatabase>();
             services.AddSingleton<CopyPasteManager>();
@@ -35,10 +33,10 @@ namespace Shared.Core
             services.AddScoped<IExceptionInformationProvider, BasicExceptionInformationProvider>();
             services.AddTransient<DevelopmentConfigurationManager>();
 
-
-
             services.AddSingleton<IPackFileContainerLoader, PackFileContainerLoader>();
-            
+
+
+
         }
     }
 

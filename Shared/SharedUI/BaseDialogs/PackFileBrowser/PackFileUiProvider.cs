@@ -3,7 +3,7 @@ using CommonControls.PackFileBrowser;
 using Shared.Core.PackFiles;
 
 namespace Shared.Ui.BaseDialogs.PackFileBrowser
-{
+{/*
     public class PackFileUiProvider : IPackFileUiProvider
     {
         private readonly IPackFileService _pfs;
@@ -39,5 +39,5 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         // Messagebox
         // ErrorWindow
         // Tool?
-    }
+    }*/
 }

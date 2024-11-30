@@ -8,6 +8,7 @@ using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
 using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.StandardDialog;
 using Shared.Ui.BaseDialogs.ToolSelector;
 using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.Exceptions;
@@ -31,7 +32,7 @@ namespace Shared.Ui
             services.AddScoped<BoneMappingViewModel>();
 
             // Implement required interfaces
-            services.AddScoped<IPackFileUiProvider, PackFileUiProvider>();
+            services.AddScoped<IPackFileUiProvider, StandardDialogs>();
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
             services.AddTransient<ICustomExceptionWindowProvider, CustomExceptionWindowProvider>();
             
