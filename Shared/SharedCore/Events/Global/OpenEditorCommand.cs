@@ -36,5 +36,13 @@ namespace Shared.Ui.Events.UiCommands
             window.ShowDialog();
         }
 
+        public void ExecuteAsWindow(EditorEnums preferedEditor,  int width, int heigh)
+        {
+            var window = _editorCreator.CreateWindow(null, preferedEditor);
+            window.Width = width;
+            window.Height = heigh;
+            window.ShowDialog();
+        }
+
     }
 }

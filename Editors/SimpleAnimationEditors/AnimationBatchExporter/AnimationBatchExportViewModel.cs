@@ -8,22 +8,26 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Common;
-using static Shared.Core.PackFiles.IPackFileService;
 
 namespace CommonControls.Editors.AnimationBatchExporter
 {
-    public class AnimationBatchExportViewModel
+    public class AnimationBatchExportViewModel : IEditorInterface
     {
-        ILogger _logger = Logging.Create<AnimationBatchExportViewModel>();
-        IPackFileService _pfs;
+        private readonly ILogger _logger = Logging.Create<AnimationBatchExportViewModel>();
+        private readonly IPackFileService _pfs;
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         public ObservableCollection<PackFileListItem> PackfileList { get; set; } = new ObservableCollection<PackFileListItem>();
         public ObservableCollection<uint> PossibleOutputFormats { get; set; } = new ObservableCollection<uint>() { 5, 6, 7 };
         public NotifyAttr<uint> SelectedOutputFormat { get; set; } = new NotifyAttr<uint>(7);
 
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+
+        public string DisplayName { get; set; } = "Animation Batch Exporter";
+
+     
 
         public AnimationBatchExportViewModel(IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
@@ -113,7 +117,10 @@ namespace CommonControls.Editors.AnimationBatchExporter
             return output;
         }
 
-
+        public void Close()
+        {
+     
+        }
 
         public class PackFileListItem
         {
