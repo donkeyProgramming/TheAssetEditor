@@ -2,6 +2,7 @@
 {
     public enum EditorEnums
     {
+        AnimationBatchExporter_Editor,
         Meta_Editor,
         XML_Editor,
         XML_CampaginBin_Edtior,

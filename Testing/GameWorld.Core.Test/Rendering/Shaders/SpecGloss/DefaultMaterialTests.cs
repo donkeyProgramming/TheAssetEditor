@@ -5,7 +5,7 @@ using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Test.TestUtility;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
@@ -20,7 +20,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
         [SetUp]
         public void Setup()
         {
-            _pfs = new PackFileService(new StandardDialogProvider(), null);
+            _pfs = new PackFileService(null);
             _pfs.EnforceGameFilesMustBeLoaded = false;
             var _ = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
         }

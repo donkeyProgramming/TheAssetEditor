@@ -1,7 +1,7 @@
 ﻿using GameWorld.Core.Rendering.Materials;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.SceneNodes;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 {

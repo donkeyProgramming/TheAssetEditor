@@ -6,7 +6,7 @@ using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using Microsoft.Xna.Framework;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.EmbeddedResources;
 using Shared.GameFormats.RigidModel;
 

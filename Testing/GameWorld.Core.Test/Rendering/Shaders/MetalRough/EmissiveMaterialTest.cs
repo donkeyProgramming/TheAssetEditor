@@ -5,7 +5,7 @@ using GameWorld.Core.Test.TestUtility.Material;
 using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
@@ -23,7 +23,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.MetalRough
         {
             var selectedGame = GameTypeEnum.Warhammer3;
             var appSettings = new ApplicationSettingsService(selectedGame);
-            _pfs = new PackFileService(new StandardDialogProvider(), null);
+            _pfs = new PackFileService(null);
             _pfs.EnforceGameFilesMustBeLoaded = false;
             var _outputPack = _pfs.CreateNewPackFileContainer("output", PackFileCAType.MOD, true);
 

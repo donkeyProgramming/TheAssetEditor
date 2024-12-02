@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Linq;
-using CommonControls.PackFileBrowser;
 using Editors.Audio.BnkCompiler;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.ErrorListDialog;
 
@@ -14,16 +14,17 @@ namespace Editors.Audio.Compiler
     {
         private readonly IPackFileService _pfs;
         private readonly CompilerService _compilerService;
+        private readonly IStandardDialogs _packFileUiProvider;
 
         public string DisplayName { get; set; } = "Audio Compiler";
         public NotifyAttr<string> ProjectFilePath { get; set; } = new NotifyAttr<string>("audioprojects\\projectsimple.json");
         public NotifyAttr<ErrorListViewModel> ProjectResult { get; set; } = new NotifyAttr<ErrorListViewModel>(new ErrorListViewModel());
 
-        public CompilerViewModel(IPackFileService pfs, CompilerService compilerService)
+        public CompilerViewModel(IPackFileService pfs, CompilerService compilerService, IStandardDialogs packFileUiProvider)
         {
             _pfs = pfs;
             _compilerService = compilerService;
-
+            _packFileUiProvider = packFileUiProvider;
             var audioProjectFiles = PackFileServiceUtility.FindAllFilesInDirectory(pfs, "audioprojects")
                 .Where(x => x.Extention.ToLower() == ".json");
 
@@ -33,9 +34,9 @@ namespace Editors.Audio.Compiler
 
         public void BrowseProjectFileAction()
         {
-            using var browser = new PackFileBrowserWindow(_pfs, new string[] { ".json" });
-            if (browser.ShowDialog())
-                ProjectFilePath.Value = _pfs.GetFullPath(browser.SelectedFile);
+            var result = _packFileUiProvider.DisplayBrowseDialog([".json"]);
+            if (result.Result)
+                ProjectFilePath.Value = _pfs.GetFullPath(result.File);
         }
 
         public void CompileProjectAction()

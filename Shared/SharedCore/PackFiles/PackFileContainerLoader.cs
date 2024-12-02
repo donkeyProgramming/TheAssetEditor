@@ -3,7 +3,7 @@ using System.Text;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace Shared.Core.PackFiles
 {

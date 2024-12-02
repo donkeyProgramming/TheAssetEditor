@@ -7,7 +7,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.Reports.Animation

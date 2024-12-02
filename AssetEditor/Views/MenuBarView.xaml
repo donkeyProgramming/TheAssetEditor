@@ -89,7 +89,7 @@
 
 
             <MenuItem Header="Misc" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-                <MenuItem Header="Animation File Batch Converter" Command="{Binding MenuBar.OpenAnimationBatchExporterCommand}" />
+
                 <MenuItem Header="Warhammer II Animpack Updater" Command="{Binding MenuBar.OpenWh2AnimpackUpdaterCommand}" Visibility="Collapsed"  />
             </MenuItem>
 

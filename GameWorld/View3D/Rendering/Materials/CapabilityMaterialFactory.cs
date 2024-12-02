@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Services;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 

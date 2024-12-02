@@ -5,7 +5,7 @@ using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Rendering.Materials.Shaders.SpecGloss;
 using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;

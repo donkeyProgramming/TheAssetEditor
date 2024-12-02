@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
@@ -23,6 +24,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
 
         private readonly IPackFileService _packFileService;
         private readonly CopyPasteManager _copyPasteManager;
+        private readonly IStandardDialogs _packFileUiProvider;
         private readonly IFileSaveService _packFileSaveService;
         [ObservableProperty] string _skeletonName = "";
         [ObservableProperty] string _refMeshName = "";
@@ -45,6 +47,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
             IPackFileService pfs,
             CopyPasteManager copyPasteManager,
             IEditorHostParameters editorHostParameters,
+            IStandardDialogs packFileUiProvider,
             IFileSaveService packFileSaveService)
             : base(editorHostParameters)
         {
@@ -52,6 +55,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
 
             _packFileService = pfs;
             _copyPasteManager = copyPasteManager;
+            _packFileUiProvider = packFileUiProvider;
             _packFileSaveService = packFileSaveService;
             _selectedBoneRotationOffset = new Vector3ViewModel(0, 0, 0, x=> HandleTranslationChanged());
             _selectedBoneTranslationOffset = new Vector3ViewModel(0, 0, 0, x => HandleTranslationChanged());
@@ -253,21 +257,20 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
 
         public void LoadSkeletonAction()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".anim"]);
-            if (browser.ShowDialog() == true && browser.SelectedFile != null)
+            var result = _packFileUiProvider.DisplayBrowseDialog([".anim"]);
+            if(result.Result && result.File != null)
             {
-                var file = browser.SelectedFile;
-                var path = _packFileService.GetFullPath(file);
+                var path = _packFileService.GetFullPath(result.File);
                 LoadSkeleton(_techSkeletonNode, path);
             }
         }
 
         public void LoadRefMeshAction()
         {
-            using var browser = new PackFileBrowserWindow(_packFileService, [".variantmeshdefinition", ".wsmodel", ".rigid_model_v2"]);
-            if (browser.ShowDialog() == true && browser.SelectedFile != null)
+            var result = _packFileUiProvider.DisplayBrowseDialog([".variantmeshdefinition", ".wsmodel", ".rigid_model_v2"]);
+            if (result.Result && result.File != null)
             {
-                var file = browser.SelectedFile;
+                var file = result.File;
                 SceneObjectEditor.SetMesh(_techSkeletonNode, file);
                 RefMeshName = _packFileService.GetFullPath(file);
                 LoadSkeleton(_techSkeletonNode, _techSkeletonNode.SkeletonName.Value);

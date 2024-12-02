@@ -1,5 +1,5 @@
 ﻿using E2EVerification.Shared;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 
 namespace E2EVerification
 {

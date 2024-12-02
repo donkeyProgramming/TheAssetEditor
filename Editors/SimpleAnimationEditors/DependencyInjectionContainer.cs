@@ -46,6 +46,12 @@ namespace Editors.AnimationTextEditors
                 .Create<TextEditorViewModel<InvMatrixToTextConverter>, TextEditorView>(EditorEnums.XML_InvBoneEditor)
                 .AddExtention(".bone_inv_trans_mats", EditorPriorites.Default)
                 .Build(database);
+
+
+            EditorInfoBuilder
+                .Create<AnimationBatchExportViewModel, AnimationBatchExportView>(EditorEnums.AnimationBatchExporter_Editor)
+                .AddToToolbar("Animation Batch Exporter")
+                .Build(database);
         }
 
         private static void RegisterCampaignAnimBin(IServiceCollection services)
@@ -65,7 +71,6 @@ namespace Editors.AnimationTextEditors
 
         private static void RegisterBatchConverter(IServiceCollection services)
         {
-            services.AddTransient<OpenAnimationBatchConverterCommand>();
             services.AddTransient<AnimationBatchExportViewModel>();
             services.AddTransient<AnimationBatchExportView>();
         }

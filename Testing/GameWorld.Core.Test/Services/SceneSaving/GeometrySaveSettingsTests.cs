@@ -9,7 +9,7 @@ using GameWorld.Core.Services.SceneSaving.Geometry;
 using GameWorld.Core.Services.SceneSaving.Lod;
 using GameWorld.Core.Services.SceneSaving.Material;
 using Moq;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel.LodHeader;
 
 namespace GameWorld.Core.Test.Services.SceneSaving

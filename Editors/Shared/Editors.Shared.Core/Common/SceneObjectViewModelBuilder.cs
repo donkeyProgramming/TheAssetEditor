@@ -5,6 +5,7 @@ using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 
 namespace Editors.Shared.Core.Common
 {
@@ -16,6 +17,7 @@ namespace Editors.Shared.Core.Common
         private readonly IPackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly IStandardDialogs _packFileUiProvider;
 
         public SceneObjectViewModelBuilder(
             AnimationPlayerViewModel animationPlayerViewModel, 
@@ -23,7 +25,8 @@ namespace Editors.Shared.Core.Common
             SceneObjectEditor assetViewModelBuilder,
             IPackFileService pfs, 
             SkeletonAnimationLookUpHelper skeletonHelper, 
-            IUiCommandFactory uiCommandFactory)
+            IUiCommandFactory uiCommandFactory,
+            IStandardDialogs packFileUiProvider)
         {
             _animationPlayerViewModel = animationPlayerViewModel;
             _metaDataFactory = metaDataFactory;
@@ -31,12 +34,13 @@ namespace Editors.Shared.Core.Common
             _pfs = pfs;
             _skeletonHelper = skeletonHelper;
             _uiCommandFactory = uiCommandFactory;
+            _packFileUiProvider = packFileUiProvider;
         }
 
         public SceneObjectViewModel CreateAsset(bool createByDefault, string header, Color skeletonColour, AnimationToolInput input, bool allowMetaData = false)
         {
             var mainAsset = _sceneObjectEditor.CreateAsset(header, skeletonColour);
-            var returnObj = new SceneObjectViewModel(_uiCommandFactory, _metaDataFactory, _pfs, mainAsset, header + ":", _sceneObjectEditor, _skeletonHelper);
+            var returnObj = new SceneObjectViewModel(_uiCommandFactory, _metaDataFactory, _pfs, _packFileUiProvider, mainAsset, header + ":", _sceneObjectEditor, _skeletonHelper);
             returnObj.AllowMetaData = allowMetaData;
 
             if (createByDefault)

@@ -6,6 +6,7 @@ using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 
 namespace Shared.Core
@@ -18,14 +19,12 @@ namespace Shared.Core
 
         public override void Register(IServiceCollection services)
         {
-            services.AddSingleton<IStandardDialogProvider, StandardDialogProvider>();
-
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<IEditorDatabase, EditorDatabase>();
             services.AddSingleton<CopyPasteManager>();
             services.AddSingleton<GameInformationFactory>();
             services.AddSingleton<IPackFileService, PackFileService>();
-            services.AddSingleton<IFileSaveService, FileSaveService>();
+            services.AddScoped<IFileSaveService, FileSaveService>();
             services.AddSingleton<ScopeRepository>();
             services.AddSingleton<TouchedFilesRecorder>();
             services.AddScoped<IUiCommandFactory, UiCommandFactory>();
@@ -35,10 +34,10 @@ namespace Shared.Core
             services.AddScoped<IExceptionInformationProvider, BasicExceptionInformationProvider>();
             services.AddTransient<DevelopmentConfigurationManager>();
 
-
-
             services.AddSingleton<IPackFileContainerLoader, PackFileContainerLoader>();
-            
+
+
+
         }
     }
 

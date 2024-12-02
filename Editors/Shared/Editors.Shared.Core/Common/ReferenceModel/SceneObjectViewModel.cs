@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Shared.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.Shared.Core.Common.ReferenceModel
@@ -10,6 +11,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
     public partial class SceneObjectViewModel : ObservableObject
     {
         private readonly IPackFileService _pfs;
+        private readonly IStandardDialogs _uiProvider;
         private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IMetaDataFactory _metaDataFactory;
@@ -29,6 +31,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             IUiCommandFactory uiCommandFactory,
             IMetaDataFactory metaDataFactory,
             IPackFileService packFileService,
+            IStandardDialogs uiProvider,
             SceneObject data,
             string headerName,
             SceneObjectEditor sceneObjectBuilder,
@@ -37,6 +40,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             _uiCommandFactory = uiCommandFactory;
             _metaDataFactory = metaDataFactory;
             _pfs = packFileService;
+            _uiProvider = uiProvider;
             _sceneObjectBuilder = sceneObjectBuilder;
            
             Data = data;
@@ -72,11 +76,10 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
         public void BrowseMesh()
         {
-            using var browser = new PackFileBrowserWindow(_pfs);
-            browser.ViewModel.Filter.SetExtentions([".variantmeshdefinition", ".wsmodel", ".rigid_model_v2"]);
-            if (browser.ShowDialog() == true && browser.SelectedFile != null)
+            var result = _uiProvider.DisplayBrowseDialog([".variantmeshdefinition", ".wsmodel", ".rigid_model_v2"]);
+            if (result.Result == true && result.File != null)
             {
-                var file = browser.SelectedFile;
+                var file = result.File;
                 _sceneObjectBuilder.SetMesh(Data, file);
             }
         }

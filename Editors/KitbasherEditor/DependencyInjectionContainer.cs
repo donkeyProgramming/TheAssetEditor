@@ -1,4 +1,5 @@
-﻿using Editors.KitbasherEditor.EventHandlers;
+﻿using Editors.KitbasherEditor.Commands;
+using Editors.KitbasherEditor.EventHandlers;
 using Editors.KitbasherEditor.Services;
 using Editors.KitbasherEditor.UiCommands;
 using Editors.KitbasherEditor.ViewModels;
@@ -86,6 +87,9 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<ImportReferenceMeshCommand>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
+
+            // Commands
+            serviceCollection.AddTransient<RemapBoneIndexesCommand>();
         }
 
         public override void RegisterTools(IEditorDatabase factory)

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using CommonControls.BaseDialogs;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.AnimationPack;

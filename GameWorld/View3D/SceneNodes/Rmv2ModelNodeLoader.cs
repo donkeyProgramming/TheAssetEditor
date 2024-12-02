@@ -9,6 +9,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.WsModel;
 
@@ -20,9 +21,9 @@ namespace GameWorld.Core.SceneNodes
         private readonly MeshBuilderService _meshBuilderService;
         private readonly IPackFileService _packFileService;
         private readonly CapabilityMaterialFactory _capabilityMaterialFactory;
-        private readonly IExceptionService _exceptionService;
+        private readonly IStandardDialogs _exceptionService;
 
-        public Rmv2ModelNodeLoader(MeshBuilderService meshBuilderService, IPackFileService packFileService, CapabilityMaterialFactory materialFactory, IExceptionService exceptionService)
+        public Rmv2ModelNodeLoader(MeshBuilderService meshBuilderService, IPackFileService packFileService, CapabilityMaterialFactory materialFactory, IStandardDialogs exceptionService)
         {
             _meshBuilderService = meshBuilderService;
             _packFileService = packFileService;
@@ -62,7 +63,7 @@ namespace GameWorld.Core.SceneNodes
                         errorMessage += "Try deleting the wsModel and connected materials, or manually change the ',' to '.' in the material files where it has been generated incorrectly\n";
                         errorMessage += "new versions of AssetEditor will generate the material files\n";
 
-                        _exceptionService.CreateDialog(e, errorMessage);
+                        _exceptionService.ShowExceptionWindow(e, errorMessage);
                         shader = _capabilityMaterialFactory.CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
                     }
 

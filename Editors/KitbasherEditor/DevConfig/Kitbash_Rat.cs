@@ -4,7 +4,7 @@ using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.EmbeddedResources;
 using Shared.Ui.Events.UiCommands;
 

@@ -6,7 +6,6 @@ using GameWorld.Core.WpfWindow.Events;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Events;
 using Shared.Core.Services;
 
@@ -20,7 +19,7 @@ namespace GameWorld.Core.WpfWindow
     {
         WpfGraphicsDeviceService _deviceServiceHandle;
         private readonly ResourceLibrary _resourceLibrary;
-        private readonly IExceptionService _exceptionService;
+        private readonly IStandardDialogs _exceptionService;
         private readonly IEventHub _eventHub;
         private readonly string _contentDir;
 
@@ -34,7 +33,7 @@ namespace GameWorld.Core.WpfWindow
         /// <summary>
         /// Creates a new instance of a game host panel.
         /// </summary>
-        public WpfGame(ResourceLibrary resourceLibrary, IExceptionService exceptionService, IEventHub eventHub, string contentDir = "Content")
+        public WpfGame(ResourceLibrary resourceLibrary, IStandardDialogs exceptionService, IEventHub eventHub, string contentDir = "Content")
         {
             if (string.IsNullOrEmpty(contentDir))
                 throw new ArgumentNullException(nameof(contentDir));
@@ -150,7 +149,7 @@ namespace GameWorld.Core.WpfWindow
             catch(Exception ex) 
             {
                 StopRendering();
-                _exceptionService.CreateDialog(ex);
+                _exceptionService.ShowExceptionWindow(ex);
                 StartRendering();
             }
         }

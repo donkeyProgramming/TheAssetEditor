@@ -1,4 +1,4 @@
-﻿using Shared.Core.Services;
+﻿using Shared.Core.Settings;
 
 namespace Shared.Core.ErrorHandling.Exceptions
 {

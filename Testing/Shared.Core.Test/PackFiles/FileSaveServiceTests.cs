@@ -11,15 +11,16 @@ namespace Test.Shared.Core.PackFiles
     {
         IPackFileService _pfs;
         PackFileContainer _container;
-        Mock<IPackFileUiProvider> _uiProvider = new();
+        Mock<IStandardDialogs> _uiProvider = new();
         Mock<IGlobalEventHub> _eventHub = new();
         PackFile _fileHandle;
 
         [SetUp]
         public void Setup()
         {
-            var dialogProvider = new Mock<IStandardDialogProvider>();
-            _pfs = new PackFileService(dialogProvider.Object, _eventHub.Object);
+            var dialogProvider = new Mock<ISimpleMessageBox>();
+            _pfs = new PackFileService(_eventHub.Object);
+            (_pfs as PackFileService).MessageBoxProvider = dialogProvider.Object;
             var container = new PackFileContainer("MyTest");
             container.SystemFilePath = "SystemPath";
             container.IsCaPackFile = true;

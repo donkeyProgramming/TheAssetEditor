@@ -1,9 +1,9 @@
-﻿using CommonControls.PackFileBrowser;
-using Editors.KitbasherEditor.Services;
+﻿using Editors.KitbasherEditor.Services;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
@@ -11,28 +11,23 @@ namespace Editors.KitbasherEditor.UiCommands
     public class BrowseForReferenceCommand : IKitbasherUiCommand
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
-        private readonly IPackFileService _packFileService;
+        private readonly IStandardDialogs _packFileUiProvider;
 
         public string ToolTip { get; set; } = "Import Reference model";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = null;
 
-        public BrowseForReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService)
+        public BrowseForReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IStandardDialogs packFileUiProvider)
         {
             _kitbashSceneCreator = kitbashSceneCreator;
-            _packFileService = packFileService;
+            _packFileUiProvider = packFileUiProvider;
         }
 
         public void Execute()
         {
-            using (var browser = new PackFileBrowserWindow(_packFileService))
-            {
-                browser.ViewModel.Filter.SetExtentions(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
-                if (browser.ShowDialog() == true && browser.SelectedFile != null)
-                {
-                    _kitbashSceneCreator.LoadReference(browser.SelectedFile);
-                }
-            }
+            var result = _packFileUiProvider.DisplayBrowseDialog(new List<string>() { ".variantmeshdefinition", ".wsmodel", ".rigid_model_v2" });
+            if (result.Result == true && result.File != null)
+                _kitbashSceneCreator.LoadReference(result.File);
         }
     }
 
@@ -89,40 +84,12 @@ namespace Editors.KitbasherEditor.UiCommands
         }
     }
 
-    public class ImportGoblinReferenceCommand : BaseImportReferenceCommand
+    public class ImportGeneralReferenceCommand : BaseImportReferenceCommand
     {
-        public ImportGoblinReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
+        public ImportGeneralReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
         {
-            _filePath = @"variantmeshes\variantmeshdefinitions\grn_forest_goblins_base.variantmeshdefinition";
-            ToolTip = "Import Goblin as Reference";
-        }
-    }
-
-
-    public class ImportGeneralHeadReferenceCommand : BaseImportReferenceCommand
-    {
-        public ImportGeneralHeadReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
-        {
-            _filePath = @"variantmeshes\wh_variantmodels\hu1e\cth\cth_celestial_general\cth_celestial_general_head_05.wsmodel";
-            ToolTip = "Import Goblin as Reference";
-        }
-    }
-
-    public class ImportSlayerReferenceCommand : BaseImportReferenceCommand
-    {
-        public ImportSlayerReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
-        {
-            _filePath = @"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition";
-            ToolTip = "Import Slayer as Reference";
-        }
-    }
-
-    public class ImportPaladinReferenceCommand : BaseImportReferenceCommand
-    {
-        public ImportPaladinReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
-        {
-            _filePath = @"variantmeshes\variantmeshdefinitions\brt_paladin.variantmeshdefinition";
-            ToolTip = "Import Paladin as Reference";
+            _filePath = @"variantmeshes\wh_variantmodels\hu1e\cth\cth_celestial_general\cth_celestial_general_body_02.wsmodel";
+            ToolTip = "Import General as Reference";
         }
     }
 }

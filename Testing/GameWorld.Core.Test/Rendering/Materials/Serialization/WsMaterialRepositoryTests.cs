@@ -1,6 +1,6 @@
 ﻿using GameWorld.Core.Rendering.Materials.Serialization;
 using Shared.Core.PackFiles;
-using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.TestUtility;
 
 namespace GameWorld.Core.Test.Rendering.Materials.Serialization
@@ -11,7 +11,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_NotExising()
         {
             // Arrange 
-            var pfs = new PackFileService(new StandardDialogProvider(), null);
+            var pfs = new PackFileService(null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
@@ -29,7 +29,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_ExistingButDifferent()
         {
             // Arrange 
-            var pfs = new PackFileService(new StandardDialogProvider(), null);
+            var pfs = new PackFileService(null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
@@ -51,7 +51,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_ExistingAndEqualButDifferentName()
         {
             // Arrange 
-            var pfs = new PackFileService(new StandardDialogProvider(), null);
+            var pfs = new PackFileService( null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
@@ -73,7 +73,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_ExistingAndEqualWithWhiteSpaceDiff()
         {
             // Arrange 
-            var pfs = new PackFileService(new StandardDialogProvider(), null);
+            var pfs = new PackFileService(null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
@@ -95,7 +95,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_ExistingAndEqualWithCapitalization()
         {
             // Arrange 
-            var pfs = new PackFileService(new StandardDialogProvider(), null);
+            var pfs = new PackFileService(null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<name> customMaterialName </name>PostContent0";
@@ -194,7 +194,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void AddMaterial_NameMissingFromFile()
         {
             // Arrange 
-            var pfs = new PackFileService(new StandardDialogProvider(), null);
+            var pfs = new PackFileService(null);
 
             var materialPath0 = "content/material0.xml.material";
             var materialContent0 = "PreContent0<nothing> customMaterialName </name>PostContent0";
