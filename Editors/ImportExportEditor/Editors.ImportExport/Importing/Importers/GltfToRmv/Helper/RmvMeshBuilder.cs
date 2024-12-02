@@ -4,7 +4,6 @@ using SharpGLTF.Schema2;
 using Shared.GameFormats.RigidModel.Vertex;
 using SharpGLTF.Geometry.VertexTypes;
 using SharpGLTF.Geometry;
-using GameWorld.Core.Animation;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using XNA = Microsoft.Xna.Framework;
 using Shared.GameFormats.RigidModel.Types;

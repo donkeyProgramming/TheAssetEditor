@@ -6,6 +6,7 @@ using System.IO;
 using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using static Shared.Core.PackFiles.IPackFileService;
+using Shared.Core.Services;
 using Shared.Core.ErrorHandling.Exceptions;
 using Editors.Shared.Core.Services;
 using System.Windows;
@@ -26,10 +27,10 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
     public class GltfImporter
     {
         private readonly IPackFileService _packFileService;
-        private readonly IExceptionService _exceptionService;
+        private readonly IStandardDialogs _exceptionService;
         private readonly SkeletonAnimationLookUpHelper _skeletonLookUpHelper;
 
-        public GltfImporter(IPackFileService packFileSerivce, IExceptionService exceptionService, SkeletonAnimationLookUpHelper skeletonLookUpHelper)
+        public GltfImporter(IPackFileService packFileSerivce, IStandardDialogs exceptionService, SkeletonAnimationLookUpHelper skeletonLookUpHelper)
         {
             _packFileService = packFileSerivce;
             _exceptionService = exceptionService;
@@ -45,7 +46,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             }
             catch (Exception ex)
             {
-                _exceptionService.CreateDialog(ex);
+                _exceptionService.ShowExceptionWindow(ex);
                 return;
             }
 

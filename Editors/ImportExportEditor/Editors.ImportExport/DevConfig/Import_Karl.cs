@@ -11,6 +11,7 @@ using Shared.GameFormats;
 using SharpGLTF.Schema2;
 using Shared.GameFormats.RigidModel.LodHeader;
 using System.Windows.Forms.Design;
+using Shared.Core.Settings;
 
 namespace Editors.ImportExport.DevConfig
 {
