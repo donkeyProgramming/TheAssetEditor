@@ -142,7 +142,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
             // TODO: check skeleton == null 
             for (var bindindIndex = 0; bindindIndex < rmv2Vertex.WeightCount; bindindIndex++)
             {
-                var boneTableIndex = GetBoneTableIndexFrom(vertexBuilder, modelRoot, animSkeletonFile, bindindIndex);
+                var boneTableIndex = GetMappedBoneTableIndex(vertexBuilder, modelRoot, animSkeletonFile, bindindIndex);
 
                 rmv2Vertex.BoneIndex[bindindIndex] = (byte)boneTableIndex;
                 rmv2Vertex.BoneWeight[bindindIndex] = vertexBuilder.Skinning.Weights[bindindIndex];
@@ -151,7 +151,10 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
             return rmv2Vertex;
         }
 
-        private static int GetBoneTableIndexFrom(VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> vertexBuilder, ModelRoot modelRoot, AnimationFile animSkeletonFile, int bindingIndex)
+        /// <summary>
+        /// Maps the gltf vertex joint index to th CA AnimationFile bone index
+        /// </summary>        
+        private static int GetMappedBoneTableIndex(VertexBuilder<VertexPositionNormalTangent, VertexTexture1, VertexJoints4> vertexBuilder, ModelRoot modelRoot, AnimationFile animSkeletonFile, int bindingIndex)
         {
             var binding = vertexBuilder.Skinning.GetBinding(bindingIndex); // Get binding
 
