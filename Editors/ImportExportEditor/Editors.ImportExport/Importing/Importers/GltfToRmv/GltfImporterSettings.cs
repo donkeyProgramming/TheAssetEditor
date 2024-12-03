@@ -15,8 +15,9 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
     (
         string InputGltfFile,
         string DestinationPackPath,
-        PackFileContainer destinationPackFileContainer,
-        bool ConvertNormalTextureToOrnge,
-        bool ImportAnimations        
+        PackFileContainer DestinationPackFileContainer,
+        bool ConvertNormalTextureToOrangeType,
+        bool ImportAnimations,
+        bool MirrorMesh
     );
 }
