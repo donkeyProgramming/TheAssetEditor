@@ -28,19 +28,8 @@ namespace Editors.ImportExport.DevConfig
 
         public void OpenFileOnLoad()
         {
-            const string inputGltfAe = @"C:\Users\Kaiza\Documents\Maharaja_GLTF_WeightCrap\PhazerMade\dae_prince_torso_base_01.gltf";
-            const string inputGltfFileResaved = @"C:\Users\Kaiza\Documents\Maharaja_GLTF_WeightCrap\PhazerMade\dae_prince_test_BlendFile_convertoGLTF.gltf";
-
-            var settingsAe = new GltfImporterSettings(inputGltfAe, true, null);
-            var settingsResaved = new GltfImporterSettings(inputGltfFileResaved, true, null);
-
-            _importer.Import(settingsResaved);
-
-            //var modelRootAe = ModelRoot.Load(inputGltfAe);
-            //var modelRootResaved = ModelRoot.Load(inputGltfFileResaved);
-
-            //var rmv2FileAe = RmvMeshBuilder.Build(settingsAe, modelRootAe);
-            //var rmv2FileResaved = RmvMeshBuilder.Build(settingsResaved, modelRootResaved);            
+            // For testing importing without going through the UI
+            // 80% import/export debugging uses these
         }
 
         public void OverrideSettings(ApplicationSettings currentSettings)
