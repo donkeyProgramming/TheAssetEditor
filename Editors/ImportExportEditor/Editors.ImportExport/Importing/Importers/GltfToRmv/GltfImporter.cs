@@ -12,12 +12,6 @@ using Shared.Core.Services;
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 {
-    public record GltfImporterSettings
-    (
-        string InputGltfFile,
-        bool ConvertNormalTextureToOrnge,
-        TreeNode destinationPackNode
-     );
 
     public class GltfImporter
     {
@@ -51,8 +45,8 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 
             var packFileImported = new PackFile(importedFileName, new MemorySource(bytesRmv2));
 
-            var newFile = new NewPackFileEntry(settings.destinationPackNode.GetFullPath(), packFileImported);
-            _packFileService.AddFilesToPack(settings.destinationPackNode.FileOwner, [newFile]);
+            var newFile = new NewPackFileEntry(settings.DestinationPackPath, packFileImported);
+            _packFileService.AddFilesToPack(settings.DestinationPackFileContainer, [newFile]);
         }
 
         private static string GetImportedPackFileName(GltfImporterSettings settings)
