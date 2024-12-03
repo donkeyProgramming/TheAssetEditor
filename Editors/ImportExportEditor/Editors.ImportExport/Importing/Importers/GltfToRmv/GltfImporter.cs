@@ -8,13 +8,15 @@ using Shared.Ui.BaseDialogs.PackFileBrowser;
 using static Shared.Core.PackFiles.IPackFileService;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Services;
-
+using Serilog;
+using Shared.Core.ErrorHandling;
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 {
 
     public class GltfImporter
     {
+        private readonly ILogger _logger = Logging.Create<GltfImporter>();
         private readonly IPackFileService _packFileService;
         private readonly IStandardDialogs _exceptionService;
 
@@ -28,6 +30,8 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 
         public void Import(GltfImporterSettings settings)
         {
+            LogSettings(settings);
+
             try
             {
                 _modelRoot = ModelRoot.Load(settings.InputGltfFile);
@@ -56,5 +60,19 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 
             return importedFileName;
         }
+
+        void LogSettings(GltfImporterSettings settings)
+        {
+            var str = $"Importing using {nameof(GltfImporter)}\n";
+            str += $"\tInputGltfFile:{settings?.InputGltfFile}\n";
+            str += $"\tDestinationPackFileContainer:{settings?.DestinationPackFileContainer}\n";
+            str += $"\tDestinationPackPath:{settings?.DestinationPackPath}\n";
+            str += $"\tConvertNormalTextureToBlue:{settings?.ConvertNormalTextureToOrangeType}n";
+            str += $"\tImportAnimations:{settings?.ImportAnimations}n";
+            str += $"\tMirrorMesh:{settings?.MirrorMesh}\n";
+
+            _logger.Here().Information(str);
+        }
+
     }
 }
