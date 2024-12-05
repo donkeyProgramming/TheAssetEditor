@@ -12,6 +12,7 @@ using Editors.ImportExport.Exporting.Presentation.DdsToPng;
 using Editors.ImportExport.Exporting.Presentation.RmvToGltf;
 using Editors.ImportExport.Importing;
 using Editors.ImportExport.Importing.Importers.GltfToRmv;
+
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
@@ -53,9 +54,10 @@ namespace Editors.ImportExport
             services.AddTransient<GltfMeshBuilder>();
             services.AddTransient<IGltfTextureHandler, GltfTextureHandler>();
             services.AddTransient<IGltfSceneSaver, GltfSceneSaver>();
+            services.AddTransient<IGltfSceneLoader, GltfSceneLoader>();
             services.AddTransient<GltfSkeletonBuilder>();
-            services.AddTransient<GltfAnimationBuilder>();            
-
+            services.AddTransient<GltfAnimationBuilder>();
+            
             RegisterAllAsInterface<IDeveloperConfiguration>(services, ServiceLifetime.Transient);
         }
     }
