@@ -12,7 +12,7 @@ using Editors.ImportExport.Exporting.Presentation.DdsToPng;
 using Editors.ImportExport.Exporting.Presentation.RmvToGltf;
 using Editors.ImportExport.Importing;
 using Editors.ImportExport.Importing.Importers.GltfToRmv;
-
+using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
