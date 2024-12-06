@@ -87,12 +87,6 @@
 
             </MenuItem>
 
-
-            <MenuItem Header="Misc" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
-
-                <MenuItem Header="Warhammer II Animpack Updater" Command="{Binding MenuBar.OpenWh2AnimpackUpdaterCommand}" Visibility="Collapsed"  />
-            </MenuItem>
-
             <MenuItem Header="Reports" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
                 <MenuItem Header="Rmv2" Command="{Binding MenuBar.GenerateRmv2ReportCommand}"/>
                 <MenuItem Header="Meta Data" Command="{Binding MenuBar.GenerateMetaDataReportCommand}"/>
@@ -108,6 +102,8 @@
                     <MenuItem Header="Extract to Pack" Command="{Binding MenuBar.TouchedFileRecorderExtractCommand }"/>
                     <MenuItem Header="Stop Recorder" Command="{Binding MenuBar.TouchedFileRecorderStopCommand }"/>
                 </MenuItem>
+                <Separator/>
+                <MenuItem Header="Debug - Clear Console" Command="{Binding MenuBar.ClearConsoleCommand}" />
             </MenuItem>
 
             <MenuItem Header="Help" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">

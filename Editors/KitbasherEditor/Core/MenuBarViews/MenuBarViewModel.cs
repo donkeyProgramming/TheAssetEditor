@@ -51,8 +51,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             RegisterUiCommand<BrowseForReferenceCommand>();
             RegisterUiCommand<ImportGeneralReferenceCommand>();
             
-            RegisterUiCommand<DeleteLodsCommand>();
-            RegisterUiCommand<ClearConsoleCommand>();
+            RegisterUiCommand<DeleteLodsCommand>();    
             RegisterUiCommand<UndoCommand>();
             RegisterUiCommand<SortMeshesCommand>();
 
@@ -104,7 +103,6 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             var debugToolbar = builder.CreateRootToolBar("Debug");
             builder.CreateToolBarItem<ImportGeneralReferenceCommand>(debugToolbar, "Import General");
             builder.CreateToolBarItem<DeleteLodsCommand>(debugToolbar, "Delete lods");
-            builder.CreateToolBarItem<ClearConsoleCommand>(debugToolbar, "Clear console");
 
             var toolsToolbar = builder.CreateRootToolBar("Tools");
             builder.CreateToolBarItem<GroupItemsCommand>(toolsToolbar, "(Un)Group selection");

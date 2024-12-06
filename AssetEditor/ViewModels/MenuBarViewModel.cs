@@ -68,6 +68,12 @@ namespace AssetEditor.ViewModels
                 _packfileService.SetEditablePack(newPackFile);
             }
         }
+
+
+
+
+     
+
         [RelayCommand] private void CreateAnimPackWarhammer3() => AnimationPackSampleDataCreator.CreateAnimationDbWarhammer3(_packFileSaveService, _packfileService);
         [RelayCommand] private void CreateAnimPack3k() => AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService, _packFileSaveService);
         [RelayCommand] private void OpenWh2AnimpackUpdater() => new AnimPackUpdaterService(_packfileService).Process();
@@ -81,6 +87,9 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void TouchedFileRecorderPrint() => _touchedFilesRecorder.Print();
         [RelayCommand] private void TouchedFileRecorderExtract() => _touchedFilesRecorder.ExtractFilesToPack(@"c:\temp\extractedPack.pack");
         [RelayCommand] private void TouchedFileRecorderStop() => _touchedFilesRecorder.Stop();
+
+        [RelayCommand] private void ClearConsole() => Console.Clear();
+        
         [RelayCommand] private void Search() => _uiCommandFactory.Create<DeepSearchCommand>().Execute();
 
         [RelayCommand] private void OpenAttilaPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Attila);
