@@ -123,6 +123,9 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
                 rmv2Mesh.IndexList[i + 1] = (ushort)indices[i + 2];
             }            
 
+            // recæculate tangents and bitangents
+            TangentBasisCalculator.CalculateForRmv2Mesh(rmv2Mesh);
+
             return rmv2Mesh;
         }
 
