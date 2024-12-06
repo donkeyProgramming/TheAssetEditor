@@ -1,10 +1,8 @@
 ﻿using KitbasherEditor.ViewModels.MenuBarViews;
-using KitbasherEditor.ViewModels.VertexDebugger;
-using KitbasherEditor.Views.EditorViews.VertexDebugger;
-using Shared.Ui.BaseDialogs.WindowHandling;
+using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 
-namespace Editors.KitbasherEditor.UiCommands
+namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
 {
     public class OpenVertexDebuggerCommand : IKitbasherUiCommand
     {
@@ -12,17 +10,17 @@ namespace Editors.KitbasherEditor.UiCommands
         public ActionEnabledRule EnabledRule => ActionEnabledRule.ObjectOrVertexSelected;
         public Hotkey HotKey { get; } = null;
 
-        private readonly IWindowFactory _windowFactory;
+        private readonly IAbstractFormFactory<VertexDebuggerWindow> _windowFactory;
 
-        public OpenVertexDebuggerCommand(IWindowFactory windowFactory)
+        public OpenVertexDebuggerCommand(IAbstractFormFactory<VertexDebuggerWindow> windowFactory)
         {
             _windowFactory = windowFactory;
         }
 
         public void Execute()
         {
-            var window = _windowFactory.Create<VertexDebuggerViewModel, VertexDebuggerView>("Vertex debugger", 1200, 1100);
-            window.ShowWindow();
+            var window = _windowFactory.Create();
+            window.Show();
         }
     }
 }

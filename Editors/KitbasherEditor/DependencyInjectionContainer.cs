@@ -1,4 +1,5 @@
-﻿using Editors.KitbasherEditor.Commands;
+﻿using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
+using Editors.KitbasherEditor.Commands;
 using Editors.KitbasherEditor.EventHandlers;
 using Editors.KitbasherEditor.Services;
 using Editors.KitbasherEditor.UiCommands;
@@ -10,21 +11,18 @@ using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
-using KitbasherEditor.ViewModels;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
-using KitbasherEditor.ViewModels.VertexDebugger;
 using KitbasherEditor.Views;
-using KitbasherEditor.Views.EditorViews.VertexDebugger;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Common.MenuSystem;
 
-namespace KitbasherEditor
+namespace Editors.KitbasherEditor
 {
     public class DependencyInjectionContainer : DependencyContainer
     {
@@ -55,10 +53,12 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<WsMaterialViewModel>();
 
             // Sub tools
-            serviceCollection.AddScoped<VertexDebuggerViewModel>();
-            serviceCollection.AddScoped<VertexDebuggerView>();
             serviceCollection.AddScoped<MeshFitterViewModel>();
             serviceCollection.AddScoped<ReRiggingViewModel>();
+
+            // Vertex debugger
+            serviceCollection.AddScoped<VertexDebuggerViewModel>();
+            RegisterWindow<VertexDebuggerWindow>(serviceCollection);
 
             // Pin tool
             serviceCollection.AddScoped<PinToolViewModel>();
@@ -87,6 +87,8 @@ namespace KitbasherEditor
             serviceCollection.AddTransient<ImportReferenceMeshCommand>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
+
+
 
             // Commands
             serviceCollection.AddTransient<RemapBoneIndexesCommand>();

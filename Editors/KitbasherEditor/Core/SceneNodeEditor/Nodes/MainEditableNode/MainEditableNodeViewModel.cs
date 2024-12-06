@@ -26,7 +26,6 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
         [ObservableProperty] ObservableCollection<string> _skeletonNameList;
         [ObservableProperty] string? _skeletonName;
 
-
         public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene, 
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             RenderEngineComponent renderEngineComponent, 

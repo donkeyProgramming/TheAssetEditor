@@ -1,9 +1,11 @@
 ﻿using Shared.Core.Events;
 using Shared.Ui.Common.MenuSystem;
-using System;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
+    // IScopedKitbasherUiCommand / ITransientKitbasherUiCommand
+
+
     public interface IKitbasherUiCommand : IUiCommand
     {
         public string ToolTip { get; set; }

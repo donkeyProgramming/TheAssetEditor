@@ -1,0 +1,35 @@
+﻿<Window x:Class="Editors.KitbasherEditor.ChildEditors.VertexDebugger.VertexDebuggerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+        xmlns:local="clr-namespace:Editors.KitbasherEditor.ChildEditors.VertexDebugger"
+        mc:Ignorable="d"
+         Style="{StaticResource CustomWindowStyle}"
+        Closing="Window_Closing"
+        Title="Vertex Debugger" Height="1200" Width="1100">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Normal debug scale:"/>
+            <TextBox Width="100" Text="{Binding DebugScale.TextValue, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                <b:Interaction.Behaviors>
+                    <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                </b:Interaction.Behaviors>
+            </TextBox>
+        </StackPanel>
+
+        <DataGrid Grid.Row="1" 
+                 ItemsSource="{Binding VertexList, UpdateSourceTrigger=PropertyChanged}" 
+                 SelectedItem="{Binding SelectedVertex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                 IsReadOnly="True" 
+                 RowBackground="white" 
+                 AlternatingRowBackground="LightBlue"/>
+    </Grid>
+</Window>

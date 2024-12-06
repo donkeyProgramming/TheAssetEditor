@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Input;
+using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
 using Editors.KitbasherEditor.UiCommands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
