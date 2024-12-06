@@ -46,7 +46,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         List<IndexRemapping> _remappingInformation;
         RemappedAnimatedBoneConfiguration _config;
-        AssetEditorWindow<BoneMappingViewModel> _activeBoneMappingWindow;
+        //AssetEditorWindow<BoneMappingViewModel> _activeBoneMappingWindow;
 
         public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
         public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = [];
@@ -199,15 +199,15 @@ namespace AnimationEditor.AnimationTransferTool
                 _config.SkeletonBoneHighlighter = new SkeletonBoneHighlighter(Generated, _copyFrom);
             }
            
-            _activeBoneMappingWindow = _windowFactory.Create<BoneMappingViewModel, BoneMappingView>("Bone-Mapping", 1200, 1100);
-            _activeBoneMappingWindow.TypedContext.Initialize(_activeBoneMappingWindow, _config);
-            var windowResult = _activeBoneMappingWindow.ShowWindow(true);
-            if (windowResult == true)
-            {
-                _remappingInformation = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
-                UpdateAnimation();
-                UpdateBonesAfterMapping(Bones);
-            }
+            //_activeBoneMappingWindow = _windowFactory.Create<BoneMappingViewModel, BoneMappingView>("Bone-Mapping", 1200, 1100);
+            //_activeBoneMappingWindow.TypedContext.Initialize(_activeBoneMappingWindow, _config);
+            //var windowResult = _activeBoneMappingWindow.ShowWindow(true);
+            //if (windowResult == true)
+            //{
+            //    _remappingInformation = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
+            //    UpdateAnimation();
+            //    UpdateBonesAfterMapping(Bones);
+            //}
 
             // TODO
             /* _activeBoneMappingWindow = new BoneMappingWindow(new BoneMappingViewModel(_config), false);
