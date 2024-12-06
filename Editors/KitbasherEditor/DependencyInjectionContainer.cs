@@ -1,5 +1,6 @@
 ﻿using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
 using Editors.KitbasherEditor.Commands;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.EventHandlers;
 using Editors.KitbasherEditor.Services;
 using Editors.KitbasherEditor.UiCommands;
@@ -82,7 +83,8 @@ namespace Editors.KitbasherEditor
             serviceCollection.AddScoped<SkeletonChangedHandler>();
 
             // Commands
-            RegisterAllAsOriginalType<IKitbasherUiCommand>(serviceCollection, ServiceLifetime.Transient);
+            RegisterAllAsOriginalType<ITransientKitbasherUiCommand>(serviceCollection, ServiceLifetime.Transient);
+            RegisterAllAsOriginalType<IScopedKitbasherUiCommand>(serviceCollection, ServiceLifetime.Scoped);
             serviceCollection.AddTransient<CopyTexturesToPackCommand>();
             serviceCollection.AddTransient<ImportReferenceMeshCommand>();
 

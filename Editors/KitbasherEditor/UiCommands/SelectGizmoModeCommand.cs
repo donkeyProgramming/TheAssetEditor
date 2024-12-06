@@ -1,11 +1,12 @@
-﻿using GameWorld.Core.Components.Gizmo;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using GameWorld.Core.Components.Gizmo;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using System.Windows.Input;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    internal class SelectGizmoModeCommand : IKitbasherUiCommand
+    internal class SelectGizmoModeCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Select Gizmo";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
@@ -28,7 +29,7 @@ namespace Editors.KitbasherEditor.UiCommands
         }
     }
 
-    internal class MoveGizmoModeCommand : IKitbasherUiCommand
+    internal class MoveGizmoModeCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Move Gizmo";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
@@ -54,11 +55,11 @@ namespace Editors.KitbasherEditor.UiCommands
 
     }
 
-    internal class RotateGizmoModeCommand : IKitbasherUiCommand
+    internal class RotateGizmoModeCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Rotate Gizmo";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
-        public Hotkey HotKey { get; } = new Hotkey(Key.E, ModifierKeys.None);
+        public Hotkey? HotKey { get; } = new Hotkey(Key.E, ModifierKeys.None);
 
         private readonly GizmoComponent _gizmoComponent;
         private readonly TransformToolViewModel _transformToolViewModel;
@@ -80,11 +81,11 @@ namespace Editors.KitbasherEditor.UiCommands
 
     }
 
-    internal class ScaleGizmoModeCommand : IKitbasherUiCommand
+    internal class ScaleGizmoModeCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Scale Gizmo";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
-        public Hotkey HotKey { get; } = new Hotkey(Key.R, ModifierKeys.None);
+        public Hotkey? HotKey { get; } = new Hotkey(Key.R, ModifierKeys.None);
 
         private readonly GizmoComponent _gizmoComponent;
         private readonly TransformToolViewModel _transformToolViewModel;

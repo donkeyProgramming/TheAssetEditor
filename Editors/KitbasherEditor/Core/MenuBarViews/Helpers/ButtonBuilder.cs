@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Media.Imaging;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews.Helpers

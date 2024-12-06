@@ -1,16 +1,16 @@
-﻿using GameWorld.Core.Components;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class SortMeshesCommand : IKitbasherUiCommand
+    public class SortMeshesCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Sort models by name";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         private readonly SceneManager _sceneManager;
         private readonly ObjectEditor _objectEditor;

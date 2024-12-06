@@ -1,15 +1,15 @@
-﻿using GameWorld.Core.Components;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class DeleteLodsCommand : IKitbasherUiCommand
+    public class DeleteLodsCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Delete all but first lod";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
 
         private readonly SceneManager _sceneManager;

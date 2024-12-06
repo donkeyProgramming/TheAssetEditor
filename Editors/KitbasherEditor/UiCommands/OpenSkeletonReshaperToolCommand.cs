@@ -1,10 +1,10 @@
 ﻿using System.Windows;
 using CommonControls.Editors.BoneMapping.View;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.WindowHandling;
@@ -13,11 +13,11 @@ using Shared.Ui.Editors.BoneMapping;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class OpenSkeletonReshaperToolCommand : IKitbasherUiCommand
+    public class OpenSkeletonReshaperToolCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Open the skeleton modelling tool";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         private readonly SelectionManager _selectionManager;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;

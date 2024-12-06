@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews.Helpers
@@ -16,7 +17,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews.Helpers
         public ObservableCollection<ToolbarItem> Build() => _toolBarItems;
 
 
-        public void CreateToolBarItem<T>(ToolbarItem parent, string name) where T : IKitbasherUiCommand
+        public void CreateToolBarItem<T>(ToolbarItem parent, string name) where T : ITransientKitbasherUiCommand
         {
             parent.Children.Add(new ToolbarItem() { Name = name, Action = GetMenuAction<T>() });
         }
@@ -30,7 +31,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews.Helpers
             return toolBarItem;
         }
 
-        MenuAction GetMenuAction<T>() where T : IKitbasherUiCommand
+        MenuAction GetMenuAction<T>() where T : ITransientKitbasherUiCommand
         {
             return _actionList.First(x => x.Key == typeof(T)).Value;
         }

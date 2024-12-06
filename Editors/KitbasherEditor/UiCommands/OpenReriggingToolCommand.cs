@@ -1,10 +1,10 @@
 ﻿using System.Windows;
 using CommonControls.Editors.BoneMapping.View;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.ViewModels;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.ViewModels.MeshFitter;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.RigidModel;
@@ -15,11 +15,11 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class OpenReriggingToolCommand : IKitbasherUiCommand
+    public class OpenReriggingToolCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Open the re-rigging tool";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly SelectionManager _selectionManager;

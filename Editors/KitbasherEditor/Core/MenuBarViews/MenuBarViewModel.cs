@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Input;
 using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.UiCommands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
@@ -232,7 +233,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _menuItemVisibilityRuleEngine.Validate(action);
         }
 
-        MenuAction GetMenuAction<T>() where T : IKitbasherUiCommand
+        MenuAction GetMenuAction<T>() where T : ITransientKitbasherUiCommand
         {
             return _uiCommands.First(x => x.Key == typeof(T)).Value;
         }

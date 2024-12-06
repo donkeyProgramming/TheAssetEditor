@@ -1,9 +1,9 @@
-﻿using Editors.Shared.Core.Services;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using KitbasherEditor.ViewModels.BmiEditor;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using KitbasherEditor.Views.EditorViews;
 using Shared.Core.PackFiles;
 using Shared.Ui.BaseDialogs.WindowHandling;
@@ -11,11 +11,11 @@ using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class OpenBmiToolCommand : IKitbasherUiCommand
+    public class OpenBmiToolCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Open the Bmi tool";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.OneObjectSelected;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         private readonly IPackFileService _packFileService;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
