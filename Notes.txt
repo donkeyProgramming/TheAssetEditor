@@ -1,12 +1,74 @@
+Bugs:
+	KitbashTool: Saving kitbash scene with name "test" and no folder crashes
+	KitbashTool: Pin tool keeps state after open and close. Also possible to make multiple instances
+	KitbashTool: After adding several items from reference meshes, not possible to create context menu for rest 
+	KitbashTool: Node clicking in tree view is slow
+	KitbashTool: Tint capability crash bug => Shield change to tint
+	KitbashTool: The issue I personally had was that if i created MetalRoughPbr_Emissive once in 0.48, changing the value to Default would still apply Emissive when i loaded the pack in 0.45, so I used the 
+	SkeletonTool: Bones get restructures on delete
+	KitbashTool: I am not sure all I know is that the materials generate in a new way that alters the way the daemon prince parts colour tints look
+	KitbashTool: when loading material - if not supported show message
+	General: But there’s that issue where if you leave and come back after the screen saver turns on then the whole thing goes nuclear lol. (Screen saver issue?)
+	KitbashTool: If texture is not found, infinate error message loop because of null
+	3d: Screen to small - infinate Exception loop
+	KitbashTool: Issues with rendering/selection and pivot point
+	SkeletonTool: Should show the pos/quat/xyz of a given bone 
+	KitbashTool: Rome 2 support https://github.com/donkeyProgramming/TheAssetEditor/issues/174
+	
+Improvements:
+	General: Save Active pack button https://github.com/donkeyProgramming/TheAssetEditor/issues/123
+	KitbashTool: Second UV map on export and render
+	KitbashTool: ship_ambientmap and tiled_dirtmap rigid materials support https://discord.com/channels/373745291289034763/1009267073987399740/threads/1312018739599904778
+	KitbashTool: destruction animations export (non-skeletal) https://discord.com/channels/373745291289034763/1009267073987399740/threads/1312020442441318450
+	General: .CS2.PARSED file format schema https://discord.com/channels/373745291289034763/1009267073987399740/threads/1312014128088350770
+	KitbashTool: When loading textures that are custom, validate that they have MipMaps
+	General: Wem files, load them but hide in tree view. To avoid files go missing on save later.
+	General: Convert GameinformationFactory to a static! 
+	General: Merge UI and shared! 
+	KitbashTool: Improve material system
+		interfaces and registeration and builders
+		Error if material fail, revert to default material 
+		good error logging, case for exception window 
+		Extend Effect and make a better exception if item in list is nto found => GetParameter().SetValue()
+		Do not reuse effect?
+	General: Enums for wsmodel format and shaders, formats ++ in GameinformationFactory
+	General: Warning if loaded packfile/mesh is most likely from a different game. How to detect?
+	General: For custom packs, get size on debug logger 
+	GameWorld: Complex scene loader - dont makes fucking nodes! 
+	GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
+	KitbashTool: MOve most node types into Kitbash tool / reduce number of nodes
+	KitbashTool: PinTool add back mesh rigging
+	General: Show hisotry of commands in exceptions
+	KitbashTool: Max 50 commands, clean up memoery!
+	General: Close console window on close
+	General: Make tree view lazy loading
+	General: Imprive memory use
+	AnimationEditors: Refactor - its bad!		
+		Consider moving wh3 and 3k parsing of anim files into a new system.
+		Clean up the animBin editor - its a mess
+		AnimpackFile to AnimPackDatabase
+		Dont convert to binary when saving file in the way its done now - use generic format somehow?
+	General: Enforce enditable pack can never be ca pack
+	Editors: Only one animation view/logic
+	SuperView: Refactor metatags handling
+	SuperView: Support for more meta tags 
+	General: Support napoleon format
+	KitbashTool: When there is no files left in a reference mesh - close the node 
+	KitbashTool: More materials
+	General: Move resent files out of settings
+	KitbashTool: Orthographic projection
+	
+New features:
+	KitbashTool: Add editor for attachmentpoints for meshes. 
+	AnimationTransferTool: Enable
+	AnimationTransferTool: make work and able to tranfer on root skeleton node
+	General: new update screen
+	KitbashTool: Manual vertex editor for weights 
+	VisualMapEditor: View map
+	VisualMapEditor: Place props
+	Tool for editing prefabs
+	
+	
 Link to cinterbreath
 https://youtu.be/sr8oVx7TkwQ?t=157
 
-
-SkeletonAnimationLookUpHelper - improve loading speed by reusing packfile handle sorted by container - fastMemePack type
-make packfile loading multuthreaded
-MainViewModel - all editor stuff should be moved out! Use events to sync! 
-Enforce enditable pack can never be ca pack
-All report generators should be dependency created!
-Clean up packfile saving
-Refactor materials
-Add editor for attachmentpoints for meshes. 
