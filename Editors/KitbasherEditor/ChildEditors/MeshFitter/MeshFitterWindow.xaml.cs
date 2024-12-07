@@ -1,24 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
 using KitbasherEditor.ViewModels.MeshFitter;
+using WindowHandling;
 
 namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 {
     /// <summary>
     /// Interaction logic for MeshFitterWindow.xaml
     /// </summary>
-    public partial class MeshFitterWindow : Window
+    public partial class MeshFitterWindow : AssetEditorWindow
     {
         public MeshFitterViewModel ViewModel { get; set; }
 

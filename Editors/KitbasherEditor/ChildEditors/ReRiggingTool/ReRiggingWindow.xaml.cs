@@ -1,12 +1,14 @@
 ﻿using System.Windows;
 using KitbasherEditor.ViewModels.MeshFitter;
+using Shared.Ui.Common;
+using WindowHandling;
 
 namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 {
     /// <summary>
     /// Interaction logic for ReRiggingWindow.xaml
     /// </summary>
-    public partial class ReRiggingWindow : Window
+    public partial class ReRiggingWindow : AssetEditorWindow
     {
         public ReRiggingViewModel ViewModel { get; set; }
 

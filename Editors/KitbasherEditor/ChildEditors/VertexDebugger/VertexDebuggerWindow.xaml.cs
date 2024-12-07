@@ -1,12 +1,13 @@
 ﻿using System.Windows;
 using Shared.Core.Services;
+using WindowHandling;
 
 namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
 {
     /// <summary>
     /// Interaction logic for VertexDebuggerWindow.xaml
     /// </summary>
-    public partial class VertexDebuggerWindow : Window
+    public partial class VertexDebuggerWindow : AssetEditorWindow
     {
         private readonly VertexDebuggerViewModel _viewModel;
         private readonly IWpfGame _game;

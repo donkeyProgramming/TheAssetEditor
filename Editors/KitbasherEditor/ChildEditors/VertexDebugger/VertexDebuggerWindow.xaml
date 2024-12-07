@@ -1,4 +1,6 @@
-﻿<Window x:Class="Editors.KitbasherEditor.ChildEditors.VertexDebugger.VertexDebuggerWindow"
+﻿<windowhandling:AssetEditorWindow 
+    xmlns:windowhandling="clr-namespace:WindowHandling;assembly=Shared.Ui"
+    x:Class="Editors.KitbasherEditor.ChildEditors.VertexDebugger.VertexDebuggerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -32,4 +34,4 @@
                  RowBackground="white" 
                  AlternatingRowBackground="LightBlue"/>
     </Grid>
-</Window>
+</windowhandling:AssetEditorWindow>
