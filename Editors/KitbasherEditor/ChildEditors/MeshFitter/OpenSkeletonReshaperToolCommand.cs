@@ -1,19 +1,18 @@
 ﻿using System.Windows;
-using CommonControls.Editors.BoneMapping.View;
+using Editors.KitbasherEditor.ChildEditors.MeshFitter;
 using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels.MeshFitter;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class OpenSkeletonReshaperToolCommand : ITransientKitbasherUiCommand
+    public class OpenSkeletonReshaperToolCommand : IScopedKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Open the skeleton modelling tool";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
@@ -22,15 +21,16 @@ namespace Editors.KitbasherEditor.UiCommands
         private readonly SelectionManager _selectionManager;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IPackFileService _pfs;
-        private readonly IWindowFactory _windowFactory;
+        private readonly IAbstractFormFactory<MeshFitterWindow> _formFactory;
         private readonly SceneManager _sceneManager;
 
-        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IPackFileService pfs, IWindowFactory windowFactory, SceneManager sceneManager)
+        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IPackFileService pfs, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager)
         {
             _selectionManager = selectionManager;
             _skeletonHelper = skeletonHelper;
             _pfs = pfs;
-            _windowFactory = windowFactory;
+            _formFactory = formFactory;
+
             _sceneManager = sceneManager;
         }
 
@@ -79,9 +79,9 @@ namespace Editors.KitbasherEditor.UiCommands
             config.MeshSkeletonName = currentSkeletonName;
             config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes);
 
-            var window = _windowFactory.Create<MeshFitterViewModel, BoneMappingView>("MeshFitter", 1200, 600);
-            window.TypedContext.Initialize(window, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile);
-            window.ShowWindow();
+            var window = _formFactory.Create();
+            window.ViewModel.Initialize(config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile);
+            window.Show();
         }
     }
 }

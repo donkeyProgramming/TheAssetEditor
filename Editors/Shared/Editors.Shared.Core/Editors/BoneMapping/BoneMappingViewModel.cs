@@ -1,15 +1,13 @@
-﻿using System.Linq;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
 using Shared.Core.Misc;
-using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common;
 
 namespace Shared.Ui.Editors.BoneMapping
 {
     public class BoneMappingViewModel : NotifyPropertyChangedImpl
     {
-        protected IAssetEditorWindow _parentWindow;
+       // protected IAssetEditorWindow _parentWindow;
         protected RemappedAnimatedBoneConfiguration _configuration;
 
         public FilterCollection<AnimatedBone> MeshBones { get; set; }
@@ -28,9 +26,9 @@ namespace Shared.Ui.Editors.BoneMapping
             OnlyShowUsedBones = new NotifyAttr<bool>(true, (x) => MeshBones.RefreshFilter());
         }
 
-        public void Initialize(IAssetEditorWindow parentWindow, RemappedAnimatedBoneConfiguration configuration)
+        public void Initialize(/*IAssetEditorWindow parentWindow,*/ RemappedAnimatedBoneConfiguration configuration)
         {
-            _parentWindow = parentWindow;
+            //_parentWindow = parentWindow;
             _configuration = configuration;
             CreateFromConfiguration(_configuration);
 
@@ -162,23 +160,24 @@ namespace Shared.Ui.Editors.BoneMapping
             ApplyChanges();
         }
 
-        public void OnOkButton()
+        public bool OnOkButton()
         {
             var res = Validate(out var errorText);
             if (res == false)
             {
                 var messageBoxResult = MessageBox.Show("Are you sure you want to do this?\n\n" + errorText + "\n\nContinue?", "Error", MessageBoxButton.OKCancel);
                 if (messageBoxResult == MessageBoxResult.Cancel)
-                    return;
+                    return false;
             }
 
             ApplyChanges();
-            _parentWindow.CloseWindow();
+            //_parentWindow.CloseWindow();
+            return true;
         }
 
         public void OnCancelButton()
         {
-            _parentWindow.CloseWindow();
+           // _parentWindow.CloseWindow();
         }
 
         protected virtual void ApplyChanges()

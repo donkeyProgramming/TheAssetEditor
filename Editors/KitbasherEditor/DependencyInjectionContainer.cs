@@ -1,4 +1,5 @@
-﻿using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
+﻿using Editors.KitbasherEditor.ChildEditors.MeshFitter;
+using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
 using Editors.KitbasherEditor.Commands;
 using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.EventHandlers;
@@ -53,10 +54,14 @@ namespace Editors.KitbasherEditor
             serviceCollection.AddTransient<WeightedMaterialViewModel>();
             serviceCollection.AddTransient<WsMaterialViewModel>();
 
-            // Sub tools
-            serviceCollection.AddScoped<MeshFitterViewModel>();
-            serviceCollection.AddScoped<ReRiggingViewModel>();
+            // Mesh fitter
+            RegisterWindow<MeshFitterWindow>(serviceCollection);
+            serviceCollection.AddTransient<MeshFitterViewModel>();
 
+            // Re-Rigging
+            serviceCollection.AddTransient<ReRiggingViewModel>();
+            RegisterWindow<ReRiggingWindow>(serviceCollection);
+            
             // Vertex debugger
             serviceCollection.AddScoped<VertexDebuggerViewModel>();
             RegisterWindow<VertexDebuggerWindow>(serviceCollection);

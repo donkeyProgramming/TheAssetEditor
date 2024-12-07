@@ -7,7 +7,6 @@ using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
 using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands;
 using Shared.Ui.BaseDialogs.StandardDialog;
 using Shared.Ui.BaseDialogs.ToolSelector;
-using Shared.Ui.BaseDialogs.WindowHandling;
 
 namespace Shared.Ui
 {
@@ -19,17 +18,9 @@ namespace Shared.Ui
 
         public override void Register(IServiceCollection services)
         {
-            services.AddTransient<IWindowFactory, WindowFactory>();
-
-
             // Implement required interfaces
             services.AddScoped<IStandardDialogs, StandardDialogs>();
             services.AddTransient<IToolSelectorUiProvider, ToolSelectorUiProvider>();
-
-
-
-
-
 
             services.AddScoped<PackFileTreeViewFactory>();
 

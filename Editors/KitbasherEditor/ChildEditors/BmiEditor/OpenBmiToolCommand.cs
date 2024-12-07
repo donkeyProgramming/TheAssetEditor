@@ -1,12 +1,7 @@
 ﻿using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.Shared.Core.Services;
-using GameWorld.Core.Animation;
 using GameWorld.Core.Components.Selection;
-using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels.BmiEditor;
-using KitbasherEditor.Views.EditorViews;
 using Shared.Core.PackFiles;
-using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
@@ -20,14 +15,12 @@ namespace Editors.KitbasherEditor.UiCommands
         private readonly IPackFileService _packFileService;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly SelectionManager _selectionManager;
-        private readonly IWindowFactory _windowFactory;
 
-        public OpenBmiToolCommand(IPackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, SelectionManager selectionManager, IWindowFactory windowFactory)
+        public OpenBmiToolCommand(IPackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, SelectionManager selectionManager)
         {
             _packFileService = packFileService;
             _skeletonHelper = skeletonHelper;
             _selectionManager = selectionManager;
-            _windowFactory = windowFactory;
         }
 
         public void Execute()

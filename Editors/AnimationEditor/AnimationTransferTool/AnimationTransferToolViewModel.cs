@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using CommonControls.Editors.BoneMapping.View;
 using CommonControls.SelectionListDialog;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
@@ -19,7 +18,6 @@ using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
 using Shared.Ui.BaseDialogs.SelectionListDialog;
-using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common;
 using Shared.Ui.Editors.BoneMapping;
 
@@ -33,7 +31,6 @@ namespace AnimationEditor.AnimationTransferTool
 
         private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
         private readonly SceneObjectEditor _assetViewModelBuilder;
-        private readonly IWindowFactory _windowFactory;
         private readonly IFileSaveService _packFileSaveService;
         private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
         private readonly IPackFileService _pfs;
@@ -63,12 +60,10 @@ namespace AnimationEditor.AnimationTransferTool
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
             SceneObjectEditor assetViewModelBuilder,
-            IWindowFactory windowFactory,
             IFileSaveService packFileSaveService)
         {
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
             _assetViewModelBuilder = assetViewModelBuilder;
-            _windowFactory = windowFactory;
             _packFileSaveService = packFileSaveService;
      
             _pfs = pfs;

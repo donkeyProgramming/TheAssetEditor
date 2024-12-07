@@ -3,7 +3,7 @@ using Editors.KitbasherEditor.ViewModels.PinTool;
 using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 
-namespace Editors.KitbasherEditor.UiCommands
+namespace Editors.KitbasherEditor.ChildEditors.PinTool
 {
     public class OpenPinToolCommand : ITransientKitbasherUiCommand
     {

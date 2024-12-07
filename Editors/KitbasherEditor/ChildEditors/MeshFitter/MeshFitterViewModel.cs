@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
-using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Editors.BoneMapping;
 
 namespace KitbasherEditor.ViewModels.MeshFitter
@@ -43,11 +42,11 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _sceneManager = sceneManager;
         }
 
-        public void Initialize(IAssetEditorWindow ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile)
+        public void Initialize(RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile)
         {
             ShowApplyButton.Value = false;
             ShowTransformSection.Value = true;
-            Initialize(ownerWindow, configuration);
+            Initialize(configuration);
 
             _meshNodes = meshNodes;
             _targetSkeleton = targetSkeleton;
