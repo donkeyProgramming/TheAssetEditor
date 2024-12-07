@@ -10,7 +10,7 @@ using Shared.GameFormats.RigidModel;
 using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace Editors.KitbasherEditor.UiCommands
+namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
 {
     public class OpenReriggingToolCommand : IScopedKitbasherUiCommand
     {
@@ -25,6 +25,8 @@ namespace Editors.KitbasherEditor.UiCommands
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IAbstractFormFactory<ReRiggingWindow> _formFactory;
 
+        ReRiggingWindow? _windowHandle;
+
         public OpenReriggingToolCommand(IStandardDialogs standardDialogs, KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<ReRiggingWindow> formFactory)
         {
             _standardDialogs = standardDialogs;
@@ -33,10 +35,16 @@ namespace Editors.KitbasherEditor.UiCommands
 
             _skeletonHelper = skeletonHelper;
             _formFactory = formFactory;
-   
+
         }
         public void Execute()
         {
+            if (_windowHandle != null)
+            {
+                _windowHandle.BringIntoView();
+                return;
+            }
+
             var targetSkeletonName = _kitbasherRootScene.Skeleton.SkeletonName;
             var state = _selectionManager.GetState<ObjectSelectionState>();
 
@@ -100,9 +108,24 @@ namespace Editors.KitbasherEditor.UiCommands
             if (targetSkeletonName == selectedMeshSkeleton)
                 _standardDialogs.ShowDialogBox("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error");
 
-            var window = _formFactory.Create();
-            window.ViewModel.Initialize(selectedMeshes, config);
-            window.Show();
+            _windowHandle = _formFactory.Create();
+            _windowHandle.ViewModel.Initialize(selectedMeshes, config);
+            _windowHandle.Show();
+            _windowHandle.Closed += OnWindowClosed;
+        }
+
+        private void OnWindowClosed(object? sender, EventArgs e)
+        {
+            if (_windowHandle != null)
+                _windowHandle.Closed -= OnWindowClosed;
+
+            _windowHandle = null;
+        }
+
+        public void Dispose()
+        {
+            _windowHandle?.Close();
+            _windowHandle = null;
         }
     }
 }

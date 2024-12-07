@@ -3,7 +3,7 @@ using GameWorld.Core.Commands;
 using GameWorld.Core.SceneNodes;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace KitbasherEditor.ViewModels.MeshFitter
+namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
 {
     public class ReRiggingViewModel : BoneMappingViewModel
     {

@@ -1,4 +1,5 @@
 ﻿using Editors.KitbasherEditor.ChildEditors.MeshFitter;
+using Editors.KitbasherEditor.ChildEditors.ReRiggingTool;
 using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
 using Editors.KitbasherEditor.Commands;
 using Editors.KitbasherEditor.Core.MenuBarViews;
@@ -14,7 +15,6 @@ using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews;
 using Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2;
 using Editors.KitbasherEditor.ViewModels.SceneNodeEditor;
 using KitbasherEditor.ViewModels.MenuBarViews;
-using KitbasherEditor.ViewModels.MeshFitter;
 using KitbasherEditor.ViewModels.SaveDialog;
 using KitbasherEditor.ViewModels.SceneExplorerNodeViews;
 using KitbasherEditor.Views;

@@ -1,18 +1,16 @@
 ﻿using System.Windows;
-using Editors.KitbasherEditor.ChildEditors.MeshFitter;
 using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.Misc;
-using Shared.Core.PackFiles;
 using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace Editors.KitbasherEditor.UiCommands
+namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 {
-    public class OpenSkeletonReshaperToolCommand : IScopedKitbasherUiCommand
+    public class OpenSkeletonReshaperToolCommand : IScopedKitbasherUiCommand, IDisposable
     {
         public string ToolTip { get; set; } = "Open the skeleton modelling tool";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
@@ -20,15 +18,15 @@ namespace Editors.KitbasherEditor.UiCommands
 
         private readonly SelectionManager _selectionManager;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
-        private readonly IPackFileService _pfs;
         private readonly IAbstractFormFactory<MeshFitterWindow> _formFactory;
         private readonly SceneManager _sceneManager;
 
-        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IPackFileService pfs, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager)
+        MeshFitterWindow? _windowHandle;
+
+        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager)
         {
             _selectionManager = selectionManager;
             _skeletonHelper = skeletonHelper;
-            _pfs = pfs;
             _formFactory = formFactory;
 
             _sceneManager = sceneManager;
@@ -36,12 +34,16 @@ namespace Editors.KitbasherEditor.UiCommands
 
         public void Execute()
         {
-            var state = _selectionManager.GetState<ObjectSelectionState>();
-            Create(state.CurrentSelection());
-        }
+            if (_windowHandle != null)
+            {
+                _windowHandle.BringIntoView();
+                return;
+            }
 
-        void Create(List<ISelectable> meshesToFit)
-        {
+            var meshesToFit = _selectionManager
+                .GetState<ObjectSelectionState>()
+                .CurrentSelection();
+
             var meshNodes = meshesToFit
                 .Where(x => x is Rmv2MeshNode)
                 .Select(x => x as Rmv2MeshNode)
@@ -79,9 +81,25 @@ namespace Editors.KitbasherEditor.UiCommands
             config.MeshSkeletonName = currentSkeletonName;
             config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes);
 
-            var window = _formFactory.Create();
-            window.ViewModel.Initialize(config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile);
-            window.Show();
+            _windowHandle = _formFactory.Create();
+            _windowHandle.ViewModel.Initialize(config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile);
+            _windowHandle.Show();
+
+            _windowHandle.Closed += OnWindowClosed;
+        }
+
+        private void OnWindowClosed(object? sender, EventArgs e)
+        {
+            if (_windowHandle != null)
+                _windowHandle.Closed -= OnWindowClosed;
+
+            _windowHandle = null;
+        }
+
+        public void Dispose()
+        {
+            _windowHandle?.Close();
+            _windowHandle = null;
         }
     }
 }

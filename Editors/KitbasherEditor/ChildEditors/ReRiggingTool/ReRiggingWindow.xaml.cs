@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using KitbasherEditor.ViewModels.MeshFitter;
+using Editors.KitbasherEditor.ChildEditors.ReRiggingTool;
 using Shared.Ui.Common;
 using WindowHandling;
 

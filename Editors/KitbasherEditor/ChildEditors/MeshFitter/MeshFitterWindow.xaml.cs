@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using KitbasherEditor.ViewModels.MeshFitter;
 using WindowHandling;
 
 namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
