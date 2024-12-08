@@ -12,8 +12,8 @@ using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.Common;
-using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {

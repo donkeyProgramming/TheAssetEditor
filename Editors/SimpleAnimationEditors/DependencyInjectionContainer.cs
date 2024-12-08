@@ -3,6 +3,7 @@ using CommonControls.Editors.AnimationFilePreviewEditor;
 using CommonControls.Editors.AnimationPack;
 using CommonControls.Editors.CampaignAnimBin;
 using CommonControls.Editors.TextEditor;
+using Editors.AnimationTextEditors.AnimationBatchExporter;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
@@ -28,23 +29,23 @@ namespace Editors.AnimationTextEditors
         {
             EditorInfoBuilder
                 .Create<AnimPackViewModel, AnimationPackView>(EditorEnums.AnimationPack_Editor)
-                .AddExtention(".animpack", EditorPriorites.High)
+                .AddExtension(".animpack", EditorPriorites.High)
                 .Build(database);
 
             EditorInfoBuilder
                 .Create<TextEditorViewModel<CampaignAnimBinToXmlConverter>, TextEditorView>(EditorEnums.XML_CampaginBin_Edtior)
-                .AddExtention(".bin", EditorPriorites.High)
+                .AddExtension(".bin", EditorPriorites.High)
                 .ValidForFoldersContaining(@"animations\campaign\database")
                 .Build(database);
         
             EditorInfoBuilder
                 .Create<TextEditorViewModel<AnimFileToTextConverter>, TextEditorView>(EditorEnums.XML_Anim_Editor)
-                .AddExtention(".anim", EditorPriorites.Default)
+                .AddExtension(".anim", EditorPriorites.Default)
                 .Build(database);
 
             EditorInfoBuilder
                 .Create<TextEditorViewModel<InvMatrixToTextConverter>, TextEditorView>(EditorEnums.XML_InvBoneEditor)
-                .AddExtention(".bone_inv_trans_mats", EditorPriorites.Default)
+                .AddExtension(".bone_inv_trans_mats", EditorPriorites.Default)
                 .Build(database);
 
 

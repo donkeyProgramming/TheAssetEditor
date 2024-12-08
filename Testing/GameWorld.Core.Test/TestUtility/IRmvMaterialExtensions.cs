@@ -4,7 +4,7 @@ using Shared.GameFormats.RigidModel.Types;
 
 namespace GameWorld.Core.Test.TestUtility
 {
-    public static class IRmvMaterialExtentions
+    public static class IRmvMaterialExtensions
     {
         public static IRmvMaterial AssignMaterials(this IRmvMaterial material, TextureType[] texturesToAssign)
         {

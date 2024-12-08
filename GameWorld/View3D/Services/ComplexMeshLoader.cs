@@ -12,7 +12,6 @@ using Shared.GameFormats.Vmd;
 using Shared.GameFormats.WsModel;
 using static Shared.GameFormats.Vmd.VariantMeshDefinition;
 
-
 namespace GameWorld.Core.Services
 {
     public class ComplexMeshLoader
@@ -46,7 +45,7 @@ namespace GameWorld.Core.Services
 
                 _logger.Here().Information($"Attempting to load file {file.Name}");
 
-                switch (file.Extention)
+                switch (file.Extension)
                 {
                     case ".variantmeshdefinition":
                         LoadVariantMesh(file, ref parent, player, attachmentPointName, onlyLoadRootNode);
@@ -60,7 +59,7 @@ namespace GameWorld.Core.Services
                         LoadWsModel(file, ref parent, player, attachmentPointName, onlyLoadRootNode);
                         break;
                     default:
-                        throw new Exception("Unknown mesh extention");
+                        throw new Exception("Unknown mesh extension");
                 }
 
                 return parent;

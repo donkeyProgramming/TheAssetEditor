@@ -26,7 +26,7 @@ namespace Editors.Audio.Compiler
             _compilerService = compilerService;
             _packFileUiProvider = packFileUiProvider;
             var audioProjectFiles = PackFileServiceUtility.FindAllFilesInDirectory(pfs, "audioprojects")
-                .Where(x => x.Extention.ToLower() == ".json");
+                .Where(x => x.Extension.ToLower() == ".json");
 
             if (audioProjectFiles.Any())
                 ProjectFilePath.Value = pfs.GetFullPath(audioProjectFiles.First());

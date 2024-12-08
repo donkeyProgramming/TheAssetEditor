@@ -4,8 +4,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using Shared.Core.Misc;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     public class SearchFilter : NotifyPropertyChangedImpl, IDataErrorInfo
     {
@@ -26,6 +27,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         }
 
         List<string> _extentionFilter;
+        List<string> _extensionFilter;
         public int AutoExapandResultsAfterLimitedCount { get; set; } = 25;
 
         public SearchFilter(ObservableCollection<TreeNode> nodes)
@@ -76,9 +78,9 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             return count;
         }
 
-        public void SetExtentions(List<string> extentions)
+        public void SetExtensions(List<string> extensions)
         {
-            _extentionFilter = extentions;
+            _extensionFilter = extensions;
             Filter(FilterText);
         }
 
@@ -92,21 +94,21 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
             if (file.GetNodeType() == NodeType.File)
             {
-                var hasValidExtention = true;
-                if (_extentionFilter != null)
+                var hasValidExtension = true;
+                if (_extensionFilter != null)
                 {
-                    hasValidExtention = false;
-                    foreach (var extention in _extentionFilter)
+                    hasValidExtension = false;
+                    foreach (var extension in _extensionFilter)
                     {
-                        if (file.Name.Contains(extention))
+                        if (file.Name.Contains(extension))
                         {
-                            hasValidExtention = true;
+                            hasValidExtension = true;
                             continue;
                         }
                     }
                 }
 
-                if (hasValidExtention)
+                if (hasValidExtension)
                 {
                     if (expression.IsMatch(file.Name))
                     {

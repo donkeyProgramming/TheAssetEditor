@@ -1,5 +1,4 @@
-﻿using AnimationEditor.MountAnimationCreator;
-using Editors.Shared.Core.Common.BaseControl;
+﻿using Editors.Shared.Core.Common.BaseControl;
 using Shared.Core.DevConfig;
 using Shared.Core.PackFiles;
 using Shared.Core.Settings;
