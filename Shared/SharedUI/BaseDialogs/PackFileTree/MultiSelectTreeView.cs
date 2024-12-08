@@ -7,8 +7,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     public class MultiSelectTreeView : TreeView
     {
