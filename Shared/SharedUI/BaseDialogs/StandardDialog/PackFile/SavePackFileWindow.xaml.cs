@@ -21,19 +21,19 @@ namespace CommonControls.PackFileBrowser
         public string CurrentFileName { get => _currentFileName; set { _currentFileName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentFileName")); SelectedFile = null; } }
         IPackFileService _packfileService;
 
-
         public string FilePath { get; private set; }
+
         public SavePackFileWindow(IPackFileService packfileService, PackFileTreeViewFactory packFileBrowserBuilder)
         {
             _packfileService = packfileService;
-            ViewModel = packFileBrowserBuilder.Create(ContextMenuType.Simple, false);
+            ViewModel = packFileBrowserBuilder.Create(ContextMenuType.Simple, showCaFiles:false, showFoldersOnly:false, useEditablePackOnly:false);
             ViewModel.FileOpen += ViewModel_FileOpen;
-            ViewModel.NodeSelected += ViewModel_FileSelected;
+            ViewModel.NodeSelected += ViewModel_NodeSelected;
             InitializeComponent();
             DataContext = this;
         }
 
-        private void ViewModel_FileSelected(TreeNode node)
+        private void ViewModel_NodeSelected(TreeNode node)
         {
             _selectedNode = node;
 
@@ -103,7 +103,7 @@ namespace CommonControls.PackFileBrowser
         public void Dispose()
         {
             ViewModel.FileOpen -= ViewModel_FileOpen;
-            ViewModel.NodeSelected -= ViewModel_FileSelected;
+            ViewModel.NodeSelected -= ViewModel_NodeSelected;
             ViewModel.Dispose();
             ViewModel = null;
             DataContext = null;
