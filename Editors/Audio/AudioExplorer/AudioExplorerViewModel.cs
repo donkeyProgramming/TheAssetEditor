@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -111,8 +110,7 @@ namespace Editors.Audio.AudioExplorer
             var regex = new Regex(@"(\d+)\.wem");
             var match = regex.Match(nodeDisplayName);
             var sourceId = match.Groups[1].Value;
-
-            _soundPlayer.PlaySound(sourceId, TreeList.First().Item.Id);
+            _soundPlayer.ConvertWemToWav(sourceId);
         }
 
         public void LoadHircFromIdAction()
