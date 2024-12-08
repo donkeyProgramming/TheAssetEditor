@@ -2,15 +2,13 @@
 using System.IO;
 using System.Linq;
 using Editors.Audio.Utility;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using static Editors.Audio.Utility.WWiseWavToWem;
 
 namespace Editors.Audio.BnkCompiler
 {
-    using Microsoft.Xna.Framework.Media;
-    using Shared.Core.ErrorHandling;
-    using Shared.Core.Misc;
-    using Shared.Core.PackFiles;
-    using static Editors.Audio.Utility.WWiseWavToWem;
-
     public class AudioFileImporter
     {
         private readonly IPackFileService _pfs;
@@ -67,7 +65,6 @@ namespace Editors.Audio.BnkCompiler
             // Load
             var createdFiles = PackFileUtil.LoadFilesFromDisk(_pfs, new PackFileUtil.FileRef(wemPath, GetExpectedFolder(compilerData), $"{hashName}.wem"));
             sound.FilePath = _pfs.GetFullPath(createdFiles.First());
-
             return Result<bool>.FromOk(true);
         }
 
@@ -76,7 +73,6 @@ namespace Editors.Audio.BnkCompiler
             var basePath = "audio\\wwise";
             if (string.IsNullOrEmpty(compilerData.ProjectSettings.Language) == false)
                 basePath += $"\\{compilerData.ProjectSettings.Language}";
-
             return basePath;
         }
     }
