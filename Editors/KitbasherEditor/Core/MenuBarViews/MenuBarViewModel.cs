@@ -16,6 +16,10 @@ using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
+
+
+
+
     public class MenuBarViewModel : IKeyboardHandler
     {
         public ObservableCollection<ToolbarItem> MenuItems { get; set; } = new ObservableCollection<ToolbarItem>();
@@ -44,6 +48,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             eventHub.Register<CommandStackChangedEvent>(this, OnUndoStackChanged);
             eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
+
         }
 
         void RegisterActions()
@@ -53,6 +58,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             RegisterUiCommand<BrowseForReferenceCommand>();
             RegisterUiCommand<ImportGeneralReferenceCommand>();
+            RegisterUiCommand<ImportKarlHammerReferenceCommand>();
             
             RegisterUiCommand<DeleteLodsCommand>();    
             RegisterUiCommand<UndoCommand>();
@@ -101,10 +107,10 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateToolBarItem<SaveAsCommand>(fileToolbar, "Save As");
             builder.CreateToolBarSeparator(fileToolbar);
             builder.CreateToolBarItem<BrowseForReferenceCommand>(fileToolbar, "Import Reference model");
-            
 
             var debugToolbar = builder.CreateRootToolBar("Debug");
             builder.CreateToolBarItem<ImportGeneralReferenceCommand>(debugToolbar, "Import General");
+            builder.CreateToolBarItem<ImportKarlHammerReferenceCommand>(debugToolbar, "Import Hammer");
             builder.CreateToolBarItem<DeleteLodsCommand>(debugToolbar, "Delete lods");
 
             var toolsToolbar = builder.CreateRootToolBar("Tools");

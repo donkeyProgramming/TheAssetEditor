@@ -65,6 +65,7 @@ namespace Shared.Ui.Common.Behaviors
                 if (command != null && command.CanExecute(item.DataContext))
                 {
                     command.Execute(commandParameter);
+                    e.Handled = true;
                 }
             }
         }

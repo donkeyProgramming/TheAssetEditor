@@ -92,4 +92,13 @@ namespace Editors.KitbasherEditor.UiCommands
             ToolTip = "Import General as Reference";
         }
     }
+
+    public class ImportKarlHammerReferenceCommand : BaseImportReferenceCommand
+    {
+        public ImportKarlHammerReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
+        {
+            _filePath = @"variantmeshes\wh_variantmodels\hu1\emp\emp_props\emp_karl_franz_hammer_2h_01.wsmodel";
+            ToolTip = "Import Hammer as Reference";
+        }
+    }
 }
