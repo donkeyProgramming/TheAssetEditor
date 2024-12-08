@@ -1,15 +1,15 @@
 ﻿using System.IO;
 using System.Linq;
 using CommunityToolkit.Diagnostics;
+using Editors.Audio.BnkCompiler.ObjectGeneration;
+using Editors.Audio.Storage;
 using Shared.Core.ErrorHandling;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Dat;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Bkhd;
 using Shared.GameFormats.WWise.Hirc;
-using Shared.Core.PackFiles;
-using Editors.Audio.BnkCompiler.ObjectGeneration;
-using Editors.Audio.Storage;
 
 namespace Editors.Audio.BnkCompiler
 {
@@ -44,7 +44,7 @@ namespace Editors.Audio.BnkCompiler
 
             // Ensure all write ids are not causing conflicts.
             var allIds = hircChunk.Hircs.Select(x => x.Id).ToList();
-            var originalCount = allIds.Count();
+            var originalCount = allIds.Count;
             var uniqueCount = allIds.Distinct().Count();
             Guard.IsEqualTo(originalCount, uniqueCount);
 
@@ -63,7 +63,7 @@ namespace Editors.Audio.BnkCompiler
             return Result<CompileResult>.FromOk(compileResult);
         }
 
-        private PackFile ConvertToPackFile(BkhdHeader header, HircChunk hircChunk, string outputFile)
+        private static PackFile ConvertToPackFile(BkhdHeader header, HircChunk hircChunk, string outputFile)
         {
             var outputName = $"{outputFile}.bnk";
             var headerBytes = BkhdParser.GetAsByteArray(header);
@@ -78,8 +78,7 @@ namespace Editors.Audio.BnkCompiler
             // Convert to output and parse for sanity
             var bnkPackFile = new PackFile(outputName, new MemorySource(bytes));
             var parser = new BnkParser();
-            var result = parser.Parse(bnkPackFile, "test\\fakefilename.bnk");
-
+            var reparsedSanityFile = parser.Parse(bnkPackFile, "test\\fakefilename.bnk");
             return bnkPackFile;
         }
 

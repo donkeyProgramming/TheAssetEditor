@@ -1,11 +1,11 @@
-﻿using Editors.Audio.AudioExplorer;
+﻿using System;
+using System.IO;
+using System.Linq;
+using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;
 using Shared.GameFormats.WWise.Hirc.V136;
-using System;
-using System.IO;
-using System.Linq;
 
 namespace Editors.Audio.Utility
 {
@@ -28,21 +28,17 @@ namespace Editors.Audio.Utility
             var dialogEvents = allHircItems.OfType<ICADialogEvent>();
 
             foreach (var dialogEvent in dialogEvents)
-            {
                 PrintDialogEventInfo(dialogEvent);
-            }
         }
 
-        private void PrintDialogEventInfo(ICADialogEvent dialogEvent)
+        private void PrintDialogEventInfo(ICADialogEvent dialogueEvent)
         {
-            var hircItem = dialogEvent as HircItem; // Assuming HircItem is the base type with an Id
-            if (hircItem == null)
-            {
+            // Assuming HircItem is the base type with an Id
+            if (dialogueEvent is not HircItem hircItem)
                 throw new InvalidCastException("dialogEvent is not a HircItem.");
-            }
 
             var helper = new DecisionPathHelper(_repository);
-            var paths = helper.GetDecisionPaths(dialogEvent);
+            var paths = helper.GetDecisionPaths(dialogueEvent);
 
             // Splitting the string by '.' and enclosing each part in quotes
             var splitPaths = paths.Header.GetAsString().Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)
@@ -58,7 +54,6 @@ namespace Editors.Audio.Utility
             Console.WriteLine(info);
             var filePath = @"C:\Users\george\Desktop\dialogue_events_state_groups.txt";
             File.AppendAllText(filePath, info + Environment.NewLine);
-
         }
     }
 
@@ -159,16 +154,10 @@ namespace Editors.Audio.Utility
                    .ToList();
 
                 foreach (var normalSwitch in normalSwitches)
-                {
                     if (normalSwitch.ulGroupID == stateGroupId)
                         ProcessNext(normalSwitch.Id, actionTreeNode);
-                }
             }
-            else
-            {
-
-                ProcessNext(childId, actionTreeNode);
-            }
+            else ProcessNext(childId, actionTreeNode);
         }
 
         private void ProcessSound(HircItem item, HircTreeItem parent)
@@ -269,11 +258,9 @@ namespace Editors.Audio.Utility
             var node = new HircTreeItem() { DisplayName = $"Music Rand Container", Item = item };
             parent.Children.Add(node);
 
-            if (hirc.pPlayList.Any())
-            {
+            if (hirc.pPlayList.Count != 0)
                 foreach (var playList in hirc.pPlayList.First().pPlayList)
                     ProcessNext(playList.SegmentID, node);
-            }
         }
     }
 }

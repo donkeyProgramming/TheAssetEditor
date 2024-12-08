@@ -1,13 +1,12 @@
-﻿using CommunityToolkit.Diagnostics;
-using Shared.Core.PackFiles;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CommunityToolkit.Diagnostics;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Shared.Core.PackFiles;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc.V136;
-using Editors.Audio.BnkCompiler;
-using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -60,7 +59,6 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
             // Applying attenuation directly to sounds is necessary as they don't appear to use the vanilla mixer's attenuation even though they're being routed through it.
             var attenuationId = inputSound.Attenuation;
-
             if (attenuationId != 0)
             {
                 wwiseSound.NodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle()
@@ -73,7 +71,6 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             }
 
             wwiseSound.UpdateSize();
-
             return wwiseSound;
         }
 

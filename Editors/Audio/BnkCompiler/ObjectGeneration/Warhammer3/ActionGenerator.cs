@@ -1,10 +1,9 @@
-﻿using CommunityToolkit.Diagnostics;
-using System;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc.V136;
-using Editors.Audio.BnkCompiler;
+﻿using System;
+using CommunityToolkit.Diagnostics;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Editors.Audio.Utility;
+using Shared.GameFormats.WWise;
+using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -29,8 +28,8 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseAction.idExt = inputAction.ChildId;
             wwiseAction.AkPlayActionParams.byBitVector = 0x04;
             wwiseAction.AkPlayActionParams.bankId = WwiseHash.Compute(project.ProjectSettings.BnkName);
+            
             wwiseAction.UpdateSize();
-
             return wwiseAction;
         }
     }

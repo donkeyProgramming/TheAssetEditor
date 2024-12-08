@@ -1,10 +1,10 @@
-﻿using CommunityToolkit.Diagnostics;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using CommunityToolkit.Diagnostics;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc.V136;
-using System.Collections.Generic;
-using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -20,7 +20,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return ConvertToWWise(typedProjectItem, project);
         }
 
-        public CAkRanSeqCntr_v136 ConvertToWWise(RandomContainer inputContainer, CompilerData project)
+        public static CAkRanSeqCntr_v136 ConvertToWWise(RandomContainer inputContainer, CompilerData project)
         {
             var wwiseRandomContainer = new CAkRanSeqCntr_v136();
             wwiseRandomContainer.Id = inputContainer.Id;
@@ -37,7 +37,6 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseRandomContainer.AkPlaylist = allChildIds.Select(CreateAkPlaylistItem).ToList();
 
             wwiseRandomContainer.UpdateSize();
-
             return wwiseRandomContainer;
         }
 

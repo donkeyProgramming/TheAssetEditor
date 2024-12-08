@@ -16,12 +16,12 @@ namespace Editors.Audio.BnkCompiler
 
     public class CompilerService
     {
-        ILogger _logger = Logging.Create<CompilerService>();
+        readonly ILogger _logger = Logging.Create<CompilerService>();
 
-        ProjectLoader _loader;
-        Compiler _compiler;
-        ResultHandler _resultHandler;
-        AudioFileImporter _audioFileImporter;
+        readonly ProjectLoader _loader;
+        readonly Compiler _compiler;
+        readonly ResultHandler _resultHandler;
+        readonly AudioFileImporter _audioFileImporter;
 
         public CompilerService(ProjectLoader loader, AudioFileImporter audioFileImporter, Compiler compiler, ResultHandler resultHandler)
         {

@@ -1,5 +1,5 @@
-﻿using Shared.Core.Misc;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using Shared.Core.Misc;
 
 namespace Editors.Audio.Utility
 {
@@ -13,14 +13,13 @@ namespace Editors.Audio.Utility
                 DirectoryHelper.OpenFolderAndSelectFile(bnkSystemFilePath);
         }
 
-        public static void ExecuteCommand(string Command)
+        public static void ExecuteCommand(string command)
         {
-            var processInfo = new ProcessStartInfo("cmd.exe", "/K " + Command)
+            var processInfo = new ProcessStartInfo("cmd.exe", "/K " + command)
             {
                 CreateNoWindow = true,
                 UseShellExecute = true,
             };
-
             using var process = Process.Start(processInfo);
         }
     }

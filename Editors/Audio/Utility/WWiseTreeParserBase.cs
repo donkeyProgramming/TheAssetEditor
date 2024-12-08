@@ -1,11 +1,11 @@
-﻿using Editors.Audio.AudioExplorer;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.WWise;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Editors.Audio.Utility
 {
@@ -43,30 +43,24 @@ namespace Editors.Audio.Utility
             var rootNode = BuildHierarchy(item);
 
             var flatList = GetHircParents(rootNode);
-            //flatList.Reverse();
             return flatList;
         }
 
-        List<HircTreeItem> GetHircParents(HircTreeItem root)
+        private static List<HircTreeItem> GetHircParents(HircTreeItem root)
         {
             var childData = new List<HircTreeItem>();
             if (root.Children != null)
-            {
                 foreach (var child in root.Children)
                     childData.AddRange(GetHircParents(child));
-            }
 
             childData.Add(root);
             return childData;
         }
 
-
-        void ProcessHircObject(HircItem item, HircTreeItem parent)
+        private void ProcessHircObject(HircItem item, HircTreeItem parent)
         {
             if (_hircProcessChildMap.TryGetValue(item.Type, out var func))
-            {
                 func(item, parent);
-            }
             else
             {
                 var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.Type} for Id {item.Id} in {item.OwnerFile}", Item = item };
@@ -109,10 +103,9 @@ namespace Editors.Audio.Utility
 
         protected string GetDisplayId(HircItem item, bool hidenNameIfMissing) => GetDisplayId(item.Id, item.OwnerFile, hidenNameIfMissing);
 
-        protected Wanted GetAsType<Wanted>(HircItem instance) where Wanted : class
+        protected static Wanted GetAsType<Wanted>(HircItem instance) where Wanted : class
         {
-            var wanted = instance as Wanted;
-            if (wanted == null)
+            if (instance is not Wanted wanted)
                 throw new Exception($"HircItem with ID {instance.Id} is of type {instance.GetType().Name} and cannot be converted to {typeof(Wanted).Name}.");
             return wanted;
         }

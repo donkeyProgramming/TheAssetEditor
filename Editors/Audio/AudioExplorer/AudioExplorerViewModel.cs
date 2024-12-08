@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -135,7 +134,7 @@ namespace Editors.Audio.AudioExplorer
                 }
 
                 var foundHircs = _audioRepository.GetHircObject(hircId);
-                if (foundHircs.Count() == 0)
+                if (foundHircs.Count == 0)
                 {
                     MessageBox.Show($"No hircs found with id {hircId}");
                     return;

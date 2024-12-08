@@ -1,11 +1,10 @@
-﻿using Editors.Audio.Storage;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Editors.Audio.Storage;
 using Shared.GameFormats.WWise.Hirc;
 using Shared.GameFormats.WWise.Hirc.Shared;
 using Shared.GameFormats.WWise.Hirc.V136;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 namespace Editors.Audio.Utility
 {
@@ -23,7 +22,6 @@ namespace Editors.Audio.Utility
         {
             public List<DecisionPathItem> Items { get; set; } = new List<DecisionPathItem>();
             public uint ChildNodeId { get; set; }
-
             public string GetAsString(string separator = ".") => string.Join(separator, Items.Select(x => x.DisplayName));
         }
 
@@ -41,7 +39,7 @@ namespace Editors.Audio.Utility
         public DecisionPathCollection GetDecisionPaths(ICADialogEvent dialogEvent) => GetDecisionPaths(dialogEvent.AkDecisionTree, dialogEvent.ArgumentList);
         public DecisionPathCollection GetDecisionPaths(CAkMusicSwitchCntr_v136 musicSwitch) => GetDecisionPaths(musicSwitch.AkDecisionTree, musicSwitch.ArgumentList);
 
-        DecisionPathCollection GetDecisionPaths(AkDecisionTree decisionTree, ArgumentList argumentsList)
+        private DecisionPathCollection GetDecisionPaths(AkDecisionTree decisionTree, ArgumentList argumentsList)
         {
             var paths = GetDecisionPaths(decisionTree);
             var decisionPath = new List<DecisionPath>();
@@ -75,7 +73,7 @@ namespace Editors.Audio.Utility
             return decisionPathCollection;
         }
 
-        List<(AkDecisionTree.Node[], uint)> GetDecisionPaths(AkDecisionTree decisionTree)
+        private static List<(AkDecisionTree.Node[], uint)> GetDecisionPaths(AkDecisionTree decisionTree)
         {
             var decisionPaths = new List<(AkDecisionTree.Node[], uint)>();
             var stack = new Stack<AkDecisionTree.Node>();
@@ -85,7 +83,7 @@ namespace Editors.Audio.Utility
             return decisionPaths;
         }
 
-        void GetDecisionPathsInternal(Stack<AkDecisionTree.Node> stack, List<(AkDecisionTree.Node[], uint)> decisionPaths)
+        static void GetDecisionPathsInternal(Stack<AkDecisionTree.Node> stack, List<(AkDecisionTree.Node[], uint)> decisionPaths)
         {
             var peek = stack.Peek();
             if (peek.IsAudioNode())
