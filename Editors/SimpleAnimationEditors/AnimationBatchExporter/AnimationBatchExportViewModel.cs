@@ -12,7 +12,7 @@ using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Common;
 
-namespace CommonControls.Editors.AnimationBatchExporter
+namespace Editors.AnimationTextEditors.AnimationBatchExporter
 {
     public class AnimationBatchExportViewModel : IEditorInterface
     {
@@ -27,7 +27,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
         public string DisplayName { get; set; } = "Animation Batch Exporter";
 
-     
+
 
         public AnimationBatchExportViewModel(IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
@@ -66,7 +66,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
                     _logger.Here().Information($"Processing packfile container {packfile.Name}");
 
-                    var animFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".anim", packfile.Container);
+                    var animFiles = PackFileServiceUtility.FindAllWithExtension(_pfs, ".anim", packfile.Container);
 
                     _logger.Here().Information($"Converting animations {animFiles.Count}");
                     var convertedAnimFiles = ConvertAnimFiles(animFiles, SelectedOutputFormat.Value, errorList);
@@ -78,7 +78,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
                     _pfs.AddFilesToPack(_pfs.GetEditablePack(), filesToAdd);
 
                     _logger.Here().Information($"Saving inv matix files");
-                    var invMatrixFileList = PackFileServiceUtility.FindAllWithExtention(_pfs, ".bone_inv_trans_mats", packfile.Container);
+                    var invMatrixFileList = PackFileServiceUtility.FindAllWithExtension(_pfs, ".bone_inv_trans_mats", packfile.Container);
                     foreach (var invMatrixFile in invMatrixFileList)
                         _pfs.CopyFileFromOtherPackFile(packfile.Container, _pfs.GetFullPath(invMatrixFile), _pfs.GetEditablePack());
                 }
@@ -119,7 +119,6 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
         public void Close()
         {
-     
         }
 
         public class PackFileListItem

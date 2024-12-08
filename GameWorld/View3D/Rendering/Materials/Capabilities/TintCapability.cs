@@ -10,8 +10,7 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
-
-    public static class EffectExtentions
+    public static class EffectExtensions
     {
         public static EffectParameter GetParameter(this Effect effect, string parameterName)
         {

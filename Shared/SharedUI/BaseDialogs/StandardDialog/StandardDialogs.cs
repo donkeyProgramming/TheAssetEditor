@@ -8,7 +8,7 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.Common.Exceptions;
 
 namespace Shared.Ui.BaseDialogs.StandardDialog
@@ -29,7 +29,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
         public SaveDialogResult DisplaySaveDialog(IPackFileService remove, List<string> extensions)
         {
             using var browser = new SavePackFileWindow(_pfs, _packFileBrowserBuilder);
-            browser.ViewModel.Filter.SetExtentions(extensions);
+            browser.ViewModel.Filter.SetExtensions(extensions);
 
             if (browser.ShowDialog() == true)
                 return new SaveDialogResult(true, browser.SelectedFile, browser.FilePath);

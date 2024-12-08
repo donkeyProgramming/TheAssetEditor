@@ -105,9 +105,9 @@ namespace Editors.KitbasherEditor
         {
             EditorInfoBuilder
                 .Create<KitbasherViewModel, KitbasherView>(EditorEnums.Kitbash_Editor)
-                .AddExtention(".rigid_model_v2", EditorPriorites.High)
-                //.AddExtention(".variantmeshdefinition", 0)
-                .AddExtention(".wsmodel", EditorPriorites.High)
+                .AddExtension(".rigid_model_v2", EditorPriorites.High)
+                //.AddExtension(".variantmeshdefinition", 0)
+                .AddExtension(".wsmodel", EditorPriorites.High)
                 .Build(factory);
         }
     }

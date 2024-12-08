@@ -2,7 +2,7 @@
 {
     public class EditorInfo
     {
-        public record ExtentionInfo(string Extention, int Priority);
+        public record ExtensionInfo(string Extension, int Priority);
 
         public EditorInfo(EditorEnums editorEnum, Type view, Type viewModel)
         {
@@ -10,7 +10,7 @@
             View = view;
             ViewModel = viewModel;
         }
-        public List<ExtentionInfo> Extensions { get; set; } = new List<ExtentionInfo>();
+        public List<ExtensionInfo> Extensions { get; set; } = new List<ExtensionInfo>();
         public List<string> FolderRules { get; set; } = new List<string>();
         public string ToolbarName { get; set; } = "";
         public bool AddToolbarButton { get; set; } = false;
@@ -46,11 +46,10 @@
             return this;
         }
 
-        public EditorInfoBuilder AddExtention(string extention, int priority)
+        public EditorInfoBuilder AddExtension(string extension, int priority)
         {
             // Ensure type is IFileEditor
-
-            _instance.Extensions.Add(new EditorInfo.ExtentionInfo(extention.Trim().ToLower(), priority));
+            _instance.Extensions.Add(new EditorInfo.ExtensionInfo(extension.Trim().ToLower(), priority));
             return this;
         }
 

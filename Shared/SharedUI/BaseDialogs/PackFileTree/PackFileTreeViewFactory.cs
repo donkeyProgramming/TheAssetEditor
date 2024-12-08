@@ -1,8 +1,9 @@
 ﻿using Shared.Core.Events;
 using Shared.Core.PackFiles;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     public class PackFileTreeViewFactory
     {

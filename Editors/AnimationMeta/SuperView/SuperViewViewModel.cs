@@ -39,7 +39,8 @@ namespace Editors.AnimationMeta.SuperView
             IEditorHostParameters editorHostParameters)
             : base(editorHostParameters)
         {
-            DisplayName = "Super view";
+            DisplayName = "Super View";
+
             _packFileService = packFileService;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _eventHub = eventHub;
@@ -58,7 +59,7 @@ namespace Editors.AnimationMeta.SuperView
             else if (evnt.FileOwner == MetaEditor)
                 _sceneObjectBuilder.SetMetaFile(_asset.Data, newFile, _asset.Data.PersistMetaData);
             else
-                throw new Exception($"Unable to determine file owner when reciving a file save event in SuperView. Owner:{evnt.FileOwner}, File:{evnt.NewPath}");
+                throw new Exception($"Unable to determine file owner when receiving a file save event in SuperView. Owner:{evnt.FileOwner}, File:{evnt.NewPath}");
         }
 
         void Initialize()

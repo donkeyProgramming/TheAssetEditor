@@ -1,9 +1,8 @@
-﻿using Shared.Core.Events;
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 
-namespace Shared.Ui.Events.UiCommands
+namespace Shared.Core.Events.Global
 {
     public class OpenEditorCommand : IUiCommand
     {
@@ -36,7 +35,7 @@ namespace Shared.Ui.Events.UiCommands
             window.ShowDialog();
         }
 
-        public void ExecuteAsWindow(EditorEnums preferedEditor,  int width, int heigh)
+        public void ExecuteAsWindow(EditorEnums preferedEditor, int width, int heigh)
         {
             var window = _editorCreator.CreateWindow(null, preferedEditor);
             window.Width = width;

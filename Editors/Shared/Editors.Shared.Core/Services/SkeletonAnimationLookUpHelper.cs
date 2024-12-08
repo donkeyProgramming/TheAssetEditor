@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using Serilog;
-using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
@@ -63,7 +62,7 @@ namespace Editors.Shared.Core.Services
             List<string> skeletonFileNameList = [];
             Dictionary<string, List<AnimationReference>> animationList = [];
 
-            var allAnimations = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_packFileService, ".anim", packFileContainer);
+            var allAnimations = PackFileServiceUtility.FindAllWithExtensionIncludePaths(_packFileService, ".anim", packFileContainer);
 
             // Split animations in to two categories.
             var allAnimsInSavedPackedFiles = new List<(string FullPath, PackedFileSource DataSource)>();
