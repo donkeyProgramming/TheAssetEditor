@@ -1,37 +1,74 @@
-﻿using System.Text;
+﻿using System.ComponentModel.Design.Serialization;
+using System.Text;
+using Shared.Core.Services;
 
 namespace Shared.TestUtility
 {
     public static class PathHelper
     {
-        public static string File(string fileName)
+        /// <summary>
+        /// Find the "AssetEditor" folder from the test directory and return the path to the file
+        /// Probably superior to the hardcoded path in the original code
+        /// </summary>        
+        public static string GetDataFolder(string fileName, string rootDir = "TheAssetEditor", string subDir = "Data")
         {
-            var fullPath = Path.GetFullPath(@"..\..\..\..\..\Data\" + fileName);
+            var currentDirectory = TestContext.CurrentContext.TestDirectory;
+            if (string.IsNullOrEmpty(currentDirectory))
+                return "";
+
+            while (true)
+            {
+                var fileNameOnly = Path.GetFileName(currentDirectory); // get last foldername
+                if (string.IsNullOrEmpty(fileNameOnly))
+                    return "";
+
+                if (fileNameOnly.ToLower() == rootDir.ToLower())
+                    break;
+
+                currentDirectory = Path.GetDirectoryName(currentDirectory); // go one folder UP
+                if (string.IsNullOrEmpty(currentDirectory))  // reached root, nothing foun              
+                    return "";
+            }
+
+            var fullPath = currentDirectory + $@"\{subDir}\" + fileName;
+
+            if (Directory.Exists(fullPath) == false)
+                throw new Exception($"Unable to find data directory {fullPath}");
+
+            return fullPath;
+        }
+
+        public static string GetDataFile(string fileName, string rootDir = "TheAssetEditor", string subDir = "Data")
+        {
+            var currentDirectory = TestContext.CurrentContext.TestDirectory;
+            if (string.IsNullOrEmpty(currentDirectory))
+                return "";
+
+            while (true)
+            {
+                var fileNameOnly = Path.GetFileName(currentDirectory); // get last foldername
+                if (string.IsNullOrEmpty(fileNameOnly))
+                    return "";
+
+                if (fileNameOnly.ToLower() == rootDir.ToLower())
+                    break;
+
+                currentDirectory = Path.GetDirectoryName(currentDirectory); // go one folder UP
+                if (string.IsNullOrEmpty(currentDirectory))  // reached root, nothing foun              
+                    return "";
+            }
+
+            var fullPath = currentDirectory + $@"\{subDir}\" + fileName;
+
             if (System.IO.File.Exists(fullPath) == false)
                 throw new Exception($"Unable to find data file {fileName}");
+
             return fullPath;
         }
-
-        public static string Folder(string fileName)
-        {
-            var fullPath = Path.GetFullPath(@"..\..\..\..\..\Data\" + fileName);
-            if (Directory.Exists(fullPath) == false)
-                throw new Exception($"Unable to find data directory {fullPath}");
-            return fullPath;
-        }
-
-        public static string Folder2(string fileName)
-        {
-            var fullPath = Path.GetFullPath(@"..\..\..\..\..\..\Data\" + fileName);
-            if (Directory.Exists(fullPath) == false)
-                throw new Exception($"Unable to find data directory {fullPath}");
-            return fullPath;
-        }
-
 
         public static byte[] GetFileAsBytes(string path)
         {
-            var fullPath = File(path);
+            var fullPath = GetDataFile(path);
             var bytes = System.IO.File.ReadAllBytes(fullPath);
             return bytes; ;
         }

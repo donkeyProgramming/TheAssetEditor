@@ -28,7 +28,7 @@ namespace Editors.ImportExport.Importing
             if (string.IsNullOrEmpty(glftFilePath))
                 return;
 
-            var settings = new GltfImporterSettings(glftFilePath, true, clickedNode);
+            var settings = new GltfImporterSettings(glftFilePath, clickedNode.GetFullPath(), clickedNode.FileOwner, true, true, true);
             _importer.Import(settings);
         }
 

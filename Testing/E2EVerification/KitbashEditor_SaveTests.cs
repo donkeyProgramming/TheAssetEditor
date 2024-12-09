@@ -13,7 +13,7 @@ namespace E2EVerification
 {
     public class KitbashEditor_SaveTests
     {
-        private readonly string _inputPackFileKarl = PathHelper.File("Karl_and_celestialgeneral.pack");
+        private readonly string _inputPackFileKarl = PathHelper.GetDataFile("Karl_and_celestialgeneral.pack");
         private readonly string _rmvFilePathKarl = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2";
         private readonly string _wsFilePathKarl = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.wsmodel";
 
@@ -123,7 +123,7 @@ namespace E2EVerification
         public void Rome2_LoadAndSaveDirtHelmet()
         {
             var runner = new AssetEditorTestRunner(GameTypeEnum.Rome_2);
-            var outputPackFile = runner.LoadFolderPackFile(PathHelper.Folder("Rome_Man_And_Shield_Pack"), true);
+            var outputPackFile = runner.LoadFolderPackFile(PathHelper.GetDataFolder("Rome_Man_And_Shield_Pack"), true);
 
             // Load the a rmv2 and open the kitbash editor
             var meshPath = "variantmeshes/_variantmodels/man/helmets/carthaginian_pylos.rigid_model_v2";
@@ -157,7 +157,7 @@ namespace E2EVerification
         public void Rome2_LoadAndSaveDirtAndDecalShield()
         {
             var runner = new AssetEditorTestRunner(GameTypeEnum.Rome_2);
-            var outputPackFile = runner.LoadFolderPackFile(PathHelper.Folder("Rome_Man_And_Shield_Pack"), true);
+            var outputPackFile = runner.LoadFolderPackFile(PathHelper.GetDataFolder(("Rome_Man_And_Shield_Pack")));
 
             // Load the a rmv2 and open the kitbash editor
             var meshPath = "variantmeshes/_variantmodels/man/shield/celtic_oval_shield_a.rigid_model_v2";
