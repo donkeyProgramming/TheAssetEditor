@@ -52,7 +52,7 @@ namespace Shared.Core.PackFiles
 
         public static List<PackFile> GetAllAnimPacks(IPackFileService pfs)
         {
-            var animPacks = FindAllWithExtention(pfs, @".animpack");
+            var animPacks = FindAllWithExtension(pfs, @".animpack");
             var itemsToRemove = animPacks.Where(x => pfs.GetFullPath(x).Contains("animation_culture_packs", StringComparison.InvariantCultureIgnoreCase)).ToList();
             foreach (var item in itemsToRemove)
                 animPacks.Remove(item);
@@ -61,15 +61,15 @@ namespace Shared.Core.PackFiles
         }
 
 
-        public static List<PackFile> FindAllWithExtention(IPackFileService pfs, string extention, PackFileContainer? packFileContainer = null)
+        public static List<PackFile> FindAllWithExtension(IPackFileService pfs, string extension, PackFileContainer? packFileContainer = null)
         {
-            return FindAllWithExtentionIncludePaths(pfs, extention, packFileContainer).Select(x => x.Item2).ToList();
+            return FindAllWithExtensionIncludePaths(pfs, extension, packFileContainer).Select(x => x.Item2).ToList();
         }
 
 
-        public static List<(string FileName, PackFile Pack)> FindAllWithExtentionIncludePaths(IPackFileService pfs, string extention, PackFileContainer? packFileContainer = null)
+        public static List<(string FileName, PackFile Pack)> FindAllWithExtensionIncludePaths(IPackFileService pfs, string extension, PackFileContainer? packFileContainer = null)
         {
-            extention = extention.ToLower();
+            extension = extension.ToLower();
             var output = new List<ValueTuple<string, PackFile>>();
             if (packFileContainer == null)
             {
@@ -77,8 +77,8 @@ namespace Shared.Core.PackFiles
                 {
                     foreach (var file in pf.FileList)
                     {
-                        var fileExtention = Path.GetExtension(file.Key);
-                        if (fileExtention == extention)
+                        var fileExtension = Path.GetExtension(file.Key);
+                        if (fileExtension == extension)
                             output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value));
                     }
                 }
@@ -87,8 +87,8 @@ namespace Shared.Core.PackFiles
             {
                 foreach (var file in packFileContainer.FileList)
                 {
-                    var fileExtention = Path.GetExtension(file.Key);
-                    if (fileExtention == extention)
+                    var fileExtension = Path.GetExtension(file.Key);
+                    if (fileExtension == extension)
                         output.Add(new ValueTuple<string, PackFile>(file.Key, file.Value));
                 }
             }

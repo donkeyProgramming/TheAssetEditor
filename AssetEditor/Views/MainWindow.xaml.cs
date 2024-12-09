@@ -5,9 +5,9 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using AssetEditor.WindowsTitleMenu;
-using CommonControls.PackFileBrowser;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
+using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.Common;
 
 namespace AssetEditor.Views

@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using CommonControls.Editors.BoneMapping.View;
 using CommonControls.SelectionListDialog;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
@@ -19,7 +18,6 @@ using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
 using Shared.Ui.BaseDialogs.SelectionListDialog;
-using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common;
 using Shared.Ui.Editors.BoneMapping;
 
@@ -33,7 +31,6 @@ namespace AnimationEditor.AnimationTransferTool
 
         private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
         private readonly SceneObjectEditor _assetViewModelBuilder;
-        private readonly IWindowFactory _windowFactory;
         private readonly IFileSaveService _packFileSaveService;
         private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
         private readonly IPackFileService _pfs;
@@ -46,7 +43,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         List<IndexRemapping> _remappingInformation;
         RemappedAnimatedBoneConfiguration _config;
-        AssetEditorWindow<BoneMappingViewModel> _activeBoneMappingWindow;
+        //AssetEditorWindow<BoneMappingViewModel> _activeBoneMappingWindow;
 
         public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
         public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = [];
@@ -63,12 +60,10 @@ namespace AnimationEditor.AnimationTransferTool
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
             SceneObjectEditor assetViewModelBuilder,
-            IWindowFactory windowFactory,
             IFileSaveService packFileSaveService)
         {
             _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
             _assetViewModelBuilder = assetViewModelBuilder;
-            _windowFactory = windowFactory;
             _packFileSaveService = packFileSaveService;
      
             _pfs = pfs;
@@ -199,15 +194,15 @@ namespace AnimationEditor.AnimationTransferTool
                 _config.SkeletonBoneHighlighter = new SkeletonBoneHighlighter(Generated, _copyFrom);
             }
            
-            _activeBoneMappingWindow = _windowFactory.Create<BoneMappingViewModel, BoneMappingView>("Bone-Mapping", 1200, 1100);
-            _activeBoneMappingWindow.TypedContext.Initialize(_activeBoneMappingWindow, _config);
-            var windowResult = _activeBoneMappingWindow.ShowWindow(true);
-            if (windowResult == true)
-            {
-                _remappingInformation = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
-                UpdateAnimation();
-                UpdateBonesAfterMapping(Bones);
-            }
+            //_activeBoneMappingWindow = _windowFactory.Create<BoneMappingViewModel, BoneMappingView>("Bone-Mapping", 1200, 1100);
+            //_activeBoneMappingWindow.TypedContext.Initialize(_activeBoneMappingWindow, _config);
+            //var windowResult = _activeBoneMappingWindow.ShowWindow(true);
+            //if (windowResult == true)
+            //{
+            //    _remappingInformation = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
+            //    UpdateAnimation();
+            //    UpdateBonesAfterMapping(Bones);
+            //}
 
             // TODO
             /* _activeBoneMappingWindow = new BoneMappingWindow(new BoneMappingViewModel(_config), false);

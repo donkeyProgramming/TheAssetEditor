@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.MountAnimationCreator.Services;
-using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using Shared.Core.ErrorHandling;
@@ -12,6 +11,7 @@ using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
 using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
+using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
 using static Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry;
 
 namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services

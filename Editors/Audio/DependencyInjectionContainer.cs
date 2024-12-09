@@ -30,7 +30,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerView>();
             serviceCollection.AddScoped<CompilerViewModel>();
 
-            serviceCollection.AddTransient<AudioEditorSettingsView>();
+            RegisterWindow<AudioEditorSettingsWindow>(serviceCollection);
             serviceCollection.AddScoped<AudioEditorSettingsViewModel>();
             serviceCollection.AddScoped<AudioEditorViewModel>();
 

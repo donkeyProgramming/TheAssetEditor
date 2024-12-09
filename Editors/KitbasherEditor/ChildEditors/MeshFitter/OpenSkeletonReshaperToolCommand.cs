@@ -1,47 +1,49 @@
 ﻿using System.Windows;
-using CommonControls.Editors.BoneMapping.View;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels.MenuBarViews;
-using KitbasherEditor.ViewModels.MeshFitter;
-using Shared.Core.PackFiles;
-using Shared.Ui.BaseDialogs.WindowHandling;
+using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace Editors.KitbasherEditor.UiCommands
+namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 {
-    public class OpenSkeletonReshaperToolCommand : IKitbasherUiCommand
+    public class OpenSkeletonReshaperToolCommand : IScopedKitbasherUiCommand, IDisposable
     {
         public string ToolTip { get; set; } = "Open the skeleton modelling tool";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         private readonly SelectionManager _selectionManager;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
-        private readonly IPackFileService _pfs;
-        private readonly IWindowFactory _windowFactory;
+        private readonly IAbstractFormFactory<MeshFitterWindow> _formFactory;
         private readonly SceneManager _sceneManager;
 
-        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IPackFileService pfs, IWindowFactory windowFactory, SceneManager sceneManager)
+        MeshFitterWindow? _windowHandle;
+
+        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager)
         {
             _selectionManager = selectionManager;
             _skeletonHelper = skeletonHelper;
-            _pfs = pfs;
-            _windowFactory = windowFactory;
+            _formFactory = formFactory;
+
             _sceneManager = sceneManager;
         }
 
         public void Execute()
         {
-            var state = _selectionManager.GetState<ObjectSelectionState>();
-            Create(state.CurrentSelection());
-        }
+            if (_windowHandle != null)
+            {
+                _windowHandle.BringIntoView();
+                return;
+            }
 
-        void Create(List<ISelectable> meshesToFit)
-        {
+            var meshesToFit = _selectionManager
+                .GetState<ObjectSelectionState>()
+                .CurrentSelection();
+
             var meshNodes = meshesToFit
                 .Where(x => x is Rmv2MeshNode)
                 .Select(x => x as Rmv2MeshNode)
@@ -79,9 +81,25 @@ namespace Editors.KitbasherEditor.UiCommands
             config.MeshSkeletonName = currentSkeletonName;
             config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(currentSkeletonFile, usedBoneIndexes);
 
-            var window = _windowFactory.Create<MeshFitterViewModel, BoneMappingView>("MeshFitter", 1200, 600);
-            window.TypedContext.Initialize(window, config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile);
-            window.ShowWindow();
+            _windowHandle = _formFactory.Create();
+            _windowHandle.ViewModel.Initialize(config, meshNodes, targetSkeleton.Skeleton, currentSkeletonFile);
+            _windowHandle.Show();
+
+            _windowHandle.Closed += OnWindowClosed;
+        }
+
+        private void OnWindowClosed(object? sender, EventArgs e)
+        {
+            if (_windowHandle != null)
+                _windowHandle.Closed -= OnWindowClosed;
+
+            _windowHandle = null;
+        }
+
+        public void Dispose()
+        {
+            _windowHandle?.Close();
+            _windowHandle = null;
         }
     }
 }

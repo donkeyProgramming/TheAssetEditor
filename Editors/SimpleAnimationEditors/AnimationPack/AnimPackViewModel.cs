@@ -2,7 +2,7 @@
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using CommonControls.BaseDialogs;
+using Shared.Ui.BaseDialogs.StandardDialog.Text;
 using CommonControls.Editors.AnimationPack.Converters;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Shared.Core.Services;

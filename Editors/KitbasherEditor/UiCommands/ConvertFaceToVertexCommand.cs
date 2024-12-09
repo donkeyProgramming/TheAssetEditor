@@ -1,15 +1,15 @@
-﻿using GameWorld.Core.Components.Selection;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class ConvertFaceToVertexCommand : IKitbasherUiCommand
+    public class ConvertFaceToVertexCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Convert selected faces to vertexes";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.FaceSelected;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         private readonly FaceEditor _faceEditor;
         private readonly SelectionManager _selectionManager;

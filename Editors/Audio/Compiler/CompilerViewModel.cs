@@ -6,7 +6,7 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.ErrorListDialog;
+using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
 
 namespace Editors.Audio.Compiler
 {
@@ -26,7 +26,7 @@ namespace Editors.Audio.Compiler
             _compilerService = compilerService;
             _packFileUiProvider = packFileUiProvider;
             var audioProjectFiles = PackFileServiceUtility.FindAllFilesInDirectory(pfs, "audioprojects")
-                .Where(x => x.Extention.ToLower() == ".json");
+                .Where(x => x.Extension.ToLower() == ".json");
 
             if (audioProjectFiles.Any())
                 ProjectFilePath.Value = pfs.GetFullPath(audioProjectFiles.First());

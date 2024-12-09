@@ -1,4 +1,4 @@
-﻿using Shared.Ui.BaseDialogs.PackFileBrowser;
+﻿using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.Common;
 using System;
 using System.Windows;

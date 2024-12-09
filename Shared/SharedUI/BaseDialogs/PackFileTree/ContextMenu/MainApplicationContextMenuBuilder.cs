@@ -1,8 +1,9 @@
 ﻿using Shared.Core.Events;
 using Shared.Core.PackFiles;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 {
     public class MainApplicationContextMenuBuilder : ContextMenuBuilder
     {
@@ -18,8 +19,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
             var nodeType = selectedNode.GetNodeType();
             switch (nodeType)
             {
-                case NodeType.File: 
-                    CreateForFile(rootNode, selectedNode); 
+                case NodeType.File:
+                    CreateForFile(rootNode, selectedNode);
                     break;
                 case NodeType.Root:
                     CreateForDirectory(rootNode, selectedNode);
@@ -73,8 +74,8 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
             }
 
             if (_packFileService.GetEditablePack() != selectedNode.FileOwner)
-                 Add<CopyToEditablePackCommand>(selectedNode, rootNode);
-            
+                Add<CopyToEditablePackCommand>(selectedNode, rootNode);
+
             if (!selectedNode.FileOwner.IsCaPackFile)
             {
                 var importFolder = AddChildMenu("Import", rootNode);

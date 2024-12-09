@@ -1,6 +1,4 @@
-﻿using Shared.Core.Misc;
-
-namespace Shared.Core.PackFiles.Models
+﻿namespace Shared.Core.PackFiles.Models
 {
     public class PackFile
     {
@@ -16,7 +14,7 @@ namespace Shared.Core.PackFiles.Models
         public string Name { get; set; }
 
         public override string ToString() => Name;
-        public string Extention { get => Path.GetExtension(Name); }
+        public string Extension { get => Path.GetExtension(Name); }
 
 
         public static PackFile CreateFromBytes(string fileName, byte[] bytes) => new(fileName, new MemorySource(bytes));

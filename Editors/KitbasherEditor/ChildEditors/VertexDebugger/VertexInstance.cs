@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace KitbasherEditor.ViewModels.VertexDebugger
+namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
 {
 
     public class VertexInstance

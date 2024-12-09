@@ -1,12 +1,11 @@
 ﻿using Editors.KitbasherEditor.Commands;
 using GameWorld.Core.Commands;
 using GameWorld.Core.SceneNodes;
-using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace KitbasherEditor.ViewModels.MeshFitter
+namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
 {
-    internal class ReRiggingViewModel : BoneMappingViewModel
+    public class ReRiggingViewModel : BoneMappingViewModel
     {
         private readonly CommandFactory _commandFactory;
         private List<Rmv2MeshNode> _selectedMeshes;
@@ -16,10 +15,10 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _commandFactory = commandFactory;
         }
 
-        internal void Initialize(List<Rmv2MeshNode> selectedMeshes, ITypedAssetEditorWindow<ReRiggingViewModel> window, RemappedAnimatedBoneConfiguration config)
+        public void Initialize(List<Rmv2MeshNode> selectedMeshes, RemappedAnimatedBoneConfiguration config)
         {
             _selectedMeshes = selectedMeshes;
-            Initialize(window, config);
+            Initialize(config);
         }
 
         protected override void ApplyChanges()

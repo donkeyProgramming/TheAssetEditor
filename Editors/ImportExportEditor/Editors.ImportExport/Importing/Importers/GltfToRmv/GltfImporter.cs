@@ -1,4 +1,4 @@
-﻿using Shared.Core.PackFiles.Models;
+using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 using SharpGLTF.Schema2;
 using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;

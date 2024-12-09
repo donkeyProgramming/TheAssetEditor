@@ -1,5 +1,5 @@
-﻿using Editors.KitbasherEditor.Services;
-using KitbasherEditor.ViewModels.MenuBarViews;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using Editors.KitbasherEditor.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -8,14 +8,14 @@ using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class BrowseForReferenceCommand : IKitbasherUiCommand
+    public class BrowseForReferenceCommand : ITransientKitbasherUiCommand
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly IStandardDialogs _packFileUiProvider;
 
         public string ToolTip { get; set; } = "Import Reference model";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         public BrowseForReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IStandardDialogs packFileUiProvider)
         {
@@ -31,7 +31,7 @@ namespace Editors.KitbasherEditor.UiCommands
         }
     }
 
-    public abstract class BaseImportReferenceCommand : IKitbasherUiCommand
+    public abstract class BaseImportReferenceCommand : ITransientKitbasherUiCommand
     {
         private readonly KitbashSceneCreator _kitbashSceneCreator;
         private readonly IPackFileService _packFileService;
@@ -90,6 +90,15 @@ namespace Editors.KitbasherEditor.UiCommands
         {
             _filePath = @"variantmeshes\wh_variantmodels\hu1e\cth\cth_celestial_general\cth_celestial_general_body_02.wsmodel";
             ToolTip = "Import General as Reference";
+        }
+    }
+
+    public class ImportKarlHammerReferenceCommand : BaseImportReferenceCommand
+    {
+        public ImportKarlHammerReferenceCommand(KitbashSceneCreator kitbashSceneCreator, IPackFileService packFileService) : base(kitbashSceneCreator, packFileService)
+        {
+            _filePath = @"variantmeshes\wh_variantmodels\hu1\emp\emp_props\emp_karl_franz_hammer_2h_01.wsmodel";
+            ToolTip = "Import Hammer as Reference";
         }
     }
 }

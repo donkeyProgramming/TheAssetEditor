@@ -1,16 +1,16 @@
 ﻿using System.Windows.Input;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class ExpandFaceSelectionCommand : IKitbasherUiCommand
+    public class ExpandFaceSelectionCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Grow selection";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.FaceSelected;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         private readonly FaceEditor _faceEditor;
         private readonly SelectionManager _selectionManager;

@@ -1,8 +1,8 @@
-﻿using Editors.KitbasherEditor.ViewModels.SaveDialog;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services.SceneSaving;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 
@@ -39,11 +39,11 @@ namespace Editors.KitbasherEditor.UiCommands
         }
     }
 
-    public class SaveCommand : SaveCommandBase, IKitbasherUiCommand
+    public class SaveCommand : SaveCommandBase, ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Save";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         public SaveCommand(GeometrySaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory)
             : base(settings, sceneManager, saveService, saveWindowFactory)
@@ -53,11 +53,11 @@ namespace Editors.KitbasherEditor.UiCommands
         public void Execute() => Save(false);
     }
 
-    public class SaveAsCommand : SaveCommandBase, IKitbasherUiCommand
+    public class SaveAsCommand : SaveCommandBase, ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "SaveAs";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         public SaveAsCommand(GeometrySaveSettings settings, SceneManager sceneManager, SaveService saveService, IAbstractFormFactory<SaveDialogWindow> saveWindowFactory)
             : base(settings, sceneManager, saveService, saveWindowFactory)

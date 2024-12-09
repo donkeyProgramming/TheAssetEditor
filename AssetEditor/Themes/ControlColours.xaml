@@ -53,17 +53,17 @@
     <SolidColorBrush x:Key="ComboBox.Disabled.Editable.Button.Border"      Color="Transparent"/>
     <SolidColorBrush x:Key="ComboBox.Static.Glyph"                         Color="{DynamicResource AColour.Glyph.Static}"/>
 
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewHover.Background"           Color="{DynamicResource AColour.Tone5.Background.MouseOver}"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewHover.Border"               Color="{DynamicResource AColour.Tone5.Border.MouseOver}"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewSelected.Background"        Color="{DynamicResource AColour.Tone5.Background.Selected}"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewSelected.Border"            Color="{DynamicResource AColour.Tone5.Border.Selected}"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewSelectedHover.Background"   Color="{DynamicResource AColour.Tone5.Background.Selected}"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewSelectedHover.Border"       Color="{DynamicResource AColour.Tone5.Border.Selected}"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewSelectedNoFocus.Background" Color="{DynamicResource AColour.Tone5.Background.Selected.Inactive}"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewSelectedNoFocus.Border"     Color="{DynamicResource AColour.Tone5.Border.Selected.Inactive}"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewFocus.Border"               Color="{DynamicResource AColour.Tone5.Border.Static}"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewHoverFocus.Background"      Color="{DynamicResource AColour.Tone5.Background.MouseOver}"/>
-    <SolidColorBrush x:Key="ComboBoxItem.ItemsviewHoverFocus.Border"          Color="{DynamicResource AColour.Tone5.Border.MouseOver}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.Hover.Background"           Color="{DynamicResource AColour.Tone5.Background.MouseOver}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.Hover.Border"               Color="{DynamicResource AColour.Tone5.Border.MouseOver}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.Selected.Background"        Color="{DynamicResource AColour.Tone5.Background.Selected}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.Selected.Border"            Color="{DynamicResource AColour.Tone5.Border.Selected}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.SelectedHover.Background"   Color="{DynamicResource AColour.Tone5.Background.Selected}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.SelectedHover.Border"       Color="{DynamicResource AColour.Tone5.Border.Selected}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.SelectedNoFocus.Background" Color="{DynamicResource AColour.Tone5.Background.Selected.Inactive}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.SelectedNoFocus.Border"     Color="{DynamicResource AColour.Tone5.Border.Selected.Inactive}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.Focus.Border"               Color="{DynamicResource AColour.Tone5.Border.Static}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.HoverFocus.Background"      Color="{DynamicResource AColour.Tone5.Background.MouseOver}"/>
+    <SolidColorBrush x:Key="ComboBoxItem.ItemsView.HoverFocus.Border"          Color="{DynamicResource AColour.Tone5.Border.MouseOver}"/>
 
     <SolidColorBrush x:Key="TextBox.Static.Background"                  Color="{DynamicResource AColour.Tone6.Background.Static}"/>
     <SolidColorBrush x:Key="TextBox.Static.Border"                      Color="{DynamicResource AColour.Tone6.Border.Static}"/>
@@ -255,15 +255,15 @@
 
     <SolidColorBrush x:Key="DataGrid.Static.Background"               Color="{DynamicResource AColour.Tone4.Background.Static}"/>
     <SolidColorBrush x:Key="DataGrid.Static.Border"                   Color="{DynamicResource AColour.Tone4.Border.Static}"/>
-    <SolidColorBrush x:Key="DataGrid.HorizontalSeparatorBrush"        Color="{DynamicResource AColour.Tone7.Background.Static}"/>
-    <SolidColorBrush x:Key="DataGrid.VerticalSeparatorBrush"          Color="{DynamicResource AColour.Tone7.Background.Static}"/>
-    <SolidColorBrush x:Key="DataGrid.HeaderItem.Static.Background"    Color="{DynamicResource AColour.Tone6.Background.Static}"/>
+    <SolidColorBrush x:Key="DataGrid.HorizontalSeparatorBrush"        Color="{DynamicResource AColour.Tone8.Background.Static}"/>
+    <SolidColorBrush x:Key="DataGrid.VerticalSeparatorBrush"          Color="{DynamicResource AColour.Tone8.Background.Static}"/>
+    <SolidColorBrush x:Key="DataGrid.HeaderItem.Static.Background"    Color="{DynamicResource AColour.Tone7.Background.Static}"/>
     <SolidColorBrush x:Key="DataGrid.HeaderItem.MouseOver.Background" Color="{DynamicResource AColour.Tone6.Background.MouseOver}"/>
     <SolidColorBrush x:Key="DataGrid.HeaderItem.MouseDown.Background" Color="{DynamicResource AColour.Tone6.Background.MouseDown}"/>
     <SolidColorBrush x:Key="DataGrid.RowHeader.Static.Background"     Color="{DynamicResource AColour.Tone6.Background.Static}"/>
-    <SolidColorBrush x:Key="DataGrid.Row.Selected.Background"         Color="{DynamicResource AColour.Tone5.Background.Selected}"/>
-    <SolidColorBrush x:Key="DataGrid.CellItem.Static.Background"      Color="{DynamicResource AColour.Tone5.Background.Static}"/>
-    <SolidColorBrush x:Key="DataGrid.CellItem.MouseOver.Background"   Color="{DynamicResource AColour.Tone5.Background.MouseOver}"/>
+    <SolidColorBrush x:Key="DataGrid.Row.Selected.Background"         Color="{DynamicResource AColour.Tone6.Background.Selected}"/>
+    <SolidColorBrush x:Key="DataGrid.CellItem.Static.Background"      Color="{DynamicResource AColour.Tone6.Background.Static}"/>
+    <SolidColorBrush x:Key="DataGrid.CellItem.MouseOver.Background"   Color="{DynamicResource AColour.Tone6.Background.MouseOver}"/>
 
     <SolidColorBrush x:Key="Window.Static.Background"                 Color="{DynamicResource AColour.Tone3.Background.Static}"/>
     <SolidColorBrush x:Key="Window.Static.Border"                     Color="{DynamicResource AColour.Tone2.Background.Static}"/>

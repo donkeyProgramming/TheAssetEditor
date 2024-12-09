@@ -1,16 +1,23 @@
 ﻿using Shared.Core.Events;
 using Shared.Ui.Common.MenuSystem;
-using System;
 
-namespace KitbasherEditor.ViewModels.MenuBarViews
+namespace Editors.KitbasherEditor.Core.MenuBarViews
 {
     public interface IKitbasherUiCommand : IUiCommand
     {
         public string ToolTip { get; set; }
         public ActionEnabledRule EnabledRule { get; }
-        public Hotkey HotKey { get; }
+        public Hotkey? HotKey { get; }
 
         public void Execute();
+    }
+
+    public interface ITransientKitbasherUiCommand : IKitbasherUiCommand
+    {
+    }
+
+    public interface IScopedKitbasherUiCommand : IKitbasherUiCommand
+    {
     }
 
     public class KitbasherMenuItem<T> : MenuAction

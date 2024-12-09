@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using AssetEditor.UiCommands;
-using CommonControls.BaseDialogs;
-using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Reports.Animation;
@@ -20,6 +18,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
+using Shared.Ui.BaseDialogs.StandardDialog.Text;
 
 namespace AssetEditor.ViewModels
 {
@@ -68,6 +67,12 @@ namespace AssetEditor.ViewModels
                 _packfileService.SetEditablePack(newPackFile);
             }
         }
+
+
+
+
+     
+
         [RelayCommand] private void CreateAnimPackWarhammer3() => AnimationPackSampleDataCreator.CreateAnimationDbWarhammer3(_packFileSaveService, _packfileService);
         [RelayCommand] private void CreateAnimPack3k() => AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService, _packFileSaveService);
         [RelayCommand] private void OpenWh2AnimpackUpdater() => new AnimPackUpdaterService(_packfileService).Process();
@@ -81,6 +86,9 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void TouchedFileRecorderPrint() => _touchedFilesRecorder.Print();
         [RelayCommand] private void TouchedFileRecorderExtract() => _touchedFilesRecorder.ExtractFilesToPack(@"c:\temp\extractedPack.pack");
         [RelayCommand] private void TouchedFileRecorderStop() => _touchedFilesRecorder.Stop();
+
+        [RelayCommand] private void ClearConsole() => Console.Clear();
+        
         [RelayCommand] private void Search() => _uiCommandFactory.Create<DeepSearchCommand>().Execute();
 
         [RelayCommand] private void OpenAttilaPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Attila);
