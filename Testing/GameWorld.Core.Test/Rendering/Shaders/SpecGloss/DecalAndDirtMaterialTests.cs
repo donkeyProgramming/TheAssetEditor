@@ -23,7 +23,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             var settings = new ApplicationSettingsService(GameTypeEnum.Attila);
             var materialFactory = new CapabilityMaterialFactory(settings, null);
 
-            var path = PathHelper.DataFolderItem("Rome_Man_And_Shield_Pack//variantmeshes//_variantmodels//man//shield//celtic_oval_shield_a.rigid_model_v2");
+            var path = PathHelper.GetDataFile("Rome_Man_And_Shield_Pack//variantmeshes//_variantmodels//man//shield//celtic_oval_shield_a.rigid_model_v2");
             var packFile = PackFile.CreateFromFileSystem("mymodel.rigid_model_v2", path);
             var rmvFile = ModelFactory.Create().Load(packFile.DataSource.ReadData());
 
@@ -52,7 +52,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             var settings = new ApplicationSettingsService(GameTypeEnum.Attila);
             var materialFactory = new CapabilityMaterialFactory(settings, null);
 
-            var path = PathHelper.DataFolderItem("Rome_Man_And_Shield_Pack//variantmeshes//_variantmodels//man//helmets//carthaginian_pylos.rigid_model_v2");
+            var path = PathHelper.GetDataFile("Rome_Man_And_Shield_Pack//variantmeshes//_variantmodels//man//helmets//carthaginian_pylos.rigid_model_v2");
             var packFile = PackFile.CreateFromFileSystem("mymodel.rigid_model_v2", path);
             var rmvFile = ModelFactory.Create().Load(packFile.DataSource.ReadData());
 
@@ -78,7 +78,7 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
         public void DecalAndDirt_GenerateRmvMaterial()
         {
             // Arrange
-            var path = PathHelper.DataFolderItem("Rome_Man_And_Shield_Pack//variantmeshes//_variantmodels//man//shield//celtic_oval_shield_a.rigid_model_v2");
+            var path = PathHelper.GetDataFile("Rome_Man_And_Shield_Pack//variantmeshes//_variantmodels//man//shield//celtic_oval_shield_a.rigid_model_v2");
             var packFile = PackFile.CreateFromFileSystem("mymodel.rigid_model_v2", path);
             var rmvFile = ModelFactory.Create().Load(packFile.DataSource.ReadData());
 

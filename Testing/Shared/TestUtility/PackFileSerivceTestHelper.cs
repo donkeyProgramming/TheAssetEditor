@@ -21,7 +21,7 @@ namespace Shared.TestUtility
             var pfs = new PackFileService(null);
             var loader = new PackFileContainerLoader(new ApplicationSettingsService(selectedGame), new GameInformationFactory());
 
-            var container = loader.LoadSystemFolderAsPackFileContainer(PathHelper.DataFolderItem(path));
+            var container = loader.LoadSystemFolderAsPackFileContainer(PathHelper.GetDataFolder(path));
             container.IsCaPackFile = true;
             pfs.AddContainer(container);
             return pfs;
