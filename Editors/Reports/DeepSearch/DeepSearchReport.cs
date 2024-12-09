@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using CommonControls.BaseDialogs;
+using Shared.Ui.BaseDialogs.StandardDialog.Text;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;

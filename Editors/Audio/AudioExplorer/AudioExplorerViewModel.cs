@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Windows;
-using CommonControls.BaseDialogs;
+using Shared.Ui.BaseDialogs.StandardDialog.Text;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;

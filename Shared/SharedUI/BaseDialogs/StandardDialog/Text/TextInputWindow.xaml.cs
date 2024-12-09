@@ -1,11 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
-namespace CommonControls.BaseDialogs
+namespace Shared.Ui.BaseDialogs.StandardDialog.Text
 {
-    /// <summary>
-    /// Interaction logic for TextInputWindow.xaml
-    /// </summary>
     public partial class TextInputWindow : Window
     {
         public TextInputWindow()
