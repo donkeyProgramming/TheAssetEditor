@@ -10,7 +10,7 @@ namespace Shared.TestUtility
         /// Find the "AssetEditor" folder from the test directory and return the path to the file
         /// Probably superior to the hardcoded path in the original code
         /// </summary>        
-        public static string FileFromDataFolder(string fileName, string rootDir = "TheAssetEditor", string subDir = "Data")
+        public static string DataFolderItem(string fileName, string rootDir = "TheAssetEditor", string subDir = "Data")
         {
             var currentDirectory = TestContext.CurrentContext.TestDirectory;
             if (string.IsNullOrEmpty(currentDirectory))
@@ -37,7 +37,7 @@ namespace Shared.TestUtility
 
         public static byte[] GetFileAsBytes(string path)
         {
-            var fullPath = FileFromDataFolder(path);
+            var fullPath = DataFolderItem(path);
             var bytes = System.IO.File.ReadAllBytes(fullPath);
             return bytes; ;
         }
