@@ -9,9 +9,9 @@ using CommunityToolkit.Mvvm.Input;
 using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.Core.Services;
 using Shared.Core.Events;
-using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.Ui.Events.UiCommands;
 
 namespace GameWorld.Core.Utility.UserInterface
 {

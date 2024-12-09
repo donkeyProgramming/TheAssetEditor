@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GameWorld.Core.Components
 {
-    public static class SceneExtensions
+    public static class SceneExtentions
     {
         public static IEnumerable<T> Search<T>(this T node, Func<T, IEnumerable<T>> childs, Func<T, bool> condition, GraphTraversal mode = GraphTraversal.DepthFirst)
         {

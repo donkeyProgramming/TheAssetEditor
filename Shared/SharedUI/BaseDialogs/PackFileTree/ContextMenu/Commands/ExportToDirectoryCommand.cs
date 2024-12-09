@@ -1,8 +1,9 @@
 ﻿using System.IO;
 using System.Windows.Forms;
 using Shared.Core.Misc;
+using Shared.Core.PackFiles;
 
-namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
+namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
 {
     public class ExportToDirectoryCommand() : IContextMenuCommand
     {

@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using Editors.Reports.Animation;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -23,8 +24,8 @@ namespace Editors.Reports.Files
         class FileItem
         {
             public string FileName { get; set; }
-            public string Extension { get; set; } = "";
-            public string ExtensionLast { get; set; } = "";
+            public string Extention { get; set; } = "";
+            public string ExtentionLast { get; set; } = "";
             public long Size { get; set; }
             public string PackFileName { get; set; } = "";
             public string CheckSum { get; set; }
@@ -88,12 +89,12 @@ namespace Editors.Reports.Files
         }
 
         bool IsDb(string fileName) => fileName.StartsWith(@"db\", StringComparison.InvariantCultureIgnoreCase);
-        string LastExtension(string fileName) => Path.GetExtension(fileName);
+        string LastExtention(string fileName) => Path.GetExtension(fileName);
 
         FileItem CreateFileItemFromFile(string fileName, PackFile file)
         {
-            var extension = Regex.Match(fileName, @"\..*").Value;
-            var extensionLast = LastExtension(fileName);
+            var extention = Regex.Match(fileName, @"\..*").Value;
+            var extentionLast = LastExtention(fileName);
             var size = file.DataSource.Size;
             var checkSum = _md5Instance.ComputeHash(file.DataSource.ReadData());
             var isDb = IsDb(fileName);
@@ -105,14 +106,16 @@ namespace Editors.Reports.Files
             return new FileItem()
             {
                 FileName = fileName,
-                Extension = extension,
-                ExtensionLast = extensionLast,
+                Extention = extention,
+                ExtentionLast = extentionLast,
                 Size = size,
                 CheckSum = checkSumStr,
                 IsDb = isDb,
                 PackFileName = packFileName
             };
         }
+
+
 
         public void CompareFiles(string oldFilePath, string newFilePath)
         {
@@ -201,16 +204,17 @@ namespace Editors.Reports.Files
             return output;
         }
 
-        private static int DetermineVersion(StreamReader fileReader)
+
+        int DetermineVersion(StreamReader fileReader)
         {
             var line = fileReader.ReadLine();
             if (line.Contains("sep", StringComparison.InvariantCultureIgnoreCase))
             {
                 var header = fileReader.ReadLine();
-                if (header.Contains("ExtensionLast", StringComparison.InvariantCultureIgnoreCase) && !header.Contains("IsDb", StringComparison.InvariantCultureIgnoreCase))
+                if (header.Contains("ExtentionLast", StringComparison.InvariantCultureIgnoreCase) && !header.Contains("IsDb", StringComparison.InvariantCultureIgnoreCase))
                     return 1;
 
-                if (header.Contains("ExtensionLast", StringComparison.InvariantCultureIgnoreCase) && header.Contains("IsDb", StringComparison.InvariantCultureIgnoreCase))
+                if (header.Contains("ExtentionLast", StringComparison.InvariantCultureIgnoreCase) && header.Contains("IsDb", StringComparison.InvariantCultureIgnoreCase))
                     return 2;
 
                 return 0;
@@ -227,8 +231,8 @@ namespace Editors.Reports.Files
                 return new FileItem()
                 {
                     FileName = parts[0],
-                    Extension = parts[1],
-                    ExtensionLast = LastExtension(parts[0]),
+                    Extention = parts[1],
+                    ExtentionLast = LastExtention(parts[0]),
                     Size = long.Parse(parts[2]),
                     PackFileName = parts[3],
                     CheckSum = parts[4],
@@ -240,8 +244,8 @@ namespace Editors.Reports.Files
                 return new FileItem()
                 {
                     FileName = parts[0],
-                    Extension = parts[1],
-                    ExtensionLast = parts[2],
+                    Extention = parts[1],
+                    ExtentionLast = parts[2],
                     Size = long.Parse(parts[3]),
                     PackFileName = parts[4],
                     CheckSum = parts[5],
@@ -253,8 +257,8 @@ namespace Editors.Reports.Files
                 return new FileItem()
                 {
                     FileName = parts[0],
-                    Extension = parts[1],
-                    ExtensionLast = parts[2],
+                    Extention = parts[1],
+                    ExtentionLast = parts[2],
                     Size = long.Parse(parts[3]),
                     PackFileName = parts[4],
                     CheckSum = parts[5],
@@ -266,8 +270,8 @@ namespace Editors.Reports.Files
                 return new FileItem()
                 {
                     FileName = parts[0],
-                    Extension = parts[1],
-                    ExtensionLast = parts[2],
+                    Extention = parts[1],
+                    ExtentionLast = parts[2],
                     Size = long.Parse(parts[3]),
                     PackFileName = parts[4],
                     CheckSum = parts[5],
@@ -278,15 +282,15 @@ namespace Editors.Reports.Files
             throw new Exception("Unknown version");
         }
 
-        static void WriteHeader(StreamWriter streamWriter)
+        void WriteHeader(StreamWriter streamWriter)
         {
             streamWriter.WriteLine("sep=|");
-            streamWriter.WriteLine("FileName|Extension|ExtensionLast|Size|PackFile|CheckSum|IsDb");
+            streamWriter.WriteLine("FileName|Extention|ExtentionLast|Size|PackFile|CheckSum|IsDb");
         }
 
-        static void WriteItem(StreamWriter writer, FileItem fileItem)
+        void WriteItem(StreamWriter writer, FileItem fileItem)
         {
-            writer.WriteLine($"{fileItem.FileName}|{fileItem.Extension}|{fileItem.ExtensionLast}|{fileItem.Size}|{fileItem.PackFileName}|{fileItem.CheckSum}|{fileItem.IsDb}");
+            writer.WriteLine($"{fileItem.FileName}|{fileItem.Extention}|{fileItem.ExtentionLast}|{fileItem.Size}|{fileItem.PackFileName}|{fileItem.CheckSum}|{fileItem.IsDb}");
         }
     }
 }

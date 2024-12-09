@@ -3,36 +3,36 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using AnimationEditor.AnimationKeyframeEditor;
-using AnimationEditor.MountAnimationCreator;
+using System.Windows.Forms;
 using AnimationEditor.MountAnimationCreator.Services;
 using AnimationEditor.MountAnimationCreator.ViewModels;
-using Editors.AnimationVisualEditors.MountAnimationCreator.Services;
-using Editors.Shared.Core.Common;
-using Editors.Shared.Core.Common.AnimationPlayer;
-using Editors.Shared.Core.Common.BaseControl;
-using Editors.Shared.Core.Common.ReferenceModel;
 using Editors.Shared.Core.Services;
-using GameWorld.Core.Animation;
-using GameWorld.Core.Components.Selection;
-using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
-using Shared.Core.Events;
-using Shared.Core.Events.Global;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
-using Clipboard = System.Windows.Clipboard;
 using MessageBox = System.Windows.Forms.MessageBox;
+using Clipboard = System.Windows.Clipboard;
+using Shared.Ui.Events.UiCommands;
+using Shared.Core.Events;
+using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
+using Editors.Shared.Core.Common.BaseControl;
+using Editors.Shared.Core.Common;
+using Editors.Shared.Core.Common.AnimationPlayer;
+using Editors.Shared.Core.Common.ReferenceModel;
+using Editors.AnimationVisualEditors.MountAnimationCreator.Services;
 
-namespace Editors.AnimationVisualEditors.MountAnimationCreator
+
+namespace AnimationEditor.MountAnimationCreator
 {
     public class MountAnimationCreatorViewModel : NotifyPropertyChangedImpl, IHostedEditor<MountAnimationCreatorViewModel>
     {
-        public Type EditorViewModelType => typeof(AnimationEditor.CampaignAnimationCreator.EditorView);
+        public Type EditorViewModelType => typeof(EditorView);
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly IFileSaveService _fileSaveService;
@@ -45,7 +45,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator
         SceneObject _mount;
         SceneObject _rider;
         SceneObject _newAnimation;
-
+  
         List<int> _mountVertexes = new();
         Rmv2MeshNode _mountVertexOwner;
 
@@ -75,8 +75,8 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator
         public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
         public FilterCollection<AnimationBinEntryGenericFormat> ActiveFragmentSlot { get; set; }
 
-        public MountAnimationCreatorViewModel(IPackFileService pfs,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+        public MountAnimationCreatorViewModel(IPackFileService pfs, 
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
             SelectionManager selectionManager,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,

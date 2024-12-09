@@ -1,6 +1,6 @@
-﻿using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External;
+﻿using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.External;
 
-namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
+namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
 {
     public class AdvancedImportCommand(IImportFileContextMenuHelper importFileContextMenuHelper) : IContextMenuCommand
     {

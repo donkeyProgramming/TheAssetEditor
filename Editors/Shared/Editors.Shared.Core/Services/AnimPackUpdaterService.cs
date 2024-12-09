@@ -34,7 +34,7 @@ namespace Editors.Shared.Core.Services
             if (existingPackVersion != GameTypeEnum.Warhammer2)
                 throw new Exception($"{outputFormat} selected as input, only Warhammer 2 is currently supported");
 
-            var animPackFiles = PackFileServiceUtility.FindAllWithExtension(_pfs, ".animpack", packFileContainer);
+            var animPackFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".animpack", packFileContainer);
             var animPacks = animPackFiles.Select(x => AnimationPackSerializer.Load(x, _pfs, GameTypeEnum.Warhammer2)).ToArray();
 
             if (animPacks.Length == 0)
@@ -72,8 +72,8 @@ namespace Editors.Shared.Core.Services
                     outputWh3AnimPack.AddFile(wh3Bin);
                 }
 
-                var animPackPathWithoutExtensions = Path.GetFileNameWithoutExtension(animPack.FileName);
-                // var outputAnimPackName = AnimationPackSampleDataCreator.GenerateWh3AnimPackName(animPackPathWithoutExtensions + "_wh3");
+                var animPackPathWithoutExtentions = Path.GetFileNameWithoutExtension(animPack.FileName);
+                // var outputAnimPackName = AnimationPackSampleDataCreator.GenerateWh3AnimPackName(animPackPathWithoutExtentions + "_wh3");
                 // SaveHelper.Save(_pfs, outputAnimPackName, null, AnimationPackSerializer.ConvertToBytes(outputWh3AnimPack), false);
             }
         }

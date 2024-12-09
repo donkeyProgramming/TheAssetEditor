@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using AssetEditor.UiCommands;
+using CommonControls.BaseDialogs;
+using CommonControls.Editors.AnimationBatchExporter;
 using CommonControls.Editors.AnimationPack;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Reports.Animation;
@@ -18,7 +20,6 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.StandardDialog.Text;
 
 namespace AssetEditor.ViewModels
 {

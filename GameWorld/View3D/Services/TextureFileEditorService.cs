@@ -392,20 +392,20 @@ namespace GameWorld.Core.Services
                 graphics.DrawLine(blackPen, uv2.X, uv2.Y, uv0.X, uv0.Y);
             }
 
-            var imagePathWithoutExtension = outputDirectory + "\\Uv_map_" + mesh.Name;
+            var imagePathWithoutExtention = outputDirectory + "\\Uv_map_" + mesh.Name;
             for (var index = 0; index < 1024; index++)
             {
-                var name = index == 0 ? imagePathWithoutExtension : string.Format("{0} _{1}", imagePathWithoutExtension, index);
+                var name = index == 0 ? imagePathWithoutExtention : string.Format("{0} _{1}", imagePathWithoutExtention, index);
                 name += ".png";
                 if (File.Exists(name))
                     continue;
 
-                imagePathWithoutExtension = name;
+                imagePathWithoutExtention = name;
                 break;
             }
 
             DirectoryHelper.EnsureCreated(outputDirectory);
-            image.Save(imagePathWithoutExtension);
+            image.Save(imagePathWithoutExtention);
         }
     }*/
 }
