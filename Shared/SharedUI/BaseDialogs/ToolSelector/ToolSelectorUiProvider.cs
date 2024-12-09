@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
+using CommonControls.BaseDialogs.ToolSelector;
 using Shared.Core.ToolCreation;
 
 namespace Shared.Ui.BaseDialogs.ToolSelector

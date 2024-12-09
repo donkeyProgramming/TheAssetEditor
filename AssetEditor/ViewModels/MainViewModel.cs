@@ -10,10 +10,10 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.PackFileTree;
-using Shared.Ui.BaseDialogs.PackFileTree;
-using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
 using Shared.Ui.Common;
+using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {
@@ -49,7 +49,7 @@ namespace AssetEditor.ViewModels
 
             eventHub.Register<PackFileContainerSetAsMainEditableEvent>(this, SetStatusBarEditablePackFile);
 
-            FileTree = packFileBrowserBuilder.Create(ContextMenuType.MainApplication, showCaFiles: true, showFoldersOnly: false, useEditablePackOnly: false);
+            FileTree = packFileBrowserBuilder.Create(ContextMenuType.MainApplication, true);
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;

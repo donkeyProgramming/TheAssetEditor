@@ -6,6 +6,10 @@ using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.ToolCreation
 {
+
+
+
+
     public interface IEditorDatabase
     {
         public void Register(EditorInfo editorInfo);
@@ -108,31 +112,31 @@ namespace Shared.Core.ToolCreation
 
         List<EditorInfo> GetAllPossibleEditors(string fullFileName)
         {
-            var extension = Regex.Match(fullFileName, @"\..*").Value;
-            if (extension.Contains("{") && extension.Contains("}"))
+            var extention = Regex.Match(fullFileName, @"\..*").Value;
+            if (extention.Contains("{") && extention.Contains("}"))
             {
-                var ext2 = Regex.Match(extension, @"\..*\.(.*)\.(.*)");
+                var ext2 = Regex.Match(extention, @"\..*\.(.*)\.(.*)");
                 if (ext2.Success)
                 {
-                    extension = "." + ext2.Groups[1].Value + "." + ext2.Groups[2].Value;
+                    extention = "." + ext2.Groups[1].Value + "." + ext2.Groups[2].Value;
                 }
             }
 
             var output = new List<(EditorInfo info, int priority)>();
             foreach (var toolLookUp in _editors)
             {
-                var hasValidExtension = false;
+                var hasValidExtention = false;
          
                 var priority = -1;
 
-                foreach (var toolExtension in toolLookUp.Extensions)
+                foreach (var toolExtention in toolLookUp.Extensions)
                 {
-                    if (toolExtension.Extension == extension)
+                    if (toolExtention.Extention == extention)
                     {
-                        if (toolExtension.Priority > priority)
+                        if (toolExtention.Priority > priority)
                         {
-                            hasValidExtension = true;
-                            priority = toolExtension.Priority;
+                            hasValidExtention = true;
+                            priority = toolExtention.Priority;
                         }
                     }
                 }
@@ -144,14 +148,14 @@ namespace Shared.Core.ToolCreation
                 }
                 else
                 {
-                    foreach (var toolExtension in toolLookUp.FolderRules)
+                    foreach (var toolExtention in toolLookUp.FolderRules)
                     {
-                        if (fullFileName.Contains(toolExtension))
+                        if (fullFileName.Contains(toolExtention))
                             isValidForFolder = true;
                     }
                 }
  
-                if (hasValidExtension && isValidForFolder)
+                if (hasValidExtention && isValidForFolder)
                     output.Add((toolLookUp, priority));
             }
 

@@ -29,7 +29,7 @@ namespace Editors.Reports.Geometry
             var shaderMap = new Dictionary<string, List<WsModelMaterialFile>>();
 
             // Collect all files and sort them
-            var fileList = PackFileServiceUtility.FindAllWithExtension(_pfs, ".wsmodel");
+            var fileList = PackFileServiceUtility.FindAllWithExtention(_pfs, ".wsmodel");
             var notFoundFiles = new List<string>();
             var errorFiles = new List<(string, Exception)>();
             foreach (var file in fileList)

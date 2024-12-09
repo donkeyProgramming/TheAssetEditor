@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Editors.KitbasherEditor.UiCommands;
 using Shared.Core.Events;
-using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
 
 namespace Editors.KitbasherEditor.ViewModels
 {

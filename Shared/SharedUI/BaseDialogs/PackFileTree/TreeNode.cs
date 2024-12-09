@@ -5,7 +5,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Shared.Core.PackFiles.Models;
 
-namespace Shared.Ui.BaseDialogs.PackFileTree
+namespace Shared.Ui.BaseDialogs.PackFileBrowser
 {
     public enum NodeType
     {

@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Windows;
+using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationPack.Converters;
+using Editors.Reports.DeepSearch;
 using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -76,7 +78,7 @@ namespace Editors.Reports.Animation
                 }
             }
 
-            var allMeta = PackFileServiceUtility.FindAllWithExtensionIncludePaths(_pfs, ".meta");
+            var allMeta = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".meta");
             foreach (var (fileName, packFile) in allMeta)
             {
                 try
@@ -95,7 +97,7 @@ namespace Editors.Reports.Animation
                 }
             }
 
-            var allAnimations = PackFileServiceUtility.FindAllWithExtensionIncludePaths(_pfs, ".anim");
+            var allAnimations = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".anim");
             foreach (var (fileName, packFile) in allAnimations)
             {
                 try
