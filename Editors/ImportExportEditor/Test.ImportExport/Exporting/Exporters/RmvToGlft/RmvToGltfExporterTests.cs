@@ -12,7 +12,7 @@ namespace Test.ImportExport.Exporting.Exporters.RmvToGlft
 
     public class RmvToGltfExporterTests
     {
-        private readonly string _inputPackFileKarl = PathHelper.Folder2("Karl_and_celestialgeneral_Pack");
+        private readonly string _inputPackFileKarl = PathHelper.FileFromDataFolder("Karl_and_celestialgeneral_Pack");
         private readonly string _rmvFilePathKarl = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2";
 
         [Test]

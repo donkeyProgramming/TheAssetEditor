@@ -21,7 +21,7 @@ namespace Test.ImportExport.Importing.Importers.GltfImporterTest
     class TestData
     {
         public static readonly string InputGtlfFile = PathHelper.FileFromDataFolder(@"Karl_Gltf_Resaved_From_Blender\karl_franz_imported_and_saved_to_blendfile_and_exported_to_gltf_from_blender.gltf");
-        public static readonly string InputPack = PathHelper.FileFromDataFolder("Humanoid01Skeleton_Pack");
+        public static readonly string InputPack = PathHelper.FileFromDataFolder("Karl_and_celestialgeneral_Pack");
 
         public static class GltfExpected
         {
