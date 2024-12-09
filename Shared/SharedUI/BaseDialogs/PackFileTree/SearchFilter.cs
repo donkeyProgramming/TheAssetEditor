@@ -4,8 +4,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using Shared.Core.Misc;
+using Shared.Ui.BaseDialogs.PackFileTree;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     public class SearchFilter : NotifyPropertyChangedImpl, IDataErrorInfo
     {
@@ -25,7 +26,18 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             }
         }
 
-        List<string> _extentionFilter;
+        private bool _showFoldersOnly;
+        public bool ShowFoldersOnly
+        {
+            get => _showFoldersOnly;
+            set
+            {
+                SetAndNotify(ref _showFoldersOnly, value);
+                Filter(FilterText);
+            }
+        }
+
+        List<string> _extensionFilter;
         public int AutoExapandResultsAfterLimitedCount { get; set; } = 25;
 
         public SearchFilter(ObservableCollection<TreeNode> nodes)
@@ -48,6 +60,12 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             foreach (var item in _nodeCollection)
                 HasChildWithFilterMatch(item, expression);
 
+            if (ShowFoldersOnly)
+            {
+                foreach (var node in _nodeCollection)
+                    ApplyFoldersOnlyFilter(node);
+            }
+
             if (AutoExapandResultsAfterLimitedCount != -1)
             {
                 var visibleNodes = 0;
@@ -64,7 +82,21 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             return "";
         }
 
-        int CountVisibleNodes(TreeNode file)
+        private static void ApplyFoldersOnlyFilter(TreeNode node)
+        {
+            if (node.NodeType == NodeType.File)
+            {
+                node.IsVisible = false;
+            }
+            else
+            {
+                node.IsVisible = true;
+                foreach (var child in node.Children)
+                    ApplyFoldersOnlyFilter(child);
+            }
+        }
+
+        private static int CountVisibleNodes(TreeNode file)
         {
             if (file.GetNodeType() == NodeType.File && file.IsVisible)
                 return 1;
@@ -76,13 +108,13 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             return count;
         }
 
-        public void SetExtentions(List<string> extentions)
+        public void SetExtensions(List<string> extensions)
         {
-            _extentionFilter = extentions;
+            _extensionFilter = extensions;
             Filter(FilterText);
         }
 
-        bool HasChildWithFilterMatch(TreeNode file, Regex expression)
+        private bool HasChildWithFilterMatch(TreeNode file, Regex expression)
         {
             if (file.GetNodeType() == NodeType.Root && file.Children.Count == 0)
             {
@@ -92,21 +124,21 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
             if (file.GetNodeType() == NodeType.File)
             {
-                var hasValidExtention = true;
-                if (_extentionFilter != null)
+                var hasValidExtension = true;
+                if (_extensionFilter != null)
                 {
-                    hasValidExtention = false;
-                    foreach (var extention in _extentionFilter)
+                    hasValidExtension = false;
+                    foreach (var extension in _extensionFilter)
                     {
-                        if (file.Name.Contains(extention))
+                        if (file.Name.Contains(extension))
                         {
-                            hasValidExtention = true;
+                            hasValidExtension = true;
                             continue;
                         }
                     }
                 }
 
-                if (hasValidExtention)
+                if (hasValidExtension)
                 {
                     if (expression.IsMatch(file.Name))
                     {

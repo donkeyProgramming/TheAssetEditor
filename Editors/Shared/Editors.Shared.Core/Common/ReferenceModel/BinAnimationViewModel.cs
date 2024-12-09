@@ -4,11 +4,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using Shared.Core.Events;
+using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
-using Shared.Ui.Events.UiCommands;
 using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace Editors.Shared.Core.Common.ReferenceModel
@@ -46,9 +46,6 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
             OnSkeletonChange(_sceneObject.Skeleton);
             _sceneObject.SkeletonChanged += OnSkeletonChange;
-
-
-  
         }
 
         public void PreviewSelectedSlot()

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Audio.Compiler"
              xmlns:s="http://schemas.singulink.com/xaml" 
-             xmlns:errorlistdialog="clr-namespace:CommonControls.BaseDialogs.ErrorListDialog;assembly=Shared.Ui"
+             xmlns:errorlistdialog="clr-namespace:Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;assembly=Shared.Ui"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>

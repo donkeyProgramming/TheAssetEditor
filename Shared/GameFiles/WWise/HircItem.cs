@@ -35,7 +35,6 @@ namespace Shared.GameFormats.WWise
                 chunk.Index = computedIndex;
                 HasError = false;
             }
-
             catch (Exception e)
             {
                 _logger.Here().Error($"Failed to parse object {Id} in {OwnerFile} at index {IndexInFile}- " + e.Message);
@@ -49,7 +48,6 @@ namespace Shared.GameFormats.WWise
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)Type, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(Size, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(Id, out _));
-
             return memStream;
         }
 

@@ -2,15 +2,14 @@
 using System.ComponentModel;
 using System.Windows;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 
-namespace CommonControls.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
 {
     public partial class SavePackFileWindow : Window, IDisposable, INotifyPropertyChanged
     {
-        public PackFile SelectedFile { get; set; }
+        public Shared.Core.PackFiles.Models.PackFile SelectedFile { get; set; }
         public PackFileBrowserViewModel ViewModel { get; set; }
 
         TreeNode _selectedNode;
@@ -21,19 +20,19 @@ namespace CommonControls.PackFileBrowser
         public string CurrentFileName { get => _currentFileName; set { _currentFileName = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentFileName")); SelectedFile = null; } }
         IPackFileService _packfileService;
 
-
         public string FilePath { get; private set; }
+
         public SavePackFileWindow(IPackFileService packfileService, PackFileTreeViewFactory packFileBrowserBuilder)
         {
             _packfileService = packfileService;
-            ViewModel = packFileBrowserBuilder.Create(ContextMenuType.Simple, false);
+            ViewModel = packFileBrowserBuilder.Create(ContextMenuType.Simple, showCaFiles:false, showFoldersOnly:false, useEditablePackOnly:false);
             ViewModel.FileOpen += ViewModel_FileOpen;
-            ViewModel.NodeSelected += ViewModel_FileSelected;
+            ViewModel.NodeSelected += ViewModel_NodeSelected;
             InitializeComponent();
             DataContext = this;
         }
 
-        private void ViewModel_FileSelected(TreeNode node)
+        private void ViewModel_NodeSelected(TreeNode node)
         {
             _selectedNode = node;
 
@@ -45,7 +44,7 @@ namespace CommonControls.PackFileBrowser
             SelectedFile = _selectedNode.Item;
         }
 
-        private void ViewModel_FileOpen(PackFile file)
+        private void ViewModel_FileOpen(Shared.Core.PackFiles.Models.PackFile file)
         {
             SelectedFile = file;
             Button_Click(null, null);
@@ -103,7 +102,7 @@ namespace CommonControls.PackFileBrowser
         public void Dispose()
         {
             ViewModel.FileOpen -= ViewModel_FileOpen;
-            ViewModel.NodeSelected -= ViewModel_FileSelected;
+            ViewModel.NodeSelected -= ViewModel_NodeSelected;
             ViewModel.Dispose();
             ViewModel = null;
             DataContext = null;

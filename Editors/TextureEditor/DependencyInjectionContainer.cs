@@ -23,9 +23,9 @@ namespace Editors.TextureEditor
         {
             EditorInfoBuilder
                 .Create<TextureEditorViewModel, TexturePreviewView>(EditorEnums.Texture_Editor)
-                .AddExtention(".dds", EditorPriorites.Default)
-                .AddExtention(".png", EditorPriorites.Default)
-                .AddExtention(".jpeg", EditorPriorites.Default)
+                .AddExtension(".dds", EditorPriorites.Default)
+                .AddExtension(".png", EditorPriorites.Default)
+                .AddExtension(".jpeg", EditorPriorites.Default)
                 .Build(factory);
         }
     }

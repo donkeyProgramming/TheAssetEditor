@@ -10,10 +10,10 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.Common;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     public delegate void FileSelectedDelegate(PackFile file);
     public delegate void NodeSelectedDelegate(TreeNode node);
@@ -29,32 +29,32 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         public ObservableCollection<TreeNode> Files { get; set; } = [];
         public SearchFilter Filter { get; private set; }
-        public ICommand DoubleClickCommand { get; set; }
-        public ICommand ClearTextCommand { get; set; }
 
         [ObservableProperty] TreeNode _selectedItem;
         [ObservableProperty] ObservableCollection<ContextMenuItem2> _contextMenu = [];
 
-        public PackFileBrowserViewModel(IContextMenuBuilder contextMenuBuilder, IPackFileService packFileService, IEventHub? eventHub, bool showCaFiles)
-        {
-            DoubleClickCommand = new RelayCommand<TreeNode>(OnDoubleClick);
-            ClearTextCommand = new RelayCommand(OnClearText);
+        public bool ShowFoldersOnly { get; }
 
+        public PackFileBrowserViewModel(IContextMenuBuilder contextMenuBuilder, IPackFileService packFileService, IEventHub? eventHub, bool showCaFiles, bool showFoldersOnly, bool useEditablePackOnly)
+        {
             _packFileService = packFileService;
             _eventHub = eventHub;
             _contextMenuBuilder = contextMenuBuilder;
+
+            ShowFoldersOnly = showFoldersOnly;
 
             _eventHub?.Register<PackFileContainerSetAsMainEditableEvent>(this, ContainerUpdated);
             _eventHub?.Register<PackFileContainerRemovedEvent>(this, PackFileContainerRemoved);
             _eventHub?.Register<PackFileContainerAddedEvent>(this, x => ReloadTree(x.Container));
             _eventHub?.Register<PackFileContainerFilesUpdatedEvent>(this, Database_PackFilesUpdated);
-            _eventHub?.Register<PackFileContainerFilesAddedEvent>(this, x=> AddFiles(x.Container, x.AddedFiles));
+            _eventHub?.Register<PackFileContainerFilesAddedEvent>(this, x => AddFiles(x.Container, x.AddedFiles));
             _eventHub?.Register<PackFileContainerFilesRemovedEvent>(this, x => Database_PackFilesRemoved(x.Container, x.RemovedFiles));
-                         
+
             _eventHub?.Register<PackFileContainerFolderRemovedEvent>(this, x => Database_PackFileFolderRemoved(x.Container, x.Folder));
             _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => Database_PackFileFolderRenamed(x.Container, x.NewNodePath));
-       
+
             Filter = new SearchFilter(Files);
+            Filter.ShowFoldersOnly = ShowFoldersOnly;
 
             foreach (var item in _packFileService.GetAllPackfileContainers())
             {
@@ -62,7 +62,17 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 if (!showCaFiles)
                     loadFile = !item.IsCaPackFile;
 
-                if (loadFile)
+                if (useEditablePackOnly)
+                {
+                    if (loadFile)
+                    {
+                        var outputPack = _packFileService.GetEditablePack();
+                        if (outputPack != null)
+                            if (item.Name == outputPack.Name)
+                                ReloadTree(item);
+                    }
+                }
+                else if (loadFile)
                     ReloadTree(item);
             }
         }
@@ -119,24 +129,22 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             }
         }
 
-        protected virtual void OnClearText()
+        [RelayCommand] protected virtual void OnClearText()
         {
-            Filter.FilterText = "";
+            Filter.FilterText = string.Empty;
         }
 
-        protected virtual void OnDoubleClick(TreeNode node)
+        [RelayCommand] protected virtual void OnDoubleClick(TreeNode node)
         {
             // using command parmeter to get node causes memory leaks, using selected node for now
             if (SelectedItem != null)
             {
-                if (SelectedItem.GetNodeType() == NodeType.File)
-                {
+                if (ShowFoldersOnly)
                     FileOpen?.Invoke(SelectedItem.Item);
-                }
+                else if (SelectedItem.GetNodeType() == NodeType.File)
+                    FileOpen?.Invoke(SelectedItem.Item);
                 else if (SelectedItem.GetNodeType() == NodeType.Directory && Keyboard.IsKeyDown(Key.LeftCtrl))
-                {
                     SelectedItem.ExpandIfVisible(true);
-                }
             }
         }
 
@@ -146,10 +154,9 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 item.IsMainEditabelPack = false;
 
             var newContiner = Files.FirstOrDefault(x => x.FileOwner == e.Container);
-            if(newContiner != null)
+            if (newContiner != null)
                 newContiner.IsMainEditabelPack = true;
         }
-
 
         private void AddFiles(PackFileContainer container, List<PackFile> files)
         {
@@ -196,7 +203,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             }
         }
 
-        TreeNode GetNodeFromPath(TreeNode parent, PackFileContainer container, string path, bool createIfMissing = true)
+        private static TreeNode GetNodeFromPath(TreeNode parent, PackFileContainer container, string path, bool createIfMissing = true)
         {
             var numSeperators = path.Count(x => x == Path.DirectorySeparatorChar);
             if (path.Length == 0)
@@ -227,7 +234,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             return null;
         }
 
-        TreeNode GetPackFileCollectionRootNode(PackFileContainer container)
+        private TreeNode GetPackFileCollectionRootNode(PackFileContainer container)
         {
             foreach (var child in Files)
             {
@@ -237,7 +244,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             return null;
         }
 
-        TreeNode GetNodeFromPackFile(PackFileContainer container, PackFile pf, bool createIfMissing = true)
+        private TreeNode GetNodeFromPackFile(PackFileContainer container, PackFile pf, bool createIfMissing = true)
         {
             var root = GetPackFileCollectionRootNode(container);
             var fullPath = _packFileService.GetFullPath(pf, container);
@@ -274,7 +281,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
                 if (pathParts.Length == 1)
                 {
-                    root.Children.Add(new TreeNode(pathParts[0], NodeType.File, container, root, item.Value));
+                        root.Children.Add(new TreeNode(pathParts[0], NodeType.File, container, root, item.Value));
                 }
                 else
                 {
@@ -309,11 +316,11 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                         }
                     }
 
-                    var fileName = pathParts.Last();
-                    var treeNode = new TreeNode(fileName, NodeType.File, container, directoryMap[directory], item.Value);
-                    directoryMap[directory].Children.Add(treeNode);
+                        var fileName = pathParts.Last();
+                        var treeNode = new TreeNode(fileName, NodeType.File, container, directoryMap[directory], item.Value);
+                        directoryMap[directory].Children.Add(treeNode);
+                    }
                 }
-            }
             Files.Add(root);
         }
 

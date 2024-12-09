@@ -8,7 +8,7 @@ using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.Events;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using static Shared.Core.Misc.NotifyPropertyChangedImpl;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews

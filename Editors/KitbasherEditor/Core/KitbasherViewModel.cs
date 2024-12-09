@@ -14,7 +14,7 @@ using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileTree;
 using Shared.Ui.Common;
 
 namespace Editors.KitbasherEditor.ViewModels

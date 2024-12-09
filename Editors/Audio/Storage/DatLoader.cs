@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using Editors.Audio.Utility;
@@ -44,11 +43,11 @@ namespace Editors.Audio.Storage
             AddNames(wh3DbNameList);
 
             // Add all the bnk file names 
-            var bnkFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".bnk");
+            var bnkFiles = PackFileServiceUtility.FindAllWithExtension(_pfs, ".bnk");
             var bnkNames = bnkFiles.Select(x => x.Name.Replace(".bnk", "")).ToArray();
             AddNames(bnkNames);
 
-            var wwiseIdFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".wwiseids");
+            var wwiseIdFiles = PackFileServiceUtility.FindAllWithExtension(_pfs, ".wwiseids");
             foreach (var item in wwiseIdFiles)
             {
                 var data = Encoding.UTF8.GetString(item.DataSource.ReadData());
@@ -65,7 +64,7 @@ namespace Editors.Audio.Storage
             var datDumpsFolderName = $"{DirectoryHelper.Temp}\\DatDumps";
             DirectoryHelper.EnsureCreated(datDumpsFolderName);
 
-            var datFiles = PackFileServiceUtility.FindAllWithExtention(pfs, ".dat");
+            var datFiles = PackFileServiceUtility.FindAllWithExtension(pfs, ".dat");
             datFiles = PackFileUtil.FilterUnvantedFiles(pfs, datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat" }, out var removedFiles);
 
             var failedDatParsing = new List<(string, string)>();

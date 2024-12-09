@@ -1,8 +1,8 @@
 ﻿using System.Windows.Input;
-using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.KitbasherEditor.Core.MenuBarViews;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
+using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
