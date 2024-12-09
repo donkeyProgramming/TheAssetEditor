@@ -2,10 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.Common;
 
-namespace CommonControls.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     public partial class PackFileBrowserView : UserControl
     {
@@ -17,9 +16,9 @@ namespace CommonControls.PackFileBrowser
         Point _lastMouseDown;
         TreeNode? _draggedItem;
 
-        public ContextMenu CustomContextMenu
+        public System.Windows.Controls.ContextMenu CustomContextMenu
         {
-            get { return (ContextMenu)GetValue(CustomContextMenuProperty); }
+            get { return (System.Windows.Controls.ContextMenu)GetValue(CustomContextMenuProperty); }
             set { SetValue(CustomContextMenuProperty, value); }
         }
 
@@ -27,7 +26,7 @@ namespace CommonControls.PackFileBrowser
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                TreeViewItem item = (TreeViewItem)sender;
+                var item = (TreeViewItem)sender;
 
                 _lastMouseDown = e.GetPosition(tvParameters);
 
@@ -50,7 +49,7 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
-        private void treeView_MouseMove(object sender, MouseEventArgs e)
+        private void TreeView_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
@@ -60,9 +59,7 @@ namespace CommonControls.PackFileBrowser
                     (Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0))
                 {
                     if (_draggedItem != null)
-                    {
                         DragDrop.DoDragDrop(tvParameters, tvParameters.SelectedValue, DragDropEffects.Move);
-                    }
                 }
             }
             else
@@ -71,7 +68,7 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
-        private void treeView_Drop(object sender, DragEventArgs e)
+        private void TreeView_Drop(object sender, DragEventArgs e)
         {
             if (DataContext is IDropTarget<TreeNode> dropContainer)
             {
@@ -79,8 +76,7 @@ namespace CommonControls.PackFileBrowser
                     return;
 
                 var dropTargetItem = sender as TreeViewItem;
-                var dropTargetNode = dropTargetItem?.DataContext as TreeNode;
-                if (dropTargetNode == null)
+                if (dropTargetItem?.DataContext is not TreeNode dropTargetNode)
                     return;
 
                 if (dropContainer.AllowDrop(_draggedItem, dropTargetNode))
@@ -99,14 +95,13 @@ namespace CommonControls.PackFileBrowser
 
         private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseEventArgs e)
         {
-            var item = sender as TreeViewItem;
-            if (item != null)
+            if (sender is TreeViewItem item)
             {
                 item.Focus();
                 e.Handled = true;
             }
         }
 
-        public static readonly DependencyProperty CustomContextMenuProperty = DependencyProperty.Register("CustomContextMenu", typeof(ContextMenu), typeof(PackFileBrowserView), new UIPropertyMetadata(null));
+        public static readonly DependencyProperty CustomContextMenuProperty = DependencyProperty.Register("CustomContextMenu", typeof(System.Windows.Controls.ContextMenu), typeof(PackFileBrowserView), new UIPropertyMetadata(null));
     }
 }

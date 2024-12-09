@@ -1,7 +1,7 @@
 ﻿using Shared.Core.Events;
 using Shared.Core.PackFiles;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
 {

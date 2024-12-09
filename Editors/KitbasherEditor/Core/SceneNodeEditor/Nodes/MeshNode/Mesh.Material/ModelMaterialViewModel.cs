@@ -12,7 +12,7 @@ using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileTree;
 
 namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
 {

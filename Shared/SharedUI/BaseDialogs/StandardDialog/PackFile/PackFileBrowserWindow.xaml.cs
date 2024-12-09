@@ -2,18 +2,16 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
-using Shared.Core.PackFiles.Models;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
 using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 
-namespace CommonControls.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
 {
     public partial class PackFileBrowserWindow : Window, IDisposable
     {
         public PackFileBrowserViewModel ViewModel { get; set; }
 
-        public PackFile SelectedFile { get; set; }
+        public Shared.Core.PackFiles.Models.PackFile SelectedFile { get; set; }
         public TreeNode? SelectedNode { get; set; }
         public string SelectedFolder { get; set; }
 
@@ -39,7 +37,7 @@ namespace CommonControls.PackFileBrowser
                 Close();
         }
 
-        private void ViewModel_FileOpen(PackFile file)
+        private void ViewModel_FileOpen(Shared.Core.PackFiles.Models.PackFile file)
         {
             SelectedFile = file;
             if (DialogResult != true)
@@ -51,9 +49,9 @@ namespace CommonControls.PackFileBrowser
         {
             if (node.NodeType == NodeType.Directory)
                 SelectedFolder = node.Name;
-                if (DialogResult != true)
-                    DialogResult = true;
-                    Close();
+            if (DialogResult != true)
+                DialogResult = true;
+            Close();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

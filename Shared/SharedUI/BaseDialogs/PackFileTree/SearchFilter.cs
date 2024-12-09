@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using Shared.Core.Misc;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileTree;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
 {

@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileTree;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
 {
