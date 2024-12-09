@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using CommonControls.BaseDialogs.ErrorListDialog;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel;
+using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
 
 namespace GameWorld.Core.Services.SceneSaving
 {

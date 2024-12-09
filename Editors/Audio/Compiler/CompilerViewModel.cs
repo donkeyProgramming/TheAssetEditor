@@ -6,7 +6,7 @@ using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.ErrorListDialog;
+using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
 
 namespace Editors.Audio.Compiler
 {

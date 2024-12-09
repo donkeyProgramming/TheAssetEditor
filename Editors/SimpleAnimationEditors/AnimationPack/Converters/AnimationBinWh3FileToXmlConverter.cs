@@ -1,6 +1,5 @@
 ﻿using System.Xml;
 using System.Xml.Serialization;
-using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.Shared.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -10,6 +9,7 @@ using Shared.GameFormats.AnimationMeta.Definitions;
 using Shared.GameFormats.AnimationMeta.Parsing;
 using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
+using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
 using Shared.Ui.Editors.TextEditor;
 
 namespace CommonControls.Editors.AnimationPack.Converters

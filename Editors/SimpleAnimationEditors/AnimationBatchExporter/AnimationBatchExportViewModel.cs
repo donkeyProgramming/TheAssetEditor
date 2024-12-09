@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
-using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -10,6 +9,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
+using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
 using Shared.Ui.Common;
 
 namespace Editors.AnimationTextEditors.AnimationBatchExporter
