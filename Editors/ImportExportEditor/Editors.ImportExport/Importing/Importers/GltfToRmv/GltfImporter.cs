@@ -1,40 +1,41 @@
-using Shared.Core.PackFiles.Models;
+﻿using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.RigidModel;
 using SharpGLTF.Schema2;
 using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
 using System.IO;
 using Shared.Core.PackFiles;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileTree;
 using static Shared.Core.PackFiles.IPackFileService;
-using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.Services;
-using Serilog;
+using Shared.Core.ErrorHandling.Exceptions;
+using Editors.Shared.Core.Services;
+using System.Windows;
+using Shared.GameFormats.Animation;
 using Shared.Core.ErrorHandling;
+using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
+
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 {
-
     public class GltfImporter
     {
-        private readonly ILogger _logger = Logging.Create<GltfImporter>();
         private readonly IPackFileService _packFileService;
         private readonly IStandardDialogs _exceptionService;
+        private readonly SkeletonAnimationLookUpHelper _skeletonLookUpHelper;
 
-        public GltfImporter(IPackFileService packFileSerivce, IStandardDialogs exceptionService)
+        public GltfImporter(IPackFileService packFileSerivce, IStandardDialogs exceptionService, SkeletonAnimationLookUpHelper skeletonLookUpHelper)
         {
             _packFileService = packFileSerivce;
             _exceptionService = exceptionService;
+            _skeletonLookUpHelper = skeletonLookUpHelper;
         }
-
-        private ModelRoot? _modelRoot;
 
         public void Import(GltfImporterSettings settings)
         {
-            LogSettings(settings);
-
+            ModelRoot? modelRoot = null;
             try
             {
-                _modelRoot = ModelRoot.Load(settings.InputGltfFile);
+                modelRoot = ModelRoot.Load(settings.InputGltfFile);
             }
             catch (Exception ex)
             {
@@ -43,14 +44,35 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             }
 
             var importedFileName = GetImportedPackFileName(settings);
+            
+            var skeletonName = FetchSkeletonIdStringFromScene(modelRoot);
+            if (skeletonName == null)
+                throw new ArgumentNullException(nameof(skeletonName), "Fatal eroro: This shouldn't be null");
 
-            var rmv2File = RmvMeshBuilder.Build(settings, _modelRoot);
+            AnimationFile? skeletonAnimFile = null;
+            if (skeletonName.Any())
+            {
+                skeletonAnimFile = _skeletonLookUpHelper.GetSkeletonFileFromName(skeletonName);
+                                
+                if (skeletonAnimFile == null)
+                {
+                    var errorList = new ErrorList();                 
+                    errorList.Error("Skeleton Not Found", $"Skeleton named '{skeletonName}' could not be found\nHave you selected the correct game AND loaded all CA Pack Files?");                   
+                    
+                    ErrorListWindow.ShowDialog("Skeleton Errors", errorList);
+
+                    return;
+                }
+            }
+
+            var rmv2File = RmvMeshBuilder.Build(settings, modelRoot, skeletonAnimFile, skeletonName);
             var bytesRmv2 = ModelFactory.Create().Save(rmv2File);
 
             var packFileImported = new PackFile(importedFileName, new MemorySource(bytesRmv2));
 
             var newFile = new NewPackFileEntry(settings.DestinationPackPath, packFileImported);
             _packFileService.AddFilesToPack(settings.DestinationPackFileContainer, [newFile]);
+            
         }
 
         private static string GetImportedPackFileName(GltfImporterSettings settings)
@@ -61,18 +83,16 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             return importedFileName;
         }
 
-        void LogSettings(GltfImporterSettings settings)
+        private static string FetchSkeletonIdStringFromScene(ModelRoot modelRoot)
         {
-            var str = $"Importing using {nameof(GltfImporter)}\n";
-            str += $"\tInputGltfFile:{settings?.InputGltfFile}\n";
-            str += $"\tDestinationPackFileContainer:{settings?.DestinationPackFileContainer}\n";
-            str += $"\tDestinationPackPath:{settings?.DestinationPackPath}\n";
-            str += $"\tConvertNormalTextureToBlue:{settings?.ConvertNormalTextureToOrangeType}n";
-            str += $"\tImportAnimations:{settings?.ImportAnimations}n";
-            str += $"\tMirrorMesh:{settings?.MirrorMesh}\n";
+            var nodeSearchResult = modelRoot.LogicalNodes.Where(node => node.Name.StartsWith("//skeleton//"));
 
-            _logger.Here().Information(str);
+            if (nodeSearchResult == null || !nodeSearchResult.Any())
+                return "";
+
+            var skeletonName = nodeSearchResult.First().Name.TrimStart("//skeleton//".ToCharArray());
+
+            return skeletonName.ToLower();
         }
-
     }
 }
