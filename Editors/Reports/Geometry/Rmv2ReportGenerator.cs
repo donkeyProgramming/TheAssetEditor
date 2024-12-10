@@ -35,7 +35,7 @@ namespace Editors.Reports.Geometry
             var gameName = _gameInformationFactory.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame).DisplayName;
             var gameDirectory = gameName;
             
-            var fileList = PackFileServiceUtility.FindAllWithExtension(_pfs, ".rigid_model_v2");
+            var fileList = PackFileServiceUtility.FindAllWithExtention(_pfs, ".rigid_model_v2");
 
             var failedMeshRecords = new List<dynamic>();
             var versionInfoRecords = new List<dynamic>();

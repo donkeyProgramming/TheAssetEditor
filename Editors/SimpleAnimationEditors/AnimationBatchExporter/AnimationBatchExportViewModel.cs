@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
+using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.Shared.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -9,10 +10,9 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
-using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
 using Shared.Ui.Common;
 
-namespace Editors.AnimationTextEditors.AnimationBatchExporter
+namespace CommonControls.Editors.AnimationBatchExporter
 {
     public class AnimationBatchExportViewModel : IEditorInterface
     {
@@ -27,7 +27,7 @@ namespace Editors.AnimationTextEditors.AnimationBatchExporter
 
         public string DisplayName { get; set; } = "Animation Batch Exporter";
 
-
+     
 
         public AnimationBatchExportViewModel(IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
@@ -66,7 +66,7 @@ namespace Editors.AnimationTextEditors.AnimationBatchExporter
 
                     _logger.Here().Information($"Processing packfile container {packfile.Name}");
 
-                    var animFiles = PackFileServiceUtility.FindAllWithExtension(_pfs, ".anim", packfile.Container);
+                    var animFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".anim", packfile.Container);
 
                     _logger.Here().Information($"Converting animations {animFiles.Count}");
                     var convertedAnimFiles = ConvertAnimFiles(animFiles, SelectedOutputFormat.Value, errorList);
@@ -78,7 +78,7 @@ namespace Editors.AnimationTextEditors.AnimationBatchExporter
                     _pfs.AddFilesToPack(_pfs.GetEditablePack(), filesToAdd);
 
                     _logger.Here().Information($"Saving inv matix files");
-                    var invMatrixFileList = PackFileServiceUtility.FindAllWithExtension(_pfs, ".bone_inv_trans_mats", packfile.Container);
+                    var invMatrixFileList = PackFileServiceUtility.FindAllWithExtention(_pfs, ".bone_inv_trans_mats", packfile.Container);
                     foreach (var invMatrixFile in invMatrixFileList)
                         _pfs.CopyFileFromOtherPackFile(packfile.Container, _pfs.GetFullPath(invMatrixFile), _pfs.GetEditablePack());
                 }
@@ -119,6 +119,7 @@ namespace Editors.AnimationTextEditors.AnimationBatchExporter
 
         public void Close()
         {
+     
         }
 
         public class PackFileListItem

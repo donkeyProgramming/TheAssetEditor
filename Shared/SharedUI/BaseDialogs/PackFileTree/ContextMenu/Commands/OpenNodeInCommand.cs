@@ -1,10 +1,10 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
+using System;
 using System.Windows;
 using Shared.Core.PackFiles.Models;
+using System.IO;
 
-namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
+namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
 {
     public abstract class OpenNodeInCommand() : IContextMenuCommand
     {

@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Shared.Core.Events;
-using Shared.Core.Events.Global;
 using Shared.Core.ToolCreation;
+using Shared.Ui.Events.UiCommands;
 
 namespace AssetEditor.ViewModels
 {

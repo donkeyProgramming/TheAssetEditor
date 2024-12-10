@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ErrorHandling;
+using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -92,12 +93,8 @@ namespace AssetEditor
             mainWindow.DataContext = _rootScope.ServiceProvider.GetRequiredService<MainViewModel>();
             mainWindow.Show();
 
-            // Ensure the window doesn't cover up the windows bar.
-            mainWindow.MaxHeight = SystemParameters.MaximizedPrimaryScreenHeight;
-            mainWindow.MaxWidth = SystemParameters.MaximizedPrimaryScreenWidth;
-
             if (applicationSettingsService.CurrentSettings.StartMaximised == true)
-                SystemCommands.MaximizeWindow(mainWindow);
+                mainWindow.WindowState = WindowState.Maximized;
         }
 
         void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)

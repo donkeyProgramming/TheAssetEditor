@@ -1,7 +1,10 @@
 ﻿using System.Windows;
 
-namespace Shared.Ui.BaseDialogs.ToolSelector
+namespace CommonControls.BaseDialogs.ToolSelector
 {
+    /// <summary>
+    /// Interaction logic for ToolSelectorWindow.xaml
+    /// </summary>
     public partial class ToolSelectorWindow : Window
     {
         public ToolSelectorWindow()

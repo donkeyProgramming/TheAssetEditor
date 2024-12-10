@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using CommonControls.BaseDialogs;
+using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.PackFileBrowser;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
-using Shared.Ui.BaseDialogs.PackFileTree;
-using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
-using Shared.Ui.BaseDialogs.StandardDialog.PackFile;
-using Shared.Ui.BaseDialogs.StandardDialog.Text;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.Common.Exceptions;
 
 namespace Shared.Ui.BaseDialogs.StandardDialog
@@ -29,7 +29,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
         public SaveDialogResult DisplaySaveDialog(IPackFileService remove, List<string> extensions)
         {
             using var browser = new SavePackFileWindow(_pfs, _packFileBrowserBuilder);
-            browser.ViewModel.Filter.SetExtensions(extensions);
+            browser.ViewModel.Filter.SetExtentions(extensions);
 
             if (browser.ShowDialog() == true)
                 return new SaveDialogResult(true, browser.SelectedFile, browser.FilePath);
@@ -37,21 +37,12 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
             return new SaveDialogResult(false, null, null);
         }
 
-        public BrowseDialogResultFile DisplayBrowseDialog(List<string> extensions)
+        public BrowseDialogResult DisplayBrowseDialog(List<string> extensions)
         {
-            using var browser = new PackFileBrowserWindow(_packFileBrowserBuilder, extensions, showCaFiles: true, showFoldersOnly: false, useEditablePackOnly: false);
+            using var browser = new PackFileBrowserWindow(_packFileBrowserBuilder, extensions);
 
             var saveResult = browser.ShowDialog();
-            var output = new BrowseDialogResultFile(saveResult, browser.SelectedFile);
-            return output;
-        }
-
-        public BrowseDialogResultFolder DisplayBrowseFoldersDialog()
-        {
-            using var browser = new PackFileBrowserWindow(_packFileBrowserBuilder, null, showCaFiles: false, showFoldersOnly: true, useEditablePackOnly: true);
-
-            var saveResult = browser.ShowDialog();
-            var output = new BrowseDialogResultFolder(saveResult, browser.SelectedFolder);
+            var output = new BrowseDialogResult(saveResult, browser.SelectedFile);
             return output;
         }
 

@@ -47,21 +47,21 @@ namespace Editors.Shared.Core
         {
             EditorInfoBuilder
                 .Create<TextEditorViewModel<VariantMeshToXmlConverter>, TextEditorView>(EditorEnums.XML_VariantMesh_Editor)
-                .AddExtension(".variantmeshdefinition", EditorPriorites.High)
+                .AddExtention(".variantmeshdefinition", EditorPriorites.High)
                 .Build(factory);
+
 
             EditorInfoBuilder
                 .Create<TextEditorViewModel<DefaultTextConverter>, TextEditorView>(EditorEnums.XML_Editor)
-                .AddExtension(".json", EditorPriorites.Default)
-                .AddExtension(".xml", EditorPriorites.Default)
-                .AddExtension(".txt", EditorPriorites.Default)
-                .AddExtension(".wsmodel", EditorPriorites.Default)
-                .AddExtension(".xml.material", EditorPriorites.Default)
-                .AddExtension(".anm.meta.xml", EditorPriorites.Default)
-                .AddExtension(".bmd.xml", EditorPriorites.Default)
-                .AddExtension(".csv", EditorPriorites.Default)
-                .AddExtension(".bnk.xml", EditorPriorites.Default)
-                .AddExtension(".aproj", EditorPriorites.Default)
+                .AddExtention(".json", EditorPriorites.Default)
+                .AddExtention(".xml", EditorPriorites.Default)
+                .AddExtention(".txt", EditorPriorites.Default)
+                .AddExtention(".wsmodel", EditorPriorites.Default)
+                .AddExtention(".xml.material", EditorPriorites.Default)
+                .AddExtention(".anm.meta.xml", EditorPriorites.Default)
+                .AddExtention(".bmd.xml", EditorPriorites.Default)
+                .AddExtention(".csv", EditorPriorites.Default)
+                .AddExtention(".bnk.xml", EditorPriorites.Default)
                 .Build(factory);
         }
     }

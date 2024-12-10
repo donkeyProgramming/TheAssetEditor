@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using CommonControls.BaseDialogs;
 using GameWorld.Core.Utility;
 using Shared.Core.Misc;
-using Shared.Ui.BaseDialogs;
 using TextureEditor.Views;
 
 namespace Editors.TextureEditor.ViewModels

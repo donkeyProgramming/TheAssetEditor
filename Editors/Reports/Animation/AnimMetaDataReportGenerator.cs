@@ -59,7 +59,7 @@ namespace Editors.Reports.Animation
 
             var output = new Dictionary<string, FileReport>();
 
-            var fileList = PackFileServiceUtility.FindAllWithExtensionIncludePaths(_pfs, ".meta");
+            var fileList = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_pfs, ".meta");
             var failedFiles = new List<string>();
 
             var metaTable = new List<(string Path, MetaDataFile File)>();

@@ -20,7 +20,7 @@ namespace Editor.VisualSkeletonEditor
         {
             EditorInfoBuilder
                 .Create<SkeletonEditorViewModel, EditorHostView>(EditorEnums.VisualSkeletonEditor)
-                .AddExtension(".anim", EditorPriorites.High)
+                .AddExtention(".anim", EditorPriorites.High)
                 .ValidForFoldersContaining(@"animations\skeletons")
                 .ValidForFoldersContaining("tech")
                 .AddToToolbar("Skeleton Tool", true)

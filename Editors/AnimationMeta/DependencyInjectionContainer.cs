@@ -43,14 +43,14 @@ namespace Editors.AnimationMeta
         {
             EditorInfoBuilder
                 .Create<SuperViewViewModel, EditorHostView>(EditorEnums.SuperView_Editor)
-                .AddToToolbar("Super View")
+                .AddToToolbar("SuperView")
                 .Build(factory);
 
             EditorInfoBuilder
                 .Create<MetaDataEditorViewModel, MainEditorView> (EditorEnums.Meta_Editor)
-                .AddExtension(".anm.meta", EditorPriorites.High)
-                .AddExtension(".meta", EditorPriorites.High)
-                .AddExtension(".snd.meta", EditorPriorites.High)
+                .AddExtention(".anm.meta", EditorPriorites.High)
+                .AddExtention(".meta", EditorPriorites.High)
+                .AddExtention(".snd.meta", EditorPriorites.High)
                 .Build(factory);
         }
     }

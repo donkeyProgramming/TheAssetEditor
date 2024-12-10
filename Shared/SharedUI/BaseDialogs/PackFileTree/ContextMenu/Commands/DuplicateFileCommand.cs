@@ -2,7 +2,7 @@
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 
-namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
+namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
 {
     public class DuplicateFileCommand(IPackFileService packFileService) : IContextMenuCommand
     {

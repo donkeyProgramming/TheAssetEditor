@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using GameWorld.Core.Components.Rendering;
+﻿using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace GameWorld.Core.Components
 {
@@ -56,7 +56,7 @@ namespace GameWorld.Core.Components
 
         public IEnumerable<ISceneNode> GetEnumeratorConditional(Func<ISceneNode, bool> condition)
         {
-            return RootNode.Search(i => i.Children, condition, SceneExtensions.GraphTraversal.BreadthFirst);
+            return RootNode.Search(i => i.Children, condition, SceneExtentions.GraphTraversal.BreadthFirst);
         }
 
         public void TriggerAddObjectEvent(ISceneNode parent, ISceneNode added)

@@ -4,7 +4,7 @@ using SharpGLTF.Schema2;
 using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
 using System.IO;
 using Shared.Core.PackFiles;
-using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.PackFileBrowser;
 using static Shared.Core.PackFiles.IPackFileService;
 using Shared.Core.Services;
 using Shared.Core.ErrorHandling.Exceptions;
@@ -12,7 +12,7 @@ using Editors.Shared.Core.Services;
 using System.Windows;
 using Shared.GameFormats.Animation;
 using Shared.Core.ErrorHandling;
-using Shared.Ui.BaseDialogs.StandardDialog.ErrorDialog;
+using CommonControls.BaseDialogs.ErrorListDialog;
 
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv
@@ -59,7 +59,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
                     var errorList = new ErrorList();                 
                     errorList.Error("Skeleton Not Found", $"Skeleton named '{skeletonName}' could not be found\nHave you selected the correct game AND loaded all CA Pack Files?");                   
                     
-                    ErrorListWindow.ShowDialog("Skeleton Errors", errorList);
+                    ErrorListWindow.ShowDialog("Skeleton Error", errorList);
 
                     return;
                 }
@@ -70,8 +70,8 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 
             var packFileImported = new PackFile(importedFileName, new MemorySource(bytesRmv2));
 
-            var newFile = new NewPackFileEntry(settings.DestinationPackPath, packFileImported);
-            _packFileService.AddFilesToPack(settings.DestinationPackFileContainer, [newFile]);
+            var newFile = new NewPackFileEntry(settings.destinationPackNode.GetFullPath(), packFileImported);
+            _packFileService.AddFilesToPack(settings.destinationPackNode.FileOwner, [newFile]);
             
         }
 
