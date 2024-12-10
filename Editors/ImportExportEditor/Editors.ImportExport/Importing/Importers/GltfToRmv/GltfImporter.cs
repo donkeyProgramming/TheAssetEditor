@@ -17,13 +17,6 @@ using CommonControls.BaseDialogs.ErrorListDialog;
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 {
-    public record GltfImporterSettings
-    (
-        string InputGltfFile,
-        bool ConvertNormalTextureToOrnge,
-        TreeNode destinationPackNode
-     );
-
     public class GltfImporter
     {
         private readonly IPackFileService _packFileService;
