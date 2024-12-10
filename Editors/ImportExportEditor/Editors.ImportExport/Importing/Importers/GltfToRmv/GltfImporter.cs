@@ -70,8 +70,8 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
 
             var packFileImported = new PackFile(importedFileName, new MemorySource(bytesRmv2));
 
-            var newFile = new NewPackFileEntry(settings.destinationPackNode.GetFullPath(), packFileImported);
-            _packFileService.AddFilesToPack(settings.destinationPackNode.FileOwner, [newFile]);
+            var newFile = new NewPackFileEntry(settings.DestinationPackPath, packFileImported);
+            _packFileService.AddFilesToPack(settings.DestinationPackFileContainer, [newFile]);
             
         }
 
