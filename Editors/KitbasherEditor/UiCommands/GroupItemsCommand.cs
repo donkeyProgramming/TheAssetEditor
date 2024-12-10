@@ -1,16 +1,16 @@
-﻿using GameWorld.Core.Components.Selection;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using System.Windows.Input;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class GroupItemsCommand : IKitbasherUiCommand
+    public class GroupItemsCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "(Un)Group";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
-        public Hotkey HotKey { get; } = new Hotkey(Key.G, ModifierKeys.Control);
+        public Hotkey? HotKey { get; } = new Hotkey(Key.G, ModifierKeys.Control);
 
         private readonly SelectionManager _selectionManager;
         private readonly ObjectEditor _objectEditor;

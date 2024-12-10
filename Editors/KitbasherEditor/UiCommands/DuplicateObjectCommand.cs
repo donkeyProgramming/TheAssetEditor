@@ -1,16 +1,16 @@
-﻿using GameWorld.Core.Components.Selection;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using System.Windows.Input;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class DuplicateObjectCommand : IKitbasherUiCommand
+    public class DuplicateObjectCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Duplicate selection";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.ObjectOrFaceSelected;
-        public Hotkey HotKey { get; } = new Hotkey(Key.D, ModifierKeys.Control);
+        public Hotkey? HotKey { get; } = new Hotkey(Key.D, ModifierKeys.Control);
 
         private readonly SelectionManager _selectionManager;
         private readonly ObjectEditor _objectEditor;

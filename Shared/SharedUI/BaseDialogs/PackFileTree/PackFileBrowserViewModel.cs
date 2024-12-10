@@ -100,11 +100,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             }
         }
 
-        private void Database_PackFilesAdded(PackFileContainer container, List<PackFile> files)
-        {
-            AddFiles(container, files);
-        }
-
         private void Database_PackFilesUpdated(PackFileContainerFilesUpdatedEvent e)
         {
             foreach (var file in e.ChangedFiles)

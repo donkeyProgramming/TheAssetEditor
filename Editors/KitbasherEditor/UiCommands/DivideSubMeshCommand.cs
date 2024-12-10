@@ -1,16 +1,16 @@
 ﻿using System.Windows.Input;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class DivideSubMeshCommand : IKitbasherUiCommand
+    public class DivideSubMeshCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Split mesh into logical parts. Hold left Alt to not combine logical sub-parts";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.OneObjectSelected;
-        public Hotkey HotKey { get; } = new Hotkey(Key.Add, ModifierKeys.None);
+        public Hotkey? HotKey { get; } = new Hotkey(Key.Add, ModifierKeys.None);
 
         private readonly SelectionManager _selectionManager;
         private readonly ObjectEditor _objectEditor;

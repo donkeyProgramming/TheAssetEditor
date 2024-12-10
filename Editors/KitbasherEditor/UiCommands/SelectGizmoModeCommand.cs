@@ -1,105 +1,64 @@
-﻿using GameWorld.Core.Components.Gizmo;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using GameWorld.Core.Components.Gizmo;
 using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using System.Windows.Input;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    internal class SelectGizmoModeCommand : IKitbasherUiCommand
+    internal class SelectGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel) : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Select Gizmo";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = new Hotkey(Key.Q, ModifierKeys.None);
 
-        private readonly GizmoComponent _gizmoComponent;
-        private readonly TransformToolViewModel _transformToolViewModel;
-
-        public SelectGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel)
-        {
-            _gizmoComponent = gizmoComponent;
-            _transformToolViewModel = transformToolViewModel;
-        }
-
         public void Execute()
         {
-            _gizmoComponent.ResetScale();
-            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.None);
-            _gizmoComponent.Disable();
+            gizmoComponent.ResetScale();
+            transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.None);
+            gizmoComponent.Disable();
         }
     }
 
-    internal class MoveGizmoModeCommand : IKitbasherUiCommand
+    internal class MoveGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel) : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Move Gizmo";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
         public Hotkey HotKey { get; } = new Hotkey(Key.W, ModifierKeys.None);
 
-        private readonly GizmoComponent _gizmoComponent;
-        private readonly TransformToolViewModel _transformToolViewModel;
-
-        public MoveGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel)
-        {
-            _gizmoComponent = gizmoComponent;
-            _transformToolViewModel = transformToolViewModel;
-        }
-
-
         public void Execute()
         {
-            _gizmoComponent.ResetScale();
-            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Translate);
-            _gizmoComponent.SetGizmoMode(GizmoMode.Translate);
+            gizmoComponent.ResetScale();
+            transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Translate);
+            gizmoComponent.SetGizmoMode(GizmoMode.Translate);
         }
-
-
     }
 
-    internal class RotateGizmoModeCommand : IKitbasherUiCommand
+    internal class RotateGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel) : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Rotate Gizmo";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
-        public Hotkey HotKey { get; } = new Hotkey(Key.E, ModifierKeys.None);
-
-        private readonly GizmoComponent _gizmoComponent;
-        private readonly TransformToolViewModel _transformToolViewModel;
-
-        public RotateGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel)
-        {
-            _gizmoComponent = gizmoComponent;
-            _transformToolViewModel = transformToolViewModel;
-        }
-
+        public Hotkey? HotKey { get; } = new Hotkey(Key.E, ModifierKeys.None);
 
         public void Execute()
         {
-            _gizmoComponent.ResetScale();
-            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Rotate);
-            _gizmoComponent.SetGizmoMode(GizmoMode.Rotate);
+            gizmoComponent.ResetScale();
+            transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Rotate);
+            gizmoComponent.SetGizmoMode(GizmoMode.Rotate);
         }
-
-
     }
 
-    internal class ScaleGizmoModeCommand : IKitbasherUiCommand
+    internal class ScaleGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel) : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Scale Gizmo";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;
-        public Hotkey HotKey { get; } = new Hotkey(Key.R, ModifierKeys.None);
-
-        private readonly GizmoComponent _gizmoComponent;
-        private readonly TransformToolViewModel _transformToolViewModel;
-
-        public ScaleGizmoModeCommand(GizmoComponent gizmoComponent, TransformToolViewModel transformToolViewModel)
-        {
-            _gizmoComponent = gizmoComponent;
-            _transformToolViewModel = transformToolViewModel;
-        }
+        public Hotkey? HotKey { get; } = new Hotkey(Key.R, ModifierKeys.None);
 
         public void Execute()
         {
-            _gizmoComponent.ResetScale();
-            _transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Scale);
-            _gizmoComponent.SetGizmoMode(GizmoMode.NonUniformScale);
+            gizmoComponent.ResetScale();
+            transformToolViewModel.SetMode(TransformToolViewModel.TransformMode.Scale);
+            gizmoComponent.SetGizmoMode(GizmoMode.NonUniformScale);
         }
     }
 }

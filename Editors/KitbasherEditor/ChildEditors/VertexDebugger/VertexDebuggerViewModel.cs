@@ -9,9 +9,9 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Ui.BaseDialogs.MathViews;
 
-namespace KitbasherEditor.ViewModels.VertexDebugger
+namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
 {
-    class VertexDebuggerViewModel : BaseComponent, IDisposable
+    public class VertexDebuggerViewModel : BaseComponent, IDisposable
     {
         public ObservableCollection<VertexInstance> VertexList { get; set; } = [];
 
@@ -112,7 +112,7 @@ namespace KitbasherEditor.ViewModels.VertexDebugger
                     var transformedBiNormal = Vector3.Transform(pos + vertexInfo.BiNormal * scale, modelMatrix);
                     var transformedTangent = Vector3.Transform(pos + vertexInfo.Tangent * scale, modelMatrix);
 
-                    _renderEngineComponent.AddRenderLines(LineHelper.AddLine(transformedPos, transformedNormal , Color.Red));
+                    _renderEngineComponent.AddRenderLines(LineHelper.AddLine(transformedPos, transformedNormal, Color.Red));
                     _renderEngineComponent.AddRenderLines(LineHelper.AddLine(transformedPos, transformedBiNormal, Color.Green));
                     _renderEngineComponent.AddRenderLines(LineHelper.AddLine(transformedPos, transformedTangent, Color.Blue));
                 }

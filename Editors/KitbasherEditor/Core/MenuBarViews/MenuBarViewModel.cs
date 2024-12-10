@@ -1,6 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Input;
+using Editors.KitbasherEditor.ChildEditors.MeshFitter;
+using Editors.KitbasherEditor.ChildEditors.PinTool;
+using Editors.KitbasherEditor.ChildEditors.ReRiggingTool;
+using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.UiCommands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
@@ -11,6 +16,10 @@ using Shared.Ui.Common.MenuSystem;
 
 namespace KitbasherEditor.ViewModels.MenuBarViews
 {
+
+
+
+
     public class MenuBarViewModel : IKeyboardHandler
     {
         public ObservableCollection<ToolbarItem> MenuItems { get; set; } = new ObservableCollection<ToolbarItem>();
@@ -39,6 +48,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             eventHub.Register<CommandStackChangedEvent>(this, OnUndoStackChanged);
             eventHub.Register<SelectionChangedEvent>(this, OnSelectionChanged);
+
         }
 
         void RegisterActions()
@@ -48,9 +58,9 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
 
             RegisterUiCommand<BrowseForReferenceCommand>();
             RegisterUiCommand<ImportGeneralReferenceCommand>();
+            RegisterUiCommand<ImportKarlHammerReferenceCommand>();
             
-            RegisterUiCommand<DeleteLodsCommand>();
-            RegisterUiCommand<ClearConsoleCommand>();
+            RegisterUiCommand<DeleteLodsCommand>();    
             RegisterUiCommand<UndoCommand>();
             RegisterUiCommand<SortMeshesCommand>();
 
@@ -97,12 +107,11 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
             builder.CreateToolBarItem<SaveAsCommand>(fileToolbar, "Save As");
             builder.CreateToolBarSeparator(fileToolbar);
             builder.CreateToolBarItem<BrowseForReferenceCommand>(fileToolbar, "Import Reference model");
-            
 
             var debugToolbar = builder.CreateRootToolBar("Debug");
             builder.CreateToolBarItem<ImportGeneralReferenceCommand>(debugToolbar, "Import General");
+            builder.CreateToolBarItem<ImportKarlHammerReferenceCommand>(debugToolbar, "Import Hammer");
             builder.CreateToolBarItem<DeleteLodsCommand>(debugToolbar, "Delete lods");
-            builder.CreateToolBarItem<ClearConsoleCommand>(debugToolbar, "Clear console");
 
             var toolsToolbar = builder.CreateRootToolBar("Tools");
             builder.CreateToolBarItem<GroupItemsCommand>(toolsToolbar, "(Un)Group selection");
@@ -231,7 +240,7 @@ namespace KitbasherEditor.ViewModels.MenuBarViews
                 _menuItemVisibilityRuleEngine.Validate(action);
         }
 
-        MenuAction GetMenuAction<T>() where T : IKitbasherUiCommand
+        MenuAction GetMenuAction<T>() where T : ITransientKitbasherUiCommand
         {
             return _uiCommands.First(x => x.Key == typeof(T)).Value;
         }

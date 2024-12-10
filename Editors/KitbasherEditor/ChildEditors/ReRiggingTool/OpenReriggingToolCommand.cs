@@ -1,44 +1,50 @@
-﻿using System.Windows;
-using CommonControls.Editors.BoneMapping.View;
+﻿using Editors.KitbasherEditor.ChildEditors.MeshFitter;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.ViewModels;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels.MenuBarViews;
-using KitbasherEditor.ViewModels.MeshFitter;
-using Shared.Core.PackFiles;
+using Shared.Core.Misc;
+using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
-using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;
-using MessageBox = System.Windows.MessageBox;
 
-namespace Editors.KitbasherEditor.UiCommands
+namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
 {
-    public class OpenReriggingToolCommand : IKitbasherUiCommand
+    public class OpenReriggingToolCommand : IScopedKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Open the re-rigging tool";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
+        private readonly IStandardDialogs _standardDialogs;
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly SelectionManager _selectionManager;
 
-        private readonly IPackFileService _packFileService;
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
-        private readonly IWindowFactory _windowFactory;
+        private readonly IAbstractFormFactory<ReRiggingWindow> _formFactory;
 
-        public OpenReriggingToolCommand(KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, IPackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, IWindowFactory windowFactory)
+        ReRiggingWindow? _windowHandle;
+
+        public OpenReriggingToolCommand(IStandardDialogs standardDialogs, KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<ReRiggingWindow> formFactory)
         {
+            _standardDialogs = standardDialogs;
             _kitbasherRootScene = kitbasherRootScene;
             _selectionManager = selectionManager;
 
-            _packFileService = packFileService;
             _skeletonHelper = skeletonHelper;
-            _windowFactory = windowFactory;
+            _formFactory = formFactory;
+
         }
         public void Execute()
         {
+            if (_windowHandle != null)
+            {
+                _windowHandle.BringIntoView();
+                return;
+            }
+
             var targetSkeletonName = _kitbasherRootScene.Skeleton.SkeletonName;
             var state = _selectionManager.GetState<ObjectSelectionState>();
 
@@ -49,7 +55,7 @@ namespace Editors.KitbasherEditor.UiCommands
             var selectedMeshes = state.SelectedObjects<Rmv2MeshNode>();
             if (selectedMeshes.Count(x => x.Geometry.VertexFormat == UiVertexFormat.Static) != 0)
             {
-                MessageBox.Show($"A static mesh is selected, which can not be remapped");
+                _standardDialogs.ShowDialogBox($"A static mesh is selected, which can not be remapped", "Error");
                 return;
             }
 
@@ -59,7 +65,7 @@ namespace Editors.KitbasherEditor.UiCommands
 
             if (selectedMeshSkeletons.Count() != 1)
             {
-                MessageBox.Show($"{selectedMeshSkeletons.Count()} skeleton types selected, the tool only works when a single skeleton types is selected");
+                _standardDialogs.ShowDialogBox($"{selectedMeshSkeletons.Count()} skeleton types selected, the tool only works when a single skeleton types is selected", "Error");
                 return;
             }
 
@@ -78,7 +84,7 @@ namespace Editors.KitbasherEditor.UiCommands
                 var hasValidBoneMapping = activeBonesMin >= 0 && skeletonBonesMax >= activeBonesMax;
                 if (!hasValidBoneMapping)
                 {
-                    MessageBox.Show($"Mesh {mesh.Name} has an invalid bones, this might cause issues. Its a result of an invalid re-rigging most of the time");
+                    _standardDialogs.ShowDialogBox($"Mesh {mesh.Name} has an invalid bones, this might cause issues. Its a result of an invalid re-rigging most of the time", "Error");
                     return;
                 }
                 allUsedBoneIndexes.AddRange(boneIndexes);
@@ -100,11 +106,26 @@ namespace Editors.KitbasherEditor.UiCommands
             };
 
             if (targetSkeletonName == selectedMeshSkeleton)
-                MessageBox.Show("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error", MessageBoxButton.OK);
+                _standardDialogs.ShowDialogBox("Trying to map to and from the same skeleton. This does not really make any sense if you are trying to make the mesh fit an other skeleton.", "Error");
 
-            var window = _windowFactory.Create<ReRiggingViewModel, BoneMappingView>("Re-rigging", 1200, 1100);
-            window.TypedContext.Initialize(selectedMeshes, window, config);
-            window.ShowWindow();
+            _windowHandle = _formFactory.Create();
+            _windowHandle.ViewModel.Initialize(selectedMeshes, config);
+            _windowHandle.Show();
+            _windowHandle.Closed += OnWindowClosed;
+        }
+
+        private void OnWindowClosed(object? sender, EventArgs e)
+        {
+            if (_windowHandle != null)
+                _windowHandle.Closed -= OnWindowClosed;
+
+            _windowHandle = null;
+        }
+
+        public void Dispose()
+        {
+            _windowHandle?.Close();
+            _windowHandle = null;
         }
     }
 }

@@ -1,0 +1,28 @@
+﻿<windowhandling:AssetEditorWindow  xmlns:windowhandling="clr-namespace:WindowHandling;assembly=Shared.Ui" x:Class="Editors.KitbasherEditor.ChildEditors.MeshFitter.MeshFitterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Editors.KitbasherEditor.ChildEditors.MeshFitter" 
+        xmlns:view="clr-namespace:CommonControls.Editors.BoneMapping.View;assembly=Editors.Shared.Core" 
+        xmlns:view1="clr-namespace:Editors.Shared.Core.Editors.BoneMapping.View;assembly=Editors.Shared.Core"
+        mc:Ignorable="d"
+        Style="{StaticResource CustomWindowStyle}"
+        Title="Mesh Fitter Tool" Height="500" Width="1000">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <view:BoneMappingView Grid.Row="0"/>
+        <view1:BoneMappingMetaDataView Grid.Row="1"/>
+        
+        <DockPanel Grid.Row="2" LastChildFill="False" >
+            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="Apply" Click="ApplyButtonClick"/>
+            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="OK" Click="OkButtonClick"/>
+            <Button DockPanel.Dock="Right" Width="50" Margin="3" Content="Cancel" Click="CancelButtonClick"/>
+        </DockPanel>
+    </Grid>
+</windowhandling:AssetEditorWindow>

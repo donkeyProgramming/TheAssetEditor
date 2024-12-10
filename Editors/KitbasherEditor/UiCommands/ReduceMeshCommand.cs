@@ -1,16 +1,16 @@
-﻿using GameWorld.Core.Components.Selection;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class ReduceMeshCommand : IKitbasherUiCommand
+    public class ReduceMeshCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Reduce the mesh polygon count by 10%";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         private readonly SelectionManager _selectionManager;
         private readonly ObjectEditor _objectEditor;

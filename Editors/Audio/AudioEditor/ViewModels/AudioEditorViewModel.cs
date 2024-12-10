@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using CommonControls.PackFileBrowser;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Views;
@@ -11,14 +10,13 @@ using Editors.Audio.Storage;
 using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.WindowHandling;
 using static Editors.Audio.AudioEditor.AudioEditorViewModelHelpers;
 using static Editors.Audio.AudioEditor.DynamicDataGrid;
-using static Shared.Core.PackFiles.IPackFileService;
 
 namespace Editors.Audio.AudioEditor.ViewModels
 {
@@ -35,7 +33,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
     {
         private readonly IAudioRepository _audioRepository;
         private readonly IPackFileService _packFileService;
-        private readonly IWindowFactory _windowFactory;
+        private readonly IAbstractFormFactory<AudioEditorSettingsWindow> _windowFactory;
         private readonly IStandardDialogs _packFileUiProvider;
         readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
 
@@ -50,7 +48,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         public static Dictionary<string, List<Dictionary<string, object>>> EventsData => AudioEditorData.Instance.EventsData; // Data storage for AudioEditorDataGridItems - managed in a single instance for ease of access.
         public static List<string> AudioProjectDialogueEvents => AudioEditorData.Instance.AudioProjectDialogueEvents;
 
-        public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IWindowFactory windowFactory, IStandardDialogs packFileUiProvider)
+        public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IAbstractFormFactory<AudioEditorSettingsWindow> windowFactory, IStandardDialogs packFileUiProvider)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;
@@ -74,15 +72,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         [RelayCommand] public void NewAudioProject()
         {
-            var window = _windowFactory.Create<AudioEditorSettingsViewModel, AudioEditorSettingsView>("New Audio Project", 500, 410);
-            window.AlwaysOnTop = false;
-            window.ResizeMode = ResizeMode.NoResize;
-
-            // Set the close action
-            if (window.DataContext is AudioEditorSettingsViewModel viewModel)
-                viewModel.SetCloseAction(() => window.Close());
-
-            window.ShowWindow();
+            var window = _windowFactory.Create().ShowDialog();
         }
 
         [RelayCommand] public void LoadAudioProject()

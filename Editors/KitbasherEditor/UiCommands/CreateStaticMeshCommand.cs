@@ -1,19 +1,19 @@
-﻿using GameWorld.Core.Commands;
+﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 using MessageBox = System.Windows.MessageBox;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class CreateStaticMeshCommand : IKitbasherUiCommand
+    public class CreateStaticMeshCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Convert the selected mesh at at the given animation frame into a static mesh";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;
-        public Hotkey HotKey { get; } = null;
+        public Hotkey? HotKey { get; } = null;
 
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly SelectionManager _selectionManager;

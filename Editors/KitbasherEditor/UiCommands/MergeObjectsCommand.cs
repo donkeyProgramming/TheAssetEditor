@@ -1,17 +1,17 @@
 ﻿using System.Windows.Input;
 using CommonControls.BaseDialogs.ErrorListDialog;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Services;
-using KitbasherEditor.ViewModels.MenuBarViews;
 using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.UiCommands
 {
-    public class MergeObjectsCommand : IKitbasherUiCommand
+    public class MergeObjectsCommand : ITransientKitbasherUiCommand
     {
         public string ToolTip { get; set; } = "Merge selected meshes";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.TwoOrMoreObjectsSelected;
-        public Hotkey HotKey { get; } = new Hotkey(Key.M, ModifierKeys.Control);
+        public Hotkey? HotKey { get; } = new Hotkey(Key.M, ModifierKeys.Control);
 
         private readonly SelectionManager _selectionManager;
         private readonly ObjectEditor _objectEditor;

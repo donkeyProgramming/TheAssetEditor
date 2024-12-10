@@ -7,10 +7,9 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.GameFormats.Animation;
 using Shared.Ui.BaseDialogs.MathViews;
-using Shared.Ui.BaseDialogs.WindowHandling;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace KitbasherEditor.ViewModels.MeshFitter
+namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
 {
     public class MeshFitterViewModel : BoneMappingViewModel, IDisposable
     {
@@ -33,7 +32,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
 
         public NotifyAttr<bool> IsBoneSelected { get; set; } = new NotifyAttr<bool>(false);
         public DoubleViewModel BoneScaleFactor { get; set; } = new DoubleViewModel(1);
-        public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0,0,0);
+        public Vector3ViewModel BonePositionOffset { get; set; } = new Vector3ViewModel(0, 0, 0);
         public Vector3ViewModel BoneRotationOffset { get; set; } = new Vector3ViewModel(0, 0, 0);
 
         public MeshFitterViewModel(CommandFactory commandFactory, AnimationsContainerComponent animationsContainerComponent, SceneManager sceneManager)
@@ -43,11 +42,11 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _sceneManager = sceneManager;
         }
 
-        public void Initialize(IAssetEditorWindow ownerWindow, RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile)
+        public void Initialize(RemappedAnimatedBoneConfiguration configuration, List<Rmv2MeshNode> meshNodes, GameSkeleton targetSkeleton, AnimationFile currentSkeletonFile)
         {
             ShowApplyButton.Value = false;
             ShowTransformSection.Value = true;
-            Initialize(ownerWindow, configuration);
+            Initialize(configuration);
 
             _meshNodes = meshNodes;
             _targetSkeleton = targetSkeleton;
@@ -67,7 +66,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             _animationClip = new AnimationClip();
             _animationClip.DynamicFrames.Add(new AnimationClip.KeyFrame());
 
-            for (int i = 0; i < _fromSkeleton.BoneCount; i++)
+            for (var i = 0; i < _fromSkeleton.BoneCount; i++)
             {
                 _animationClip.DynamicFrames[0].Rotation.Add(_fromSkeleton.Rotation[i]);
                 _animationClip.DynamicFrames[0].Position.Add(_fromSkeleton.Translation[i]);
@@ -155,7 +154,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             var mapping = AnimatedBoneHelper.BuildRemappingList(MeshBones.PossibleValues.First());
 
             // Reset the animation back to bind pose
-            for (int i = 0; i < _fromSkeleton.BoneCount; i++)
+            for (var i = 0; i < _fromSkeleton.BoneCount; i++)
             {
                 _animationClip.DynamicFrames[0].Rotation[i] = _fromSkeleton.Rotation[i];
                 _animationClip.DynamicFrames[0].Position[i] = _fromSkeleton.Translation[i];
@@ -163,14 +162,14 @@ namespace KitbasherEditor.ViewModels.MeshFitter
             }
 
             // Set the base scale for the mesh and apply the animation
-            float baseScale = (float)ScaleFactor.Value;
+            var baseScale = (float)ScaleFactor.Value;
             _animationClip.DynamicFrames[0].Scale[0] = new Vector3(baseScale);
             _animationPlayer.Refresh();
 
             if (baseScale == 0)
                 return;
 
-            for (int i = 0; i < _fromSkeleton.BoneCount; i++)
+            for (var i = 0; i < _fromSkeleton.BoneCount; i++)
             {
                 var mappedIndex = mapping.FirstOrDefault(x => x.OriginalValue == i);
                 var boneValuesObject = MeshBones.PossibleValues.First().GetFromBoneId(i);
@@ -239,7 +238,7 @@ namespace KitbasherEditor.ViewModels.MeshFitter
                 var childBones = _fromSkeleton.GetDirectChildBones(i);
                 foreach (var childBoneIndex in childBones)
                 {
-                    float invScale = 1 / scale;
+                    var invScale = 1 / scale;
                     _animationClip.DynamicFrames[0].Scale[childBoneIndex] *= new Vector3(invScale);
                 }
 
