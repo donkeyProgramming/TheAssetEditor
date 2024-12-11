@@ -939,9 +939,10 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Rectangle Margin="2" SnapsToDevicePixels="true" 
-                                   Stroke="{DynamicResource ABrush.ColourfulGlyph.Static}"
-                                   StrokeThickness="1" StrokeDashArray="1 2"/>
+                    <Rectangle 
+                        Margin="2" SnapsToDevicePixels="true" 
+                        Stroke="{DynamicResource ABrush.ColourfulGlyph.Static}"
+                        StrokeThickness="1" StrokeDashArray="1 2"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -2183,8 +2184,8 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Border x:Name="radioButtonBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding ap:CornerRadiusHelper.Value}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="0,0,0,0" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Width="16" Height="16">
-                            <Grid x:Name="markGrid" Margin="2">
-                                <Ellipse x:Name="optionMark" Fill="{DynamicResource RadioButton.Static.Glyph}" MinWidth="6" MinHeight="6" Opacity="0"/>
+                            <Grid x:Name="markGrid" Margin="0">
+                                <Ellipse x:Name="optionMark" Fill="{DynamicResource RadioButton.Static.Glyph}" Width="8" Height="8" Opacity="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Grid>
                         </Border>
                         <ContentPresenter x:Name="contentPresenter" Grid.Column="0" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="20,0,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
@@ -3438,7 +3439,7 @@
     </Style>
 
     <Style TargetType="{x:Type DataGridCell}">
-        <Setter Property="Foreground" Value="{DynamicResource ABrush.Foreground.Static}"/>
+        <Setter Property="Foreground" Value="{DynamicResource DataGrid.CellItem.Static.Background}"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
@@ -4360,12 +4361,9 @@
                                     <Binding Path="ActualHeight" RelativeSource="{RelativeSource Self}"/>
                                 </MultiBinding>
                             </Border.OpacityMask>
-                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0">
-                                <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0"/>
-                            </Border>
                         </Border>
                         <Border x:Name="Header" Grid.Column="1" Padding="3,1,3,0" Grid.Row="0" Grid.RowSpan="2">
-                            <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" HorizontalAlignment="Center"/>
                         </Border>
                         <ContentPresenter Grid.ColumnSpan="2" Grid.Column="1" Margin="{TemplateBinding Padding}" Grid.Row="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                     </Grid>
@@ -4373,7 +4371,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-
+    
     <Style x:Key="DefaultGroupbox" TargetType="{x:Type GroupBox}">
         <Setter Property="BorderBrush" Value="{DynamicResource GroupBox.Static.Border}"/>
         <Setter Property="Background" Value="{DynamicResource GroupBox.Static.Background}"/>
@@ -4722,6 +4720,7 @@
                             <!--
                             <Setter Property="Content" TargetName="ExpandText" Value="-"/>
                             -->
+                            <Setter Property="Margin" TargetName="ExpandPath" Value="4, 5, 0, 0"/>
                             <Setter Property="RenderTransform" TargetName="ExpandPath">
                                 <Setter.Value>
                                     <RotateTransform Angle="180" CenterY="3" CenterX="3"/>
