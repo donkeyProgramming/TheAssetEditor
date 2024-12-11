@@ -1,6 +1,6 @@
-﻿using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.External;
+﻿using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     public class AdvancedExportCommand(IExportFileContextMenuHelper exportFileContextMenuHelper) : IContextMenuCommand
     {

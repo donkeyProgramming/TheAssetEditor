@@ -1,6 +1,6 @@
 ﻿using Shared.Core.Events;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     public interface IContextMenuCommand : IUiCommand
     {

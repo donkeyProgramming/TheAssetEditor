@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Windows;
 using CommonControls.BaseDialogs;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using CommonControls.PackFileBrowser;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
+using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.StandardDialog.PackFile;
 using Shared.Ui.Common.Exceptions;
 
 namespace Shared.Ui.BaseDialogs.StandardDialog

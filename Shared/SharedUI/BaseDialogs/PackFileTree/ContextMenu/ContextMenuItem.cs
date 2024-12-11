@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 {
     public class ContextMenuItem
     {
@@ -34,7 +34,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
         public ContextMenuItem2(string name, Action? action)
         {
             Name = name;
-            if(action != null)
+            if (action != null)
                 Command = new RelayCommand(action);
         }
 

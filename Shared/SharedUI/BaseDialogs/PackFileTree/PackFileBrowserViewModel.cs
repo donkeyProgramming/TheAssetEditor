@@ -10,10 +10,10 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.Common;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     public delegate void FileSelectedDelegate(PackFile file);
     public delegate void NodeSelectedDelegate(TreeNode node);
@@ -48,12 +48,12 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             _eventHub?.Register<PackFileContainerRemovedEvent>(this, PackFileContainerRemoved);
             _eventHub?.Register<PackFileContainerAddedEvent>(this, x => ReloadTree(x.Container));
             _eventHub?.Register<PackFileContainerFilesUpdatedEvent>(this, Database_PackFilesUpdated);
-            _eventHub?.Register<PackFileContainerFilesAddedEvent>(this, x=> AddFiles(x.Container, x.AddedFiles));
+            _eventHub?.Register<PackFileContainerFilesAddedEvent>(this, x => AddFiles(x.Container, x.AddedFiles));
             _eventHub?.Register<PackFileContainerFilesRemovedEvent>(this, x => Database_PackFilesRemoved(x.Container, x.RemovedFiles));
-                         
+
             _eventHub?.Register<PackFileContainerFolderRemovedEvent>(this, x => Database_PackFileFolderRemoved(x.Container, x.Folder));
             _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => Database_PackFileFolderRenamed(x.Container, x.NewNodePath));
-       
+
             Filter = new SearchFilter(Files);
 
             foreach (var item in _packFileService.GetAllPackfileContainers())
@@ -146,7 +146,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 item.IsMainEditabelPack = false;
 
             var newContiner = Files.FirstOrDefault(x => x.FileOwner == e.Container);
-            if(newContiner != null)
+            if (newContiner != null)
                 newContiner.IsMainEditabelPack = true;
         }
 

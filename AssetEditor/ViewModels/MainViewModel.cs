@@ -10,8 +10,8 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.Common;
 using Shared.Ui.Events.UiCommands;
 

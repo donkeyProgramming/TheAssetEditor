@@ -2,15 +2,14 @@
 using System.ComponentModel;
 using System.Windows;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu;
+using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 
-namespace CommonControls.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
 {
     public partial class SavePackFileWindow : Window, IDisposable, INotifyPropertyChanged
     {
-        public PackFile SelectedFile { get; set; }
+        public Core.PackFiles.Models.PackFile SelectedFile { get; set; }
         public PackFileBrowserViewModel ViewModel { get; set; }
 
         TreeNode _selectedNode;
@@ -45,7 +44,7 @@ namespace CommonControls.PackFileBrowser
             SelectedFile = _selectedNode.Item;
         }
 
-        private void ViewModel_FileOpen(PackFile file)
+        private void ViewModel_FileOpen(Core.PackFiles.Models.PackFile file)
         {
             SelectedFile = file;
             Button_Click(null, null);
@@ -65,7 +64,7 @@ namespace CommonControls.PackFileBrowser
                     return;
             }
 
-            string path = "";
+            var path = "";
             if (SelectedFile != null)
             {
                 path = _packfileService.GetFullPath(SelectedFile);

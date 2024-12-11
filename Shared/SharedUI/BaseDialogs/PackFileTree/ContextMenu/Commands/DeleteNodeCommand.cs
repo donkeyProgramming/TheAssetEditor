@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using Shared.Core.PackFiles;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     public class DeleteNodeCommand(IPackFileService packFileService) : IContextMenuCommand
     {
@@ -10,7 +10,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
 
         public void Execute(TreeNode _selectedNode)
         {
-            if(_selectedNode.FileOwner.IsCaPackFile)
+            if (_selectedNode.FileOwner.IsCaPackFile)
             {
                 MessageBox.Show("Unable to edit CA packfile");
                 return;
