@@ -34,12 +34,12 @@ namespace AssetEditor.ViewModels
         public MainViewModel(
                 IEditorManager editorManager,
                 PackFileTreeViewFactory packFileBrowserBuilder,
-                MenuBarViewModel menuViewModel, 
-                IPackFileService packfileService, 
-                IEditorDatabase toolFactory, 
-                IUiCommandFactory uiCommandFactory, 
+                MenuBarViewModel menuViewModel,
+                IPackFileService packfileService,
+                IEditorDatabase toolFactory,
+                IUiCommandFactory uiCommandFactory,
                 IEventHub eventHub,
-                ApplicationSettingsService applicationSettingsService, 
+                ApplicationSettingsService applicationSettingsService,
                 GameInformationFactory gameInformationFactory)
         {
             MenuBar = menuViewModel;
@@ -49,7 +49,7 @@ namespace AssetEditor.ViewModels
 
             eventHub.Register<PackFileContainerSetAsMainEditableEvent>(this, SetStatusBarEditablePackFile);
 
-            FileTree = packFileBrowserBuilder.Create(ContextMenuType.MainApplication, true);
+            FileTree = packFileBrowserBuilder.Create(ContextMenuType.MainApplication, showCaFiles: true, showFoldersOnly: false);
             FileTree.FileOpen += OpenFile;
 
             ToolsFactory = toolFactory;
@@ -60,7 +60,7 @@ namespace AssetEditor.ViewModels
 
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenEditorCommand>().Execute(file);
 
-        [RelayCommand] private void Closing(IEditorInterface editor) 
+        [RelayCommand] private void Closing(IEditorInterface editor)
         {
             var hasUnsavedPackFiles = FileTree.Files.Any(node => node.UnsavedChanged);
             if (_editorManager.ShouldBlockCloseCommand(editor, hasUnsavedPackFiles))
