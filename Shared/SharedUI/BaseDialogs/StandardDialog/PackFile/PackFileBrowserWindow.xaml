@@ -6,11 +6,11 @@
         xmlns:packfiletree="clr-namespace:Shared.Ui.BaseDialogs.PackFileTree"
         Style="{StaticResource CustomWindowStyle}"
         mc:Ignorable="d"
-        Title="PackFileBrowserWindow" Height="450" Width="800">
-    <Grid>
+        Title="PackFileBrowserWindow" Height="460" Width="800">
+    <Grid Margin="10, 5, 10, 10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <packfiletree:PackFileBrowserView KeyboardNavigation.TabIndex="0" KeyboardNavigation.IsTabStop="True" Grid.Row="0" DataContext="{Binding ViewModel, Mode=OneTime}"/>
