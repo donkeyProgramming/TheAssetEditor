@@ -129,9 +129,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
             // using command parmeter to get node causes memory leaks, using selected node for now
             if (SelectedItem != null)
             {
-                if (ShowFoldersOnly)
-                    NodeSelected?.Invoke(SelectedItem);
-                else if (SelectedItem.GetNodeType() == NodeType.File)
+                if (SelectedItem.GetNodeType() == NodeType.File)
                     FileOpen?.Invoke(SelectedItem.Item);
                 else if (SelectedItem.GetNodeType() == NodeType.Directory && Keyboard.IsKeyDown(Key.LeftCtrl))
                     SelectedItem.ExpandIfVisible(true);

@@ -94,6 +94,9 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
             Add<ExpandNodeCommand>(selectedNode, rootNode);
             Add<CollapseNodeCommand>(selectedNode, rootNode);
             Add<ExportToDirectoryCommand>(selectedNode, rootNode);
+
+            if (!selectedNode.FileOwner.IsCaPackFile)
+                Add<OpenPackInFileExplorerCommand>(selectedNode, rootNode);
         }
     }
 }
