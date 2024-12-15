@@ -3,7 +3,7 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using Shared.EmbeddedResources;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ValueConverters
+namespace Shared.Ui.BaseDialogs.PackFileTree.ValueConverters
 {
     [ValueConversion(typeof(TreeNode), typeof(BitmapImage))]
     public class PackFileToImageValueConverter : IValueConverter

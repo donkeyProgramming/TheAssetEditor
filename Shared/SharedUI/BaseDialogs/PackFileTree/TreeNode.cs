@@ -5,7 +5,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Shared.Core.PackFiles.Models;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     public enum NodeType
     {
@@ -27,7 +27,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         [ObservableProperty] string _name = "";
         [ObservableProperty] bool _isNodeExpanded = false;
         [ObservableProperty] NodeType _nodeType;
-        
+
         public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode parent, PackFile? packFile = null)
         {
             Name = name;
@@ -63,7 +63,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
 
         public override string ToString() => Name;
 
-
         public List<TreeNode> GetAllChildFileNodes()
         {
             var output = new List<TreeNode>();
@@ -78,8 +77,6 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 foreach (var n in node.Children)
                     nodes.Push(n);
             }
-
-
             return output;
         }
 

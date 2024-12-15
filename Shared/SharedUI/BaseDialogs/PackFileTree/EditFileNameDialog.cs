@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using CommonControls.BaseDialogs;
 using MessageBox = System.Windows.MessageBox;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     /// <summary>
     /// Shows simple value entry dialog, for file/folder names
@@ -19,7 +18,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
         /// <param name="parentNode">Parent Node for checking for folders with identical names</param>
         /// <param name="currentValue">The Value of the property to edit</param>
         /// <returns>Edit Name, empty string if user pressed "cancel" </returns>
-        static public string ShowDialog(TreeNode parentNode, string currentValue )
+        static public string ShowDialog(TreeNode parentNode, string currentValue)
         {
             var isInputCorrect = false;
             var dialogTextBoxValue = currentValue;
@@ -36,12 +35,12 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser
                 dialogTextBoxValue = window.TextValue; // store for next dialog instance (if ínput is invalud)
 
                 isInputCorrect = isInputCorrect && IsStringProper(window.TextValue);
-                
+
                 newFileName = window.TextValue.ToLower().Trim();
-                                
+
                 isInputCorrect = isInputCorrect && IsFileNameUniqueInFolder(parentNode, newFileName);
 
-                isInputCorrect = isInputCorrect && AreStringCharsValidForFileName(newFileName);                
+                isInputCorrect = isInputCorrect && AreStringCharsValidForFileName(newFileName);
             }
 
             return newFileName;

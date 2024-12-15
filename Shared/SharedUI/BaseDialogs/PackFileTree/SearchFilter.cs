@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using Shared.Core.Misc;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     public class SearchFilter : NotifyPropertyChangedImpl, IDataErrorInfo
     {

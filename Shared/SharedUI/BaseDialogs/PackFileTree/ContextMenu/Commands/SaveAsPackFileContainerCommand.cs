@@ -2,7 +2,7 @@
 using Shared.Core.PackFiles;
 using Shared.Ui.Common;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     public class SaveAsPackFileContainerCommand(IPackFileService packFileService) : IContextMenuCommand
     {

@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ValueConverters
+namespace Shared.Ui.BaseDialogs.PackFileTree.ValueConverters
 {
     public class SortedCollectionViewSource : IValueConverter
     {
