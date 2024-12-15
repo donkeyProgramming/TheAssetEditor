@@ -169,7 +169,7 @@ namespace GameWorld.Core.Components.Rendering
             var device = _deviceResolverComponent.Device;
             device.RasterizerState = _rasterStates[RasterizerStateEnum.Normal];
 
-            if (renderingTechnique == RenderingTechnique.Normal)
+            if (renderingTechnique == RenderingTechnique.Normal && _renderLines.Count != 0)
             {
                 var shader = _resourceLib.GetStaticEffect(ShaderTypes.Line);
                 shader.Parameters["View"].SetValue(commonShaderParameters.View);

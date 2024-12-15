@@ -1,74 +1,51 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using GameWorld.Core.Commands;
-using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components.Selection;
-using GameWorld.Core.Rendering;
-using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
-using Microsoft.Xna.Framework;
-using Shared.Core.Misc;
+using Shared.Core.Services;
 
-namespace Editors.KitbasherEditor.ViewModels.PinTool
+namespace Editors.KitbasherEditor.ChildEditors.PinTool
 {
-    public class PinToolViewModel : ObservableObject
+    public enum RiggingMode
+    { 
+        Pin,
+        SkinWrap
+    }
+
+    public partial class PinToolViewModel : ObservableObject
     {
         private readonly SelectionManager _selectionManager;
         private readonly CommandFactory _commandFactory;
+        private readonly IStandardDialogs _standardDialogs;
 
-        Rmv2MeshNode _selectedVertexMesh;
-        List<int> _selectedVertexList = new();
+        [ObservableProperty] PinRiggingAlgorithm _pinMode;
+        [ObservableProperty] SkinWrapAlgorithm _skinWrapMode;
+        [ObservableProperty] RiggingMode[] _possibleRiggingModes = Enum.GetValues<RiggingMode>();
+        [ObservableProperty] RiggingMode _selectedRiggingMode = RiggingMode.Pin;
+        [ObservableProperty] ObservableCollection<Rmv2MeshNode> _affectedMeshCollection = [];
+        [ObservableProperty] ObservableCollection<Rmv2MeshNode> _sourceMeshCollection = [];
 
-        public ObservableCollection<Rmv2MeshNode> AffectedMeshCollection { get; set; } = new ObservableCollection<Rmv2MeshNode>();
-        public ObservableCollection<Rmv2MeshNode> SourceMeshCollection { get; set; } = new ObservableCollection<Rmv2MeshNode>();
-
-        public NotifyAttr<string> SelectedForStaticMeshName { get; set; } = new NotifyAttr<string>();
-        public NotifyAttr<string> SelectedForStaticDescription { get; set; } = new NotifyAttr<string>($"Selected vertex count : ");
-
-
-        public PinToolViewModel(SelectionManager selectionManager, CommandFactory commandFactory)
+        public PinToolViewModel(SelectionManager selectionManager, CommandFactory commandFactory, IStandardDialogs standardDialogs)
         {
             _selectionManager = selectionManager;
             _commandFactory = commandFactory;
+            _standardDialogs = standardDialogs;
+
+            _pinMode = new PinRiggingAlgorithm(_commandFactory, _standardDialogs, _selectionManager);
+            _skinWrapMode = new SkinWrapAlgorithm(_commandFactory, _standardDialogs, _selectionManager);
         }
 
-        public void ClearSourcedMeshCollection() => SourceMeshCollection.Clear();
-        public void AddSelectionToSourceMeshCollection() => AddSelectionToList(SourceMeshCollection);
-        public void ClearAffectedMeshCollection() => AffectedMeshCollection.Clear();
-        public void AddSelectionToAffectMeshCollection() => AddSelectionToList(AffectedMeshCollection);
-
-        public void SetSelectedVertex()
-        {
-            _selectedVertexList.Clear();
-            _selectedVertexMesh = null;
-
-            SelectedForStaticMeshName.Value = "";
-            SelectedForStaticDescription.Value = $"Selected vertex count : ";
-
-            var selectionState = _selectionManager.GetState<VertexSelectionState>();
-
-            if (selectionState == null || selectionState.SelectionCount() == 0)
-            {
-                MessageBox.Show("No vertex selected", "Error");
-            }
-            else
-            {
-                _selectedVertexMesh = selectionState.GetSingleSelectedObject() as Rmv2MeshNode;
-                _selectedVertexList = selectionState.SelectedVertices.ToList();
-
-                SelectedForStaticMeshName.Value = _selectedVertexMesh.Name;
-                SelectedForStaticDescription.Value = $"Num selected verts: {_selectedVertexList.Count}";
-            }
-        }
+        [RelayCommand] void ClearAffectedMeshCollection() => AffectedMeshCollection.Clear();
+        [RelayCommand] void AddSelectionToAffectMeshCollection() => AddSelectionToList(AffectedMeshCollection);
 
         void AddSelectionToList(ObservableCollection<Rmv2MeshNode> itemList)
         {
             var selectionState = _selectionManager.GetState<ObjectSelectionState>();
-
             if (selectionState == null)
             {
-                MessageBox.Show("Please select objects", "Error");
+                _standardDialogs.ShowDialogBox("Please select objects", "Error");
                 return;
             }
 
@@ -89,76 +66,25 @@ namespace Editors.KitbasherEditor.ViewModels.PinTool
                 itemList.Add(item);
         }
 
-        public void Apply()
+        public bool Apply()
         {
             if (AffectedMeshCollection.Count == 0)
             {
-                MessageBox.Show("No meshes to be affected seleceted", "Error");
-                return;
+                _standardDialogs.ShowDialogBox("No meshes to be affected seleceted", "Error");
+                return false;
             }
 
-            ApplyPintToPoint();
-        }
-
-        void ApplyPintToPoint()
-        {
-            if (_selectedVertexMesh == null || _selectedVertexList.Count == 0)
+            switch (SelectedRiggingMode)
             {
-                MessageBox.Show("No mesh or vertex selected", "Error");
-                return;
+                case RiggingMode.Pin:
+                    return PinMode.Execute(AffectedMeshCollection.ToList());
+              
+                case RiggingMode.SkinWrap:
+                    return SkinWrapMode.Excute(AffectedMeshCollection.ToList());
+                default:
+                    throw new NotImplementedException($"unable to find an algorithm for selected mode '{SelectedRiggingMode}'");
             }
 
-            if (AffectedMeshCollection.Any(x => x == _selectedVertexMesh))
-            {
-                MessageBox.Show("Source mesh is also in the list of target meshes", "Error");
-                return;
-            }
-
-            _commandFactory.Create<PinMeshToVertexCommand>().Configure(x => x.Configure(AffectedMeshCollection, _selectedVertexMesh, _selectedVertexList.First())).BuildAndExecute();
         }
     }
-
-   //public class FindClosestPointOnMesh
-   //{
-   //
-   //    public VertexPositionNormalTextureCustom Process(Vector3 inputVertexPosition, MeshObject meshObject)
-   //    {
-   //        var minDistance = float.MaxValue;
-   //        var minPolygonIndex = -1;
-   //
-   //        var vertexList = meshObject.GetVertexList();
-   //        var polygonCount = meshObject.IndexArray.Length / 3;
-   //        for (int polygonIndex = 0; polygonIndex < polygonCount; polygonIndex += 3)
-   //        {
-   //            var i0 = meshObject.IndexArray[polygonIndex + 0];
-   //            var i1 = meshObject.IndexArray[polygonIndex + 1];
-   //            var i2 = meshObject.IndexArray[polygonIndex + 2];
-   //
-   //            var v0 = vertexList[i0];
-   //            var v1 = vertexList[i1];
-   //            var v2 = vertexList[i2];
-   //
-   //            var closetPoint = MathUtil.ClosestPtPointTriangle(inputVertexPosition, v0, v1, v2);
-   //            var dist = Math.Abs(Vector3.DistanceSquared(closetPoint, inputVertexPosition));
-   //
-   //            if (dist > minDistance)
-   //            {
-   //                minDistance = dist;
-   //                minPolygonIndex = polygonIndex;
-   //            }
-   //        }
-   //
-   //        if(minPolygonIndex == -1)
-   //        // Find closes polygon
-   //        // Find closes point on polygon
-   //        // Combyt berry cord 
-   //    
-   //    
-   //    
-   //    }
-   //
-   //
-   //
-   //
-   //}
 }

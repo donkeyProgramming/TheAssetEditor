@@ -1,4 +1,11 @@
+Fixes for v055:
+	General: Double clicking nodes does not expand them
+	Fixed rendering crash with all empty scene 
+Make sure double click works!
+
 Bugs:
+	KitbashTool: Import hammer, make whole node editable. Select mesh. No scene node view 
+	KitbashTool: Bug related to offsets and bounding box 
 	KitbashTool: Saving kitbash scene with name "test" and no folder crashes
 	KitbashTool: Pin tool keeps state after open and close. Also possible to make multiple instances
 	KitbashTool: After adding several items from reference meshes, not possible to create context menu for rest 
@@ -13,9 +20,13 @@ Bugs:
 	3d: Screen to small - infinate Exception loop
 	KitbashTool: Issues with rendering/selection and pivot point
 	SkeletonTool: Should show the pos/quat/xyz of a given bone 
+	Ganeral: Try and rename folder in backfilebrowser - crashes
+	3d: textues that cant be loaded, constant error window
 	KitbashTool: Rome 2 support https://github.com/donkeyProgramming/TheAssetEditor/issues/174
+	KitbashTool: Right clicking a node does not alway display the context menu https://discord.com/channels/373745291289034763/795235087352201226/1312940367532003379
 	
 Improvements:
+	General: Upgrade to new community toolkit
 	General: Save Active pack button https://github.com/donkeyProgramming/TheAssetEditor/issues/123
 	KitbashTool: Second UV map on export and render
 	KitbashTool: ship_ambientmap and tiled_dirtmap rigid materials support https://discord.com/channels/373745291289034763/1009267073987399740/threads/1312018739599904778

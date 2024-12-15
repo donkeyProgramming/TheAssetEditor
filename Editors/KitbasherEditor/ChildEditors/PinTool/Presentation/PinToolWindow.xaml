@@ -1,0 +1,134 @@
+﻿<windowhandling:AssetEditorWindow  xmlns:windowhandling="clr-namespace:WindowHandling;assembly=Shared.Ui"
+                                   x:Class="Editors.KitbasherEditor.ViewModels.PinTool.PinToolWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Editors.KitbasherEditor.ViewModels.PinTool"
+        xmlns:s="http://schemas.singulink.com/xaml" xmlns:pintool="clr-namespace:Editors.KitbasherEditor.ChildEditors.PinTool"
+        mc:Ignorable="d"
+                                
+        Style="{StaticResource CustomWindowStyle}"
+        Title="Pin Tool" Height="600" Width="400">
+    <DockPanel LastChildFill="False">
+
+        <Expander Header="Instructions" DockPanel.Dock="Top">
+            <TextBlock Margin="10,0,0,10">
+                1. Select mode: 
+                <LineBreak/>
+                'Pin': for things which should not bend
+                <LineBreak/>
+                'Skin wrap': for things which should deform
+                <LineBreak/>           
+                2. Select meshes which should get new animation
+                <LineBreak/>
+                3. Select the meshes to take animation from
+                <LineBreak/>
+                'Pin': go into vertex mode and press button with a vertex selected
+                <LineBreak/>
+                'Skin wrap': select mesh
+                <LineBreak/>
+                4. Press Apply
+            </TextBlock>
+        </Expander>
+
+        <DockPanel DockPanel.Dock="Top">
+            <Label Content="Animation transfer mode:"/>
+            <ComboBox Margin="10,0,0,0" ItemsSource="{Binding PossibleRiggingModes, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding SelectedRiggingMode, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+        </DockPanel>
+
+        <GroupBox Header="Apply animation to:" Margin="0,5,0,0" DockPanel.Dock="Top">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.5*"/>
+                    <ColumnDefinition Width="0.5*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+                <ListView Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{Binding AffectedMeshCollection, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" >
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Height" Value="30"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+
+                <Button Content="Add selected meshes" Grid.Row="1" Grid.Column="0" Margin="2,2,2,0" Command="{Binding AddSelectionToAffectMeshCollectionCommand}" />
+                <Button Content="Remove all" Grid.Row="1" Grid.Column="1" Margin="2,2,2,0" Command="{Binding ClearAffectedMeshCollectionCommand}" />
+            </Grid>
+        </GroupBox>
+
+        <ContentControl DockPanel.Dock="Top">
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Style.Triggers>
+                        <!-- Pin -->
+                        <DataTrigger Binding="{Binding SelectedRiggingMode, UpdateSourceTrigger=PropertyChanged}" Value="Pin">
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <GroupBox Header="Take animation from (PinMode):" Margin="0,5,0,0">
+                                        <Grid >
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="auto"/>
+                                                <RowDefinition Height="auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <Label Grid.Column="0" Grid.Row="0" Content="Source:"/>
+                                            <TextBox Grid.Column="1" Grid.Row="0" IsReadOnly="true" VerticalContentAlignment="Center" Margin="2" Text="{Binding PinMode.Description, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                            <Button Grid.Column="1" Grid.Row="1" Content="Set from selected Vertex" Margin="2" Command="{Binding PinMode.SetSelectionCommand}" />
+                                        </Grid>
+                                    </GroupBox>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+
+                        <!-- Skin Wrap -->
+                        <DataTrigger Binding="{Binding SelectedRiggingMode, UpdateSourceTrigger=PropertyChanged}" Value="SkinWrap">
+                            <Setter Property="Content">
+                                <Setter.Value>
+                                    <GroupBox Header="Take AnimationFrom (SkinWrapMode):" Margin="0,5,0,0">
+                                        <Grid >
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="auto"/>
+                                                <RowDefinition Height="auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <Label Grid.Column="0" Grid.Row="0" Content="Mesh:"/>
+                                            <TextBox Grid.Column="1" Grid.Row="0" IsReadOnly="true" VerticalContentAlignment="Center" Margin="2" Text="{Binding SkinWrapMode.Description, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Button Grid.Column="1" Grid.Row="1" Content="Set from selection" Margin="2" Command="{Binding SkinWrapMode.SetSelectionCommand}" />
+
+                                        </Grid>
+                                    </GroupBox>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+
+
+
+
+
+
+
+        <Button Content="Apply" Margin="2,5,2,2" Click="OnApplyClick" DockPanel.Dock="Top"/>
+
+    </DockPanel>
+</windowhandling:AssetEditorWindow>

@@ -1,4 +1,6 @@
 ﻿using Editors.KitbasherEditor.ChildEditors.MeshFitter;
+using Editors.KitbasherEditor.ChildEditors.PinTool;
+using Editors.KitbasherEditor.ChildEditors.PinTool.Commands;
 using Editors.KitbasherEditor.ChildEditors.ReRiggingTool;
 using Editors.KitbasherEditor.ChildEditors.VertexDebugger;
 using Editors.KitbasherEditor.Commands;
@@ -69,6 +71,8 @@ namespace Editors.KitbasherEditor
             // Pin tool
             serviceCollection.AddScoped<PinToolViewModel>();
             RegisterWindow<PinToolWindow>(serviceCollection);
+            serviceCollection.AddTransient<PinMeshToVertexCommand>();
+            serviceCollection.AddTransient<SkinWrapRiggingCommand>();
 
             // Save dialog
             serviceCollection.AddTransient<SaveDialogViewModel>();

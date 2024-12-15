@@ -134,7 +134,7 @@ namespace GameWorld.Core
             serviceCollection.AddTransient<GroupObjectsCommand>();
             serviceCollection.AddTransient<GrowMeshCommand>();
             serviceCollection.AddTransient<ObjectSelectionModeCommand>();
-            serviceCollection.AddTransient<PinMeshToVertexCommand>();
+
             serviceCollection.AddTransient<BoneSelectionCommand>();
             serviceCollection.AddTransient<TransformBoneCommand>();
             serviceCollection.AddTransient<ResetTransformBoneCommand>();

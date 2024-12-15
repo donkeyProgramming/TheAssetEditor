@@ -3,10 +3,8 @@ using GameWorld.Core.Components.Selection;
 using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace GameWorld.Core.Commands.Object
+namespace Editors.KitbasherEditor.ChildEditors.PinTool.Commands
 {
     public class PinMeshToVertexCommand : ICommand
     {
@@ -18,7 +16,6 @@ namespace GameWorld.Core.Commands.Object
         List<Rmv2MeshNode> _meshesToPin;
         Rmv2MeshNode _source;
         int _vertexId;
-
 
         public void Configure(IEnumerable<Rmv2MeshNode> meshesToPin, Rmv2MeshNode source, int vertexId)
         {
