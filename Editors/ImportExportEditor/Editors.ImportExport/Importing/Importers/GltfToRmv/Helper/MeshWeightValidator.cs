@@ -13,21 +13,17 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
     /// Validates weighting Rmv2 meshes
     /// </summary>
     public class MeshWeightValidator
-    {                
-        private bool _hasWeights = false;
-
-        public bool Validate(RmvMesh rmv2mesh)
+    {                       
+        static public bool Validate(RmvMesh rmv2mesh)
         {
             foreach (var vertex in rmv2mesh.VertexList)
             {
-                if (!ValidateVertexWeighting(vertex))
-                    return false;
+                ValidateVertexWeighting(vertex);                
             }
 
             return true;
         }
-
-        public bool ValidateVertexWeighting(CommonVertex v)
+        static public void ValidateVertexWeighting(CommonVertex v)
         {            
             if (v.WeightCount != v.BoneWeight.Length || v.WeightCount != v.BoneIndex.Length)
                 throw new Exception("Error: Invalid Vertex Weight State");            
@@ -44,17 +40,8 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
             if (weightSum < (1.0f - tolerance) || weightSum > (1.0f + tolerance))
                 throw new Exception("Error: sum of weights not 1.0f");
                         
-            if (v.WeightCount == 0)
-            {
-                if (_hasWeights)
-                    throw new Exception("Error: Invalid weights, 1 of more null weights in weighted mesh");
-
-                return false;
-            }
-
-            _hasWeights = true;
-
-            return true;
+            if (v.WeightCount == 0)                          
+                   throw new Exception("Error: Invalid weights, 1 of more null weights in weighted mesh");
         }
     }
 }
