@@ -11,28 +11,29 @@ namespace CommonControls.PackFileBrowser
     public partial class PackFileBrowserWindow : Window, IDisposable
     {
         public PackFile SelectedFile { get; set; }
+        public string SelectedFolder { get; set; }
+
         public PackFileBrowserViewModel ViewModel { get; set; }
 
-        public PackFileBrowserWindow(PackFileTreeViewFactory packFileBrowserBuilder) => Create(packFileBrowserBuilder);
-
-        public PackFileBrowserWindow(PackFileTreeViewFactory packFileBrowserBuilder, List<string> extentions)
+        public PackFileBrowserWindow(PackFileTreeViewFactory packFileBrowserBuilder, List<string>? extensions, bool showCaFiles, bool showFoldersOnly)
         {
-            Create(packFileBrowserBuilder);
-            ViewModel.Filter.SetExtentions(extentions);
+            Create(packFileBrowserBuilder, showCaFiles, showFoldersOnly);
+
+            if (extensions != null)
+                ViewModel.Filter.SetExtensions(extensions);
         }
 
-        void Create(PackFileTreeViewFactory packFileBrowserBuilder)
+        void Create(PackFileTreeViewFactory packFileBrowserBuilder, bool showCaFiles, bool showFoldersOnly)
         {
-            ViewModel = packFileBrowserBuilder.Create(ContextMenuType.None, true);
+            ViewModel = packFileBrowserBuilder.Create(ContextMenuType.None, showCaFiles, showFoldersOnly);
             ViewModel.FileOpen += ViewModel_FileOpen;
-            ViewModel.Filter.AutoExapandResultsAfterLimitedCount = 50;
-            
+
             InitializeComponent();
             DataContext = this;
             PreviewKeyDown += HandleEsc;
         }
 
-        public new bool ShowDialog() => (this as Window).ShowDialog() == true && SelectedFile != null;
+        public new bool ShowDialog() => (this as Window).ShowDialog() == true && (SelectedFile != null || SelectedFolder != null);
 
         private void HandleEsc(object sender, KeyEventArgs e)
         {
@@ -51,6 +52,10 @@ namespace CommonControls.PackFileBrowser
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             SelectedFile = ViewModel.SelectedItem?.Item;
+
+            if (ViewModel.SelectedItem?.NodeType == NodeType.Directory)
+                SelectedFolder = ViewModel.SelectedItem?.Name;
+
             DialogResult = true;
             Close();
         }

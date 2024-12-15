@@ -29,7 +29,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
         public SaveDialogResult DisplaySaveDialog(IPackFileService remove, List<string> extensions)
         {
             using var browser = new SavePackFileWindow(_pfs, _packFileBrowserBuilder);
-            browser.ViewModel.Filter.SetExtentions(extensions);
+            browser.ViewModel.Filter.SetExtensions(extensions);
 
             if (browser.ShowDialog() == true)
                 return new SaveDialogResult(true, browser.SelectedFile, browser.FilePath);
@@ -37,12 +37,21 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
             return new SaveDialogResult(false, null, null);
         }
 
-        public BrowseDialogResult DisplayBrowseDialog(List<string> extensions)
+        public BrowseDialogResultFile DisplayBrowseDialog(List<string> extensions)
         {
-            using var browser = new PackFileBrowserWindow(_packFileBrowserBuilder, extensions);
+            using var browser = new PackFileBrowserWindow(_packFileBrowserBuilder, extensions, showCaFiles: true, showFoldersOnly: false);
 
             var saveResult = browser.ShowDialog();
-            var output = new BrowseDialogResult(saveResult, browser.SelectedFile);
+            var output = new BrowseDialogResultFile(saveResult, browser.SelectedFile);
+            return output;
+        }
+
+        public BrowseDialogResultFolder DisplayBrowseFolderDialog()
+        {
+            using var browser = new PackFileBrowserWindow(_packFileBrowserBuilder, null, showCaFiles: false, showFoldersOnly: true);
+
+            var saveResult = browser.ShowDialog();
+            var output = new BrowseDialogResultFolder(saveResult, browser.SelectedFolder);
             return output;
         }
 

@@ -46,6 +46,7 @@ namespace Shared.Ui
             services.AddScoped<OnRenameNodeCommand>();
             services.AddScoped<OpenNodeInNotepadCommand>();
             services.AddScoped<OpenNodeInHxDCommand>();
+            services.AddScoped<OpenPackInFileExplorerCommand>();
             services.AddScoped<SaveAsPackFileContainerCommand>();
             services.AddScoped<SavePackFileContainerCommand>();
         }
