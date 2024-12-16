@@ -7,9 +7,9 @@ using Shared.Core.Events;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.RigidModel;
-using Shared.TestUtility;
 using Shared.Ui.Events.UiCommands;
 using Test.TestingUtility.Shared;
+using Test.TestingUtility.TestUtility;
 
 namespace E2EVerification
 {

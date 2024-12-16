@@ -2,6 +2,7 @@
 using Shared.Core.PackFiles;
 using Shared.Core.Settings;
 using Shared.TestUtility;
+using Test.TestingUtility.TestUtility;
 
 namespace GameWorld.Core.Test.Rendering.Materials.Serialization
 {

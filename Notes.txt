@@ -3,12 +3,12 @@ Fixes for v055:
 	Fixed rendering crash with all empty scene 
 	Pintool now has both modes again! 
 	KitbashTool: Pin tool keeps state after open and close. Also possible to make multiple instances
-	
+	SkeletonTool: Should show the pos/quat/xyz of a given bone 
 	
 	
 	Before release
 		KitbashTool: Wsmodel guessing - add user dialog 
-		SkeletonTool: Should show the pos/quat/xyz of a given bone 
+		
 		3d: textues that cant be loaded, constant error window
 		Ganeral: Try and rename folder in backfilebrowser - crashes
 		KitbashTool: If texture is not found, infinate error message loop because of null
@@ -36,6 +36,7 @@ Bugs:
 	KitbashTool: Right clicking a node does not alway display the context menu https://discord.com/channels/373745291289034763/795235087352201226/1312940367532003379
 	
 Improvements:
+	3d: ONly render glow if there is glow stuff in the pass 
 	General: Upgrade to new community toolkit
 	General: Save Active pack button https://github.com/donkeyProgramming/TheAssetEditor/issues/123
 	KitbashTool: Second UV map on export and render

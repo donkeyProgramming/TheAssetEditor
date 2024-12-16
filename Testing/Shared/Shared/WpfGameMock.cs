@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Services;
-using Shared.TestUtility;
+using Test.TestingUtility.TestUtility;
 
 namespace Test.TestingUtility.Shared
 {

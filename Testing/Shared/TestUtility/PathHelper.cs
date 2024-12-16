@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.Design.Serialization;
-using System.Text;
-using Shared.Core.Services;
+﻿using System.Text;
 
-namespace Shared.TestUtility
+namespace Test.TestingUtility.TestUtility
 {
     public static class PathHelper
     {
@@ -16,10 +14,10 @@ namespace Shared.TestUtility
 
             var index = currentDirectory.IndexOf(rootDir, StringComparison.InvariantCultureIgnoreCase);
             var rootPath = currentDirectory.Substring(0, index) + rootDir;
-            var fullPath = Path.Combine(rootPath, folder);
+            var fullPath = Path.Combine(rootPath, folder).ToLower();
 
             if (Directory.Exists(fullPath) == false)
-                throw new Exception($"Unable to find data directory {fullPath}");
+                throw new Exception($"Unable to find data directory {fullPath}. TestFolder : {currentDirectory}. InputFolder: {folder}");
 
             return fullPath;
         }
@@ -46,7 +44,7 @@ namespace Shared.TestUtility
 
             var fullPath = currentDirectory + $@"\{subDir}\" + fileName;
 
-            if (System.IO.File.Exists(fullPath) == false)
+            if (File.Exists(fullPath) == false)
                 throw new Exception($"Unable to find data file {fileName}");
 
             return fullPath;
@@ -55,7 +53,7 @@ namespace Shared.TestUtility
         public static byte[] GetFileAsBytes(string path)
         {
             var fullPath = GetDataFile(path);
-            var bytes = System.IO.File.ReadAllBytes(fullPath);
+            var bytes = File.ReadAllBytes(fullPath);
             return bytes; ;
         }
 

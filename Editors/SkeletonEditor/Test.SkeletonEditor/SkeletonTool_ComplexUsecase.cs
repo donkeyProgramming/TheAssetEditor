@@ -5,9 +5,9 @@ using Moq;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.Animation;
-using Shared.TestUtility;
 using Shared.Ui.Events.UiCommands;
 using Test.TestingUtility.Shared;
+using Test.TestingUtility.TestUtility;
 
 namespace Test.SkeletonEditor
 {

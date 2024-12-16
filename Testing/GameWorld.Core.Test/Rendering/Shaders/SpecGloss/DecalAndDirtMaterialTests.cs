@@ -9,7 +9,7 @@ using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Types;
-using Shared.TestUtility;
+using Test.TestingUtility.TestUtility;
 
 namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
 {
