@@ -26,7 +26,6 @@ jobs:
     - name: Build the project
       run: dotnet build AssetEditor\AssetEditor.csproj --no-restore
 
-
     - name: Run Shared.Core Tests
       run: dotnet test Testing\Shared.Core.Test\Test.Shared.Core.csproj --no-restore --verbosity normal
 
@@ -38,3 +37,6 @@ jobs:
 
     - name: Run Editors.ImportExport Tests
       run: dotnet test Editors\ImportExportEditor\Test.ImportExport\Test.ImportExport.csproj --no-restore --verbosity normal
+
+    - name: Run Editors.SkeletonEditor Tests
+      run: dotnet test Editors\SkeletonEditor\Test.SkeletonEditor\Test.SkeletonEditor.csproj --no-restore --verbosity normal

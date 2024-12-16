@@ -12,7 +12,7 @@ namespace Test.TestingUtility.TestUtility
         {
             var currentDirectory = TestContext.CurrentContext.TestDirectory;
 
-            var index = currentDirectory.IndexOf(rootDir, StringComparison.InvariantCultureIgnoreCase);
+            var index = currentDirectory.LastIndexOf(rootDir, StringComparison.InvariantCultureIgnoreCase);
             var rootPath = currentDirectory.Substring(0, index) + rootDir;
             var fullPath = Path.Combine(rootPath, folder).ToLower();
 
