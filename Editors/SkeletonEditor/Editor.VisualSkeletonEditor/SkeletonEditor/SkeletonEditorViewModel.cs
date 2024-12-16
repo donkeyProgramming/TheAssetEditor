@@ -7,6 +7,7 @@ using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Common.ReferenceModel;
 using GameWorld.Core.Animation;
+using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -173,9 +174,9 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
         private void SetTechSkeletonTransform(bool value)
         {
             if (value)
-                _techSkeletonNode.SetTransform(Matrix.CreateScale(1, 1, -1));
+                _techSkeletonNode.Offset = Matrix.CreateScale(1, 1, -1);
             else
-                _techSkeletonNode.SetTransform(Matrix.Identity);
+                _techSkeletonNode.Offset = Matrix.Identity;
         }
 
         private void HandleTranslationChanged()

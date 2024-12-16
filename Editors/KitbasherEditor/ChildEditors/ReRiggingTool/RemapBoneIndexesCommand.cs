@@ -3,7 +3,7 @@ using GameWorld.Core.Rendering.Geometry;
 using GameWorld.Core.SceneNodes;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace Editors.KitbasherEditor.Commands
+namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
 {
     public class RemapBoneIndexesCommand : ICommand
     {

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Editors.Shared.Core.Services;
+﻿using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;

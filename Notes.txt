@@ -1,13 +1,23 @@
 Fixes for v055:
 	General: Double clicking nodes does not expand them
 	Fixed rendering crash with all empty scene 
-Make sure double click works!
+	Pintool now has both modes again! 
+	KitbashTool: Pin tool keeps state after open and close. Also possible to make multiple instances
+	
+	
+	
+	Before release
+		KitbashTool: Wsmodel guessing - add user dialog 
+		SkeletonTool: Should show the pos/quat/xyz of a given bone 
+		3d: textues that cant be loaded, constant error window
+		Ganeral: Try and rename folder in backfilebrowser - crashes
+		KitbashTool: If texture is not found, infinate error message loop because of null
+
 
 Bugs:
 	KitbashTool: Import hammer, make whole node editable. Select mesh. No scene node view 
 	KitbashTool: Bug related to offsets and bounding box 
 	KitbashTool: Saving kitbash scene with name "test" and no folder crashes
-	KitbashTool: Pin tool keeps state after open and close. Also possible to make multiple instances
 	KitbashTool: After adding several items from reference meshes, not possible to create context menu for rest 
 	KitbashTool: Node clicking in tree view is slow
 	KitbashTool: Tint capability crash bug => Shield change to tint
@@ -16,12 +26,12 @@ Bugs:
 	KitbashTool: I am not sure all I know is that the materials generate in a new way that alters the way the daemon prince parts colour tints look
 	KitbashTool: when loading material - if not supported show message
 	General: But there’s that issue where if you leave and come back after the screen saver turns on then the whole thing goes nuclear lol. (Screen saver issue?)
-	KitbashTool: If texture is not found, infinate error message loop because of null
-	3d: Screen to small - infinate Exception loop
+		KitbashTool: If texture is not found, infinate error message loop because of null
+		3d: Screen to small - infinate Exception loop
 	KitbashTool: Issues with rendering/selection and pivot point
-	SkeletonTool: Should show the pos/quat/xyz of a given bone 
-	Ganeral: Try and rename folder in backfilebrowser - crashes
-	3d: textues that cant be loaded, constant error window
+		SkeletonTool: Should show the pos/quat/xyz of a given bone 
+		Ganeral: Try and rename folder in backfilebrowser - crashes
+		3d: textues that cant be loaded, constant error window
 	KitbashTool: Rome 2 support https://github.com/donkeyProgramming/TheAssetEditor/issues/174
 	KitbashTool: Right clicking a node does not alway display the context menu https://discord.com/channels/373745291289034763/795235087352201226/1312940367532003379
 	
@@ -48,9 +58,9 @@ Improvements:
 	GameWorld: Complex scene loader - dont makes fucking nodes! 
 	GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
 	KitbashTool: MOve most node types into Kitbash tool / reduce number of nodes
-	KitbashTool: PinTool add back mesh rigging
 	General: Show hisotry of commands in exceptions
 	KitbashTool: Max 50 commands, clean up memoery!
+		KitbashTool: Wsmodel guessing
 	General: Close console window on close
 	General: Make tree view lazy loading
 	General: Imprive memory use

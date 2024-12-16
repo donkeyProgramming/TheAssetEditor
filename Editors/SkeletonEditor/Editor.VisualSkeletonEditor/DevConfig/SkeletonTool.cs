@@ -23,6 +23,7 @@ namespace Editor.VisualSkeletonEditor.DevConfig
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.LoadWemFiles = false;
+            currentSettings.LoadCaPacksByDefault = false;
 
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";
             var container = _packFileContainerLoader.Load(packFile);

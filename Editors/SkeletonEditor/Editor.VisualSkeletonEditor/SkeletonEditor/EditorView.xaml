@@ -110,7 +110,7 @@
 
                 <Label      Grid.Row="3" Grid.Column="0" Content="World transforms"/>
                 <Label      Grid.Row="3" Grid.Column="1" Content=":"/>
-                <CheckBox   Grid.Row="3" Grid.Column="2" IsChecked="{Binding ShowBonesAsWorldTransform.Value, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
+                <CheckBox   Grid.Row="3" Grid.Column="2" IsChecked="{Binding ShowBonesAsWorldTransform, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center"/>
 
                 <Label      Grid.Row="4" Grid.Column="0" Content="Is Tech skeleton"/>
                 <Label      Grid.Row="4" Grid.Column="1" Content=":"/>

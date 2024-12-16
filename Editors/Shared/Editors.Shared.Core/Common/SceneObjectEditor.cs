@@ -145,7 +145,7 @@ namespace Editors.Shared.Core.Common
                 assetViewModel.SkeletonName.Value = "";
                 assetViewModel.Skeleton = null;
                 assetViewModel.AnimationClip = null;
-                assetViewModel.Player.SetAnimation(null, assetViewModel.Skeleton); ;
+                assetViewModel.Player.SetAnimation(null, assetViewModel.Skeleton);
             }
 
             assetViewModel.TriggerSkeletonChanged();
