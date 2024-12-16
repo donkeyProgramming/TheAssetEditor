@@ -2,9 +2,9 @@
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 
-namespace E2EVerification.Shared
+namespace Test.TestingUtility.Shared
 {
-    internal static class RmvHelper
+    public static class RmvHelper
     {
         public static RmvFile AssertFile(PackFile? rmv2File, RmvVersionEnum expectedVersion, uint expectedNumberOfLods, string expectedSkeletonName)
         {
@@ -28,7 +28,7 @@ namespace E2EVerification.Shared
             Assert.That(rmv2.LodHeaders.Count, Is.EqualTo(expectedNumberOfLods));
 
             // Verify the geometry
-       
+
             var processedMeshes = 0;
             for (var lodIndex = 0; lodIndex < expectedNumberOfLods; lodIndex++)
             {
@@ -83,7 +83,7 @@ namespace E2EVerification.Shared
             }
 
             // Verify all meshes are processed
-            var expectedMeshCount = expectedVertexType.Sum(x=>x.Length);
+            var expectedMeshCount = expectedVertexType.Sum(x => x.Length);
             Assert.That(processedMeshes, Is.EqualTo(expectedMeshCount));
         }
     }

@@ -1,8 +1,8 @@
 ﻿using Shared.Core.PackFiles.Models;
 
-namespace E2EVerification.Shared
+namespace Test.TestingUtility.Shared
 {
-    internal static class WsModelHelper
+    public static class WsModelHelper
     {
         public static void AssertFile(PackFile wsModelFile)
         {

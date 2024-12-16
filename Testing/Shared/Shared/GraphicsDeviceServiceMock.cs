@@ -1,7 +1,7 @@
 ﻿using System.Windows.Forms;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace E2EVerification.Shared
+namespace Test.TestingUtility.Shared
 {
     public class GraphicsDeviceServiceMock : IGraphicsDeviceService
     {

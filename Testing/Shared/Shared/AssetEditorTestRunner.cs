@@ -10,9 +10,9 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.Settings;
-using Shared.TestUtility;
+using Shared.Ui.BaseDialogs.StandardDialog;
 
-namespace E2EVerification.Shared
+namespace Test.TestingUtility.Shared
 {
     public class AssetEditorTestRunner
     {
@@ -22,6 +22,7 @@ namespace E2EVerification.Shared
         public IPackFileService PackFileService { get; private set; }
         public IUiCommandFactory CommandFactory { get; private set; }
         public ScopeRepository ScopeRepository { get; private set; }
+        public Mock<IStandardDialogs> Dialogs { get; private set; }
 
 
         public AssetEditorTestRunner(GameTypeEnum gameEnum = GameTypeEnum.Warhammer3, bool forceValidateServiceScopes = false)
@@ -31,7 +32,7 @@ namespace E2EVerification.Shared
 
             var settings = EditorServiceProvider.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             settings.CurrentSettings.CurrentGame = gameEnum;
-            
+
             var game = EditorServiceProvider.ServiceProvider.GetRequiredService<IWpfGame>();
             var resourceLibrary = EditorServiceProvider.ServiceProvider.GetRequiredService<ResourceLibrary>();
             resourceLibrary.Initialize(game.GraphicsDevice, game.Content);
@@ -78,7 +79,7 @@ namespace E2EVerification.Shared
 
             var gameDescriptor = new ServiceDescriptor(typeof(IWpfGame), typeof(WpfGame), ServiceLifetime.Scoped);
             services.Remove(gameDescriptor);
-            services.AddScoped<IWpfGame, GameMock>();
+            services.AddScoped<IWpfGame, WpfGameMock>();
 
             var keyboardDescriptor = new ServiceDescriptor(typeof(IKeyboardComponent), typeof(KeyboardComponent), ServiceLifetime.Scoped);
             services.Remove(keyboardDescriptor);
@@ -87,6 +88,12 @@ namespace E2EVerification.Shared
             var mouseDescriptor = new ServiceDescriptor(typeof(IMouseComponent), typeof(MouseComponent), ServiceLifetime.Scoped);
             services.Remove(mouseDescriptor);
             services.AddScoped(x => new Mock<IMouseComponent>().Object);
+
+
+            Dialogs = new Mock<IStandardDialogs>();
+            var dialogDescriptor = new ServiceDescriptor(typeof(IStandardDialogs), typeof(StandardDialogs), ServiceLifetime.Scoped);
+            services.Remove(dialogDescriptor);
+            services.AddScoped(x => Dialogs.Object);
         }
     }
 }

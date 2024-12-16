@@ -1,5 +1,4 @@
-﻿using E2EVerification.Shared;
-using Editor.VisualSkeletonEditor.SkeletonEditor;
+﻿using Editor.VisualSkeletonEditor.SkeletonEditor;
 using Editors.KitbasherEditor.UiCommands;
 using GameWorld.Core.Services.SceneSaving;
 using GameWorld.Core.Services.SceneSaving.Lod;
@@ -10,6 +9,7 @@ using Shared.Core.ToolCreation;
 using Shared.GameFormats.RigidModel;
 using Shared.TestUtility;
 using Shared.Ui.Events.UiCommands;
+using Test.TestingUtility.Shared;
 
 namespace E2EVerification
 {
@@ -157,7 +157,7 @@ namespace E2EVerification
         public void Rome2_LoadAndSaveDirtHelmet()
         {
             var runner = new AssetEditorTestRunner(GameTypeEnum.Rome_2);
-            var outputPackFile = runner.LoadFolderPackFile(PathHelper.GetDataFolder("Rome_Man_And_Shield_Pack"), true);
+            var outputPackFile = runner.LoadFolderPackFile(PathHelper.GetDataFolder("Data\\Rome_Man_And_Shield_Pack"), true);
 
             // Load the a rmv2 and open the kitbash editor
             var meshPath = "variantmeshes/_variantmodels/man/helmets/carthaginian_pylos.rigid_model_v2";
@@ -191,7 +191,7 @@ namespace E2EVerification
         public void Rome2_LoadAndSaveDirtAndDecalShield()
         {
             var runner = new AssetEditorTestRunner(GameTypeEnum.Rome_2);
-            var outputPackFile = runner.LoadFolderPackFile(PathHelper.GetDataFolder(("Rome_Man_And_Shield_Pack")));
+            var outputPackFile = runner.LoadFolderPackFile(PathHelper.GetDataFolder(("Data\\Rome_Man_And_Shield_Pack")));
 
             // Load the a rmv2 and open the kitbash editor
             var meshPath = "variantmeshes/_variantmodels/man/shield/celtic_oval_shield_a.rigid_model_v2";

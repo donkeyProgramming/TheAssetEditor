@@ -1,16 +1,16 @@
-﻿using E2EVerification.Shared;
-using Shared.Core.PackFiles;
+﻿using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
+using Test.TestingUtility.Shared;
 
-namespace E2EVerification
+namespace Test.E2EVerification
 {
     internal class UiCommand_DuplicateFile_Tests
     {
         [Test]
-        [TestCase("testFile",           "testFile_copy")]            // No extension
-        [TestCase("testFile.anm",       "testFile_copy.anm")]        // Single extension 
-        [TestCase("testFile.anm.meta",  "testFile_copy.anm.meta")]   // Double extension 
+        [TestCase("testFile", "testFile_copy")]            // No extension
+        [TestCase("testFile.anm", "testFile_copy.anm")]        // Single extension 
+        [TestCase("testFile.anm.meta", "testFile_copy.anm.meta")]   // Double extension 
         public void DuplicateFileCommand(string fileName, string result)
         {
             var runner = new AssetEditorTestRunner();

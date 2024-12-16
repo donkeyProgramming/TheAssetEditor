@@ -22,7 +22,7 @@
         <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.2.1105" />
         <PackageReference Include="Pfim" Version="0.11.3" />
         <PackageReference Include="DotNetKit.Wpf.AutoCompleteComboBox" Version="1.6.0" />
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="Singulink.WPF.Data.MethodBinding" Version="1.1.0" />
         <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
         <PackageReference Include="CsvHelper" Version="33.0.1" />

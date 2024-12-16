@@ -117,7 +117,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void LoadExistingMaterials()
         {
             // Arrange 
-            var pfs = PackFileSerivceTestHelper.CreateFromFolder(GameTypeEnum.Warhammer3, "Karl_and_celestialgeneral_Pack");
+            var pfs = PackFileSerivceTestHelper.CreateFromFolder(GameTypeEnum.Warhammer3, "Data\\Karl_and_celestialgeneral_Pack");
 
              // Act
              var repo = new WsMaterialRepository(pfs);
@@ -131,7 +131,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void LoadExistingMaterials_AddComplexEqual()
         {
             // Arrange 
-            var pfs = PackFileSerivceTestHelper.CreateFromFolder(GameTypeEnum.Warhammer3, "Karl_and_celestialgeneral_Pack");
+            var pfs = PackFileSerivceTestHelper.CreateFromFolder(GameTypeEnum.Warhammer3, "Data\\Karl_and_celestialgeneral_Pack");
 
             var path = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\materials\emp_karl_franz_body_01_weighted2_alpha_off.xml.material";
             var content = PathHelper.GetFileContentAsString("Karl_and_celestialgeneral_Pack\\" + path);
@@ -151,7 +151,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void LoadExistingMaterials_AddDifferent()
         {
             // Arrange 
-            var pfs = PackFileSerivceTestHelper.CreateFromFolder(GameTypeEnum.Warhammer3, "Karl_and_celestialgeneral_Pack");
+            var pfs = PackFileSerivceTestHelper.CreateFromFolder(GameTypeEnum.Warhammer3, "Data\\Karl_and_celestialgeneral_Pack");
 
             var path = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\materials\emp_karl_franz_body_01_weighted2_alpha_off.xml.material";
             var content = PathHelper.GetFileContentAsString("Karl_and_celestialgeneral_Pack\\" + path) + "content is no longer equal";
@@ -171,7 +171,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         public void LoadExistingMaterials_AddDifferentOnlyInName()
         {
             // Arrange 
-            var pfs = PackFileSerivceTestHelper.CreateFromFolder(GameTypeEnum.Warhammer3, "Karl_and_celestialgeneral_Pack");
+            var pfs = PackFileSerivceTestHelper.CreateFromFolder(GameTypeEnum.Warhammer3, "Data\\Karl_and_celestialgeneral_Pack");
 
             var path = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\materials\emp_karl_franz_body_01_weighted2_alpha_off.xml.material";
             var content = PathHelper.GetFileContentAsString("Karl_and_celestialgeneral_Pack\\" + path);

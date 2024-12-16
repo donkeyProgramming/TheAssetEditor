@@ -13,7 +13,7 @@ using Shared.Ui.Common.Exceptions;
 
 namespace Shared.Ui.BaseDialogs.StandardDialog
 {
-    internal class StandardDialogs : IStandardDialogs
+    public class StandardDialogs : IStandardDialogs
     {
         private readonly IPackFileService _pfs;
         private readonly PackFileTreeViewFactory _packFileBrowserBuilder;

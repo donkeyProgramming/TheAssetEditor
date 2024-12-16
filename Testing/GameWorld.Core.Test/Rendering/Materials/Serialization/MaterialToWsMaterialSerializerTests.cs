@@ -25,7 +25,7 @@ namespace GameWorld.Core.Test.Rendering.Materials.Serialization
         {
             var selectedGame = GameTypeEnum.Warhammer3;
             var appSettings = new ApplicationSettingsService(selectedGame);
-            _pfs = PackFileSerivceTestHelper.CreateFromFolder(selectedGame, "Karl_and_celestialgeneral_Pack");
+            _pfs = PackFileSerivceTestHelper.CreateFromFolder(selectedGame, "Data\\Karl_and_celestialgeneral_Pack");
 
             var saveHelper = new FileSaveService(_pfs, null);
             var materialRepo = new WsMaterialRepository(_pfs);

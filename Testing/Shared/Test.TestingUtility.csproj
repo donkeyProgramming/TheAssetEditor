@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\AssetEditor\AssetEditor.csproj" />
     <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
   </ItemGroup>
 

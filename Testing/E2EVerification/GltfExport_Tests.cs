@@ -1,7 +1,4 @@
-﻿using E2EVerification.Shared;
-using Editors.ImportExport.Exporting.Exporters.RmvToGltf;
-
-namespace E2EVerification
+﻿namespace E2EVerification
 {
     public class GltfExport_Tests
     {

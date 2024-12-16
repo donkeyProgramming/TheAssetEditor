@@ -1,7 +1,7 @@
-﻿using E2EVerification.Shared;
-using Shared.Core.Settings;
+﻿using Shared.Core.Settings;
+using Test.TestingUtility.Shared;
 
-namespace E2EVerification
+namespace Test.E2EVerification
 {
     internal class ServiceScopeValidation
     {
