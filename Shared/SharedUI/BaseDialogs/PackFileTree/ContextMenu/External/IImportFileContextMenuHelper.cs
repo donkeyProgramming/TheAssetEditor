@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Shared.Core.Events.Global;
-using Shared.Core.PackFiles.Models;
-
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.External
+﻿namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.External
 {
     public interface IImportFileContextMenuHelper
     {

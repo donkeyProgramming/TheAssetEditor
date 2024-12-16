@@ -1,4 +1,4 @@
-﻿namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
+﻿namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     public class CollapseNodeCommand() : IContextMenuCommand
     {
