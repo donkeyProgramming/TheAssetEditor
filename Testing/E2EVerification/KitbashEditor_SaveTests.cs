@@ -1,10 +1,12 @@
 ﻿using E2EVerification.Shared;
+using Editor.VisualSkeletonEditor.SkeletonEditor;
 using Editors.KitbasherEditor.UiCommands;
 using GameWorld.Core.Services.SceneSaving;
 using GameWorld.Core.Services.SceneSaving.Lod;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.Events;
 using Shared.Core.Settings;
+using Shared.Core.ToolCreation;
 using Shared.GameFormats.RigidModel;
 using Shared.TestUtility;
 using Shared.Ui.Events.UiCommands;
@@ -21,6 +23,38 @@ namespace E2EVerification
         public void Setup()
         {
         }
+
+        [Test]
+        public void SkeletonToolTets()
+        {
+            var runner = new AssetEditorTestRunner();
+            var outputPackFile = runner.LoadPackFile(_inputPackFileKarl, true);
+
+            // Load the a rmv2 and open the kitbash editor
+            var originalRmv2File = runner.PackFileService.FindFile("animations\\skeletons\\humanoid01.anim");
+            runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File, EditorEnums.VisualSkeletonEditor);
+
+            // Get the scope of the newly created kitbash editor
+            var kitbashScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;
+
+            var toolCommandFactory = kitbashScope.GetRequiredService<SkeletonEditorViewModel>();
+
+            // Load a reference mesh
+            // Select a bone
+            // Rename
+            // Get pos
+            // Enable worldpos
+            // Move up in worldspace
+            // Select a new shoulder (finger)
+            // Delete bone 
+            // Save
+            //toolCommandFactory.LoadRefMeshAction()
+
+
+        }
+
+
+
 
         [Test]
         public void Warhammer3_SaveKarl_Default()

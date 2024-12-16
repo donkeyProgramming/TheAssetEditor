@@ -57,7 +57,7 @@ namespace Editors.Shared.Core.Common
             return _mainScene.AddComponent(instance);
         }
 
-        public void SetMesh(SceneObject sceneObject, PackFile file)
+        public void SetMesh(SceneObject sceneObject, PackFile file, bool updateSkeleton = true)
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
 
@@ -73,10 +73,13 @@ namespace Editors.Shared.Core.Common
             sceneObject.ModelNode = loadedNode;
             sceneObject.ParentNode.AddObject(loadedNode);
 
-            var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
-            var fullSkeletonName = $"animations\\skeletons\\{skeletonName}.anim";
-            var skeletonFile = _packFileService.FindFile(fullSkeletonName);
-            SetSkeleton(sceneObject, skeletonFile);
+            if (updateSkeleton)
+            {
+                var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
+                var fullSkeletonName = $"animations\\skeletons\\{skeletonName}.anim";
+                var skeletonFile = _packFileService.FindFile(fullSkeletonName);
+                SetSkeleton(sceneObject, skeletonFile);
+            }
             sceneObject.MeshName.Value = file.Name;
             sceneObject.ShowMesh.Value = sceneObject.ShowMesh.Value;
             sceneObject.ShowSkeleton.Value = sceneObject.ShowSkeleton.Value;

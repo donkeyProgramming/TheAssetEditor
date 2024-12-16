@@ -6,7 +6,6 @@ using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Common.ReferenceModel;
 using GameWorld.Core.Animation;
-using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -26,6 +25,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
         private readonly CopyPasteManager _copyPasteManager;
         private readonly IStandardDialogs _packFileUiProvider;
         private readonly IFileSaveService _packFileSaveService;
+
         [ObservableProperty] string _skeletonName = "";
         [ObservableProperty] string _refMeshName = "";
         [ObservableProperty] string _sourceSkeletonName = "";
@@ -271,9 +271,9 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
             if (result.Result && result.File != null)
             {
                 var file = result.File;
-                SceneObjectEditor.SetMesh(_techSkeletonNode, file);
+                SceneObjectEditor.SetMesh(_techSkeletonNode, file, false);
                 RefMeshName = _packFileService.GetFullPath(file);
-                LoadSkeleton(_techSkeletonNode, _techSkeletonNode.SkeletonName.Value);
+                //LoadSkeleton(_techSkeletonNode, _techSkeletonNode.SkeletonName.Value);
             }
         }
     }
