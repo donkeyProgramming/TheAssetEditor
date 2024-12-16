@@ -1,7 +1,7 @@
 ﻿using Shared.Core.Events;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 {
     public class SimpleContextMenuBuilder : ContextMenuBuilder
     {

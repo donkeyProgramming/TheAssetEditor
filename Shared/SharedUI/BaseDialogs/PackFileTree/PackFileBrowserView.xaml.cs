@@ -2,10 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Shared.Ui.BaseDialogs.PackFileBrowser;
 using Shared.Ui.Common;
 
-namespace CommonControls.PackFileBrowser
+namespace Shared.Ui.BaseDialogs.PackFileTree
 {
     public partial class PackFileBrowserView : UserControl
     {
@@ -17,9 +16,9 @@ namespace CommonControls.PackFileBrowser
         Point _lastMouseDown;
         TreeNode? _draggedItem;
 
-        public ContextMenu CustomContextMenu
+        public System.Windows.Controls.ContextMenu CustomContextMenu
         {
-            get { return (ContextMenu)GetValue(CustomContextMenuProperty); }
+            get { return (System.Windows.Controls.ContextMenu)GetValue(CustomContextMenuProperty); }
             set { SetValue(CustomContextMenuProperty, value); }
         }
 
@@ -27,7 +26,7 @@ namespace CommonControls.PackFileBrowser
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                TreeViewItem item = (TreeViewItem)sender;
+                var item = (TreeViewItem)sender;
 
                 _lastMouseDown = e.GetPosition(tvParameters);
 
@@ -56,8 +55,8 @@ namespace CommonControls.PackFileBrowser
             {
                 var currentPosition = e.GetPosition(tvParameters);
 
-                if ((Math.Abs(currentPosition.X - _lastMouseDown.X) > 10.0) ||
-                    (Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0))
+                if (Math.Abs(currentPosition.X - _lastMouseDown.X) > 10.0 ||
+                    Math.Abs(currentPosition.Y - _lastMouseDown.Y) > 10.0)
                 {
                     if (_draggedItem != null)
                     {
@@ -107,6 +106,6 @@ namespace CommonControls.PackFileBrowser
             }
         }
 
-        public static readonly DependencyProperty CustomContextMenuProperty = DependencyProperty.Register("CustomContextMenu", typeof(ContextMenu), typeof(PackFileBrowserView), new UIPropertyMetadata(null));
+        public static readonly DependencyProperty CustomContextMenuProperty = DependencyProperty.Register("CustomContextMenu", typeof(System.Windows.Controls.ContextMenu), typeof(PackFileBrowserView), new UIPropertyMetadata(null));
     }
 }

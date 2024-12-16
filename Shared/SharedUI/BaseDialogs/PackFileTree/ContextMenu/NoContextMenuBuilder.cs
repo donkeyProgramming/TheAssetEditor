@@ -1,6 +1,6 @@
 ﻿using Shared.Core.Events;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 {
     public class NoContextMenuBuilder : ContextMenuBuilder
     {

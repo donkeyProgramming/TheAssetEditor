@@ -1,7 +1,7 @@
 ﻿using E2EVerification.Shared;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
 namespace E2EVerification
 {

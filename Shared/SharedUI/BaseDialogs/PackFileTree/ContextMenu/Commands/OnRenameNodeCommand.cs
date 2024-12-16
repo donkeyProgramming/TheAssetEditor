@@ -2,7 +2,7 @@
 using System.Windows;
 using Shared.Core.PackFiles;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 {
     public class OnRenameNodeCommand(IPackFileService packFileService) : IContextMenuCommand
     {
@@ -37,9 +37,4 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands
             }
         }
     }
-
-
-
-
-
 }

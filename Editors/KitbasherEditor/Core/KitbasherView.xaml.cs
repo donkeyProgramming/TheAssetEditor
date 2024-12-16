@@ -1,8 +1,7 @@
-﻿using Shared.Ui.BaseDialogs.PackFileBrowser;
-using Shared.Ui.Common;
-using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using Shared.Ui.BaseDialogs.PackFileTree;
+using Shared.Ui.Common;
 
 namespace KitbasherEditor.Views
 {

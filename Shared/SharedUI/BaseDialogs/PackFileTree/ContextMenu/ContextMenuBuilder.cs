@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Shared.Core.Events;
-using Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu.Commands;
+using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands;
 
-namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
+namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 {
     public enum ContextMenuType
     {
@@ -39,7 +39,7 @@ namespace Shared.Ui.BaseDialogs.PackFileBrowser.ContextMenu
         public ContextMenuType Type { get; private set; }
 
         public ContextMenuBuilder(ContextMenuType type, IUiCommandFactory commandFactory)
-        { 
+        {
             Type = type;
             _commandFactory = commandFactory;
         }
