@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GameWorld.Core.Commands.Face;
-using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
@@ -17,8 +16,6 @@ namespace GameWorld.Core.Commands.Object
 
         private readonly List<GroupNode> _newGroupNodes = [];
         private readonly SelectionManager _selectionManager;
-        private readonly ResourceLibrary _resourceLib;
-        private readonly RenderEngineComponent _renderEngineComponent;
 
         ISelectionState _originalSelectionState;
         IEditableGeometry _objectToSplit;
@@ -27,11 +24,9 @@ namespace GameWorld.Core.Commands.Object
         public string HintText { get => "Divide Object"; }
         public bool IsMutation { get => true; }
 
-        public DivideObjectIntoSubmeshesCommand(SelectionManager selectionManager, ResourceLibrary resourceLibrary, RenderEngineComponent renderEngineComponent)
+        public DivideObjectIntoSubmeshesCommand(SelectionManager selectionManager)
         {
             _selectionManager = selectionManager;
-            _resourceLib = resourceLibrary;
-            _renderEngineComponent = renderEngineComponent;
         }
 
         public void Configure(IEditableGeometry objectToSplit, bool combineOverlappingVertexes)

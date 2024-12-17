@@ -10,7 +10,7 @@ namespace GameWorld.Core.Rendering
     {
         public readonly GraphicsDevice _device;
         public readonly SpriteBatch _spriteBatch;
-        public readonly ResourceLibrary _resourceLibary;
+        public readonly IScopedResourceLibrary _resourceLibary;
 
         public class DrawSettings
         {
@@ -20,7 +20,7 @@ namespace GameWorld.Core.Rendering
             public bool OnlyAlpha { get; set; } = false;
         }
 
-        public TextureToTextureRenderer(GraphicsDevice device, SpriteBatch spriteBatch, ResourceLibrary resourceLibary)
+        public TextureToTextureRenderer(GraphicsDevice device, SpriteBatch spriteBatch, IScopedResourceLibrary resourceLibary)
         {
             _device = device;
             _spriteBatch = spriteBatch;

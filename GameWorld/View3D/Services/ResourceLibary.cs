@@ -25,8 +25,6 @@ namespace GameWorld.Core.Services
     public class ResourceLibrary
     {
         private readonly ILogger _logger = Logging.Create<ResourceLibrary>();
-
-        private readonly Dictionary<string, Texture2D> _cachedTextures = new();
         private readonly Dictionary<ShaderTypes, Effect> _cachedShaders = new();
 
         private readonly IPackFileService _pfs;
@@ -37,8 +35,7 @@ namespace GameWorld.Core.Services
         private TextureCube _pbrSpecular;
         private Texture2D _pbrLut;
 
-        public SpriteBatch CommonSpriteBatch { get; private set; }
-        public SpriteFont DefaultFont { get; private set; }
+        public ContentManager Content => _content;
 
         public ResourceLibrary(IPackFileService pf)
         {
@@ -55,7 +52,6 @@ namespace GameWorld.Core.Services
                 _isInitialized = true;
                 _content = content;
                 _graphicsDevice = graphicsDevice;
-                CommonSpriteBatch = new SpriteBatch(_graphicsDevice);
 
                 // Load default resources
                 var mr = LoadEffect("Shaders\\Pbr\\MetalRoughness\\MetalRoughness_main", ShaderTypes.Pbs_MetalRough);
@@ -63,7 +59,7 @@ namespace GameWorld.Core.Services
                 LoadEffect("Shaders\\Geometry\\BasicShader", ShaderTypes.BasicEffect);
                 LoadEffect("Shaders\\TexturePreview", ShaderTypes.TexturePreview);
                 LoadEffect("Shaders\\LineShader", ShaderTypes.Line);
-                DefaultFont = _content.Load<SpriteFont>("Fonts//DefaultFont");
+                LoadEffect("Shaders\\InstancingShader", ShaderTypes.GeometryInstance);
 
                 _pbrDiffuse = _content.Load<TextureCube>("textures\\phazer\\DiffuseAmbientLightCubeMap");
                 _pbrSpecular= _content.Load<TextureCube>("textures\\phazer\\SpecularAmbientLightCubemap");
@@ -85,10 +81,6 @@ namespace GameWorld.Core.Services
 
         public void Reset()
         {
-            foreach (var item in _cachedTextures)
-                item.Value.Dispose();
-            _cachedTextures.Clear();
-
             foreach (var item in _cachedShaders)
                 item.Value.Dispose();
             _cachedShaders.Clear();
@@ -102,9 +94,6 @@ namespace GameWorld.Core.Services
             _pbrLut?.Dispose();
             _pbrLut = null;
 
-            CommonSpriteBatch?.Dispose();
-            CommonSpriteBatch = null;
-
             _graphicsDevice = null;
             _content = null;
             _isInitialized = false;
@@ -117,15 +106,7 @@ namespace GameWorld.Core.Services
 
         public Texture2D LoadTexture(string fileName, bool forceRefreshTexture = false, bool fromFile = false)
         {
-            if (forceRefreshTexture == false)
-            {
-                if (_cachedTextures.TryGetValue(fileName, out var value))
-                    return value;
-            }
-
             var texture = ImageLoader.LoadTextureAsTexture2d(fileName, _pfs, _graphicsDevice, out var _, fromFile);
-            if (texture != null)
-                _cachedTextures[fileName] = texture;
             return texture;
         }
 
@@ -145,7 +126,5 @@ namespace GameWorld.Core.Services
                 return value;
             throw new Exception($"Shader not found: ShaderTypes::{type}");
         }
-
-        public Texture2D GetTexture(string textureName) => LoadTexture(textureName);
     }
 }

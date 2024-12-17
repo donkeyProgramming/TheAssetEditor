@@ -20,14 +20,14 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
 
     public abstract class CapabilityMaterial : IShader
     {
-        protected readonly ResourceLibrary _resourceLibrary;
+        protected readonly IScopedResourceLibrary _resourceLibrary;
         protected readonly ShaderTypes _shaderType;
         protected Dictionary<RenderingTechnique, string> _renderingTechniqueMap = [];
 
         public ICapability[] Capabilities { get; protected set; } = [];
         public CapabilityMaterialsEnum Type { get; protected set; }
 
-        protected CapabilityMaterial(CapabilityMaterialsEnum materialType, ShaderTypes shaderType, ResourceLibrary resourceLibrary)
+        protected CapabilityMaterial(CapabilityMaterialsEnum materialType, ShaderTypes shaderType, IScopedResourceLibrary resourceLibrary)
         {
             _shaderType = shaderType;
             _resourceLibrary = resourceLibrary;

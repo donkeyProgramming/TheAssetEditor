@@ -8,14 +8,14 @@ namespace GameWorld.Core.Rendering.RenderItems
 {
     internal class FontRenderItem : IRenderItem
     {
-        private readonly ResourceLibrary _resourceLibrary;
+        private readonly RenderEngineComponent _resourceLibrary;
         private readonly string _text;
         private readonly Vector2 _position;
         private readonly Color _color;
 
         public Matrix ModelMatrix { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public FontRenderItem(ResourceLibrary resourceLibrary, string text, Vector2 position, Color color)
+        public FontRenderItem(RenderEngineComponent resourceLibrary, string text, Vector2 position, Color color)
         {
             _resourceLibrary = resourceLibrary;
             _text = text;

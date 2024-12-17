@@ -20,7 +20,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly SelectionManager _selectionManager;
         private readonly IPackFileService _packFileService;
-        private readonly ResourceLibrary _resourceLibrary;
+        private readonly IScopedResourceLibrary _resourceLibrary;
         private readonly CapabilityMaterialFactory _materialFactory;
         private readonly IStandardDialogs _packFileUiProvider;
         Rmv2MeshNode? _currentNode;
@@ -35,7 +35,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.MeshSubViews
         [ObservableProperty] EmissiveViewModel? _emissive;
         [ObservableProperty] TintViewModel? _tint;
 
-        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, SelectionManager selectionManager, IPackFileService packFileService, ResourceLibrary resourceLibrary, CapabilityMaterialFactory abstractMaterialFactory, IStandardDialogs packFileUiProvider)
+        public WsMaterialViewModel(IUiCommandFactory uiCommandFactory, SelectionManager selectionManager, IPackFileService packFileService, IScopedResourceLibrary resourceLibrary, CapabilityMaterialFactory abstractMaterialFactory, IStandardDialogs packFileUiProvider)
         {
             _uiCommandFactory = uiCommandFactory;
             _selectionManager = selectionManager;

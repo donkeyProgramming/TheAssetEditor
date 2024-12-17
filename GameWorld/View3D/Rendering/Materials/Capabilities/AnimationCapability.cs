@@ -11,7 +11,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public Matrix[]? AnimationTransforms { get; set; }
         public int AnimationWeightCount { get; set; }
 
-        public void Apply(Effect effect, ResourceLibrary _)
+        public void Apply(Effect effect, IScopedResourceLibrary _)
         {
             effect.Parameters["CapabilityFlag_ApplyAnimation"].SetValue(ApplyAnimation);
             effect.Parameters["Animation_WeightCount"].SetValue(AnimationWeightCount);

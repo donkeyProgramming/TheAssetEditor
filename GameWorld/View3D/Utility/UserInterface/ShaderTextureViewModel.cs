@@ -20,13 +20,13 @@ namespace GameWorld.Core.Utility.UserInterface
         private readonly TextureInput _shaderTextureReference;
         private readonly IPackFileService _packFileService;
         private readonly IUiCommandFactory _uiCommandFactory;
-        private readonly ResourceLibrary _resourceLibrary;
+        private readonly IScopedResourceLibrary _resourceLibrary;
         private readonly IStandardDialogs _packFileUiProvider;
 
         [ObservableProperty] string _path;
         [ObservableProperty] bool _shouldRenderTexture;
 
-        public ShaderTextureViewModel(TextureInput shaderTextureReference, IPackFileService packFileService, IUiCommandFactory uiCommandFactory, ResourceLibrary resourceLibrary, IStandardDialogs packFileUiProvider) 
+        public ShaderTextureViewModel(TextureInput shaderTextureReference, IPackFileService packFileService, IUiCommandFactory uiCommandFactory, IScopedResourceLibrary resourceLibrary, IStandardDialogs packFileUiProvider) 
         {
             _shaderTextureReference = shaderTextureReference;
             _packFileService = packFileService;

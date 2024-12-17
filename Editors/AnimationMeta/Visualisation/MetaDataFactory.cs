@@ -7,6 +7,7 @@ using Editors.AnimationMeta.Visualisation.Rules;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Components;
+using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.Core.SceneNodes;
@@ -28,13 +29,13 @@ namespace Editors.AnimationMeta.Visualisation
     {
         private readonly ILogger _logger = Logging.Create<MetaDataFactory>();
         private readonly ComplexMeshLoader _complexMeshLoader;
-        private readonly ResourceLibrary _resourceLibrary;
+        private readonly RenderEngineComponent _resourceLibrary;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IPackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
 
         public MetaDataFactory(ComplexMeshLoader complexMeshLoader,
-            ResourceLibrary resourceLibrary,
+            RenderEngineComponent resourceLibrary,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             IPackFileService packFileService,
             AnimationsContainerComponent animationsContainerComponent)

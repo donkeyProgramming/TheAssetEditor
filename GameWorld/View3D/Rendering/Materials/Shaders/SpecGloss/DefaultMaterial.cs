@@ -6,7 +6,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.SpecGloss
 {
     public class DefaultMaterial : CapabilityMaterial
     {
-        public DefaultMaterial(ResourceLibrary resourceLibrary)
+        public DefaultMaterial(IScopedResourceLibrary resourceLibrary)
             : base(CapabilityMaterialsEnum.SpecGlossPbr_Default, ShaderTypes.Pbr_SpecGloss, resourceLibrary)
         {
             Capabilities =

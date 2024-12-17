@@ -35,13 +35,13 @@ namespace GameWorld.Core.Components.Selection
         private readonly IDeviceResolver _deviceResolverComponent;
         private readonly CommandFactory _commandFactory;
         private readonly SceneManager _sceneManger;
-        private readonly ResourceLibrary _resourceLibrary;
+        private readonly RenderEngineComponent _resourceLibrary;
 
         public SelectionComponent(
             IMouseComponent mouseComponent, IKeyboardComponent keyboardComponent,
             ArcBallCamera camera, SelectionManager selectionManager,
             IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
-            SceneManager sceneManager, ResourceLibrary resourceLibrary)
+            SceneManager sceneManager, RenderEngineComponent resourceLibrary)
         {
             _mouseComponent = mouseComponent;
             _keyboardComponent = keyboardComponent;

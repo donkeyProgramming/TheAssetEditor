@@ -16,7 +16,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public TextureInput BloodMask { get; set; } = new TextureInput(TextureType.Blood);
         public float PreviewBlood { get; set; } = 0;
 
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary)
+        public void Apply(Effect effect, IScopedResourceLibrary resourceLibrary)
         {
         }
 

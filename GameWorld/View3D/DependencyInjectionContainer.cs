@@ -37,6 +37,8 @@ namespace GameWorld.Core
             // Graphics scene
             serviceCollection.AddScoped<IGeometryGraphicsContextFactory, GeometryGraphicsContextFactory>();
             serviceCollection.AddScoped<IWpfGame, WpfGame>();
+            serviceCollection.AddScoped<IScopedResourceLibrary, ScopedResourceLibrary>();
+            
             serviceCollection.AddSingleton<ResourceLibrary>();
 
             // Settings

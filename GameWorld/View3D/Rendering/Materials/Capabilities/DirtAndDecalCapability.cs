@@ -26,7 +26,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public TextureInput DecalPreviewColour { get; set; } = new TextureInput(TextureType.Decal_mask);
         public TextureInput DecalPreviewNormal { get; set; } = new TextureInput(TextureType.Decal_mask);
 
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary)
+        public void Apply(Effect effect, IScopedResourceLibrary resourceLibrary)
         {
 
         }

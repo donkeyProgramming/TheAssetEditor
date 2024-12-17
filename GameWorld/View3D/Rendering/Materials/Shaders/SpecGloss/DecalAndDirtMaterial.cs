@@ -6,7 +6,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.SpecGloss
 {
     public class DecalAndDirtMaterial : CapabilityMaterial
     {
-        public DecalAndDirtMaterial(ResourceLibrary resourceLibrary)
+        public DecalAndDirtMaterial(IScopedResourceLibrary resourceLibrary)
             : base(CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal, ShaderTypes.Pbr_SpecGloss, resourceLibrary)
         {
             Capabilities =

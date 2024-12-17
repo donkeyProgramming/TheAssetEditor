@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
@@ -10,19 +9,6 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
-
-    public static class EffectExtentions
-    {
-        public static EffectParameter GetParameter(this Effect effect, string parameterName)
-        {
-            var param = effect.Parameters.FirstOrDefault(x => x.Name == parameterName);
-            if (param == null)
-                throw new Exception($"Parameter {parameterName} is not a part of {effect.Name}");
-
-            return param;
-        }
-    }
-
     public class TintCapability : ICapability
     {
         public bool ApplyCapability { get; set; } = true;
@@ -39,7 +25,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public Vector3[] FactionColours { get; set; } = [new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1)];
         public Vector3[] TintColours { get; set; } = [new Vector3(0.7f, 0.7f, 0.6f), new Vector3(0.6f, 0.6f, 0.7f), new Vector3(0.7f, 0.6f, 0.6f)];
 
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary)
+        public void Apply(Effect effect, IScopedResourceLibrary resourceLibrary)
         {
             effect.GetParameter("CapabilityFlag_ApplyTinting").SetValue(ApplyCapability);
 

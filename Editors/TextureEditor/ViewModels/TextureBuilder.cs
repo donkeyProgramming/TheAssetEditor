@@ -14,11 +14,11 @@ namespace Editors.TextureEditor.ViewModels
 {
     public class TextureBuilder
     {
-        private readonly ResourceLibrary _resourceLib;
+        private readonly IScopedResourceLibrary _resourceLib;
         private readonly TextureToTextureRenderer _textureRenderer;
         private readonly IWpfGame _wpfGame;
 
-        public TextureBuilder(ResourceLibrary resourceLibrary, IWpfGame wpfGame)
+        public TextureBuilder(IScopedResourceLibrary resourceLibrary, IWpfGame wpfGame)
         {
             _resourceLib = resourceLibrary;
             _wpfGame = wpfGame;

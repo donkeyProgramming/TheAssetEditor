@@ -30,10 +30,7 @@ namespace Test.SkeletonEditor
             var originalRmv2File = runner.PackFileService.FindFile("animations\\skeletons\\humanoid01.anim");
             runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File, EditorEnums.VisualSkeletonEditor);
 
-            // Get the scope of the newly created kitbash editor
-            var toolScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;
-
-            var skeletonTool = toolScope.GetRequiredService<SkeletonEditorViewModel>();
+            var skeletonTool = runner.GetRequiredService<SkeletonEditorViewModel>();
 
             LoadReferenceMesh(runner, skeletonTool);
             EditBone(skeletonTool);

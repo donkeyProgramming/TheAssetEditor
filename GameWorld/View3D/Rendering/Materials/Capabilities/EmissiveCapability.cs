@@ -32,7 +32,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public Vector2 EmissiveTiling { get; set; } = new Vector2(1);
         public Vector3 EmissiveTint { get; set; } = new Vector3(1, 0, 0);
 
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary)
+        public void Apply(Effect effect, IScopedResourceLibrary resourceLibrary)
         {
             Emissive.Apply(effect, resourceLibrary);
 

@@ -20,7 +20,7 @@ namespace GameWorld.Core.Components.Gizmo
         private readonly SelectionManager _selectionManager;
         private readonly CommandExecutor _commandManager;
         private readonly ArcBallCamera _camera;
-        private readonly ResourceLibrary _resourceLibary;
+        private readonly RenderEngineComponent _resourceLibary;
         private readonly IDeviceResolver _deviceResolverComponent;
         private readonly CommandFactory _commandFactory;
         Gizmo _gizmo;
@@ -31,7 +31,7 @@ namespace GameWorld.Core.Components.Gizmo
 
         public GizmoComponent(IEventHub eventHub,
             IKeyboardComponent keyboardComponent, IMouseComponent mouseComponent, ArcBallCamera camera, CommandExecutor commandExecutor,
-            ResourceLibrary resourceLibary, IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
+            RenderEngineComponent resourceLibary, IDeviceResolver deviceResolverComponent, CommandFactory commandFactory,
             SelectionManager selectionManager)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.Gizmo;
@@ -51,7 +51,7 @@ namespace GameWorld.Core.Components.Gizmo
 
         public override void Initialize()
         {
-            _gizmo = new Gizmo(_camera, _mouse, _deviceResolverComponent.Device, _resourceLibary.CommonSpriteBatch, _resourceLibary.DefaultFont);
+            _gizmo = new Gizmo(_camera, _mouse, _deviceResolverComponent.Device, _resourceLibary);
             _gizmo.ActivePivot = PivotType.ObjectCenter;
             _gizmo.TranslateEvent += GizmoTranslateEvent;
             _gizmo.RotateEvent += GizmoRotateEvent;

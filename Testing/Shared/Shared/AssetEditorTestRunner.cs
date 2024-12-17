@@ -18,34 +18,33 @@ namespace Test.TestingUtility.Shared
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public IServiceScope EditorServiceProvider { get; private set; }
+        public IServiceProvider EditorServiceProvider => _serviceProvider;
         public IPackFileService PackFileService { get; private set; }
         public IUiCommandFactory CommandFactory { get; private set; }
-        public ScopeRepository ScopeRepository { get; private set; }
+        public IScopeRepository ScopeRepository { get; private set; }
         public Mock<IStandardDialogs> Dialogs { get; private set; }
 
 
         public AssetEditorTestRunner(GameTypeEnum gameEnum = GameTypeEnum.Warhammer3, bool forceValidateServiceScopes = false)
         {
             _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes, MockServices);
-            EditorServiceProvider = _serviceProvider.CreateScope();
-
-            var settings = EditorServiceProvider.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
+  
+            var settings = EditorServiceProvider.GetRequiredService<ApplicationSettingsService>();
             settings.CurrentSettings.CurrentGame = gameEnum;
 
-            var game = EditorServiceProvider.ServiceProvider.GetRequiredService<IWpfGame>();
-            var resourceLibrary = EditorServiceProvider.ServiceProvider.GetRequiredService<ResourceLibrary>();
+            var game = EditorServiceProvider.GetRequiredService<IWpfGame>();
+            var resourceLibrary = EditorServiceProvider.GetRequiredService<ResourceLibrary>();
             resourceLibrary.Initialize(game.GraphicsDevice, game.Content);
 
-            PackFileService = EditorServiceProvider.ServiceProvider.GetRequiredService<IPackFileService>();
-            CommandFactory = EditorServiceProvider.ServiceProvider.GetRequiredService<IUiCommandFactory>();
-            ScopeRepository = EditorServiceProvider.ServiceProvider.GetRequiredService<ScopeRepository>();
-            ScopeRepository.Root = EditorServiceProvider;
+            PackFileService = EditorServiceProvider.GetRequiredService<IPackFileService>();
+            CommandFactory = EditorServiceProvider.GetRequiredService<IUiCommandFactory>();
+            ScopeRepository = EditorServiceProvider.GetRequiredService<IScopeRepository>() ;
+            //(ScopeRepository as ScopeRepository).Root = EditorServiceProvider;
         }
 
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)
         {
-            var loader = EditorServiceProvider.ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
+            var loader = EditorServiceProvider.GetRequiredService<IPackFileContainerLoader>();
             var container = loader.Load(path);
             container.IsCaPackFile = true;
             PackFileService.AddContainer(container);
@@ -55,9 +54,16 @@ namespace Test.TestingUtility.Shared
             return null;
         }
 
+        public T GetRequiredService<T>()
+        {
+            var handle = ScopeRepository.GetEditorHandles().First();
+            return ScopeRepository.GetRequiredService<T>(handle);
+        }
+
+
         public PackFileContainer? LoadFolderPackFile(string path, bool createOutputPackFile = true)
         {
-            var loader = EditorServiceProvider.ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
+            var loader = EditorServiceProvider.GetRequiredService<IPackFileContainerLoader>();
             var container = loader.LoadSystemFolderAsPackFileContainer(path);
             container.IsCaPackFile = true;
             PackFileService.AddContainer(container);

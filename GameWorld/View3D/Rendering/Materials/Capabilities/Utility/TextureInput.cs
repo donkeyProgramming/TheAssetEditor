@@ -26,7 +26,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities.Utility
             };
         }
 
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary)
+        public void Apply(Effect effect, IScopedResourceLibrary resourceLibrary)
         {
             var useTextureParam = ShaderParameterHelper.UseTextureTypeToParamName[Type];
             var textureParam = ShaderParameterHelper.TextureTypeToParamName[Type];

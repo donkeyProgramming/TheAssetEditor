@@ -18,7 +18,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public TextureInput Distortion { get; set; } = new TextureInput(TextureType.Distortion);
         public TextureInput DistortionNoise { get; set; } = new TextureInput(TextureType.DistortionNoise);
 
-        public override void Apply(Effect effect, ResourceLibrary resourceLibrary)
+        public override void Apply(Effect effect, IScopedResourceLibrary resourceLibrary)
         {
             BaseColour.Apply(effect, resourceLibrary);
             MaterialMap.Apply(effect, resourceLibrary);

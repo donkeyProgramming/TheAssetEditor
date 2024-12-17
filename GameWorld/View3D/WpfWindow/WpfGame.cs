@@ -110,6 +110,7 @@ namespace GameWorld.Core.WpfWindow
 
         protected override void OnGraphicDeviceDisposed()
         {
+            _eventHub.PublishGlobalEvent(new GraphicDeviceDisposedEvent());
             _resourceLibrary.Reset();
         }
 

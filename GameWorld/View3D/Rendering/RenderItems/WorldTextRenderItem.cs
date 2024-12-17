@@ -9,11 +9,11 @@ namespace GameWorld.Core.Rendering.RenderItems
     {
         Vector3 _pos;
 
-        readonly ResourceLibrary _resourceLib;
+        readonly RenderEngineComponent _resourceLib;
         readonly string _text;
         public Matrix ModelMatrix { get; set; } = Matrix.Identity;
 
-        public WorldTextRenderItem(ResourceLibrary resourceLib, string text, Vector3 pos)
+        public WorldTextRenderItem(RenderEngineComponent resourceLib, string text, Vector3 pos)
         {
             _resourceLib = resourceLib;
             _text = text;

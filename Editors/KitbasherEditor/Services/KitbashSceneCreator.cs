@@ -12,7 +12,6 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
 using Shared.GameFormats.WsModel;
-using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Editors.KitbasherEditor.Services
 {

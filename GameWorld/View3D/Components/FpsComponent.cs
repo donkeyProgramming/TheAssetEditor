@@ -1,7 +1,6 @@
 ﻿using System;
 using GameWorld.Core.Components.Rendering;
 using GameWorld.Core.Rendering.RenderItems;
-using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 
 namespace GameWorld.Core.Components
@@ -12,12 +11,11 @@ namespace GameWorld.Core.Components
         private int _liveFrames;
         private TimeSpan _timeElapsed;
         private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly ResourceLibrary _resourceLibrary;
 
-        public FpsComponent(RenderEngineComponent renderEngineComponent, ResourceLibrary resourceLibrary)
+
+        public FpsComponent(RenderEngineComponent renderEngineComponent)
         {
             _renderEngineComponent = renderEngineComponent;
-            _resourceLibrary = resourceLibrary;
         }
 
         public override void Update(GameTime gameTime)
@@ -36,7 +34,7 @@ namespace GameWorld.Core.Components
             _liveFrames++;
             var text = $"FPS: {_frames}";
 
-            var renderItem = new FontRenderItem(_resourceLibrary, text, new Vector2(5), Color.White);
+            var renderItem = new FontRenderItem(_renderEngineComponent, text, new Vector2(5), Color.White);
             _renderEngineComponent.AddRenderItem(RenderBuckedId.Font, renderItem);
         }
     }

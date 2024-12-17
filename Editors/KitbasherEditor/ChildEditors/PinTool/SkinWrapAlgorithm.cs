@@ -4,6 +4,7 @@ using Editors.KitbasherEditor.ChildEditors.PinTool.Commands;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using Shared.Core.Services;
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool
@@ -45,6 +46,13 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
             var selectionAsMeshNode = selectionState.GetSingleSelectedObject() as Rmv2MeshNode;
             if (selectionAsMeshNode == null)
                 throw new Exception($"Unexpected result for selection. State = {selectionState}");
+
+            if (selectionAsMeshNode.PivotPoint != Vector3.Zero)
+            {
+                _standardDialogs.ShowDialogBox("Selected mesh has a pivot point, the tool will not work correctly", "error");
+                return;
+            }
+
             TakeAnimationFromMesh = selectionAsMeshNode;
 
             description = $"{TakeAnimationFromMesh.Name}'";

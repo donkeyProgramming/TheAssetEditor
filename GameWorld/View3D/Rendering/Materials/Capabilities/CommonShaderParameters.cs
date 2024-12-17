@@ -18,7 +18,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         public float LightIntensityMult { get; set; }
 
-        public void Apply(Effect effect, ResourceLibrary _)
+        public void Apply(Effect effect, IScopedResourceLibrary _)
         {
             effect.Parameters["View"].SetValue(View);
             effect.Parameters["Projection"].SetValue(Projection);

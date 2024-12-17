@@ -6,10 +6,6 @@ using Shared.Core.ErrorHandling;
 
 namespace Shared.Core.ToolCreation
 {
-
-
-
-
     public interface IEditorDatabase
     {
         public void Register(EditorInfo editorInfo);
@@ -26,15 +22,13 @@ namespace Shared.Core.ToolCreation
     {
         private readonly ILogger _logger = Logging.Create<EditorDatabase>();
 
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ScopeRepository _scopeRepository;
+        private readonly IScopeRepository _scopeRepository;
         private readonly IToolSelectorUiProvider _toolSelectorUiProvider;
 
         private readonly List<EditorInfo> _editors = [];
 
-        public EditorDatabase(IServiceProvider serviceProvider, ScopeRepository scopeRepository, IToolSelectorUiProvider toolSelectorUiProvider)
+        public EditorDatabase(IScopeRepository scopeRepository, IToolSelectorUiProvider toolSelectorUiProvider)
         {
-            _serviceProvider = serviceProvider;
             _scopeRepository = scopeRepository;
             _toolSelectorUiProvider = toolSelectorUiProvider;
         }
@@ -101,12 +95,7 @@ namespace Shared.Core.ToolCreation
         IEditorInterface CreateEditorInternal(Type editorType)
         {
             ApplicationStateRecorder.EditorOpened();
-
-            var scope = _serviceProvider.CreateScope();
-            var instance = scope.ServiceProvider.GetRequiredService(editorType) as IEditorInterface;
-            if (instance == null)
-                throw new Exception($"Type '{editorType}' is not a IEditorViewModel");
-            _scopeRepository.Add(instance, scope);
+            var instance = _scopeRepository.CreateScope(editorType);
             return instance;
         }
 

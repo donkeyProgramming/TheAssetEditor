@@ -17,7 +17,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public TextureInput NormalMap { get; set; } = new TextureInput(TextureType.Normal);
         public TextureInput Mask { get; set; } = new TextureInput(TextureType.Mask);
 
-        public override void Apply(Effect effect, ResourceLibrary resourceLibrary)
+        public override void Apply(Effect effect, IScopedResourceLibrary resourceLibrary)
         {
             SpecularMap.Apply(effect, resourceLibrary);
             GlossMap.Apply(effect, resourceLibrary);

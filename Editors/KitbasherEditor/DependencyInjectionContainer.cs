@@ -68,7 +68,7 @@ namespace Editors.KitbasherEditor
             RegisterWindow<VertexDebuggerWindow>(serviceCollection);
 
             // Pin tool
-            serviceCollection.AddScoped<PinToolViewModel>();
+            serviceCollection.AddTransient<PinToolViewModel>();
             RegisterWindow<PinToolWindow>(serviceCollection);
             serviceCollection.AddTransient<PinMeshToVertexCommand>();
             serviceCollection.AddTransient<SkinWrapRiggingCommand>();
@@ -97,8 +97,6 @@ namespace Editors.KitbasherEditor
             serviceCollection.AddTransient<ImportReferenceMeshCommand>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
-
-
 
             // Commands
             serviceCollection.AddTransient<RemapBoneIndexesCommand>();

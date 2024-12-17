@@ -12,11 +12,11 @@ namespace GameWorld.Core.Components
         string _animationText;
         GameTime? _animationStart;
         bool _startAnimation;
-        private readonly ResourceLibrary _resourceLibrary;
+        private readonly RenderEngineComponent _resourceLibrary;
         private readonly IEventHub _eventHub;
         private readonly RenderEngineComponent _renderEngineComponent;
 
-        public CommandStackRenderer(ResourceLibrary resourceLibrary, IEventHub eventHub, RenderEngineComponent renderEngineComponent)
+        public CommandStackRenderer(RenderEngineComponent resourceLibrary, IEventHub eventHub, RenderEngineComponent renderEngineComponent)
         {
             _resourceLibrary = resourceLibrary;
             _eventHub = eventHub;

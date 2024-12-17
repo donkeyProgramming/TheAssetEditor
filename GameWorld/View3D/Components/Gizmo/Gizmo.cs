@@ -38,10 +38,11 @@ namespace GameWorld.Core.Components.Gizmo
         public bool Enabled { get; set; }
 
         private readonly GraphicsDevice _graphics;
-        private readonly SpriteBatch _spriteBatch;
+        private readonly RenderEngineComponent _renderEngineComponent;
+
         private readonly BasicEffect _lineEffect;
         private readonly BasicEffect _meshEffect;
-        private readonly SpriteFont _font;
+
 
         // -- Screen Scale -- //
         private float _screenScale;
@@ -141,12 +142,12 @@ namespace GameWorld.Core.Components.Gizmo
         private readonly IMouseComponent _mouse;
 
 
-        public Gizmo(ArcBallCamera camera, IMouseComponent mouse, GraphicsDevice graphics, SpriteBatch spriteBatch, SpriteFont font)
+        public Gizmo(ArcBallCamera camera, IMouseComponent mouse, GraphicsDevice graphics, RenderEngineComponent renderEngineComponent)
         {
             SceneWorld = Matrix.Identity;
             _graphics = graphics;
-            _spriteBatch = spriteBatch;
-            _font = font;
+            _renderEngineComponent = renderEngineComponent;
+
             _camera = camera;
             _mouse = mouse;
 
@@ -653,7 +654,7 @@ namespace GameWorld.Core.Components.Gizmo
 
         private void Draw2D(Matrix view, Matrix projection)
         {
-            _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
+            _renderEngineComponent.CommonSpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
             // -- Draw Axis identifiers ("X,Y,Z") -- // 
             for (var i = 0; i < 3; i++)
@@ -682,10 +683,10 @@ namespace GameWorld.Core.Components.Gizmo
                         break;
                 }
 
-                _spriteBatch.DrawString(_font, _axisText[i], new Vector2(screenPos.X, screenPos.Y), color);
+                _renderEngineComponent.CommonSpriteBatch.DrawString(_renderEngineComponent.DefaultFont, _axisText[i], new Vector2(screenPos.X, screenPos.Y), color);
             }
 
-            _spriteBatch.End();
+            _renderEngineComponent.CommonSpriteBatch.End();
         }
 
         /// <summary>

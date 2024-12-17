@@ -16,14 +16,12 @@ namespace GameWorld.Core.Components
 
         private readonly IKeyboardComponent _keyboardComponent;
         private readonly RenderEngineComponent _renderEngineComponent;
-        private readonly ResourceLibrary _resourceLibrary;
         private readonly SceneRenderParametersStore _sceneRenderParametersStore;
 
-        public LightControllerComponent(IKeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent, ResourceLibrary resourceLibrary, SceneRenderParametersStore sceneRenderParametersStore)
+        public LightControllerComponent(IKeyboardComponent keyboardComponent, RenderEngineComponent renderEngineComponent, SceneRenderParametersStore sceneRenderParametersStore)
         {
             _keyboardComponent = keyboardComponent;
             _renderEngineComponent = renderEngineComponent;
-            _resourceLibrary = resourceLibrary;
             _sceneRenderParametersStore = sceneRenderParametersStore;
         }
 
@@ -43,7 +41,7 @@ namespace GameWorld.Core.Components
                 if (lerpValue >= 1)
                     _animationStart = null;
 
-                _renderEngineComponent.AddRenderItem(RenderBuckedId.Font, new FontRenderItem(_resourceLibrary, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue)));
+                _renderEngineComponent.AddRenderItem(RenderBuckedId.Font, new FontRenderItem(_renderEngineComponent, _animationText, new Vector2(5, 20), new Color(0, 0, 0, alphaValue)));
             }
 
             base.Draw(gameTime);

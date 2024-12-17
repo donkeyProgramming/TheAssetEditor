@@ -24,37 +24,6 @@ namespace E2EVerification
         {
         }
 
-        [Test]
-        public void SkeletonToolTets()
-        {
-            var runner = new AssetEditorTestRunner();
-            var outputPackFile = runner.LoadPackFile(_inputPackFileKarl, true);
-
-            // Load the a rmv2 and open the kitbash editor
-            var originalRmv2File = runner.PackFileService.FindFile("animations\\skeletons\\humanoid01.anim");
-            runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File, EditorEnums.VisualSkeletonEditor);
-
-            // Get the scope of the newly created kitbash editor
-            var kitbashScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;
-
-            var toolCommandFactory = kitbashScope.GetRequiredService<SkeletonEditorViewModel>();
-
-            // Load a reference mesh
-            // Select a bone
-            // Rename
-            // Get pos
-            // Enable worldpos
-            // Move up in worldspace
-            // Select a new shoulder (finger)
-            // Delete bone 
-            // Save
-            //toolCommandFactory.LoadRefMeshAction()
-
-
-        }
-
-
-
 
         [Test]
         public void Warhammer3_SaveKarl_Default()
@@ -66,14 +35,11 @@ namespace E2EVerification
             var originalRmv2File = runner.PackFileService.FindFile(_rmvFilePathKarl);
             runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
-            // Get the scope of the newly created kitbash editor
-            var kitbashScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;
-
             // Edit the save settings and trigger a save
-            var saveSettings = kitbashScope.GetRequiredService<GeometrySaveSettings>();
+            var saveSettings = runner.GetRequiredService<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
 
-            var toolCommandFactory = kitbashScope.GetRequiredService<IUiCommandFactory>();
+            var toolCommandFactory = runner.GetRequiredService<IUiCommandFactory>();
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
@@ -114,15 +80,12 @@ namespace E2EVerification
             var originalRmv2File = runner.PackFileService.FindFile(_rmvFilePathKarl);
             runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
-            // Get the scope of the newly created kitbash editor
-            var kitbashScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;
-
             // Edit the save settings and trigger a save
-            var saveSettings = kitbashScope.GetRequiredService<GeometrySaveSettings>();
+            var saveSettings = runner.GetRequiredService<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
             saveSettings.LodGenerationMethod = LodStrategy.Lod0ForAll;
 
-            var toolCommandFactory = kitbashScope.GetRequiredService<IUiCommandFactory>();
+            var toolCommandFactory = runner.GetRequiredService<IUiCommandFactory>();
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
@@ -164,14 +127,11 @@ namespace E2EVerification
             var originalRmv2File = runner.PackFileService.FindFile(meshPath);
             runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
-            // Get the scope of the newly created kitbash editor
-            var kitbashScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;
-
             // Edit the save settings and trigger a save
-            var saveSettings = kitbashScope.GetRequiredService<GeometrySaveSettings>();
+            var saveSettings = runner.GetRequiredService<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
 
-            var toolCommandFactory = kitbashScope.GetRequiredService<IUiCommandFactory>();
+            var toolCommandFactory = runner.GetRequiredService<IUiCommandFactory>();
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
@@ -198,14 +158,11 @@ namespace E2EVerification
             var originalRmv2File = runner.PackFileService.FindFile(meshPath);
             runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
-            // Get the scope of the newly created kitbash editor
-            var kitbashScope = runner.ScopeRepository.Scopes.First().Value.ServiceProvider;
-
             // Edit the save settings and trigger a save
-            var saveSettings = kitbashScope.GetRequiredService<GeometrySaveSettings>();
+            var saveSettings = runner.GetRequiredService<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
 
-            var toolCommandFactory = kitbashScope.GetRequiredService<IUiCommandFactory>();
+            var toolCommandFactory = runner.GetRequiredService<IUiCommandFactory>();
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files

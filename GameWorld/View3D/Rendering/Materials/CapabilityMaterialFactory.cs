@@ -11,9 +11,9 @@ namespace GameWorld.Core.Rendering.Materials
     public class CapabilityMaterialFactory
     {
         private readonly ApplicationSettingsService _applicationSettingsService;
-        private readonly ResourceLibrary _resourceLibrary;
+        private readonly IScopedResourceLibrary _resourceLibrary;
 
-        public CapabilityMaterialFactory(ApplicationSettingsService applicationSettingsService, ResourceLibrary resourceLibrary)
+        public CapabilityMaterialFactory(ApplicationSettingsService applicationSettingsService, IScopedResourceLibrary resourceLibrary)
         {
             _applicationSettingsService = applicationSettingsService;
             _resourceLibrary = resourceLibrary;

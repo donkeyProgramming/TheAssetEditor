@@ -8,6 +8,7 @@ using GameWorld.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
+using Shared.Core.Services;
 using Shared.Core.Settings;
 
 namespace GameWorld.Core.Components.Rendering
@@ -17,10 +18,11 @@ namespace GameWorld.Core.Components.Rendering
         Color _backgroundColour;
 
         private readonly Dictionary<RasterizerStateEnum, RasterizerState> _rasterStates = [];
+        private readonly IWpfGame _wpfGame;
+        private readonly ResourceLibrary _resourceLibrary;
         private readonly ArcBallCamera _camera;
         private readonly Dictionary<RenderBuckedId, List<IRenderItem>> _renderItems = [];
         private readonly List<VertexPositionColor> _renderLines = [];
-        private readonly ResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
         private readonly SceneRenderParametersStore _sceneLightParameters;
         private readonly IEventHub _eventHub;
@@ -35,14 +37,19 @@ namespace GameWorld.Core.Components.Rendering
         RenderTarget2D _defaultRenderTarget;
         RenderTarget2D _glowRenderTarget;
 
-        public RenderEngineComponent(ArcBallCamera camera, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneRenderParametersStore sceneLightParametersStore, IEventHub eventHub)
+        public SpriteBatch CommonSpriteBatch { get; private set; }
+        public SpriteFont DefaultFont { get; private set; }
+
+        public RenderEngineComponent(IWpfGame wpfGame, ResourceLibrary resourceLibrary, ArcBallCamera camera, IDeviceResolver deviceResolverComponent, ApplicationSettingsService applicationSettingsService, SceneRenderParametersStore sceneLightParametersStore, IEventHub eventHub)
         {
             UpdateOrder = (int)ComponentUpdateOrderEnum.RenderEngine;
             DrawOrder = (int)ComponentDrawOrderEnum.RenderEngine;
 
             _backgroundColour = ApplicationSettingsHelper.GetEnumAsColour(applicationSettingsService.CurrentSettings.RenderEngineBackgroundColour);
+            _wpfGame = wpfGame;
+            _resourceLibrary = resourceLibrary;
             _camera = camera;
-            _resourceLib = resourceLib;
+
             _deviceResolverComponent = deviceResolverComponent;
             _sceneLightParameters = sceneLightParametersStore;
             _eventHub = eventHub;
@@ -70,11 +77,14 @@ namespace GameWorld.Core.Components.Rendering
             var device = _deviceResolverComponent.Device;
 
             _bloomFilter = new BloomFilter();
-            _bloomFilter.Load(device, _resourceLib, device.Viewport.Width, device.Viewport.Height);
+            _bloomFilter.Load(device, _resourceLibrary, device.Viewport.Width, device.Viewport.Height);
             _bloomFilter.BloomPreset = BloomFilter.BloomPresets.SuperWide;
 
             _whiteTexture = new Texture2D(_deviceResolverComponent.Device, 1, 1);
             _whiteTexture.SetData(new[] { Color.White });
+
+            CommonSpriteBatch = new SpriteBatch(device);
+            DefaultFont = _wpfGame.Content.Load<SpriteFont>("Fonts//DefaultFont");
         }
 
         void RebuildRasterStates(bool cullingEnabled, bool bigSceneDepthBias)
@@ -112,7 +122,7 @@ namespace GameWorld.Core.Components.Rendering
         public override void Draw(GameTime gameTime)
         {
             var device = _deviceResolverComponent.Device;
-            var spriteBatch = _resourceLib.CommonSpriteBatch;
+            var spriteBatch = CommonSpriteBatch;
             var screenWidth = device.Viewport.Width;
             var screenHeight = device.Viewport.Height;
             var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters);
@@ -153,7 +163,7 @@ namespace GameWorld.Core.Components.Rendering
 
         private void Render2DObjects(GraphicsDevice device, CommonShaderParameters commonShaderParameters)
         {
-            var spriteBatch = _resourceLib.CommonSpriteBatch;
+            var spriteBatch = CommonSpriteBatch;
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
 
             // Clear the screen
@@ -171,7 +181,7 @@ namespace GameWorld.Core.Components.Rendering
 
             if (renderingTechnique == RenderingTechnique.Normal && _renderLines.Count != 0)
             {
-                var shader = _resourceLib.GetStaticEffect(ShaderTypes.Line);
+                var shader = _resourceLibrary.GetStaticEffect(ShaderTypes.Line);
                 shader.Parameters["View"].SetValue(commonShaderParameters.View);
                 shader.Parameters["Projection"].SetValue(commonShaderParameters.Projection);
                 shader.Parameters["World"].SetValue(Matrix.Identity);
@@ -198,6 +208,9 @@ namespace GameWorld.Core.Components.Rendering
         public void Dispose()
         {
             _eventHub.UnRegister(this);
+
+            CommonSpriteBatch?.Dispose();
+            CommonSpriteBatch = null;
 
             _bloomFilter.Dispose();
             _defaultRenderTarget.Dispose();

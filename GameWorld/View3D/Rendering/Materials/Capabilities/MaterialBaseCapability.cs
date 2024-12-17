@@ -13,7 +13,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
         public bool UseAlpha { get; set; }
         public float ScaleMult { get; set; } = 1;
 
-        public virtual void Apply(Effect effect, ResourceLibrary resourceLibrary)
+        public virtual void Apply(Effect effect, IScopedResourceLibrary resourceLibrary)
         {
             effect.Parameters["UseAlpha"].SetValue(UseAlpha);
         }

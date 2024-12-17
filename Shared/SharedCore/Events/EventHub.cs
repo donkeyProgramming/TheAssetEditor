@@ -24,14 +24,14 @@ namespace Shared.Core.Events
 
     class SingletonScopeEventHub : EventHub, IGlobalEventHub
     {
-        public SingletonScopeEventHub(ScopeRepository scopeRepository) : base(scopeRepository, nameof(IGlobalEventHub))
+        public SingletonScopeEventHub(IScopeRepository scopeRepository) : base(scopeRepository, nameof(IGlobalEventHub), true)
         {
         }
     }
 
     class LocalScopeEventHub : EventHub, IEventHub
     {
-        public LocalScopeEventHub(ScopeRepository scopeRepository) : base(scopeRepository, nameof(IEventHub))
+        public LocalScopeEventHub(IScopeRepository scopeRepository) : base(scopeRepository, nameof(IEventHub), false)
         {
         }
     }
@@ -42,45 +42,67 @@ namespace Shared.Core.Events
         bool _isDisposed = false;
         
         Dictionary<Type, List<(Delegate Callback, object Owner)>> _callbackList = new();
-        private readonly ScopeRepository _scopeRepository;
+        private readonly IScopeRepository _scopeRepository;
         private readonly string _hubName;
+        private readonly bool _isGlobal;
 
-        public EventHub(ScopeRepository scopeRepository, string hubName)
+        public EventHub(IScopeRepository scopeRepository, string hubName, bool isGlobal)
         {
             _scopeRepository = scopeRepository;
             _hubName = hubName;
+            _isGlobal = isGlobal;
         }
 
         public void PublishGlobalEvent<T>(T e)
         {
-            _logger.Here().Information($"Publshing event {e.GetType().Name} on {_hubName}");
-
-            // Send to all editors
-            foreach (var scope in _scopeRepository.Scopes.Values)
+            // If gloabl, send to self and all children
+            if (_isGlobal)
             {
-                var handler = scope.ServiceProvider.GetRequiredService<IEventHub>();
-                if (handler != null)
-                    handler.Publish(e);
+                _logger.Here().Information($"Publshing global event {e.GetType().Name} on {_hubName}");
+
+                // Send to global subscribers 
+                Publish(e);
+
+                // get the event hub that lives in the "main" scope
+                var mainScope = _scopeRepository.GetRequiredServiceRootScope<IEventHub>();
+                mainScope.Publish(e);
+
+                // Send to all editors
+                var handles = _scopeRepository.GetEditorHandles();
+                foreach (var editorHandle in handles)
+                {
+                    var scopedEventHub = _scopeRepository.GetRequiredService<IEventHub>(editorHandle);
+                    if (scopedEventHub != null)
+                        scopedEventHub.Publish(e);
+                }
             }
-
-            // Send to the root scope, which the main windows, packfiles and a few other things live in
-            var rootHandler = _scopeRepository.Root.ServiceProvider.GetRequiredService<IEventHub>();
-            if (rootHandler != null)
-                rootHandler.Publish(e);
-
-            // Send to other globals
-            Publish(e);
+            // If local, send to global
+            else
+            {
+                var globalEventHub = _scopeRepository.GetRequiredServiceRootScope<IGlobalEventHub>();
+                if (globalEventHub != null)
+                    globalEventHub.PublishGlobalEvent(e);
+            }
         }
 
         public void Publish<T>(T instance)
         {
-            _callbackList.TryGetValue(typeof(T), out var callbackItems);
-            if (callbackItems == null)
-                return;
-            foreach (var callbackItem in callbackItems)
+            foreach (var callbackItem in _callbackList)
             {
-                var action = (Action<T>)callbackItem.Callback;
-                action(instance);
+                var subscribedType = callbackItem.Key;
+                var isSameType = subscribedType == typeof(T);
+                var isAssignableFrom = subscribedType.IsAssignableFrom(typeof(T));
+
+                if (isSameType || isAssignableFrom)
+                {
+                    foreach (var subscriber in callbackItem.Value)
+                    {
+                        var action = (Action<T>)subscriber.Callback;
+                        action(instance);
+
+                    }
+                }
+
             }
         }
 

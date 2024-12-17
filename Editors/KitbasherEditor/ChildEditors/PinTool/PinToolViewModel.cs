@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using Microsoft.Xna.Framework;
 using Shared.Core.Services;
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool
@@ -53,6 +54,12 @@ namespace Editors.KitbasherEditor.ChildEditors.PinTool
                 .Select(x => x as Rmv2MeshNode)
                 .Where(x => x != null)
                 .ToList();
+
+            if (selectedObjects.Any(x => x.PivotPoint != Vector3.Zero))
+            {
+                _standardDialogs.ShowDialogBox("Mesh(s) has a pivot point, the tool will not work correctly", "error");
+                return;
+            }
 
             foreach (var item in itemList)
                 selectedObjects.Add(item);

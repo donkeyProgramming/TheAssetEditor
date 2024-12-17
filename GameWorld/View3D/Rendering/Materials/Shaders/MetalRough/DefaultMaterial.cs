@@ -7,7 +7,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders.MetalRough
 {
     public class DefaultMaterial : CapabilityMaterial
     {
-        public DefaultMaterial(ResourceLibrary resourceLibrary)
+        public DefaultMaterial(IScopedResourceLibrary resourceLibrary)
             : base(CapabilityMaterialsEnum.MetalRoughPbr_Default, ShaderTypes.Pbs_MetalRough, resourceLibrary)
         {
             Capabilities =

@@ -19,7 +19,6 @@ namespace AssetEditor
     public partial class App : Application
     {
         IServiceProvider _serviceProvider;
-        IServiceScope _rootScope;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -31,32 +30,30 @@ namespace AssetEditor
 
             var forceValidateServiceScopes = Debugger.IsAttached;
             _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes);
-            _rootScope = _serviceProvider.CreateScope();
 
-            _ = _rootScope.ServiceProvider.GetRequiredService<RecentFilesTracker>(); // Force instance
-            var scopeRepo = _rootScope.ServiceProvider.GetRequiredService<ScopeRepository>();
-            scopeRepo.Root = _rootScope;
+            _ = _serviceProvider.GetRequiredService<RecentFilesTracker>(); // Force instance of the RecentFilesTracker
+            _ = _serviceProvider.GetRequiredService<IScopeRepository>();  // Force instance of the IScopeRepository
 
-            var settingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
+            var settingsService = _serviceProvider.GetRequiredService<ApplicationSettingsService>();
             settingsService.AllowSettingsUpdate = true;
             settingsService.Load();
 
             // Init 3d world
-            var gameWorld = _rootScope.ServiceProvider.GetRequiredService<IWpfGame>();
+            var gameWorld = _serviceProvider.GetRequiredService<IWpfGame>();
             gameWorld.ForceEnsureCreated();
 
             // Show the settings window if its the first time the tool is ran
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)
             {
-                var settingsWindow = _rootScope.ServiceProvider.GetRequiredService<SettingsWindow>();
-                settingsWindow.DataContext = _rootScope.ServiceProvider.GetRequiredService<SettingsViewModel>();
+                var settingsWindow = _serviceProvider.GetRequiredService<SettingsWindow>();
+                settingsWindow.DataContext = _serviceProvider.GetRequiredService<SettingsViewModel>();
                 settingsWindow.ShowDialog();
 
                 settingsService.CurrentSettings.IsFirstTimeStartingApplication = false;
                 settingsService.Save();
             }
 
-            var devConfigManager = _rootScope.ServiceProvider.GetRequiredService<DevelopmentConfigurationManager>();
+            var devConfigManager = _serviceProvider.GetRequiredService<DevelopmentConfigurationManager>();
             devConfigManager.Initialize(e);
             devConfigManager.OverrideSettings();
 
@@ -66,8 +63,8 @@ namespace AssetEditor
                 var gamePath = settingsService.GetGamePathForCurrentGame();
                 if (gamePath != null)
                 {
-                    var packfileService = _rootScope.ServiceProvider.GetRequiredService<IPackFileService>();
-                    var containerLoader = _rootScope.ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
+                    var packfileService = _serviceProvider.GetRequiredService<IPackFileService>();
+                    var containerLoader = _serviceProvider.GetRequiredService<IPackFileContainerLoader>();
                     var loadRes = containerLoader.LoadAllCaFiles(settingsService.CurrentSettings.CurrentGame);
 
                     if (loadRes == null)
@@ -85,11 +82,11 @@ namespace AssetEditor
 
         void ShowMainWindow()
         {
-            var applicationSettingsService = _rootScope.ServiceProvider.GetRequiredService<ApplicationSettingsService>();
+            var applicationSettingsService = _serviceProvider.GetRequiredService<ApplicationSettingsService>();
             ThemesController.SetTheme(applicationSettingsService.CurrentSettings.Theme);
 
-            var mainWindow = _rootScope.ServiceProvider.GetRequiredService<MainWindow>();
-            mainWindow.DataContext = _rootScope.ServiceProvider.GetRequiredService<MainViewModel>();
+            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            mainWindow.DataContext = _serviceProvider.GetRequiredService<MainViewModel>();
             mainWindow.Show();
 
             // Ensure the window doesn't cover up the windows bar.
@@ -104,7 +101,7 @@ namespace AssetEditor
         {
             Logging.Create<App>().Here().Fatal(args.Exception.ToString());
 
-            var exceptionService = _rootScope?.ServiceProvider.GetService<IStandardDialogs>();
+            var exceptionService = _serviceProvider?.GetService<IStandardDialogs>();
             if (exceptionService != null)
                exceptionService.ShowExceptionWindow(args.Exception);   
             else

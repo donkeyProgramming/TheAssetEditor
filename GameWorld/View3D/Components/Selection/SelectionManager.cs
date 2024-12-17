@@ -26,10 +26,10 @@ namespace GameWorld.Core.Components.Selection
 
         VertexInstanceMesh _vertexRenderer;
         float _vertexSelectionFalloff = 0;
-        private readonly ResourceLibrary _resourceLib;
+        private readonly IScopedResourceLibrary _resourceLib;
         private readonly IDeviceResolver _deviceResolverComponent;
 
-        public SelectionManager(IEventHub eventHub, RenderEngineComponent renderEngine, ResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent)
+        public SelectionManager(IEventHub eventHub, RenderEngineComponent renderEngine, IScopedResourceLibrary resourceLib, IDeviceResolver deviceResolverComponent)
         {
             _eventHub = eventHub;
             _renderEngine = renderEngine;

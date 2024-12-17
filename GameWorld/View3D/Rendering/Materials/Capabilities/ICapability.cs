@@ -8,7 +8,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 {
     public interface ICapability
     {
-        public void Apply(Effect effect, ResourceLibrary resourceLibrary);
+        public void Apply(Effect effect, IScopedResourceLibrary resourceLibrary);
         public ICapability Clone();
 
         void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial) { }

@@ -65,14 +65,14 @@ namespace GameWorld.Core.Rendering
         Vector3 _selectedColour = new(1, 0, 0);
         Vector3 _deselectedColour = new (1, 1, 1);
 
-        public VertexInstanceMesh(IDeviceResolver deviceResolverComponent, ResourceLibrary resourceLibrary)
+        public VertexInstanceMesh(IDeviceResolver deviceResolverComponent, IScopedResourceLibrary resourceLibrary)
         {
             Initialize(deviceResolverComponent.Device, resourceLibrary);
         }
 
-        void Initialize(GraphicsDevice device, ResourceLibrary resourceLib)
+        void Initialize(GraphicsDevice device, IScopedResourceLibrary resourceLib)
         {
-            _effect = resourceLib.LoadEffect("Shaders//InstancingShader", ShaderTypes.GeometryInstance);
+            _effect = resourceLib.GetStaticEffect(ShaderTypes.GeometryInstance);
 
             _instanceVertexDeclaration = InstanceDataOrientation.VertexDeclaration;
             GenerateGeometry(device);

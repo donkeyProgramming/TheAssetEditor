@@ -1,5 +1,4 @@
 ﻿using Editors.KitbasherEditor.UiCommands;
-using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.Events;
@@ -15,9 +14,9 @@ namespace Editors.KitbasherEditor.DevConfig
         private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly IUiCommandFactory _uiCommandFactory;
-        private readonly ScopeRepository _scopeRepositor;
+        private readonly IScopeRepository _scopeRepositor;
 
-        public Kitbash_Rat(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory, ScopeRepository scopeRepositor)
+        public Kitbash_Rat(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, IUiCommandFactory uiCommandFactory, IScopeRepository scopeRepositor)
         {
             _packFileService = packFileService;
             _packFileContainerLoader = packFileContainerLoader;
@@ -30,8 +29,9 @@ namespace Editors.KitbasherEditor.DevConfig
             var file = _packFileService.FindFile(@"variantmeshes\wh_variantmodels\hu17\skv\skv_throt\skv_throt_body_01.rigid_model_v2");
             _uiCommandFactory.Create<OpenEditorCommand>().Execute(file);
 
-            var kitbashToolScope = _scopeRepositor.Scopes.First().Value;
-            var localCommandFactory = kitbashToolScope.ServiceProvider.GetRequiredService<IUiCommandFactory>();
+            var editorHandle = _scopeRepositor.GetEditorHandles().First();
+            var localCommandFactory = _scopeRepositor.GetRequiredService<IUiCommandFactory>(editorHandle);
+
             localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_throt\\skv_throt_head_01.wsmodel");
             localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_throt_ratcatcher_1h_rigid_01.wsmodel");
             localCommandFactory.Create<ImportReferenceMeshCommand>().Execute("variantmeshes\\wh_variantmodels\\hu17\\skv\\skv_props\\skv_warpstone_1h_01.rigid_model_v2");

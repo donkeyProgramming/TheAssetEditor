@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ToolCreation;
@@ -21,8 +20,6 @@ namespace AssetEditor.Services
                 new Shared.GameFormats.DependencyInjectionContainer(),
                 new Shared.EmbeddedResources.DependencyInjectionContainer(loadResources),
                 new GameWorld.Core.DependencyInjectionContainer(),
-               
-                // Misc
 
                 // Domains
                 new Editors.Shared.Core.DependencyInjectionContainer(),
@@ -43,22 +40,24 @@ namespace AssetEditor.Services
 
         public IServiceProvider Build(bool forceValidateServiceScopes, Action<IServiceCollection> replaceServices = null)
         {
-            var host = Host.CreateDefaultBuilder()
-                .ConfigureServices(x=> ConfigureServices(x, replaceServices))
-                .UseDefaultServiceProvider(x=>ConfigureServiceOptions(forceValidateServiceScopes, x))
-                .Build();
+            var option = new ServiceProviderOptions()
+            {
+                ValidateOnBuild = forceValidateServiceScopes,
+                ValidateScopes = forceValidateServiceScopes,
+            };
 
-            RegisterTools(host.Services.GetService<IEditorDatabase>());
-            return host.Services;
-        }
+            // Add all normal classes
+            var serviceCollection = new ServiceCollection();
+            ConfigureServices(serviceCollection, replaceServices);
+            var initialServiceProvider = serviceCollection.BuildServiceProvider(option);
 
-        void ConfigureServiceOptions(bool forceValidateServiceScopes, ServiceProviderOptions options)
-        {
-            if(forceValidateServiceScopes)
-            { 
-                options.ValidateOnBuild = true;
-                options.ValidateScopes = true;
-            }
+            //Add self and build final provider
+            serviceCollection.AddSingleton<IServiceProvider>(initialServiceProvider);
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            // Register all tools
+            RegisterTools(serviceProvider.GetRequiredService<IEditorDatabase>());
+            return serviceProvider;
         }
 
         private void ConfigureServices(IServiceCollection services, Action<IServiceCollection> replaceServices)

@@ -68,16 +68,16 @@
                       ItemsSource="{Binding LodNodes, UpdateSourceTrigger=PropertyChanged}" 
                       AutoGenerateColumns="False" CanUserAddRows="False" ToolTipService.ShowOnDisabled="True" DockPanel.Dock="Top">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Index" Binding="{Binding LodIndex, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"/>
-                            <common:DataGridNumericColumn Header="Distance" Binding="{Binding CameraDistance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            <common:DataGridNumericColumn Header="Qlt Level" Binding="{Binding QualityLvl, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            <common:DataGridNumericColumn Header="Reduction Factor" Binding="{Binding LodReductionFactor, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                            <DataGridCheckBoxColumn Header="Merge Alpha" Binding="{Binding OptimizeLod_Alpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            <DataGridCheckBoxColumn Header="Fast AnimVertex" Binding="{Binding OptimizeLod_Vertex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <DataGridTextColumn Header="Index" Binding="{Binding LodIndex, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Foreground="Black"/>
+                            <common:DataGridNumericColumn Header="Distance" Binding="{Binding CameraDistance, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="Black"/>
+                            <common:DataGridNumericColumn Header="Qlt Level" Binding="{Binding QualityLvl, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="Black"/>
+                            <common:DataGridNumericColumn Header="Reduction Factor" Binding="{Binding LodReductionFactor, StringFormat={}{0:N2}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="Black"/>
+                            <DataGridCheckBoxColumn Header="Merge Alpha" Binding="{Binding OptimizeLod_Alpha, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            <DataGridCheckBoxColumn Header="Fast AnimVertex" Binding="{Binding OptimizeLod_Vertex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
 
-                            <common:DataGridNumericColumn Header="Num Polygons" Binding="{Binding PolygonCount.Value}" IsReadOnly="True" />
-                            <common:DataGridNumericColumn Header="Num Meshes" Binding="{Binding MeshCount.Value}" IsReadOnly="True" />
-                            <common:DataGridNumericColumn Header="Num Textures" Binding="{Binding TextureCount.Value}" IsReadOnly="True" />
+                            <common:DataGridNumericColumn Header="Num Polygons" Binding="{Binding PolygonCount.Value}" IsReadOnly="True" Foreground="Black" />
+                            <common:DataGridNumericColumn Header="Num Meshes" Binding="{Binding MeshCount.Value}" IsReadOnly="True" Foreground="Black"/>
+                            <common:DataGridNumericColumn Header="Num Textures" Binding="{Binding TextureCount.Value}" IsReadOnly="True" Foreground="Black"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
