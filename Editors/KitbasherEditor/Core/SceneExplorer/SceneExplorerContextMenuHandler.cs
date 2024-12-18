@@ -6,10 +6,10 @@ using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Object;
 using GameWorld.Core.Components;
+using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.Events;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
-using static Shared.Core.Misc.NotifyPropertyChangedImpl;
 
 namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 {
@@ -18,20 +18,18 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
         private readonly IEventHub _eventHub;
         private readonly SceneManager _sceneManager;
         private readonly CommandFactory _commandFactory;
-
+        private readonly SelectionManager _selectionManager;
         ISceneNode _activeNode;
         IEnumerable<ISceneNode> _activeNodes;
 
-        public event ValueChangedDelegate<IEnumerable<ISceneNode>> SelectedNodesChanged; // Hack - move commands to SceneExplorer instad. Trigger commands from here 
-
         [ObservableProperty] ObservableCollection<ContextMenuItem> _items = [];
 
-        public SceneExplorerContextMenuHandler(IEventHub eventHub, SceneManager sceneManager, CommandFactory commandFactory)
+        public SceneExplorerContextMenuHandler(IEventHub eventHub, SceneManager sceneManager, CommandFactory commandFactory, SelectionManager selectionManager)
         {
             _eventHub = eventHub;
             _sceneManager = sceneManager;
             _commandFactory = commandFactory;
-
+            _selectionManager = selectionManager;
             _eventHub.Register<SceneNodeSelectedEvent>(this, OnSelectionChanged);
         }
 
@@ -194,7 +192,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
 
         void InvertSelection()
         {
-            SelectedNodesChanged?.Invoke(_activeNode.Parent.Children.Except(_activeNodes).ToList());
+            var nodesToSelect = _activeNode.Parent.Children.Except(_activeNodes)
+                .Where(x=>x is ISelectable)
+                .Cast<ISelectable>()
+                .ToList();
+
+            var selection = new ObjectSelectionState();
+            selection.ModifySelection(nodesToSelect, false);
+            _selectionManager.SetState(selection);
         }
 
         void SelectSimilar()
@@ -209,7 +214,14 @@ namespace KitbasherEditor.ViewModels.SceneExplorerNodeViews
                 return siblingMatchResult.Success && siblingMatchResult.Value == m.Value;
             });
 
-            SelectedNodesChanged?.Invoke(selectedNodes.ToList());
+
+            var nodesToSelect = selectedNodes.Where(x => x is ISelectable)
+                .Cast<ISelectable>()
+                .ToList();
+
+            var selection = new ObjectSelectionState();
+            selection.ModifySelection(nodesToSelect, false);
+            _selectionManager.SetState(selection);
         }
 
         void ToggleLock()

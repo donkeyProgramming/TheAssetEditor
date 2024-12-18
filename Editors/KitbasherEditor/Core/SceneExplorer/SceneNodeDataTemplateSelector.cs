@@ -11,11 +11,11 @@ namespace KitbasherEditor.Views
             try
             {
                 var element = container as FrameworkElement;
-                var sceneElement = item as SceneNode;
+                var sceneElement = item as SceneExplorerNode;
 
                 if (element != null && sceneElement != null)
                 {
-                    if (sceneElement.IsEditable)
+                    if (sceneElement.Content.IsEditable)
                         return element.FindResource("DefaultTreeNodeStyle") as HierarchicalDataTemplate;
                     else
                         return element.FindResource("ReferenceTreeNodeStyle") as HierarchicalDataTemplate;

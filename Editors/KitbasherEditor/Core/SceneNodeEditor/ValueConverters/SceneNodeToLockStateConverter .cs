@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Data;
 using GameWorld.Core.SceneNodes;
+using KitbasherEditor.Views;
 
 namespace Editors.KitbasherEditor.ValueConverters
 {
@@ -10,7 +11,7 @@ namespace Editors.KitbasherEditor.ValueConverters
         public object Convert(
             object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var node = values[0] as SceneNode;
+            var node = (values[0] as ISceneNode);
             if (node.IsEditable == true)
             {
                 if (node is ISelectable selectable)

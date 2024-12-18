@@ -3,144 +3,247 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.KitbasherEditor.Core.SceneExplorer;
+using Editors.KitbasherEditor.Events;
+using GameWorld.Core.Components;
+using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.Events;
 
 namespace KitbasherEditor.Views
 {
-    public class MultiSelectTreeView : TreeView
+    public partial class SceneExplorerNode : ObservableObject
     {
-        private SolidColorBrush _selectedBackgroundBrush { get; } = new SolidColorBrush(Color.FromRgb(255, 0, 0));//= new SolidColorBrush(Color.FromRgb(58, 58, 58));
-        private SolidColorBrush _selectedForegroundBrush { get; } = new SolidColorBrush(Color.FromRgb(255, 0, 0));
+        public ObservableCollection<SceneExplorerNode> Children { get; set; } = [];
 
-        private SolidColorBrush _notSelectedBackgroundBrush { get; } = new SolidColorBrush(Color.FromRgb(36, 36, 36));
-        private SolidColorBrush _notSelectedForegroundBrush { get; } = new SolidColorBrush(Color.FromRgb(0, 255, 0));
-        TreeViewItem? _lastItemSelected;
+        public ISceneNode Content { get; set; }
+        [ObservableProperty] bool _isSelected;
 
-        public ObservableCollection<ISceneNode> SelectedObjects
+        public SceneExplorerNode(ISceneNode content)
         {
-            get { return (ObservableCollection<ISceneNode>)GetValue(SelectedObjectsProperty); }
-            set { SetValue(SelectedObjectsProperty, value); }
+            Content = content;
+        }
+    }
+
+    public class MultiSelectTreeView : TreeView, IDisposable
+    {
+        TreeViewItem? _lastItemSelected;
+        bool _ignoreSelectionEvents = false;
+        bool _setInitialNodeExpandInfo = true;
+
+        private readonly ObservableCollection<SceneExplorerNode> _nodes = [];
+
+        public IEventHub EventHub
+        {
+            get { return (IEventHub)GetValue(EventHubProperty); }
+            set { SetValue(EventHubProperty, value); }
         }
 
-        public static readonly DependencyProperty SelectedObjectsProperty =
-            DependencyProperty.Register("SelectedObjects", typeof(ObservableCollection<ISceneNode>), typeof(MultiSelectTreeView), new FrameworkPropertyMetadata(OnSelectionCollectionAssigned));
-
-        private static void OnSelectionCollectionAssigned(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public SceneManager SceneManager
         {
-            var tb = d as MultiSelectTreeView;
-            if (e.NewValue == null)
-                tb.UnSubscribe(e.OldValue as ObservableCollection<ISceneNode>);
-            else
-                tb.Subscribe(e.NewValue as ObservableCollection<ISceneNode>);
+            get { return (SceneManager)GetValue(SceneManagerProperty); }
+            set { SetValue(SceneManagerProperty, value); }
+        }
+
+        public SelectionManager SelectionManager
+        {
+            get { return (SelectionManager)GetValue(SelectionManagerProperty); }
+            set { SetValue(SelectionManagerProperty, value); }
+        }
+
+        public static readonly DependencyProperty EventHubProperty = DependencyProperty.Register(nameof(EventHub), typeof(IEventHub), typeof(MultiSelectTreeView), new FrameworkPropertyMetadata(AttemptRegistration));
+        public static readonly DependencyProperty SceneManagerProperty = DependencyProperty.Register(nameof(SceneManager), typeof(SceneManager), typeof(MultiSelectTreeView), new FrameworkPropertyMetadata(AttemptRegistration));
+        public static readonly DependencyProperty SelectionManagerProperty = DependencyProperty.Register(nameof(SelectionManager), typeof(SelectionManager), typeof(MultiSelectTreeView));
+
+        private static void AttemptRegistration(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            (d as MultiSelectTreeView)?.Register();
         }
 
         public MultiSelectTreeView()
         {
-            _selectedBackgroundBrush = (SolidColorBrush)FindResource("TreeViewItem.Selected.Background");
-            _notSelectedBackgroundBrush = (SolidColorBrush)FindResource("TreeView.Static.Background");
-
             SelectedItemChanged += MyTreeView_SelectedItemChanged;
             Focusable = true;
             PreviewMouseDoubleClick += MultiSelectTreeView_PreviewMouseDoubleClick;
+            PreviewMouseRightButtonDown += MultiSelectTreeView_PreviewMouseRightButtonDown;
+            ItemsSource = _nodes;
+        }
+
+        private void MultiSelectTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var treeViewItem = ItemContainerGeneratorHelper.VisualUpwardSearch(e.OriginalSource as DependencyObject);
+
+            if (treeViewItem.DataContext is SceneExplorerNode sceneNode)
+            {
+                if (sceneNode.IsSelected == false)
+                    treeViewItem.Focus();
+                e.Handled = true;
+            }
+        }
+
+
+        public void Register()
+        {
+            if (SceneManager == null || EventHub == null)
+                return;
+
+            EventHub.Register<SelectionChangedEvent>(this, SelectionEventHandler);
+            EventHub.Register<SceneObjectAddedEvent>(this, x => RebuildTree());
+            EventHub.Register<SceneObjectRemovedEvent>(this, x => RebuildTree());
+
+            RebuildTree();
+        }
+
+        private void RebuildTree()
+        {
+            SceneExplorerNodeBuilder.Update(_nodes, SceneManager.RootNode, _setInitialNodeExpandInfo);
+            _setInitialNodeExpandInfo = false;
+        }
+
+        private void SelectionEventHandler(SelectionChangedEvent notification)
+        {
+            if (_ignoreSelectionEvents)
+                return;
+
+
+            if (notification.NewState is not ObjectSelectionState objectSelection)
+                return;
+
+            ForEachNode(_nodes, objectSelection.CurrentSelection());
+
+            SendNodeSelectionEvent();
+        }
+
+        void ForEachNode(IEnumerable<SceneExplorerNode> nodes, List<ISelectable> selectedWorldNodes)
+        {
+            _lastItemSelected = null;
+            foreach (var node in nodes)
+            {
+                var selectedNode = selectedWorldNodes.FirstOrDefault(x => x == node.Content);
+                if (selectedNode != null)
+                    node.IsSelected = true;
+                else
+                    node.IsSelected = false;
+
+                ForEachNode(node.Children, selectedWorldNodes);
+            }
+        }
+
+        void SendNodeSelectionEvent()
+        {
+            var selectedNodes = GetSelectedNodes(_nodes);
+            EventHub.Publish(new SceneNodeSelectedEvent(selectedNodes));
         }
 
         private void MultiSelectTreeView_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            TreeViewItem treeViewItem = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+            TreeViewItem treeViewItem = ItemContainerGeneratorHelper.VisualUpwardSearch(e.OriginalSource as DependencyObject);
             if (treeViewItem != null)
             {
-                var node = treeViewItem.DataContext as SceneNode;
+                var node = treeViewItem.DataContext as SceneExplorerNode;
                 if (node != null)
-                    node.IsExpanded = !node.IsExpanded;
+                    node.Content.IsExpanded = !node.Content.IsExpanded;
             }
-
+            
             e.Handled = true;
         }
 
-        public static TreeViewItem VisualUpwardSearch(DependencyObject source)
-        {
-            while (source != null && !(source is TreeViewItem))
-                source = VisualTreeHelper.GetParent(source);
-
-            return source as TreeViewItem;
-        }
-
-        void Deselect(TreeViewItem treeViewItem, ISceneNode node)
-        {
-            if (treeViewItem != null)
-            {
-                treeViewItem.Background = _notSelectedBackgroundBrush;
-                treeViewItem.Foreground = _notSelectedForegroundBrush;
-            }
-            SelectedObjects.Remove(node);
-        }
-
-
-        void Select(TreeViewItem treeViewItem, ISceneNode node)
-        {
-            if (treeViewItem != null)
-            {
-                treeViewItem.Background = _selectedBackgroundBrush;
-                treeViewItem.Foreground = _selectedBackgroundBrush;
-            }
-
-            if (node != null)
-            {
-                if (SelectedObjects.Contains(node) == false)
-                    SelectedObjects.Add(node);
-            }
-        }
-
-
-
-
         void MyTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (SelectedObjects == null)
+            var node = (e.NewValue as SceneExplorerNode);
+            if (node == null)
                 return;
+
+            // ------------
+            var treeViewItem = ItemContainerGenerator.ContainerFromItemRecursive(node);
+            if (treeViewItem == null)
+                return;
+
+            treeViewItem.IsSelected = false;
+            treeViewItem.Focus();
+
+            if (!IsCtrlPressed)
+            {
+                var items = GetTreeViewItems(this, true);
+                foreach (var i in items)
+                    (i.DataContext as SceneExplorerNode).IsSelected = false;
+            }
+
+            if (IsShiftPressed && _lastItemSelected != null)
+            {
+                var items = GetTreeViewItemRange(_lastItemSelected, treeViewItem);
+                foreach (var i in items)
+                    (i.DataContext as SceneExplorerNode).IsSelected = true;
+
+            }
+            else
+            {
+                _lastItemSelected = treeViewItem;
+                (treeViewItem.DataContext as SceneExplorerNode).IsSelected = true;
+            }
 
             try
             {
-                SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
-                SelectedItemChanged -= MyTreeView_SelectedItemChanged;
+                // Create the selection state
+                var newSelection = new ObjectSelectionState();
+                UpdateSelectionStateFromNode(_nodes, newSelection);
 
-                var treeViewItem = ItemContainerGenerator.ContainerFromItemRecursive(SelectedItem);
-                if (treeViewItem == null)
-                    return;
+                // Check if the selection is same as before
+                var currentSelection = SelectionManager.GetState() as ObjectSelectionState;
+                var selectionEqual = false;
+                if (currentSelection != null)
+                    selectionEqual = currentSelection.IsSelectionEqual(newSelection);
 
-                treeViewItem.IsSelected = false;
-                treeViewItem.Focus();
-
-                if (!IsCtrlPressed)
+                // Send the new selection state
+                if (selectionEqual == false)
                 {
-                    var items = GetTreeViewItems(this, true);
-                    foreach (var i in items)
-                        Deselect(i, i.DataContext as ISceneNode);
+                    _ignoreSelectionEvents = true;
+                    SelectionManager.SetState(newSelection);
                 }
-    
-                if (IsShiftPressed && _lastItemSelected != null)
-                {
-                    var items = GetTreeViewItemRange(_lastItemSelected, treeViewItem);
-                    foreach (var i in items)
-                    {
-                        Select(i, i.DataContext as ISceneNode);
-                    }
-                   
-                }
-                else
-                {
-                    _lastItemSelected = treeViewItem;
-                    Select(treeViewItem, treeViewItem.DataContext as ISceneNode);
-                }
-
-
             }
-            finally
+            finally 
             {
-                SelectedItemChanged += MyTreeView_SelectedItemChanged;
-                SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
+                _ignoreSelectionEvents = false;
+            }
+
+            SendNodeSelectionEvent();
+        }
+
+
+        void UpdateSelectionStateFromNode(IEnumerable<SceneExplorerNode> nodes, ObjectSelectionState selectionState)
+        {
+            foreach (var node in nodes)
+            {
+                if (node.IsSelected == true)
+                {
+                    var content = node.Content as ISelectable;
+                    if (content != null && content.IsSelectable)
+                        selectionState.ModifySelectionSingleObject(content, false);
+                }
+
+                UpdateSelectionStateFromNode(node.Children, selectionState);
             }
         }
+
+
+        List<ISceneNode> GetSelectedNodes(IEnumerable<SceneExplorerNode> nodes)
+        {
+            var output = new List<ISceneNode>();
+            foreach (var node in nodes)
+            {
+                if (node.IsSelected)
+                    output.Add(node.Content);
+
+                var result = GetSelectedNodes(node.Children);
+                output.AddRange(result);
+            }
+
+            return output;
+        }
+
+
+
 
         private static List<TreeViewItem> GetTreeViewItems(ItemsControl parentItem, bool includeCollapsedItems, List<TreeViewItem> itemList = null)
         {
@@ -176,64 +279,9 @@ namespace KitbasherEditor.Views
             return rangeCount > 0 ? items.GetRange(rangeStart, rangeCount) : new List<TreeViewItem>();
         }
 
-
-        public void Subscribe(ObservableCollection<ISceneNode> collection)
+        public void Dispose()
         {
-            collection.CollectionChanged += SelectedObjects_CollectionChanged;
-        }
-
-        public void UnSubscribe(ObservableCollection<ISceneNode> collection)
-        {
-            collection.CollectionChanged -= SelectedObjects_CollectionChanged;
-        }
-
-        private void SelectedObjects_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (SelectedObjects == null)
-                return;
-
-            try
-            {
-                SelectedObjects.CollectionChanged -= SelectedObjects_CollectionChanged;
-                SelectedItemChanged -= MyTreeView_SelectedItemChanged;
-
-                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-                {
-                    foreach (var item in e.NewItems)
-                    {
-                        var treeViewItem = ItemContainerGenerator.ContainerFromItemRecursive(item);
-                        if (treeViewItem != null)
-                        {
-                            treeViewItem.Background = _selectedBackgroundBrush;
-                            treeViewItem.Foreground = _selectedForegroundBrush;
-                            treeViewItem.IsSelected = true;
-                            treeViewItem.Focus();
-                        }
-                    }
-                }
-                else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-                {
-                    foreach (var item in e.OldItems)
-                    {
-                        var treeViewItem = ItemContainerGenerator.ContainerFromItemRecursive(item);
-                        if (treeViewItem != null)
-                        {
-                            treeViewItem.Background = _notSelectedBackgroundBrush;
-                            treeViewItem.Foreground = _notSelectedForegroundBrush;
-                            treeViewItem.IsSelected = false;
-                        }
-                    }
-                }
-                else
-                {
-                    throw new Exception("Unknown event in MultiSelectTreeView::SelectedObjects_CollectionChanged " + e.Action);
-                }
-            }
-            finally
-            {
-                SelectedObjects.CollectionChanged += SelectedObjects_CollectionChanged;
-                SelectedItemChanged += MyTreeView_SelectedItemChanged;
-            }
+            EventHub?.UnRegister(this);
         }
 
         private static bool IsCtrlPressed
@@ -262,6 +310,15 @@ namespace KitbasherEditor.Views
                     return search;
             }
             return null;
+        }
+
+
+        public static TreeViewItem VisualUpwardSearch(DependencyObject source)
+        {
+            while (source != null && !(source is TreeViewItem))
+                source = VisualTreeHelper.GetParent(source);
+
+            return source as TreeViewItem;
         }
     }
 }
