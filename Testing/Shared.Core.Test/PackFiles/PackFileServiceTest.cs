@@ -7,6 +7,9 @@ using Shared.Core.Services;
 
 namespace Test.Shared.Core.PackFiles
 {
+
+
+
     internal class PackFileServiceTest
     {
         [Test]
@@ -135,6 +138,10 @@ namespace Test.Shared.Core.PackFiles
             eventHub.Verify(m => m.PublishGlobalEvent(new PackFileContainerAddedEvent(emptyPackFileContainer)), Times.Once);
         }
 
+
+
+
+        //AddFilesToPack
 
 
         // AddFilesToPack - Ensure valid path!

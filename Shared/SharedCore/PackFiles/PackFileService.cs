@@ -13,7 +13,7 @@ namespace Shared.Core.PackFiles
         bool EnableFileLookUpEvents { get; set; }
         bool EnforceGameFilesMustBeLoaded { get; set; }
 
-        void AddContainer(PackFileContainer container, bool setToMainPackIfFirst = false);
+        PackFileContainer? AddContainer(PackFileContainer container, bool setToMainPackIfFirst = false);
         void AddFilesToPack(PackFileContainer container, List<NewPackFileEntry> newFiles);
         void CopyFileFromOtherPackFile(PackFileContainer source, string path, PackFileContainer target);
         PackFileContainer CreateNewPackFileContainer(string name, PackFileCAType type, bool setEditablePack = false);
@@ -54,7 +54,7 @@ namespace Shared.Core.PackFiles
 
         public List<PackFileContainer> GetAllPackfileContainers() => _packFileContainers.ToList(); // Return a list of the list to avoid bugs!
 
-        public void AddContainer(PackFileContainer container, bool setToMainPackIfFirst = false)
+        public PackFileContainer? AddContainer(PackFileContainer container, bool setToMainPackIfFirst = false)
         {
             if (EnforceGameFilesMustBeLoaded)
             {
@@ -62,7 +62,7 @@ namespace Shared.Core.PackFiles
                 if (caPacksLoaded == 0 && container.IsCaPackFile == false)
                 {
                     MessageBoxProvider.ShowDialogBox("You are trying to load a pack file before loading CA packfile. Most editors EXPECT the CA packfiles to be loaded and will cause issues if they are not.\nFile not loaded!", "Error");
-                    return;
+                    return null;
                 }
             }
 
@@ -72,11 +72,12 @@ namespace Shared.Core.PackFiles
                 if (packFile.SystemFilePath == container.SystemFilePath)
                 {
                     MessageBoxProvider.ShowDialogBox($"Pack file \"{packFile.SystemFilePath}\" is already loaded.", "Error");
-                    return;
+                    return null;
                 }
             }
 
             AddContainerInternal(container, setToMainPackIfFirst);
+            return container;
         }
 
         void AddContainerInternal(PackFileContainer container, bool setToMainPackIfFirst = false)
@@ -113,14 +114,13 @@ namespace Shared.Core.PackFiles
             {
                 if (string.IsNullOrWhiteSpace(file.PackFile.Name))
                     throw new Exception("PackFile name can not be empty");
-
-                if (string.IsNullOrWhiteSpace(file.DirectoyPath))
-                    throw new Exception("Directory name can not be empty");
             }
 
             foreach (var file in newFiles)
             {
-                var path = file.DirectoyPath;
+                file.PackFile.Name = file.PackFile.Name.Trim();
+
+                var path = file.DirectoyPath.Trim();
                 if (!string.IsNullOrWhiteSpace(path))
                     path += "\\";
                 path += file.PackFile.Name;

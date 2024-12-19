@@ -16,10 +16,10 @@ Fixes for v055:
 	
 	KitbashTool: Bug related to offsets and bounding box 
 	KitbashTool: BugFix Scene tree does not change when updateing  | Handle selection and expantion
+	KitbashTool: Saving kitbash scene with name "test" and no folder crashes
 
 
-	Before release
-		KitbashTool: Saving kitbash scene with name "test" and no folder crashes
+		
 	
 	
 
