@@ -1,67 +1,12 @@
-﻿using Editors.Audio.AudioExplorer;
+﻿using System.Linq;
+using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;
 using Shared.GameFormats.WWise.Hirc.V136;
-using System;
-using System.IO;
-using System.Linq;
 
 namespace Editors.Audio.Utility
 {
-
-    public class DialogEventInfoPrinter
-    {
-        private readonly IAudioRepository _repository;
-
-        public DialogEventInfoPrinter(IAudioRepository repository)
-        {
-            _repository = repository;
-        }
-
-        public void PrintDialogEventInfos()
-        {
-            // Retrieve all HircItem instances from the repository.
-            var allHircItems = _repository.GetAllOfType<HircItem>();
-
-            // Filter those that are ICADialogEvent.
-            var dialogEvents = allHircItems.OfType<ICADialogEvent>();
-
-            foreach (var dialogEvent in dialogEvents)
-            {
-                PrintDialogEventInfo(dialogEvent);
-            }
-        }
-
-        private void PrintDialogEventInfo(ICADialogEvent dialogEvent)
-        {
-            var hircItem = dialogEvent as HircItem; // Assuming HircItem is the base type with an Id
-            if (hircItem == null)
-            {
-                throw new InvalidCastException("dialogEvent is not a HircItem.");
-            }
-
-            var helper = new DecisionPathHelper(_repository);
-            var paths = helper.GetDecisionPaths(dialogEvent);
-
-            // Splitting the string by '.' and enclosing each part in quotes
-            var splitPaths = paths.Header.GetAsString().Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)
-                              .Select(part => $"\"{part}\"")
-                              .ToArray();
-
-            // Joining the quoted strings with a comma and a space, and enclosing the result in brackets
-            var formattedPaths = "[" + string.Join(", ", splitPaths) + "]";
-
-            // Format the information with quotes around the dialog event and the modified path string
-            var info = $"\"{_repository.GetNameFromHash(hircItem.Id)}\" : {formattedPaths}";
-
-            Console.WriteLine(info);
-            var filePath = @"C:\Users\george\Desktop\dialogue_events_state_groups.txt";
-            File.AppendAllText(filePath, info + Environment.NewLine);
-
-        }
-    }
-
     public class WWiseTreeParserChildren : WWiseTreeParserBase
     {
         public WWiseTreeParserChildren(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
@@ -83,11 +28,6 @@ namespace Editors.Audio.Utility
 
         private void ProcessDialogEvent(HircItem item, HircTreeItem parent)
         {
-
-            // Get all the dialogue event info
-            //var printer = new DialogEventInfoPrinter(_repository);
-            //printer.PrintDialogEventInfos();
-
             var hirc = GetAsType<ICADialogEvent>(item);
 
             var helper = new DecisionPathHelper(_repository);
@@ -159,16 +99,10 @@ namespace Editors.Audio.Utility
                    .ToList();
 
                 foreach (var normalSwitch in normalSwitches)
-                {
                     if (normalSwitch.ulGroupID == stateGroupId)
                         ProcessNext(normalSwitch.Id, actionTreeNode);
-                }
             }
-            else
-            {
-
-                ProcessNext(childId, actionTreeNode);
-            }
+            else ProcessNext(childId, actionTreeNode);
         }
 
         private void ProcessSound(HircItem item, HircTreeItem parent)
@@ -269,11 +203,9 @@ namespace Editors.Audio.Utility
             var node = new HircTreeItem() { DisplayName = $"Music Rand Container", Item = item };
             parent.Children.Add(node);
 
-            if (hirc.pPlayList.Any())
-            {
+            if (hirc.pPlayList.Count != 0)
                 foreach (var playList in hirc.pPlayList.First().pPlayList)
                     ProcessNext(playList.SegmentID, node);
-            }
         }
     }
 }

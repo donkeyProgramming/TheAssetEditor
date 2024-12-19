@@ -18,7 +18,8 @@ namespace Editors.Audio.DevConfig
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-            currentSettings.LoadWemFiles = false;
+            currentSettings.LoadCaPacksByDefault = true;
+            currentSettings.LoadWemFiles = true;
         }
 
         public void OpenFileOnLoad()

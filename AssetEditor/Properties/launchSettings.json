@@ -34,6 +34,11 @@
       "commandLineArgs": "-devcfg AudioEditor_Wh3",
       "nativeDebugging": false
     },
+    "AE-AudioExplorer": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg AudioExplorer_Wh3",
+      "nativeDebugging": false
+    },
     "AE-SuperView": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg SuperView_Rat",
