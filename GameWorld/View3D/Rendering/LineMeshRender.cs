@@ -89,26 +89,26 @@ namespace GameWorld.Core.Rendering
             return output.ToArray();
         }
 
-        public static VertexPositionColor[] AddBoundingBox(BoundingBox b, Color color)
+        public static VertexPositionColor[] AddBoundingBox(BoundingBox b, Color color, Vector3 offset)
         {
             var output = new VertexPositionColor[24];
             var corners = b.GetCorners();
             var index = 0;
 
-            output[index++] = new VertexPositionColor(corners[0], color); output[index++] = new VertexPositionColor(corners[1], color);
-            output[index++] = new VertexPositionColor(corners[2], color); output[index++] = new VertexPositionColor(corners[3], color);
-            output[index++] = new VertexPositionColor(corners[0], color); output[index++] = new VertexPositionColor(corners[3], color);
-            output[index++] = new VertexPositionColor(corners[1], color); output[index++] = new VertexPositionColor(corners[2], color);
+            output[index++] = new VertexPositionColor(corners[0] + offset, color); output[index++] = new VertexPositionColor(corners[1] + offset, color);
+            output[index++] = new VertexPositionColor(corners[2] + offset, color); output[index++] = new VertexPositionColor(corners[3] + offset, color);
+            output[index++] = new VertexPositionColor(corners[0] + offset, color); output[index++] = new VertexPositionColor(corners[3] + offset, color);
+            output[index++] = new VertexPositionColor(corners[1] + offset, color); output[index++] = new VertexPositionColor(corners[2] + offset, color);
 
-            output[index++] = new VertexPositionColor(corners[4], color); output[index++] = new VertexPositionColor(corners[5], color);
-            output[index++] = new VertexPositionColor(corners[6], color); output[index++] = new VertexPositionColor(corners[7], color);
-            output[index++] = new VertexPositionColor(corners[4], color); output[index++] = new VertexPositionColor(corners[7], color);
-            output[index++] = new VertexPositionColor(corners[5], color); output[index++] = new VertexPositionColor(corners[6], color);
+            output[index++] = new VertexPositionColor(corners[4] + offset, color); output[index++] = new VertexPositionColor(corners[5] + offset, color);
+            output[index++] = new VertexPositionColor(corners[6] + offset, color); output[index++] = new VertexPositionColor(corners[7] + offset, color);
+            output[index++] = new VertexPositionColor(corners[4] + offset, color); output[index++] = new VertexPositionColor(corners[7] + offset, color);
+            output[index++] = new VertexPositionColor(corners[5] + offset, color); output[index++] = new VertexPositionColor(corners[6] + offset, color);
 
-            output[index++] = new VertexPositionColor(corners[0], color); output[index++] = new VertexPositionColor(corners[4], color);
-            output[index++] = new VertexPositionColor(corners[1], color); output[index++] = new VertexPositionColor(corners[5], color);
-            output[index++] = new VertexPositionColor(corners[2], color); output[index++] = new VertexPositionColor(corners[6], color);
-            output[index++] = new VertexPositionColor(corners[3], color); output[index++] = new VertexPositionColor(corners[7], color);
+            output[index++] = new VertexPositionColor(corners[0] + offset, color); output[index++] = new VertexPositionColor(corners[4] + offset, color);
+            output[index++] = new VertexPositionColor(corners[1] + offset, color); output[index++] = new VertexPositionColor(corners[5] + offset, color);
+            output[index++] = new VertexPositionColor(corners[2] + offset, color); output[index++] = new VertexPositionColor(corners[6] + offset, color);
+            output[index++] = new VertexPositionColor(corners[3] + offset, color); output[index++] = new VertexPositionColor(corners[7] + offset, color);
 
             return output;
         }

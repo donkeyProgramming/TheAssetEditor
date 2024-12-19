@@ -98,7 +98,7 @@ namespace GameWorld.Core.SceneNodes
                 renderEngine.AddRenderLines(LineHelper.AddLocator(PivotPoint, 1, Color.Red));
 
             if (DisplayBoundingBox)
-                renderEngine.AddRenderLines(LineHelper.AddBoundingBox(Geometry.BoundingBox, Color.Red));
+                renderEngine.AddRenderLines(LineHelper.AddBoundingBox(Geometry.BoundingBox, Color.Red, PivotPoint));
         }
 
         public Rmv2ModelNode? GetParentModel()

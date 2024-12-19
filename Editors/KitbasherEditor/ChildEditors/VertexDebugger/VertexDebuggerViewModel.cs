@@ -96,7 +96,7 @@ namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
                 if (SelectedVertex != null)
                 {
                     var bb = BoundingBox.CreateFromSphere(new BoundingSphere(mesh.Geometry.GetVertexById(SelectedVertex.Id), 0.05f));
-                    _renderEngineComponent.AddRenderLines(LineHelper.AddBoundingBox(bb, Color.Black));
+                    _renderEngineComponent.AddRenderLines(LineHelper.AddBoundingBox(bb, Color.Black, Vector3.Zero));
                 }
 
                 var modelMatrix = mesh.ModelMatrix * Matrix.CreateTranslation(mesh.PivotPoint);

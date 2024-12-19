@@ -11,12 +11,16 @@ Fixes for v055:
 	KitbashTool: If texture is not found, infinate error message loop because of null
 	Import/Export: Bug fixes 
 	
+	KitbashTool: Import hammer, make whole node editable. Select mesh. No scene node view  
+	KitbashTool: Right clicking a node does not alway display the context menu https://discord.com/channels/373745291289034763/795235087352201226/1312940367532003379
+	
+	KitbashTool: Bug related to offsets and bounding box 
+	KitbashTool: BugFix Scene tree does not change when updateing  | Handle selection and expantion
+
 
 	Before release
-		KitbashTool: Import hammer, make whole node editable. Select mesh. No scene node view  
-		KitbashTool: Bug related to offsets and bounding box 
 		KitbashTool: Saving kitbash scene with name "test" and no folder crashes
-		KitbashTool: Right clicking a node does not alway display the context menu https://discord.com/channels/373745291289034763/795235087352201226/1312940367532003379
+	
 	
 
 Bugs:
