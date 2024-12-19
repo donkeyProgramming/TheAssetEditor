@@ -1,33 +1,8 @@
-Fixes for v055:
-	General: Double clicking nodes does not expand them
-	Fixed rendering crash with all empty scene 
-	KitbashTool:Pintool now has both modes again! 
-	KitbashTool: Pin tool keeps state after open and close. Also possible to make multiple instances
-	KitbashTool: Give error in pivot point
-	SkeletonTool: Should show the pos/quat/xyz of a given bone 
-	Ganeral: Try and rename folder in backfilebrowser - crashes
-	
-	3d: textues that cant be loaded, constant error window
-	KitbashTool: If texture is not found, infinate error message loop because of null
-	Import/Export: Bug fixes 
-	
-	KitbashTool: Import hammer, make whole node editable. Select mesh. No scene node view  
-	KitbashTool: Right clicking a node does not alway display the context menu https://discord.com/channels/373745291289034763/795235087352201226/1312940367532003379
-	
-	KitbashTool: Bug related to offsets and bounding box 
-	KitbashTool: BugFix Scene tree does not change when updateing  | Handle selection and expantion
-	KitbashTool: Saving kitbash scene with name "test" and no folder crashes
 
-
-		
-	
 	
 
 Bugs:
-
-	
-	
-	KitbashTool: After adding several items from reference meshes, not possible to create context menu for rest 
+	General: Double clicking nodes does not expand them
 	KitbashTool: Node clicking in tree view is slow
 	KitbashTool: Tint capability crash bug => Shield change to tint
 	KitbashTool: The issue I personally had was that if i created MetalRoughPbr_Emissive once in 0.48, changing the value to Default would still apply Emissive when i loaded the pack in 0.45, so I used the 
@@ -102,6 +77,25 @@ New features:
 	VisualMapEditor: View map
 	VisualMapEditor: Place props
 	Tool for editing prefabs
+	
+	
+	
+	
+Fixes for v055:
+	[Feature]General: Pin tool is improved and now has the SkinWrap rigging enabled again.
+
+	[Bug] General: Fixed rendering crash with all empty scene
+	[Bug] General: Saving files to the root folder no longer causes a crash
+	[Bug] General: Improved error handling for packfiles, to reduce potential errors which can cause corrupted pack files.
+	[Bug] General: Fixed crash when renaming folders
+	[Bug] General: Texture failures now give a single error, not a infinite stream of them
+	[Bug] SkeletonTool: Correctly show world/localspace position and rotation for selected bones.
+	[Bug] Import/Export: Improvements of the GLTF process
+	[Bug] KitbashTool: Fixed issues related to selecting meshes and the context menu for scene nodes
+	[Bug] KitbashTool: Fixed rendering issues for boundingboxes / selection for meshes with pivot points
+	[Bug] KitbashTool: Scene explorer now correctly keeps nodes visible and expanded when changing the content of the scene.
+
+
 	
 	
 Link to cinterbreath
