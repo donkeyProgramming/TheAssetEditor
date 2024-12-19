@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\GameFiles\Shared.GameFormats.csproj" />
     <ProjectReference Include="..\..\Shared\SharedCore\Shared.Core.csproj" />
+    <ProjectReference Include="..\Audio\Editors.Audio.csproj" />
     <ProjectReference Include="..\SimpleAnimationEditors\Editors.AnimationTextEditors.csproj" />
   </ItemGroup>
 
