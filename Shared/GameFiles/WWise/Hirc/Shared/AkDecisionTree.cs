@@ -14,8 +14,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             public uint AudioNodeId { get; set; }
             public ushort Children_uIdx { get; set; }
             public ushort Children_uCount { get; set; }
-            public ushort uWeight { get; set; }
-            public ushort uProbability { get; set; }
+            public ushort UWeight { get; set; }
+            public ushort UProbability { get; set; }
             public static readonly int SerializationByteSize = 12;
 
             public BinaryNode(ByteChunk chunk)
@@ -24,8 +24,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
                 AudioNodeId = chunk.PeakUint32();
                 Children_uIdx = chunk.ReadUShort();
                 Children_uCount = chunk.ReadUShort();
-                uWeight = chunk.ReadUShort();
-                uProbability = chunk.ReadUShort();
+                UWeight = chunk.ReadUShort();
+                UProbability = chunk.ReadUShort();
             }
 
             public BinaryNode()
@@ -34,8 +34,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
                 AudioNodeId = 0;
                 Children_uIdx = 0;
                 Children_uCount = 0;
-                uWeight = 0;
-                uProbability = 0;
+                UWeight = 0;
+                UProbability = 0;
             }
         }
 
@@ -46,9 +46,9 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             public uint AudioNodeId { get; set; }
             public ushort Children_uIdx { get; set; }
             public ushort Children_uCount { get; set; }
-            public ushort uWeight { get; set; }
-            public ushort uProbability { get; set; }
-            public List<Node> Children { get; set; } = new List<Node>();
+            public ushort UWeight { get; set; }
+            public ushort UProbability { get; set; }
+            public List<Node> Children { get; set; } = [];
 
             public Node(BinaryNode sNode)
             {
@@ -56,8 +56,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
                 AudioNodeId = sNode.AudioNodeId;
                 Children_uIdx = sNode.Children_uIdx;
                 Children_uCount = sNode.Children_uCount;
-                uWeight = sNode.uWeight;
-                uProbability = sNode.uProbability;
+                UWeight = sNode.UWeight;
+                UProbability = sNode.UProbability;
             }
         }
 
@@ -67,19 +67,19 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             {
                 var indent = new string(' ', depth * 2);
                 if (node.AudioNodeId != 0)
-                    Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+                    Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
 
                 else
-                    Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+                    Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
             }
         }
 
         private static void PrintGraph(Node node, int depth)
         {
             if (node.AudioNodeId != 0)
-                Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+                Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
             else
-                Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+                Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
 
             foreach (var child in node.Children)
                 PrintGraph(child, depth + 1);
@@ -127,9 +127,9 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             var stringBuilder = new StringBuilder();
 
             if (node.AudioNodeId != 0)
-                stringBuilder.AppendLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+                stringBuilder.AppendLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
             else
-                stringBuilder.AppendLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.uWeight}, uProbability: {node.uProbability}");
+                stringBuilder.AppendLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
 
             foreach (var child in node.Children)
                 stringBuilder.Append(ConvertGraphToString(child, depth + 1));
@@ -171,8 +171,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
                 AudioNodeId = node.AudioNodeId,
                 Children_uIdx = node.Children_uIdx,
                 Children_uCount = node.Children_uCount,
-                uWeight = node.uWeight,
-                uProbability = node.uProbability
+                UWeight = node.UWeight,
+                UProbability = node.UProbability
             };
 
             // Insert the current node at the currentIndex
@@ -258,8 +258,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
                     memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.Children_uCount, out _), 0, 2);
                 }
 
-                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.uWeight, out _), 0, 2);
-                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.uProbability, out _), 0, 2);
+                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.UWeight, out _), 0, 2);
+                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.UProbability, out _), 0, 2);
             }
 
             return memStream.ToArray();
@@ -283,8 +283,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
                     memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.Children_uCount, out _), 0, 2);
                 }
 
-                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.uWeight, out _), 0, 2);
-                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.uProbability, out _), 0, 2);
+                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.UWeight, out _), 0, 2);
+                memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.UProbability, out _), 0, 2);
             }
 
             return memStream.ToArray();

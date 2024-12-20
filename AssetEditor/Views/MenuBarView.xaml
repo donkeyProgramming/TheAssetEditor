@@ -93,6 +93,7 @@
                 <MenuItem Header="File List" Command="{Binding MenuBar.GenerateFileListReportCommand}"/>
                 <MenuItem Header="Meta Jsons" Command="{Binding MenuBar.GenerateMetaDataJsonsReportCommand}"/>
                 <MenuItem Header="Materials" Command="{Binding MenuBar.GenerateMaterialReportCommand}"/>
+                <MenuItem Header="Dialogue Event Info" Command="{Binding MenuBar.GenerateDialogueEventInfoReportCommand}"/>
                 <Separator/>
                 <MenuItem Header="Search" Command="{Binding MenuBar.SearchCommand}"/>
                 <Separator/>

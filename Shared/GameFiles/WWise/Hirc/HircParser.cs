@@ -18,7 +18,7 @@ namespace Shared.GameFormats.WWise.Hirc
             return HircFactory.CreateFactory(bnkVersion);
         }
 
-        public HircChunk Parse(string fileName, ByteChunk chunk, uint bnkVersion)
+        public HircChunk Parse(string fileName, ByteChunk chunk, uint bnkVersion, bool isCaHircItem)
         {
             var hircChuck = new HircChunk
             {
@@ -40,6 +40,7 @@ namespace Shared.GameFormats.WWise.Hirc
                     hircItem.IndexInFile = itemIndex;
                     hircItem.ByteIndexInFile = itemIndex;
                     hircItem.OwnerFile = fileName;
+                    hircItem.IsCaHircItem = isCaHircItem;
                     hircItem.Parse(chunk);
                     hircChuck.Hircs.Add(hircItem);
                 }
@@ -72,7 +73,7 @@ namespace Shared.GameFormats.WWise.Hirc
             var byteArray = memStream.ToArray();
 
             // For sanity, read back
-            Parse("name", new ByteChunk(byteArray), 136);
+            Parse("name", new ByteChunk(byteArray), 136, true);
 
             return byteArray;
         }

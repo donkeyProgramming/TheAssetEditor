@@ -9,7 +9,6 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using static Editors.Audio.BnkCompiler.ProjectLoaderHelpers;
-using static Shared.Core.PackFiles.IPackFileService;
 
 namespace Editors.Audio.BnkCompiler
 {
@@ -118,7 +117,7 @@ namespace Editors.Audio.BnkCompiler
             return Result<bool>.FromOk(true);
         }
 
-        private Result<bool> ValidateInputFile(CompilerInputProject projectFile)
+        private static Result<bool> ValidateInputFile(CompilerInputProject projectFile)
         {
             return Result<bool>.FromOk(true);
         }
@@ -129,7 +128,7 @@ namespace Editors.Audio.BnkCompiler
             compilerData.ProjectSettings.Version = 1;
             compilerData.ProjectSettings.BnkName = input.Settings.BnkName;
             compilerData.ProjectSettings.Language = input.Settings.Language;
-            compilerData.ProjectSettings.WwiseStartId = input.Settings.WwiseStartId;
+            //compilerData.ProjectSettings.WwiseStartId = input.Settings.WwiseStartId;
 
             var mixers = new List<ActorMixer>() { };
 

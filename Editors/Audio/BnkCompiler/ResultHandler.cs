@@ -24,21 +24,24 @@ namespace Editors.Audio.BnkCompiler
 
         void SaveToPackFile(CompileResult compileResult, CompilerData compilerData, CompilerSettings settings)
         {
-            var bnkOutputPath = "audio\\wwise";
-            var datOutputPath = "audio\\wwise";
-            if (string.IsNullOrWhiteSpace(compilerData.ProjectSettings.Language) == false)
-                bnkOutputPath += $"\\{compilerData.ProjectSettings.Language}";
-
+            var language = compilerData.ProjectSettings.Language;
+            var bnkOutputPath = string.IsNullOrWhiteSpace(language) ? $"audio\\wwise\\{compileResult.OutputBnkFile.Name}" : $"audio\\wwise\\{language}\\{compileResult.OutputBnkFile.Name}";
             _packFileSaveService.Save(bnkOutputPath, compileResult.OutputBnkFile.DataSource.ReadData(), true);
 
             if (compileResult.Project.Events.Count > 0)
-                _packFileSaveService.Save(datOutputPath, compileResult.OutputDatFile.DataSource.ReadData(), true);
+            {
+                var datOutputPath = $"audio\\wwise\\{compileResult.OutputEventDatFile.Name}";
+                _packFileSaveService.Save(datOutputPath, compileResult.OutputEventDatFile.DataSource.ReadData(), true);
+            }
 
             if (compileResult.Project.DialogueEvents.Count > 0)
-                _packFileSaveService.Save(datOutputPath, compileResult.OutputStatesDatFile.DataSource.ReadData(), true);
+            {
+                var datOutputPath = $"audio\\wwise\\{compileResult.OutputStateDatFile.Name}";
+                _packFileSaveService.Save(datOutputPath, compileResult.OutputStateDatFile.DataSource.ReadData(), true);
+            }
         }
 
-        void ExportToDirectory(CompileResult result, CompilerSettings settings)
+        private static void ExportToDirectory(CompileResult result, CompilerSettings settings)
         {
             var outputDirectory = settings.FileExportPath;
 
@@ -50,13 +53,13 @@ namespace Editors.Audio.BnkCompiler
                 if (result.Project.Events.Count > 0)
                 {
                     var datPath = Path.Combine(outputDirectory, $"{result.Project.ProjectSettings.BnkName}.dat");
-                    File.WriteAllBytes(datPath, result.OutputDatFile.DataSource.ReadData());
+                    File.WriteAllBytes(datPath, result.OutputEventDatFile.DataSource.ReadData());
                 }
 
                 if (result.Project.DialogueEvents.Count > 0)
                 {
                     var statesDatPath = Path.Combine(outputDirectory, $"{result.Project.ProjectSettings.BnkName}.dat");
-                    File.WriteAllBytes(statesDatPath, result.OutputStatesDatFile.DataSource.ReadData());
+                    File.WriteAllBytes(statesDatPath, result.OutputStateDatFile.DataSource.ReadData());
                 }
             }
         }

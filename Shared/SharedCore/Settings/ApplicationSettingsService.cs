@@ -29,9 +29,16 @@ namespace Shared.Core.Settings
 
         public ApplicationSettings()
         {
-            WwisePath = Environment.GetEnvironmentVariable("WWISEROOT") ?? "";
-            if (!string.IsNullOrEmpty(WwisePath))
-                WwisePath = Path.Combine(WwisePath, "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
+            var wwiseRoot = Environment.GetEnvironmentVariable("WWISEROOT") ?? "";
+            if (!string.IsNullOrEmpty(wwiseRoot))
+            {
+                var audiokineticRoot = Path.GetDirectoryName(wwiseRoot) ?? "";
+                if (!string.IsNullOrEmpty(audiokineticRoot))
+                {
+                    var wwise2019Path = Path.Combine(audiokineticRoot, "Wwise2019.2.15.7667", "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
+                    WwisePath = wwise2019Path;
+                }
+            }
         }
     }
 
@@ -134,19 +141,19 @@ namespace Shared.Core.Settings
             var areSettingsValid = true;
             List<string> settingsError = [];
 
-            if (Enum.IsDefined(typeof(ThemeType), CurrentSettings.Theme) == false)
+            if (Enum.IsDefined(CurrentSettings.Theme) == false)
             {
                 settingsError.Add($"Unkown theme setting - {CurrentSettings.Theme}");
                 areSettingsValid = false;
             }
 
-            if (Enum.IsDefined(typeof(BackgroundColour), CurrentSettings.RenderEngineBackgroundColour) == false)
+            if (Enum.IsDefined(CurrentSettings.RenderEngineBackgroundColour) == false)
             {
                 settingsError.Add($"Unkown RenderEngineBackgroundColour setting - {CurrentSettings.RenderEngineBackgroundColour}");
                 areSettingsValid = false;
             }
 
-            if (Enum.IsDefined(typeof(GameTypeEnum), CurrentSettings.CurrentGame) == false)
+            if (Enum.IsDefined(CurrentSettings.CurrentGame) == false)
             {
                 settingsError.Add($"Unkown CurrentGame setting - {CurrentSettings.CurrentGame}");
                 areSettingsValid = false;
@@ -154,7 +161,7 @@ namespace Shared.Core.Settings
 
             foreach (var currentGameDir in CurrentSettings.GameDirectories)
             {
-                if (Enum.IsDefined(typeof(GameTypeEnum), currentGameDir.Game) == false)
+                if (Enum.IsDefined(currentGameDir.Game) == false)
                 {
                     settingsError.Add($"Unkown GameDir setting - {currentGameDir.Game}");
                     areSettingsValid = false;

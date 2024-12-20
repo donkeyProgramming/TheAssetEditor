@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework.Audio;
 
 namespace Editors.Audio.BnkCompiler
 {
@@ -9,7 +8,7 @@ namespace Editors.Audio.BnkCompiler
         {
             public string BnkName { get; set; }
             public string Language { get; set; }
-            public uint WwiseStartId { get; set; }
+            //public uint WwiseStartId { get; set; }
         }
 
         public class ProjectDecisionTree
