@@ -104,6 +104,7 @@
                 </MenuItem>
                 <Separator/>
                 <MenuItem Header="Debug - Clear Console" Command="{Binding MenuBar.ClearConsoleCommand}" />
+                <MenuItem Header="Debug - Print Scopes" Command="{Binding MenuBar.PrintScopeCommand}" />
             </MenuItem>
 
             <MenuItem Header="Help" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">

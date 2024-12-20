@@ -69,11 +69,6 @@ namespace AssetEditor.ViewModels
             }
         }
 
-
-
-
-     
-
         [RelayCommand] private void CreateAnimPackWarhammer3() => AnimationPackSampleDataCreator.CreateAnimationDbWarhammer3(_packFileSaveService, _packfileService);
         [RelayCommand] private void CreateAnimPack3k() => AnimationPackSampleDataCreator.CreateAnimationDb3k(_packfileService, _packFileSaveService);
         [RelayCommand] private void OpenWh2AnimpackUpdater() => new AnimPackUpdaterService(_packfileService).Process();
@@ -89,9 +84,8 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void TouchedFileRecorderStop() => _touchedFilesRecorder.Stop();
 
         [RelayCommand] private void ClearConsole() => Console.Clear();
-        
+        [RelayCommand] private void PrintScope() => _uiCommandFactory.Create<PrintScopesCommand>().Execute();
         [RelayCommand] private void Search() => _uiCommandFactory.Create<DeepSearchCommand>().Execute();
-
         [RelayCommand] private void OpenAttilaPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.Attila);
         [RelayCommand] private void OpenRomeRemasteredPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.RomeRemastered);
         [RelayCommand] private void OpenThreeKingdomsPacks() => _uiCommandFactory.Create<OpenGamePackCommand>().Execute(GameTypeEnum.ThreeKingdoms);
