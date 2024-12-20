@@ -1,18 +1,42 @@
-
-	
-
-Bugs:
+Fixes for v056
 	General: Double clicking nodes does not expand them
+	General: Move resent files out of settings
+	General: Save Active pack button https://github.com/donkeyProgramming/TheAssetEditor/issues/123
+	General: Wem files, load them but hide in tree view. To avoid files go missing on save later.
+	General: Convert GameinformationFactory to a static! 
+	General: Show hisotry of commands in exceptions
+	General: Close console window on close
+		
+	GameWorld:Move bloomeffect to resourcelib
+	GameWorld: ONly render glow if there is glow stuff in the pass 
+	GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
+	GameWorld: Resizing window to small causes crash
+	
+	KitbashTool: Manual vertex editor for weights 
+	KitbashTool: Reduce icon size?
+	KitbashTool: when loading material - if not supported show message
+	KitbashTool: Issues with rendering/selection and pivot point
+	KitbashTool: When there is no files left in a reference mesh - close the node 
+	
+	Fix dobile clicki
+	Editable node context missing / unit test
+	dont make an extra game wordl! / Move static init to other class 
+	Force delete game and events. Global events as well? 
+	
+	Logging for SendNodeSelectionEvent
+	Log all scopes / give them id and keep ref for ever
+	Increase log to 150 lines
+	For logger, get all scopes
+	For logger, include scope ID in statement
+	
+Bugs:
 	KitbashTool: Node clicking in tree view is slow
 	KitbashTool: Tint capability crash bug => Shield change to tint
 	KitbashTool: The issue I personally had was that if i created MetalRoughPbr_Emissive once in 0.48, changing the value to Default would still apply Emissive when i loaded the pack in 0.45, so I used the 
 	SkeletonTool: Bones get restructures on delete
 	KitbashTool: I am not sure all I know is that the materials generate in a new way that alters the way the daemon prince parts colour tints look
-	KitbashTool: when loading material - if not supported show message
 	General: But there’s that issue where if you leave and come back after the screen saver turns on then the whole thing goes nuclear lol. (Screen saver issue?)
-	KitbashTool: Issues with rendering/selection and pivot point
 	KitbashTool: Rome 2 support https://github.com/donkeyProgramming/TheAssetEditor/issues/174
-	
 	Ganeral: Case issues, should be leagal to have upper and lower case
 		Unittest and bug fix related to casing
 			Load
@@ -21,19 +45,14 @@ Bugs:
 			Search 
 	
 	
-	
 Improvements:
-	3d:Move bloomeffect to resourcelib
-	3d: ONly render glow if there is glow stuff in the pass 
+	General: SelectionManager, remove the use of SelectionManager_SelectionChanged event
 	General: Upgrade to new community toolkit
-	General: Save Active pack button https://github.com/donkeyProgramming/TheAssetEditor/issues/123
 	KitbashTool: Second UV map on export and render
 	KitbashTool: ship_ambientmap and tiled_dirtmap rigid materials support https://discord.com/channels/373745291289034763/1009267073987399740/threads/1312018739599904778
 	KitbashTool: destruction animations export (non-skeletal) https://discord.com/channels/373745291289034763/1009267073987399740/threads/1312020442441318450
 	General: .CS2.PARSED file format schema https://discord.com/channels/373745291289034763/1009267073987399740/threads/1312014128088350770
 	KitbashTool: When loading textures that are custom, validate that they have MipMaps
-	General: Wem files, load them but hide in tree view. To avoid files go missing on save later.
-	General: Convert GameinformationFactory to a static! 
 	General: Merge UI and shared! 
 	KitbashTool: Improve material system
 		interfaces and registeration and builders
@@ -45,12 +64,9 @@ Improvements:
 	General: Warning if loaded packfile/mesh is most likely from a different game. How to detect?
 	General: For custom packs, get size on debug logger 
 	GameWorld: Complex scene loader - dont makes fucking nodes! 
-	GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
 	KitbashTool: MOve most node types into Kitbash tool / reduce number of nodes
-	General: Show hisotry of commands in exceptions
 	KitbashTool: Max 50 commands, clean up memoery!
 	KitbashTool: Wsmodel guessing
-	General: Close console window on close
 	General: Make tree view lazy loading
 	General: Imprive memory use
 	AnimationEditors: Refactor - its bad!		
@@ -63,9 +79,7 @@ Improvements:
 	SuperView: Refactor metatags handling
 	SuperView: Support for more meta tags 
 	General: Support napoleon format
-	KitbashTool: When there is no files left in a reference mesh - close the node 
 	KitbashTool: More materials
-	General: Move resent files out of settings
 	KitbashTool: Orthographic projection
 	
 New features:
@@ -73,7 +87,6 @@ New features:
 	AnimationTransferTool: Enable
 	AnimationTransferTool: make work and able to tranfer on root skeleton node
 	General: new update screen
-	KitbashTool: Manual vertex editor for weights 
 	VisualMapEditor: View map
 	VisualMapEditor: Place props
 	Tool for editing prefabs

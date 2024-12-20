@@ -282,6 +282,10 @@ namespace KitbasherEditor.Views
         public void Dispose()
         {
             EventHub?.UnRegister(this);
+
+            SelectedItemChanged -= MyTreeView_SelectedItemChanged;
+            PreviewMouseDoubleClick -= MultiSelectTreeView_PreviewMouseDoubleClick;
+            PreviewMouseRightButtonDown -= MultiSelectTreeView_PreviewMouseRightButtonDown;
         }
 
         private static bool IsCtrlPressed

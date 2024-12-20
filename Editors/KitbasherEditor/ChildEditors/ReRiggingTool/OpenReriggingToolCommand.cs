@@ -12,7 +12,7 @@ using Shared.Ui.Editors.BoneMapping;
 
 namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
 {
-    public class OpenReriggingToolCommand : IScopedKitbasherUiCommand
+    public class OpenReriggingToolCommand : IScopedKitbasherUiCommand, IDisposable
     {
         public string ToolTip { get; set; } = "Open the re-rigging tool";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.AtleastOneObjectSelected;

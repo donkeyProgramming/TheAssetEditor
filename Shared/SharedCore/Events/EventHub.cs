@@ -99,7 +99,6 @@ namespace Shared.Core.Events
                     {
                         var action = (Action<T>)subscriber.Callback;
                         action(instance);
-
                     }
                 }
 

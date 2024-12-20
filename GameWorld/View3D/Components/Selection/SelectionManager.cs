@@ -161,6 +161,11 @@ namespace GameWorld.Core.Components.Selection
 
         public void Dispose()
         {
+            _eventHub?.UnRegister(this);
+
+            if(_currentState != null)
+                _currentState.SelectionChanged -= SelectionManager_SelectionChanged;
+
             if (_wireframeEffect != null)
             {
                 _wireframeEffect.Dispose();

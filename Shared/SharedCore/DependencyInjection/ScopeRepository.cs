@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.ToolCreation;
 
 namespace Shared.Core.DependencyInjection
@@ -18,6 +20,8 @@ namespace Shared.Core.DependencyInjection
 
     public class ScopeRepository : IScopeRepository
     {
+        private readonly ILogger _logger = Logging.Create<ScopeRepository>();
+
         private readonly Dictionary<IEditorInterface, IServiceScope> _scopes = [];
         private readonly IServiceProvider _rootProvider;
 
@@ -51,11 +55,13 @@ namespace Shared.Core.DependencyInjection
             if (_scopes.ContainsKey(owner))
                 throw new ArgumentException("Owner already added!");
 
+            _logger.Here().Information($"Adding scope for {owner.DisplayName} of type {owner.GetType()}");
             _scopes.Add(owner, scope);
         }
 
         public void RemoveScope(IEditorInterface owner)
         {
+            _logger.Here().Information($"Removing scope for {owner.DisplayName} of type {owner.GetType()}");
             _scopes[owner].Dispose();
             _scopes.Remove(owner);
         }

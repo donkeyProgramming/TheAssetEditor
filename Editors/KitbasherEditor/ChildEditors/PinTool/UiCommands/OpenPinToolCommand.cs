@@ -5,7 +5,7 @@ using Shared.Ui.Common.MenuSystem;
 
 namespace Editors.KitbasherEditor.ChildEditors.PinTool.UiCommands
 {
-    public class OpenPinToolCommand : ITransientKitbasherUiCommand
+    public class OpenPinToolCommand : ITransientKitbasherUiCommand, IDisposable
     {
         public string ToolTip { get; set; } = "Open the pin tool";
         public ActionEnabledRule EnabledRule => ActionEnabledRule.Always;

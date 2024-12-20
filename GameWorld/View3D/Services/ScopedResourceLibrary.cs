@@ -22,7 +22,7 @@ namespace GameWorld.Core.Services
         private readonly IEventHub _eventHub;
         private readonly IStandardDialogs _standardDialogs;
 
-        private readonly Dictionary<string, Texture2D?> _cachedTextures = new();
+        private readonly Dictionary<string, Texture2D?> _cachedTextures = [];
         private bool _isDisposed = false;
 
         public ScopedResourceLibrary(ResourceLibrary resourceLibrary, IEventHub eventHub, IStandardDialogs standardDialogs)

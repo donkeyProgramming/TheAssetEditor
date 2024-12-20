@@ -80,6 +80,9 @@ namespace GameWorld.Core.WpfWindow
         protected override void Dispose(bool disposing)
         {
             _deviceServiceHandle = null;
+            
+            // Should we ever need to dispose of the components?
+            // They should always be created though DI, so DI should dispose them
             foreach (var c in Components)
             {
                 var disposable = c as IDisposable;
@@ -93,6 +96,8 @@ namespace GameWorld.Core.WpfWindow
             Services.RemoveService(typeof(IGraphicsDeviceManager));
             _sortedUpdateable.Clear();
             _sortedDrawable.Clear();
+
+            base.Dispose();
         }
 
         /// <summary>
