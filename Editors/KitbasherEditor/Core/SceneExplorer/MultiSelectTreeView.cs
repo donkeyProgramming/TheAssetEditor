@@ -56,13 +56,22 @@ namespace KitbasherEditor.Views
             set { SetValue(SelectionManagerProperty, value); }
         }
 
-        public static readonly DependencyProperty EventHubProperty = DependencyProperty.Register(nameof(EventHub), typeof(IEventHub), typeof(MultiSelectTreeView), new FrameworkPropertyMetadata(AttemptRegistration));
-        public static readonly DependencyProperty SceneManagerProperty = DependencyProperty.Register(nameof(SceneManager), typeof(SceneManager), typeof(MultiSelectTreeView), new FrameworkPropertyMetadata(AttemptRegistration));
+        public static readonly DependencyProperty EventHubProperty = DependencyProperty.Register(nameof(EventHub), typeof(IEventHub), typeof(MultiSelectTreeView), new FrameworkPropertyMetadata(AttemptRegistrationEventHub));
+        public static readonly DependencyProperty SceneManagerProperty = DependencyProperty.Register(nameof(SceneManager), typeof(SceneManager), typeof(MultiSelectTreeView), new FrameworkPropertyMetadata(AttemptRegistrationSceneManager));
         public static readonly DependencyProperty SelectionManagerProperty = DependencyProperty.Register(nameof(SelectionManager), typeof(SelectionManager), typeof(MultiSelectTreeView));
 
-        private static void AttemptRegistration(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void AttemptRegistrationSceneManager(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             (d as MultiSelectTreeView)?.Register();
+        }
+
+        private static void AttemptRegistrationEventHub(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var treeView = d as MultiSelectTreeView;
+            if (treeView == null)
+                return;
+
+            treeView.OnRegisterEventHub((IEventHub)e.OldValue, (IEventHub)e.NewValue);
         }
 
         public MultiSelectTreeView()
@@ -72,7 +81,10 @@ namespace KitbasherEditor.Views
             PreviewMouseDoubleClick += MultiSelectTreeView_PreviewMouseDoubleClick;
             PreviewMouseRightButtonDown += MultiSelectTreeView_PreviewMouseRightButtonDown;
             ItemsSource = _nodes;
+            Unloaded += MultiSelectTreeView_Unloaded;
         }
+
+        private void MultiSelectTreeView_Unloaded(object sender, RoutedEventArgs e) => Dispose();
 
         private void MultiSelectTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -86,15 +98,26 @@ namespace KitbasherEditor.Views
             }
         }
 
+        public void OnRegisterEventHub(IEventHub oldValue, IEventHub newValue)
+        {
+            if (newValue == null && oldValue != null)
+                oldValue.UnRegister(this);
+
+            if (newValue != null)
+            {
+                EventHub.Register<SelectionChangedEvent>(this, SelectionEventHandler);
+                EventHub.Register<SceneObjectAddedEvent>(this, x => RebuildTree());
+                EventHub.Register<SceneObjectRemovedEvent>(this, x => RebuildTree());
+            }
+
+            Register();
+        }
+
 
         public void Register()
         {
             if (SceneManager == null || EventHub == null)
                 return;
-
-            EventHub.Register<SelectionChangedEvent>(this, SelectionEventHandler);
-            EventHub.Register<SceneObjectAddedEvent>(this, x => RebuildTree());
-            EventHub.Register<SceneObjectRemovedEvent>(this, x => RebuildTree());
 
             RebuildTree();
         }
@@ -299,6 +322,7 @@ namespace KitbasherEditor.Views
             SelectedItemChanged -= MyTreeView_SelectedItemChanged;
             PreviewMouseDoubleClick -= MultiSelectTreeView_PreviewMouseDoubleClick;
             PreviewMouseRightButtonDown -= MultiSelectTreeView_PreviewMouseRightButtonDown;
+            Unloaded -= MultiSelectTreeView_Unloaded;
         }
 
         private static bool IsCtrlPressed
