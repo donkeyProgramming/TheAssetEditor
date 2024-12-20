@@ -133,6 +133,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                     FileOpen?.Invoke(SelectedItem.Item);
                 else if (SelectedItem.GetNodeType() == NodeType.Directory && Keyboard.IsKeyDown(Key.LeftCtrl))
                     SelectedItem.ExpandIfVisible(true);
+                else if (SelectedItem.GetNodeType() == NodeType.Directory || SelectedItem.GetNodeType() == NodeType.Root)
+                    SelectedItem.IsNodeExpanded = !SelectedItem.IsNodeExpanded;
             }
         }
 

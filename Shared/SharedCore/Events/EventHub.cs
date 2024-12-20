@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Serilog;
+﻿using Serilog;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 

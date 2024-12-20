@@ -57,13 +57,20 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 
         void CreateForDirectory(ContextMenuItem2 rootNode, TreeNode selectedNode)
         {
+            var isCaPack = selectedNode.FileOwner.IsCaPackFile;
+            var isCurrentEditable = _packFileService.GetEditablePack() == selectedNode.FileOwner;
+
             if (selectedNode.GetNodeType() == NodeType.Root)
             {
                 // Close
                 Add<ClosePackContainerFileCommand>(selectedNode, rootNode);
                 AddSeperator(rootNode);
 
-                if (!selectedNode.FileOwner.IsCaPackFile)
+
+                if (!isCaPack && isCurrentEditable == false)
+                    Add<SetAsEditablePackCommand>(selectedNode, rootNode);
+
+                if (!isCaPack)
                 {
                     AddSeperator(rootNode);
                     Add<SavePackFileContainerCommand>(selectedNode, rootNode);
@@ -72,10 +79,10 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
                 }
             }
 
-            if (_packFileService.GetEditablePack() != selectedNode.FileOwner)
+            if (isCurrentEditable == false)
                 Add<CopyToEditablePackCommand>(selectedNode, rootNode);
 
-            if (!selectedNode.FileOwner.IsCaPackFile)
+            if (!isCaPack)
             {
                 var importFolder = AddChildMenu("Import", rootNode);
                 Add<ImportFileCommand>(selectedNode, importFolder);
@@ -95,7 +102,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
             Add<CollapseNodeCommand>(selectedNode, rootNode);
             Add<ExportToDirectoryCommand>(selectedNode, rootNode);
 
-            if (!selectedNode.FileOwner.IsCaPackFile)
+            if (!isCaPack)
                 Add<OpenPackInFileExplorerCommand>(selectedNode, rootNode);
         }
     }

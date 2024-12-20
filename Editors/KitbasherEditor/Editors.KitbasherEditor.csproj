@@ -25,4 +25,6 @@
     <ProjectReference Include="..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
   </ItemGroup>
 
+
+
 </Project>

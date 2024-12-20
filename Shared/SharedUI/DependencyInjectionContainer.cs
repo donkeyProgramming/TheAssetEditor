@@ -30,6 +30,7 @@ namespace Shared.Ui
             services.AddScoped<IContextMenuBuilder, SimpleContextMenuBuilder>();
             services.AddScoped<IContextMenuBuilder, NoContextMenuBuilder>();
 
+            // TODO: Should all be transient?
             services.AddScoped<AdvancedExportCommand>();
             services.AddScoped<AdvancedImportCommand>();
             services.AddScoped<CopyNodePathCommand>();
@@ -49,12 +50,11 @@ namespace Shared.Ui
             services.AddScoped<OpenPackInFileExplorerCommand>();
             services.AddScoped<SaveAsPackFileContainerCommand>();
             services.AddScoped<SavePackFileContainerCommand>();
+            services.AddScoped<SetAsEditablePackCommand>();
         }
 
         public override void RegisterTools(IEditorDatabase factory)
         {
-
-
         }
     }
 }

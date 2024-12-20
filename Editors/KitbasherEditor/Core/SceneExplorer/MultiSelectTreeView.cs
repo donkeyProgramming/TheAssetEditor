@@ -9,6 +9,8 @@ using Editors.KitbasherEditor.Events;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using Serilog;
+using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 
 namespace KitbasherEditor.Views
@@ -28,6 +30,8 @@ namespace KitbasherEditor.Views
 
     public class MultiSelectTreeView : TreeView, IDisposable
     {
+        private readonly ILogger _logger = Logging.Create<MultiSelectTreeView>();
+
         TreeViewItem? _lastItemSelected;
         bool _ignoreSelectionEvents = false;
         bool _setInitialNodeExpandInfo = true;
@@ -132,8 +136,17 @@ namespace KitbasherEditor.Views
 
         void SendNodeSelectionEvent()
         {
+            if (_nodes == null)
+                _logger.Here().Error($"{nameof(_nodes)} is null");
+
+            if (EventHub == null)
+                _logger.Here().Error($"{nameof(EventHub)} is null");
+
+            if (_nodes == null)
+                return;
+
             var selectedNodes = GetSelectedNodes(_nodes);
-            EventHub.Publish(new SceneNodeSelectedEvent(selectedNodes));
+            EventHub?.Publish(new SceneNodeSelectedEvent(selectedNodes));
         }
 
         private void MultiSelectTreeView_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)

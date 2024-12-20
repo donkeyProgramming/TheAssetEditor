@@ -34,5 +34,10 @@
         <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
         <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
     </ItemGroup>
+
+
+    <ItemGroup>
+        <Using Include="Serilog" />
+    </ItemGroup>
    
 </Project>
