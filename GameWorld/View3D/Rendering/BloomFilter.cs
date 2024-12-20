@@ -584,23 +584,23 @@ namespace GameWorld.Core.Rendering
             }
 
             _bloomRenderTarget2DMip0 = new RenderTarget2D(_graphicsDevice,
-                width,
-                height, false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
+                Math.Max(1,width),
+                Math.Max(1, height), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
             _bloomRenderTarget2DMip1 = new RenderTarget2D(_graphicsDevice,
-                width / 2,
-                height / 2, false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+                Math.Max(1,width / 2),
+                Math.Max(1, height / 2), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             _bloomRenderTarget2DMip2 = new RenderTarget2D(_graphicsDevice,
-                width / 4,
-                height / 4, false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+                Math.Max(1,width / 4),
+                Math.Max(1, height / 4), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             _bloomRenderTarget2DMip3 = new RenderTarget2D(_graphicsDevice,
-                width / 8,
-                height / 8, false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+                Math.Max(1,width / 8),
+                Math.Max(1, height / 8), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             _bloomRenderTarget2DMip4 = new RenderTarget2D(_graphicsDevice,
-                width / 16,
-                height / 16, false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+                Math.Max(1,width / 16),
+                Math.Max(1, height / 16), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
             _bloomRenderTarget2DMip5 = new RenderTarget2D(_graphicsDevice,
-                width / 32,
-                height / 32, false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+                Math.Max(1, width / 32),
+                Math.Max(1, height / 32), false, _renderTargetFormat, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
         }
 
         /// <summary>
