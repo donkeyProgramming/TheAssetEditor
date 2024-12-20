@@ -1,5 +1,4 @@
-﻿using Audio.AudioExplorer;
-using Audio.Compiler;
+﻿using Audio.Compiler;
 using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.AudioEditor.Views;

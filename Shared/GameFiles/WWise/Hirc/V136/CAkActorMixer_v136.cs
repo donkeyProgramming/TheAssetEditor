@@ -8,7 +8,6 @@ namespace Shared.GameFormats.WWise.Hirc.V136
         public Children Children { get; set; }
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
 
-
         protected override void CreateSpecificData(ByteChunk chunk)
         {
             NodeBaseParams = NodeBaseParams.Create(chunk);

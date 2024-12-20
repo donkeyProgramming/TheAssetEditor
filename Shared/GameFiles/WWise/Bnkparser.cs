@@ -34,7 +34,7 @@ namespace Shared.GameFormats.WWise
                 if (WWiseObjectHeaders.BKHD == chunckHeader.Tag)
                     parsedBnkFile.Header = LoadHeader(fullName, chunk);
                 else if (WWiseObjectHeaders.HIRC == chunckHeader.Tag)
-                    parsedBnkFile.HircChuck = LoadHircs(fullName, chunk, chunckHeader.ChunkSize, parsedBnkFile.Header.dwBankGeneratorVersion, isCaHircItem);
+                    parsedBnkFile.HircChuck = LoadHircs(fullName, chunk, chunckHeader.ChunkSize, parsedBnkFile.Header.DwBankGeneratorVersion, isCaHircItem);
                 else if (WWiseObjectHeaders.DIDX == chunckHeader.Tag)
                     parsedBnkFile.DidxChunk = LoadDidx(fullName, chunk);
                 else if (WWiseObjectHeaders.DATA == chunckHeader.Tag)
@@ -56,7 +56,7 @@ namespace Shared.GameFormats.WWise
             return parsedBnkFile;
         }
 
-        BkhdHeader LoadHeader(string fullName, ByteChunk chunk) => _bkhdParser.Parse(fullName, chunk);
+        private static BkhdHeader LoadHeader(string fullName, ByteChunk chunk) => BkhdParser.Parse(fullName, chunk);
 
         private HircChunk LoadHircs(string fullName, ByteChunk chunk, uint chunkHeaderSize, uint bnkVersion, bool isCaHircItem)
         {
@@ -71,9 +71,9 @@ namespace Shared.GameFormats.WWise
             return hircData;
         }
 
-        DidxChunk LoadDidx(string fullName, ByteChunk chunk) => _didxParser.Parse(fullName, chunk, null);
-        ByteChunk LoadData(string fullName, ByteChunk chunk) => _dataParser.Parse(fullName, chunk, null);
-        void LoadStid(string fullName, ByteChunk chunk) => _stidParser.Parse(fullName, chunk, null);
+        private static DidxChunk LoadDidx(string fullName, ByteChunk chunk) => DidxParser.Parse(fullName, chunk, null);
+        private static ByteChunk LoadData(string fullName, ByteChunk chunk) => DataParser.Parse(fullName, chunk, null);
+        private void LoadStid(string fullName, ByteChunk chunk) => _stidParser.Parse(fullName, chunk, null);
     }
 }
 

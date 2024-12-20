@@ -5,7 +5,6 @@ namespace Shared.GameFormats.WWise.Hirc.V122
 {
     public class CAkDialogueEvent_v122 : HircItem, ICADialogEvent
     {
-
         public byte uProbability { get; set; }
         public uint uTreeDepth { get; set; }
         public ArgumentList ArgumentList { get; set; }

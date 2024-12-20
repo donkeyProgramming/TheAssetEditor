@@ -2,22 +2,21 @@
 
 namespace Shared.GameFormats.WWise.Hirc.V112
 {
-
     public class CAkRanSeqCnt_V112 : CAkRanSeqCnt
     {
         public NodeBaseParams NodeBaseParams { get; set; }
 
         public ushort LoopCount { get; set; }
-        public ushort sLoopModMin { get; set; }
-        public ushort sLoopModMax { get; set; }
-        public float fTransitionTime { get; set; }
-        public float fTransitionTimeModMin { get; set; }
-        public float fTransitionTimeModMax { get; set; }
-        public ushort wAvoidRepeatCount { get; set; }
-        public byte eTransitionMode { get; set; }
-        public byte eRandomMode { get; set; }
-        public byte eMode { get; set; }
-        public byte byBitVector { get; set; }
+        public ushort SLoopModMin { get; set; }
+        public ushort SLoopModMax { get; set; }
+        public float FTransitionTime { get; set; }
+        public float FTransitionTimeModMin { get; set; }
+        public float FTransitionTimeModMax { get; set; }
+        public ushort WAvoidRepeatCount { get; set; }
+        public byte ETransitionMode { get; set; }
+        public byte ERandomMode { get; set; }
+        public byte EMode { get; set; }
+        public byte ByBitVector { get; set; }
 
         public Children Children { get; set; }
         public List<AkPlaylistItem> AkPlaylist { get; set; } = new List<AkPlaylistItem>();
@@ -27,19 +26,19 @@ namespace Shared.GameFormats.WWise.Hirc.V112
             NodeBaseParams = NodeBaseParams.Create(chunk);
 
             LoopCount = chunk.ReadUShort();
-            sLoopModMin = chunk.ReadUShort();
-            sLoopModMax = chunk.ReadUShort();
+            SLoopModMin = chunk.ReadUShort();
+            SLoopModMax = chunk.ReadUShort();
 
-            fTransitionTime = chunk.ReadSingle();
-            fTransitionTimeModMin = chunk.ReadSingle();
-            fTransitionTimeModMax = chunk.ReadSingle();
+            FTransitionTime = chunk.ReadSingle();
+            FTransitionTimeModMin = chunk.ReadSingle();
+            FTransitionTimeModMax = chunk.ReadSingle();
 
-            wAvoidRepeatCount = chunk.ReadUShort();
+            WAvoidRepeatCount = chunk.ReadUShort();
 
-            eTransitionMode = chunk.ReadByte();
-            eRandomMode = chunk.ReadByte();
-            eMode = chunk.ReadByte();
-            byBitVector = chunk.ReadByte();
+            ETransitionMode = chunk.ReadByte();
+            ERandomMode = chunk.ReadByte();
+            EMode = chunk.ReadByte();
+            ByBitVector = chunk.ReadByte();
 
             Children = Children.Create(chunk);
 
@@ -55,7 +54,6 @@ namespace Shared.GameFormats.WWise.Hirc.V112
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
-
 
     public class AkPlaylistItem
     {

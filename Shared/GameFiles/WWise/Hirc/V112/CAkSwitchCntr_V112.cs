@@ -3,14 +3,13 @@ using static Shared.GameFormats.WWise.Hirc.ICAkSwitchCntr;
 
 namespace Shared.GameFormats.WWise.Hirc.V112
 {
-
     public class CAkSwitchCntr_V112 : CAkSwitchCntr, ICAkSwitchCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
-        public AkGroupType eGroupType { get; set; }
-        public uint ulGroupID { get; set; }   // Enum group name
-        public uint ulDefaultSwitch { get; set; }    // Default value name
-        public byte bIsContinuousValidation { get; set; }
+        public AkGroupType EGroupType { get; set; }
+        public uint UlGroupID { get; set; }   // Enum group name
+        public uint UlDefaultSwitch { get; set; }    // Default value name
+        public byte BIsContinuousValidation { get; set; }
         public Children Children { get; set; }
         public List<ICAkSwitchPackage> SwitchList { get; set; } = new List<ICAkSwitchPackage>();
         public List<AkSwitchNodeParams> Parameters { get; set; } = new List<AkSwitchNodeParams>();
@@ -18,10 +17,10 @@ namespace Shared.GameFormats.WWise.Hirc.V112
         protected override void CreateSpecificData(ByteChunk chunk)
         {
             NodeBaseParams = NodeBaseParams.Create(chunk);
-            eGroupType = (AkGroupType)chunk.ReadByte();
-            ulGroupID = chunk.ReadUInt32();
-            ulDefaultSwitch = chunk.ReadUInt32();
-            bIsContinuousValidation = chunk.ReadByte();
+            EGroupType = (AkGroupType)chunk.ReadByte();
+            UlGroupID = chunk.ReadUInt32();
+            UlDefaultSwitch = chunk.ReadUInt32();
+            BIsContinuousValidation = chunk.ReadByte();
             Children = Children.Create(chunk);
 
             var switchListCount = chunk.ReadUInt32();
@@ -31,20 +30,14 @@ namespace Shared.GameFormats.WWise.Hirc.V112
             var paramCount = chunk.ReadUInt32();
             for (var i = 0; i < paramCount; i++)
                 Parameters.Add(AkSwitchNodeParams.Create(chunk));
-
         }
 
-        public override uint GroupId => ulGroupID;
-
-        public override uint DefaultSwitch => ulDefaultSwitch;
-
+        public override uint GroupId => UlGroupID;
+        public override uint DefaultSwitch => UlDefaultSwitch;
         public override uint ParentId => NodeBaseParams.DirectParentId;
-
         public override List<SwitchListItem> Items => SwitchList.Select(x => new SwitchListItem() { SwitchId = x.SwitchId, ChildNodeIds = x.NodeIdList }).ToList();
-
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
-
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
     }
 
@@ -85,7 +78,6 @@ namespace Shared.GameFormats.WWise.Hirc.V112
         public uint NodeId { get; set; }
         public byte BitVector0 { get; set; }
         public byte BitVector1 { get; set; }
-
         public float FadeOutTime { get; set; }
         public float FadeInTime { get; set; }
 
@@ -106,11 +98,10 @@ namespace Shared.GameFormats.WWise.Hirc.V112
     {
         public NodeInitialFxParams NodeInitialFxParams { get; set; }
 
-
-        public byte bOverrideAttachmentParams { get; set; }
+        public byte BOverrideAttachmentParams { get; set; }
         public uint OverrideBusId { get; set; }
         public uint DirectParentId { get; set; }
-        public byte byBitVector { get; set; }
+        public byte ByBitVector { get; set; }
 
         public NodeInitialParams NodeInitialParams { get; set; }
         public PositioningParams PositioningParams { get; set; }
@@ -120,19 +111,19 @@ namespace Shared.GameFormats.WWise.Hirc.V112
         public InitialRTPC InitialRTPC { get; set; }
 
 
-        public byte eGroupType { get; set; } // "Switch"
-        public uint ulGroupID { get; set; }     // Enum switch name
-        public uint ulDefaultSwitch { get; set; }   // Enum switch defautl value
-        public byte bIsContinuousValidation { get; set; } // "Switch"
+        public byte EGroupType { get; set; } // "Switch"
+        public uint UlGroupID { get; set; }     // Enum switch name
+        public uint UlDefaultSwitch { get; set; }   // Enum switch defautl value
+        public byte BIsContinuousValidation { get; set; } // "Switch"
 
         public static NodeBaseParams Create(ByteChunk chunk)
         {
             var node = new NodeBaseParams();
             node.NodeInitialFxParams = NodeInitialFxParams.Create(chunk);
-            node.bOverrideAttachmentParams = chunk.ReadByte();
+            node.BOverrideAttachmentParams = chunk.ReadByte();
             node.OverrideBusId = chunk.ReadUInt32();
             node.DirectParentId = chunk.ReadUInt32();
-            node.byBitVector = chunk.ReadByte();
+            node.ByBitVector = chunk.ReadByte();
             node.NodeInitialParams = NodeInitialParams.Create(chunk);
             node.PositioningParams = PositioningParams.Create(chunk);
             node.AuxParams = AuxParams.Create(chunk);
@@ -167,7 +158,7 @@ namespace Shared.GameFormats.WWise.Hirc.V112
             public float Value { get; set; }
         }
 
-        public List<AkPropBundleInstance> Values = new List<AkPropBundleInstance>();
+        public List<AkPropBundleInstance> _values = [];
 
         public static AkPropBundle Create(ByteChunk chunk)
         {
@@ -175,10 +166,10 @@ namespace Shared.GameFormats.WWise.Hirc.V112
             var propsCount = chunk.ReadByte();
 
             for (byte i = 0; i < propsCount; i++)
-                output.Values.Add(new AkPropBundleInstance() { Type = (AkPropBundleType)chunk.ReadByte() });
+                output._values.Add(new AkPropBundleInstance() { Type = (AkPropBundleType)chunk.ReadByte() });
 
             for (byte i = 0; i < propsCount; i++)
-                output.Values[i].Value = chunk.ReadSingle();
+                output._values[i].Value = chunk.ReadSingle();
 
             return output;
         }
@@ -215,20 +206,20 @@ namespace Shared.GameFormats.WWise.Hirc.V112
 
     public class NodeInitialFxParams
     {
-        public byte bIsOverrideParentFX { get; set; }
+        public byte BIsOverrideParentFX { get; set; }
 
-        public byte bitsFXBypass { get; set; }
-        public List<FXChunk> FxList { get; set; } = new List<FXChunk>();
+        public byte BitsFXBypass { get; set; }
+        public List<FXChunk> FxList { get; set; } = [];
 
         public static NodeInitialFxParams Create(ByteChunk chunk)
         {
             var instance = new NodeInitialFxParams();
-            instance.bIsOverrideParentFX = chunk.ReadByte();
+            instance.BIsOverrideParentFX = chunk.ReadByte();
             var uNumFx = chunk.ReadByte();
 
             if (uNumFx != 0)
             {
-                instance.bitsFXBypass = chunk.ReadByte();
+                instance.BitsFXBypass = chunk.ReadByte();
                 for (var i = 0; i < uNumFx; i++)
                     instance.FxList.Add(FXChunk.Create(chunk));
             }
@@ -239,18 +230,18 @@ namespace Shared.GameFormats.WWise.Hirc.V112
 
     public class FXChunk
     {
-        public byte uFXIndex { get; set; }
-        public uint fxID { get; set; }
-        public byte bIsShareSet { get; set; }
-        public byte bIsRendered { get; set; }
+        public byte UFXIndex { get; set; }
+        public uint FxID { get; set; }
+        public byte BIsShareSet { get; set; }
+        public byte BIsRendered { get; set; }
 
         public static FXChunk Create(ByteChunk chunk)
         {
             var instance = new FXChunk();
-            instance.uFXIndex = chunk.ReadByte();
-            instance.fxID = chunk.ReadUInt32();
-            instance.bIsShareSet = chunk.ReadByte();
-            instance.bIsRendered = chunk.ReadByte();
+            instance.UFXIndex = chunk.ReadByte();
+            instance.FxID = chunk.ReadUInt32();
+            instance.BIsShareSet = chunk.ReadByte();
+            instance.BIsRendered = chunk.ReadByte();
             return instance;
         }
     }
@@ -258,32 +249,32 @@ namespace Shared.GameFormats.WWise.Hirc.V112
 
     public class PositioningParams
     {
-        public byte uByVector { get; set; }
-        public byte uBits3d { get; set; }
-        public uint uAttenuationID { get; set; }
+        public byte UByVector { get; set; }
+        public byte UBits3d { get; set; }
+        public uint UAttenuationID { get; set; }
 
-        public byte ePathMode { get; set; }
+        public byte EPathMode { get; set; }
         public float TransitionTime { get; set; }
-        public List<AkPathVertex> VertexList { get; set; } = new List<AkPathVertex>();
-        public List<AkPathListItemOffset> PlayListItems { get; set; } = new List<AkPathListItemOffset>();
-        public List<Ak3DAutomationParams> Params { get; set; } = new List<Ak3DAutomationParams>();
+        public List<AkPathVertex> VertexList { get; set; } = [];
+        public List<AkPathListItemOffset> PlayListItems { get; set; } = [];
+        public List<Ak3DAutomationParams> Params { get; set; } = [];
 
         public static PositioningParams Create(ByteChunk chunk)
         {
             var instance = new PositioningParams();
-            instance.uByVector = chunk.ReadByte();
+            instance.UByVector = chunk.ReadByte();
 
-            var bPositioningInfoOverrideParent = (instance.uByVector >> 0 & 1) == 1;
-            var cbIs3DPositioningAvailable = (instance.uByVector >> 3 & 1) == 1;
+            var bPositioningInfoOverrideParent = (instance.UByVector >> 0 & 1) == 1;
+            var cbIs3DPositioningAvailable = (instance.UByVector >> 3 & 1) == 1;
 
             if (bPositioningInfoOverrideParent && cbIs3DPositioningAvailable)
             {
-                instance.uBits3d = chunk.ReadByte();
-                instance.uAttenuationID = chunk.ReadUInt32();
+                instance.UBits3d = chunk.ReadByte();
+                instance.UAttenuationID = chunk.ReadUInt32();
 
-                if ((instance.uBits3d >> 0 & 1) == 0)
+                if ((instance.UBits3d >> 0 & 1) == 0)
                 {
-                    instance.ePathMode = chunk.ReadByte();
+                    instance.EPathMode = chunk.ReadByte();
                     instance.TransitionTime = chunk.ReadSingle();
 
                     var numVertexes = chunk.ReadUInt32();
@@ -301,7 +292,6 @@ namespace Shared.GameFormats.WWise.Hirc.V112
                         instance.Params.Add(Ak3DAutomationParams.Create(chunk));
                 }
             }
-
 
             return instance;
         }
@@ -360,46 +350,42 @@ namespace Shared.GameFormats.WWise.Hirc.V112
 
     public class AuxParams
     {
-        public byte byBitVector { get; set; }
-        public uint auxID0 { get; set; }
-        public uint auxID1 { get; set; }
-        public uint auxID2 { get; set; }
-        public uint auxID3 { get; set; }
+        public byte ByBitVector { get; set; }
+        public uint AuxID0 { get; set; }
+        public uint AuxID1 { get; set; }
+        public uint AuxID2 { get; set; }
+        public uint AuxID3 { get; set; }
 
         public static AuxParams Create(ByteChunk chunk)
         {
             var instance = new AuxParams();
-            instance.byBitVector = chunk.ReadByte();
+            instance.ByBitVector = chunk.ReadByte();
 
-            if ((instance.byBitVector >> 3 & 1) == 1)
+            if ((instance.ByBitVector >> 3 & 1) == 1)
             {
-                instance.auxID0 = chunk.ReadUInt32();
-                instance.auxID1 = chunk.ReadUInt32();
-                instance.auxID2 = chunk.ReadUInt32();
-                instance.auxID3 = chunk.ReadUInt32();
+                instance.AuxID0 = chunk.ReadUInt32();
+                instance.AuxID1 = chunk.ReadUInt32();
+                instance.AuxID2 = chunk.ReadUInt32();
+                instance.AuxID3 = chunk.ReadUInt32();
             }
 
             return instance;
         }
     }
 
-
     public class AdvSettingsParams
     {
-        public byte byBitVector { get; set; }
-        public byte eVirtualQueueBehavior { get; set; }
-        public ushort u16MaxNumInstance { get; set; }
-        public byte eBelowThresholdBehavior { get; set; }
-        public byte byBitVector2 { get; set; }
-
-
+        public byte ByBitVector { get; set; }
+        public byte EVirtualQueueBehavior { get; set; }
+        public ushort U16MaxNumInstance { get; set; }
+        public byte EBelowThresholdBehavior { get; set; }
+        public byte ByBitVector2 { get; set; }
 
         public static AdvSettingsParams Create(ByteChunk chunk)
         {
-            return new AdvSettingsParams() { byBitVector = chunk.ReadByte(), eVirtualQueueBehavior = chunk.ReadByte(), u16MaxNumInstance = chunk.ReadUShort(), eBelowThresholdBehavior = chunk.ReadByte(), byBitVector2 = chunk.ReadByte() };
+            return new AdvSettingsParams() { ByBitVector = chunk.ReadByte(), EVirtualQueueBehavior = chunk.ReadByte(), U16MaxNumInstance = chunk.ReadUShort(), EBelowThresholdBehavior = chunk.ReadByte(), ByBitVector2 = chunk.ReadByte() };
         }
     }
-
 
     public class StateChunk
     {
@@ -415,18 +401,17 @@ namespace Shared.GameFormats.WWise.Hirc.V112
         }
     }
 
-
     public class AkStateGroupChunk
     {
-        public uint ulStateGroupID { get; set; }
-        public byte eStateSyncType { get; set; }
+        public uint UlStateGroupID { get; set; }
+        public byte EStateSyncType { get; set; }
         public List<AkState> States { get; set; } = new List<AkState>();
 
         public static AkStateGroupChunk Create(ByteChunk chunk)
         {
             var instance = new AkStateGroupChunk();
-            instance.ulStateGroupID = chunk.ReadUInt32();
-            instance.eStateSyncType = chunk.ReadByte();
+            instance.UlStateGroupID = chunk.ReadUInt32();
+            instance.EStateSyncType = chunk.ReadByte();
 
             var count = chunk.ReadUShort();
             for (var i = 0; i < count; i++)
@@ -438,17 +423,16 @@ namespace Shared.GameFormats.WWise.Hirc.V112
 
     public class AkState
     {
-        public uint ulStateID { get; set; }
-        public uint ulStateInstanceID { get; set; }
+        public uint UlStateID { get; set; }
+        public uint UlStateInstanceID { get; set; }
         public static AkState Create(ByteChunk chunk)
         {
             var instance = new AkState();
-            instance.ulStateID = chunk.ReadUInt32();
-            instance.ulStateInstanceID = chunk.ReadUInt32();
+            instance.UlStateID = chunk.ReadUInt32();
+            instance.UlStateInstanceID = chunk.ReadUInt32();
             return instance;
         }
     }
-
 
     public class InitialRTPC
     {
@@ -468,26 +452,26 @@ namespace Shared.GameFormats.WWise.Hirc.V112
     public class RTPC
     {
         public uint RTPCID { get; set; }
-        public byte rtpcType { get; set; }
-        public byte rtpcAccum { get; set; }
+        public byte RtpcType { get; set; }
+        public byte RtpcAccum { get; set; }
         public byte ParamID { get; set; }
-        public uint rtpcCurveID { get; set; }
-        public byte eScaling { get; set; }
-        public List<AkRTPCGraphPoint> pRTPCMgr { get; set; } = new List<AkRTPCGraphPoint>();
+        public uint RtpcCurveID { get; set; }
+        public byte EScaling { get; set; }
+        public List<AkRTPCGraphPoint> PRTPCMgr { get; set; } = new List<AkRTPCGraphPoint>();
 
         public static RTPC Create(ByteChunk chunk)
         {
             var instance = new RTPC();
             instance.RTPCID = chunk.ReadUInt32();
-            instance.rtpcType = chunk.ReadByte();
-            instance.rtpcAccum = chunk.ReadByte();
+            instance.RtpcType = chunk.ReadByte();
+            instance.RtpcAccum = chunk.ReadByte();
             instance.ParamID = chunk.ReadByte();
-            instance.rtpcCurveID = chunk.ReadUInt32();
-            instance.eScaling = chunk.ReadByte();
+            instance.RtpcCurveID = chunk.ReadUInt32();
+            instance.EScaling = chunk.ReadByte();
 
             var count = chunk.ReadUShort();
             for (var i = 0; i < count; i++)
-                instance.pRTPCMgr.Add(AkRTPCGraphPoint.Create(chunk));
+                instance.PRTPCMgr.Add(AkRTPCGraphPoint.Create(chunk));
 
             return instance;
         }
@@ -508,5 +492,4 @@ namespace Shared.GameFormats.WWise.Hirc.V112
             return instance;
         }
     }
-
 }

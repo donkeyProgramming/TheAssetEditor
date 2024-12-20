@@ -1,8 +1,8 @@
-﻿using Editors.Audio.Storage;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Editors.Audio.Storage;
 using Shared.GameFormats.WWise;
 using Shared.Ui.Common;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Editors.Audio.AudioExplorer
 {
@@ -27,8 +27,10 @@ namespace Editors.Audio.AudioExplorer
         public void Refresh(bool showEvents, bool showDialogEvents)
         {
             var typesToShow = new List<HircType>();
+
             if (showEvents)
                 typesToShow.Add(HircType.Event);
+
             if (showDialogEvents)
                 typesToShow.Add(HircType.Dialogue_Event);
 

@@ -5,7 +5,7 @@ namespace Shared.GameFormats.WWise.Didx
 {
     public class DidxChunk
     {
-        public List<MediaHeader> MediaList { get; set; } = new();
+        public List<MediaHeader> MediaList { get; set; } = [];
 
         public class MediaHeader
         {
@@ -25,7 +25,7 @@ namespace Shared.GameFormats.WWise.Didx
 
     public class DidxParser
     {
-        public DidxChunk Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
+        public static DidxChunk Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
         {
             var tag = Encoding.UTF8.GetString(chunk.ReadBytes(4));
             var chunkSize = chunk.ReadUInt32();
@@ -37,7 +37,5 @@ namespace Shared.GameFormats.WWise.Didx
 
             return new DidxChunk { MediaList = MediaListediaList };
         }
-
-
     }
 }

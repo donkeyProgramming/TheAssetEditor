@@ -2,15 +2,13 @@
 using System.IO;
 using System.Linq;
 using Editors.Audio.Utility;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
+using static Editors.Audio.Utility.WWiseWavToWem;
 
 namespace Editors.Audio.BnkCompiler
 {
-    using Microsoft.Xna.Framework.Media;
-    using Shared.Core.ErrorHandling;
-    using Shared.Core.Misc;
-    using Shared.Core.PackFiles;
-    using static Editors.Audio.Utility.WWiseWavToWem;
-
     public class AudioFileImporter
     {
         private readonly IPackFileService _pfs;
@@ -45,6 +43,7 @@ namespace Editors.Audio.BnkCompiler
                 if (converterResult.IsSuccess == false)
                     return converterResult;
             }
+
             return Result<bool>.FromOk(true);
         }
 

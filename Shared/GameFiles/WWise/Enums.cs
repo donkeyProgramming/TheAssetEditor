@@ -1,6 +1,5 @@
 ﻿namespace Shared.GameFormats.WWise
 {
-
     public static class WWiseObjectHeaders
     {
         public const string BKHD = "BKHD";

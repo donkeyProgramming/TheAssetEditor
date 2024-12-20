@@ -1,10 +1,10 @@
-﻿using CommunityToolkit.Diagnostics;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using CommunityToolkit.Diagnostics;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc.V136;
-using System.Collections.Generic;
-using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -20,24 +20,23 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return ConvertToWWise(typedProjectItem, project);
         }
 
-        public CAkRanSeqCntr_v136 ConvertToWWise(RandomContainer inputContainer, CompilerData project)
+        public static CAkRanSeqCntr_v136 ConvertToWWise(RandomContainer inputContainer, CompilerData project)
         {
             var wwiseRandomContainer = new CAkRanSeqCntr_v136();
             wwiseRandomContainer.Id = inputContainer.Id;
             wwiseRandomContainer.Type = HircType.SequenceContainer;
             wwiseRandomContainer.NodeBaseParams = NodeBaseParams.CreateDefaultRandomContainer();
-            wwiseRandomContainer.byBitVector = 0x12;
-            wwiseRandomContainer.fTransitionTime = 1000;
+            wwiseRandomContainer.ByBitVector = 0x12;
+            wwiseRandomContainer.FTransitionTime = 1000;
             wwiseRandomContainer.NodeBaseParams.DirectParentId = inputContainer.DirectParentId;
-            wwiseRandomContainer.sLoopCount = 1;
-            wwiseRandomContainer.wAvoidRepeatCount = 2;
+            wwiseRandomContainer.SLoopCount = 1;
+            wwiseRandomContainer.WAvoidRepeatCount = 2;
 
             var allChildIds = inputContainer.Children.Select(x => x).OrderBy(x => x).ToList();
             wwiseRandomContainer.Children = CreateChildrenList(allChildIds);
             wwiseRandomContainer.AkPlaylist = allChildIds.Select(CreateAkPlaylistItem).ToList();
 
             wwiseRandomContainer.UpdateSize();
-
             return wwiseRandomContainer;
         }
 

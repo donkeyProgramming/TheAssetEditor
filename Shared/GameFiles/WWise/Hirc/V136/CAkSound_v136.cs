@@ -45,7 +45,7 @@ namespace Shared.GameFormats.WWise.Hirc.V136
         public SourceType StreamType { get; set; }
 
         public AkMediaInformation akMediaInformation { get; set; }
-        public uint uSize { get; set; }
+        public uint USize { get; set; }
         public static AkBankSourceData Create(ByteChunk chunk)
         {
             var output = new AkBankSourceData()
@@ -63,7 +63,7 @@ namespace Shared.GameFormats.WWise.Hirc.V136
             }
 
             if (output.PluginId_type == 0x02)
-                output.uSize = chunk.ReadUInt32();
+                output.USize = chunk.ReadUInt32();
 
             output.akMediaInformation = AkMediaInformation.Create(chunk);
 
@@ -78,8 +78,8 @@ namespace Shared.GameFormats.WWise.Hirc.V136
             memStream.Write(ByteParsers.UInt32.EncodeValue(PluginId, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)StreamType, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(akMediaInformation.SourceId, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(akMediaInformation.uInMemoryMediaSize, out _));
-            memStream.Write(ByteParsers.Byte.EncodeValue(akMediaInformation.uSourceBits, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(akMediaInformation.UInMemoryMediaSize, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(akMediaInformation.USourceBits, out _));
             return memStream.ToArray();
         }
 
@@ -89,16 +89,16 @@ namespace Shared.GameFormats.WWise.Hirc.V136
     public class AkMediaInformation
     {
         public uint SourceId { get; set; }
-        public uint uInMemoryMediaSize { get; set; }
-        public byte uSourceBits { get; set; }
+        public uint UInMemoryMediaSize { get; set; }
+        public byte USourceBits { get; set; }
 
         public static AkMediaInformation Create(ByteChunk chunk)
         {
             return new AkMediaInformation()
             {
                 SourceId = chunk.ReadUInt32(),
-                uInMemoryMediaSize = chunk.ReadUInt32(),
-                uSourceBits = chunk.ReadByte(),
+                UInMemoryMediaSize = chunk.ReadUInt32(),
+                USourceBits = chunk.ReadByte(),
             };
         }
     }

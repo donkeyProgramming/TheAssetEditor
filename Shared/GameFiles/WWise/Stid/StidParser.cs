@@ -11,6 +11,4 @@ namespace Shared.GameFormats.WWise.Stid
             return chunckHeader;
         }
     }
-
-
 }

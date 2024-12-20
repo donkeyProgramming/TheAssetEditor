@@ -26,7 +26,6 @@ namespace Shared.GameFormats.WWise.Hirc
         public AkDecisionTree AkDecisionTree { get; }
     }
 
-
     public interface ICAkActorMixer
     {
         public List<uint> GetChildren();
@@ -59,16 +58,12 @@ namespace Shared.GameFormats.WWise.Hirc
         public uint GetDirectParentId();
     }
 
-
     // Convert to interfaces 
-
     public abstract class CAkRanSeqCnt : HircItem
     {
         public abstract uint GetParentId();
         public abstract List<uint> GetChildren();
     }
-
-
 
     public abstract class CAkSwitchCntr : HircItem
     {

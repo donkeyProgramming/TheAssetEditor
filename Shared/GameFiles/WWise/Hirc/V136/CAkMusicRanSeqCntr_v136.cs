@@ -5,8 +5,7 @@ namespace Shared.GameFormats.WWise.Hirc.V136
     public class CAkMusicRanSeqCntr_v136 : HircItem
     {
         public MusicTransNodeParams MusicTransNodeParams { get; set; }
-        public List<AkMusicRanSeqPlaylistItem> pPlayList { get; set; } = new List<AkMusicRanSeqPlaylistItem>();
-
+        public List<AkMusicRanSeqPlaylistItem> PPlayList { get; set; } = [];
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
@@ -16,16 +15,17 @@ namespace Shared.GameFormats.WWise.Hirc.V136
             var numPlaylistItems = chunk.ReadUInt32();
             //and the root always has 1, again I think...
             //for (int i = 0; i < numPlaylistItems; i++)
-            pPlayList.Add(AkMusicRanSeqPlaylistItem.Create(chunk));
+            PPlayList.Add(AkMusicRanSeqPlaylistItem.Create(chunk));
         }
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
+
     public class MusicTransNodeParams
     {
         public MusicNodeParams MusicNodeParams { get; set; }
-        public List<AkMusicTransitionRule> pPlayList { get; set; } = new List<AkMusicTransitionRule>();
+        public List<AkMusicTransitionRule> PPlayList { get; set; } = [];
 
         public static MusicTransNodeParams Create(ByteChunk chunk)
         {
@@ -35,7 +35,7 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
             var numRules = chunk.ReadUInt32();
             for (var i = 0; i < numRules; i++)
-                instance.pPlayList.Add(AkMusicTransitionRule.Create(chunk));
+                instance.PPlayList.Add(AkMusicTransitionRule.Create(chunk));
 
             return instance;
         }
@@ -43,16 +43,16 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
     public class AkMusicTransitionRule
     {
-        public uint uNumSrc { get; set; }
-        public List<uint> srcIDList { get; set; } = new List<uint>();
+        public uint UNumSrc { get; set; }
+        public List<uint> SrcIDList { get; set; } = [];
 
-        public uint uNumDst { get; set; }
-        public List<uint> dstIDList { get; set; } = new List<uint>();
+        public uint UNumDst { get; set; }
+        public List<uint> DstIDList { get; set; } = [];
         public AkMusicTransSrcRule AkMusicTransSrcRule { get; set; }
         public AkMusicTransDstRule AkMusicTransDstRule { get; set; }
 
-        public uint ulStateGroupID_custom { get; set; }
-        public uint ulStateID_custom { get; set; }
+        public uint UlStateGroupID_custom { get; set; }
+        public uint UlStateID_custom { get; set; }
         public byte AllocTransObjectFlag { get; set; }
         public AkMusicTransitionObject AkMusicTransitionObject { get; set; }
 
@@ -62,22 +62,21 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
             var uNumSrc = chunk.ReadUInt32();
             for (var i = 0; i < uNumSrc; i++)
-                instance.srcIDList.Add(chunk.ReadUInt32());
+                instance.SrcIDList.Add(chunk.ReadUInt32());
 
             var uNumDst = chunk.ReadUInt32();
             for (var i = 0; i < uNumDst; i++)
-                instance.dstIDList.Add(chunk.ReadUInt32());
+                instance.DstIDList.Add(chunk.ReadUInt32());
 
             instance.AkMusicTransSrcRule = AkMusicTransSrcRule.Create(chunk);
 
             instance.AkMusicTransDstRule = AkMusicTransDstRule.Create(chunk);
 
+            instance.UlStateGroupID_custom = chunk.ReadUInt32();
+            instance.UlStateID_custom = chunk.ReadUInt32();
 
-            instance.ulStateGroupID_custom = chunk.ReadUInt32();
-            instance.ulStateID_custom = chunk.ReadUInt32();
-
-            var AllocTransObjectFlag = chunk.ReadByte();
-            var has_transobj = AllocTransObjectFlag != 0;
+            var allocTransObjectFlag = chunk.ReadByte();
+            var has_transobj = allocTransObjectFlag != 0;
             if (has_transobj)
                 instance.AkMusicTransitionObject = AkMusicTransitionObject.Create(chunk);
 
@@ -87,22 +86,22 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
     public class AkMusicTransitionObject
     {
-        public int segmentID { get; set; }
-        public AkMusicFade fadeInParams { get; set; }
-        public AkMusicFade fadeOutParams { get; set; }
-        public byte bPlayPreEntry { get; set; }
-        public byte bPlayPostExit { get; set; }
+        public int SegmentID { get; set; }
+        public AkMusicFade FadeInParams { get; set; }
+        public AkMusicFade FadeOutParams { get; set; }
+        public byte BPlayPreEntry { get; set; }
+        public byte BPlayPostExit { get; set; }
 
         public static AkMusicTransitionObject Create(ByteChunk chunk)
         {
             var instance = new AkMusicTransitionObject();
 
-            instance.segmentID = chunk.ReadInt32();
-            instance.fadeInParams = AkMusicFade.Create(chunk);
-            instance.fadeOutParams = AkMusicFade.Create(chunk);
+            instance.SegmentID = chunk.ReadInt32();
+            instance.FadeInParams = AkMusicFade.Create(chunk);
+            instance.FadeOutParams = AkMusicFade.Create(chunk);
 
-            instance.bPlayPreEntry = chunk.ReadByte();
-            instance.bPlayPostExit = chunk.ReadByte();
+            instance.BPlayPreEntry = chunk.ReadByte();
+            instance.BPlayPostExit = chunk.ReadByte();
 
             return instance;
         }
@@ -110,18 +109,17 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
     public class AkMusicFade
     {
-        public int transitionTime { get; set; }
-        public uint eFadeCurve { get; set; }
-        public int iFadeOffset { get; set; }
-
+        public int TransitionTime { get; set; }
+        public uint EFadeCurve { get; set; }
+        public int IFadeOffset { get; set; }
 
         public static AkMusicFade Create(ByteChunk chunk)
         {
             var instance = new AkMusicFade();
 
-            instance.transitionTime = chunk.ReadInt32();
-            instance.eFadeCurve = chunk.ReadUInt32();
-            instance.iFadeOffset = chunk.ReadInt32();
+            instance.TransitionTime = chunk.ReadInt32();
+            instance.EFadeCurve = chunk.ReadUInt32();
+            instance.IFadeOffset = chunk.ReadInt32();
 
             return instance;
         }
@@ -129,24 +127,23 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
     public class AkMusicTransSrcRule
     {
-        public int transitionTime { get; set; }
-        public uint eFadeCurve { get; set; }
-        public int iFadeOffset { get; set; }
-        public uint eSyncType { get; set; }
-        public uint uCueFilterHash { get; set; }
-        public byte bPlayPostExit { get; set; }
-
+        public int TransitionTime { get; set; }
+        public uint EFadeCurve { get; set; }
+        public int IFadeOffset { get; set; }
+        public uint ESyncType { get; set; }
+        public uint UCueFilterHash { get; set; }
+        public byte BPlayPostExit { get; set; }
 
         public static AkMusicTransSrcRule Create(ByteChunk chunk)
         {
             var instance = new AkMusicTransSrcRule();
 
-            instance.transitionTime = chunk.ReadInt32();
-            instance.eFadeCurve = chunk.ReadUInt32();
-            instance.iFadeOffset = chunk.ReadInt32();
-            instance.eSyncType = chunk.ReadUInt32();
-            instance.uCueFilterHash = chunk.ReadUInt32();
-            instance.bPlayPostExit = chunk.ReadByte();
+            instance.TransitionTime = chunk.ReadInt32();
+            instance.EFadeCurve = chunk.ReadUInt32();
+            instance.IFadeOffset = chunk.ReadInt32();
+            instance.ESyncType = chunk.ReadUInt32();
+            instance.UCueFilterHash = chunk.ReadUInt32();
+            instance.BPlayPostExit = chunk.ReadByte();
 
             return instance;
         }
@@ -154,31 +151,29 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
     public class AkMusicTransDstRule
     {
-
-        public int transitionTime { get; set; }
-        public uint eFadeCurve { get; set; }
-        public int iFadeOffset { get; set; }
-        public uint uCueFilterHash { get; set; }
-        public uint uJumpToID { get; set; }
-        public ushort eJumpToType { get; set; }
-        public ushort eEntryType { get; set; }
-        public byte bPlayPreEntry { get; set; }
-        public byte bDestMatchSourceCueName { get; set; }
-
+        public int TransitionTime { get; set; }
+        public uint EFadeCurve { get; set; }
+        public int IFadeOffset { get; set; }
+        public uint UCueFilterHash { get; set; }
+        public uint UJumpToID { get; set; }
+        public ushort EJumpToType { get; set; }
+        public ushort EEntryType { get; set; }
+        public byte BPlayPreEntry { get; set; }
+        public byte BDestMatchSourceCueName { get; set; }
 
         public static AkMusicTransDstRule Create(ByteChunk chunk)
         {
             var instance = new AkMusicTransDstRule();
 
-            instance.transitionTime = chunk.ReadInt32();
-            instance.eFadeCurve = chunk.ReadUInt32();
-            instance.iFadeOffset = chunk.ReadInt32();
-            instance.uCueFilterHash = chunk.ReadUInt32();
-            instance.uJumpToID = chunk.ReadUInt32();
-            instance.eJumpToType = chunk.ReadUShort();
-            instance.eEntryType = chunk.ReadUShort();
-            instance.bPlayPreEntry = chunk.ReadByte();
-            instance.bDestMatchSourceCueName = chunk.ReadByte();
+            instance.TransitionTime = chunk.ReadInt32();
+            instance.EFadeCurve = chunk.ReadUInt32();
+            instance.IFadeOffset = chunk.ReadInt32();
+            instance.UCueFilterHash = chunk.ReadUInt32();
+            instance.UJumpToID = chunk.ReadUInt32();
+            instance.EJumpToType = chunk.ReadUShort();
+            instance.EEntryType = chunk.ReadUShort();
+            instance.BPlayPreEntry = chunk.ReadByte();
+            instance.BDestMatchSourceCueName = chunk.ReadByte();
 
             return instance;
         }
@@ -187,37 +182,36 @@ namespace Shared.GameFormats.WWise.Hirc.V136
     public class AkMusicRanSeqPlaylistItem
     {
         public uint SegmentID { get; set; }
-        public int playlistItemID { get; set; }
-        public uint eRSType { get; set; }
+        public int PlaylistItemID { get; set; }
+        public uint ERSType { get; set; }
         public short Loop { get; set; }
         public short LoopMin { get; set; }
         public short LoopMax { get; set; }
         public uint Weight { get; set; }
-        public ushort wAvoidRepeatCount { get; set; }
-        public byte bIsUsingWeight { get; set; }
-        public byte bIsShuffle { get; set; }
+        public ushort WAvoidRepeatCount { get; set; }
+        public byte BIsUsingWeight { get; set; }
+        public byte BIsShuffle { get; set; }
 
-        public List<AkMusicRanSeqPlaylistItem> pPlayList { get; set; } = new List<AkMusicRanSeqPlaylistItem>();
-
+        public List<AkMusicRanSeqPlaylistItem> PPlayList { get; set; } = [];
 
         public static AkMusicRanSeqPlaylistItem Create(ByteChunk chunk)
         {
             var instance = new AkMusicRanSeqPlaylistItem();
 
             instance.SegmentID = chunk.ReadUInt32();
-            instance.playlistItemID = chunk.ReadInt32();
-            var NumChildren = chunk.ReadUInt32();
-            instance.eRSType = chunk.ReadUInt32();
+            instance.PlaylistItemID = chunk.ReadInt32();
+            var numChildren = chunk.ReadUInt32();
+            instance.ERSType = chunk.ReadUInt32();
             instance.Loop = chunk.ReadShort();
             instance.LoopMin = chunk.ReadShort();
             instance.LoopMax = chunk.ReadShort();
             instance.Weight = chunk.ReadUInt32();
-            instance.wAvoidRepeatCount = chunk.ReadUShort();
-            instance.bIsUsingWeight = chunk.ReadByte();
-            instance.bIsShuffle = chunk.ReadByte();
+            instance.WAvoidRepeatCount = chunk.ReadUShort();
+            instance.BIsUsingWeight = chunk.ReadByte();
+            instance.BIsShuffle = chunk.ReadByte();
 
-            for (var i = 0; i < NumChildren; i++)
-                instance.pPlayList.Add(Create(chunk));
+            for (var i = 0; i < numChildren; i++)
+                instance.PPlayList.Add(Create(chunk));
 
             return instance;
         }

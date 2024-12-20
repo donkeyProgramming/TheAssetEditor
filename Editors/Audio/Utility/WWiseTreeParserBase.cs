@@ -1,11 +1,11 @@
-﻿using Editors.Audio.AudioExplorer;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.WWise;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Editors.Audio.Utility
 {
@@ -13,19 +13,19 @@ namespace Editors.Audio.Utility
     {
         protected ILogger _logger = Logging.Create<WWiseTreeParserBase>();
 
-        protected Dictionary<HircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = new Dictionary<HircType, Action<HircItem, HircTreeItem>>();
-        protected readonly IAudioRepository _repository;
+        protected Dictionary<HircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = [];
+        protected readonly IAudioRepository Repository;
 
-        protected readonly bool _showId;
-        protected readonly bool _showOwningBnkFile;
-        protected readonly bool _filterByBnkName;
+        protected readonly bool ShowId;
+        protected readonly bool ShowOwningBnkFile;
+        protected readonly bool FilterByBnkName;
 
         public WWiseTreeParserBase(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
         {
-            _repository = repository;
-            _showId = showId;
-            _showOwningBnkFile = showOwningBnkFile;
-            _filterByBnkName = filterByBnkName;
+            Repository = repository;
+            ShowId = showId;
+            ShowOwningBnkFile = showOwningBnkFile;
+            FilterByBnkName = filterByBnkName;
         }
 
         public HircTreeItem BuildHierarchy(HircItem item)
@@ -43,11 +43,10 @@ namespace Editors.Audio.Utility
             var rootNode = BuildHierarchy(item);
 
             var flatList = GetHircParents(rootNode);
-            //flatList.Reverse();
             return flatList;
         }
 
-        List<HircTreeItem> GetHircParents(HircTreeItem root)
+        private static List<HircTreeItem> GetHircParents(HircTreeItem root)
         {
             var childData = new List<HircTreeItem>();
             if (root.Children != null)
@@ -60,13 +59,10 @@ namespace Editors.Audio.Utility
             return childData;
         }
 
-
-        void ProcessHircObject(HircItem item, HircTreeItem parent)
+        private void ProcessHircObject(HircItem item, HircTreeItem parent)
         {
             if (_hircProcessChildMap.TryGetValue(item.Type, out var func))
-            {
                 func(item, parent);
-            }
             else
             {
                 var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.Type} for Id {item.Id} in {item.OwnerFile}", Item = item };
@@ -80,7 +76,7 @@ namespace Editors.Audio.Utility
             if (hircId == 0)
                 return;
 
-            var instances = _repository.GetHircObject(hircId);
+            var instances = Repository.GetHircObject(hircId);
             var hircItem = instances.FirstOrDefault();
             if (hircItem == null)
                 parent.Children.Add(new HircTreeItem() { DisplayName = $"Error: Unable to find ID {hircId}" });
@@ -97,22 +93,21 @@ namespace Editors.Audio.Utility
 
         protected virtual string GetDisplayId(uint id, string fileName, bool hidenNameIfMissing)
         {
-            var name = _repository.GetNameFromHash(id, out var found);
+            var name = Repository.GetNameFromHash(id, out var found);
             if (hidenNameIfMissing)
                 name = "";
-            if (found == true && _showId)
+            if (found == true && ShowId)
                 name += " " + id;
-            if (_showOwningBnkFile && string.IsNullOrWhiteSpace(fileName) == false)
+            if (ShowOwningBnkFile && string.IsNullOrWhiteSpace(fileName) == false)
                 name += " " + fileName;
             return name;
         }
 
         protected string GetDisplayId(HircItem item, bool hidenNameIfMissing) => GetDisplayId(item.Id, item.OwnerFile, hidenNameIfMissing);
 
-        protected Wanted GetAsType<Wanted>(HircItem instance) where Wanted : class
+        protected static Wanted GetAsType<Wanted>(HircItem instance) where Wanted : class
         {
-            var wanted = instance as Wanted;
-            if (wanted == null)
+            if (instance is not Wanted wanted)
                 throw new Exception($"HircItem with ID {instance.Id} is of type {instance.GetType().Name} and cannot be converted to {typeof(Wanted).Name}.");
             return wanted;
         }

@@ -105,9 +105,7 @@ namespace Editors.Audio.Utility
 
                 Console.WriteLine(output);
                 if (!string.IsNullOrEmpty(error))
-                {
                     Console.Error.WriteLine(error);
-                }
             }
             catch (Exception ex)
             {
@@ -156,9 +154,7 @@ namespace Editors.Audio.Utility
                 }
             }
             else
-            {
                 Console.WriteLine($"The directory {excessFolderPath} does not exist.");
-            }
         }
 
         public static void InitialiseWwiseProject()
@@ -188,6 +184,5 @@ namespace Editors.Audio.Utility
             ZipFile.ExtractToDirectory(tempZipPath, wavToWemFolderPath, overwriteFiles: true);
             File.Delete(tempZipPath);
         }
-
     }
 }

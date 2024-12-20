@@ -6,7 +6,7 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
     public class AkDecisionTree
     {
         public Node Root { get; set; }
-        public static List<BinaryNode> flattenedTree;
+        public static List<BinaryNode> FlattenedTree;
 
         public class BinaryNode
         {
@@ -107,9 +107,7 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             childrenId += (ushort)childrenCount; // Incrementing the value in the caller's scope
 
             foreach (var child in node.Children)
-            {
                 UpdateChildrenData(child, ref childrenId); // Pass by reference
-            }
         }
 
         private static int CountNodeDescendants(Node node)
@@ -204,26 +202,26 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             Console.WriteLine($"======================= PRINTING CUSTOM DECISION TREE GRAPH =======================");
             PrintGraph(rootNode, 0);
 
-            flattenedTree = new List<BinaryNode>();
-            ConvertGraphToList(rootNode, flattenedTree, 0);
+            FlattenedTree = new List<BinaryNode>();
+            ConvertGraphToList(rootNode, FlattenedTree, 0);
 
             Console.WriteLine($"======================= PRINTING FLATTENED CUSTOM DECISION TREE =======================");
-            PrintBinaryNodes(flattenedTree, 0);
+            PrintBinaryNodes(FlattenedTree, 0);
 
-            return flattenedTree;
+            return FlattenedTree;
         }
 
         public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint uTreeDataSize)
         {
             // Produce initial flattenedTree
-            flattenedTree = new List<BinaryNode>();
+            FlattenedTree = new List<BinaryNode>();
             var numNodes = uTreeDataSize / BinaryNode.SerializationByteSize;
 
             foreach (var item in Enumerable.Range(0, (int)numNodes))
-                flattenedTree.Add(new BinaryNode(chunk));
+                FlattenedTree.Add(new BinaryNode(chunk));
 
             // Convert flattenedTree into a graph
-            Root = ConvertListToGraph(flattenedTree, maxTreeDepth, 0, 0, 0);
+            Root = ConvertListToGraph(FlattenedTree, maxTreeDepth, 0, 0, 0);
 
             // Sort nodes into order by ID at each depth level
             SortNodes(Root);
@@ -238,10 +236,10 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             //PrintGraph(Root, 0);
         }
 
-        public byte[] GetAsBytes()
+        public static byte[] GetAsBytes()
         {
             using var memStream = new MemoryStream();
-            foreach (var binaryNode in flattenedTree)
+            foreach (var binaryNode in FlattenedTree)
             {
                 //Console.WriteLine($"Writing node: {binaryNode.Key}");
                 memStream.Write(ByteParsers.UInt32.EncodeValue(binaryNode.Key ?? 0, out _), 0, 4);

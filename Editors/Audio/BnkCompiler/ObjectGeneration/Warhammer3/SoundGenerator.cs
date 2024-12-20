@@ -1,13 +1,12 @@
-﻿using CommunityToolkit.Diagnostics;
-using Shared.Core.PackFiles;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CommunityToolkit.Diagnostics;
+using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Shared.Core.PackFiles;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc.V136;
-using Editors.Audio.BnkCompiler;
-using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -16,11 +15,11 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(Sound);
 
-        private readonly IPackFileService _pfs;
+        private readonly IPackFileService _packFileService;
 
-        public SoundGenerator(IPackFileService pfs)
+        public SoundGenerator(IPackFileService packfileService)
         {
-            _pfs = pfs;
+            _packFileService = packfileService;
         }
 
         public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
@@ -33,7 +32,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public CAkSound_v136 ConvertToWWise(Sound inputSound, CompilerData project)
         {
             var filePath = inputSound.FilePath;
-            var file = _pfs.FindFile(filePath);
+            var file = _packFileService.FindFile(filePath);
             var nodeBaseParams = NodeBaseParams.CreateDefault();
             var wavFile = Path.GetFileName(filePath);
             var wavFileName = wavFile.Replace(".wem", "");
@@ -49,8 +48,8 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                     akMediaInformation = new AkMediaInformation()
                     {
                         SourceId = uint.Parse(wavFileName),
-                        uInMemoryMediaSize = (uint)file.DataSource.Size,
-                        uSourceBits = 0x01,
+                        UInMemoryMediaSize = (uint)file.DataSource.Size,
+                        USourceBits = 0x01,
                     }
                 },
                 NodeBaseParams = nodeBaseParams
@@ -60,7 +59,6 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
             // Applying attenuation directly to sounds is necessary as they don't appear to use the vanilla mixer's attenuation even though they're being routed through it.
             var attenuationId = inputSound.Attenuation;
-
             if (attenuationId != 0)
             {
                 wwiseSound.NodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle()
@@ -73,7 +71,6 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             }
 
             wwiseSound.UpdateSize();
-
             return wwiseSound;
         }
 

@@ -74,7 +74,7 @@ namespace Editors.Audio.Utility
 
         protected override string GetDisplayId(uint id, string fileName, bool hidenNameIfMissing)
         {
-            var name = _repository.GetNameFromHash(id, out var found);
+            var name = Repository.GetNameFromHash(id, out var found);
             if (found)
                 return $"'{name}' with ID[{id}] in {fileName}";
             else
@@ -83,7 +83,7 @@ namespace Editors.Audio.Utility
 
         string GetParentInfo(uint id)
         {
-            var name = _repository.GetNameFromHash(id, out var found);
+            var name = Repository.GetNameFromHash(id, out var found);
             if (found)
                 return $"has parent '{name}' with ID[{id}]";
             else

@@ -14,7 +14,7 @@ namespace Shared.GameFormats.WWise.Hirc.V112
         }
 
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
-        public uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
+        public uint GetSourceId() => AkBankSourceData.AkMediaInformation.SourceId;
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
@@ -27,8 +27,8 @@ namespace Shared.GameFormats.WWise.Hirc.V112
         public ushort PluginId_company { get; set; }
         public SourceType StreamType { get; set; }
 
-        public AkMediaInformation akMediaInformation { get; set; }
-        public uint uSize { get; set; }
+        public AkMediaInformation AkMediaInformation { get; set; }
+        public uint USize { get; set; }
         public static AkBankSourceData Create(ByteChunk chunk)
         {
             var output = new AkBankSourceData()
@@ -49,14 +49,13 @@ namespace Shared.GameFormats.WWise.Hirc.V112
             }
 
             if (output.PluginId_type == 0x02)
-                output.uSize = chunk.ReadUInt32();
+                output.USize = chunk.ReadUInt32();
 
-            output.akMediaInformation = AkMediaInformation.Create(chunk, output.StreamType);
+            output.AkMediaInformation = AkMediaInformation.Create(chunk, output.StreamType);
 
             return output;
         }
     }
-
 
     public class AkMediaInformation
     {

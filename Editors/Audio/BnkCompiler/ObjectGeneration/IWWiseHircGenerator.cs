@@ -1,6 +1,5 @@
-﻿using Editors.Audio.BnkCompiler;
+﻿using System;
 using Shared.GameFormats.WWise;
-using System;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {
