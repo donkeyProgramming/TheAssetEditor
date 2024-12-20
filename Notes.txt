@@ -1,5 +1,5 @@
 Fixes for v056
-	General: Double clicking nodes does not expand them
+
 	General: Move resent files out of settings
 	General: Save Active pack button https://github.com/donkeyProgramming/TheAssetEditor/issues/123
 	General: Wem files, load them but hide in tree view. To avoid files go missing on save later.
@@ -10,33 +10,12 @@ Fixes for v056
 	GameWorld:Move bloomeffect to resourcelib
 	GameWorld: ONly render glow if there is glow stuff in the pass 
 	GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
-	GameWorld: Resizing window to small causes crash
 	
 	KitbashTool: Manual vertex editor for weights 
 	KitbashTool: Reduce icon size?
 	KitbashTool: when loading material - if not supported show message
 	KitbashTool: Issues with rendering/selection and pivot point
 	KitbashTool: When there is no files left in a reference mesh - close the node 
-	
-	////
-	  internal sealed class ServiceProviderEngineScope : IServiceScope, IServiceProvider, IKeyedServiceProvider, IAsyncDisposable, IServiceScopeFactory
-	+		_scopes[owner]	ServiceDescriptors = 364, IsScope = true, Disposed = true	Microsoft.Extensions.DependencyInjection.IServiceScope {Microsoft.Extensions.DependencyInjection.ServiceLookup.ServiceProviderEngineScope}
-
-	...
-	Createpackfile with no name - crash
-	
-	done | Fix dobile clicki
-	done | Editable node context missing / unit test
-	done | Logging for SendNodeSelectionEvent
-	
-	dont make an extra game wordl! / Move static init to other class 
-	Force delete game and events. Global events as well? 
-	
-	
-	Log all scopes / give them id and keep ref for ever
-	Increase log to 150 lines
-	For logger, get all scopes
-	For logger, include scope ID in statement
 	
 Bugs:
 	KitbashTool: Node clicking in tree view is slow
@@ -90,6 +69,11 @@ Improvements:
 	General: Support napoleon format
 	KitbashTool: More materials
 	KitbashTool: Orthographic projection
+	General: Improve logging to contain scope info
+		Log all scopes / give them id and keep ref for ever
+		Increase log to 150 lines
+		For logger, get all scopes
+		For logger, include scope ID in statement
 	
 New features:
 	KitbashTool: Add editor for attachmentpoints for meshes. 
@@ -101,8 +85,16 @@ New features:
 	Tool for editing prefabs
 	
 	
-	
-	
+Fixes for v056:
+	[Bug] General: Double clicking a packfile node did not expand it correctly
+	[Bug] General: "Make editable pack" option missing from context menu
+	[Bug] General: Fix crash when resize window to very small
+	[Bug] General: Fix issue related to making packfiles with no name
+	[Bug] General: Fix issue with missing font on close 
+	[Bug] General: Fix issue related to selection change event on application close 
+	[Bug] KitbashEditor: Fixed event issue related to selection in SceneNodeExplorer
+
+
 Fixes for v055:
 	[Feature]General: Pin tool is improved and now has the SkinWrap rigging enabled again.
 
