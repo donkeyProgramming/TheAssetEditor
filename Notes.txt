@@ -18,12 +18,21 @@ Fixes for v056
 	KitbashTool: Issues with rendering/selection and pivot point
 	KitbashTool: When there is no files left in a reference mesh - close the node 
 	
-	Fix dobile clicki
-	Editable node context missing / unit test
+	////
+	  internal sealed class ServiceProviderEngineScope : IServiceScope, IServiceProvider, IKeyedServiceProvider, IAsyncDisposable, IServiceScopeFactory
+	+		_scopes[owner]	ServiceDescriptors = 364, IsScope = true, Disposed = true	Microsoft.Extensions.DependencyInjection.IServiceScope {Microsoft.Extensions.DependencyInjection.ServiceLookup.ServiceProviderEngineScope}
+
+	...
+	Createpackfile with no name - crash
+	
+	done | Fix dobile clicki
+	done | Editable node context missing / unit test
+	done | Logging for SendNodeSelectionEvent
+	
 	dont make an extra game wordl! / Move static init to other class 
 	Force delete game and events. Global events as well? 
 	
-	Logging for SendNodeSelectionEvent
+	
 	Log all scopes / give them id and keep ref for ever
 	Increase log to 150 lines
 	For logger, get all scopes

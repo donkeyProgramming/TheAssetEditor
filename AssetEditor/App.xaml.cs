@@ -39,8 +39,8 @@ namespace AssetEditor
             settingsService.Load();
 
             // Init 3d world
-            var gameWorld = _serviceProvider.GetRequiredService<IWpfGame>();
-            gameWorld.ForceEnsureCreated();
+            //var gameWorld = _serviceProvider.GetRequiredService<IWpfGame>();
+            //gameWorld.ForceEnsureCreated();
 
             // Show the settings window if its the first time the tool is ran
             if (settingsService.CurrentSettings.IsFirstTimeStartingApplication)

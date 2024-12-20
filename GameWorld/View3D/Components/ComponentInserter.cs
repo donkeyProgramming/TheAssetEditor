@@ -22,6 +22,7 @@ namespace GameWorld.Core.Components
 
         public void Execute()
         {
+            _wpfGame.ForceEnsureCreated();
             foreach (var component in _components)
                 _wpfGame.AddComponent(component);
         }
