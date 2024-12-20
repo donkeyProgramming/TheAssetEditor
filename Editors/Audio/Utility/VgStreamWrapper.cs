@@ -11,11 +11,11 @@ namespace Editors.Audio.Utility
 {
     public class VgStreamWrapper
     {
-        ILogger _logger = Logging.Create<VgStreamWrapper>();
+        readonly ILogger _logger = Logging.Create<VgStreamWrapper>();
 
-        string VgStreamFolderName => $"{DirectoryHelper.Temp}\\VgStream";
-        string AudioFolderName => $"{DirectoryHelper.Temp}\\Audio";
-        void EnsureCreated() => GetCliPath();
+        private static string VgStreamFolderName => $"{DirectoryHelper.Temp}\\VgStream";
+        private static string AudioFolderName => $"{DirectoryHelper.Temp}\\Audio";
+        static void EnsureCreated() => GetCliPath();
 
         public VgStreamWrapper()
         {
@@ -29,15 +29,15 @@ namespace Editors.Audio.Utility
             }
         }
 
-        public Result<string> ConvertFromWem(string fileNameWithoutExtention, byte[] wemBytes)
+        public Result<string> ConvertWemToWav(string fileNameWithoutExtension, byte[] wemBytes)
         {
             Guard.IsNotNull(wemBytes);
-            Guard.IsNotNullOrEmpty(fileNameWithoutExtention);
+            Guard.IsNotNullOrEmpty(fileNameWithoutExtension);
 
-            var wemName = $"{AudioFolderName}\\{fileNameWithoutExtention}.wem";
-            var wavName = $"{AudioFolderName}\\{fileNameWithoutExtention}.wav";
+            var wemName = $"{AudioFolderName}\\{fileNameWithoutExtension}.wem";
+            var wavName = $"{AudioFolderName}\\{fileNameWithoutExtension}.wav";
 
-            _logger.Here().Information($"Trying to export sound '{fileNameWithoutExtention}' - {wemBytes.Length} bytes");
+            _logger.Here().Information($"Trying to export sound '{fileNameWithoutExtension}' - {wemBytes.Length} bytes");
 
             var exportResult = ExportFile(wemName, wemBytes);
             if (exportResult.Failed)
@@ -76,6 +76,7 @@ namespace Editors.Audio.Utility
                     return Result<string>.FromError("VgSteam", $"Failed to convert file - File {outputSoundFilePath} no found on disk");
                 return Result<string>.FromOk(outputSoundFilePath);
             }
+
             catch (Exception e)
             {
                 _logger.Here().Error(e.Message);
@@ -83,7 +84,7 @@ namespace Editors.Audio.Utility
             }
         }
 
-        Result<bool> ExportFile(string filePath, byte[] bytes)
+        private Result<bool> ExportFile(string filePath, byte[] bytes)
         {
             try
             {
@@ -99,7 +100,7 @@ namespace Editors.Audio.Utility
             }
         }
 
-        string GetCliPath()
+        private static string GetCliPath()
         {
             DirectoryHelper.EnsureCreated(VgStreamFolderName);
             DirectoryHelper.EnsureCreated(AudioFolderName);
@@ -121,7 +122,6 @@ namespace Editors.Audio.Utility
                 var outputFileName = $"{VgStreamFolderName}\\{fileName}";
 
                 using var resourceStream = assembly.GetManifestResourceStream(file);
-
                 if (resourceStream == null)
                     throw new Exception($"Failed to retrieve resource stream for {file}");
 
@@ -131,7 +131,5 @@ namespace Editors.Audio.Utility
 
             return vgStreamCli;
         }
-
-
     }
 }

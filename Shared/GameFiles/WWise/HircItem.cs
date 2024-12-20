@@ -10,6 +10,7 @@ namespace Shared.GameFormats.WWise
 
         public static readonly uint HircHeaderSize = 4; // 2x uint. Type is not included for some reason
         public string OwnerFile { get; set; } = "OwnerFile Not Set";
+        public bool IsCaHircItem { get; set; }
         public uint ByteIndexInFile { get; set; }
         public bool HasError { get; set; } = true;
 

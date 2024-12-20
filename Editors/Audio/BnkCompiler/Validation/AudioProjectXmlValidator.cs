@@ -1,11 +1,10 @@
-﻿using FluentValidation;
-using Shared.Core.PackFiles;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.BnkCompiler;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using FluentValidation;
+using Shared.Core.PackFiles;
 
 namespace Editors.Audio.BnkCompiler.Validation
 {
@@ -26,7 +25,7 @@ namespace Editors.Audio.BnkCompiler.Validation
             RuleFor(x => x).Custom((projectFile, context) => ValidateUniqeIds(projectXml, context));
         }
 
-        void ValidateUniqeIds(CompilerData projectXml, ValidationContext<CompilerData> context)
+        private static void ValidateUniqeIds(CompilerData projectXml, ValidationContext<CompilerData> context)
         {
             var allIds = GetAllItems(projectXml)
              .Select(x => x.Id)
@@ -43,8 +42,7 @@ namespace Editors.Audio.BnkCompiler.Validation
         }
 
         // Check for unreferenced ids
-
-        List<IAudioProjectHircItem> GetAllItems(CompilerData projectXml)
+        private static List<IAudioProjectHircItem> GetAllItems(CompilerData projectXml)
         {
             var output = new List<IAudioProjectHircItem>();
             output.AddRange(projectXml.Actions);
@@ -72,24 +70,22 @@ namespace Editors.Audio.BnkCompiler.Validation
                 });
         }
 
-        private bool ValidateActionReference(uint actionId, List<IAudioProjectHircItem> allItems) => allItems.Any(x => x.Id == actionId && x is Action);   // Can only point to actions! 
+        private static bool ValidateActionReference(uint actionId, List<IAudioProjectHircItem> allItems) => allItems.Any(x => x.Id == actionId && x is Action);   // Can only point to actions! 
     }
 
     public class ActionValidator : AbstractValidator<Action>
     {
-        private readonly List<string> ValidActionTypes = new List<string>() { "Play" };
+        private readonly List<string> _validActionTypes = ["Play"];
 
         public ActionValidator(List<IAudioProjectHircItem> allItems)
         {
             RuleFor(x => x.Id).NotEmpty().WithMessage("Item is missing ID");
-            //RuleFor(x => x.ChildId).Must(x => ValidateChildReference(x, allItems)).WithMessage($"ActionChild has invalid reference");
             RuleFor(x => x.Type)
                 .NotEmpty().WithMessage("ActionChild has no type")
-                .Must(ValidateChildActionType).WithMessage(x => $"ActionChild has invalid type '{x.Type}'. Valid values are {string.Join(", ", ValidActionTypes)}");
+                .Must(ValidateChildActionType).WithMessage(x => $"ActionChild has invalid type '{x.Type}'. Valid values are {string.Join(", ", _validActionTypes)}");
         }
 
-        private bool ValidateChildReference(uint id, List<IAudioProjectHircItem> allItems) => allItems.Any(x => x.Id == id);
-        private bool ValidateChildActionType(string childType) => ValidActionTypes.Contains(childType, StringComparer.InvariantCultureIgnoreCase);
+        private bool ValidateChildActionType(string childType) => _validActionTypes.Contains(childType, StringComparer.InvariantCultureIgnoreCase);
     }
 
     public class GameSoundValidator : AbstractValidator<Sound>

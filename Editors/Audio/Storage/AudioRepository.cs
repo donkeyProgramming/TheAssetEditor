@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using Shared.GameFormats.Dat;
 using Shared.GameFormats.WWise;
@@ -17,7 +16,6 @@ namespace Editors.Audio.Storage
         Dictionary<string, List<string>> StateGroupsWithStates { get; }
         Dictionary<uint, List<HircItem>> HircObjects { get; }
 
-
         void ExportNameListToFile(string outputDirectory, bool includeIds = false);
         List<T> GetAllOfType<T>() where T : HircItem;
         List<HircItem> GetHircObject(uint id);
@@ -25,17 +23,17 @@ namespace Editors.Audio.Storage
         string GetNameFromHash(uint value);
         string GetNameFromHash(uint value, out bool found);
         string GetNameFromHash(uint? key);
-        string GetOwnerFileFromDialogueEvent(uint id, bool removeFileType = false);
+        string GetOwnerFileFromDialogueEvent(uint id);
     }
 
     public class AudioRepository : IAudioRepository
     {
-        public Dictionary<uint, string> NameLookUpTable { get; private set; } = new Dictionary<uint, string>();
-        public List<SoundDatFile.DatDialogueEventsWithStateGroups> DatDialogueEventsWithStateGroups { get; private set; } = new List<SoundDatFile.DatDialogueEventsWithStateGroups>();
-        public List<SoundDatFile.DatStateGroupsWithStates> DatStateGroupsWithStates { get; private set; } = new List<SoundDatFile.DatStateGroupsWithStates>();
+        public Dictionary<uint, string> NameLookUpTable { get; private set; } = [];
+        public List<SoundDatFile.DatDialogueEventsWithStateGroups> DatDialogueEventsWithStateGroups { get; private set; } = [];
+        public List<SoundDatFile.DatStateGroupsWithStates> DatStateGroupsWithStates { get; private set; } = [];
         public Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; private set; }
         public Dictionary<string, List<string>> StateGroupsWithStates { get; private set; }
-        public Dictionary<uint, List<HircItem>> HircObjects { get; private set; } = new Dictionary<uint, List<HircItem>>();
+        public Dictionary<uint, List<HircItem>> HircObjects { get; private set; } = [];
 
 
         public AudioRepository(RepositoryProvider provider)
@@ -109,25 +107,22 @@ namespace Editors.Audio.Storage
                 throw new System.NotImplementedException();
         }
 
-        public string GetOwnerFileFromDialogueEvent(uint id, bool removeFileType = false)
+        public string GetOwnerFileFromDialogueEvent(uint id)
         {
-            // Check if the dictionary contains the key first
             if (HircObjects.TryGetValue(id, out var hircItemList))
             {
                 foreach (var hircItem in hircItemList)
                 {
-                    if (hircItem.Type == HircType.Dialogue_Event && hircItem.Id == id)
+                    if (hircItem.Type == HircType.Dialogue_Event && hircItem.Id == id && hircItem.IsCaHircItem)
                     {
                         var file = Path.GetFileName(hircItem.OwnerFile);
-
-                        if (removeFileType)
-                            file = Path.GetFileNameWithoutExtension(file);
+                        file = Path.GetFileNameWithoutExtension(file);
+                        file = file.Replace("__core", string.Empty);
 
                         return file;
                     }
                 }
             }
-
             return null;
         }
 
@@ -160,9 +155,7 @@ namespace Editors.Audio.Storage
                     StateGroupsWithStates[stateGroup.StateGroupName] = new List<string>();
 
                 foreach (var state in stateGroup.States)
-                {
                     StateGroupsWithStates[stateGroup.StateGroupName].Add(state);
-                }
             }
         }
     }

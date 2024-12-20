@@ -20,7 +20,7 @@ namespace Shared.GameFormats.WWise
         {
         }
 
-        public ParsedBnkFile Parse(PackFile file, string fullName)
+        public ParsedBnkFile Parse(PackFile file, string fullName, bool isCaHircItem)
         {
             var chunk = file.DataSource.ReadDataAsChunk();
             var parsedBnkFile = new ParsedBnkFile();
@@ -34,7 +34,7 @@ namespace Shared.GameFormats.WWise
                 if (WWiseObjectHeaders.BKHD == chunckHeader.Tag)
                     parsedBnkFile.Header = LoadHeader(fullName, chunk);
                 else if (WWiseObjectHeaders.HIRC == chunckHeader.Tag)
-                    parsedBnkFile.HircChuck = LoadHircs(fullName, chunk, chunckHeader.ChunkSize, parsedBnkFile.Header.dwBankGeneratorVersion);
+                    parsedBnkFile.HircChuck = LoadHircs(fullName, chunk, chunckHeader.ChunkSize, parsedBnkFile.Header.dwBankGeneratorVersion, isCaHircItem);
                 else if (WWiseObjectHeaders.DIDX == chunckHeader.Tag)
                     parsedBnkFile.DidxChunk = LoadDidx(fullName, chunk);
                 else if (WWiseObjectHeaders.DATA == chunckHeader.Tag)
@@ -58,9 +58,9 @@ namespace Shared.GameFormats.WWise
 
         BkhdHeader LoadHeader(string fullName, ByteChunk chunk) => _bkhdParser.Parse(fullName, chunk);
 
-        HircChunk LoadHircs(string fullName, ByteChunk chunk, uint chunkHeaderSize, uint bnkVersion)
+        private HircChunk LoadHircs(string fullName, ByteChunk chunk, uint chunkHeaderSize, uint bnkVersion, bool isCaHircItem)
         {
-            var hircData = _hircParser.Parse(fullName, chunk, bnkVersion);
+            var hircData = _hircParser.Parse(fullName, chunk, bnkVersion, isCaHircItem);
 
             var hircSizes = hircData.Hircs.Sum(x => x.Size);
             var expectedHircChuckSize = hircSizes + hircData.NumHircItems * 5 + 4;
