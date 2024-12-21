@@ -94,7 +94,6 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
         [Test]
         [TestCase(GameTypeEnum.Troy)]
         [TestCase(GameTypeEnum.Warhammer2)]
-        [TestCase(GameTypeEnum.Pharaoh)]
         public void GenerateWsMaterial(GameTypeEnum gameType)
         {
             // Arrange
@@ -120,6 +119,35 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             Assert.That(generatedMaterial.Textures[TextureType.Diffuse], Is.EqualTo($"texturePath/wsmodel/{TextureType.Diffuse}.dds"));
             Assert.That(generatedMaterial.Textures[TextureType.Normal], Is.EqualTo($"texturePath/wsmodel/{TextureType.Normal}.dds"));
             Assert.That(generatedMaterial.Textures[TextureType.Mask], Is.EqualTo($"texturePath/wsmodel/{TextureType.Mask}.dds"));
+        }
+        [Test]
+        [TestCase(GameTypeEnum.Pharaoh)]
+        public void GenerateWsMaterialPharaoh(GameTypeEnum gameType)
+        {
+            //Arrange
+            var wsMaterial = GetWsModelFile();
+
+            //Act
+            var material = GetMaterialFactory(gameType).Create(null, wsMaterial);
+            var serializer = CreateWsMaterialSerializer(gameType);
+            var wsMaterialPath = serializer.ProsessMaterial("custompath/materials", "mymesh", UiVertexFormat.Cinematic, material);
+            var packfile = _pfs.FindFile(wsMaterialPath);
+            var generatedMaterial = new WsModelMaterialFile(packfile);
+
+            // Assert
+            Assert.That(generatedMaterial.VertexType, Is.EqualTo(UiVertexFormat.Cinematic));
+            Assert.That(generatedMaterial.Alpha, Is.EqualTo(false));
+
+            Assert.That(generatedMaterial.ShaderPath, Is.EqualTo("shaders/system/weighted_standard_4.xml.shader"));
+            Assert.That(generatedMaterial.Name, Is.EqualTo("mymesh_weighted_standard_4.xml"));
+
+            Assert.That(generatedMaterial.Textures[TextureType.Specular], Is.EqualTo($"texturePath/wsmodel/{TextureType.Specular}.dds"));
+            if (gameType != GameTypeEnum.Pharaoh)
+                Assert.That(generatedMaterial.Textures[TextureType.Gloss], Is.EqualTo($"texturePath/wsmodel/{TextureType.Gloss}.dds"));
+            Assert.That(generatedMaterial.Textures[TextureType.Diffuse], Is.EqualTo($"texturePath/wsmodel/{TextureType.Diffuse}.dds"));
+            Assert.That(generatedMaterial.Textures[TextureType.Normal], Is.EqualTo($"texturePath/wsmodel/{TextureType.Normal}.dds"));
+            Assert.That(generatedMaterial.Textures[TextureType.Mask], Is.EqualTo($"texturePath/wsmodel/{TextureType.Mask}.dds"));
+
         }
 
         [Test]
