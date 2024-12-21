@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
-using GameWorld.Core.Rendering.Materials.Serialization;
-using GameWorld.Core.Rendering.Materials.Capabilities;
+﻿using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Rendering.Materials.Shaders;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
-using System.Diagnostics.Contracts;
 
 namespace Test.GameWorld.Core.WsMaterialTemplate
 {

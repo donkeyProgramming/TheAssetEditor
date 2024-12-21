@@ -72,7 +72,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
                 UiVertexFormat.Weighted => "weighted2",
                 _ => throw new Exception("Unknown vertex type")
             };
-            if (GameHint == GameTypeEnum.Pharaoh)
+            if (GameHint == GameTypeEnum.Pharaoh) //Pharaoh does not require alpha and the naming is different as well as the template
             {
                 materialVertexFormatStr = vertexFormat switch
                 {
@@ -81,7 +81,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
                     UiVertexFormat.Weighted => "weighted_standard_2",
                     _ => throw new Exception("Unknown vertex type")
                 };
-                fileName = $"{meshName}_{materialVertexFormatStr}.xml";
+                fileName = $"{meshName}_{materialVertexFormatStr}.xml";//no alpha attribute in template
                 AddAttribute("TEMPLATE_ATTR_FILE_NAME", fileName);
                 AddAttribute("TEMPLATE_ATTR_VERTEXTYPE", materialVertexFormatStr);
                 return $"{fileName}.material"; ;

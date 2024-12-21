@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GameWorld.Core.Rendering.Materials.Shaders;
+﻿using GameWorld.Core.Rendering.Materials.Shaders;
 using GameWorld.Core.Services;
 
 namespace Test.GameWorld.Core.WsMaterialTemplate
