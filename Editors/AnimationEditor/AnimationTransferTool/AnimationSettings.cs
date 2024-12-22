@@ -1,8 +1,9 @@
-﻿using Shared.Core.Misc;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.MathViews;
 using Shared.Ui.Common;
 
-namespace AnimationEditor.AnimationTransferTool
+namespace Editors.AnimationVisualEditors.AnimationTransferTool
 {
     public class AnimationSettings : NotifyPropertyChangedImpl
     {
@@ -17,8 +18,19 @@ namespace AnimationEditor.AnimationTransferTool
         public NotifyAttr<string> SavePrefix { get; set; } = new NotifyAttr<string>("prefix_");
 
         public ComboBox<uint> AnimationOutputFormat { get; set; } = new ComboBox<uint>(new uint[] { 5, 6, 7 }, 7);
-
     }
+
+
+    public partial class AnimationGenerationSettings : ObservableObject
+    {
+        [ObservableProperty] float _skeletonScale = 1;
+        [ObservableProperty] float _animationSpeedMult = 1;
+        [ObservableProperty] bool _applyRelativeScale = true;
+        [ObservableProperty] bool _zeroUnmappedBones = false;
+    }
+
+
+
 
     //public enum MasterEnum
     //{ 

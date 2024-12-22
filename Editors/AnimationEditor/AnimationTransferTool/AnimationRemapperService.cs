@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Animation;
+﻿using Editors.AnimationVisualEditors.AnimationTransferTool;
+using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Ui.Editors.BoneMapping;

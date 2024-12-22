@@ -14,7 +14,9 @@
         <System:Double x:Key="labelWidth">100</System:Double>
     </UserControl.Resources>
 
-    <Expander IsExpanded="true" Visibility="{Binding IsControlVisible, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}" Margin="10,0,0,0">
+    <Expander IsExpanded="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+              IsEnabled="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+              Visibility="{Binding IsControlVisible, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}" Margin="10,0,0,0">
         <Expander.Header>
             <StackPanel Orientation="Horizontal">
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>

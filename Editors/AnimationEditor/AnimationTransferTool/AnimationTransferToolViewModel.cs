@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using CommonControls.SelectionListDialog;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.AnimationVisualEditors.AnimationTransferTool;
+using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
@@ -27,7 +30,62 @@ namespace AnimationEditor.AnimationTransferTool
     // Show scale factor in view for each bone 
 
 
-    public class AnimationTransferToolViewModel : EditorHostBase
+
+    public class BoneHandler
+    {
+        // Selected bone
+        // All bones array
+
+        // Send event => Updated
+
+        // Open mapping window
+
+    }
+
+    public class RenderHelper
+    { 
+        // uses boneHandler
+
+        // Draw selected bones
+
+        // Handle offset
+        // Draw on groud. Source, target, generated
+    
+    }
+
+    public class Configuration
+    { 
+        // Source skeleton
+        // Target skeleton
+
+        // Global scale
+        // Use Relaitve scale
+        // Zero unmapped bones
+        // Speed mult
+    
+    }
+
+
+    public class AnimationRegargeter
+    {
+        // uses BoneHandler to get data
+        // Outputes an animation
+
+    }
+
+    public class SaveHandler
+    {
+        // Used AnimationRegargeter
+
+        // Save
+        // Batch Save
+
+    }
+
+
+
+
+    public partial class AnimationTransferToolViewModel : EditorHostBase
     {
         AnimationToolInput _inputTargetData;
         AnimationToolInput _inputSourceData;
@@ -48,23 +106,34 @@ namespace AnimationEditor.AnimationTransferTool
         RemappedAnimatedBoneConfiguration _config;
         //AssetEditorWindow<BoneMappingViewModel> _activeBoneMappingWindow;
 
-        public FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
-        public ObservableCollection<SkeletonBoneNode> Bones { get; set; } = [];
-        public ObservableCollection<SkeletonBoneNode> FlatBoneList { get; set; } = [];
-        public AnimationSettings AnimationSettings { get; set; } = new AnimationSettings();
+        FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
+        ObservableCollection<SkeletonBoneNode> Bones { get; set; } = [];
+        ObservableCollection<SkeletonBoneNode> FlatBoneList { get; set; } = [];
+        AnimationSettings AnimationSettings { get; set; } = new AnimationSettings();
 
-        public NotifyAttr<SkeletonBoneNode> SelectedBone { get; set; } = new NotifyAttr<SkeletonBoneNode>();
+        NotifyAttr<SkeletonBoneNode> SelectedBone { get; set; } = new NotifyAttr<SkeletonBoneNode>();
+
+        //---
+
+        [ObservableProperty] BoneManager _boneManager;
+        //--
 
 
         public override Type EditorViewModelType => typeof(EditorView);
 
-        public AnimationTransferToolViewModel(IPackFileService pfs, IEditorHostParameters editorHostParameters,
+        public AnimationTransferToolViewModel(
+            BoneManager boneManager,
+
+            IPackFileService pfs, IEditorHostParameters editorHostParameters,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
             SceneObjectEditor assetViewModelBuilder,
             IFileSaveService packFileSaveService) : base(editorHostParameters)
         {
+
+            _boneManager = boneManager;
+
 
             DisplayName = "Animation transfer tool";
 
@@ -102,7 +171,14 @@ namespace AnimationEditor.AnimationTransferTool
 
             var target = _sceneObjectViewModelBuilder.CreateAsset(true, "Target", Color.Black, _inputTargetData);
             var source = _sceneObjectViewModelBuilder.CreateAsset(true, "Source", Color.Black, _inputSourceData);
-            var generated = _assetViewModelBuilder.CreateAsset("Generated", Color.Black);
+            var sourceView = _sceneObjectViewModelBuilder.CreateAsset(true, "Generated", Color.Black, null);
+            sourceView.Data.IsSelectable = false;
+            sourceView.IsExpand = false;
+            sourceView.IsEnabled = false;
+            //sourceView.
+
+
+            var generated = sourceView.Data;// _assetViewModelBuilder.CreateAsset("", Color.Black);
 
             source.Data.IsSelectable = false;
 
@@ -111,6 +187,9 @@ namespace AnimationEditor.AnimationTransferTool
 
             SceneObjects.Add(target);
             SceneObjects.Add(source);
+            SceneObjects.Add(sourceView);
+
+            BoneManager.SetSceneNodes(source.Data, target.Data);
         }
 
 
@@ -130,6 +209,9 @@ namespace AnimationEditor.AnimationTransferTool
                 CopyFromSkeletonChanged(_copyFrom.Skeleton);
             AnimationSettings.DisplayOffset.OnValueChanged += DisplayOffset_OnValueChanged;
             DisplayOffset_OnValueChanged(new Vector3ViewModel(0, 0, 2));
+
+            BoneManager.UpdateSourceSkeleton(_copyFrom.Skeleton.SkeletonName);
+            BoneManager.UpdateTargetSkeleton(_copyTo.Skeleton.SkeletonName);
         }
 
         private void DisplayOffset_OnValueChanged(Vector3ViewModel newValue)
@@ -188,47 +270,47 @@ namespace AnimationEditor.AnimationTransferTool
 
         public void OpenMappingWindow()
         {
-            //if (_activeBoneMappingWindow != null)
-            //{
-            //    _activeBoneMappingWindow.Focus();
-            //    return;
-            //}
-
-            if (_copyTo.Skeleton == null || _copyFrom.Skeleton == null)
-            {
-                MessageBox.Show("Source or target skeleton not selected", "Error");
-                return;
-            }
-
-            var targetSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_copyTo.SkeletonName.Value);
-            var sourceSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_copyFrom.SkeletonName.Value);
-
-            if (_config == null)
-            {
-                _config = new RemappedAnimatedBoneConfiguration();
-                _config.MeshSkeletonName = _copyTo.SkeletonName.Value;
-                _config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(targetSkeleton);
-
-                _config.ParnetModelSkeletonName = _copyFrom.SkeletonName.Value;
-                _config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(sourceSkeleton);
-                _config.SkeletonBoneHighlighter = new SkeletonBoneHighlighter(Generated, _copyFrom);
-            }
-           
-            //_activeBoneMappingWindow = _windowFactory.Create<BoneMappingViewModel, BoneMappingView>("Bone-Mapping", 1200, 1100);
-            //_activeBoneMappingWindow.TypedContext.Initialize(_activeBoneMappingWindow, _config);
-            //var windowResult = _activeBoneMappingWindow.ShowWindow(true);
-            //if (windowResult == true)
-            //{
-            //    _remappingInformation = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
-            //    UpdateAnimation();
-            //    UpdateBonesAfterMapping(Bones);
-            //}
-
-            // TODO
-            /* _activeBoneMappingWindow = new BoneMappingWindow(new BoneMappingViewModel(_config), false);
-             _activeBoneMappingWindow.Show();
-             _activeBoneMappingWindow.ApplySettings += BoneMappingWindow_Apply;
-             _activeBoneMappingWindow.Closed += BoneMappingWindow_Closed;*/
+           ////if (_activeBoneMappingWindow != null)
+           ////{
+           ////    _activeBoneMappingWindow.Focus();
+           ////    return;
+           ////}
+           //
+           //if (_copyTo.Skeleton == null || _copyFrom.Skeleton == null)
+           //{
+           //    MessageBox.Show("Source or target skeleton not selected", "Error");
+           //    return;
+           //}
+           //
+           //var targetSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_copyTo.SkeletonName.Value);
+           //var sourceSkeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(_copyFrom.SkeletonName.Value);
+           //
+           //if (_config == null)
+           //{
+           //    _config = new RemappedAnimatedBoneConfiguration();
+           //    _config.MeshSkeletonName = _copyTo.SkeletonName.Value;
+           //    _config.MeshBones = AnimatedBoneHelper.CreateFromSkeleton(targetSkeleton);
+           //
+           //    _config.ParnetModelSkeletonName = _copyFrom.SkeletonName.Value;
+           //    _config.ParentModelBones = AnimatedBoneHelper.CreateFromSkeleton(sourceSkeleton);
+           //    _config.SkeletonBoneHighlighter = new SkeletonBoneHighlighter(Generated, _copyFrom);
+           //}
+           //
+           ////_activeBoneMappingWindow = _windowFactory.Create<BoneMappingViewModel, BoneMappingView>("Bone-Mapping", 1200, 1100);
+           ////_activeBoneMappingWindow.TypedContext.Initialize(_activeBoneMappingWindow, _config);
+           ////var windowResult = _activeBoneMappingWindow.ShowWindow(true);
+           ////if (windowResult == true)
+           ////{
+           ////    _remappingInformation = AnimatedBoneHelper.BuildRemappingList(_config.MeshBones.First());
+           ////    UpdateAnimation();
+           ////    UpdateBonesAfterMapping(Bones);
+           ////}
+           //
+           //// TODO
+           ///* _activeBoneMappingWindow = new BoneMappingWindow(new BoneMappingViewModel(_config), false);
+           // _activeBoneMappingWindow.Show();
+           // _activeBoneMappingWindow.ApplySettings += BoneMappingWindow_Apply;
+           // _activeBoneMappingWindow.Closed += BoneMappingWindow_Closed;*/
         }
 
         //private void BoneMappingWindow_Apply(object sender, EventArgs e)
