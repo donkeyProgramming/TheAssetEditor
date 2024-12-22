@@ -22,7 +22,7 @@ namespace Editor.VisualSkeletonEditor.DevConfig
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-            currentSettings.LoadWemFiles = false;
+            currentSettings.ShowCAWemFiles = false;
             currentSettings.LoadCaPacksByDefault = false;
 
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Karl_and_celestialgeneral.pack";

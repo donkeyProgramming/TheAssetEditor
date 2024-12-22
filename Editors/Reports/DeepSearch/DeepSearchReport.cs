@@ -69,7 +69,7 @@ namespace Editors.Reports.DeepSearch
                       {
                           using (var reader = new BinaryReader(fileStram, Encoding.ASCII))
                           {
-                              var pfc = PackFileSerializer.Load(packFilePath, reader, false, new CaPackDuplicatePackFileResolver());
+                              var pfc = PackFileSerializer.Load(packFilePath, reader, new CaPackDuplicatePackFileResolver());
 
                               _logger.Here().Information($"Searching through packfile {currentIndex}/{files.Count} -  {packFilePath} {pfc.FileList.Count} files");
 

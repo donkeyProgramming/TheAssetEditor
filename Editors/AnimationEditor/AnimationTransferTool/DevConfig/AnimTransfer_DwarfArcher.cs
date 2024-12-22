@@ -22,7 +22,7 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool.DevConfig
         {
             currentSettings.LoadCaPacksByDefault = true;
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-            currentSettings.LoadWemFiles = false;
+            currentSettings.ShowCAWemFiles = false;
         }
 
         public void OpenFileOnLoad()

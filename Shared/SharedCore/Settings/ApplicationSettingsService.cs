@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 
@@ -21,7 +20,7 @@ namespace Shared.Core.Settings
         public List<GamePathPair> GameDirectories { get; set; } = [];
         public GameTypeEnum CurrentGame { get; set; } = GameTypeEnum.Warhammer3;
         public bool LoadCaPacksByDefault { get; set; } = true;
-        public bool LoadWemFiles { get; set; } = true;
+        public bool ShowCAWemFiles { get; set; } = false;
         public bool IsFirstTimeStartingApplication { get; set; } = true;
         public bool IsDeveloperRun { get; set; } = false;
         public string WwisePath { get; set; }

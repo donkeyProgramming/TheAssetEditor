@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Runtime.Intrinsics.Arm;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -88,7 +89,26 @@ namespace KitbasherEditor.Views
 
         private void MultiSelectTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var treeViewItem = ItemContainerGeneratorHelper.VisualUpwardSearch(e.OriginalSource as DependencyObject);
+            if (e.OriginalSource == null)
+            {
+                _logger.Here().Error("MultiSelectTreeView_PreviewMouseRightButtonDown: e.OriginalSource is null");
+                return;
+            }
+
+            var dp = e.OriginalSource as DependencyObject;
+            if (dp == null)
+            {
+                _logger.Here().Error($"MultiSelectTreeView_PreviewMouseRightButtonDown: e.OriginalSource is not a DependencyObject, its: {dp.GetType()}");
+                return;
+            }
+
+            var treeViewItem = ItemContainerGeneratorHelper.VisualUpwardSearch(dp);
+            if (treeViewItem == null)
+            {
+                _logger.Here().Error($"MultiSelectTreeView_PreviewMouseRightButtonDown: treeViewItem is null.");
+                return;
+            }
+
 
             if (treeViewItem.DataContext is SceneExplorerNode sceneNode)
             {

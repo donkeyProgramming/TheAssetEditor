@@ -302,6 +302,8 @@ namespace Shared.Core.PackFiles
             File.Move(path + "_temp", path);
 
             pf.OriginalLoadByteSize = new FileInfo(path).Length;
+
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerSavedEvent(pf));
         }
 
         public PackFileContainer? GetPackFileContainer(PackFile file)

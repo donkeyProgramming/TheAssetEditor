@@ -10,6 +10,7 @@ using Shared.Core.Events;
 using Shared.Core.Events.Global;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.Common;
 
@@ -22,6 +23,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
     {
         protected IPackFileService _packFileService;
         private readonly IEventHub? _eventHub;
+        private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IContextMenuBuilder _contextMenuBuilder;
 
         public event FileSelectedDelegate FileOpen;
@@ -35,10 +37,11 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         public bool ShowFoldersOnly { get; }
 
-        public PackFileBrowserViewModel(IContextMenuBuilder contextMenuBuilder, IPackFileService packFileService, IEventHub? eventHub, bool showCaFiles, bool showFoldersOnly)
+        public PackFileBrowserViewModel(ApplicationSettingsService applicationSettingsService, IContextMenuBuilder contextMenuBuilder, IPackFileService packFileService, IEventHub? eventHub, bool showCaFiles, bool showFoldersOnly)
         {
             _packFileService = packFileService;
             _eventHub = eventHub;
+            _applicationSettingsService = applicationSettingsService;
             _contextMenuBuilder = contextMenuBuilder;
 
             ShowFoldersOnly = showFoldersOnly;
@@ -49,9 +52,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             _eventHub?.Register<PackFileContainerFilesUpdatedEvent>(this, Database_PackFilesUpdated);
             _eventHub?.Register<PackFileContainerFilesAddedEvent>(this, x => AddFiles(x.Container, x.AddedFiles));
             _eventHub?.Register<PackFileContainerFilesRemovedEvent>(this, x => Database_PackFilesRemoved(x.Container, x.RemovedFiles));
-
             _eventHub?.Register<PackFileContainerFolderRemovedEvent>(this, x => Database_PackFileFolderRemoved(x.Container, x.Folder));
             _eventHub?.Register<PackFileContainerFolderRenamedEvent>(this, x => Database_PackFileFolderRenamed(x.Container, x.NewNodePath));
+            _eventHub?.Register<PackFileContainerSavedEvent>(this, ContainerSaved);
 
             Filter = new SearchFilter(Files);
             Filter.ShowFoldersOnly = ShowFoldersOnly;
@@ -67,6 +70,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
+
+
         partial void OnSelectedItemChanged(TreeNode value)
         {
             ContextMenu = _contextMenuBuilder.Build(value);
@@ -81,6 +86,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             var parent = nodeToDelete.Parent;
             parent.Children.Remove(nodeToDelete);
             nodeToDelete.RemoveSelf();
+
+            root.UnsavedChanged = true;
         }
 
         private void Database_PackFileFolderRenamed(PackFileContainer container, string folder)
@@ -91,8 +98,19 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             node.UnsavedChanged = true;
         }
 
+        private void ContainerSaved(PackFileContainerSavedEvent e)
+        {
+            var root = GetPackFileCollectionRootNode(e.Container);
+
+            root.UnsavedChanged = false;
+            root.ForeachNode((node) => node.UnsavedChanged = false);
+        }
+
         private void Database_PackFilesRemoved(PackFileContainer container, List<PackFile> files)
         {
+            var root = GetPackFileCollectionRootNode(container);
+            root.UnsavedChanged = true;
+
             foreach (var file in files)
             {
                 var node = GetNodeFromPackFile(container, file, false);
@@ -126,7 +144,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         [RelayCommand] protected virtual void OnDoubleClick(TreeNode node)
         {
-            // using command parmeter to get node causes memory leaks, using selected node for now
             if (SelectedItem != null)
             {
                 if (SelectedItem.GetNodeType() == NodeType.File)
@@ -155,6 +172,13 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             foreach (var item in files)
             {
+                if (container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false)
+                {
+                    var isWemFile = item.Name.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase);
+                    if (isWemFile)
+                        continue;
+                }
+
                 var fullPath = _packFileService.GetFullPath(item, container);
                 var numSeperators = fullPath.Count(x => x == Path.DirectorySeparatorChar);
 
@@ -193,7 +217,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
-        private static TreeNode GetNodeFromPath(TreeNode parent, PackFileContainer container, string path, bool createIfMissing = true)
+        private static TreeNode? GetNodeFromPath(TreeNode parent, PackFileContainer container, string path, bool createIfMissing = true)
         {
             var numSeperators = path.Count(x => x == Path.DirectorySeparatorChar);
             if (path.Length == 0)
@@ -224,7 +248,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             return null;
         }
 
-        private TreeNode GetPackFileCollectionRootNode(PackFileContainer container)
+        private TreeNode? GetPackFileCollectionRootNode(PackFileContainer container)
         {
             foreach (var child in Files)
             {
@@ -234,7 +258,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             return null;
         }
 
-        private TreeNode GetNodeFromPackFile(PackFileContainer container, PackFile pf, bool createIfMissing = true)
+        private TreeNode? GetNodeFromPackFile(PackFileContainer container, PackFile pf, bool createIfMissing = true)
         {
             var root = GetPackFileCollectionRootNode(container);
             var fullPath = _packFileService.GetFullPath(pf, container);
@@ -266,6 +290,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             foreach (var item in container.FileList)
             {
+                // Should we skip adding the file? 
+                if (container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false)
+                {
+                    var isWemFile = item.Key.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase);
+                    if (isWemFile)
+                        continue;
+                }
+
                 var fullPath = item.Key;
                 var pathParts = fullPath.Split(Path.DirectorySeparatorChar);
 

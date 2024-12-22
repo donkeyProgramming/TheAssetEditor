@@ -72,7 +72,7 @@ namespace Shared.Core.PackFiles
                 using var fileStream = File.OpenRead(packFileSystemPath);
                 using var reader = new BinaryReader(fileStream, Encoding.ASCII);
 
-                var container = PackFileSerializer.Load(packFileSystemPath, reader, _settingsService.CurrentSettings.LoadWemFiles, new CustomPackDuplicatePackFileResolver());
+                var container = PackFileSerializer.Load(packFileSystemPath, reader, new CustomPackDuplicatePackFileResolver());
 
                 return container;
             }
@@ -106,14 +106,13 @@ namespace Shared.Core.PackFiles
                         using var fileStram = File.OpenRead(path);
                         using var reader = new BinaryReader(fileStram, Encoding.ASCII);
 
-                        var pack = PackFileSerializer.Load(path, reader, _settingsService.CurrentSettings.LoadWemFiles, new CaPackDuplicatePackFileResolver());
+                        var pack = PackFileSerializer.Load(path, reader, new CaPackDuplicatePackFileResolver());
                         packList.Add(pack);
                     }
                     else
                     {
                         _logger.Here().Warning($"{gameName} pack file '{path}' not found, loading skipped");
                     }
-                
                 });
 
                 var caPackFileContainer = new PackFileContainer($"All Game Packs - {gameName}");

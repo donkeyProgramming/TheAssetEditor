@@ -22,7 +22,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.DevConfig
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
-            currentSettings.LoadWemFiles = true;
+            currentSettings.ShowCAWemFiles = true;
         }
 
         public void OpenFileOnLoad()

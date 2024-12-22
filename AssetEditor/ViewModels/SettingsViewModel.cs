@@ -6,7 +6,6 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.Settings;
 
@@ -26,11 +25,9 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private bool _startMaximised;
         [ObservableProperty] private GameTypeEnum _currentGame;
         [ObservableProperty] private bool _loadCaPacksByDefault;
-        [ObservableProperty] private bool _loadWemFiles;
+        [ObservableProperty] private bool _showCAWemFiles;
         [ObservableProperty] private string _wwisePath;
         [ObservableProperty] private bool _onlyLoadLod0ForReferenceMeshes;
-
-        public bool IsLoadWemFilesEnabled => LoadCaPacksByDefault;
 
         public SettingsViewModel(ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
         {
@@ -43,7 +40,7 @@ namespace AssetEditor.ViewModels
             Games = new ObservableCollection<GameTypeEnum>(gameInformationFactory.Games.OrderBy(g => g.DisplayName).Select(g => g.Type));
             CurrentGame = _settingsService.CurrentSettings.CurrentGame;
             LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
-            LoadWemFiles = _settingsService.CurrentSettings.LoadWemFiles;
+            ShowCAWemFiles = _settingsService.CurrentSettings.ShowCAWemFiles;
             OnlyLoadLod0ForReferenceMeshes = _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes;
             foreach (var game in gameInformationFactory.Games.OrderBy(g => g.DisplayName))
             {
@@ -58,12 +55,6 @@ namespace AssetEditor.ViewModels
             WwisePath = _settingsService.CurrentSettings.WwisePath;
         }
 
-        partial void OnLoadCaPacksByDefaultChanged(bool value)
-        {
-            OnPropertyChanged(nameof(IsLoadWemFilesEnabled));
-            if (value == false)
-                LoadWemFiles = value;
-        }
 
         [RelayCommand] private void Save()
         {
@@ -72,7 +63,7 @@ namespace AssetEditor.ViewModels
             _settingsService.CurrentSettings.StartMaximised = StartMaximised;
             _settingsService.CurrentSettings.CurrentGame = CurrentGame;
             _settingsService.CurrentSettings.LoadCaPacksByDefault = LoadCaPacksByDefault;
-            _settingsService.CurrentSettings.LoadWemFiles = LoadWemFiles;
+            _settingsService.CurrentSettings.ShowCAWemFiles = ShowCAWemFiles;
             _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes = OnlyLoadLod0ForReferenceMeshes;
             _settingsService.CurrentSettings.GameDirectories.Clear();
             foreach (var item in GameDirectores)

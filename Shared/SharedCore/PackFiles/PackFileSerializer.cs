@@ -25,7 +25,7 @@ namespace Shared.Core.PackFiles
     {
         static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileSerializer));
 
-        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, bool loadWemFiles, IDuplicatePackFileResolver dubplicatePackFileResolver)
+        public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IDuplicatePackFileResolver dubplicatePackFileResolver)
         {
             try
             {
@@ -68,35 +68,28 @@ namespace Shared.Core.PackFiles
                     var packFileName = Path.GetFileName(fullPackedFileName);
                     var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
 
-                    // Should we skip sound files? 
-                    var addFile = true;
-                    if (loadWemFiles == false)
-                        addFile = packFileName.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase) == false;
-
-                    if (addFile)
+                    if (dubplicatePackFileResolver.CheckForDuplicates)
                     {
-                        if (dubplicatePackFileResolver.CheckForDuplicates)
+                        var containsKey = output.FileList.ContainsKey(fullPackedFileName);
+                        if (containsKey)
                         {
-                            var containsKey = output.FileList.ContainsKey(fullPackedFileName);
-                            if (containsKey)
+                            if (dubplicatePackFileResolver.KeepDuplicateFile(fullPackedFileName))
                             {
-                                if (dubplicatePackFileResolver.KeepDuplicateFile(fullPackedFileName))
-                                {
-                                    _logger.Here().Warning($"Duplicate file found {fullPackedFileName}");
-                                    output.FileList.Add(fullPackedFileName + Guid.NewGuid().ToString(), fileContent);
-                                }
-                            }
-                            else
-                            {
-                                output.FileList.Add(fullPackedFileName, fileContent);
+                                _logger.Here().Warning($"Duplicate file found {fullPackedFileName}");
+                                output.FileList.Add(fullPackedFileName + Guid.NewGuid().ToString(), fileContent);
                             }
                         }
                         else
                         {
                             output.FileList.Add(fullPackedFileName, fileContent);
                         }
-
                     }
+                    else
+                    {
+                        output.FileList.Add(fullPackedFileName, fileContent);
+                    }
+
+                
                     offset += size;
                 }
 

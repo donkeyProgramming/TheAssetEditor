@@ -19,7 +19,7 @@ namespace Editors.Audio.DevConfig
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.LoadCaPacksByDefault = true;
-            currentSettings.LoadWemFiles = false;
+            currentSettings.ShowCAWemFiles = false;
         }
 
         public void OpenFileOnLoad()

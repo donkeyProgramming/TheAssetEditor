@@ -136,7 +136,7 @@ namespace Shared.GameFormats.Animation
             catch (Exception e)
             {
                 var logger = Logging.Create<AnimationFile>();
-                logger.Here().Information($"Loading animation failed: {file} Size:{data.Length} Error:\n{e.ToString()}");
+                logger.Here().Information($"Loading animation failed: {file} Size:{data.Length} Error:\n{e}");
                 throw;
             }
         }

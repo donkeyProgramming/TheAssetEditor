@@ -71,8 +71,8 @@
             <TextBlock Grid.Row="6" Grid.Column="0" Text="Load game files" Margin="5, 0, 0, 0"/>
             <CheckBox Grid.Row="6" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding LoadCaPacksByDefault, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <TextBlock Grid.Row="7" Grid.Column="0" Text="Load audio (.wem) files" Margin="5, 0, 0, 0"/>
-            <CheckBox Grid.Row="7" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding LoadWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsEnabled="{Binding IsLoadWemFilesEnabled}"/>
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Show CA audio (.wem) files" Margin="5, 0, 0, 0"/>
+            <CheckBox Grid.Row="7" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding ShowCAWemFiles, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
             <TextBlock Grid.Row="8" Grid.Column="0" Text="Only load Lod0 for Reference meshes" Margin="5, 0, 0, 0" ToolTip="When importing a reference mesh in the Kitbash tool, only import Lod0 in order to save memory."/>
             <CheckBox Grid.Row="8" Grid.Column="1" Margin="-1, 0, 0, 5" IsChecked="{Binding OnlyLoadLod0ForReferenceMeshes, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />

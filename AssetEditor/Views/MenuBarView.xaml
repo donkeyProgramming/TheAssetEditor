@@ -23,6 +23,8 @@
                 <MenuItem Header="New AnimPack (Three Kingdoms)" Command="{Binding MenuBar.CreateAnimPack3kCommand}"/>
 
                 <Separator/>
+                <MenuItem Header="Save active pack" Command="{Binding MenuBar.SaveActivePackCommand}"/>
+                <Separator/>
 
                 <MenuItem Header="Open Pack" Command="{Binding MenuBar.OpenPackFileCommand}"/>
 

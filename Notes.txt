@@ -7,6 +7,8 @@ Fixes for v056
 	General: Show hisotry of commands in exceptions
 	General: Close console window on close
 		
+	KitbashTool: Unit test - open karl, import general, make head editable, rerig, save 
+		
 	GameWorld:Move bloomeffect to resourcelib
 	GameWorld: ONly render glow if there is glow stuff in the pass 
 	GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
@@ -16,6 +18,9 @@ Fixes for v056
 	KitbashTool: when loading material - if not supported show message
 	KitbashTool: Issues with rendering/selection and pivot point
 	KitbashTool: When there is no files left in a reference mesh - close the node 
+	
+	
+	
 	
 Bugs:
 	KitbashTool: Node clicking in tree view is slow
@@ -43,6 +48,7 @@ Improvements:
 	KitbashTool: When loading textures that are custom, validate that they have MipMaps
 	General: Merge UI and shared! 
 	KitbashTool: Improve material system
+		For older games - just a singel material! Makes life easier. Show all texttures and attributes. Easy peazye!
 		interfaces and registeration and builders
 		Error if material fail, revert to default material 
 		good error logging, case for exception window 
