@@ -28,7 +28,6 @@
             var sortedFiles = FileList.OrderBy(x => x.Key, StringComparer.Ordinal).ToList();
             foreach (var file in sortedFiles)
             {
-
                 if (Header.Version == PackFileVersion.PFH5)
                     fileNamesOffset += 1;
                 if (Header.HasIndexWithTimeStamp)
@@ -84,8 +83,8 @@
                 var data = file.Value.DataSource.ReadData();
                 var offset = writer.BaseStream.Position;
                 var dataLength = data.Length;
-                file.Value.DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength);
-
+                var isEncrypted = Header.HasEncryptedData;
+                file.Value.DataSource = new PackedFileSource(packedFileSourceParent, offset, dataLength, isEncrypted);
                 writer.Write(data);
             }
         }

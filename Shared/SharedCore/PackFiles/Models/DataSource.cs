@@ -1,4 +1,5 @@
 ﻿using Shared.Core.ByteParsing;
+using static Shared.Core.PackFiles.PackFileDecryptor;
 
 namespace Shared.Core.PackFiles.Models
 {
@@ -8,6 +9,7 @@ namespace Shared.Core.PackFiles.Models
         PackFile,
         Memory
     }
+
     public interface IDataSource
     {
         long Size { get; }
@@ -20,26 +22,25 @@ namespace Shared.Core.PackFiles.Models
     {
         public long Size { get; private set; }
 
-        protected string filepath;
-        public FileSystemSource(string filepath)
-            : base()
+        protected string _filepath;
+
+        public FileSystemSource(string filepath) : base()
         {
             Size = new FileInfo(filepath).Length;
-            this.filepath = filepath;
+            this._filepath = filepath;
         }
+
         public byte[] ReadData()
         {
-            return File.ReadAllBytes(filepath);
+            return File.ReadAllBytes(_filepath);
         }
 
         public byte[] ReadData(int size)
         {
-            using (var reader = new BinaryReader(new FileStream(filepath, FileMode.Open)))
-            {
-                var output = new byte[size];
-                reader.Read(output, 0, size);
-                return output;
-            }
+            using var reader = new BinaryReader(new FileStream(_filepath, FileMode.Open));
+            var output = new byte[size];
+            reader.Read(output, 0, size);
+            return output;
         }
 
         public ByteChunk ReadDataAsChunk()
@@ -52,21 +53,23 @@ namespace Shared.Core.PackFiles.Models
     {
         public long Size { get; private set; }
 
-        private byte[] data;
+        private readonly byte[] _data;
+
         public MemorySource(byte[] data)
         {
             Size = data.Length;
-            this.data = data;
+            this._data = data;
         }
+
         public byte[] ReadData()
         {
-            return data;
+            return _data;
         }
 
         public byte[] ReadData(int size)
         {
             var output = new byte[size];
-            Array.Copy(data, 0, output, 0, size);
+            Array.Copy(_data, 0, output, 0, size);
             return output;
 
         }
@@ -83,39 +86,40 @@ namespace Shared.Core.PackFiles.Models
 
     public record PackedFileSource : IDataSource
     {
-        public long Size { get; private set; }
-
         public long Offset { get; private set; }
-
-        PackedFileSourceParent _parent;
-
+        public long Size { get; private set; }
+        public bool IsEncrypted { get; private set; }
         public PackedFileSourceParent Parent { get => _parent; }
 
-        public PackedFileSource(PackedFileSourceParent parent, long offset, long length)
+        private readonly PackedFileSourceParent _parent;
+
+        public PackedFileSource(PackedFileSourceParent parent, long offset, long length, bool isEncrypted)
         {
             Offset = offset;
             _parent = parent;
             Size = length;
+            IsEncrypted = isEncrypted;
         }
+
         public byte[] ReadData()
         {
             var data = new byte[Size];
-            using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                stream.Seek(Offset, SeekOrigin.Begin);
-                stream.Read(data, 0, data.Length);
-            }
+            using var stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            stream.Seek(Offset, SeekOrigin.Begin);
+            stream.ReadExactly(data);
+            if (IsEncrypted)
+                data = Decrypt(data);
             return data;
         }
 
         public byte[] ReadData(int size)
         {
             var data = new byte[size];
-            using (Stream stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                stream.Seek(Offset, SeekOrigin.Begin);
-                stream.Read(data, 0, size);
-            }
+            using var stream = File.Open(_parent.FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            stream.Seek(Offset, SeekOrigin.Begin);
+            stream.ReadExactly(data, 0, size);
+            if (IsEncrypted)
+                data = Decrypt(data);
             return data;
         }
 
@@ -123,7 +127,9 @@ namespace Shared.Core.PackFiles.Models
         {
             var data = new byte[Size];
             knownStream.Seek(Offset, SeekOrigin.Begin);
-            knownStream.Read(data, 0, (int)Size);
+            knownStream.ReadExactly(data, 0, (int)Size);
+            if (IsEncrypted)
+                data = Decrypt(data);
             return data;
         }
 
