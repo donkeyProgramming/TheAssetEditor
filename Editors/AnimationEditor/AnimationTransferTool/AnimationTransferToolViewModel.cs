@@ -93,7 +93,7 @@ namespace AnimationEditor.AnimationTransferTool
         private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly SceneObjectEditor _assetViewModelBuilder;
         private readonly IFileSaveService _packFileSaveService;
-        private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
+       // private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
         private readonly IPackFileService _pfs;
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly AnimationPlayerViewModel _player;

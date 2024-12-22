@@ -18,27 +18,27 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool.Saving
 {
     public partial class SaveViewModel : ObservableObject
     {
-        private readonly ILogger _logger = Logging.Create<SaveViewModel>();
+        //private readonly ILogger _logger = Logging.Create<SaveViewModel>();
 
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IPackFileService _pfs;
 
-        private SceneObject _copyTo;
-        private SceneObject _copyFrom;
-        private SceneObject Generated { get; set; }
-
-
-
+        //private SceneObject _copyTo;
+        //private SceneObject _copyFrom;
+        //private SceneObject Generated { get; set; }
         //
-        private readonly AnimationGenerationSettings AnimationSettings;
-        private readonly BoneManager _boneManager;
+        //
+        //
+        ////
+        //private readonly AnimationGenerationSettings AnimationSettings;
+        //private readonly BoneManager _boneManager;
 
         public SaveViewModel(BoneManager boneManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, IPackFileService pfs)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _pfs = pfs;
         }
-
+        /*
         public void OpenBatchProcessDialog()
         {
             if (!CanUpdateAnimation(false))
@@ -160,7 +160,7 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool.Saving
             newPath = SaveUtility.EnsureEnding(newPath, ".anim");
 
             _packFileSaveService.Save(newPath, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
-        }
+        }*/
 
 
     }
