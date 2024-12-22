@@ -10,18 +10,18 @@
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
              xmlns:System="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="400" d:DesignWidth="800">
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">110</System:Double>
     </UserControl.Resources>
     <Expander IsExpanded="True" Header="Selected Bone settings:">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
+        <Grid MaxHeight="400" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*"/>
+                <ColumnDefinition Width="0.5*"/>
+            </Grid.ColumnDefinitions>
 
-            <TreeView Grid.Row="0" ItemsSource="{Binding Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400">
+            <TreeView Grid.Column="0" ItemsSource="{Binding Bones, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top">
                 <b:Interaction.Behaviors>
                     <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SelectedBone.Value, Mode=TwoWay}" />
                 </b:Interaction.Behaviors>
@@ -43,7 +43,7 @@
                 </TreeView.ItemTemplate>
             </TreeView>
 
-            <Grid Grid.Row="1">
+            <Grid Grid.Column="1" >
                 <StackPanel>
                     <DockPanel>
                         <Label>

@@ -1,15 +1,13 @@
 Fixes for v056
 
 	General: Move resent files out of settings
-	General: Save Active pack button https://github.com/donkeyProgramming/TheAssetEditor/issues/123
-	General: Wem files, load them but hide in tree view. To avoid files go missing on save later.
 	General: Convert GameinformationFactory to a static! 
 	General: Show hisotry of commands in exceptions
 	General: Close console window on close
 		
 	KitbashTool: Unit test - open karl, import general, make head editable, rerig, save 
 		
-	GameWorld:Move bloomeffect to resourcelib
+	GameWorld: Move bloomeffect to resourcelib
 	GameWorld: ONly render glow if there is glow stuff in the pass 
 	GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
 	
@@ -18,8 +16,6 @@ Fixes for v056
 	KitbashTool: when loading material - if not supported show message
 	KitbashTool: Issues with rendering/selection and pivot point
 	KitbashTool: When there is no files left in a reference mesh - close the node 
-	
-	
 	
 	
 Bugs:
@@ -89,6 +85,20 @@ New features:
 	VisualMapEditor: View map
 	VisualMapEditor: Place props
 	Tool for editing prefabs
+	
+	
+Fixes for v057:
+	[Feature] 	General: 	Added 'Save Active pack' button to file menu https://github.com/donkeyProgramming/TheAssetEditor/issues/123
+	[Feature] 	General: 	Improvements to "Load Wem Files" option. This option now only effects if the files are visible in the pack browser
+							Wem files are now always loaded which makes the audio tools work better. 
+							Wem files are also alway loaded for mods, which fixes an issue where if the flag was disabled,
+							the audio files would be deleted from the mod on saving. No there should be no issues. 
+	
+	[Bug] 		General:	Fixed some issues related to saving packfiles after deleting files and folders
+	[Bug] KitbashEditor:	Fixed errors related to selecting meshes. 
+							Logging added to get more data. 
+							Please provide the log info if you get error log messages related to selection
+	[Bug] KitbashEditor:	Fixed wsmodel generation for pharaoh. Thanks to Ewajos
 	
 	
 Fixes for v056:

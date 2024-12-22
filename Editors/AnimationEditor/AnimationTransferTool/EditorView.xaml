@@ -7,27 +7,23 @@
              xmlns:s="http://schemas.singulink.com/xaml"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
+    <DockPanel LastChildFill="False">
 
-        <local:AnimationSettingsView Grid.Row="0"/>
-        <local:BoneSettingsView Grid.Row="2"/>
+        <local:AnimationSettingsView DockPanel.Dock="Top"/>
 
-        <Expander Grid.Row="1" IsExpanded="True" Header="Buttons:">
+        <local:BoneSettingsView DockPanel.Dock="Top"/>
+
+        <Expander  IsExpanded="True" Header="Buttons:" DockPanel.Dock="Top">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
                     <RowDefinition/>
-                    <RowDefinition/>
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
                 <Button Grid.Row="0" Grid.Column="0" Content="Open bone mapping window" Click="{s:MethodBinding OpenMappingWindow}" Margin="2"/>
@@ -38,5 +34,6 @@
                 <Button Grid.Row="1" Grid.Column="1"  Content="Use Target as Source" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
             </Grid>
         </Expander>
-    </Grid>
+
+    </DockPanel>
 </UserControl>

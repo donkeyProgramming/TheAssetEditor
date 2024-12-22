@@ -43,7 +43,8 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool.DevConfig
                 Animation = packfileService.FindFile(@"animations\battle\humanoid01\sword_and_pistol\missile_attacks\hu1_swp_missile_attack_aim_to_shootready_01.anim")
             };
 
-            creator.Create(EditorEnums.AnimationTransfer_Editor, x => (x as EditorHost<AnimationTransferToolViewModel>).Editor.SetDebugInputParameters(targetInput, sourceInput));
+            var editor = (AnimationTransferToolViewModel)creator.Create(EditorEnums.AnimationTransfer_Editor);
+            editor.SetDebugInputParameters(targetInput, sourceInput);
         }
     }
 }

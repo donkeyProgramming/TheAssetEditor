@@ -5,7 +5,6 @@ using Editors.AnimationMeta.Presentation;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Common.ReferenceModel;
-using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;
@@ -19,7 +18,6 @@ namespace Editors.AnimationMeta.SuperView
 
         private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly IPackFileService _packFileService;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IEventHub _eventHub;
         private readonly IUiCommandFactory _uiCommandFactory;
 
@@ -32,7 +30,6 @@ namespace Editors.AnimationMeta.SuperView
 
         public SuperViewViewModel(
             IPackFileService packFileService,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             IEventHub eventHub,
             IUiCommandFactory uiCommandFactory,
             SceneObjectEditor sceneObjectBuilder,
@@ -41,7 +38,6 @@ namespace Editors.AnimationMeta.SuperView
         {
             DisplayName = "Super view";
             _packFileService = packFileService;
-            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _eventHub = eventHub;
             _uiCommandFactory = uiCommandFactory;
             _sceneObjectBuilder = sceneObjectBuilder;

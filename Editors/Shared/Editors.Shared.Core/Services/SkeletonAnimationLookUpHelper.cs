@@ -154,7 +154,11 @@ namespace Editors.Shared.Core.Services
         {
             if (Debugger.IsAttached)
             {
-                var brokenAnims = new string[] { "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim" };
+                var brokenAnims = new string[] 
+                { 
+                    "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim",
+                    "animations\\battle\\raptor02\\subset\\colossal_squig\\deaths\\rp2_colossalsquig_death_01.anim"
+                };
                 if (brokenAnims.Contains(fullPath))
                 {
                     _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);

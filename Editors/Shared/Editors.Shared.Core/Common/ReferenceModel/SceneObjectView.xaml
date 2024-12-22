@@ -13,91 +13,91 @@
     <UserControl.Resources>
         <System:Double x:Key="labelWidth">100</System:Double>
     </UserControl.Resources>
-    <GroupBox  Visibility="{Binding IsControlVisible, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}">
-        <Expander IsExpanded="true" >
-            <Expander.Header>
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                    <TextBlock VerticalAlignment="Center">
+
+    <Expander IsExpanded="true" Visibility="{Binding IsControlVisible, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}" Margin="10,0,0,0">
+        <Expander.Header>
+            <StackPanel Orientation="Horizontal">
+                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <TextBlock VerticalAlignment="Center">
                         <Run FontSize="14" FontWeight="Bold"  Text="{Binding HeaderName, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
                         <Run Text="{Binding SubHeaderName, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
-                    </TextBlock>
-                </StackPanel>
-            </Expander.Header>
-            <StackPanel Orientation="Vertical">
+                </TextBlock>
+            </StackPanel>
+        </Expander.Header>
+        <StackPanel Orientation="Vertical" Margin="23,0,0,0">
 
-                <DockPanel >
-                    <CheckBox DockPanel.Dock="Left" VerticalContentAlignment="Center" IsChecked="{Binding Data.ShowMesh.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                    <Label DockPanel.Dock="Left" Content="Mesh" Width ="{StaticResource labelWidth}" />
-                    <Label DockPanel.Dock="Left" Content=":"/>
-                    <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="X" Click="{s:MethodBinding RemoveMesh}" />
-                    <Button DockPanel.Dock="Right" Width="70" Content="Browse" Click="{s:MethodBinding BrowseMesh}" />
-                    <TextBox VerticalContentAlignment="Center" IsReadOnly="True" Text="{Binding Data.MeshName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                </DockPanel>
+            <DockPanel >
+                <CheckBox DockPanel.Dock="Left" VerticalContentAlignment="Center" IsChecked="{Binding Data.ShowMesh.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <Label DockPanel.Dock="Left" Content="Mesh" Width ="{StaticResource labelWidth}" />
+                <Label DockPanel.Dock="Left" Content=":"/>
+                <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="X" Click="{s:MethodBinding RemoveMesh}" />
+                <Button DockPanel.Dock="Right" Width="70" Content="Browse" Click="{s:MethodBinding BrowseMesh}" />
+                <TextBox VerticalContentAlignment="Center" IsReadOnly="True" Text="{Binding Data.MeshName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            </DockPanel>
 
-                <DockPanel>
-                    <CheckBox VerticalContentAlignment="Top" Margin="0,3,0,0" IsChecked="{Binding Data.ShowSkeleton.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                    <Label  Width ="{StaticResource labelWidth}" Content="Skeleton"/>
-                    <Label  Content=":"/>
-                    <Expander IsExpanded="False" Header="{Binding Data.SkeletonName.Value, UpdateSourceTrigger=PropertyChanged}">
-                        <TreeView ItemsSource="{Binding SkeletonInformation.Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400">
-                            <b:Interaction.Behaviors>
-                                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SkeletonInformation.SelectedBone, Mode=TwoWay}" />
-                            </b:Interaction.Behaviors>
+            <DockPanel>
+                <CheckBox VerticalContentAlignment="Top" Margin="0,3,0,0" IsChecked="{Binding Data.ShowSkeleton.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                <Label  Width ="{StaticResource labelWidth}" Content="Skeleton"/>
+                <Label  Content=":"/>
+                <Expander IsExpanded="False" Header="{Binding Data.SkeletonName.Value, UpdateSourceTrigger=PropertyChanged}">
+                    <TreeView ItemsSource="{Binding SkeletonInformation.Bones, UpdateSourceTrigger=PropertyChanged}" MaxHeight="400">
+                        <b:Interaction.Behaviors>
+                            <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding SkeletonInformation.SelectedBone, Mode=TwoWay}" />
+                        </b:Interaction.Behaviors>
 
-                            <TreeView.ItemContainerStyle>
-                                <Style TargetType="{x:Type TreeViewItem}">
-                                    <Setter Property="IsExpanded" Value="True" />
-                                </Style>
-                            </TreeView.ItemContainerStyle>
-                            <TreeView.ItemTemplate >
-                                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <TextBlock Text=" - "></TextBlock>
-                                        <TextBlock Text="{Binding BoneIndex, UpdateSourceTrigger=PropertyChanged}"/>
-                                    </StackPanel>
-                                </HierarchicalDataTemplate>
-                            </TreeView.ItemTemplate>
-                        </TreeView>
-                    </Expander>
-                </DockPanel>
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="IsExpanded" Value="True" />
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.ItemTemplate >
+                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text=" - "></TextBlock>
+                                    <TextBlock Text="{Binding BoneIndex, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Expander>
+            </DockPanel>
 
-                <Rectangle  Fill="LightGray" Height="1" Margin="2,2,2,2"/>
+            <Rectangle  Fill="LightGray" Height="1" Margin="2,2,2,2"/>
 
-                <DockPanel >
-                    <CheckBox Visibility="Hidden" />
-                    <Label DockPanel.Dock="Left" Content="Fragment" Width ="{StaticResource labelWidth}" />
-                    <Label DockPanel.Dock="Left" Content=":"/>
-                    <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="..."  Click="{s:MethodBinding ViewFragment}" />
+            <DockPanel >
+                <CheckBox Visibility="Hidden" />
+                <Label DockPanel.Dock="Left" Content="Fragment" Width ="{StaticResource labelWidth}" />
+                <Label DockPanel.Dock="Left" Content=":"/>
+                <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="..."  Click="{s:MethodBinding ViewFragment}" />
 
-                    <ComboBox
+                <ComboBox
                           IsEditable="True"
                           IsTextSearchEnabled="false"
                           DisplayMemberPath="FileName"
                           Text="{Binding FragAndSlotSelection.FragmentList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding FragAndSlotSelection.FragmentList.Values}" 
                           SelectedItem="{Binding FragAndSlotSelection.FragmentList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                </DockPanel>
+            </DockPanel>
 
-                <DockPanel Margin="0,3,0,1">
-                    <CheckBox Visibility="Hidden" />
-                    <Label DockPanel.Dock="Left" Content="Slot" Width ="{StaticResource labelWidth}" />
-                    <Label DockPanel.Dock="Left" Content=":"/>
-                    <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="..." Click="{s:MethodBinding RemoveMesh}" Visibility="Hidden"/>
+            <DockPanel Margin="0,3,0,1">
+                <CheckBox Visibility="Hidden" />
+                <Label DockPanel.Dock="Left" Content="Slot" Width ="{StaticResource labelWidth}" />
+                <Label DockPanel.Dock="Left" Content=":"/>
+                <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="..." Click="{s:MethodBinding RemoveMesh}" Visibility="Hidden"/>
 
-                    <ComboBox
+                <ComboBox
                           IsEditable="True"
                           IsTextSearchEnabled="false"
                           DisplayMemberPath="SlotName"
                           Text="{Binding FragAndSlotSelection.FragmentSlotList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding FragAndSlotSelection.FragmentSlotList.Values}" 
                           SelectedItem="{Binding FragAndSlotSelection.FragmentSlotList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                </DockPanel>
+            </DockPanel>
 
-                <Rectangle  Fill="LightGray" Height="1" Margin="2,2,2,2"/>
+            <Rectangle  Fill="LightGray" Height="1" Margin="2,2,2,2"/>
 
-                <!--
+            <!--
                 <DockPanel Width="Auto">
                     <CheckBox Visibility="Hidden"/>
                     <Label  Width ="{StaticResource labelWidth}" Content="Animation"/>
@@ -114,39 +114,32 @@
                                     ShowLabel="false"/>
                 </DockPanel>
 -->
-                <DockPanel Margin="0,0,40,0" Visibility="{Binding AllowMetaData, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}">
+            <DockPanel Margin="0,0,40,0" Visibility="{Binding AllowMetaData, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}">
 
-                    <DockPanel DockPanel.Dock="Top">
-                        <CheckBox Visibility="Hidden"/>
-                        <Label  Width ="{StaticResource labelWidth}" Content="Animation File"/>
-                        <Label  Content=":"/>
-                        <TextBox Text="{Binding FragAndSlotSelection.AnimationFileName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" VerticalContentAlignment="Center"/>
-                    </DockPanel>
-
-
-                    <DockPanel DockPanel.Dock="Top" Margin="0,3,0,3">
-                        <CheckBox Visibility="Hidden"/>
-                        <Label  Width ="{StaticResource labelWidth}" Content="Meta File"/>
-                        <Label  Content=":"/>
-                        <TextBox Text="{Binding FragAndSlotSelection.MetaDataName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" VerticalContentAlignment="Center"/>
-                    </DockPanel>
-
-                    <DockPanel DockPanel.Dock="Top">
-                        <CheckBox Visibility="Hidden"/>
-                        <Label  Width ="{StaticResource labelWidth}" Content="Persist Meta File"/>
-                        <Label  Content=":"/>
-                
-                        <TextBox Text="{Binding FragAndSlotSelection.MetaDataPersistName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" VerticalContentAlignment="Center"/>
-                        
-                    </DockPanel>
+                <DockPanel DockPanel.Dock="Top">
+                    <CheckBox Visibility="Hidden"/>
+                    <Label  Width ="{StaticResource labelWidth}" Content="Animation File"/>
+                    <Label  Content=":"/>
+                    <TextBox Text="{Binding FragAndSlotSelection.AnimationFileName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" VerticalContentAlignment="Center"/>
                 </DockPanel>
 
 
+                <DockPanel DockPanel.Dock="Top" Margin="0,3,0,3">
+                    <CheckBox Visibility="Hidden"/>
+                    <Label  Width ="{StaticResource labelWidth}" Content="Meta File"/>
+                    <Label  Content=":"/>
+                    <TextBox Text="{Binding FragAndSlotSelection.MetaDataName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" VerticalContentAlignment="Center"/>
+                </DockPanel>
 
-            </StackPanel>
+                <DockPanel DockPanel.Dock="Top">
+                    <CheckBox Visibility="Hidden"/>
+                    <Label  Width ="{StaticResource labelWidth}" Content="Persist Meta File"/>
+                    <Label  Content=":"/>
 
+                    <TextBox Text="{Binding FragAndSlotSelection.MetaDataPersistName, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="true" VerticalContentAlignment="Center"/>
 
-
-        </Expander>
-    </GroupBox>
+                </DockPanel>
+            </DockPanel>
+        </StackPanel>
+    </Expander>
 </UserControl>

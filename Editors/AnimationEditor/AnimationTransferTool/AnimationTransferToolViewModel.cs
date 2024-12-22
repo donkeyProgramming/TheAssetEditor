@@ -23,13 +23,16 @@ using Shared.Ui.Editors.BoneMapping;
 
 namespace AnimationEditor.AnimationTransferTool
 {
-    public class AnimationTransferToolViewModel : IHostedEditor<AnimationTransferToolViewModel>
+    // When applying proportion scling, should also rotation be scaled? 
+    // Show scale factor in view for each bone 
+
+
+    public class AnimationTransferToolViewModel : EditorHostBase
     {
-        public Type EditorViewModelType => typeof(EditorView);
         AnimationToolInput _inputTargetData;
         AnimationToolInput _inputSourceData;
 
-        private readonly SceneObjectViewModelBuilder _referenceModelSelectionViewModelBuilder;
+        private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
         private readonly SceneObjectEditor _assetViewModelBuilder;
         private readonly IFileSaveService _packFileSaveService;
         private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
@@ -52,17 +55,20 @@ namespace AnimationEditor.AnimationTransferTool
 
         public NotifyAttr<SkeletonBoneNode> SelectedBone { get; set; } = new NotifyAttr<SkeletonBoneNode>();
 
-        public string EditorName => "Animation transfer tool";
 
+        public override Type EditorViewModelType => typeof(EditorView);
 
-        public AnimationTransferToolViewModel(IPackFileService pfs, 
+        public AnimationTransferToolViewModel(IPackFileService pfs, IEditorHostParameters editorHostParameters,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
             SceneObjectEditor assetViewModelBuilder,
-            IFileSaveService packFileSaveService)
+            IFileSaveService packFileSaveService) : base(editorHostParameters)
         {
-            _referenceModelSelectionViewModelBuilder = referenceModelSelectionViewModelBuilder;
+
+            DisplayName = "Animation transfer tool";
+
+            _sceneObjectViewModelBuilder = referenceModelSelectionViewModelBuilder;
             _assetViewModelBuilder = assetViewModelBuilder;
             _packFileSaveService = packFileSaveService;
      
@@ -71,6 +77,8 @@ namespace AnimationEditor.AnimationTransferTool
             _player = player;
 
             SelectedBone.PropertyChanged += (x, y) => HightlightSelectedBones((x as NotifyAttr<SkeletonBoneNode>).Value);
+
+            Initialize();
         }
 
         public void SetDebugInputParameters(AnimationToolInput target, AnimationToolInput source)
@@ -79,10 +87,21 @@ namespace AnimationEditor.AnimationTransferTool
             _inputSourceData = source;
         }
 
-        public void Initialize(EditorHost<AnimationTransferToolViewModel> owner)
+        void Initialize()
         {
-            var target = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Target", Color.Black, _inputTargetData);
-            var source = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "Source", Color.Black, _inputSourceData);
+            _inputTargetData = new AnimationToolInput()
+            {
+                Mesh = _pfs.FindFile(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition")
+            };
+
+            _inputSourceData = new AnimationToolInput()
+            {
+                Mesh = _pfs.FindFile(@"variantmeshes\variantmeshdefinitions\emp_archer_ror.variantmeshdefinition"),
+                Animation = _pfs.FindFile(@"animations\battle\humanoid01\sword_and_pistol\missile_attacks\hu1_swp_missile_attack_aim_to_shootready_01.anim")
+            };
+
+            var target = _sceneObjectViewModelBuilder.CreateAsset(true, "Target", Color.Black, _inputTargetData);
+            var source = _sceneObjectViewModelBuilder.CreateAsset(true, "Source", Color.Black, _inputSourceData);
             var generated = _assetViewModelBuilder.CreateAsset("Generated", Color.Black);
 
             source.Data.IsSelectable = false;
@@ -90,9 +109,10 @@ namespace AnimationEditor.AnimationTransferTool
             _player.RegisterAsset(generated);
             Create(target.Data, source.Data, generated);
 
-            owner.SceneObjects.Add(target);
-            owner.SceneObjects.Add(source);
+            SceneObjects.Add(target);
+            SceneObjects.Add(source);
         }
+
 
         void Create(SceneObject copyToAsset, SceneObject copyFromAsset, SceneObject generated)
         {

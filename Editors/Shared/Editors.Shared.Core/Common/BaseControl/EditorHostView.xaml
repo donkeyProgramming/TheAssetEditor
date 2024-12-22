@@ -53,12 +53,21 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
-            <ListView Grid.Row="1" ItemsSource="{Binding SceneObjects, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <Expander  Grid.Row="2" IsExpanded="True">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center">
+                            <Run FontSize="14" FontWeight="Bold"  Text="Scene content:"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Expander.Header>
+                
+                <ListView ItemsSource="{Binding SceneObjects, UpdateSourceTrigger=PropertyChanged}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -78,10 +87,11 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+            </Expander>
 
-            <Rectangle Grid.Row="2" Fill="LightGray" Height="3" Margin="2,2,2,2"/>
+            <Rectangle Grid.Row="3" Fill="LightGray" Height="3" Margin="2,2,2,2"/>
 
-            <ScrollViewer  Grid.Row="3" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer  Grid.Row="4" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto">
                 <DockPanel  DockPanel.Dock="Top">
                     <ContentControl Content="{Binding ., UpdateSourceTrigger=PropertyChanged}"       
                                     ContentTemplateSelector="{StaticResource EditorSelector}"/>
