@@ -1,29 +1,29 @@
-﻿using Serilog;
-using Shared.Core.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using static Shared.Core.PackFiles.PackFileDecryptor;
 
 namespace Shared.Core.PackFiles
 {
     public static class PackFileVersionConverter
     {
-        static List<(PackFileVersion EnumValue, string StringValue)> _values = new List<(PackFileVersion EnumValue, string StringValue)>()
-        {
+        private static readonly List<(PackFileVersion EnumValue, string StringValue)> s_values =
+        [
             (PackFileVersion.PFH0,  "PFH0"),
             (PackFileVersion.PFH2,  "PFH2"),
             (PackFileVersion.PFH3,  "PFH3"),
             (PackFileVersion.PFH4,  "PFH4"),
             (PackFileVersion.PFH5,  "PFH5"),
             (PackFileVersion.PFH6,  "PFH6"),
-        };
+        ];
 
-        public static string ToString(PackFileVersion versionEnum) => _values.First(x => x.EnumValue == versionEnum).StringValue;
-        public static PackFileVersion GetEnum(string versionStr) => _values.First(x => x.StringValue == versionStr.ToUpper()).EnumValue;
+        public static string ToString(PackFileVersion versionEnum) => s_values.First(x => x.EnumValue == versionEnum).StringValue;
+        public static PackFileVersion GetEnum(string versionStr) => s_values.First(x => x.StringValue == versionStr.ToUpper()).EnumValue;
     }
 
     public static class PackFileSerializer
     {
-        static readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileSerializer));
+        static readonly ILogger s_logger = Logging.CreateStatic(typeof(PackFileSerializer));
 
         public static PackFileContainer Load(string packFileSystemPath, BinaryReader reader, IDuplicatePackFileResolver dubplicatePackFileResolver)
         {
@@ -39,7 +39,7 @@ namespace Shared.Core.PackFiles
                     OriginalLoadByteSize = new FileInfo(packFileSystemPath).Length,
                 };
 
-                // If larger then int.max throw error
+                // If larger then int.max throw error.
                 if (output.Header.FileCount > int.MaxValue)
                     throw new Exception("Too many files in packfile!");
 
@@ -54,19 +54,24 @@ namespace Shared.Core.PackFiles
                 var headerVersion = output.Header.Version;
                 for (var i = 0; i < output.Header.FileCount; i++)
                 {
-                    var size = reader.ReadUInt32();
+                    uint size;
+                    if (output.Header.HasEncryptedIndex)
+                        size = DecryptAndReadU32(reader, (uint)(output.Header.FileCount - i - 1));
+                    else
+                        size = reader.ReadUInt32();
 
                     if (output.Header.HasIndexWithTimeStamp)
                         reader.ReadUInt32();
 
                     byte isCompressed = 0;
                     if (headerVersion == PackFileVersion.PFH5)
-                        isCompressed = reader.ReadByte();   // Is the file actually compressed, or is it just a compressed format?
+                        isCompressed = reader.ReadByte(); // Is the file actually compressed, or is it just a compressed format?
 
                     var fullPackedFileName = IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer).ToLower();
 
                     var packFileName = Path.GetFileName(fullPackedFileName);
-                    var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
+                    var isEncrypted = output.Header.HasEncryptedData;
+                    var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size, isEncrypted));
 
                     if (dubplicatePackFileResolver.CheckForDuplicates)
                     {
@@ -75,7 +80,7 @@ namespace Shared.Core.PackFiles
                         {
                             if (dubplicatePackFileResolver.KeepDuplicateFile(fullPackedFileName))
                             {
-                                _logger.Here().Warning($"Duplicate file found {fullPackedFileName}");
+                                s_logger.Here().Warning($"Duplicate file found {fullPackedFileName}");
                                 output.FileList.Add(fullPackedFileName + Guid.NewGuid().ToString(), fileContent);
                             }
                         }
@@ -97,7 +102,7 @@ namespace Shared.Core.PackFiles
             }
             catch (Exception e)
             {
-                _logger.Here().Error($"Failed to load packfile {packFileSystemPath} - {e.Message}");
+                s_logger.Here().Error($"Failed to load packfile {packFileSystemPath} - {e.Message}");
                 throw;
             }
         }
@@ -116,11 +121,15 @@ namespace Shared.Core.PackFiles
             var pack_file_count = reader.ReadUInt32();              // 20
             var packed_file_index_size = reader.ReadUInt32();       // 24
 
+            if (header.HasEncryptedIndex)
+            {
+                var filesRemaining = header.ReferenceFileCount;
+                packed_file_index_size = DecryptAndReadU32(reader, filesRemaining);
+            }
+
             // Read the buffer of data stuff
             if (header.Version == PackFileVersion.PFH0)
-            {
                 header.Buffer = new byte[0];
-            }
             else if (header.Version == PackFileVersion.PFH2 || header.Version == PackFileVersion.PFH3)
             {
                 header.Buffer = reader.ReadBytes(8);
@@ -159,7 +168,6 @@ namespace Shared.Core.PackFiles
             return header;
         }
 
-
         public static void WriteHeader(PFHeader header, uint fileContentSize, BinaryWriter writer)
         {
             var packFileTypeStr = PackFileVersionConverter.ToString(header.Version);        // 4
@@ -176,7 +184,6 @@ namespace Shared.Core.PackFiles
             writer.Write(pack_file_index_size);                                             // 16
             writer.Write(header.FileCount);                                                 // 20
             writer.Write(fileContentSize);                                                  // 24
-
 
             switch (header.Version)
             {
