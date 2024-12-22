@@ -57,6 +57,7 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
         {
             var alphaShaderPart = "";
             var alphaNamePart = "off";
+            var fileName = "";
 
             var baseCapability = capabilityMaterial.TryGetCapability<MaterialBaseCapability>();
             if (baseCapability != null && baseCapability.UseAlpha)
@@ -64,7 +65,6 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
                 alphaShaderPart = "_alpha";
                 alphaNamePart = "on";
             }
-
             var materialVertexFormatStr = vertexFormat switch
             {
                 UiVertexFormat.Static => "rigid",
@@ -72,8 +72,22 @@ namespace GameWorld.Core.Rendering.Materials.Serialization
                 UiVertexFormat.Weighted => "weighted2",
                 _ => throw new Exception("Unknown vertex type")
             };
+            if (GameHint == GameTypeEnum.Pharaoh) //Pharaoh does not require alpha and the naming is different as well as the template
+            {
+                materialVertexFormatStr = vertexFormat switch
+                {
+                    UiVertexFormat.Static => "rigid",
+                    UiVertexFormat.Cinematic => "weighted_standard_4",
+                    UiVertexFormat.Weighted => "weighted_standard_2",
+                    _ => throw new Exception("Unknown vertex type")
+                };
+                fileName = $"{meshName}_{materialVertexFormatStr}.xml";//no alpha attribute in template
+                AddAttribute("TEMPLATE_ATTR_FILE_NAME", fileName);
+                AddAttribute("TEMPLATE_ATTR_VERTEXTYPE", materialVertexFormatStr);
+                return $"{fileName}.material"; ;
+            }
 
-            var fileName = $"{meshName}_{materialVertexFormatStr}_alpha_{alphaNamePart}.xml";
+            fileName = $"{meshName}_{materialVertexFormatStr}_alpha_{alphaNamePart}.xml";
             AddAttribute("TEMPLATE_ATTR_FILE_NAME", fileName);
             AddAttribute("TEMPLATE_ATTR_ALPHAMODE", alphaShaderPart);
             AddAttribute("TEMPLATE_ATTR_VERTEXTYPE", materialVertexFormatStr);
