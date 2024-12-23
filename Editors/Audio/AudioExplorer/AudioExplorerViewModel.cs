@@ -10,6 +10,7 @@ using Shared.Core.Misc;
 using Shared.Core.ToolCreation;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.WWise.Hirc.V112;
 using Shared.GameFormats.WWise.Hirc.V136;
 
 namespace Editors.Audio.AudioExplorer
@@ -106,6 +107,20 @@ namespace Editors.Audio.AudioExplorer
 
         public void PlaySelectedSoundAction()
         {
+            CAkSound_V112 cakSound_V112 = _selectedNode.Item as CAkSound_V112;
+            if (cakSound_V112 != null && cakSound_V112.GetStreamType() == SourceType.Data_BNK)
+            {
+                _soundPlayer.ConvertWemToWav(
+                    _audioRepository,
+                    cakSound_V112.AkBankSourceData.akMediaInformation.SourceId,
+                    cakSound_V112.AkBankSourceData.akMediaInformation.FileId,
+                    (int)cakSound_V112.AkBankSourceData.akMediaInformation.uFileOffset,
+                    (int)cakSound_V112.AkBankSourceData.akMediaInformation.uInMemoryMediaSize
+                );
+
+                return;
+            }
+
             var nodeDisplayName = _selectedNode.DisplayName;
             var regex = new Regex(@"(\d+)\.wem");
             var match = regex.Match(nodeDisplayName);

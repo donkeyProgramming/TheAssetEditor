@@ -19,6 +19,7 @@ namespace Editors.Audio.Storage
         {
             public Dictionary<uint, List<HircItem>> HircList { get; internal set; } = new();
             public Dictionary<uint, List<DidxAudio>> DidxAudioList { get; internal set; } = new();
+            public Dictionary<string, PackFile> PackFileMap { get; internal set; } = new();
         }
 
         private readonly IPackFileService _packFileService;
@@ -56,12 +57,15 @@ namespace Editors.Audio.Storage
 
             var counter = 1;
 
+            var output = new LoadResult();
+
             Parallel.ForEach(wantedBnkFiles, bnkFile =>
             {
                 var name = bnkFile.Key;
                 var file = bnkFile.Value;
                 var filePack = _packFileService.GetPackFileContainer(file);
                 _logger.Here().Information($"{counter++}/{wantedBnkFiles.Count} - {name}");
+                output.PackFileMap.Add(file.Name, file);
 
                 try
                 {
@@ -76,8 +80,6 @@ namespace Editors.Audio.Storage
                     failedBnks.Add((name, e.Message));
                 }
             });
-
-            var output = new LoadResult();
 
             // Combine the data
             foreach (var parsedBnk in parsedBnkList)

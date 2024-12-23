@@ -108,7 +108,12 @@ namespace Editors.Audio.Utility
         private void ProcessSound(HircItem item, HircTreeItem parent)
         {
             var soundHirc = GetAsType<ICAkSound>(item);
-            var soundTreeNode = new HircTreeItem() { DisplayName = $"Sound {soundHirc.GetSourceId()}.wem", Item = item };
+
+            string displayName = soundHirc.GetStreamType() == SourceType.Data_BNK
+                ? $"Sound {soundHirc.GetSourceId()} (stream type: {soundHirc.GetStreamType()})"
+                : $"Sound {soundHirc.GetSourceId()}.wem";
+
+            var soundTreeNode = new HircTreeItem() { DisplayName = displayName, Item = item };
             parent.Children.Add(soundTreeNode);
         }
 
