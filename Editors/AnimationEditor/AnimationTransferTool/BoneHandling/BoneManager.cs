@@ -38,7 +38,7 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling
         }
 
 
-        public void SetSceneNodes(SceneObject source, SceneObject target)
+        public void SetSceneNodes(SceneObject source, SceneObject target, SceneObject generated)
         {
             _skeletonBoneHighlighter = new SkeletonBoneHighlighter(source, target);
         }
@@ -88,7 +88,29 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling
             }
             SelectedBone = Bones.FirstOrDefault();
             _activeConfig = null;
+
+            //HightlightSelectedBones(null);
         }
+
+        /*
+        void HightlightSelectedBones(SkeletonBoneNode bone)
+        {
+            if (bone == null)
+            {
+                Generated.SelectedBoneIndex(-1);
+                _copyFrom.SelectedBoneIndex(-1);
+            }
+            else
+            {
+                Generated.SelectedBoneIndex(bone.BoneIndex.Value);
+                if (_remappingInformation != null)
+                {
+                    var mapping = _remappingInformation.FirstOrDefault(x => x.OriginalValue == bone.BoneIndex.Value);
+                    if (mapping != null)
+                        _copyFrom.SelectedBoneIndex(mapping.NewValue);
+                }
+            }
+        }*/
 
 
         [RelayCommand] void ShowBoneMappingWindow()

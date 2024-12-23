@@ -8,6 +8,7 @@ using CommonControls.SelectionListDialog;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.AnimationVisualEditors.AnimationTransferTool;
 using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling;
+using Editors.AnimationVisualEditors.AnimationTransferTool.Settings;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
@@ -28,61 +29,6 @@ namespace AnimationEditor.AnimationTransferTool
 {
     // When applying proportion scling, should also rotation be scaled? 
     // Show scale factor in view for each bone 
-
-
-
-    public class BoneHandler
-    {
-        // Selected bone
-        // All bones array
-
-        // Send event => Updated
-
-        // Open mapping window
-
-    }
-
-    public class RenderHelper
-    { 
-        // uses boneHandler
-
-        // Draw selected bones
-
-        // Handle offset
-        // Draw on groud. Source, target, generated
-    
-    }
-
-    public class Configuration
-    { 
-        // Source skeleton
-        // Target skeleton
-
-        // Global scale
-        // Use Relaitve scale
-        // Zero unmapped bones
-        // Speed mult
-    
-    }
-
-
-    public class AnimationRegargeter
-    {
-        // uses BoneHandler to get data
-        // Outputes an animation
-
-    }
-
-    public class SaveHandler
-    {
-        // Used AnimationRegargeter
-
-        // Save
-        // Batch Save
-
-    }
-
-
 
 
     public partial class AnimationTransferToolViewModel : EditorHostBase
@@ -116,6 +62,9 @@ namespace AnimationEditor.AnimationTransferTool
         //---
 
         [ObservableProperty] BoneManager _boneManager;
+        [ObservableProperty] AnimationReTargetRenderingComponent _rendering;
+        [ObservableProperty] AnimationGenerationSettings _settings;
+
         //--
 
 
@@ -123,7 +72,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public AnimationTransferToolViewModel(
             BoneManager boneManager,
-
+            AnimationReTargetRenderingComponent renderingComponent,
             IPackFileService pfs, IEditorHostParameters editorHostParameters,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             AnimationPlayerViewModel player,
@@ -132,9 +81,10 @@ namespace AnimationEditor.AnimationTransferTool
             IFileSaveService packFileSaveService) : base(editorHostParameters)
         {
 
+            _settings = new AnimationGenerationSettings();
+
             _boneManager = boneManager;
-
-
+            _rendering = renderingComponent;
             DisplayName = "Animation transfer tool";
 
             _sceneObjectViewModelBuilder = referenceModelSelectionViewModelBuilder;
@@ -144,8 +94,6 @@ namespace AnimationEditor.AnimationTransferTool
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _player = player;
-
-            SelectedBone.PropertyChanged += (x, y) => HightlightSelectedBones((x as NotifyAttr<SkeletonBoneNode>).Value);
 
             Initialize();
         }
@@ -189,7 +137,8 @@ namespace AnimationEditor.AnimationTransferTool
             SceneObjects.Add(source);
             SceneObjects.Add(sourceView);
 
-            BoneManager.SetSceneNodes(source.Data, target.Data);
+            BoneManager.SetSceneNodes(source.Data, target.Data, generated);
+            _rendering.SetSceneNodes(source.Data, target.Data, generated);
         }
 
 
@@ -220,7 +169,7 @@ namespace AnimationEditor.AnimationTransferTool
             _copyFrom.Offset = Matrix.CreateTranslation(newValue.GetAsVector3());
         }
 
-        void HightlightSelectedBones(SkeletonBoneNode bone)
+        /*void HightlightSelectedBones(SkeletonBoneNode bone)
         {
             if (bone == null)
             {
@@ -237,13 +186,13 @@ namespace AnimationEditor.AnimationTransferTool
                         _copyFrom.SelectedBoneIndex(mapping.NewValue);
                 }
             }
-        }
+        }*/
 
         private void CopyToMeshChanged(SceneObject newValue)
         {
             _assetViewModelBuilder.CopyMeshFromOther(Generated, newValue);
             CreateBoneOverview(newValue.Skeleton);
-            HightlightSelectedBones(null);
+           // HightlightSelectedBones(null);
 
             _config = null;
             AnimationSettings.UseScaledSkeletonName.Value = false;
@@ -257,7 +206,7 @@ namespace AnimationEditor.AnimationTransferTool
 
             _remappingInformation = null;
             CreateBoneOverview(_copyTo.Skeleton);
-            HightlightSelectedBones(null);
+           // HightlightSelectedBones(null);
 
             var standAnim = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(newValue.SkeletonName).FirstOrDefault(x => x.AnimationFile.Contains("stand"));
             if (standAnim != null)

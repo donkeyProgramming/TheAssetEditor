@@ -12,8 +12,4 @@
     <ProjectReference Include="..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="AnimationTransferTool\Rendering\" />
-  </ItemGroup>
-
 </Project>

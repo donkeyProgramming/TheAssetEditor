@@ -17,46 +17,45 @@
     
     <Expander IsExpanded="True" Header="Bone settings:" >
         <Grid Margin="10,0,2,0" >
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.5*"/>
                 <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Row="1"  Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,5">
-                <Button Content="Open Bone Mapping Window" Command="{Binding BoneManager.ShowBoneMappingWindowCommand}"/>
-            </StackPanel>
+            <TreeView MinHeight="200" Grid.Column="0"
+                      MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                      VerticalAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
+                            ItemsSource="{Binding BoneManager.Bones, UpdateSourceTrigger=PropertyChanged}">
+  
+                    <b:Interaction.Behaviors>
+                        <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding BoneManager.SelectedBone, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </b:Interaction.Behaviors>
 
-           
-            <TreeView Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Top" MaxHeight="400"
-                      ItemsSource="{Binding BoneManager.Bones, UpdateSourceTrigger=PropertyChanged}">
-                <b:Interaction.Behaviors>
-                    <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding BoneManager.SelectedBone, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                </b:Interaction.Behaviors>
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                            <Setter Property="IsExpanded" Value="True" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ItemTemplate >
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"   Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
+                                <TextBlock Text=" [" Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
+                                <TextBlock Text="{Binding BoneIndex, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
+                                <TextBlock Text="]" Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
 
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                        <Setter Property="IsExpanded" Value="True" />
-                    </Style>
-                </TreeView.ItemContainerStyle>
-                <TreeView.ItemTemplate >
-                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"   Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
-                            <TextBlock Text=" [" Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
-                            <TextBlock Text="{Binding BoneIndex, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
-                            <TextBlock Text="]" Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
+            <presentation:SelectedBoneView Grid.Column="1"/>
 
-
-            <presentation:SelectedBoneView Grid.Row="0" Grid.Column="1"/>
         </Grid>
     </Expander>
 </UserControl>

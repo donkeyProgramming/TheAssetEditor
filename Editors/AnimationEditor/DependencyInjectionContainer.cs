@@ -5,6 +5,7 @@ using AnimationEditor.MountAnimationCreator;
 using Editors.AnimationVisualEditors.AnimationKeyframeEditor;
 using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling;
 using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling.Presentation;
+using Editors.AnimationVisualEditors.AnimationTransferTool.Settings;
 using Editors.Shared.Core.Common.BaseControl;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
@@ -23,7 +24,7 @@ namespace Editors.AnimationVisualEditors
             serviceCollection.AddScoped<AnimationTransferToolViewModel>();
             serviceCollection.AddScoped<BoneManager>();
             RegisterWindow<BoneMappingWindow>(serviceCollection);
-
+            RegisterGameComponent<AnimationReTargetRenderingComponent>(serviceCollection);
 
 
             serviceCollection.AddScoped<EditorHost<MountAnimationCreatorViewModel>>();
