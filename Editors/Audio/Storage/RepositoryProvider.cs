@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Dat;
 using Shared.GameFormats.WWise;
 using Shared.GameFormats.WWise.Didx;
@@ -17,6 +18,7 @@ namespace Editors.Audio.Storage
         public Dictionary<uint, List<DidxAudio>> DidxAudioObject { get; internal set; }
         public List<SoundDatFile.DatDialogueEventsWithStateGroups> DialogueEventsWithStateGroups { get; internal set; }
         public List<SoundDatFile.DatStateGroupsWithStates> StateGroupsWithStates { get; internal set; }
+        public Dictionary<string, PackFile> PackFileMap { get; internal set; } = new();
     }
 
     public class CreateRepositoryFromAllPackFiles : RepositoryProvider
@@ -41,7 +43,8 @@ namespace Editors.Audio.Storage
                 DialogueEventsWithStateGroups = dialogueEventsWithStateGroups,
                 StateGroupsWithStates = stateGroupsWithStates,
                 HircObjects = loadResult.HircList,
-                DidxAudioObject = loadResult.DidxAudioList
+                DidxAudioObject = loadResult.DidxAudioList,
+                PackFileMap = loadResult.PackFileMap,
             };
         }
     }
