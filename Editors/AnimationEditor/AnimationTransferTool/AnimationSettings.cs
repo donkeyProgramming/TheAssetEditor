@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Shared.Core.Misc;
+﻿using Shared.Core.Misc;
 using Shared.Ui.BaseDialogs.MathViews;
 using Shared.Ui.Common;
 
@@ -19,36 +18,4 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool
 
         public ComboBox<uint> AnimationOutputFormat { get; set; } = new ComboBox<uint>(new uint[] { 5, 6, 7 }, 7);
     }
-
-
-
-
-
-
-
-    //public enum MasterEnum
-    //{ 
-    //    Source,
-    //    Target
-    //}
-    //
-    //public enum LengthMatchingModeEnum
-    //{
-    //    Smart,
-    //    Time,
-    //    Loop
-    //}
-    //
-    //public enum CombineModeEnum
-    //{ 
-    //    Add,
-    //    Replace,
-    //    OnlySource
-    //}
-    //
-    //public enum CopyModeEnum
-    //{
-    //    World,
-    //    Local
-    //}
 }
