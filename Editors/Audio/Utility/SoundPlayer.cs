@@ -23,16 +23,16 @@ namespace Editors.Audio.Utility
 
         public bool ConvertWemToWav(string wemFileName)
         {
-            if (wemFileName == null)
+            if (wemFileName == null || wemFileName == string.Empty)
             {
-                s_logger.Here().Warning("Input is not a valid wem file.");
+                s_logger.Here().Warning("Invalid wem file; input is empty.");
                 return false;
             }
 
             var audioFile = FindWemFile(wemFileName, _pfs);
             if (audioFile == null)
             {
-                s_logger.Here().Error("Unable to find wem file.");
+                s_logger.Here().Error($"Unable to find wem file '{wemFileName}'.");
                 return true;
             }
 

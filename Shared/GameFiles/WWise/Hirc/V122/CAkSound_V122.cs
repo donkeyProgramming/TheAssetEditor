@@ -15,6 +15,7 @@ namespace Shared.GameFormats.WWise.Hirc.V122
 
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
         public uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
+        public SourceType GetStreamType() => AkBankSourceData.StreamType;
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
