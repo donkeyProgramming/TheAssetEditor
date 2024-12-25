@@ -48,6 +48,7 @@ Bugs:
 	
 	
 Improvements:
+	https://github.com/Dirkster99/AvalonDock
 	General: SelectionManager, remove the use of SelectionManager_SelectionChanged event
 	General: Upgrade to new community toolkit
 	KitbashTool: Second UV map on export and render
@@ -139,6 +140,9 @@ Fixes for v055:
 	[Bug] KitbashTool: Scene explorer now correctly keeps nodes visible and expanded when changing the content of the scene.
 
 
+Other modding tools:
+	https://github.com/Shazbot/WH3-Mod-Manager/tree/master
+	https://github.com/MattFiler/OpenCAGE/?tab=readme-ov-file
 	
 	
 Link to cinterbreath
