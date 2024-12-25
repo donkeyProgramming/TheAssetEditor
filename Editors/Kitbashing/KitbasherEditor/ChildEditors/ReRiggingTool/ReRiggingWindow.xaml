@@ -6,8 +6,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Editors.KitbasherEditor.ChildEditors.MeshFitter" 
-       xmlns:view="clr-namespace:CommonControls.Editors.BoneMapping.View;assembly=Editors.Shared.Core"
-        mc:Ignorable="d"
+    xmlns:view="clr-namespace:CommonControls.Editors.BoneMapping.View;assembly=Editors.Shared.Core"
+    mc:Ignorable="d"
         Style="{StaticResource CustomWindowStyle}"
         Title="Re-Rigging Tool" Height="500" Width="1000">
     <Grid>

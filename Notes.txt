@@ -10,6 +10,7 @@ Remember:
 	Create a "save project" button?
 	Superview - default scene content to be expanded. Allow select meshes
 	Change renderingcomponent to be added manually in the retarget tool. 
+	Move Editors.Shared.Core into shared? Maybe under UI?
 
 Fixes for v056
 	General: Move resent files out of settings

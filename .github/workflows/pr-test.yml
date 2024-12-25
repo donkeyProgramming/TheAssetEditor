@@ -43,3 +43,6 @@ jobs:
 
     - name: Run Editors.AnimatioReTarget Tests
       run: dotnet test Editors\AnimationReTarget\Test.AnimatioReTarget\Test.AnimatioReTarget.csproj --no-restore --verbosity normal
+
+    - name: Run Editors.Kitbashing Tests
+      run: dotnet test Editors\Kitbashing\Test.KitbashEditor\Test.KitbashEditor.csproj --no-restore --verbosity normal
