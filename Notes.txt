@@ -8,6 +8,7 @@ Remember:
 	Complex mesh loader - fast loading! 
 	"How to use" window - point to github?
 	Create a "save project" button?
+	Superview - default scene content to be expanded. Allow select meshes
 
 Fixes for v056
 	General: Move resent files out of settings
