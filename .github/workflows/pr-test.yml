@@ -40,3 +40,6 @@ jobs:
 
     - name: Run Editors.SkeletonEditor Tests
       run: dotnet test Editors\SkeletonEditor\Test.SkeletonEditor\Test.SkeletonEditor.csproj --no-restore --verbosity normal
+
+    - name: Run Editors.AnimatioReTarget Tests
+      run: dotnet test Editors\AnimationReTarget\Test.AnimatioReTarget\Test.AnimatioReTarget.csproj --no-restore --verbosity normal

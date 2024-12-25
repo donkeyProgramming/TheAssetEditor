@@ -74,6 +74,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AnimationReTarget", "Animat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editors.AnimatioReTarget", "Editors\AnimationReTarget\Editors.AnimatioReTarget\Editors.AnimatioReTarget.csproj", "{8B5252E2-7A08-45DC-9596-1B217B104C83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.AnimatioReTarget", "Editors\AnimationReTarget\Test.AnimatioReTarget\Test.AnimatioReTarget.csproj", "{F70996AA-023E-4EDE-B2C8-1BD692E76873}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -180,6 +182,10 @@ Global
 		{8B5252E2-7A08-45DC-9596-1B217B104C83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B5252E2-7A08-45DC-9596-1B217B104C83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B5252E2-7A08-45DC-9596-1B217B104C83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F70996AA-023E-4EDE-B2C8-1BD692E76873}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F70996AA-023E-4EDE-B2C8-1BD692E76873}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F70996AA-023E-4EDE-B2C8-1BD692E76873}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F70996AA-023E-4EDE-B2C8-1BD692E76873}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -213,6 +219,7 @@ Global
 		{C0B47D79-D2F3-445B-A90F-6AA40E23D7D8} = {711AC21F-B31C-4FC8-9D38-D1F0C1FEC6C0}
 		{CDE2CA10-4E4A-45A2-99A1-8BE46AD6FD48} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 		{8B5252E2-7A08-45DC-9596-1B217B104C83} = {CDE2CA10-4E4A-45A2-99A1-8BE46AD6FD48}
+		{F70996AA-023E-4EDE-B2C8-1BD692E76873} = {CDE2CA10-4E4A-45A2-99A1-8BE46AD6FD48}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}
