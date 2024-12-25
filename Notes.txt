@@ -1,23 +1,34 @@
-Fixes for v056
+Remember:
+	Rename to Animation Retarget - own project 
+	Check with bb, the diabled buttons /warbeast 
+	Damping and root node handling 
+	Unit tests! 
+	make everything selectable
+	Rendering window - disbale backface culling 
+	Complex mesh loader - fast loading! 
+	"How to use" window - point to github?
+	Create a "save project" button?
+	Superview - default scene content to be expanded. Allow select meshes
 
+Fixes for v056
 	General: Move resent files out of settings
 	General: Convert GameinformationFactory to a static! 
 	General: Show hisotry of commands in exceptions
 	General: Close console window on close
 		
 	KitbashTool: Unit test - open karl, import general, make head editable, rerig, save 
-		
+	KitbashTool: Unit tests - ensure shader paths are correct!
+	
 	GameWorld: Move bloomeffect to resourcelib
 	GameWorld: ONly render glow if there is glow stuff in the pass 
 	GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
 	
-	KitbashTool: Manual vertex editor for weights 
+	KitbashTool: Manual vertex editor for weights (new editor or reuse debug view)
 	KitbashTool: Reduce icon size?
 	KitbashTool: when loading material - if not supported show message
 	KitbashTool: Issues with rendering/selection and pivot point
 	KitbashTool: When there is no files left in a reference mesh - close the node 
-	
-	
+		
 Bugs:
 	KitbashTool: Node clicking in tree view is slow
 	KitbashTool: Tint capability crash bug => Shield change to tint

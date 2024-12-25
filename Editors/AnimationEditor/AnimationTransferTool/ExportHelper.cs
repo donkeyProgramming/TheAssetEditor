@@ -5,9 +5,6 @@ namespace AnimationEditor.AnimationTransferTool
 {
     class ExportHelper
     {
-
-
-
         public static void ExportMappedSkeleton()
         {
 

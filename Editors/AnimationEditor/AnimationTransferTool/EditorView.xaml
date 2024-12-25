@@ -4,36 +4,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AnimationEditor.AnimationTransferTool" 
-             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:s="http://schemas.singulink.com/xaml" 
+             xmlns:settings="clr-namespace:Editors.AnimationVisualEditors.AnimationTransferTool.Settings"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="800">
-    <DockPanel LastChildFill="False">
+    <DockPanel >
 
-        <local:AnimationSettingsView DockPanel.Dock="Top"/>
+        <settings:SettingsView DockPanel.Dock="Top"/>
 
+
+
+        <Button DockPanel.Dock="Bottom"  Content="Apply Settings" Command="{Binding UpdateAnimationCommand}" Margin="2" />
+        <Button DockPanel.Dock="Bottom"  Content="Use Target as Source" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
+        <Button DockPanel.Dock="Bottom"  Content="Save" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
+        <Button DockPanel.Dock="Bottom"  Content="Advanced Save" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
+        <Button DockPanel.Dock="Bottom"  Content="Open Bone Mapping Window" Command="{Binding BoneManager.ShowBoneMappingWindowCommand}"/>
+        
         <local:BoneSettingsView DockPanel.Dock="Top"/>
 
-        <Expander  IsExpanded="True" Header="Buttons:" DockPanel.Dock="Top">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition />
-                </Grid.RowDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0" Content="Open bone mapping window" Click="{s:MethodBinding OpenMappingWindow}" Margin="2"/>
-                <Button Grid.Row="0" Grid.Column="1" Content="Save Animation" Click="{s:MethodBinding SaveAnimationAction}" Margin="2"/>
-                <Button Grid.Row="0" Grid.Column="2" Content="Batch Process"  Click="{s:MethodBinding OpenBatchProcessDialog}" Margin="2"/>
-
-                <Button Grid.Row="1" Grid.Column="0"  Content="Apply Settings" Click="{s:MethodBinding UpdateAnimation}" Margin="2" />
-                <Button Grid.Row="1" Grid.Column="1"  Content="Use Target as Source" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
-            </Grid>
-        </Expander>
-
+       
     </DockPanel>
 </UserControl>

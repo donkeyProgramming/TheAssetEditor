@@ -63,27 +63,7 @@
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.FreezeUnmapped.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Content="Zero unmapped bones" ToolTip="Set the transform of all unmapped bones to 0"/>
             </DockPanel>
 
-            <GroupBox Header="Saving" >
-                <StackPanel>
-                    <DockPanel >
-                        <Label Content="Save Prefix" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                        <Label Content=":" DockPanel.Dock="Left"/>
-                        <ComboBox Margin="2" DockPanel.Dock="Right" Width="60" ItemsSource="{Binding AnimationSettings.AnimationOutputFormat.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.AnimationOutputFormat.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                        <Label Content="Format:" DockPanel.Dock="Right"/>
-                        <TextBox Text="{Binding AnimationSettings.SavePrefix.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
-                    </DockPanel>
-
-                    <DockPanel >
-                        <Label Content="Use generated skeleton" Width ="{StaticResource labelWidth}"/>
-                        <Label Content=":"/>
-                        <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.UseScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                        <Button Content="Export Mesh/skeleton at scale" Click="{s:MethodBinding ExportScaledMesh}" DockPanel.Dock="Right" Margin="2"/>
-                        <TextBox Text="{Binding AnimationSettings.ScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
-
-                    </DockPanel>
-                </StackPanel>
-            </GroupBox>
-
+          
             <DockPanel>
                 <StackPanel>
                     <DockPanel>
