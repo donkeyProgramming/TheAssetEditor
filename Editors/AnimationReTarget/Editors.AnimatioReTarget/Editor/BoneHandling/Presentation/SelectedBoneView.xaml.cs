@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling.Presentation
+namespace Editors.AnimatioReTarget.Editor.BoneHandling.Presentation
 {
     /// <summary>
     /// Interaction logic for SelectedBoneView.xaml

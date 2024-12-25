@@ -1,9 +1,8 @@
 ﻿using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.AnimationVisualEditors.AnimationTransferTool;
-using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling;
-using Editors.AnimationVisualEditors.AnimationTransferTool.Settings;
+using Editors.AnimatioReTarget.Editor.BoneHandling;
+using Editors.AnimatioReTarget.Editor.Settings;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
@@ -12,13 +11,13 @@ using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Shared.Core.PackFiles;
 
-namespace AnimationEditor.AnimationTransferTool
+namespace Editors.AnimatioReTarget.Editor
 {
     // When applying proportion scling, should also rotation be scaled? 
     // Show scale factor in view for each bone 
 
 
-    public partial class AnimationTransferToolViewModel : EditorHostBase
+    public partial class AnimationRetargetViewModel : EditorHostBase
     {
         // private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
 
@@ -40,7 +39,7 @@ namespace AnimationEditor.AnimationTransferTool
 
         public override Type EditorViewModelType => typeof(EditorView);
 
-        public AnimationTransferToolViewModel(
+        public AnimationRetargetViewModel(
             IEditorHostParameters editorHostParameters,
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,

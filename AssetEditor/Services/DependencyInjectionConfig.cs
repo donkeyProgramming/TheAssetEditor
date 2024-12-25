@@ -32,6 +32,7 @@ namespace AssetEditor.Services
                 new Editors.AnimationVisualEditors.DependencyInjectionContainer(),
                 new Editors.ImportExport.DependencyInjectionContainer(),
                 new Editor.VisualSkeletonEditor.DependencyInjectionContainer(),
+                new Editors.AnimatioReTarget.DependencyInjectionContainer(),
 
                 // Host application
                 new DependencyInjectionContainer(),

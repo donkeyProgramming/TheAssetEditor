@@ -1,29 +1,21 @@
-﻿<UserControl x:Class="AnimationEditor.AnimationTransferTool.EditorView"
+﻿<UserControl x:Class="Editors.AnimatioReTarget.Editor.EditorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:AnimationEditor.AnimationTransferTool" 
              xmlns:s="http://schemas.singulink.com/xaml" 
-             xmlns:settings="clr-namespace:Editors.AnimationVisualEditors.AnimationTransferTool.Settings"
+             xmlns:settings="clr-namespace:Editors.AnimatioReTarget.Editor.Settings" xmlns:presentation="clr-namespace:Editors.AnimatioReTarget.Editor.BoneHandling.Presentation"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="800">
     <DockPanel >
-
         <settings:SettingsView DockPanel.Dock="Top"/>
-
-
 
         <Button DockPanel.Dock="Bottom"  Content="Apply Settings" Command="{Binding UpdateAnimationCommand}" Margin="2" />
         <Button DockPanel.Dock="Bottom"  Content="Use Target as Source" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
         <Button DockPanel.Dock="Bottom"  Content="Save" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
         <Button DockPanel.Dock="Bottom"  Content="Advanced Save" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
         <Button DockPanel.Dock="Bottom"  Content="Open Bone Mapping Window" Command="{Binding BoneManager.ShowBoneMappingWindowCommand}"/>
-        
-        <local:BoneSettingsView DockPanel.Dock="Top"/>
 
-
-
-       
+        <presentation:BoneSettingsView DockPanel.Dock="Top"/>
     </DockPanel>
 </UserControl>

@@ -1,7 +1,7 @@
 ﻿using Editors.Shared.Core.Common;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling
+namespace Editors.AnimatioReTarget.Editor.BoneHandling
 {
     class SkeletonBoneHighlighter : ISkeletonBoneHighlighter
     {

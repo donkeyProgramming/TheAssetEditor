@@ -70,6 +70,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Shared.Core", "Testing
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.SkeletonEditor", "Editors\SkeletonEditor\Test.SkeletonEditor\Test.SkeletonEditor.csproj", "{C0B47D79-D2F3-445B-A90F-6AA40E23D7D8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AnimationReTarget", "AnimationReTarget", "{CDE2CA10-4E4A-45A2-99A1-8BE46AD6FD48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editors.AnimatioReTarget", "Editors\AnimationReTarget\Editors.AnimatioReTarget\Editors.AnimatioReTarget.csproj", "{8B5252E2-7A08-45DC-9596-1B217B104C83}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -172,6 +176,10 @@ Global
 		{C0B47D79-D2F3-445B-A90F-6AA40E23D7D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0B47D79-D2F3-445B-A90F-6AA40E23D7D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0B47D79-D2F3-445B-A90F-6AA40E23D7D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B5252E2-7A08-45DC-9596-1B217B104C83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B5252E2-7A08-45DC-9596-1B217B104C83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B5252E2-7A08-45DC-9596-1B217B104C83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B5252E2-7A08-45DC-9596-1B217B104C83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -203,6 +211,8 @@ Global
 		{95A59789-08A8-4917-A252-B6E14BC18C6A} = {3DC5AC01-2C79-484D-A9FD-4EB3F7EC4960}
 		{13904B63-D942-41A9-863D-B977B33205E8} = {18424B6A-CB8A-4CE1-935C-72459F31521B}
 		{C0B47D79-D2F3-445B-A90F-6AA40E23D7D8} = {711AC21F-B31C-4FC8-9D38-D1F0C1FEC6C0}
+		{CDE2CA10-4E4A-45A2-99A1-8BE46AD6FD48} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
+		{8B5252E2-7A08-45DC-9596-1B217B104C83} = {CDE2CA10-4E4A-45A2-99A1-8BE46AD6FD48}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}

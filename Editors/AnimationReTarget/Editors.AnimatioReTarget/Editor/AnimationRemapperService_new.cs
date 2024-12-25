@@ -1,21 +1,21 @@
-﻿using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling;
-using Editors.AnimationVisualEditors.AnimationTransferTool.Settings;
+﻿using Editors.AnimatioReTarget.Editor.BoneHandling;
+using Editors.AnimatioReTarget.Editor.Settings;
 using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool
+namespace Editors.AnimatioReTarget.Editor
 {
     public class AnimationRemapperService_new
     {
-       // List<IndexRemapping> _remappingInformaton;
+        // List<IndexRemapping> _remappingInformaton;
         private readonly IEnumerable<SkeletonBoneNode_new> _bones;
         private readonly AnimationGenerationSettings _settings;
 
         public AnimationRemapperService_new(AnimationGenerationSettings settings, IEnumerable<SkeletonBoneNode_new> bones)
         {
             _settings = settings;
-           // _remappingInformaton = mapping;
+            // _remappingInformaton = mapping;
             _bones = bones;
         }
 
@@ -239,7 +239,7 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool
 
 
                     var boneIndexAttachmentPointSource = mappedIndex.Value;
-                    var mappedIndexRef = BoneHelper_new.GetMappedIndex(_bones, boneIndexHandSelf); 
+                    var mappedIndexRef = BoneHelper_new.GetMappedIndex(_bones, boneIndexHandSelf);
                     var boneIndexHandSource = mappedIndexRef;
 
 

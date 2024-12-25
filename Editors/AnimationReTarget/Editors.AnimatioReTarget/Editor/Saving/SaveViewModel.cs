@@ -1,20 +1,9 @@
-﻿using System.Windows;
-using AnimationEditor.AnimationTransferTool;
-using CommonControls.SelectionListDialog;
-using CommunityToolkit.Mvvm.ComponentModel;
-using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling;
-using Editors.Shared.Core.Common;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.AnimatioReTarget.Editor.BoneHandling;
 using Editors.Shared.Core.Services;
-using GameWorld.Core.Animation;
-using Serilog;
-using Shared.Core.ErrorHandling;
-using Shared.Core.Misc;
 using Shared.Core.PackFiles;
-using Shared.GameFormats.Animation;
-using Shared.Ui.BaseDialogs.SelectionListDialog;
-using Shared.Ui.Common;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.Saving
+namespace Editors.AnimatioReTarget.Editor.Saving
 {
     public partial class SaveViewModel : ObservableObject
     {

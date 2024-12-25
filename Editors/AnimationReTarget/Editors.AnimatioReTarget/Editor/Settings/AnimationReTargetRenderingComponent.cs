@@ -6,7 +6,7 @@ using GameWorld.Core.Rendering.RenderItems;
 using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.Settings
+namespace Editors.AnimatioReTarget.Editor.Settings
 {
     public class AnimationReTargetRenderingComponent : BaseComponent
     {

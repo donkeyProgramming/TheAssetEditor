@@ -1,11 +1,7 @@
-﻿using AnimationEditor.AnimationTransferTool;
-using AnimationEditor.CampaignAnimationCreator;
+﻿using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.Common.BaseControl;
 using AnimationEditor.MountAnimationCreator;
 using Editors.AnimationVisualEditors.AnimationKeyframeEditor;
-using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling;
-using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling.Presentation;
-using Editors.AnimationVisualEditors.AnimationTransferTool.Settings;
 using Editors.Shared.Core.Common.BaseControl;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
@@ -21,12 +17,6 @@ namespace Editors.AnimationVisualEditors
             serviceCollection.AddScoped<EditorHost<CampaignAnimationCreatorViewModel>>();
             serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
 
-            serviceCollection.AddScoped<AnimationTransferToolViewModel>();
-            serviceCollection.AddScoped<BoneManager>();
-            RegisterWindow<BoneMappingWindow>(serviceCollection);
-            RegisterGameComponent<AnimationReTargetRenderingComponent>(serviceCollection);
-
-
             serviceCollection.AddScoped<EditorHost<MountAnimationCreatorViewModel>>();
             serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
 
@@ -38,11 +28,6 @@ namespace Editors.AnimationVisualEditors
 
         public override void RegisterTools(IEditorDatabase database)
         {
-            EditorInfoBuilder
-              .Create<AnimationTransferToolViewModel, EditorHostView>(EditorEnums.AnimationTransfer_Editor)
-              .AddToToolbar("Animation Transfer Tool", false)
-              .Build(database);
-
             EditorInfoBuilder
                 .Create<EditorHost<MountAnimationCreatorViewModel>, EditorHostView>(EditorEnums.MountTool_Editor)
                 .AddToToolbar("Mount Tool", false)

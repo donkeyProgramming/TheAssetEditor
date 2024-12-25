@@ -10,19 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.Saving
+namespace Editors.AnimatioReTarget.Editor.Settings
 {
     /// <summary>
-    /// Interaction logic for SaveWindow.xaml
+    /// Interaction logic for SettingsView.xaml
     /// </summary>
-    public partial class SaveWindow : Window
+    public partial class SettingsView : UserControl
     {
-        public SaveWindow(SaveViewModel viewModel)
+        public SettingsView()
         {
             InitializeComponent();
-            DataContext = viewModel;
         }
     }
 }

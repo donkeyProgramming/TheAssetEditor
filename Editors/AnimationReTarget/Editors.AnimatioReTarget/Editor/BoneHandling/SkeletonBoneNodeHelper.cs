@@ -2,7 +2,7 @@
 using Shared.GameFormats.Animation;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling
+namespace Editors.AnimatioReTarget.Editor.BoneHandling
 {
     public static class SkeletonBoneNodeHelper
     {

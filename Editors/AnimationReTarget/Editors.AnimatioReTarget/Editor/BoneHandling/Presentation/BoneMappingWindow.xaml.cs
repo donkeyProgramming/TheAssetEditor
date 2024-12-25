@@ -2,7 +2,7 @@
 using Shared.Ui.Editors.BoneMapping;
 using WindowHandling;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling.Presentation
+namespace Editors.AnimatioReTarget.Editor.BoneHandling.Presentation
 {
     /// <summary>
     /// Interaction logic for BoneMappingWindow.xaml

@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.Settings
+namespace Editors.AnimatioReTarget.Editor.Settings
 {
     public partial class AnimationGenerationSettings : ObservableObject
     {

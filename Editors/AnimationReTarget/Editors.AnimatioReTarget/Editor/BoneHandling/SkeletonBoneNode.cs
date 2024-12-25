@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Shared.Ui.BaseDialogs.MathViews;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling
+namespace Editors.AnimatioReTarget.Editor.BoneHandling
 {
     public partial class SkeletonBoneNode_new : ObservableObject
     {

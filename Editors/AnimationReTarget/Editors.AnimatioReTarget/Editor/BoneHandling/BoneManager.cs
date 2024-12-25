@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling.Presentation;
+using Editors.AnimatioReTarget.Editor.BoneHandling.Presentation;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Services;
 using Shared.Core.Misc;
@@ -9,7 +9,7 @@ using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 using Shared.Ui.Editors.BoneMapping;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling
+namespace Editors.AnimatioReTarget.Editor.BoneHandling
 {
     public partial class BoneManager : ObservableObject
     {
