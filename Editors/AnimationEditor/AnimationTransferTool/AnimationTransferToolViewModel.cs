@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using CommonControls.SelectionListDialog;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationVisualEditors.AnimationTransferTool;
 using Editors.AnimationVisualEditors.AnimationTransferTool.BoneHandling;
 using Editors.AnimationVisualEditors.AnimationTransferTool.Settings;
@@ -36,7 +37,7 @@ namespace AnimationEditor.AnimationTransferTool
         AnimationToolInput _inputTargetData;
         AnimationToolInput _inputSourceData;
 
-        private readonly SceneObjectViewModelBuilder _sceneObjectViewModelBuilder;
+ 
         private readonly SceneObjectEditor _assetViewModelBuilder;
         private readonly IFileSaveService _packFileSaveService;
        // private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
@@ -48,8 +49,8 @@ namespace AnimationEditor.AnimationTransferTool
         private SceneObject _copyFrom;
         private SceneObject Generated { get; set; }
 
-        List<IndexRemapping> _remappingInformation;
-        RemappedAnimatedBoneConfiguration _config;
+        //List<IndexRemapping> _remappingInformation;
+        //RemappedAnimatedBoneConfiguration _config;
         //AssetEditorWindow<BoneMappingViewModel> _activeBoneMappingWindow;
 
         FilterCollection<SkeletonBoneNode> ModelBoneList { get; set; } = new FilterCollection<SkeletonBoneNode>(null);
@@ -87,7 +88,7 @@ namespace AnimationEditor.AnimationTransferTool
             _rendering = renderingComponent;
             DisplayName = "Animation transfer tool";
 
-            _sceneObjectViewModelBuilder = referenceModelSelectionViewModelBuilder;
+            
             _assetViewModelBuilder = assetViewModelBuilder;
             _packFileSaveService = packFileSaveService;
      
@@ -156,18 +157,53 @@ namespace AnimationEditor.AnimationTransferTool
 
             if (_copyFrom.Skeleton != null)
                 CopyFromSkeletonChanged(_copyFrom.Skeleton);
-            AnimationSettings.DisplayOffset.OnValueChanged += DisplayOffset_OnValueChanged;
-            DisplayOffset_OnValueChanged(new Vector3ViewModel(0, 0, 2));
 
             BoneManager.UpdateSourceSkeleton(_copyFrom.Skeleton.SkeletonName);
             BoneManager.UpdateTargetSkeleton(_copyTo.Skeleton.SkeletonName);
         }
 
-        private void DisplayOffset_OnValueChanged(Vector3ViewModel newValue)
+        
+        [RelayCommand]public void UpdateAnimation()
         {
-            _copyTo.Offset = Matrix.CreateTranslation(newValue.GetAsVector3() * -1);
-            _copyFrom.Offset = Matrix.CreateTranslation(newValue.GetAsVector3());
+            if (CanUpdateAnimation(true))
+            {
+                var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip, _copyTo.AnimationClip);
+                _assetViewModelBuilder.SetAnimationClip(Generated, newAnimationClip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+                _player.SelectedMainAnimation = _player.PlayerItems.First(x => x.Asset == Generated);
+            }
         }
+
+        AnimationClip UpdateAnimation(AnimationClip animationToCopy, AnimationClip originalAnimation)
+        {
+            
+            var service = new AnimationRemapperService_new(Settings, BoneManager.Bones);
+            var newClip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, animationToCopy);
+            return newClip;
+        }
+
+        bool CanUpdateAnimation(bool requireAnimation)
+        {
+            //if (_remappingInformation == null)
+            //{
+            //    MessageBox.Show("No mapping created?", "Error", MessageBoxButton.OK);
+            //    return false;
+            //}
+
+            if (_copyTo.Skeleton == null || _copyFrom.Skeleton == null)
+            {
+                MessageBox.Show("Missing a skeleton?", "Error", MessageBoxButton.OK);
+                return false;
+            }
+
+            if (_copyFrom.AnimationClip == null && requireAnimation)
+            {
+                MessageBox.Show("No animation to copy selected", "Error", MessageBoxButton.OK);
+                return false;
+            }
+
+            return true;
+        }
+         
 
         /*void HightlightSelectedBones(SkeletonBoneNode bone)
         {
@@ -191,10 +227,10 @@ namespace AnimationEditor.AnimationTransferTool
         private void CopyToMeshChanged(SceneObject newValue)
         {
             _assetViewModelBuilder.CopyMeshFromOther(Generated, newValue);
-            CreateBoneOverview(newValue.Skeleton);
+          //  CreateBoneOverview(newValue.Skeleton);
            // HightlightSelectedBones(null);
 
-            _config = null;
+           // _config = null;
             AnimationSettings.UseScaledSkeletonName.Value = false;
             AnimationSettings.ScaledSkeletonName.Value = "";
         }
@@ -204,21 +240,21 @@ namespace AnimationEditor.AnimationTransferTool
             if (newValue == _copyFrom.Skeleton)
                 return;
 
-            _remappingInformation = null;
-            CreateBoneOverview(_copyTo.Skeleton);
+           // _remappingInformation = null;
+         //   CreateBoneOverview(_copyTo.Skeleton);
            // HightlightSelectedBones(null);
 
             var standAnim = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(newValue.SkeletonName).FirstOrDefault(x => x.AnimationFile.Contains("stand"));
             if (standAnim != null)
                 _assetViewModelBuilder.SetAnimation(_copyFrom, standAnim);
 
-            _config = null;
+          //  _config = null;
             AnimationSettings.UseScaledSkeletonName.Value = false;
             AnimationSettings.ScaledSkeletonName.Value = "";
         }
 
-        public void OpenMappingWindow()
-        {
+       // public void OpenMappingWindow()
+       // {
            ////if (_activeBoneMappingWindow != null)
            ////{
            ////    _activeBoneMappingWindow.Focus();
@@ -260,7 +296,7 @@ namespace AnimationEditor.AnimationTransferTool
            // _activeBoneMappingWindow.Show();
            // _activeBoneMappingWindow.ApplySettings += BoneMappingWindow_Apply;
            // _activeBoneMappingWindow.Closed += BoneMappingWindow_Closed;*/
-        }
+        //}
 
         //private void BoneMappingWindow_Apply(object sender, EventArgs e)
         //{
@@ -286,74 +322,74 @@ namespace AnimationEditor.AnimationTransferTool
         //    }
         //}
 
-        void UpdateBonesAfterMapping(IEnumerable<SkeletonBoneNode> bones)
-        {
-            foreach (var bone in bones)
-            {
-                var mapping = _remappingInformation.FirstOrDefault(x => x.OriginalValue == bone.BoneIndex.Value);
-                bone.HasMapping.Value = mapping != null;
-                UpdateBonesAfterMapping(bone.Children);
-            }
-        }
-
-        public void ClearRelativeSelectedBoneAction()
-        {
-            if (SelectedBone.Value != null)
-                SelectedBone.Value.SelectedRelativeBone.Value = null;
-        }
-
-      
-
-
-        public void ClearAllSettings()
-        {
-            if (MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                CreateBoneOverview(_copyTo.Skeleton);
-        }
-
-        public void UseTargetAsSource()
-        {
-            if (MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            {
-                AnimationSettings.UseScaledSkeletonName.Value = false;
-                AnimationSettings.ScaledSkeletonName.Value = "";
-                _assetViewModelBuilder.CopyMeshFromOther(_copyFrom, _copyTo);
-            }
-        }
-
-        void CreateBoneOverview(GameSkeleton skeleton)
-        {
-            SelectedBone.Value = null;
-            Bones.Clear();
-            FlatBoneList.Clear();
-            FlatBoneList.Add(null);
-
-            if (skeleton == null)
-                return;
-            for (int i = 0; i < skeleton.BoneCount; i++)
-            {
-                SkeletonBoneNode newBone = null;
-                var parentBoneId = skeleton.GetParentBoneIndex(i);
-                if (parentBoneId == -1)
-                {
-                    newBone = new SkeletonBoneNode(skeleton.BoneNames[i], i, -1);
-                    Bones.Add(newBone);
-                }
-                else
-                {
-                    var treeParent = BoneHelper.GetBoneFromId(Bones, parentBoneId);
-                    if (treeParent != null)
-                    {
-                        newBone = new SkeletonBoneNode(skeleton.BoneNames[i], i, parentBoneId);
-                        treeParent.Children.Add(newBone);
-                    }
-                }
-
-                FlatBoneList.Add(newBone);
-            }
-        }
-
-        public void ExportMappedSkeleton() => ExportHelper.ExportMappedSkeleton();
-        public void ExportScaledMesh() => ExportHelper.ExportScaledMesh();
+       // void UpdateBonesAfterMapping(IEnumerable<SkeletonBoneNode> bones)
+       // {
+       //     foreach (var bone in bones)
+       //     {
+       //         var mapping = _remappingInformation.FirstOrDefault(x => x.OriginalValue == bone.BoneIndex.Value);
+       //         bone.HasMapping.Value = mapping != null;
+       //         UpdateBonesAfterMapping(bone.Children);
+       //     }
+       // }
+       //
+       // public void ClearRelativeSelectedBoneAction()
+       // {
+       //     if (SelectedBone.Value != null)
+       //         SelectedBone.Value.SelectedRelativeBone.Value = null;
+       // }
+       //
+       //
+       //
+       //
+       // public void ClearAllSettings()
+       // {
+       //     if (MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+       //         CreateBoneOverview(_copyTo.Skeleton);
+       // }
+       //
+       // public void UseTargetAsSource()
+       // {
+       //     if (MessageBox.Show("Are you sure?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+       //     {
+       //         AnimationSettings.UseScaledSkeletonName.Value = false;
+       //         AnimationSettings.ScaledSkeletonName.Value = "";
+       //         _assetViewModelBuilder.CopyMeshFromOther(_copyFrom, _copyTo);
+       //     }
+       // }
+       //
+       // void CreateBoneOverview(GameSkeleton skeleton)
+       // {
+       //     SelectedBone.Value = null;
+       //     Bones.Clear();
+       //     FlatBoneList.Clear();
+       //     FlatBoneList.Add(null);
+       //
+       //     if (skeleton == null)
+       //         return;
+       //     for (int i = 0; i < skeleton.BoneCount; i++)
+       //     {
+       //         SkeletonBoneNode newBone = null;
+       //         var parentBoneId = skeleton.GetParentBoneIndex(i);
+       //         if (parentBoneId == -1)
+       //         {
+       //             newBone = new SkeletonBoneNode(skeleton.BoneNames[i], i, -1);
+       //             Bones.Add(newBone);
+       //         }
+       //         else
+       //         {
+       //             var treeParent = BoneHelper.GetBoneFromId(Bones, parentBoneId);
+       //             if (treeParent != null)
+       //             {
+       //                 newBone = new SkeletonBoneNode(skeleton.BoneNames[i], i, parentBoneId);
+       //                 treeParent.Children.Add(newBone);
+       //             }
+       //         }
+       //
+       //         FlatBoneList.Add(newBone);
+       //     }
+       // }
+       //
+       // public void ExportMappedSkeleton() => ExportHelper.ExportMappedSkeleton();
+       // public void ExportScaledMesh() => ExportHelper.ExportScaledMesh();
     }
 }
