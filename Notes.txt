@@ -48,6 +48,7 @@ Bugs:
 	
 	
 Improvements:
+	play sound using monogame audio. find wem converter?
 	https://github.com/Dirkster99/AvalonDock
 	General: SelectionManager, remove the use of SelectionManager_SelectionChanged event
 	General: Upgrade to new community toolkit
