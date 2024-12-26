@@ -50,7 +50,7 @@ namespace Editors.Audio.Utility
                 Description = "Graph structure:"
             };
 
-            var parser = new WWiseTreeParserParent(audioRepository, true, true, true);
+            var parser = new TempRenameWwiseTreeParserParent(audioRepository, true, true, true);
             var nodes = parser.BuildHierarchyAsFlatList(sound);
             nodes.Reverse();
 

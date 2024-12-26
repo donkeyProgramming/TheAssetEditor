@@ -9,7 +9,7 @@ namespace Editors.Audio.BnkCompiler
     using Shared.Core.ErrorHandling;
     using Shared.Core.Misc;
     using Shared.Core.PackFiles;
-    using static Editors.Audio.Utility.WWiseWavToWem;
+    using static Editors.Audio.Utility.TempRenameWwiseWavToWem;
 
     public class AudioFileImporter
     {
@@ -36,7 +36,7 @@ namespace Editors.Audio.BnkCompiler
                 wavFilePaths.Add(sound.FilePath);
             }
 
-            var wavToWem = new WWiseWavToWem();
+            var wavToWem = new TempRenameWwiseWavToWem();
             wavToWem.WavToWem(wavFiles, wavFilePaths);
 
             foreach (var sound in compilerData.Sounds)

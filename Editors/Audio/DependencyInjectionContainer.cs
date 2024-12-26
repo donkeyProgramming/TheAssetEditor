@@ -42,12 +42,12 @@ namespace Editors.Audio
             serviceCollection.AddTransient<BnkParser>();
             serviceCollection.AddTransient<SoundPlayer>();
 
-            serviceCollection.AddScoped<IWWiseHircGenerator, ActionGenerator>();
-            serviceCollection.AddScoped<IWWiseHircGenerator, EventGenerator>();
-            serviceCollection.AddScoped<IWWiseHircGenerator, SoundGenerator>();
-            serviceCollection.AddScoped<IWWiseHircGenerator, ActorMixerGenerator>();
-            serviceCollection.AddScoped<IWWiseHircGenerator, RandomContainerGenerator>();
-            serviceCollection.AddScoped<IWWiseHircGenerator, DialogueEventGenerator>();
+            serviceCollection.AddScoped<TempRenameIWwiseHircGenerator, ActionGenerator>();
+            serviceCollection.AddScoped<TempRenameIWwiseHircGenerator, EventGenerator>();
+            serviceCollection.AddScoped<TempRenameIWwiseHircGenerator, SoundGenerator>();
+            serviceCollection.AddScoped<TempRenameIWwiseHircGenerator, ActorMixerGenerator>();
+            serviceCollection.AddScoped<TempRenameIWwiseHircGenerator, RandomContainerGenerator>();
+            serviceCollection.AddScoped<TempRenameIWwiseHircGenerator, DialogueEventGenerator>();
             serviceCollection.AddScoped<HircBuilder>();
             serviceCollection.AddScoped<BnkHeaderBuilder>();
             serviceCollection.AddScoped<CompilerService>();

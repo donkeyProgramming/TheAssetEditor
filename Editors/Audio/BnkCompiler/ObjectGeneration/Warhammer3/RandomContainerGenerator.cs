@@ -8,7 +8,7 @@ using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
-    public class RandomContainerGenerator : IWWiseHircGenerator
+    public class RandomContainerGenerator : TempRenameIWwiseHircGenerator
     {
         public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(RandomContainer);

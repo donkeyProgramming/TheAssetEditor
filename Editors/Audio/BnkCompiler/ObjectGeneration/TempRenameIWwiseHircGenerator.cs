@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {
-    public interface IWWiseHircGenerator
+    public interface TempRenameIWwiseHircGenerator
     {
         public string GameName { get; }
         public Type AudioProjectType { get; }

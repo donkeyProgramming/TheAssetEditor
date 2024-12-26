@@ -11,11 +11,11 @@ using Shared.Core.Settings;
 
 namespace Editors.Audio.Utility
 {
-    public class WWiseWavToWem
+    public class TempRenameWwiseWavToWem
     {
         readonly ApplicationSettingsService _settingsService;
 
-        public WWiseWavToWem()
+        public TempRenameWwiseWavToWem()
         {
             _settingsService = new ApplicationSettingsService();
         }

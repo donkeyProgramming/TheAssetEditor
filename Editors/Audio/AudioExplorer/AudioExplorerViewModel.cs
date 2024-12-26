@@ -69,7 +69,7 @@ namespace Editors.Audio.AudioExplorer
                 _selectedNode = null;
                 TreeList.Clear();
 
-                var parser = new WWiseTreeParserChildren(_audioRepository, ShowIds.Value, ShowBnkName.Value, UseBnkNameWhileParsing.Value);
+                var parser = new TempRenameWwiseTreeParserChildren(_audioRepository, ShowIds.Value, ShowBnkName.Value, UseBnkNameWhileParsing.Value);
                 var rootNode = parser.BuildHierarchy(newValue.HircItem);
                 TreeList.Add(rootNode);
             }

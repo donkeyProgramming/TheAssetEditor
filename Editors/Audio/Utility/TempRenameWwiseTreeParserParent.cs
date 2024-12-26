@@ -5,9 +5,9 @@ using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Utility
 {
-    public class WWiseTreeParserParent : WWiseTreeParserBase
+    public class TempRenameWwiseTreeParserParent : TempRenameWwiseTreeParserBase
     {
-        public WWiseTreeParserParent(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
+        public TempRenameWwiseTreeParserParent(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
             : base(repository, showId, showOwningBnkFile, filterByBnkName)
         {
             _hircProcessChildMap.Add(HircType.SwitchContainer, FindParentSwitchControl);
