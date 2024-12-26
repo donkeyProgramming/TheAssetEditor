@@ -14,11 +14,10 @@ namespace Editors.AnimatioReTarget
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-
             serviceCollection.AddScoped<AnimationRetargetViewModel>();
             serviceCollection.AddScoped<BoneManager>();
             RegisterWindow<BoneMappingWindow>(serviceCollection);
-            RegisterGameComponent<AnimationReTargetRenderingComponent>(serviceCollection);
+            serviceCollection.AddScoped<AnimationReTargetRenderingComponent>();
 
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);

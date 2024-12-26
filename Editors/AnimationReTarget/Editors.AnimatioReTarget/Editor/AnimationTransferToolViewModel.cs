@@ -59,6 +59,8 @@ namespace Editors.AnimatioReTarget.Editor
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _player = player;
 
+            editorHostParameters.GameWorld.AddComponent(renderingComponent);
+
             Initialize();
         }
 
