@@ -12,6 +12,20 @@ Remember:
 	Change renderingcomponent to be added manually in the retarget tool. 
 	Move Editors.Shared.Core into shared? Maybe under UI?
 
+
+Bug: System.Windows.ResourceReferenceKeyNotFoundException: DefaultTreeNodeStyle resource not found
+	Maybe it's being called and not attached to the tree yet? Consider not using resources and instead defining properties so the selector has the templates as children. eg.
+	https://github.com/stevemonaco/ImageMagitek/blob/wpf/TileShop.WPF/ViewExtenders/Selectors/ProjectTreeTemplateSelector.cs
+	https://github.com/stevemonaco/ImageMagitek/blob/wpf/TileShop.WPF/Features/Project/ProjectTreeView.xaml#L31-L45
+	
+Bug: Open kitbash editor. Move files around, tree view crash in Database_PackFilesUpdated
+Bug: Opening the same file in two different editors cause Attempting to open file 'sengko_linchin.wsmodel', but is is already open. Give better error
+Bug: Wrong text in lod view for kitbash https://github.com/donkeyProgramming/TheAssetEditor/issues/230
+bug: Closing superview https://github.com/donkeyProgramming/TheAssetEditor/issues/231
+Bug: Rendering issue, causes softlock https://github.com/donkeyProgramming/TheAssetEditor/issues/232
+Bug: Try to detect mismatch between wsmodel and rmv model, difference in lods/meshes count 
+Bug: Complex mesh loader - only load lod/model 1 for superview+++
+
 Fixes for v056
 	General: Move resent files out of settings
 	General: Convert GameinformationFactory to a static! 
