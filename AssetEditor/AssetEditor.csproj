@@ -17,7 +17,6 @@
         <ProjectReference Include="..\Editors\AnimationReTarget\Editors.AnimatioReTarget\Editors.AnimatioReTarget.csproj" />
         <ProjectReference Include="..\Editors\Audio\Editors.Audio.csproj" />
         <ProjectReference Include="..\Editors\ImportExportEditor\Editors.ImportExport\Editors.ImportExport.csproj" />
-        <ProjectReference Include="..\Editors\KitbasherEditor\Editors.KitbasherEditor.csproj" />
         <ProjectReference Include="..\Editors\Kitbashing\KitbasherEditor\Editors.KitbasherEditor.csproj" />
         <ProjectReference Include="..\Editors\Reports\Editors.Reports.csproj" />
         <ProjectReference Include="..\Editors\SkeletonEditor\Editor.VisualSkeletonEditor\Editor.VisualSkeletonEditor.csproj" />
