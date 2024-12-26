@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Shared.Core.ByteParsing;
 
-namespace Shared.GameFormats.WWise
+namespace Shared.GameFormats.Wwise
 {
     public class BnkChunkHeader
     {

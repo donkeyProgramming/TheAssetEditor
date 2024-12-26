@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
-using Shared.GameFormats.WWise.Hirc.Shared;
+using Shared.GameFormats.Wwise.Hirc.Shared;
 using static Editors.Audio.BnkCompiler.ProjectLoader;
 
 namespace Editors.Audio.BnkCompiler

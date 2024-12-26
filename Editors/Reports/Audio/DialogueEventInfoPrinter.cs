@@ -2,8 +2,8 @@
 using Editors.Audio.Utility;
 using Shared.Core.Events;
 using Shared.Core.Misc;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Reports.Audio
 {

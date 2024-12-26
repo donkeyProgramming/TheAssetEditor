@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System;
 using System.Linq;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc.V136;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc.V136;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
@@ -12,14 +12,14 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(ActorMixer);
 
-        public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
+        public HircItem ConvertToWwise(IAudioProjectHircItem projectItem, CompilerData project)
         {
             var typedProjectItem = projectItem as ActorMixer;
             Guard.IsNotNull(typedProjectItem);
-            return ConvertToWWise(typedProjectItem, project);
+            return ConvertToWwise(typedProjectItem, project);
         }
 
-        public CAkActorMixer_v136 ConvertToWWise(ActorMixer actorMixer, CompilerData project)
+        public static CAkActorMixer_v136 ConvertToWwise(ActorMixer actorMixer, CompilerData project)
         {
             var wwiseActorMixer = new CAkActorMixer_v136();
             wwiseActorMixer.Id = actorMixer.Id;

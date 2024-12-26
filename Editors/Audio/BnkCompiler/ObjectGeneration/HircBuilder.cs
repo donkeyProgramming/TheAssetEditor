@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommunityToolkit.Diagnostics;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {
@@ -36,7 +36,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration
             var wwiseHircs = sortedProjectHircList.Select(hircProjectItem =>
             {
                 var generator = FindGenerator(hircProjectItem, project.ProjectSettings.OutputGame);
-                return generator.ConvertToWWise(hircProjectItem, project);
+                return generator.ConvertToWwise(hircProjectItem, project);
             }).ToList();
             return wwiseHircs;
         }

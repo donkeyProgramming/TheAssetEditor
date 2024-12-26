@@ -1,7 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.WWise.Hirc.Shared;
+using Shared.GameFormats.Wwise.Hirc.Shared;
 
-namespace Shared.GameFormats.WWise.Hirc.V112
+namespace Shared.GameFormats.Wwise.Hirc.V112
 {
     public class CAkDialogueEvent_v112 : HircItem, ICADialogEvent
     {

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Shared.Core.ByteParsing;
 
-namespace Shared.GameFormats.WWise.Data
+namespace Shared.GameFormats.Wwise.Data
 {
     public class DataParser
     {

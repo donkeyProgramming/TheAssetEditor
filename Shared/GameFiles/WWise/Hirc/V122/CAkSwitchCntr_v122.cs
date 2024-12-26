@@ -1,6 +1,6 @@
 ﻿using Shared.Core.ByteParsing;
 
-namespace Shared.GameFormats.WWise.Hirc.V122
+namespace Shared.GameFormats.Wwise.Hirc.V122
 {
     public class CAkSwitchCntr_v122 : HircItem
     {

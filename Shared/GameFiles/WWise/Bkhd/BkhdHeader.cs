@@ -1,4 +1,4 @@
-﻿namespace Shared.GameFormats.WWise.Bkhd
+﻿namespace Shared.GameFormats.Wwise.Bkhd
 {
     public class BkhdHeader
     {

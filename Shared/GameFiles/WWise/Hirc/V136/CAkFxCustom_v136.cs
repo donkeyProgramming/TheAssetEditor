@@ -1,6 +1,6 @@
 ﻿using Shared.Core.ByteParsing;
 
-namespace Shared.GameFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public class CAkFxCustom_v136 : HircItem
     {

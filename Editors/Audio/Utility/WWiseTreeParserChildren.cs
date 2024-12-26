@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc;
-using Shared.GameFormats.WWise.Hirc.V136;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.Utility
 {

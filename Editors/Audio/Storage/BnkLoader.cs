@@ -7,9 +7,9 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Didx;
-using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Didx;
+using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Storage
 {

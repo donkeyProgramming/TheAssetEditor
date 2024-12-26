@@ -1,4 +1,4 @@
-﻿namespace Shared.GameFormats.WWise.Hirc
+﻿namespace Shared.GameFormats.Wwise.Hirc
 {
     public class HircChunk
     {

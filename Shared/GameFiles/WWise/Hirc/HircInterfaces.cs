@@ -1,6 +1,6 @@
-﻿using Shared.GameFormats.WWise.Hirc.Shared;
+﻿using Shared.GameFormats.Wwise.Hirc.Shared;
 
-namespace Shared.GameFormats.WWise.Hirc
+namespace Shared.GameFormats.Wwise.Hirc
 {
     public interface ICAkEvent
     {

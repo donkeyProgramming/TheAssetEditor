@@ -1,9 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.WWise.Bkhd;
-using Shared.GameFormats.WWise.Didx;
-using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.Wwise.Bkhd;
+using Shared.GameFormats.Wwise.Didx;
+using Shared.GameFormats.Wwise.Hirc;
 
-namespace Shared.GameFormats.WWise
+namespace Shared.GameFormats.Wwise
 {
     public class ParsedBnkFile
     {

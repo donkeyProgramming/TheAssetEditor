@@ -1,7 +1,7 @@
 ﻿using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Utility
 {

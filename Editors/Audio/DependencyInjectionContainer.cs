@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
-using Shared.GameFormats.WWise;
+using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio
 {

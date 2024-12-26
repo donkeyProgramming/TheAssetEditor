@@ -1,6 +1,6 @@
 ﻿using Shared.Core.ByteParsing;
 
-namespace Shared.GameFormats.WWise.Hirc.V112
+namespace Shared.GameFormats.Wwise.Hirc.V112
 {
     public class CAkActorMixer_v112 : HircItem, ICAkActorMixer
     {

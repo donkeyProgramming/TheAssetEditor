@@ -8,10 +8,10 @@ using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.ToolCreation;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc;
-using Shared.GameFormats.WWise.Hirc.V112;
-using Shared.GameFormats.WWise.Hirc.V136;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Hirc.V112;
+using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.AudioExplorer
 {

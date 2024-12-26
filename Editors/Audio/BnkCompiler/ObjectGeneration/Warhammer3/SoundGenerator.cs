@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc.V136;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc.V136;
 using Editors.Audio.BnkCompiler;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
@@ -23,14 +23,14 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             _pfs = pfs;
         }
 
-        public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
+        public HircItem ConvertToWwise(IAudioProjectHircItem projectItem, CompilerData project)
         {
             var typedProjectItem = projectItem as Sound;
             Guard.IsNotNull(typedProjectItem);
-            return ConvertToWWise(typedProjectItem, project);
+            return ConvertToWwise(typedProjectItem, project);
         }
 
-        public CAkSound_v136 ConvertToWWise(Sound inputSound, CompilerData project)
+        public CAkSound_v136 ConvertToWwise(Sound inputSound, CompilerData project)
         {
             var filePath = inputSound.FilePath;
             var file = _pfs.FindFile(filePath);
@@ -77,9 +77,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return wwiseSound;
         }
 
-        public List<CAkSound_v136> ConvertToWWise(IEnumerable<Sound> inputSound, CompilerData project)
+        public List<CAkSound_v136> ConvertToWwise(IEnumerable<Sound> inputSound, CompilerData project)
         {
-            return inputSound.Select(x => ConvertToWWise(x, project)).ToList();
+            return inputSound.Select(x => ConvertToWwise(x, project)).ToList();
         }
     }
 }

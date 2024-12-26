@@ -1,9 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.WWise.Hirc.Shared;
-using static Shared.GameFormats.WWise.Hirc.Shared.AkDecisionTree;
-using static Shared.GameFormats.WWise.Hirc.Shared.ArgumentList;
+using Shared.GameFormats.Wwise.Hirc.Shared;
+using static Shared.GameFormats.Wwise.Hirc.Shared.AkDecisionTree;
+using static Shared.GameFormats.Wwise.Hirc.Shared.ArgumentList;
 
-namespace Shared.GameFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public class CAkDialogueEvent_v136 : HircItem, ICADialogEvent
     {

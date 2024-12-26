@@ -1,6 +1,6 @@
 ﻿using Shared.Core.ByteParsing;
 
-namespace Shared.GameFormats.WWise.Stid
+namespace Shared.GameFormats.Wwise.Stid
 {
     public class StidParser
     {

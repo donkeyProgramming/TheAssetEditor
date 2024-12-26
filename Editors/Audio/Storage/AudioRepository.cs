@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Dat;
-using Shared.GameFormats.WWise;
+using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio.Storage
 {

@@ -1,7 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
-using static Shared.GameFormats.WWise.Hirc.ICAkSwitchCntr;
+using static Shared.GameFormats.Wwise.Hirc.ICAkSwitchCntr;
 
-namespace Shared.GameFormats.WWise.Hirc.V112
+namespace Shared.GameFormats.Wwise.Hirc.V112
 {
     public class CAkSwitchCntr_V112 : CAkSwitchCntr, ICAkSwitchCntr
     {

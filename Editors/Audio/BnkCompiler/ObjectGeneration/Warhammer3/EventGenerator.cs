@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System;
 using System.Linq;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc.V136;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc.V136;
 using Editors.Audio.BnkCompiler;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Editors.Audio.BnkCompiler.ObjectGeneration;
@@ -14,14 +14,14 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(Event);
 
-        public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
+        public HircItem ConvertToWwise(IAudioProjectHircItem projectItem, CompilerData project)
         {
             var typedProjectItem = projectItem as Event;
             Guard.IsNotNull(typedProjectItem);
-            return ConvertToWWise(typedProjectItem, project);
+            return ConvertToWwise(typedProjectItem, project);
         }
 
-        public CAkEvent_v136 ConvertToWWise(Event inputEvent, CompilerData project)
+        public static CAkEvent_v136 ConvertToWwise(Event inputEvent, CompilerData project)
         {
             var wwiseEvent = new CAkEvent_v136();
             wwiseEvent.Id = inputEvent.Id;

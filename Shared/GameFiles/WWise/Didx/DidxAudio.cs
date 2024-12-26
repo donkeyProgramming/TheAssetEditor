@@ -1,4 +1,4 @@
-﻿namespace Shared.GameFormats.WWise.Didx
+﻿namespace Shared.GameFormats.Wwise.Didx
 {
     public class DidxAudio
     {

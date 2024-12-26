@@ -1,7 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.WWise.Hirc.Shared;
+using Shared.GameFormats.Wwise.Hirc.Shared;
 
-namespace Shared.GameFormats.WWise.Hirc.V136
+namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public class CAkMusicSwitchCntr_v136 : HircItem, INodeBaseParamsAccessor
     {

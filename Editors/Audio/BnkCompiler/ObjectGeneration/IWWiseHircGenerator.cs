@@ -1,6 +1,5 @@
-﻿using Editors.Audio.BnkCompiler;
-using Shared.GameFormats.WWise;
-using System;
+﻿using System;
+using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {
@@ -8,6 +7,6 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration
     {
         public string GameName { get; }
         public Type AudioProjectType { get; }
-        public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project);
+        public HircItem ConvertToWwise(IAudioProjectHircItem projectItem, CompilerData project);
     }
 }

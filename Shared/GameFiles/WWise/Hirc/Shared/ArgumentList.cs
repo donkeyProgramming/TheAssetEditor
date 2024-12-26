@@ -1,6 +1,6 @@
 ﻿using Shared.Core.ByteParsing;
 
-namespace Shared.GameFormats.WWise.Hirc.Shared
+namespace Shared.GameFormats.Wwise.Hirc.Shared
 {
     public class ArgumentList
     {

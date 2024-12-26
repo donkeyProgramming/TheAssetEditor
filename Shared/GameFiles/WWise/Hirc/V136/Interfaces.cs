@@ -1,4 +1,4 @@
-﻿namespace Shared.GameFormats.WWise.Hirc.V136
+﻿namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public interface INodeBaseParamsAccessor
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Editors.Audio.BnkCompiler;
 using Editors.Audio.Utility;
-using Shared.GameFormats.WWise.Bkhd;
+using Shared.GameFormats.Wwise.Bkhd;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {

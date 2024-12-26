@@ -1,6 +1,6 @@
-﻿namespace Shared.GameFormats.WWise
+﻿namespace Shared.GameFormats.Wwise
 {
-    public static class WWiseObjectHeaders
+    public static class WwiseObjectHeaders
     {
         public const string BKHD = "BKHD";
         public const string HIRC = "HIRC";

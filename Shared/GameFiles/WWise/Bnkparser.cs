@@ -1,12 +1,12 @@
 ﻿using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles.Models;
-using Shared.GameFormats.WWise.Bkhd;
-using Shared.GameFormats.WWise.Data;
-using Shared.GameFormats.WWise.Didx;
-using Shared.GameFormats.WWise.Hirc;
-using Shared.GameFormats.WWise.Stid;
+using Shared.GameFormats.Wwise.Bkhd;
+using Shared.GameFormats.Wwise.Data;
+using Shared.GameFormats.Wwise.Didx;
+using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Stid;
 
-namespace Shared.GameFormats.WWise
+namespace Shared.GameFormats.Wwise
 {
     public class BnkParser
     {
@@ -27,15 +27,15 @@ namespace Shared.GameFormats.WWise
                 var indexBeforeRead = chunk.Index;
                 var expectedIndexAfterRead = indexBeforeRead + BnkChunkHeader.HeaderByteSize + chunckHeader.ChunkSize;
 
-                if (WWiseObjectHeaders.BKHD == chunckHeader.Tag)
+                if (WwiseObjectHeaders.BKHD == chunckHeader.Tag)
                     parsedBnkFile.Header = LoadHeader(fullName, chunk);
-                else if (WWiseObjectHeaders.HIRC == chunckHeader.Tag)
+                else if (WwiseObjectHeaders.HIRC == chunckHeader.Tag)
                     parsedBnkFile.HircChuck = LoadHircs(fullName, chunk, chunckHeader.ChunkSize, parsedBnkFile.Header.DwBankGeneratorVersion, isCaHircItem);
-                else if (WWiseObjectHeaders.DIDX == chunckHeader.Tag)
+                else if (WwiseObjectHeaders.DIDX == chunckHeader.Tag)
                     parsedBnkFile.DidxChunk = LoadDidx(fullName, chunk);
-                else if (WWiseObjectHeaders.DATA == chunckHeader.Tag)
+                else if (WwiseObjectHeaders.DATA == chunckHeader.Tag)
                     parsedBnkFile.DataChunk = LoadData(fullName, chunk);
-                else if (WWiseObjectHeaders.STID == chunckHeader.Tag)
+                else if (WwiseObjectHeaders.STID == chunckHeader.Tag)
                     LoadStid(fullName, chunk);  // We never care about this. Discard after loading
                 else
                     throw new ArgumentException($"Unknown data block '{chunckHeader.Tag}' while parsing bnk file '{fullName}'");
