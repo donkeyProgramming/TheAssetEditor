@@ -7,9 +7,9 @@ using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.Utility
 {
-    public class TempRenameWwiseTreeParserChildren : TempRenameWwiseTreeParserBase
+    public class WwiseTreeParserChildren : WwiseTreeParserBase
     {
-        public TempRenameWwiseTreeParserChildren(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
+        public WwiseTreeParserChildren(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
             : base(repository, showId, showOwningBnkFile, filterByBnkName)
         {
             _hircProcessChildMap.Add(HircType.Event, ProcessEvent);

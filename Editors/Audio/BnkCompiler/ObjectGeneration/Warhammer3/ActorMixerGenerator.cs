@@ -7,7 +7,7 @@ using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
-    public class ActorMixerGenerator : TempRenameIWwiseHircGenerator
+    public class ActorMixerGenerator : IWwiseHircGenerator
     {
         public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(ActorMixer);

@@ -9,9 +9,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {
     public class HircBuilder
     {
-        private readonly IEnumerable<TempRenameIWwiseHircGenerator> _wwiseHircGenerators;
+        private readonly IEnumerable<IWwiseHircGenerator> _wwiseHircGenerators;
 
-        public HircBuilder(IEnumerable<TempRenameIWwiseHircGenerator> wwiseHircGenerators)
+        public HircBuilder(IEnumerable<IWwiseHircGenerator> wwiseHircGenerators)
         {
             _wwiseHircGenerators = wwiseHircGenerators;
         }
@@ -41,9 +41,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration
             return wwiseHircs;
         }
 
-        private TempRenameIWwiseHircGenerator FindGenerator(IAudioProjectHircItem projectItem, string game)
+        private IWwiseHircGenerator FindGenerator(IAudioProjectHircItem projectItem, string game)
         {
-            var generators = new List<TempRenameIWwiseHircGenerator>();
+            var generators = new List<IWwiseHircGenerator>();
             foreach (var generator in _wwiseHircGenerators)
             {
                 if (generator.GameName.Equals(game, StringComparison.InvariantCultureIgnoreCase) && generator.AudioProjectType == projectItem.GetType())

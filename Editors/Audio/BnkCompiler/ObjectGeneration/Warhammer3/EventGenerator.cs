@@ -9,7 +9,7 @@ using Editors.Audio.BnkCompiler.ObjectGeneration;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
-    public class EventGenerator : TempRenameIWwiseHircGenerator
+    public class EventGenerator : IWwiseHircGenerator
     {
         public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(Event);

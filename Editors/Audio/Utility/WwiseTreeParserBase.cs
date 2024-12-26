@@ -9,9 +9,9 @@ using System.Linq;
 
 namespace Editors.Audio.Utility
 {
-    public abstract class TempRenameWwiseTreeParserBase
+    public abstract class WwiseTreeParserBase
     {
-        protected ILogger _logger = Logging.Create<TempRenameWwiseTreeParserBase>();
+        protected ILogger _logger = Logging.Create<WwiseTreeParserBase>();
 
         protected Dictionary<HircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = new Dictionary<HircType, Action<HircItem, HircTreeItem>>();
         protected readonly IAudioRepository _repository;
@@ -20,7 +20,7 @@ namespace Editors.Audio.Utility
         protected readonly bool _showOwningBnkFile;
         protected readonly bool _filterByBnkName;
 
-        public TempRenameWwiseTreeParserBase(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
+        public WwiseTreeParserBase(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
         {
             _repository = repository;
             _showId = showId;

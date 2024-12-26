@@ -11,7 +11,7 @@ using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
-    public class DialogueEventGenerator : TempRenameIWwiseHircGenerator
+    public class DialogueEventGenerator : IWwiseHircGenerator
     {
         private readonly IAudioRepository _audioRepository;
 
