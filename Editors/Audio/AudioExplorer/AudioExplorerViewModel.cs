@@ -107,25 +107,31 @@ namespace Editors.Audio.AudioExplorer
 
         public void PlaySelectedSoundAction()
         {
-            CAkSound_V112 cakSound_V112 = _selectedNode.Item as CAkSound_V112;
-            if (cakSound_V112 != null && cakSound_V112.GetStreamType() == SourceType.Data_BNK)
+            ICAkSound sound = _selectedNode.Item as ICAkSound;
+            if (sound == null)
             {
-                _soundPlayer.ConvertWemToWav(
-                    _audioRepository,
-                    cakSound_V112.AkBankSourceData.akMediaInformation.SourceId,
-                    cakSound_V112.AkBankSourceData.akMediaInformation.FileId,
-                    (int)cakSound_V112.AkBankSourceData.akMediaInformation.uFileOffset,
-                    (int)cakSound_V112.AkBankSourceData.akMediaInformation.uInMemoryMediaSize
-                );
-
                 return;
             }
 
-            var nodeDisplayName = _selectedNode.DisplayName;
-            var regex = new Regex(@"(\d+)\.wem");
-            var match = regex.Match(nodeDisplayName);
-            var sourceId = match.Groups[1].Value;
-            _soundPlayer.ConvertWemToWav(sourceId);
+            if (sound.GetStreamType() == SourceType.Data_BNK)
+            {
+                CAkSound_V112 cakSound_V112 = _selectedNode.Item as CAkSound_V112;
+
+                if (cakSound_V112 != null)
+                {
+                    _soundPlayer.ConvertWemToWav(
+                        _audioRepository,
+                        cakSound_V112.AkBankSourceData.akMediaInformation.SourceId,
+                        cakSound_V112.AkBankSourceData.akMediaInformation.FileId,
+                        (int)cakSound_V112.AkBankSourceData.akMediaInformation.uFileOffset,
+                        (int)cakSound_V112.AkBankSourceData.akMediaInformation.uInMemoryMediaSize
+                    );
+                 
+                    return;
+                }
+            }
+
+            _soundPlayer.ConvertWemToWav(sound.GetSourceId().ToString());
         }
 
         public void LoadHircFromIdAction()
