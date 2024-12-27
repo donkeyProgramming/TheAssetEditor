@@ -1,5 +1,5 @@
 ﻿using Editors.Audio.Storage;
-using Shared.GameFormats.WWise;
+using Shared.GameFormats.Wwise;
 using Shared.Ui.Common;
 using System.Collections.Generic;
 using System.Linq;

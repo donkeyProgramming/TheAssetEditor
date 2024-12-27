@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
 using Shared.Core.ToolCreation;
-using Shared.GameFormats.WWise;
+using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio
 {
@@ -42,12 +42,12 @@ namespace Editors.Audio
             serviceCollection.AddTransient<BnkParser>();
             serviceCollection.AddTransient<SoundPlayer>();
 
-            serviceCollection.AddScoped<IWWiseHircGenerator, ActionGenerator>();
-            serviceCollection.AddScoped<IWWiseHircGenerator, EventGenerator>();
-            serviceCollection.AddScoped<IWWiseHircGenerator, SoundGenerator>();
-            serviceCollection.AddScoped<IWWiseHircGenerator, ActorMixerGenerator>();
-            serviceCollection.AddScoped<IWWiseHircGenerator, RandomContainerGenerator>();
-            serviceCollection.AddScoped<IWWiseHircGenerator, DialogueEventGenerator>();
+            serviceCollection.AddScoped<IWwiseHircGenerator, ActionGenerator>();
+            serviceCollection.AddScoped<IWwiseHircGenerator, EventGenerator>();
+            serviceCollection.AddScoped<IWwiseHircGenerator, SoundGenerator>();
+            serviceCollection.AddScoped<IWwiseHircGenerator, ActorMixerGenerator>();
+            serviceCollection.AddScoped<IWwiseHircGenerator, RandomContainerGenerator>();
+            serviceCollection.AddScoped<IWwiseHircGenerator, DialogueEventGenerator>();
             serviceCollection.AddScoped<HircBuilder>();
             serviceCollection.AddScoped<BnkHeaderBuilder>();
             serviceCollection.AddScoped<CompilerService>();

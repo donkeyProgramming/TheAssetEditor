@@ -5,13 +5,13 @@ using CommunityToolkit.Diagnostics;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc.Shared;
-using Shared.GameFormats.WWise.Hirc.V136;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc.Shared;
+using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
-    public class DialogueEventGenerator : IWWiseHircGenerator
+    public class DialogueEventGenerator : IWwiseHircGenerator
     {
         private readonly IAudioRepository _audioRepository;
 
@@ -23,14 +23,14 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public string GameName => CompilerConstants.GameWarhammer3;
         public Type AudioProjectType => typeof(DialogueEvent);
 
-        public HircItem ConvertToWWise(IAudioProjectHircItem projectItem, CompilerData project)
+        public HircItem ConvertToWwise(IAudioProjectHircItem projectItem, CompilerData project)
         {
             var typedProjectItem = projectItem as DialogueEvent;
             Guard.IsNotNull(typedProjectItem);
-            return ConvertToWWise(typedProjectItem, project);
+            return ConvertToWwise(typedProjectItem, project);
         }
 
-        public CAkDialogueEvent_v136 ConvertToWWise(DialogueEvent inputDialogueEvent, CompilerData project)
+        public CAkDialogueEvent_v136 ConvertToWwise(DialogueEvent inputDialogueEvent, CompilerData project)
         {
             var wwiseDialogueEvent = new CAkDialogueEvent_v136();
             wwiseDialogueEvent.CustomArgumentList = new List<ArgumentList.Argument>();

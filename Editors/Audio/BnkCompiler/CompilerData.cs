@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Shared.GameFormats.WWise.Hirc.Shared;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Shared.GameFormats.Wwise.Hirc.Shared;
 
 namespace Editors.Audio.BnkCompiler
 {
@@ -46,8 +46,8 @@ namespace Editors.Audio.BnkCompiler
     public class ActorMixer : IAudioProjectHircItem
     {
         public uint DirectParentId { get; set; } = 0;
-        public List<uint> Children { get; set; } = new List<uint>();
-        public List<uint> ActorMixerChildren { get; set; } = new List<uint>();
+        public List<uint> Children { get; set; } = [];
+        public List<uint> ActorMixerChildren { get; set; } = [];
         public string DialogueEvent { get; set; }
     }
 
@@ -62,16 +62,16 @@ namespace Editors.Audio.BnkCompiler
 
     public class CompilerData
     {
-        private readonly List<IAudioProjectHircItem> _projectWwiseObjects = new List<IAudioProjectHircItem>();
+        private readonly List<IAudioProjectHircItem> _projectWwiseObjects = [];
         public ProjectSettings ProjectSettings { get; set; } = new ProjectSettings();
-        public List<Event> Events { get; set; } = new List<Event>();
-        public List<Action> Actions { get; set; } = new List<Action>();
-        public List<Sound> Sounds { get; set; } = new List<Sound>();
-        public List<ActorMixer> ActorMixers { get; set; } = new List<ActorMixer>();
-        public List<RandomContainer> RandomContainers { get; set; } = new List<RandomContainer>();
-        public List<DialogueEvent> DialogueEvents { get; set; } = new List<DialogueEvent>();
-        public List<string> EventsDat { get; set; } = new List<string>();
-        public List<string> StatesDat { get; set; } = new List<string>();
+        public List<Event> Events { get; set; } = [];
+        public List<Action> Actions { get; set; } = [];
+        public List<Sound> Sounds { get; set; } = [];
+        public List<ActorMixer> ActorMixers { get; set; } = [];
+        public List<RandomContainer> RandomContainers { get; set; } = [];
+        public List<DialogueEvent> DialogueEvents { get; set; } = [];
+        public List<string> EventsDat { get; set; } = [];
+        public List<string> StatesDat { get; set; } = [];
 
         public void StoreWwiseObjects()
         {
