@@ -16,7 +16,6 @@ namespace Shared.GameFormats.WWise.Hirc
         {
             using var memStream = WriteHeader();
             memStream.Write(HircData);
-
             return memStream.ToArray();
         }
     }

@@ -86,7 +86,7 @@ namespace Editors.Audio.Utility
 
                 foreach (var musicSwitch in musicSwitches)
                 {
-                    var allArgs = musicSwitch.ArgumentList.Arguments.Select(x => x.ulGroupId).ToList();
+                    var allArgs = musicSwitch.ArgumentList.Arguments.Select(x => x.UlGroupId).ToList();
                     if (allArgs.Contains(stateGroupId))
                         ProcessNext(musicSwitch.Id, actionTreeNode);
                 }
@@ -99,7 +99,7 @@ namespace Editors.Audio.Utility
                    .ToList();
 
                 foreach (var normalSwitch in normalSwitches)
-                    if (normalSwitch.ulGroupID == stateGroupId)
+                    if (normalSwitch.UlGroupId == stateGroupId)
                         ProcessNext(normalSwitch.Id, actionTreeNode);
             }
             else ProcessNext(childId, actionTreeNode);
@@ -208,9 +208,9 @@ namespace Editors.Audio.Utility
             var node = new HircTreeItem() { DisplayName = $"Music Rand Container", Item = item };
             parent.Children.Add(node);
 
-            if (hirc.pPlayList.Count != 0)
-                foreach (var playList in hirc.pPlayList.First().pPlayList)
-                    ProcessNext(playList.SegmentID, node);
+            if (hirc.PPlayList.Count != 0)
+                foreach (var playList in hirc.PPlayList.First().PPlayList)
+                    ProcessNext(playList.SegmentId, node);
         }
     }
 }

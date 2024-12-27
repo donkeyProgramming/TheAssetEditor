@@ -6,7 +6,6 @@ namespace Shared.GameFormats.WWise.Hirc
     {
         public string ErrorMsg { get; set; }
 
-
         protected override void CreateSpecificData(ByteChunk chunk)
         {
             chunk.ReadBytes((int)Size - 4);

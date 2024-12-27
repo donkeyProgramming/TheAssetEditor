@@ -44,19 +44,19 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             {
                 var argument = new ArgumentList.Argument
                 {
-                    ulGroupId = WwiseHash.Compute(stateGroup),
-                    eGroupType = AkGroupType.State
+                    UlGroupId = WwiseHash.Compute(stateGroup),
+                    EGroupType = AkGroupType.State
                 };
                 wwiseDialogueEvent.CustomArgumentList.Add(argument);
             }
 
-            wwiseDialogueEvent.uTreeDepth = (uint)wwiseDialogueEvent.CustomArgumentList.Count();
-            wwiseDialogueEvent.uTreeDataSize = inputDialogueEvent.NodesCount * 12;
-            wwiseDialogueEvent.uProbability = 100;
+            wwiseDialogueEvent.UTreeDepth = (uint)wwiseDialogueEvent.CustomArgumentList.Count();
+            wwiseDialogueEvent.UTreeDataSize = inputDialogueEvent.NodesCount * 12;
+            wwiseDialogueEvent.UProbability = 100;
 
-            wwiseDialogueEvent.uMode = (byte)AkMode.BestMatch;
+            wwiseDialogueEvent.UMode = (byte)AkMode.BestMatch;
 
-            wwiseDialogueEvent.CustomAkDecisionTree = AkDecisionTree.ReflattenTree(inputDialogueEvent.RootNode, wwiseDialogueEvent.uTreeDepth);
+            wwiseDialogueEvent.CustomAkDecisionTree = AkDecisionTree.ReflattenTree(inputDialogueEvent.RootNode, wwiseDialogueEvent.UTreeDepth);
 
             wwiseDialogueEvent.AkPropBundle0 = 0;
             wwiseDialogueEvent.AkPropBundle1 = 0;

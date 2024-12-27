@@ -4,32 +4,31 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkFxCustom_v136 : HircItem
     {
-        public uint plugin_id { get; set; }
+        public uint PluginId { get; set; }
         public AkPluginParam AkPluginParam { get; set; }
-        public List<AkMediaMap> mediaList { get; set; } = new List<AkMediaMap>();
-        public InitialRTPC InitialRTPC { get; set; }
+        public List<AkMediaMap> MediaList { get; set; } = [];
+        public InitialRtpc InitialRtpc { get; set; }
         public StateChunk StateChunk { get; set; }
-        public List<PluginPropertyValue> propertyValuesList { get; set; } = new List<PluginPropertyValue>();
+        public List<PluginPropertyValue> PropertyValuesList { get; set; } = [];
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
             //contains the plugin type and company id (CA doesn't have one apparently)
-            plugin_id = chunk.ReadUInt32();
+            PluginId = chunk.ReadUInt32();
 
             var uSize = chunk.ReadUInt32();
-            AkPluginParam = AkPluginParam.Create(chunk, plugin_id, uSize);
+            AkPluginParam = AkPluginParam.Create(chunk, PluginId, uSize);
 
             var uNumBankData = chunk.ReadByte();
             for (var i = 0; i < uNumBankData; i++)
-                mediaList.Add(AkMediaMap.Create(chunk));
+                MediaList.Add(AkMediaMap.Create(chunk));
 
-            InitialRTPC = InitialRTPC.Create(chunk);
+            InitialRtpc = InitialRtpc.Create(chunk);
             StateChunk = StateChunk.Create(chunk);
 
             var numValues = chunk.ReadShort();
             for (var i = 0; i < numValues; i++)
-                propertyValuesList.Add(PluginPropertyValue.Create(chunk));
-
+                PropertyValuesList.Add(PluginPropertyValue.Create(chunk));
         }
 
         public override void UpdateSize() => throw new NotImplementedException();
@@ -38,57 +37,53 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
     public class AkMediaMap
     {
-        public byte index { get; set; }
-        public uint sourceId { get; set; }
+        public byte Index { get; set; }
+        public uint SourceId { get; set; }
 
         public static AkMediaMap Create(ByteChunk chunk)
         {
             var instance = new AkMediaMap();
-
-            instance.index = chunk.ReadByte();
-            instance.sourceId = chunk.ReadUInt32();
-
+            instance.Index = chunk.ReadByte();
+            instance.SourceId = chunk.ReadUInt32();
             return instance;
         }
     }
 
     public class PluginPropertyValue
     {
-        public uint propertyId { get; set; }
-        public byte rtpcAccum { get; set; }
-        public float fValue { get; set; }
+        public uint PropertyId { get; set; }
+        public byte RtpcAccum { get; set; }
+        public float FValue { get; set; }
 
         public static PluginPropertyValue Create(ByteChunk chunk)
         {
             var instance = new PluginPropertyValue();
-
-            instance.propertyId = chunk.ReadUInt32();
-            instance.rtpcAccum = chunk.ReadByte();
-            instance.fValue = chunk.ReadSingle();
-
+            instance.PropertyId = chunk.ReadUInt32();
+            instance.RtpcAccum = chunk.ReadByte();
+            instance.FValue = chunk.ReadSingle();
             return instance;
         }
     }
 
     public class CAkFxSrcSilenceParams : AkPluginParam
     {
-        public float fDuration { get; set; }
-        public float fRandomizedLengthMinus { get; set; }
-        public float fRandomizedLengthPlus { get; set; }
+        public float FDuration { get; set; }
+        public float FRandomizedLengthMinus { get; set; }
+        public float FRandomizedLengthPlus { get; set; }
 
         public static CAkFxSrcSilenceParams Create(ByteChunk chunk, uint uSize)
         {
             var instance = new CAkFxSrcSilenceParams();
-            instance.fDuration = chunk.ReadSingle();
-            instance.fRandomizedLengthMinus = chunk.ReadSingle();
-            instance.fRandomizedLengthPlus = chunk.ReadSingle();
+            instance.FDuration = chunk.ReadSingle();
+            instance.FRandomizedLengthMinus = chunk.ReadSingle();
+            instance.FRandomizedLengthPlus = chunk.ReadSingle();
             return instance;
         }
     }
 
     public class AkPluginParam
     {
-        public List<byte> pParamBlock { get; set; } = new List<byte>();
+        public List<byte> PParamBlock { get; set; } = [];
         //used for default case, "gap" of bytes
 
         public static AkPluginParam Create(ByteChunk chunk, uint plugin_id, uint uSize)
@@ -118,7 +113,7 @@ namespace Shared.GameFormats.WWise.Hirc.V136
                     //Default "gap"
                     var instance = new AkPluginParam();
                     for (var i = 0; i < uSize; i++)
-                        instance.pParamBlock.Add(chunk.ReadByte());
+                        instance.PParamBlock.Add(chunk.ReadByte());
                     return instance;
             }
         }

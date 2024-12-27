@@ -13,7 +13,6 @@ namespace Shared.GameFormats.WWise
         public bool IsCaHircItem { get; set; }
         public uint ByteIndexInFile { get; set; }
         public bool HasError { get; set; } = true;
-
         public HircType Type { get; set; }
         public uint Size { get; set; }
         public uint Id { get; set; }

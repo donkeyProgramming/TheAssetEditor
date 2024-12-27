@@ -6,11 +6,9 @@ namespace Shared.GameFormats.WWise.Hirc.V112
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }
-        public List<CAkLayer> LayerList { get; set; } = new List<CAkLayer>();
-        public byte bIsContinuousValidation { get; set; }
+        public List<CAkLayer> LayerList { get; set; } = [];
+        public byte BIsContinuousValidation { get; set; }
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
-
-
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
@@ -21,53 +19,50 @@ namespace Shared.GameFormats.WWise.Hirc.V112
             for (var i = 0; i < layerCount; i++)
                 LayerList.Add(CAkLayer.Create(chunk));
 
-            bIsContinuousValidation = chunk.ReadByte();
+            BIsContinuousValidation = chunk.ReadByte();
         }
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
-
         public List<uint> GetChildren() => Children.ChildIdList;
     }
 
     public class CAkLayer
     {
-        public uint ulLayerID { get; set; }
-        public InitialRTPC InitialRTPC { get; set; }
-        public uint rtpcID { get; set; }    // Attribute name
-        public AkRtpcType rtpcType { get; set; }
-        public List<CAssociatedChildData> CAssociatedChildDataList { get; set; } = new List<CAssociatedChildData>();
+        public uint UlLayerIr { get; set; }
+        public InitialRtpc InitialRtpc { get; set; }
+        public uint RtpcId { get; set; }
+        public AkRtpcType RtpcType { get; set; }
+        public List<CAssociatedChildData> CAssociatedChildDataList { get; set; } = [];
 
         public static CAkLayer Create(ByteChunk chunk)
         {
             var instance = new CAkLayer();
-            instance.ulLayerID = chunk.ReadUInt32();
-            instance.InitialRTPC = InitialRTPC.Create(chunk);
-            instance.rtpcID = chunk.ReadUInt32();
-            instance.rtpcType = (AkRtpcType)chunk.ReadByte();
+            instance.UlLayerIr = chunk.ReadUInt32();
+            instance.InitialRtpc = InitialRtpc.Create(chunk);
+            instance.RtpcId = chunk.ReadUInt32();
+            instance.RtpcType = (AkRtpcType)chunk.ReadByte();
             var ulNumAssoc = chunk.ReadUInt32();
             for (var i = 0; i < ulNumAssoc; i++)
                 instance.CAssociatedChildDataList.Add(CAssociatedChildData.Create(chunk));
-
             return instance;
         }
     }
 
     public class CAssociatedChildData
     {
-
-        public uint ulAssociatedChildID { get; set; }
-        public uint ulCurveSize { get; set; }
-        public byte unknown_custom1 { get; set; }
-        public List<AkRTPCGraphPoint> AkRTPCGraphPointList { get; set; } = new List<AkRTPCGraphPoint>();
+        public uint UlAssociatedChildId { get; set; }
+        public uint UlCurveSize { get; set; }
+        public byte UnknownCustom1 { get; set; }
+        public List<AkRtpcGraphPoint> AkRtpcGraphPointList { get; set; } = [];
 
         public static CAssociatedChildData Create(ByteChunk chunk)
         {
             var instance = new CAssociatedChildData();
-            instance.ulAssociatedChildID = chunk.ReadUInt32();
-            instance.ulCurveSize = chunk.ReadUInt32();
-            for (var i = 0; i < instance.ulCurveSize; i++)
-                instance.AkRTPCGraphPointList.Add(AkRTPCGraphPoint.Create(chunk));
+            instance.UlAssociatedChildId = chunk.ReadUInt32();
+            instance.UlCurveSize = chunk.ReadUInt32();
+            for (var i = 0; i < instance.UlCurveSize; i++)
+                instance.AkRtpcGraphPointList.Add(AkRtpcGraphPoint.Create(chunk));
             return instance;
         }
     }

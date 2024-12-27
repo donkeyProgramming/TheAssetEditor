@@ -26,11 +26,11 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseRandomContainer.Id = inputContainer.Id;
             wwiseRandomContainer.Type = HircType.SequenceContainer;
             wwiseRandomContainer.NodeBaseParams = NodeBaseParams.CreateDefaultRandomContainer();
-            wwiseRandomContainer.byBitVector = 0x12;
-            wwiseRandomContainer.fTransitionTime = 1000;
+            wwiseRandomContainer.ByBitVector = 0x12;
+            wwiseRandomContainer.FTransitionTime = 1000;
             wwiseRandomContainer.NodeBaseParams.DirectParentId = inputContainer.DirectParentId;
-            wwiseRandomContainer.sLoopCount = 1;
-            wwiseRandomContainer.wAvoidRepeatCount = 2;
+            wwiseRandomContainer.SLoopCount = 1;
+            wwiseRandomContainer.WAvoidRepeatCount = 2;
 
             var allChildIds = inputContainer.Children.Select(x => x).OrderBy(x => x).ToList();
             wwiseRandomContainer.Children = CreateChildrenList(allChildIds);

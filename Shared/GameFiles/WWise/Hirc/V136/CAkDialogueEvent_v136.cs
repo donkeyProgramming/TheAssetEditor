@@ -7,11 +7,11 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkDialogueEvent_v136 : HircItem, ICADialogEvent
     {
-        public byte uProbability { get; set; }
-        public uint uTreeDepth { get; set; }
+        public byte UProbability { get; set; }
+        public uint UTreeDepth { get; set; }
         public ArgumentList ArgumentList { get; set; }
-        public uint uTreeDataSize { get; set; }
-        public byte uMode { get; set; }
+        public uint UTreeDataSize { get; set; }
+        public byte UMode { get; set; }
         public AkDecisionTree AkDecisionTree { get; set; }
         public List<Argument> CustomArgumentList { get; set; }
         public List<BinaryNode> CustomAkDecisionTree { get; set; }
@@ -20,13 +20,13 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            uProbability = chunk.ReadByte();
-            uTreeDepth = chunk.ReadUInt32();
-            ArgumentList = new ArgumentList(chunk, uTreeDepth);
-            uTreeDataSize = chunk.ReadUInt32();
-            uMode = chunk.ReadByte();
+            UProbability = chunk.ReadByte();
+            UTreeDepth = chunk.ReadUInt32();
+            ArgumentList = new ArgumentList(chunk, UTreeDepth);
+            UTreeDataSize = chunk.ReadUInt32();
+            UMode = chunk.ReadByte();
 
-            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize);
+            AkDecisionTree = new AkDecisionTree(chunk, UTreeDepth, UTreeDataSize);
 
             AkPropBundle0 = chunk.ReadByte();
             AkPropBundle1 = chunk.ReadByte();
@@ -34,16 +34,17 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
         public override void UpdateSize()
         {
-            Size = HircHeaderSize + 1 + 4 + (uint)CustomArgumentList.Count * 5 + 4 + 1 + uTreeDataSize + 1 + 1;
+            Size = HircHeaderSize + 1 + 4 + (uint)CustomArgumentList.Count * 5 + 4 + 1 + UTreeDataSize + 1 + 1;
         }
+
         public override byte[] GetAsByteArray()
         {
             using var memStream = WriteHeader();
-            memStream.Write(ByteParsers.Byte.EncodeValue(uProbability, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(uTreeDepth, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(UProbability, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(UTreeDepth, out _));
             memStream.Write(GetCustomArgumentsAsBytes(CustomArgumentList));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(uTreeDataSize, out _));
-            memStream.Write(ByteParsers.Byte.EncodeValue(uMode, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(UTreeDataSize, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(UMode, out _));
 
             memStream.Write(GetAsBytes(CustomAkDecisionTree));
 

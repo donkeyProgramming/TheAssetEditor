@@ -4,22 +4,20 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 {
     public class CAkMusicSegment_v136 : HircItem, INodeBaseParamsAccessor
     {
-
         public MusicNodeParams MusicNodeParams { get; set; }
-        public double fDuration { get; set; }
-        public List<AkMusicMarkerWwise> pArrayMarkersList { get; set; } = new List<AkMusicMarkerWwise>();
-
+        public double FDuration { get; set; }
+        public List<AkMusicMarkerWwise> PArrayMarkersList { get; set; } = [];
         public NodeBaseParams NodeBaseParams => MusicNodeParams.NodeBaseParams;
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
             MusicNodeParams = MusicNodeParams.Create(chunk);
 
-            fDuration = chunk.ReadInt64(); //chunk.ReadDouble();
+            FDuration = chunk.ReadInt64(); //chunk.ReadDouble();
 
             var ulNumMarkers = chunk.ReadUInt32();
             for (var i = 0; i < ulNumMarkers; i++)
-                pArrayMarkersList.Add(AkMusicMarkerWwise.Create(chunk));
+                PArrayMarkersList.Add(AkMusicMarkerWwise.Create(chunk));
         }
 
         public override void UpdateSize() => throw new NotImplementedException();
@@ -28,25 +26,25 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
     public class AkMusicMarkerWwise
     {
-        public uint id { get; set; }
-        public double fPosition { get; set; }
+        public uint Id { get; set; }
+        public double FPosition { get; set; }
 
         //see below
         //public string pMarkerName { get; set; }
-        public List<byte> pMarkerName { get; set; } = new List<byte>();
+        public List<byte> PMarkerName { get; set; } = [];
 
         public static AkMusicMarkerWwise Create(ByteChunk chunk)
         {
             var instance = new AkMusicMarkerWwise();
-            instance.id = chunk.ReadUInt32();
-            instance.fPosition = chunk.ReadInt64(); //chunk.ReadDouble();
+            instance.Id = chunk.ReadUInt32();
+            instance.FPosition = chunk.ReadInt64(); //chunk.ReadDouble();
 
             //instance.pMarkerName = chunk.ReadString();
             //The above wasn't working because uStringSize is an uint32, yet the ReadString was trying to read it as a uint16
             //So instead I just made it read the raw bytes, stored in a list
             var uStringSize = chunk.ReadUInt32();
             for (var i = 0; i < uStringSize; i++)
-                instance.pMarkerName.Add(chunk.ReadByte());
+                instance.PMarkerName.Add(chunk.ReadByte());
 
             return instance;
         }
@@ -54,25 +52,25 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
     public class MusicNodeParams
     {
-        public byte uFlags { get; set; }
+        public byte UFlags { get; set; }
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }
         public AkMeterInfo AkMeterInfo { get; set; }
-        public byte bMeterInfoFlag { get; set; }
-        public List<CAkStinger> pStingersList { get; set; } = new List<CAkStinger>();
+        public byte BMeterInfoFlag { get; set; }
+        public List<CAkStinger> PStingersList { get; set; } = [];
 
         public static MusicNodeParams Create(ByteChunk chunk)
         {
             var instance = new MusicNodeParams();
-            instance.uFlags = chunk.ReadByte();
+            instance.UFlags = chunk.ReadByte();
             instance.NodeBaseParams = NodeBaseParams.Create(chunk);
             instance.Children = Children.Create(chunk);
             instance.AkMeterInfo = AkMeterInfo.Create(chunk);
-            instance.bMeterInfoFlag = chunk.ReadByte();
+            instance.BMeterInfoFlag = chunk.ReadByte();
 
-            var NumStingers = chunk.ReadUInt32();
-            for (var i = 0; i < NumStingers; i++)
-                instance.pStingersList.Add(CAkStinger.Create(chunk));
+            var numStingers = chunk.ReadUInt32();
+            for (var i = 0; i < numStingers; i++)
+                instance.PStingersList.Add(CAkStinger.Create(chunk));
 
             return instance;
         }
@@ -80,44 +78,42 @@ namespace Shared.GameFormats.WWise.Hirc.V136
 
     public class AkMeterInfo
     {
-        public double fGridPeriod { get; set; }
-        public double fGridOffset { get; set; }
-        public float fTempo { get; set; }
-        public byte uTimeSigNumBeatsBar { get; set; }
-        public byte uTimeSigBeatValue { get; set; }
+        public double FGridPeriod { get; set; }
+        public double FGridOffset { get; set; }
+        public float FTempo { get; set; }
+        public byte UTimeSigNumBeatsBar { get; set; }
+        public byte UTimeSigBeatValue { get; set; }
 
         public static AkMeterInfo Create(ByteChunk chunk)
         {
             var instance = new AkMeterInfo();
-            instance.fGridPeriod = chunk.ReadInt64(); //chunk.ReadDouble();
-            instance.fGridOffset = chunk.ReadInt64(); //chunk.ReadDouble();
-            instance.fTempo = chunk.ReadSingle();
-            instance.uTimeSigNumBeatsBar = chunk.ReadByte();
-            instance.uTimeSigBeatValue = chunk.ReadByte();
-
+            instance.FGridPeriod = chunk.ReadInt64(); //chunk.ReadDouble();
+            instance.FGridOffset = chunk.ReadInt64(); //chunk.ReadDouble();
+            instance.FTempo = chunk.ReadSingle();
+            instance.UTimeSigNumBeatsBar = chunk.ReadByte();
+            instance.UTimeSigBeatValue = chunk.ReadByte();
             return instance;
         }
     }
 
     public class CAkStinger
     {
-        public uint TriggerID { get; set; }
-        public uint SegmentID { get; set; }
+        public uint TriggerId { get; set; }
+        public uint SegmentId { get; set; }
         public uint SyncPlayAt { get; set; }
-        public uint uCueFilterHash { get; set; }
+        public uint UCueFilterHash { get; set; }
         public int DontRepeatTime { get; set; }
-        public uint numSegmentLookAhead { get; set; }
+        public uint NumSegmentLookAhead { get; set; }
 
         public static CAkStinger Create(ByteChunk chunk)
         {
             var instance = new CAkStinger();
-            instance.TriggerID = chunk.ReadUInt32();
-            instance.SegmentID = chunk.ReadUInt32();
+            instance.TriggerId = chunk.ReadUInt32();
+            instance.SegmentId = chunk.ReadUInt32();
             instance.SyncPlayAt = chunk.ReadUInt32();
-            instance.uCueFilterHash = chunk.ReadUInt32();
+            instance.UCueFilterHash = chunk.ReadUInt32();
             instance.DontRepeatTime = chunk.ReadInt32();
-            instance.numSegmentLookAhead = chunk.ReadUInt32();
-
+            instance.NumSegmentLookAhead = chunk.ReadUInt32();
             return instance;
         }
     }

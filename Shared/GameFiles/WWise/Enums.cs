@@ -1,6 +1,5 @@
 ﻿namespace Shared.GameFormats.WWise
 {
-
     public static class WWiseObjectHeaders
     {
         public const string BKHD = "BKHD";
@@ -21,12 +20,10 @@
         ActorMixer = 0x07,
         Audio_Bus = 0x08,
         LayerContainer = 0x09,
-        //
         Music_Segment = 0x0a,
         Music_Track = 0x0b,
         Music_Switch = 0x0c,
         Music_Random_Sequence = 0x0d,
-        //
         Attenuation = 0x0e,
         Dialogue_Event = 0x0f,
         FxShareSet = 0x10,
@@ -36,7 +33,6 @@
         Envelope = 0x14,
         AudioDevice = 0x15,
         TimeMod = 0x16,
-
         Didx_Audio = 0x17
     }
 

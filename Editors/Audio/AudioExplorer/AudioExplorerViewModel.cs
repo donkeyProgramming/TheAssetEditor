@@ -121,10 +121,10 @@ namespace Editors.Audio.AudioExplorer
                 {
                     _soundPlayer.ConvertWemToWav(
                         _audioRepository,
-                        cakSound_V112.AkBankSourceData.akMediaInformation.SourceId,
-                        cakSound_V112.AkBankSourceData.akMediaInformation.FileId,
-                        (int)cakSound_V112.AkBankSourceData.akMediaInformation.uFileOffset,
-                        (int)cakSound_V112.AkBankSourceData.akMediaInformation.uInMemoryMediaSize
+                        cakSound_V112.AkBankSourceData.AkMediaInformation.SourceId,
+                        cakSound_V112.AkBankSourceData.AkMediaInformation.FileId,
+                        (int)cakSound_V112.AkBankSourceData.AkMediaInformation.UFileOffset,
+                        (int)cakSound_V112.AkBankSourceData.AkMediaInformation.UInMemoryMediaSize
                     );
                  
                     return;
