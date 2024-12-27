@@ -39,7 +39,7 @@ namespace Editors.Audio
 
             serviceCollection.AddTransient<BnkLoader>();
             serviceCollection.AddTransient<DatLoader>();
-            serviceCollection.AddTransient<BnkParser>();
+            serviceCollection.AddTransient<TempRenameBnkParser>();
             serviceCollection.AddTransient<SoundPlayer>();
 
             serviceCollection.AddScoped<IWwiseHircGenerator, ActionGenerator>();

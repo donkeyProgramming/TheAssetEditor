@@ -23,10 +23,10 @@ namespace Editors.Audio.Storage
         }
 
         private readonly IPackFileService _packFileService;
-        private readonly BnkParser _bnkParser;
+        private readonly TempRenameBnkParser _bnkParser;
         readonly ILogger _logger = Logging.Create<BnkLoader>();
 
-        public BnkLoader(IPackFileService packFileService, BnkParser bnkParser)
+        public BnkLoader(IPackFileService packFileService, TempRenameBnkParser bnkParser)
         {
             _packFileService = packFileService;
             _bnkParser = bnkParser;

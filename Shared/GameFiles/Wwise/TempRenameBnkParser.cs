@@ -8,11 +8,11 @@ using Shared.GameFormats.Wwise.Stid;
 
 namespace Shared.GameFormats.Wwise
 {
-    public class BnkParser
+    public class TempRenameBnkParser
     {
         readonly HircParser _hircParser = new();
 
-        public BnkParser()
+        public TempRenameBnkParser()
         {
         }
 

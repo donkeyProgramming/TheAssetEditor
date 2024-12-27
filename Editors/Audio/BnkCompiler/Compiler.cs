@@ -77,7 +77,7 @@ namespace Editors.Audio.BnkCompiler
 
             // Convert to output and parse for sanity
             var bnkPackFile = new PackFile(outputName, new MemorySource(bytes));
-            var parser = new BnkParser();
+            var parser = new TempRenameBnkParser();
             var reparsedSanityFile = parser.Parse(bnkPackFile, "test\\fakefilename.bnk", true);
             return bnkPackFile;
         }
