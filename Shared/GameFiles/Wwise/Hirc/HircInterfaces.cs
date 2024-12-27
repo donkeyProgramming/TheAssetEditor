@@ -21,7 +21,7 @@ namespace Shared.GameFormats.Wwise.Hirc
         public uint GetStateGroupId();
     }
 
-    public interface ICADialogEvent
+    public interface ICAkDialogueEvent
     {
         public ArgumentList ArgumentList { get; }
         public AkDecisionTree AkDecisionTree { get; }

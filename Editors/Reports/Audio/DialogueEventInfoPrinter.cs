@@ -39,13 +39,13 @@ namespace Editors.Reports.Audio
             var allHircItems = _audioRepository.GetAllOfType<HircItem>();
 
             // Filter those that are ICADialogEvent.
-            var dialogEvents = allHircItems.OfType<ICADialogEvent>();
+            var dialogEvents = allHircItems.OfType<ICAkDialogueEvent>();
 
             foreach (var dialogEvent in dialogEvents)
                 PrintDialogEventInfo(dialogEvent);
         }
 
-        private void PrintDialogEventInfo(ICADialogEvent dialogueEvent)
+        private void PrintDialogEventInfo(ICAkDialogueEvent dialogueEvent)
         {
             // Assuming HircItem is the base type with an Id.
             if (dialogueEvent is not HircItem hircItem)

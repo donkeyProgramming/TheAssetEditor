@@ -37,7 +37,7 @@ namespace Editors.Audio.Utility
             _audioRepository = audioRepository;
         }
 
-        public DecisionPathCollection GetDecisionPaths(ICADialogEvent dialogEvent) => GetDecisionPaths(dialogEvent.AkDecisionTree, dialogEvent.ArgumentList);
+        public DecisionPathCollection GetDecisionPaths(ICAkDialogueEvent dialogEvent) => GetDecisionPaths(dialogEvent.AkDecisionTree, dialogEvent.ArgumentList);
         public DecisionPathCollection GetDecisionPaths(CAkMusicSwitchCntr_v136 musicSwitch) => GetDecisionPaths(musicSwitch.AkDecisionTree, musicSwitch.ArgumentList);
 
         DecisionPathCollection GetDecisionPaths(AkDecisionTree decisionTree, ArgumentList argumentsList)

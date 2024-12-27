@@ -28,7 +28,7 @@ namespace Editors.Audio.Utility
 
         private void ProcessDialogEvent(HircItem item, HircTreeItem parent)
         {
-            var hirc = GetAsType<ICADialogEvent>(item);
+            var hirc = GetAsType<ICAkDialogueEvent>(item);
 
             var helper = new DecisionPathHelper(_repository);
             var paths = helper.GetDecisionPaths(hirc);

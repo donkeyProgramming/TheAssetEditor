@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise.Hirc.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V122
 {
-    public class CAkDialogueEvent_v122 : HircItem, ICADialogEvent
+    public class CAkDialogueEvent_v122 : HircItem, ICAkDialogueEvent
     {
         public byte UProbability { get; set; }
         public uint UTreeDepth { get; set; }

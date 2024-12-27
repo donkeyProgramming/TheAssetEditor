@@ -5,7 +5,7 @@ using static Shared.GameFormats.Wwise.Hirc.Shared.ArgumentList;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkDialogueEvent_v136 : HircItem, ICADialogEvent
+    public class CAkDialogueEvent_v136 : HircItem, ICAkDialogueEvent
     {
         public byte UProbability { get; set; }
         public uint UTreeDepth { get; set; }
