@@ -6,24 +6,25 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
     public class AkDecisionTree
     {
         public Node Root { get; set; }
-        public static List<BinaryNode> flattenedTree;
+        public static List<BinaryNode> FlattenedTree;
 
         public class BinaryNode
         {
             public uint? Key { get; set; }
             public uint AudioNodeId { get; set; }
-            public ushort Children_uIdx { get; set; }
-            public ushort Children_uCount { get; set; }
+            public ushort ChildrenUIdx { get; set; }
+            public ushort ChildrenUCount { get; set; }
             public ushort UWeight { get; set; }
             public ushort UProbability { get; set; }
+
             public static readonly int SerializationByteSize = 12;
 
             public BinaryNode(ByteChunk chunk)
             {
                 Key = chunk.ReadUInt32();
                 AudioNodeId = chunk.PeakUint32();
-                Children_uIdx = chunk.ReadUShort();
-                Children_uCount = chunk.ReadUShort();
+                ChildrenUIdx = chunk.ReadUShort();
+                ChildrenUCount = chunk.ReadUShort();
                 UWeight = chunk.ReadUShort();
                 UProbability = chunk.ReadUShort();
             }
@@ -32,8 +33,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             {
                 Key = 0;
                 AudioNodeId = 0;
-                Children_uIdx = 0;
-                Children_uCount = 0;
+                ChildrenUIdx = 0;
+                ChildrenUCount = 0;
                 UWeight = 0;
                 UProbability = 0;
             }
@@ -44,8 +45,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             public bool IsAudioNode() => Children.Count == 0;
             public uint? Key { get; set; }
             public uint AudioNodeId { get; set; }
-            public ushort Children_uIdx { get; set; }
-            public ushort Children_uCount { get; set; }
+            public ushort ChildrenUIdx { get; set; }
+            public ushort ChildrenUCount { get; set; }
             public ushort UWeight { get; set; }
             public ushort UProbability { get; set; }
             public List<Node> Children { get; set; } = [];
@@ -54,8 +55,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             {
                 Key = sNode.Key;
                 AudioNodeId = sNode.AudioNodeId;
-                Children_uIdx = sNode.Children_uIdx;
-                Children_uCount = sNode.Children_uCount;
+                ChildrenUIdx = sNode.ChildrenUIdx;
+                ChildrenUCount = sNode.ChildrenUCount;
                 UWeight = sNode.UWeight;
                 UProbability = sNode.UProbability;
             }
@@ -70,7 +71,7 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
                     Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
 
                 else
-                    Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
+                    Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.ChildrenUIdx}, Children_uCount: {node.ChildrenUCount}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
             }
         }
 
@@ -79,12 +80,11 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             if (node.AudioNodeId != 0)
                 Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
             else
-                Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
+                Console.WriteLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.ChildrenUIdx}, Children_uCount: {node.ChildrenUCount}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
 
             foreach (var child in node.Children)
                 PrintGraph(child, depth + 1);
         }
-
 
         // Sorts nodes into order by ID recursively at each depth level
         private static void SortNodes(Node node)
@@ -99,17 +99,15 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
 
         private static void UpdateChildrenData(Node node, ref ushort childrenId)
         {
-            node.Children_uIdx = childrenId;
+            node.ChildrenUIdx = childrenId;
 
             var childrenCount = node.Children.Count;
-            node.Children_uCount = (ushort)childrenCount;
+            node.ChildrenUCount = (ushort)childrenCount;
 
             childrenId += (ushort)childrenCount; // Incrementing the value in the caller's scope
 
             foreach (var child in node.Children)
-            {
                 UpdateChildrenData(child, ref childrenId); // Pass by reference
-            }
         }
 
         private static int CountNodeDescendants(Node node)
@@ -129,7 +127,7 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             if (node.AudioNodeId != 0)
                 stringBuilder.AppendLine(new string(' ', depth * 2) + $"Key: {node.Key}, AudioNodeId: {node.AudioNodeId}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
             else
-                stringBuilder.AppendLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.Children_uIdx}, Children_uCount: {node.Children_uCount}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
+                stringBuilder.AppendLine(new string(' ', depth * 2) + $"Key: {node.Key}, Children_uIdx: {node.ChildrenUIdx}, Children_uCount: {node.ChildrenUCount}, uWeight: {node.UWeight}, uProbability: {node.UProbability}");
 
             foreach (var child in node.Children)
                 stringBuilder.Append(ConvertGraphToString(child, depth + 1));
@@ -141,21 +139,21 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
         {
             var sNode = flattenedTree[parentsFirstChildIndex + childIndex];
             var isAtMaxDepth = currentDepth == maxTreeDepth;
-            var isOutsideRange = sNode.Children_uIdx >= flattenedTree.Count;
+            var isOutsideRange = sNode.ChildrenUIdx >= flattenedTree.Count;
 
             if (isAtMaxDepth || isOutsideRange)
             {
-                sNode.Children_uIdx = 0;
-                sNode.Children_uCount = 0;
+                sNode.ChildrenUIdx = 0;
+                sNode.ChildrenUCount = 0;
                 return new Node(sNode);
             }
             else
             {
                 sNode.AudioNodeId = 0;
                 var pathNode = new Node(sNode);
-                for (var i = 0; i < sNode.Children_uCount; i++)
+                for (var i = 0; i < sNode.ChildrenUCount; i++)
                 {
-                    var childNode = ConvertListToGraph(flattenedTree, maxTreeDepth, sNode.Children_uIdx, (ushort)i, currentDepth + 1);
+                    var childNode = ConvertListToGraph(flattenedTree, maxTreeDepth, sNode.ChildrenUIdx, (ushort)i, currentDepth + 1);
                     pathNode.Children.Add(childNode);
                 }
                 return pathNode;
@@ -169,8 +167,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             {
                 Key = node.Key,
                 AudioNodeId = node.AudioNodeId,
-                Children_uIdx = node.Children_uIdx,
-                Children_uCount = node.Children_uCount,
+                ChildrenUIdx = node.ChildrenUIdx,
+                ChildrenUCount = node.ChildrenUCount,
                 UWeight = node.UWeight,
                 UProbability = node.UProbability
             };
@@ -204,26 +202,26 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             Console.WriteLine($"======================= PRINTING CUSTOM DECISION TREE GRAPH =======================");
             PrintGraph(rootNode, 0);
 
-            flattenedTree = new List<BinaryNode>();
-            ConvertGraphToList(rootNode, flattenedTree, 0);
+            FlattenedTree = new List<BinaryNode>();
+            ConvertGraphToList(rootNode, FlattenedTree, 0);
 
             Console.WriteLine($"======================= PRINTING FLATTENED CUSTOM DECISION TREE =======================");
-            PrintBinaryNodes(flattenedTree, 0);
+            PrintBinaryNodes(FlattenedTree, 0);
 
-            return flattenedTree;
+            return FlattenedTree;
         }
 
         public AkDecisionTree(ByteChunk chunk, uint maxTreeDepth, uint uTreeDataSize)
         {
             // Produce initial flattenedTree
-            flattenedTree = new List<BinaryNode>();
+            FlattenedTree = new List<BinaryNode>();
             var numNodes = uTreeDataSize / BinaryNode.SerializationByteSize;
 
             foreach (var item in Enumerable.Range(0, (int)numNodes))
-                flattenedTree.Add(new BinaryNode(chunk));
+                FlattenedTree.Add(new BinaryNode(chunk));
 
             // Convert flattenedTree into a graph
-            Root = ConvertListToGraph(flattenedTree, maxTreeDepth, 0, 0, 0);
+            Root = ConvertListToGraph(FlattenedTree, maxTreeDepth, 0, 0, 0);
 
             // Sort nodes into order by ID at each depth level
             SortNodes(Root);
@@ -238,10 +236,10 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
             //PrintGraph(Root, 0);
         }
 
-        public byte[] GetAsBytes()
+        public static byte[] GetAsBytes()
         {
             using var memStream = new MemoryStream();
-            foreach (var binaryNode in flattenedTree)
+            foreach (var binaryNode in FlattenedTree)
             {
                 //Console.WriteLine($"Writing node: {binaryNode.Key}");
                 memStream.Write(ByteParsers.UInt32.EncodeValue(binaryNode.Key ?? 0, out _), 0, 4);
@@ -254,8 +252,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
                 else
                 {
                     // Write Children_uIdx and Children_uCount if AudioNodeId is empty
-                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.Children_uIdx, out _), 0, 2);
-                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.Children_uCount, out _), 0, 2);
+                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.ChildrenUIdx, out _), 0, 2);
+                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.ChildrenUCount, out _), 0, 2);
                 }
 
                 memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.UWeight, out _), 0, 2);
@@ -279,8 +277,8 @@ namespace Shared.GameFormats.WWise.Hirc.Shared
                 }
                 else
                 {
-                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.Children_uIdx, out _), 0, 2);
-                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.Children_uCount, out _), 0, 2);
+                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.ChildrenUIdx, out _), 0, 2);
+                    memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.ChildrenUCount, out _), 0, 2);
                 }
 
                 memStream.Write(ByteParsers.UShort.EncodeValue(binaryNode.UWeight, out _), 0, 2);

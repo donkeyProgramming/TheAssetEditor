@@ -3,29 +3,24 @@ using Shared.GameFormats.WWise.Hirc.Shared;
 
 namespace Shared.GameFormats.WWise.Hirc.V112
 {
-
-
     public class CAkDialogueEvent_v112 : HircItem, ICADialogEvent
     {
-        public byte uProbability { get; set; }
-        public uint uTreeDepth { get; set; }
+        public byte UProbability { get; set; }
+        public uint UTreeDepth { get; set; }
         public ArgumentList ArgumentList { get; set; }
-        public uint uTreeDataSize { get; set; }
-        public byte uMode { get; set; }
+        public uint UTreeDataSize { get; set; }
+        public byte UMode { get; set; }
         public AkDecisionTree AkDecisionTree { get; set; }
-
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            uProbability = chunk.ReadByte();
-            uTreeDepth = chunk.ReadUInt32();
-            ArgumentList = new ArgumentList(chunk, uTreeDepth);
-            uTreeDataSize = chunk.ReadUInt32();
-            uMode = chunk.ReadByte();
-
-            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize);
+            UProbability = chunk.ReadByte();
+            UTreeDepth = chunk.ReadUInt32();
+            ArgumentList = new ArgumentList(chunk, UTreeDepth);
+            UTreeDataSize = chunk.ReadUInt32();
+            UMode = chunk.ReadByte();
+            AkDecisionTree = new AkDecisionTree(chunk, UTreeDepth, UTreeDataSize);
         }
-
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();

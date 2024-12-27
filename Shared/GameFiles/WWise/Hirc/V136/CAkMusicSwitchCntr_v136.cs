@@ -6,29 +6,24 @@ namespace Shared.GameFormats.WWise.Hirc.V136
     public class CAkMusicSwitchCntr_v136 : HircItem, INodeBaseParamsAccessor
     {
         public NodeBaseParams NodeBaseParams => MusicTransNodeParams.MusicNodeParams.NodeBaseParams;
-
         public MusicTransNodeParams MusicTransNodeParams { get; set; }
-        public byte bIsContinuePlayback { get; set; }
-
-
-
-        public uint uTreeDepth { get; set; }
+        public byte BIsContinuePlayback { get; set; }
+        public uint UTreeDepth { get; set; }
         public ArgumentList ArgumentList { get; set; }
-        public uint uTreeDataSize { get; set; }
-        public byte uMode { get; set; }
+        public uint UTreeDataSize { get; set; }
+        public byte UMode { get; set; }
         public AkDecisionTree AkDecisionTree { get; set; }
-
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
             MusicTransNodeParams = MusicTransNodeParams.Create(chunk);
-            bIsContinuePlayback = chunk.ReadByte();
+            BIsContinuePlayback = chunk.ReadByte();
 
-            uTreeDepth = chunk.ReadUInt32();
-            ArgumentList = new ArgumentList(chunk, uTreeDepth);
-            uTreeDataSize = chunk.ReadUInt32();
-            uMode = chunk.ReadByte();
-            AkDecisionTree = new AkDecisionTree(chunk, uTreeDepth, uTreeDataSize);
+            UTreeDepth = chunk.ReadUInt32();
+            ArgumentList = new ArgumentList(chunk, UTreeDepth);
+            UTreeDataSize = chunk.ReadUInt32();
+            UMode = chunk.ReadByte();
+            AkDecisionTree = new AkDecisionTree(chunk, UTreeDepth, UTreeDataSize);
         }
 
         public override void UpdateSize() => throw new NotImplementedException();

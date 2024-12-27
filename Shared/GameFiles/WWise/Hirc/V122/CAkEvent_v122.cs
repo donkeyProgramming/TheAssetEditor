@@ -9,7 +9,7 @@ namespace Shared.GameFormats.WWise.Hirc.V122
             public uint ActionId { get; set; }
         }
 
-        public List<Action> Actions { get; set; } = new List<Action>();
+        public List<Action> Actions { get; set; } = [];
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {

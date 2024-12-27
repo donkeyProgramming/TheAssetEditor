@@ -46,11 +46,11 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 {
                     PluginId = 0x00040001, // [VORBIS]
                     StreamType = SourceType.Streaming,
-                    akMediaInformation = new AkMediaInformation()
+                    AkMediaInformation = new AkMediaInformation()
                     {
                         SourceId = uint.Parse(wavFileName),
-                        uInMemoryMediaSize = (uint)file.DataSource.Size,
-                        uSourceBits = 0x01,
+                        UInMemoryMediaSize = (uint)file.DataSource.Size,
+                        USourceBits = 0x01,
                     }
                 },
                 NodeBaseParams = nodeBaseParams

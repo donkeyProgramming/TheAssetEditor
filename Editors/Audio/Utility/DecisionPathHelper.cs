@@ -1,11 +1,10 @@
-﻿using Editors.Audio.Storage;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Editors.Audio.Storage;
 using Shared.GameFormats.WWise.Hirc;
 using Shared.GameFormats.WWise.Hirc.Shared;
 using Shared.GameFormats.WWise.Hirc.V136;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 namespace Editors.Audio.Utility
 {
@@ -62,13 +61,13 @@ namespace Editors.Audio.Utility
             var arguments = argumentsList.Arguments
                 .Select(x =>
                 {
-                    var name = _audioRepository.GetNameFromHash(x.ulGroupId);
-                    return new { Name = name, x.ulGroupId };
+                    var name = _audioRepository.GetNameFromHash(x.UlGroupId);
+                    return new { Name = name, x.UlGroupId };
                 }).ToList();
 
             var decisionPathCollection = new DecisionPathCollection()
             {
-                Header = new DecisionPath() { Items = arguments.Select(x => new DecisionPathItem() { DisplayName = x.Name, Value = x.ulGroupId }).ToList() },
+                Header = new DecisionPath() { Items = arguments.Select(x => new DecisionPathItem() { DisplayName = x.Name, Value = x.UlGroupId }).ToList() },
                 Paths = decisionPath
             };
 

@@ -14,9 +14,7 @@ namespace Shared.GameFormats.WWise.Hirc.V112
         }
 
         public override void UpdateSize() => throw new NotImplementedException();
-
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
-
         public List<uint> GetChildren() => Children.ChildIdList;
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
     }

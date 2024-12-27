@@ -26,9 +26,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseAction.Id = inputAction.Id;
             wwiseAction.Type = HircType.Action;
             wwiseAction.ActionType = ActionType.Play;
-            wwiseAction.idExt = inputAction.ChildId;
-            wwiseAction.AkPlayActionParams.byBitVector = 0x04;
-            wwiseAction.AkPlayActionParams.bankId = WwiseHash.Compute(project.ProjectSettings.BnkName);
+            wwiseAction.IdExt = inputAction.ChildId;
+            wwiseAction.AkPlayActionParams.ByBitVector = 0x04;
+            wwiseAction.AkPlayActionParams.BankId = WwiseHash.Compute(project.ProjectSettings.BnkName);
             wwiseAction.UpdateSize();
 
             return wwiseAction;

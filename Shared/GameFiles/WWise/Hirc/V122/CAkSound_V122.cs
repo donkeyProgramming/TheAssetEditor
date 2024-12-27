@@ -14,7 +14,7 @@ namespace Shared.GameFormats.WWise.Hirc.V122
         }
 
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
-        public uint GetSourceId() => AkBankSourceData.akMediaInformation.SourceId;
+        public uint GetSourceId() => AkBankSourceData.AkMediaInformation.SourceId;
         public SourceType GetStreamType() => AkBankSourceData.StreamType;
 
         public override void UpdateSize() => throw new NotImplementedException();
@@ -24,12 +24,12 @@ namespace Shared.GameFormats.WWise.Hirc.V122
     public class AkBankSourceData
     {
         public uint PluginId { get; set; }
-        public ushort PluginId_type { get; set; }
+        public ushort PluginIdType { get; set; }
         public ushort PluginId_company { get; set; }
         public SourceType StreamType { get; set; }
 
-        public AkMediaInformation akMediaInformation { get; set; }
-        public uint uSize { get; set; }
+        public AkMediaInformation AkMediaInformation { get; set; }
+        public uint USize { get; set; }
         public static AkBankSourceData Create(ByteChunk chunk)
         {
             var output = new AkBankSourceData()
@@ -40,8 +40,7 @@ namespace Shared.GameFormats.WWise.Hirc.V122
                 StreamType = (SourceType)chunk.ReadByte()
             };
 
-
-            output.PluginId_type = (ushort)(output.PluginId >> 0 & 0x000F);
+            output.PluginIdType = (ushort)(output.PluginId >> 0 & 0x000F);
             output.PluginId_company = (ushort)(output.PluginId >> 4 & 0x03FF);
 
             if (output.StreamType != SourceType.Streaming)
@@ -49,29 +48,28 @@ namespace Shared.GameFormats.WWise.Hirc.V122
                 //   throw new Exception();
             }
 
-            if (output.PluginId_type == 0x02)
-                output.uSize = chunk.ReadUInt32();
+            if (output.PluginIdType == 0x02)
+                output.USize = chunk.ReadUInt32();
 
-            output.akMediaInformation = AkMediaInformation.Create(chunk);
+            output.AkMediaInformation = AkMediaInformation.Create(chunk);
 
             return output;
         }
     }
 
-
     public class AkMediaInformation
     {
         public uint SourceId { get; set; }
-        public uint uInMemoryMediaSize { get; set; }
-        public byte uSourceBits { get; set; }
+        public uint UInMemoryMediaSize { get; set; }
+        public byte USourceBits { get; set; }
 
         public static AkMediaInformation Create(ByteChunk chunk)
         {
             return new AkMediaInformation()
             {
                 SourceId = chunk.ReadUInt32(),
-                uInMemoryMediaSize = chunk.ReadUInt32(),
-                uSourceBits = chunk.ReadByte(),
+                UInMemoryMediaSize = chunk.ReadUInt32(),
+                USourceBits = chunk.ReadByte(),
             };
         }
     }

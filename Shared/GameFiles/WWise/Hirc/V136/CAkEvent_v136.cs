@@ -9,7 +9,7 @@ namespace Shared.GameFormats.WWise.Hirc.V136
             public uint ActionId { get; set; }
         }
 
-        public List<Action> Actions { get; set; } = new List<Action>();
+        public List<Action> Actions { get; set; } = [];
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
@@ -41,7 +41,5 @@ namespace Shared.GameFormats.WWise.Hirc.V136
         {
             Size = (uint)(HircHeaderSize + 1 + 4 * Actions.Count);
         }
-
-
     }
 }
