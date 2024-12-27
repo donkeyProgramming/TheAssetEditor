@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Dat;
 using Shared.GameFormats.WWise;
 
@@ -15,6 +16,7 @@ namespace Editors.Audio.Storage
         Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; }
         Dictionary<string, List<string>> StateGroupsWithStates { get; }
         Dictionary<uint, List<HircItem>> HircObjects { get; }
+        Dictionary<string, PackFile> PackFileMap { get; }
 
         void ExportNameListToFile(string outputDirectory, bool includeIds = false);
         List<T> GetAllOfType<T>() where T : HircItem;
@@ -34,6 +36,7 @@ namespace Editors.Audio.Storage
         public Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; private set; }
         public Dictionary<string, List<string>> StateGroupsWithStates { get; private set; }
         public Dictionary<uint, List<HircItem>> HircObjects { get; private set; } = [];
+        public Dictionary<string, PackFile> PackFileMap { get; private set; }
 
 
         public AudioRepository(RepositoryProvider provider)
@@ -44,6 +47,7 @@ namespace Editors.Audio.Storage
                 DatDialogueEventsWithStateGroups = data.DialogueEventsWithStateGroups;
                 DatStateGroupsWithStates = data.StateGroupsWithStates;
                 HircObjects = data.HircObjects;
+                PackFileMap = data.PackFileMap;
 
                 StoreDialogueEventsWithStateGroups();
                 StoreStateGroupsWithStates();

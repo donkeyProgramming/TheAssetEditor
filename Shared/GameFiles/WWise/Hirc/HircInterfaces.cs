@@ -11,6 +11,7 @@ namespace Shared.GameFormats.WWise.Hirc
     {
         public uint GetDirectParentId();
         public uint GetSourceId();
+        public SourceType GetStreamType();
     }
 
     public interface ICAkAction
