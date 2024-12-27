@@ -156,7 +156,7 @@ namespace Editors.Audio.Utility
 
         private void ProcessSequenceContainer(HircItem item, HircTreeItem parent)
         {
-            var layerContainer = GetAsType<CAkRanSeqCnt>(item);
+            var layerContainer = GetAsType<ICAkRanSeqCnt>(item);
             var layerNode = new HircTreeItem() { DisplayName = $"Rand Container", Item = item };
             parent.Children.Add(layerNode);
 

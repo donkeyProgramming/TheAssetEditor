@@ -58,10 +58,10 @@ namespace Shared.GameFormats.Wwise.Hirc
         public uint GetDirectParentId();
     }
 
-    public abstract class CAkRanSeqCnt : HircItem
+    public interface ICAkRanSeqCnt
     {
-        public abstract uint GetParentId();
-        public abstract List<uint> GetChildren();
+        public uint GetParentId();
+        public List<uint> GetChildren();
     }
 
     public abstract class CAkSwitchCntr : HircItem

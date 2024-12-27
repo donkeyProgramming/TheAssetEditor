@@ -2,7 +2,7 @@
 
 namespace Shared.GameFormats.Wwise.Hirc.V112
 {
-    public class CAkRanSeqCnt_V112 : CAkRanSeqCnt
+    public class CAkRanSeqCnt_V112 : HircItem, ICAkRanSeqCnt
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public ushort LoopCount { get; set; }
@@ -45,8 +45,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
                 AkPlaylist.Add(AkPlaylistItem.Create(chunk));
         }
 
-        public override uint GetParentId() => NodeBaseParams.DirectParentId;
-        public override List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
+        public uint GetParentId() => NodeBaseParams.DirectParentId;
+        public List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }

@@ -1,7 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkRanSeqCntr_v136 : CAkRanSeqCnt, INodeBaseParamsAccessor
+    public class CAkRanSeqCntr_v136 : HircItem, ICAkRanSeqCnt, INodeBaseParamsAccessor
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public ushort SLoopCount { get; set; }
@@ -44,8 +44,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 AkPlaylist.Add(AkPlaylistItem.Create(chunk));
         }
 
-        public override uint GetParentId() => NodeBaseParams.DirectParentId;
-        public override List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
+        public uint GetParentId() => NodeBaseParams.DirectParentId;
+        public List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
 
         public override void UpdateSize()
         {
