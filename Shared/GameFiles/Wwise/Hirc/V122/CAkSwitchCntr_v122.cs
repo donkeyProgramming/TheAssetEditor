@@ -1,8 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
+using static Shared.GameFormats.Wwise.Hirc.ICAkSwitchCntr;
 
 namespace Shared.GameFormats.Wwise.Hirc.V122
 {
-    public class CAkSwitchCntr_v122 : HircItem
+    public class CAkSwitchCntr_v122 : HircItem, ICAkSwitchCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public AkGroupType EGroupType { get; set; }
@@ -10,7 +11,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V122
         public uint UlDefaultSwitch { get; set; }
         public byte BIsContinuousValidation { get; set; }
         public Children Children { get; set; }
-        public List<CAkSwitchPackage> SwitchList { get; set; } = [];
+        public List<ICAkSwitchPackage> SwitchList { get; set; } = [];
         public List<AkSwitchNodeParams> Parameters { get; set; } = [];
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
 
@@ -51,12 +52,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V122
         }
     }
 
-    public class CAkSwitchPackage
+    public class CAkSwitchPackage : ICAkSwitchPackage
     {
         public uint SwitchId { get; set; }
         public List<uint> NodeIdList { get; set; } = [];
 
-        public static CAkSwitchPackage Create(ByteChunk chunk)
+        public static ICAkSwitchPackage Create(ByteChunk chunk)
         {
             var instance = new CAkSwitchPackage();
             instance.SwitchId = chunk.ReadUInt32();

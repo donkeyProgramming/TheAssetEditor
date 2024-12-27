@@ -37,8 +37,8 @@ namespace Shared.GameFormats.Wwise.Hirc
     {
         public uint GetDirectParentId();
         public List<ICAkSwitchPackage> SwitchList { get; }
-        uint GroupId { get; }
-        uint DefaultSwitch { get; }
+        uint UlGroupId { get; }
+        uint UlDefaultSwitch { get; }
 
         public interface ICAkSwitchPackage
         {
@@ -62,19 +62,5 @@ namespace Shared.GameFormats.Wwise.Hirc
     {
         public uint GetParentId();
         public List<uint> GetChildren();
-    }
-
-    public abstract class CAkSwitchCntr : HircItem
-    {
-        public abstract uint GroupId { get; }
-        public abstract uint DefaultSwitch { get; }
-        public abstract uint ParentId { get; }
-        public abstract List<SwitchListItem> Items { get; }
-
-        public class SwitchListItem
-        {
-            public uint SwitchId { get; set; }
-            public List<uint> ChildNodeIds { get; set; }
-        }
     }
 }

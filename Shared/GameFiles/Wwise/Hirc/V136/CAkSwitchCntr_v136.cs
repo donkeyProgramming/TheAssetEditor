@@ -1,4 +1,5 @@
 ﻿using Shared.Core.ByteParsing;
+using static Shared.GameFormats.Wwise.Hirc.ICAkSwitchCntr;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
@@ -10,7 +11,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public uint UlDefaultSwitch { get; set; }
         public byte BIsContinuousValidation { get; set; }
         public Children Children { get; set; }
-        public List<ICAkSwitchCntr.ICAkSwitchPackage> SwitchList { get; set; } = [];
+        public List<ICAkSwitchPackage> SwitchList { get; set; } = [];
         public List<AkSwitchNodeParams> Parameters { get; set; } = [];
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
 
@@ -34,7 +35,5 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
-        public uint GroupId { get => UlGroupId; }
-        public uint DefaultSwitch { get => UlDefaultSwitch; }
     }
 }

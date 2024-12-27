@@ -129,8 +129,8 @@ namespace Editors.Audio.Utility
         void ProcessSwitchControl(HircItem item, HircTreeItem parent)
         {
             var switchControl = GetAsType<ICAkSwitchCntr>(item);
-            var switchType = _repository.GetNameFromHash(switchControl.GroupId);
-            var defaultValue = _repository.GetNameFromHash(switchControl.DefaultSwitch);
+            var switchType = _repository.GetNameFromHash(switchControl.UlGroupId);
+            var defaultValue = _repository.GetNameFromHash(switchControl.UlDefaultSwitch);
             var switchControlNode = new HircTreeItem() { DisplayName = $"Switch {switchType} DefaultValue: {defaultValue}", Item = item };
             parent.Children.Add(switchControlNode);
 

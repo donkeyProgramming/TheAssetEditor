@@ -1,4 +1,5 @@
 ﻿using Shared.Core.ByteParsing;
+using static Shared.GameFormats.Wwise.Hirc.ICAkSwitchCntr;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
@@ -35,12 +36,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         }
     }
 
-    public class CAkSwitchPackage : ICAkSwitchCntr.ICAkSwitchPackage
+    public class CAkSwitchPackage : ICAkSwitchPackage
     {
         public uint SwitchId { get; set; }
         public List<uint> NodeIdList { get; set; } = [];
 
-        public static CAkSwitchPackage Create(ByteChunk chunk)
+        public static ICAkSwitchPackage Create(ByteChunk chunk)
         {
             var instance = new CAkSwitchPackage();
             instance.SwitchId = chunk.ReadUInt32();

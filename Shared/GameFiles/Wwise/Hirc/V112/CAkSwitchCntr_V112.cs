@@ -3,7 +3,7 @@ using static Shared.GameFormats.Wwise.Hirc.ICAkSwitchCntr;
 
 namespace Shared.GameFormats.Wwise.Hirc.V112
 {
-    public class CAkSwitchCntr_V112 : CAkSwitchCntr, ICAkSwitchCntr
+    public class CAkSwitchCntr_V112 : HircItem, ICAkSwitchCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public AkGroupType EGroupType { get; set; }
@@ -13,6 +13,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
         public Children Children { get; set; }
         public List<ICAkSwitchPackage> SwitchList { get; set; } = [];
         public List<AkSwitchNodeParams> Parameters { get; set; } = [];
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
@@ -32,13 +33,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
                 Parameters.Add(AkSwitchNodeParams.Create(chunk));
         }
 
-        public override uint GroupId => UlGroupId;
-        public override uint DefaultSwitch => UlDefaultSwitch;
-        public override uint ParentId => NodeBaseParams.DirectParentId;
-        public override List<SwitchListItem> Items => SwitchList.Select(x => new SwitchListItem() { SwitchId = x.SwitchId, ChildNodeIds = x.NodeIdList }).ToList();
         public override void UpdateSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
     }
 
     public class Children
