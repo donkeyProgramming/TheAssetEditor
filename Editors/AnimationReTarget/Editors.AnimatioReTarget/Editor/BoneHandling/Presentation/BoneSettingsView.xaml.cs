@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace AnimationEditor.AnimationTransferTool
+namespace Editors.AnimatioReTarget.Editor.BoneHandling.Presentation
 {
     /// <summary>
     /// Interaction logic for BoneSettingsView.xaml

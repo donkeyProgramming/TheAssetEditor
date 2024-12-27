@@ -1,13 +1,10 @@
 ﻿using System;
 using GameWorld.Core.Animation;
 
-namespace AnimationEditor.AnimationTransferTool
+namespace Editors.AnimatioReTarget.Editor
 {
     class ExportHelper
     {
-
-
-
         public static void ExportMappedSkeleton()
         {
 

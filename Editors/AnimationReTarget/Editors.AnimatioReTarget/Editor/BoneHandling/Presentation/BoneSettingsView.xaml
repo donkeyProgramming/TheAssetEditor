@@ -1,0 +1,61 @@
+﻿<UserControl x:Class="Editors.AnimatioReTarget.Editor.BoneHandling.Presentation.BoneSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:s="http://schemas.singulink.com/xaml"
+             xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
+             xmlns:System="clr-namespace:System;assembly=System.Runtime" 
+             xmlns:presentation="clr-namespace:Editors.AnimatioReTarget.Editor.BoneHandling.Presentation"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="800">
+    <UserControl.Resources>
+        <System:Double x:Key="labelWidth">110</System:Double>
+    </UserControl.Resources>
+    
+    <Expander IsExpanded="True" Header="Bone settings:" >
+        <Grid Margin="10,0,2,0" >
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*"/>
+                <ColumnDefinition Width="0.5*"/>
+            </Grid.ColumnDefinitions>
+
+            <TreeView MinHeight="200" Grid.Column="0"
+                      MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                      VerticalAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
+                            ItemsSource="{Binding BoneManager.Bones, UpdateSourceTrigger=PropertyChanged}">
+  
+                    <b:Interaction.Behaviors>
+                        <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding BoneManager.SelectedBone, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                    </b:Interaction.Behaviors>
+
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                            <Setter Property="IsExpanded" Value="True" />
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                    <TreeView.ItemTemplate >
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding BoneName, UpdateSourceTrigger=PropertyChanged}"   Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
+                                <TextBlock Text=" [" Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
+                                <TextBlock Text="{Binding BoneIndex, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
+                                <TextBlock Text="]" Foreground="{Binding HasMapping, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToColour_white_red}}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+
+            <presentation:SelectedBoneView Grid.Column="1"/>
+
+        </Grid>
+    </Expander>
+</UserControl>

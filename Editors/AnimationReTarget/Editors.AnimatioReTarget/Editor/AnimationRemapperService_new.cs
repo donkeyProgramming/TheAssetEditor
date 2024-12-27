@@ -1,29 +1,28 @@
-﻿using GameWorld.Core.Animation;
+﻿using Editors.AnimatioReTarget.Editor.BoneHandling;
+using Editors.AnimatioReTarget.Editor.Settings;
+using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
-using Shared.Ui.Editors.BoneMapping;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace AnimationEditor.AnimationTransferTool
+namespace Editors.AnimatioReTarget.Editor
 {
-    public class AnimationRemapperService
+    public class AnimationRemapperService_new
     {
-        List<IndexRemapping> _remappingInformaton;
-        IEnumerable<SkeletonBoneNode> _bones;
-        AnimationSettings _settings;
+        // List<IndexRemapping> _remappingInformaton;
+        private readonly IEnumerable<SkeletonBoneNode_new> _bones;
+        private readonly AnimationGenerationSettings _settings;
 
-        public AnimationRemapperService(AnimationSettings settings, List<IndexRemapping> mapping, IEnumerable<SkeletonBoneNode> bones)
+        public AnimationRemapperService_new(AnimationGenerationSettings settings, IEnumerable<SkeletonBoneNode_new> bones)
         {
             _settings = settings;
-            _remappingInformaton = mapping;
+            // _remappingInformaton = mapping;
             _bones = bones;
         }
 
         public AnimationClip ReMapAnimation(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy)
         {
-            var newFrameCount = (int)(_settings.SpeedMult.Value * animationToCopy.DynamicFrames.Count);
-            var newPlayTime = (float)_settings.SpeedMult.Value * animationToCopy.PlayTimeInSec;
+            var newFrameCount = (int)(_settings.AnimationSpeedMult * animationToCopy.DynamicFrames.Count);
+            var newPlayTime = (float)_settings.AnimationSpeedMult * animationToCopy.PlayTimeInSec;
 
             //animationToCopy.RemoveOptimizations(copyFromSkeleton);
             var resampledAnimationToCopy = GameWorld.Core.Animation.AnimationEditor.ReSample(copyFromSkeleton, animationToCopy, newFrameCount, newPlayTime);
@@ -34,7 +33,7 @@ namespace AnimationEditor.AnimationTransferTool
             else
                 newAnimation = resampledAnimationToCopy;
 
-            if (_settings.ApplyRelativeScale.Value)
+            if (_settings.ApplyRelativeScale)
                 ApplyRelativeScale(copyFromSkeleton, copyToSkeleton, newAnimation);
 
             // Apply the "rules"
@@ -52,19 +51,19 @@ namespace AnimationEditor.AnimationTransferTool
         void TransferAnimationWorld(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToCopy, AnimationClip newAnimation)
         {
             var frameCount = animationToCopy.DynamicFrames.Count;
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                for (int i = 0; i < copyToSkeleton.BoneCount; i++)
+                for (var i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
                     var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, newAnimation);
                     var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
 
                     var desiredBonePosWorld = currentCopyToFrame.GetSkeletonAnimatedWorld(copyToSkeleton, i);
 
-                    var mappedIndex = _remappingInformaton.FirstOrDefault(x => x.OriginalValue == i);
+                    var mappedIndex = BoneHelper_new.GetMappedIndex(_bones, i);
                     if (mappedIndex != null)
                     {
-                        var targetBoneIndex = mappedIndex.NewValue;
+                        var targetBoneIndex = mappedIndex.Value;
                         desiredBonePosWorld = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, targetBoneIndex) * Matrix.CreateScale(1);
                     }
 
@@ -78,10 +77,12 @@ namespace AnimationEditor.AnimationTransferTool
 
                     desiredBonePosWorld.Decompose(out var _, out var boneRotation, out var bonePosition);
 
-                    var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
-                    if (boneSettings.ApplyRotation.Value == true)
+                    var boneSettings = BoneHelper_new.GetBoneFromId(_bones, i);
+                    if (boneSettings == null)
+                        continue;
+                    if (boneSettings.ApplyRotation == true)
                         newAnimation.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
-                    if (boneSettings.ApplyTranslation.Value == true)
+                    if (boneSettings.ApplyTranslation == true)
                         newAnimation.DynamicFrames[frameIndex].Position[i] = bonePosition;
 
                 }
@@ -91,16 +92,16 @@ namespace AnimationEditor.AnimationTransferTool
         void ApplyRelativeScale(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToScale)
         {
             var frameCount = animationToScale.DynamicFrames.Count;
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                for (int i = 0; i < copyToSkeleton.BoneCount; i++)
+                for (var i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
-                    var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
-                    var mappedIndex = _remappingInformaton.FirstOrDefault(x => x.OriginalValue == i);
+                    var boneSettings = BoneHelper_new.GetBoneFromId(_bones, i);
+                    var mappedIndex = BoneHelper_new.GetMappedIndex(_bones, i);
 
                     if (mappedIndex != null)
                     {
-                        var targetBoneIndex = mappedIndex.NewValue;
+                        var targetBoneIndex = mappedIndex.Value;
                         var copyFromParentIndex = copyFromSkeleton.GetParentBoneIndex(targetBoneIndex);
                         var copyToParentIndex = copyToSkeleton.GetParentBoneIndex(i);
 
@@ -131,19 +132,21 @@ namespace AnimationEditor.AnimationTransferTool
         void SnapBonesToWorld(GameSkeleton copyFromSkeleton, GameSkeleton copyToSkeleton, AnimationClip animationToScale, AnimationClip animationToCopy)
         {
             var frameCount = animationToScale.DynamicFrames.Count;
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
                 var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
 
-                for (int i = 0; i < copyToSkeleton.BoneCount; i++)
+                for (var i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
                     var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToScale);
 
-                    var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
-                    if (boneSettings.ForceSnapToWorld.Value == false)
+                    var boneSettings = BoneHelper_new.GetBoneFromId(_bones, i);
+                    if (boneSettings == null)
+                        continue;
+                    if (boneSettings.ForceSnapToWorld == false)
                         continue;
 
-                    var mappedIndex = _remappingInformaton.FirstOrDefault(x => x.OriginalValue == i);
+                    var mappedIndex = BoneHelper_new.GetMappedIndex(_bones, i);
                     if (mappedIndex == null)
                         continue;
 
@@ -151,7 +154,7 @@ namespace AnimationEditor.AnimationTransferTool
                     if (fromParentBoneIndex == -1)
                         continue;
 
-                    var targetBoneIndex = mappedIndex.NewValue;
+                    var targetBoneIndex = mappedIndex.Value;
                     var desiredBonePosWorld = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, targetBoneIndex) * Matrix.CreateScale(1);
 
                     var parentWorld = currentFrame.GetSkeletonAnimatedWorld(copyToSkeleton, fromParentBoneIndex);
@@ -169,9 +172,9 @@ namespace AnimationEditor.AnimationTransferTool
         void ApplyOffsets(GameSkeleton copyToSkeleton, AnimationClip animationToScale)
         {
             var frameCount = animationToScale.DynamicFrames.Count;
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                for (int i = 0; i < copyToSkeleton.BoneCount; i++)
+                for (var i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
                     var currentFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToScale);
 
@@ -179,7 +182,10 @@ namespace AnimationEditor.AnimationTransferTool
                     if (fromParentBoneIndex == -1)
                         continue;
 
-                    var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
+                    var boneSettings = BoneHelper_new.GetBoneFromId(_bones, i);
+                    if (boneSettings == null)
+                        continue;
+
                     var desiredBonePosWorld = MathUtil.CreateRotation(new Vector3((float)boneSettings.RotationOffset.X.Value, (float)boneSettings.RotationOffset.Y.Value, (float)boneSettings.RotationOffset.Z.Value)) *
                         currentFrame.GetSkeletonAnimatedWorld(copyToSkeleton, i) *
                         Matrix.CreateTranslation(new Vector3((float)boneSettings.TranslationOffset.X.Value, (float)boneSettings.TranslationOffset.Y.Value, (float)boneSettings.TranslationOffset.Z.Value));
@@ -191,7 +197,7 @@ namespace AnimationEditor.AnimationTransferTool
                     animationToScale.DynamicFrames[frameIndex].Rotation[i] = boneRotation;
                     animationToScale.DynamicFrames[frameIndex].Position[i] = bonePosition;
 
-                    if (boneSettings.IsLocalOffset.Value)
+                    if (boneSettings.IsLocalOffset)
                     {
                         // Todo - Some inverse fuckery to children
                         var childBones = copyToSkeleton.GetDirectChildBones(i);
@@ -204,18 +210,20 @@ namespace AnimationEditor.AnimationTransferTool
         {
             var frameCount = animationToCopy.DynamicFrames.Count;
 
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                for (int i = 0; i < copyToSkeleton.BoneCount; i++)
+                for (var i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
                     // Does this bone have a thing to fix?
-                    var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
-
-                    var mappedIndex = _remappingInformaton.FirstOrDefault(x => x.OriginalValue == i);
-                    if (boneSettings.SelectedRelativeBone.Value == null || mappedIndex == null)
+                    var boneSettings = BoneHelper_new.GetBoneFromId(_bones, i);
+                    if (boneSettings == null)
                         continue;
 
-                    var targetBoneIndex = mappedIndex.NewValue;
+                    var mappedIndex = BoneHelper_new.GetMappedIndex(_bones, i);
+                    if (boneSettings.SelectedRelativeBone == null || mappedIndex == null)
+                        continue;
+
+                    var targetBoneIndex = mappedIndex.Value;
 
                     var currentCopyToFrame = AnimationSampler.Sample(frameIndex, 0, copyToSkeleton, animationToFix);
                     var copyFromFrame = AnimationSampler.Sample(frameIndex, 0, copyFromSkeleton, animationToCopy);
@@ -227,16 +235,16 @@ namespace AnimationEditor.AnimationTransferTool
                     // target hand-  reference point | copyFromSkeleton -> boneIndex self hand mapping index
 
                     var boneIndexAttachmentPointSelf = i;
-                    var boneIndexHandSelf = boneSettings.SelectedRelativeBone.Value.BoneIndex.Value;
+                    var boneIndexHandSelf = boneSettings.SelectedRelativeBone.BoneIndex;
 
 
-                    var boneIndexAttachmentPointSource = mappedIndex.NewValue;
-                    var mappedIndexRef = _remappingInformaton.FirstOrDefault(x => x.OriginalValue == boneIndexHandSelf);
-                    var boneIndexHandSource = mappedIndexRef.NewValue;
+                    var boneIndexAttachmentPointSource = mappedIndex.Value;
+                    var mappedIndexRef = BoneHelper_new.GetMappedIndex(_bones, boneIndexHandSelf);
+                    var boneIndexHandSource = mappedIndexRef;
 
 
                     var self = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, boneIndexAttachmentPointSource);
-                    var hand = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, boneIndexHandSource);
+                    var hand = copyFromFrame.GetSkeletonAnimatedWorld(copyFromSkeleton, boneIndexHandSource.Value);
 
                     self.Decompose(out var _, out var _, out var bone0);
                     hand.Decompose(out var _, out var _, out var bone1);
@@ -273,9 +281,9 @@ namespace AnimationEditor.AnimationTransferTool
         void ApplyAnimationScale(AnimationClip animation, GameSkeleton copyToSkeleton)
         {
             var frameCount = animation.DynamicFrames.Count;
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                animation.DynamicFrames[frameIndex].Scale[0] = new Vector3((float)_settings.Scale.Value);
+                animation.DynamicFrames[frameIndex].Scale[0] = new Vector3((float)_settings.SkeletonScale);
             }
 
 
@@ -284,15 +292,15 @@ namespace AnimationEditor.AnimationTransferTool
         void ApplyBoneLengthMult(AnimationClip animation, GameSkeleton copyToSkeleton)
         {
             var frameCount = animation.DynamicFrames.Count;
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                for (int boneIndex = 0; boneIndex < copyToSkeleton.BoneCount; boneIndex++)
+                for (var boneIndex = 0; boneIndex < copyToSkeleton.BoneCount; boneIndex++)
                 {
-                    var boneSettings = BoneHelper.GetBoneFromId(_bones, boneIndex);
+                    var boneSettings = BoneHelper_new.GetBoneFromId(_bones, boneIndex);
                     if (boneSettings == null)
                         continue;
 
-                    animation.DynamicFrames[frameIndex].Position[boneIndex] = animation.DynamicFrames[frameIndex].Position[boneIndex] * (float)boneSettings.BoneLengthMult.Value;
+                    animation.DynamicFrames[frameIndex].Position[boneIndex] = animation.DynamicFrames[frameIndex].Position[boneIndex] * (float)boneSettings.BoneLengthMult;
                 }
             }
         }
@@ -300,25 +308,25 @@ namespace AnimationEditor.AnimationTransferTool
         void FreezeBones(GameSkeleton copyToSkeleton, AnimationClip animation)
         {
             var frameCount = animation.DynamicFrames.Count;
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
-                for (int i = 0; i < copyToSkeleton.BoneCount; i++)
+                for (var i = 0; i < copyToSkeleton.BoneCount; i++)
                 {
-                    var mappedIndex = _remappingInformaton.FirstOrDefault(x => x.OriginalValue == i);
+                    var mappedIndex = BoneHelper_new.GetMappedIndex(_bones, i);
                     if (mappedIndex != null)
                     {
-                        var boneSettings = BoneHelper.GetBoneFromId(_bones, i);
-                        if (boneSettings.FreezeTranslation.Value)
+                        var boneSettings = BoneHelper_new.GetBoneFromId(_bones, i);
+                        if (boneSettings.FreezeTranslation)
                             animation.DynamicFrames[frameIndex].Position[i] = Vector3.Zero;
 
-                        if (boneSettings.FreezeRotation.Value)
+                        if (boneSettings.FreezeRotation)
                             animation.DynamicFrames[frameIndex].Rotation[i] = Quaternion.Identity;
-                        if (boneSettings.FreezeRotationZ.Value)
+                        if (boneSettings.FreezeRotationZ)
                             animation.DynamicFrames[frameIndex].Rotation[i] = new Quaternion(0, 0, animation.DynamicFrames[0].Rotation[i].Z, animation.DynamicFrames[0].Rotation[i].W);
                     }
                     else
                     {
-                        if (_settings.FreezeUnmapped.Value)
+                        if (_settings.ZeroUnmappedBones)
                         {
                             animation.DynamicFrames[frameIndex].Rotation[i] = Quaternion.Identity;
                             animation.DynamicFrames[frameIndex].Position[i] = Vector3.Zero;
@@ -337,10 +345,10 @@ namespace AnimationEditor.AnimationTransferTool
 
             var newAnimation = new AnimationClip();
             newAnimation.PlayTimeInSec = animationToCopy.PlayTimeInSec;
-            for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
+            for (var frameIndex = 0; frameIndex < frameCount; frameIndex++)
             {
                 newAnimation.DynamicFrames.Add(new AnimationClip.KeyFrame());
-                for (int i = 0; i < skeleton.BoneCount; i++)
+                for (var i = 0; i < skeleton.BoneCount; i++)
                 {
                     newAnimation.DynamicFrames[frameIndex].Rotation.Add(skeleton.Rotation[i]);
                     newAnimation.DynamicFrames[frameIndex].Position.Add(skeleton.Translation[i]);
@@ -348,7 +356,7 @@ namespace AnimationEditor.AnimationTransferTool
                 }
             }
 
-            for (int i = 0; i < skeleton.BoneCount; i++)
+            for (var i = 0; i < skeleton.BoneCount; i++)
             {
                 if (newAnimation.DynamicFrames.Count != 0)
                     newAnimation.DynamicFrames[0].Scale[0] = Vector3.One;
@@ -357,13 +365,13 @@ namespace AnimationEditor.AnimationTransferTool
         }
     }
 
-    public static class BoneHelper
+    public static class BoneHelper_new
     {
-        public static SkeletonBoneNode GetBoneFromId(IEnumerable<SkeletonBoneNode> root, int boneId)
+        public static SkeletonBoneNode_new? GetBoneFromId(IEnumerable<SkeletonBoneNode_new> root, int boneId)
         {
-            foreach (SkeletonBoneNode item in root)
+            foreach (SkeletonBoneNode_new item in root)
             {
-                if (item.BoneIndex.Value == boneId)
+                if (item.BoneIndex == boneId)
                     return item;
 
                 var result = GetBoneFromId(item.Children, boneId);
@@ -371,6 +379,15 @@ namespace AnimationEditor.AnimationTransferTool
                     return result;
             }
             return null;
+        }
+
+        public static int? GetMappedIndex(IEnumerable<SkeletonBoneNode_new> bones, int boneId)
+        {
+            var bone = GetBoneFromId(bones, boneId);
+            if (bone == null || bone.HasMapping == false)
+                return null;
+
+            return bone.MappedIndex;
         }
     }
 }

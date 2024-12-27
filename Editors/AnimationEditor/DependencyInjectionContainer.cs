@@ -1,5 +1,4 @@
-﻿using AnimationEditor.AnimationTransferTool;
-using AnimationEditor.CampaignAnimationCreator;
+﻿using AnimationEditor.CampaignAnimationCreator;
 using AnimationEditor.Common.BaseControl;
 using AnimationEditor.MountAnimationCreator;
 using Editors.AnimationVisualEditors.AnimationKeyframeEditor;
@@ -18,9 +17,6 @@ namespace Editors.AnimationVisualEditors
             serviceCollection.AddScoped<EditorHost<CampaignAnimationCreatorViewModel>>();
             serviceCollection.AddScoped<CampaignAnimationCreatorViewModel>();
 
-            serviceCollection.AddScoped<EditorHost<AnimationTransferToolViewModel>>();
-            serviceCollection.AddScoped<AnimationTransferToolViewModel>();
-
             serviceCollection.AddScoped<EditorHost<MountAnimationCreatorViewModel>>();
             serviceCollection.AddScoped<MountAnimationCreatorViewModel>();
 
@@ -37,11 +33,6 @@ namespace Editors.AnimationVisualEditors
                 .AddToToolbar("Mount Tool", false)
                 .Build(database);
       
-            EditorInfoBuilder
-              .Create<EditorHost<AnimationTransferToolViewModel>, EditorHostView> (EditorEnums.AnimationTransfer_Editor)
-              .AddToToolbar("Animation Transfer Tool", false)
-              .Build(database);
-    
             EditorInfoBuilder
               .Create<EditorHost<CampaignAnimationCreatorViewModel>, EditorHostView>(EditorEnums.CampaginAnimation_Editor)
               .AddToToolbar("Campagin Aanimation Tool", false)

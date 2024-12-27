@@ -21,6 +21,8 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         [ObservableProperty] bool _isVisible = true;
         [ObservableProperty] bool _isControlVisible = true;
         [ObservableProperty] bool _allowMetaData = true;
+        [ObservableProperty] bool _isEnabled = true;
+        [ObservableProperty] bool _isExpand = true;
 
         public Depricated_SelectAnimationViewModel AnimViewModel { get; set; }
         public SkeletonPreviewViewModel SkeletonInformation { get; set; }

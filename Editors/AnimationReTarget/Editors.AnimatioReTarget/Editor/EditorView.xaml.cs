@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace AnimationEditor.AnimationTransferTool
+namespace Editors.AnimatioReTarget.Editor
 {
     /// <summary>
     /// Interaction logic for EditorView.xaml

@@ -1,11 +1,11 @@
-﻿using AnimationEditor.AnimationTransferTool;
+﻿using Editors.AnimatioReTarget.Editor;
 using Editors.Shared.Core.Common.BaseControl;
 using Shared.Core.DevConfig;
 using Shared.Core.PackFiles;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 
-namespace Editors.AnimationVisualEditors.AnimationTransferTool.DevConfig
+namespace Editors.AnimatioReTarget.DevConfig
 {
     internal class AnimTransfer_DwarfArcher : IDeveloperConfiguration
     {
@@ -43,7 +43,8 @@ namespace Editors.AnimationVisualEditors.AnimationTransferTool.DevConfig
                 Animation = packfileService.FindFile(@"animations\battle\humanoid01\sword_and_pistol\missile_attacks\hu1_swp_missile_attack_aim_to_shootready_01.anim")
             };
 
-            creator.Create(EditorEnums.AnimationTransfer_Editor, x => (x as EditorHost<AnimationTransferToolViewModel>).Editor.SetDebugInputParameters(targetInput, sourceInput));
+            var editor = (AnimationRetargetViewModel)creator.Create(EditorEnums.AnimationTransfer_Editor);
+            editor.SetDebugInputParameters(targetInput, sourceInput);
         }
     }
 }

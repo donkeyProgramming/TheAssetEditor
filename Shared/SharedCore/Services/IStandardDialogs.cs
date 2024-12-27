@@ -14,7 +14,7 @@ namespace Shared.Core.Services
         void ShowErrorViewDialog(string title, ErrorList errorItems, bool modal = true);
 
         TextInputDialogResult ShowTextInputDialog(string title, string initialText = "");
-        void ShowDialogBox(string message, string title);
+        void ShowDialogBox(string message, string title = "Error");
         ShowMessageBoxResult ShowYesNoBox(string message, string title);
     }
 

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\GameWorld\View3D\GameWorld.Core.csproj" />
+      <ProjectReference Include="..\..\..\Shared\SharedUI\Shared.Ui.csproj" />
+      <ProjectReference Include="..\..\Shared\Editors.Shared.Core\Editors.Shared.Core.csproj" />
+    </ItemGroup>
+
+</Project>

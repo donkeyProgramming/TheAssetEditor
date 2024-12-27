@@ -1,27 +1,50 @@
-Fixes for v056
+Remember:
+	Rename to Animation Retarget - own project 
+	Check with bb, the diabled buttons /warbeast 
+	Damping and root node handling 
+	Unit tests! 
+	make everything selectable
+	Rendering window - disbale backface culling 
+	Complex mesh loader - fast loading! 
+	"How to use" window - point to github?
+	Create a "save project" button?
+	Superview - default scene content to be expanded. Allow select meshes
+	Change renderingcomponent to be added manually in the retarget tool. 
+	Move Editors.Shared.Core into shared? Maybe under UI?
 
+
+Bug: System.Windows.ResourceReferenceKeyNotFoundException: DefaultTreeNodeStyle resource not found
+	Maybe it's being called and not attached to the tree yet? Consider not using resources and instead defining properties so the selector has the templates as children. eg.
+	https://github.com/stevemonaco/ImageMagitek/blob/wpf/TileShop.WPF/ViewExtenders/Selectors/ProjectTreeTemplateSelector.cs
+	https://github.com/stevemonaco/ImageMagitek/blob/wpf/TileShop.WPF/Features/Project/ProjectTreeView.xaml#L31-L45
+	
+Bug: Open kitbash editor. Move files around, tree view crash in Database_PackFilesUpdated
+Bug: Opening the same file in two different editors cause Attempting to open file 'sengko_linchin.wsmodel', but is is already open. Give better error
+Bug: Wrong text in lod view for kitbash https://github.com/donkeyProgramming/TheAssetEditor/issues/230
+bug: Closing superview https://github.com/donkeyProgramming/TheAssetEditor/issues/231
+Bug: Rendering issue, causes softlock https://github.com/donkeyProgramming/TheAssetEditor/issues/232
+Bug: Try to detect mismatch between wsmodel and rmv model, difference in lods/meshes count 
+Bug: Complex mesh loader - only load lod/model 1 for superview+++
+
+Fixes for v056
 	General: Move resent files out of settings
-	General: Save Active pack button https://github.com/donkeyProgramming/TheAssetEditor/issues/123
-	General: Wem files, load them but hide in tree view. To avoid files go missing on save later.
 	General: Convert GameinformationFactory to a static! 
 	General: Show hisotry of commands in exceptions
 	General: Close console window on close
 		
 	KitbashTool: Unit test - open karl, import general, make head editable, rerig, save 
-		
-	GameWorld:Move bloomeffect to resourcelib
+	KitbashTool: Unit tests - ensure shader paths are correct!
+	
+	GameWorld: Move bloomeffect to resourcelib
 	GameWorld: ONly render glow if there is glow stuff in the pass 
 	GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
 	
-	KitbashTool: Manual vertex editor for weights 
+	KitbashTool: Manual vertex editor for weights (new editor or reuse debug view)
 	KitbashTool: Reduce icon size?
 	KitbashTool: when loading material - if not supported show message
 	KitbashTool: Issues with rendering/selection and pivot point
 	KitbashTool: When there is no files left in a reference mesh - close the node 
-	
-	
-	
-	
+		
 Bugs:
 	KitbashTool: Node clicking in tree view is slow
 	KitbashTool: Tint capability crash bug => Shield change to tint
@@ -39,6 +62,8 @@ Bugs:
 	
 	
 Improvements:
+	play sound using monogame audio. find wem converter?
+	https://github.com/Dirkster99/AvalonDock
 	General: SelectionManager, remove the use of SelectionManager_SelectionChanged event
 	General: Upgrade to new community toolkit
 	KitbashTool: Second UV map on export and render
@@ -91,6 +116,20 @@ New features:
 	Tool for editing prefabs
 	
 	
+Fixes for v057:
+	[Feature] 	General: 	Added 'Save Active pack' button to file menu https://github.com/donkeyProgramming/TheAssetEditor/issues/123
+	[Feature] 	General: 	Improvements to "Load Wem Files" option. This option now only effects if the files are visible in the pack browser
+							Wem files are now always loaded which makes the audio tools work better. 
+							Wem files are also alway loaded for mods, which fixes an issue where if the flag was disabled,
+							the audio files would be deleted from the mod on saving. No there should be no issues. 
+	
+	[Bug] 		General:	Fixed some issues related to saving packfiles after deleting files and folders
+	[Bug] KitbashEditor:	Fixed errors related to selecting meshes. 
+							Logging added to get more data. 
+							Please provide the log info if you get error log messages related to selection
+	[Bug] KitbashEditor:	Fixed wsmodel generation for pharaoh. Thanks to Ewajos
+	
+	
 Fixes for v056:
 	[Bug] General: Double clicking a packfile node did not expand it correctly
 	[Bug] General: "Make editable pack" option missing from context menu
@@ -116,6 +155,9 @@ Fixes for v055:
 	[Bug] KitbashTool: Scene explorer now correctly keeps nodes visible and expanded when changing the content of the scene.
 
 
+Other modding tools:
+	https://github.com/Shazbot/WH3-Mod-Manager/tree/master
+	https://github.com/MattFiler/OpenCAGE/?tab=readme-ov-file
 	
 	
 Link to cinterbreath

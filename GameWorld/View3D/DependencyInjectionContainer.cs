@@ -152,16 +152,6 @@ namespace GameWorld.Core
             serviceCollection.AddTransient<InterpolateFramesSelectedBonesBoneCommand>();
         }
 
-        protected void RegisterGameComponent<T>(IServiceCollection serviceCollection) where T : class, IGameComponent
-        {
-            serviceCollection.AddScoped<T>();
-            serviceCollection.AddScoped<IGameComponent, T>(x => x.GetRequiredService<T>());
-        }
 
-        protected void RegisterGameComponent<TInterface, TActual>(IServiceCollection serviceCollection) where TInterface : class, IGameComponent where TActual : class, TInterface
-        {
-            serviceCollection.AddScoped<TInterface, TActual>();
-            serviceCollection.AddScoped<IGameComponent, TInterface>(x => x.GetRequiredService<TInterface>());
-        }
     }
 }
