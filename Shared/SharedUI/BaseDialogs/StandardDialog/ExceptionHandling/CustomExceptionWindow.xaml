@@ -9,11 +9,9 @@
         Title="Error" Height="450" Width="800">
     <DockPanel>
 
-
-        <Button DockPanel.Dock="Bottom" Content="Close" Margin="5" Click="CloseButtonPressed"/>
-
-
-        <Button DockPanel.Dock="Bottom" Content="Copy to clipboard" Margin="5" Click="CopyButtonPressed" />
+        <Button DockPanel.Dock="Bottom" Content="Emergency - Force Close Current Window" Margin="5" Click="ForceCloseButtonPressed"/>
+        <Button DockPanel.Dock="Bottom" Content="Close Error window" Margin="5" Click="CloseButtonPressed"/>
+        <Button DockPanel.Dock="Bottom" Content="Copy to Clipboard" Margin="5" Click="CopyButtonPressed" />
 
         <TextBox 
             IsReadOnly="True"

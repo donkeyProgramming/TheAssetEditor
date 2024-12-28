@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using KitbasherEditor.Views;
 
@@ -15,7 +16,6 @@ namespace Editors.KitbasherEditor.Core.SceneExplorer
             // Add nodes
             sceneExplorerNodes.Clear();
             AddRecursive(sceneExplorerNodes, sceneGraphRoot);
-
 
             // Add default states
             var rootNode = sceneExplorerNodes.FirstOrDefault();
@@ -83,14 +83,17 @@ namespace Editors.KitbasherEditor.Core.SceneExplorer
             return output;
         }
 
-        static void AddRecursive(ObservableCollection<SceneExplorerNode> sceneExplorerNodes, ISceneNode currentNode)
+        static void AddRecursive(ObservableCollection<SceneExplorerNode> sceneExplorerNodes, ISceneNode currentNode, bool isParentReferance = false)
         {
-            var newNode = new SceneExplorerNode(currentNode);
+            if (currentNode.Name == SpecialNodes.ReferenceMeshs)
+                isParentReferance = true;
+
+            var newNode = new SceneExplorerNode(currentNode, isParentReferance);
             sceneExplorerNodes.Add(newNode);
 
             foreach (var child in currentNode.Children)
             {
-                AddRecursive(newNode.Children, child);
+                AddRecursive(newNode.Children, child, isParentReferance);
             }
         }
 

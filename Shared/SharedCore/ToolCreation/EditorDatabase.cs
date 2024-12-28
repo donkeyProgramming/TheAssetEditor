@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
+using Shared.Core.Events.Global;
 
 namespace Shared.Core.ToolCreation
 {

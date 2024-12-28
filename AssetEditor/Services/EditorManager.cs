@@ -46,6 +46,7 @@ namespace AssetEditor.Services
             _editorDatabase = editorDatabase;
 
             eventHub.Register<BeforePackFileContainerRemovedEvent>(this, OnBeforeRemoved);
+            eventHub.Register<ForceShutdownEvent>(this, OnForceShutdownEditor);
         }
 
         public IList<IEditorInterface> GetAllEditors() => CurrentEditorsList;
@@ -159,6 +160,12 @@ namespace AssetEditor.Services
                 CurrentEditorsList.Remove(editor);
                 editor.Close();
             }
+        }
+
+        private void OnForceShutdownEditor(ForceShutdownEvent e)
+        {
+            _logger.Here().Warning($"Attempting to force shutdown editor {e.EditorHandle.DisplayName}");
+            CloseTool(e.EditorHandle);
         }
 
         public void CloseTool(IEditorInterface tool)

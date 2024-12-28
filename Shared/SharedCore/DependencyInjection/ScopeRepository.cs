@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms.VisualStyles;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ToolCreation;
@@ -18,13 +19,20 @@ namespace Shared.Core.DependencyInjection
         T GetRequiredService<T>(IEditorInterface editorHandle);
 
         void Print();
+        IEditorInterface? GetEditorFromToken(ScopeToken token);
+    }
+
+    public class ScopeToken
+    { 
+        public string MetaData { get; set; } = string.Empty;
     }
 
     public class ScopeRepository : IScopeRepository
     {
+        private record ScopeInfo(IServiceScope Scope, ScopeToken token);
         private readonly ILogger _logger = Logging.Create<ScopeRepository>();
 
-        private readonly Dictionary<IEditorInterface, IServiceScope> _scopes = [];
+        private readonly Dictionary<IEditorInterface, ScopeInfo> _scopes = [];
         private readonly IServiceProvider _rootProvider;
 
         public List<IEditorInterface> GetEditorHandles() => _scopes.Select(x=>x.Key).ToList();
@@ -57,26 +65,39 @@ namespace Shared.Core.DependencyInjection
             if (_scopes.ContainsKey(owner))
                 throw new ArgumentException("Owner already added!");
 
+            var scopeToken = scope.ServiceProvider.GetRequiredService<ScopeToken>();
+            scopeToken.MetaData = $"Scope for {owner.DisplayName} of type {owner.GetType()}";
+
             _logger.Here().Information($"Adding scope for {owner.DisplayName} of type {owner.GetType()}");
-            _scopes.Add(owner, scope);
+            _scopes.Add(owner, new ScopeInfo(scope, scopeToken));
         }
 
         public void RemoveScope(IEditorInterface owner)
         {
             _logger.Here().Information($"Removing scope for {owner.DisplayName} of type {owner.GetType()}");
-            _scopes[owner].Dispose();
+            _scopes[owner].Scope.Dispose();
             _scopes.Remove(owner);
         }
-
 
         public T GetRequiredService<T>(IEditorInterface editorHandle) where T : notnull
         { 
             var found = _scopes.TryGetValue(editorHandle, out var result);
-            if (found == false)
+            if (found == false || result == null)
                 throw new Exception($"Unable to scope '{editorHandle.DisplayName}|{editorHandle.GetType()}' when looking for {typeof(T)}");
             
-            var instance = result.ServiceProvider.GetRequiredService<T>();
+            var instance = result.Scope.ServiceProvider.GetRequiredService<T>();
             return instance;
+        }
+
+        public IEditorInterface? GetEditorFromToken(ScopeToken token)
+        {
+            foreach (var item in _scopes)
+            {
+                if (item.Value.token == token)
+                    return item.Key;
+            }
+
+            return null;
         }
 
         public T GetRequiredServiceRootScope<T>() where T : notnull
@@ -91,7 +112,7 @@ namespace Shared.Core.DependencyInjection
             builder.AppendLine($"ScopeTable info - Num Scopes:{_scopes.Count}");
             GenerateDebugString(_rootProvider, "RootScope", builder);
             foreach (var scope in _scopes)
-                GenerateDebugString(scope.Value.ServiceProvider, $"{scope.Key.GetType()}-'{scope.Key.DisplayName}'", builder);
+                GenerateDebugString(scope.Value.Scope.ServiceProvider, $"{scope.Key.GetType()}-'{scope.Key.DisplayName}'", builder);
 
             _logger.Here().Information(builder.ToString()); 
         }

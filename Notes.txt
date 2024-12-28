@@ -12,12 +12,9 @@ Remember:
 	Move Editors.Shared.Core into shared? Maybe under UI?
 	Print scope - special handling for eventhub. Include registred callbacks 
 
+Create unit test for SuperView
 
-Bug: System.Windows.ResourceReferenceKeyNotFoundException: DefaultTreeNodeStyle resource not found
-	Maybe it's being called and not attached to the tree yet? Consider not using resources and instead defining properties so the selector has the templates as children. eg.
-	https://github.com/stevemonaco/ImageMagitek/blob/wpf/TileShop.WPF/ViewExtenders/Selectors/ProjectTreeTemplateSelector.cs
-	https://github.com/stevemonaco/ImageMagitek/blob/wpf/TileShop.WPF/Features/Project/ProjectTreeView.xaml#L31-L45
-	
+
 
 Bug: Opening the same file in two different editors cause Attempting to open file 'sengko_linchin.wsmodel', but is is already open. Give better error
 Bug: Wrong text in lod view for kitbash https://github.com/donkeyProgramming/TheAssetEditor/issues/230
@@ -117,6 +114,7 @@ New features:
 	
 	
 Fixes for v057:
+	[Feature]	General:	Force close current editor option added to the error window to avoid softlocks.
 	[Feature]	AnimationReTarget: The tool is enabled again - probably pretty buggy in its first iterations. Improvements will come. 
 	[Feature] 	General: 	Added 'Save Active pack' button to file menu https://github.com/donkeyProgramming/TheAssetEditor/issues/123
 	[Feature] 	General: 	Improvements to "Load Wem Files" option. This option now only effects if the files are visible in the pack browser
@@ -124,6 +122,7 @@ Fixes for v057:
 							Wem files are also alway loaded for mods, which fixes an issue where if the flag was disabled,
 							the audio files would be deleted from the mod on saving. No there should be no issues. 
 	
+	[Bug] KitbashEditor:	Hopefully fixed System.Windows.ResourceReferenceKeyNotFoundException, which happens when turning a reference mesh into an editable mesh. 	
 	[Bug]	Superview:		When loading models, all lods was visible. Now only first lod is visible. 
 	[Bug]	SuperView:		Fixed crash on close https://github.com/donkeyProgramming/TheAssetEditor/issues/231
 	[Bug]		General:	Moving files using drag and drop caused crash

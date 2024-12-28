@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Windows;
 using CommonControls.BaseDialogs;
 using CommonControls.BaseDialogs.ErrorListDialog;
+using Shared.Core.DependencyInjection;
 using Shared.Core.ErrorHandling;
 using Shared.Core.ErrorHandling.Exceptions;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Ui.BaseDialogs.PackFileTree;
@@ -18,12 +20,18 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
         private readonly IPackFileService _pfs;
         private readonly PackFileTreeViewFactory _packFileBrowserBuilder;
         private readonly IExceptionService _exceptionService;
+        private readonly IScopeRepository _scopeRepository;
+        private readonly IEventHub _eventHub;
+        private readonly ScopeToken _scopeToken;
 
-        public StandardDialogs(IPackFileService pfs, PackFileTreeViewFactory packFileBrowserBuilder, IExceptionService exceptionService)
+        public StandardDialogs(IPackFileService pfs, PackFileTreeViewFactory packFileBrowserBuilder, IExceptionService exceptionService, IScopeRepository scopeRepository, IEventHub eventHub, ScopeToken scopeToken)
         {
             _pfs = pfs;
             _packFileBrowserBuilder = packFileBrowserBuilder;
             _exceptionService = exceptionService;
+            _scopeRepository = scopeRepository;
+            _eventHub = eventHub;
+            _scopeToken = scopeToken;
         }
 
         public SaveDialogResult DisplaySaveDialog(IPackFileService remove, List<string> extensions)
@@ -58,7 +66,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog
         public void ShowExceptionWindow(Exception e, string userInfo = "")
         {
             var extendedException = _exceptionService.Create(e);
-            var errorWindow = new CustomExceptionWindow(extendedException);
+            var errorWindow = new CustomExceptionWindow(extendedException, this, _eventHub, _scopeToken, _scopeRepository);
             if (Application.Current.MainWindow != null)
             {
                 if (errorWindow != Application.Current.MainWindow)

@@ -8,31 +8,38 @@ namespace Editors.KitbasherEditor.ValueConverters
 {
     public class SceneNodeToLockStateConverter : IMultiValueConverter
     {
-        public object Convert(
-            object[] values, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var node = (values[0] as ISceneNode);
-            if (node.IsEditable == true)
+            var sceneExplorerNode = (values[2] as SceneExplorerNode);
+            if (sceneExplorerNode != null && sceneExplorerNode.IsReference)
             {
-                if (node is ISelectable selectable)
+                return Visibility.Visible;
+            }
+
+            var node = (values[0] as ISceneNode);
+            if (node != null)
+            {
+                if (node.IsEditable == true)
                 {
-                    if (selectable.IsSelectable == false)
+                    if (node is ISelectable selectable)
                     {
-                        if (node is Rmv2ModelNode)
-                            return Visibility.Visible;
-                        if (node is Rmv2MeshNode)
+                        if (selectable.IsSelectable == false)
+                        {
+                            if (node is Rmv2ModelNode)
+                                return Visibility.Visible;
+                            if (node is Rmv2MeshNode)
+                                return Visibility.Visible;
+                        }
+                    }
+                    else if (node is GroupNode groupNode)
+                    {
+                        if (groupNode.IsSelectable == false && groupNode.IsLockable)
                             return Visibility.Visible;
                     }
-                }
-                else if (node is GroupNode groupNode)
-                {
-                    if (groupNode.IsSelectable == false && groupNode.IsLockable)
-                        return Visibility.Visible;
                 }
             }
 
             return Visibility.Collapsed;
-
         }
 
         public object[] ConvertBack(

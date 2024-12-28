@@ -45,6 +45,5 @@ namespace Shared.Ui.Events.UiCommands
             window.Height = heigh;
             window.ShowDialog();
         }
-
     }
 }

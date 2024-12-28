@@ -601,6 +601,9 @@ namespace GameWorld.Core.WpfWindow
 
         protected void StartRendering()
         {
+            if (_disposed)
+                return;
+
             if (_isRendering)
                 return;
 

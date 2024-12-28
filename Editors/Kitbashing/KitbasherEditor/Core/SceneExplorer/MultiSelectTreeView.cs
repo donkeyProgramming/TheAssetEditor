@@ -22,10 +22,12 @@ namespace KitbasherEditor.Views
 
         public ISceneNode Content { get; set; }
         [ObservableProperty] bool _isSelected;
+        [ObservableProperty] bool _isReference;
 
-        public SceneExplorerNode(ISceneNode content)
+        public SceneExplorerNode(ISceneNode content, bool isReference)
         {
             Content = content;
+            _isReference = isReference;
         }
     }
 
