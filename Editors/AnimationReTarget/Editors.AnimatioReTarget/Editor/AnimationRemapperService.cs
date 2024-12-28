@@ -6,12 +6,12 @@ using Shared.Core.Misc;
 
 namespace Editors.AnimatioReTarget.Editor
 {
-    public class AnimationRemapperService_new
+    public class AnimationRemapperService
     {
         private readonly IEnumerable<SkeletonBoneNode_new> _bones;
         private readonly AnimationGenerationSettings _settings;
 
-        public AnimationRemapperService_new(AnimationGenerationSettings settings, IEnumerable<SkeletonBoneNode_new> bones)
+        public AnimationRemapperService(AnimationGenerationSettings settings, IEnumerable<SkeletonBoneNode_new> bones)
         {
             _settings = settings;
             _bones = bones;

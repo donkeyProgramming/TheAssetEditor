@@ -117,16 +117,16 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void Initialize(EditorHost<MountAnimationCreatorViewModel> owner)
         {
-            var riderItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Rider", Color.Black, _inputRiderData);
-            var mountItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Mount", Color.Black, _inputMountData);
-            mountItem.Data.IsSelectable = true;
-
-            var propAsset = _sceneObjectBuilder.CreateAsset("New Anim", Color.Red);
-            _animationPlayerViewModel.RegisterAsset(propAsset);
-
-            Create(riderItem.Data, mountItem.Data, propAsset);
-            owner.SceneObjects.Add(riderItem);
-            owner.SceneObjects.Add(mountItem);
+           // var riderItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Rider", Color.Black, _inputRiderData);
+           // var mountItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Mount", Color.Black, _inputMountData);
+           // mountItem.Data.IsSelectable = true;
+           //
+           // var propAsset = _sceneObjectBuilder.CreateAsset("New Anim", Color.Red);
+           // _animationPlayerViewModel.RegisterAsset(propAsset);
+           //
+           // Create(riderItem.Data, mountItem.Data, propAsset);
+           // owner.SceneObjects.Add(riderItem);
+           // owner.SceneObjects.Add(mountItem);
         }
 
         internal void Create(SceneObject rider, SceneObject mount, SceneObject newAnimation)

@@ -37,9 +37,9 @@ namespace Editors.Shared.Core.Common
             _packFileUiProvider = packFileUiProvider;
         }
 
-        public SceneObjectViewModel CreateAsset(bool createByDefault, string header, Color skeletonColour, AnimationToolInput input, bool allowMetaData = false)
+        public SceneObjectViewModel CreateAsset(string uniqeId, bool createByDefault, string header, Color skeletonColour, AnimationToolInput input, bool allowMetaData = false)
         {
-            var mainAsset = _sceneObjectEditor.CreateAsset(header, skeletonColour);
+            var mainAsset = _sceneObjectEditor.CreateAsset(uniqeId, header, skeletonColour);
             var returnObj = new SceneObjectViewModel(_uiCommandFactory, _metaDataFactory, _pfs, _packFileUiProvider, mainAsset, header + ":", _sceneObjectEditor, _skeletonHelper);
             returnObj.AllowMetaData = allowMetaData;
 

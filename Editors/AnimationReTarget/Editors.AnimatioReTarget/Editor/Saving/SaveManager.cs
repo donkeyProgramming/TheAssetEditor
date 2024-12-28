@@ -10,7 +10,7 @@ namespace Editors.AnimatioReTarget.Editor.Saving
 {
 
 
-    public partial class SaveViewModel : ObservableObject
+    public partial class SaveManager : ObservableObject
     {
         //private readonly ILogger _logger = Logging.Create<SaveViewModel>();
 
@@ -30,10 +30,15 @@ namespace Editors.AnimatioReTarget.Editor.Saving
         //private readonly AnimationGenerationSettings AnimationSettings;
         //private readonly BoneManager _boneManager;
 
-        public SaveViewModel(BoneManager boneManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, IPackFileService pfs)
+        public SaveManager(BoneManager boneManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, IPackFileService pfs)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _pfs = pfs;
+        }
+
+        public void SaveAnimation()
+        { 
+        
         }
 
 

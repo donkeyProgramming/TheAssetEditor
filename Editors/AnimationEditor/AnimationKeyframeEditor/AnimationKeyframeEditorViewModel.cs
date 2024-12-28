@@ -208,21 +208,21 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 
         public void Initialize(EditorHost<AnimationKeyframeEditorViewModel> owner)
         {
-            var riderItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Rider", Color.Black, null);
-            var mountItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Mount", Color.Black, null);
-            mountItem.Data.IsSelectable = true;
-
-            var propAsset = _sceneObjectBuilder.CreateAsset("New Anim", Color.Red);
-            _animationPlayerViewModel.RegisterAsset(propAsset);
-
-            Create(riderItem.Data, mountItem.Data, propAsset);
-            owner.SceneObjects.Add(riderItem);
-            owner.SceneObjects.Add(mountItem);
-
-            _gizmoToolbox = new(this);
-            _copyPastePose = new(this);
-            _copyPasteClipboardPose = new(this);
-            _interpolateBetweenPose = new(this);
+           //var riderItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Rider", Color.Black, null);
+           //var mountItem = _sceneObjectViewModelBuilder.CreateAsset(true, "Mount", Color.Black, null);
+           //mountItem.Data.IsSelectable = true;
+           //
+           //var propAsset = _sceneObjectBuilder.CreateAsset("New Anim", Color.Red);
+           //_animationPlayerViewModel.RegisterAsset(propAsset);
+           //
+           //Create(riderItem.Data, mountItem.Data, propAsset);
+           //owner.SceneObjects.Add(riderItem);
+           //owner.SceneObjects.Add(mountItem);
+           //
+           //_gizmoToolbox = new(this);
+           //_copyPastePose = new(this);
+           //_copyPasteClipboardPose = new(this);
+           //_interpolateBetweenPose = new(this);
         }
 
         internal void Create(SceneObject rider, SceneObject mount, SceneObject newAnimation)

@@ -45,5 +45,11 @@ namespace Editors.Shared.Core.Common.BaseControl
         {
             GameWorld = null;
         }
+
+        public SceneObjectViewModel? GetSceneObjectFromId(string id)
+        {
+            var view = SceneObjects.FirstOrDefault(x => x.Data.Id == id);
+            return view;
+        }
     }
 }

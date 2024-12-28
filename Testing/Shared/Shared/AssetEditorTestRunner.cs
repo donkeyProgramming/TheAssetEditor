@@ -63,7 +63,7 @@ namespace Test.TestingUtility.Shared
             return caConainter;
         }
 
-        public T GetRequiredService<T>()
+        public T GetRequiredServiceInCurrentEditorScope<T>()
         {
             var handle = ScopeRepository.GetEditorHandles().First();
             return ScopeRepository.GetRequiredService<T>(handle);

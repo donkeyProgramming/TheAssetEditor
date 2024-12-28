@@ -13,7 +13,7 @@
         MountTool_Editor,
         VisualSkeletonEditor,
         SuperView_Editor,
-        AnimationTransfer_Editor,
+        AnimationRetarget_Editor,
         Texture_Editor,
         AnimationKeyFrame_Editor,
         CampaginAnimation_Editor,

@@ -2,6 +2,7 @@
 using Editors.AnimatioReTarget.Editor;
 using Editors.AnimatioReTarget.Editor.BoneHandling;
 using Editors.AnimatioReTarget.Editor.BoneHandling.Presentation;
+using Editors.AnimatioReTarget.Editor.Saving;
 using Editors.AnimatioReTarget.Editor.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
@@ -16,9 +17,9 @@ namespace Editors.AnimatioReTarget
         {
             serviceCollection.AddScoped<AnimationRetargetViewModel>();
             serviceCollection.AddScoped<BoneManager>();
+            serviceCollection.AddScoped<SaveManager>();
             RegisterWindow<BoneMappingWindow>(serviceCollection);
             serviceCollection.AddScoped<AnimationReTargetRenderingComponent>();
-
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
@@ -26,11 +27,9 @@ namespace Editors.AnimatioReTarget
         public override void RegisterTools(IEditorDatabase database)
         {
             EditorInfoBuilder
-              .Create<AnimationRetargetViewModel, EditorHostView>(EditorEnums.AnimationTransfer_Editor)
+              .Create<AnimationRetargetViewModel, EditorHostView>(EditorEnums.AnimationRetarget_Editor)
               .AddToToolbar("Animation ReTarget Tool", false)
               .Build(database);
-
-
         }
     }
 }

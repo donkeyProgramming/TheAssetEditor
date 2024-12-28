@@ -62,7 +62,7 @@ namespace Editors.AnimationMeta.SuperView
             PersistentMetaEditor = new MetaDataEditorViewModel(_uiCommandFactory);
             MetaEditor = new MetaDataEditorViewModel(_uiCommandFactory);
             
-            var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset(true, "Root", Color.Black,null, true);
+            var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset("SuperViewRoot", true, "Root", Color.Black,null, true);
             SceneObjects.Add(assetViewModel);
             
             _asset = assetViewModel;

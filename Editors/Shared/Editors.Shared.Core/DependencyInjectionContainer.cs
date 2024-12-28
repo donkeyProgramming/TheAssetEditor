@@ -32,7 +32,6 @@ namespace Editors.Shared.Core
 
 
             serviceCollection.AddScoped<SceneObjectEditor>();
-            serviceCollection.AddTransient<SceneObject>();
             serviceCollection.AddScoped<AnimationPlayerViewModel>();
             serviceCollection.AddScoped<SceneObjectViewModelBuilder>();
             serviceCollection.AddScoped<EditorHostView>();

@@ -46,9 +46,9 @@ namespace Editors.Shared.Core.Common
             _eventHub = eventHub;
         }
 
-        public SceneObject CreateAsset(string description, Color skeletonColour)
+        public SceneObject CreateAsset(string uniqeId, string description, Color skeletonColour)
         {
-            var instance = _serviceProvider.GetRequiredService<SceneObject>();
+            var instance = new SceneObject(uniqeId);
             var rootNode = _sceneManager.RootNode;
             var parentNode = rootNode.AddObject(new GroupNode(description));
 

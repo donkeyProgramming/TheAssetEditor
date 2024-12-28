@@ -30,7 +30,7 @@ namespace Test.SkeletonEditor
             var originalRmv2File = runner.PackFileService.FindFile("animations\\skeletons\\humanoid01.anim");
             runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File, EditorEnums.VisualSkeletonEditor);
 
-            var skeletonTool = runner.GetRequiredService<SkeletonEditorViewModel>();
+            var skeletonTool = runner.GetRequiredServiceInCurrentEditorScope<SkeletonEditorViewModel>();
 
             LoadReferenceMesh(runner, skeletonTool);
             EditBone(skeletonTool);

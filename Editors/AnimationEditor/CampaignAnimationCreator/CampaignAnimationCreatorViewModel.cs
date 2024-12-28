@@ -46,7 +46,7 @@ namespace AnimationEditor.CampaignAnimationCreator
 
         public void Initialize(EditorHost<CampaignAnimationCreatorViewModel> owner)
         {
-            var item = _referenceModelSelectionViewModelBuilder.CreateAsset(true, "model", Color.Black, _debugDataToLoad);
+            var item = _referenceModelSelectionViewModelBuilder.CreateAsset("model", true, "model", Color.Black, _debugDataToLoad);
             Create(item.Data);
             owner.SceneObjects.Add(item);
         }

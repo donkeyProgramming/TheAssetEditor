@@ -65,7 +65,7 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
 
         void Initialize()
         {
-            var assetNode = _sceneObjectViewModelBuilder.CreateAsset(false, "SkeletonNode", Color.Black, null);
+            var assetNode = _sceneObjectViewModelBuilder.CreateAsset("Skeleton", false, "SkeletonNode", Color.Black, null);
             assetNode.IsControlVisible = false;
             _techSkeletonNode = assetNode.Data;
 

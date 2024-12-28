@@ -38,6 +38,21 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
             }
         }
 
+        public static int CountMappedBones(ObservableCollection<SkeletonBoneNode_new> skeletonNodes)
+        {
+            var totalMappedCount = 0;
+            foreach (var boneNode in skeletonNodes)
+            {
+                if (boneNode.HasMapping)
+                    totalMappedCount++;
+
+                var mappedChildren = CountMappedBones(boneNode.Children);
+                totalMappedCount += mappedChildren;
+            }
+
+            return totalMappedCount;
+        }
+
         public static SkeletonBoneNode_new? GetNodeFromId(int boneIndex, IEnumerable<SkeletonBoneNode_new> boneList)
         {
             foreach (var bone in boneList)
@@ -67,6 +82,23 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
 
             return null;
         }
+
+
+        public static SkeletonBoneNode_new? GetNodeFromName(string boneName, IEnumerable<SkeletonBoneNode_new> boneList)
+        {
+            foreach (var bone in boneList)
+            {
+                if (bone.BoneName == boneName)
+                    return bone;
+
+                var result = GetNodeFromName(boneName, bone.Children);
+                if (result != null)
+                    return result;
+            }
+
+            return null;
+        }
+
 
     }
 }

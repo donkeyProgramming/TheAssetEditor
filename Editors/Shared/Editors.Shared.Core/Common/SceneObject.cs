@@ -42,6 +42,7 @@ namespace Editors.Shared.Core.Common
         public PackFile MetaData { get; set; }
         public PackFile PersistMetaData { get; set; }
         public Matrix Offset { get; set; } = Matrix.Identity;
+        public string Id { get; private set; }
 
 
         // --- UI elements
@@ -52,8 +53,9 @@ namespace Editors.Shared.Core.Common
         public NotifyAttr<bool> ShowSkeleton { get; set; }
 
 
-        public SceneObject() : base()
+        public SceneObject(string uniqeId) : base()
         {
+            Id = uniqeId;
             ShowMesh = new NotifyAttr<bool>(true, (x) => SetMeshVisability(x));
             ShowSkeleton = new NotifyAttr<bool>(true, (x) => SkeletonSceneNode.IsVisible = ShowSkeleton.Value);
         }

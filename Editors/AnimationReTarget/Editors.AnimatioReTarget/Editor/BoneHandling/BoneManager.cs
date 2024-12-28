@@ -109,6 +109,14 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
             _activeConfig = null;
         }
 
+        public void ApplyDefaultMapping()
+        {
+            CreateMappingConfig();
+            BoneMappingHelper.AutomapDirectBoneLinksBasedOnNames(_activeConfig.MeshBones.First(), _activeConfig.ParentModelBones);
+            SkeletonBoneNodeHelper.ApplyMapping(Bones, _activeConfig);
+        }
+
+
         [RelayCommand] void ShowBoneMappingWindow()
         {
             if (_targetSkeleton == null || _sourceSkeleton == null)
@@ -116,6 +124,22 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
                 _standardDialogs.ShowDialogBox("Source or target skeleton not selected", "Error");
                 return;
             }
+
+            CreateMappingConfig();
+
+            // Make this possible to use without being a modal!
+            var handle = _boneMappingWindowFactory.Create();
+            handle.ViewModel.Initialize(_activeConfig);
+            var result = handle.ShowDialog();
+
+            if ((result.HasValue && result.Value == true) == false)
+                return;
+
+            SkeletonBoneNodeHelper.ApplyMapping(Bones, _activeConfig);
+        }
+
+        void CreateMappingConfig()
+        {
 
             if (_activeConfig == null)
             {
@@ -130,21 +154,13 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
                     SkeletonBoneHighlighter = _skeletonBoneHighlighter
                 };
             }
-
-            // Make this possible to use without being a modal!
-            var handle = _boneMappingWindowFactory.Create();
-            handle.ViewModel.Initialize(_activeConfig);
-            var result = handle.ShowDialog();
-
-            if ((result.HasValue && result.Value == true) == false)
-                return;
-
-            SkeletonBoneNodeHelper.ApplyMapping(Bones, _activeConfig);
         }
 
         [RelayCommand] void ResetSelectedBone()
         {
             _standardDialogs.ShowDialogBox("Button pressed");
         }
+
+
     }
 }

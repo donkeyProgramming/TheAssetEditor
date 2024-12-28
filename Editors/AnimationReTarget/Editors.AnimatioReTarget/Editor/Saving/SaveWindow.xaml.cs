@@ -19,7 +19,7 @@ namespace Editors.AnimatioReTarget.Editor.Saving
     /// </summary>
     public partial class SaveWindow : Window
     {
-        public SaveWindow(SaveViewModel viewModel)
+        public SaveWindow(SaveManager viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;

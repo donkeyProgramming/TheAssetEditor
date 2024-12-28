@@ -34,10 +34,10 @@ namespace E2EVerification
             runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
             // Edit the save settings and trigger a save
-            var saveSettings = runner.GetRequiredService<GeometrySaveSettings>();
+            var saveSettings = runner.GetRequiredServiceInCurrentEditorScope<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
 
-            var toolCommandFactory = runner.GetRequiredService<IUiCommandFactory>();
+            var toolCommandFactory = runner.GetRequiredServiceInCurrentEditorScope<IUiCommandFactory>();
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
@@ -80,11 +80,11 @@ namespace E2EVerification
             runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
             // Edit the save settings and trigger a save
-            var saveSettings = runner.GetRequiredService<GeometrySaveSettings>();
+            var saveSettings = runner.GetRequiredServiceInCurrentEditorScope<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
             saveSettings.LodGenerationMethod = LodStrategy.Lod0ForAll;
 
-            var toolCommandFactory = runner.GetRequiredService<IUiCommandFactory>();
+            var toolCommandFactory = runner.GetRequiredServiceInCurrentEditorScope<IUiCommandFactory>();
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
@@ -129,10 +129,10 @@ namespace E2EVerification
             runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
             // Edit the save settings and trigger a save
-            var saveSettings = runner.GetRequiredService<GeometrySaveSettings>();
+            var saveSettings = runner.GetRequiredServiceInCurrentEditorScope<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
 
-            var toolCommandFactory = runner.GetRequiredService<IUiCommandFactory>();
+            var toolCommandFactory = runner.GetRequiredServiceInCurrentEditorScope<IUiCommandFactory>();
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files
@@ -162,10 +162,10 @@ namespace E2EVerification
             runner.CommandFactory.Create<OpenEditorCommand>().Execute(originalRmv2File);
 
             // Edit the save settings and trigger a save
-            var saveSettings = runner.GetRequiredService<GeometrySaveSettings>();
+            var saveSettings = runner.GetRequiredServiceInCurrentEditorScope<GeometrySaveSettings>();
             saveSettings.IsUserInitialized = true;
 
-            var toolCommandFactory = runner.GetRequiredService<IUiCommandFactory>();
+            var toolCommandFactory = runner.GetRequiredServiceInCurrentEditorScope<IUiCommandFactory>();
             toolCommandFactory.Create<SaveCommand>().Execute();
 
             // Verify output files

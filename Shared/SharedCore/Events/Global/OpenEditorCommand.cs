@@ -16,14 +16,16 @@ namespace Shared.Ui.Events.UiCommands
             _editorCreator = editorCreator;
         }
 
-        public void Execute(PackFile file, EditorEnums? preferedEditor = null)
+        public IEditorInterface Execute(PackFile file, EditorEnums? preferedEditor = null)
         {
-            _editorCreator.CreateFromFile(file, preferedEditor);
+            var editor = _editorCreator.CreateFromFile(file, preferedEditor);
+            return editor;
         }
 
-        public void Execute(EditorEnums editorEnum)
+        public IEditorInterface Execute(EditorEnums editorEnum)
         {
-            _editorCreator.Create(editorEnum);
+            var editor = _editorCreator.Create(editorEnum);
+            return editor;
         }
 
         public void ExecuteAsWindow(string fileName, int width, int heigh)
