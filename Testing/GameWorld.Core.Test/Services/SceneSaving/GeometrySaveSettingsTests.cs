@@ -35,7 +35,7 @@ namespace GameWorld.Core.Test.Services.SceneSaving
         public void Initialize_OldGame()
         {
             // Arrange
-            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
+            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Rome2);
 
             // Act
             var saveSettings = new GeometrySaveSettings(gameSettings);
@@ -51,7 +51,7 @@ namespace GameWorld.Core.Test.Services.SceneSaving
         public void InitializeLodSettings_2_LodsFromHeader()
         {
             // Arrange
-            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
+            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Rome2);
             RmvLodHeader[] lodHeader = [
                 new Mock<RmvLodHeader>().Object,
                 new Mock<RmvLodHeader>().Object];
@@ -68,7 +68,7 @@ namespace GameWorld.Core.Test.Services.SceneSaving
         public void InitializeLodSettings_4_LodsFromHeader()
         {
             // Arrange
-            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
+            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Rome2);
             RmvLodHeader[] lodHeader = [
                 new Mock<RmvLodHeader>().Object,
                 new Mock<RmvLodHeader>().Object,
@@ -88,7 +88,7 @@ namespace GameWorld.Core.Test.Services.SceneSaving
         public void InitializeLodSettings_RefreshNumberOfLods_2()
         {
             // Arrange
-            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
+            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Rome2);
             RmvLodHeader[] lodHeader = [
                 new Mock<RmvLodHeader>().Object,
                 new Mock<RmvLodHeader>().Object,
@@ -109,7 +109,7 @@ namespace GameWorld.Core.Test.Services.SceneSaving
         public void InitializeLodSettings_RefreshNumberOfLods_5()
         {
             // Arrange
-            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
+            var gameSettings = new ApplicationSettingsService(GameTypeEnum.Rome2);
             RmvLodHeader[] lodHeader = [
                 new Mock<RmvLodHeader>().Object,
                 new Mock<RmvLodHeader>().Object,

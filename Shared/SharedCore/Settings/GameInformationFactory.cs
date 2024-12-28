@@ -8,8 +8,8 @@
         Empire,
         Napoleon,
         RomeRemastered,
-        Rome_2,
-        Shogun_2,
+        Rome2,
+        Shogun2,
         ThreeKingdoms,
         ThronesOfBritannia,
         Warhammer,
@@ -49,7 +49,7 @@
         public GameTypeEnum Type { get; set; }
         public string DisplayName { get; set; }
         public string DefaultPackType { get; set; }
-        public string ShortID { get; set; }
+        public uint? BankGeneratorVersion { get; set; }
     }
 
     public class GameInformationFactory
@@ -59,22 +59,22 @@
         public GameInformation Warhammer3 { get; private set; }
         public GameInformation Troy { get; private set; }
         public GameInformation ThreeKingdoms { get; private set; }
-        public GameInformation Rome_2 { get; private set; }
+        public GameInformation Rome2 { get; private set; }
         public GameInformation Attila { get; private set; }
         public GameInformation Pharaoh { get; private set; }
         public List<GameInformation> Games { get; private set; }
 
         public GameInformationFactory()
         {
-            Warhammer = new GameInformation() { Type = GameTypeEnum.Warhammer, DisplayName = "Warhammer", DefaultPackType = "PFH4", ShortID = "Warhammer" };
-            Warhammer2 = new GameInformation() { Type = GameTypeEnum.Warhammer2, DisplayName = "Warhammer II", DefaultPackType = "PFH5", ShortID = "WarhammerII" };
-            Warhammer3 = new GameInformation() { Type = GameTypeEnum.Warhammer3, DisplayName = "Warhammer III", DefaultPackType = "PFH5", ShortID = "WarhammerIII" };
-            Troy = new GameInformation() { Type = GameTypeEnum.Troy, DisplayName = "Troy", DefaultPackType = "PFH5", ShortID = "troy" };
-            ThreeKingdoms = new GameInformation() { Type = GameTypeEnum.ThreeKingdoms, DisplayName = "Three Kingdoms", DefaultPackType = "PFH5", ShortID = "ThreeKingdoms" };
-            Rome_2 = new GameInformation() { Type = GameTypeEnum.Rome_2, DisplayName = "Rome II", DefaultPackType = "PFH5", ShortID = "Rome_2" };
-            Attila = new GameInformation() { Type = GameTypeEnum.Attila, DisplayName = "Attila", DefaultPackType = "PFH5", ShortID = "Attila" };
-            Pharaoh = new GameInformation() { Type = GameTypeEnum.Pharaoh, DisplayName = "Pharaoh", DefaultPackType = "PFH5", ShortID = "Pharaoh" };
-            Games = [Warhammer, Warhammer2, Warhammer3, Troy, ThreeKingdoms, Rome_2, Attila, Pharaoh];
+            Warhammer = new GameInformation() { Type = GameTypeEnum.Warhammer, DisplayName = "Warhammer", DefaultPackType = "PFH4", BankGeneratorVersion = null };
+            Warhammer2 = new GameInformation() { Type = GameTypeEnum.Warhammer2, DisplayName = "Warhammer II", DefaultPackType = "PFH5", BankGeneratorVersion = null };
+            Warhammer3 = new GameInformation() { Type = GameTypeEnum.Warhammer3, DisplayName = "Warhammer III", DefaultPackType = "PFH5", BankGeneratorVersion = 2147483784 };
+            Troy = new GameInformation() { Type = GameTypeEnum.Troy, DisplayName = "Troy", DefaultPackType = "PFH5", BankGeneratorVersion = null };
+            ThreeKingdoms = new GameInformation() { Type = GameTypeEnum.ThreeKingdoms, DisplayName = "Three Kingdoms", DefaultPackType = "PFH5", BankGeneratorVersion = null };
+            Rome2 = new GameInformation() { Type = GameTypeEnum.Rome2, DisplayName = "Rome II", DefaultPackType = "PFH5", BankGeneratorVersion = null };
+            Attila = new GameInformation() { Type = GameTypeEnum.Attila, DisplayName = "Attila", DefaultPackType = "PFH5", BankGeneratorVersion = 112 };
+            Pharaoh = new GameInformation() { Type = GameTypeEnum.Pharaoh, DisplayName = "Pharaoh", DefaultPackType = "PFH5", BankGeneratorVersion = null };
+            Games = [Warhammer, Warhammer2, Warhammer3, Troy, ThreeKingdoms, Rome2, Attila, Pharaoh];
         }
 
         public GameInformation GetGameById(GameTypeEnum type)
@@ -92,8 +92,8 @@
                 GameTypeEnum.Empire => "Empire",
                 GameTypeEnum.Napoleon => "Napoleon",
                 GameTypeEnum.RomeRemastered => "Rome Remastered",
-                GameTypeEnum.Rome_2 => "Rome 2",
-                GameTypeEnum.Shogun_2 => "Shogun 2",
+                GameTypeEnum.Rome2 => "Rome II",
+                GameTypeEnum.Shogun2 => "Shogun 2",
                 GameTypeEnum.ThreeKingdoms => "Three Kingdoms",
                 GameTypeEnum.ThronesOfBritannia => "Thrones of Britannia",
                 GameTypeEnum.Warhammer => "Warhammer",

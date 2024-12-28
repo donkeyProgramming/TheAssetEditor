@@ -29,7 +29,7 @@ namespace Editors.KitbasherEditor.DevConfig
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.LoadCaPacksByDefault = false;
-            currentSettings.CurrentGame = GameTypeEnum.Rome_2;
+            currentSettings.CurrentGame = GameTypeEnum.Rome2;
             var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\Rome_Man_And_Shield_Pack";
 
             var container = _packFileContainerLoader.LoadSystemFolderAsPackFileContainer(packFile);

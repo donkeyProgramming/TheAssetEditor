@@ -111,7 +111,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
                 .SetAlpha(true)
                 .AssignMaterials([TextureType.Normal, TextureType.Gloss]);
 
-            var appSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
+            var appSettings = new ApplicationSettingsService(GameTypeEnum.Rome2);
             var abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
             var material = abstractMaterialFactory.Create(rmvMaterial, null);
 
@@ -141,7 +141,7 @@ namespace GameWorld.Core.Test.Rendering.Materials
                 .SetDecalAndDirt(true, true)
                 .AssignMaterials([TextureType.Diffuse, TextureType.Decal_dirtmap, TextureType.Decal_mask, TextureType.Decal_dirtmask]);
             
-            var appSettings = new ApplicationSettingsService(GameTypeEnum.Rome_2);
+            var appSettings = new ApplicationSettingsService(GameTypeEnum.Rome2);
             var abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
             var material = abstractMaterialFactory.Create(rmvMaterial, null);
             

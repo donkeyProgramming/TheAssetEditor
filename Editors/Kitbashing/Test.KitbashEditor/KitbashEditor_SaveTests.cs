@@ -118,7 +118,7 @@ namespace Test.KitbashEditor
         [Test]
         public void Rome2_LoadAndSaveDirtHelmet()
         {
-            var runner = new AssetEditorTestRunner(GameTypeEnum.Rome_2);
+            var runner = new AssetEditorTestRunner(GameTypeEnum.Rome2);
             runner.CreateCaContainer();
             runner.LoadFolderPackFile(PathHelper.GetDataFolder("Data\\Rome_Man_And_Shield_Pack"));
             var outputPackFile = runner.CreateOutputPack();
@@ -151,7 +151,7 @@ namespace Test.KitbashEditor
         [Test]
         public void Rome2_LoadAndSaveDirtAndDecalShield()
         {
-            var runner = new AssetEditorTestRunner(GameTypeEnum.Rome_2);
+            var runner = new AssetEditorTestRunner(GameTypeEnum.Rome2);
             runner.CreateCaContainer();
             runner.LoadFolderPackFile(PathHelper.GetDataFolder(("Data\\Rome_Man_And_Shield_Pack")));
             var outputPackFile = runner.CreateOutputPack();
