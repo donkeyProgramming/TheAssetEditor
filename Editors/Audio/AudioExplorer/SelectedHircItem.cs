@@ -1,4 +1,4 @@
-﻿using Shared.GameFormats.WWise;
+﻿using Shared.GameFormats.Wwise;
 
 namespace Editors.Audio.AudioExplorer
 {

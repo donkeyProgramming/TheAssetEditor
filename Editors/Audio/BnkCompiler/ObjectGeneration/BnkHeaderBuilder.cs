@@ -1,7 +1,7 @@
 ﻿using System;
 using Editors.Audio.BnkCompiler;
 using Editors.Audio.Utility;
-using Shared.GameFormats.WWise.Bkhd;
+using Shared.GameFormats.Wwise.Bkhd;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {
@@ -15,12 +15,12 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration
 
             var header = new BkhdHeader()
             {
-                dwBankGeneratorVersion = 0x80000088,
-                dwSoundBankId = soundBankId,
-                dwLanguageId = language,
-                bFeedbackInBank = 0x10,
-                dwProjectID = 2361,
-                padding = BitConverter.GetBytes(0x04)
+                DwBankGeneratorVersion = 0x80000088,
+                DwSoundBankId = soundBankId,
+                DwLanguageId = language,
+                BFeedbackInBank = 0x10,
+                DwProjectId = 2361,
+                Padding = BitConverter.GetBytes(0x04)
             };
 
             return header;

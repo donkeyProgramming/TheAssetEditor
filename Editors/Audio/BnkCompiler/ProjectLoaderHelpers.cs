@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
-using Shared.GameFormats.WWise.Hirc.Shared;
+using Shared.GameFormats.Wwise.Hirc.Shared;
 using static Editors.Audio.BnkCompiler.ProjectLoader;
 
 namespace Editors.Audio.BnkCompiler
@@ -48,9 +48,9 @@ namespace Editors.Audio.BnkCompiler
             //var wwiseIdStart = input.Settings.WwiseStartId;
 
             //if (wwiseIdStart == 0)
-                //UsableWwiseId = 1;
+            //UsableWwiseId = 1;
             //else
-                //UsableWwiseId = wwiseIdStart;
+            //UsableWwiseId = wwiseIdStart;
 
             // Add mixers to compilerData first so they can be individually referenced later.
             AddDialogueEventMixers(audioRepository, mixers, input, compilerData);
@@ -65,9 +65,9 @@ namespace Editors.Audio.BnkCompiler
 
                 uint key = 0; // Any value will initialise this property. In the case of the WH3 Dialogue Events the root node value always exists and is always 0.
                 uint audioNodeId = 0; // If 0 this property is not initialised. The root node in WH3 Dialogue Events is always unused so the value is set to 0.
-                ushort children_uIdx = 1; // If 0 this property is not initialised. This value is set to 1 to initialise the value. Its intended value is updated later.
-                ushort children_uCount = 1; // If 0 this property is not initialised. This value is set to 1 to initialise the value. Its intended value is updated later.
-                var rootNode = CreateNode(key, audioNodeId, children_uIdx, children_uCount, CompilerConstants.UWeight, CompilerConstants.UProbability);
+                ushort childrenUIdx = 1; // If 0 this property is not initialised. This value is set to 1 to initialise the value. Its intended value is updated later.
+                ushort childrenUCount = 1; // If 0 this property is not initialised. This value is set to 1 to initialise the value. Its intended value is updated later.
+                var rootNode = CreateNode(key, audioNodeId, childrenUIdx, childrenUCount, CompilerConstants.UWeight, CompilerConstants.UProbability);
 
                 dialogueEvent.Name = hircDialogueEvent.DialogueEvent;
                 dialogueEvent.Id = eventId;
@@ -295,9 +295,9 @@ namespace Editors.Audio.BnkCompiler
                 else
                 {
                     var audioNodeId = currentStateIndex == statePathArray.Length ? containerId : 0; // If 0 this property is not initialised. If this is the last state in the path AudioNodeId is set to containerId, otherwise it's set to 0 which removes the property.
-                    var children_uIdx = (ushort)(currentStateIndex == statePathArray.Length ? 0 : 1); // If 0 this property is not initialised. If this is the last state in the path Children_uIdx is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
-                    var children_uCount = (ushort)(currentStateIndex == statePathArray.Length ? 0 : 1); // If 0 this property is not initialised. If this is the last state in the path Children_uCount is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
-                    var newNode = CreateNode(hashedState, audioNodeId, children_uIdx, children_uCount, CompilerConstants.UWeight, CompilerConstants.UProbability);
+                    var childrenUIdx = (ushort)(currentStateIndex == statePathArray.Length ? 0 : 1); // If 0 this property is not initialised. If this is the last state in the path Children_uIdx is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
+                    var childrenUCount = (ushort)(currentStateIndex == statePathArray.Length ? 0 : 1); // If 0 this property is not initialised. If this is the last state in the path Children_uCount is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
+                    var newNode = CreateNode(hashedState, audioNodeId, childrenUIdx, childrenUCount, CompilerConstants.UWeight, CompilerConstants.UProbability);
                     parentNode.Children.Add(newNode);
                     parentNode = newNode;
                 }
@@ -356,14 +356,14 @@ namespace Editors.Audio.BnkCompiler
             };
         }
 
-        public static AkDecisionTree.Node CreateNode(uint key, uint audioNodeId, ushort children_uIdx, ushort children_uCount, ushort uWeight, ushort uProbability)
+        public static AkDecisionTree.Node CreateNode(uint key, uint audioNodeId, ushort childrenUIdx, ushort childrenUCount, ushort uWeight, ushort uProbability)
         {
             return new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
             {
                 Key = key,
                 AudioNodeId = audioNodeId,
-                Children_uIdx = children_uIdx,
-                Children_uCount = children_uCount,
+                ChildrenUIdx = childrenUIdx,
+                ChildrenUCount = childrenUCount,
                 UWeight = uWeight,
                 UProbability = uProbability
             });
@@ -426,8 +426,8 @@ namespace Editors.Audio.BnkCompiler
             Console.WriteLine($"======================= PRINTING CUSTOM DECISION TREE GRAPH =======================");
             Console.WriteLine($"{indentation}Key: {node.Key}");
             Console.WriteLine($"{indentation}AudioNodeId: {node.AudioNodeId}");
-            Console.WriteLine($"{indentation}Children_uIdx: {node.Children_uIdx}");
-            Console.WriteLine($"{indentation}Children_uCount: {node.Children_uCount}");
+            Console.WriteLine($"{indentation}Children_uIdx: {node.ChildrenUIdx}");
+            Console.WriteLine($"{indentation}Children_uCount: {node.ChildrenUCount}");
             Console.WriteLine($"{indentation}uWeight: {node.UWeight}");
             Console.WriteLine($"{indentation}uProbability: {node.UProbability}");
 

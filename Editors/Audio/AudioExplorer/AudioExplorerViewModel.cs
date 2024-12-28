@@ -8,9 +8,10 @@ using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.ToolCreation;
-using Shared.GameFormats.WWise;
-using Shared.GameFormats.WWise.Hirc;
-using Shared.GameFormats.WWise.Hirc.V136;
+using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Hirc.V112;
+using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.AudioExplorer
 {
@@ -68,7 +69,7 @@ namespace Editors.Audio.AudioExplorer
                 _selectedNode = null;
                 TreeList.Clear();
 
-                var parser = new WWiseTreeParserChildren(_audioRepository, ShowIds.Value, ShowBnkName.Value, UseBnkNameWhileParsing.Value);
+                var parser = new WwiseTreeParserChildren(_audioRepository, ShowIds.Value, ShowBnkName.Value, UseBnkNameWhileParsing.Value);
                 var rootNode = parser.BuildHierarchy(newValue.HircItem);
                 TreeList.Add(rootNode);
             }
@@ -106,11 +107,31 @@ namespace Editors.Audio.AudioExplorer
 
         public void PlaySelectedSoundAction()
         {
-            var nodeDisplayName = _selectedNode.DisplayName;
-            var regex = new Regex(@"(\d+)\.wem");
-            var match = regex.Match(nodeDisplayName);
-            var sourceId = match.Groups[1].Value;
-            _soundPlayer.ConvertWemToWav(sourceId);
+            ICAkSound sound = _selectedNode.Item as ICAkSound;
+            if (sound == null)
+            {
+                return;
+            }
+
+            if (sound.GetStreamType() == SourceType.Data_BNK)
+            {
+                CAkSound_V112 cakSound_V112 = _selectedNode.Item as CAkSound_V112;
+
+                if (cakSound_V112 != null)
+                {
+                    _soundPlayer.ConvertWemToWav(
+                        _audioRepository,
+                        cakSound_V112.AkBankSourceData.AkMediaInformation.SourceId,
+                        cakSound_V112.AkBankSourceData.AkMediaInformation.FileId,
+                        (int)cakSound_V112.AkBankSourceData.AkMediaInformation.UFileOffset,
+                        (int)cakSound_V112.AkBankSourceData.AkMediaInformation.UInMemoryMediaSize
+                    );
+                 
+                    return;
+                }
+            }
+
+            _soundPlayer.ConvertWemToWav(sound.GetSourceId().ToString());
         }
 
         public void LoadHircFromIdAction()
