@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using Editors.Audio.Utility;
@@ -9,15 +8,22 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.GameFormats.Dat;
+using static Shared.GameFormats.Dat.SoundDatFile;
 
 namespace Editors.Audio.Storage
 {
     public class DatLoader
     {
+        public class LoadResult
+        {
+            public Dictionary<uint, string> NameLookUpTable { get; set; } = [];
+            public Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; set; } = [];
+            public Dictionary<string, Dictionary<string, string>> DialogueEventsWithStateGroupsWithQualifiersAndStateGroups { get; set; } = [];
+            public Dictionary<string, List<string>> StateGroupsWithStates { get; set; } = [];
+        }
+
         private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _applicationSettingsService;
-
-        private Dictionary<uint, string> _nameLookUp { get; set; } = new Dictionary<uint, string>();
 
         public DatLoader(IPackFileService pfs, ApplicationSettingsService applicationSettingsService)
         {
@@ -25,28 +31,112 @@ namespace Editors.Audio.Storage
             _applicationSettingsService = applicationSettingsService;
         }
 
-        public (Dictionary<uint, string> nameLookUp, List<SoundDatFile.DatDialogueEventsWithStateGroups> dialogueEventsWithStateGroups, List<SoundDatFile.DatStateGroupsWithStates> stateGroupsWithStates) LoadDatData()
+        public LoadResult LoadDatData()
         {
             var wh3Db = LoadDatFiles(_pfs, out var _);
             var nameLookUp = BuildNameHelper(wh3Db);
-            var dialogueEventsWithStateGroups = wh3Db.DialogueEventsWithStateGroups;
+
+            var unprocessedDialogueEventsWithStateGroups = wh3Db.DialogueEventsWithStateGroups;
+            var processedDialogueEventsWithStateGroups = ProcessDialogueEvents(unprocessedDialogueEventsWithStateGroups, nameLookUp);
+
+            // Add qualifiers to State Groups as some events have the same State Group twice e.g. VO_Actor.
+            var dialogueEventsWithStateGroupsWithQualifiersAndStateGroups = BuildDialogueEventsWithStateGroupsWithQualifiersAndStateGroups(processedDialogueEventsWithStateGroups);
+
             var stateGroupsWithStates0 = wh3Db.StateGroupsWithStates0;
             var stateGroupsWithStates1 = wh3Db.StateGroupsWithStates1;
-            var stateGroupsWithStates = stateGroupsWithStates0.Concat(stateGroupsWithStates1).ToList();
-            ChangeNoneStatesToAny(stateGroupsWithStates);
+            var unprocessedStateGroupsWithStates = stateGroupsWithStates0.Concat(stateGroupsWithStates1).ToList();
+            var processedStateGroupsWithStates = ProcessStateGroups(unprocessedStateGroupsWithStates);
 
-            return (nameLookUp, dialogueEventsWithStateGroups, stateGroupsWithStates);
+            return new LoadResult
+            {
+                NameLookUpTable = nameLookUp,
+                DialogueEventsWithStateGroups = processedDialogueEventsWithStateGroups,
+                DialogueEventsWithStateGroupsWithQualifiersAndStateGroups = dialogueEventsWithStateGroupsWithQualifiersAndStateGroups,
+                StateGroupsWithStates = processedStateGroupsWithStates
+            };
+        }
+
+        private static Dictionary<string, List<string>> ProcessDialogueEvents(List<DatDialogueEventsWithStateGroups> dialogueEvents, Dictionary<uint, string> nameLookup)
+        {
+            var processedDialogueEventsWithStateGroups = new Dictionary<string, List<string>>();
+
+            foreach (var dialogueEvent in dialogueEvents)
+            {
+                if (!processedDialogueEventsWithStateGroups.ContainsKey(dialogueEvent.EventName))
+                    processedDialogueEventsWithStateGroups[dialogueEvent.EventName] = new List<string>();
+
+                foreach (var stateGroupId in dialogueEvent.StateGroups)
+                {
+                    if (nameLookup.TryGetValue(stateGroupId, out var stateGroup))
+                        processedDialogueEventsWithStateGroups[dialogueEvent.EventName].Add(stateGroup);
+                }
+            }
+            return processedDialogueEventsWithStateGroups;
+        }
+
+        private static Dictionary<string, List<string>> ProcessStateGroups(List<DatStateGroupsWithStates> unprocessedStateGroupsWithStates)
+        {
+            var processedStateGroupsWithStates = new Dictionary<string, List<string>>();
+
+            var stateGroups = ChangeNoneStatesToAny(unprocessedStateGroupsWithStates);
+            foreach (var stateGroup in stateGroups)
+            {
+                if (!processedStateGroupsWithStates.ContainsKey(stateGroup.StateGroupName))
+                    processedStateGroupsWithStates[stateGroup.StateGroupName] = new List<string>();
+
+                processedStateGroupsWithStates[stateGroup.StateGroupName].AddRange(stateGroup.States);
+            }
+
+            return processedStateGroupsWithStates;
+        }
+
+        public static Dictionary<string, Dictionary<string, string>> BuildDialogueEventsWithStateGroupsWithQualifiersAndStateGroups(Dictionary<string, List<string>> dialogueEventsWithStateGroups)
+        {
+            var dialogueEventsWithStateGroupsWithQualifiersAndStateGroups = new Dictionary<string, Dictionary<string, string>>();
+
+            foreach (var dialogueEvent in dialogueEventsWithStateGroups)
+            {
+                var stateGroupsWithQualifiers = new Dictionary<string, string>();
+                var stateGroups = dialogueEvent.Value;
+
+                var voActorCount = 0;
+                var voCultureCount = 0;
+
+                foreach (var stateGroup in stateGroups)
+                {
+                    if (stateGroup == "VO_Actor")
+                    {
+                        voActorCount++;
+
+                        var qualifier = voActorCount > 1 ? "VO_Actor (Target)" : "VO_Actor (Source)";
+                        stateGroupsWithQualifiers[qualifier] = "VO_Actor";
+                    }
+                    else if (stateGroup == "VO_Culture")
+                    {
+                        voCultureCount++;
+
+                        var qualifier = voCultureCount > 1 ? "VO_Culture (Target)" : "VO_Culture (Source)";
+                        stateGroupsWithQualifiers[qualifier] = "VO_Culture";
+                    }
+                    else
+                        stateGroupsWithQualifiers[stateGroup] = stateGroup; // No qualifier needed as State Group doesn't reoccur.
+                }
+
+                dialogueEventsWithStateGroupsWithQualifiersAndStateGroups[dialogueEvent.Key] = stateGroupsWithQualifiers;
+            }
+
+            return dialogueEventsWithStateGroupsWithQualifiersAndStateGroups;
         }
 
         public Dictionary<uint, string> BuildNameHelper(SoundDatFile wh3Db)
         {
+            var nameLookUp = new Dictionary<uint, string>();
             var wh3DbNameList = wh3Db.CreateFileNameList();
-            AddNames(wh3DbNameList);
+            AddNames(wh3DbNameList, nameLookUp);
 
-            // Add all the bnk file names 
             var bnkFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".bnk");
             var bnkNames = bnkFiles.Select(x => x.Name.Replace(".bnk", "")).ToArray();
-            AddNames(bnkNames);
+            AddNames(bnkNames, nameLookUp);
 
             var wwiseIdFiles = PackFileServiceUtility.FindAllWithExtention(_pfs, ".wwiseids");
             foreach (var item in wwiseIdFiles)
@@ -54,13 +144,13 @@ namespace Editors.Audio.Storage
                 var data = Encoding.UTF8.GetString(item.DataSource.ReadData());
                 data = data.Replace("\r", "");
                 var splitData = data.Split("\n");
-                AddNames(splitData);
+                AddNames(splitData, nameLookUp);
             }
 
-            return _nameLookUp;
+            return nameLookUp;
         }
 
-        SoundDatFile LoadDatFiles(IPackFileService pfs, out List<string> failedFiles)
+        private SoundDatFile LoadDatFiles(IPackFileService pfs, out List<string> failedFiles)
         {
             var datDumpsFolderName = $"{DirectoryHelper.Temp}\\DatDumps";
             DirectoryHelper.EnsureCreated(datDumpsFolderName);
@@ -94,7 +184,7 @@ namespace Editors.Audio.Storage
             return masterDat;
         }
 
-        SoundDatFile LoadDatFile(PackFile datFile)
+        private SoundDatFile LoadDatFile(PackFile datFile)
         {
             if (_applicationSettingsService.CurrentSettings.CurrentGame == GameTypeEnum.Attila)
                 return DatFileParser.Parse(datFile, true);
@@ -102,16 +192,16 @@ namespace Editors.Audio.Storage
                 return DatFileParser.Parse(datFile, false);
         }
 
-        void AddNames(string[] names)
+        private static void AddNames(string[] names, Dictionary<uint, string> nameLookUp)
         {
             foreach (var name in names)
             {
                 var hashVal = WwiseHash.Compute(name.Trim());
-                _nameLookUp[hashVal] = name;
+                nameLookUp[hashVal] = name;
             }
         }
 
-        private static void ChangeNoneStatesToAny(List<SoundDatFile.DatStateGroupsWithStates> stateGroupsWithStates)
+        private static List<DatStateGroupsWithStates> ChangeNoneStatesToAny(List<DatStateGroupsWithStates> stateGroupsWithStates)
         {
             foreach (var item in stateGroupsWithStates)
             {
@@ -125,6 +215,7 @@ namespace Editors.Audio.Storage
                     }
                 }
             }
+            return stateGroupsWithStates;
         }
     }
 }

@@ -3,16 +3,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Shared.Core.PackFiles.Models;
-using Shared.GameFormats.Dat;
+using Shared.Core.Settings;
 using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Didx;
+using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Storage
 {
     public interface IAudioRepository
     {
         Dictionary<uint, string> NameLookUpTable { get; }
-        List<SoundDatFile.DatDialogueEventsWithStateGroups> DatDialogueEventsWithStateGroups { get; }
-        List<SoundDatFile.DatStateGroupsWithStates> DatStateGroupsWithStates { get; }
         Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; }
         Dictionary<string, List<string>> StateGroupsWithStates { get; }
         Dictionary<uint, List<HircItem>> HircObjects { get; }
@@ -30,36 +30,40 @@ namespace Editors.Audio.Storage
 
     public class AudioRepository : IAudioRepository
     {
-        public Dictionary<uint, string> NameLookUpTable { get; private set; } = [];
-        public List<SoundDatFile.DatDialogueEventsWithStateGroups> DatDialogueEventsWithStateGroups { get; private set; } = [];
-        public List<SoundDatFile.DatStateGroupsWithStates> DatStateGroupsWithStates { get; private set; } = [];
-        public Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; private set; }
-        public Dictionary<string, List<string>> StateGroupsWithStates { get; private set; }
         public Dictionary<uint, List<HircItem>> HircObjects { get; private set; } = [];
+        public Dictionary<uint, List<DidxAudio>> DidxAudioObject { get; internal set; }
         public Dictionary<string, PackFile> PackFileMap { get; private set; }
+        public Dictionary<uint, string> NameLookUpTable { get; private set; } = [];
+        public Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; private set; }
+        public Dictionary<string, Dictionary<string, string>> DialogueEventsWithStateGroupsWithQualifiersAndStateGroups { get; set; } = [];
+        public Dictionary<string, List<string>> StateGroupsWithStates { get; private set; }
 
-
-        public AudioRepository(RepositoryProvider provider)
+        public AudioRepository(RepositoryProvider provider, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
         {
-            {
-                var data = provider.LoadBnkAndDatData();
-                NameLookUpTable = data.NameLookUpTable;
-                DatDialogueEventsWithStateGroups = data.DialogueEventsWithStateGroups;
-                DatStateGroupsWithStates = data.StateGroupsWithStates;
-                HircObjects = data.HircObjects;
-                PackFileMap = data.PackFileMap;
+            var audioData = new AudioData();
 
-                StoreDialogueEventsWithStateGroups();
-                StoreStateGroupsWithStates();
+            var gameInformation = gameInformationFactory.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+            var gameBankGeneratorVersion = gameInformation.BankGeneratorVersion;
+            if (gameBankGeneratorVersion != null)
+            {
+                provider.LoadDatData(audioData);
+                provider.LoadBnkData(audioData);
             }
+
+            HircObjects = audioData.HircObjects ?? [];
+            DidxAudioObject = audioData.DidxAudioObject ?? [];
+            PackFileMap = audioData.PackFileMap ?? [];
+            NameLookUpTable = audioData.NameLookUpTable ?? [];
+            DialogueEventsWithStateGroups = audioData.DialogueEventsWithStateGroups ?? [];
+            DialogueEventsWithStateGroupsWithQualifiersAndStateGroups = audioData.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups ?? [];
+            StateGroupsWithStates = audioData.StateGroupsWithStates ?? [];
         }
 
         public List<HircItem> GetHircObject(uint id)
         {
             if (HircObjects.ContainsKey(id))
                 return HircObjects[id];
-
-            return new List<HircItem>();
+            return [];
         }
 
         public List<HircItem> GetHircObject(uint id, string owningFileName)
@@ -128,39 +132,6 @@ namespace Editors.Audio.Storage
                 }
             }
             return null;
-        }
-
-        public void StoreDialogueEventsWithStateGroups()
-        {
-            DialogueEventsWithStateGroups = new Dictionary<string, List<string>>();
-            var dialogueEventsWithStateGroups = DatDialogueEventsWithStateGroups;
-
-            foreach (var dialogueEvent in dialogueEventsWithStateGroups)
-            {
-                if (!DialogueEventsWithStateGroups.ContainsKey(dialogueEvent.EventName))
-                    DialogueEventsWithStateGroups[dialogueEvent.EventName] = new List<string>();
-
-                foreach (var stateGroupId in dialogueEvent.StateGroups)
-                {
-                    var stateGroup = GetNameFromHash(stateGroupId);
-                    DialogueEventsWithStateGroups[dialogueEvent.EventName].Add(stateGroup);
-                }
-            }
-        }
-
-        public void StoreStateGroupsWithStates()
-        {
-            StateGroupsWithStates = new Dictionary<string, List<string>>();
-            var stateGroupsWithStates = DatStateGroupsWithStates;
-
-            foreach (var stateGroup in stateGroupsWithStates)
-            {
-                if (!StateGroupsWithStates.ContainsKey(stateGroup.StateGroupName))
-                    StateGroupsWithStates[stateGroup.StateGroupName] = new List<string>();
-
-                foreach (var state in stateGroup.States)
-                    StateGroupsWithStates[stateGroup.StateGroupName].Add(state);
-            }
         }
     }
 }

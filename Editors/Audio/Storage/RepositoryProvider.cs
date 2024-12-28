@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Shared.Core.PackFiles.Models;
-using Shared.GameFormats.Dat;
 using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Didx;
 
@@ -8,17 +7,19 @@ namespace Editors.Audio.Storage
 {
     public interface RepositoryProvider
     {
-        AudioData LoadBnkAndDatData();
+        void LoadBnkData(AudioData audioData);
+        void LoadDatData(AudioData audioData);
     }
 
     public class AudioData
     {
-        public Dictionary<uint, string> NameLookUpTable { get; internal set; }
         public Dictionary<uint, List<HircItem>> HircObjects { get; internal set; }
         public Dictionary<uint, List<DidxAudio>> DidxAudioObject { get; internal set; }
-        public List<SoundDatFile.DatDialogueEventsWithStateGroups> DialogueEventsWithStateGroups { get; internal set; }
-        public List<SoundDatFile.DatStateGroupsWithStates> StateGroupsWithStates { get; internal set; }
-        public Dictionary<string, PackFile> PackFileMap { get; internal set; } = new();
+        public Dictionary<string, PackFile> PackFileMap { get; internal set; } = [];
+        public Dictionary<uint, string> NameLookUpTable { get; internal set; }
+        public Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; set; } = [];
+        public Dictionary<string, Dictionary<string, string>> DialogueEventsWithStateGroupsWithQualifiersAndStateGroups { get; set; } = [];
+        public Dictionary<string, List<string>> StateGroupsWithStates { get; set; } = [];
     }
 
     public class CreateRepositoryFromAllPackFiles : RepositoryProvider
@@ -32,20 +33,21 @@ namespace Editors.Audio.Storage
             _datLoader = datLoader;
         }
 
-        public AudioData LoadBnkAndDatData()
+        public void LoadDatData(AudioData audioData)
         {
-            var (nameLookUp, dialogueEventsWithStateGroups, stateGroupsWithStates) = _datLoader.LoadDatData();
-            var loadResult = _bnkLoader.LoadBnkFiles();
+            var loadResult = _datLoader.LoadDatData();
+            audioData.NameLookUpTable = loadResult.NameLookUpTable;
+            audioData.DialogueEventsWithStateGroups = loadResult.DialogueEventsWithStateGroups;
+            audioData.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups = loadResult.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups;
+            audioData.StateGroupsWithStates = loadResult.StateGroupsWithStates;
+        }
 
-            return new AudioData()
-            {
-                NameLookUpTable = nameLookUp,
-                DialogueEventsWithStateGroups = dialogueEventsWithStateGroups,
-                StateGroupsWithStates = stateGroupsWithStates,
-                HircObjects = loadResult.HircList,
-                DidxAudioObject = loadResult.DidxAudioList,
-                PackFileMap = loadResult.PackFileMap,
-            };
+        public void LoadBnkData(AudioData audioData)
+        {
+            var loadResult = _bnkLoader.LoadBnkFiles();
+            audioData.HircObjects = loadResult.HircList;
+            audioData.DidxAudioObject = loadResult.DidxAudioList;
+            audioData.PackFileMap = loadResult.PackFileMap;
         }
     }
 }
