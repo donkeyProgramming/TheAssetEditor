@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace Editors.AnimatioReTarget.Editor.Saving
 {
@@ -19,10 +7,28 @@ namespace Editors.AnimatioReTarget.Editor.Saving
     /// </summary>
     public partial class SaveWindow : Window
     {
-        public SaveWindow(SaveManager viewModel)
+        SaveManager _saveManager;
+
+        public SaveWindow(SaveSettings viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;
+        }
+
+        public void Initialize(SaveManager saveManager)
+        {
+            _saveManager = saveManager;
+        }
+
+        private void SaveButtonClick(object sender, RoutedEventArgs e)
+        {
+            _saveManager.SaveAnimation();
+            Close();
+        }
+
+        private void CloseButtonClick(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

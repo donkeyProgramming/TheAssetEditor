@@ -1,9 +1,12 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.IO;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Editors.AnimatioReTarget.Editor.BoneHandling;
+using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Services;
-using GameWorld.Core.Animation;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.GameFormats.Animation;
 
 namespace Editors.AnimatioReTarget.Editor.Saving
@@ -16,59 +19,74 @@ namespace Editors.AnimatioReTarget.Editor.Saving
 
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IPackFileService _pfs;
+        private readonly IFileSaveService _saveService;
+        private readonly IStandardDialogs _standardDialogs;
+        private readonly IAbstractFormFactory<SaveWindow> _settingsWindowFactory;
+        [ObservableProperty] SaveSettings _settings;
 
-        [ObservableProperty] SaveSettings _settings = new SaveSettings();
+        SceneObject _generated;
+        SceneObject _source;
+        SceneObject _target;
 
-
-        //private SceneObject _copyTo;
-        //private SceneObject _copyFrom;
-        //private SceneObject Generated { get; set; }
-        //
-        //
-        //
-        ////
-        //private readonly AnimationGenerationSettings AnimationSettings;
-        //private readonly BoneManager _boneManager;
-
-        public SaveManager(BoneManager boneManager, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, IPackFileService pfs)
+        public SaveManager(BoneManager boneManager, 
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+            IPackFileService pfs,
+            SaveSettings saveSettings,
+            IFileSaveService saveService,
+            IStandardDialogs standardDialogs,
+            IAbstractFormFactory<SaveWindow> settingsWindowFactory)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _pfs = pfs;
+            _saveService = saveService;
+            _standardDialogs = standardDialogs;
+            _settingsWindowFactory = settingsWindowFactory;
+            _settings = saveSettings;
         }
 
-        public void SaveAnimation()
-        { 
-        
-        }
-
-
-        void SaveAnimation(AnimationClip clip, string animationName, bool prompOnOverride = true)
+        public void SetSceneNodes(SceneObject source, SceneObject target, SceneObject generated)
         {
-           // var animFile = clip.ConvertToFileFormat(_copyTo.Skeleton);
-           // if (AnimationSettings.UseScaledSkeletonName.Value)
-           //     animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
-           //
-           // if (AnimationSettings.AnimationOutputFormat.Value != 7)
-           // {
-           //     var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animFile.Header.SkeletonName);
-           //     animFile.ConvertToVersion(AnimationSettings.AnimationOutputFormat.Value, skeleton, _pfs);
-           // }
-           //
-           // if (AnimationSettings.UseScaledSkeletonName.Value)
-           //     animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
-           //
-           // var orgSkeleton = _copyFrom.Skeleton.SkeletonName;
-           // var newSkeleton = _copyTo.Skeleton.SkeletonName;
-           // var newPath = animationName.Replace(orgSkeleton, newSkeleton);
-           // var currentFileName = Path.GetFileName(newPath);
-           // newPath = newPath.Replace(currentFileName, AnimationSettings.SavePrefix.Value + currentFileName);
-           // newPath = SaveUtility.EnsureEnding(newPath, ".anim");
-           //
-           // _packFileSaveService.Save(newPath, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
+            _generated = generated;
+            _source = source;
+            _target = target;
         }
 
+        public void SaveAnimation(bool prompOnConflict = true)
+        {
+            if (_generated?.AnimationClip == null)
+            {
+                _standardDialogs.ShowDialogBox("Generated skeleton not set, or animation not created");
+                return;
+            }
 
+            var animationName = _source.AnimationName.Value;
+            var clip = _generated.AnimationClip;
+           
+            var animFile = clip.ConvertToFileFormat(_generated.Skeleton);
 
+             var orgSkeleton = _source.Skeleton.SkeletonName;
+             var newSkeleton = _target.Skeleton.SkeletonName;
+             var newPath = animationName.Replace(orgSkeleton, newSkeleton);
+
+            if (Settings.AnimationFormat != 7)
+            {
+                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animFile.Header.SkeletonName);
+                animFile.ConvertToVersion(Settings.AnimationFormat, skeleton, _pfs);
+            }
+
+            var currentFileName = Path.GetFileName(newPath);
+            newPath = newPath.Replace(currentFileName, Settings.SavePrefix + currentFileName);
+            newPath = SaveUtility.EnsureEnding(newPath, ".anim");
+
+            _saveService.Save(newPath, AnimationFile.ConvertToBytes(animFile), prompOnConflict);
+
+        }
+        [RelayCommand] void ShowSaveSettings()
+        {
+            var window = _settingsWindowFactory.Create();
+            window.Initialize(this);
+            window.ShowDialog();
+        }
 
         /*
         public void OpenBatchProcessDialog()

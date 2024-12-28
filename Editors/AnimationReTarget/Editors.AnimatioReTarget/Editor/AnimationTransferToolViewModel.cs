@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimatioReTarget.Editor.BoneHandling;
 using Editors.AnimatioReTarget.Editor.Saving;
@@ -102,6 +101,7 @@ namespace Editors.AnimatioReTarget.Editor
 
             BoneManager.SetSceneNodes(source.Data, target.Data, generated.Data);
             Rendering.SetSceneNodes(source.Data, target.Data, generated.Data);
+            SaveManager.SetSceneNodes(source.Data, target.Data, generated.Data);
         }
 
         private void OnSceneObjectUpdated(SceneObjectUpdateEvent e)

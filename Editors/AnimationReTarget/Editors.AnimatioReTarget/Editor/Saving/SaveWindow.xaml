@@ -13,32 +13,33 @@
     </Window.Resources>
 
 
-        <StackPanel>
-            <DockPanel >
-                <Label Content="Save Prefix" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                <Label Content=":" DockPanel.Dock="Left"/>
-                <ComboBox Margin="2" DockPanel.Dock="Right" Width="60" ItemsSource="{Binding AnimationSettings.AnimationOutputFormat.PossibleValues, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding AnimationSettings.AnimationOutputFormat.SelectedValue.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <Label Content="Format:" DockPanel.Dock="Right"/>
-                <TextBox Text="{Binding AnimationSettings.SavePrefix, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
-            </DockPanel>
+    <StackPanel>
+        <DockPanel >
+            <Label Content="Save Prefix" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+            <Label Content=":" DockPanel.Dock="Left"/>
+            <ComboBox Margin="2" DockPanel.Dock="Right" Width="60" 
+                      ItemsSource="{Binding PossibleAnimationFormats, UpdateSourceTrigger=PropertyChanged}" 
+                      SelectedItem="{Binding AnimationFormat, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <Label Content="Format:" DockPanel.Dock="Right"/>
+            <TextBox Text="{Binding SavePrefix, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+        </DockPanel>
 
-            <DockPanel IsEnabled="False">
-                <Label Content="Use generated skeleton" Width ="{StaticResource labelWidth}"/>
-                <Label Content=":"/>
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding AnimationSettings.UseScaledSkeletonName.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <Button Content="Export Mesh/skeleton at scale" Command="{Binding ExportScaledMesh}"  DockPanel.Dock="Right" Margin="2"/>
-                <TextBox Text="{Binding AnimationSettings.ScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
-
-            </DockPanel>
+        <DockPanel IsEnabled="False">
+            <Label Content="Use generated skeleton" Width ="{StaticResource labelWidth}"/>
+            <Label Content=":"/>
+            <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding UseScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <Button Content="Export Mesh/skeleton at scale" Command="{Binding ExportScaledMesh}"  DockPanel.Dock="Right" Margin="2"/>
+            <TextBox Text="{Binding ScaledSkeletonName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"/>
+        </DockPanel>
 
         <DockPanel>
-            <Button>Save</Button>
+            <Button Click="SaveButtonClick">Save</Button>
         </DockPanel>
         <DockPanel IsEnabled="False">
             <Button>Batch export</Button>
         </DockPanel>
         <DockPanel>
-            <Button>Close</Button>
+            <Button Click="CloseButtonClick">Close</Button>
         </DockPanel>
     </StackPanel>
 

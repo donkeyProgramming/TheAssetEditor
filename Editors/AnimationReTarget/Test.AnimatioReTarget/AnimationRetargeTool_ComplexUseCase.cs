@@ -45,7 +45,6 @@ namespace Test.AnimatioReTarget
             // Close
         }
 
-
         private void Step0_SelectSource_NoGeneratedSet(AssetEditorTestRunner runner, AnimationRetargetViewModel editor)
         {
             var sceneObjectEditor = runner.GetRequiredServiceInCurrentEditorScope<SceneObjectEditor>();
@@ -65,7 +64,6 @@ namespace Test.AnimatioReTarget
             var generated = editor.GetSceneObjectFromId(AnimationRetargetIds.Generated);
             Assert.That(generated.Data.Skeleton, Is.Null);
         }
-
 
         private void Step1_SelectTarget_GeneratedSet(AssetEditorTestRunner runner, AnimationRetargetViewModel editor)
         {
@@ -113,14 +111,13 @@ namespace Test.AnimatioReTarget
             // Check player
         }
 
-
         private void Step5_UpdateAnimationSettingsAndGenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetViewModel editor)
         {
             var bone = SkeletonBoneNodeHelper.GetNodeFromName("skirt_back_0", editor.BoneManager.Bones);
             bone.TranslationOffset.X.Value = 10;
 
             editor.UpdateAnimation();
-            editor.SaveManager.SaveAnimation();
+            editor.SaveManager.SaveAnimation(false);
 
             // Ensure new file is created in pfs
         }

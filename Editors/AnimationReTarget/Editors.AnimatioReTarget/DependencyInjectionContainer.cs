@@ -18,9 +18,12 @@ namespace Editors.AnimatioReTarget
             serviceCollection.AddScoped<AnimationRetargetViewModel>();
             serviceCollection.AddScoped<BoneManager>();
             serviceCollection.AddScoped<SaveManager>();
-            RegisterWindow<BoneMappingWindow>(serviceCollection);
+            serviceCollection.AddScoped<SaveSettings>();
             serviceCollection.AddScoped<AnimationReTargetRenderingComponent>();
 
+            RegisterWindow<BoneMappingWindow>(serviceCollection);
+            RegisterWindow<SaveWindow>(serviceCollection);
+          
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
 

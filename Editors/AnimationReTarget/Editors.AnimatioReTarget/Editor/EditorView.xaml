@@ -10,11 +10,9 @@
     <DockPanel >
         <settings:SettingsView DockPanel.Dock="Top"/>
 
-        <Button DockPanel.Dock="Bottom"  Content="Apply Settings" Command="{Binding UpdateAnimationCommand}" Margin="2" />
-        <Button DockPanel.Dock="Bottom"  Content="Use Target as Source" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
-        <Button DockPanel.Dock="Bottom"  Content="Save" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
-        <Button DockPanel.Dock="Bottom"  Content="Advanced Save" Click="{s:MethodBinding UseTargetAsSource}" Margin="2" />
-        <Button DockPanel.Dock="Bottom"  Content="Open Bone Mapping Window" Command="{Binding BoneManager.ShowBoneMappingWindowCommand}"/>
+        <Button DockPanel.Dock="Bottom" Content="Apply Settings" Command="{Binding UpdateAnimationCommand}" Margin="2" />
+        <Button DockPanel.Dock="Bottom" Content="Save" Command="{Binding SaveManager.ShowSaveSettingsCommand}"  Margin="2" />
+        <Button DockPanel.Dock="Bottom" Content="Open Bone Mapping Window" Command="{Binding BoneManager.ShowBoneMappingWindowCommand}" Margin="2" />
 
         <presentation:BoneSettingsView DockPanel.Dock="Top"/>
     </DockPanel>

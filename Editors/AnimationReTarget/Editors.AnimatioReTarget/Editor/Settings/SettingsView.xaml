@@ -44,63 +44,42 @@
 
         <Expander IsExpanded="True" Header="Animation Settings:" DockPanel.Dock="Bottom">
             <StackPanel Margin="10,0,2,0">
-            <DockPanel>
-                <Label Content="Skeleton Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
-                <Label Content=":" DockPanel.Dock="Left"/>
+                <DockPanel>
+                    <Label Content="Skeleton Scale" Width ="{StaticResource labelWidth}"  DockPanel.Dock="Left"/>
+                    <Label Content=":" DockPanel.Dock="Left"/>
 
-                <TextBox Text="{Binding Settings.SkeletonScale, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
-                    <TextBox.ToolTip>
-                        <ToolTip Content="Scaling the skeleton will make the mesh look dragged unless the mesh is also exported"/>
-                    </TextBox.ToolTip>
+                    <TextBox Text="{Binding Settings.SkeletonScale, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
+                        <TextBox.ToolTip>
+                            <ToolTip Content="Scaling the skeleton will make the mesh look dragged unless the mesh is also exported"/>
+                        </TextBox.ToolTip>
 
-                    <b:Interaction.Behaviors>
-                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                    </b:Interaction.Behaviors>
-                </TextBox>
+                        <b:Interaction.Behaviors>
+                            <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                        </b:Interaction.Behaviors>
+                    </TextBox>
+                </DockPanel>
 
-            </DockPanel>
+                <DockPanel>
+                    <Label Content="Animation speed mult" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
+                    <Label Content=":" DockPanel.Dock="Left"/>
+                    <TextBox Text="{Binding Settings.AnimationSpeedMult, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
+                        <b:Interaction.Behaviors>
+                            <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
+                        </b:Interaction.Behaviors>
+                    </TextBox>
+                </DockPanel>
 
-            <DockPanel>
-                <Label Content="Animation speed mult" Width ="{StaticResource labelWidth}" DockPanel.Dock="Left"/>
-                <Label Content=":" DockPanel.Dock="Left"/>
-                <TextBox Text="{Binding Settings.AnimationSpeedMult, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalContentAlignment="Center" Margin="2">
-                    <b:Interaction.Behaviors>
-                        <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </DockPanel>
+                <DockPanel >
+                    <Label Content="Zero unmapped bones" Width ="{StaticResource labelWidth}"/>
+                    <Label Content=":"/>
 
+                    <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Settings.ZeroUnmappedBones, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  ToolTip="Set the transform of all unmapped bones to 0"/>
+                </DockPanel>
 
-            <DockPanel >
-                <Label Content="Zero unmapped bones" Width ="{StaticResource labelWidth}"/>
-                <Label Content=":"/>
-
-                <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Settings.ZeroUnmappedBones, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  ToolTip="Set the transform of all unmapped bones to 0"/>
-            </DockPanel>
-
-
-            <DockPanel >
+                <DockPanel >
                 <Label Content="Apply Relative scale" Width ="{StaticResource labelWidth}"/>
                 <Label Content=":"/>
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding Settings.ApplyRelativeScale, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  ToolTip="Scale bone length based on relative difference" Margin="0,0,5,0"/>
-            </DockPanel>
-
-
-            <DockPanel IsEnabled="False" Visibility="Collapsed">
-                <StackPanel>
-                    <DockPanel>
-                        <Label Content="Root bone for animation war beast convert operation" Width ="300"/>
-                        <Label Content=":"/>
-                        <ComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
-                          IsEditable="True"
-                          IsTextSearchEnabled="false"
-                          DisplayMemberPath="BoneName"
-                          Text="{Binding ModelBoneList.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                          ItemsSource="{Binding ModelBoneList.Values}" 
-                          SelectedItem="{Binding ModelBoneList.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                    </DockPanel>
-                    <Button  Content="convert to war beast!" Command="{Binding FreezePositionAndRotation}" Margin="2" />
-                </StackPanel>
             </DockPanel>
 
         </StackPanel>
