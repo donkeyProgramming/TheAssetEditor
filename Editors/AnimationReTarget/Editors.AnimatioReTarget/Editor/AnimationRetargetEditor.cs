@@ -31,7 +31,7 @@ namespace Editors.AnimatioReTarget.Editor
         public static string Generated => "Generated";
     }
 
-    public partial class AnimationRetargetViewModel : EditorHostBase, IDisposable
+    public partial class AnimationRetargetEditor : EditorHostBase, IDisposable
     {
         // private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
 
@@ -52,7 +52,7 @@ namespace Editors.AnimatioReTarget.Editor
 
         public override Type EditorViewModelType => typeof(EditorView);
 
-        public AnimationRetargetViewModel(
+        public AnimationRetargetEditor(
             IEditorHostParameters editorHostParameters,
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,

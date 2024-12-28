@@ -28,7 +28,7 @@ namespace Test.AnimatioReTarget
             var originalRmv2File = runner.PackFileService.FindFile("animations\\skeletons\\humanoid01.anim");
             var editorInterface = runner.CommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AnimationRetarget_Editor);
 
-            var editor = editorInterface as AnimationRetargetViewModel;
+            var editor = editorInterface as AnimationRetargetEditor;
             Assert.That(editor, Is.Not.Null);
            
             Step0_SelectSource_NoGeneratedSet(runner, editor!);
@@ -42,7 +42,7 @@ namespace Test.AnimatioReTarget
             // Close
         }
 
-        private void Step0_SelectSource_NoGeneratedSet(AssetEditorTestRunner runner, AnimationRetargetViewModel editor)
+        private void Step0_SelectSource_NoGeneratedSet(AssetEditorTestRunner runner, AnimationRetargetEditor editor)
         {
             var sceneObjectEditor = runner.GetRequiredServiceInCurrentEditorScope<SceneObjectEditor>();
             var meshFile = runner.PackFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.wsmodel");
@@ -62,7 +62,7 @@ namespace Test.AnimatioReTarget
             Assert.That(generated.Data.Skeleton, Is.Null);
         }
 
-        private void Step1_SelectTarget_GeneratedSet(AssetEditorTestRunner runner, AnimationRetargetViewModel editor)
+        private void Step1_SelectTarget_GeneratedSet(AssetEditorTestRunner runner, AnimationRetargetEditor editor)
         {
             var sceneObjectEditor = runner.GetRequiredServiceInCurrentEditorScope<SceneObjectEditor>();
             var meshFile = runner.PackFileService.FindFile(@"variantmeshes\wh_variantmodels\hu1e\cth\cth_celestial_general\cth_celestial_general_body_02.wsmodel");
@@ -82,7 +82,7 @@ namespace Test.AnimatioReTarget
             Assert.That(meshCount, Is.Not.Zero);
         }
 
-        private void Step2_TryGeneratingAnimation(AssetEditorTestRunner runner, AnimationRetargetViewModel editor)
+        private void Step2_TryGeneratingAnimation(AssetEditorTestRunner runner, AnimationRetargetEditor editor)
         {
             var result = editor.CanUpdateAnimation(out var text);
             Assert.That(result, Is.True);
@@ -90,7 +90,7 @@ namespace Test.AnimatioReTarget
         }
 
 
-        private void Step3_ApplyDefaultMapping(AssetEditorTestRunner runner, AnimationRetargetViewModel editor)
+        private void Step3_ApplyDefaultMapping(AssetEditorTestRunner runner, AnimationRetargetEditor editor)
         {
             var count0 = SkeletonBoneNodeHelper.CountMappedBones(editor.BoneManager.Bones);
             editor.BoneManager.ApplyDefaultMapping();
@@ -100,7 +100,7 @@ namespace Test.AnimatioReTarget
             Assert.That(count1, Is.EqualTo(57));
         }
 
-        private void Step4_GenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetViewModel editor)
+        private void Step4_GenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetEditor editor)
         {
             editor.UpdateAnimation();
 
@@ -108,7 +108,7 @@ namespace Test.AnimatioReTarget
             // Check player
         }
 
-        private void Step5_UpdateAnimationSettingsAndGenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetViewModel editor, PackFileContainer outputPackFile)
+        private void Step5_UpdateAnimationSettingsAndGenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetEditor editor, PackFileContainer outputPackFile)
         {
             Assert.That(outputPackFile.FileList.Count, Is.EqualTo(0));
 

@@ -15,7 +15,7 @@ namespace Editors.AnimatioReTarget
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddScoped<AnimationRetargetViewModel>();
+            serviceCollection.AddScoped<AnimationRetargetEditor>();
             serviceCollection.AddScoped<BoneManager>();
             serviceCollection.AddScoped<SaveManager>();
             serviceCollection.AddScoped<SaveSettings>();
@@ -30,7 +30,7 @@ namespace Editors.AnimatioReTarget
         public override void RegisterTools(IEditorDatabase database)
         {
             EditorInfoBuilder
-              .Create<AnimationRetargetViewModel, EditorHostView>(EditorEnums.AnimationRetarget_Editor)
+              .Create<AnimationRetargetEditor, EditorHostView>(EditorEnums.AnimationRetarget_Editor)
               .AddToToolbar("Animation ReTarget Tool", true)
               .Build(database);
         }
