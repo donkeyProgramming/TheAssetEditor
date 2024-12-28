@@ -19,6 +19,7 @@ namespace Test.Shared.Core.Events
             serviceCollection.AddSingleton<IGlobalEventHub, SingletonScopeEventHub>();
             serviceCollection.AddScoped<IEventHub, LocalScopeEventHub>();
             serviceCollection.AddScoped<ScopedClass>();
+            serviceCollection.AddScoped<ScopeToken>();
 
             // Build first provider
             var initialServiceProvider = serviceCollection.BuildServiceProvider();
