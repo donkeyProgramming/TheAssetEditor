@@ -64,7 +64,7 @@ namespace Editors.AnimatioReTarget.Editor.Settings
             _renderEngineComponent = renderEngineComponent;
         }
 
-        void Compute()
+        public void ComputeOffsets()
         {
             var r0 = ComputeWidth(_source);
             var r1 = ComputeWidth(_target);
@@ -106,7 +106,7 @@ namespace Editors.AnimatioReTarget.Editor.Settings
             _source = source;
             _target = target;
             _generated = generated;
-            Compute();
+            ComputeOffsets();
         }
 
         float ComputeWidth(SceneObject? sceneObject)
@@ -115,7 +115,6 @@ namespace Editors.AnimatioReTarget.Editor.Settings
             if (sceneObject == null)
                 return defaultValue;
        
-
             var modelNodes = SceneNodeHelper.GetChildrenOfType<Rmv2ModelNode>(sceneObject.MainNode);
 
             var bb = new BoundingSphere(Vector3.Zero, defaultValue);

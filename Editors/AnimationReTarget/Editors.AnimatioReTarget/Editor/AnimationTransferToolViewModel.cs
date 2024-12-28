@@ -9,6 +9,7 @@ using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using Microsoft.Xna.Framework;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 
 namespace Editors.AnimatioReTarget.Editor
@@ -17,19 +18,16 @@ namespace Editors.AnimatioReTarget.Editor
     // Show scale factor in view for each bone 
 
 
-    public partial class AnimationRetargetViewModel : EditorHostBase
+    public partial class AnimationRetargetViewModel : EditorHostBase, IDisposable
     {
         // private readonly ILogger _logger = Logging.Create<AnimationTransferToolViewModel>();
 
-        AnimationToolInput _inputTargetData;
-        AnimationToolInput _inputSourceData;
-
         private readonly IPackFileService _pfs;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly AnimationPlayerViewModel _player;
+        private readonly IEventHub _eventHub;
 
-        private SceneObject _copyTo;
-        private SceneObject _copyFrom;
+        private SceneObject _target;
+        private SceneObject _source;
         private SceneObject _generated;
 
         [ObservableProperty] BoneManager _boneManager;
@@ -43,11 +41,10 @@ namespace Editors.AnimatioReTarget.Editor
             IEditorHostParameters editorHostParameters,
             AnimationPlayerViewModel player,
             SceneObjectViewModelBuilder referenceModelSelectionViewModelBuilder,
-
+            IEventHub eventHub,
             BoneManager boneManager,
             AnimationReTargetRenderingComponent renderingComponent,
-            IPackFileService pfs, 
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper) : base(editorHostParameters)
+            IPackFileService pfs) : base(editorHostParameters)
         {
             DisplayName = "Animation transfer tool";
 
@@ -56,101 +53,84 @@ namespace Editors.AnimatioReTarget.Editor
             _rendering = renderingComponent;
           
             _pfs = pfs;
-            _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _player = player;
+            _eventHub = eventHub;
 
             GameWorld.AddComponent(renderingComponent);
+
+            _eventHub.Register<SceneObjectUpdateEvent>(this, OnSceneObjectUpdated);
 
             Initialize();
         }
 
-        public void SetDebugInputParameters(AnimationToolInput target, AnimationToolInput source)
-        {
-            _inputTargetData = target;
-            _inputSourceData = source;
-        }
-
         void Initialize()
         {
-            _inputTargetData = new AnimationToolInput()
-            {
-                Mesh = _pfs.FindFile(@"variantmeshes\variantmeshdefinitions\dwf_giant_slayers.variantmeshdefinition")
-            };
+            var target = _sceneObjectViewModelBuilder.CreateAsset(true, "Target", Color.Black, null);
+            var source = _sceneObjectViewModelBuilder.CreateAsset(true, "Source", Color.Black, null);
+            var generated = _sceneObjectViewModelBuilder.CreateAsset(true, "Generated", Color.Black, null);
+            _target = target.Data;
+            _source = source.Data;
+            _generated = generated.Data;
 
-            _inputSourceData = new AnimationToolInput()
-            {
-                Mesh = _pfs.FindFile(@"variantmeshes\variantmeshdefinitions\emp_archer_ror.variantmeshdefinition"),
-                Animation = _pfs.FindFile(@"animations\battle\humanoid01\sword_and_pistol\missile_attacks\hu1_swp_missile_attack_aim_to_shootready_01.anim")
-            };
-
-            var target = _sceneObjectViewModelBuilder.CreateAsset(true, "Target", Color.Black, _inputTargetData);
-            var source = _sceneObjectViewModelBuilder.CreateAsset(true, "Source", Color.Black, _inputSourceData);
-            var sourceView = _sceneObjectViewModelBuilder.CreateAsset(true, "Generated", Color.Black, null);
-            sourceView.Data.IsSelectable = false;
-            sourceView.IsExpand = false;
-            sourceView.IsEnabled = false;
-  
-            var generated = sourceView.Data;
-
-            source.Data.IsSelectable = false;
-
-            _player.RegisterAsset(generated);
-            Create(target.Data, source.Data, generated);
+            generated.IsExpand = false;
+            generated.IsEnabled = false;
 
             SceneObjects.Add(target);
             SceneObjects.Add(source);
-            SceneObjects.Add(sourceView);
+            SceneObjects.Add(generated);
 
-            BoneManager.SetSceneNodes(source.Data, target.Data, generated);
-            _rendering.SetSceneNodes(source.Data, target.Data, generated);
+            BoneManager.SetSceneNodes(source.Data, target.Data, generated.Data);
+            Rendering.SetSceneNodes(source.Data, target.Data, generated.Data);
         }
 
-        void Create(SceneObject copyToAsset, SceneObject copyFromAsset, SceneObject generated)
+        private void OnSceneObjectUpdated(SceneObjectUpdateEvent e)
         {
-            _copyTo = copyToAsset;
-            _copyFrom = copyFromAsset;
-            _generated = generated;
+           if (e.Owner == _target && e.MeshChanged)
+               _sceneObjectEditor.CopyMeshFromOther(_generated, _target);
 
-            _copyFrom.SkeletonChanged += CopyFromSkeletonChanged;
-            _copyTo.MeshChanged += CopyToMeshChanged;
+            if (e.Owner == _source && e.SkeletonChanged)
+                BoneManager.UpdateSourceSkeleton(_source.SkeletonName.Value);
+           
+            if (e.Owner == _target && e.SkeletonChanged)
+                BoneManager.UpdateTargetSkeleton(_target.SkeletonName.Value);
 
-            if (_copyTo.Skeleton != null)
-                CopyToMeshChanged(_copyTo);
-
-            if (_copyFrom.Skeleton != null)
-                CopyFromSkeletonChanged(_copyFrom.Skeleton);
-
-            BoneManager.UpdateSourceSkeleton(_copyFrom.Skeleton.SkeletonName);
-            BoneManager.UpdateTargetSkeleton(_copyTo.Skeleton.SkeletonName);
+            Rendering.ComputeOffsets();
         }
-        
+
+        public void LoadData(AnimationToolInput targetInput, AnimationToolInput sourceInput)
+        {
+            _sceneObjectEditor.SetMesh(_target, targetInput.Mesh);
+
+            _sceneObjectEditor.SetMesh(_source, sourceInput.Mesh);
+            _sceneObjectEditor.SetAnimation(_source, _pfs.GetFullPath(sourceInput.Animation));
+        }
+
         [RelayCommand]public void UpdateAnimation()
         {
             if (CanUpdateAnimation(true))
             {
-                var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip, _copyTo.AnimationClip);
-                _sceneObjectEditor.SetAnimationClip(_generated, newAnimationClip, null);
+                var newAnimationClip = UpdateAnimation(_source.AnimationClip);
+                _sceneObjectEditor.SetAnimationClip(_generated, newAnimationClip, "Generated");
                 _player.SelectedMainAnimation = _player.PlayerItems.First(x => x.Asset == _generated);
             }
         }
 
-        AnimationClip UpdateAnimation(AnimationClip animationToCopy, AnimationClip originalAnimation)
-        {
-            
+        AnimationClip UpdateAnimation(AnimationClip animationToCopy)
+        { 
             var service = new AnimationRemapperService_new(Settings, BoneManager.Bones);
-            var newClip = service.ReMapAnimation(_copyFrom.Skeleton, _copyTo.Skeleton, animationToCopy);
+            var newClip = service.ReMapAnimation(_source.Skeleton, _target.Skeleton, animationToCopy);
             return newClip;
         }
 
         bool CanUpdateAnimation(bool requireAnimation)
         {
-            if (_copyTo.Skeleton == null || _copyFrom.Skeleton == null)
+            if (_target.Skeleton == null || _source.Skeleton == null)
             {
                 MessageBox.Show("Missing a skeleton?", "Error", MessageBoxButton.OK);
                 return false;
             }
 
-            if (_copyFrom.AnimationClip == null && requireAnimation)
+            if (_source.AnimationClip == null && requireAnimation)
             {
                 MessageBox.Show("No animation to copy selected", "Error", MessageBoxButton.OK);
                 return false;
@@ -159,19 +139,9 @@ namespace Editors.AnimatioReTarget.Editor
             return true;
         }
 
-        private void CopyToMeshChanged(SceneObject newValue)
+        public void Dispose()
         {
-            _sceneObjectEditor.CopyMeshFromOther(_generated, newValue);
-        }
-
-        private void CopyFromSkeletonChanged(GameSkeleton newValue)
-        {
-            if (newValue == _copyFrom.Skeleton)
-                return;
-
-            var standAnim = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(newValue.SkeletonName).FirstOrDefault(x => x.AnimationFile.Contains("stand"));
-            if (standAnim != null)
-                _sceneObjectEditor.SetAnimation(_copyFrom, standAnim);
+            _eventHub?.UnRegister(this);
         }
     }
 }

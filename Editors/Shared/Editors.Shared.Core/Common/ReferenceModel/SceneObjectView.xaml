@@ -16,7 +16,7 @@
 
     <Expander IsExpanded="{Binding IsExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
               IsEnabled="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-              Visibility="{Binding IsControlVisible, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}" Margin="10,0,0,0">
+              Visibility="{Binding IsControlVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToCollapsedConverter}}" Margin="10,0,0,0">
         <Expander.Header>
             <StackPanel Orientation="Horizontal">
                 <CheckBox VerticalContentAlignment="Center" IsChecked="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -99,23 +99,6 @@
 
             <Rectangle  Fill="LightGray" Height="1" Margin="2,2,2,2"/>
 
-            <!--
-                <DockPanel Width="Auto">
-                    <CheckBox Visibility="Hidden"/>
-                    <Label  Width ="{StaticResource labelWidth}" Content="Animation"/>
-                    <Label  Content=":"/>
-
-                    <Button DockPanel.Dock="Right" Width="30" Margin="10,0,0,0" Content="..." Visibility="Hidden" />
-                    <filterdialog:CollapsableFilterControl VerticalContentAlignment="Center"
-                                    SelectedItem="{Binding AnimViewModel.SelectedAnimation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                    SearchItems="{Binding AnimViewModel.AnimationsForCurrentSkeleton, UpdateSourceTrigger=PropertyChanged}"     
-                                    OnSearch="{Binding AnimViewModel.FiterByFullPath, UpdateSourceTrigger=PropertyChanged}"   
-                                    IsManipulationEnabled="False"
-                                    LabelTotalWidth="0"   
-                                    MaxHeight="400"
-                                    ShowLabel="false"/>
-                </DockPanel>
--->
             <DockPanel Margin="0,0,40,0" Visibility="{Binding AllowMetaData, UpdateSourceTrigger=PropertyChanged , Converter={StaticResource BoolToCollapsedConverter}}">
 
                 <DockPanel DockPanel.Dock="Top">

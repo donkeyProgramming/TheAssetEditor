@@ -273,7 +273,6 @@ namespace Editor.VisualSkeletonEditor.SkeletonEditor
                 var file = result.File;
                 SceneObjectEditor.SetMesh(_techSkeletonNode, file, false);
                 RefMeshName = _packFileService.GetFullPath(file);
-                //LoadSkeleton(_techSkeletonNode, _techSkeletonNode.SkeletonName.Value);
             }
         }
     }

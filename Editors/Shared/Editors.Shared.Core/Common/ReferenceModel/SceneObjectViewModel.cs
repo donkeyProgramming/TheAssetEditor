@@ -12,7 +12,6 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         private readonly IPackFileService _pfs;
         private readonly IStandardDialogs _uiProvider;
         private readonly SceneObjectEditor _sceneObjectBuilder;
-        private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IMetaDataFactory _metaDataFactory;
 
         [ObservableProperty] string _headerName;
@@ -24,7 +23,6 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         [ObservableProperty] bool _isEnabled = true;
         [ObservableProperty] bool _isExpand = true;
 
-        public Depricated_SelectAnimationViewModel AnimViewModel { get; set; }
         public SkeletonPreviewViewModel SkeletonInformation { get; set; }
         public BinAnimationViewModel FragAndSlotSelection { get; set; }
 
@@ -38,7 +36,6 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             SceneObjectEditor sceneObjectBuilder,
             SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
-            _uiCommandFactory = uiCommandFactory;
             _metaDataFactory = metaDataFactory;
             _pfs = packFileService;
             _uiProvider = uiProvider;
@@ -47,7 +44,6 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             Data = data;
             HeaderName = headerName;
 
-            AnimViewModel = new Depricated_SelectAnimationViewModel(sceneObjectBuilder, Data, _pfs, skeletonAnimationLookUpHelper);
             SkeletonInformation = new SkeletonPreviewViewModel(Data);
             FragAndSlotSelection = new BinAnimationViewModel(sceneObjectBuilder, _pfs, skeletonAnimationLookUpHelper, Data, uiCommandFactory);
 
@@ -85,6 +81,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             }
         }
 
+        // Move this to superveiw! 
         void RecreateMetaDataInformation(SceneObject model)
         {
             if (AllowMetaData == false)

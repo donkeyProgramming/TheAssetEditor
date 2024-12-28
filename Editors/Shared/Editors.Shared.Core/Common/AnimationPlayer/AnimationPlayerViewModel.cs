@@ -52,7 +52,7 @@ namespace Editors.Shared.Core.Common.AnimationPlayer
 
         void RefreshAssetViewModel(SceneObject asset, AssetPlayerItem playerItem)
         {
-            playerItem.AnimationName.Value = asset.AnimationName.Value?.AnimationFile;
+            playerItem.AnimationName.Value = asset.AnimationName.Value;
             playerItem.SlotName.Value = asset.Description;
             playerItem.MaxFrames.Value = asset.Player.FrameCount();
         }

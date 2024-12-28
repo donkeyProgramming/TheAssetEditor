@@ -53,7 +53,10 @@ namespace Editors.Shared.Core.Common
                         _sceneObjectEditor.SetMesh(mainAsset, input.Mesh);
 
                     if (input.Animation != null)
-                        _sceneObjectEditor.SetAnimation(mainAsset, _skeletonHelper.FindAnimationRefFromPackFile(input.Animation));
+                    {
+                        var animationPath = _pfs.GetFullPath(input.Animation);
+                        _sceneObjectEditor.SetAnimation(mainAsset, animationPath);
+                    }
 
                     if (input.FragmentName != null)
                     {

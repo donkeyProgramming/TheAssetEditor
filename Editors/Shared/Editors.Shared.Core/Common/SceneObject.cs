@@ -47,9 +47,7 @@ namespace Editors.Shared.Core.Common
         // --- UI elements
         public NotifyAttr<string> MeshName { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<string> SkeletonName { get; set; } = new NotifyAttr<string>("");
-
-        public NotifyAttr<AnimationReference> AnimationName { get; set; } = new NotifyAttr<AnimationReference>(null);
-
+        public NotifyAttr<string> AnimationName { get; set; } = new NotifyAttr<string>("");
         public NotifyAttr<bool> ShowMesh { get; set; }
         public NotifyAttr<bool> ShowSkeleton { get; set; }
 

@@ -147,7 +147,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
                 }
             }
 
-            _sceneObjectEditor.SetAnimation(_sceneObject, animationReference);
+            _sceneObjectEditor.SetAnimation(_sceneObject, animationReference?.AnimationFile);
             _sceneObjectEditor.SetMetaFile(_sceneObject, meta, persistMeta);
 
             MetaDataName = value?.MetaFile;

@@ -44,7 +44,7 @@ namespace Editors.AnimatioReTarget.DevConfig
             };
 
             var editor = (AnimationRetargetViewModel)creator.Create(EditorEnums.AnimationTransfer_Editor);
-            editor.SetDebugInputParameters(targetInput, sourceInput);
+            editor.LoadData(targetInput, sourceInput);
         }
     }
 }

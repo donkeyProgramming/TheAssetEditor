@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Animation;
+﻿using Editors.Shared.Core.Common;
+using GameWorld.Core.Animation;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
@@ -7,14 +8,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.GameFormats.Animation;
-using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace Editors.Shared.Core.Common
 {
+    public record SceneObjectUpdateEvent(SceneObject Owner, bool MeshChanged, bool SkeletonChanged, bool AnimationChanged, bool MetaDataChanged);
+
     public class SceneObjectEditor
     {
         private readonly ILogger _logger = Logging.Create<SceneObjectEditor>();
@@ -24,10 +27,15 @@ namespace Editors.Shared.Core.Common
         private readonly IPackFileService _packFileService;
         private readonly AnimationsContainerComponent _animationsContainerComponent;
         private readonly ComplexMeshLoader _complexMeshLoader;
+        private readonly IEventHub _eventHub;
 
         public SceneObjectEditor(IWpfGame mainScene,
-            IServiceProvider serviceProvider, SceneManager sceneManager, IPackFileService packFileService,
-            AnimationsContainerComponent animationsContainerComponent, ComplexMeshLoader complexMeshLoader)
+            IServiceProvider serviceProvider, 
+            SceneManager sceneManager, 
+            IPackFileService packFileService,
+            AnimationsContainerComponent animationsContainerComponent,
+            ComplexMeshLoader complexMeshLoader,
+            IEventHub eventHub)
         {
             _mainScene = mainScene;
             _serviceProvider = serviceProvider;
@@ -35,6 +43,7 @@ namespace Editors.Shared.Core.Common
             _packFileService = packFileService;
             _animationsContainerComponent = animationsContainerComponent;
             _complexMeshLoader = complexMeshLoader;
+            _eventHub = eventHub;
         }
 
         public SceneObject CreateAsset(string description, Color skeletonColour)
@@ -57,12 +66,6 @@ namespace Editors.Shared.Core.Common
             return _mainScene.AddComponent(instance);
         }
 
-        // Set mesh
-        // Set animation
-        // Set skeleton
-        // Set metadata
-        record SceneObjectUpdate();
-
         public void SetMesh(SceneObject sceneObject, PackFile file, bool updateSkeleton = true)
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
@@ -79,12 +82,14 @@ namespace Editors.Shared.Core.Common
             sceneObject.ModelNode = loadedNode;
             sceneObject.ParentNode.AddObject(loadedNode);
 
+            var skeletonChanged = false;
             if (updateSkeleton)
             {
+                skeletonChanged = true;
                 var skeletonName = SceneNodeHelper.GetSkeletonName(loadedNode);
                 var fullSkeletonName = $"animations\\skeletons\\{skeletonName}.anim";
                 var skeletonFile = _packFileService.FindFile(fullSkeletonName);
-                SetSkeleton(sceneObject, skeletonFile);
+                SetSkeleton(sceneObject, skeletonFile, false);
             }
             sceneObject.MeshName.Value = file.Name;
             sceneObject.ShowMesh.Value = sceneObject.ShowMesh.Value;
@@ -102,6 +107,7 @@ namespace Editors.Shared.Core.Common
                 }
             });
 
+            _eventHub.Publish(new SceneObjectUpdateEvent(sceneObject, true, skeletonChanged, skeletonChanged, false));
             sceneObject.TriggerMeshChanged();
         }
 
@@ -127,10 +133,11 @@ namespace Editors.Shared.Core.Common
             assetViewModel.ShowSkeleton.Value = assetViewModel.ShowSkeleton.Value;
             assetViewModel.SetMeshVisability(assetViewModel.ShowMesh.Value);
 
+            //_eventHub.Publish(new SceneObjectUpdateEvent(assetViewModel, true, true, true, true));
             assetViewModel.TriggerMeshChanged();
         }
 
-        public void SetSkeleton(SceneObject assetViewModel, PackFile skeletonPackFile)
+        public void SetSkeleton(SceneObject assetViewModel, PackFile skeletonPackFile, bool sendUpdateEvent = true)
         {
             if (skeletonPackFile != null)
             {
@@ -157,10 +164,11 @@ namespace Editors.Shared.Core.Common
                 assetViewModel.Player.SetAnimation(null, assetViewModel.Skeleton);
             }
 
-            assetViewModel.TriggerSkeletonChanged();
+            if(sendUpdateEvent)
+                assetViewModel.TriggerSkeletonChanged();
         }
 
-        public void SetSkeleton(SceneObject assetViewModel, AnimationFile animFile, string skeletonName)
+        public void SetSkeleton(SceneObject assetViewModel, AnimationFile animFile, string skeletonName, bool sendUpdateEvent = true)
         {
             assetViewModel.SkeletonName.Value = skeletonName;
             assetViewModel.Skeleton = new GameSkeleton(animFile, assetViewModel.Player);
@@ -169,7 +177,8 @@ namespace Editors.Shared.Core.Common
             assetViewModel.SkeletonSceneNode.Skeleton = assetViewModel.Skeleton;
             assetViewModel.Player.SetAnimation(null, assetViewModel.Skeleton);
 
-            assetViewModel.TriggerSkeletonChanged();
+            if(sendUpdateEvent)
+                assetViewModel.TriggerSkeletonChanged();
         }
 
         public void SetMetaFile(SceneObject sceneObject, PackFile? metaFile, PackFile? persistantFile)
@@ -179,33 +188,28 @@ namespace Editors.Shared.Core.Common
             sceneObject.TriggerMetaDataChanged();
         }
 
-        public void SetAnimation(SceneObject assetViewModel, AnimationReference? animationReference)
+        public void SetAnimation(SceneObject assetViewModel, string animationFileName)
         {
-            if (animationReference != null)
+            if (animationFileName == null)
             {
-                var file = _packFileService.FindFile(animationReference.AnimationFile, animationReference.Container);
-                assetViewModel.AnimationName.Value = animationReference;
-                var animation = AnimationFile.Create(file);
-                SetAnimationClip(assetViewModel, new AnimationClip(animation, assetViewModel.Skeleton), animationReference);
+                SetAnimationClip(assetViewModel, null, "");
+                return;
             }
-            else
-            {
-                SetAnimationClip(assetViewModel, null, null);
-            }
+            
+            var file = _packFileService.FindFile(animationFileName);
+            var animation = AnimationFile.Create(file);
+            var animationClip = new AnimationClip(animation, assetViewModel.Skeleton);
+            SetAnimationClip(assetViewModel, animationClip, animationFileName);
         }
 
-        public void SetAnimationClip(SceneObject assetViewModel, AnimationClip clip, AnimationReference animationReference)
+        public void SetAnimationClip(SceneObject assetViewModel, AnimationClip? clip, string animationName)
         {
-            if (assetViewModel.AnimationClip == null && clip == null && animationReference == null)
-                return;
             var frame = assetViewModel.Player.CurrentFrame;
             assetViewModel.AnimationClip = clip;
-            assetViewModel.AnimationName.Value = animationReference;
+            assetViewModel.AnimationName.Value = animationName;
             assetViewModel.Player.SetAnimation(assetViewModel.AnimationClip, assetViewModel.Skeleton);
             assetViewModel.TriggerAnimationChanged();
             assetViewModel.Player.CurrentFrame = frame;
         }
-
-
     }
 }
