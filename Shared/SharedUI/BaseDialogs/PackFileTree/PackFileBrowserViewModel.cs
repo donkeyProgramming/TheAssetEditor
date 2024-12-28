@@ -70,8 +70,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
-
-
         partial void OnSelectedItemChanged(TreeNode value)
         {
             ContextMenu = _contextMenuBuilder.Build(value);
@@ -125,6 +123,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 var rootNode = GetPackFileCollectionRootNode(e.Container);
                 rootNode.UnsavedChanged = true;
                 var node = GetNodeFromPackFile(e.Container, file);
+                if (node == null)
+                    continue;
                 node.Name = file.Name;
                 node.UnsavedChanged = true;
 
@@ -185,6 +185,8 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 var directoryEnd = fullPath.LastIndexOf(Path.DirectorySeparatorChar);
                 var fileName = fullPath.Substring(directoryEnd + 1);
 
+                // Check if alreayd added - this happens moving files.
+
                 TreeNode newNode;
                 if (numSeperators == 0)
                 {
@@ -215,6 +217,31 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                     parent = parent.Parent;
                 }
             }
+        }
+
+        public TreeNode? GetFromPath(TreeNode parent, string path)
+        {
+            var numSeperators = path.Count(x => x == Path.DirectorySeparatorChar);
+            if (path.Length == 0)
+                return parent;
+
+            var nodeName = path;
+            var remainingStr = "";
+
+            if (numSeperators != 0)
+            {
+                var currentIndex = path.IndexOf(Path.DirectorySeparatorChar, 0);
+                nodeName = path.Substring(0, currentIndex);
+                remainingStr = path.Substring(currentIndex + 1);
+            }
+
+            foreach (var child in parent.Children)
+            {
+                if (child.Name == nodeName)
+                    return GetFromPath(child, remainingStr);
+            }
+
+            return null;
         }
 
         private static TreeNode? GetNodeFromPath(TreeNode parent, PackFileContainer container, string path, bool createIfMissing = true)
@@ -385,13 +412,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 return false;
 
             _packFileService.MoveFile(container, draggedFile, dropPath);
-
-            node.Parent.Children.Remove(node);
-            targeNode.Children.Add(node);
-            node.Parent = targeNode;
-
-            var root = GetPackFileCollectionRootNode(container);
-            root.UnsavedChanged = true;
 
             return true;
         }

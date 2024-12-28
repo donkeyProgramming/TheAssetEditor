@@ -92,7 +92,7 @@ namespace Editors.KitbasherEditor.Services
 
         SceneNode? LoadModel(PackFile file, bool onlyLoadRootNode)
         {
-            var loadedNode = _complexMeshLoader.Load(file, _kitbasherRootScene.Player, onlyLoadRootNode);
+            var loadedNode = _complexMeshLoader.Load(file, _kitbasherRootScene.Player, onlyLoadRootNode, false);
             if (loadedNode == null)
             {
                 _logger.Here().Error("Unable to load model");

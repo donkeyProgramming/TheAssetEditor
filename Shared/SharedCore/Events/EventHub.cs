@@ -136,8 +136,7 @@ namespace Shared.Core.Events
         public void Dispose()
         {
             _isDisposed = true;
-            _callbackList.Clear();
-            _callbackList = null;
+            _callbackList?.Clear();
         }
     }
 }

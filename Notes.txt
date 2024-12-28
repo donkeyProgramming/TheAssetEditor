@@ -11,6 +11,7 @@ Remember:
 	Superview - default scene content to be expanded. Allow select meshes
 	Change renderingcomponent to be added manually in the retarget tool. 
 	Move Editors.Shared.Core into shared? Maybe under UI?
+	Print scope - special handling for eventhub. Include registred callbacks 
 
 
 Bug: System.Windows.ResourceReferenceKeyNotFoundException: DefaultTreeNodeStyle resource not found
@@ -123,6 +124,8 @@ Fixes for v057:
 							Wem files are also alway loaded for mods, which fixes an issue where if the flag was disabled,
 							the audio files would be deleted from the mod on saving. No there should be no issues. 
 	
+	[Bug]	SuperView:		Fixed crash on close 
+	[Bug]		General:	Moving files using drag and drop caused crash
 	[Bug] 		General:	Fixed some issues related to saving packfiles after deleting files and folders
 	[Bug] KitbashEditor:	Fixed errors related to selecting meshes. 
 							Logging added to get more data. 

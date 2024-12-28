@@ -57,11 +57,17 @@ namespace Editors.Shared.Core.Common
             return _mainScene.AddComponent(instance);
         }
 
+        // Set mesh
+        // Set animation
+        // Set skeleton
+        // Set metadata
+        record SceneObjectUpdate();
+
         public void SetMesh(SceneObject sceneObject, PackFile file, bool updateSkeleton = true)
         {
             _logger.Here().Information($"Loading reference model - {_packFileService.GetFullPath(file)}");
 
-            var loadedNode = _complexMeshLoader.Load(file, sceneObject.Player, false);// TODO: Could last arg be true? WOuld be better
+            var loadedNode = _complexMeshLoader.Load(file, sceneObject.Player, true, true);
             if (loadedNode == null)
             {
                 _logger.Here().Error("Unable to load model");

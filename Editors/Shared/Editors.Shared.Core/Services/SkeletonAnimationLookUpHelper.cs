@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using Serilog;
-using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
 using Shared.Core.Events.Global;
@@ -210,7 +209,6 @@ namespace Editors.Shared.Core.Services
             }
         }
 
-
         public ObservableCollection<AnimationReference> GetAnimationsForSkeleton(string skeletonName)
         {
             if (_skeletonNameToAnimationMap.ContainsKey(skeletonName) == false)
@@ -277,7 +275,6 @@ namespace Editors.Shared.Core.Services
 
 
         // Delete this piece of shit
-
         public class AnimationReference
         {
             public AnimationReference(string animationFile, PackFileContainer container)

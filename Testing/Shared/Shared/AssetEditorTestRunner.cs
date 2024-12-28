@@ -18,7 +18,7 @@ namespace Test.TestingUtility.Shared
     {
         private readonly IServiceProvider _serviceProvider;
 
-        public IServiceProvider EditorServiceProvider => _serviceProvider;
+        public IServiceProvider ServiceProvider => _serviceProvider;
         public IPackFileService PackFileService { get; private set; }
         public IUiCommandFactory CommandFactory { get; private set; }
         public IScopeRepository ScopeRepository { get; private set; }
@@ -29,29 +29,38 @@ namespace Test.TestingUtility.Shared
         {
             _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes, MockServices);
   
-            var settings = EditorServiceProvider.GetRequiredService<ApplicationSettingsService>();
+            var settings = ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             settings.CurrentSettings.CurrentGame = gameEnum;
 
-            var game = EditorServiceProvider.GetRequiredService<IWpfGame>();
-            var resourceLibrary = EditorServiceProvider.GetRequiredService<ResourceLibrary>();
+            var game = ServiceProvider.GetRequiredService<IWpfGame>();
+            var resourceLibrary = ServiceProvider.GetRequiredService<ResourceLibrary>();
             resourceLibrary.Initialize(game.GraphicsDevice, game.Content);
 
-            PackFileService = EditorServiceProvider.GetRequiredService<IPackFileService>();
-            CommandFactory = EditorServiceProvider.GetRequiredService<IUiCommandFactory>();
-            ScopeRepository = EditorServiceProvider.GetRequiredService<IScopeRepository>() ;
-            //(ScopeRepository as ScopeRepository).Root = EditorServiceProvider;
+            PackFileService = ServiceProvider.GetRequiredService<IPackFileService>();
+            CommandFactory = ServiceProvider.GetRequiredService<IUiCommandFactory>();
+            ScopeRepository = ServiceProvider.GetRequiredService<IScopeRepository>() ;
         }
 
         public PackFileContainer? LoadPackFile(string path, bool createOutputPackFile = true)
         {
-            var loader = EditorServiceProvider.GetRequiredService<IPackFileContainerLoader>();
+            var loader = ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
             var container = loader.Load(path);
-            container.IsCaPackFile = true;
             PackFileService.AddContainer(container);
 
             if (createOutputPackFile)
                 return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
             return null;
+        }
+
+        public PackFileContainer? CreateCaContainer()
+        {
+            var caConainter = new PackFileContainer("CA")
+            {
+                IsCaPackFile = true,
+                SystemFilePath = @"c:\files\game\ca.pack"
+            };
+            PackFileService.AddContainer(caConainter, false);
+            return caConainter;
         }
 
         public T GetRequiredService<T>()
@@ -60,17 +69,18 @@ namespace Test.TestingUtility.Shared
             return ScopeRepository.GetRequiredService<T>(handle);
         }
 
-
-        public PackFileContainer? LoadFolderPackFile(string path, bool createOutputPackFile = true)
+        public PackFileContainer LoadFolderPackFile(string path)
         {
-            var loader = EditorServiceProvider.GetRequiredService<IPackFileContainerLoader>();
+            var loader = ServiceProvider.GetRequiredService<IPackFileContainerLoader>();
             var container = loader.LoadSystemFolderAsPackFileContainer(path);
-            container.IsCaPackFile = true;
-            PackFileService.AddContainer(container);
 
-            if (createOutputPackFile)
-                return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
-            return null;
+            PackFileService.AddContainer(container);
+            return container;
+        }
+
+        public PackFileContainer CreateOutputPack()
+        {
+            return PackFileService.CreateNewPackFileContainer("TestOutput", PackFileCAType.MOD, true);
         }
 
 

@@ -8,14 +8,12 @@ namespace Editors.AnimatioReTarget.Editor
 {
     public class AnimationRemapperService_new
     {
-        // List<IndexRemapping> _remappingInformaton;
         private readonly IEnumerable<SkeletonBoneNode_new> _bones;
         private readonly AnimationGenerationSettings _settings;
 
         public AnimationRemapperService_new(AnimationGenerationSettings settings, IEnumerable<SkeletonBoneNode_new> bones)
         {
             _settings = settings;
-            // _remappingInformaton = mapping;
             _bones = bones;
         }
 

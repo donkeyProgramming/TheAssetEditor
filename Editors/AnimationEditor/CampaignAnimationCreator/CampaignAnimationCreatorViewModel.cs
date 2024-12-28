@@ -70,29 +70,29 @@ namespace AnimationEditor.CampaignAnimationCreator
 
         public void Convert()
         {
-            if (_selectedAnimationClip == null)
-            {
-                MessageBox.Show("No animation selected");
-                return;
-            }
-
-            if (ModelBoneList.SelectedItem == null)
-            {
-                MessageBox.Show("No root bone selected");
-                return;
-            }
-
-            var newAnimation = _selectedAnimationClip.Clone();
-            for (var frameIndex = 0; frameIndex < newAnimation.DynamicFrames.Count; frameIndex++)
-            {
-                var frame = newAnimation.DynamicFrames[frameIndex];
-                frame.Position[ModelBoneList.SelectedItem.BoneIndex] = Vector3.Zero;
-                frame.Rotation[ModelBoneList.SelectedItem.BoneIndex] = Quaternion.Identity;
-            }
-
-            _selectedUnit.AnimationChanged -= AnimationChanged;
-            _assetViewModelEditor.SetAnimationClip(_selectedUnit, newAnimation, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
-            _selectedUnit.AnimationChanged += AnimationChanged;
+           //if (_selectedAnimationClip == null)
+           //{
+           //    MessageBox.Show("No animation selected");
+           //    return;
+           //}
+           //
+           //if (ModelBoneList.SelectedItem == null)
+           //{
+           //    MessageBox.Show("No root bone selected");
+           //    return;
+           //}
+           //
+           //var newAnimation = _selectedAnimationClip.Clone();
+           //for (var frameIndex = 0; frameIndex < newAnimation.DynamicFrames.Count; frameIndex++)
+           //{
+           //    var frame = newAnimation.DynamicFrames[frameIndex];
+           //    frame.Position[ModelBoneList.SelectedItem.BoneIndex] = Vector3.Zero;
+           //    frame.Rotation[ModelBoneList.SelectedItem.BoneIndex] = Quaternion.Identity;
+           //}
+           //
+           //_selectedUnit.AnimationChanged -= AnimationChanged;
+           //_assetViewModelEditor.SetAnimationClip(_selectedUnit, newAnimation, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+           //_selectedUnit.AnimationChanged += AnimationChanged;
         }
 
         private void AnimationChanged(AnimationClip newValue)

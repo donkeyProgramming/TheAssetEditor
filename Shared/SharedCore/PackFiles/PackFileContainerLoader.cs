@@ -36,7 +36,11 @@ namespace Shared.Core.PackFiles
                 throw new Exception($"Unable to find folder {packFileSystemPath}. Curret systempath is {loactionDir}");
             }
 
-            var container = new PackFileContainer(packFileSystemPath);
+            var containerName = Path.GetFileName(packFileSystemPath);
+            var container = new PackFileContainer(containerName)
+            {
+                SystemFilePath = packFileSystemPath,
+            };
             AddFolderContentToPackFile(container, packFileSystemPath, packFileSystemPath.ToLower() + "\\");
             return container;
         }

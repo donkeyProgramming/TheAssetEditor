@@ -264,18 +264,18 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
 
         private void TryReGenerateAnimation(AnimationClip newValue = null)
         {
-            if (_newAnimation != null)
-                _sceneObjectBuilder.SetAnimation(_newAnimation, null);
-
-            if (newValue != null)
-            {
-                _originalClip = newValue.Clone();
-                FramesDurationInSeconds = _originalClip.PlayTimeInSec.ToString();
-                SetFrameLengthMax();
-            }
-
-            IsDirty.Value = false;
-            _interpolateBetweenPose.Reset();
+           // if (_newAnimation != null)
+           //     _sceneObjectBuilder.SetAnimation(_newAnimation, null);
+           //
+           // if (newValue != null)
+           // {
+           //     _originalClip = newValue.Clone();
+           //     FramesDurationInSeconds = _originalClip.PlayTimeInSec.ToString();
+           //     SetFrameLengthMax();
+           // }
+           //
+           // IsDirty.Value = false;
+           // _interpolateBetweenPose.Reset();
         }
 
         private void RiderSkeletonChanges(GameSkeleton newValue)

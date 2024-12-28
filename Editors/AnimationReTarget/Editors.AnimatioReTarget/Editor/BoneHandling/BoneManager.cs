@@ -37,10 +37,29 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
         }
 
+        partial void OnSelectedBoneChanged(SkeletonBoneNode_new? value)
+        {
+            if (_skeletonBoneHighlighter == null)
+                return;
+                
+            if(value == null)
+            {
+                _skeletonBoneHighlighter.SelectSourceSkeletonBone(-1);
+                _skeletonBoneHighlighter.SelectTargetSkeletonBone(-1);
+            }
+            else
+            {
+                _skeletonBoneHighlighter.SelectSourceSkeletonBone(value.BoneIndex);
+                if(value.HasMapping)
+                    _skeletonBoneHighlighter.SelectTargetSkeletonBone(value.MappedIndex);
+                else
+                    _skeletonBoneHighlighter.SelectTargetSkeletonBone(-1);
+            }
+        }
 
         public void SetSceneNodes(SceneObject source, SceneObject target, SceneObject generated)
         {
-            _skeletonBoneHighlighter = new SkeletonBoneHighlighter(source, target);
+            _skeletonBoneHighlighter = new SkeletonBoneHighlighter(source, generated);
         }
 
         public void UpdateTargetSkeleton(string? skeletonName) 
@@ -88,30 +107,7 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
             }
             SelectedBone = Bones.FirstOrDefault();
             _activeConfig = null;
-
-            //HightlightSelectedBones(null);
         }
-
-        /*
-        void HightlightSelectedBones(SkeletonBoneNode bone)
-        {
-            if (bone == null)
-            {
-                Generated.SelectedBoneIndex(-1);
-                _copyFrom.SelectedBoneIndex(-1);
-            }
-            else
-            {
-                Generated.SelectedBoneIndex(bone.BoneIndex.Value);
-                if (_remappingInformation != null)
-                {
-                    var mapping = _remappingInformation.FirstOrDefault(x => x.OriginalValue == bone.BoneIndex.Value);
-                    if (mapping != null)
-                        _copyFrom.SelectedBoneIndex(mapping.NewValue);
-                }
-            }
-        }*/
-
 
         [RelayCommand] void ShowBoneMappingWindow()
         {

@@ -31,7 +31,7 @@
                 <MenuItem Header="Save shortcut file" />
             </MenuItem>
             <MenuItem Header="Camera">
-                <MenuItem Header="Focus Selection" Command="{Binding FocusCamerasCommand}"/>
+                <MenuItem Header="Focus Selection" Command="{Binding FocusCameraCommand}"/>
                 <MenuItem Header="Reset" Command="{Binding ResetCameraCommand}"/>
             </MenuItem>
         </Menu>

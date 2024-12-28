@@ -59,7 +59,7 @@ namespace Editors.AnimatioReTarget.Editor
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _player = player;
 
-            editorHostParameters.GameWorld.AddComponent(renderingComponent);
+            GameWorld.AddComponent(renderingComponent);
 
             Initialize();
         }
@@ -89,10 +89,8 @@ namespace Editors.AnimatioReTarget.Editor
             sourceView.Data.IsSelectable = false;
             sourceView.IsExpand = false;
             sourceView.IsEnabled = false;
-            //sourceView.
-
-
-            var generated = sourceView.Data;// _assetViewModelBuilder.CreateAsset("", Color.Black);
+  
+            var generated = sourceView.Data;
 
             source.Data.IsSelectable = false;
 
@@ -106,7 +104,6 @@ namespace Editors.AnimatioReTarget.Editor
             BoneManager.SetSceneNodes(source.Data, target.Data, generated);
             _rendering.SetSceneNodes(source.Data, target.Data, generated);
         }
-
 
         void Create(SceneObject copyToAsset, SceneObject copyFromAsset, SceneObject generated)
         {
@@ -126,14 +123,13 @@ namespace Editors.AnimatioReTarget.Editor
             BoneManager.UpdateSourceSkeleton(_copyFrom.Skeleton.SkeletonName);
             BoneManager.UpdateTargetSkeleton(_copyTo.Skeleton.SkeletonName);
         }
-
         
         [RelayCommand]public void UpdateAnimation()
         {
             if (CanUpdateAnimation(true))
             {
                 var newAnimationClip = UpdateAnimation(_copyFrom.AnimationClip, _copyTo.AnimationClip);
-                _sceneObjectEditor.SetAnimationClip(_generated, newAnimationClip, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+                _sceneObjectEditor.SetAnimationClip(_generated, newAnimationClip, null);
                 _player.SelectedMainAnimation = _player.PlayerItems.First(x => x.Asset == _generated);
             }
         }
@@ -166,7 +162,6 @@ namespace Editors.AnimatioReTarget.Editor
         private void CopyToMeshChanged(SceneObject newValue)
         {
             _sceneObjectEditor.CopyMeshFromOther(_generated, newValue);
-
         }
 
         private void CopyFromSkeletonChanged(GameSkeleton newValue)
@@ -174,14 +169,9 @@ namespace Editors.AnimatioReTarget.Editor
             if (newValue == _copyFrom.Skeleton)
                 return;
 
-           // _remappingInformation = null;
-         //   CreateBoneOverview(_copyTo.Skeleton);
-           // HightlightSelectedBones(null);
-
             var standAnim = _skeletonAnimationLookUpHelper.GetAnimationsForSkeleton(newValue.SkeletonName).FirstOrDefault(x => x.AnimationFile.Contains("stand"));
             if (standAnim != null)
                 _sceneObjectEditor.SetAnimation(_copyFrom, standAnim);
-
         }
     }
 }

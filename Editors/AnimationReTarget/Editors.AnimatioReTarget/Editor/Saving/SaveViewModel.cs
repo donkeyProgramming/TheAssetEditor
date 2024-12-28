@@ -1,16 +1,24 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.AnimatioReTarget.Editor.BoneHandling;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Animation;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
+using Shared.GameFormats.Animation;
 
 namespace Editors.AnimatioReTarget.Editor.Saving
 {
+
+
     public partial class SaveViewModel : ObservableObject
     {
         //private readonly ILogger _logger = Logging.Create<SaveViewModel>();
 
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IPackFileService _pfs;
+
+        [ObservableProperty] SaveSettings _settings = new SaveSettings();
+
 
         //private SceneObject _copyTo;
         //private SceneObject _copyFrom;
@@ -27,6 +35,36 @@ namespace Editors.AnimatioReTarget.Editor.Saving
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _pfs = pfs;
         }
+
+
+        void SaveAnimation(AnimationClip clip, string animationName, bool prompOnOverride = true)
+        {
+           // var animFile = clip.ConvertToFileFormat(_copyTo.Skeleton);
+           // if (AnimationSettings.UseScaledSkeletonName.Value)
+           //     animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
+           //
+           // if (AnimationSettings.AnimationOutputFormat.Value != 7)
+           // {
+           //     var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animFile.Header.SkeletonName);
+           //     animFile.ConvertToVersion(AnimationSettings.AnimationOutputFormat.Value, skeleton, _pfs);
+           // }
+           //
+           // if (AnimationSettings.UseScaledSkeletonName.Value)
+           //     animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
+           //
+           // var orgSkeleton = _copyFrom.Skeleton.SkeletonName;
+           // var newSkeleton = _copyTo.Skeleton.SkeletonName;
+           // var newPath = animationName.Replace(orgSkeleton, newSkeleton);
+           // var currentFileName = Path.GetFileName(newPath);
+           // newPath = newPath.Replace(currentFileName, AnimationSettings.SavePrefix.Value + currentFileName);
+           // newPath = SaveUtility.EnsureEnding(newPath, ".anim");
+           //
+           // _packFileSaveService.Save(newPath, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
+        }
+
+
+
+
         /*
         public void OpenBatchProcessDialog()
         {
@@ -126,41 +164,10 @@ namespace Editors.AnimatioReTarget.Editor.Saving
             SaveAnimation(Generated.AnimationClip, _copyFrom.AnimationName.Value.AnimationFile);
         }
 
-        void SaveAnimation(AnimationClip clip, string animationName, bool prompOnOverride = true)
-        {
-            var animFile = clip.ConvertToFileFormat(_copyTo.Skeleton);
-            if (AnimationSettings.UseScaledSkeletonName.Value)
-                animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
 
-            if (AnimationSettings.AnimationOutputFormat.Value != 7)
-            {
-                var skeleton = _skeletonAnimationLookUpHelper.GetSkeletonFileFromName(animFile.Header.SkeletonName);
-                animFile.ConvertToVersion(AnimationSettings.AnimationOutputFormat.Value, skeleton, _pfs);
-            }
-
-            if (AnimationSettings.UseScaledSkeletonName.Value)
-                animFile.Header.SkeletonName = AnimationSettings.ScaledSkeletonName.Value;
-
-            var orgSkeleton = _copyFrom.Skeleton.SkeletonName;
-            var newSkeleton = _copyTo.Skeleton.SkeletonName;
-            var newPath = animationName.Replace(orgSkeleton, newSkeleton);
-            var currentFileName = Path.GetFileName(newPath);
-            newPath = newPath.Replace(currentFileName, AnimationSettings.SavePrefix.Value + currentFileName);
-            newPath = SaveUtility.EnsureEnding(newPath, ".anim");
-
-            _packFileSaveService.Save(newPath, AnimationFile.ConvertToBytes(animFile), prompOnOverride);
-        }*/
-
+        */
 
     }
 
-    public partial class SaveSettings : ObservableObject
-    {
-        public List<uint> PossibleAnimationFormats = [5, 6, 7];
 
-        [ObservableProperty] string _savePrefix = "prefix_";
-        [ObservableProperty] uint _animationFormat = 7;
-        [ObservableProperty] bool _useGeneratedSkeleton = false;
-        [ObservableProperty] string _scaledSkeletonName = "";
-    }
 }

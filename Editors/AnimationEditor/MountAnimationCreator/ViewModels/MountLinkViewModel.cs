@@ -116,35 +116,35 @@ namespace AnimationEditor.MountAnimationCreator.ViewModels
 
         private void MountTagSeleted(AnimationBinEntryGenericFormat value)
         {
-            if (value != null)
-            {
-                var file = _pfs.FindFile(value.AnimationFile);
-                var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
-                _assetViewModelEditor.SetAnimation(_mount, animationRef);
-
-                var lookUp = "RIDER_" + value.SlotName;
-                SelectedRiderTag.Filter = "";
-                SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.SlotName == lookUp);
-            }
-            _validateAction();
+           //if (value != null)
+           //{
+           //    var file = _pfs.FindFile(value.AnimationFile);
+           //    var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
+           //    _assetViewModelEditor.SetAnimation(_mount, animationRef);
+           //
+           //    var lookUp = "RIDER_" + value.SlotName;
+           //    SelectedRiderTag.Filter = "";
+           //    SelectedRiderTag.SelectedItem = SelectedRiderTag.Values.FirstOrDefault(x => x.SlotName == lookUp);
+           //}
+           //_validateAction();
         }
 
         private void RiderTagSelected(AnimationBinEntryGenericFormat value)
         {
-            if (value != null)
-            {
-                var file = _pfs.FindFile(value.AnimationFile);
-                if (file == null)
-                {
-                    _assetViewModelEditor.SetAnimation(_rider, null);
-                }
-                else
-                {
-                    var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
-                    _assetViewModelEditor.SetAnimation(_rider, animationRef);
-                }
-            }
-            _validateAction();
+          // if (value != null)
+          // {
+          //     var file = _pfs.FindFile(value.AnimationFile);
+          //     if (file == null)
+          //     {
+          //         _assetViewModelEditor.SetAnimation(_rider, null);
+          //     }
+          //     else
+          //     {
+          //         var animationRef = _skeletonAnimationLookUpHelper.FindAnimationRefFromPackFile(file);
+          //         _assetViewModelEditor.SetAnimation(_rider, animationRef);
+          //     }
+          // }
+          // _validateAction();
         }
     }
 }

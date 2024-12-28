@@ -1,6 +1,5 @@
 ﻿using Editor.VisualSkeletonEditor.SkeletonEditor;
 using Editors.Shared.Core.Common.ReferenceModel;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
@@ -24,6 +23,7 @@ namespace Test.SkeletonEditor
         public void IntegrationTest_0()
         {
             var runner = new AssetEditorTestRunner();
+            runner.CreateCaContainer();
             var outputPackFile = runner.LoadPackFile(_inputPackFileKarl, true);
 
             // Load the a rmv2 and open the kitbash editor

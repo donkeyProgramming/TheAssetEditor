@@ -26,9 +26,6 @@ namespace Editors.Shared.Core.Common.BaseControl
         [ObservableProperty] ObservableCollection<SceneObjectViewModel> _sceneObjects = new();
         [ObservableProperty] AnimationPlayerViewModel _player;
 
-        [ObservableProperty] ICommand _resetCameraCommand;
-        [ObservableProperty] ICommand _focusCamerasCommand;
-
         public EditorHostBase(IEditorHostParameters inputParams)
         {
             GameWorld = inputParams.GameWorld;
@@ -38,16 +35,11 @@ namespace Editors.Shared.Core.Common.BaseControl
             _sceneObjectViewModelBuilder = inputParams.SceneObjectViewModelBuilder;
             _sceneObjectEditor = inputParams.SceneObjectEditor;
 
-            ResetCameraCommand = new RelayCommand(ResetCameraAction);
-            FocusCamerasCommand = new RelayCommand(FocusCameraAction);
-
             inputParams.ComponentInserter.Execute();
         }
 
-
-
-        void ResetCameraAction() => _focusSelectableObjectService.ResetCamera();
-        void FocusCameraAction() => _focusSelectableObjectService.FocusSelection();
+        [RelayCommand] void ResetCamera() => _focusSelectableObjectService.ResetCamera();
+        [RelayCommand] void FocusCamera() => _focusSelectableObjectService.FocusSelection();
 
         public virtual void Close()
         {

@@ -96,7 +96,7 @@ namespace Editors.AnimationMeta.SuperView
         public override void Close()
         {
             _asset.Data.MetaDataChanged -= UpdateMetaDataInfoFromAsset;
-            _eventHub.UnRegister(this);
+            _eventHub?.UnRegister(this);
             base.Close();
         }
     }

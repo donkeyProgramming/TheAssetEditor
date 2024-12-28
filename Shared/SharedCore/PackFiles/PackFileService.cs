@@ -208,12 +208,14 @@ namespace Shared.Core.PackFiles
             var newFullPath = newFolderPath + "\\" + file.Name;
 
             var key = pf.FileList.FirstOrDefault(x => x.Value == file).Key;
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesRemovedEvent(pf, [file]));
+
             pf.FileList.Remove(key);
             pf.FileList[newFullPath] = file;
 
             _logger.Here().Information($"Moving file {key}");
 
-            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesUpdatedEvent(pf, [file]));
+            _globalEventHub?.PublishGlobalEvent(new PackFileContainerFilesAddedEvent(pf, [file]));
         }
 
         public void RenameDirectory(PackFileContainer pf, string currentNodeName, string newName)

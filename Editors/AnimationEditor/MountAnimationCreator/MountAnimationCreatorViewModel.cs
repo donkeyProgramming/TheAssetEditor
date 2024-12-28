@@ -148,14 +148,14 @@ namespace AnimationEditor.MountAnimationCreator
 
         private void TryReGenerateAnimation(AnimationClip newValue = null)
         {
-            UpdateCanSaveAndPreviewStates();
-            if (CanPreview.Value)
-                CreateMountAnimationAction();
-            else
-            {
-                if (_newAnimation != null)
-                    _sceneObjectBuilder.SetAnimation(_newAnimation, null);
-            }
+           // UpdateCanSaveAndPreviewStates();
+           // if (CanPreview.Value)
+           //     CreateMountAnimationAction();
+           // else
+           // {
+           //     if (_newAnimation != null)
+           //         _sceneObjectBuilder.SetAnimation(_newAnimation, null);
+           // }
         }
 
         private void MountSkeletonChanged(GameSkeleton newValue)
@@ -231,14 +231,14 @@ namespace AnimationEditor.MountAnimationCreator
 
         public void CreateMountAnimationAction()
         {
-            var newRiderAnim = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
-
-            // Apply
-            _sceneObjectBuilder.CopyMeshFromOther(_newAnimation, _rider);
-            _sceneObjectBuilder.SetAnimationClip(_newAnimation, newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
-            _newAnimation.ShowSkeleton.Value = DisplayGeneratedSkeleton.Value;
-            _newAnimation.ShowMesh.Value = DisplayGeneratedMesh.Value;
-            UpdateCanSaveAndPreviewStates();
+           //var newRiderAnim = CreateAnimationGenerator().GenerateMountAnimation(_mount.AnimationClip, _rider.AnimationClip);
+           //
+           //// Apply
+           //_sceneObjectBuilder.CopyMeshFromOther(_newAnimation, _rider);
+           //_sceneObjectBuilder.SetAnimationClip(_newAnimation, newRiderAnim, new SkeletonAnimationLookUpHelper.AnimationReference("Generated animation", null));
+           //_newAnimation.ShowSkeleton.Value = DisplayGeneratedSkeleton.Value;
+           //_newAnimation.ShowMesh.Value = DisplayGeneratedMesh.Value;
+           //UpdateCanSaveAndPreviewStates();
         }
 
         MountAnimationGeneratorService CreateAnimationGenerator()
