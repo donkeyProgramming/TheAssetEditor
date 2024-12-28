@@ -1,15 +1,14 @@
 Remember:
+	Create ogre test 
 	Rename to Animation Retarget - own project 
-	Check with bb, the diabled buttons /warbeast 
 	Damping and root node handling 
 	Unit tests! 
+	use events 
 	make everything selectable
 	Rendering window - disbale backface culling 
-	Complex mesh loader - fast loading! 
 	"How to use" window - point to github?
 	Create a "save project" button?
 	Superview - default scene content to be expanded. Allow select meshes
-	Change renderingcomponent to be added manually in the retarget tool. 
 	Move Editors.Shared.Core into shared? Maybe under UI?
 	Print scope - special handling for eventhub. Include registred callbacks 
 
@@ -19,13 +18,13 @@ Bug: System.Windows.ResourceReferenceKeyNotFoundException: DefaultTreeNodeStyle 
 	https://github.com/stevemonaco/ImageMagitek/blob/wpf/TileShop.WPF/ViewExtenders/Selectors/ProjectTreeTemplateSelector.cs
 	https://github.com/stevemonaco/ImageMagitek/blob/wpf/TileShop.WPF/Features/Project/ProjectTreeView.xaml#L31-L45
 	
-Bug: Open kitbash editor. Move files around, tree view crash in Database_PackFilesUpdated
+
 Bug: Opening the same file in two different editors cause Attempting to open file 'sengko_linchin.wsmodel', but is is already open. Give better error
 Bug: Wrong text in lod view for kitbash https://github.com/donkeyProgramming/TheAssetEditor/issues/230
-bug: Closing superview https://github.com/donkeyProgramming/TheAssetEditor/issues/231
+
 Bug: Rendering issue, causes softlock https://github.com/donkeyProgramming/TheAssetEditor/issues/232
 Bug: Try to detect mismatch between wsmodel and rmv model, difference in lods/meshes count 
-Bug: Complex mesh loader - only load lod/model 1 for superview+++
+
 
 Fixes for v056
 	General: Move resent files out of settings
@@ -118,13 +117,15 @@ New features:
 	
 	
 Fixes for v057:
+	[Feature]	AnimationReTarget: The tool is enabled again - probably pretty buggy in its first iterations. Improvements will come. 
 	[Feature] 	General: 	Added 'Save Active pack' button to file menu https://github.com/donkeyProgramming/TheAssetEditor/issues/123
 	[Feature] 	General: 	Improvements to "Load Wem Files" option. This option now only effects if the files are visible in the pack browser
 							Wem files are now always loaded which makes the audio tools work better. 
 							Wem files are also alway loaded for mods, which fixes an issue where if the flag was disabled,
 							the audio files would be deleted from the mod on saving. No there should be no issues. 
 	
-	[Bug]	SuperView:		Fixed crash on close 
+	[Bug]	Superview:		When loading models, all lods was visible. Now only first lod is visible. 
+	[Bug]	SuperView:		Fixed crash on close https://github.com/donkeyProgramming/TheAssetEditor/issues/231
 	[Bug]		General:	Moving files using drag and drop caused crash
 	[Bug] 		General:	Fixed some issues related to saving packfiles after deleting files and folders
 	[Bug] KitbashEditor:	Fixed errors related to selecting meshes. 

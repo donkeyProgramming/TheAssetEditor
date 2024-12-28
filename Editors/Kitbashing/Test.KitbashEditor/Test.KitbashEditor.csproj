@@ -16,6 +16,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\AssetEditor\AssetEditor.csproj" />
+    <ProjectReference Include="..\..\..\Testing\Shared\Test.TestingUtility.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="NUnit.Framework" />
   </ItemGroup>
 

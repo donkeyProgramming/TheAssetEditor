@@ -8,7 +8,7 @@ using Shared.Ui.Events.UiCommands;
 using Test.TestingUtility.Shared;
 using Test.TestingUtility.TestUtility;
 
-namespace E2EVerification
+namespace Test.KitbashEditor
 {
     public class KitbashEditor_SaveTests
     {
@@ -139,11 +139,11 @@ namespace E2EVerification
             Assert.That(outputPackFile!.FileList.Count, Is.EqualTo(1));
 
             // Verify the generated RMV2 file
-            VertexFormat[][] expectedVertexType = [ [VertexFormat.Weighted],[VertexFormat.Weighted],[VertexFormat.Weighted],[VertexFormat.Weighted]];
-            bool[][] alpha = [ [true],[true], [false], [false]];
+            VertexFormat[][] expectedVertexType = [[VertexFormat.Weighted], [VertexFormat.Weighted], [VertexFormat.Weighted], [VertexFormat.Weighted]];
+            bool[][] alpha = [[true], [true], [false], [false]];
 
             var rmv2File = runner.PackFileService.FindFile(meshPath, outputPackFile);
-            
+
             var rmv = RmvHelper.AssertFile(rmv2File, RmvVersionEnum.RMV2_V6, 4, "rome_man_game");
             RmvHelper.AssertMaterial(rmv, 4, expectedVertexType, alpha, ModelMaterialEnum.weighted_dirtmap);
         }
