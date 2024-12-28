@@ -109,8 +109,14 @@ namespace KitbasherEditor.Views
                 return;
             }
 
+            var sceneNode = treeViewItem.DataContext as SceneExplorerNode;
+            if (sceneNode == null)
+            {
+                _logger.Here().Error($"MultiSelectTreeView_PreviewMouseRightButtonDown: sceneNode is null.");
+                return;
+            }
 
-            if (treeViewItem.DataContext is SceneExplorerNode sceneNode)
+            if (sceneNode != null)
             {
                 if (sceneNode.IsSelected == false)
                     treeViewItem.Focus();

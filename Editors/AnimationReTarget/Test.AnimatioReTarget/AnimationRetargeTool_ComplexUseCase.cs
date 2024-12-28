@@ -2,6 +2,7 @@
 using Editors.AnimatioReTarget.Editor.BoneHandling;
 using Editors.Shared.Core.Common;
 using GameWorld.Core.SceneNodes;
+using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Shared.Ui.Events.UiCommands;
 using Test.TestingUtility.Shared;
@@ -23,7 +24,6 @@ namespace Test.AnimatioReTarget
             runner.CreateCaContainer();
             var outputPackFile = runner.LoadPackFile(_inputPackFileKarl, true);
 
-
             // Open the tool
             var originalRmv2File = runner.PackFileService.FindFile("animations\\skeletons\\humanoid01.anim");
             var editorInterface = runner.CommandFactory.Create<OpenEditorCommand>().Execute(EditorEnums.AnimationRetarget_Editor);
@@ -36,12 +36,9 @@ namespace Test.AnimatioReTarget
             Step2_TryGeneratingAnimation(runner, editor!);
             Step3_ApplyDefaultMapping(runner, editor!);
             Step4_GenerateAnimation(runner, editor!);
-            Step5_UpdateAnimationSettingsAndGenerateAnimation(runner, editor!);
-            // SaveAnimation(runner, editor!);
+            Step5_UpdateAnimationSettingsAndGenerateAnimation(runner, editor!, outputPackFile);
             // UpdateSouceAndValidate(runner, editor!);
             // UpdateTargetAndValidate(runner, editor!);
-            // Change source - ensure things are reset
-            // Change target - ensure things are reset 
             // Close
         }
 
@@ -111,8 +108,10 @@ namespace Test.AnimatioReTarget
             // Check player
         }
 
-        private void Step5_UpdateAnimationSettingsAndGenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetViewModel editor)
+        private void Step5_UpdateAnimationSettingsAndGenerateAnimation(AssetEditorTestRunner runner, AnimationRetargetViewModel editor, PackFileContainer outputPackFile)
         {
+            Assert.That(outputPackFile.FileList.Count, Is.EqualTo(0));
+
             var bone = SkeletonBoneNodeHelper.GetNodeFromName("skirt_back_0", editor.BoneManager.Bones);
             bone.TranslationOffset.X.Value = 10;
 
@@ -120,6 +119,8 @@ namespace Test.AnimatioReTarget
             editor.SaveManager.SaveAnimation(false);
 
             // Ensure new file is created in pfs
+            Assert.That(outputPackFile.FileList.Count, Is.EqualTo(1));
+            Assert.That(outputPackFile.FileList.First().Key, Is.EqualTo("animations\\battle\\humanoid01e\\2handed_hammer\\stand\\prefix_hu1_2hh_stand_idle_01.anim"));
         }
 
     }
