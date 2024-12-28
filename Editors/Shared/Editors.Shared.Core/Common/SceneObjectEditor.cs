@@ -165,7 +165,9 @@ namespace Editors.Shared.Core.Common
             }
 
             if(sendUpdateEvent)
-                assetViewModel.TriggerSkeletonChanged();
+                _eventHub.Publish(new SceneObjectUpdateEvent(assetViewModel, false, true, true, false));
+
+            assetViewModel.TriggerSkeletonChanged();
         }
 
         public void SetSkeleton(SceneObject assetViewModel, AnimationFile animFile, string skeletonName, bool sendUpdateEvent = true)
@@ -185,6 +187,7 @@ namespace Editors.Shared.Core.Common
         {
             sceneObject.MetaData = metaFile;
             sceneObject.PersistMetaData = persistantFile;
+            _eventHub.Publish(new SceneObjectUpdateEvent(sceneObject, false, false, false, true));
             sceneObject.TriggerMetaDataChanged();
         }
 

@@ -30,6 +30,9 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
             foreach (var boneNode in skeletonNodes)
             {
                 var mapping = GetNodeFromId(boneNode.BoneIndex, mappingConfiguration.MeshBones);
+                if (mapping == null)
+                    continue;
+
                 var mappedValue = mapping.MappedBoneIndex.Value;
 
                 boneNode.MappedIndex = mappedValue;

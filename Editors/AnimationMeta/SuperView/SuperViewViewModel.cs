@@ -44,6 +44,7 @@ namespace Editors.AnimationMeta.SuperView
 
             Initialize();
             eventHub.Register<ScopedFileSavedEvent>(this, OnFileSaved);
+            eventHub.Register<SceneObjectUpdateEvent>(this, OnSceneObjectUpdated);
         }
 
         private void OnFileSaved(ScopedFileSavedEvent evnt)
@@ -66,8 +67,15 @@ namespace Editors.AnimationMeta.SuperView
             SceneObjects.Add(assetViewModel);
             
             _asset = assetViewModel;
-            _asset.Data.MetaDataChanged += UpdateMetaDataInfoFromAsset;
-            UpdateMetaDataInfoFromAsset(_asset.Data);
+            OnSceneObjectUpdated(new SceneObjectUpdateEvent(_asset.Data, false, false, false, true));
+           // _asset.Data.MetaDataChanged += UpdateMetaDataInfoFromAsset;
+           //  UpdateMetaDataInfoFromAsset(_asset.Data);
+        }
+
+        private void OnSceneObjectUpdated(SceneObjectUpdateEvent e)
+        {
+            PersistentMetaEditor.LoadFile(e.Owner.PersistMetaData);
+            MetaEditor.LoadFile(e.Owner.MetaData);
         }
 
         public void Load(AnimationToolInput debugDataToLoad)
@@ -85,17 +93,17 @@ namespace Editors.AnimationMeta.SuperView
             }
         }
 
-        private void UpdateMetaDataInfoFromAsset(SceneObject asset)
-        {
-            PersistentMetaEditor.LoadFile(asset.PersistMetaData);
-            MetaEditor.LoadFile(asset.MetaData);
-        }
+      //  private void UpdateMetaDataInfoFromAsset(SceneObject asset)
+      //  {
+      //      PersistentMetaEditor.LoadFile(asset.PersistMetaData);
+      //      MetaEditor.LoadFile(asset.MetaData);
+      //  }
 
         public void RefreshAction() => _asset.Data.TriggerMeshChanged();
 
         public override void Close()
         {
-            _asset.Data.MetaDataChanged -= UpdateMetaDataInfoFromAsset;
+       //     _asset.Data.MetaDataChanged -= UpdateMetaDataInfoFromAsset;
             _eventHub?.UnRegister(this);
             base.Close();
         }

@@ -46,9 +46,6 @@ namespace Editors.Shared.Core.Common.ReferenceModel
 
             OnSkeletonChange(_sceneObject.Skeleton);
             _sceneObject.SkeletonChanged += OnSkeletonChange;
-
-
-  
         }
 
         public void PreviewSelectedSlot()
