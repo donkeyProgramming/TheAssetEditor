@@ -1,48 +1,35 @@
-Remember:
+Fixes for v059
+	Twui editor v0
+
+	X GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing. Make a input setting struct 
+	X General: Enums for wsmodel format and shaders, formats ++ in GameinformationFactory
+	X General: Convert GameinformationFactory to a static! 
+	
 	Create ogre test 
-	Rename to Animation Retarget - own project 
 	Damping and root node handling 
-	Unit tests! 
-	use events 
-	make everything selectable
-	Rendering window - disbale backface culling 
 	"How to use" window - point to github?
-	Create a "save project" button?
+	Rendering window - disbale backface culling 
 	Superview - default scene content to be expanded. Allow select meshes
 	Move Editors.Shared.Core into shared? Maybe under UI?
-	Print scope - special handling for eventhub. Include registred callbacks 
 
-Create unit test for SuperView
+	Change how metadata parsing is handled. need to be lazy! Slow slow
+	KitbashTOol Materiul - warning for not supported material! 
 
-
-
-Bug: Opening the same file in two different editors cause Attempting to open file 'sengko_linchin.wsmodel', but is is already open. Give better error
-Bug: Wrong text in lod view for kitbash https://github.com/donkeyProgramming/TheAssetEditor/issues/230
-
-Bug: Rendering issue, causes softlock https://github.com/donkeyProgramming/TheAssetEditor/issues/232
-Bug: Try to detect mismatch between wsmodel and rmv model, difference in lods/meshes count 
-
-
-Fixes for v056
-	General: Move resent files out of settings
-	General: Convert GameinformationFactory to a static! 
-	General: Show hisotry of commands in exceptions
-	General: Close console window on close
-		
+Unit test:
 	KitbashTool: Unit test - open karl, import general, make head editable, rerig, save 
-	KitbashTool: Unit tests - ensure shader paths are correct!
-	
-	GameWorld: Move bloomeffect to resourcelib
-	GameWorld: ONly render glow if there is glow stuff in the pass 
-	GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
-	
+	KitbashTool: Unit tests - ensure shader paths are correct!	
+	Create unit test for SuperView
+		
+Bugs:
 	KitbashTool: Manual vertex editor for weights (new editor or reuse debug view)
 	KitbashTool: Reduce icon size?
 	KitbashTool: when loading material - if not supported show message
 	KitbashTool: Issues with rendering/selection and pivot point
 	KitbashTool: When there is no files left in a reference mesh - close the node 
-		
-Bugs:
+
+	KitbashEditor: Try to detect mismatch between wsmodel and rmv model and give error, difference in lods/meshes count 
+	KitbashEditor: Wrong text in lod view for kitbash https://github.com/donkeyProgramming/TheAssetEditor/issues/230
+	General: Opening the same file in two different editors cause Attempting to open file 'sengko_linchin.wsmodel', but is is already open. Give better error
 	KitbashTool: Node clicking in tree view is slow
 	KitbashTool: Tint capability crash bug => Shield change to tint
 	KitbashTool: The issue I personally had was that if i created MetalRoughPbr_Emissive once in 0.48, changing the value to Default would still apply Emissive when i loaded the pack in 0.45, so I used the 
@@ -59,6 +46,14 @@ Bugs:
 	
 	
 Improvements:
+	General: Print scope - special handling for eventhub. Include registred callbacks 
+	General: Show hisotry of commands in exceptions
+	GameWorld: Move bloomeffect to resourcelib
+	GameWorld: ONly render glow if there is glow stuff in the pass 
+	X GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing
+	General: Close console window on close
+	X General: Convert GameinformationFactory to a static! 
+	General: Move resent files out of settings
 	play sound using monogame audio. find wem converter?
 	https://github.com/Dirkster99/AvalonDock
 	General: SelectionManager, remove the use of SelectionManager_SelectionChanged event
@@ -68,7 +63,6 @@ Improvements:
 	KitbashTool: destruction animations export (non-skeletal) https://discord.com/channels/373745291289034763/1009267073987399740/threads/1312020442441318450
 	General: .CS2.PARSED file format schema https://discord.com/channels/373745291289034763/1009267073987399740/threads/1312014128088350770
 	KitbashTool: When loading textures that are custom, validate that they have MipMaps
-	General: Merge UI and shared! 
 	KitbashTool: Improve material system
 		For older games - just a singel material! Makes life easier. Show all texttures and attributes. Easy peazye!
 		interfaces and registeration and builders
@@ -76,10 +70,9 @@ Improvements:
 		good error logging, case for exception window 
 		Extend Effect and make a better exception if item in list is nto found => GetParameter().SetValue()
 		Do not reuse effect?
-	General: Enums for wsmodel format and shaders, formats ++ in GameinformationFactory
+	X General: Enums for wsmodel format and shaders, formats ++ in GameinformationFactory
 	General: Warning if loaded packfile/mesh is most likely from a different game. How to detect?
 	General: For custom packs, get size on debug logger 
-	GameWorld: Complex scene loader - dont makes fucking nodes! 
 	KitbashTool: MOve most node types into Kitbash tool / reduce number of nodes
 	KitbashTool: Max 50 commands, clean up memoery!
 	KitbashTool: Wsmodel guessing
@@ -114,7 +107,7 @@ New features:
 	
 	
 Fixes for v057:
-	[Feature]	General:	Force close current editor option added to the error window to avoid softlocks.
+	[Feature]	General:	Force close current editor option added to the error window to avoid softlocks. https://github.com/donkeyProgramming/TheAssetEditor/issues/232
 	[Feature]	AnimationReTarget: The tool is enabled again - probably pretty buggy in its first iterations. Improvements will come. 
 	[Feature] 	General: 	Added 'Save Active pack' button to file menu https://github.com/donkeyProgramming/TheAssetEditor/issues/123
 	[Feature] 	General: 	Improvements to "Load Wem Files" option. This option now only effects if the files are visible in the pack browser

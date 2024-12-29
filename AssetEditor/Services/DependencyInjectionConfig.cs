@@ -33,6 +33,7 @@ namespace AssetEditor.Services
                 new Editors.ImportExport.DependencyInjectionContainer(),
                 new Editor.VisualSkeletonEditor.DependencyInjectionContainer(),
                 new Editors.AnimatioReTarget.DependencyInjectionContainer(),
+                new Editors.Twui.DependencyInjectionContainer(),
 
                 // Host application
                 new DependencyInjectionContainer(),

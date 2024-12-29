@@ -73,6 +73,11 @@
       "commandName": "Project",
       "commandLineArgs": "-devcfg Import_Karl",
       "nativeDebugging": false
+    },
+    "AE-Twui": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg TwuiToolEditor",
+      "nativeDebugging": false
     }
   }
 }

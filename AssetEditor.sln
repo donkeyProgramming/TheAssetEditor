@@ -80,6 +80,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editors.KitbasherEditor", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.KitbashEditor", "Editors\Kitbashing\Test.KitbashEditor\Test.KitbashEditor.csproj", "{AE3B8059-D6E0-4AFD-BB00-9E28CE0933A1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TwUiEditor", "TwUiEditor", "{9A22B0C7-FB6E-419E-A87D-4E86F4A2952C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Editors.Twui", "Editors\TwuiEditor\Editor.Twui\Editors.Twui.csproj", "{FB35CFEB-811F-41E6-BBAD-0312954324BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -194,6 +198,10 @@ Global
 		{AE3B8059-D6E0-4AFD-BB00-9E28CE0933A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE3B8059-D6E0-4AFD-BB00-9E28CE0933A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE3B8059-D6E0-4AFD-BB00-9E28CE0933A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB35CFEB-811F-41E6-BBAD-0312954324BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB35CFEB-811F-41E6-BBAD-0312954324BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB35CFEB-811F-41E6-BBAD-0312954324BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB35CFEB-811F-41E6-BBAD-0312954324BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -230,6 +238,8 @@ Global
 		{1A9F8CC6-CFE9-4559-A969-20FB9CC2A07F} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
 		{4048C940-F1FD-4077-AF87-3760E0CB0A1F} = {1A9F8CC6-CFE9-4559-A969-20FB9CC2A07F}
 		{AE3B8059-D6E0-4AFD-BB00-9E28CE0933A1} = {1A9F8CC6-CFE9-4559-A969-20FB9CC2A07F}
+		{9A22B0C7-FB6E-419E-A87D-4E86F4A2952C} = {07AC615B-A8FC-4E1A-BDD5-BC11452429A0}
+		{FB35CFEB-811F-41E6-BBAD-0312954324BF} = {9A22B0C7-FB6E-419E-A87D-4E86F4A2952C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB5968F3-98ED-4AFF-98EA-0DBEDCACADF2}
