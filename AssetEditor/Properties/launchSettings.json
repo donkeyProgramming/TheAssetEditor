@@ -29,12 +29,12 @@
       "commandLineArgs": "-devcfg Texture_Karl",
       "nativeDebugging": false
     },
-    "AE-AudioEditor": {
+    "AE-AudioEditor_Wh3": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg AudioEditor_Wh3",
       "nativeDebugging": false
     },
-    "AE-AudioExplorer": {
+    "AE-AudioExplorer_Wh3": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg AudioExplorer_Wh3",
       "nativeDebugging": false

@@ -17,9 +17,9 @@ namespace Editors.Audio.Storage
     {
         public class LoadResult
         {
-            public Dictionary<uint, List<HircItem>> HircList { get; internal set; } = new();
-            public Dictionary<uint, List<DidxAudio>> DidxAudioList { get; internal set; } = new();
-            public Dictionary<string, PackFile> PackFileMap { get; internal set; } = new();
+            public Dictionary<uint, List<HircItem>> HircList { get; internal set; } = [];
+            public Dictionary<uint, List<DidxAudio>> DidxAudioList { get; internal set; } = [];
+            public Dictionary<string, PackFile> PackFileMap { get; internal set; } = [];
         }
 
         private readonly IPackFileService _packFileService;

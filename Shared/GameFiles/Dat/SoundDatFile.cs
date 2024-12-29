@@ -32,15 +32,15 @@ namespace Shared.GameFormats.Dat
         public class DatStateGroupsWithStates
         {
             public string StateGroupName { get; set; }
-            public List<string> States { get; set; } = new List<string>();
+            public List<string> States { get; set; } = [];
         }
 
-        public List<DatEventWithStateGroup> EventWithStateGroup { get; set; } = new List<DatEventWithStateGroup>();
-        public List<DatStateGroupsWithStates> StateGroupsWithStates0 { get; set; } = new List<DatStateGroupsWithStates>();
-        public List<DatStateGroupsWithStates> StateGroupsWithStates1 { get; set; } = new List<DatStateGroupsWithStates>();
-        public List<DatDialogueEventsWithStateGroups> DialogueEventsWithStateGroups { get; set; } = new List<DatDialogueEventsWithStateGroups>();
-        public List<DatSettingValues> SettingValues { get; set; } = new List<DatSettingValues>();
-        public List<string> Unknown { get; set; } = new List<string>();
+        public List<DatEventWithStateGroup> EventWithStateGroup { get; set; } = [];
+        public List<DatStateGroupsWithStates> StateGroupsWithStates0 { get; set; } = [];
+        public List<DatStateGroupsWithStates> StateGroupsWithStates1 { get; set; } = [];
+        public List<DatDialogueEventsWithStateGroups> DialogueEventsWithStateGroups { get; set; } = [];
+        public List<DatSettingValues> SettingValues { get; set; } = [];
+        public List<string> Unknown { get; set; } = [];
 
         public void DumpToFile(string filePath)
         {

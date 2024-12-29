@@ -63,7 +63,7 @@ namespace Editors.Audio
         {
             EditorInfoBuilder
                 .Create<AudioExplorerViewModel, AudioExplorerView>(EditorEnums.AudioExplorer_Editor)
-                .AddToToolbar("Audio Exporer")
+                .AddToToolbar("Audio Explorer")
                 .Build(factory);
 
             EditorInfoBuilder
