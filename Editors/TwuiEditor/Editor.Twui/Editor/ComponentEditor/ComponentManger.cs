@@ -1,16 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Twui.Editor.Datatypes;
 
-namespace Editors.Twui.Editor
+namespace Editors.Twui.Editor.ComponentEditor
 {
-    public partial class ComponentEditor : ObservableObject
+    public partial class ComponentManger : ObservableObject
     {
         [ObservableProperty] HierarchyItem? _selectedHierarchyItem;
         [ObservableProperty] Component? _selectedComponent;
 
         TwuiFile _currentFile;
 
-        public ComponentEditor()
+        public ComponentManger()
         { 
         
         }

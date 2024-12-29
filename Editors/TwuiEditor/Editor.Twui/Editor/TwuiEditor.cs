@@ -6,6 +6,7 @@ using Editors.Twui.Editor.Serialization;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
+using Editors.Twui.Editor.ComponentEditor;
 
 namespace Editors.Twui.Editor
 {
@@ -19,13 +20,13 @@ namespace Editors.Twui.Editor
         public PackFile CurrentFile { get; set; }
 
         [ObservableProperty] TwuiFile _parsedTwuiFile;
-        [ObservableProperty] ComponentEditor _componentEditor;
+        [ObservableProperty] ComponentManger _componentManager;
         [ObservableProperty] PreviewRenderer _previewRenderer;
 
-        public TwuiEditor(IUiCommandFactory uiCommandFactory, ComponentEditor componentEditor, PreviewRenderer previewRenderer)
+        public TwuiEditor(IUiCommandFactory uiCommandFactory, ComponentManger componentEditor, PreviewRenderer previewRenderer)
         {
             _uiCommandFactory = uiCommandFactory;
-            _componentEditor = componentEditor;
+            _componentManager = componentEditor;
             _previewRenderer = previewRenderer;
         }
 
@@ -41,7 +42,7 @@ namespace Editors.Twui.Editor
             ParsedTwuiFile = serializer.Load(file);
             DisplayName = "Twui Editor:" + Path.GetFileName(file.Name);
 
-            ComponentEditor.SetFile(ParsedTwuiFile);
+            ComponentManager.SetFile(ParsedTwuiFile);
             PreviewRenderer.SetFile(ParsedTwuiFile);
         }
     }

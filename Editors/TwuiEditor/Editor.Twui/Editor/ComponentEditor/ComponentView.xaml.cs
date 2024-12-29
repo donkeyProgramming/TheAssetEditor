@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Editors.Twui.Editor.Presentation
+namespace Editors.Twui.Editor.ComponentEditor
 {
     /// <summary>
     /// Interaction logic for ComponentView.xaml

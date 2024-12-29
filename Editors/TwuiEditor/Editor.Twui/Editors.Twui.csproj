@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net9.0-windows</TargetFramework>
+        <LangVersion>preview</LangVersion>
         <UseWPF>true</UseWPF>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -12,6 +13,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\GameWorld\View3D\GameWorld.Core.csproj" />
     <ProjectReference Include="..\..\..\Shared\SharedUI\Shared.Ui.csproj" />
+  </ItemGroup>
+    
+    
+
+  <ItemGroup>
+    <Folder Include="Editor\ComponentEditor\StateHandling\" />
   </ItemGroup>
 
 </Project>
