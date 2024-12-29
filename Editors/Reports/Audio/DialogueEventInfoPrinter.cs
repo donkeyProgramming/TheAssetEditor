@@ -6,7 +6,7 @@ using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Reports.Audio
 {
-    public class GenerateDialogueEventInfoReportCommand(DialogueEventInfoPrinter generator) : IUiCommand
+    public class GenerateDialogueEventInfoPrinterReportCommand(DialogueEventInfoPrinter generator) : IUiCommand
     {
         public void Execute() => generator.Create();
     }
@@ -28,28 +28,23 @@ namespace Editors.Reports.Audio
 
         public void Create()
         {
-            // Get all the dialogue event info.
             var printer = new DialogueEventInfoPrinter(_audioRepository);
-            printer.PrintDialogEventInfos();
+            printer.PrintDialogEventInfo();
         }
 
-        public void PrintDialogEventInfos()
+        public void PrintDialogEventInfo()
         {
-            // Retrieve all HircItem instances from the repository.
             var allHircItems = _audioRepository.GetAllOfType<HircItem>();
-
-            // Filter those that are ICADialogEvent.
-            var dialogEvents = allHircItems.OfType<ICAkDialogueEvent>();
-
-            foreach (var dialogEvent in dialogEvents)
-                PrintDialogEventInfo(dialogEvent);
+            var dialogueEvents = allHircItems.OfType<ICAkDialogueEvent>();
+            foreach (var dialogueEvent in dialogueEvents)
+                PrintDialogEventInfo(dialogueEvent);
         }
 
         private void PrintDialogEventInfo(ICAkDialogueEvent dialogueEvent)
         {
             // Assuming HircItem is the base type with an Id.
             if (dialogueEvent is not HircItem hircItem)
-                throw new InvalidCastException("dialogEvent is not a HircItem.");
+                throw new InvalidCastException("dialogueEvent is not a HircItem.");
 
             var helper = new DecisionPathHelper(_audioRepository);
             var paths = helper.GetDecisionPaths(dialogueEvent);

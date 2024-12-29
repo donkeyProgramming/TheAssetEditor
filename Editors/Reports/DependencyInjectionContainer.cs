@@ -35,8 +35,11 @@ namespace Editors.Reports
             serviceCollection.AddTransient<Rmv2ReportCommand>();
             serviceCollection.AddTransient<Rmv2ReportGenerator>();
 
-            serviceCollection.AddTransient<GenerateDialogueEventInfoReportCommand>();
+            serviceCollection.AddTransient<GenerateDialogueEventInfoPrinterReportCommand>();
             serviceCollection.AddTransient<DialogueEventInfoPrinter>();
+
+            serviceCollection.AddTransient<GenerateDialogueEventAndEventNamePrinterReportCommand>();
+            serviceCollection.AddTransient<DialogueEventAndEventNamePrinter>();
         }
     }
 }
