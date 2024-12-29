@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="Editors.Twui.Editor.Presentation.ComponentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Editors.Twui.Editor.Presentation" xmlns:basedialogs="clr-namespace:Shared.Ui.BaseDialogs;assembly=Shared.Ui" xmlns:System="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <System:Double x:Key="labelWidth">140</System:Double>
+        <Thickness x:Key="LabelMargin">20,0,0,0</Thickness>
+        <System:Double x:Key="HeaderFontSize">10</System:Double>
+        <System:Double x:Key="HeaderLabelLength">100</System:Double>
+
+    </UserControl.Resources>
+    <DockPanel LastChildFill="False">
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Some attribute" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+            <CheckBox IsChecked="{Binding UseDecal, UpdateSourceTrigger=PropertyChanged}"/>
+        </basedialogs:AeAttribute>
+
+        <basedialogs:AeAttribute DockPanel.Dock="Top" LabelText="Some attribute2" LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
+            <CheckBox IsChecked="{Binding UseDecal, UpdateSourceTrigger=PropertyChanged}"/>
+        </basedialogs:AeAttribute>
+
+
+    </DockPanel>
+</UserControl>

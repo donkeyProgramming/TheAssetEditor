@@ -103,6 +103,12 @@ namespace GameWorld.Core.Utility
             if (imageContent == null)
                 return null;
 
+            if (Path.GetExtension(fileName).ToLower() == ".png")
+            {
+                using var stream = new MemoryStream(imageContent);
+                return Texture2D.FromStream(device, stream);
+            }
+
             var image = LoadImageFromBytes(imageContent, out out_imageInfo);
             if (image == null)
                 return null;
