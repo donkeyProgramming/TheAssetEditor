@@ -3,6 +3,7 @@ using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc;
 using System;
 using System.Collections.Generic;
 using System.Linq;

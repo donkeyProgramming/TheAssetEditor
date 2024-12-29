@@ -2,7 +2,7 @@
 using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 
-namespace Shared.GameFormats.Wwise
+namespace Shared.GameFormats.Wwise.Hirc
 {
     public abstract class HircItem
     {

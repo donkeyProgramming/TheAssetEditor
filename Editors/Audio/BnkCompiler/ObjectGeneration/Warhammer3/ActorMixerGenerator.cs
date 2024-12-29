@@ -4,6 +4,7 @@ using System.Linq;
 using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Hirc.V136;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
+using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommunityToolkit.Diagnostics;
-using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration

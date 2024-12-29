@@ -6,6 +6,7 @@ using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.Shared;
 using Shared.GameFormats.Wwise.Hirc.V136;
 

@@ -10,13 +10,9 @@ namespace Shared.GameFormats.Wwise.Bkhd
             {
                 OwnerFile = fileName,
                 ChunkHeader = BnkChunkHeader.CreateSpecificData(chunk),
-                AkBankHeader = new AkBankHeader()
             };
             bkdh.AkBankHeader.CreateSpecificData(chunk, bkdh.ChunkHeader.ChunkSize);
 
-            // Sometimes the version number is strange, probably because CA has their own compiled 
-            // version of WWISE. Their version is based on an official version, so we map it to the
-            // closest known ID
             if (bkdh.AkBankHeader.DwBankGeneratorVersion == 2147483770)
                 bkdh.AkBankHeader.DwBankGeneratorVersion = 122;
 
