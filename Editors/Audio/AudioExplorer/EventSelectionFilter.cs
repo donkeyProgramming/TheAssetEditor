@@ -12,7 +12,7 @@ namespace Editors.Audio.AudioExplorer
 
         public FilterCollection<SelectedHircItem> EventList { get; set; }
 
-        public EventSelectionFilter(IAudioRepository repository, bool showEvents, bool showDialogEvents)
+        public EventSelectionFilter(IAudioRepository repository, bool showEvents, bool showDialogueEvents)
         {
             _repository = repository;
 
@@ -21,15 +21,15 @@ namespace Editors.Audio.AudioExplorer
                 SearchFilter = (value, rx) => rx.Match(value.DisplayName).Success
             };
 
-            Refresh(showEvents, showDialogEvents);
+            Refresh(showEvents, showDialogueEvents);
         }
 
-        public void Refresh(bool showEvents, bool showDialogEvents)
+        public void Refresh(bool showEvents, bool showDialogueEvents)
         {
             var typesToShow = new List<HircType>();
             if (showEvents)
                 typesToShow.Add(HircType.Event);
-            if (showDialogEvents)
+            if (showDialogueEvents)
                 typesToShow.Add(HircType.Dialogue_Event);
 
             var allEvents = _repository.HircObjects.SelectMany(x => x.Value)

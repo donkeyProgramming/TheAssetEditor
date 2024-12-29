@@ -19,27 +19,27 @@ namespace Editors.Audio.Utility
             _hircProcessChildMap.Add(HircType.SequenceContainer, ProcessSequenceContainer);
             _hircProcessChildMap.Add(HircType.Sound, ProcessSound);
             _hircProcessChildMap.Add(HircType.ActorMixer, ProcessActorMixer);
-            _hircProcessChildMap.Add(HircType.Dialogue_Event, ProcessDialogEvent);
+            _hircProcessChildMap.Add(HircType.Dialogue_Event, ProcessDialogueEvent);
             _hircProcessChildMap.Add(HircType.Music_Track, ProcessMusicTrack);
             _hircProcessChildMap.Add(HircType.Music_Segment, ProcessMusicSegment);
             _hircProcessChildMap.Add(HircType.Music_Switch, ProcessMusicSwitch);
             _hircProcessChildMap.Add(HircType.Music_Random_Sequence, ProcessRandMusicContainer);
         }
 
-        private void ProcessDialogEvent(HircItem item, HircTreeItem parent)
+        private void ProcessDialogueEvent(HircItem item, HircTreeItem parent)
         {
             var hirc = GetAsType<ICAkDialogueEvent>(item);
 
             var helper = new DecisionPathHelper(_repository);
             var paths = helper.GetDecisionPaths(hirc);
 
-            var dialogEventNode = new HircTreeItem() { DisplayName = $"Dialog_Event {_repository.GetNameFromHash(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
-            parent.Children.Add(dialogEventNode);
+            var dialogueEventNode = new HircTreeItem() { DisplayName = $"Dialog_Event {_repository.GetNameFromHash(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
+            parent.Children.Add(dialogueEventNode);
 
             foreach (var path in paths.Paths)
             {
                 var pathNode = new HircTreeItem() { DisplayName = path.GetAsString(), Item = item, IsExpanded = false };
-                dialogEventNode.Children.Add(pathNode);
+                dialogueEventNode.Children.Add(pathNode);
                 ProcessNext(path.ChildNodeId, pathNode);
             }
         }
@@ -191,13 +191,13 @@ namespace Editors.Audio.Utility
             var helper = new DecisionPathHelper(_repository);
             var paths = helper.GetDecisionPaths(hirc);
 
-            var dialogEventNode = new HircTreeItem() { DisplayName = $"Music Switch {_repository.GetNameFromHash(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
-            parent.Children.Add(dialogEventNode);
+            var dialogueEventNode = new HircTreeItem() { DisplayName = $"Music Switch {_repository.GetNameFromHash(item.Id)} - [{paths.Header.GetAsString()}]", Item = item };
+            parent.Children.Add(dialogueEventNode);
 
             foreach (var path in paths.Paths)
             {
                 var pathNode = new HircTreeItem() { DisplayName = path.GetAsString(), Item = hirc, IsExpanded = false };
-                dialogEventNode.Children.Add(pathNode);
+                dialogueEventNode.Children.Add(pathNode);
                 ProcessNext(path.ChildNodeId, pathNode);
             }
         }

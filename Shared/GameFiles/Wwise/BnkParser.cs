@@ -30,7 +30,7 @@ namespace Shared.GameFormats.Wwise
                 if (BankChunkTypes.BKHD == chunkHeader.Tag)
                     parsedBnkFile.BkhdChunk = LoadBkhdChunk(fullName, chunk);
                 else if (BankChunkTypes.HIRC == chunkHeader.Tag)
-                    parsedBnkFile.HircChuck = LoadHircChunk(fullName, chunk, chunkHeader.ChunkSize, parsedBnkFile.BkhdChunk.AkBankHeader.DwBankGeneratorVersion, isCaHircItem);
+                    parsedBnkFile.HircChunk = LoadHircChunk(fullName, chunk, chunkHeader.ChunkSize, parsedBnkFile.BkhdChunk.AkBankHeader.DwBankGeneratorVersion, isCaHircItem);
                 else if (BankChunkTypes.DIDX == chunkHeader.Tag)
                     parsedBnkFile.DidxChunk = LoadDidxChunk(fullName, chunk);
                 else if (BankChunkTypes.DATA == chunkHeader.Tag)
@@ -58,9 +58,9 @@ namespace Shared.GameFormats.Wwise
         {
             var hircData = _hircParser.Parse(fullName, chunk, bnkVersion, isCaHircItem);
 
-            var hircSizes = hircData.Hircs.Sum(x => x.Size);
-            var expectedHircChuckSize = hircSizes + hircData.NumHircItems * 5 + 4;
-            var areEqual = expectedHircChuckSize == chunkHeaderSize;
+            var hircSizes = hircData.HircItems.Sum(x => x.Size);
+            var expectedHircChunkSize = hircSizes + hircData.NumHircItems * 5 + 4;
+            var areEqual = expectedHircChunkSize == chunkHeaderSize;
             if (areEqual == false)
                 throw new Exception("Error parsing HIRC in bnk, expected and actual not matching");
 

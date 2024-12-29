@@ -36,7 +36,7 @@ namespace Editors.Audio.Storage
         {
             var soundDb = _bnkParser.Parse(bnkFile, bnkFileName, isCaHircItem);
             if (printData)
-                PrintHircList(soundDb.HircChuck.Hircs, bnkFileName);
+                PrintHircList(soundDb.HircChunk.HircItems, bnkFileName);
             return soundDb;
         }
 
@@ -70,7 +70,7 @@ namespace Editors.Audio.Storage
                 try
                 {
                     var parsedBnk = LoadBnkFile(file, name, filePack.IsCaPackFile);
-                    if (parsedBnk.HircChuck.Hircs.Any(y => y is CAkUnknown == true || y.HasError))
+                    if (parsedBnk.HircChunk.HircItems.Any(y => y is CAkUnknown == true || y.HasError))
                         banksWithUnknowns.Add(name);
 
                     parsedBnkList.Add(parsedBnk);
@@ -84,7 +84,7 @@ namespace Editors.Audio.Storage
             // Combine the data
             foreach (var parsedBnk in parsedBnkList)
             {
-                // Build Audio Hircs from DIDX and DATA
+                // Build Audio Hirc Items from DIDX and DATA
                 if (parsedBnk.DataChunk is not null && parsedBnk.DidxChunk is not null)
                 {
                     foreach (var didx in parsedBnk.DidxChunk.MediaList)
@@ -102,7 +102,7 @@ namespace Editors.Audio.Storage
                     }
                 }
 
-                foreach (var item in parsedBnk.HircChuck.Hircs)
+                foreach (var item in parsedBnk.HircChunk.HircItems)
                 {
                     if (output.HircList.ContainsKey(item.Id) == false)
                         output.HircList[item.Id] = new List<HircItem>();
@@ -112,8 +112,8 @@ namespace Editors.Audio.Storage
             }
 
             // Print it all
-            var allHircs = parsedBnkList.SelectMany(x => x.HircChuck.Hircs);
-            PrintHircList(allHircs, "All");
+            var allHircItems = parsedBnkList.SelectMany(x => x.HircChunk.HircItems);
+            PrintHircList(allHircItems, "All");
 
             if (failedBnks.Count != 0)
                 _logger.Here().Error($"{failedBnks.Count} banks failed: {string.Join("\n", failedBnks)}");

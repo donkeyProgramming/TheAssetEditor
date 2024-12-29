@@ -20,24 +20,24 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration
             // Build Hirc list. Order is important! 
             var hircList = ConvertProjectToHircObjects(projectFile);
 
-            var hircChuck = new HircChunk();
-            hircChuck.SetFromHircList(hircList);
+            var hircChunk = new HircChunk();
+            hircChunk.SetFromHircList(hircList);
 
             // Validate this is same as before.
-            hircChuck.ChunkHeader.ChunkSize = (uint)(hircChuck.Hircs.Sum(x => x.Size) + hircChuck.Hircs.Count * 5 + 4);
-            hircChuck.NumHircItems = (uint)hircChuck.Hircs.Count;
-            return hircChuck;
+            hircChunk.ChunkHeader.ChunkSize = (uint)(hircChunk.HircItems.Sum(x => x.Size) + hircChunk.HircItems.Count * 5 + 4);
+            hircChunk.NumHircItems = (uint)hircChunk.HircItems.Count;
+            return hircChunk;
         }
 
         private List<HircItem> ConvertProjectToHircObjects(CompilerData project)
         {
             var sortedProjectHircList = HircSorter.Sort(project);
-            var wwiseHircs = sortedProjectHircList.Select(hircProjectItem =>
+            var wwiseHircItems = sortedProjectHircList.Select(hircProjectItem =>
             {
                 var generator = FindGenerator(hircProjectItem, project.ProjectSettings.OutputGame);
                 return generator.ConvertToWwise(hircProjectItem, project);
             }).ToList();
-            return wwiseHircs;
+            return wwiseHircItems;
         }
 
         private IWwiseHircGenerator FindGenerator(IAudioProjectHircItem projectItem, string game)

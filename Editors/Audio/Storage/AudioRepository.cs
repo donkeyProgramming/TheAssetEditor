@@ -68,8 +68,8 @@ namespace Editors.Audio.Storage
 
         public List<HircItem> GetHircObject(uint id, string owningFileName)
         {
-            var hircs = GetHircObject(id).Where(x => x.OwnerFile == owningFileName).ToList();
-            return hircs;
+            var hircItems = GetHircObject(id).Where(x => x.OwnerFile == owningFileName).ToList();
+            return hircItems;
         }
 
         public string GetNameFromHash(uint value, out bool found)

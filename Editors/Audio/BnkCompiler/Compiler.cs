@@ -43,7 +43,7 @@ namespace Editors.Audio.BnkCompiler
             var hircChunk = _hircBuilder.Generate(audioProject);
 
             // Ensure all write ids are not causing conflicts.
-            var allIds = hircChunk.Hircs.Select(x => x.Id).ToList();
+            var allIds = hircChunk.HircItems.Select(x => x.Id).ToList();
             var originalCount = allIds.Count;
             var uniqueCount = allIds.Distinct().Count();
             Guard.IsEqualTo(originalCount, uniqueCount);

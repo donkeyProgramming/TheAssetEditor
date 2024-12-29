@@ -20,7 +20,7 @@ namespace Shared.GameFormats.Wwise.Hirc
 
         public HircChunk Parse(string fileName, ByteChunk chunk, uint bnkVersion, bool isCaHircItem)
         {
-            var hircChuck = new HircChunk
+            var hircChunk = new HircChunk
             {
                 ChunkHeader = BnkChunkHeader.CreateSpecificData(chunk),
                 NumHircItems = chunk.ReadUInt32()
@@ -29,7 +29,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             var failedItems = new List<uint>();
             var factory = GetHircFactory(bnkVersion);
 
-            for (uint itemIndex = 0; itemIndex < hircChuck.NumHircItems; itemIndex++)
+            for (uint itemIndex = 0; itemIndex < hircChunk.NumHircItems; itemIndex++)
             {
                 var hircType = (HircType)chunk.PeakByte();
 
@@ -42,7 +42,7 @@ namespace Shared.GameFormats.Wwise.Hirc
                     hircItem.OwnerFile = fileName;
                     hircItem.IsCaHircItem = isCaHircItem;
                     hircItem.Parse(chunk);
-                    hircChuck.Hircs.Add(hircItem);
+                    hircChunk.HircItems.Add(hircItem);
                 }
                 catch (Exception e)
                 {
@@ -51,11 +51,11 @@ namespace Shared.GameFormats.Wwise.Hirc
 
                     var unkInstance = new CAkUnknown() { ErrorMsg = e.Message, ByteIndexInFile = itemIndex, OwnerFile = fileName };
                     unkInstance.Parse(chunk);
-                    hircChuck.Hircs.Add(unkInstance);
+                    hircChunk.HircItems.Add(unkInstance);
                 }
             }
 
-            return hircChuck;
+            return hircChunk;
         }
 
         public byte[] GetAsBytes(HircChunk hircChunk)
@@ -64,7 +64,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             memStream.Write(BnkChunkHeader.GetAsByteArray(hircChunk.ChunkHeader));
             memStream.Write(ByteParsers.UInt32.EncodeValue(hircChunk.NumHircItems, out _));
 
-            foreach (var hircItem in hircChunk.Hircs)
+            foreach (var hircItem in hircChunk.HircItems)
             {
                 var bytes = hircItem.GetAsByteArray();
                 memStream.Write(bytes);
