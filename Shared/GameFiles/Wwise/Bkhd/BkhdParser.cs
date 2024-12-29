@@ -8,7 +8,7 @@ namespace Shared.GameFormats.Wwise.Bkhd
         {
             var bkdh = new BkhdChunk()
             {
-                OwnerFileName = fileName,
+                OwnerFile = fileName,
                 ChunkHeader = BnkChunkHeader.CreateSpecificData(chunk),
                 AkBankHeader = new AkBankHeader()
             };

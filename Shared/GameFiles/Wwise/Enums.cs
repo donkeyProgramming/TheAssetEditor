@@ -1,12 +1,14 @@
 ﻿namespace Shared.GameFormats.Wwise
 {
-    public static class WwiseObjectHeaders
+    public static class BankChunkTypes
     {
-        public const string BKHD = "BKHD";
-        public const string HIRC = "HIRC";
-        public const string STID = "STID";
-        public const string DIDX = "DIDX";
-        public const string DATA = "DATA";
+        // There are other chunk types but these are the ones we care about. 
+        // For more info on chunk types see: https://github.com/bnnm/wwiser/blob/master/doc/WWISER.md
+        public const string BKHD = "BKHD"; // The BKHD (Bank Header) section contains the Bank version and some global config stuff like Bank name.
+        public const string HIRC = "HIRC"; // The HIRC (Hierarchy) section contains most Wwise objects.
+        public const string STID = "STID"; // The DIDX (Data Index) section contains the references to the .wem files embedded in the SoundBank.
+        public const string DIDX = "DIDX"; // The DATA section contains the .wem files data, not encoded, and immediately following each other or alternatively pre-fetch data for streaming.
+        public const string DATA = "DATA"; // The STID (String Table ID) section contains a list of all project Banks referenced in the HIRC section (including the current SoundBank) with info on their IDs and file names.
     }
 
     public enum HircType : byte

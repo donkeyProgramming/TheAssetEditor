@@ -23,27 +23,27 @@ namespace Shared.GameFormats.Wwise
 
             while (chunk.BytesLeft != 0)
             {
-                var chunckHeader = BnkChunkHeader.PeakFromBytes(chunk);
+                var chunkHeader = BnkChunkHeader.PeekFromBytes(chunk);
                 var indexBeforeRead = chunk.Index;
-                var expectedIndexAfterRead = indexBeforeRead + BnkChunkHeader.HeaderByteSize + chunckHeader.ChunkSize;
+                var expectedIndexAfterRead = indexBeforeRead + BnkChunkHeader.HeaderByteSize + chunkHeader.ChunkSize;
 
-                if (WwiseObjectHeaders.BKHD == chunckHeader.Tag)
+                if (BankChunkTypes.BKHD == chunkHeader.Tag)
                     parsedBnkFile.BkhdChunk = LoadBkhdChunk(fullName, chunk);
-                else if (WwiseObjectHeaders.HIRC == chunckHeader.Tag)
-                    parsedBnkFile.HircChuck = LoadHircs(fullName, chunk, chunckHeader.ChunkSize, parsedBnkFile.BkhdChunk.AkBankHeader.DwBankGeneratorVersion, isCaHircItem);
-                else if (WwiseObjectHeaders.DIDX == chunckHeader.Tag)
-                    parsedBnkFile.DidxChunk = LoadDidx(fullName, chunk);
-                else if (WwiseObjectHeaders.DATA == chunckHeader.Tag)
-                    parsedBnkFile.DataChunk = LoadData(fullName, chunk);
-                else if (WwiseObjectHeaders.STID == chunckHeader.Tag)
-                    LoadStid(fullName, chunk);  // We never care about this. Discard after loading
+                else if (BankChunkTypes.HIRC == chunkHeader.Tag)
+                    parsedBnkFile.HircChuck = LoadHircChunk(fullName, chunk, chunkHeader.ChunkSize, parsedBnkFile.BkhdChunk.AkBankHeader.DwBankGeneratorVersion, isCaHircItem);
+                else if (BankChunkTypes.DIDX == chunkHeader.Tag)
+                    parsedBnkFile.DidxChunk = LoadDidxChunk(fullName, chunk);
+                else if (BankChunkTypes.DATA == chunkHeader.Tag)
+                    parsedBnkFile.DataChunk = LoadDataChunk(fullName, chunk);
+                else if (BankChunkTypes.STID == chunkHeader.Tag)
+                    LoadStidChunk(fullName, chunk); // We never care about this. Discard after loading
                 else
-                    throw new ArgumentException($"Unknown data block '{chunckHeader.Tag}' while parsing bnk file '{fullName}'");
+                    throw new ArgumentException($"Unknown data block '{chunkHeader.Tag}' while parsing bnk file '{fullName}'");
 
                 // Verify
                 var bytesRead = expectedIndexAfterRead - indexBeforeRead;
                 if (chunk.Index != expectedIndexAfterRead)
-                    throw new Exception($"Error parsing bnk with tag '{chunckHeader.Tag}', incorrect num bytes read. '{bytesRead}' bytes read in this operation");
+                    throw new Exception($"Error parsing bnk with tag '{chunkHeader.Tag}', incorrect num bytes read. '{bytesRead}' bytes read in this operation");
             }
 
             if (chunk.BytesLeft != 0)
@@ -54,7 +54,7 @@ namespace Shared.GameFormats.Wwise
 
         private static BkhdChunk LoadBkhdChunk(string fullName, ByteChunk chunk) => BkhdParser.Parse(fullName, chunk);
 
-        private HircChunk LoadHircs(string fullName, ByteChunk chunk, uint chunkHeaderSize, uint bnkVersion, bool isCaHircItem)
+        private HircChunk LoadHircChunk(string fullName, ByteChunk chunk, uint chunkHeaderSize, uint bnkVersion, bool isCaHircItem)
         {
             var hircData = _hircParser.Parse(fullName, chunk, bnkVersion, isCaHircItem);
 
@@ -67,9 +67,9 @@ namespace Shared.GameFormats.Wwise
             return hircData;
         }
 
-        private static DidxChunk LoadDidx(string fullName, ByteChunk chunk) => DidxParser.Parse(fullName, chunk, null);
-        private static ByteChunk LoadData(string fullName, ByteChunk chunk) => DataParser.Parse(fullName, chunk, null);
-        static void LoadStid(string fullName, ByteChunk chunk) => StidParser.Parse(fullName, chunk, null);
+        private static DidxChunk LoadDidxChunk(string fullName, ByteChunk chunk) => DidxParser.Parse(fullName, chunk, null);
+        private static ByteChunk LoadDataChunk(string fullName, ByteChunk chunk) => DataParser.Parse(fullName, chunk, null);
+        static void LoadStidChunk(string fullName, ByteChunk chunk) => StidParser.Parse(fullName, chunk, null);
     }
 }
 

@@ -22,7 +22,7 @@ namespace Shared.GameFormats.Wwise.Hirc
         {
             var hircChuck = new HircChunk
             {
-                ChunkHeader = BnkChunkHeader.CreateFromBytes(chunk),
+                ChunkHeader = BnkChunkHeader.CreateSpecificData(chunk),
                 NumHircItems = chunk.ReadUInt32()
             };
 

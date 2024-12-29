@@ -110,7 +110,7 @@ namespace Editors.Audio.Utility
             var soundHirc = GetAsType<ICAkSound>(item);
 
             string displayName = soundHirc.GetStreamType() == SourceType.Data_BNK
-                ? $"Sound {soundHirc.GetSourceId()} (stream type: {soundHirc.GetStreamType()})"
+                ? $"Sound {soundHirc.GetSourceId()}.wem (stream type: {soundHirc.GetStreamType()})"
                 : $"Sound {soundHirc.GetSourceId()}.wem";
 
             var soundTreeNode = new HircTreeItem() { DisplayName = displayName, Item = item };

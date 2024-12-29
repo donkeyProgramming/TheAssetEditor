@@ -4,8 +4,8 @@ namespace Shared.GameFormats.Wwise.Bkhd
 {
     public class BkhdChunk
     {
-        public string OwnerFileName { get; set; }
-        public BnkChunkHeader ChunkHeader { get; set; } = new BnkChunkHeader() { Tag = "BKHD", ChunkSize = 0x18 };
+        public string OwnerFile { get; set; }
+        public BnkChunkHeader ChunkHeader { get; set; } = new BnkChunkHeader() { Tag = BankChunkTypes.BKHD, ChunkSize = 0x18 };
         public AkBankHeader AkBankHeader { get; set; }
     }
 

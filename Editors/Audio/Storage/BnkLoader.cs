@@ -93,7 +93,7 @@ namespace Editors.Audio.Storage
                         {
                             Id = didx.Id,
                             ByteArray = parsedBnk.DataChunk.GetBytesFromBuffer((int)didx.Offset, (int)didx.Size),
-                            OwnerFile = parsedBnk.BkhdChunk.OwnerFileName,
+                            OwnerFile = parsedBnk.BkhdChunk.OwnerFile,
                         };
 
                         if (output.DidxAudioList.ContainsKey(didx.Id) is false)
