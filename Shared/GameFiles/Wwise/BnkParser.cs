@@ -28,9 +28,9 @@ namespace Shared.GameFormats.Wwise
                 var expectedIndexAfterRead = indexBeforeRead + BnkChunkHeader.HeaderByteSize + chunckHeader.ChunkSize;
 
                 if (WwiseObjectHeaders.BKHD == chunckHeader.Tag)
-                    parsedBnkFile.Header = LoadHeader(fullName, chunk);
+                    parsedBnkFile.BkhdChunk = LoadBkhdChunk(fullName, chunk);
                 else if (WwiseObjectHeaders.HIRC == chunckHeader.Tag)
-                    parsedBnkFile.HircChuck = LoadHircs(fullName, chunk, chunckHeader.ChunkSize, parsedBnkFile.Header.DwBankGeneratorVersion, isCaHircItem);
+                    parsedBnkFile.HircChuck = LoadHircs(fullName, chunk, chunckHeader.ChunkSize, parsedBnkFile.BkhdChunk.AkBankHeader.DwBankGeneratorVersion, isCaHircItem);
                 else if (WwiseObjectHeaders.DIDX == chunckHeader.Tag)
                     parsedBnkFile.DidxChunk = LoadDidx(fullName, chunk);
                 else if (WwiseObjectHeaders.DATA == chunckHeader.Tag)
@@ -52,7 +52,7 @@ namespace Shared.GameFormats.Wwise
             return parsedBnkFile;
         }
 
-        private static BkhdHeader LoadHeader(string fullName, ByteChunk chunk) => BkhdParser.Parse(fullName, chunk);
+        private static BkhdChunk LoadBkhdChunk(string fullName, ByteChunk chunk) => BkhdParser.Parse(fullName, chunk);
 
         private HircChunk LoadHircs(string fullName, ByteChunk chunk, uint chunkHeaderSize, uint bnkVersion, bool isCaHircItem)
         {

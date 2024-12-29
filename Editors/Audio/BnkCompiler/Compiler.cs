@@ -63,7 +63,7 @@ namespace Editors.Audio.BnkCompiler
             return Result<CompileResult>.FromOk(compileResult);
         }
 
-        private static PackFile ConvertToPackFile(BkhdHeader header, HircChunk hircChunk, string outputFile)
+        private static PackFile ConvertToPackFile(BkhdChunk header, HircChunk hircChunk, string outputFile)
         {
             var outputName = $"{outputFile}.bnk";
             var headerBytes = BkhdParser.GetAsByteArray(header);
