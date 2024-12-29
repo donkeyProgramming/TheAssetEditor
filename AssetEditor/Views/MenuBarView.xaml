@@ -97,6 +97,7 @@
                 <MenuItem Header="Materials" Command="{Binding MenuBar.GenerateMaterialReportCommand}"/>
                 <MenuItem Header="Dialogue Events with State Groups" Command="{Binding MenuBar.GenerateDialogueEventInfoPrinterReportCommand}"/>
                 <MenuItem Header="Dialogue Event and Event Names" Command="{Binding MenuBar.GenerateDialogueEventAndEventNamePrinterReportCommand}"/>
+                <MenuItem Header="Dat Dump" Command="{Binding MenuBar.GenerateDatDumperReportCommand}"/>
                 <Separator/>
                 <MenuItem Header="Search" Command="{Binding MenuBar.SearchCommand}"/>
                 <Separator/>

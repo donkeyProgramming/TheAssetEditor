@@ -19,7 +19,6 @@ namespace Editors.Reports
             serviceCollection.AddTransient<DeepSearchReport>();
             serviceCollection.AddTransient<DeepSearchCommand>();
 
-
             serviceCollection.AddTransient<MaterialReportCommand>();
             serviceCollection.AddTransient<MaterialReportGenerator>();
 
@@ -40,6 +39,9 @@ namespace Editors.Reports
 
             serviceCollection.AddTransient<GenerateDialogueEventAndEventNamePrinterReportCommand>();
             serviceCollection.AddTransient<DialogueEventAndEventNamePrinter>();
+
+            serviceCollection.AddTransient<GenerateDatDumperReportCommand>();
+            serviceCollection.AddTransient<DatDumper>();
         }
     }
 }

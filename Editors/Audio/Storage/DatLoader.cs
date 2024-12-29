@@ -33,17 +33,17 @@ namespace Editors.Audio.Storage
 
         public LoadResult LoadDatData()
         {
-            var wh3Db = LoadDatFiles(_pfs, out var _);
-            var nameLookUp = BuildNameHelper(wh3Db);
+            var datDb = LoadDatFiles(_pfs, out var _);
+            var nameLookUp = BuildNameHelper(datDb);
 
-            var unprocessedDialogueEventsWithStateGroups = wh3Db.DialogueEventsWithStateGroups;
+            var unprocessedDialogueEventsWithStateGroups = datDb.DialogueEventsWithStateGroups;
             var processedDialogueEventsWithStateGroups = ProcessDialogueEvents(unprocessedDialogueEventsWithStateGroups, nameLookUp);
 
             // Add qualifiers to State Groups as some events have the same State Group twice e.g. VO_Actor.
             var dialogueEventsWithStateGroupsWithQualifiersAndStateGroups = BuildDialogueEventsWithStateGroupsWithQualifiersAndStateGroups(processedDialogueEventsWithStateGroups);
 
-            var stateGroupsWithStates0 = wh3Db.StateGroupsWithStates0;
-            var stateGroupsWithStates1 = wh3Db.StateGroupsWithStates1;
+            var stateGroupsWithStates0 = datDb.StateGroupsWithStates0;
+            var stateGroupsWithStates1 = datDb.StateGroupsWithStates1;
             var unprocessedStateGroupsWithStates = stateGroupsWithStates0.Concat(stateGroupsWithStates1).ToList();
             var processedStateGroupsWithStates = ProcessStateGroups(unprocessedStateGroupsWithStates);
 
@@ -152,9 +152,6 @@ namespace Editors.Audio.Storage
 
         private SoundDatFile LoadDatFiles(IPackFileService pfs, out List<string> failedFiles)
         {
-            var datDumpsFolderName = $"{DirectoryHelper.Temp}\\DatDumps";
-            DirectoryHelper.EnsureCreated(datDumpsFolderName);
-
             var datFiles = PackFileServiceUtility.FindAllWithExtention(pfs, ".dat");
             datFiles = PackFileUtil.FilterUnvantedFiles(pfs, datFiles, new[] { "bank_splits.dat", "campaign_music.dat", "battle_music.dat", "icudt61l.dat" }, out var removedFiles);
 
@@ -163,12 +160,10 @@ namespace Editors.Audio.Storage
 
             foreach (var datFile in datFiles)
             {
-                var datDump = $"{datDumpsFolderName}\\dat_dump_{datFile}.txt";
                 try
                 {
                     var parsedFile = LoadDatFile(datFile);
                     masterDat.Merge(parsedFile);
-                    //parsedFile.DumpToFile(datDump); // This creates dat dumps for individual dat files
                 }
                 catch (Exception e)
                 {
@@ -178,9 +173,6 @@ namespace Editors.Audio.Storage
             }
 
             failedFiles = failedDatParsing.Select(x => x.Item1).ToList();
-
-            var masterDatDump = $"{datDumpsFolderName}\\dat_dump_master.txt";
-            masterDat.DumpToFile(masterDatDump);
             return masterDat;
         }
 
