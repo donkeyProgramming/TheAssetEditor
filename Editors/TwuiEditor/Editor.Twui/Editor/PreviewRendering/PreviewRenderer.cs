@@ -1,15 +1,13 @@
 ﻿using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.IO;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.TextureEditor.ViewModels;
 using Editors.Twui.Editor.Datatypes;
 using GameWorld.Core.Rendering;
 using GameWorld.Core.Services;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.Core.PackFiles;
 using Shared.Core.Services;
-using static GameWorld.Core.Rendering.TextureToTextureRenderer;
 
 namespace Editors.Twui.Editor.PreviewRendering
 {
@@ -18,18 +16,19 @@ namespace Editors.Twui.Editor.PreviewRendering
         private readonly IScopedResourceLibrary _resourceLib;
         private readonly TextureToTextureRenderer _textureRenderer;
         private readonly IWpfGame _wpfGame;
-
+        private readonly IPackFileService _packFileService;
         TwuiFile _currentFile;
 
-        [ObservableProperty] ImageSource _previewImage;
+        [ObservableProperty] System.Windows.Media.ImageSource _previewImage;
 
-        public PreviewRenderer(IScopedResourceLibrary resourceLibrary, IWpfGame wpfGame)
+        public PreviewRenderer(IScopedResourceLibrary resourceLibrary, IWpfGame wpfGame, IPackFileService packFileService)
         {
             _resourceLib = resourceLibrary;
             _wpfGame = wpfGame;
+            _packFileService = packFileService;
             _wpfGame.ForceEnsureCreated();
 
-            _textureRenderer = new TextureToTextureRenderer(_wpfGame.GraphicsDevice, new SpriteBatch(_wpfGame.GraphicsDevice), _resourceLib);
+            _textureRenderer = new TextureToTextureRenderer(_wpfGame.GraphicsDevice, new Microsoft.Xna.Framework.Graphics.SpriteBatch(_wpfGame.GraphicsDevice), _resourceLib);
         }
 
         public void SetFile(TwuiFile file)
@@ -40,63 +39,92 @@ namespace Editors.Twui.Editor.PreviewRendering
 
         public void Refresh()
         {
-            var texture = _resourceLib.ForceLoadImage(@"ui\skins\default\dlc25_book_of_grudges\panel_back.png", out var imageInformation);
+            if (_currentFile == null)
+                return;
 
+            var width = 1600;
+            var height = 900;
+           
 
-            var settings = new DrawSettings();
-            using var renderedTexture = _textureRenderer.RenderToTexture(texture, texture.Width, texture.Height, settings);
-            using var sourceBitmap = new Bitmap(texture.Width, texture.Height);
-            using var g = Graphics.FromImage(sourceBitmap);
+            var textures = _currentFile.Components
+                .SelectMany(x=>x.ComponentImages)
+                .Select(x=>x.ImagePath)
+                .Distinct()
+                .ToList();
+     
 
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            DrawCheckerBoard(g, texture.Width, texture.Height);
-            var bitmap = ConvertTextureToImage(renderedTexture);
-            g.DrawImage(bitmap, 0, 0);
-            PreviewImage = BitmapToImageSource(sourceBitmap);
+            var device = _wpfGame.GraphicsDevice;
+            var spriteBatch = new Microsoft.Xna.Framework.Graphics.SpriteBatch(device);
+            var renderTarget = new RenderTarget2D(device, width, height, false, SurfaceFormat.Color, DepthFormat.Depth24);
 
-        }
+            device.SetRenderTarget(renderTarget);
+            device.Clear(Microsoft.Xna.Framework.Color.Transparent);
+            device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
 
-        public static Image ConvertTextureToImage(Texture2D texture)
-        {
-            using var stream = new MemoryStream();
-            texture.SaveAsPng(stream, texture.Width, texture.Height);
-            stream.Seek(0, SeekOrigin.Begin);
-            return Image.FromStream(stream);
-        }
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default,RasterizerState.CullNone);
 
-        static BitmapImage BitmapToImageSource(Image bitmap)
-        {
-            using var memory = new MemoryStream();
-            bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-            memory.Position = 0;
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = memory;
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
+            var notFound = new List<string>();
 
-            return bitmapImage;
-        }
-
-
-        private static void DrawCheckerBoard(Graphics g, int width, int height)
-        {
-            var size = 50;
-            var countX = width / size + 1;
-            var countY = height / size + 1;
-            using var blackBrush = new SolidBrush(System.Drawing.Color.DarkGray);
-            using var whiteBrush = new SolidBrush(System.Drawing.Color.LightGray);
-
-            for (var i = 0; i < countX; i++)
+            var componentList = _currentFile.Components.OrderByDescending(x=>x.Priority).ToList();
+            foreach (var comp in _currentFile.Components)
             {
-                for (var j = 0; j < countY; j++)
+                foreach (var image in comp.ComponentImages)
                 {
-                    if (j % 2 == 0 && i % 2 == 0 || j % 2 != 0 && i % 2 != 0)
-                        g.FillRectangle(blackBrush, i * size, j * size, size, size);
-                    else if (j % 2 == 0 && i % 2 != 0 || j % 2 != 0 && i % 2 == 0)
-                        g.FillRectangle(whiteBrush, i * size, j * size, size, size);
+                    if (string.IsNullOrWhiteSpace(image.ImagePath))
+                        continue;
+
+                    var found = _packFileService.FindFile(image.ImagePath);
+                    if (found == null)
+                    {
+                        notFound.Add(image.ImagePath);
+                        continue;
+                    }
+
+                    var texture = _resourceLib.ForceLoadImage(image.ImagePath, out var imageInformation);
+                    spriteBatch.Draw(texture, comp.Offset.GetAsVector2(), Microsoft.Xna.Framework.Color.White);
+
                 }
             }
+
+
+            device.SetRenderTarget(null);
+         
+            using var sourceBitmap = new System.Drawing.Bitmap(renderTarget.Width, renderTarget.Height);
+            using var g = Graphics.FromImage(sourceBitmap);
+            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+            DrawCheckerBoard(g, renderTarget.Width, renderTarget.Height);
+            var bitmap = TextureBuilder.ConvertTextureToImage(renderTarget);
+            g.DrawImage(bitmap, 0, 0);
+            
+            
+            PreviewImage = TextureBuilder.BitmapToImageSource(sourceBitmap);
+
+            renderTarget.Dispose();
+            spriteBatch.Dispose();
+
         }
+
+
+
+
+      private static void DrawCheckerBoard(Graphics g, int width, int height)
+      {
+          var size = 50;
+          var countX = width / size + 1;
+          var countY = height / size + 1;
+          using var blackBrush = new SolidBrush(System.Drawing.Color.DarkGray);
+          using var whiteBrush = new SolidBrush(System.Drawing.Color.LightGray);
+      
+          for (var i = 0; i < countX; i++)
+          {
+              for (var j = 0; j < countY; j++)
+              {
+                  if (j % 2 == 0 && i % 2 == 0 || j % 2 != 0 && i % 2 != 0)
+                      g.FillRectangle(blackBrush, i * size, j * size, size, size);
+                  else if (j % 2 == 0 && i % 2 != 0 || j % 2 != 0 && i % 2 == 0)
+                      g.FillRectangle(whiteBrush, i * size, j * size, size, size);
+              }
+          }
+      }
     }
 }

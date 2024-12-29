@@ -91,7 +91,7 @@ namespace Editors.TextureEditor.ViewModels
             return Image.FromStream(stream);
         }
 
-        static BitmapImage BitmapToImageSource(Image bitmap)
+        public static BitmapImage BitmapToImageSource(Image bitmap)
         {
             using var memory = new MemoryStream();
             bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);

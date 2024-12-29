@@ -1,11 +1,58 @@
 ﻿using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Shared.Ui.BaseDialogs.MathViews;
 
 namespace Editors.Twui.Editor.Datatypes
 {
+
+    public partial class ComponentImage : ObservableObject
+    {
+        [ObservableProperty] public partial string This { get; set; } = string.Empty;
+        [ObservableProperty] public partial string UniqueGuid { get; set; } = string.Empty;
+        [ObservableProperty] public partial string ImagePath { get; set; } = string.Empty;
+    }
+
+    public partial class State : ObservableObject
+    {
+        [ObservableProperty] public partial string This { get; set; } = string.Empty;
+        [ObservableProperty] public partial string Name { get; set; } = string.Empty;
+        [ObservableProperty] public partial float Width { get; set; } = 0;
+        [ObservableProperty] public partial float Height { get; set; } = 0;
+        [ObservableProperty] public partial bool Interactive { get; set; } = false;
+        [ObservableProperty] public partial string UniqueGuid { get; set; } = string.Empty;
+
+        [ObservableProperty] public partial ObservableCollection<StateImage> Images { get; set; } = [];
+
+        //<component_text
+        /*
+         					<component_text
+						text="Rewards"
+						textvalign="Center"
+						texthalign="Center"
+						textlocalised="true"
+						textlabel="StateText_52b2fba0"
+						font_m_font_name="Norse-Bold"
+						font_m_size="16"
+						font_m_colour="#4A0000FF"
+						fontcat_name="grudges_subheader"/>
+         */
+    }
+
+
+    public partial class StateImage : ObservableObject
+    {
+        [ObservableProperty] public partial string This { get; set; } = string.Empty;
+        [ObservableProperty] public partial string UniqueGuid { get; set; } = string.Empty;
+        [ObservableProperty] public partial string Componentimage { get; set; } = string.Empty;
+        [ObservableProperty] public partial float Width { get; set; } = 0;
+        [ObservableProperty] public partial float Height { get; set; } = 0;
+        [ObservableProperty] public partial string Colour { get; set; } = string.Empty;
+    }
+
+
     public partial class Component : ObservableObject
     {
         [ObservableProperty]public partial string This { get; set; } = string.Empty;
@@ -24,6 +71,12 @@ namespace Editors.Twui.Editor.Datatypes
         [ObservableProperty]public partial string Currentstate { get; set; } = string.Empty;
         [ObservableProperty]public partial bool Allowhorizontalresize { get; set; } = false;
         [ObservableProperty]public partial bool Allowverticalresize { get; set; } = false;
+
+
+        [ObservableProperty] public partial ObservableCollection<ComponentImage> ComponentImages { get; set; } = [];
+        [ObservableProperty] public partial ObservableCollection<State> States { get; set; } = [];
+
+        //LayoutEngine
     }
 
 
@@ -62,8 +115,83 @@ namespace Editors.Twui.Editor.Datatypes
             output.Allowhorizontalresize = AssignAttribute(output.Allowhorizontalresize, componentNode);
             output.Allowverticalresize = AssignAttribute(output.Allowverticalresize, componentNode);
 
+            if (output.Id == "root")
+            { 
+            
+            }
+
+            var states = componentNode.Element("states");
+            output.States = SerializeState(states);
+
+            var componentImageNodes = componentNode.Element("componentimages");
+            output.ComponentImages = SerializeComponentImage(componentImageNodes);
+
+
             return output;
         }
+
+        static ObservableCollection<ComponentImage> SerializeComponentImage(XElement? xmlStatesNode)
+        {
+            if (xmlStatesNode == null)
+                return [];
+            
+            var output = new ObservableCollection<ComponentImage>();
+            var allComponentImages = xmlStatesNode.Elements().ToList();
+            foreach (var xmlComponentImage in allComponentImages)
+            {
+                var image = new ComponentImage();
+                image.This = AssignAttribute(image.This, xmlComponentImage);
+                image.ImagePath = AssignAttribute(image.ImagePath, xmlComponentImage);
+                image.UniqueGuid = AssignAttribute(image.UniqueGuid, xmlComponentImage);
+                output.Add(image);
+            }
+
+            return output;
+        }
+
+        static ObservableCollection<State> SerializeState(XElement? xmlStatesNode)
+        {
+            if (xmlStatesNode == null)
+                return [];
+
+            var output = new ObservableCollection<State>();
+            var xmlAllStateNodes = xmlStatesNode.Elements().ToList();
+            foreach (var xmlState in xmlAllStateNodes)
+            {
+                var state = new State();
+                state.This = AssignAttribute(state.This, xmlState);
+                state.Name = AssignAttribute(state.Name, xmlState);
+                state.Width = AssignAttribute(state.Width, xmlState);
+                state.Height = AssignAttribute(state.Height, xmlState);
+                state.Interactive = AssignAttribute(state.Interactive, xmlState);
+                state.UniqueGuid = AssignAttribute(state.UniqueGuid, xmlState);
+
+                // Handle images
+                var xmlStateImageRoot = xmlState.Element("imagemetrics")?.Elements();
+                if (xmlStateImageRoot != null)
+                {
+                    foreach (var xmlStateImage in xmlStateImageRoot)
+                    {
+                        var stateImage = new StateImage();
+                        stateImage.This = AssignAttribute(stateImage.This, xmlStateImage);
+                        stateImage.UniqueGuid = AssignAttribute(stateImage.UniqueGuid, xmlStateImage);
+                        stateImage.Componentimage = AssignAttribute(stateImage.Componentimage, xmlStateImage);
+                        stateImage.Width = AssignAttribute(stateImage.Width, xmlStateImage);
+                        stateImage.Height = AssignAttribute(stateImage.Height, xmlStateImage);
+                        stateImage.Colour = AssignAttribute(stateImage.Colour, xmlStateImage);
+
+                        state.Images.Add(stateImage);
+                    }
+                }
+
+                output.Add(state);
+            }
+
+
+            return output;
+        }
+
+
 
         static string AssignAttribute(string value, XElement xmlNode, [CallerArgumentExpression("value")] string variableName = null)
         {
