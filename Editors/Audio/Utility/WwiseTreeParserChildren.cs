@@ -52,18 +52,6 @@ namespace Editors.Audio.Utility
 
             var actions = actionHirc.GetActionIds();
             ProcessNext(actions, actionTreeNode);
-
-            /*
-            // Generate CSV of strings (triggered when an event is searched)
-            var lines = File.ReadLines("C:\\Users\\george\\Desktop\\hirc_ids.csv");
-            using (var file = File.CreateText("C:\\Users\\george\\Desktop\\hirc_names.csv"))
-            foreach (var line in lines)
-            {
-                var name = _repository.GetNameFromHash(Convert.ToUInt32(line));
-                file.WriteLine(string.Join(",", name));
-            }
-            */
-
         }
 
         void ProcessAction(HircItem item, HircTreeItem parent)

@@ -90,6 +90,7 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void GenerateMaterialReport() => _uiCommandFactory.Create<MaterialReportCommand>().Execute();
         [RelayCommand] private void GenerateDialogueEventInfoPrinterReport() => _uiCommandFactory.Create<GenerateDialogueEventInfoPrinterReportCommand>().Execute();
         [RelayCommand] private void GenerateDialogueEventAndEventNamePrinterReport() => _uiCommandFactory.Create<GenerateDialogueEventAndEventNamePrinterReportCommand>().Execute();
+        [RelayCommand] private void GenerateDatDumperReport() => _uiCommandFactory.Create<GenerateDatDumperReportCommand>().Execute();
 
 
         [RelayCommand] private void TouchedFileRecorderStart() => _touchedFilesRecorder.Start();
