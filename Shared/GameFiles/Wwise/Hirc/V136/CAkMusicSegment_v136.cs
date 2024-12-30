@@ -2,12 +2,11 @@
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkMusicSegment_v136 : HircItem, INodeBaseParamsAccessor
+    public class CAkMusicSegment_v136 : HircItem
     {
         public MusicNodeParams MusicNodeParams { get; set; }
         public double FDuration { get; set; }
         public List<AkMusicMarkerWwise> PArrayMarkersList { get; set; } = [];
-        public NodeBaseParams NodeBaseParams => MusicNodeParams.NodeBaseParams;
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {

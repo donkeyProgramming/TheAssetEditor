@@ -2,7 +2,7 @@
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkActorMixer_v136 : HircItem, INodeBaseParamsAccessor, ICAkActorMixer
+    public class CAkActorMixer_v136 : HircItem, ICAkActorMixer
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }

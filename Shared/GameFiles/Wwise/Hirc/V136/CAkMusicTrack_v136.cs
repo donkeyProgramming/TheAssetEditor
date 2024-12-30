@@ -2,7 +2,7 @@
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkMusicTrack_v136 : HircItem, INodeBaseParamsAccessor, ICAkMusicTrack
+    public class CAkMusicTrack_v136 : HircItem, ICAkMusicTrack
     {
         public byte UFlags { get; set; }
         public List<AkBankSourceData> PSourceList { get; set; } = [];

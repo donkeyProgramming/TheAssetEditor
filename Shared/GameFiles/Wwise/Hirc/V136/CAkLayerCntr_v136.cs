@@ -2,7 +2,7 @@
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkLayerCntr_v136 : HircItem, INodeBaseParamsAccessor, ICAkLayerCntr
+    public class CAkLayerCntr_v136 : HircItem, ICAkLayerCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public Children Children { get; set; }

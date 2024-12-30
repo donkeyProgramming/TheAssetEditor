@@ -1,7 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkRanSeqCntr_v136 : HircItem, ICAkRanSeqCnt, INodeBaseParamsAccessor
+    public class CAkRanSeqCntr_v136 : HircItem, ICAkRanSeqCnt
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public ushort SLoopCount { get; set; }

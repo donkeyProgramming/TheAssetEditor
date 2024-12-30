@@ -2,7 +2,7 @@
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkSound_v136 : HircItem, ICAkSound, INodeBaseParamsAccessor
+    public class CAkSound_v136 : HircItem, ICAkSound
     {
         public AkBankSourceData AkBankSourceData { get; set; }
         public NodeBaseParams NodeBaseParams { get; set; }

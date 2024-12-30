@@ -3,7 +3,7 @@ using static Shared.GameFormats.Wwise.Hirc.ICAkSwitchCntr;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkSwitchCntr_v136 : HircItem, INodeBaseParamsAccessor, ICAkSwitchCntr
+    public class CAkSwitchCntr_v136 : HircItem, ICAkSwitchCntr
     {
         public NodeBaseParams NodeBaseParams { get; set; }
         public AkGroupType EGroupType { get; set; }

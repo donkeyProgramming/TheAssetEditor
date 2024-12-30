@@ -3,9 +3,8 @@ using Shared.GameFormats.Wwise.Hirc.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkMusicSwitchCntr_v136 : HircItem, INodeBaseParamsAccessor
+    public class CAkMusicSwitchCntr_v136 : HircItem
     {
-        public NodeBaseParams NodeBaseParams => MusicTransNodeParams.MusicNodeParams.NodeBaseParams;
         public MusicTransNodeParams MusicTransNodeParams { get; set; }
         public byte BIsContinuePlayback { get; set; }
         public uint UTreeDepth { get; set; }
