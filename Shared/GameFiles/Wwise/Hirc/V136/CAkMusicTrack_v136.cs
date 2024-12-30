@@ -39,7 +39,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             ILookAheadTime = chunk.ReadInt32();
         }
 
-        public override void UpdateSize() => throw new NotImplementedException();
+        public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
 
         public List<uint> GetChildren() => PSourceList.Select(x => x.AkMediaInformation.SourceId).ToList();

@@ -23,7 +23,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
             return Actions.Select(x => x.ActionId).ToList();
         }
 
-        public override void UpdateSize() => throw new NotImplementedException();
+        public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 }

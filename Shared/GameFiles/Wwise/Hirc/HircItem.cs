@@ -12,26 +12,28 @@ namespace Shared.GameFormats.Wwise.Hirc
         public string OwnerFile { get; set; } = "OwnerFile Not Set";
         public bool IsCaHircItem { get; set; }
         public uint ByteIndexInFile { get; set; }
-        public bool HasError { get; set; } = true;
-        public HircType Type { get; set; }
-        public uint Size { get; set; }
-        public uint Id { get; set; }
         public uint IndexInFile { get; set; }
+        public bool HasError { get; set; } = true;
+
+        // Wwise object properties
+        public HircType HircType { get; set; }
+        public uint SectionSize { get; set; }
+        public uint Id { get; set; }
 
         public void Parse(ByteChunk chunk)
         {
             try
             {
                 var objectStartIndex = chunk.Index;
-
                 ByteIndexInFile = (uint)objectStartIndex;
-                Type = (HircType)chunk.ReadByte();
-                Size = chunk.ReadUInt32();
+
+                HircType = (HircType)chunk.ReadByte();
+                SectionSize = chunk.ReadUInt32();
                 Id = chunk.ReadUInt32();
                 CreateSpecificData(chunk);
-                var currentIndex = chunk.Index;
-                var computedIndex = (int)(objectStartIndex + 5 + Size);
 
+                var currentIndex = chunk.Index;
+                var computedIndex = (int)(objectStartIndex + 5 + SectionSize);
                 chunk.Index = computedIndex;
                 HasError = false;
             }
@@ -46,15 +48,15 @@ namespace Shared.GameFormats.Wwise.Hirc
         protected MemoryStream WriteHeader()
         {
             var memStream = new MemoryStream();
-            memStream.Write(ByteParsers.Byte.EncodeValue((byte)Type, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(Size, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue((byte)HircType, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(SectionSize, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(Id, out _));
 
             return memStream;
         }
 
         protected abstract void CreateSpecificData(ByteChunk chunk);
-        public abstract void UpdateSize();
+        public abstract void UpdateSectionSize();
         public abstract byte[] GetAsByteArray();
     }
 }

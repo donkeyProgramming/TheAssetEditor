@@ -54,9 +54,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             return byteArray;
         }
 
-        public override void UpdateSize()
+        public override void UpdateSectionSize()
         {
-            Size = HircHeaderSize + 2 + 4 + 1 + AkPropBundle0.GetSize() + AkPropBundle1.GetSize() + AkPlayActionParams.ComputeSize();
+            SectionSize = HircHeaderSize + 2 + 4 + 1 + AkPropBundle0.GetSize() + AkPropBundle1.GetSize() + AkPlayActionParams.ComputeSize();
         }
         public ActionType GetActionType() => ActionType;
         public uint GetChildId() => IdExt;

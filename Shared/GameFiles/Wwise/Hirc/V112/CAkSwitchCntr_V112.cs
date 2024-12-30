@@ -33,7 +33,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
                 Parameters.Add(AkSwitchNodeParams.Create(chunk));
         }
 
-        public override void UpdateSize() => throw new NotImplementedException();
+        public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 

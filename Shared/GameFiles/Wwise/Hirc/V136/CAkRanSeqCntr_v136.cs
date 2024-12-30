@@ -47,13 +47,13 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public uint GetParentId() => NodeBaseParams.DirectParentId;
         public List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
 
-        public override void UpdateSize()
+        public override void UpdateSectionSize()
         {
             var nodeBaseParams = NodeBaseParams.GetSize();
             var children = Children.GetSize();
             var akPlaylistCount = Convert.ToUInt32(AkPlaylist.Count);
 
-            Size = BnkChunkHeader.HeaderByteSize + nodeBaseParams + 2 + 2 + 2 + 4 + 4 + 4 + 2 + 1 + 1 + 1 + 1 + children + 2 + akPlaylistCount * 8 - 4;
+            SectionSize = BnkChunkHeader.HeaderByteSize + nodeBaseParams + 2 + 2 + 2 + 4 + 4 + 4 + 2 + 1 + 1 + 1 + 1 + children + 2 + akPlaylistCount * 8 - 4;
         }
 
         public override byte[] GetAsByteArray()

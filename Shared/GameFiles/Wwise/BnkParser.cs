@@ -58,7 +58,7 @@ namespace Shared.GameFormats.Wwise
         {
             var hircData = _hircParser.Parse(fullName, chunk, bnkVersion, isCaHircItem);
 
-            var hircSizes = hircData.HircItems.Sum(x => x.Size);
+            var hircSizes = hircData.HircItems.Sum(x => x.SectionSize);
             var expectedHircChunkSize = hircSizes + hircData.NumHircItems * 5 + 4;
             var areEqual = expectedHircChunkSize == chunkHeaderSize;
             if (areEqual == false)

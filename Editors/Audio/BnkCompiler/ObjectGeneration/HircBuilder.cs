@@ -24,7 +24,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration
             hircChunk.SetFromHircList(hircList);
 
             // Validate this is same as before.
-            hircChunk.ChunkHeader.ChunkSize = (uint)(hircChunk.HircItems.Sum(x => x.Size) + hircChunk.HircItems.Count * 5 + 4);
+            hircChunk.ChunkHeader.ChunkSize = (uint)(hircChunk.HircItems.Sum(x => x.SectionSize) + hircChunk.HircItems.Count * 5 + 4);
             hircChunk.NumHircItems = (uint)hircChunk.HircItems.Count;
             return hircChunk;
         }

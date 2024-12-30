@@ -88,7 +88,7 @@ namespace Editors.Audio.AudioExplorer
             var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
             SelectedNodeText.Value = hircAsString;
 
-            if (selectedNode.Item.Type == HircType.Sound)
+            if (selectedNode.Item.HircType == HircType.Sound)
             {
                 var findAudioParentStructureHelper = new FindAudioParentStructureHelper();
                 var parentStructs = findAudioParentStructureHelper.Compute(selectedNode.Item, _audioRepository);

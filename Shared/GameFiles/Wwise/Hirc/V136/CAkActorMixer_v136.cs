@@ -14,9 +14,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             Children = Children.Create(chunk);
         }
 
-        public override void UpdateSize()
+        public override void UpdateSectionSize()
         {
-            Size = BnkChunkHeader.HeaderByteSize + Children.GetSize() + NodeBaseParams.GetSize() - 4;
+            SectionSize = BnkChunkHeader.HeaderByteSize + Children.GetSize() + NodeBaseParams.GetSize() - 4;
         }
 
         public override byte[] GetAsByteArray()

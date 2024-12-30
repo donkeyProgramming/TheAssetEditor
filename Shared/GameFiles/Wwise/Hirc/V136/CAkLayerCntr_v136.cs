@@ -22,7 +22,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             BIsContinuousValidation = chunk.ReadByte();
         }
 
-        public override void UpdateSize() => throw new NotImplementedException();
+        public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
 
         public List<uint> GetChildren() => Children.ChildIdList;

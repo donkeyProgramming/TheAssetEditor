@@ -9,7 +9,7 @@
         public void SetFromHircList(List<HircItem> hircList)
         {
             HircItems.AddRange(hircList);
-            ChunkHeader.ChunkSize = (uint)(hircList.Sum(x => x.Size) + hircList.Count * 5 + 4);
+            ChunkHeader.ChunkSize = (uint)(hircList.Sum(x => x.SectionSize) + hircList.Count * 5 + 4);
             NumHircItems = (uint)hircList.Count;
         }
     }

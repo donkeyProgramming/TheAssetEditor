@@ -25,7 +25,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         {
             var wwiseRandomContainer = new CAkRanSeqCntr_v136();
             wwiseRandomContainer.Id = inputContainer.Id;
-            wwiseRandomContainer.Type = HircType.SequenceContainer;
+            wwiseRandomContainer.HircType = HircType.SequenceContainer;
             wwiseRandomContainer.NodeBaseParams = NodeBaseParams.CreateDefaultRandomContainer();
             wwiseRandomContainer.ByBitVector = 0x12;
             wwiseRandomContainer.FTransitionTime = 1000;
@@ -37,7 +37,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseRandomContainer.Children = CreateChildrenList(allChildIds);
             wwiseRandomContainer.AkPlaylist = allChildIds.Select(CreateAkPlaylistItem).ToList();
 
-            wwiseRandomContainer.UpdateSize();
+            wwiseRandomContainer.UpdateSectionSize();
 
             return wwiseRandomContainer;
         }

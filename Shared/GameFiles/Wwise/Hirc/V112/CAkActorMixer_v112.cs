@@ -13,7 +13,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
             Children = Children.Create(chunk);
         }
 
-        public override void UpdateSize() => throw new NotImplementedException();
+        public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
         public List<uint> GetChildren() => Children.ChildIdList;
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;

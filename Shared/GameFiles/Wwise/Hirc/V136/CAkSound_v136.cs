@@ -17,10 +17,10 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public uint GetSourceId() => AkBankSourceData.AkMediaInformation.SourceId;
         public SourceType GetStreamType() => AkBankSourceData.StreamType;
 
-        public override void UpdateSize()
+        public override void UpdateSectionSize()
         {
             var nodeBaseParams = NodeBaseParams.GetSize();
-            Size = BnkChunkHeader.HeaderByteSize + AkBankSourceData.GetSize() + nodeBaseParams - 4;
+            SectionSize = BnkChunkHeader.HeaderByteSize + AkBankSourceData.GetSize() + nodeBaseParams - 4;
         }
 
         public override byte[] GetAsByteArray()

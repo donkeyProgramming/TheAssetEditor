@@ -25,12 +25,12 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         {
             var wwiseAction = new CAkAction_v136();
             wwiseAction.Id = inputAction.Id;
-            wwiseAction.Type = HircType.Action;
+            wwiseAction.HircType = HircType.Action;
             wwiseAction.ActionType = ActionType.Play;
             wwiseAction.IdExt = inputAction.ChildId;
             wwiseAction.AkPlayActionParams.ByBitVector = 0x04;
             wwiseAction.AkPlayActionParams.BankId = WwiseHash.Compute(project.ProjectSettings.BnkName);
-            wwiseAction.UpdateSize();
+            wwiseAction.UpdateSectionSize();
 
             return wwiseAction;
         }

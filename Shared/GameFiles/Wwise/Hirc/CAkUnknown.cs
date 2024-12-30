@@ -8,10 +8,10 @@ namespace Shared.GameFormats.Wwise.Hirc
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            chunk.ReadBytes((int)Size - 4);
+            chunk.ReadBytes((int)SectionSize - 4);
         }
 
-        public override void UpdateSize() => throw new NotImplementedException();
+        public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 }

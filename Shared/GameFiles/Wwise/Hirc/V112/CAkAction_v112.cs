@@ -16,7 +16,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
         public ActionType GetActionType() => ActionType;
         public uint GetChildId() => SoundId;
         public uint GetStateGroupId() => throw new NotImplementedException();
-        public override void UpdateSize() => throw new NotImplementedException();
+        public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 }

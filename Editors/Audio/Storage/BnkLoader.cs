@@ -129,7 +129,7 @@ namespace Editors.Audio.Storage
             var errorHirc = hircItems.Where(hircItem => hircItem.HasError).Count();
             stringBuilder.AppendLine($"\t Total HircObjects: {hircItems.Count()} Unknown: {unknownHirc} Decoding Errors:{errorHirc}");
 
-            var grouped = hircItems.GroupBy(hircItem => hircItem.Type);
+            var grouped = hircItems.GroupBy(hircItem => hircItem.HircType);
             var groupedWithError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is CAkUnknown == true || y.HasError));
             var groupedWithoutError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is CAkUnknown == false && y.HasError == false));
 

@@ -121,7 +121,7 @@ namespace Editors.Audio.Storage
             {
                 foreach (var hircItem in hircItemList)
                 {
-                    if (hircItem.Type == HircType.Dialogue_Event && hircItem.Id == id && hircItem.IsCaHircItem)
+                    if (hircItem.HircType == HircType.Dialogue_Event && hircItem.Id == id && hircItem.IsCaHircItem)
                     {
                         var file = Path.GetFileName(hircItem.OwnerFile);
                         file = Path.GetFileNameWithoutExtension(file);

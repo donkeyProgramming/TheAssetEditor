@@ -64,13 +64,13 @@ namespace Editors.Audio.Utility
 
         void ProcessHircObject(HircItem item, HircTreeItem parent)
         {
-            if (_hircProcessChildMap.TryGetValue(item.Type, out var func))
+            if (_hircProcessChildMap.TryGetValue(item.HircType, out var func))
             {
                 func(item, parent);
             }
             else
             {
-                var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.Type} for Id {item.Id} in {item.OwnerFile}", Item = item };
+                var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.HircType} for Id {item.Id} in {item.OwnerFile}", Item = item };
                 parent.Children.Add(unknownNode);
             }
         }

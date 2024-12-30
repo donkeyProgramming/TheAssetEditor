@@ -8,7 +8,7 @@ namespace Shared.GameFormats.Wwise.Hirc
         {
         }
 
-        HircFactory GetHircFactory(uint bnkVersion)
+        private static HircFactory GetHircFactory(uint bnkVersion)
         {
             return HircFactory.CreateFactory(bnkVersion);
         }

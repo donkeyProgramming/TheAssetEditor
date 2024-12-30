@@ -24,7 +24,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         {
             var wwiseActorMixer = new CAkActorMixer_v136();
             wwiseActorMixer.Id = actorMixer.Id;
-            wwiseActorMixer.Type = HircType.ActorMixer;
+            wwiseActorMixer.HircType = HircType.ActorMixer;
             wwiseActorMixer.NodeBaseParams = NodeBaseParams.CreateDefault();
             wwiseActorMixer.NodeBaseParams.DirectParentId = actorMixer.DirectParentId;
 
@@ -35,7 +35,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 ChildIdList = allChildIds
             };
 
-            wwiseActorMixer.UpdateSize();
+            wwiseActorMixer.UpdateSectionSize();
 
             return wwiseActorMixer;
         }

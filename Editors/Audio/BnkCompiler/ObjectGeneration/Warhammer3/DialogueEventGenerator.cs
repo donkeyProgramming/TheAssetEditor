@@ -37,7 +37,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseDialogueEvent.CustomArgumentList = new List<ArgumentList.Argument>();
 
             wwiseDialogueEvent.Id = inputDialogueEvent.Id;
-            wwiseDialogueEvent.Type = HircType.Dialogue_Event;
+            wwiseDialogueEvent.HircType = HircType.Dialogue_Event;
 
             var extractedDialogueEvents = _audioRepository.DialogueEventsWithStateGroups;
 
@@ -62,7 +62,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseDialogueEvent.AkPropBundle0 = 0;
             wwiseDialogueEvent.AkPropBundle1 = 0;
 
-            wwiseDialogueEvent.UpdateSize();
+            wwiseDialogueEvent.UpdateSectionSize();
             return wwiseDialogueEvent;
         }
     }

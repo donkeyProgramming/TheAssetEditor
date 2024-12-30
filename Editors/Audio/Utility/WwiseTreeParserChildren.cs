@@ -67,7 +67,7 @@ namespace Editors.Audio.Utility
                 var stateGroupId = actionHirc.GetStateGroupId();
                 var musicSwitches = _repository.HircObjects
                    .SelectMany(x => x.Value)
-                   .Where(X => X.Type == HircType.Music_Switch)
+                   .Where(X => X.HircType == HircType.Music_Switch)
                    .DistinctBy(x => x.Id)
                    .Cast<CAkMusicSwitchCntr_v136>()
                    .ToList();
@@ -81,7 +81,7 @@ namespace Editors.Audio.Utility
 
                 var normalSwitches = _repository.HircObjects
                    .SelectMany(x => x.Value)
-                   .Where(X => X.Type == HircType.SwitchContainer)
+                   .Where(X => X.HircType == HircType.SwitchContainer)
                    .DistinctBy(x => x.Id)
                    .Cast<CAkSwitchCntr_v136>()
                    .ToList();

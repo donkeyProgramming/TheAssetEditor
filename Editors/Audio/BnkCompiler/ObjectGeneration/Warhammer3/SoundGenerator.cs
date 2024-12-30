@@ -42,7 +42,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             var wwiseSound = new CAkSound_v136()
             {
                 Id = inputSound.Id,
-                Type = HircType.Sound,
+                HircType = HircType.Sound,
                 AkBankSourceData = new AkBankSourceData()
                 {
                     PluginId = 0x00040001, // [VORBIS]
@@ -73,7 +73,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 };
             }
 
-            wwiseSound.UpdateSize();
+            wwiseSound.UpdateSectionSize();
 
             return wwiseSound;
         }

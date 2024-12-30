@@ -47,7 +47,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
 
         public uint GetParentId() => NodeBaseParams.DirectParentId;
         public List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
-        public override void UpdateSize() => throw new NotImplementedException();
+        public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 

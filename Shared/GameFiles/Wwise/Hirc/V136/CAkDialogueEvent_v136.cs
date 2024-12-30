@@ -32,9 +32,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             AkPropBundle1 = chunk.ReadByte();
         }
 
-        public override void UpdateSize()
+        public override void UpdateSectionSize()
         {
-            Size = HircHeaderSize + 1 + 4 + (uint)CustomArgumentList.Count * 5 + 4 + 1 + UTreeDataSize + 1 + 1;
+            SectionSize = HircHeaderSize + 1 + 4 + (uint)CustomArgumentList.Count * 5 + 4 + 1 + UTreeDataSize + 1 + 1;
         }
 
         public override byte[] GetAsByteArray()

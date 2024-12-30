@@ -31,7 +31,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 PropertyValuesList.Add(PluginPropertyValue.Create(chunk));
         }
 
-        public override void UpdateSize() => throw new NotImplementedException();
+        public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 }

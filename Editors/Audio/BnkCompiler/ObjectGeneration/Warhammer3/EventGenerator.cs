@@ -26,10 +26,10 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         {
             var wwiseEvent = new CAkEvent_v136();
             wwiseEvent.Id = inputEvent.Id;
-            wwiseEvent.Type = HircType.Event;
+            wwiseEvent.HircType = HircType.Event;
             wwiseEvent.Actions = inputEvent.Actions.Select(x => CreateActionFromInputEvent(x, project)).ToList();
 
-            wwiseEvent.UpdateSize();
+            wwiseEvent.UpdateSectionSize();
             return wwiseEvent;
         }
 

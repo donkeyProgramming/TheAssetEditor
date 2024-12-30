@@ -37,9 +37,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             return byteArray;
         }
 
-        public override void UpdateSize()
+        public override void UpdateSectionSize()
         {
-            Size = (uint)(HircHeaderSize + 1 + 4 * Actions.Count);
+            SectionSize = (uint)(HircHeaderSize + 1 + 4 * Actions.Count);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 PArrayMarkersList.Add(AkMusicMarkerWwise.Create(chunk));
         }
 
-        public override void UpdateSize() => throw new NotImplementedException();
+        public override void UpdateSectionSize() => throw new NotImplementedException();
         public override byte[] GetAsByteArray() => throw new NotImplementedException();
     }
 
