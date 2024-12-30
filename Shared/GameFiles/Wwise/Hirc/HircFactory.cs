@@ -31,24 +31,10 @@
             switch (version)
             {
                 case 112: return CreateFactory_v112();
-                case 122: return CreateFactory_v122();
                 case 136: return CreateFactory_v136();
             }
 
             throw new Exception($"Unknown Version {version}");
-        }
-
-        private static HircFactory CreateFactory_v122()
-        {
-            var instance = new HircFactory();
-            instance.RegisterHirc(HircType.Sound, () => new V122.CAkSound_V122());
-            instance.RegisterHirc(HircType.Event, () => new V122.CAkEvent_v122());
-            instance.RegisterHirc(HircType.Action, () => new V122.CAkAction_V122());
-            instance.RegisterHirc(HircType.SwitchContainer, () => new V122.CAkSwitchCntr_v122());
-            instance.RegisterHirc(HircType.SequenceContainer, () => new V122.CAkRanSeqCnt_V122());
-            instance.RegisterHirc(HircType.LayerContainer, () => new V122.CAkLayerCntr_v122());
-            instance.RegisterHirc(HircType.Dialogue_Event, () => new V122.CAkDialogueEvent_v122());
-            return instance;
         }
 
         private static HircFactory CreateFactory_v112()
