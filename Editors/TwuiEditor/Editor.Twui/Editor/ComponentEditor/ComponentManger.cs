@@ -27,7 +27,6 @@ namespace Editors.Twui.Editor.ComponentEditor
             SelectedComponent = component;
         }
 
-
         public void SetFile(TwuiFile file)
         { 
             _currentFile = file;

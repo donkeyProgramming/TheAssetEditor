@@ -1,6 +1,6 @@
 ﻿using GameWorld.Core.Services;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.GameFormats.Twui.Data;
 
@@ -10,58 +10,68 @@ namespace Editors.Twui.Editor.PreviewRendering
     {
         private readonly IWpfGame _wpfGame;
         private readonly IScopedResourceLibrary _resourceLibrary;
-        private readonly IPackFileService _packFileService;
+        SpriteBatch _spriteBatch;
 
-        public TwuiPreviewBuilder(IWpfGame wpfGame, IScopedResourceLibrary resourceLibrary, IPackFileService packFileService)
+        public TwuiPreviewBuilder(IWpfGame wpfGame, IScopedResourceLibrary resourceLibrary)
         {
             _wpfGame = wpfGame;
             _resourceLibrary = resourceLibrary;
-            _packFileService = packFileService;
         }
 
-        public void UpdateTexture(RenderTarget2D renderTarget, TwuiFile _currentFile)
+        void Create()
         {
-            var textures = _currentFile.Components
-                .SelectMany(x => x.ComponentImages)
-                .Select(x => x.ImagePath)
-                .Distinct()
-                .ToList();
+            _spriteBatch = new SpriteBatch(_wpfGame.GraphicsDevice);
+        }
 
+        void Cleanup()
+        {
+            _spriteBatch?.Dispose();
+        }
+
+        public void UpdateTexture(RenderTarget2D renderTarget, TwuiFile twuiFile)
+        {
+            Create();
             var device = _wpfGame.GraphicsDevice;
-            var spriteBatch = new SpriteBatch(device);   
-
             device.SetRenderTarget(renderTarget);
-            device.Clear(Microsoft.Xna.Framework.Color.Transparent);
+            device.Clear(Color.Transparent);
             device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
+            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone);
 
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone);
 
-            var notFound = new List<string>();
-
-            var componentList = _currentFile.Components.OrderByDescending(x => x.Priority).ToList();
-            foreach (var comp in _currentFile.Components)
-            {
-                foreach (var image in comp.ComponentImages)
-                {
-                    if (string.IsNullOrWhiteSpace(image.ImagePath))
-                        continue;
-
-                    var found = _packFileService.FindFile(image.ImagePath);
-                    if (found == null)
-                    {
-                        notFound.Add(image.ImagePath);
-                        continue;
-                    }
-
-                    var texture = _resourceLibrary.ForceLoadImage(image.ImagePath, out var imageInformation);
-                    spriteBatch.Draw(texture, comp.Offset, Microsoft.Xna.Framework.Color.White);
-
-                }
-            }
+            DrawHierarchy(Vector2.Zero, twuiFile.Hierarchy.RootItems, twuiFile.Components);
 
             device.SetRenderTarget(null);
-            spriteBatch?.Dispose();
+            Cleanup();
         }
-    
+
+        void DrawHierarchy(Vector2 localSpace, IEnumerable<HierarchyItem> hierarchyItems, List<Component> componentList)
+        {
+            foreach (var hierarchyItem in hierarchyItems)
+            {
+                var component = componentList.FirstOrDefault(x=> hierarchyItem.Id == x.This);
+                if (component == null)
+                    continue;
+
+                var componentLocalSpace = DrawComponent(localSpace, component);
+                DrawHierarchy(componentLocalSpace, hierarchyItem.Children, componentList);
+            }
+        }
+
+        Vector2 DrawComponent(Vector2 localSpace, Component component)
+        {
+            foreach (var image in component.ComponentImages)
+            {
+                if (string.IsNullOrWhiteSpace(image.ImagePath))
+                    continue;
+
+                var texture = _resourceLibrary.LoadTexture(image.ImagePath);
+                if (texture == null)
+                    continue;
+
+                _spriteBatch.Draw(texture, component.Offset, Color.White);
+            }
+
+            return localSpace;
+        }  
     }
 }
