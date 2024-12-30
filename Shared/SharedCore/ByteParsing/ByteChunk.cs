@@ -140,6 +140,7 @@ namespace Shared.Core.ByteParsing
 
         public string ReadStringAscii() => Read(ByteParsers.StringAscii);
         public string ReadString() => Read(ByteParsers.String);
+        public string ReadOptionalString() => Read(ByteParsers.OptString);
         public int ReadInt32() => Read(ByteParsers.Int32);
         public uint ReadUInt32() => Read(ByteParsers.UInt32);
         public long ReadInt64() => Read(ByteParsers.Int64);
