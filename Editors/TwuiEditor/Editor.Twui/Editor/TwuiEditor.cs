@@ -1,12 +1,12 @@
 ﻿using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Editors.Twui.Editor.Datatypes;
 using Editors.Twui.Editor.PreviewRendering;
-using Editors.Twui.Editor.Serialization;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
 using Editors.Twui.Editor.ComponentEditor;
+using Shared.GameFormats.Twui;
+using Shared.GameFormats.Twui.Data;
 
 namespace Editors.Twui.Editor
 {

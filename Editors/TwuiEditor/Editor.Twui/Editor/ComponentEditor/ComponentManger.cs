@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Editors.Twui.Editor.Datatypes;
+using Shared.GameFormats.Twui.Data;
 
 namespace Editors.Twui.Editor.ComponentEditor
 {
@@ -8,7 +8,7 @@ namespace Editors.Twui.Editor.ComponentEditor
         [ObservableProperty] HierarchyItem? _selectedHierarchyItem;
         [ObservableProperty] Component? _selectedComponent;
 
-        TwuiFile _currentFile;
+        TwuiFile? _currentFile;
 
         public ComponentManger()
         { 
@@ -23,7 +23,7 @@ namespace Editors.Twui.Editor.ComponentEditor
                 return;
             }
 
-            var component = _currentFile.Components.FirstOrDefault(x => x.This == value.Id);
+            var component = _currentFile.Components.FirstOrDefault(x => x.This == value.Id);    // Build a veiw model here! 
             SelectedComponent = component;
         }
 

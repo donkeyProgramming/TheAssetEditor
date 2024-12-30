@@ -63,7 +63,7 @@ namespace Editors.TextureEditor.ViewModels
             return previewImages;
         }
 
-        private static void DrawCheckerBoard(Graphics g, int width, int height)
+        public static void DrawCheckerBoard(Graphics g, int width, int height)
         {
             var size = 50;
             var countX = width / size + 1;

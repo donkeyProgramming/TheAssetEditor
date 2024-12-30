@@ -1,16 +1,15 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Xml.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Xml.Linq;
+using Shared.GameFormats.Twui.Data;
 
-namespace Editors.Twui.Editor.Datatypes
+namespace Shared.GameFormats.Twui
 {
-    public partial class Hierarchy : ObservableObject
+    public class HierarchySerializer
     {
-        [ObservableProperty] ObservableCollection<HierarchyItem> _rootItems = [];
-
-        public static Hierarchy Serialize(XElement hierarchyNode)
+        public static Hierarchy Serialize(XElement? hierarchyNode)
         {
+            if (hierarchyNode == null)
+                return new();
+
             var nodes = Process(hierarchyNode.FirstNode as XElement, null);
             return new Hierarchy()
             {
@@ -18,9 +17,9 @@ namespace Editors.Twui.Editor.Datatypes
             };
         }
 
-        private static ObservableCollection<HierarchyItem> Process(XElement hierarchyNode, HierarchyItem? parentHierarchyItem)
+        private static List<HierarchyItem> Process(XElement hierarchyNode, HierarchyItem? parentHierarchyItem)
         {
-            var output = new ObservableCollection<HierarchyItem>();
+            var output = new List<HierarchyItem>();
 
             var currentXmlNode = hierarchyNode;
             if (currentXmlNode != null)
@@ -45,14 +44,5 @@ namespace Editors.Twui.Editor.Datatypes
             return output;
 
         }
-    }
-
-    [DebuggerDisplay("{Name} - {Id}")]
-    public class HierarchyItem
-    {
-        public List<HierarchyItem> Children { get; set; } = new List<HierarchyItem>();
-
-        public string Name { get; set; } = string.Empty;
-        public string Id { get; set; } = string.Empty;
     }
 }

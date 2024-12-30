@@ -1,31 +1,25 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
-using Editors.Twui.Editor.Datatypes;
+﻿using System.Xml.Linq;
 using Shared.Core.PackFiles.Models;
+using Shared.GameFormats.Twui.Data;
 
-namespace Editors.Twui.Editor.Serialization
+namespace Shared.GameFormats.Twui
 {
     public class TwuiSerializer
     {
+       
+        public TwuiSerializer()
+        {
 
-        public TwuiSerializer() 
-        { 
-            
-        
-        
-        
+
+
+
         }
 
         public TwuiFile Load(PackFile packFile)
         {
+            ComponentSerializer componentSerializer = new ComponentSerializer();
+
+
             var output = new TwuiFile();
 
             var byteArray = packFile.DataSource.ReadData();
@@ -36,12 +30,12 @@ namespace Editors.Twui.Editor.Serialization
 
 
             var hierarchyNode = xmlRoot.Element("hierarchy");
-            output.Hierarchy = Hierarchy.Serialize(hierarchyNode);
+            output.Hierarchy = HierarchySerializer.Serialize(hierarchyNode);
 
             var componentsNode = xmlRoot.Element("components");
             output.Components = ComponentSerializer.Serialize(componentsNode);
 
             return output;
-        }          
+        }
     }
 }

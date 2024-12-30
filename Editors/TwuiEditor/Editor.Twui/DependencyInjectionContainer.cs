@@ -18,6 +18,8 @@ namespace Editors.Twui
 
             serviceCollection.AddScoped<ComponentManger>();
             serviceCollection.AddScoped<PreviewRenderer>();
+            serviceCollection.AddScoped<TwuiPreviewBuilder>();
+            
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }
