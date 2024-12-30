@@ -12,10 +12,6 @@ namespace Shared.GameFormats.Wwise.Bkhd
                 ChunkHeader = BnkChunkHeader.CreateSpecificData(chunk),
             };
             bkdh.AkBankHeader.CreateSpecificData(chunk, bkdh.ChunkHeader.ChunkSize);
-
-            if (bkdh.AkBankHeader.DwBankGeneratorVersion == 2147483784)
-                bkdh.AkBankHeader.DwBankGeneratorVersion = 136;
-
             return bkdh;
         }
 

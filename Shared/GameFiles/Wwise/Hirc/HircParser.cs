@@ -4,17 +4,12 @@ namespace Shared.GameFormats.Wwise.Hirc
 {
     public class HircParser
     {
-        public bool UseByteFactory { get; set; } = false;
-
         public HircParser()
         {
         }
 
         HircFactory GetHircFactory(uint bnkVersion)
         {
-            if (UseByteFactory)
-                return HircFactory.CreateByteHircFactory();
-
             return HircFactory.CreateFactory(bnkVersion);
         }
 
