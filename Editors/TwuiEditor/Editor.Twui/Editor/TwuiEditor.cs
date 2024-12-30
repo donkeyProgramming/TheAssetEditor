@@ -7,12 +7,13 @@ using Shared.Core.ToolCreation;
 using Editors.Twui.Editor.ComponentEditor;
 using Shared.GameFormats.Twui;
 using Shared.GameFormats.Twui.Data;
+using Editors.Twui.Editor.Events;
 
 namespace Editors.Twui.Editor
 {
     public partial class TwuiEditor : ObservableObject, IEditorInterface, ISaveableEditor, IFileEditor
     {
-        private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly IEventHub _eventHub;
 
         [ObservableProperty] string _displayName = "Twui Editor";
 
@@ -20,12 +21,13 @@ namespace Editors.Twui.Editor
         public PackFile CurrentFile { get; set; }
 
         [ObservableProperty] TwuiFile _parsedTwuiFile;
+   
         [ObservableProperty] ComponentManger _componentManager;
-        [ObservableProperty] PreviewRenderer _previewRenderer;
+        [ObservableProperty] EditorRenderHandler _previewRenderer;
 
-        public TwuiEditor(IUiCommandFactory uiCommandFactory, ComponentManger componentEditor, PreviewRenderer previewRenderer)
+        public TwuiEditor(IEventHub eventHub, ComponentManger componentEditor, EditorRenderHandler previewRenderer)
         {
-            _uiCommandFactory = uiCommandFactory;
+            _eventHub = eventHub;
             _componentManager = componentEditor;
             _previewRenderer = previewRenderer;
         }
@@ -43,7 +45,7 @@ namespace Editors.Twui.Editor
             DisplayName = "Twui Editor:" + Path.GetFileName(file.Name);
 
             ComponentManager.SetFile(ParsedTwuiFile);
-            PreviewRenderer.SetFile(ParsedTwuiFile);
+            _eventHub.Publish(new RedrawTwuiEvent(ParsedTwuiFile, null));
         }
     }
 }

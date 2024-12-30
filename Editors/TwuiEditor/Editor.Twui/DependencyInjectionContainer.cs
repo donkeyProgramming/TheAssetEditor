@@ -17,9 +17,8 @@ namespace Editors.Twui
             serviceCollection.AddScoped<TwuiMainView>();
 
             serviceCollection.AddScoped<ComponentManger>();
-            serviceCollection.AddScoped<PreviewRenderer>();
+            serviceCollection.AddScoped<EditorRenderHandler>();
             serviceCollection.AddScoped<TwuiPreviewBuilder>();
-            
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }

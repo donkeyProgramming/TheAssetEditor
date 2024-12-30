@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework;
 namespace Shared.GameFormats.Twui.Data
 {
 
+    // If values are not set, null is probably better? 
+    // Stuff like Dimensions are not always set, and 0,0 is very different then not set
     [DebuggerDisplay("{Name} - {This}")]
     public class Component
     {

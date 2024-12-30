@@ -6,11 +6,12 @@ using Shared.GameFormats.Twui.Data;
 
 namespace Editors.Twui.Editor.PreviewRendering
 {
-    public class TwuiPreviewBuilder
+    public class TwuiPreviewBuilder : IDisposable
     {
         private readonly IWpfGame _wpfGame;
         private readonly IScopedResourceLibrary _resourceLibrary;
-        SpriteBatch _spriteBatch;
+        SpriteBatch? _spriteBatch;
+        Texture2D _whiteSquareTexture;
 
         public TwuiPreviewBuilder(IWpfGame wpfGame, IScopedResourceLibrary resourceLibrary)
         {
@@ -18,33 +19,34 @@ namespace Editors.Twui.Editor.PreviewRendering
             _resourceLibrary = resourceLibrary;
         }
 
-        void Create()
+        SpriteBatch GetSpritebatch()
         {
-            _spriteBatch = new SpriteBatch(_wpfGame.GraphicsDevice);
+            if (_spriteBatch == null)
+            {
+                _spriteBatch = new SpriteBatch(_wpfGame.GraphicsDevice);
+                _whiteSquareTexture = new Texture2D(_wpfGame.GraphicsDevice, 1, 1);
+                _whiteSquareTexture.SetData([Color.White]);
+            }
+
+            return _spriteBatch;
         }
 
-        void Cleanup()
+        public void UpdateTexture(RenderTarget2D renderTarget, TwuiFile twuiFile, Component? selectedComponent)
         {
-            _spriteBatch?.Dispose();
-        }
-
-        public void UpdateTexture(RenderTarget2D renderTarget, TwuiFile twuiFile)
-        {
-            Create();
             var device = _wpfGame.GraphicsDevice;
             device.SetRenderTarget(renderTarget);
             device.Clear(Color.Transparent);
             device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
+           
+            var spriteBatch = GetSpritebatch();
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone);
-
-
-            DrawHierarchy(Vector2.Zero, twuiFile.Hierarchy.RootItems, twuiFile.Components);
+            DrawHierarchy(Vector2.Zero, twuiFile.Hierarchy.RootItems, twuiFile.Components, selectedComponent);
+            spriteBatch.End();
 
             device.SetRenderTarget(null);
-            Cleanup();
         }
 
-        void DrawHierarchy(Vector2 localSpace, IEnumerable<HierarchyItem> hierarchyItems, List<Component> componentList)
+        void DrawHierarchy(Vector2 localSpace, IEnumerable<HierarchyItem> hierarchyItems, List<Component> componentList, Component? selectedComponent)
         {
             foreach (var hierarchyItem in hierarchyItems)
             {
@@ -52,14 +54,20 @@ namespace Editors.Twui.Editor.PreviewRendering
                 if (component == null)
                     continue;
 
-                var componentLocalSpace = DrawComponent(localSpace, component);
-                DrawHierarchy(componentLocalSpace, hierarchyItem.Children, componentList);
+                var componentLocalSpace = DrawComponent(localSpace, component, selectedComponent);
+                DrawHierarchy(componentLocalSpace, hierarchyItem.Children, componentList, selectedComponent);
             }
         }
 
-        Vector2 DrawComponent(Vector2 localSpace, Component component)
+        Vector2 DrawComponent(Vector2 localSpace, Component currentComponent, Component? selectedComponent)
         {
-            foreach (var image in component.ComponentImages)
+            // Take into account docking
+            // Take into account colour
+            // Take into account state
+
+            var compnentLocalSpace = localSpace + currentComponent.Offset;
+
+            foreach (var image in currentComponent.ComponentImages)
             {
                 if (string.IsNullOrWhiteSpace(image.ImagePath))
                     continue;
@@ -68,10 +76,30 @@ namespace Editors.Twui.Editor.PreviewRendering
                 if (texture == null)
                     continue;
 
-                _spriteBatch.Draw(texture, component.Offset, Color.White);
+         
+                var compnentWidth = texture.Width;
+                var compnentHeight = texture.Height;
+                var componentRect = new Rectangle((int)compnentLocalSpace.X, (int)compnentLocalSpace.Y, compnentWidth, compnentHeight );
+
+                _spriteBatch.Draw(texture, componentRect, null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 1);
+
+                // Draw debuginfo about selected component
+                if (selectedComponent == currentComponent)
+                {
+                    var selectionOverlayColour = new Color(255, 0, 0, 50);
+                    _spriteBatch.Draw(_whiteSquareTexture, componentRect, null, selectionOverlayColour, 0, Vector2.Zero, SpriteEffects.None, 1);
+                    // Draw ancor point
+                    // Draw local space point
+                }
+
             }
 
-            return localSpace;
-        }  
+            return localSpace + currentComponent.Offset;
+        }
+
+        public void Dispose()
+        {
+            _spriteBatch?.Dispose();
+        }
     }
 }
