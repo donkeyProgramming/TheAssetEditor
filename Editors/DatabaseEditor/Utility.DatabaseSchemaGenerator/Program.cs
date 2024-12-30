@@ -42,6 +42,7 @@ namespace Utility.DatabaseSchemaGenerator
         static void CreateExampleDb()
         {
             var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
+            settings.Load();
             var gameInfo = new GameInformationFactory();
 
             var containerLoader = new PackFileContainerLoader(settings, gameInfo);
@@ -50,19 +51,17 @@ namespace Utility.DatabaseSchemaGenerator
             var pfs = new PackFileService(null);
             pfs.AddContainer(gameFiles);
 
-            using (ExampleDb sc = CreateDbContext())
-            {
+            using ExampleDb sc = CreateDbContext();
 
-                //https://marketplace.visualstudio.com/items?itemName=ErikEJ.SQLServerCompactSQLiteToolbox&ssr=false#overview
-                // dotnet tool install --global dotnet-ef
-                //dotnet add package Microsoft.EntityFrameworkCore.Design*/
-                
-                //var m = sc.Database.GetAppliedMigrations();
-                sc.Database.EnsureCreated();
+            //https://marketplace.visualstudio.com/items?itemName=ErikEJ.SQLServerCompactSQLiteToolbox&ssr=false#overview
+            // dotnet tool install --global dotnet-ef
+            //dotnet add package Microsoft.EntityFrameworkCore.Design
 
-                sc.Deserialize(pfs);
-                sc.SaveChanges();
-            }
+            //var m = sc.Database.GetAppliedMigrations();
+            sc.Database.EnsureCreated();
+
+            sc.Deserialize(pfs);
+            sc.SaveChanges();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Utility.DatabaseSchemaGenerator.Examples
         public string root_joint { get; set; }
         // --- 
 
-        public static string TableName => "battle_skeleton_parts_table";    // 
+        public static string TableName => "battle_skeleton_parts_tables";    // 
         public static int TableVersion => 0;                                //
 
         static battle_skeleton_parts Create(ByteChunk byteChunk)
@@ -26,10 +26,17 @@ namespace Utility.DatabaseSchemaGenerator.Examples
 
         public static List<battle_skeleton_parts> Deserialize(PackFile dbFile)
         {
+            //https://github.com/Frodo45127/rpfm/blob/master/rpfm_lib/src/files/db/mod.rs#L213
+            // Version u8
+            // unkonw 1 (bool)
+            // entries = u32
+
             var ouput = new List<battle_skeleton_parts>();
             var byteChunk = dbFile.DataSource.ReadDataAsChunk();
+            var version = byteChunk.ReadUShort();
+            //var u = byteChunk.ReadBool();
             var numItems = byteChunk.ReadUInt32();
-            var version = byteChunk.ReadUInt32();
+            
 
             if (version != TableVersion)
                 throw new Exception($"Failed to deserialize {TableName}. Version mismatch. Expected {TableVersion}, Actual {version}");
