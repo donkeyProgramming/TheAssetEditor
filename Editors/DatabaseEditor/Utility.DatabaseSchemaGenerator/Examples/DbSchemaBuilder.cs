@@ -1,16 +1,9 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
 using System.Data.SQLite;
-using System.Linq;
-using System.Windows.Documents;
 using Editors.DatabaseEditor.FileFormats;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.VisualBasic;
-using Newtonsoft.Json.Linq;
 using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles;
 using Shared.Core.Settings;
-using SharpDX.MediaFoundation.DirectX;
 
 namespace Utility.DatabaseSchemaGenerator.Examples
 {
@@ -78,10 +71,13 @@ namespace Utility.DatabaseSchemaGenerator.Examples
 
             // Filter scheamas to make debugging easier
             _jsonSchema.TableSchemas = _jsonSchema.TableSchemas
+                // Make sure we grab latest version (For now)
                 .OrderByDescending(x=>x.Version)
                 .GroupBy(x => x.Name)
                 .Select(x=>x.First())
-               // .Where(x => x.Name == "battle_skeleton_parts_tables" || x.Name == "battle_skeletons_tables")
+
+                // For debugging, only have a few tables
+                //.Where(x => x.Name == "battle_skeleton_parts_tables" || x.Name == "battle_skeletons_tables")
                 .ToList();
 
         }
