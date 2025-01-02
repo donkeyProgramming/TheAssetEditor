@@ -76,9 +76,8 @@ namespace Utility.DatabaseSchemaGenerator
         {
             var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
             settings.Load();
-            var gameInfo = new GameInformationFactory();
 
-            var containerLoader = new PackFileContainerLoader(settings, gameInfo);
+            var containerLoader = new PackFileContainerLoader(settings);
             var gameFiles = containerLoader.LoadAllCaFiles(GameTypeEnum.Warhammer3);
 
             var pfs = new PackFileService(null);

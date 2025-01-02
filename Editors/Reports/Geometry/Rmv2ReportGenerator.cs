@@ -20,19 +20,17 @@ namespace Editors.Reports.Geometry
     public class Rmv2ReportGenerator
     {
         private readonly IPackFileService _pfs;
-        private readonly GameInformationFactory _gameInformationFactory;
         private readonly ApplicationSettingsService _applicationSettingsService;
 
-        public Rmv2ReportGenerator(IPackFileService pfs, GameInformationFactory gameInformationFactory, ApplicationSettingsService applicationSettingsService)
+        public Rmv2ReportGenerator(IPackFileService pfs, ApplicationSettingsService applicationSettingsService)
         {
             _pfs = pfs;
-            _gameInformationFactory = gameInformationFactory;
             _applicationSettingsService = applicationSettingsService;
         }
 
         public void Create(string outputDir = @"c:\temp\AssReports\rmv\")
         {
-            var gameName = _gameInformationFactory.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame).DisplayName;
+            var gameName = GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame).DisplayName;
             var gameDirectory = gameName;
             
             var fileList = PackFileServiceUtility.FindAllWithExtention(_pfs, ".rigid_model_v2");

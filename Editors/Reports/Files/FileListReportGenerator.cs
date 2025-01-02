@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
-using Editors.Reports.Animation;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -35,20 +34,18 @@ namespace Editors.Reports.Files
         private readonly ILogger _logger = Logging.Create<FileListReportGenerator>();
         private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
-        private readonly GameInformationFactory _gameInformationFactory;
         private readonly HashAlgorithm _md5Instance;
 
-        public FileListReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public FileListReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService )
         {
             _pfs = pfs;
             _settingsService = settingsService;
-            _gameInformationFactory = gameInformationFactory;
             _md5Instance = MD5.Create();
         }
 
-        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService)
         {
-            var instance = new FileListReportGenerator(pfs, settingsService, gameInformationFactory);
+            var instance = new FileListReportGenerator(pfs, settingsService);
             instance.Create();
         }
 
@@ -56,7 +53,7 @@ namespace Editors.Reports.Files
         {
             var outputFolder = DirectoryHelper.ReportsDirectory + "\\FileList";
             DirectoryHelper.EnsureCreated(outputFolder);
-            var gameName = _gameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var gameName = GameInformationDatabase.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
             var outputFileName = $"{gameName} {DateTime.Now.ToString("yyyyMMddHHmmssfff")}.csv";
             var outputFilePath = $"{outputFolder}\\{outputFileName}";
 
@@ -115,14 +112,12 @@ namespace Editors.Reports.Files
             };
         }
 
-
-
         public void CompareFiles(string oldFilePath, string newFilePath)
         {
             var oldData = LoadFile(oldFilePath);
             var newData = LoadFile(newFilePath);
 
-            var gameName = _gameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var gameName = GameInformationDatabase.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
             var gameFolder = $"{gameName}_fileCompare_{DateTime.Now.ToString("yyyyMMddHHmmss")}";
 
             var outputFolder = DirectoryHelper.ReportsDirectory + "\\FileList\\" + gameFolder;

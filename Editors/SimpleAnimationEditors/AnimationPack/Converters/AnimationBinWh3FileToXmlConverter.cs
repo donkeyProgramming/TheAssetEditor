@@ -37,8 +37,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
 
         protected override XmlFormat ConvertBytesToXmlClass(byte[] bytes)
         {
-
-            var binFile = new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", bytes);
+            var binFile = new AnimationBinWh3("", bytes);
             var outputBin = new XmlFormat();
 
             var slotHelper = binFile.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();

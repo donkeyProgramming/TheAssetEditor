@@ -29,7 +29,7 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private string _wwisePath;
         [ObservableProperty] private bool _onlyLoadLod0ForReferenceMeshes;
 
-        public SettingsViewModel(ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public SettingsViewModel(ApplicationSettingsService settingsService)
         {
             _settingsService = settingsService;
             AvailableThemes = new ObservableCollection<ThemeType>((ThemeType[])Enum.GetValues(typeof(ThemeType)));
@@ -37,12 +37,12 @@ namespace AssetEditor.ViewModels
             RenderEngineBackgroundColours = new ObservableCollection<BackgroundColour>((BackgroundColour[])Enum.GetValues(typeof(BackgroundColour)));
             CurrentRenderEngineBackgroundColour = _settingsService.CurrentSettings.RenderEngineBackgroundColour;
             StartMaximised = _settingsService.CurrentSettings.StartMaximised;
-            Games = new ObservableCollection<GameTypeEnum>(gameInformationFactory.Games.OrderBy(g => g.DisplayName).Select(g => g.Type));
+            Games = new ObservableCollection<GameTypeEnum>(GameInformationDatabase.Games.OrderBy(g => g.DisplayName).Select(g => g.Type));
             CurrentGame = _settingsService.CurrentSettings.CurrentGame;
             LoadCaPacksByDefault = _settingsService.CurrentSettings.LoadCaPacksByDefault;
             ShowCAWemFiles = _settingsService.CurrentSettings.ShowCAWemFiles;
             OnlyLoadLod0ForReferenceMeshes = _settingsService.CurrentSettings.OnlyLoadLod0ForReferenceMeshes;
-            foreach (var game in gameInformationFactory.Games.OrderBy(g => g.DisplayName))
+            foreach (var game in GameInformationDatabase.Games.OrderBy(g => g.DisplayName))
             {
                 GameDirectores.Add(
                     new GamePathItem()

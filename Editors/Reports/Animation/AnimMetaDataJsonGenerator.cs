@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows;
-using CommonControls.BaseDialogs;
-using CommonControls.Editors.AnimationPack.Converters;
-using Editors.Reports.DeepSearch;
+using Editors.AnimationTextEditors.AnimationPack.Converters;
 using Newtonsoft.Json;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -27,20 +25,18 @@ namespace Editors.Reports.Animation
         private readonly ILogger _logger = Logging.Create<AnimMetaDataJsonGenerator>();
         private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
-        private readonly GameInformationFactory _gameInformationFactory;
         private readonly JsonSerializerSettings _jsonOptions;
 
-        public AnimMetaDataJsonGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public AnimMetaDataJsonGenerator(IPackFileService pfs, ApplicationSettingsService settingsService)
         {
             _pfs = pfs;
             _settingsService = settingsService;
-            _gameInformationFactory = gameInformationFactory;
             _jsonOptions = new JsonSerializerSettings { Formatting = Formatting.Indented };
         }
 
-        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService)
         {
-            var instance = new AnimMetaDataJsonGenerator(pfs, settingsService, gameInformationFactory);
+            var instance = new AnimMetaDataJsonGenerator(pfs, settingsService);
             instance.Create();
         }
 
@@ -54,7 +50,7 @@ namespace Editors.Reports.Animation
 
         public void Create()
         {
-            var gameName = _gameInformationFactory.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
+            var gameName = GameInformationDatabase.GetGameById(_settingsService.CurrentSettings.CurrentGame).DisplayName;
             var timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             var gameOutputDir = $"{DirectoryHelper.ReportsDirectory}\\MetaDataJsons\\{gameName}_{timeStamp}\\";
             if (Directory.Exists(gameOutputDir))
