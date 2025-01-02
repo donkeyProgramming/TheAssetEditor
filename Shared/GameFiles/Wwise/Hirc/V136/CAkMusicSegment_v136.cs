@@ -1,119 +1,43 @@
-﻿using Shared.Core.ByteParsing;
+﻿using System.Text;
+using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkMusicSegment_v136 : HircItem
+    public partial class CAkMusicSegment_v136 : HircItem
     {
-        public MusicNodeParams MusicNodeParams { get; set; }
-        public double FDuration { get; set; }
-        public List<AkMusicMarkerWwise> PArrayMarkersList { get; set; } = [];
+        public MusicNodeParams_V136 MusicNodeParams { get; set; } = new MusicNodeParams_V136();
+        public double Duration { get; set; }
+        public List<AkMusicMarkerWwise_V136> ArrayMarkersList { get; set; } = [];
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            MusicNodeParams = MusicNodeParams.Create(chunk);
-
-            FDuration = chunk.ReadInt64(); //chunk.ReadDouble();
+            MusicNodeParams.Create(chunk);
+            Duration = chunk.ReadInt64(); //chunk.ReadDouble();
 
             var ulNumMarkers = chunk.ReadUInt32();
             for (var i = 0; i < ulNumMarkers; i++)
-                PArrayMarkersList.Add(AkMusicMarkerWwise.Create(chunk));
+                ArrayMarkersList.Add(AkMusicMarkerWwise_V136.Create(chunk));
         }
 
-        public override void UpdateSectionSize() => throw new NotImplementedException();
-        public override byte[] GetAsByteArray() => throw new NotImplementedException();
-    }
+        public override byte[] GetAsByteArray() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
 
-    public class AkMusicMarkerWwise
-    {
-        public uint Id { get; set; }
-        public double FPosition { get; set; }
-
-        //see below
-        //public string pMarkerName { get; set; }
-        public List<byte> PMarkerName { get; set; } = [];
-
-        public static AkMusicMarkerWwise Create(ByteChunk chunk)
+        public class AkMusicMarkerWwise_V136
         {
-            var instance = new AkMusicMarkerWwise();
-            instance.Id = chunk.ReadUInt32();
-            instance.FPosition = chunk.ReadInt64(); //chunk.ReadDouble();
+            public uint Id { get; set; }
+            public double Position { get; set; }
+            public uint StringSize { get; set; }
+            public string? MarkerName { get; set; }
 
-            //instance.pMarkerName = chunk.ReadString();
-            //The above wasn't working because uStringSize is an uint32, yet the ReadString was trying to read it as a uint16
-            //So instead I just made it read the raw bytes, stored in a list
-            var uStringSize = chunk.ReadUInt32();
-            for (var i = 0; i < uStringSize; i++)
-                instance.PMarkerName.Add(chunk.ReadByte());
-
-            return instance;
-        }
-    }
-
-    public class MusicNodeParams
-    {
-        public byte UFlags { get; set; }
-        public NodeBaseParams NodeBaseParams { get; set; }
-        public Children Children { get; set; }
-        public AkMeterInfo AkMeterInfo { get; set; }
-        public byte BMeterInfoFlag { get; set; }
-        public List<CAkStinger> PStingersList { get; set; } = [];
-
-        public static MusicNodeParams Create(ByteChunk chunk)
-        {
-            var instance = new MusicNodeParams();
-            instance.UFlags = chunk.ReadByte();
-            instance.NodeBaseParams = NodeBaseParams.Create(chunk);
-            instance.Children = Children.Create(chunk);
-            instance.AkMeterInfo = AkMeterInfo.Create(chunk);
-            instance.BMeterInfoFlag = chunk.ReadByte();
-
-            var numStingers = chunk.ReadUInt32();
-            for (var i = 0; i < numStingers; i++)
-                instance.PStingersList.Add(CAkStinger.Create(chunk));
-
-            return instance;
-        }
-    }
-
-    public class AkMeterInfo
-    {
-        public double FGridPeriod { get; set; }
-        public double FGridOffset { get; set; }
-        public float FTempo { get; set; }
-        public byte UTimeSigNumBeatsBar { get; set; }
-        public byte UTimeSigBeatValue { get; set; }
-
-        public static AkMeterInfo Create(ByteChunk chunk)
-        {
-            var instance = new AkMeterInfo();
-            instance.FGridPeriod = chunk.ReadInt64(); //chunk.ReadDouble();
-            instance.FGridOffset = chunk.ReadInt64(); //chunk.ReadDouble();
-            instance.FTempo = chunk.ReadSingle();
-            instance.UTimeSigNumBeatsBar = chunk.ReadByte();
-            instance.UTimeSigBeatValue = chunk.ReadByte();
-            return instance;
-        }
-    }
-
-    public class CAkStinger
-    {
-        public uint TriggerId { get; set; }
-        public uint SegmentId { get; set; }
-        public uint SyncPlayAt { get; set; }
-        public uint UCueFilterHash { get; set; }
-        public int DontRepeatTime { get; set; }
-        public uint NumSegmentLookAhead { get; set; }
-
-        public static CAkStinger Create(ByteChunk chunk)
-        {
-            var instance = new CAkStinger();
-            instance.TriggerId = chunk.ReadUInt32();
-            instance.SegmentId = chunk.ReadUInt32();
-            instance.SyncPlayAt = chunk.ReadUInt32();
-            instance.UCueFilterHash = chunk.ReadUInt32();
-            instance.DontRepeatTime = chunk.ReadInt32();
-            instance.NumSegmentLookAhead = chunk.ReadUInt32();
-            return instance;
+            public static AkMusicMarkerWwise_V136 Create(ByteChunk chunk)
+            {
+                var akMusicMarkerWwise = new AkMusicMarkerWwise_V136();
+                akMusicMarkerWwise.Id = chunk.ReadUInt32();
+                akMusicMarkerWwise.Position = chunk.ReadInt64();
+                akMusicMarkerWwise.MarkerName = Encoding.UTF8.GetString(chunk.ReadBytes((int)akMusicMarkerWwise.StringSize));
+                return akMusicMarkerWwise;
+            }
         }
     }
 }

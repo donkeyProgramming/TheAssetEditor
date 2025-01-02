@@ -1,122 +1,121 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Enums;
+using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public class CAkAction_v136 : HircItem, ICAkAction
     {
-        public ActionType ActionType { get; set; }
+        public AkActionType ActionType { get; set; }
         public uint IdExt { get; set; }
         public byte IdExt4 { get; set; }
-        public AkPropBundle AkPropBundle0 { get; set; } = new AkPropBundle();
-        public AkPropBundle AkPropBundle1 { get; set; } = new AkPropBundle();
-        public AkPlayActionParams AkPlayActionParams { get; set; } = new AkPlayActionParams();
-        public AkSetStateParams AkSetStateParams { get; set; } = new AkSetStateParams();
+        public AkPropBundle_V136 AkPropBundle0 { get; set; } = new AkPropBundle_V136();
+        public AkPropBundle_V136 AkPropBundle1 { get; set; } = new AkPropBundle_V136();
+        public PlayActionParams_V136? PlayActionParams { get; set; }
+        public StateActionParams_V136? StateActionParams { get; set; }
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            ActionType = (ActionType)chunk.ReadUShort();
+            ActionType = (AkActionType)chunk.ReadUShort();
             IdExt = chunk.ReadUInt32();
             IdExt4 = chunk.ReadByte();
+            AkPropBundle0.CreateSpecificData(chunk);
+            AkPropBundle1.CreateSpecificData(chunk);
 
-            if (ActionType == ActionType.Play)
-            {
-                AkPropBundle0 = AkPropBundle.Create(chunk);
-                AkPropBundle1 = AkPropBundle.Create(chunk);
-                AkPlayActionParams = AkPlayActionParams.Create(chunk);
-            }
-            else if (ActionType == ActionType.SetState)
-            {
-                AkPropBundle0 = AkPropBundle.Create(chunk);
-                AkPropBundle1 = AkPropBundle.Create(chunk);
-                AkSetStateParams = AkSetStateParams.Create(chunk);
-            }
+            if (ActionType == AkActionType.Play)
+                PlayActionParams = PlayActionParams_V136.CreateSpecificData(chunk);
+            else if (ActionType == AkActionType.SetState)
+                StateActionParams = StateActionParams_V136.CreateSpecificData(chunk);
         }
 
         public override byte[] GetAsByteArray()
         {
-            if (ActionType != ActionType.Play)
-                throw new Exception("Unsupported action type");
-
             using var memStream = WriteHeader();
             memStream.Write(ByteParsers.UShort.EncodeValue((ushort)ActionType, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(IdExt, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(IdExt4, out _));
-            memStream.Write(AkPropBundle0.GetAsBytes());
-            memStream.Write(AkPropBundle1.GetAsBytes());
-            memStream.Write(AkPlayActionParams.GetAsBytes());
+            memStream.Write(AkPropBundle0.GetAsByteArray());
+            memStream.Write(AkPropBundle1.GetAsByteArray());
+
+            if (ActionType == AkActionType.Play)
+                memStream.Write(PlayActionParams!.GetAsByteArray());
+            else if (ActionType == AkActionType.SetState)
+                throw new NotSupportedException("Users probably don't need this complexity.");
 
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var copyInstance = new CAkAction_v136();
-            copyInstance.Parse(new ByteChunk(byteArray));
+            var sanityReload = new CAkAction_v136();
+            sanityReload.Parse(new ByteChunk(byteArray));
 
             return byteArray;
         }
 
         public override void UpdateSectionSize()
         {
-            SectionSize = HircHeaderSize + 2 + 4 + 1 + AkPropBundle0.GetSize() + AkPropBundle1.GetSize() + AkPlayActionParams.ComputeSize();
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
+            var actionTypeSize = ByteHelper.GetPropertyTypeSize(ActionType);
+            var idExtSize = ByteHelper.GetPropertyTypeSize(IdExt);
+            var idExt4Size = ByteHelper.GetPropertyTypeSize(IdExt4);
+            var akPropBundle0Size = AkPropBundle0.GetSize();
+            var akPropBundle1Size = AkPropBundle1.GetSize();
+
+            if (ActionType == AkActionType.Play)
+            {
+                var playActionParamsSize = PlayActionParams!.GetSize();
+                SectionSize = (ushort)(idSize + actionTypeSize + idExtSize + idExt4Size + akPropBundle0Size + akPropBundle1Size + playActionParamsSize);
+            }
+            else if (ActionType == AkActionType.SetState)
+                throw new NotSupportedException("Users probably don't need this complexity."); 
         }
-        public ActionType GetActionType() => ActionType;
+
+        public AkActionType GetActionType() => ActionType;
         public uint GetChildId() => IdExt;
-        public uint GetStateGroupId() => AkSetStateParams.UlStateGroupId;
-    }
+        public uint GetStateGroupId() => StateActionParams!.StateGroupId;
 
-    public class AkPlayActionParams
-    {
-        public byte ByBitVector { get; set; }
-        public uint BankId { get; set; }
-
-        public static AkPlayActionParams Create(ByteChunk chunk)
+        public class PlayActionParams_V136
         {
-            return new AkPlayActionParams()
+            public byte BitVector { get; set; }
+            public uint BankId { get; set; }
+
+            public static PlayActionParams_V136 CreateSpecificData(ByteChunk chunk)
             {
-                ByBitVector = chunk.ReadByte(),
-                BankId = chunk.ReadUInt32(),
-            };
-        }
+                return new PlayActionParams_V136()
+                {
+                    BitVector = chunk.ReadByte(),
+                    BankId = chunk.ReadUInt32()
+                };
+            }
 
-        internal static uint ComputeSize()
-        {
-            return 5;
-        }
-
-        public byte[] GetAsBytes()
-        {
-            var allbytes = new List<byte>();
-            allbytes.AddRange(ByteParsers.Byte.EncodeValue(ByBitVector, out _));
-            allbytes.AddRange(ByteParsers.UInt32.EncodeValue(BankId, out _));
-            return allbytes.ToArray();
-        }
-    }
-
-
-    public class AkSetStateParams
-    {
-        public uint UlStateGroupId { get; set; }
-        public uint UlTargetStateId { get; set; }
-
-        public static AkSetStateParams Create(ByteChunk chunk)
-        {
-            return new AkSetStateParams()
+            public byte[] GetAsByteArray()
             {
-                UlStateGroupId = chunk.ReadUInt32(),
-                UlTargetStateId = chunk.ReadUInt32(),
-            };
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.Byte.EncodeValue(BitVector, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(BankId, out _));
+                return memStream.ToArray();
+            }
+
+            public uint GetSize()
+            {
+                var bitVectorSize = ByteHelper.GetPropertyTypeSize(BitVector);
+                var fileIdSize = ByteHelper.GetPropertyTypeSize(BankId);
+                return bitVectorSize + fileIdSize;
+            }
         }
 
-        internal static uint ComputeSize()
+        public class StateActionParams_V136
         {
-            return 8;
-        }
+            public uint StateGroupId { get; set; }
+            public uint TargetStateId { get; set; }
 
-        public byte[] GetAsBytes()
-        {
-            var allbytes = new List<byte>();
-            allbytes.AddRange(ByteParsers.UInt32.EncodeValue(UlStateGroupId, out _));
-            allbytes.AddRange(ByteParsers.UInt32.EncodeValue(UlTargetStateId, out _));
-            return allbytes.ToArray();
+            public static StateActionParams_V136 CreateSpecificData(ByteChunk chunk)
+            {
+                return new StateActionParams_V136()
+                {
+                    StateGroupId = chunk.ReadUInt32(),
+                    TargetStateId = chunk.ReadUInt32()
+                };
+            }
         }
     }
 }

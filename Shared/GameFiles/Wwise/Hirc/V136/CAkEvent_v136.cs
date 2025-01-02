@@ -4,42 +4,71 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public class CAkEvent_v136 : HircItem, ICAkEvent
     {
-        public class Action
-        {
-            public uint ActionId { get; set; }
-        }
-
-        public List<Action> Actions { get; set; } = [];
+        public uint ActionListSize { get; set; }
+        public List<Action_V136> Actions { get; set; } = [];
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            var actionCount = chunk.ReadByte();
-            for (var i = 0; i < actionCount; i++)
-                Actions.Add(new Action() { ActionId = chunk.ReadUInt32() });
+            ActionListSize = chunk.ReadByte();
+            for (var i = 0; i < ActionListSize; i++)
+                Actions.Add(Action_V136.Create(chunk));
         }
-
-        public List<uint> GetActionIds() => Actions.Select(x => x.ActionId).ToList();
 
         public override byte[] GetAsByteArray()
         {
             using var memStream = WriteHeader();
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)Actions.Count, out _));
             foreach (var action in Actions)
-                memStream.Write(ByteParsers.UInt32.EncodeValue(action.ActionId, out _));
+                memStream.Write(action.GetAsByteArray());
 
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var copyInstance = new CAkEvent_v136();
+            var sanityReload = new CAkEvent_v136();
             var chunk = new ByteChunk(byteArray);
-            copyInstance.Parse(chunk);
+            sanityReload.Parse(chunk);
 
             return byteArray;
         }
 
         public override void UpdateSectionSize()
         {
-            SectionSize = (uint)(HircHeaderSize + 1 + 4 * Actions.Count);
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
+            var actionListSizeSize = ByteHelper.GetPropertyTypeSize(ActionListSize);
+
+            uint actionListSize = 0;
+            foreach (var action in Actions)
+                actionListSize += action.GetSize();
+
+            SectionSize = idSize + actionListSizeSize + actionListSize;
+        }
+
+        public List<uint> GetActionIds() => Actions.Select(x => x.ActionId).ToList();
+
+        public class Action_V136
+        {
+            public uint ActionId { get; set; }
+            
+            public static Action_V136 Create(ByteChunk chunk)
+            {
+                return new Action_V136()
+                {
+                    ActionId = chunk.ReadUInt32()
+                };
+            }
+
+            public byte[] GetAsByteArray()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UInt32.EncodeValue(ActionId, out _));
+                return memStream.ToArray();
+            }
+
+            public uint GetSize()
+            {
+                var actionIdSize = ByteHelper.GetPropertyTypeSize(ActionId);
+                return actionIdSize;
+            }
         }
     }
 }

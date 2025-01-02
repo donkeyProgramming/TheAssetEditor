@@ -1,58 +1,88 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.Wwise.Hirc.Shared;
-using static Shared.GameFormats.Wwise.Hirc.Shared.AkDecisionTree;
-using static Shared.GameFormats.Wwise.Hirc.Shared.ArgumentList;
+using Shared.GameFormats.Wwise.Enums;
+using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkDialogueEvent_v136 : HircItem, ICAkDialogueEvent
+    public partial class CAkDialogueEvent_v136 : HircItem, ICAkDialogueEvent
     {
-        public byte UProbability { get; set; }
-        public uint UTreeDepth { get; set; }
-        public ArgumentList ArgumentList { get; set; }
-        public uint UTreeDataSize { get; set; }
-        public byte UMode { get; set; }
-        public AkDecisionTree AkDecisionTree { get; set; }
-        public List<Argument> CustomArgumentList { get; set; }
-        public List<BinaryNode> CustomAkDecisionTree { get; set; }
-        public byte AkPropBundle0 { get; set; }
-        public byte AkPropBundle1 { get; set; }
+        public byte Probability { get; set; }
+        public uint TreeDepth { get; set; }
+        public List<AkGameSync_V136> Arguments { get; set; } = [];
+        public uint TreeDataSize { get; set; }
+        public byte Mode { get; set; }
+        public AkDecisionTree_V136 AkDecisionTree { get; set; } = new AkDecisionTree_V136();
+        public AkPropBundle_V136 AkPropBundle0 { get; set; } = new AkPropBundle_V136();
+        public AkPropBundleMinMax_V136 AkPropBundle1 { get; set; } = new AkPropBundleMinMax_V136();
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            UProbability = chunk.ReadByte();
-            UTreeDepth = chunk.ReadUInt32();
-            ArgumentList = new ArgumentList(chunk, UTreeDepth);
-            UTreeDataSize = chunk.ReadUInt32();
-            UMode = chunk.ReadByte();
+            Probability = chunk.ReadByte();
 
-            AkDecisionTree = new AkDecisionTree(chunk, UTreeDepth, UTreeDataSize);
+            TreeDepth = chunk.ReadUInt32();
+            for (uint i = 0; i < TreeDepth; i++)
+                Arguments.Add(new AkGameSync_V136());
 
-            AkPropBundle0 = chunk.ReadByte();
-            AkPropBundle1 = chunk.ReadByte();
-        }
+            // First read all the group ids
+            for (var i = 0; i < TreeDepth; i++)
+                Arguments[i].GroupId = chunk.ReadUInt32();
 
-        public override void UpdateSectionSize()
-        {
-            SectionSize = HircHeaderSize + 1 + 4 + (uint)CustomArgumentList.Count * 5 + 4 + 1 + UTreeDataSize + 1 + 1;
+            // Then read all the group types
+            for (var i = 0; i < TreeDepth; i++)
+                Arguments[i].GroupType = (AkGroupType)chunk.ReadByte();
+
+            TreeDataSize = chunk.ReadUInt32();
+            Mode = chunk.ReadByte();
+            AkDecisionTree.CreateSpecificData(chunk, TreeDataSize, TreeDepth);
+            AkPropBundle0.CreateSpecificData(chunk);
+            AkPropBundle1.CreateSpecificData(chunk);
         }
 
         public override byte[] GetAsByteArray()
         {
             using var memStream = WriteHeader();
-            memStream.Write(ByteParsers.Byte.EncodeValue(UProbability, out _));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(UTreeDepth, out _));
-            memStream.Write(GetCustomArgumentsAsBytes(CustomArgumentList));
-            memStream.Write(ByteParsers.UInt32.EncodeValue(UTreeDataSize, out _));
-            memStream.Write(ByteParsers.Byte.EncodeValue(UMode, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(Probability, out _));
+            memStream.Write(ByteParsers.UInt32.EncodeValue(TreeDepth, out _));
 
-            memStream.Write(GetAsBytes(CustomAkDecisionTree));
+            // Write all the Ids first
+            for (var i = 0; i < TreeDepth; i++)
+                memStream.Write(ByteParsers.UInt32.EncodeValue(Arguments[i].GroupId, out _));
 
-            memStream.Write(ByteParsers.Byte.EncodeValue(AkPropBundle0, out _));
-            memStream.Write(ByteParsers.Byte.EncodeValue(AkPropBundle1, out _));
+            // Then write all the values
+            for (var i = 0; i < TreeDepth; i++)
+                memStream.Write(ByteParsers.Byte.EncodeValue((byte)Arguments[i].GroupType, out _));
+
+            memStream.Write(ByteParsers.UInt32.EncodeValue(TreeDataSize, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(Mode, out _));
+            memStream.Write(AkDecisionTree.GetAsByteArray());
+            memStream.Write(AkPropBundle0.GetAsByteArray());
+            memStream.Write(AkPropBundle1.GetAsByteArray());
 
             var byteArray = memStream.ToArray();
+
+            // Reload the object to ensure sanity
+            var sanityReload = new CAkDialogueEvent_v136();
+            sanityReload.Parse(new ByteChunk(byteArray));
+
             return byteArray;
         }
+
+        public override void UpdateSectionSize()
+        {
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
+            var probabilitySize = ByteHelper.GetPropertyTypeSize(Probability);
+            var treeDepthSize = ByteHelper.GetPropertyTypeSize(TreeDepth);
+            
+            uint arugumentsSize = 0;
+            foreach (var argument in Arguments)
+                arugumentsSize += argument.GetSize();
+
+            var treeDataSizeSize = ByteHelper.GetPropertyTypeSize(TreeDataSize);
+            var modeSize = ByteHelper.GetPropertyTypeSize(Mode);
+            SectionSize = idSize + probabilitySize + treeDepthSize + arugumentsSize + treeDataSizeSize + modeSize + TreeDataSize + AkPropBundle0.GetSize() + AkPropBundle1.GetSize();
+        }
+
+        List<object> ICAkDialogueEvent.Arguments => Arguments.Cast<object>().ToList();
+        object ICAkDialogueEvent.AkDecisionTree => AkDecisionTree;
     }
 }

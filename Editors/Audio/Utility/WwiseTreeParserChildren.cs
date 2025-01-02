@@ -88,7 +88,7 @@ namespace Editors.Audio.Utility
                    .ToList();
 
                 foreach (var normalSwitch in normalSwitches)
-                    if (normalSwitch.UlGroupId == stateGroupId)
+                    if (normalSwitch.GroupId == stateGroupId)
                         ProcessNext(normalSwitch.Id, actionTreeNode);
             }
             else ProcessNext(childId, actionTreeNode);
@@ -118,8 +118,8 @@ namespace Editors.Audio.Utility
         void ProcessSwitchControl(HircItem item, HircTreeItem parent)
         {
             var switchControl = GetAsType<ICAkSwitchCntr>(item);
-            var switchType = _repository.GetNameFromHash(switchControl.UlGroupId);
-            var defaultValue = _repository.GetNameFromHash(switchControl.UlDefaultSwitch);
+            var switchType = _repository.GetNameFromHash(switchControl.GroupId);
+            var defaultValue = _repository.GetNameFromHash(switchControl.DefaultSwitch);
             var switchControlNode = new HircTreeItem() { DisplayName = $"Switch {switchType} DefaultValue: {defaultValue}", Item = item };
             parent.Children.Add(switchControlNode);
 
@@ -169,7 +169,7 @@ namespace Editors.Audio.Utility
             var node = new HircTreeItem() { DisplayName = $"Music Segment", Item = item };
             parent.Children.Add(node);
 
-            foreach (var childId in hirc.MusicNodeParams.Children.ChildIdList)
+            foreach (var childId in hirc.MusicNodeParams.Children.ChildIds)
                 ProcessNext(childId, node);
         }
 
@@ -197,8 +197,8 @@ namespace Editors.Audio.Utility
             var node = new HircTreeItem() { DisplayName = $"Music Rand Container", Item = item };
             parent.Children.Add(node);
 
-            if (hirc.PPlayList.Count != 0)
-                foreach (var playList in hirc.PPlayList.First().PPlayList)
+            if (hirc.PlayList.Count != 0)
+                foreach (var playList in hirc.PlayList.First().PlayList)
                     ProcessNext(playList.SegmentId, node);
         }
     }

@@ -1,31 +1,42 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.Wwise.Hirc.Shared;
+using Shared.GameFormats.Wwise.Enums;
+using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public class CAkMusicSwitchCntr_v136 : HircItem
     {
-        public MusicTransNodeParams MusicTransNodeParams { get; set; }
-        public byte BIsContinuePlayback { get; set; }
-        public uint UTreeDepth { get; set; }
-        public ArgumentList ArgumentList { get; set; }
-        public uint UTreeDataSize { get; set; }
-        public byte UMode { get; set; }
-        public AkDecisionTree AkDecisionTree { get; set; }
+        public MusicTransNodeParams_V136 MusicTransNodeParams { get; set; } = new MusicTransNodeParams_V136();
+        public byte IsContinuePlayback { get; set; }
+        public uint TreeDepth { get; set; }
+        public List<AkGameSync_V136> Arguments { get; set; } = [];
+        public uint TreeDataSize { get; set; }
+        public byte Mode { get; set; }
+        public AkDecisionTree_V136 AkDecisionTree { get; set; } = new AkDecisionTree_V136();
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            MusicTransNodeParams = MusicTransNodeParams.Create(chunk);
-            BIsContinuePlayback = chunk.ReadByte();
+            MusicTransNodeParams.Create(chunk);
+            IsContinuePlayback = chunk.ReadByte();
 
-            UTreeDepth = chunk.ReadUInt32();
-            ArgumentList = new ArgumentList(chunk, UTreeDepth);
-            UTreeDataSize = chunk.ReadUInt32();
-            UMode = chunk.ReadByte();
-            AkDecisionTree = new AkDecisionTree(chunk, UTreeDepth, UTreeDataSize);
+            TreeDepth = chunk.ReadUInt32();
+            for (uint i = 0; i < TreeDepth; i++)
+                Arguments.Add(new AkGameSync_V136());
+
+            // First read all the group ids
+            for (var i = 0; i < TreeDepth; i++)
+                Arguments[i].GroupId = chunk.ReadUInt32();
+
+            // Then read all the group types
+            for (var i = 0; i < TreeDepth; i++)
+                Arguments[i].GroupType = (AkGroupType)chunk.ReadByte();
+
+            TreeDataSize = chunk.ReadUInt32();
+            Mode = chunk.ReadByte();
+            AkDecisionTree.CreateSpecificData(chunk, TreeDepth, TreeDataSize);
         }
 
-        public override void UpdateSectionSize() => throw new NotImplementedException();
-        public override byte[] GetAsByteArray() => throw new NotImplementedException();
+        public override byte[] GetAsByteArray() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
     }
 }

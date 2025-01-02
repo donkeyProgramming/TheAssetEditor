@@ -1,22 +1,17 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public class CAkActorMixer_v136 : HircItem, ICAkActorMixer
     {
-        public NodeBaseParams NodeBaseParams { get; set; }
-        public Children Children { get; set; }
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
+        public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
+        public Children_V136 Children { get; set; } = new Children_V136();
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            NodeBaseParams = NodeBaseParams.Create(chunk);
-            Children = Children.Create(chunk);
-        }
-
-        public override void UpdateSectionSize()
-        {
-            SectionSize = BnkChunkHeader.HeaderByteSize + Children.GetSize() + NodeBaseParams.GetSize() - 4;
+            NodeBaseParams.Create(chunk);
+            Children.Create(chunk);
         }
 
         public override byte[] GetAsByteArray()
@@ -27,12 +22,19 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var copyInstance = new CAkActorMixer_v136();
-            copyInstance.Parse(new ByteChunk(byteArray));
+            var sanityReload = new CAkActorMixer_v136();
+            sanityReload.Parse(new ByteChunk(byteArray));
 
             return byteArray;
         }
 
-        public List<uint> GetChildren() => Children.ChildIdList;
+        public override void UpdateSectionSize()
+        {
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
+            SectionSize = idSize + Children.GetSize() + NodeBaseParams.GetSize();
+        }
+
+        public List<uint> GetChildren() => Children.ChildIds;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
     }
 }

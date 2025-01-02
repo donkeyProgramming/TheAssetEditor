@@ -1,111 +1,154 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Hirc.V136.Shared;
+
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public class CAkRanSeqCntr_v136 : HircItem, ICAkRanSeqCnt
     {
-        public NodeBaseParams NodeBaseParams { get; set; }
-        public ushort SLoopCount { get; set; }
-        public ushort SLoopModMin { get; set; }
-        public ushort SLoopModMax { get; set; }
-        public float FTransitionTime { get; set; }
-        public float FTransitionTimeModMin { get; set; }
-        public float FTransitionTimeModMax { get; set; }
-        public ushort WAvoidRepeatCount { get; set; }
-        public byte ETransitionMode { get; set; }
-        public byte ERandomMode { get; set; }
-        public byte EMode { get; set; }
-        public byte ByBitVector { get; set; }
-        public Children Children { get; set; }
-        public List<AkPlaylistItem> AkPlaylist { get; set; } = [];
+        public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
+        public ushort LoopCount { get; set; }
+        public ushort LoopModMin { get; set; }
+        public ushort LoopModMax { get; set; }
+        public float TransitionTime { get; set; }
+        public float TransitionTimeModMin { get; set; }
+        public float TransitionTimeModMax { get; set; }
+        public ushort AvoidRepeatCount { get; set; }
+        public byte TransitionMode { get; set; }
+        public byte RandomMode { get; set; }
+        public byte Mode { get; set; }
+        public byte BitVector { get; set; }
+        public Children_V136 Children { get; set; } = new Children_V136();
+        public CAkPlayList_V136 CAkPlayList { get; set; } = new CAkPlayList_V136();
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            NodeBaseParams = NodeBaseParams.Create(chunk);
-
-            SLoopCount = chunk.ReadUShort();
-            SLoopModMin = chunk.ReadUShort();
-            SLoopModMax = chunk.ReadUShort();
-
-            FTransitionTime = chunk.ReadSingle();
-            FTransitionTimeModMin = chunk.ReadSingle();
-            FTransitionTimeModMax = chunk.ReadSingle();
-
-            WAvoidRepeatCount = chunk.ReadUShort();
-
-            ETransitionMode = chunk.ReadByte();
-            ERandomMode = chunk.ReadByte();
-            EMode = chunk.ReadByte();
-            ByBitVector = chunk.ReadByte();
-
-            Children = Children.Create(chunk);
-
-            var playListItemCount = chunk.ReadUShort();
-            for (var i = 0; i < playListItemCount; i++)
-                AkPlaylist.Add(AkPlaylistItem.Create(chunk));
-        }
-
-        public uint GetParentId() => NodeBaseParams.DirectParentId;
-        public List<uint> GetChildren() => AkPlaylist.Select(x => x.PlayId).ToList();
-
-        public override void UpdateSectionSize()
-        {
-            var nodeBaseParams = NodeBaseParams.GetSize();
-            var children = Children.GetSize();
-            var akPlaylistCount = Convert.ToUInt32(AkPlaylist.Count);
-
-            SectionSize = BnkChunkHeader.HeaderByteSize + nodeBaseParams + 2 + 2 + 2 + 4 + 4 + 4 + 2 + 1 + 1 + 1 + 1 + children + 2 + akPlaylistCount * 8 - 4;
+            NodeBaseParams.Create(chunk);
+            LoopCount = chunk.ReadUShort();
+            LoopModMin = chunk.ReadUShort();
+            LoopModMax = chunk.ReadUShort();
+            TransitionTime = chunk.ReadSingle();
+            TransitionTimeModMin = chunk.ReadSingle();
+            TransitionTimeModMax = chunk.ReadSingle();
+            AvoidRepeatCount = chunk.ReadUShort();
+            TransitionMode = chunk.ReadByte();
+            RandomMode = chunk.ReadByte();
+            Mode = chunk.ReadByte();
+            BitVector = chunk.ReadByte();
+            Children.Create(chunk);
+            CAkPlayList.Create(chunk);
         }
 
         public override byte[] GetAsByteArray()
         {
             using var memStream = WriteHeader();
             memStream.Write(NodeBaseParams.GetAsByteArray());
-
-            memStream.Write(ByteParsers.UShort.EncodeValue(SLoopCount, out _));
-            memStream.Write(ByteParsers.UShort.EncodeValue(SLoopModMin, out _));
-            memStream.Write(ByteParsers.UShort.EncodeValue(SLoopModMax, out _));
-
-            memStream.Write(ByteParsers.Single.EncodeValue(FTransitionTime, out _));
-            memStream.Write(ByteParsers.Single.EncodeValue(FTransitionTimeModMin, out _));
-            memStream.Write(ByteParsers.Single.EncodeValue(FTransitionTimeModMax, out _));
-
-            memStream.Write(ByteParsers.UShort.EncodeValue(WAvoidRepeatCount, out _));
-
-            memStream.Write(ByteParsers.Byte.EncodeValue(ETransitionMode, out _));
-            memStream.Write(ByteParsers.Byte.EncodeValue(ERandomMode, out _));
-            memStream.Write(ByteParsers.Byte.EncodeValue(EMode, out _));
-            memStream.Write(ByteParsers.Byte.EncodeValue(ByBitVector, out _));
-
+            memStream.Write(ByteParsers.UShort.EncodeValue(LoopCount, out _));
+            memStream.Write(ByteParsers.UShort.EncodeValue(LoopModMin, out _));
+            memStream.Write(ByteParsers.UShort.EncodeValue(LoopModMax, out _));
+            memStream.Write(ByteParsers.Single.EncodeValue(TransitionTime, out _));
+            memStream.Write(ByteParsers.Single.EncodeValue(TransitionTimeModMin, out _));
+            memStream.Write(ByteParsers.Single.EncodeValue(TransitionTimeModMax, out _));
+            memStream.Write(ByteParsers.UShort.EncodeValue(AvoidRepeatCount, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(TransitionMode, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(RandomMode, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(Mode, out _));
+            memStream.Write(ByteParsers.Byte.EncodeValue(BitVector, out _));
             memStream.Write(Children.GetAsByteArray());
-
-            memStream.Write(ByteParsers.UShort.EncodeValue((ushort)AkPlaylist.Count(), out _));
-            foreach (var akPlaylistItem in AkPlaylist)
-            {
-                memStream.Write(ByteParsers.UInt32.EncodeValue(akPlaylistItem.PlayId, out _));
-                memStream.Write(ByteParsers.UInt32.EncodeValue(Convert.ToUInt32(akPlaylistItem.Weight), out _));
-            }
-
+            memStream.Write(ByteParsers.UShort.EncodeValue(CAkPlayList.PlayListItem, out _));
+            memStream.Write(CAkPlayList.GetAsByteArray());
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var copyInstance = new CAkRanSeqCntr_v136();
-            copyInstance.Parse(new ByteChunk(byteArray));
+            var sanityReload = new CAkRanSeqCntr_v136();
+            sanityReload.Parse(new ByteChunk(byteArray));
 
             return byteArray;
         }
-    }
 
-    public class AkPlaylistItem
-    {
-        public uint PlayId { get; set; }
-        public int Weight { get; set; }
-
-        public static AkPlaylistItem Create(ByteChunk chunk)
+        public override void UpdateSectionSize()
         {
-            var instance = new AkPlaylistItem();
-            instance.PlayId = chunk.ReadUInt32();
-            instance.Weight = chunk.ReadInt32();
-            return instance;
+            var idSize = ByteHelper.GetPropertyTypeSize(Id);
+            var nodeBaseParamsSize = NodeBaseParams.GetSize();
+            var loopCountSize = ByteHelper.GetPropertyTypeSize(LoopCount);
+            var loopModMinSize = ByteHelper.GetPropertyTypeSize(LoopModMin);
+            var loopModMaxSize = ByteHelper.GetPropertyTypeSize(LoopModMax);
+            var transitionTimeSize = ByteHelper.GetPropertyTypeSize(TransitionTime);
+            var transitionTimeModMinSize = ByteHelper.GetPropertyTypeSize(TransitionTimeModMin);
+            var transitionTimeModMaxSize = ByteHelper.GetPropertyTypeSize(TransitionTimeModMax);
+            var avoidRepeatCountSize = ByteHelper.GetPropertyTypeSize(AvoidRepeatCount);
+            var transitionModeSize = ByteHelper.GetPropertyTypeSize(TransitionMode);
+            var randomModeSize = ByteHelper.GetPropertyTypeSize(RandomMode);
+            var modeSize = ByteHelper.GetPropertyTypeSize(Mode);
+            var bitVectorSize = ByteHelper.GetPropertyTypeSize(BitVector);
+            var childrenSize = Children.GetSize();
+            var playListSize = CAkPlayList.GetSize();
+
+            SectionSize = idSize + nodeBaseParamsSize + loopCountSize + loopModMinSize + loopModMaxSize + transitionTimeSize + transitionTimeModMinSize +
+                transitionTimeModMaxSize + avoidRepeatCountSize + transitionModeSize + randomModeSize + modeSize + bitVectorSize + childrenSize + playListSize;
+        }
+
+        public uint GetParentId() => NodeBaseParams.DirectParentId;
+        public List<uint> GetChildren() => CAkPlayList.Playlist.Select(x => x.PlayId).ToList();
+
+        public class CAkPlayList_V136
+        {
+            public ushort PlayListItem { get; set; }
+            public List<AkPlaylistItem_V136> Playlist { get; set; } = [];
+
+            public void Create(ByteChunk chunk)
+            {
+                PlayListItem = chunk.ReadUShort();
+                for (var i = 0; i < PlayListItem; i++)
+                    Playlist.Add(AkPlaylistItem_V136.Create(chunk));
+            }
+
+            public byte[] GetAsByteArray()
+            {
+                using var memStream = new MemoryStream();
+                memStream.Write(ByteParsers.UShort.EncodeValue(PlayListItem, out _));
+                foreach (var playlistItem in Playlist)
+                    memStream.Write(playlistItem.GetAsByteArray());
+                return memStream.ToArray();
+            }
+
+            public uint GetSize()
+            {
+                var playListItemSize = ByteHelper.GetPropertyTypeSize(PlayListItem);
+                uint playListSize = 0;
+                foreach (var playlistItem in Playlist)
+                    playListSize += playlistItem.GetSize();
+                return playListItemSize + playListItemSize;
+            }
+
+            public class AkPlaylistItem_V136
+            {
+                public uint PlayId { get; set; }
+                public int Weight { get; set; }
+
+                public static AkPlaylistItem_V136 Create(ByteChunk chunk)
+                {
+                    return new AkPlaylistItem_V136
+                    {
+                        PlayId = chunk.ReadUInt32(),
+                        Weight = chunk.ReadInt32()
+                    };
+                }
+
+                public byte[] GetAsByteArray()
+                {
+                    using var memStream = new MemoryStream();
+                    memStream.Write(ByteParsers.UInt32.EncodeValue(PlayId, out _));
+                    memStream.Write(ByteParsers.Int32.EncodeValue(Weight, out _)); 
+                    return memStream.ToArray();
+                }
+
+                public uint GetSize()
+                {
+                    var playIdSize = ByteHelper.GetPropertyTypeSize(PlayId);
+                    var weightSize = ByteHelper.GetPropertyTypeSize(Weight);
+                    return playIdSize + weightSize;
+                }
+            }
         }
     }
 }
