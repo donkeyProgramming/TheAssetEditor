@@ -66,10 +66,19 @@ namespace Editors.KitbasherEditor.Services
                 rmv = ModelFactory.Create().Load(file.DataSource.ReadData());
             }
 
-            var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromFile(rmv, modelFullPath, _kitbasherRootScene.Player, false, wsModel);
+            var lodNodes = _rmv2ModelNodeLoader.CreateModelNodesFromFile(rmv, modelFullPath, false, wsModel);
+            foreach (var lodNode in lodNodes)
+            {
+                SceneNodeHelper
+                    .GetChildrenOfType<Rmv2MeshNode>(lodNode)
+                    .ForEach(x=>x.AnimationPlayer = _kitbasherRootScene.Player);
+            }
+            
             mainNode.Children.Clear();
             foreach(var lodNode in lodNodes)
                 mainNode.AddObject(lodNode);
+
+
 
             _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
 
