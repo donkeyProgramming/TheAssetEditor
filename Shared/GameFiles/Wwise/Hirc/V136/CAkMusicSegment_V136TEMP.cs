@@ -4,7 +4,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public partial class CAkMusicSegment_v136 : HircItem
+    public partial class CAkMusicSegment_V136TEMP : HircItem
     {
         public MusicNodeParams_V136 MusicNodeParams { get; set; } = new MusicNodeParams_V136();
         public double Duration { get; set; }

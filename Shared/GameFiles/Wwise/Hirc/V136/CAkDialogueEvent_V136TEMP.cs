@@ -4,7 +4,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public partial class CAkDialogueEvent_v136 : HircItem, ICAkDialogueEvent
+    public partial class CAkDialogueEvent_V136TEMP : HircItem, ICAkDialogueEvent
     {
         public byte Probability { get; set; }
         public uint TreeDepth { get; set; }
@@ -61,7 +61,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var sanityReload = new CAkDialogueEvent_v136();
+            var sanityReload = new CAkDialogueEvent_V136TEMP();
             sanityReload.Parse(new ByteChunk(byteArray));
 
             return byteArray;

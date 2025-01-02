@@ -4,7 +4,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkLayerCntr_v136 : HircItem, ICAkLayerCntr
+    public class CAkLayerCntr_V136TEMP : HircItem, ICAkLayerCntr
     {
         public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
         public Children_V136 Children { get; set; } = new Children_V136();

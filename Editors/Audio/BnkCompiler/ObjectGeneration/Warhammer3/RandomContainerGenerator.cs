@@ -7,7 +7,7 @@ using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
-using static Shared.GameFormats.Wwise.Hirc.V136.CAkRanSeqCntr_v136.CAkPlayList_V136;
+using static Shared.GameFormats.Wwise.Hirc.V136.CAkRanSeqCntr_V136TEMP.CAkPlayList_V136;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -23,9 +23,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return ConvertToWwise(typedProjectItem, project);
         }
 
-        public static CAkRanSeqCntr_v136 ConvertToWwise(RandomContainer inputContainer, CompilerData project)
+        public static CAkRanSeqCntr_V136TEMP ConvertToWwise(RandomContainer inputContainer, CompilerData project)
         {
-            var wwiseRandomContainer = new CAkRanSeqCntr_v136();
+            var wwiseRandomContainer = new CAkRanSeqCntr_V136TEMP();
             wwiseRandomContainer.Id = inputContainer.Id;
             wwiseRandomContainer.HircType = AkBkHircType.SequenceContainer;
             wwiseRandomContainer.NodeBaseParams = CreateBaseNodeParams();

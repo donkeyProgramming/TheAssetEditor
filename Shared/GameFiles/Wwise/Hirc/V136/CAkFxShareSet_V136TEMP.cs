@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkFxShareSet_v136 : HircItem
+    public class CAkFxShareSet_V136TEMP : HircItem
     {
         public uint PluginId { get; set; }
         public uint Size { get; set; }

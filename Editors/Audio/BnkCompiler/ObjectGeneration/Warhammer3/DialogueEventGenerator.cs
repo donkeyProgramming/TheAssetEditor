@@ -31,9 +31,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return ConvertToWwise(typedProjectItem, project);
         }
 
-        public CAkDialogueEvent_v136 ConvertToWwise(DialogueEvent inputDialogueEvent, CompilerData project)
+        public CAkDialogueEvent_V136TEMP ConvertToWwise(DialogueEvent inputDialogueEvent, CompilerData project)
         {
-            var wwiseDialogueEvent = new CAkDialogueEvent_v136();
+            var wwiseDialogueEvent = new CAkDialogueEvent_V136TEMP();
             wwiseDialogueEvent.Arguments = new List<AkGameSync_V136>();
             wwiseDialogueEvent.Id = inputDialogueEvent.Id;
             wwiseDialogueEvent.HircType = AkBkHircType.Dialogue_Event;

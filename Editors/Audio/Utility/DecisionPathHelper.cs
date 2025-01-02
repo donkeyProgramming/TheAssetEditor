@@ -44,12 +44,12 @@ namespace Editors.Audio.Utility
         public DecisionPathCollection GetDecisionPaths(ICAkDialogueEvent dialogueEvent) =>
             dialogueEvent switch
             {
-                CAkDialogueEvent_v136 event136 => GetDecisionPaths(event136.AkDecisionTree, event136.Arguments),
-                CAkDialogueEvent_v112 event112 => GetDecisionPaths(event112.AkDecisionTree, event112.Arguments),
+                CAkDialogueEvent_V136TEMP event136 => GetDecisionPaths(event136.AkDecisionTree, event136.Arguments),
+                CAkDialogueEvent_V112TEMP event112 => GetDecisionPaths(event112.AkDecisionTree, event112.Arguments),
                 _ => throw new NotImplementedException(),
             };
 
-        public DecisionPathCollection GetDecisionPaths(CAkMusicSwitchCntr_v136 musicSwitch) => GetDecisionPaths(musicSwitch.AkDecisionTree, musicSwitch.Arguments);
+        public DecisionPathCollection GetDecisionPaths(CAkMusicSwitchCntr_V136TEMP musicSwitch) => GetDecisionPaths(musicSwitch.AkDecisionTree, musicSwitch.Arguments);
         
         DecisionPathCollection GetDecisionPaths(AkDecisionTree_V136 decisionTree, List<AkGameSync_V136> argumentsList)
         {

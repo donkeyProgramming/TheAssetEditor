@@ -32,7 +32,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return ConvertToWwise(typedProjectItem, project);
         }
 
-        public CAkSound_v136 ConvertToWwise(Sound inputSound, CompilerData project)
+        public CAkSound_V136TEMP ConvertToWwise(Sound inputSound, CompilerData project)
         {
             var filePath = inputSound.FilePath;
             var file = _pfs.FindFile(filePath);
@@ -40,7 +40,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             var wavFile = Path.GetFileName(filePath);
             var wavFileName = wavFile.Replace(".wem", "");
 
-            var wwiseSound = new CAkSound_v136()
+            var wwiseSound = new CAkSound_V136TEMP()
             {
                 Id = inputSound.Id,
                 HircType = AkBkHircType.Sound,
@@ -79,7 +79,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return wwiseSound;
         }
 
-        public List<CAkSound_v136> ConvertToWwise(IEnumerable<Sound> inputSound, CompilerData project)
+        public List<CAkSound_V136TEMP> ConvertToWwise(IEnumerable<Sound> inputSound, CompilerData project)
         {
             return inputSound.Select(x => ConvertToWwise(x, project)).ToList();
         }

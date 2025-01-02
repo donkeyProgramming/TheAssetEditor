@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkMusicRanSeqCntr_v136 : HircItem
+    public class CAkMusicRanSeqCntr_V136TEMP : HircItem
     {
         public MusicTransNodeParams_V136 MusicTransNodeParams { get; set; } = new MusicTransNodeParams_V136();
         public uint NumPlaylistItems { get; set; }

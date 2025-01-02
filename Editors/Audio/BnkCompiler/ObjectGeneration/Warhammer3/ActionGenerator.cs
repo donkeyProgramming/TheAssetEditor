@@ -21,9 +21,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return ConvertToWwise(typedProjectItem, project);
         }
 
-        public static CAkAction_v136 ConvertToWwise(Action inputAction, CompilerData project)
+        public static CAkAction_V136TEMP ConvertToWwise(Action inputAction, CompilerData project)
         {
-            var wwiseAction = new CAkAction_v136();
+            var wwiseAction = new CAkAction_V136TEMP();
             wwiseAction.Id = inputAction.Id;
             wwiseAction.HircType = AkBkHircType.Action;
             wwiseAction.ActionType = AkActionType.Play;

@@ -22,9 +22,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return ConvertToWwise(typedProjectItem, project);
         }
 
-        public static CAkActorMixer_v136 ConvertToWwise(ActorMixer actorMixer, CompilerData project)
+        public static CAkActorMixer_V136TEMP ConvertToWwise(ActorMixer actorMixer, CompilerData project)
         {
-            var wwiseActorMixer = new CAkActorMixer_v136();
+            var wwiseActorMixer = new CAkActorMixer_V136TEMP();
             wwiseActorMixer.Id = actorMixer.Id;
             wwiseActorMixer.HircType = AkBkHircType.ActorMixer;
             wwiseActorMixer.NodeBaseParams = CreateBaseNodeParams();

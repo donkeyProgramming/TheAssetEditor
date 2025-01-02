@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkBus_v136 : HircItem
+    public class CAkBus_V136TEMP : HircItem
     {
         public uint OverrideBusId { get; set; }
         public uint IdDeviceShareset { get; set; }

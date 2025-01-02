@@ -77,7 +77,7 @@ namespace Editors.Audio.AudioExplorer
         void OnNodeSelected(HircTreeItem selectedNode)
         {
             IsPlaySoundButtonEnabled.Value = _selectedNode?.Item is ICAkSound or ICAkMusicTrack;
-            CanExportCurrrentDialogueEventAsCsvAction.Value = _selectedNode?.Item is CAkDialogueEvent_v136;
+            CanExportCurrrentDialogueEventAsCsvAction.Value = _selectedNode?.Item is CAkDialogueEvent_V136TEMP;
 
             SelectedNodeText.Value = "";
 

@@ -4,7 +4,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkAction_v136 : HircItem, ICAkAction
+    public class CAkAction_V136TEMP : HircItem, ICAkAction
     {
         public AkActionType ActionType { get; set; }
         public uint IdExt { get; set; }
@@ -45,7 +45,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var sanityReload = new CAkAction_v136();
+            var sanityReload = new CAkAction_V136TEMP();
             sanityReload.Parse(new ByteChunk(byteArray));
 
             return byteArray;

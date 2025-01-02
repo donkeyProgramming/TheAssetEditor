@@ -1,12 +1,12 @@
 ﻿using Shared.Core.ByteParsing;
-using Shared.GameFormats.Wwise.Hirc.V136.Shared;
+using Shared.GameFormats.Wwise.Hirc.V112.Shared;
 
-namespace Shared.GameFormats.Wwise.Hirc.V136
+namespace Shared.GameFormats.Wwise.Hirc.V112
 {
-    public class CAkActorMixer_v136 : HircItem, ICAkActorMixer
+    public class CAkActorMixer_V112TEMP : HircItem, ICAkActorMixer
     {
-        public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
-        public Children_V136 Children { get; set; } = new Children_V136();
+        public NodeBaseParams_V112 NodeBaseParams { get; set; } = new NodeBaseParams_V112();
+        public Children_V112 Children { get; set; } = new Children_V112();
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
@@ -22,7 +22,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var sanityReload = new CAkActorMixer_v136();
+            var sanityReload = new CAkActorMixer_V112TEMP();
             sanityReload.Parse(new ByteChunk(byteArray));
 
             return byteArray;

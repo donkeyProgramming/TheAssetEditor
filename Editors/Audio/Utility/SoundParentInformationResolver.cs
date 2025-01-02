@@ -57,27 +57,27 @@ namespace Editors.Audio.Utility
             {
                 var busInfo = "";
 
-                if (node.Item is CAkActorMixer_v136 mixerInstance && mixerInstance.NodeBaseParams.OverrideBusId != 0)
+                if (node.Item is CAkActorMixer_V136TEMP mixerInstance && mixerInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With AudioBus [{mixerInstance.NodeBaseParams.OverrideBusId}]";
                     busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = mixerInstance.NodeBaseParams.OverrideBusId });
                 }
-                else if (node.Item is CAkSound_v136 soundInstance && soundInstance.NodeBaseParams.OverrideBusId != 0)
+                else if (node.Item is CAkSound_V136TEMP soundInstance && soundInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With AudioBus [{soundInstance.NodeBaseParams.OverrideBusId}]";
                     busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = soundInstance.NodeBaseParams.OverrideBusId });
                 }
-                else if (node.Item is CAkRanSeqCntr_v136 randInstance && randInstance.NodeBaseParams.OverrideBusId != 0)
+                else if (node.Item is CAkRanSeqCntr_V136TEMP randInstance && randInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With AudioBus [{randInstance.NodeBaseParams.OverrideBusId}]";
                     busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = randInstance.NodeBaseParams.OverrideBusId });
                 }
-                else if (node.Item is CAkLayerCntr_v136 layerInstance && layerInstance.NodeBaseParams.OverrideBusId != 0)
+                else if (node.Item is CAkLayerCntr_V136TEMP layerInstance && layerInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With AudioBus [{layerInstance.NodeBaseParams.OverrideBusId}]";
                     busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = layerInstance.NodeBaseParams.OverrideBusId });
                 }
-                else if (node.Item is CAkSwitchCntr_v136 switchInstance && switchInstance.NodeBaseParams.OverrideBusId != 0)
+                else if (node.Item is CAkSwitchCntr_V136TEMP switchInstance && switchInstance.NodeBaseParams.OverrideBusId != 0)
                 {
                     busInfo = $" - With AudioBus [{switchInstance.NodeBaseParams.OverrideBusId}]";
                     busses.Add(new BusItem() { SourceDescription = $"{node.Item.HircType}[{node.Item.Id}]", BusId = switchInstance.NodeBaseParams.OverrideBusId });
@@ -105,7 +105,7 @@ namespace Editors.Audio.Utility
 
                 var firstBus = audioRepository.GetHircObject(currentBusItem.BusId)
                     .Where(x => x.HircType == AkBkHircType.Audio_Bus)
-                    .Cast<CAkBus_v136>()
+                    .Cast<CAkBus_V136TEMP>()
                     .First();
 
                 var item = firstBus;
@@ -113,7 +113,7 @@ namespace Editors.Audio.Utility
                 {
                     item = audioRepository.GetHircObject(item.OverrideBusId)
                             .Where(x => x.HircType == AkBkHircType.Audio_Bus)
-                            .Cast<CAkBus_v136>()
+                            .Cast<CAkBus_V136TEMP>()
                             .First();
 
                     var name = audioRepository.GetNameFromHash(item.Id, out var found);
