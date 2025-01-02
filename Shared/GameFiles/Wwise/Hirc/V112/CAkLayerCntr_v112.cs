@@ -1,69 +1,77 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Enums;
+using Shared.GameFormats.Wwise.Hirc.V112.Shared;
+using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V112
 {
     public class CAkLayerCntr_v112 : HircItem, ICAkLayerCntr
     {
-        public NodeBaseParams NodeBaseParams { get; set; }
-        public Children Children { get; set; }
-        public List<CAkLayer> LayerList { get; set; } = [];
-        public byte BIsContinuousValidation { get; set; }
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
+        public NodeBaseParams_V112 NodeBaseParams { get; set; } = new NodeBaseParams_V112();
+        public Children_V112 Children { get; set; } = new Children_V112();
+        public uint NumLayers { get; set; }
+        public List<CAkLayer_V112> LayerList { get; set; } = [];
+        public byte IsContinuousValidation { get; set; }
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
-            NodeBaseParams = NodeBaseParams.Create(chunk);
-            Children = Children.Create(chunk);
+            NodeBaseParams.Create(chunk);
+            Children.Create(chunk);
 
-            var layerCount = chunk.ReadUInt32();
-            for (var i = 0; i < layerCount; i++)
-                LayerList.Add(CAkLayer.Create(chunk));
-
-            BIsContinuousValidation = chunk.ReadByte();
+            NumLayers = chunk.ReadUInt32();
+            for (var i = 0; i < NumLayers; i++)
+            {
+                var layer = new CAkLayer_V112();
+                layer.Create(chunk);
+                LayerList.Add(layer);
+            }
         }
 
-        public override void UpdateSectionSize() => throw new NotImplementedException();
-        public override byte[] GetAsByteArray() => throw new NotImplementedException();
-        public List<uint> GetChildren() => Children.ChildIdList;
-    }
+        public override byte[] GetAsByteArray() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
 
-    public class CAkLayer
-    {
-        public uint UlLayerIr { get; set; }
-        public InitialRtpc InitialRtpc { get; set; }
-        public uint RtpcId { get; set; }
-        public AkRtpcType RtpcType { get; set; }
-        public List<CAssociatedChildData> CAssociatedChildDataList { get; set; } = [];
+        public List<uint> GetChildren() => Children.ChildIds;
+        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
 
-        public static CAkLayer Create(ByteChunk chunk)
+        public class CAkLayer_V112
         {
-            var instance = new CAkLayer();
-            instance.UlLayerIr = chunk.ReadUInt32();
-            instance.InitialRtpc = InitialRtpc.Create(chunk);
-            instance.RtpcId = chunk.ReadUInt32();
-            instance.RtpcType = (AkRtpcType)chunk.ReadByte();
-            var ulNumAssoc = chunk.ReadUInt32();
-            for (var i = 0; i < ulNumAssoc; i++)
-                instance.CAssociatedChildDataList.Add(CAssociatedChildData.Create(chunk));
-            return instance;
+            public uint UlLayerIr { get; set; }
+            public InitialRtpc_V112 InitialRtpc { get; set; } = new InitialRtpc_V112();
+            public uint RtpcId { get; set; }
+            public AkRtpcType RtpcType { get; set; }
+            public uint NumAssoc {  get; set; }
+            public List<CAssociatedChildData_V112> CAssociatedChildDataList { get; set; } = [];
+
+            public void Create(ByteChunk chunk)
+            {
+                UlLayerIr = chunk.ReadUInt32();
+                InitialRtpc.Create(chunk);
+                RtpcId = chunk.ReadUInt32();
+                RtpcType = (AkRtpcType)chunk.ReadByte();
+
+                NumAssoc = chunk.ReadUInt32();
+                for (var i = 0; i < NumAssoc; i++)
+                {
+                    var associatedChildData = new CAssociatedChildData_V112();
+                    associatedChildData.Create(chunk);
+                    CAssociatedChildDataList.Add(associatedChildData);
+                }
+            }
         }
-    }
 
-    public class CAssociatedChildData
-    {
-        public uint UlAssociatedChildId { get; set; }
-        public uint UlCurveSize { get; set; }
-        public byte UnknownCustom1 { get; set; }
-        public List<AkRtpcGraphPoint> AkRtpcGraphPointList { get; set; } = [];
-
-        public static CAssociatedChildData Create(ByteChunk chunk)
+        public class CAssociatedChildData_V112
         {
-            var instance = new CAssociatedChildData();
-            instance.UlAssociatedChildId = chunk.ReadUInt32();
-            instance.UlCurveSize = chunk.ReadUInt32();
-            for (var i = 0; i < instance.UlCurveSize; i++)
-                instance.AkRtpcGraphPointList.Add(AkRtpcGraphPoint.Create(chunk));
-            return instance;
+            public uint AssociatedChildId { get; set; }
+            public uint CurveSize { get; set; }
+            public List<AkRtpcGraphPoint_V112> AkRtpcGraphPointList { get; set; } = [];
+
+            public void Create(ByteChunk chunk)
+            {
+                AssociatedChildId = chunk.ReadUInt32();
+                CurveSize = chunk.ReadUInt32();
+                for (var i = 0; i < CurveSize; i++)
+                    AkRtpcGraphPointList.Add(AkRtpcGraphPoint_V112.Create(chunk));
+            }
         }
     }
 }
