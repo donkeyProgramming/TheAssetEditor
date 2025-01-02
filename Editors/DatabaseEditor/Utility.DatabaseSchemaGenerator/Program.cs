@@ -49,6 +49,8 @@ namespace Utility.DatabaseSchemaGenerator
                 {
                     Console.WriteLine($"Error applying schema: {ex.Message}");
                 }
+
+                //dbHandler.PopulateTable(pfs, connection);
             }
 
             Console.WriteLine("Done.");
