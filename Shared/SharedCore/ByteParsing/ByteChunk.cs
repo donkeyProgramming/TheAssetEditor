@@ -153,9 +153,18 @@ namespace Shared.Core.ByteParsing
         public string ReadStringTableIndex(IEnumerable<string> stringTable) => stringTable.ElementAt(ReadInt32());
 
 
+
         public uint PeakUint32() => Peak(ByteParsers.UInt32);
         public long PeakInt64() => Peak(ByteParsers.Int64);
         public byte PeakByte() => Peak(ByteParsers.Byte);
+
+
+        public object ReadObject(DbTypesEnum type)
+        {
+            var result = ByteParserFactory.Create(type).GetValueAsObject(_buffer, CurrentIndex, out var byteRead);
+            CurrentIndex += byteRead;
+            return result;
+        }
 
         public UnknownParseResult PeakUnknown()
         {

@@ -24,6 +24,9 @@ namespace Editors.DatabaseEditor.FileFormats
         public required string Name { get; set; }
         public required string DataType { get; set; }
         public required bool IsKey { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
+        public DbColoumnForeignKey? ForeignKey { get; set; }
     }
+
+    public record DbColoumnForeignKey(string Table, string ColoumnName);
 }

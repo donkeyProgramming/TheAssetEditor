@@ -14,15 +14,12 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
   </ItemGroup>
 
   <ItemGroup>
      <ProjectReference Include="..\..\..\Shared\SharedCore\Shared.Core.csproj" />
     <ProjectReference Include="..\Editors.DatabaseEditor\Editors.DatabaseEditor.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Templates\" />
   </ItemGroup>
 
 

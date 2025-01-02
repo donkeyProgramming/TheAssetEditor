@@ -1,6 +1,11 @@
-﻿using Editors.DatabaseEditor.FileFormats;
+﻿using System.Data.SqlClient;
+using System.Data.SQLite;
+using Editors.DatabaseEditor.FileFormats;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
+using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles;
 using Shared.Core.Settings;
 using Utility.DatabaseSchemaGenerator.Examples;
@@ -11,8 +16,9 @@ namespace Utility.DatabaseSchemaGenerator
     {
         static void Main(string[] args)
         {
+            CreateDatabase();
             //GenerateSchema();
-            CreateExampleDb();
+            //CreateExampleDb();
         }
 
         static void GenerateSchema()
@@ -23,6 +29,82 @@ namespace Utility.DatabaseSchemaGenerator
             // Get table
             // Generate
         }
+
+
+
+
+        static void CreateDatabase()
+        {
+            var dbHandler = new DbSchemaBuilder();
+            var pfs = CreatePackFileService();
+            var databasePath = "app.db";
+
+            if (File.Exists(databasePath))
+            { 
+                File.Delete(databasePath);
+            }
+
+            // Create the SQLite database file
+            if (!File.Exists(databasePath))
+            {
+                Console.WriteLine($"Creating database file: {databasePath}");
+                SQLiteConnection.CreateFile(databasePath);
+            }
+
+
+            // Create and open the SQLite connection
+            using (var connection = new SQLiteConnection($"Data Source={databasePath};Version=3;"))
+            {
+                connection.Open();
+                Console.WriteLine("Database connection opened.");
+
+                using var command = new SQLiteCommand("PRAGMA foreign_keys = ON;", connection);
+                command.ExecuteNonQuery();
+
+                try
+                {
+                    dbHandler.CreateSqTableScehma(connection, true, true);
+                    Console.WriteLine("Schema successfully applied.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error applying schema: {ex.Message}");
+                }
+
+               // using var transaction = connection.BeginTransaction();
+               // try
+               // {
+               //     dbHandler.PopulateTable(pfs, connection);
+               //     Console.WriteLine("PopulateTable called successfully.");
+               // }
+               // catch (Exception ex)
+               // {
+               //     Console.WriteLine($"Error PopulateTable: {ex.Message}");
+               // }
+               //
+               // transaction.Commit();
+            }
+
+            Console.WriteLine("Done.");
+        }
+
+        static string FormatCommandText(SQLiteCommand command)
+        {
+            string formattedCommand = command.CommandText;
+
+            foreach (SQLiteParameter parameter in command.Parameters)
+            {
+                string placeholder = parameter.ParameterName;
+                string value = parameter.Value is string ? $"'{parameter.Value}'" : parameter.Value.ToString();
+
+                // Replace the parameter placeholder with the actual value
+                formattedCommand = formattedCommand.Replace(placeholder, value);
+            }
+
+            return formattedCommand;
+        }
+
+
 
         public static ExampleDb CreateDbContext()
         {
@@ -39,7 +121,7 @@ namespace Utility.DatabaseSchemaGenerator
             return new ExampleDb(optionsBuilder.Options);
         }
 
-        static void CreateExampleDb()
+        static IPackFileService CreatePackFileService()
         {
             var settings = new ApplicationSettingsService(GameTypeEnum.Warhammer3);
             settings.Load();
@@ -51,17 +133,7 @@ namespace Utility.DatabaseSchemaGenerator
             var pfs = new PackFileService(null);
             pfs.AddContainer(gameFiles);
 
-            using ExampleDb sc = CreateDbContext();
-
-            //https://marketplace.visualstudio.com/items?itemName=ErikEJ.SQLServerCompactSQLiteToolbox&ssr=false#overview
-            // dotnet tool install --global dotnet-ef
-            //dotnet add package Microsoft.EntityFrameworkCore.Design
-
-            //var m = sc.Database.GetAppliedMigrations();
-            sc.Database.EnsureCreated();
-
-            sc.Deserialize(pfs);
-            sc.SaveChanges();
+            return pfs;
         }
     }
 }

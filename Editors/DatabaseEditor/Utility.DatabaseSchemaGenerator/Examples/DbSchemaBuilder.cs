@@ -1,0 +1,243 @@
+﻿using System.Data;
+using System.Data.SqlClient;
+using System.Data.SQLite;
+using System.Linq;
+using System.Windows.Documents;
+using Editors.DatabaseEditor.FileFormats;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json.Linq;
+using Shared.Core.ByteParsing;
+using Shared.Core.PackFiles;
+using Shared.Core.Settings;
+using SharpDX.MediaFoundation.DirectX;
+
+namespace Utility.DatabaseSchemaGenerator.Examples
+{
+    internal class DbSchemaBuilder
+    {
+        // battle_skeletons_tables
+        // battle_skeleton_parts_tables
+
+
+
+        /*
+        CREATE TABLE IF NOT EXISTS Products (
+            Id INTEGER,
+            Name TEXT NOT NULL,
+            Price REAL NOT NULL
+        ) WITHOUT ROWID;
+        */
+
+
+        private readonly static Dictionary<string, string> s_mappingTable = new()
+        {
+            {"StringU8", "TEXT NOT NULL"},
+            {"StringU16", "TEXT NOT NULL"},
+            {"OptionalStringU8", "TEXT"},
+            {"F32","FLOAT"},
+            {"F64","REAL"},
+
+            {"Boolean","bit"},
+           
+            {"I32","INT"},
+            {"I64","BIGINT"},
+            {"I16","smallint"},
+            {"OptionalI32","NullableColumn INTEGER"},
+            {"ColourRGB","tinyint"},// probably need to find a better type
+           
+        };
+
+
+        private readonly static List<(string SchemaName, string sqlType, DbType SqlSerializeType, DbTypesEnum GameType)> s_typeMappingTable = new()
+        {
+            {("StringU8",           "TEXT NOT NULL",            DbType.String,      DbTypesEnum.String)},
+            {("OptionalStringU8",   "TEXT",                     DbType.String,      DbTypesEnum.Optstring)},
+
+            {("StringU16",          "TEXT NOT NULL",            DbType.AnsiString,  DbTypesEnum.String_ascii)},
+            {("OptionalStringU8",   "TEXT",                     DbType.AnsiString,  DbTypesEnum.Optstring_ascii)},
+
+            {("F32",                "FLOAT",                    DbType.Double,      DbTypesEnum.Single)},
+            {("F64",                "REAL",                     DbType.Double,      DbTypesEnum.Int64)},     // wrong type
+
+            {("I16",                "smallint",                 DbType.Int16,       DbTypesEnum.Short)},
+            {("I32",                "INT",                      DbType.Int32,       DbTypesEnum.Integer)},
+            {("OptionalI32",        "NullableColumn INTEGER",   DbType.Int32,       DbTypesEnum.Integer)},   // wrong type
+            {("I64",                "BIGINT",                   DbType.Int64,       DbTypesEnum.Int64)},
+           
+            {("Boolean",            "TEXT NOT NULL",            DbType.Boolean,     DbTypesEnum.Boolean)},
+
+            {("ColourRGB",          "tinyint",                  DbType.SByte,       DbTypesEnum.Short)},     // wrong type
+        };
+
+        private readonly DbSchema _jsonSchema;
+
+        public DbSchemaBuilder()
+        {
+            _jsonSchema = DbScehmaParser.CreateFromRpfmJson(@"C:\Users\ole_k\Downloads\schema_wh3.json", GameTypeEnum.Warhammer3);
+
+            // Filter scheamas to make debugging easier
+            _jsonSchema.TableSchemas = _jsonSchema.TableSchemas
+                .OrderByDescending(x=>x.Version)
+                .GroupBy(x => x.Name)
+                .Select(x=>x.First())
+               // .Where(x => x.Name == "battle_skeleton_parts_tables" || x.Name == "battle_skeletons_tables")
+                .ToList();
+
+        }
+
+        public void CreateSqTableScehma(SQLiteConnection connection, bool addKeys, bool addForeignKeys)
+        {
+            string[] dontGenerateFkTables = ["effect_bonus_value_teleportation_node_template_junctions_tables"];
+
+            var tableSchemas = _jsonSchema.TableSchemas;
+
+            var tables = new Dictionary<string, string>(); 
+            foreach (var tableSchema in tableSchemas)
+            {
+                var tableName = tableSchema.Name;
+
+                var sqlCommand = $"CREATE TABLE {tableName} (\n";
+                for(var i = 0; i < tableSchema.Coloumns.Count; i++) 
+                {
+                    var coloumnSchema = tableSchema.Coloumns[i];
+                    var coloumName = coloumnSchema.Name;
+                    var coloumDataType = s_mappingTable[coloumnSchema.DataType];
+                    var coloumnModifier = "";
+                    var comma = i != (tableSchema.Coloumns.Count-1) ? "," : "";
+
+                    sqlCommand += $"\t[{coloumName}] {coloumDataType} {coloumnModifier} {comma} \n";
+                }
+
+                var foreignKeyColoums = tableSchema.Coloumns.Where(x=>x.ForeignKey != null).ToList();
+
+
+                if (addForeignKeys)
+                {
+                    foreach (var coloumn in foreignKeyColoums)
+                    {
+                        var coloumName = coloumn.Name;
+
+                        sqlCommand += $"\t ,FOREIGN KEY ([{coloumName}]) REFERENCES {coloumn.ForeignKey.Table + "_tables"}([{coloumn.ForeignKey.ColoumnName}]) \n";
+                    }
+                }
+
+                var keyColoumns = tableSchema.Coloumns
+                    .Where(x=>x.IsKey)
+                    .Select(x=>$"[{x.Name}]")
+                    .ToList();
+               
+                // Add this to the top!
+                if (keyColoumns.Any())
+                    sqlCommand += $",PRIMARY KEY ({string.Join(", ", keyColoumns)})";
+
+
+                sqlCommand += ");";
+
+                tables.Add(tableName, sqlCommand);
+            }
+
+            var fullSqlCommand = "";
+            fullSqlCommand +=string.Join("\n\n", tables.Values);
+
+            // Execute the schema SQL commands
+            using var command = new SQLiteCommand(fullSqlCommand, connection);
+
+            command.ExecuteNonQuery();
+        }
+
+        public void PopulateTable(IPackFileService packFileService, SQLiteConnection sqlConnection)
+        {
+            var tableSchemas = _jsonSchema.TableSchemas;
+            var parsedTables = 0;
+            var skippedTables = 0;
+            var failedTables = new List<string>();
+            foreach (var tableSchema in tableSchemas)
+            {
+                try
+                {
+                    // Skip tables with datatypes that are currently not supported:
+                    string[] unsupportedTypes = ["F62", "OptionalI32", "ColourRGB"];
+
+                    var allTypes = tableSchema.Coloumns
+                        .Select(x => x.DataType)
+                        .Distinct()
+                        .ToList();
+
+                    var hasMatch = allTypes.Any(x => unsupportedTypes.Any(y => y == x));
+                    if (hasMatch)
+                    {
+                        skippedTables++;
+                        continue;
+                    }
+
+                    // PackFile Parsing
+                    var packFile = packFileService.FindFile($"db\\{tableSchema.Name}\\data__");
+                    if (packFile == null)
+                        continue;
+                    var byteChunk = packFile.DataSource.ReadDataAsChunk();
+
+                    var peakGuid = byteChunk.PeakUint32();
+                    if ((uint)4294770429 == peakGuid)
+                    {
+                        byteChunk.ReadUInt32();
+                        var guid = byteChunk.ReadStringAscii();
+                    }
+
+                    var peakVersion = byteChunk.PeakUint32();
+                    if ((uint)4294901244 == peakVersion)
+                    {
+                        byteChunk.ReadUInt32();
+                        var version = byteChunk.ReadUInt32();
+                    }
+
+                    var unkownBool = byteChunk.ReadBool();
+                    var numTableEntries = byteChunk.ReadUInt32();
+
+                    // Create sql command
+                    var tableColoumnNames = tableSchema.Coloumns.Select(x => $"[{x.Name}]").ToList();
+                    var values = tableSchema.Coloumns.Select(x => $"@{x.Name}").ToList();
+
+                    var strCommand = $"INSERT INTO {tableSchema.Name} ({string.Join(",", tableColoumnNames)}) VALUES ({string.Join(",", values)})";
+                    using var sqlCommand = new SQLiteCommand(strCommand, sqlConnection);
+
+                    // Build the parameters
+                    var valueParameters = new List<SQLiteParameter>();
+                    foreach (var tableColoumn in tableSchema.Coloumns)
+                    {
+                        var dbType = s_typeMappingTable.First(x => x.SchemaName == tableColoumn.DataType).SqlSerializeType;
+                        var dbName = $"@{tableColoumn.Name}";
+                        var newParam = sqlCommand.Parameters.Add(dbName, dbType);
+                        valueParameters.Add(newParam);
+                    }
+
+                    // Fill the command with game data
+                    for (var i = 0; i < numTableEntries; i++)
+                    {
+                        //foreach (var valueParameter in valueParameters)
+                        for (var j = 0; j < tableSchema.Coloumns.Count; j++)
+                        {
+                            var valueParameter = valueParameters[j];
+                            var coloumn = tableSchema.Coloumns[j];
+
+                            var gameType = s_typeMappingTable.First(x => x.SchemaName == coloumn.DataType).GameType;
+                            var valueFromGameDb = byteChunk.ReadObject(gameType);
+                            valueParameter.Value = valueFromGameDb;
+                        }
+
+                        sqlCommand.ExecuteNonQuery();
+                    }
+
+                    if (byteChunk.BytesLeft != 0)
+                        throw new Exception("Data left - error parsing");
+
+                    parsedTables++;
+                }
+                catch (Exception e)
+                {
+                    failedTables.Add(tableSchema.Name + " - " + e.Message);
+                }
+            }
+        }
+    }
+}

@@ -35,6 +35,10 @@ namespace Editors.DatabaseEditor.FileFormats
                         var name = schemaField["name"].GetValue<string>();
                         var field_type = schemaField["field_type"].GetValue<string>();
                         var isKey = schemaField["is_key"].GetValue<bool>();
+                        var is_ref = schemaField["is_reference"] as JsonArray;
+
+          
+
 
                         var dbColoumnSchema = new DbColoumnSchema()
                         {
@@ -43,6 +47,13 @@ namespace Editors.DatabaseEditor.FileFormats
                             Name = name,
                             Description = ""
                         };
+
+                        if (is_ref != null)
+                        {
+                            var foreignKeyTable = is_ref[0].GetValue<string>();
+                            var foreignKeyColumn= is_ref[1].GetValue<string>();
+                            dbColoumnSchema.ForeignKey = new DbColoumnForeignKey(foreignKeyTable, foreignKeyColumn);
+                        }
 
                         dbTableSchema.Coloumns.Add(dbColoumnSchema);
                     }
