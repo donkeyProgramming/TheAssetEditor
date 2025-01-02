@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -174,17 +175,23 @@ namespace Shared.Core.PackFiles
             if (pf.IsCaPackFile)
                 throw new Exception("Can not delete folder inside CA pack file");
 
-            var folderLower = folder.ToLower();
-            var itemsToDelete = pf.FileList
-                .Where(x => string.Equals(Path.GetDirectoryName(x.Key), folder, StringComparison.InvariantCultureIgnoreCase))
-                .ToList();
+            var filesToDelete = new List<string>();
+            foreach (var file in pf.FileList)
+            { 
+                var directory = Path.GetDirectoryName(file.Key);
+                if (directory == null)
+                    continue;
+
+                if (directory.StartsWith(folder, StringComparison.InvariantCultureIgnoreCase))
+                    filesToDelete.Add(file.Key);
+            }
 
             _globalEventHub?.PublishGlobalEvent(new PackFileContainerFolderRemovedEvent(pf, folder));
 
-            foreach (var item in itemsToDelete)
+            foreach (var item in filesToDelete)
             {
-                _logger.Here().Information($"Deleting file {item.Key} in directory {folder}");
-                pf.FileList.Remove(item.Key);
+                _logger.Here().Information($"Deleting file {item} in directory {folder}");
+                pf.FileList.Remove(item);
             }
         }
 

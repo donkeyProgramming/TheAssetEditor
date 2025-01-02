@@ -26,7 +26,7 @@
             </TreeView.ItemContainerStyle>
 
             <b:Interaction.Behaviors>
-                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding ComponentEditor.SelectedHierarchyItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding ComponentManager.SelectedHierarchyItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
 
             <TreeView.ItemTemplate >

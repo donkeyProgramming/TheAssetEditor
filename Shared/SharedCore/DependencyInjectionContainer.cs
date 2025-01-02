@@ -22,7 +22,6 @@ namespace Shared.Core
             services.AddSingleton<ApplicationSettingsService>();
             services.AddSingleton<IEditorDatabase, EditorDatabase>();
             services.AddSingleton<CopyPasteManager>();
-            services.AddSingleton<GameInformationFactory>();
             services.AddSingleton<IPackFileService, PackFileService>();
             services.AddScoped<IFileSaveService, FileSaveService>();
             services.AddScoped<ScopeToken>();
@@ -36,9 +35,6 @@ namespace Shared.Core
             services.AddTransient<DevelopmentConfigurationManager>();
 
             services.AddSingleton<IPackFileContainerLoader, PackFileContainerLoader>();
-
-
-
         }
     }
 

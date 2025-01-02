@@ -1,3 +1,11 @@
+Finished for v059
+	[Feature] GameDb => SQL DB convrter v0.1
+	
+	[Bugfix] General: Fixed bug which caused deleted files to not be removed 
+	[Bugfix] Kitbash: Error message if there is an error in wsmodel, reverts to using rmv2 material
+	[Bugfix] Kitbash: Fixed potential softlock when loading wsmodels with errors 
+	[Bugfix] AnimationBins: Most warnings turned into errors, as CA has terrible QA.
+	
 Fixes for v059
 	Twui editor v0
 

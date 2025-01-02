@@ -140,6 +140,7 @@ namespace Shared.Core.ByteParsing
 
         public string ReadStringAscii() => Read(ByteParsers.StringAscii);
         public string ReadString() => Read(ByteParsers.String);
+        public string ReadOptionalString() => Read(ByteParsers.OptString);
         public int ReadInt32() => Read(ByteParsers.Int32);
         public uint ReadUInt32() => Read(ByteParsers.UInt32);
         public long ReadInt64() => Read(ByteParsers.Int64);
@@ -152,9 +153,18 @@ namespace Shared.Core.ByteParsing
         public string ReadStringTableIndex(IEnumerable<string> stringTable) => stringTable.ElementAt(ReadInt32());
 
 
+
         public uint PeakUint32() => Peak(ByteParsers.UInt32);
         public long PeakInt64() => Peak(ByteParsers.Int64);
         public byte PeakByte() => Peak(ByteParsers.Byte);
+
+
+        public object ReadObject(DbTypesEnum type)
+        {
+            var result = ByteParserFactory.Create(type).GetValueAsObject(_buffer, CurrentIndex, out var byteRead);
+            CurrentIndex += byteRead;
+            return result;
+        }
 
         public UnknownParseResult PeakUnknown()
         {

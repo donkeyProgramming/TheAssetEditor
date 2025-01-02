@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Windows.Data;
 using Shared.Core.Settings;
-using static Shared.Core.Settings.GameInformationFactory;
 using static Shared.Core.Settings.ThemesController;
 using static Shared.Core.Settings.ApplicationSettingsHelper;
 
@@ -15,7 +14,7 @@ namespace AssetEditor.Views.Settings
             if (value == null)
                 return value;
             else if (value is GameTypeEnum game)
-                return GetEnumAsString(game);
+                return GameInformationDatabase.GetEnumAsString(game);
             else if (value is ThemeType theme)
                 return GetEnumAsString(theme);
             else if (value is BackgroundColour backgroundColour)

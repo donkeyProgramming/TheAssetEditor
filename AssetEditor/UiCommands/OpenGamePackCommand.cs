@@ -11,14 +11,12 @@ namespace AssetEditor.UiCommands
         private readonly IPackFileService _packFileService;
         private readonly IPackFileContainerLoader _packFileContainerLoader;
         private readonly ApplicationSettingsService _applicationSettingsService;
-        private readonly GameInformationFactory _gameInformationFactory;
 
-        public OpenGamePackCommand(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
+        public OpenGamePackCommand(IPackFileService packFileService, IPackFileContainerLoader packFileContainerLoader, ApplicationSettingsService applicationSettingsService)
         {
             _packFileService = packFileService;
             _packFileContainerLoader = packFileContainerLoader;
             _applicationSettingsService = applicationSettingsService;
-            _gameInformationFactory = gameInformationFactory;
         }
 
         public void Execute(GameTypeEnum game)
@@ -38,7 +36,7 @@ namespace AssetEditor.UiCommands
             {
                 if (packFile.SystemFilePath == gamePath.Path)
                 {
-                    MessageBox.Show($"Pack files for \"{_gameInformationFactory.GetGameById(game).DisplayName}\" are already loaded.", "Error");
+                    MessageBox.Show($"Pack files for \"{GameInformationDatabase.GetGameById(game).DisplayName}\" are already loaded.", "Error");
                     return;
                 }
             }

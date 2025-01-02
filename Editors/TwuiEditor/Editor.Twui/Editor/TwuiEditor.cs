@@ -1,17 +1,19 @@
 ﻿using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Editors.Twui.Editor.Datatypes;
 using Editors.Twui.Editor.PreviewRendering;
-using Editors.Twui.Editor.Serialization;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
+using Editors.Twui.Editor.ComponentEditor;
+using Shared.GameFormats.Twui;
+using Shared.GameFormats.Twui.Data;
+using Editors.Twui.Editor.Events;
 
 namespace Editors.Twui.Editor
 {
     public partial class TwuiEditor : ObservableObject, IEditorInterface, ISaveableEditor, IFileEditor
     {
-        private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly IEventHub _eventHub;
 
         [ObservableProperty] string _displayName = "Twui Editor";
 
@@ -19,13 +21,14 @@ namespace Editors.Twui.Editor
         public PackFile CurrentFile { get; set; }
 
         [ObservableProperty] TwuiFile _parsedTwuiFile;
-        [ObservableProperty] ComponentEditor _componentEditor;
-        [ObservableProperty] PreviewRenderer _previewRenderer;
+   
+        [ObservableProperty] ComponentManger _componentManager;
+        [ObservableProperty] EditorRenderHandler _previewRenderer;
 
-        public TwuiEditor(IUiCommandFactory uiCommandFactory, ComponentEditor componentEditor, PreviewRenderer previewRenderer)
+        public TwuiEditor(IEventHub eventHub, ComponentManger componentEditor, EditorRenderHandler previewRenderer)
         {
-            _uiCommandFactory = uiCommandFactory;
-            _componentEditor = componentEditor;
+            _eventHub = eventHub;
+            _componentManager = componentEditor;
             _previewRenderer = previewRenderer;
         }
 
@@ -41,8 +44,8 @@ namespace Editors.Twui.Editor
             ParsedTwuiFile = serializer.Load(file);
             DisplayName = "Twui Editor:" + Path.GetFileName(file.Name);
 
-            ComponentEditor.SetFile(ParsedTwuiFile);
-            PreviewRenderer.SetFile(ParsedTwuiFile);
+            ComponentManager.SetFile(ParsedTwuiFile);
+            _eventHub.Publish(new RedrawTwuiEvent(ParsedTwuiFile, null));
         }
     }
 }

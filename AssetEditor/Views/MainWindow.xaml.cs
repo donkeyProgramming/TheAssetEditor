@@ -18,12 +18,10 @@ namespace AssetEditor.Views
         IEditorInterface _draggedItem;
 
         private readonly ApplicationSettingsService _applicationSettingsService;
-        private readonly GameInformationFactory _gameInformationFactory;
 
-        public MainWindow(ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
+        public MainWindow(ApplicationSettingsService applicationSettingsService)
         {
             _applicationSettingsService = applicationSettingsService;
-            _gameInformationFactory = gameInformationFactory;
 
             InitializeComponent();
             SourceInitialized += OnSourceInitialized;
@@ -203,7 +201,7 @@ namespace AssetEditor.Views
 
         private void NewWindowMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var w = new MainWindow(_applicationSettingsService, _gameInformationFactory);
+            var w = new MainWindow(_applicationSettingsService);
             w.WindowState = WindowState.Normal;
             w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             w.Show();

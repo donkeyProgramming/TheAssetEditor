@@ -23,17 +23,18 @@ namespace Editors.Twui.DevConfig
         {
             currentSettings.CurrentGame = GameTypeEnum.Warhammer3;
             currentSettings.ShowCAWemFiles = false;
-            currentSettings.LoadCaPacksByDefault = false;
+            currentSettings.LoadCaPacksByDefault = true;
 
-            var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\twui_pack";
-            var container = _packFileContainerLoader.LoadSystemFolderAsPackFileContainer(packFile);
-            container.IsCaPackFile = true;
-            _packFileService.AddContainer(container);
+            //var packFile = ResourceLoader.GetDevelopmentDataFolder() + "\\twui_pack";
+            //var container = _packFileContainerLoader.LoadSystemFolderAsPackFileContainer(packFile);
+            //container.IsCaPackFile = true;
+            //_packFileService.AddContainer(container);
         }
 
         public void OpenFileOnLoad()
         {
-            var file = _packFileService.FindFile(@"ui\campaign ui\dlc25_bog_legendary_grudges.twui.xml");
+            var file = _packFileService.FindFile(@"ui\campaign ui\dlc25_bog_main.twui.xml");
+            //var file = _packFileService.FindFile(@"ui\campaign ui\dlc25_bog_legendary_grudges.twui.xml");
             _editorCreator.CreateFromFile(file, EditorEnums.Twui_Editor);
         }
     }

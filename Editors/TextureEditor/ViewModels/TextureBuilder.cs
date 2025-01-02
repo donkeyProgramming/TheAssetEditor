@@ -63,7 +63,7 @@ namespace Editors.TextureEditor.ViewModels
             return previewImages;
         }
 
-        private static void DrawCheckerBoard(Graphics g, int width, int height)
+        public static void DrawCheckerBoard(Graphics g, int width, int height)
         {
             var size = 50;
             var countX = width / size + 1;
@@ -91,7 +91,7 @@ namespace Editors.TextureEditor.ViewModels
             return Image.FromStream(stream);
         }
 
-        static BitmapImage BitmapToImageSource(Image bitmap)
+        public static BitmapImage BitmapToImageSource(Image bitmap)
         {
             using var memory = new MemoryStream();
             bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);

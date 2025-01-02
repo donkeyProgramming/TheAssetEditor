@@ -1,6 +1,7 @@
 ﻿using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
+using CommonControls.Editors.AnimationPack.Converters;
 using Editors.Shared.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -12,7 +13,7 @@ using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
 using Shared.Ui.Editors.TextEditor;
 
-namespace CommonControls.Editors.AnimationPack.Converters
+namespace Editors.AnimationTextEditors.AnimationPack.Converters
 {
     public class AnimationBinWh3FileToXmlConverter : BaseAnimConverter<AnimationBinWh3FileToXmlConverter.XmlFormat, AnimationBinWh3>
     {
@@ -36,8 +37,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override XmlFormat ConvertBytesToXmlClass(byte[] bytes)
         {
-
-            var binFile = new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", bytes);
+            var binFile = new AnimationBinWh3("", bytes);
             var outputBin = new XmlFormat();
 
             var slotHelper = binFile.TableVersion == 4 ? AnimationSlotTypeHelperWh3.GetInstance() : AnimationSlotTypeHelper3k.GetInstance();
@@ -86,7 +86,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override byte[] ConvertToAnimClassBytes(XmlFormat xmlBin, string fileName)
         {
-            var binFile = new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", null);
+            var binFile = new AnimationBinWh3("", null);
 
             binFile.TableVersion = xmlBin.Data.TableVersion;
             binFile.TableSubVersion = xmlBin.Data.TableSubVersion;
@@ -101,7 +101,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             foreach (var animationEntry in xmlBin.Animations)
             {
-                binFile.AnimationTableEntries.Add(new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+                binFile.AnimationTableEntries.Add(new AnimationBinEntry()
                 {
                     AnimationId = (uint)slotHelper.GetfromValue(animationEntry.Slot).Id,
                     BlendIn = animationEntry.BlendId,
@@ -180,23 +180,23 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     errorList.Error(animation.Slot, $"Not a valid animation slot for game");
 
                 if (animation.Ref == null || animation.Ref.Count == 0)
-                    errorList.Error(animation.Slot, "Slot does not have any animations");
+                    errorList.Warning(animation.Slot, "Slot does not have any animations");
 
                 foreach (var animationRef in animation.Ref)
                 {
                     if (pfs.FindFile(animationRef.File) == null)
                         errorList.Warning(animation.Slot, $"Animation file {animationRef.File} is not found");
                     else if (!IsAnimFile(animationRef.File, pfs))
-                        errorList.Error(animation.Slot, $"Animation file {animationRef.File} does not appears to be a valid animation file");
-                    else if (String.IsNullOrWhiteSpace(animationRef.File))
-                        errorList.Error(animation.Slot, $"Animation file {animationRef.File} contain whitespace which could trigger a tpose");
+                        errorList.Warning(animation.Slot, $"Animation file {animationRef.File} does not appears to be a valid animation file");
+                    else if (string.IsNullOrWhiteSpace(animationRef.File))
+                        errorList.Warning(animation.Slot, $"Animation file {animationRef.File} contain whitespace which could trigger a tpose");
                     else
                         ValidateAnimationVersionAgainstPersistenceMeta(animationRef.File, animation.Slot, type.Data.SkeletonName, pfs, errorList);
 
                     if (pfs.FindFile(animationRef.Meta) == null)
                         errorList.Warning(animation.Slot, $"Meta file {animationRef.Meta} is not found");
                     else if (!IsAnimMetaFile(animationRef.Meta, pfs))
-                        errorList.Error(animation.Slot, $"Meta file {animationRef.Meta} does not appear to be a valid meta animation");
+                        errorList.Warning(animation.Slot, $"Meta file {animationRef.Meta} does not appear to be a valid meta animation");
                     else
                     {
                         CheckForAnimationVersionsInMeta(animationRef.File, animationRef.Meta, animation.Slot, type.Data.SkeletonName, pfs, errorList);
@@ -208,7 +208,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     if (pfs.FindFile(animationRef.Sound) == null)
                         errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} is not found");
                     else if (!IsSndMetaFile(animationRef.Sound, pfs))
-                        errorList.Error(animation.Slot, $"Sound file {animationRef.Sound} does not appear to be a valid meta sound");
+                        errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} does not appear to be a valid meta sound");
                 }
             }
 
@@ -216,37 +216,37 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 ErrorListWindow.ShowDialog("Errors", errorList, false);
 
             var hasCriticalError = errorList.Errors.Where(x => x.IsError).Any();
-            if(hasCriticalError)
+            if (hasCriticalError)
                 return new ITextConverter.SaveError() { ErrorLength = 0, ErrorLineNumber = 1, ErrorPosition = 0, Text = "Critical Error found, unable to save" };
             return null;
         }
 
         private bool IsAnimFile(string file, IPackFileService pfs)
         {
-            bool endsWithAnim = file.EndsWith(".anim");
+            var endsWithAnim = file.EndsWith(".anim");
 
             var theFile = pfs.FindFile(file);
             var data = theFile.DataSource.ReadData(20);
-            bool headerIsReallyAnimFile = (data[0] == 0x06) || (data[0] == 0x07) || (data[0] == 0x08); //check if version is not 6 7 8 (or just check if it's 2)
+            var headerIsReallyAnimFile = data[0] == 0x06 || data[0] == 0x07 || data[0] == 0x08; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithAnim && headerIsReallyAnimFile;
         }
         private bool IsAnimMetaFile(string file, IPackFileService pfs)
         {
-            bool endsWithDotMeta = file.EndsWith(".anm.meta") || file.EndsWith(".meta");
+            var endsWithDotMeta = file.EndsWith(".anm.meta") || file.EndsWith(".meta");
 
             var theFile = pfs.FindFile(file);
             var data = theFile.DataSource.ReadData(20);
-            bool headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
+            var headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithDotMeta && headerIsReallyAnimMetaFile;
         }
 
         private bool IsSndMetaFile(string file, IPackFileService pfs)
         {
-            bool endsWithDotMeta = file.EndsWith(".snd.meta");
+            var endsWithDotMeta = file.EndsWith(".snd.meta");
 
             var theFile = pfs.FindFile(file);
             var data = theFile.DataSource.ReadData(20);
-            bool headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
+            var headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithDotMeta && headerIsReallyAnimMetaFile;
         }
 
@@ -262,7 +262,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             var mainAnimationHeader = GetAnimationHeader(mainAnimationFile, pfs);
             if (mainAnimationHeader == null)
             {
-                errorList.Error(animationSlot, $"Cannot locate animation {mainAnimationFile} while trying to parse meta");
+                errorList.Warning(animationSlot, $"Cannot locate animation {mainAnimationFile} while trying to parse meta");
                 return false;
             }
 
@@ -304,7 +304,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                         if (isTheVersionMatch) continue;
 
                         {
-                            errorList.Error(animationSlot, $"Animation Meta Splice {metaFile} has different version than in the main animation. File referenced in meta: {animPath} with version {animationVersion} vs in the main animation {mainAnimationFile} with version {mainAnimationVersion}");
+                            errorList.Warning(animationSlot, $"Animation Meta Splice {metaFile} has different version than in the main animation. File referenced in meta: {animPath} with version {animationVersion} vs in the main animation {mainAnimationFile} with version {mainAnimationVersion}");
                             result = false;
                         }
                     }
@@ -342,9 +342,8 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 if (isMatchedCombat) continue;
                 if (!isMountedAnim) continue;
                 if (isTheVersionMatch) continue;
-
                 {
-                    errorList.Error(animationSlot, $"Animation Meta Splice {AnimationPersistanceMetaFileName} has different version than in the main animation. File referenced in meta: {animPath} with version {animationVersion} vs in the main animation {mainAnimationFile} with version {mainAnimationVersion}");
+                    errorList.Warning(animationSlot, $"Animation Meta Splice {AnimationPersistanceMetaFileName} has different version than in the main animation. File referenced in meta: {animPath} with version {animationVersion} vs in the main animation {mainAnimationFile} with version {mainAnimationVersion}");
                     result = false;
                 }
             }
@@ -375,7 +374,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             var riderAnimationSlotWithoutPrefix = animationSlot.Substring(6);
             var mainAnimationToCompareHeader = GetAnimationHeader(animationFile, pfs);
-            if(mainAnimationToCompareHeader == null)
+            if (mainAnimationToCompareHeader == null)
             {
                 errorList.Warning(animationSlot, $"Cannot validate referenced {mountBinReference} of this rider, perhaps it's located in outside the current animpak files? or it is defined in another animpack or mod?");
                 return false;
@@ -395,7 +394,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                 {
                     var header = GetAnimationHeader(animationInstance.File, pfs);
 
-                    if(header == null)
+                    if (header == null)
                     {
                         errorList.Warning(animationSlot, $"Could not locate {animationInstance.File} while trying to validate CheckForRiderAndHisMountAnimationsVersion");
                         continue;
@@ -405,7 +404,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     var isVersionMatch = version == mainAnimationToCompareVersion;
                     if (!isVersionMatch)
                     {
-                        errorList.Error(animationSlot, $"Rider animation version mismatch with mount animation. Mount animation {animationInstance.File} with version {version} vs in the main animation {animationFile} with version {mainAnimationToCompareVersion}");
+                        errorList.Warning(animationSlot, $"Rider animation version mismatch with mount animation. Mount animation {animationInstance.File} with version {version} vs in the main animation {animationFile} with version {mainAnimationToCompareVersion}");
                         result = false;
                     }
 
@@ -416,14 +415,14 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     var isTImingMatch = mainAnimationTime == timing;
                     if (!isTImingMatch)
                     {
-                        errorList.Error(animationSlot, $"Rider animation mismatch with mount timing  animation. Mount animation {animationInstance.File} with timing {timing} vs in the main animation {animationFile} with timing {mainAnimationTime}");
+                        errorList.Warning(animationSlot, $"Rider animation mismatch with mount timing  animation. Mount animation {animationInstance.File} with timing {timing} vs in the main animation {animationFile} with timing {mainAnimationTime}");
                         result = false;
                     }
 
                     var isLenMatch = mainAnimationLength == length;
                     if (!isLenMatch)
                     {
-                        errorList.Error(animationSlot, $"Rider animation mismatch with mount frames animation. Mount animation {animationInstance.File} with length {length} vs in the main animation {animationFile} with timing {mainAnimationLength}");
+                        errorList.Warning(animationSlot, $"Rider animation mismatch with mount frames animation. Mount animation {animationInstance.File} with length {length} vs in the main animation {animationFile} with timing {mainAnimationLength}");
                         result = false;
                     }
                 }

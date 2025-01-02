@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Text;
-using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
@@ -19,12 +18,10 @@ namespace Shared.Core.PackFiles
     {
         static private readonly ILogger _logger = Logging.CreateStatic(typeof(PackFileContainerLoader));
         private readonly ApplicationSettingsService _settingsService;
-        private readonly GameInformationFactory _gameInformationFactory;
 
-        public PackFileContainerLoader(ApplicationSettingsService settingsService, GameInformationFactory gameInformationFactory)
+        public PackFileContainerLoader(ApplicationSettingsService settingsService)
         {
             _settingsService = settingsService;
-            _gameInformationFactory = gameInformationFactory;
         }
 
         public PackFileContainer LoadSystemFolderAsPackFileContainer(string packFileSystemPath)
@@ -90,7 +87,7 @@ namespace Shared.Core.PackFiles
 
         public PackFileContainer? LoadAllCaFiles(GameTypeEnum gameEnum)
         {
-            var game = _gameInformationFactory.GetGameById(gameEnum);
+            var game = GameInformationDatabase.GetGameById(gameEnum);
             var gamePathInfo = _settingsService.CurrentSettings.GameDirectories.FirstOrDefault(x => x.Game == game.Type);
             var gameDataFolder = gamePathInfo!.Path;
             var gameName = game.DisplayName;

@@ -40,11 +40,11 @@ namespace Editors.Audio.Storage
         public Dictionary<string, Dictionary<string, string>> DialogueEventsWithStateGroupsWithQualifiersAndStateGroups { get; set; } = [];
         public Dictionary<string, List<string>> StateGroupsWithStates { get; private set; }
 
-        public AudioRepository(RepositoryProvider provider, ApplicationSettingsService applicationSettingsService, GameInformationFactory gameInformationFactory)
+        public AudioRepository(RepositoryProvider provider, ApplicationSettingsService applicationSettingsService)
         {
             var audioData = new AudioData();
 
-            var gameInformation = gameInformationFactory.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+            var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
             var gameBankGeneratorVersion = gameInformation.BankGeneratorVersion;
             if (gameBankGeneratorVersion != null)
             {

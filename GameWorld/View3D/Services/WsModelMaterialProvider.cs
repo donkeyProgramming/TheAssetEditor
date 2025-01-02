@@ -1,7 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
+using GameWorld.Core.Rendering.Materials;
+using GameWorld.Core.Rendering.Materials.Shaders;
 using Shared.Core.PackFiles;
+using Shared.Core.Services;
+using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Services
@@ -9,49 +15,97 @@ namespace GameWorld.Core.Services
     public class WsModelMaterialProvider
     {
         private readonly IPackFileService _packFileService;
-        private readonly WsModelFile? _wsModelFile;
+        private readonly CapabilityMaterialFactory _materialFactory;
+        private WsModelFile? _wsModelFile;
+        private readonly IStandardDialogs _standardDialogs;
 
-        private WsModelMaterialProvider(IPackFileService packFileService, WsModelFile? wsModelFile)
+        private readonly Dictionary<string, CapabilityMaterial> _materialCache = [];
+
+        private WsModelMaterialProvider(IPackFileService packFileService, CapabilityMaterialFactory materialFactory, IStandardDialogs standardDialogs, WsModelFile? wsModelFile)
         {
             _packFileService = packFileService;
+            _materialFactory = materialFactory;
+            _standardDialogs = standardDialogs;
             _wsModelFile = wsModelFile;
         }
 
-        public static WsModelMaterialProvider CreateFromModelPath(IPackFileService packFileService, string rmv2ModelPath)
+        public static WsModelMaterialProvider CreateFromModelPath(IPackFileService packFileService, CapabilityMaterialFactory materialFactory, IStandardDialogs standardDialogs, string rmv2ModelPath)
         {
             var wsModelPath = Path.ChangeExtension(rmv2ModelPath, ".wsmodel");
-            return CreateFromWsModelPath(packFileService, wsModelPath);
+            return CreateFromWsModelPath(packFileService, materialFactory, standardDialogs, wsModelPath);
         }
 
-        public static WsModelMaterialProvider CreateFromWsModel(IPackFileService packFileService, WsModelFile wsModel)
+        public static WsModelMaterialProvider CreateFromWsModel(IPackFileService packFileService, CapabilityMaterialFactory materialFactory, IStandardDialogs standardDialogs, WsModelFile wsModel)
         {
-            return new WsModelMaterialProvider(packFileService, wsModel);
+            return new WsModelMaterialProvider(packFileService, materialFactory, standardDialogs, wsModel);
         }
 
-        public static WsModelMaterialProvider CreateFromWsModelPath(IPackFileService packFileService, string wsModelPath)
+        public static WsModelMaterialProvider CreateFromWsModelPath(IPackFileService packFileService, CapabilityMaterialFactory materialFactory, IStandardDialogs standardDialogs, string wsModelPath)
         {
             var packFile = packFileService.FindFile(wsModelPath);
             if (packFile == null)
-                return new WsModelMaterialProvider(packFileService, null);
+                return new WsModelMaterialProvider(packFileService, materialFactory, standardDialogs, null);
 
             var wsModel = new WsModelFile(packFile);
-            return CreateFromWsModel(packFileService, wsModel);
+            return CreateFromWsModel(packFileService, materialFactory, standardDialogs, wsModel);
         }
 
-        public WsModelMaterialFile? GetModelMaterial(int lodIndex, int partIndex)
+        public void ValidateWsModelMaterial(int[] meshCountInLods)
+        { 
+            if(_wsModelFile == null) 
+                return;
+
+            for (var lodIndex = 0; lodIndex < meshCountInLods.Length; lodIndex++)
+            {
+                for (var meshIndex = 0;  meshIndex < meshCountInLods[lodIndex]; meshIndex++)
+                { 
+                    var found = _wsModelFile.MaterialList.FirstOrDefault(x => x.LodIndex == lodIndex && x.PartIndex == meshIndex);
+                    if (found == null)
+                    {
+                        _standardDialogs.ShowDialogBox($"Unable to apply wsmodel file. Mismatch between expected mesh and lod counts.\nReverting to using rmv2 material.");
+                        _wsModelFile = null;
+                    }
+                }
+            }
+        }
+
+        public CapabilityMaterial ConstructMaterial(int lodIndex, int partIndex, IRmvMaterial fallbackMaterial)
         {
             if (_wsModelFile == null)
-                return null;
+                return _materialFactory.Create(fallbackMaterial, null);
 
             var materialPath = _wsModelFile.MaterialList.FirstOrDefault(x => x.LodIndex == lodIndex && x.PartIndex == partIndex);
             if (materialPath == null)
-                return null;
+                return _materialFactory.Create(fallbackMaterial, null);
 
             var wsMaterialPath = _packFileService.FindFile(materialPath.MaterialPath);
             if (wsMaterialPath == null)
-                return null;
+                return _materialFactory.Create(fallbackMaterial, null);
 
-            return new WsModelMaterialFile(wsMaterialPath);
+            var found =_materialCache.TryGetValue(materialPath.MaterialPath, out var capMaterial);
+            if (found)
+                return capMaterial!.Clone();
+
+            CapabilityMaterial shader;
+            try
+            {
+                var mFile = new WsModelMaterialFile(wsMaterialPath);
+                var wsModelMaterial = mFile;
+                shader = _materialFactory.Create(fallbackMaterial, wsModelMaterial);
+            }
+            catch (Exception e)
+            {
+                var errorMessage = "Failed to load material - creating default\n";
+                errorMessage += "The most common reason for this is materials generated by AssetEditor with ',' for deciaml number instead of '.'\n";
+                errorMessage += "Try deleting the wsModel and connected materials, or manually change the ',' to '.' in the material files where it has been generated incorrectly\n";
+                errorMessage += "new versions of AssetEditor will generate the material files\n";
+
+                _standardDialogs.ShowExceptionWindow(e, errorMessage);
+                shader = _materialFactory.CreateMaterial(CapabilityMaterialsEnum.MetalRoughPbr_Default);
+            }
+
+            _materialCache.Add(materialPath.MaterialPath, shader);
+            return shader;
         }
     }
 }

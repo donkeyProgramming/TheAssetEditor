@@ -39,8 +39,7 @@ namespace AssetEditor.ViewModels
                 IEditorDatabase toolFactory, 
                 IUiCommandFactory uiCommandFactory, 
                 IEventHub eventHub,
-                ApplicationSettingsService applicationSettingsService, 
-                GameInformationFactory gameInformationFactory)
+                ApplicationSettingsService applicationSettingsService)
         {
             MenuBar = menuViewModel;
 
@@ -55,7 +54,7 @@ namespace AssetEditor.ViewModels
             ToolsFactory = toolFactory;
 
             ApplicationTitle = $"AssetEditor v{VersionChecker.CurrentVersion}";
-            CurrentGame = $"Current Game: {gameInformationFactory.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame).DisplayName}";
+            CurrentGame = $"Current Game: {GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame).DisplayName}";
         }
 
         void OpenFile(PackFile file) => _uiCommandFactory.Create<OpenEditorCommand>().Execute(file);

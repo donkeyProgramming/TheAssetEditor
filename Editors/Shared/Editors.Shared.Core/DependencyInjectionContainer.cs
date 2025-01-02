@@ -61,6 +61,7 @@ namespace Editors.Shared.Core
                 .AddExtention(".bmd.xml", EditorPriorites.Default)
                 .AddExtention(".csv", EditorPriorites.Default)
                 .AddExtention(".bnk.xml", EditorPriorites.Default)
+                .AddExtention(".twui.xml", EditorPriorites.Default)
                 .Build(factory);
         }
     }
