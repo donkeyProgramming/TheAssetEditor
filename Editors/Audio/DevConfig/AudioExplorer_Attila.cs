@@ -18,7 +18,8 @@ namespace Editors.Audio.DevConfig
         public void OverrideSettings(ApplicationSettings currentSettings)
         {
             currentSettings.CurrentGame = GameTypeEnum.Attila;
-            currentSettings.ShowCAWemFiles = false;
+            currentSettings.LoadCaPacksByDefault = true;
+            currentSettings.ShowCAWemFiles = true;
         }
 
         public void OpenFileOnLoad()

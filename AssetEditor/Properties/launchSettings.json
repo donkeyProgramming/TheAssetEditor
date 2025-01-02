@@ -39,6 +39,11 @@
       "commandLineArgs": "-devcfg AudioExplorer_Wh3",
       "nativeDebugging": false
     },
+    "AE-AudioExplorer_Attila": {
+      "commandName": "Project",
+      "commandLineArgs": "-devcfg AudioExplorer_Attila",
+      "nativeDebugging": false
+    },
     "AE-SuperView": {
       "commandName": "Project",
       "commandLineArgs": "-devcfg SuperView_Rat",
