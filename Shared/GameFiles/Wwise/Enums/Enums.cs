@@ -1,4 +1,4 @@
-﻿namespace Shared.GameFormats.Wwise
+﻿namespace Shared.GameFormats.Wwise.Enums
 {
     public static class BankChunkTypes
     {
@@ -11,7 +11,8 @@
         public const string DATA = "DATA"; // The STID (String Table ID) section contains a list of all project Banks referenced in the HIRC section (including the current SoundBank) with info on their IDs and file names.
     }
 
-    public enum HircType : byte
+    // need to account for the different hirc types in different versions, hmm
+    public enum AkBkHircType : byte
     {
         State = 0x01,
         Sound = 0x02,
@@ -38,7 +39,7 @@
         Didx_Audio = 0x17
     }
 
-    public enum ActionType : ushort
+    public enum AkActionType : ushort
     {
         None = 0x0000,
         SetState = 0x1204,
@@ -146,27 +147,11 @@
         Release_O = 0x1F03,
     };
 
-    public enum SourceType : ushort
+    public enum AKBKSourceType : ushort
     {
         Data_BNK = 0x00,
         PrefetchStreaming = 0x01,
         Streaming = 0x02,
-    }
-
-    public enum AkPropBundleType : byte
-    {
-        Volume = 0x00,
-        Pitch = 0x02,
-        LPF = 0x03,
-        HPF = 0x04,
-        MakeUpGain = 0x06,
-        StatePropNum_Priority = 0x07,
-        PriorityDistanceOffset = 0x08,
-        UserAuxSendVolume0 = 0x13,
-        InitialDelay = 0x3B,
-        CenterPCT = 0x0E,
-        UnknownThing = 0x4A,
-        Attenuation = 0x46,
     }
 
     public enum AkGroupType : byte

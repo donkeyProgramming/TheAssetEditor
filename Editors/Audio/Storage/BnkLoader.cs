@@ -70,7 +70,7 @@ namespace Editors.Audio.Storage
                 try
                 {
                     var parsedBnk = LoadBnkFile(file, name, filePack.IsCaPackFile);
-                    if (parsedBnk.HircChunk.HircItems.Any(y => y is CAkUnknown == true || y.HasError))
+                    if (parsedBnk.HircChunk.HircItems.Any(y => y is UnknownHirc == true || y.HasError))
                         banksWithUnknowns.Add(name);
 
                     parsedBnkList.Add(parsedBnk);
@@ -125,13 +125,13 @@ namespace Editors.Audio.Storage
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"\n Result: {header}");
-            var unknownHirc = hircItems.Where(hircItem => hircItem is CAkUnknown).Count();
+            var unknownHirc = hircItems.Where(hircItem => hircItem is UnknownHirc).Count();
             var errorHirc = hircItems.Where(hircItem => hircItem.HasError).Count();
             stringBuilder.AppendLine($"\t Total HircObjects: {hircItems.Count()} Unknown: {unknownHirc} Decoding Errors:{errorHirc}");
 
             var grouped = hircItems.GroupBy(hircItem => hircItem.HircType);
-            var groupedWithError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is CAkUnknown == true || y.HasError));
-            var groupedWithoutError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is CAkUnknown == false && y.HasError == false));
+            var groupedWithError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is UnknownHirc == true || y.HasError));
+            var groupedWithoutError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is UnknownHirc == false && y.HasError == false));
 
             stringBuilder.AppendLine("\t\t Correct:");
             foreach (var group in groupedWithoutError)
@@ -141,7 +141,7 @@ namespace Editors.Audio.Storage
             {
                 stringBuilder.AppendLine("\t\t Error:");
                 foreach (var group in groupedWithError)
-                    stringBuilder.AppendLine($"\t\t\t {group.Key}: {group.Where(x => x is CAkUnknown == true || x.HasError).Count()}/{group.Count()} Failed");
+                    stringBuilder.AppendLine($"\t\t\t {group.Key}: {group.Where(x => x is UnknownHirc == true || x.HasError).Count()}/{group.Count()} Failed");
             }
 
             _logger.Here().Information(stringBuilder.ToString());

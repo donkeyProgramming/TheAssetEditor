@@ -1,4 +1,5 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Shared.GameFormats.Wwise.Hirc
 {
@@ -26,7 +27,7 @@ namespace Shared.GameFormats.Wwise.Hirc
 
             for (uint itemIndex = 0; itemIndex < hircChunk.NumHircItems; itemIndex++)
             {
-                var hircType = (HircType)chunk.PeakByte();
+                var hircType = (AkBkHircType)chunk.PeakByte();
 
                 var start = chunk.Index;
                 try
@@ -44,7 +45,7 @@ namespace Shared.GameFormats.Wwise.Hirc
                     failedItems.Add(itemIndex);
                     chunk.Index = start;
 
-                    var unkInstance = new CAkUnknown() { ErrorMsg = e.Message, ByteIndexInFile = itemIndex, OwnerFile = fileName };
+                    var unkInstance = new UnknownHirc() { ErrorMsg = e.Message, ByteIndexInFile = itemIndex, OwnerFile = fileName };
                     unkInstance.Parse(chunk);
                     hircChunk.HircItems.Add(unkInstance);
                 }

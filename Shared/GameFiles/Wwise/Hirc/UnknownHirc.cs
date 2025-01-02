@@ -2,7 +2,7 @@
 
 namespace Shared.GameFormats.Wwise.Hirc
 {
-    public class CAkUnknown : HircItem
+    public class UnknownHirc : HircItem
     {
         public string ErrorMsg { get; set; }
 

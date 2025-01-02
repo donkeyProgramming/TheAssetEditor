@@ -1,4 +1,6 @@
-﻿namespace Shared.GameFormats.Wwise.Hirc
+﻿using Shared.GameFormats.Wwise.Enums;
+
+namespace Shared.GameFormats.Wwise.Hirc
 {
     public class HircChunk
     {

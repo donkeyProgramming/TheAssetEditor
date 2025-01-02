@@ -1,4 +1,5 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Shared.GameFormats.Wwise.Bkhd
 {

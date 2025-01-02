@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Shared.GameFormats.Wwise.Hirc
 {
@@ -16,7 +17,7 @@ namespace Shared.GameFormats.Wwise.Hirc
         public bool HasError { get; set; } = true;
 
         // Wwise object properties
-        public HircType HircType { get; set; }
+        public AkBkHircType HircType { get; set; }
         public uint SectionSize { get; set; }
         public uint Id { get; set; }
 
@@ -27,7 +28,7 @@ namespace Shared.GameFormats.Wwise.Hirc
                 var objectStartIndex = chunk.Index;
                 ByteIndexInFile = (uint)objectStartIndex;
 
-                HircType = (HircType)chunk.ReadByte();
+                HircType = (AkBkHircType)chunk.ReadByte();
                 SectionSize = chunk.ReadUInt32();
                 Id = chunk.ReadUInt32();
                 CreateSpecificData(chunk);
@@ -40,7 +41,7 @@ namespace Shared.GameFormats.Wwise.Hirc
 
             catch (Exception e)
             {
-                _logger.Here().Error($"Failed to parse object {Id} in {OwnerFile} at index {IndexInFile}- " + e.Message);
+                _logger.Here().Error($"Failed to parse object {Id} of type {HircType} in {OwnerFile} at index {IndexInFile} - " + e.Message);
                 throw;
             }
         }
@@ -51,12 +52,11 @@ namespace Shared.GameFormats.Wwise.Hirc
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)HircType, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(SectionSize, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(Id, out _));
-
             return memStream;
         }
 
         protected abstract void CreateSpecificData(ByteChunk chunk);
-        public abstract void UpdateSectionSize();
         public abstract byte[] GetAsByteArray();
+        public abstract void UpdateSectionSize(); 
     }
 }

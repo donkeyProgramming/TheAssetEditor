@@ -3,6 +3,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Wwise.Bkhd;
 using Shared.GameFormats.Wwise.Data;
 using Shared.GameFormats.Wwise.Didx;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Stid;
 

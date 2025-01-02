@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
-using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Didx;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.Storage
 {
@@ -121,7 +123,7 @@ namespace Editors.Audio.Storage
             {
                 foreach (var hircItem in hircItemList)
                 {
-                    if (hircItem.HircType == HircType.Dialogue_Event && hircItem.Id == id && hircItem.IsCaHircItem)
+                    if (hircItem.HircType == AkBkHircType.Dialogue_Event && hircItem.Id == id && hircItem.IsCaHircItem)
                     {
                         var file = Path.GetFileName(hircItem.OwnerFile);
                         file = Path.GetFileNameWithoutExtension(file);

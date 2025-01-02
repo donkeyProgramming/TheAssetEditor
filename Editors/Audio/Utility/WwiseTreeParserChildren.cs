@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
-using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 
@@ -12,19 +12,20 @@ namespace Editors.Audio.Utility
         public WwiseTreeParserChildren(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
             : base(repository, showId, showOwningBnkFile, filterByBnkName)
         {
-            _hircProcessChildMap.Add(HircType.Event, ProcessEvent);
-            _hircProcessChildMap.Add(HircType.Action, ProcessAction);
-            _hircProcessChildMap.Add(HircType.SwitchContainer, ProcessSwitchControl);
-            _hircProcessChildMap.Add(HircType.LayerContainer, ProcessLayerContainer);
-            _hircProcessChildMap.Add(HircType.SequenceContainer, ProcessSequenceContainer);
-            _hircProcessChildMap.Add(HircType.Sound, ProcessSound);
-            _hircProcessChildMap.Add(HircType.ActorMixer, ProcessActorMixer);
-            _hircProcessChildMap.Add(HircType.Dialogue_Event, ProcessDialogueEvent);
-            _hircProcessChildMap.Add(HircType.Music_Track, ProcessMusicTrack);
-            _hircProcessChildMap.Add(HircType.Music_Segment, ProcessMusicSegment);
-            _hircProcessChildMap.Add(HircType.Music_Switch, ProcessMusicSwitch);
-            _hircProcessChildMap.Add(HircType.Music_Random_Sequence, ProcessRandMusicContainer);
+            _hircProcessChildMap.Add(AkBkHircType.Event, ProcessEvent);
+            _hircProcessChildMap.Add(AkBkHircType.Action, ProcessAction);
+            _hircProcessChildMap.Add(AkBkHircType.SwitchContainer, ProcessSwitchControl);
+            _hircProcessChildMap.Add(AkBkHircType.LayerContainer, ProcessLayerContainer);
+            _hircProcessChildMap.Add(AkBkHircType.SequenceContainer, ProcessSequenceContainer);
+            _hircProcessChildMap.Add(AkBkHircType.Sound, ProcessSound);
+            _hircProcessChildMap.Add(AkBkHircType.ActorMixer, ProcessActorMixer);
+            _hircProcessChildMap.Add(AkBkHircType.Dialogue_Event, ProcessDialogueEvent);
+            _hircProcessChildMap.Add(AkBkHircType.Music_Track, ProcessMusicTrack);
+            _hircProcessChildMap.Add(AkBkHircType.Music_Segment, ProcessMusicSegment);
+            _hircProcessChildMap.Add(AkBkHircType.Music_Switch, ProcessMusicSwitch);
+            _hircProcessChildMap.Add(AkBkHircType.Music_Random_Sequence, ProcessRandMusicContainer);
         }
+
 
         private void ProcessDialogueEvent(HircItem item, HircTreeItem parent)
         {
@@ -62,26 +63,26 @@ namespace Editors.Audio.Utility
             var childId = actionHirc.GetChildId();
 
             // Override child id if type is setState based on parameters 
-            if (actionHirc.GetActionType() == ActionType.SetState)
+            if (actionHirc.GetActionType() == AkActionType.SetState)
             {
                 var stateGroupId = actionHirc.GetStateGroupId();
                 var musicSwitches = _repository.HircObjects
                    .SelectMany(x => x.Value)
-                   .Where(X => X.HircType == HircType.Music_Switch)
+                   .Where(X => X.HircType == AkBkHircType.Music_Switch)
                    .DistinctBy(x => x.Id)
                    .Cast<CAkMusicSwitchCntr_v136>()
                    .ToList();
 
                 foreach (var musicSwitch in musicSwitches)
                 {
-                    var allArgs = musicSwitch.ArgumentList.Arguments.Select(x => x.UlGroupId).ToList();
+                    var allArgs = musicSwitch.Arguments.Select(x => x.GroupId).ToList();
                     if (allArgs.Contains(stateGroupId))
                         ProcessNext(musicSwitch.Id, actionTreeNode);
                 }
 
                 var normalSwitches = _repository.HircObjects
                    .SelectMany(x => x.Value)
-                   .Where(X => X.HircType == HircType.SwitchContainer)
+                   .Where(X => X.HircType == AkBkHircType.SwitchContainer)
                    .DistinctBy(x => x.Id)
                    .Cast<CAkSwitchCntr_v136>()
                    .ToList();
@@ -97,7 +98,7 @@ namespace Editors.Audio.Utility
         {
             var soundHirc = GetAsType<ICAkSound>(item);
 
-            string displayName = soundHirc.GetStreamType() == SourceType.Data_BNK
+            string displayName = soundHirc.GetStreamType() == AKBKSourceType.Data_BNK
                 ? $"Sound {soundHirc.GetSourceId()}.wem (stream type: {soundHirc.GetStreamType()})"
                 : $"Sound {soundHirc.GetSourceId()}.wem";
 

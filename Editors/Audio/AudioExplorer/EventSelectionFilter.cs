@@ -1,5 +1,5 @@
 ﻿using Editors.Audio.Storage;
-using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.Ui.Common;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,11 +26,11 @@ namespace Editors.Audio.AudioExplorer
 
         public void Refresh(bool showEvents, bool showDialogueEvents)
         {
-            var typesToShow = new List<HircType>();
+            var typesToShow = new List<AkBkHircType>();
             if (showEvents)
-                typesToShow.Add(HircType.Event);
+                typesToShow.Add(AkBkHircType.Event);
             if (showDialogueEvents)
-                typesToShow.Add(HircType.Dialogue_Event);
+                typesToShow.Add(AkBkHircType.Dialogue_Event);
 
             var allEvents = _repository.HircObjects.SelectMany(x => x.Value)
                 .Where(x => typesToShow.Contains(x.HircType))

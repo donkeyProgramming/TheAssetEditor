@@ -1,14 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 using System.Windows;
 using CommonControls.BaseDialogs;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.ToolCreation;
-using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V112;
 using Shared.GameFormats.Wwise.Hirc.V136;
@@ -88,7 +87,7 @@ namespace Editors.Audio.AudioExplorer
             var hircAsString = JsonSerializer.Serialize((object)selectedNode.Item, new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter() }, WriteIndented = true });
             SelectedNodeText.Value = hircAsString;
 
-            if (selectedNode.Item.HircType == HircType.Sound)
+            if (selectedNode.Item.HircType == AkBkHircType.Sound)
             {
                 var findAudioParentStructureHelper = new FindAudioParentStructureHelper();
                 var parentStructs = findAudioParentStructureHelper.Compute(selectedNode.Item, _audioRepository);
@@ -113,7 +112,7 @@ namespace Editors.Audio.AudioExplorer
                 return;
             }
 
-            if (sound.GetStreamType() == SourceType.Data_BNK)
+            if (sound.GetStreamType() == AKBKSourceType.Data_BNK)
             {
                 CAkSound_V112 cakSound_V112 = _selectedNode.Item as CAkSound_V112;
 
@@ -123,8 +122,8 @@ namespace Editors.Audio.AudioExplorer
                         _audioRepository,
                         cakSound_V112.AkBankSourceData.AkMediaInformation.SourceId,
                         cakSound_V112.AkBankSourceData.AkMediaInformation.FileId,
-                        (int)cakSound_V112.AkBankSourceData.AkMediaInformation.UFileOffset,
-                        (int)cakSound_V112.AkBankSourceData.AkMediaInformation.UInMemoryMediaSize
+                        (int)cakSound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
+                        (int)cakSound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize
                     );
                  
                     return;
