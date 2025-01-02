@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkMusicTrack_V136TEMP : HircItem, ICAkMusicTrack
+    public class CAkMusicTrack_V136 : HircItem, ICAkMusicTrack
     {
         public byte Flags { get; set; }
         public uint NumSources { get; set; }

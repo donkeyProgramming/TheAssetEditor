@@ -22,9 +22,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return ConvertToWwise(typedProjectItem, project);
         }
 
-        public static CAkEvent_V136TEMP ConvertToWwise(Event inputEvent, CompilerData project)
+        public static CAkEvent_V136 ConvertToWwise(Event inputEvent, CompilerData project)
         {
-            var wwiseEvent = new CAkEvent_V136TEMP();
+            var wwiseEvent = new CAkEvent_V136();
             wwiseEvent.Id = inputEvent.Id;
             wwiseEvent.HircType = AkBkHircType.Event;
             wwiseEvent.Actions = inputEvent.Actions.Select(x => CreateActionFromInputEvent(x, project)).ToList();
@@ -33,9 +33,9 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return wwiseEvent;
         }
 
-        private static CAkEvent_V136TEMP.Action_V136 CreateActionFromInputEvent(uint actionId, CompilerData project)
+        private static CAkEvent_V136.Action_V136 CreateActionFromInputEvent(uint actionId, CompilerData project)
         {
-            return new CAkEvent_V136TEMP.Action_V136() { ActionId = actionId };
+            return new CAkEvent_V136.Action_V136() { ActionId = actionId };
         }
     }
 }

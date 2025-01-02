@@ -70,7 +70,7 @@ namespace Editors.Audio.Utility
                    .SelectMany(x => x.Value)
                    .Where(X => X.HircType == AkBkHircType.Music_Switch)
                    .DistinctBy(x => x.Id)
-                   .Cast<CAkMusicSwitchCntr_V136TEMP>()
+                   .Cast<CAkMusicSwitchCntr_V136>()
                    .ToList();
 
                 foreach (var musicSwitch in musicSwitches)
@@ -84,7 +84,7 @@ namespace Editors.Audio.Utility
                    .SelectMany(x => x.Value)
                    .Where(X => X.HircType == AkBkHircType.SwitchContainer)
                    .DistinctBy(x => x.Id)
-                   .Cast<CAkSwitchCntr_V136TEMP>()
+                   .Cast<CAkSwitchCntr_V136>()
                    .ToList();
 
                 foreach (var normalSwitch in normalSwitches)
@@ -165,7 +165,7 @@ namespace Editors.Audio.Utility
 
         private void ProcessMusicSegment(HircItem item, HircTreeItem parent)
         {
-            var hirc = GetAsType<CAkMusicSegment_V136TEMP>(item);
+            var hirc = GetAsType<CAkMusicSegment_V136>(item);
             var node = new HircTreeItem() { DisplayName = $"Music Segment", Item = item };
             parent.Children.Add(node);
 
@@ -175,7 +175,7 @@ namespace Editors.Audio.Utility
 
         private void ProcessMusicSwitch(HircItem item, HircTreeItem parent)
         {
-            var hirc = GetAsType<CAkMusicSwitchCntr_V136TEMP>(item);
+            var hirc = GetAsType<CAkMusicSwitchCntr_V136>(item);
 
             var helper = new DecisionPathHelper(_repository);
             var paths = helper.GetDecisionPaths(hirc);
@@ -193,7 +193,7 @@ namespace Editors.Audio.Utility
 
         private void ProcessRandMusicContainer(HircItem item, HircTreeItem parent)
         {
-            var hirc = GetAsType<CAkMusicRanSeqCntr_V136TEMP>(item);
+            var hirc = GetAsType<CAkMusicRanSeqCntr_V136>(item);
             var node = new HircTreeItem() { DisplayName = $"Music Rand Container", Item = item };
             parent.Children.Add(node);
 

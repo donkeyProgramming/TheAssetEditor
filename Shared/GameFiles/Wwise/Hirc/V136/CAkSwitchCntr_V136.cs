@@ -5,7 +5,7 @@ using static Shared.GameFormats.Wwise.Hirc.ICAkSwitchCntr;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkSwitchCntr_V136TEMP : HircItem, ICAkSwitchCntr
+    public class CAkSwitchCntr_V136 : HircItem, ICAkSwitchCntr
     {
         public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
         public AkGroupType EGroupType { get; set; }

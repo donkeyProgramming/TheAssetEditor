@@ -4,7 +4,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkMusicSwitchCntr_V136TEMP : HircItem
+    public class CAkMusicSwitchCntr_V136 : HircItem
     {
         public MusicTransNodeParams_V136 MusicTransNodeParams { get; set; } = new MusicTransNodeParams_V136();
         public byte IsContinuePlayback { get; set; }

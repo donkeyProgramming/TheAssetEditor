@@ -1,28 +1,29 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkActorMixer_V136TEMP : HircItem, ICAkActorMixer
+    public class CAkSound_V136 : HircItem, ICAkSound
     {
+        public AkBankSourceData_V136 AkBankSourceData { get; set; }
         public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
-        public Children_V136 Children { get; set; } = new Children_V136();
 
         protected override void CreateSpecificData(ByteChunk chunk)
         {
+            AkBankSourceData = AkBankSourceData_V136.Create(chunk);
             NodeBaseParams.Create(chunk);
-            Children.Create(chunk);
         }
 
         public override byte[] GetAsByteArray()
         {
             using var memStream = WriteHeader();
+            memStream.Write(AkBankSourceData.GetAsByteArray());
             memStream.Write(NodeBaseParams.GetAsByteArray());
-            memStream.Write(Children.GetAsByteArray());
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var sanityReload = new CAkActorMixer_V136TEMP();
+            var sanityReload = new CAkSound_V136();
             sanityReload.Parse(new ByteChunk(byteArray));
 
             return byteArray;
@@ -31,10 +32,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public override void UpdateSectionSize()
         {
             var idSize = ByteHelper.GetPropertyTypeSize(Id);
-            SectionSize = idSize + Children.GetSize() + NodeBaseParams.GetSize();
+            SectionSize = idSize + AkBankSourceData.GetSize() + NodeBaseParams.GetSize();
         }
 
-        public List<uint> GetChildren() => Children.ChildIds;
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
+        public uint GetSourceId() => AkBankSourceData.AkMediaInformation.SourceId;
+        public AKBKSourceType GetStreamType() => AkBankSourceData.StreamType;
     }
 }

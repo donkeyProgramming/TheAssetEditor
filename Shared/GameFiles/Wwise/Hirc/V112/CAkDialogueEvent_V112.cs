@@ -4,7 +4,7 @@ using Shared.GameFormats.Wwise.Hirc.V112.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V112
 {
-    public class CAkDialogueEvent_V112TEMP : HircItem, ICAkDialogueEvent
+    public class CAkDialogueEvent_V112 : HircItem, ICAkDialogueEvent
     {
         public byte Probability { get; set; }
         public uint TreeDepth { get; set; }

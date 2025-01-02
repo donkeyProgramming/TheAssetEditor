@@ -2,7 +2,7 @@
 
 namespace Shared.GameFormats.Wwise.Hirc.V112
 {
-    public class CAkEvent_V112TEMP : HircItem, ICAkEvent
+    public class CAkEvent_V112 : HircItem, ICAkEvent
     {
         public uint ActionListSize { get; set; }
         public List<Action_V112> Actions { get; set; } = [];
@@ -24,7 +24,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var sanityReload = new CAkEvent_V112TEMP();
+            var sanityReload = new CAkEvent_V112();
             var chunk = new ByteChunk(byteArray);
             sanityReload.Parse(chunk);
 
