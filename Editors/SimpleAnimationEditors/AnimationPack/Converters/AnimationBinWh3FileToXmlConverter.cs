@@ -86,7 +86,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
         protected override byte[] ConvertToAnimClassBytes(XmlFormat xmlBin, string fileName)
         {
-            var binFile = new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinWh3("", null);
+            var binFile = new AnimationBinWh3("", null);
 
             binFile.TableVersion = xmlBin.Data.TableVersion;
             binFile.TableSubVersion = xmlBin.Data.TableSubVersion;
@@ -101,7 +101,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
 
             foreach (var animationEntry in xmlBin.Animations)
             {
-                binFile.AnimationTableEntries.Add(new Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3.AnimationBinEntry()
+                binFile.AnimationTableEntries.Add(new AnimationBinEntry()
                 {
                     AnimationId = (uint)slotHelper.GetfromValue(animationEntry.Slot).Id,
                     BlendIn = animationEntry.BlendId,
@@ -180,23 +180,23 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     errorList.Error(animation.Slot, $"Not a valid animation slot for game");
 
                 if (animation.Ref == null || animation.Ref.Count == 0)
-                    errorList.Error(animation.Slot, "Slot does not have any animations");
+                    errorList.Warning(animation.Slot, "Slot does not have any animations");
 
                 foreach (var animationRef in animation.Ref)
                 {
                     if (pfs.FindFile(animationRef.File) == null)
                         errorList.Warning(animation.Slot, $"Animation file {animationRef.File} is not found");
                     else if (!IsAnimFile(animationRef.File, pfs))
-                        errorList.Error(animation.Slot, $"Animation file {animationRef.File} does not appears to be a valid animation file");
+                        errorList.Warning(animation.Slot, $"Animation file {animationRef.File} does not appears to be a valid animation file");
                     else if (String.IsNullOrWhiteSpace(animationRef.File))
-                        errorList.Error(animation.Slot, $"Animation file {animationRef.File} contain whitespace which could trigger a tpose");
+                        errorList.Warning(animation.Slot, $"Animation file {animationRef.File} contain whitespace which could trigger a tpose");
                     else
                         ValidateAnimationVersionAgainstPersistenceMeta(animationRef.File, animation.Slot, type.Data.SkeletonName, pfs, errorList);
 
                     if (pfs.FindFile(animationRef.Meta) == null)
                         errorList.Warning(animation.Slot, $"Meta file {animationRef.Meta} is not found");
                     else if (!IsAnimMetaFile(animationRef.Meta, pfs))
-                        errorList.Error(animation.Slot, $"Meta file {animationRef.Meta} does not appear to be a valid meta animation");
+                        errorList.Warning(animation.Slot, $"Meta file {animationRef.Meta} does not appear to be a valid meta animation");
                     else
                     {
                         CheckForAnimationVersionsInMeta(animationRef.File, animationRef.Meta, animation.Slot, type.Data.SkeletonName, pfs, errorList);
@@ -208,7 +208,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                     if (pfs.FindFile(animationRef.Sound) == null)
                         errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} is not found");
                     else if (!IsSndMetaFile(animationRef.Sound, pfs))
-                        errorList.Error(animation.Slot, $"Sound file {animationRef.Sound} does not appear to be a valid meta sound");
+                        errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} does not appear to be a valid meta sound");
                 }
             }
 
@@ -262,7 +262,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
             var mainAnimationHeader = GetAnimationHeader(mainAnimationFile, pfs);
             if (mainAnimationHeader == null)
             {
-                errorList.Error(animationSlot, $"Cannot locate animation {mainAnimationFile} while trying to parse meta");
+                errorList.Warning(animationSlot, $"Cannot locate animation {mainAnimationFile} while trying to parse meta");
                 return false;
             }
 
@@ -304,7 +304,7 @@ namespace CommonControls.Editors.AnimationPack.Converters
                         if (isTheVersionMatch) continue;
 
                         {
-                            errorList.Error(animationSlot, $"Animation Meta Splice {metaFile} has different version than in the main animation. File referenced in meta: {animPath} with version {animationVersion} vs in the main animation {mainAnimationFile} with version {mainAnimationVersion}");
+                            errorList.Warning(animationSlot, $"Animation Meta Splice {metaFile} has different version than in the main animation. File referenced in meta: {animPath} with version {animationVersion} vs in the main animation {mainAnimationFile} with version {mainAnimationVersion}");
                             result = false;
                         }
                     }
