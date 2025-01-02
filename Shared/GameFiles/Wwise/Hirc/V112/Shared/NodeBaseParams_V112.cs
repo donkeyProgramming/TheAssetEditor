@@ -16,35 +16,35 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
         public StateChunk_V112 StateChunk { get; set; } = new StateChunk_V112();
         public InitialRtpc_V112 InitialRtpc { get; set; } = new InitialRtpc_V112();
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
-            NodeInitialFxParams.Create(chunk);
+            NodeInitialFxParams.ReadData(chunk);
             OverrideAttachmentParams = chunk.ReadByte();
             OverrideBusId = chunk.ReadUInt32();
             DirectParentId = chunk.ReadUInt32();
             BitVector = chunk.ReadByte();
-            NodeInitialParams.Create(chunk);
-            PositioningParams.Create(chunk);
-            AuxParams.Create(chunk);
-            AdvSettingsParams.Create(chunk);
-            StateChunk.Create(chunk);
-            InitialRtpc.Create(chunk);
+            NodeInitialParams.ReadData(chunk);
+            PositioningParams.ReadData(chunk);
+            AuxParams.ReadData(chunk);
+            AdvSettingsParams.ReadData(chunk);
+            StateChunk.ReadData(chunk);
+            InitialRtpc.ReadData(chunk);
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             using var memStream = new MemoryStream();
-            memStream.Write(NodeInitialFxParams.GetAsByteArray());
+            memStream.Write(NodeInitialFxParams.WriteData());
             memStream.Write(ByteParsers.Byte.EncodeValue(OverrideAttachmentParams, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(OverrideBusId, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(DirectParentId, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(BitVector, out _));
-            memStream.Write(NodeInitialParams.GetAsByteArray());
-            memStream.Write(PositioningParams.GetAsByteArray());
-            memStream.Write(AuxParams.GetAsByteArray());
-            memStream.Write(AdvSettingsParams.GetAsByteArray());
-            memStream.Write(StateChunk.GetAsByteArray());
-            memStream.Write(InitialRtpc.GetAsByteArray());
+            memStream.Write(NodeInitialParams.WriteData());
+            memStream.Write(PositioningParams.WriteData());
+            memStream.Write(AuxParams.WriteData());
+            memStream.Write(AdvSettingsParams.WriteData());
+            memStream.Write(StateChunk.WriteData());
+            memStream.Write(InitialRtpc.WriteData());
             return memStream.ToArray();
         }
 

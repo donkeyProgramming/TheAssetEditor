@@ -9,17 +9,17 @@ namespace Shared.GameFormats.Wwise.Bkhd
             var bkdh = new BkhdChunk()
             {
                 OwnerFile = fileName,
-                ChunkHeader = BnkChunkHeader.CreateSpecificData(chunk),
+                ChunkHeader = BnkChunkHeader.ReadData(chunk),
             };
-            bkdh.AkBankHeader.CreateSpecificData(chunk, bkdh.ChunkHeader.ChunkSize);
+            bkdh.AkBankHeader.ReadData(chunk, bkdh.ChunkHeader.ChunkSize);
             return bkdh;
         }
 
-        public static byte[] GetAsByteArray(BkhdChunk header)
+        public static byte[] WriteData(BkhdChunk header)
         {
             using var memStream = new MemoryStream();
-            memStream.Write(BnkChunkHeader.GetAsByteArray(header.ChunkHeader));
-            memStream.Write(header.AkBankHeader.GetAsByteArray());
+            memStream.Write(BnkChunkHeader.WriteData(header.ChunkHeader));
+            memStream.Write(header.AkBankHeader.WriteData());
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity

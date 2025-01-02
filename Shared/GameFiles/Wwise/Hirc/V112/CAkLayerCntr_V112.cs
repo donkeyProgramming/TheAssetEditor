@@ -13,21 +13,21 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
         public List<CAkLayer_V112> LayerList { get; set; } = [];
         public byte IsContinuousValidation { get; set; }
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
-            NodeBaseParams.Create(chunk);
-            Children.Create(chunk);
+            NodeBaseParams.ReadData(chunk);
+            Children.ReadData(chunk);
 
             NumLayers = chunk.ReadUInt32();
             for (var i = 0; i < NumLayers; i++)
             {
                 var layer = new CAkLayer_V112();
-                layer.Create(chunk);
+                layer.ReadData(chunk);
                 LayerList.Add(layer);
             }
         }
 
-        public override byte[] GetAsByteArray() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
         public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
 
         public List<uint> GetChildren() => Children.ChildIds;
@@ -42,10 +42,10 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
             public uint NumAssoc {  get; set; }
             public List<CAssociatedChildData_V112> CAssociatedChildDataList { get; set; } = [];
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 UlLayerIr = chunk.ReadUInt32();
-                InitialRtpc.Create(chunk);
+                InitialRtpc.ReadData(chunk);
                 RtpcId = chunk.ReadUInt32();
                 RtpcType = (AkRtpcType)chunk.ReadByte();
 
@@ -53,7 +53,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
                 for (var i = 0; i < NumAssoc; i++)
                 {
                     var associatedChildData = new CAssociatedChildData_V112();
-                    associatedChildData.Create(chunk);
+                    associatedChildData.ReadData(chunk);
                     CAssociatedChildDataList.Add(associatedChildData);
                 }
             }
@@ -65,12 +65,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
             public uint CurveSize { get; set; }
             public List<AkRtpcGraphPoint_V112> AkRtpcGraphPointList { get; set; } = [];
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 AssociatedChildId = chunk.ReadUInt32();
                 CurveSize = chunk.ReadUInt32();
                 for (var i = 0; i < CurveSize; i++)
-                    AkRtpcGraphPointList.Add(AkRtpcGraphPoint_V112.Create(chunk));
+                    AkRtpcGraphPointList.Add(AkRtpcGraphPoint_V112.ReadData(chunk));
             }
         }
     }

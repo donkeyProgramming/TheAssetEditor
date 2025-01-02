@@ -66,8 +66,8 @@ namespace Editors.Audio.BnkCompiler
         private static PackFile ConvertToPackFile(BkhdChunk header, HircChunk hircChunk, string outputFile)
         {
             var outputName = $"{outputFile}.bnk";
-            var headerBytes = BkhdParser.GetAsByteArray(header);
-            var hircBytes = new HircParser().GetAsBytes(hircChunk);
+            var headerBytes = BkhdParser.WriteData(header);
+            var hircBytes = new HircParser().WriteData(hircChunk);
 
             // Write
             using var memStream = new MemoryStream();
@@ -90,7 +90,7 @@ namespace Editors.Audio.BnkCompiler
             foreach (var wwiseEvent in projectFile.StatesDat)
                 datFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { EventName = wwiseEvent, Value = 400 });
 
-            var bytes = DatFileParser.GetAsByteArray(datFile);
+            var bytes = DatFileParser.WriteData(datFile);
             var packFile = new PackFile(outputName, new MemorySource(bytes));
             var reparsedSanityFile = DatFileParser.Parse(packFile, false);
             return packFile;
@@ -104,7 +104,7 @@ namespace Editors.Audio.BnkCompiler
             foreach (var state in projectFile.StatesDat)
                 datFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { EventName = state, Value = 400 });
 
-            var bytes = DatFileParser.GetAsByteArray(datFile);
+            var bytes = DatFileParser.WriteData(datFile);
             var packFile = new PackFile(outputName, new MemorySource(bytes));
             var reparsedSanityFile = DatFileParser.Parse(packFile, false);
             return packFile;

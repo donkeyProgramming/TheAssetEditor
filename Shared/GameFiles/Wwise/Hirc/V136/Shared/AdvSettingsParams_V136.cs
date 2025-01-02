@@ -10,7 +10,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public byte BelowThresholdBehavior { get; set; }
         public byte BitVector2 { get; set; }
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             BitVector = chunk.ReadByte();
             VirtualQueueBehavior = chunk.ReadByte();
@@ -29,7 +29,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             return bitVectorSize + virtualQueueBehaviorSize + maxNumInstanceSize + belowThresholdBehaviorSize + bitVector2Size;
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.Byte.EncodeValue(BitVector, out _));

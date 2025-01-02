@@ -18,7 +18,7 @@ namespace Shared.GameFormats.Wwise.Hirc
         {
             var hircChunk = new HircChunk
             {
-                ChunkHeader = BnkChunkHeader.CreateSpecificData(chunk),
+                ChunkHeader = BnkChunkHeader.ReadData(chunk),
                 NumHircItems = chunk.ReadUInt32()
             };
 
@@ -54,15 +54,15 @@ namespace Shared.GameFormats.Wwise.Hirc
             return hircChunk;
         }
 
-        public byte[] GetAsBytes(HircChunk hircChunk)
+        public byte[] WriteData(HircChunk hircChunk)
         {
             using var memStream = new MemoryStream();
-            memStream.Write(BnkChunkHeader.GetAsByteArray(hircChunk.ChunkHeader));
+            memStream.Write(BnkChunkHeader.WriteData(hircChunk.ChunkHeader));
             memStream.Write(ByteParsers.UInt32.EncodeValue(hircChunk.NumHircItems, out _));
 
             foreach (var hircItem in hircChunk.HircItems)
             {
-                var bytes = hircItem.GetAsByteArray();
+                var bytes = hircItem.WriteData();
                 memStream.Write(bytes);
             }
 

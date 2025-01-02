@@ -14,9 +14,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public byte Mode { get; set; }
         public AkDecisionTree_V136 AkDecisionTree { get; set; } = new AkDecisionTree_V136();
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
-            MusicTransNodeParams.Create(chunk);
+            MusicTransNodeParams.ReadData(chunk);
             IsContinuePlayback = chunk.ReadByte();
 
             TreeDepth = chunk.ReadUInt32();
@@ -33,10 +33,10 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             TreeDataSize = chunk.ReadUInt32();
             Mode = chunk.ReadByte();
-            AkDecisionTree.CreateSpecificData(chunk, TreeDepth, TreeDataSize);
+            AkDecisionTree.ReadData(chunk, TreeDepth, TreeDataSize);
         }
 
-        public override byte[] GetAsByteArray() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
         public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
     }
 }

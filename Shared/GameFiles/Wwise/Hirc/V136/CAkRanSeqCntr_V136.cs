@@ -20,9 +20,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public Children_V136 Children { get; set; } = new Children_V136();
         public CAkPlayList_V136 CAkPlayList { get; set; } = new CAkPlayList_V136();
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
-            NodeBaseParams.Create(chunk);
+            NodeBaseParams.ReadData(chunk);
             LoopCount = chunk.ReadUShort();
             LoopModMin = chunk.ReadUShort();
             LoopModMax = chunk.ReadUShort();
@@ -34,14 +34,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             RandomMode = chunk.ReadByte();
             Mode = chunk.ReadByte();
             BitVector = chunk.ReadByte();
-            Children.Create(chunk);
-            CAkPlayList.Create(chunk);
+            Children.ReadData(chunk);
+            CAkPlayList.ReadData(chunk);
         }
 
-        public override byte[] GetAsByteArray()
+        public override byte[] WriteData()
         {
             using var memStream = WriteHeader();
-            memStream.Write(NodeBaseParams.GetAsByteArray());
+            memStream.Write(NodeBaseParams.WriteData());
             memStream.Write(ByteParsers.UShort.EncodeValue(LoopCount, out _));
             memStream.Write(ByteParsers.UShort.EncodeValue(LoopModMin, out _));
             memStream.Write(ByteParsers.UShort.EncodeValue(LoopModMax, out _));
@@ -53,9 +53,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             memStream.Write(ByteParsers.Byte.EncodeValue(RandomMode, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(Mode, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(BitVector, out _));
-            memStream.Write(Children.GetAsByteArray());
+            memStream.Write(Children.WriteData());
             memStream.Write(ByteParsers.UShort.EncodeValue(CAkPlayList.PlayListItem, out _));
-            memStream.Write(CAkPlayList.GetAsByteArray());
+            memStream.Write(CAkPlayList.WriteData());
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
@@ -95,19 +95,19 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             public ushort PlayListItem { get; set; }
             public List<AkPlaylistItem_V136> Playlist { get; set; } = [];
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 PlayListItem = chunk.ReadUShort();
                 for (var i = 0; i < PlayListItem; i++)
-                    Playlist.Add(AkPlaylistItem_V136.Create(chunk));
+                    Playlist.Add(AkPlaylistItem_V136.ReadData(chunk));
             }
 
-            public byte[] GetAsByteArray()
+            public byte[] WriteData()
             {
                 using var memStream = new MemoryStream();
                 memStream.Write(ByteParsers.UShort.EncodeValue(PlayListItem, out _));
                 foreach (var playlistItem in Playlist)
-                    memStream.Write(playlistItem.GetAsByteArray());
+                    memStream.Write(playlistItem.WriteData());
                 return memStream.ToArray();
             }
 
@@ -125,7 +125,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 public uint PlayId { get; set; }
                 public int Weight { get; set; }
 
-                public static AkPlaylistItem_V136 Create(ByteChunk chunk)
+                public static AkPlaylistItem_V136 ReadData(ByteChunk chunk)
                 {
                     return new AkPlaylistItem_V136
                     {
@@ -134,7 +134,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                     };
                 }
 
-                public byte[] GetAsByteArray()
+                public byte[] WriteData()
                 {
                     using var memStream = new MemoryStream();
                     memStream.Write(ByteParsers.UInt32.EncodeValue(PlayId, out _));

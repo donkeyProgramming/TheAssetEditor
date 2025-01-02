@@ -15,7 +15,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public AkPropBundle_V136 AkPropBundle0 { get; set; } = new AkPropBundle_V136();
         public AkPropBundleMinMax_V136 AkPropBundle1 { get; set; } = new AkPropBundleMinMax_V136();
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
             Probability = chunk.ReadByte();
 
@@ -33,12 +33,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             TreeDataSize = chunk.ReadUInt32();
             Mode = chunk.ReadByte();
-            AkDecisionTree.CreateSpecificData(chunk, TreeDataSize, TreeDepth);
-            AkPropBundle0.CreateSpecificData(chunk);
-            AkPropBundle1.CreateSpecificData(chunk);
+            AkDecisionTree.ReadData(chunk, TreeDataSize, TreeDepth);
+            AkPropBundle0.ReadData(chunk);
+            AkPropBundle1.ReadData(chunk);
         }
 
-        public override byte[] GetAsByteArray()
+        public override byte[] WriteData()
         {
             using var memStream = WriteHeader();
             memStream.Write(ByteParsers.Byte.EncodeValue(Probability, out _));
@@ -54,9 +54,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             memStream.Write(ByteParsers.UInt32.EncodeValue(TreeDataSize, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(Mode, out _));
-            memStream.Write(AkDecisionTree.GetAsByteArray());
-            memStream.Write(AkPropBundle0.GetAsByteArray());
-            memStream.Write(AkPropBundle1.GetAsByteArray());
+            memStream.Write(AkDecisionTree.WriteData());
+            memStream.Write(AkPropBundle0.WriteData());
+            memStream.Write(AkPropBundle1.WriteData());
 
             var byteArray = memStream.ToArray();
 

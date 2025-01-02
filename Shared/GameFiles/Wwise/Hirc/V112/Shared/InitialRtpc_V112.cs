@@ -8,13 +8,13 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
         public ushort NumRtpc { get; set; }
         public List<Rtpc_V112> RtpcList { get; set; } = [];
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             NumRtpc = chunk.ReadUShort();
             for (var i = 0; i < NumRtpc; i++)
             {
                 var rtpc = new Rtpc_V112();
-                rtpc.Create(chunk);
+                rtpc.ReadData(chunk);
                 RtpcList.Add(rtpc);
             }
         }
@@ -28,7 +28,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
 
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             if (RtpcList.Count != 0)
                 throw new NotSupportedException("Users probably don't need this complexity.");
@@ -49,7 +49,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
             public ushort Size { get; set; }
             public List<AkRtpcGraphPoint_V112> RtpcMgr { get; set; } = [];
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 RtpcId = chunk.ReadUInt32();
                 RtpcType = chunk.ReadByte();
@@ -60,7 +60,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
 
                 Size = chunk.ReadUShort();
                 for (var i = 0; i < Size; i++)
-                    RtpcMgr.Add(AkRtpcGraphPoint_V112.Create(chunk));
+                    RtpcMgr.Add(AkRtpcGraphPoint_V112.ReadData(chunk));
             }
         }
     }

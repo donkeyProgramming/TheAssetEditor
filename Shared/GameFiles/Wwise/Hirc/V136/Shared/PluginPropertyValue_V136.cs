@@ -8,7 +8,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public byte RtpcAccum { get; set; }
         public float Value { get; set; }
 
-        public static PluginPropertyValue_V136 Create(ByteChunk chunk)
+        public static PluginPropertyValue_V136 ReadData(ByteChunk chunk)
         {
             var instance = new PluginPropertyValue_V136();
             instance.PropertyId = chunk.ReadUInt32();

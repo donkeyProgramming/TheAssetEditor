@@ -16,23 +16,23 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public InitialRtpc_V136 InitialRtpc { get; set; } = new InitialRtpc_V136();
         public StateChunk_V136 StateChunk { get; set; } = new StateChunk_V136();
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
             OverrideBusId = chunk.ReadUInt32();
             if (OverrideBusId == 0)
                 IdDeviceShareset = chunk.ReadUInt32();
-            BusInitialParams.Create(chunk);
+            BusInitialParams.ReadData(chunk);
             RecoveryTime = chunk.ReadSingle();
             MaxDuckVolume = chunk.ReadSingle();
-            DuckList.Create(chunk);
-            BusInitialFxParams.Create(chunk);
+            DuckList.ReadData(chunk);
+            BusInitialFxParams.ReadData(chunk);
             OverrideAttachmentParams = chunk.ReadByte();
-            InitialRtpc.Create(chunk);
-            StateChunk.Create(chunk);
+            InitialRtpc.ReadData(chunk);
+            StateChunk.ReadData(chunk);
         }
 
         // We don't need to make CAkBus objects because we can route audio through the existing busses as hircs appear to be shared between Banks.
-        public override byte[] GetAsByteArray() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
         public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
 
         public class BusInitialParams_V136
@@ -44,11 +44,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             public ushort MaxNumInstance { get; set; }
             public uint ChannelConfig { get; set; }
             public byte BitVector2 { get; set; }
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
-                AkPropBundle.CreateSpecificData(chunk);
-                PositioningParams.Create(chunk);
-                AuxParams.Create(chunk);
+                AkPropBundle.ReadData(chunk);
+                PositioningParams.ReadData(chunk);
+                AuxParams.ReadData(chunk);
                 BitVector1 = chunk.ReadByte();
                 MaxNumInstance = chunk.ReadUShort();
                 ChannelConfig = chunk.ReadUInt32();
@@ -70,7 +70,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 public byte FadeCurve { get; set; }
                 public byte TargetProp { get; set; }
 
-                public void Create(ByteChunk chunk)
+                public void ReadData(ByteChunk chunk)
                 {
                     BusId = chunk.ReadUInt32();
                     DuckVolume = chunk.ReadSingle();
@@ -81,13 +81,13 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 }
             }
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 UlDucks = chunk.ReadUInt32();
                 for (uint i = 0; i < UlDucks; i++)
                 {
                     var akDuckInfo = new AkDuckInfo_V136();
-                    akDuckInfo.Create(chunk);
+                    akDuckInfo.ReadData(chunk);
                     Ducks.Add(akDuckInfo);
                 }
             }
@@ -101,14 +101,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             public uint FxId0 { get; set; }
             public byte IsShareSet0 { get; set; }
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 NumFx = chunk.ReadByte();
                 if (NumFx != 0)
                     BitsFxBypass = chunk.ReadByte();
 
                 for (uint i = 0; i < NumFx; i++)
-                    FxChunk.Add(FxChunk_V136.Create(chunk));
+                    FxChunk.Add(FxChunk_V136.ReadData(chunk));
 
                 FxId0 = chunk.ReadUInt32();
                 IsShareSet0 = chunk.ReadByte();

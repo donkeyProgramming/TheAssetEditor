@@ -14,31 +14,31 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public PlayActionParams_V136? PlayActionParams { get; set; }
         public StateActionParams_V136? StateActionParams { get; set; }
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
             ActionType = (AkActionType)chunk.ReadUShort();
             IdExt = chunk.ReadUInt32();
             IdExt4 = chunk.ReadByte();
-            AkPropBundle0.CreateSpecificData(chunk);
-            AkPropBundle1.CreateSpecificData(chunk);
+            AkPropBundle0.ReadData(chunk);
+            AkPropBundle1.ReadData(chunk);
 
             if (ActionType == AkActionType.Play)
-                PlayActionParams = PlayActionParams_V136.CreateSpecificData(chunk);
+                PlayActionParams = PlayActionParams_V136.ReadData(chunk);
             else if (ActionType == AkActionType.SetState)
-                StateActionParams = StateActionParams_V136.CreateSpecificData(chunk);
+                StateActionParams = StateActionParams_V136.ReadData(chunk);
         }
 
-        public override byte[] GetAsByteArray()
+        public override byte[] WriteData()
         {
             using var memStream = WriteHeader();
             memStream.Write(ByteParsers.UShort.EncodeValue((ushort)ActionType, out _));
             memStream.Write(ByteParsers.UInt32.EncodeValue(IdExt, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(IdExt4, out _));
-            memStream.Write(AkPropBundle0.GetAsByteArray());
-            memStream.Write(AkPropBundle1.GetAsByteArray());
+            memStream.Write(AkPropBundle0.WriteData());
+            memStream.Write(AkPropBundle1.WriteData());
 
             if (ActionType == AkActionType.Play)
-                memStream.Write(PlayActionParams!.GetAsByteArray());
+                memStream.Write(PlayActionParams!.WriteData());
             else if (ActionType == AkActionType.SetState)
                 throw new NotSupportedException("Users probably don't need this complexity.");
 
@@ -78,7 +78,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             public byte BitVector { get; set; }
             public uint BankId { get; set; }
 
-            public static PlayActionParams_V136 CreateSpecificData(ByteChunk chunk)
+            public static PlayActionParams_V136 ReadData(ByteChunk chunk)
             {
                 return new PlayActionParams_V136()
                 {
@@ -87,7 +87,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 };
             }
 
-            public byte[] GetAsByteArray()
+            public byte[] WriteData()
             {
                 using var memStream = new MemoryStream();
                 memStream.Write(ByteParsers.Byte.EncodeValue(BitVector, out _));
@@ -108,7 +108,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             public uint StateGroupId { get; set; }
             public uint TargetStateId { get; set; }
 
-            public static StateActionParams_V136 CreateSpecificData(ByteChunk chunk)
+            public static StateActionParams_V136 ReadData(ByteChunk chunk)
             {
                 return new StateActionParams_V136()
                 {

@@ -9,7 +9,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public byte IsShareSet { get; set; }
         public byte IsRendered { get; set; }
 
-        public static FxChunk_V136 Create(ByteChunk chunk)
+        public static FxChunk_V136 ReadData(ByteChunk chunk)
         {
             return new FxChunk_V136
             {

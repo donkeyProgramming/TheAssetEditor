@@ -16,25 +16,25 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
         public List<ICAkSwitchPackage> SwitchList { get; set; } = [];
         public List<AkSwitchNodeParams_V112> Parameters { get; set; } = [];
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
-            NodeBaseParams.Create(chunk);
+            NodeBaseParams.ReadData(chunk);
             GroupType = (AkGroupType)chunk.ReadByte();
             GroupId = chunk.ReadUInt32();
             DefaultSwitch = chunk.ReadUInt32();
             IsContinuousValidation = chunk.ReadByte();
-            Children.Create(chunk);
+            Children.ReadData(chunk);
 
             var switchListCount = chunk.ReadUInt32();
             for (var i = 0; i < switchListCount; i++)
-                SwitchList.Add(CAkSwitchPackage_V112.Create(chunk));
+                SwitchList.Add(CAkSwitchPackage_V112.ReadData(chunk));
 
             var paramCount = chunk.ReadUInt32();
             for (var i = 0; i < paramCount; i++)
-                Parameters.Add(AkSwitchNodeParams_V112.Create(chunk));
+                Parameters.Add(AkSwitchNodeParams_V112.ReadData(chunk));
         }
 
-        public override byte[] GetAsByteArray() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
         public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
         public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
 
@@ -43,7 +43,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
             public uint SwitchId { get; set; }
             public List<uint> NodeIdList { get; set; } = [];
 
-            public static ICAkSwitchPackage Create(ByteChunk chunk)
+            public static ICAkSwitchPackage ReadData(ByteChunk chunk)
             {
                 var instance = new CAkSwitchPackage_V112();
                 instance.SwitchId = chunk.ReadUInt32();
@@ -62,7 +62,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
             public float FadeOutTime { get; set; }
             public float FadeInTime { get; set; }
 
-            public static AkSwitchNodeParams_V112 Create(ByteChunk chunk)
+            public static AkSwitchNodeParams_V112 ReadData(ByteChunk chunk)
             {
                 var instance = new AkSwitchNodeParams_V112();
                 instance.NodeId = chunk.ReadUInt32();

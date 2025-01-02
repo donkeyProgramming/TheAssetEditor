@@ -7,7 +7,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public byte Index { get; set; }
         public uint SourceId { get; set; }
 
-        public static AkMediaMap_V136 Create(ByteChunk chunk)
+        public static AkMediaMap_V136 ReadData(ByteChunk chunk)
         {
             return new AkMediaMap_V136
             {

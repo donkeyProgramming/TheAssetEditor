@@ -7,7 +7,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public Node_V136 DecisionTree { get; set; } = new Node_V136(); // Root node of the decision tree in hierarchical form
         public List<Node_V136> Nodes { get; set; } = []; // Flattened list of all nodes in the decision tree in sequential order  for read / write
 
-        public void CreateSpecificData(ByteChunk chunk, uint uTreeDataSize, uint maxTreeDepth)
+        public void ReadData(ByteChunk chunk, uint uTreeDataSize, uint maxTreeDepth)
         {
             Nodes = new List<Node_V136>();
             uint currentDepth = 0;
@@ -15,7 +15,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
             for (var i = 0; i < countMax; i++)
             {
-                Nodes.Add(Node_V136.CreateSpecificData(chunk, countMax, currentDepth, maxTreeDepth));
+                Nodes.Add(Node_V136.ReadData(chunk, countMax, currentDepth, maxTreeDepth));
                 currentDepth ++;
             }
 
@@ -48,7 +48,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             return node;
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             using var memStream = new MemoryStream();
             foreach (var node in Nodes)
@@ -100,7 +100,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public ushort Probability { get; set; }
             public List<Node_V136> Nodes { get; set; } = [];
 
-            public static Node_V136 CreateSpecificData(ByteChunk chunk, uint countMax, uint currentDepth, uint maxDepth)
+            public static Node_V136 ReadData(ByteChunk chunk, uint countMax, uint currentDepth, uint maxDepth)
             {
                 var node = new Node_V136();
                 node.Key = chunk.ReadUInt32();

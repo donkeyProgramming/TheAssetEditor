@@ -8,14 +8,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public uint NumRules { get; set; }
         public List<AkMusicTransitionRule_V136> PlayList { get; set; } = [];
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
-            MusicNodeParams.Create(chunk);
+            MusicNodeParams.ReadData(chunk);
             NumRules = chunk.ReadUInt32();
             for (var i = 0; i < NumRules; i++)
             {
                 var akMusicTransitionRule = new AkMusicTransitionRule_V136();
-                akMusicTransitionRule.Create(chunk);
+                akMusicTransitionRule.ReadData(chunk);
                 PlayList.Add(akMusicTransitionRule);
             }
         }
@@ -33,7 +33,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public byte AllocTransObjectFlag { get; set; }
             public AkMusicTransitionObject_V136? AkMusicTransitionObject { get; set; }
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 NumSrc = chunk.ReadUInt32();
                 for (var i = 0; i < NumSrc; i++)
@@ -43,15 +43,15 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 for (var i = 0; i < NumDst; i++)
                     DstIdList.Add(chunk.ReadUInt32());
 
-                AkMusicTransSrcRule.Create(chunk);
-                AkMusicTransDstRule.Create(chunk);
+                AkMusicTransSrcRule.ReadData(chunk);
+                AkMusicTransDstRule.ReadData(chunk);
                 StateGroupIdCustom = chunk.ReadUInt32();
                 StateIdCustom = chunk.ReadUInt32();
 
                 var allocTransObjectFlag = chunk.ReadByte();
                 var has_transobj = allocTransObjectFlag != 0;
                 if (has_transobj)
-                    AkMusicTransitionObject = AkMusicTransitionObject_V136.Create(chunk);
+                    AkMusicTransitionObject = AkMusicTransitionObject_V136.ReadData(chunk);
             }
 
             public class AkMusicTransSrcRule_V136
@@ -63,7 +63,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 public uint CueFilterHash { get; set; }
                 public byte PlayPostExit { get; set; }
 
-                public void Create(ByteChunk chunk)
+                public void ReadData(ByteChunk chunk)
                 {
                     TransitionTime = chunk.ReadInt32();
                     FadeCurve = chunk.ReadUInt32();
@@ -86,7 +86,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 public byte PlayPreEntry { get; set; }
                 public byte DestMatchSourceCueName { get; set; }
 
-                public void Create(ByteChunk chunk)
+                public void ReadData(ByteChunk chunk)
                 {
                     TransitionTime = chunk.ReadInt32();
                     FadeCurve = chunk.ReadUInt32();
@@ -108,13 +108,13 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 public byte PlayPreEntry { get; set; }
                 public byte PlayPostExit { get; set; }
 
-                public static AkMusicTransitionObject_V136 Create(ByteChunk chunk)
+                public static AkMusicTransitionObject_V136 ReadData(ByteChunk chunk)
                 {
                     return new AkMusicTransitionObject_V136
                     {
                         SegmentId = chunk.ReadInt32(),
-                        FadeInParams = AkMusicFade_V136.Create(chunk),
-                        FadeOutParams = AkMusicFade_V136.Create(chunk),
+                        FadeInParams = AkMusicFade_V136.ReadData(chunk),
+                        FadeOutParams = AkMusicFade_V136.ReadData(chunk),
                         PlayPreEntry = chunk.ReadByte(),
                         PlayPostExit = chunk.ReadByte()
                     };
@@ -126,7 +126,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     public uint FadeCurve { get; set; }
                     public int FadeOffset { get; set; }
 
-                    public static AkMusicFade_V136 Create(ByteChunk chunk)
+                    public static AkMusicFade_V136 ReadData(ByteChunk chunk)
                     {
                         return new AkMusicFade_V136
                         {

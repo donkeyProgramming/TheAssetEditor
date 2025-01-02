@@ -10,11 +10,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public byte PlayPreEntry { get; set; }
         public byte PlayPostExit { get; set; }
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             SegmentId = chunk.ReadInt32();
-            FadeInParams.Create(chunk);
-            FadeOutParams.Create(chunk);
+            FadeInParams.ReadData(chunk);
+            FadeOutParams.ReadData(chunk);
             PlayPreEntry = chunk.ReadByte();
             PlayPostExit = chunk.ReadByte();
         }
@@ -25,7 +25,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public uint FadeCurve { get; set; }
             public int FadeOffset { get; set; }
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 TransitionTime = chunk.ReadInt32();
                 FadeCurve = chunk.ReadUInt32();

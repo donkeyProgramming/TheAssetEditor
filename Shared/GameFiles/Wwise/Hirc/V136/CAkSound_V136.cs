@@ -9,17 +9,17 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public AkBankSourceData_V136 AkBankSourceData { get; set; }
         public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
-            AkBankSourceData = AkBankSourceData_V136.Create(chunk);
-            NodeBaseParams.Create(chunk);
+            AkBankSourceData = AkBankSourceData_V136.ReadData(chunk);
+            NodeBaseParams.ReadData(chunk);
         }
 
-        public override byte[] GetAsByteArray()
+        public override byte[] WriteData()
         {
             using var memStream = WriteHeader();
-            memStream.Write(AkBankSourceData.GetAsByteArray());
-            memStream.Write(NodeBaseParams.GetAsByteArray());
+            memStream.Write(AkBankSourceData.WriteData());
+            memStream.Write(NodeBaseParams.WriteData());
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity

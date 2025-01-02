@@ -12,14 +12,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public AkMediaInformation_V136 AkMediaInformation { get; set; } = new AkMediaInformation_V136();
         public uint Size { get; set; }
 
-        public static AkBankSourceData_V136 Create(ByteChunk chunk)
+        public static AkBankSourceData_V136 ReadData(ByteChunk chunk)
         {
             var akBankSourceData_V136 = new AkBankSourceData_V136();
             akBankSourceData_V136.PluginId = chunk.ReadUInt32();
             akBankSourceData_V136.PluginIdType = (AkPluginType_V136)(ushort)(akBankSourceData_V136.PluginId >> 0 & 0x000F);
             akBankSourceData_V136.PluginIdCompany = (ushort)(akBankSourceData_V136.PluginId >> 4 & 0x03FF); // Apparently CA doesn't have one
             akBankSourceData_V136.StreamType = (AKBKSourceType)chunk.ReadByte();
-            akBankSourceData_V136.AkMediaInformation.Create(chunk); 
+            akBankSourceData_V136.AkMediaInformation.ReadData(chunk); 
             
             if (akBankSourceData_V136.PluginIdType == AkPluginType_V136.Source)
                 akBankSourceData_V136.Size = chunk.ReadUInt32();
@@ -27,12 +27,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             return akBankSourceData_V136;
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.UInt32.EncodeValue(PluginId, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)StreamType, out _));
-            memStream.Write(AkMediaInformation.GetAsByteArray());
+            memStream.Write(AkMediaInformation.WriteData());
             if (PluginIdType == AkPluginType_V136.Source)
                 memStream.Write(ByteParsers.UInt32.EncodeValue(Size, out _));
             return memStream.ToArray();
@@ -57,14 +57,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public uint InMemoryMediaSize { get; set; }
             public byte SourceBits { get; set; }
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 SourceId = chunk.ReadUInt32();
                 InMemoryMediaSize = chunk.ReadUInt32();
                 SourceBits = chunk.ReadByte();
             }
 
-            public byte[] GetAsByteArray()
+            public byte[] WriteData()
             {
                 using var memStream = new MemoryStream();
                 memStream.Write(ByteParsers.UInt32.EncodeValue(SourceId, out _));

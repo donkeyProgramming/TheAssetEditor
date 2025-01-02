@@ -11,7 +11,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public uint AuxBus3 { get; set; }
         public uint ReflectionsAuxBus { get; set; }
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             BitVector = chunk.ReadByte();
             if ((BitVector >> 3 & 1) == 1)
@@ -24,7 +24,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             ReflectionsAuxBus = chunk.ReadUInt32();
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             if (BitVector != 0)
                 throw new NotSupportedException("Users probably don't need this complexity.");

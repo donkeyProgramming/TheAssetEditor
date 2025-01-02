@@ -13,14 +13,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
         public AkMediaInformation_V112 AkMediaInformation { get; set; } = new AkMediaInformation_V112();
         public uint Size { get; set; }
 
-        public static AkBankSourceData_V112 Create(ByteChunk chunk)
+        public static AkBankSourceData_V112 ReadData(ByteChunk chunk)
         {
             var akBankSourceData_V112 = new AkBankSourceData_V112();
             akBankSourceData_V112.PluginId = chunk.ReadUInt32();
             akBankSourceData_V112.PluginIdType = (AkPluginType_V112)(ushort)(akBankSourceData_V112.PluginId >> 0 & 0x000F);
             akBankSourceData_V112.PluginIdCompany = (ushort)(akBankSourceData_V112.PluginId >> 4 & 0x03FF); // Apparently CA doesn't have one
             akBankSourceData_V112.StreamType = (AKBKSourceType)chunk.ReadByte();
-            akBankSourceData_V112.AkMediaInformation.Create(chunk, akBankSourceData_V112.StreamType);
+            akBankSourceData_V112.AkMediaInformation.ReadData(chunk, akBankSourceData_V112.StreamType);
 
             if (akBankSourceData_V112.PluginIdType == AkPluginType_V112.Source || akBankSourceData_V112.PluginIdType == AkPluginType_V112.MotionSource)
                 akBankSourceData_V112.Size = chunk.ReadUInt32();
@@ -28,12 +28,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
             return akBankSourceData_V112;
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.UInt32.EncodeValue(PluginId, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)StreamType, out _));
-            memStream.Write(AkMediaInformation.GetAsByteArray(StreamType));
+            memStream.Write(AkMediaInformation.WriteData(StreamType));
 
             if (PluginIdType == AkPluginType_V112.Source || PluginIdType == AkPluginType_V112.MotionSource)
                 memStream.Write(ByteParsers.UInt32.EncodeValue(Size, out _));
@@ -62,7 +62,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
             public uint InMemoryMediaSize { get; set; }
             public byte SourceBits { get; set; }
 
-            public void Create(ByteChunk chunk, AKBKSourceType sourceType)
+            public void ReadData(ByteChunk chunk, AKBKSourceType sourceType)
             {
                 SourceId = chunk.ReadUInt32();
                 FileId = chunk.ReadUInt32();
@@ -74,7 +74,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
                 SourceBits = chunk.ReadByte();
             }
 
-            public byte[] GetAsByteArray(AKBKSourceType sourceType)
+            public byte[] WriteData(AKBKSourceType sourceType)
             {
                 using var memStream = new MemoryStream();
                 memStream.Write(ByteParsers.UInt32.EncodeValue(SourceId, out _));

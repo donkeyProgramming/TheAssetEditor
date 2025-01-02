@@ -7,18 +7,18 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
         public uint NumStateGroups { get; set; }
         public List<AkStateGroupChunk_V112> StateChunks { get; set; } = [];
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             NumStateGroups = chunk.ReadUInt32();
             for (var i = 0; i < NumStateGroups; i++)
             {
                 var akStateGroupChunk = new AkStateGroupChunk_V112();
-                akStateGroupChunk.Create(chunk);
+                akStateGroupChunk.ReadData(chunk);
                 StateChunks.Add(akStateGroupChunk);
             }
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             if (StateChunks.Count != 0 )
                 throw new NotSupportedException("Users probably don't need this complexity.");
@@ -45,7 +45,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
             public ushort NumStates { get; set; }
             public List<AkState_V112> States { get; set; } = [];
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 StateGroupId = chunk.ReadUInt32();
                 StateSyncType = chunk.ReadByte();
@@ -53,7 +53,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
                 for (var i = 0; i < NumStates; i++)
                 {
                     var akState = new AkState_V112();
-                    akState.Create(chunk);
+                    akState.ReadData(chunk);
                     States.Add(akState);
                 }
             }
@@ -64,7 +64,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
             public uint StateId { get; set; }
             public uint StateInstanceId { get; set; }
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 StateId = chunk.ReadUInt32();
                 StateInstanceId = chunk.ReadUInt32();

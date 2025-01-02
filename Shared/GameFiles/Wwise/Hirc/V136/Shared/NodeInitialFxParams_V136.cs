@@ -9,7 +9,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public byte BitsFxBypass { get; set; }
         public List<FxChunk_V136> FxChunk { get; set; } = [];
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             IsOverrideParentFx = chunk.ReadByte();
             NumFx = chunk.ReadByte();
@@ -17,11 +17,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             {
                 BitsFxBypass = chunk.ReadByte();
                 for (var i = 0; i < NumFx; i++)
-                    FxChunk.Add(FxChunk_V136.Create(chunk));
+                    FxChunk.Add(FxChunk_V136.ReadData(chunk));
             }
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.Byte.EncodeValue(IsOverrideParentFx, out _));

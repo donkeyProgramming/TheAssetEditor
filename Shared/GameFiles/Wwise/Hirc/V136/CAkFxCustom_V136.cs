@@ -15,25 +15,25 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public short NumValues { get; set; }
         public List<PluginPropertyValue_V136> PropertyValuesList { get; set; } = [];
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
             PluginId = chunk.ReadUInt32();
             Size = chunk.ReadUInt32();
-            AkPluginParam = AkPluginParam_V136.Create(chunk, PluginId, Size);
+            AkPluginParam = AkPluginParam_V136.ReadData(chunk, PluginId, Size);
 
             NumBankData = chunk.ReadByte();
             for (var i = 0; i < NumBankData; i++)
-                MediaList.Add(AkMediaMap_V136.Create(chunk));
+                MediaList.Add(AkMediaMap_V136.ReadData(chunk));
 
-            InitialRtpc.Create(chunk);
-            StateChunk.Create(chunk);
+            InitialRtpc.ReadData(chunk);
+            StateChunk.ReadData(chunk);
 
             NumValues = chunk.ReadShort();
             for (var i = 0; i < NumValues; i++)
-                PropertyValuesList.Add(PluginPropertyValue_V136.Create(chunk));
+                PropertyValuesList.Add(PluginPropertyValue_V136.ReadData(chunk));
         }
 
-        public override byte[] GetAsByteArray() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
         public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
     }
 }

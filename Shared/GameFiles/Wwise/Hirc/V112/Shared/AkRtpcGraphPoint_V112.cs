@@ -9,7 +9,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
         public float To { get; set; }
         public uint Interp { get; set; }
 
-        public static AkRtpcGraphPoint_V112 Create(ByteChunk chunk)
+        public static AkRtpcGraphPoint_V112 ReadData(ByteChunk chunk)
         {
             return new AkRtpcGraphPoint_V112
             {

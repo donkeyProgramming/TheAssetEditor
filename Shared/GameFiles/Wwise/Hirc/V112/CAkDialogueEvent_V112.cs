@@ -13,7 +13,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
         public byte Mode { get; set; }
         public AkDecisionTree_V112 AkDecisionTree { get; set; } = new AkDecisionTree_V112();
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
             Probability = chunk.ReadByte();
 
@@ -31,11 +31,11 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
 
             TreeDataSize = chunk.ReadUInt32();
             Mode = chunk.ReadByte();
-            AkDecisionTree.CreateSpecificData(chunk, TreeDataSize, TreeDepth);
+            AkDecisionTree.ReadData(chunk, TreeDataSize, TreeDepth);
         }
 
         public override void UpdateSectionSize() => throw new NotImplementedException();
-        public override byte[] GetAsByteArray() => throw new NotImplementedException();
+        public override byte[] WriteData() => throw new NotImplementedException();
 
         List<object> ICAkDialogueEvent.Arguments => Arguments.Cast<object>().ToList();
         object ICAkDialogueEvent.AkDecisionTree => AkDecisionTree;

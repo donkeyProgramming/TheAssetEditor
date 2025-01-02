@@ -9,18 +9,18 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public byte NumStateGroups { get; set; }
         public List<AkStateGroupChunk_V136> StateChunks { get; set; } = [];
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             NumStateProps = chunk.ReadByte();
             for (var i = 0; i < NumStateProps; i++)
-                StateProps.Add(AkStatePropertyInfo_V136.Create(chunk));
+                StateProps.Add(AkStatePropertyInfo_V136.ReadData(chunk));
 
             NumStateGroups = chunk.ReadByte();
             for (var i = 0; i < NumStateGroups; i++)
-                StateChunks.Add(AkStateGroupChunk_V136.Create(chunk));
+                StateChunks.Add(AkStateGroupChunk_V136.ReadData(chunk));
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             if (StateChunks.Count != 0 || StateProps.Count != 0)
                 throw new NotSupportedException("Users probably don't need this complexity.");
@@ -47,7 +47,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public byte Type { get; set; }
             public byte InDb { get; set; }
 
-            public static AkStatePropertyInfo_V136 Create(ByteChunk chunk)
+            public static AkStatePropertyInfo_V136 ReadData(ByteChunk chunk)
             {
                 return new AkStatePropertyInfo_V136
                 {
@@ -65,7 +65,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public byte NumStates { get; set; }
             public List<AkState_V136> States { get; set; } = [];
 
-            public static AkStateGroupChunk_V136 Create(ByteChunk chunk)
+            public static AkStateGroupChunk_V136 ReadData(ByteChunk chunk)
             {
                 var instance = new AkStateGroupChunk_V136
                 {
@@ -75,7 +75,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 };
 
                 for (var i = 0; i < instance.NumStates; i++)
-                    instance.States.Add(AkState_V136.Create(chunk));
+                    instance.States.Add(AkState_V136.ReadData(chunk));
 
                 return instance;
             }
@@ -86,7 +86,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public uint StateId { get; set; }
             public uint StateInstanceId { get; set; }
 
-            public static AkState_V136 Create(ByteChunk chunk)
+            public static AkState_V136 ReadData(ByteChunk chunk)
             {
                 return new AkState_V136
                 {

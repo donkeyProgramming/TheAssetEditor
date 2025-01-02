@@ -12,16 +12,16 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public uint NumStingers { get; set; }
         public List<CAkStinger_V136> StingersList { get; set; } = [];
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             Flags = chunk.ReadByte();
-            NodeBaseParams.Create(chunk);
-            Children.Create(chunk);
-            AkMeterInfo.Create(chunk);
+            NodeBaseParams.ReadData(chunk);
+            Children.ReadData(chunk);
+            AkMeterInfo.ReadData(chunk);
             MeterInfoFlag = chunk.ReadByte();
             NumStingers = chunk.ReadUInt32();
             for (var i = 0; i < NumStingers; i++)
-                StingersList.Add(CAkStinger_V136.Create(chunk));
+                StingersList.Add(CAkStinger_V136.ReadData(chunk));
         }
 
         public class AkMeterInfo_V136
@@ -32,7 +32,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public byte TimeSigNumBeatsBar { get; set; }
             public byte TimeSigBeatValue { get; set; }
 
-            public void Create(ByteChunk chunk)
+            public void ReadData(ByteChunk chunk)
             {
                 GridPeriod = chunk.ReadInt64();
                 GridOffset = chunk.ReadInt64();
@@ -51,7 +51,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public int DontRepeatTime { get; set; }
             public uint NumSegmentLookAhead { get; set; }
 
-            public static CAkStinger_V136 Create(ByteChunk chunk)
+            public static CAkStinger_V136 ReadData(ByteChunk chunk)
             {
                 return new CAkStinger_V136
                 {

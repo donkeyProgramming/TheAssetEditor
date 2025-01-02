@@ -7,7 +7,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public uint NumChilds { get; set; }
         public List<uint> ChildIds { get; set; } = [];
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             NumChilds = chunk.ReadUInt32();
             for (var i = 0; i < NumChilds; i++)
@@ -17,7 +17,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             }
         }
 
-        internal byte[] GetAsByteArray()
+        internal byte[] WriteData()
         {
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.UInt32.EncodeValue((uint)ChildIds.Count, out _));

@@ -8,7 +8,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public byte Props { get; set; }
         public List<AkPropBundleInstance_V136> Values { get; set; } = [];
 
-        public void     CreateSpecificData(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             Props = chunk.ReadByte();
 
@@ -24,7 +24,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             }
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)Values.Count, out _));

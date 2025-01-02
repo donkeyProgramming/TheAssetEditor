@@ -7,19 +7,19 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public uint ActionListSize { get; set; }
         public List<Action_V136> Actions { get; set; } = [];
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
             ActionListSize = chunk.ReadByte();
             for (var i = 0; i < ActionListSize; i++)
-                Actions.Add(Action_V136.Create(chunk));
+                Actions.Add(Action_V136.ReadData(chunk));
         }
 
-        public override byte[] GetAsByteArray()
+        public override byte[] WriteData()
         {
             using var memStream = WriteHeader();
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)Actions.Count, out _));
             foreach (var action in Actions)
-                memStream.Write(action.GetAsByteArray());
+                memStream.Write(action.WriteData());
 
             var byteArray = memStream.ToArray();
 
@@ -49,7 +49,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         {
             public uint ActionId { get; set; }
             
-            public static Action_V136 Create(ByteChunk chunk)
+            public static Action_V136 ReadData(ByteChunk chunk)
             {
                 return new Action_V136()
                 {
@@ -57,7 +57,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 };
             }
 
-            public byte[] GetAsByteArray()
+            public byte[] WriteData()
             {
                 using var memStream = new MemoryStream();
                 memStream.Write(ByteParsers.UInt32.EncodeValue(ActionId, out _));

@@ -8,17 +8,17 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
         public Children_V136 Children { get; set; } = new Children_V136();
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
-            NodeBaseParams.Create(chunk);
-            Children.Create(chunk);
+            NodeBaseParams.ReadData(chunk);
+            Children.ReadData(chunk);
         }
 
-        public override byte[] GetAsByteArray()
+        public override byte[] WriteData()
         {
             using var memStream = WriteHeader();
-            memStream.Write(NodeBaseParams.GetAsByteArray());
-            memStream.Write(Children.GetAsByteArray());
+            memStream.Write(NodeBaseParams.WriteData());
+            memStream.Write(Children.WriteData());
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity

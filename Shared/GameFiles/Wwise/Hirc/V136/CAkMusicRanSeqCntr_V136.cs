@@ -9,9 +9,9 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public uint NumPlaylistItems { get; set; }
         public List<AkMusicRanSeqPlaylistItem_V136> PlayList { get; set; } = [];
 
-        protected override void CreateSpecificData(ByteChunk chunk)
+        protected override void ReadData(ByteChunk chunk)
         {
-            MusicTransNodeParams.Create(chunk);
+            MusicTransNodeParams.ReadData(chunk);
             NumPlaylistItems = chunk.ReadUInt32();
             // Playlists work linearly (unlike decision trees):
             // node[0]            ch=3
@@ -22,10 +22,10 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             //   node[5]          ch=0    // parent: [0]
             //   node[6]          ch=1    // parent: [0]
             //     node[7]        ch=0    // parent: [6]
-            PlayList.Add(AkMusicRanSeqPlaylistItem_V136.Create(chunk));
+            PlayList.Add(AkMusicRanSeqPlaylistItem_V136.ReadData(chunk));
         }
 
-        public override byte[] GetAsByteArray() => throw new NotSupportedException("Users probably don't need this complexity.");
+        public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
         public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
 
         public class AkMusicRanSeqPlaylistItem_V136
@@ -43,7 +43,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             public byte IsShuffle { get; set; }
             public List<AkMusicRanSeqPlaylistItem_V136> PlayList { get; set; } = [];
 
-            public static AkMusicRanSeqPlaylistItem_V136 Create(ByteChunk chunk)
+            public static AkMusicRanSeqPlaylistItem_V136 ReadData(ByteChunk chunk)
             {
                 var akMusicRanSeqPlaylistItem = new AkMusicRanSeqPlaylistItem_V136
                 {
@@ -61,7 +61,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 };
 
                 for (var i = 0; i < akMusicRanSeqPlaylistItem.NumChildren; i++)
-                    akMusicRanSeqPlaylistItem.PlayList.Add(Create(chunk));
+                    akMusicRanSeqPlaylistItem.PlayList.Add(ReadData(chunk));
 
                 return akMusicRanSeqPlaylistItem;
             }

@@ -9,7 +9,7 @@ namespace Shared.GameFormats.Wwise
         public string Tag { get; set; }
         public uint ChunkSize { get; set; }
 
-        public static BnkChunkHeader CreateSpecificData(ByteChunk chunk)
+        public static BnkChunkHeader ReadData(ByteChunk chunk)
         {
             var instance = new BnkChunkHeader();
             instance.Tag = Encoding.UTF8.GetString(chunk.ReadBytes(4));
@@ -20,10 +20,10 @@ namespace Shared.GameFormats.Wwise
         public static BnkChunkHeader PeekFromBytes(ByteChunk chunk)
         {
             var peakBytes = chunk.PeekChunk(8);
-            return CreateSpecificData(peakBytes);
+            return ReadData(peakBytes);
         }
 
-        public static byte[] GetAsByteArray(BnkChunkHeader header)
+        public static byte[] WriteData(BnkChunkHeader header)
         {
             if (header.Tag.Length != 4)
                 throw new Exception($"Header not valid {header.Tag}");
@@ -38,7 +38,7 @@ namespace Shared.GameFormats.Wwise
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var reload = CreateSpecificData(new ByteChunk(byteArray));
+            var reload = ReadData(new ByteChunk(byteArray));
             return byteArray;
         }
     }

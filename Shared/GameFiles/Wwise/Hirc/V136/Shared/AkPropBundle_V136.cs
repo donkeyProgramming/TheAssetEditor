@@ -8,7 +8,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public byte Props { get; set; }
         public List<PropBundleInstance_V136> PropsList { get; set; } = [];
 
-        public void CreateSpecificData(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             Props = chunk.ReadByte();
 
@@ -21,7 +21,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                 PropsList[i].Value = chunk.ReadUInt32();
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             using var memStream = new MemoryStream();
             memStream.Write(ByteParsers.Byte.EncodeValue((byte)PropsList.Count, out _));

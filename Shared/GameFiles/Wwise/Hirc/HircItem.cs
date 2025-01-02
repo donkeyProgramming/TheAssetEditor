@@ -31,7 +31,7 @@ namespace Shared.GameFormats.Wwise.Hirc
                 HircType = (AkBkHircType)chunk.ReadByte();
                 SectionSize = chunk.ReadUInt32();
                 Id = chunk.ReadUInt32();
-                CreateSpecificData(chunk);
+                ReadData(chunk);
 
                 var currentIndex = chunk.Index;
                 var computedIndex = (int)(objectStartIndex + 5 + SectionSize);
@@ -55,8 +55,8 @@ namespace Shared.GameFormats.Wwise.Hirc
             return memStream;
         }
 
-        protected abstract void CreateSpecificData(ByteChunk chunk);
-        public abstract byte[] GetAsByteArray();
+        protected abstract void ReadData(ByteChunk chunk);
+        public abstract byte[] WriteData();
         public abstract void UpdateSectionSize(); 
     }
 }

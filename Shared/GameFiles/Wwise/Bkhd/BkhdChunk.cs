@@ -19,7 +19,7 @@ namespace Shared.GameFormats.Wwise.Bkhd
         public uint DwProjectId { get; set; }
         public byte[] Padding { get; set; }
 
-        public void CreateSpecificData(ByteChunk chunk, uint chunkSize)
+        public void ReadData(ByteChunk chunk, uint chunkSize)
         {
             DwBankGeneratorVersion = chunk.ReadUInt32();
             DwSoundBankId = chunk.ReadUInt32();
@@ -32,7 +32,7 @@ namespace Shared.GameFormats.Wwise.Bkhd
                 Padding = chunk.ReadBytes(headerDiff);
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             using var memStream = new MemoryStream();
 

@@ -14,7 +14,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
         public List<AkPathListItemOffset_V136> PlayListItems { get; set; } = [];
         public List<Ak3DAutomationParams_V136> Params { get; set; } = [];
 
-        public void Create(ByteChunk chunk)
+        public void ReadData(ByteChunk chunk)
         {
             BitsPositioning = chunk.ReadByte();
             var has_positioning = (BitsPositioning >> 0 & 1) == 1;
@@ -31,19 +31,19 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
                     TransitionTime = chunk.ReadSingle();
                     NumVertexes = chunk.ReadUInt32();
                     for (var i = 0; i < NumVertexes; i++)
-                        VertexList.Add(AkPathVertex_V136.Create(chunk));
+                        VertexList.Add(AkPathVertex_V136.ReadData(chunk));
 
                     NumPlayListItems = chunk.ReadUInt32();
                     for (var i = 0; i < NumPlayListItems; i++)
-                        PlayListItems.Add(AkPathListItemOffset_V136.Create(chunk));
+                        PlayListItems.Add(AkPathListItemOffset_V136.ReadData(chunk));
 
                     for (var i = 0; i < NumPlayListItems; i++)
-                        Params.Add(Ak3DAutomationParams_V136.Create(chunk));
+                        Params.Add(Ak3DAutomationParams_V136.ReadData(chunk));
                 }
             }
         }
 
-        public byte[] GetAsByteArray()
+        public byte[] WriteData()
         {
             if (BitsPositioning == 0x03 && Bits3d == 0x08)
                 return [0x03, 0x08];
@@ -70,7 +70,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public float Z { get; set; }
             public int Duration { get; set; }
 
-            public static AkPathVertex_V136 Create(ByteChunk chunk)
+            public static AkPathVertex_V136 ReadData(ByteChunk chunk)
             {
                 return new AkPathVertex_V136
                 {
@@ -87,7 +87,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public uint VerticesOffset { get; set; }
             public uint NumVertices { get; set; }
 
-            public static AkPathListItemOffset_V136 Create(ByteChunk chunk)
+            public static AkPathListItemOffset_V136 ReadData(ByteChunk chunk)
             {
                 return new AkPathListItemOffset_V136
                 {
@@ -103,7 +103,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
             public float Y { get; set; }
             public float Z { get; set; }
 
-            public static Ak3DAutomationParams_V136 Create(ByteChunk chunk)
+            public static Ak3DAutomationParams_V136 ReadData(ByteChunk chunk)
             {
                 return new Ak3DAutomationParams_V136
                 {
