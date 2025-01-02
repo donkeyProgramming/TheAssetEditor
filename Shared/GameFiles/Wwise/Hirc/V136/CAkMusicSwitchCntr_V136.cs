@@ -33,7 +33,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             TreeDataSize = chunk.ReadUInt32();
             Mode = chunk.ReadByte();
-            AkDecisionTree.ReadData(chunk, TreeDepth, TreeDataSize);
+            AkDecisionTree.ReadData(chunk, TreeDataSize, TreeDepth);
         }
 
         public override byte[] WriteData() => throw new NotSupportedException("Users probably don't need this complexity.");
