@@ -88,7 +88,9 @@ namespace AssetEditor.ViewModels
         [RelayCommand] private void GenerateFileListReport() => _uiCommandFactory.Create<FileListReportCommand>().Execute();
         [RelayCommand] private void GenerateMetaDataJsonsReport() => _uiCommandFactory.Create<GenerateMetaJsonDataReportCommand>().Execute();
         [RelayCommand] private void GenerateMaterialReport() => _uiCommandFactory.Create<MaterialReportCommand>().Execute();
-        [RelayCommand] private void GenerateDialogueEventInfoReport() => _uiCommandFactory.Create<GenerateDialogueEventInfoReportCommand>().Execute();
+        [RelayCommand] private void GenerateDialogueEventInfoPrinterReport() => _uiCommandFactory.Create<GenerateDialogueEventInfoPrinterReportCommand>().Execute();
+        [RelayCommand] private void GenerateDialogueEventAndEventNamePrinterReport() => _uiCommandFactory.Create<GenerateDialogueEventAndEventNamePrinterReportCommand>().Execute();
+        [RelayCommand] private void GenerateDatDumperReport() => _uiCommandFactory.Create<GenerateDatDumperReportCommand>().Execute();
 
 
         [RelayCommand] private void TouchedFileRecorderStart() => _touchedFilesRecorder.Start();

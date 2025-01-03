@@ -1,11 +1,12 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System;
 using System.Linq;
-using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Hirc.V136;
 using Editors.Audio.BnkCompiler;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Editors.Audio.BnkCompiler.ObjectGeneration;
+using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -21,20 +22,20 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return ConvertToWwise(typedProjectItem, project);
         }
 
-        public static CAkEvent_v136 ConvertToWwise(Event inputEvent, CompilerData project)
+        public static CAkEvent_V136 ConvertToWwise(Event inputEvent, CompilerData project)
         {
-            var wwiseEvent = new CAkEvent_v136();
+            var wwiseEvent = new CAkEvent_V136();
             wwiseEvent.Id = inputEvent.Id;
-            wwiseEvent.Type = HircType.Event;
+            wwiseEvent.HircType = AkBkHircType.Event;
             wwiseEvent.Actions = inputEvent.Actions.Select(x => CreateActionFromInputEvent(x, project)).ToList();
 
-            wwiseEvent.UpdateSize();
+            wwiseEvent.UpdateSectionSize();
             return wwiseEvent;
         }
 
-        private static CAkEvent_v136.Action CreateActionFromInputEvent(uint actionId, CompilerData project)
+        private static CAkEvent_V136.Action_V136 CreateActionFromInputEvent(uint actionId, CompilerData project)
         {
-            return new CAkEvent_v136.Action() { ActionId = actionId };
+            return new CAkEvent_V136.Action_V136() { ActionId = actionId };
         }
     }
 }

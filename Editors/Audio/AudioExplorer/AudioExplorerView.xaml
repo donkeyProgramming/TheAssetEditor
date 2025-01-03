@@ -76,7 +76,7 @@
 
                             <DockPanel Grid.Column="1">
                                 <CheckBox DockPanel.Dock="Top" Content="Show Events" IsChecked="{Binding ShowEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                                <CheckBox DockPanel.Dock="Top" Content="Show Dialogs Events" IsChecked="{Binding ShowDialogEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <CheckBox DockPanel.Dock="Top" Content="Show Dialogs Events" IsChecked="{Binding ShowDialogueEvents.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                             </DockPanel>
                         </Grid>
                         <DockPanel DockPanel.Dock="Top" IsEnabled="false">
@@ -89,7 +89,7 @@
                             <TextBox Margin="3" IsReadOnly="True"/>
                         </DockPanel>
                         <DockPanel DockPanel.Dock="Top">
-                            <Button Content="Export Dialog Event as CSV" Click="{s:MethodBinding ExportCurrrentDialogEventAsCsvAction}" IsEnabled="{Binding CanExportCurrrentDialogEventAsCsvAction.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            <Button Content="Export Dialog Event as CSV" Click="{s:MethodBinding ExportCurrrentDialogueEventAsCsvAction}" IsEnabled="{Binding CanExportCurrrentDialogueEventAsCsvAction.Value, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                         </DockPanel>
                     </DockPanel>
                 </Expander>

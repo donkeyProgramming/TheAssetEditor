@@ -1,10 +1,11 @@
 ﻿using CommunityToolkit.Diagnostics;
 using System;
-using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Hirc.V136;
 using Editors.Audio.BnkCompiler;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Editors.Audio.Utility;
+using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 {
@@ -20,17 +21,16 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             return ConvertToWwise(typedProjectItem, project);
         }
 
-        public static CAkAction_v136 ConvertToWwise(Action inputAction, CompilerData project)
+        public static CAkAction_V136 ConvertToWwise(Action inputAction, CompilerData project)
         {
-            var wwiseAction = new CAkAction_v136();
+            var wwiseAction = new CAkAction_V136();
             wwiseAction.Id = inputAction.Id;
-            wwiseAction.Type = HircType.Action;
-            wwiseAction.ActionType = ActionType.Play;
+            wwiseAction.HircType = AkBkHircType.Action;
+            wwiseAction.ActionType = AkActionType.Play;
             wwiseAction.IdExt = inputAction.ChildId;
-            wwiseAction.AkPlayActionParams.ByBitVector = 0x04;
-            wwiseAction.AkPlayActionParams.BankId = WwiseHash.Compute(project.ProjectSettings.BnkName);
-            wwiseAction.UpdateSize();
-
+            wwiseAction.PlayActionParams.BitVector = 0x04;
+            wwiseAction.PlayActionParams.BankId = WwiseHash.Compute(project.ProjectSettings.BnkName);
+            wwiseAction.UpdateSectionSize();
             return wwiseAction;
         }
     }

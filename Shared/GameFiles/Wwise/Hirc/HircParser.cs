@@ -1,37 +1,33 @@
 ﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Shared.GameFormats.Wwise.Hirc
 {
     public class HircParser
     {
-        public bool UseByteFactory { get; set; } = false;
-
         public HircParser()
         {
         }
 
-        HircFactory GetHircFactory(uint bnkVersion)
+        private static HircFactory GetHircFactory(uint bnkVersion)
         {
-            if (UseByteFactory)
-                return HircFactory.CreateByteHircFactory();
-
             return HircFactory.CreateFactory(bnkVersion);
         }
 
         public HircChunk Parse(string fileName, ByteChunk chunk, uint bnkVersion, bool isCaHircItem)
         {
-            var hircChuck = new HircChunk
+            var hircChunk = new HircChunk
             {
-                ChunkHeader = BnkChunkHeader.CreateFromBytes(chunk),
+                ChunkHeader = BnkChunkHeader.ReadData(chunk),
                 NumHircItems = chunk.ReadUInt32()
             };
 
             var failedItems = new List<uint>();
             var factory = GetHircFactory(bnkVersion);
 
-            for (uint itemIndex = 0; itemIndex < hircChuck.NumHircItems; itemIndex++)
+            for (uint itemIndex = 0; itemIndex < hircChunk.NumHircItems; itemIndex++)
             {
-                var hircType = (HircType)chunk.PeakByte();
+                var hircType = (AkBkHircType)chunk.PeakByte();
 
                 var start = chunk.Index;
                 try
@@ -42,31 +38,31 @@ namespace Shared.GameFormats.Wwise.Hirc
                     hircItem.OwnerFile = fileName;
                     hircItem.IsCaHircItem = isCaHircItem;
                     hircItem.Parse(chunk);
-                    hircChuck.Hircs.Add(hircItem);
+                    hircChunk.HircItems.Add(hircItem);
                 }
                 catch (Exception e)
                 {
                     failedItems.Add(itemIndex);
                     chunk.Index = start;
 
-                    var unkInstance = new CAkUnknown() { ErrorMsg = e.Message, ByteIndexInFile = itemIndex, OwnerFile = fileName };
+                    var unkInstance = new UnknownHirc() { ErrorMsg = e.Message, ByteIndexInFile = itemIndex, OwnerFile = fileName };
                     unkInstance.Parse(chunk);
-                    hircChuck.Hircs.Add(unkInstance);
+                    hircChunk.HircItems.Add(unkInstance);
                 }
             }
 
-            return hircChuck;
+            return hircChunk;
         }
 
-        public byte[] GetAsBytes(HircChunk hircChunk)
+        public byte[] WriteData(HircChunk hircChunk)
         {
             using var memStream = new MemoryStream();
-            memStream.Write(BnkChunkHeader.GetAsByteArray(hircChunk.ChunkHeader));
+            memStream.Write(BnkChunkHeader.WriteData(hircChunk.ChunkHeader));
             memStream.Write(ByteParsers.UInt32.EncodeValue(hircChunk.NumHircItems, out _));
 
-            foreach (var hircItem in hircChunk.Hircs)
+            foreach (var hircItem in hircChunk.HircItems)
             {
-                var bytes = hircItem.GetAsByteArray();
+                var bytes = hircItem.WriteData();
                 memStream.Write(bytes);
             }
 

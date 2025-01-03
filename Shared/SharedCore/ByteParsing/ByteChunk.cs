@@ -209,7 +209,7 @@ namespace Shared.Core.ByteParsing
         }
 
 
-        public ByteChunk PeakChunk(int size)
+        public ByteChunk PeekChunk(int size)
         {
             var currentIndex = CurrentIndex;
             var chunk = CreateSub(size);

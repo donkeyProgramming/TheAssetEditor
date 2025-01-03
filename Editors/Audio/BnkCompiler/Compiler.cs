@@ -43,7 +43,7 @@ namespace Editors.Audio.BnkCompiler
             var hircChunk = _hircBuilder.Generate(audioProject);
 
             // Ensure all write ids are not causing conflicts.
-            var allIds = hircChunk.Hircs.Select(x => x.Id).ToList();
+            var allIds = hircChunk.HircItems.Select(x => x.Id).ToList();
             var originalCount = allIds.Count;
             var uniqueCount = allIds.Distinct().Count();
             Guard.IsEqualTo(originalCount, uniqueCount);
@@ -63,11 +63,11 @@ namespace Editors.Audio.BnkCompiler
             return Result<CompileResult>.FromOk(compileResult);
         }
 
-        private static PackFile ConvertToPackFile(BkhdHeader header, HircChunk hircChunk, string outputFile)
+        private static PackFile ConvertToPackFile(BkhdChunk header, HircChunk hircChunk, string outputFile)
         {
             var outputName = $"{outputFile}.bnk";
-            var headerBytes = BkhdParser.GetAsByteArray(header);
-            var hircBytes = new HircParser().GetAsBytes(hircChunk);
+            var headerBytes = BkhdParser.WriteData(header);
+            var hircBytes = new HircParser().WriteData(hircChunk);
 
             // Write
             using var memStream = new MemoryStream();
@@ -90,7 +90,7 @@ namespace Editors.Audio.BnkCompiler
             foreach (var wwiseEvent in projectFile.StatesDat)
                 datFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { EventName = wwiseEvent, Value = 400 });
 
-            var bytes = DatFileParser.GetAsByteArray(datFile);
+            var bytes = DatFileParser.WriteData(datFile);
             var packFile = new PackFile(outputName, new MemorySource(bytes));
             var reparsedSanityFile = DatFileParser.Parse(packFile, false);
             return packFile;
@@ -104,7 +104,7 @@ namespace Editors.Audio.BnkCompiler
             foreach (var state in projectFile.StatesDat)
                 datFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { EventName = state, Value = 400 });
 
-            var bytes = DatFileParser.GetAsByteArray(datFile);
+            var bytes = DatFileParser.WriteData(datFile);
             var packFile = new PackFile(outputName, new MemorySource(bytes));
             var reparsedSanityFile = DatFileParser.Parse(packFile, false);
             return packFile;

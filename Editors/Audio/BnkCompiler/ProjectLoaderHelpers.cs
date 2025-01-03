@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
-using Shared.GameFormats.Wwise.Hirc.Shared;
+using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 using static Editors.Audio.BnkCompiler.ProjectLoader;
 
 namespace Editors.Audio.BnkCompiler
@@ -203,7 +203,7 @@ namespace Editors.Audio.BnkCompiler
             }
         }
 
-        public static void AddSingleSoundDialogueEvent(IAudioRepository audioRepository, CompilerData compilerData, AkDecisionTree.Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
+        public static void AddSingleSoundDialogueEvent(IAudioRepository audioRepository, CompilerData compilerData, AkDecisionTree_V136.Node_V136 rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
         {
             var mixerId = currentMixer.Id;
             var containerId = GenerateRandomNumber(UsableWwiseId);
@@ -222,7 +222,7 @@ namespace Editors.Audio.BnkCompiler
             ProcessStatePath(rootNode, statePathArray, compilerData, containerId);
         }
 
-        public static void AddMultipleSoundDialogueEvent(IAudioRepository audioRepository, CompilerData compilerData, AkDecisionTree.Node rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
+        public static void AddMultipleSoundDialogueEvent(IAudioRepository audioRepository, CompilerData compilerData, AkDecisionTree_V136.Node_V136 rootNode, ActorMixer currentMixer, CompilerInputProject.ProjectDecisionTree branch)
         {
             var mixerId = currentMixer.Id;
             var containerId = GenerateRandomNumber(UsableWwiseId);
@@ -260,7 +260,7 @@ namespace Editors.Audio.BnkCompiler
             }
         }
 
-        private static void ProcessStatePath(AkDecisionTree.Node parentNode, string[] statePathArray, CompilerData compilerData, uint containerId)
+        private static void ProcessStatePath(AkDecisionTree_V136.Node_V136 parentNode, string[] statePathArray, CompilerData compilerData, uint containerId)
         {
             var currentStateIndex = 0;
 
@@ -273,12 +273,12 @@ namespace Editors.Audio.BnkCompiler
                 var hashedState = state.Equals("Any", StringComparison.OrdinalIgnoreCase) ? 0 : WwiseHash.Compute(state); // The hashed value of the State that is used in this node.
 
                 var parentExists = false;
-                AkDecisionTree.Node existingParentNode = null;
+                AkDecisionTree_V136.Node_V136 existingParentNode = null;
 
                 if (currentStateIndex == 1)
                 {
                     // Check if the parent node already exists.
-                    foreach (var childNode in parentNode.Children)
+                    foreach (var childNode in parentNode.Nodes)
                     {
                         if (childNode.Key == hashedState)
                         {
@@ -298,7 +298,7 @@ namespace Editors.Audio.BnkCompiler
                     var childrenUIdx = (ushort)(currentStateIndex == statePathArray.Length ? 0 : 1); // If 0 this property is not initialised. If this is the last state in the path Children_uIdx is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
                     var childrenUCount = (ushort)(currentStateIndex == statePathArray.Length ? 0 : 1); // If 0 this property is not initialised. If this is the last state in the path Children_uCount is set to 0 which removes the property otherwise it's set to 1 which means the property can be set later on.
                     var newNode = CreateNode(hashedState, audioNodeId, childrenUIdx, childrenUCount, CompilerConstants.UWeight, CompilerConstants.UProbability);
-                    parentNode.Children.Add(newNode);
+                    parentNode.Nodes.Add(newNode);
                     parentNode = newNode;
                 }
             }
@@ -356,17 +356,17 @@ namespace Editors.Audio.BnkCompiler
             };
         }
 
-        public static AkDecisionTree.Node CreateNode(uint key, uint audioNodeId, ushort childrenUIdx, ushort childrenUCount, ushort uWeight, ushort uProbability)
+        public static AkDecisionTree_V136.Node_V136 CreateNode(uint key, uint audioNodeId, ushort childrenUIdx, ushort childrenUCount, ushort uWeight, ushort uProbability)
         {
-            return new AkDecisionTree.Node(new AkDecisionTree.BinaryNode
+            return new AkDecisionTree_V136.Node_V136
             {
                 Key = key,
                 AudioNodeId = audioNodeId,
-                ChildrenUIdx = childrenUIdx,
-                ChildrenUCount = childrenUCount,
-                UWeight = uWeight,
-                UProbability = uProbability
-            });
+                ChildrenIdx = childrenUIdx,
+                ChildrenCount = childrenUCount,
+                Weight = uWeight,
+                Probability = uProbability
+            };
         }
 
         public static void RecordDatData(List<string> datData, string value)
@@ -407,17 +407,17 @@ namespace Editors.Audio.BnkCompiler
                 return 0;
         }
 
-        public static int CountNodeDescendants(AkDecisionTree.Node node)
+        public static int CountNodeDescendants(AkDecisionTree_V136.Node_V136 node)
         {
-            var count = node.Children.Count;
+            var count = node.Nodes.Count;
 
-            foreach (var child in node.Children)
-                count += CountNodeDescendants(child);
+            foreach (var childNode in node.Nodes)
+                count += CountNodeDescendants(childNode);
 
             return count;
         }
 
-        public static void PrintNode(AkDecisionTree.Node node, int depth)
+        public static void PrintNode(AkDecisionTree_V136.Node_V136 node, int depth)
         {
             if (node == null)
                 return;
@@ -426,12 +426,12 @@ namespace Editors.Audio.BnkCompiler
             Console.WriteLine($"======================= PRINTING CUSTOM DECISION TREE GRAPH =======================");
             Console.WriteLine($"{indentation}Key: {node.Key}");
             Console.WriteLine($"{indentation}AudioNodeId: {node.AudioNodeId}");
-            Console.WriteLine($"{indentation}Children_uIdx: {node.ChildrenUIdx}");
-            Console.WriteLine($"{indentation}Children_uCount: {node.ChildrenUCount}");
-            Console.WriteLine($"{indentation}uWeight: {node.UWeight}");
-            Console.WriteLine($"{indentation}uProbability: {node.UProbability}");
+            Console.WriteLine($"{indentation}ChildrenIdx: {node.ChildrenIdx}");
+            Console.WriteLine($"{indentation}ChildrenCount: {node.ChildrenCount}");
+            Console.WriteLine($"{indentation}Weight: {node.Weight}");
+            Console.WriteLine($"{indentation}Probability: {node.Probability}");
 
-            foreach (var childNode in node.Children)
+            foreach (var childNode in node.Nodes)
                 PrintNode(childNode, depth + 1);
         }
     }

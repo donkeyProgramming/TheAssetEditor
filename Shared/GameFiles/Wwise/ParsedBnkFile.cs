@@ -7,8 +7,8 @@ namespace Shared.GameFormats.Wwise
 {
     public class ParsedBnkFile
     {
-        public BkhdHeader Header { get; internal set; } = new BkhdHeader();
-        public HircChunk HircChuck { get; internal set; } = new HircChunk();
+        public BkhdChunk BkhdChunk { get; internal set; } = new BkhdChunk();
+        public HircChunk HircChunk { get; internal set; } = new HircChunk();
         public DidxChunk DidxChunk { get; internal set; }
         public ByteChunk DataChunk { get; internal set; }
     }

@@ -1,11 +1,12 @@
-﻿using Editors.Audio.AudioExplorer;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using Shared.GameFormats.Wwise;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Shared.GameFormats.Wwise.Enums;
+using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Utility
 {
@@ -13,7 +14,7 @@ namespace Editors.Audio.Utility
     {
         protected ILogger _logger = Logging.Create<WwiseTreeParserBase>();
 
-        protected Dictionary<HircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = new Dictionary<HircType, Action<HircItem, HircTreeItem>>();
+        protected Dictionary<AkBkHircType, Action<HircItem, HircTreeItem>> _hircProcessChildMap = [];
         protected readonly IAudioRepository _repository;
 
         protected readonly bool _showId;
@@ -47,7 +48,7 @@ namespace Editors.Audio.Utility
             return flatList;
         }
 
-        List<HircTreeItem> GetHircParents(HircTreeItem root)
+        private List<HircTreeItem> GetHircParents(HircTreeItem root)
         {
             var childData = new List<HircTreeItem>();
             if (root.Children != null)
@@ -60,16 +61,15 @@ namespace Editors.Audio.Utility
             return childData;
         }
 
-
-        void ProcessHircObject(HircItem item, HircTreeItem parent)
+        private void ProcessHircObject(HircItem item, HircTreeItem parent)
         {
-            if (_hircProcessChildMap.TryGetValue(item.Type, out var func))
+            if (_hircProcessChildMap.TryGetValue(item.HircType, out var func))
             {
                 func(item, parent);
             }
             else
             {
-                var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.Type} for Id {item.Id} in {item.OwnerFile}", Item = item };
+                var unknownNode = new HircTreeItem() { DisplayName = $"Unknown node type {item.HircType} for Id {item.Id} in {item.OwnerFile}", Item = item };
                 parent.Children.Add(unknownNode);
             }
         }

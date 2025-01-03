@@ -1,5 +1,4 @@
 ﻿using System;
-using Editors.Audio.BnkCompiler;
 using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise.Bkhd;
 
@@ -7,13 +6,13 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration
 {
     public class BnkHeaderBuilder
     {
-        public static BkhdHeader Generate(CompilerData projectFile)
+        public static BkhdChunk Generate(CompilerData projectFile)
         {
             var bnkName = projectFile.ProjectSettings.BnkName;
             var soundBankId = WwiseHash.Compute(bnkName);
             var language = WwiseHash.Compute(projectFile.ProjectSettings.Language);
 
-            var header = new BkhdHeader()
+            var akBankHeader = new AkBankHeader()
             {
                 DwBankGeneratorVersion = 0x80000088,
                 DwSoundBankId = soundBankId,
@@ -23,7 +22,12 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration
                 Padding = BitConverter.GetBytes(0x04)
             };
 
-            return header;
+            var bkhdChunk = new BkhdChunk
+            {
+                AkBankHeader = akBankHeader
+            };
+
+            return bkhdChunk;
         }
     }
 }

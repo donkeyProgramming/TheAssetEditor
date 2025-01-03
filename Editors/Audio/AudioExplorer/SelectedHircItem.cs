@@ -1,4 +1,4 @@
-﻿using Shared.GameFormats.Wwise;
+﻿using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.AudioExplorer
 {
