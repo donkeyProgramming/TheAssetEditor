@@ -133,7 +133,7 @@ namespace Shared.GameFormats.AnimationMeta.Definitions
     {
         // new field
         [MetaDataTag(10)]
-        public bool UnknownBool { get; set; }
+        public bool ScalesWithParent { get; set; }  
 
         // override order
         [MetaDataTag(11)]
