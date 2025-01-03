@@ -1,6 +1,6 @@
 ﻿using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
-using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Utility
@@ -10,13 +10,13 @@ namespace Editors.Audio.Utility
         public WwiseTreeParserParent(IAudioRepository repository, bool showId, bool showOwningBnkFile, bool filterByBnkName)
             : base(repository, showId, showOwningBnkFile, filterByBnkName)
         {
-            _hircProcessChildMap.Add(HircType.SwitchContainer, FindParentSwitchControl);
-            _hircProcessChildMap.Add(HircType.LayerContainer, FindParentLayerContainer);
-            _hircProcessChildMap.Add(HircType.SequenceContainer, FindParentRandContainer);
-            _hircProcessChildMap.Add(HircType.Sound, FindParentSound);
-            _hircProcessChildMap.Add(HircType.ActorMixer, FindParentActorMixer);
-            _hircProcessChildMap.Add(HircType.FxCustom, FindParentFxCustom);
-            _hircProcessChildMap.Add(HircType.FxShareSet, FindParentFxShareSet);
+            _hircProcessChildMap.Add(AkBkHircType.SwitchContainer, FindParentSwitchControl);
+            _hircProcessChildMap.Add(AkBkHircType.LayerContainer, FindParentLayerContainer);
+            _hircProcessChildMap.Add(AkBkHircType.SequenceContainer, FindParentRandContainer);
+            _hircProcessChildMap.Add(AkBkHircType.Sound, FindParentSound);
+            _hircProcessChildMap.Add(AkBkHircType.ActorMixer, FindParentActorMixer);
+            _hircProcessChildMap.Add(AkBkHircType.FxCustom, FindParentFxCustom);
+            _hircProcessChildMap.Add(AkBkHircType.FxShareSet, FindParentFxShareSet);
         }
 
         private void FindParentLayerContainer(HircItem item, HircTreeItem parent)
@@ -37,7 +37,7 @@ namespace Editors.Audio.Utility
 
         private void FindParentRandContainer(HircItem item, HircTreeItem parent)
         {
-            var sqtContainer = GetAsType<CAkRanSeqCnt>(item);
+            var sqtContainer = GetAsType<ICAkRanSeqCnt>(item);
             var node = new HircTreeItem() { DisplayName = $"Rand Container {GetDisplayId(item.Id, item.OwnerFile, false)} {GetParentInfo(sqtContainer.GetParentId())}", Item = item };
             parent.Children.Add(node);
             ProcessNext(sqtContainer.GetParentId(), node);
@@ -50,7 +50,6 @@ namespace Editors.Audio.Utility
             parent.Children.Add(node);
             ProcessNext(actorMixer.GetDirectParentId(), node);
         }
-
 
         private void FindParentFxShareSet(HircItem item, HircTreeItem parent)
         {

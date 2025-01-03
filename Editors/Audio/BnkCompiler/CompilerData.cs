@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Editors.Audio.BnkCompiler.ObjectConfiguration.Warhammer3;
-using Shared.GameFormats.Wwise.Hirc.Shared;
+using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Editors.Audio.BnkCompiler
 {
@@ -17,7 +17,7 @@ namespace Editors.Audio.BnkCompiler
 
     public class DialogueEvent : IAudioProjectHircItem
     {
-        public AkDecisionTree.Node RootNode { get; set; }
+        public AkDecisionTree_V136.Node_V136 RootNode { get; set; }
         public uint NodesCount { get; set; } = 0;
 
     }

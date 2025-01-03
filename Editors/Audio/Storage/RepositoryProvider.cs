@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Shared.Core.PackFiles.Models;
-using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Didx;
+using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Storage
 {

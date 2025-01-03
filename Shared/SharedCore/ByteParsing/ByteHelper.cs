@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Shared.Core.ByteParsing
@@ -56,6 +57,17 @@ namespace Shared.Core.ByteParsing
         public static int GetSize<T>()
         {
             return Marshal.SizeOf(typeof(T));
+        }
+
+        public static uint GetPropertyTypeSize<T>(T property)
+        {
+            if (property is IList)
+                return (uint)Marshal.SizeOf(typeof(T).GetGenericArguments()[0]);
+
+            if (property is Enum)
+                return (uint)Marshal.SizeOf(Enum.GetUnderlyingType(property.GetType()));
+
+            return (uint)Marshal.SizeOf(property);
         }
     }
 }

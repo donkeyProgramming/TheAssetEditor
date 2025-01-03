@@ -70,7 +70,7 @@ namespace Shared.GameFormats.Dat
             return output;
         }
 
-        public static byte[] GetAsByteArray(SoundDatFile file)
+        public static byte[] WriteData(SoundDatFile file)
         {
             using var memStream = new MemoryStream();
 

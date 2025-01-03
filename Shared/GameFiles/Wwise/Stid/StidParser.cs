@@ -6,9 +6,9 @@ namespace Shared.GameFormats.Wwise.Stid
     {
         public static BnkChunkHeader Parse(string fileName, ByteChunk chunk, ParsedBnkFile soundDb)
         {
-            var chunckHeader = BnkChunkHeader.CreateFromBytes(chunk);
-            chunk.Index += (int)chunckHeader.ChunkSize;
-            return chunckHeader;
+            var chunkHeader = BnkChunkHeader.ReadData(chunk);
+            chunk.Index += (int)chunkHeader.ChunkSize;
+            return chunkHeader;
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Editors.Audio.Storage;
-using Shared.GameFormats.Wwise;
+using Shared.GameFormats.Wwise.Enums;
 using Shared.Ui.Common;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace Editors.Audio.AudioExplorer
 
         public FilterCollection<SelectedHircItem> EventList { get; set; }
 
-        public EventSelectionFilter(IAudioRepository repository, bool showEvents, bool showDialogEvents)
+        public EventSelectionFilter(IAudioRepository repository, bool showEvents, bool showDialogueEvents)
         {
             _repository = repository;
 
@@ -21,19 +21,19 @@ namespace Editors.Audio.AudioExplorer
                 SearchFilter = (value, rx) => rx.Match(value.DisplayName).Success
             };
 
-            Refresh(showEvents, showDialogEvents);
+            Refresh(showEvents, showDialogueEvents);
         }
 
-        public void Refresh(bool showEvents, bool showDialogEvents)
+        public void Refresh(bool showEvents, bool showDialogueEvents)
         {
-            var typesToShow = new List<HircType>();
+            var typesToShow = new List<AkBkHircType>();
             if (showEvents)
-                typesToShow.Add(HircType.Event);
-            if (showDialogEvents)
-                typesToShow.Add(HircType.Dialogue_Event);
+                typesToShow.Add(AkBkHircType.Event);
+            if (showDialogueEvents)
+                typesToShow.Add(AkBkHircType.Dialogue_Event);
 
             var allEvents = _repository.HircObjects.SelectMany(x => x.Value)
-                .Where(x => typesToShow.Contains(x.Type))
+                .Where(x => typesToShow.Contains(x.HircType))
                 .ToList();
 
             var selectedableList = allEvents.Select(x => new SelectedHircItem() { HircItem = x, DisplayName = _repository.GetNameFromHash(x.Id), Id = x.Id, PackFile = x.OwnerFile, IndexInFile = x.ByteIndexInFile }).OrderBy(x => x.DisplayName).ToList();

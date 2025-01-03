@@ -1,94 +1,71 @@
-﻿namespace Shared.GameFormats.Wwise.Hirc
+﻿using Shared.GameFormats.Wwise.Enums;
+
+namespace Shared.GameFormats.Wwise.Hirc
 {
     public class HircFactory
     {
-        private readonly Dictionary<HircType, Func<HircItem>> _itemList = [];
+        private readonly Dictionary<AkBkHircType, Func<HircItem>> _itemList = [];
 
-        public void RegisterHirc(HircType type, Func<HircItem> creator)
+        public void RegisterHirc(AkBkHircType type, Func<HircItem> creator)
         {
             _itemList[type] = creator;
         }
 
-        public HircItem CreateInstance(HircType type)
+        public HircItem CreateInstance(AkBkHircType type)
         {
             if (_itemList.TryGetValue(type, out var functor))
                 return functor();
 
-            else if (type == HircType.Audio_Bus)
-            { }
-            else if (type == HircType.FxCustom)
-            { }
-
-            return new CAkUnknown();
+            return new UnknownHirc();
         }
 
-        public static HircFactory CreateFactory(uint version)
+        // Each major release of Wwise has a bank generator version.
+        // CA sometimes use in-house compiled version of Wwise which is based on a public release with custom modifications to some Wwise objects.
+        // The bank generator version of the closest public release (2019.2.15.7667) to that used in Wh3 (2147483784) is 135.
+        // Wwiser adds 1 to that for internal use to create a pseudo version called 136 but really it's 2147483784.
+        public static HircFactory CreateFactory(uint bankGeneratorVersion)
         {
-            switch (version)
+            switch (bankGeneratorVersion)
             {
                 case 112: return CreateFactory_v112();
-                case 122: return CreateFactory_v122();
-                case 136: return CreateFactory_v136();
+                case 2147483784: return CreateFactory_v136();
             }
 
-            throw new Exception($"Unknown Version {version}");
-        }
-
-        private static HircFactory CreateFactory_v122()
-        {
-            var instance = new HircFactory();
-            instance.RegisterHirc(HircType.Sound, () => new V122.CAkSound_V122());
-            instance.RegisterHirc(HircType.Event, () => new V122.CAkEvent_v122());
-            instance.RegisterHirc(HircType.Action, () => new V122.CAkAction_V122());
-            instance.RegisterHirc(HircType.SwitchContainer, () => new V122.CAkSwitchCntr_v122());
-            instance.RegisterHirc(HircType.SequenceContainer, () => new V122.CAkRanSeqCnt_V122());
-            instance.RegisterHirc(HircType.LayerContainer, () => new V122.CAkLayerCntr_v122());
-            instance.RegisterHirc(HircType.Dialogue_Event, () => new V122.CAkDialogueEvent_v122());
-            return instance;
+            throw new Exception($"Unknown Bank Generator Version: {bankGeneratorVersion}");
         }
 
         private static HircFactory CreateFactory_v112()
         {
             var instance = new HircFactory();
-            instance.RegisterHirc(HircType.ActorMixer, () => new V112.CAkActorMixer_v112());
-            instance.RegisterHirc(HircType.Sound, () => new V112.CAkSound_V112());
-            instance.RegisterHirc(HircType.Event, () => new V112.CAkEvent_v112());
-            instance.RegisterHirc(HircType.Action, () => new V112.CAkAction_v112());
-            instance.RegisterHirc(HircType.SwitchContainer, () => new V112.CAkSwitchCntr_V112());
-            instance.RegisterHirc(HircType.SequenceContainer, () => new V112.CAkRanSeqCnt_V112());
-            instance.RegisterHirc(HircType.LayerContainer, () => new V112.CAkLayerCntr_v112());
-            instance.RegisterHirc(HircType.Dialogue_Event, () => new V112.CAkDialogueEvent_v112());
+            instance.RegisterHirc(AkBkHircType.ActorMixer, () => new V112.CAkActorMixer_V112());
+            instance.RegisterHirc(AkBkHircType.Sound, () => new V112.CAkSound_V112());
+            instance.RegisterHirc(AkBkHircType.Event, () => new V112.CAkEvent_V112());
+            instance.RegisterHirc(AkBkHircType.Action, () => new V112.CAkAction_V112());
+            instance.RegisterHirc(AkBkHircType.SwitchContainer, () => new V112.CAkSwitchCntr_V112());
+            instance.RegisterHirc(AkBkHircType.SequenceContainer, () => new V112.CAkRanSeqCnt_V112());
+            instance.RegisterHirc(AkBkHircType.LayerContainer, () => new V112.CAkLayerCntr_V112());
+            instance.RegisterHirc(AkBkHircType.Dialogue_Event, () => new V112.CAkDialogueEvent_V112());
             return instance;
         }
 
         private static HircFactory CreateFactory_v136()
         {
             var instance = new HircFactory();
-            instance.RegisterHirc(HircType.ActorMixer, () => new V136.CAkActorMixer_v136());
-            instance.RegisterHirc(HircType.Sound, () => new V136.CAkSound_v136());
-            instance.RegisterHirc(HircType.Event, () => new V136.CAkEvent_v136());
-            instance.RegisterHirc(HircType.Action, () => new V136.CAkAction_v136());
-            instance.RegisterHirc(HircType.SwitchContainer, () => new V136.CAkSwitchCntr_v136());
-            instance.RegisterHirc(HircType.SequenceContainer, () => new V136.CAkRanSeqCntr_v136());
-            instance.RegisterHirc(HircType.LayerContainer, () => new V136.CAkLayerCntr_v136());
-            instance.RegisterHirc(HircType.Dialogue_Event, () => new V136.CAkDialogueEvent_v136());
-            instance.RegisterHirc(HircType.Music_Track, () => new V136.CAkMusicTrack_v136());
-            instance.RegisterHirc(HircType.Music_Segment, () => new V136.CAkMusicSegment_v136());
-            instance.RegisterHirc(HircType.Music_Random_Sequence, () => new V136.CAkMusicRanSeqCntr_v136());
-            instance.RegisterHirc(HircType.Music_Switch, () => new V136.CAkMusicSwitchCntr_v136());
-            instance.RegisterHirc(HircType.FxCustom, () => new V136.CAkFxCustom_v136());
-            instance.RegisterHirc(HircType.FxShareSet, () => new V136.CAkFxShareSet_v136());
-            instance.RegisterHirc(HircType.Audio_Bus, () => new V136.CAkBus_v136());
-            instance.RegisterHirc(HircType.AuxiliaryBus, () => new V136.CAkAuxBus_v136());
-            return instance;
-        }
-
-        public static HircFactory CreateByteHircFactory()
-        {
-            var instance = new HircFactory();
-            var hircTypes = Enum.GetValues(typeof(HircType)) as HircType[];
-            foreach (var hircType in hircTypes)
-                instance.RegisterHirc(hircType, () => new ByteHirc());
+            instance.RegisterHirc(AkBkHircType.ActorMixer, () => new V136.CAkActorMixer_V136());
+            instance.RegisterHirc(AkBkHircType.Sound, () => new V136.CAkSound_V136());
+            instance.RegisterHirc(AkBkHircType.Event, () => new V136.CAkEvent_V136());
+            instance.RegisterHirc(AkBkHircType.Action, () => new V136.CAkAction_V136());
+            instance.RegisterHirc(AkBkHircType.SwitchContainer, () => new V136.CAkSwitchCntr_V136());
+            instance.RegisterHirc(AkBkHircType.SequenceContainer, () => new V136.CAkRanSeqCntr_V136());
+            instance.RegisterHirc(AkBkHircType.LayerContainer, () => new V136.CAkLayerCntr_V136());
+            instance.RegisterHirc(AkBkHircType.Dialogue_Event, () => new V136.CAkDialogueEvent_V136());
+            instance.RegisterHirc(AkBkHircType.Music_Track, () => new V136.CAkMusicTrack_V136());
+            instance.RegisterHirc(AkBkHircType.Music_Segment, () => new V136.CAkMusicSegment_V136());
+            instance.RegisterHirc(AkBkHircType.Music_Random_Sequence, () => new V136.CAkMusicRanSeqCntr_V136());
+            instance.RegisterHirc(AkBkHircType.Music_Switch, () => new V136.CAkMusicSwitchCntr_V136());
+            instance.RegisterHirc(AkBkHircType.FxCustom, () => new V136.CAkFxCustom_V136());
+            instance.RegisterHirc(AkBkHircType.FxShareSet, () => new V136.CAkFxShareSet_V136());
+            instance.RegisterHirc(AkBkHircType.Audio_Bus, () => new V136.CAkBus_V136());
             return instance;
         }
     }

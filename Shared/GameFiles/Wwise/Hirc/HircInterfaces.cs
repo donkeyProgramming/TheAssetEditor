@@ -1,4 +1,4 @@
-﻿using Shared.GameFormats.Wwise.Hirc.Shared;
+﻿using Shared.GameFormats.Wwise.Enums;
 
 namespace Shared.GameFormats.Wwise.Hirc
 {
@@ -11,20 +11,20 @@ namespace Shared.GameFormats.Wwise.Hirc
     {
         public uint GetDirectParentId();
         public uint GetSourceId();
-        public SourceType GetStreamType();
+        public AKBKSourceType GetStreamType();
     }
 
     public interface ICAkAction
     {
-        public ActionType GetActionType();
+        public AkActionType GetActionType();
         public uint GetChildId();
         public uint GetStateGroupId();
     }
 
-    public interface ICADialogEvent
+    public interface ICAkDialogueEvent
     {
-        public ArgumentList ArgumentList { get; }
-        public AkDecisionTree AkDecisionTree { get; }
+        List<object> Arguments { get; }
+        object AkDecisionTree { get; }
     }
 
     public interface ICAkActorMixer
@@ -35,16 +35,17 @@ namespace Shared.GameFormats.Wwise.Hirc
 
     public interface ICAkSwitchCntr
     {
-        public uint GetDirectParentId();
-        public List<ICAkSwitchPackage> SwitchList { get; }
         uint GroupId { get; }
         uint DefaultSwitch { get; }
+        public List<ICAkSwitchPackage> SwitchList { get; }
 
         public interface ICAkSwitchPackage
         {
             uint SwitchId { get; }
             List<uint> NodeIdList { get; }
         }
+
+        public uint GetDirectParentId();
     }
 
     public interface ICAkMusicTrack
@@ -58,23 +59,9 @@ namespace Shared.GameFormats.Wwise.Hirc
         public uint GetDirectParentId();
     }
 
-    public abstract class CAkRanSeqCnt : HircItem
+    public interface ICAkRanSeqCnt
     {
-        public abstract uint GetParentId();
-        public abstract List<uint> GetChildren();
-    }
-
-    public abstract class CAkSwitchCntr : HircItem
-    {
-        public abstract uint GroupId { get; }
-        public abstract uint DefaultSwitch { get; }
-        public abstract uint ParentId { get; }
-        public abstract List<SwitchListItem> Items { get; }
-
-        public class SwitchListItem
-        {
-            public uint SwitchId { get; set; }
-            public List<uint> ChildNodeIds { get; set; }
-        }
+        public uint GetParentId();
+        public List<uint> GetChildren();
     }
 }
