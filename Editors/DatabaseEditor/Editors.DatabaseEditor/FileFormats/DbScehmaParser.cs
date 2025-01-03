@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
+using Newtonsoft.Json.Schema;
 using Shared.Core.Settings;
 
 namespace Editors.DatabaseEditor.FileFormats
@@ -36,9 +37,6 @@ namespace Editors.DatabaseEditor.FileFormats
                         var field_type = schemaField["field_type"].GetValue<string>();
                         var isKey = schemaField["is_key"].GetValue<bool>();
                         var is_ref = schemaField["is_reference"] as JsonArray;
-
-          
-
 
                         var dbColoumnSchema = new DbColoumnSchema()
                         {

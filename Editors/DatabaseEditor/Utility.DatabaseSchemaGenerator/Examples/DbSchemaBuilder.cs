@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SQLite;
+using System.Linq;
 using Editors.DatabaseEditor.FileFormats;
 using Shared.Core.ByteParsing;
 using Shared.Core.PackFiles;
@@ -80,18 +81,25 @@ namespace Utility.DatabaseSchemaGenerator.Examples
                 //.Where(x => x.Name == "battle_skeleton_parts_tables" || x.Name == "battle_skeletons_tables")
                 .ToList();
 
+
+
+            DbScemaValidation.Validate(_jsonSchema);
+
         }
 
         public void CreateSqTableScehma(SQLiteConnection connection, bool addKeys, bool addForeignKeys)
         {
-            string[] dontGenerateFkTables = ["effect_bonus_value_teleportation_node_template_junctions_tables"];
-
+            var numEdges = 0;
+            var numNodes = 0;
+            var maxEdges = 10;
+            var tablesWithoutFk = 0;
             var tableSchemas = _jsonSchema.TableSchemas;
 
             var tables = new Dictionary<string, string>(); 
             foreach (var tableSchema in tableSchemas)
             {
                 var tableName = tableSchema.Name;
+                numNodes++;
 
                 var sqlCommand = $"CREATE TABLE {tableName} (\n";
                 for(var i = 0; i < tableSchema.Coloumns.Count; i++) 
@@ -106,15 +114,21 @@ namespace Utility.DatabaseSchemaGenerator.Examples
                 }
 
                 var foreignKeyColoums = tableSchema.Coloumns.Where(x=>x.ForeignKey != null).ToList();
-
+                if (foreignKeyColoums.Count == 0)
+                    tablesWithoutFk++;
 
                 if (addForeignKeys)
                 {
                     foreach (var coloumn in foreignKeyColoums)
                     {
                         var coloumName = coloumn.Name;
-
-                        sqlCommand += $"\t ,FOREIGN KEY ([{coloumName}]) REFERENCES {coloumn.ForeignKey.Table + "_tables"}([{coloumn.ForeignKey.ColoumnName}]) \n";
+                        var foreignKeyTableName = coloumn.ForeignKey.Table + "_tables";
+                        var foreignTableRef = tableSchemas.FirstOrDefault(x => x.Name == foreignKeyTableName);
+                        if (foreignTableRef != null)
+                        {
+                            sqlCommand += $"\t ,FOREIGN KEY ([{coloumName}]) REFERENCES {foreignKeyTableName}([{coloumn.ForeignKey.ColoumnName}]) \n";
+                            numEdges++;
+                        }
                     }
                 }
 
@@ -123,10 +137,9 @@ namespace Utility.DatabaseSchemaGenerator.Examples
                     .Select(x=>$"[{x.Name}]")
                     .ToList();
                
-                // Add this to the top!
+                // Add this to the top to make it look prettier
                 if (keyColoumns.Any())
                     sqlCommand += $",PRIMARY KEY ({string.Join(", ", keyColoumns)})";
-
 
                 sqlCommand += ");";
 
