@@ -6,6 +6,8 @@ using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
+using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials.Shaders
 {
@@ -125,6 +127,12 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
             }
 
             return (true, "");
+        }
+
+        internal void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
+        {
+            foreach (var capability in Capabilities)
+                capability.Initialize(wsModelMaterial, rmvMaterial);
         }
     }
 }

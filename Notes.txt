@@ -1,6 +1,7 @@
 Finished for v059
 	[Feature] GameDb => SQL DB convrter v0.1
 	
+	[Bugfix] Audiostuff: Ask pear for a description
 	[Bugfix] General: Fixed bug which caused deleted files to not be removed 
 	[Bugfix] Kitbash: Error message if there is an error in wsmodel, reverts to using rmv2 material
 	[Bugfix] Kitbash: Fixed potential softlock when loading wsmodels with errors 

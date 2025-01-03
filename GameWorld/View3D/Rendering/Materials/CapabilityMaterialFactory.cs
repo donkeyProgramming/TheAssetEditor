@@ -8,6 +8,48 @@ using Shared.GameFormats.WsModel;
 
 namespace GameWorld.Core.Rendering.Materials
 {
+
+    public enum MaterialVersion
+    {
+        SpecGloss,
+
+        MetalRough,
+    }
+
+    //  RegisterShader(PreferedShaderGroup.Wh3)
+    //      .Shader("path", shaderEnum)
+    //      .AddCapability<TCap, TWsModelSerializer, TRmvSerializer>();
+
+    public class CapabilityMaterialDatabase
+    {
+        public CapabilityMaterialDatabase()
+        {
+
+        }
+
+
+
+        public void Create()
+        {
+            //RegisterShader(MaterialVersion.MetalRough)
+            //  .Shader("Path", Pbr_MetalRough)
+            //  .AddCapability<MetalRoughCapability, MetalRoughCapabilityWsModelSerializer, MetalRoughCapabilityMaterialSerizer>();
+            //  .AddCapability<AnimationCapability...>();
+            //  .AddCapability<BloodCapability...>();
+            //  .AddCapability<EmissiveCapability...>();
+            //  .AddCapability<TintCapability...>();
+            //  .AddToDb(this);
+        }
+
+    }
+
+    public interface ICapabilityMaterialFactory
+    {
+        public CapabilityMaterial Create(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial = null);
+        public CapabilityMaterial GetDefault();
+    }
+
+
     public class CapabilityMaterialFactory
     {
         private readonly ApplicationSettingsService _applicationSettingsService;
@@ -32,8 +74,7 @@ namespace GameWorld.Core.Rendering.Materials
             try
             {
                 var material = CreateMaterial(preferredMaterial);
-                foreach (var capability in material.Capabilities)
-                    capability.Initialize(wsModelMaterial, rmvMaterial);
+                material.Initialize(wsModelMaterial, rmvMaterial);
                 return material;
             }
             catch (Exception ex)

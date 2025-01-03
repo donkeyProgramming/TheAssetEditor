@@ -16,9 +16,7 @@
     //
     /*
      
-     RegisterShader(PreferedShaderGroup.Wh3)
-        .Shader("path", shaderEnum)
-        .AddCapability<TCap, TWsModelSerializer, TRmvSerializer>();
+
      
      
      
