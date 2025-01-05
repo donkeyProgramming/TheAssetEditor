@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
@@ -106,31 +107,36 @@ namespace Editors.Audio.AudioExplorer
 
         public void PlaySelectedSoundAction()
         {
-            ICAkSound sound = _selectedNode.Item as ICAkSound;
-            if (sound == null)
+            if (_selectedNode.Item is ICAkSound sound)
             {
+                if (sound.GetStreamType() == AKBKSourceType.Data_BNK)
+                {
+                    CAkSound_V112 cakSound_V112 = _selectedNode.Item as CAkSound_V112;
+
+                    if (cakSound_V112 != null)
+                    {
+                        _soundPlayer.ConvertWemToWav(
+                            _audioRepository,
+                            cakSound_V112.AkBankSourceData.AkMediaInformation.SourceId,
+                            cakSound_V112.AkBankSourceData.AkMediaInformation.FileId,
+                            (int)cakSound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
+                            (int)cakSound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize
+                        );
+
+                        return;
+                    }
+                }
+
+                _soundPlayer.ConvertWemToWav(sound.GetSourceId().ToString());
                 return;
             }
 
-            if (sound.GetStreamType() == AKBKSourceType.Data_BNK)
+            if (_selectedNode.Item is ICAkMusicTrack musicTrack)
             {
-                CAkSound_V112 cakSound_V112 = _selectedNode.Item as CAkSound_V112;
-
-                if (cakSound_V112 != null)
-                {
-                    _soundPlayer.ConvertWemToWav(
-                        _audioRepository,
-                        cakSound_V112.AkBankSourceData.AkMediaInformation.SourceId,
-                        cakSound_V112.AkBankSourceData.AkMediaInformation.FileId,
-                        (int)cakSound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
-                        (int)cakSound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize
-                    );
-                 
-                    return;
-                }
+                // Only seems to have one child in practice 
+                var musicTrackId = musicTrack.GetChildren().FirstOrDefault(); 
+                _soundPlayer.ConvertWemToWav(musicTrackId.ToString());
             }
-
-            _soundPlayer.ConvertWemToWav(sound.GetSourceId().ToString());
         }
 
         public void LoadHircFromIdAction()
