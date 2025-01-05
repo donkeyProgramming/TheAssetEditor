@@ -7,12 +7,16 @@ Finished for v059
 	[Bugfix] Kitbash: Fixed potential softlock when loading wsmodels with errors 
 	[Bugfix] AnimationBins: Most warnings turned into errors, as CA has terrible QA.
 	
+	X GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing. Make a input setting struct 
+	X General: Convert GameinformationFactory to a static! 
 Fixes for v059
+	Finish game settings and make stuff hide behind interface. 
+		Consider movving all of material stuff out of rendering, as it would then make more sene to move wsmodel parsing and generations in there 
 	Twui editor v0
 
-	X GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing. Make a input setting struct 
+
 	X General: Enums for wsmodel format and shaders, formats ++ in GameinformationFactory
-	X General: Convert GameinformationFactory to a static! 
+	
 	
 	Create ogre test 
 	Damping and root node handling 

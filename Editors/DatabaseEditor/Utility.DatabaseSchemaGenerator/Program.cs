@@ -42,7 +42,7 @@ namespace Utility.DatabaseSchemaGenerator
 
                 try
                 {
-                    dbHandler.CreateSqTableScehma(connection, true, true);
+                    dbHandler.CreateSqTableScehma(connection, false, false);
                     Console.WriteLine("Schema successfully applied.");
                 }
                 catch (Exception ex)
@@ -50,7 +50,7 @@ namespace Utility.DatabaseSchemaGenerator
                     Console.WriteLine($"Error applying schema: {ex.Message}");
                 }
 
-                //dbHandler.PopulateTable(pfs, connection);
+                dbHandler.PopulateTable(pfs, connection);
             }
 
             Console.WriteLine("Done.");

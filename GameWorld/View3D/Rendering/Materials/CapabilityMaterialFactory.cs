@@ -46,6 +46,8 @@ namespace GameWorld.Core.Rendering.Materials
     public interface ICapabilityMaterialFactory
     {
         public CapabilityMaterial Create(IRmvMaterial rmvMaterial, WsModelMaterialFile? wsModelMaterial = null);
+        // GetPossiblematerials
+        //IsmaterialSupportedFromWsModelName
         public CapabilityMaterial GetDefault();
     }
 

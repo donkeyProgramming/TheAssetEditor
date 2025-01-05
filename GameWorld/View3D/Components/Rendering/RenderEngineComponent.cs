@@ -125,6 +125,13 @@ namespace GameWorld.Core.Components.Rendering
             var spriteBatch = CommonSpriteBatch;
             var screenWidth = device.Viewport.Width;
             var screenHeight = device.Viewport.Height;
+            if (screenWidth <= 10 || screenHeight <= 10)
+            {
+                // Dont render the screen if its super small,
+                // as it causes some werid corner case issues for some users
+                return;
+            }
+
             var commonShaderParameters = CommonShaderParameterBuilder.Build(_camera, _sceneLightParameters);
 
             _defaultRenderTarget = RenderTargetHelper.GetRenderTarget(device, _defaultRenderTarget);
@@ -153,11 +160,16 @@ namespace GameWorld.Core.Components.Rendering
 
             if (_drawGlow)
             {
+                // While re-sizing or changing view, there is a small chance that the
+                // bloomRenderTarget could be null
                 var bloomRenderTarget = _bloomFilter.Draw(_glowRenderTarget, screenWidth, screenHeight);
-                device.SetRenderTarget(backBufferRenderTarget);
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
-                spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
-                spriteBatch.End();
+                if (bloomRenderTarget != null)
+                {
+                    device.SetRenderTarget(backBufferRenderTarget);
+                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive);
+                    spriteBatch.Draw(bloomRenderTarget, new Rectangle(0, 0, screenWidth, screenHeight), Color.White);
+                    spriteBatch.End();
+                }
             }
         }
 
