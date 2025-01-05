@@ -28,7 +28,7 @@
             </GridSplitter.Template>
         </GridSplitter>
 
-        <Image  Grid.Column="2"  Source="{Binding Path=PreviewRenderer.PreviewImage, UpdateSourceTrigger=PropertyChanged}"/>
+        <ContentControl  Grid.Column="2"  Content="{Binding Path=Scene, UpdateSourceTrigger=PropertyChanged, Mode=OneTime}"/>
 
         <GridSplitter Grid.Column="3"  HorizontalAlignment="Stretch">
             <GridSplitter.Template>

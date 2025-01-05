@@ -1,13 +1,14 @@
 ﻿using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.Twui.Editor.ComponentEditor;
+using Editors.Twui.Editor.Events;
 using Editors.Twui.Editor.PreviewRendering;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using Editors.Twui.Editor.ComponentEditor;
 using Shared.GameFormats.Twui;
 using Shared.GameFormats.Twui.Data;
-using Editors.Twui.Editor.Events;
 
 namespace Editors.Twui.Editor
 {
@@ -23,13 +24,20 @@ namespace Editors.Twui.Editor
         [ObservableProperty] TwuiFile _parsedTwuiFile;
    
         [ObservableProperty] ComponentManger _componentManager;
-        [ObservableProperty] EditorRenderHandler _previewRenderer;
+        [ObservableProperty] IWpfGame _scene;
 
-        public TwuiEditor(IEventHub eventHub, ComponentManger componentEditor, EditorRenderHandler previewRenderer)
+        public TwuiEditor(IEventHub eventHub, ComponentManger componentEditor, TwuiPreviewBuilder previewBuilder, IWpfGame wpfGame)
         {
             _eventHub = eventHub;
             _componentManager = componentEditor;
-            _previewRenderer = previewRenderer;
+            _scene = wpfGame;
+
+
+            wpfGame.ForceEnsureCreated();
+            previewBuilder.Initialize();
+
+
+            wpfGame.AddComponent(previewBuilder);
         }
 
         public bool Save() { return true; } 
