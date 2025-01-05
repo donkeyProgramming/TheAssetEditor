@@ -40,6 +40,9 @@ namespace Test.Shared.Core.PackFiles
                 file.Value.DataSource = new MemorySource(encryptedData);
             }
 
+            // Assert the file count is what we expect
+            Assert.That(_container.FileList.Count, Is.EqualTo(4), "Unexpected number of files in the container.");
+
             // Verify encryption and decryption
             foreach (var file in _container.FileList)
             {
