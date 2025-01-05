@@ -1,7 +1,7 @@
-﻿using Serilog;
-using Shared.Core.ByteParsing;
+﻿using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using static Shared.Core.PackFiles.PackFileDecrypter;
 
 namespace Shared.Core.PackFiles
 {
@@ -54,7 +54,11 @@ namespace Shared.Core.PackFiles
                 var headerVersion = output.Header.Version;
                 for (var i = 0; i < output.Header.FileCount; i++)
                 {
-                    var size = reader.ReadUInt32();
+                    uint size;
+                    if (output.Header.HasEncryptedIndex)
+                        size = DecryptAndReadU32(reader, (uint)(output.Header.FileCount - i - 1));
+                    else
+                        size = reader.ReadUInt32();
 
                     if (output.Header.HasIndexWithTimeStamp)
                         reader.ReadUInt32();
@@ -66,7 +70,8 @@ namespace Shared.Core.PackFiles
                     var fullPackedFileName = IOFunctions.ReadZeroTerminatedAscii(reader, fileNameBuffer).ToLower();
 
                     var packFileName = Path.GetFileName(fullPackedFileName);
-                    var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size));
+                    var isEncrypted = output.Header.HasEncryptedData;
+                    var fileContent = new PackFile(packFileName, new PackedFileSource(packedFileSourceParent, offset, size, isEncrypted));
 
                     if (dubplicatePackFileResolver.CheckForDuplicates)
                     {
@@ -89,7 +94,7 @@ namespace Shared.Core.PackFiles
                         output.FileList.Add(fullPackedFileName, fileContent);
                     }
 
-                
+
                     offset += size;
                 }
 
@@ -116,11 +121,15 @@ namespace Shared.Core.PackFiles
             var pack_file_count = reader.ReadUInt32();              // 20
             var packed_file_index_size = reader.ReadUInt32();       // 24
 
+            if (header.HasEncryptedIndex)
+            {
+                var filesRemaining = header.ReferenceFileCount;
+                packed_file_index_size = DecryptAndReadU32(reader, filesRemaining);
+            }
+
             // Read the buffer of data stuff
             if (header.Version == PackFileVersion.PFH0)
-            {
                 header.Buffer = new byte[0];
-            }
             else if (header.Version == PackFileVersion.PFH2 || header.Version == PackFileVersion.PFH3)
             {
                 header.Buffer = reader.ReadBytes(8);
@@ -159,7 +168,6 @@ namespace Shared.Core.PackFiles
             return header;
         }
 
-
         public static void WriteHeader(PFHeader header, uint fileContentSize, BinaryWriter writer)
         {
             var packFileTypeStr = PackFileVersionConverter.ToString(header.Version);        // 4
@@ -176,7 +184,6 @@ namespace Shared.Core.PackFiles
             writer.Write(pack_file_index_size);                                             // 16
             writer.Write(header.FileCount);                                                 // 20
             writer.Write(fileContentSize);                                                  // 24
-
 
             switch (header.Version)
             {
