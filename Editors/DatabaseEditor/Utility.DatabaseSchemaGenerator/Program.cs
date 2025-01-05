@@ -14,7 +14,7 @@ namespace Utility.DatabaseSchemaGenerator
 
         static void CreateDatabase()
         {
-            var dbHandler = new DbSchemaBuilder();
+            var dbHandler = new DbSchemaBuilder(null);
             var pfs = CreatePackFileService();
             var databasePath = "app.db";
 

@@ -267,7 +267,7 @@ namespace Utility.DatabaseSchemaGenerator.Examples
                         //copy.ColumnMappings.Add(nameof(Customer.FirstName), "FirstName");
 
 
-                        copy.WriteToServer(dt);
+                       // copy.WriteToServer(dt);
                     }
                  
                     Console.WriteLine($"{tableSchema.Name} - {parsedTables}/{tableSchemas.Count}");
