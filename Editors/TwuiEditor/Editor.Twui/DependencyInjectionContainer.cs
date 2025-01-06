@@ -1,7 +1,7 @@
 ﻿using Editors.Twui.Editor;
 using Editors.Twui.Editor.ComponentEditor;
 using Editors.Twui.Editor.Presentation;
-using Editors.Twui.Editor.PreviewRendering;
+using Editors.Twui.Editor.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.DevConfig;
@@ -17,6 +17,7 @@ namespace Editors.Twui
             serviceCollection.AddScoped<TwuiMainView>();
 
             serviceCollection.AddScoped<ComponentManger>();
+            serviceCollection.AddScoped<TwuiRenderComponent>();
             serviceCollection.AddScoped<TwuiPreviewBuilder>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
