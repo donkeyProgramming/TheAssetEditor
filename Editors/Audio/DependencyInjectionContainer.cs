@@ -1,6 +1,6 @@
 ﻿using Audio.AudioExplorer;
 using Audio.Compiler;
-using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.AudioProject;
 using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.AudioEditor.Views;
 using Editors.Audio.AudioExplorer;
@@ -30,9 +30,13 @@ namespace Editors.Audio
             serviceCollection.AddScoped<CompilerView>();
             serviceCollection.AddScoped<CompilerViewModel>();
 
-            RegisterWindow<AudioEditorSettingsWindow>(serviceCollection);
-            serviceCollection.AddScoped<AudioEditorSettingsViewModel>();
+            serviceCollection.AddTransient<NewAudioProjectWindow>();
+            serviceCollection.AddScoped<NewAudioProjectViewModel>();
+
             serviceCollection.AddScoped<AudioEditorViewModel>();
+            serviceCollection.AddScoped<AudioEditorView>();
+
+            serviceCollection.AddScoped<IAudioProjectService, AudioProjectService>();
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();

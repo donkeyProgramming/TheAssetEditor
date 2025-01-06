@@ -12,11 +12,13 @@ namespace Editors.Audio.Storage
 {
     public interface IAudioRepository
     {
+        Dictionary<uint, List<HircItem>> HircObjects { get; }
+        Dictionary<uint, List<DidxAudio>> DidxAudioObject { get; }
+        Dictionary<string, PackFile> PackFileMap { get; }
         Dictionary<uint, string> NameLookUpTable { get; }
         Dictionary<string, List<string>> DialogueEventsWithStateGroups { get; }
+        Dictionary<string, Dictionary<string, string>> DialogueEventsWithStateGroupsWithQualifiersAndStateGroups { get; }
         Dictionary<string, List<string>> StateGroupsWithStates { get; }
-        Dictionary<uint, List<HircItem>> HircObjects { get; }
-        Dictionary<string, PackFile> PackFileMap { get; }
 
         void ExportNameListToFile(string outputDirectory, bool includeIds = false);
         List<T> GetAllOfType<T>() where T : HircItem;
