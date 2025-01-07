@@ -45,7 +45,6 @@ namespace Editors.Twui.Editor.Rendering
             _twuiPreview = _twuiPreviewBuilder.UpdateTexture(twuiFile, selectedComponent);
         }
 
-
         public override void Draw(GameTime gameTime)
         {
             _wpfGame.GraphicsDevice.Clear(Color.Black);
@@ -62,9 +61,6 @@ namespace Editors.Twui.Editor.Rendering
             _spriteBatch.Draw(_twuiPreview, destinationRectangle, Color.White);
             _spriteBatch.End();
         }
-
-
-
 
         Rectangle ComputeAspectCorrectDrawingRectangle()
         {

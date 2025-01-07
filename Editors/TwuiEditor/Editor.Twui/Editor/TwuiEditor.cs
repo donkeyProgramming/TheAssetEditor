@@ -32,10 +32,8 @@ namespace Editors.Twui.Editor
             _componentManager = componentEditor;
             _scene = wpfGame;
 
-
             wpfGame.ForceEnsureCreated();
             previewBuilder.Initialize();
-
 
             wpfGame.AddComponent(previewBuilder);
         }

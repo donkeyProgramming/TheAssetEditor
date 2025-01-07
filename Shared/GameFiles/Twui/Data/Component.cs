@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.Xna.Framework;
+using Shared.GameFormats.Twui.Data.DataTypes;
 
 namespace Shared.GameFormats.Twui.Data
 {
@@ -16,7 +17,8 @@ namespace Shared.GameFormats.Twui.Data
         public string Uniqueguid_in_template { get; set; } = string.Empty;
         public string Uniqueguid { get; set; } = string.Empty;
         public Vector2 Dimensions { get; set; } = new(0, 0);
-        public string Dock_point { get; set; } = string.Empty;
+        public DockingVertical DockingVertical { get; set; } = DockingVertical.None;
+        public DockingHorizontal DockingHorizontal { get; set; } = DockingHorizontal.None;
         public bool Tooltips_localised { get; set; } = false;
         public Vector2 Offset { get; set; } = new(0, 0);
         public float Priority { get; set; } = 100;

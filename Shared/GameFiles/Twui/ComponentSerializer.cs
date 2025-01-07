@@ -1,5 +1,6 @@
 ﻿using System.Xml.Linq;
 using Shared.GameFormats.Twui.Data;
+using Shared.GameFormats.Twui.Data.DataTypes;
 
 namespace Shared.GameFormats.Twui
 {
@@ -30,7 +31,6 @@ namespace Shared.GameFormats.Twui
             output.Uniqueguid_in_template = AssignAttribute(output.Uniqueguid_in_template, componentNode);
             output.Uniqueguid = AssignAttribute(output.Uniqueguid, componentNode);
             output.Dimensions = AssignAttribute(output.Dimensions, componentNode);
-            output.Dock_point = AssignAttribute(output.Dock_point, componentNode);
             output.Tooltips_localised = AssignAttribute(output.Tooltips_localised, componentNode);
             output.Offset = AssignAttribute(output.Offset, componentNode);
             output.Priority = AssignAttribute(output.Priority, componentNode);
@@ -40,9 +40,17 @@ namespace Shared.GameFormats.Twui
             output.Currentstate = AssignAttribute(output.Currentstate, componentNode);
             output.Allowhorizontalresize = AssignAttribute(output.Allowhorizontalresize, componentNode);
             output.Allowverticalresize = AssignAttribute(output.Allowverticalresize, componentNode);
+
+            DockingParser.ConvertFrom(componentNode, out var horizontal, out var vertical);
+            output.DockingVertical = vertical;
+            output.DockingHorizontal = horizontal; 
+
+            // States
             var states = componentNode.Element("states");
             output.States = SerializeComponentState(states);
 
+
+            // Component images
             var componentImageNodes = componentNode.Element("componentimages");
             output.ComponentImages = SerializeComponentImage(componentImageNodes);
 

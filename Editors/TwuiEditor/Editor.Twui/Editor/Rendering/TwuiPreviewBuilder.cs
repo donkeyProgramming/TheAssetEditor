@@ -6,6 +6,8 @@ using Shared.GameFormats.Twui.Data;
 
 //https://github.com/Apostolique/Apos.Gui/blob/main/Source/Dock.cs
 
+
+
 namespace Editors.Twui.Editor.Rendering
 {
     public class TwuiPreviewBuilder
@@ -85,7 +87,8 @@ namespace Editors.Twui.Editor.Rendering
             // Take into account colour
             // Take into account state
 
-            var compnentLocalSpace = localSpace + currentComponent.Offset;
+            var computedLocalSpace = ComponentCoordinateHelper.GetLocalCoordinateSpace(currentComponent, Rectangle.Empty);
+            var compnentLocalSpace = localSpace + computedLocalSpace;
 
             foreach (var image in currentComponent.ComponentImages)
             {
@@ -95,7 +98,6 @@ namespace Editors.Twui.Editor.Rendering
                 var texture = _resourceLibrary.LoadTexture(image.ImagePath);
                 if (texture == null)
                     continue;
-
 
                 var compnentWidth = texture.Width;
                 var compnentHeight = texture.Height;
@@ -111,10 +113,14 @@ namespace Editors.Twui.Editor.Rendering
                     // Draw ancor point
                     // Draw local space point
                 }
-
             }
 
             return localSpace + currentComponent.Offset;
+        }
+
+        void DrawComponentSpaceOutline(Rectangle componentRectable)
+        { 
+        
         }
 
     }
