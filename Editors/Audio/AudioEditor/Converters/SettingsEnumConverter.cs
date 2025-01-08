@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
-using Editors.Audio.GameSettings.Warhammer3;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
+using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
+using static Editors.Audio.GameSettings.Warhammer3.Languages;
+using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.Converters
 {
@@ -12,14 +14,20 @@ namespace Editors.Audio.AudioEditor.Converters
         {
             if (value == null)
                 return value;
-            else if (value is Languages.GameLanguage language)
-                return Languages.GameLanguageToStringMap[language];
-            else if (value is SoundBanks.GameSoundBank soundbank)
-                return SoundBanks.GetDisplayString(soundbank);
-            else if (value is DialogueEvents.DialogueEventPreset dialogueEventSubtype)
-                return DialogueEvents.GetDisplayString(dialogueEventSubtype);
-            else if (value is PlayType playType)
-                return GetPlayTypeString(playType);
+            else if (value is GameLanguage language)
+                return GameLanguageToStringMap[language];
+            else if (value is GameSoundBank soundbank)
+                return GetDisplayString(soundbank);
+            else if (value is DialogueEventPreset dialogueEventSubtype)
+                return GetDisplayString(dialogueEventSubtype);
+            else if (value is PlaylistType playlistType)
+                return PlaylistTypeToStringMap[playlistType];
+            else if (value is PlaylistMode playlistMode)
+                return PlaylistModeToStringMap[playlistMode];
+            else if (value is EndBehaviour endBehaviour)
+                return EndBehaviourToStringMap[endBehaviour];
+            else if (value is Transition transition)
+                return TransitionToStringMap[transition];
             else
                 return null;
         }

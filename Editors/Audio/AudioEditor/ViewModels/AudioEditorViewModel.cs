@@ -32,8 +32,9 @@ namespace Editors.Audio.AudioEditor.ViewModels
         private readonly IAudioRepository _audioRepository;
         private readonly IPackFileService _packFileService;
         private readonly IAudioProjectService _audioProjectService;
-        private readonly PackFileTreeViewFactory _packFileBrowserBuilder;
         private readonly IStandardDialogs _packFileUiProvider;
+
+        public AudioSettingsViewModel AudioSettingsViewModel { get; set; } = new();
 
         public string DisplayName { get; set; } = "Audio Editor";
 
@@ -69,12 +70,11 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [ObservableProperty] private bool _isShowModdedStatesCheckBoxEnabled = false;
         [ObservableProperty] private bool _isPasteEnabled = true;
 
-        public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IAudioProjectService audioProjectService, PackFileTreeViewFactory packFileBrowserBuilder, IStandardDialogs packFileUiProvider)
+        public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;
             _audioProjectService = audioProjectService;
-            _packFileBrowserBuilder = packFileBrowserBuilder;
             _packFileUiProvider = packFileUiProvider;
 
             InitialiseCollections();

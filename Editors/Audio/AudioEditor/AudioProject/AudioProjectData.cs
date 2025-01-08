@@ -62,11 +62,19 @@ namespace Editors.Audio.AudioEditor.AudioProject
         public State State { get; set; }
     }
 
-    public class AudioProjectData
+    public class AudioSettings
     {
-        public string Language { get; set; }
-        public ObservableCollection<SoundBank> SoundBanks { get; set; } = [];
-        public ObservableCollection<StateGroup> ModdedStates { get; set; } = [];
-        [JsonIgnore] public ObservableCollection<object> AudioProjectTreeViewItems { get; set; } = [];
+        public PlaylistType PlaylistType { get; set; }
+        public decimal Volume { get; set; }
+        public decimal InitialDelay { get; set; }
+        public PlaylistMode PlaylistMode { get; set; }
+        public uint RepetitionInterval { get; set; }
+        public EndBehaviour EndBehaviour { get; set; }
+        public bool IsLoopingEnabled { get; set; }
+        public bool IsLoopingInfinitely { get; set; }
+        public uint NumberOfLoops { get; set; }
+        public bool IsTransitionsEnabled { get; set; }
+        public Transition Transition { get; set; }
+        public decimal Duration { get; set; }
     }        
 }
