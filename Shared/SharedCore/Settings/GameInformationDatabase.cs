@@ -20,28 +20,39 @@
     }
 
     public enum GameBnkVersion : uint
-    { 
-        Unknown = 0,
+    {
+        Unsupported = 0,
         Warhammer3 = 2147483784,
         Attila = 112
     }
 
+    public enum PackFileVersion
+    {
+        PFH0,
+        PFH2,
+        PFH3,
+        PFH4,
+        PFH5,
+        PFH6
+    }
+
     public enum WsModelVersion
-    { 
-        Version1,   // ThreeKingdoms, Troy, Warhammer2
-        Version2,   // Troy
-        Version3,   // Warhammer3
+    {
+        Unknown = 0,
+        Version1,
+        Version2,
+        Version3,
     }
 
     //RmvVersionEnum
 
-    public class GameInformation(GameTypeEnum gameType, string displayName, string defaultPackType, uint? bankGeneratorVersion)
+    public class GameInformation(GameTypeEnum gameType, string displayName, PackFileVersion packFileVersion, GameBnkVersion bankGeneratorVersion, WsModelVersion wsModelVersion)
     {
         public GameTypeEnum Type { get; } = gameType;
         public string DisplayName { get; } = displayName;
-        public string DefaultPackType { get; } = defaultPackType;
-
-        public uint? BankGeneratorVersion { get; } = bankGeneratorVersion;
+        public PackFileVersion PackFileVersion { get; } = packFileVersion;
+        public GameBnkVersion BankGeneratorVersion { get; } = bankGeneratorVersion;
+        public WsModelVersion WsModelVersion { get; } = wsModelVersion;
     }
 
     public static class GameInformationDatabase
@@ -50,16 +61,16 @@
 
         static GameInformationDatabase()
         {
-            var Warhammer = new GameInformation(GameTypeEnum.Warhammer,  "Warhammer",  "PFH4",  null );
-            var Warhammer2 = new GameInformation(GameTypeEnum.Warhammer2,  "Warhammer II",  "PFH5", null );
-            var Warhammer3 = new GameInformation(GameTypeEnum.Warhammer3, "Warhammer III", "PFH5", 2147483784);
-            var Troy = new GameInformation(GameTypeEnum.Troy, "Troy",  "PFH5",  null );
-            var ThreeKingdoms = new GameInformation( GameTypeEnum.ThreeKingdoms,  "Three Kingdoms",  "PFH5",  null );
-            var Rome2 = new GameInformation(GameTypeEnum.Rome2, "Rome II", "PFH5", null );
-            var Attila = new GameInformation(GameTypeEnum.Attila,  "Attila",  "PFH5",  112 );
-            var Pharaoh = new GameInformation(GameTypeEnum.Pharaoh,  "Pharaoh",  "PFH5",  null );
+            var warhammer = new GameInformation(GameTypeEnum.Warhammer, "Warhammer", PackFileVersion.PFH4, GameBnkVersion.Unsupported, WsModelVersion.Unknown );
+            var warhammer2 = new GameInformation(GameTypeEnum.Warhammer2, "Warhammer II", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Version1 );
+            var warhammer3 = new GameInformation(GameTypeEnum.Warhammer3, "Warhammer III", PackFileVersion.PFH5, GameBnkVersion.Warhammer3, WsModelVersion.Version3);
+            var troy = new GameInformation(GameTypeEnum.Troy, "Troy", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Unknown);
+            var threeKingdoms = new GameInformation( GameTypeEnum.ThreeKingdoms, "Three Kingdoms", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Version1 );
+            var rome2 = new GameInformation(GameTypeEnum.Rome2, "Rome II", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Unknown);
+            var attila = new GameInformation(GameTypeEnum.Attila, "Attila", PackFileVersion.PFH5, GameBnkVersion.Attila, WsModelVersion.Unknown);
+            var pharaoh = new GameInformation(GameTypeEnum.Pharaoh, "Pharaoh", PackFileVersion.PFH5, GameBnkVersion.Unsupported, WsModelVersion.Unknown);
 
-            Games = [Warhammer, Warhammer2, Warhammer3, Troy, ThreeKingdoms, Rome2, Attila, Pharaoh];
+            Games = [warhammer, warhammer2, warhammer3, troy, threeKingdoms, rome2, attila, pharaoh];
         }
 
         public static GameInformation GetGameById(GameTypeEnum type)
