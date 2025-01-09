@@ -1,5 +1,4 @@
-﻿using GameWorld.Core.Rendering.Materials;
-using GameWorld.Core.Rendering.Materials.Serialization;
+﻿using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.SceneNodes;
 using Shared.Core.Settings;
 
@@ -22,7 +21,7 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
 
         public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
         {
-            var input = WsModelGeneratorInputHelper.Create(mainNode);
+            var input = WsModelGeneratorInputHelper.Create(mainNode, onlyVisibleNodes);
             _wsModelGeneratorService.GenerateWsModel(_wsMaterialGeneratorFactory.CreateInstance(GameTypeEnum.Warhammer2), outputPath, input);
         }
     }

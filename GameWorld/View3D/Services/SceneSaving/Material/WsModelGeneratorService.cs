@@ -108,14 +108,14 @@ namespace GameWorld.Core.Services.SceneSaving.Material
 
     public static class WsModelGeneratorInputHelper
     {
-        public static List<WsModelGeneratorInput> Create(MainEditableNode node)
+        public static List<WsModelGeneratorInput> Create(MainEditableNode node, bool onlyVisibleNodes)
         {
             var lodNodes = node.GetLodNodes();
             var output = new List<WsModelGeneratorInput>();
 
             for (var lodIndex = 0; lodIndex < lodNodes.Count; lodIndex++)
             {
-                var meshes = node.GetMeshesInLod(lodIndex, false);
+                var meshes = node.GetMeshesInLod(lodIndex, onlyVisibleNodes);
 
                 for (var meshPart = 0; meshPart < meshes.Count; meshPart++)
                 {
