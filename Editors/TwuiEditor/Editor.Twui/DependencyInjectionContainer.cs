@@ -25,10 +25,10 @@ namespace Editors.Twui
 
         public override void RegisterTools(IEditorDatabase editorDatabase)
         {
-            EditorInfoBuilder
-                .Create<TwuiEditor, TwuiMainView>(EditorEnums.Twui_Editor)
-                .AddExtention(".twui.xml", EditorPriorites.High)
-                .Build(editorDatabase);
+            //EditorInfoBuilder
+            //    .Create<TwuiEditor, TwuiMainView>(EditorEnums.Twui_Editor)
+            //    .AddExtention(".twui.xml", EditorPriorites.High)
+            //    .Build(editorDatabase);
         }
     }
 }
