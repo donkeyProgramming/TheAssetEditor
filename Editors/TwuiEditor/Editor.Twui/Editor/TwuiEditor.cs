@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Twui.Editor.ComponentEditor;
 using Editors.Twui.Editor.Events;
-using Editors.Twui.Editor.PreviewRendering;
+using Editors.Twui.Editor.Rendering;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
@@ -26,7 +26,7 @@ namespace Editors.Twui.Editor
         [ObservableProperty] ComponentManger _componentManager;
         [ObservableProperty] IWpfGame _scene;
 
-        public TwuiEditor(IEventHub eventHub, ComponentManger componentEditor, TwuiPreviewBuilder previewBuilder, IWpfGame wpfGame)
+        public TwuiEditor(IEventHub eventHub, ComponentManger componentEditor, TwuiRenderComponent previewBuilder, IWpfGame wpfGame)
         {
             _eventHub = eventHub;
             _componentManager = componentEditor;
