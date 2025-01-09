@@ -4,7 +4,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 {
     public class CAkEvent_V136 : HircItem, ICAkEvent
     {
-        public uint ActionListSize { get; set; }
+        public byte ActionListSize { get; set; }
         public List<Action_V136> Actions { get; set; } = [];
 
         protected override void ReadData(ByteChunk chunk)

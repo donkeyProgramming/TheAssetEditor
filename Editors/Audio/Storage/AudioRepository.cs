@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,7 +7,6 @@ using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Didx;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
-using Shared.GameFormats.Wwise.Hirc.V136;
 
 namespace Editors.Audio.Storage
 {
@@ -46,7 +44,7 @@ namespace Editors.Audio.Storage
 
             var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
             var gameBankGeneratorVersion = gameInformation.BankGeneratorVersion;
-            if (gameBankGeneratorVersion != null)
+            if (gameBankGeneratorVersion != GameBnkVersion.Unsupported)
             {
                 provider.LoadDatData(audioData);
                 provider.LoadBnkData(audioData);

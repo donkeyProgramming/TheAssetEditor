@@ -105,9 +105,6 @@ namespace Editors.Audio.BnkCompiler.Validation
     {
         public SettingsValidator()
         {
-            RuleFor(x => x.Version)
-                .Must(x => x == 1).WithMessage("Only version one is allowed");
-
             RuleFor(x => x.OutputGame)
                 .NotEmpty().WithMessage($"Output game not selected. Only '{CompilerConstants.GameWarhammer3}' is supported")
                 .Must(x => string.Compare(x, CompilerConstants.GameWarhammer3, StringComparison.InvariantCultureIgnoreCase) == 0).WithMessage("Only warhammer 3 is supported");

@@ -56,7 +56,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
             var bitVectorId = ByteHelper.GetPropertyTypeSize(BitVector);
 
             return NodeInitialFxParams.GetSize() + (overrideAttachmentSize + overrideBusIdSize + directParentId + bitVectorId)
-                   + NodeInitialParams.GetSize() + PositioningParams.GetSize() + AuxParams.GetSize() + AdvSettingsParams.GetSize() + InitialRtpc.GetSize();
+                   + NodeInitialParams.GetSize() + PositioningParams.GetSize() + AuxParams.GetSize() + AdvSettingsParams.GetSize() + StateChunk.GetSize() + InitialRtpc.GetSize();
         }
     }
 }

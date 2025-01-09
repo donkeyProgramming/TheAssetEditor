@@ -1,6 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Settings;
 using static Shared.Core.PackFiles.PackFileDecrypter;
 
 namespace Shared.Core.PackFiles
