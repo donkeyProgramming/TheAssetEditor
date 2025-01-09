@@ -8,6 +8,7 @@ using Editors.Audio.Storage;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Settings;
 using static Editors.Audio.BnkCompiler.ProjectLoaderHelpers;
 
 namespace Editors.Audio.BnkCompiler
@@ -15,8 +16,8 @@ namespace Editors.Audio.BnkCompiler
     public class ProjectLoader
     {
         private readonly IPackFileService _packFileService;
-        public static readonly Dictionary<uint, uint> EventMixers = new Dictionary<uint, uint>();
-        public static readonly Dictionary<uint, uint> DialogueEventMixers = new Dictionary<uint, uint>();
+        public static Dictionary<uint, uint> EventMixers = new Dictionary<uint, uint>();
+        public static Dictionary<uint, uint> DialogueEventMixers = new Dictionary<uint, uint>();
         public static readonly IVanillaObjectIds VanillaObjectIds = new WwiseIdProvider();
         private readonly IAudioRepository _audioRepository;
 
@@ -26,7 +27,7 @@ namespace Editors.Audio.BnkCompiler
             _audioRepository = audioRepository;
         }
 
-        public Result<CompilerData> LoadProject(string path, CompilerSettings settings)
+        public Result<CompilerData> LoadProject(string path, CompilerSettings settings, ApplicationSettingsService applicationSettingsService)
         {
             // Find packfile
             var packfile = _packFileService.FindFile(path);
@@ -34,10 +35,12 @@ namespace Editors.Audio.BnkCompiler
                 return Result<CompilerData>.FromError("BnkCompiler-Loader", $"Unable to find file '{path}'");
 
             // Load project
-            return LoadProject(packfile, settings);
+            var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+            var gameBankGeneratorVersion = (uint)gameInformation.BankGeneratorVersion;
+            return LoadProject(packfile, settings, gameBankGeneratorVersion);
         }
 
-        public Result<CompilerData> LoadProject(PackFile packfile, CompilerSettings settings)
+        public Result<CompilerData> LoadProject(PackFile packfile, CompilerSettings settings, uint gameBankGeneratorVersion)
         {
             try
             {
@@ -62,7 +65,7 @@ namespace Editors.Audio.BnkCompiler
                     return Result<CompilerData>.FromError(validateInputResult.LogItems);
 
                 // Convert and validate to compiler input
-                var compilerData = ConvertInputToCompilerData(_audioRepository, projectFile, settings);
+                var compilerData = ConvertInputToCompilerData(_audioRepository, projectFile, settings, gameBankGeneratorVersion);
 
                 SaveCompilerDataToPackFile(compilerData, settings, packfile);
 
@@ -122,10 +125,10 @@ namespace Editors.Audio.BnkCompiler
             return Result<bool>.FromOk(true);
         }
 
-        private static CompilerData ConvertInputToCompilerData(IAudioRepository audioRepository, CompilerInputProject input, CompilerSettings settings)
+        private static CompilerData ConvertInputToCompilerData(IAudioRepository audioRepository, CompilerInputProject input, CompilerSettings settings, uint gameBankGeneratorVersion)
         {
             var compilerData = new CompilerData();
-            compilerData.ProjectSettings.Version = 1;
+            compilerData.ProjectSettings.Version = gameBankGeneratorVersion;
             compilerData.ProjectSettings.BnkName = input.Settings.BnkName;
             compilerData.ProjectSettings.Language = input.Settings.Language;
             //compilerData.ProjectSettings.WwiseStartId = input.Settings.WwiseStartId;

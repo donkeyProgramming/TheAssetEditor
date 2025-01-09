@@ -6,6 +6,7 @@ using Editors.Audio.Storage;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
+using Shared.Core.Settings;
 using Shared.GameFormats.Dat;
 using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Bkhd;
@@ -36,7 +37,7 @@ namespace Editors.Audio.BnkCompiler
             _packFileService = packFileService;
         }
 
-        public Result<CompileResult> CompileProject(CompilerData audioProject)
+        public Result<CompileResult> CompileProject(CompilerData audioProject, ApplicationSettingsService applicationSettingsService)
         {
             // Build the wwise object graph. 
             var header = BnkHeaderBuilder.Generate(audioProject);
@@ -52,10 +53,13 @@ namespace Editors.Audio.BnkCompiler
             var eventDat = audioProject.Events.Count == 0 ? null : BuildEventDataDat(audioProject);
             var statesDat = audioProject.DialogueEvents.Count == 0 ? null : BuildStateDataDat(audioProject);
 
+            var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+            var gameBankGeneratorVersion = (uint)gameInformation.BankGeneratorVersion;
+
             var compileResult = new CompileResult()
             {
                 Project = audioProject,
-                OutputBnkFile = ConvertToPackFile(header, hircChunk, audioProject.ProjectSettings.BnkName),
+                OutputBnkFile = ConvertToPackFile(header, hircChunk, audioProject.ProjectSettings.BnkName, gameBankGeneratorVersion),
                 OutputEventDatFile = eventDat,
                 OutputStateDatFile = statesDat,
             };
@@ -63,11 +67,11 @@ namespace Editors.Audio.BnkCompiler
             return Result<CompileResult>.FromOk(compileResult);
         }
 
-        private static PackFile ConvertToPackFile(BkhdChunk header, HircChunk hircChunk, string outputFile)
+        private static PackFile ConvertToPackFile(BkhdChunk header, HircChunk hircChunk, string outputFile, uint gameBankGeneratorVersion)
         {
             var outputName = $"{outputFile}.bnk";
             var headerBytes = BkhdParser.WriteData(header);
-            var hircBytes = new HircParser().WriteData(hircChunk);
+            var hircBytes = new HircParser().WriteData(hircChunk, gameBankGeneratorVersion);
 
             // Write
             using var memStream = new MemoryStream();

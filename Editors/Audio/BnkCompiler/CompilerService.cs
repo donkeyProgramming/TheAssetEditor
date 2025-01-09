@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using Shared.Core.ErrorHandling;
+using Shared.Core.Settings;
 
 namespace Editors.Audio.BnkCompiler
 {
@@ -22,18 +23,20 @@ namespace Editors.Audio.BnkCompiler
         Compiler _compiler;
         ResultHandler _resultHandler;
         AudioFileImporter _audioFileImporter;
+        ApplicationSettingsService _applicationSettingsService;
 
-        public CompilerService(ProjectLoader loader, AudioFileImporter audioFileImporter, Compiler compiler, ResultHandler resultHandler)
+        public CompilerService(ProjectLoader loader, AudioFileImporter audioFileImporter, Compiler compiler, ResultHandler resultHandler, ApplicationSettingsService applicationSettingsService)
         {
             _loader = loader;
             _audioFileImporter = audioFileImporter;
             _compiler = compiler;
             _resultHandler = resultHandler;
+            _applicationSettingsService = applicationSettingsService;
         }
 
         public Result<bool> Compile(string packFilePath, CompilerSettings settings)
         {
-            var project = _loader.LoadProject(packFilePath, settings);
+            var project = _loader.LoadProject(packFilePath, settings, _applicationSettingsService);
             if (project.IsSuccess == false)
                 return Result<bool>.FromError(project.LogItems);
 
@@ -41,7 +44,7 @@ namespace Editors.Audio.BnkCompiler
             if (importResult.IsSuccess == false)
                 return Result<bool>.FromError(importResult.LogItems);
 
-            var compilerOutput = _compiler.CompileProject(project.Item);
+            var compilerOutput = _compiler.CompileProject(project.Item, _applicationSettingsService);
             if (compilerOutput.IsSuccess == false)
                 return Result<bool>.FromError(compilerOutput.LogItems);
 

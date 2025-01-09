@@ -36,12 +36,18 @@
     public class GameInformationBuilder()
     {
         private GameInformation _instance;
+
         public static GameInformationBuilder Create(GameTypeEnum type, string displayName)
         {
             return new GameInformationBuilder()
             {
-                _instance = new GameInformation(type, displayName, "PFH5", null)
+                _instance = new GameInformation(type, displayName, Settings.PackFileVersion.PFH5, Settings.GameBnkVersion.Unsupported, Settings.WsModelVersion.Unknown)
             };
+        }
+
+        public GameInformationBuilder PackFileVersion(uint version)
+        {
+            return this;
         }
 
         public GameInformationBuilder ShaderVersion(int version)
@@ -64,7 +70,7 @@
             return this;
         }
 
-        public GameInformationBuilder WwiseBankGeneratorVersion(uint version)
+        public GameInformationBuilder GameBnkVersion(uint version)
         {
             return this;
         }

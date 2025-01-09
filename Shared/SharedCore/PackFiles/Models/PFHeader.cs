@@ -1,4 +1,6 @@
-﻿namespace Shared.Core.PackFiles.Models
+﻿using Shared.Core.Settings;
+
+namespace Shared.Core.PackFiles.Models
 {
     public enum PackFileCAType : uint
     {
@@ -7,16 +9,6 @@
         PATCH = 2,
         MOD = 3,
         MOVIE = 4,
-    }
-
-    public enum PackFileVersion
-    {
-        PFH0,
-        PFH2,
-        PFH3,
-        PFH4,
-        PFH5,
-        PFH6
     }
 
     public static class PFHFlags

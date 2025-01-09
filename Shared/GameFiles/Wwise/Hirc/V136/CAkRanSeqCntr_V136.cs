@@ -54,7 +54,6 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             memStream.Write(ByteParsers.Byte.EncodeValue(Mode, out _));
             memStream.Write(ByteParsers.Byte.EncodeValue(BitVector, out _));
             memStream.Write(Children.WriteData());
-            memStream.Write(ByteParsers.UShort.EncodeValue(CAkPlayList.PlayListItem, out _));
             memStream.Write(CAkPlayList.WriteData());
             var byteArray = memStream.ToArray();
 
@@ -105,7 +104,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             public byte[] WriteData()
             {
                 using var memStream = new MemoryStream();
-                memStream.Write(ByteParsers.UShort.EncodeValue(PlayListItem, out _));
+                memStream.Write(ByteParsers.UShort.EncodeValue((ushort)Playlist.Count, out _));
                 foreach (var playlistItem in Playlist)
                     memStream.Write(playlistItem.WriteData());
                 return memStream.ToArray();
@@ -117,7 +116,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 uint playListSize = 0;
                 foreach (var playlistItem in Playlist)
                     playListSize += playlistItem.GetSize();
-                return playListItemSize + playListItemSize;
+                return playListItemSize + playListSize;
             }
 
             public class AkPlaylistItem_V136
