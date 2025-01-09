@@ -17,15 +17,14 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
 {
     public class AnimationBinWh3FileToXmlConverter : BaseAnimConverter<AnimationBinWh3FileToXmlConverter.XmlFormat, AnimationBinWh3>
     {
-        private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private string AnimationPersistanceMetaFileName = "";
-        private Dictionary<string, uint> AnimationsVersionFoundInPersistenceMeta = new();
+        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private string _animationPersistanceMetaFileName = "";
+        private readonly Dictionary<string, uint> _animationsVersionFoundInPersistenceMeta = new();
 
         public AnimationBinWh3FileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
         }
-
 
         protected override string CleanUpXml(string xmlText)
         {
@@ -172,7 +171,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
                     errorList.Error("Name", $"The name of the bin file has to be the same as the provided name. {filename} vs {type.Data.Name}");
             }
 
-            AnimationsVersionFoundInPersistenceMeta.Clear();
+            _animationsVersionFoundInPersistenceMeta.Clear();
             foreach (var animation in type.Animations)
             {
                 var slot = slotHelper.GetfromValue(animation.Slot);
@@ -180,13 +179,16 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
                     errorList.Error(animation.Slot, $"Not a valid animation slot for game");
 
                 if (animation.Ref == null || animation.Ref.Count == 0)
+                {
                     errorList.Warning(animation.Slot, "Slot does not have any animations");
+                    continue;
+                }
 
                 foreach (var animationRef in animation.Ref)
                 {
                     if (pfs.FindFile(animationRef.File) == null)
                         errorList.Warning(animation.Slot, $"Animation file {animationRef.File} is not found");
-                    else if (!IsAnimFile(animationRef.File, pfs))
+                    else if (!IsAnimFile(animationRef.File, pfs, errorList, animation.Slot))
                         errorList.Warning(animation.Slot, $"Animation file {animationRef.File} does not appears to be a valid animation file");
                     else if (string.IsNullOrWhiteSpace(animationRef.File))
                         errorList.Warning(animation.Slot, $"Animation file {animationRef.File} contain whitespace which could trigger a tpose");
@@ -195,7 +197,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
 
                     if (pfs.FindFile(animationRef.Meta) == null)
                         errorList.Warning(animation.Slot, $"Meta file {animationRef.Meta} is not found");
-                    else if (!IsAnimMetaFile(animationRef.Meta, pfs))
+                    else if (!IsAnimMetaFile(animationRef.Meta, pfs, errorList, animation.Slot))
                         errorList.Warning(animation.Slot, $"Meta file {animationRef.Meta} does not appear to be a valid meta animation");
                     else
                     {
@@ -207,7 +209,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
 
                     if (pfs.FindFile(animationRef.Sound) == null)
                         errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} is not found");
-                    else if (!IsSndMetaFile(animationRef.Sound, pfs))
+                    else if (!IsSndMetaFile(animationRef.Sound, pfs, errorList, animation.Slot))
                         errorList.Warning(animation.Slot, $"Sound file {animationRef.Sound} does not appear to be a valid meta sound");
                 }
             }
@@ -221,30 +223,48 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
             return null;
         }
 
-        private bool IsAnimFile(string file, IPackFileService pfs)
+        private bool IsAnimFile(string file, IPackFileService pfs, ErrorList errorList, string animationSlot)
         {
             var endsWithAnim = file.EndsWith(".anim");
 
             var theFile = pfs.FindFile(file);
+            if (theFile == null)
+            {
+                errorList.Warning(animationSlot, $"Inable to locate {file} for {animationSlot}");
+                return false;
+            }
+
             var data = theFile.DataSource.ReadData(20);
             var headerIsReallyAnimFile = data[0] == 0x06 || data[0] == 0x07 || data[0] == 0x08; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithAnim && headerIsReallyAnimFile;
         }
-        private bool IsAnimMetaFile(string file, IPackFileService pfs)
+
+        private bool IsAnimMetaFile(string file, IPackFileService pfs, ErrorList errorList, string animationSlot)
         {
             var endsWithDotMeta = file.EndsWith(".anm.meta") || file.EndsWith(".meta");
 
             var theFile = pfs.FindFile(file);
+            if (theFile == null)
+            {
+                errorList.Warning(animationSlot, $"Inable to locate {file} for {animationSlot}");
+                return false;
+            }
             var data = theFile.DataSource.ReadData(20);
             var headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithDotMeta && headerIsReallyAnimMetaFile;
         }
 
-        private bool IsSndMetaFile(string file, IPackFileService pfs)
+        private bool IsSndMetaFile(string file, IPackFileService pfs, ErrorList errorList, string animationSlot)
         {
             var endsWithDotMeta = file.EndsWith(".snd.meta");
 
             var theFile = pfs.FindFile(file);
+            if (theFile == null)
+            {
+                errorList.Warning(animationSlot, $"Inable to locate {file} for {animationSlot}");
+                return false;
+            }
+
             var data = theFile.DataSource.ReadData(20);
             var headerIsReallyAnimMetaFile = data[0] == 0x02; //check if version is not 6 7 8 (or just check if it's 2)
             return endsWithDotMeta && headerIsReallyAnimMetaFile;
@@ -254,8 +274,12 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
         {
             var result = true;
 
-
             var theFile = pfs.FindFile(metaFile);
+            if (theFile == null)
+            {
+                errorList.Warning(animationSlot, $"Inable to locate {metaFile} for {animationSlot}");
+                return false;
+            }
             var data = theFile.DataSource.ReadData();
             var parsed = new MetaDataFileParser().ParseFile(data);
 
@@ -283,12 +307,19 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
                         continue;
                     }
 
-                    var animationVersion = GetAnimationHeader(animPath, pfs).Version;
+                    var parsedHeader = GetAnimationHeader(animPath, pfs);
+                    if (parsedHeader == null)
+                    {
+                        errorList.Warning(animationSlot, $"Unable to determine header for {animPath} in slot {animationSlot}");
+                        result = false;
+                        continue;
+                    }
 
+                    var animationVersion = parsedHeader.Version;
                     if (animationSlot == "PERSISTENT_METADATA_ALIVE") //check for this too, cus this plays throughtout char animation (all of them)
                     {
-                        AnimationsVersionFoundInPersistenceMeta[animPath] = animationVersion;
-                        AnimationPersistanceMetaFileName = metaFile;
+                        _animationsVersionFoundInPersistenceMeta[animPath] = animationVersion;
+                        _animationPersistanceMetaFileName = metaFile;
                     }
                     else
                     {
@@ -322,10 +353,15 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
 
         private bool ValidateAnimationVersionAgainstPersistenceMeta(string mainAnimationFile, string animationSlot, string skeleton, IPackFileService pfs, ErrorList errorList)
         {
-            var versions = AnimationsVersionFoundInPersistenceMeta;
+            var versions = _animationsVersionFoundInPersistenceMeta;
             var result = true;
 
             var mainAnimation = pfs.FindFile(mainAnimationFile);
+            if (mainAnimation == null)
+            {
+                errorList.Warning(animationSlot, $"Inable to locate {mainAnimationFile} for {animationSlot}");
+                return false;
+            }
             var mainAnimationParsed = AnimationFile.Create(mainAnimation);
             var mainAnimationVersion = mainAnimationParsed.Header.Version;
 
@@ -343,7 +379,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
                 if (!isMountedAnim) continue;
                 if (isTheVersionMatch) continue;
                 {
-                    errorList.Warning(animationSlot, $"Animation Meta Splice {AnimationPersistanceMetaFileName} has different version than in the main animation. File referenced in meta: {animPath} with version {animationVersion} vs in the main animation {mainAnimationFile} with version {mainAnimationVersion}");
+                    errorList.Warning(animationSlot, $"Animation Meta Splice {_animationPersistanceMetaFileName} has different version than in the main animation. File referenced in meta: {animPath} with version {animationVersion} vs in the main animation {mainAnimationFile} with version {mainAnimationVersion}");
                     result = false;
                 }
             }
@@ -381,6 +417,12 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
             }
             var mainAnimationToCompareVersion = mainAnimationToCompareHeader.Version;
             var mainAnimationToData = GetAnimationData(animationFile, pfs);
+            if (mainAnimationToData == null)
+            {
+                errorList.Warning(animationSlot, $"Failed to find {animationFile} for {animationSlot}");
+                return false;
+            }
+
             var mainAnimationLength = mainAnimationToData.AnimationParts[0].DynamicFrames.Count;
             var mainAnimationTime = mainAnimationToCompareHeader.AnimationTotalPlayTimeInSec;
 
@@ -410,20 +452,27 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
 
                     var timing = header.AnimationTotalPlayTimeInSec;
                     var data = GetAnimationData(animationInstance.File, pfs);
-                    var length = data.AnimationParts[0].DynamicFrames.Count;
-
-                    var isTImingMatch = mainAnimationTime == timing;
-                    if (!isTImingMatch)
+                    if (data == null)
                     {
-                        errorList.Warning(animationSlot, $"Rider animation mismatch with mount timing  animation. Mount animation {animationInstance.File} with timing {timing} vs in the main animation {animationFile} with timing {mainAnimationTime}");
-                        result = false;
+                        errorList.Warning(animationSlot, $"Failed to find {animationInstance.File} for {animationSlot}");
+                        return false;
                     }
-
-                    var isLenMatch = mainAnimationLength == length;
-                    if (!isLenMatch)
+                    else
                     {
-                        errorList.Warning(animationSlot, $"Rider animation mismatch with mount frames animation. Mount animation {animationInstance.File} with length {length} vs in the main animation {animationFile} with timing {mainAnimationLength}");
-                        result = false;
+                        var length = data.AnimationParts[0].DynamicFrames.Count;
+                        var isTImingMatch = mainAnimationTime == timing;
+                        if (!isTImingMatch)
+                        {
+                            errorList.Warning(animationSlot, $"Rider animation mismatch with mount timing  animation. Mount animation {animationInstance.File} with timing {timing} vs in the main animation {animationFile} with timing {mainAnimationTime}");
+                            result = false;
+                        }
+
+                        var isLenMatch = mainAnimationLength == length;
+                        if (!isLenMatch)
+                        {
+                            errorList.Warning(animationSlot, $"Rider animation mismatch with mount frames animation. Mount animation {animationInstance.File} with length {length} vs in the main animation {animationFile} with timing {mainAnimationLength}");
+                            result = false;
+                        }
                     }
                 }
             }
@@ -432,7 +481,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
         }
 
 
-        private AnimationFile.AnimationHeader GetAnimationHeader(string path, IPackFileService pfs)
+        private AnimationFile.AnimationHeader? GetAnimationHeader(string path, IPackFileService pfs)
         {
             var mainAnimation = pfs.FindFile(path);
             if (mainAnimation == null) return null;
@@ -440,9 +489,10 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
             return mainAnimationParsed.Header;
         }
 
-        private AnimationFile GetAnimationData(string path, IPackFileService pfs)
+        private AnimationFile? GetAnimationData(string path, IPackFileService pfs)
         {
             var mainAnimation = pfs.FindFile(path);
+            if (mainAnimation == null) return null;
             var mainAnimationParsed = AnimationFile.Create(mainAnimation);
             return mainAnimationParsed;
         }
