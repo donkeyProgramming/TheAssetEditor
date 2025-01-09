@@ -15,4 +15,16 @@
     <ProjectReference Include="..\SharedCore\Shared.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="BaseDialogs\AeAttribute2.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="BaseDialogs\AeAttribute2.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
 </Project>

@@ -59,8 +59,8 @@ namespace Editors.Twui.Editor.Rendering
             device.Clear(Color.Transparent);
             device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
 
-            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone);
-            DrawHierarchy(Vector2.Zero, twuiFile.Hierarchy.RootItems, twuiFile.Components, selectedComponent);
+            _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);//, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone);
+            DrawHierarchy(Rectangle.Empty, twuiFile.Hierarchy.RootItems, twuiFile.Components, selectedComponent);
             _spriteBatch.End();
 
             device.SetRenderTarget(null);
@@ -68,7 +68,7 @@ namespace Editors.Twui.Editor.Rendering
             return _renderTarget;
         }
 
-        void DrawHierarchy(Vector2 localSpace, IEnumerable<HierarchyItem> hierarchyItems, List<Component> componentList, Component? selectedComponent)
+        void DrawHierarchy(Rectangle localSpace, IEnumerable<HierarchyItem> hierarchyItems, List<Component> componentList, Component? selectedComponent)
         {
             foreach (var hierarchyItem in hierarchyItems)
             {
@@ -81,14 +81,15 @@ namespace Editors.Twui.Editor.Rendering
             }
         }
 
-        Vector2 DrawComponent(Vector2 localSpace, Component currentComponent, Component? selectedComponent)
+        Rectangle DrawComponent(Rectangle localSpace, Component currentComponent, Component? selectedComponent)
         {
+            var invMaxLayerDepth = 1f/999999f;
+
             // Take into account docking
             // Take into account colour
             // Take into account state
 
-            var computedLocalSpace = ComponentCoordinateHelper.GetLocalCoordinateSpace(currentComponent, Rectangle.Empty);
-            var compnentLocalSpace = localSpace + computedLocalSpace;
+            var compnentLocalSpace = ComponentCoordinateHelper.GetLocalCoordinateSpace(currentComponent, Rectangle.Empty);
 
             foreach (var image in currentComponent.ComponentImages)
             {
@@ -103,19 +104,18 @@ namespace Editors.Twui.Editor.Rendering
                 var compnentHeight = texture.Height;
                 var componentRect = new Rectangle((int)compnentLocalSpace.X, (int)compnentLocalSpace.Y, compnentWidth, compnentHeight);
 
-                _spriteBatch.Draw(texture, componentRect, null, new Color(255, 255, 255, 255), 0, Vector2.Zero, SpriteEffects.None, 1);
-
-                // Draw debuginfo about selected component
-                if (selectedComponent == currentComponent)
-                {
-                    var selectionOverlayColour = new Color(255, 0, 0, 50);
-                    _spriteBatch.Draw(_whiteSquareTexture, componentRect, null, selectionOverlayColour, 0, Vector2.Zero, SpriteEffects.None, 1);
-                    // Draw ancor point
-                    // Draw local space point
-                }
+                _spriteBatch.Draw(texture, componentRect, null, new Color(255, 255, 255, 255), 0, Vector2.Zero, SpriteEffects.None, currentComponent.Priority * invMaxLayerDepth);
             }
 
-            return localSpace + currentComponent.Offset;
+            if (selectedComponent == currentComponent)
+            {
+                var selectionOverlayColour = new Color(255, 0, 0, 50);
+                _spriteBatch.Draw(_whiteSquareTexture, compnentLocalSpace, null, selectionOverlayColour, 0, Vector2.Zero, SpriteEffects.None, 1);
+                // Draw ancor point
+                // Draw local space point
+            }
+
+            return compnentLocalSpace;
         }
 
         void DrawComponentSpaceOutline(Rectangle componentRectable)

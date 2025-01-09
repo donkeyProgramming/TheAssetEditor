@@ -3,81 +3,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:basedialogs="clr-namespace:Shared.Ui.BaseDialogs;assembly=Shared.Ui" xmlns:System="clr-namespace:System;assembly=mscorlib" xmlns:mathviews="clr-namespace:Shared.Ui.BaseDialogs.MathViews;assembly=Shared.Ui"
+             xmlns:basedialogs="clr-namespace:Shared.Ui.BaseDialogs;assembly=Shared.Ui" xmlns:System="clr-namespace:System;assembly=mscorlib" xmlns:mathviews="clr-namespace:Shared.Ui.BaseDialogs.MathViews;assembly=Shared.Ui" xmlns:componenteditor="clr-namespace:Editors.Twui.Editor.ComponentEditor"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <System:Double x:Key="labelWidth">140</System:Double>
+        <System:Double x:Key="labelWidth">50</System:Double>
         <Thickness x:Key="LabelMargin">20,0,0,0</Thickness>
         <System:Double x:Key="HeaderFontSize">10</System:Double>
         <System:Double x:Key="HeaderLabelLength">100</System:Double>
     </UserControl.Resources>
-        
-        
+
+
     <DockPanel LastChildFill="False">
-        <basedialogs:AeAttribute LabelText="Id" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <TextBox Text="{Binding SelectedComponent.Id, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="This" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <TextBox Text="{Binding SelectedComponent.This, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="PartOfTemplate" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <CheckBox IsChecked="{Binding SelectedComponent.PartOfTemplate, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Uniqueguid_in_template" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <TextBox Text="{Binding SelectedComponent.Uniqueguid_in_template, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Uniqueguid" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <TextBox Text="{Binding SelectedComponent.This, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Dimensions" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <mathviews:Vector2View DataContext="{Binding SelectedComponent.Dimensions, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Dock_point" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <TextBox Text="{Binding SelectedComponent.Dock_point, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Tooltips_localised" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <CheckBox IsChecked="{Binding SelectedComponent.Tooltips_localised, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Offset" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <mathviews:Vector2View DataContext="{Binding SelectedComponent.Offset, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Priority" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <TextBox Text="{Binding SelectedComponent.Priority, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Component_anchor_point" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <mathviews:Vector2View DataContext="{Binding SelectedComponent.Component_anchor_point, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Dock_offset" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <mathviews:Vector2View DataContext="{Binding SelectedComponent.Dock_offset, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Defaultstate" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <TextBox Text="{Binding SelectedComponent.Defaultstate, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Currentstate" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <TextBox Text="{Binding SelectedComponent.Currentstate, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Allowhorizontalresize" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <CheckBox IsChecked="{Binding SelectedComponent.Allowhorizontalresize, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
-        <basedialogs:AeAttribute LabelText="Allowverticalresize" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"  ToolTipEnumValue="None">
-            <CheckBox IsChecked="{Binding SelectedComponent.Allowverticalresize, UpdateSourceTrigger=PropertyChanged}"/>
-        </basedialogs:AeAttribute>
-
+        <basedialogs:AutoAeAttribute InnerContent="{Binding SelectedComponentViewModel.TestString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  LabelText="String" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
+        <basedialogs:AutoAeAttribute  InnerContent="{Binding SelectedComponentViewModel.TestFloat, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  LabelText="Float" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
+        <basedialogs:AutoAeAttribute  InnerContent="{Binding SelectedComponentViewModel.TextVector2, UpdateSourceTrigger=PropertyChanged}"  LabelText="Vector2" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
+        <basedialogs:AutoAeAttribute  InnerContent="{Binding SelectedComponentViewModel.TestBool, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"  LabelText="Bool" DockPanel.Dock="Top"  LabelWidth="{StaticResource labelWidth}"/>
     </DockPanel>
 </UserControl>

@@ -17,7 +17,7 @@ namespace Editors.Twui.Editor.ComponentEditor
         
 
         public ComponentManger(IEventHub eventHub)
-        {
+        { 
             _eventHub = eventHub;
         }
 
