@@ -23,14 +23,22 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
         public static CAkAction_V136 ConvertToWwise(Action inputAction, CompilerData project)
         {
-            var wwiseAction = new CAkAction_V136();
-            wwiseAction.Id = inputAction.Id;
-            wwiseAction.HircType = AkBkHircType.Action;
-            wwiseAction.ActionType = AkActionType.Play;
-            wwiseAction.IdExt = inputAction.ChildId;
-            wwiseAction.PlayActionParams.BitVector = 0x04;
-            wwiseAction.PlayActionParams.BankId = WwiseHash.Compute(project.ProjectSettings.BnkName);
+            var wwiseAction = new CAkAction_V136
+            {
+                Id = inputAction.Id,
+                HircType = AkBkHircType.Action,
+                ActionType = AkActionType.Play,
+                IdExt = inputAction.ChildId,
+
+                PlayActionParams = new CAkAction_V136.PlayActionParams_V136
+                {
+                    BitVector = 0x04,
+                    BankId = WwiseHash.Compute(project.ProjectSettings.BnkName)
+                }
+            };
+
             wwiseAction.UpdateSectionSize();
+
             return wwiseAction;
         }
     }

@@ -54,7 +54,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             return hircChunk;
         }
 
-        public byte[] WriteData(HircChunk hircChunk)
+        public byte[] WriteData(HircChunk hircChunk, uint gameBankGeneratorVersion)
         {
             using var memStream = new MemoryStream();
             memStream.Write(BnkChunkHeader.WriteData(hircChunk.ChunkHeader));
@@ -69,7 +69,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             var byteArray = memStream.ToArray();
 
             // For sanity, read back
-            Parse("name", new ByteChunk(byteArray), 136, true);
+            Parse("name", new ByteChunk(byteArray), gameBankGeneratorVersion, true);
 
             return byteArray;
         }
