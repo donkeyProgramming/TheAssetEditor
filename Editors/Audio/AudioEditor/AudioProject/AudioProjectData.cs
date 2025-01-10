@@ -2,9 +2,18 @@
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 
 namespace Editors.Audio.AudioEditor.AudioProject
 {
+    public class AudioProjectData
+    {
+        public string Language { get; set; }
+        public ObservableCollection<SoundBank> SoundBanks { get; set; } = [];
+        public ObservableCollection<StateGroup> ModdedStates { get; set; } = [];
+        [JsonIgnore] public ObservableCollection<object> AudioProjectTreeViewItems { get; set; } = [];
+    }
+
     public abstract class IAudioProjectItem : ObservableObject
     {
         public string Name { get; set; }
@@ -24,17 +33,19 @@ namespace Editors.Audio.AudioEditor.AudioProject
     {
         public List<string> AudioFiles { get; set; } = [];
         public string AudioFilesDisplay { get; set; }
+        public AudioSettings AudioSettings { get; set; }
     }
 
     public class DialogueEvent : IAudioProjectItem
     {
-        public List<DecisionNode> DecisionTree { get; set; } = [];
+        public List<StatePath> DecisionTree { get; set; } = [];
     }
 
     public class MusicEvent : IAudioProjectItem
     {
         public List<string> AudioFiles { get; set; } = [];
         public string AudioFilesDisplay { get; set; }
+        public AudioSettings AudioSettings { get; set; }
     }
 
     public class StateGroup : IAudioProjectItem 
@@ -44,16 +55,12 @@ namespace Editors.Audio.AudioEditor.AudioProject
 
     public class State : IAudioProjectItem { }
 
-    public class DecisionNode
-    {
-        public StatePath StatePath { get; set; }
-        public List<string> AudioFiles { get; set; } = [];
-        public string AudioFilesDisplay { get; set; }
-    }
-
     public class StatePath
     {
         public List<StatePathNode> Nodes { get; set; } = [];
+        public List<string> AudioFiles { get; set; } = [];
+        public string AudioFilesDisplay { get; set; }
+        public AudioSettings AudioSettings { get; set; }
     }
 
     public class StatePathNode
@@ -76,5 +83,5 @@ namespace Editors.Audio.AudioEditor.AudioProject
         public bool IsTransitionsEnabled { get; set; }
         public Transition Transition { get; set; }
         public decimal Duration { get; set; }
-    }        
+    }
 }

@@ -408,7 +408,7 @@
                         Maximum="3600"
                         Increment="0.05"
                         ClipValueToMinMax="True"
-                        Value="{Binding NumberOfLoops, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        Value="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 </Grid>
             </Border>
         </Grid>

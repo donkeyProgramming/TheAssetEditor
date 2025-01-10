@@ -65,13 +65,12 @@ namespace Editors.Audio.AudioEditor.AudioProject
         {
             var statePath = new StatePath();
 
-            foreach (var kvp in dataGridRow)
+            var stateGroupsWithQualifiers = dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository[selectedDialogueEvent.Name];
+            foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers.Keys)
             {
-                if (kvp.Key != "AudioFiles" && kvp.Key != "AudioFilesDisplay")
+                if (dataGridRow.TryGetValue(AddExtraUnderscoresToString(stateGroupWithQualifier), out var cellValue))
                 {
-                    var stateGroupWithQualifierAndExtraUnderscores = kvp.Key;
-                    var stateGroupWithQualifier = RemoveExtraUnderscoresFromString(stateGroupWithQualifierAndExtraUnderscores);
-                    var state = kvp.Value;
+                    var state = cellValue;
 
                     var statePathNode = new StatePathNode
                     {
@@ -87,16 +86,16 @@ namespace Editors.Audio.AudioEditor.AudioProject
             return statePath;
         }
 
-        public static DecisionNode GetMatchingDecisionNode(StatePath comparisonStatePath, DialogueEvent selectedDialogueEvent)
+        public static StatePath GetMatchingDecisionNode(StatePath comparisonStatePath, DialogueEvent selectedDialogueEvent)
         {
-            foreach (var decisionNode in selectedDialogueEvent.DecisionTree)
+            foreach (var statePath in selectedDialogueEvent.DecisionTree)
             {
-                var stateGroups = decisionNode.StatePath.Nodes.Select(node => node.StateGroup.Name).ToList();
-                var states = decisionNode.StatePath.Nodes.Select(node => node.State.Name).ToList();
+                var stateGroups = statePath.Nodes.Select(node => node.StateGroup.Name).ToList();
+                var states = statePath.Nodes.Select(node => node.State.Name).ToList();
                 var comparisonStateGroups = comparisonStatePath.Nodes.Select(node => node.StateGroup.Name).ToList();
                 var comparisonStates = comparisonStatePath.Nodes.Select(node => node.State.Name).ToList();
                 if (states.SequenceEqual(comparisonStates) && stateGroups.SequenceEqual(comparisonStateGroups))
-                    return decisionNode;
+                    return statePath;
             }
 
             return null;
@@ -174,15 +173,15 @@ namespace Editors.Audio.AudioEditor.AudioProject
             audioProjectEditorFullDataGrid.Insert(insertIndex, newRow);
         }
 
-        public static void InsertStatePathAlphabetically(DialogueEvent selectedDialogueEvent, DecisionNode decisionNode, StatePath newStatePath)
+        public static void InsertStatePathAlphabetically(DialogueEvent selectedDialogueEvent, StatePath statePath)
         {
-            var newStateName = newStatePath.Nodes.First().State.Name;
+            var newStateName = statePath.Nodes.First().State.Name;
             var decisionTree = selectedDialogueEvent.DecisionTree;
             var insertIndex = 0;
 
             for (var i = 0; i < decisionTree.Count; i++)
             {
-                var existingStateName = decisionTree[i].StatePath.Nodes.First().State.Name;
+                var existingStateName = decisionTree[i].Nodes.First().State.Name;
                 var comparison = string.Compare(newStateName, existingStateName, StringComparison.Ordinal);
                 if (comparison < 0)
                 {
@@ -195,7 +194,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
                     insertIndex = i + 1;
             }
 
-            decisionTree.Insert(insertIndex, decisionNode);
+            decisionTree.Insert(insertIndex, statePath);
         }
 
         public static void InsertActionEventAlphabetically(SoundBank selectedSoundBank, ActionEvent newEvent)

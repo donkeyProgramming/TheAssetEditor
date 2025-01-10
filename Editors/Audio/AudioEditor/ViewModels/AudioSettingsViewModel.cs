@@ -36,19 +36,46 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [ObservableProperty] private ObservableCollection<Transition> _transitions = new(Enum.GetValues<Transition>());
         [ObservableProperty] private decimal _duration;
 
-        public AudioSettingsViewModel(IPackFileService packFileService, AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
+        public static AudioProject.AudioSettings BuildAudioSettings(AudioSettingsViewModel audioSettingsViewModel, int audioFilesCount)
         {
-            _packFileService = packFileService;
-            _audioEditorViewModel = audioEditorViewModel;
-            _audioProjectService = audioProjectService;
+            var audioSettings = new AudioProject.AudioSettings();
+
+            if (audioSettingsViewModel.InitialDelay > 0)
+                audioSettings.InitialDelay = audioSettingsViewModel.InitialDelay;
+
+            if (audioSettingsViewModel.Volume > 0)
+                audioSettings.Volume = audioSettingsViewModel.Volume;
+
+            if (audioFilesCount > 1)
+            {
+                audioSettings.PlaylistType = audioSettingsViewModel.PlaylistType;
+
+                audioSettings.PlaylistMode = audioSettingsViewModel.PlaylistMode;
+                audioSettings.RepetitionInterval = audioSettingsViewModel.RepetitionInterval;
+                audioSettings.EndBehaviour = audioSettingsViewModel.EndBehaviour;
+
+                if (audioSettingsViewModel.IsLoopingEnabled)
+                {
+                    audioSettings.IsLoopingEnabled = audioSettingsViewModel.IsLoopingEnabled;
+                    if (audioSettingsViewModel.IsLoopingInfinitely)
+                        audioSettings.IsLoopingInfinitely = audioSettingsViewModel.IsLoopingInfinitely;
+                    else
+                        audioSettings.NumberOfLoops = audioSettingsViewModel.NumberOfLoops;
+                }
+
+                if (audioSettingsViewModel.IsTransitionsEnabled)
+                {
+                    audioSettings.IsTransitionsEnabled = audioSettingsViewModel.IsTransitionsEnabled;
+                    audioSettings.Transition = audioSettingsViewModel.Transition;
+                    audioSettings.Duration = audioSettingsViewModel.Duration;
+                }
+            }
+
+            return audioSettings;
         }
 
         public void Close()
         {
         }
-
-        public PackFile MainFile { get; set; }
-
-        public bool HasUnsavedChanges { get; set; } = false;
     }
 }

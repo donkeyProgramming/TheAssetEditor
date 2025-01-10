@@ -27,7 +27,7 @@ namespace Editors.Audio.AudioEditor
             foreach (var copiedDataGridRow in audioEditorViewModel.CopiedDataGridRows)
             {
                 audioEditorViewModel.AudioProjectEditorFullDataGrid.Add(copiedDataGridRow);
-                AddRowDataToDialogueEvent(copiedDataGridRow, selectedDialogueEvent, dialogueEventsWithStateGroupsWithQualifiersAndStateGroups);
+                AddRowDataToDialogueEvent(audioEditorViewModel.AudioSettingsViewModel, copiedDataGridRow, selectedDialogueEvent, dialogueEventsWithStateGroupsWithQualifiersAndStateGroups);
             }
 
             SetIsPasteEnabled(audioEditorViewModel, audioProjectService, dialogueEventsWithStateGroupsWithQualifiersAndStateGroups);

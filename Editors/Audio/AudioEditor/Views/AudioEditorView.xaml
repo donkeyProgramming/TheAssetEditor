@@ -214,13 +214,6 @@
                                 </HierarchicalDataTemplate>
 
                                 <HierarchicalDataTemplate 
-                                    DataType="{x:Type audioeditor:MusicEventSoundBanksTreeViewWrapper}" 
-                                    ItemsSource="{Binding MusicEventSoundBanks}">
-                                    <TextBlock 
-                                        Text="{Binding Name}" />
-                                </HierarchicalDataTemplate>
-
-                                <HierarchicalDataTemplate 
                                     DataType="{x:Type audioproject:SoundBank}"
                                     ItemsSource="{Binding SoundBankTreeViewItems}">
                                     <TextBlock>

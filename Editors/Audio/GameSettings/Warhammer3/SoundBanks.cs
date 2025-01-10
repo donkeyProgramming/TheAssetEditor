@@ -14,22 +14,22 @@
             Rituals,
             UI,
             Vocalisation,
-            BattleIndividualMelee,
-            BattleConversationalVO,
-            BattleVO,
-            CampaignConversationalVO,
-            CampaignVO,
-            FrontendVO,
-            BattleMusic,
+            FrontendMusic,
             CampaignMusic,
-            LoadingScreenMusic
+            BattleMusic,
+            LoadingScreenMusic,
+            FrontendVO,
+            CampaignVO,
+            CampaignConversationalVO,
+            BattleVO,
+            BattleConversationalVO,
+            BattleIndividualMelee
         }
 
         public enum GameSoundBankType
         {
             ActionEventSoundBank,
-            DialogueEventSoundBank,
-            MusicEventSoundBank
+            DialogueEventSoundBank
         }
 
         public static GameSoundBankType GetSoundBankType(GameSoundBank soundbank)
@@ -46,15 +46,16 @@
                 GameSoundBank.Rituals => GameSoundBankType.ActionEventSoundBank,
                 GameSoundBank.UI => GameSoundBankType.ActionEventSoundBank,
                 GameSoundBank.Vocalisation => GameSoundBankType.ActionEventSoundBank,
-                GameSoundBank.BattleIndividualMelee => GameSoundBankType.DialogueEventSoundBank,
-                GameSoundBank.BattleConversationalVO => GameSoundBankType.DialogueEventSoundBank,
-                GameSoundBank.BattleVO => GameSoundBankType.DialogueEventSoundBank,
-                GameSoundBank.CampaignConversationalVO => GameSoundBankType.DialogueEventSoundBank,
-                GameSoundBank.CampaignVO => GameSoundBankType.DialogueEventSoundBank,
+                GameSoundBank.FrontendMusic => GameSoundBankType.ActionEventSoundBank,
+                GameSoundBank.CampaignMusic => GameSoundBankType.ActionEventSoundBank,
+                GameSoundBank.BattleMusic => GameSoundBankType.ActionEventSoundBank,
+                GameSoundBank.LoadingScreenMusic => GameSoundBankType.ActionEventSoundBank,
                 GameSoundBank.FrontendVO => GameSoundBankType.DialogueEventSoundBank,
-                GameSoundBank.BattleMusic => GameSoundBankType.MusicEventSoundBank,
-                GameSoundBank.CampaignMusic => GameSoundBankType.MusicEventSoundBank,
-                GameSoundBank.LoadingScreenMusic => GameSoundBankType.MusicEventSoundBank,
+                GameSoundBank.CampaignVO => GameSoundBankType.DialogueEventSoundBank,
+                GameSoundBank.CampaignConversationalVO => GameSoundBankType.DialogueEventSoundBank,
+                GameSoundBank.BattleVO => GameSoundBankType.DialogueEventSoundBank,
+                GameSoundBank.BattleConversationalVO => GameSoundBankType.DialogueEventSoundBank,
+                GameSoundBank.BattleIndividualMelee => GameSoundBankType.DialogueEventSoundBank
             };
         }
 
@@ -68,15 +69,16 @@
         public const string RitualsDisplayString = "Rituals";
         public const string UIDisplayString = "UI";
         public const string VocalisationDisplayString = "Vocalisation";
-        public const string BattleIndividualMeleeDisplayString = "Battle Individual Melee";
-        public const string BattleConversationalVODisplayString = "Battle Conversational VO";
-        public const string BattleVODisplayString = "Battle VO";
-        public const string CampaignConversationalVODisplayString = "Campaign Conversational VO";
-        public const string CampaignVODisplayString = "Campaign VO";
-        public const string FrontendVODisplayString = "Frontend VO";
-        public const string BattleMusicDisplayString = "Battle Music";
+        public const string FrontendMusicDisplayString = "Frontend Music";
         public const string CampaignMusicDisplayString = "Campaign Music";
+        public const string BattleMusicDisplayString = "Battle Music";
         public const string LoadingScreenMusicDisplayString = "Loading Screen Music";
+        public const string FrontendVODisplayString = "Frontend VO";
+        public const string CampaignVODisplayString = "Campaign VO";
+        public const string CampaignConversationalVODisplayString = "Campaign Conversational VO";
+        public const string BattleVODisplayString = "Battle VO";
+        public const string BattleConversationalVODisplayString = "Battle Conversational VO";
+        public const string BattleIndividualMeleeDisplayString = "Battle Individual Melee";
 
         public static string GetDisplayString(GameSoundBank soundbank)
         {
@@ -92,15 +94,16 @@
                 GameSoundBank.Rituals => RitualsDisplayString,
                 GameSoundBank.UI => UIDisplayString,
                 GameSoundBank.Vocalisation => VocalisationDisplayString,
+                GameSoundBank.FrontendMusic => FrontendMusicDisplayString,
+                GameSoundBank.CampaignMusic => CampaignMusicDisplayString,
+                GameSoundBank.BattleMusic => BattleMusicDisplayString,
+                GameSoundBank.LoadingScreenMusic => LoadingScreenMusicDisplayString,
                 GameSoundBank.FrontendVO => FrontendVODisplayString,
                 GameSoundBank.CampaignVO => CampaignVODisplayString,
                 GameSoundBank.CampaignConversationalVO => CampaignConversationalVODisplayString,
                 GameSoundBank.BattleVO => BattleVODisplayString,
                 GameSoundBank.BattleConversationalVO => BattleConversationalVODisplayString,
                 GameSoundBank.BattleIndividualMelee => BattleIndividualMeleeDisplayString,
-                GameSoundBank.BattleMusic => BattleMusicDisplayString,
-                GameSoundBank.CampaignMusic => CampaignMusicDisplayString,
-                GameSoundBank.LoadingScreenMusic => LoadingScreenMusicDisplayString,
             };
         }
 
@@ -118,15 +121,16 @@
                 RitualsDisplayString => GameSoundBank.Rituals,
                 UIDisplayString => GameSoundBank.UI,
                 VocalisationDisplayString => GameSoundBank.Vocalisation,
+                FrontendMusicDisplayString => GameSoundBank.FrontendMusic,
+                CampaignMusicDisplayString => GameSoundBank.CampaignMusic,
+                BattleMusicDisplayString => GameSoundBank.BattleMusic,
+                LoadingScreenMusicDisplayString => GameSoundBank.LoadingScreenMusic,
+                FrontendVODisplayString => GameSoundBank.FrontendVO,
+                CampaignVODisplayString => GameSoundBank.CampaignVO,
+                CampaignConversationalVODisplayString => GameSoundBank.CampaignConversationalVO,
+                BattleVODisplayString => GameSoundBank.BattleVO,
                 BattleConversationalVODisplayString => GameSoundBank.BattleConversationalVO,
                 BattleIndividualMeleeDisplayString => GameSoundBank.BattleIndividualMelee,
-                BattleVODisplayString => GameSoundBank.BattleVO,
-                CampaignConversationalVODisplayString => GameSoundBank.CampaignConversationalVO,
-                CampaignVODisplayString => GameSoundBank.CampaignVO,
-                FrontendVODisplayString => GameSoundBank.FrontendVO,
-                BattleMusicDisplayString => GameSoundBank.BattleMusic,
-                CampaignMusicDisplayString => GameSoundBank.CampaignMusic,
-                LoadingScreenMusicDisplayString => GameSoundBank.LoadingScreenMusic,
             };
         }
     }

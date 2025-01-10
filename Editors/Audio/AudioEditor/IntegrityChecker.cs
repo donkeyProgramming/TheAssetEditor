@@ -52,10 +52,10 @@ namespace Editors.Audio.AudioEditor
                 if (soundBank.Type == GameSoundBankType.DialogueEventSoundBank.ToString())
                     foreach (var dialogueEvent in soundBank.DialogueEvents)
                     {
-                        var firstNode = dialogueEvent.DecisionTree.FirstOrDefault();
-                        if (firstNode != null)
+                        var firstStatePath = dialogueEvent.DecisionTree.FirstOrDefault();
+                        if (firstStatePath != null)
                         {
-                            var stateGroups = firstNode.StatePath.Nodes.Select(node => node.StateGroup.Name).ToList();
+                            var stateGroups = firstStatePath.Nodes.Select(node => node.StateGroup.Name).ToList();
                             audioProjectDialogueEventsWithStateGroups[dialogueEvent.Name] = stateGroups;
                         }
                     }

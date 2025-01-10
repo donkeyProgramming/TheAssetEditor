@@ -65,10 +65,6 @@ namespace Editors.Audio.AudioEditor
                     audioEditorViewModel.IsDialogueEventPresetFilterEnabled = isDialogueEventPresetFilterEnabled;
                     audioEditorViewModel.DialogueEventPresets = dialogueEventPresets;
                 }
-                else if (selectedSoundBank.Type == GameSoundBankType.MusicEventSoundBank.ToString())
-                {
-                    throw new NotImplementedException();
-                }
             }
             else if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
@@ -111,6 +107,7 @@ namespace Editors.Audio.AudioEditor
             dataGridRow["Event"] = string.Empty;
             dataGridRow["AudioFiles"] = new List<string> { };
             dataGridRow["AudioFilesDisplay"] = string.Empty;
+            dataGridRow["AudioSettings"] = new AudioProject.AudioSettings();
             audioProjectEditorSingleRowDataGrid.Add(dataGridRow);
         }
 
@@ -128,6 +125,7 @@ namespace Editors.Audio.AudioEditor
 
             dataGridRow["AudioFiles"] = new List<string> { };
             dataGridRow["AudioFilesDisplay"] = string.Empty;
+            dataGridRow["AudioSettings"] = new AudioProject.AudioSettings();
             audioProjectEditorSingleRowDataGrid.Add(dataGridRow);
         }
 
@@ -162,14 +160,14 @@ namespace Editors.Audio.AudioEditor
 
         public static void SetAudioProjectEditorFullDataGridToDialogueEvent(Dictionary<string, Dictionary<string, string>> dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository, ObservableCollection<Dictionary<string, object>> audioProjectEditorFullDataGrid, DialogueEvent dialogueEvent)
         {
-            foreach (var decisionNode in dialogueEvent.DecisionTree)
+            foreach (var statePath in dialogueEvent.DecisionTree)
             {
                 var dataGridRow = new Dictionary<string, object>();
-                dataGridRow["AudioFiles"] = decisionNode.AudioFiles;
-                dataGridRow["AudioFilesDisplay"] = decisionNode.AudioFilesDisplay;
+                dataGridRow["AudioFiles"] = statePath.AudioFiles;
+                dataGridRow["AudioFilesDisplay"] = statePath.AudioFilesDisplay;
 
                 var stateGroupsWithQualifiersList = dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository[dialogueEvent.Name].ToList();
-                foreach (var (node, kvp) in decisionNode.StatePath.Nodes.Zip(stateGroupsWithQualifiersList, (node, kvp) => (node, kvp)))
+                foreach (var (node, kvp) in statePath.Nodes.Zip(stateGroupsWithQualifiersList, (node, kvp) => (node, kvp)))
                 {
                     var stateGroupfromDialogueEvent = node.StateGroup.Name;
                     var stateFromDialogueEvent = node.State.Name;

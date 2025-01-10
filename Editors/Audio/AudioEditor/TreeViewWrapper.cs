@@ -17,12 +17,6 @@ namespace Editors.Audio.AudioEditor
         public static string Name => "Dialogue Events";
     }
 
-    public class MusicEventSoundBanksTreeViewWrapper
-    {
-        public ObservableCollection<SoundBank> MusicEventSoundBanks { get; set; }
-        public static string Name => "Music Events";
-    }
-
     public class ModdedStatesTreeViewWrapper
     {
         public ObservableCollection<StateGroup> ModdedStates { get; set; }
@@ -58,20 +52,6 @@ namespace Editors.Audio.AudioEditor
                     DialogueEventSoundBanks = new ObservableCollection<SoundBank>(dialogueEventSoundBanks)
                 });
             }
-
-            var musicEventSoundBanks = audioProjectService.AudioProject.SoundBanks
-                .Where(soundBank => soundBank.Type == GameSoundBankType.MusicEventSoundBank.ToString())
-                .ToList();
-
-            /*
-            if (musicEventSoundBanks.Count != 0)
-            {
-                audioProjectService.AudioProject.AudioProjectTreeViewItems.Add(new MusicEventSoundBanksTreeViewWrapper
-                {
-                    MusicEventSoundBanks = new ObservableCollection<SoundBank>(musicEventSoundBanks)
-                });
-            }
-            */
 
             if (audioProjectService.AudioProject.ModdedStates.Any())
             {
@@ -111,21 +91,6 @@ namespace Editors.Audio.AudioEditor
                     DialogueEventSoundBanks = new ObservableCollection<SoundBank>(dialogueEventSoundBanks)
                 });
             }
-
-            var musicEventSoundBanks = audioProjectService.AudioProject.SoundBanks
-                .Where(soundBank => soundBank.Type == GameSoundBankType.MusicEventSoundBank.ToString()
-                    && soundBank.MusicEvents.Count > 0)
-                .ToList();
-
-            /*
-            if (musicEventSoundBanks.Count != 0)
-            {
-                audioProjectService.AudioProject.AudioProjectTreeViewItems.Add(new MusicEventSoundBanksTreeViewWrapper
-                {
-                    MusicEventSoundBanks = new ObservableCollection<SoundBank>(musicEventSoundBanks)
-                });
-            }
-            */
 
             if (audioProjectService.AudioProject.ModdedStates.Any())
             {
