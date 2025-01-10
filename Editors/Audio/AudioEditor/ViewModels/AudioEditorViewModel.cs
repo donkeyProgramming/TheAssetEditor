@@ -11,7 +11,6 @@ using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using Shared.Ui.BaseDialogs.PackFileTree;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 using static Editors.Audio.AudioEditor.AudioProject.AudioProjectManager;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
@@ -77,7 +76,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             _audioProjectService = audioProjectService;
             _packFileUiProvider = packFileUiProvider;
 
-            InitialiseCollections();
+            Initialise();
 
             CheckAudioEditorDialogueEventIntegrity(_audioRepository, DialogueEventData);
         }
@@ -225,7 +224,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             DialogueEventSoundBankFiltering.Clear();
         }
 
-        public void InitialiseCollections()
+        public void Initialise()
         {
             AudioProjectEditorSingleRowDataGrid = [];
             AudioProjectEditorFullDataGrid = [];

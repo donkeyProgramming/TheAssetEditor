@@ -36,6 +36,10 @@ namespace Editors.Audio.AudioEditor
             audioEditorViewModel.IsPlayAudioButtonEnabled = false;
             audioEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
 
+            // Set AudioSettings visibility
+            audioEditorViewModel.AudioSettingsViewModel.IsAudioSettingsVisible = false;
+            audioEditorViewModel.AudioSettingsViewModel.IsUsingMultipleAudioFiles = false;
+
             // Reset DataGrids
             ClearDataGrid(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
             ClearDataGrid(audioEditorViewModel.AudioProjectEditorFullDataGrid);
@@ -47,6 +51,8 @@ namespace Editors.Audio.AudioEditor
                 if (selectedSoundBank.Type == GameSoundBankType.ActionEventSoundBank.ToString())
                 {
                     audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {selectedSoundBank.Name}";
+
+                    AudioSettingsViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
                     ConfigureAudioProjectEditorSingleRowDataGridForActionEventSoundBank(audioEditorViewModel, audioProjectService, audioRepository);
                     SetAudioProjectEditorSingleRowDataGridToActionEventSoundBank(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
@@ -69,6 +75,8 @@ namespace Editors.Audio.AudioEditor
             else if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
                 audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
+
+                AudioSettingsViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
                 // Rebuild StateGroupsWithModdedStates in case any have been added since the Audio Project was initialised
                 audioProjectService.BuildStateGroupsWithModdedStatesRepository(audioProjectService.AudioProject.ModdedStates, audioProjectService.StateGroupsWithModdedStatesRepository);

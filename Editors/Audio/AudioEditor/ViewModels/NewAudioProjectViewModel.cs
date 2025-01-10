@@ -88,7 +88,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             // Reset and initialise data
             _audioEditorViewModel.ResetAudioEditorViewModelData();
             _audioProjectService.ResetAudioProject();
-            _audioEditorViewModel.InitialiseCollections();
+            _audioEditorViewModel.Initialise();
 
             // Initialise AudioProject according to the Audio Project settings selected
             _audioProjectService.InitialiseAudioProject(_audioEditorViewModel, AudioProjectFileName, AudioProjectDirectory, GameLanguageToStringMap[SelectedLanguage]);

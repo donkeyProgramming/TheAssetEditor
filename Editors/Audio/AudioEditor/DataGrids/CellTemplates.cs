@@ -167,20 +167,14 @@ namespace Editors.Audio.AudioEditor.DataGrids
             {
                 var button = sender as Button;
                 var dataGridRow = FindVisualParent<DataGridRow>(button);
-
                 if (dataGridRow != null)
                 {
                     var textBox = FindVisualChild<TextBox>(dataGridRow, "AudioFilesDisplay");
-
                     if (textBox != null)
                     {
                         var rowDataContext = dataGridRow.DataContext;
-
                         if (rowDataContext is Dictionary<string, object> dataGridRowContext)
-                        {
-                            AddAudioFilesToAudioProjectEditorSingleRowDataGrid(dataGridRowContext, textBox);
-                            SetIsAddRowButtonEnabled(audioEditorViewModel, audioProjectService, audioRepository);
-                        }
+                            CellTemplatesHelpers.OnAudioFilesButtonClicked(audioEditorViewModel, audioProjectService, audioRepository, textBox, dataGridRowContext);
                     }
                 }
             }));
@@ -207,7 +201,6 @@ namespace Editors.Audio.AudioEditor.DataGrids
             factory.AddHandler(System.Windows.Controls.Primitives.TextBoxBase.TextChangedEvent, new TextChangedEventHandler((s, e) =>
             {
                 SetIsAddRowButtonEnabled(audioEditorViewModel, audioProjectService, audioRepository);
-
             }));
 
             template.VisualTree = factory;

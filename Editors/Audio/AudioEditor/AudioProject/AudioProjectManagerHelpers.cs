@@ -116,7 +116,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
             return null;
         }
 
-        public static void AddAudioFilesToAudioProjectEditorSingleRowDataGrid(Dictionary<string, object> dataGridRow, TextBox textBox)
+        public static bool AddAudioFilesToAudioProjectEditorSingleRowDataGrid(Dictionary<string, object> dataGridRow, TextBox textBox)
         {
             var dialog = new OpenFileDialog()
             {
@@ -137,7 +137,11 @@ namespace Editors.Audio.AudioEditor.AudioProject
                 var audioFiles = new List<string>(filePaths);
                 dataGridRow["AudioFiles"] = audioFiles;
                 dataGridRow["AudioFilesDisplay"] = fileNamesString;
+
+                return true;
             }
+            else 
+                return false;
         }
 
         public static void SortSoundBanksAlphabetically(ObservableCollection<SoundBank> audioProjectItems)

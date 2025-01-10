@@ -75,13 +75,14 @@ namespace Editors.Audio.AudioEditor.AudioProject
         public decimal Volume { get; set; }
         public decimal InitialDelay { get; set; }
         public PlaylistMode PlaylistMode { get; set; }
+        public bool EnableRepetitionInterval { get; set; }
         public uint RepetitionInterval { get; set; }
         public EndBehaviour EndBehaviour { get; set; }
-        public bool IsLoopingEnabled { get; set; }
-        public bool IsLoopingInfinitely { get; set; }
+        public bool EnableLooping { get; set; }
+        public bool ILoopInfinitely { get; set; }
         public uint NumberOfLoops { get; set; }
-        public bool IsTransitionsEnabled { get; set; }
-        public Transition Transition { get; set; }
+        public bool EnableTransitions { get; set; }
+        public TransitionType Transition { get; set; }
         public decimal Duration { get; set; }
     }
 }

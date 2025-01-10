@@ -24,16 +24,16 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
         public enum PlaylistMode
         {
-            Continous,
-            Step
+            Step,
+            Continuous
         }
 
-        public const string Continous = "Continous";
         public const string Step = "Step";
+        public const string Continous = "Continuous";
 
         public static readonly Dictionary<PlaylistMode, string> PlaylistModeToStringMap = new()
         {
-            { PlaylistMode.Continous, Continous },
+            { PlaylistMode.Continuous, Continous },
             { PlaylistMode.Step, Step }
         };
 
@@ -52,7 +52,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             { EndBehaviour.PlayInReverseOrder, PlayInReverseOrder}
         };
 
-        public enum Transition
+        public enum TransitionType
         {
             XfadeAmp,
             XfadePower,
@@ -67,13 +67,13 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         public const string SampleAccurate = "Sample Accurate";
         public const string TriggerRate = "Trigger Rate";
 
-        public static readonly Dictionary<Transition, string> TransitionToStringMap = new()
+        public static readonly Dictionary<TransitionType, string> TransitionToStringMap = new()
         {
-            { Transition.XfadeAmp, XfadeAmp },
-            { Transition.XfadePower, XfadePower },
-            { Transition.Delay, Delay },
-            { Transition.SampleAccurate, SampleAccurate },
-            { Transition.TriggerRate, TriggerRate }
+            { TransitionType.XfadeAmp, XfadeAmp },
+            { TransitionType.XfadePower, XfadePower },
+            { TransitionType.Delay, Delay },
+            { TransitionType.SampleAccurate, SampleAccurate },
+            { TransitionType.TriggerRate, TriggerRate }
         };
     }
 }

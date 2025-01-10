@@ -110,7 +110,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
             }
 
             if (dataGridRow.TryGetValue("AudioSettings", out var audioSettings))
-                soundBankEvent.AudioSettings = AudioSettingsViewModel.BuildAudioSettings(audioSettingsViewModel, soundBankEvent.AudioFiles.Count);
+                soundBankEvent.AudioSettings = AudioSettingsViewModel.BuildAudioSettings(audioSettingsViewModel);
 
             InsertActionEventAlphabetically(selectedSoundBank, soundBankEvent);
         }
@@ -158,7 +158,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
             }
 
             if (dataGridRow.TryGetValue("AudioSettings", out var audioSettings))
-                statePath.AudioSettings = AudioSettingsViewModel.BuildAudioSettings(audioSettingsViewModel, statePath.AudioFiles.Count);
+                statePath.AudioSettings = AudioSettingsViewModel.BuildAudioSettings(audioSettingsViewModel);
 
             InsertStatePathAlphabetically(selectedDialogueEvent, statePath);
         }

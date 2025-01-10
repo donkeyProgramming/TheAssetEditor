@@ -12,7 +12,6 @@ namespace Editors.Audio.AudioEditor
 {
     public class ButtonEnablement
     {
-        // Need to add a check to this to ensure that it takes account of when things can be left empty e.g. not part of the battle indiv one
         public static void SetIsAddRowButtonEnabled(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
         {
             audioEditorViewModel.IsAddRowButtonEnabled = false;

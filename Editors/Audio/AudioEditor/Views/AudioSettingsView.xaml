@@ -13,9 +13,10 @@
              xmlns:viewmodels="clr-namespace:Editors.Audio.AudioEditor.ViewModels" 
              d:DataContext="{d:DesignInstance Type=viewmodels:AudioSettingsViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="190" d:DesignWidth="960">
+             d:DesignHeight="230" d:DesignWidth="960">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <converters:SettingsEnumConverter 
             x:Key="SettingsEnumConverter"/>
         <DataTemplate 
@@ -28,7 +29,8 @@
     <Expander
         Margin="2.5, 0, 0, 0"
         Header="Audio Settings"
-        IsExpanded="True">
+        IsExpanded="True"
+        Visibility="{Binding IsAudioSettingsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
 
         <Grid>
             <Grid.RowDefinitions>
@@ -93,8 +95,6 @@
                             Height="Auto"/>
                         <RowDefinition 
                             Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
@@ -148,20 +148,6 @@
                         ClipValueToMinMax="True"
                         Value="{Binding InitialDelay, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                    <TextBlock 
-                        Grid.Row="3"
-                        Grid.Column="0"
-                        Margin="10, 0, 5, 10"
-                        Text="Playlist Type"/>
-
-                    <ComboBox
-                        Grid.Row="3"
-                        Grid.Column="1"
-                        Margin="10, 0, 10, 10"
-                        ItemsSource="{Binding PlaylistTypes}" 
-                        SelectedItem="{Binding PlaylistType}" 
-                        ItemTemplate="{StaticResource EnumToStringTemplate}"/>
-
                 </Grid>
             </Border>
 
@@ -174,6 +160,8 @@
 
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition 
+                            Height="Auto"/>
                         <RowDefinition 
                             Height="Auto"/>
                         <RowDefinition 
@@ -207,44 +195,65 @@
                         Grid.Row="1"
                         Grid.Column="0"
                         Margin="10, 10, 5, 5"
-                        Text="Playlist Mode"/>
+                        Text="Playlist Type"/>
 
                     <ComboBox
                         Grid.Row="1"
                         Grid.Column="1"
                         Margin="10, 10, 10, 5"
-                        ItemsSource="{Binding PlaylistModes}" 
-                        SelectedItem="{Binding PlaylistMode}" 
-                        ItemTemplate="{StaticResource EnumToStringTemplate}"/>
+                        ItemsSource="{Binding PlaylistTypes}" 
+                        SelectedItem="{Binding PlaylistType}" 
+                        ItemTemplate="{StaticResource EnumToStringTemplate}"
+                        IsEnabled="{Binding IsPlaylistTypeEnabled}"/>
 
-                    <CheckBox
+                    <TextBlock 
                         Grid.Row="2"
                         Grid.Column="0"
                         Margin="10, 0, 5, 5"
-                        Content="Repitition Interval"/>
+                        Text="Playlist Mode"/>
+
+                    <ComboBox
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Margin="10, 0, 10, 5"
+                        ItemsSource="{Binding PlaylistModes}" 
+                        SelectedItem="{Binding PlaylistMode}" 
+                        ItemTemplate="{StaticResource EnumToStringTemplate}"
+                        IsEnabled="{Binding IsPlaylistModeEnabled}"/>
+
+                    <CheckBox
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Margin="10, 0, 5, 5"
+                        Content="Repitition Interval"
+                        IsChecked="{Binding EnableRepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        IsEnabled="{Binding IsEnableRepetitionIntervalEnabled}"/>
+
 
                     <extendedwpftoolkit:IntegerUpDown 
-                        Grid.Row="2"
+                        Grid.Row="3"
                         Grid.Column="1"
                         Minimum="1"
                         Maximum="999"
                         ClipValueToMinMax="True"
                         Margin="10, 0, 10, 5"
-                        Value="{Binding RepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        Value="{Binding RepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        IsEnabled="{Binding IsRepetitionIntervalEnabled}"/>
 
                     <TextBlock 
-                        Grid.Row="3"
+                        Grid.Row="4"
                         Grid.Column="0"
                         Margin="10, 0, 5, 5"
                         Text="End Behaviour"/>
 
                     <ComboBox
-                        Grid.Row="3"
+                        Grid.Row="4"
                         Grid.Column="1"
                         Margin="10, 0, 10, 5"
                         ItemsSource="{Binding EndBehaviours}" 
                         SelectedItem="{Binding EndBehaviour}" 
-                        ItemTemplate="{StaticResource EnumToStringTemplate}"/>
+                        ItemTemplate="{StaticResource EnumToStringTemplate}"
+                        IsEnabled="{Binding IsEndBehaviourEnabled}"/>
                 </Grid>
             </Border>
 
@@ -297,7 +306,8 @@
                         Grid.Row="1"
                         Grid.Column="1"
                         Margin="10, 10, 10, 5"
-                        IsChecked="{Binding IsLoopingEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        IsChecked="{Binding EnableLooping, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        IsEnabled="{Binding IsEnableLoopingEnabled}"/>
 
                     <TextBlock 
                         Grid.Row="2"
@@ -309,7 +319,8 @@
                         Grid.Row="2"
                         Grid.Column="1"
                         Margin="10, 0, 10, 5"
-                        IsChecked="{Binding IsLoopingInfinitely, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        IsChecked="{Binding LoopInfinitely, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        IsEnabled="{Binding IsLoopInfinitelyEnabled}"/>
 
                     <TextBlock 
                         Grid.Row="3"
@@ -324,7 +335,8 @@
                         Maximum="32767"
                         ClipValueToMinMax="True"
                         Margin="10, 0, 10, 10"
-                        Value="{Binding NumberOfLoops, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        Value="{Binding NumberOfLoops, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        IsEnabled="{Binding IsNumberOfLoopsEnabled}"/>
 
                 </Grid>
             </Border>
@@ -378,13 +390,14 @@
                         Grid.Row="1"
                         Grid.Column="1"
                         Margin="10, 10, 10, 5"
-                        IsChecked="{Binding IsTransitionsEnabled, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        IsChecked="{Binding EnableTransitions, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        IsEnabled="{Binding IsEnableTransitionsEnabled}"/>
 
                     <TextBlock 
                         Grid.Row="2"
                         Grid.Column="0"
                         Margin="10, 0, 5, 5"
-                        Text="Transition"/>
+                        Text="Transition Type"/>
 
                     <ComboBox
                         Grid.Row="2"
@@ -392,7 +405,8 @@
                         Margin="10, 0, 10, 5"
                         ItemsSource="{Binding Transitions}" 
                         SelectedItem="{Binding Transition}" 
-                        ItemTemplate="{StaticResource EnumToStringTemplate}"/>
+                        ItemTemplate="{StaticResource EnumToStringTemplate}"
+                        IsEnabled="{Binding IsTransitionTypeEnabled}"/>
 
                     <TextBlock 
                         Grid.Row="3"
@@ -404,11 +418,12 @@
                         Grid.Row="3"
                         Grid.Column="1"
                         Margin="10, 0, 10, 10"
-                        Minimum="1"
+                        Minimum="0"
                         Maximum="3600"
                         Increment="0.05"
                         ClipValueToMinMax="True"
-                        Value="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        Value="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        IsEnabled="{Binding IsDurationEnabled}"/>
                 </Grid>
             </Border>
         </Grid>

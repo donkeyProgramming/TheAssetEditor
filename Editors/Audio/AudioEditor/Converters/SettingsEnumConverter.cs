@@ -26,7 +26,7 @@ namespace Editors.Audio.AudioEditor.Converters
                 return PlaylistModeToStringMap[playlistMode];
             else if (value is EndBehaviour endBehaviour)
                 return EndBehaviourToStringMap[endBehaviour];
-            else if (value is Transition transition)
+            else if (value is TransitionType transition)
                 return TransitionToStringMap[transition];
             else
                 return null;
