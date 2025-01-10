@@ -59,6 +59,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         // Audio Project Editor
         [ObservableProperty] private string _audioProjectEditorLabel = "Audio Project Editor";
+        [ObservableProperty] private string _audioProjectViewerLabel = "Audio Project Viewer";
         [ObservableProperty] private string _audioProjectEditorSingleRowDataGridTag = "AudioProjectEditorSingleRowDataGrid";
         [ObservableProperty] private string _audioProjectEditorFullDataGridTag = "AudioProjectEditorFullDataGrid";
         [ObservableProperty] private bool _showModdedStatesOnly;

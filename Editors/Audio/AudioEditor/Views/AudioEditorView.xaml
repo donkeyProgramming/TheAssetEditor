@@ -124,7 +124,7 @@
                         <!-- Filtering -->
                         <Grid 
                             Grid.Row="1" 
-                            Margin="0, 5, 0, 5">
+                            Margin="0, 0, 0, 5">
 
                             <Grid.RowDefinitions>
                                 <RowDefinition 
@@ -274,6 +274,10 @@
                     <RowDefinition 
                         Height="Auto"/>
                     <RowDefinition 
+                        Height="Auto"/>
+                    <RowDefinition 
+                        Height="Auto"/>
+                    <RowDefinition 
                         Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -285,7 +289,7 @@
                 <DataGrid 
                     Grid.Row="1" 
                     Tag="{Binding AudioProjectEditorSingleRowDataGridTag}" 
-                    Margin="0, 5, 0, 0"
+                    Margin="0, 0, 0, 0"
                     AutoGenerateColumns="False"
                     CanUserAddRows="False" 
                     ItemsSource="{Binding AudioProjectEditorSingleRowDataGrid}"/>
@@ -297,9 +301,9 @@
 
                     <Grid.RowDefinitions>
                         <RowDefinition 
-                        Height="Auto"/>
+                            Height="Auto"/>
                         <RowDefinition 
-                        Height="Auto"/>
+                            Height="Auto"/>
                     </Grid.RowDefinitions>
                     
                     <Grid.ColumnDefinitions>
@@ -380,10 +384,19 @@
                     Grid.Column="0"
                     DataContext="{Binding AudioSettingsViewModel}"/>
 
+                <Border 
+                    Grid.Row="4"
+                    Height="5" 
+                    Background="{DynamicResource App.Border}"/>
+
+                <Label 
+                    Grid.Row="5"
+                    Content="{Binding AudioProjectViewerLabel}"/>
+                
                 <!-- Setting CanUserAddRows to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF. -->
                 <DataGrid 
-                    Grid.Row="4"
-                    Margin="0, 5, 0, 0"
+                    Grid.Row="6"
+                    Margin="0, 0, 0, 0"
                     Tag="{Binding AudioProjectEditorFullDataGridTag}" 
                     AutoGenerateColumns="False" 
                     VerticalScrollBarVisibility="Auto" 

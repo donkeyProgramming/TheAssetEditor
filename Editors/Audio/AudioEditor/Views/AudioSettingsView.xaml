@@ -13,7 +13,7 @@
              xmlns:viewmodels="clr-namespace:Editors.Audio.AudioEditor.ViewModels" 
              d:DataContext="{d:DesignInstance Type=viewmodels:AudioSettingsViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="230" d:DesignWidth="960">
+             d:DesignHeight="550" d:DesignWidth="960">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
@@ -25,36 +25,54 @@
                 Text="{Binding Converter={StaticResource SettingsEnumConverter}}"/>
         </DataTemplate>
     </UserControl.Resources>
-    
-    <Expander
-        Margin="2.5, 0, 0, 0"
-        Header="Audio Settings"
-        IsExpanded="True"
-        Visibility="{Binding IsAudioSettingsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
 
-        <Grid>
+    <Grid 
+        Visibility="{Binding IsAudioSettingsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+        
+        <Grid.RowDefinitions>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border 
+            Grid.Row="0"
+            Height="5" 
+            Background="{DynamicResource App.Border}" 
+            Margin="0, 5, 0, 0"/>
+
+        <Label 
+            Grid.Row="1" 
+            Content="Audio Settings Editor"/>
+
+        <Grid
+            Grid.Row="2"
+            Margin="0, 0, 0, 0">
+
             <Grid.RowDefinitions>
+                <RowDefinition
+                    Height="Auto"/>
+                <RowDefinition
+                     Height="Auto"/>
+                <RowDefinition
+                    Height="Auto"/>
                 <RowDefinition
                     Height="Auto"/>
                 <RowDefinition
                     Height="Auto"/>
             </Grid.RowDefinitions>
-            
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition 
-                    Width="Auto"/>
-                <ColumnDefinition 
-                    Width="Auto"/>
-                <ColumnDefinition 
-                    Width="Auto"/>
-                <ColumnDefinition 
-                    Width="Auto"/>
+                    Width="*"/>
             </Grid.ColumnDefinitions>
 
             <Grid
                 Grid.Row="0"
-                Grid.ColumnSpan="4"
-                Margin="0, 5, 0, 0">
+                Margin="0, 0, 0, 0">
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition
@@ -79,353 +97,374 @@
                     VerticalAlignment="Center"
                     Content="Use Default Audio Settings"/>
             </Grid>
-            
+
             <Border 
                 Grid.Row="1"
                 Grid.Column="0"
-                Margin="5, 5, 0, 0"
-                BorderBrush="{DynamicResource Button.Static.Border}"
-                BorderThickness="2, 2, 1, 2">
+                BorderBrush="{DynamicResource Button.Static.Border}">
 
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <Expander 
+                    Style="{StaticResource ExpanderWithBorderBackground}"
+                    IsExpanded="True"
+                    Margin="0"
+                    Padding="5,0,0,0"
+                    BorderBrush="{DynamicResource Button.Static.Border}" >
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition 
-                            Width="Auto"/>
-                        <ColumnDefinition 
-                            Width="125"/>
-                    </Grid.ColumnDefinitions>
+                    <Expander.Header>
+                        <DockPanel 
+                            VerticalAlignment="Center" 
+                            LastChildFill="True" 
+                            Margin="10, 5, 10, 5">
+                            
+                            <TextBlock 
+                                Text="General"
+                                VerticalAlignment="Center"
+                                Margin="-5, 0, 10, 0" />
+                        </DockPanel>
+                    </Expander.Header>
 
-                    <Border
-                        Grid.Row="0"
-                        Grid.ColumnSpan="2"
-                        BorderBrush="{DynamicResource Button.Static.Border}"
-                        BorderThickness="0, 0, 0, 2"
-                        Background="{DynamicResource Button.Static.Background}">
-                        
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition 
+                                Width="150"/>
+                            <ColumnDefinition 
+                                Width="*"/>
+                        </Grid.ColumnDefinitions>
+
                         <TextBlock 
-                            Margin="10, 5, 10, 5"
-                            Text="General:"/>
-                    </Border>
-                    
-                    <TextBlock 
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        Margin="10, 10, 5, 5"
-                        Text="Volume"/>
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="10, 10, 5, 5"
+                            Text="Volume"/>
 
-                    <extendedwpftoolkit:DecimalUpDown
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Margin="10, 10, 10, 5"
-                        Minimum="-200"
-                        Maximum="200"
-                        Increment="0.05"
-                        ClipValueToMinMax="True"
-                        Value="{Binding Volume, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        <extendedwpftoolkit:DecimalUpDown
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="10, 10, 10, 5"
+                            Minimum="-200"
+                            Maximum="200"
+                            Increment="0.05"
+                            ClipValueToMinMax="True"
+                            Value="{Binding Volume, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                    <TextBlock 
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        Margin="10, 0, 5, 5"
-                        Text="Initial Delay"/>
+                        <TextBlock 
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="Initial Delay"/>
 
-                    <extendedwpftoolkit:DecimalUpDown
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Margin="10, 0, 10, 5"
-                        Minimum="0"
-                        Maximum="3600"
-                        Increment="0.05"
-                        ClipValueToMinMax="True"
-                        Value="{Binding InitialDelay, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-                </Grid>
+                        <extendedwpftoolkit:DecimalUpDown
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="10, 0, 10, 5"
+                            Minimum="0"
+                            Maximum="3600"
+                            Increment="0.05"
+                            ClipValueToMinMax="True"
+                            Value="{Binding InitialDelay, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    </Grid>
+                </Expander>
             </Border>
 
             <Border 
-                Grid.Row="1"
-                Grid.Column="1"
-                Margin="0, 5, 0, 0"
-                BorderBrush="{DynamicResource Button.Static.Border}"
-                BorderThickness="1, 2, 1, 2">
+                Grid.Row="2"
+                Grid.Column="0"
+                BorderBrush="{DynamicResource Button.Static.Border}">
 
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <Expander 
+                    Style="{StaticResource ExpanderWithBorderBackground}"
+                    IsExpanded="True"
+                    Margin="0"
+                    Padding="5,0,0,0"
+                    BorderBrush="{DynamicResource Button.Static.Border}">
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition 
-                            Width="Auto"/>
-                        <ColumnDefinition 
-                            Width="125"/>
-                    </Grid.ColumnDefinitions>
+                    <Expander.Header>
+                        <DockPanel 
+                            VerticalAlignment="Center"    
+                            LastChildFill="True"      
+                            Margin="10, 5, 10, 5">
+                            
+                            <TextBlock 
+                                Text="Playlist"
+                                VerticalAlignment="Center"
+                                Margin="-5, 0, 10, 0" />
+                        </DockPanel>
+                    </Expander.Header>
 
-                    <Border
-                        Grid.Row="0"
-                        Grid.ColumnSpan="2"
-                        BorderBrush="{DynamicResource Button.Static.Border}"
-                        BorderThickness="0, 0, 0, 2"
-                        Background="{DynamicResource Button.Static.Background}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                        <TextBlock 
-                            Margin="10, 5, 10, 5"
-                            Text="Playlist:"/>
-                    </Border>
-
-                    <TextBlock 
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        Margin="10, 10, 5, 5"
-                        Text="Playlist Type"/>
-
-                    <ComboBox
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Margin="10, 10, 10, 5"
-                        ItemsSource="{Binding PlaylistTypes}" 
-                        SelectedItem="{Binding PlaylistType}" 
-                        ItemTemplate="{StaticResource EnumToStringTemplate}"
-                        IsEnabled="{Binding IsPlaylistTypeEnabled}"/>
-
-                    <TextBlock 
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        Margin="10, 0, 5, 5"
-                        Text="Playlist Mode"/>
-
-                    <ComboBox
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Margin="10, 0, 10, 5"
-                        ItemsSource="{Binding PlaylistModes}" 
-                        SelectedItem="{Binding PlaylistMode}" 
-                        ItemTemplate="{StaticResource EnumToStringTemplate}"
-                        IsEnabled="{Binding IsPlaylistModeEnabled}"/>
-
-                    <CheckBox
-                        Grid.Row="3"
-                        Grid.Column="0"
-                        Margin="10, 0, 5, 5"
-                        Content="Repitition Interval"
-                        IsChecked="{Binding EnableRepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        IsEnabled="{Binding IsEnableRepetitionIntervalEnabled}"/>
-
-
-                    <extendedwpftoolkit:IntegerUpDown 
-                        Grid.Row="3"
-                        Grid.Column="1"
-                        Minimum="1"
-                        Maximum="999"
-                        ClipValueToMinMax="True"
-                        Margin="10, 0, 10, 5"
-                        Value="{Binding RepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        IsEnabled="{Binding IsRepetitionIntervalEnabled}"/>
-
-                    <TextBlock 
-                        Grid.Row="4"
-                        Grid.Column="0"
-                        Margin="10, 0, 5, 5"
-                        Text="End Behaviour"/>
-
-                    <ComboBox
-                        Grid.Row="4"
-                        Grid.Column="1"
-                        Margin="10, 0, 10, 5"
-                        ItemsSource="{Binding EndBehaviours}" 
-                        SelectedItem="{Binding EndBehaviour}" 
-                        ItemTemplate="{StaticResource EnumToStringTemplate}"
-                        IsEnabled="{Binding IsEndBehaviourEnabled}"/>
-                </Grid>
-            </Border>
-
-
-            <Border 
-                Grid.Row="1"
-                Grid.Column="2"
-                Margin="0, 5, 0, 0"
-                BorderBrush="{DynamicResource Button.Static.Border}"
-                BorderThickness="1, 2, 1, 2">
-                <Grid>
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition 
-                            Width="Auto"/>
-                        <ColumnDefinition 
-                            Width="125"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Border
-                        Grid.Row="0"
-                        Grid.ColumnSpan="2"
-                        BorderBrush="{DynamicResource Button.Static.Border}"
-                        BorderThickness="0, 0, 0, 2"
-                        Background="{DynamicResource Button.Static.Background}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition 
+                                Width="150"/>
+                            <ColumnDefinition 
+                                Width="*"/>
+                        </Grid.ColumnDefinitions>
 
                         <TextBlock 
-                            Margin="10, 5, 10, 5"
-                            Text="Playlist Looping:"/>
-                    </Border>
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="10, 10, 5, 5"
+                            Text="Playlist Type"/>
 
-                    <TextBlock 
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        Margin="10, 10, 5, 5"
-                        Text="Enable"/>
+                        <ComboBox
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="10, 10, 10, 5"
+                            ItemsSource="{Binding PlaylistTypes}" 
+                            SelectedItem="{Binding PlaylistType}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsPlaylistTypeEnabled}"/>
 
-                    <CheckBox
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Margin="10, 10, 10, 5"
-                        IsChecked="{Binding EnableLooping, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        IsEnabled="{Binding IsEnableLoopingEnabled}"/>
+                        <TextBlock 
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="Playlist Mode"/>
 
-                    <TextBlock 
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        Margin="10, 0, 5, 5"
-                        Text="Loop Infinitely"/>
+                        <ComboBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="10, 0, 10, 5"
+                            ItemsSource="{Binding PlaylistModes}" 
+                            SelectedItem="{Binding PlaylistMode}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsPlaylistModeEnabled}"/>
 
-                    <CheckBox
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Margin="10, 0, 10, 5"
-                        IsChecked="{Binding LoopInfinitely, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        IsEnabled="{Binding IsLoopInfinitelyEnabled}"/>
+                        <CheckBox
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Content="Repetition Interval"
+                            IsChecked="{Binding EnableRepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsEnableRepetitionIntervalEnabled}"/>
 
-                    <TextBlock 
-                        Grid.Row="3"
-                        Grid.Column="0"
-                        Margin="10, 1, 5, 5"
-                        Text="Number of Loops"/>
+                        <extendedwpftoolkit:IntegerUpDown 
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Minimum="1"
+                            Maximum="999"
+                            ClipValueToMinMax="True"
+                            Margin="10, 0, 10, 5"
+                            Value="{Binding RepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsRepetitionIntervalEnabled}"/>
 
-                    <extendedwpftoolkit:IntegerUpDown 
-                        Grid.Row="3"
-                        Grid.Column="1"
-                        Minimum="1"
-                        Maximum="32767"
-                        ClipValueToMinMax="True"
-                        Margin="10, 0, 10, 10"
-                        Value="{Binding NumberOfLoops, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        IsEnabled="{Binding IsNumberOfLoopsEnabled}"/>
+                        <TextBlock 
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="End Behaviour"/>
 
-                </Grid>
+                        <ComboBox
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Margin="10, 0, 10, 5"
+                            ItemsSource="{Binding EndBehaviours}" 
+                            SelectedItem="{Binding EndBehaviour}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsEndBehaviourEnabled}"/>
+                    </Grid>
+                </Expander>
             </Border>
 
             <Border 
-                Grid.Row="1"
-                Grid.Column="3"
-                Margin="0, 5, 0, 0"
-                BorderBrush="{DynamicResource Button.Static.Border}"
-                BorderThickness="1, 2, 2, 2">
-                
-                <Grid>
+                Grid.Row="3"
+                Grid.Column="0"
+                BorderBrush="{DynamicResource Button.Static.Border}">
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <Expander 
+                    Style="{StaticResource ExpanderWithBorderBackground}"
+                    IsExpanded="True"
+                    Margin="0"
+                    Padding="5,0,0,0"
+                    BorderBrush="{DynamicResource Button.Static.Border}">
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition 
-                            Width="Auto"/>
-                        <ColumnDefinition 
-                            Width="125"/>
-                    </Grid.ColumnDefinitions>
+                    <Expander.Header>
+                        <DockPanel 
+                            VerticalAlignment="Center" 
+                            LastChildFill="True" 
+                            Margin="10, 5, 10, 5">
 
-                    <Border
-                        Grid.Row="0"
-                        Grid.ColumnSpan="2"
-                        BorderBrush="{DynamicResource Button.Static.Border}"
-                        BorderThickness="0, 0, 0, 2"
-                        Background="{DynamicResource Button.Static.Background}">
+                            <TextBlock 
+                                Text="Playlist Looping"
+                                VerticalAlignment="Center"
+                                Margin="-5, 0, 10, 0" />
+                        </DockPanel>
+                    </Expander.Header>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition 
+                                Width="150"/>
+                            <ColumnDefinition 
+                                Width="*"/>
+                        </Grid.ColumnDefinitions>
 
                         <TextBlock 
-                            Margin="10, 5, 10, 5"
-                            Text="Playlist Transitions:"/>
-                    </Border>
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="10, 10, 5, 5"
+                            Text="Enable"/>
 
-                    <TextBlock 
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        Margin="10, 10, 5, 5"
-                        Text="Enable"/>
+                        <CheckBox
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="10, 10, 10, 5"
+                            IsChecked="{Binding EnableLooping, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsEnableLoopingEnabled}"/>
 
-                    <CheckBox
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Margin="10, 10, 10, 5"
-                        IsChecked="{Binding EnableTransitions, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        IsEnabled="{Binding IsEnableTransitionsEnabled}"/>
+                        <TextBlock 
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="Loop Infinitely"/>
 
-                    <TextBlock 
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        Margin="10, 0, 5, 5"
-                        Text="Transition Type"/>
+                        <CheckBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="10, 0, 10, 5"
+                            IsChecked="{Binding LoopInfinitely, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsLoopInfinitelyEnabled}"/>
 
-                    <ComboBox
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Margin="10, 0, 10, 5"
-                        ItemsSource="{Binding Transitions}" 
-                        SelectedItem="{Binding Transition}" 
-                        ItemTemplate="{StaticResource EnumToStringTemplate}"
-                        IsEnabled="{Binding IsTransitionTypeEnabled}"/>
+                        <TextBlock 
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Margin="10, 1, 5, 5"
+                            Text="Number of Loops"/>
 
-                    <TextBlock 
-                        Grid.Row="3"
-                        Grid.Column="0"
-                        Margin="10, 1, 5, 5"
-                        Text="Duration"/>
+                        <extendedwpftoolkit:IntegerUpDown 
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Minimum="1"
+                            Maximum="32767"
+                            ClipValueToMinMax="True"
+                            Margin="10, 0, 10, 10"
+                            Value="{Binding NumberOfLoops, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsNumberOfLoopsEnabled}"/>
+                    </Grid>
+                </Expander>
+            </Border>
 
-                    <extendedwpftoolkit:DecimalUpDown  
-                        Grid.Row="3"
-                        Grid.Column="1"
-                        Margin="10, 0, 10, 10"
-                        Minimum="0"
-                        Maximum="3600"
-                        Increment="0.05"
-                        ClipValueToMinMax="True"
-                        Value="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                        IsEnabled="{Binding IsDurationEnabled}"/>
-                </Grid>
+            <Border 
+                Grid.Row="4"
+                Grid.Column="0"
+                BorderBrush="{DynamicResource Button.Static.Border}"
+                BorderThickness="0, 0, 0, 0">
+
+                <Expander 
+                    Style="{StaticResource ExpanderWithBorderBackground}"
+                    IsExpanded="True"
+                    Padding="5,0,0,0"
+                    BorderBrush="{DynamicResource Button.Static.Border}">
+
+                    <Expander.Header>
+                        <DockPanel 
+                            VerticalAlignment="Center" 
+                            LastChildFill="True" 
+                            Margin="10, 5, 10, 5">
+
+                            <TextBlock 
+                                Text="Playlist Transitions"
+                                VerticalAlignment="Center"
+                                Margin="-5, 0, 10, 0" />
+                        </DockPanel>
+                    </Expander.Header>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                            <RowDefinition 
+                                Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition 
+                                Width="150"/>
+                            <ColumnDefinition 
+                                Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock 
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="10, 10, 5, 5"
+                            Text="Enable"/>
+
+                        <CheckBox
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="10, 10, 10, 5"
+                            IsChecked="{Binding EnableTransitions, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsEnableTransitionsEnabled}"/>
+
+                        <TextBlock 
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="10, 0, 5, 5"
+                            Text="Transition Type"/>
+
+                        <ComboBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="10, 0, 10, 5"
+                            ItemsSource="{Binding Transitions}" 
+                            SelectedItem="{Binding Transition}" 
+                            ItemTemplate="{StaticResource EnumToStringTemplate}"
+                            IsEnabled="{Binding IsTransitionTypeEnabled}"/>
+
+                        <TextBlock 
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Margin="10, 1, 5, 5"
+                            Text="Duration"/>
+
+                        <extendedwpftoolkit:DecimalUpDown  
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Margin="10, 0, 10, 10"
+                            Minimum="0"
+                            Maximum="3600"
+                            Increment="0.05"
+                            ClipValueToMinMax="True"
+                            Value="{Binding Duration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsDurationEnabled}"/>
+                    </Grid>
+                </Expander>
             </Border>
         </Grid>
-    </Expander>
+    </Grid>
 </UserControl>

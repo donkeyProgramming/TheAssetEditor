@@ -24,6 +24,7 @@ namespace Editors.Audio.AudioEditor
         public static void HandleSelectedTreeViewItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
         {
             audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor";
+            audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer";
 
             // Set filtering properties
             audioEditorViewModel.IsDialogueEventPresetFilterEnabled = false;
@@ -51,6 +52,7 @@ namespace Editors.Audio.AudioEditor
                 if (selectedSoundBank.Type == GameSoundBankType.ActionEventSoundBank.ToString())
                 {
                     audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {selectedSoundBank.Name}";
+                    audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {selectedSoundBank.Name}";
 
                     AudioSettingsViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
@@ -75,6 +77,7 @@ namespace Editors.Audio.AudioEditor
             else if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
                 audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
+                audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
 
                 AudioSettingsViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
@@ -95,6 +98,7 @@ namespace Editors.Audio.AudioEditor
             else if (audioEditorViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
             {
                 audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
+                audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
 
                 ConfigureAudioProjectEditorSingleRowDataGridForModdedStates(audioEditorViewModel, audioProjectService, audioRepository, selectedModdedStateGroup.Name);
                 SetAudioProjectEditorSingleRowDataGridToModdedStateGroup(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid, selectedModdedStateGroup.Name);
