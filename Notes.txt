@@ -1,25 +1,13 @@
-FIX GameDb => SQL DB convrter v0.1
-
-RenderEngineComponent=> Draw
-inside _drawGlow, crash if device.Viewport.Width == 1 as bloomRenderTarget == null
 
 
-Finished for v059
-	asd888
+
+
+
+Fixes for v060
+
 	[Feature] twui editor v0.1
-	[Feature] Support for reading encrypted packfiles
-	
-	[Bugfix] General: Fixed common crash when opening 3d models, that caused soft lock. Thanks to Cemmen and timbabwiani for debugging help
-	[Bugfix] Audiostuff: Ask pear for a description
-	[Bugfix] General: Fixed bug which caused deleted files to not be removed 
-	[Bugfix] Kitbash: Error message if there is an error in wsmodel, reverts to using rmv2 material
-	[Bugfix] Kitbash: Fixed potential softlock when loading wsmodels with errors 
-	[Bugfix] AnimationBins: Most warnings turned into errors, as CA has terrible QA.
-	
-	X GameWorld: Complex scene loader, make it work without needed Animation players, and graphics card. For unit testing. Make a input setting struct 
-	X General: Convert GameinformationFactory to a static! 
+	FIX GameDb => SQL DB convrter v0.1
 
-Fixes for v059
 	Finish game settings and make stuff hide behind interface. 
 		Consider movving all of material stuff out of rendering, as it would then make more sene to move wsmodel parsing and generations in there 
 		Hide basic shader behind material factory as well. It can also be a capability shader. 
@@ -67,7 +55,11 @@ Bugs:
 			Save
 			Add 
 			Search 
-	
+			
+Important tests:
+	WsModel for only visible nodes 
+	AnimationBin saving/parsing 
+
 	
 Improvements:
 	General: Print scope - special handling for eventhub. Include registred callbacks 
@@ -132,6 +124,20 @@ New features:
 	
 Interesting links:
 	https://github.com/kikipoulet/SukiUI/blob/main/SukiUI/Controls/PropertyGrid/InstanceViewModel.cs	-> Auto generate views for property gird. Also good docking in same lib 
+	
+	
+	
+Finished for v058
+	[Feature] Support for reading encrypted packfiles
+	
+	[Bugfix] Kitbash: Fixed issue when generating WsModel for only visible meshes 
+	[Bugfix] General: Fixed common crash when opening 3d models, that caused soft lock. Thanks to Cemmen and timbabwiani for debugging help
+	[Bugfix] Audio: General bugfixes and Improvements  
+	[Bugfix] General: Fixed bug which caused deleted files to not be removed 
+	[Bugfix] Kitbash: Error message if there is an error in wsmodel, reverts to using rmv2 material
+	[Bugfix] Kitbash: Fixed potential softlock when loading wsmodels with errors 
+	[Bugfix] AnimationBins: Most warnings turned into errors, as CA has terrible QA.
+	[Bugfix] AnimationBins: Fixed crash when validating bin, due to missing file. Is now a warrning #243
 	
 Fixes for v058:
 	[Feature]	General:	Force close current editor option added to the error window to avoid softlocks. https://github.com/donkeyProgramming/TheAssetEditor/issues/232
