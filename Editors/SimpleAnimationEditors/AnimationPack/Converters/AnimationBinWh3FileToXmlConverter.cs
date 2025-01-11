@@ -18,12 +18,15 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
     public class AnimationBinWh3FileToXmlConverter : BaseAnimConverter<AnimationBinWh3FileToXmlConverter.XmlFormat, AnimationBinWh3>
     {
         private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
-        private string _animationPersistanceMetaFileName = "";
-        private readonly Dictionary<string, uint> _animationsVersionFoundInPersistenceMeta = new();
+        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
 
-        public AnimationBinWh3FileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        private string _animationPersistanceMetaFileName = "";
+        private readonly Dictionary<string, uint> _animationsVersionFoundInPersistenceMeta = [];
+
+        public AnimationBinWh3FileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
+            _metaDataTagDeSerializer = metaDataTagDeSerializer;
         }
 
         protected override string CleanUpXml(string xmlText)
@@ -281,7 +284,7 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
                 return false;
             }
             var data = theFile.DataSource.ReadData();
-            var parsed = new MetaDataFileParser().ParseFile(data);
+            var parsed = new MetaDataFileParser().ParseFile(data, _metaDataTagDeSerializer);
 
             var mainAnimationHeader = GetAnimationHeader(mainAnimationFile, pfs);
             if (mainAnimationHeader == null)

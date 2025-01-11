@@ -1,6 +1,7 @@
-﻿using Shared.Core.Events;
+﻿using Editors.AnimationMeta.Presentation;
+using Shared.Core.Events;
 
-namespace Editors.AnimationMeta.Presentation.Commands
+namespace Editors.AnimationMeta.MetaEditor.Commands
 {
     internal class MoveEntryCommand : IUiCommand
     {

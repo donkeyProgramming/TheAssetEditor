@@ -8,16 +8,16 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 {
     public class MetaDataFileParser
     {
-        ILogger _logger = Logging.Create<MetaDataFileParser>();
+        private readonly ILogger _logger = Logging.Create<MetaDataFileParser>();
 
-        public MetaDataFile ParseFile(PackFile pf)
+        public MetaDataFile? ParseFile(PackFile pf, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             if (pf == null)
                 return null;
-            return ParseFile(pf.DataSource.ReadData());
+            return ParseFile(pf.DataSource.ReadData(), metaDataTagDeSerializer);
         }
 
-        public MetaDataFile ParseFile(byte[] fileContent)
+        public MetaDataFile ParseFile(byte[] fileContent, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             var contentLength = fileContent.Count();
 
@@ -45,7 +45,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
                 {
                     try
                     {
-                        var deserializedTag = MetaDataTagDeSerializer.DeSerialize(item, out var errorStr);
+                        var deserializedTag = metaDataTagDeSerializer.DeSerialize(item, out var errorStr);
                         if (deserializedTag == null)
                         {
                             outputFile.Items.Add(item);

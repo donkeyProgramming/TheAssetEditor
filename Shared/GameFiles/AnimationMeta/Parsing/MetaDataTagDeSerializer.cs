@@ -5,16 +5,16 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 {
     public class MetaDataTagDeSerializer
     {
-        public static Dictionary<string, List<Type>> _typeTable;
-        public static Dictionary<string, string> _descriptionMap;
+        private readonly Dictionary<string, List<Type>> _typeTable = [];
+        private readonly Dictionary<string, string> _descriptionMap = [];
 
-        public static void EnsureMappingTableCreated()
+        public MetaDataTagDeSerializer()
         {
-            if (_typeTable != null)
-                return;
+            EnsureMappingTableCreated();
+        }
 
-            _typeTable = new Dictionary<string, List<Type>>();
-
+        void EnsureMappingTableCreated()
+        {
             CreateDescriptions();
 
             var typesWithMyAttribute =
@@ -73,9 +73,8 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 #endif
         }
 
-        static void CreateDescriptions()
+        void CreateDescriptions()
         {
-            _descriptionMap = new Dictionary<string, string>();
             _descriptionMap["TIME"] = "Generic time marker";
             _descriptionMap["DISABLE_PERSISTENT"] = "Disable persistent animation metadata";
             _descriptionMap["DISABLE_PERSISTENT_VFX"] = "Disable persistent vfx metadata";
@@ -176,31 +175,31 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             _descriptionMap["EJECT_ATTACHED"] = "Eject the attached riders. Defines the direction of ejection(2D, Y is ignored).";
         }
 
-        public static string GetDescription(string metaDataTagName)
+        public string GetDescription(string metaDataTagName)
         {
             if (_descriptionMap.ContainsKey(metaDataTagName) == false)
                 throw new Exception($"Unable to get description of {metaDataTagName}");
             return _descriptionMap[metaDataTagName];
         }
 
-        public static string GetDescriptionSafe(string metaDataTagName)
+        public string GetDescriptionSafe(string metaDataTagName)
         {
             if (_descriptionMap.ContainsKey(metaDataTagName) == false)
                 return "Missing";
             return _descriptionMap[metaDataTagName];
         }
 
-        public static List<string> GetSupportedTypes()
+        public List<string> GetSupportedTypes()
         {
             return _typeTable.Select(x => x.Key).ToList();
         }
 
-        static bool IsSequential(int[] array)
+        bool IsSequential(int[] array)
         {
             return array.Zip(array.Skip(1), (a, b) => a + 1 == b).All(x => x);
         }
 
-        static List<Type> GetTypesFromMeta(BaseMetaEntry entry)
+        List<Type> GetTypesFromMeta(BaseMetaEntry entry)
         {
             var key = entry.Name + "_" + entry.Version;
             if (_typeTable.ContainsKey(key) == false)
@@ -209,7 +208,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             return _typeTable[key];
         }
 
-        public static BaseMetaEntry DeSerialize(UnknownMetaEntry entry, out string errorMessage)
+        public BaseMetaEntry? DeSerialize(UnknownMetaEntry entry, out string? errorMessage)
         {
             var entryInfoList = GetEntryInformation(entry);
             if (entryInfoList == null)
@@ -261,7 +260,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             return null;
         }
 
-        public static List<(string Header, string Value)> DeSerializeToStrings(BaseMetaEntry entry, out string errorMessage)
+        public List<(string Header, string Value)>? DeSerializeToStrings(BaseMetaEntry entry, out string? errorMessage)
         {
             var entryInfoList = GetEntryInformation(entry);
             if (entryInfoList == null)
@@ -308,7 +307,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             return output;
         }
 
-        public static BaseMetaEntry CreateDefault(string itemName)
+        public BaseMetaEntry CreateDefault(string itemName)
         {
             if (_typeTable.ContainsKey(itemName) == false)
                 throw new Exception("Unknown metadata item " + itemName);
@@ -322,7 +321,7 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
             return instance;
         }
 
-        static List<EntryInfoResult> GetEntryInformation(BaseMetaEntry entry)
+        List<EntryInfoResult>? GetEntryInformation(BaseMetaEntry entry)
         {
             var metaDataTypes = GetTypesFromMeta(entry);
             if (metaDataTypes == null)
@@ -347,8 +346,8 @@ namespace Shared.GameFormats.AnimationMeta.Parsing
 
         public class EntryInfoResult
         {
-            public Type Type { get; set; }
-            public List<PropertyInfo> Properties { get; set; }
+            public Type? Type { get; set; }
+            public List<PropertyInfo> Properties { get; set; } = new();
         }
     }
 }

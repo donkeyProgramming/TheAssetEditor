@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationMeta.MetaEditor.Commands;
-using Editors.AnimationMeta.Presentation.Commands;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
@@ -14,6 +13,7 @@ namespace Editors.AnimationMeta.Presentation
     public partial class MetaDataEditorViewModel : ObservableObject, IEditorInterface, ISaveableEditor, IFileEditor
     {
         private readonly IUiCommandFactory _uiCommandFactory;
+        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
 
         [ObservableProperty] string _displayName = "Metadata Editor";
         [ObservableProperty] IMetaDataEntry _selectedTag;
@@ -23,9 +23,10 @@ namespace Editors.AnimationMeta.Presentation
         public bool HasUnsavedChanges { get; set; } = false;
         public PackFile CurrentFile { get; set; }
 
-        public MetaDataEditorViewModel(IUiCommandFactory uiCommandFactory)
+        public MetaDataEditorViewModel(IUiCommandFactory uiCommandFactory, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _uiCommandFactory = uiCommandFactory;
+            _metaDataTagDeSerializer = metaDataTagDeSerializer;
         }
 
         public bool Save() => _uiCommandFactory.Create<SaveCommand>().Execute(this);
@@ -46,7 +47,7 @@ namespace Editors.AnimationMeta.Presentation
             var fileContent = CurrentFile.DataSource.ReadData();
 
             var parser = new MetaDataFileParser();
-            var loadedMetadataFile = parser.ParseFile(fileContent);
+            var loadedMetadataFile = parser.ParseFile(fileContent, _metaDataTagDeSerializer);
             MetaDataFileVersion = loadedMetadataFile.Version;
 
             foreach (var item in loadedMetadataFile.Items)
@@ -54,7 +55,7 @@ namespace Editors.AnimationMeta.Presentation
                 if (item is UnknownMetaEntry uknMeta)
                     Tags.Add(new UnkMetaDataEntry(uknMeta));
                 else if (item is BaseMetaEntry metaBase)
-                    Tags.Add(new MetaDataEntry(metaBase));
+                    Tags.Add(new MetaDataEntry(metaBase, _metaDataTagDeSerializer));
                 else
                     throw new Exception($"{item.GetType()} is not a known type for {nameof(MetaDataEditorViewModel)}");
             }

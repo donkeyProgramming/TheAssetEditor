@@ -12,6 +12,7 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
+using Shared.GameFormats.AnimationMeta.Parsing;
 using Shared.GameFormats.AnimationPack;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes;
 using Shared.GameFormats.AnimationPack.AnimPackFileTypes.Wh3;
@@ -27,7 +28,7 @@ namespace CommonControls.Editors.AnimationPack
         private ITextConverter _activeConverter;
         private readonly ApplicationSettingsService _appSettings;
         private readonly IFileSaveService _packFileSaveService;
- 
+        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
 
         public string DisplayName { get; set; } = "Not set";
 
@@ -43,13 +44,14 @@ namespace CommonControls.Editors.AnimationPack
         public ICommand RenameCommand { get; set; }
         public ICommand CopyFullPathCommand { get; set; }
 
-        public AnimPackViewModel(IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings, IFileSaveService packFileSaveService)
+        public AnimPackViewModel(IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings, IFileSaveService packFileSaveService, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _appSettings = appSettings;
             _packFileSaveService = packFileSaveService;
- 
+            _metaDataTagDeSerializer = metaDataTagDeSerializer;
+
             AnimationPackItems = new FilterCollection<IAnimationPackFile>(new List<IAnimationPackFile>(), ItemSelected, BeforeItemSelected)
             {
                 SearchFilter = (value, rx) => { return rx.Match(value.FileName).Success; }
@@ -95,7 +97,7 @@ namespace CommonControls.Editors.AnimationPack
             DisplayName = animPack.FileName;
         }
 
-        string GetAnimSetFileName()
+        string? GetAnimSetFileName()
         {
             var window = new TextInputWindow("Fragment name", "");
             if (window.ShowDialog() == true)
@@ -142,7 +144,7 @@ namespace CommonControls.Editors.AnimationPack
             else if (seletedFile is Shared.GameFormats.AnimationPack.AnimPackFileTypes.AnimationBin typedBin)
                 _activeConverter = new AnimationBinFileToXmlConverter();
             else if (seletedFile is AnimationBinWh3 wh3Bin)
-                _activeConverter = new AnimationBinWh3FileToXmlConverter(_skeletonAnimationLookUpHelper);
+                _activeConverter = new AnimationBinWh3FileToXmlConverter(_skeletonAnimationLookUpHelper, _metaDataTagDeSerializer);
 
             if (seletedFile == null || _activeConverter == null || seletedFile.IsUnknownFile)
             {

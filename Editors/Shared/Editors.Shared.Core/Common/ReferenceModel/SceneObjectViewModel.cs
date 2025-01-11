@@ -12,6 +12,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         private readonly IPackFileService _pfs;
         private readonly IStandardDialogs _uiProvider;
         private readonly SceneObjectEditor _sceneObjectBuilder;
+        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
         private readonly IMetaDataFactory _metaDataFactory;
 
         [ObservableProperty] string _headerName;
@@ -34,13 +35,14 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             SceneObject data,
             string headerName,
             SceneObjectEditor sceneObjectBuilder,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _metaDataFactory = metaDataFactory;
             _pfs = packFileService;
             _uiProvider = uiProvider;
             _sceneObjectBuilder = sceneObjectBuilder;
-           
+            _metaDataTagDeSerializer = metaDataTagDeSerializer;
             Data = data;
             HeaderName = headerName;
 
@@ -93,8 +95,8 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             model.Player.AnimationRules.Clear();
 
             var parser = new MetaDataFileParser();
-            var persist = parser.ParseFile(model.PersistMetaData);
-            var meta = parser.ParseFile(model.MetaData);
+            var persist = parser.ParseFile(model.PersistMetaData, _metaDataTagDeSerializer);
+            var meta = parser.ParseFile(model.MetaData, _metaDataTagDeSerializer);
             model.MetaDataItems = _metaDataFactory.Create(persist, meta, model.MainNode, model, model.Player, FragAndSlotSelection.FragmentList.SelectedItem);
         }
     }

@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using Editors.AnimationMeta.Presentation;
 using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.GameFormats.AnimationMeta.Parsing;
 
-namespace Editors.AnimationMeta.Presentation.Commands
+namespace Editors.AnimationMeta.MetaEditor.Commands
 {
     public class MetaDataTagCopyItem : ICopyPastItem
     {
@@ -17,10 +18,12 @@ namespace Editors.AnimationMeta.Presentation.Commands
     class CopyPastCommand : IUiCommand
     {
         private readonly CopyPasteManager _copyPasteManager;
+        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
 
-        public CopyPastCommand(CopyPasteManager copyPasteManager)
+        public CopyPastCommand(CopyPasteManager copyPasteManager, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _copyPasteManager = copyPasteManager;
+            _metaDataTagDeSerializer = metaDataTagDeSerializer;
         }
 
         public void ExecuteCopy(MetaDataEditorViewModel controller)
@@ -61,17 +64,17 @@ namespace Editors.AnimationMeta.Presentation.Commands
             {
                 var pasteObjects = pastObject.Items;
                 var confirm = MessageBox.Show($"Paste {pasteObjects.Count} metadata objects?", "Meta Copy Paste", MessageBoxButton.YesNo);
-                if (confirm != MessageBoxResult.Yes) 
+                if (confirm != MessageBoxResult.Yes)
                     return;
 
                 foreach (var item in pasteObjects)
                 {
                     try
                     {
-                        var typed = MetaDataTagDeSerializer.DeSerialize(item, out var errorStr);
+                        var typed = _metaDataTagDeSerializer.DeSerialize(item, out var errorStr);
                         if (typed == null)
                             throw new Exception(errorStr);
-                        controller.Tags.Add(new MetaDataEntry(typed));
+                        controller.Tags.Add(new MetaDataEntry(typed, _metaDataTagDeSerializer));
                     }
                     catch
                     {
@@ -84,7 +87,7 @@ namespace Editors.AnimationMeta.Presentation.Commands
         }
 
 
-       
+
 
     }
 }
