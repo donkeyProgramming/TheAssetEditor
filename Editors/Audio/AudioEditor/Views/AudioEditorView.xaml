@@ -312,7 +312,10 @@
                     Margin="0, 0, 0, 0"
                     AutoGenerateColumns="False"
                     CanUserAddRows="False" 
-                    ItemsSource="{Binding AudioProjectEditorSingleRowDataGrid}"/>
+                    ItemsSource="{Binding AudioProjectEditorSingleRowDataGrid}"
+                    EnableRowVirtualization="True" 
+                    EnableColumnVirtualization="True"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
 
                 <Grid 
                     Grid.Row="2" 
@@ -441,7 +444,10 @@
                     VerticalScrollBarVisibility="Auto" 
                     SelectionChanged="DataGrid_SelectionChanged"
                     CanUserAddRows="False"
-                    ItemsSource="{Binding AudioProjectEditorFullDataGrid}">
+                    ItemsSource="{Binding AudioProjectEditorFullDataGrid}"
+                    EnableRowVirtualization="True" 
+                    EnableColumnVirtualization="True"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
                     <DataGrid.ContextMenu>
                         <ContextMenu>

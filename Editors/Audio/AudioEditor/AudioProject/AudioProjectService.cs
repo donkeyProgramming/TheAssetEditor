@@ -88,7 +88,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
                 AudioProjectFileName = fileName.Replace(fileType, string.Empty);
                 AudioProjectDirectory = filePath.Replace($"\\{fileName}", string.Empty);
 
-                // Initialise data. This must be done after AudioProject is set so it uses the correct instance
+                // Initialise data after AudioProject is set so it uses the correct instance
                 audioEditorViewModel.Initialise();
 
                 // Get the Modded States and prepare them for being added to the DataGrid ComboBoxes

@@ -25,17 +25,17 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         public string DisplayName { get; set; } = "New Audio Project";
 
-        // Settings properties.
+        // Settings properties
         [ObservableProperty] private string _audioProjectFileName;
         [ObservableProperty] private string _audioProjectDirectory;
         [ObservableProperty] private GameLanguage _selectedLanguage;
         [ObservableProperty] private ObservableCollection<GameLanguage> _languages = new(Enum.GetValues<GameLanguage>());
 
-        // Ok button enablement.
+        // Ok button enablement
         [ObservableProperty] private bool _isAudioProjectFileNameSet;
         [ObservableProperty] private bool _isAudioProjectDirectorySet;
         [ObservableProperty] private bool _isLanguageSelected;
-        [ObservableProperty] private bool _isOKButtonEnabled;
+        [ObservableProperty] private bool _isOkButtonEnabled;
 
         public NewAudioProjectViewModel(IPackFileService packFileService, AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
         {
@@ -69,7 +69,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
 
         private void UpdateOkButtonIsEnabled()
         {
-            IsOKButtonEnabled = IsAudioProjectFileNameSet && IsAudioProjectDirectorySet && IsLanguageSelected;
+            IsOkButtonEnabled = IsAudioProjectFileNameSet && IsAudioProjectDirectorySet && IsLanguageSelected;
         }
 
         [RelayCommand] public void SetNewFileLocation()
@@ -106,7 +106,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             IsAudioProjectFileNameSet = false;
             IsAudioProjectDirectorySet = false;
             IsLanguageSelected = false;
-            IsOKButtonEnabled = false;
+            IsOkButtonEnabled = false;
         }
 
         [RelayCommand] public void CloseWindowAction()

@@ -28,7 +28,7 @@ namespace Editors.Audio.AudioEditor.Views
             var window = new NewAudioProjectWindow(packFileService, audioEditorViewModel, audioProjectService, packFileUiProvider);
             var newAudioProjectViewModel = new NewAudioProjectViewModel(packFileService, audioEditorViewModel, audioProjectService, packFileUiProvider);
 
-            // Set the close action for the ViewModel.
+            // Set the close action for the ViewModel
             newAudioProjectViewModel.SetCloseAction(() =>
             {
                 window.Close();

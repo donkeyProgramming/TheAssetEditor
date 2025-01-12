@@ -25,7 +25,6 @@ namespace Editors.Audio.AudioEditor.AudioProject
         public string Type { get; set; }
         public ObservableCollection<ActionEvent> ActionEvents { get; set; } = [];
         public ObservableCollection<DialogueEvent> DialogueEvents { get; set; } = [];
-        public ObservableCollection<MusicEvent> MusicEvents { get; set; } = [];
         [JsonIgnore] public ObservableCollection<object> SoundBankTreeViewItems { get; set; } = [];
     }
 
@@ -39,13 +38,6 @@ namespace Editors.Audio.AudioEditor.AudioProject
     public class DialogueEvent : IAudioProjectItem
     {
         public List<StatePath> DecisionTree { get; set; } = [];
-    }
-
-    public class MusicEvent : IAudioProjectItem
-    {
-        public List<string> AudioFiles { get; set; } = [];
-        public string AudioFilesDisplay { get; set; }
-        public AudioSettings AudioSettings { get; set; }
     }
 
     public class StateGroup : IAudioProjectItem 
