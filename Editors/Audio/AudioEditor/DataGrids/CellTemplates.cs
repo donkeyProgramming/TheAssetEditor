@@ -158,33 +158,6 @@ namespace Editors.Audio.AudioEditor.DataGrids
             return template;
         }
 
-        public static DataTemplate CreateSoundsButtonTemplate(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
-        {
-            var template = new DataTemplate();
-            var factory = new FrameworkElementFactory(typeof(Button));
-
-            factory.AddHandler(System.Windows.Controls.Primitives.ButtonBase.ClickEvent, new RoutedEventHandler((sender, e) =>
-            {
-                var button = sender as Button;
-                var dataGridRow = FindVisualParent<DataGridRow>(button);
-                if (dataGridRow != null)
-                {
-                    var textBox = FindVisualChild<TextBox>(dataGridRow, "AudioFilesDisplay");
-                    if (textBox != null)
-                    {
-                        var rowDataContext = dataGridRow.DataContext;
-                        if (rowDataContext is Dictionary<string, object> dataGridRowContext)
-                            CellTemplatesHelpers.OnAudioFilesButtonClicked(audioEditorViewModel, audioProjectService, audioRepository, textBox, dataGridRowContext);
-                    }
-                }
-            }));
-
-            factory.SetValue(ContentControl.ContentProperty, "...");
-            factory.SetValue(FrameworkElement.ToolTipProperty, "Browse wav files");
-            template.VisualTree = factory;
-            return template;
-        }
-
         public static DataTemplate CreateEditableTextBoxTemplate(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository, string columnHeader)
         {
             var template = new DataTemplate();

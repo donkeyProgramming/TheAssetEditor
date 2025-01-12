@@ -34,6 +34,7 @@ namespace Editors.Audio.AudioEditor
             audioEditorViewModel.IsAddRowButtonEnabled = false;
             audioEditorViewModel.IsUpdateRowButtonEnabled = false;
             audioEditorViewModel.IsRemoveRowButtonEnabled = false;
+            audioEditorViewModel.IsAddAudioFilesButtonEnabled = false;
             audioEditorViewModel.IsPlayAudioButtonEnabled = false;
             audioEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
 

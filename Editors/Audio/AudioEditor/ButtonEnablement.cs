@@ -78,6 +78,7 @@ namespace Editors.Audio.AudioEditor
             // Reset button enablement
             audioEditorViewModel.IsUpdateRowButtonEnabled = false;
             audioEditorViewModel.IsRemoveRowButtonEnabled = false;
+            audioEditorViewModel.IsAddAudioFilesButtonEnabled = false;
             audioEditorViewModel.IsPlayAudioButtonEnabled = false;
             audioEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
 
@@ -100,6 +101,9 @@ namespace Editors.Audio.AudioEditor
 
             if (audioProjectService.StateGroupsWithModdedStatesRepository.Count > 0)
                 audioEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
+
+            if (audioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes.Count > 0)
+                audioEditorViewModel.IsAddAudioFilesButtonEnabled = true;
         }
     }
 }

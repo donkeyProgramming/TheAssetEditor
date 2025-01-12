@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioProject;
@@ -34,6 +35,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         private readonly IStandardDialogs _packFileUiProvider;
 
         public AudioSettingsViewModel AudioSettingsViewModel { get; set; } = new();
+        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
 
         public string DisplayName { get; set; } = "Audio Editor";
 
@@ -66,6 +68,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [ObservableProperty] private bool _isAddRowButtonEnabled = false;
         [ObservableProperty] private bool _isUpdateRowButtonEnabled = false;
         [ObservableProperty] private bool _isRemoveRowButtonEnabled = false;
+        [ObservableProperty] private bool _isAddAudioFilesButtonEnabled = false;
         [ObservableProperty] private bool _isPlayAudioButtonEnabled = false;
         [ObservableProperty] private bool _isShowModdedStatesCheckBoxEnabled = false;
         [ObservableProperty] private bool _isPasteEnabled = true;
@@ -76,6 +79,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
             _packFileService = packFileService;
             _audioProjectService = audioProjectService;
             _packFileUiProvider = packFileUiProvider;
+
+            AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(_packFileService, this, _audioProjectService, _packFileUiProvider);
 
             Initialise();
 
@@ -182,6 +187,43 @@ namespace Editors.Audio.AudioEditor.ViewModels
             HandleRemovingRowData(this, _audioProjectService, _audioRepository);
         }
 
+        [RelayCommand] public void AddSelectedAudioFiles()
+        {
+            var dataGridRow = AudioProjectEditorSingleRowDataGrid[0];
+
+            var selectedWavFilePaths = AudioFilesExplorerViewModel.SelectedTreeNodes
+                .Select(wavFile => wavFile.FilePath)
+                .ToList();
+
+            var selectedWavFileNames = AudioFilesExplorerViewModel.SelectedTreeNodes
+                .Select(wavFile => wavFile.Name)
+                .ToList();
+
+            var fileNamesString = string.Join(", ", selectedWavFileNames);
+            var filePathsString = string.Join(", ", selectedWavFilePaths.Select(filePath => $"\"{filePath}\""));
+
+            var audioFiles = new List<string>(selectedWavFilePaths);
+            dataGridRow["AudioFiles"] = audioFiles;
+            dataGridRow["AudioFilesDisplay"] = fileNamesString;
+
+            var dataGrid = GetDataGridByTag(AudioProjectEditorSingleRowDataGridTag);
+            var textBox = FindVisualChild<TextBox>(dataGrid, "AudioFilesDisplay");
+            if (textBox != null)
+            {
+                textBox.Text = fileNamesString;
+                textBox.ToolTip = filePathsString;
+            }
+
+            if (audioFiles.Count > 1)
+                AudioSettingsViewModel.IsUsingMultipleAudioFiles = true;
+            else
+                AudioSettingsViewModel.IsUsingMultipleAudioFiles = false;
+
+            AudioSettingsViewModel.SetAudioSettingsEnablement(AudioSettingsViewModel);
+            SetIsAddRowButtonEnabled(this, _audioProjectService, _audioRepository);
+        }
+
+        // Maybe change this to play a file in the explorer
         [RelayCommand] public void PlayRandomAudioFile()
         {
             if (SelectedDataGridRows[0].TryGetValue("AudioFiles", out var audioFilesObj) && audioFilesObj is List<string> audioFiles && audioFiles.Any())

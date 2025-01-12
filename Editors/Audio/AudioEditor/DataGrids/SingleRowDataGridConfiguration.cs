@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             var dataGrid = GetDataGridByTag(audioEditorViewModel.AudioProjectEditorSingleRowDataGridTag);
             ClearDataGridColumns(audioEditorViewModel.AudioProjectEditorSingleRowDataGridTag);
 
-            var columnsCount = 3;
+            var columnsCount = 2;
             var columnWidth = columnsCount > 0 ? 1.0 / columnsCount : 1.0;
 
             // Column for the Event
@@ -52,15 +52,6 @@ namespace Editors.Audio.AudioEditor.DataGrids
                 Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
             };
             dataGrid.Columns.Add(soundsTextBoxColumn);
-
-            // Create and set the tooltip binding
-            var soundsButtonColumn = new DataGridTemplateColumn
-            {
-                CellTemplate = CreateSoundsButtonTemplate(audioEditorViewModel, audioProjectService, audioRepository),
-                Width = 30.0,
-                CanUserResize = false
-            };
-            dataGrid.Columns.Add(soundsButtonColumn);
         }
 
         public static void ConfigureAudioProjectEditorSingleRowDataGridForDialogueEvent(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, DialogueEvent dialogueEvent, IAudioProjectService audioProjectService)
@@ -120,14 +111,6 @@ namespace Editors.Audio.AudioEditor.DataGrids
                 Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
             };
             dataGrid.Columns.Add(soundsTextBoxColumn);
-
-            var soundsButtonColumn = new DataGridTemplateColumn
-            {
-                CellTemplate = CreateSoundsButtonTemplate(audioEditorViewModel, audioProjectService, audioRepository),
-                Width = 30.0,
-                CanUserResize = false
-            };
-            dataGrid.Columns.Add(soundsButtonColumn);
         }
     }
 }

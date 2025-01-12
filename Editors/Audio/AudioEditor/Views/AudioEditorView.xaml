@@ -104,6 +104,10 @@
                         <RowDefinition 
                             Height="Auto"/>
                         <RowDefinition 
+                            Height="450"/>
+                        <RowDefinition 
+                            Height="Auto"/>
+                        <RowDefinition 
                             Height="*"/>
                     </Grid.RowDefinitions>
 
@@ -248,6 +252,20 @@
                             </TreeView.Resources>
                         </TreeView>
                     </Grid>
+
+                    <GridSplitter
+                        Grid.Row="2"
+                        Height="5"
+                        Background="{DynamicResource App.Border}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        ResizeBehavior="PreviousAndNext"
+                        ResizeDirection="Rows"/>
+
+                    <views:AudioFilesExplorerView 
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        DataContext="{Binding AudioFilesExplorerViewModel}"/>
                 </Grid>
             </Grid>
 
@@ -265,6 +283,8 @@
                 Grid.Column="2">
 
                 <Grid.RowDefinitions>
+                    <RowDefinition 
+                        Height="Auto"/>
                     <RowDefinition 
                         Height="Auto"/>
                     <RowDefinition 
@@ -317,6 +337,8 @@
                             Width="Auto"/>
                         <ColumnDefinition 
                             Width="Auto"/>
+                        <ColumnDefinition 
+                            Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <Button 
@@ -358,6 +380,18 @@
                     <Button 
                         Grid.Row="0"
                         Grid.Column="3"
+                        Content="Add Audio Files" 
+                        ToolTip="Select the wav files from the Audio Files Explorer and add them with this button." 
+                        Command="{Binding AddSelectedAudioFilesCommand}" 
+                        Margin="5, 0, 0, 0" 
+                        Width="100" 
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Left"
+                        IsEnabled="{Binding IsAddAudioFilesButtonEnabled}"/>
+                    
+                    <Button 
+                        Grid.Row="0"
+                        Grid.Column="4"
                         Content="Play Audio" 
                         ToolTip="Play a random audio file audio from the selected item." 
                         Command="{Binding PlayRandomAudioFileCommand}" 
@@ -369,7 +403,7 @@
 
                     <CheckBox 
                         Grid.Row="0"
-                        Grid.Column="4"
+                        Grid.Column="5"
                         Content="Show Modded States Only"
                         ToolTip="PLACEHOLDER" 
                         Margin="5, 0, 0, 0" 
@@ -379,18 +413,23 @@
                         IsEnabled="{Binding IsShowModdedStatesCheckBoxEnabled}"/>
                 </Grid>
 
-                <views:AudioSettingsView 
+                <Border 
                     Grid.Row="3"
+                    Height="5" 
+                    Background="{DynamicResource App.Border}"/>
+                
+                <views:AudioSettingsView 
+                    Grid.Row="4"
                     Grid.Column="0"
                     DataContext="{Binding AudioSettingsViewModel}"/>
 
                 <Border 
-                    Grid.Row="4"
+                    Grid.Row="5"
                     Height="5" 
                     Background="{DynamicResource App.Border}"/>
 
                 <Label 
-                    Grid.Row="5"
+                    Grid.Row="6"
                     Content="{Binding AudioProjectViewerLabel}"/>
                 
                 <!-- Setting CanUserAddRows to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF. -->

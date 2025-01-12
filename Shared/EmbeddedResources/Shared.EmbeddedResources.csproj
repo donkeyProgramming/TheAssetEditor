@@ -99,6 +99,7 @@
     <None Remove="Resources\Icons\Redo.png" />
     <None Remove="Resources\Icons\Save.png" />
     <None Remove="Resources\Icons\Undo.png" />
+    <None Remove="Resources\Icons\Wav-File.png" />
     <None Remove="Resources\Icons\WordWrap.png" />
     <None Remove="Resources\OptionalRadioButtonStyle.xaml" />
     <None Remove="Resources\AudioConversion\vgstream\avcodec-vgmstream-58.dll" />
@@ -173,6 +174,7 @@
     <EmbeddedResource Include="Resources\AudioConversion\vgstream\vgstream.exe" />
     <EmbeddedResource Include="Resources\AudioConversion\vgstream\xmp-vgmstream.dll" />
     <EmbeddedResource Include="Resources\AudioConversion\WavToWemWwiseProject\WavToWemWwiseProject.zip" />
+    <EmbeddedResource Include="Resources\Icons\Wav-File.png" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_pharaoh_default.xml" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh2_default.xml" />
     <EmbeddedResource Include="Resources\WsModelTemplates\MaterialTemplate_wh3_default.xml" />

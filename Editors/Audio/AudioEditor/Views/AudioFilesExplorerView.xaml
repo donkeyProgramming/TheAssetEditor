@@ -1,0 +1,70 @@
+﻿<UserControl x:Class="Editors.Audio.AudioEditor.Views.AudioFilesExplorerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Editors.Audio.AudioEditor.Views" 
+             xmlns:viewmodels="clr-namespace:Editors.Audio.AudioEditor.ViewModels"
+             xmlns:packfiletree="clr-namespace:Shared.Ui.BaseDialogs.PackFileTree;assembly=Shared.Ui"
+             xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters" 
+             d:DataContext="{d:DesignInstance Type=viewmodels:AudioFilesExplorerViewModel}"
+             mc:Ignorable="d"
+             d:DesignHeight="250" d:DesignWidth="500">
+
+    <UserControl.Resources>
+        <converters:AudioFilesExplorerImageConverter 
+            x:Key="ImageValueConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Label 
+            Grid.Row="0"
+            Content="{Binding AudioFilesExplorerLabel}"/>
+        
+        <TextBox Grid.Row="1"
+                 Style="{StaticResource HintedTextBox}"
+                 Margin="6,5,6,0"
+                 Padding="2.5, 0, 0, 0"  
+                 Height="24"
+                 VerticalContentAlignment="Center" 
+                 Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}" 
+                 Tag="Search .wav files"/>
+        
+        <viewmodels:MultiSelectTreeView
+            Grid.Row="2"
+            ItemsSource="{Binding TreeNodes}"
+            Background="Transparent"
+            BorderBrush="Transparent"
+            SelectedItems="{Binding SelectedTreeNodes, Mode=TwoWay}"
+            Style="{StaticResource {x:Type TreeView}}"
+            Margin="0,5,0,0">
+
+            <viewmodels:MultiSelectTreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                    <Setter Property="IsExpanded" Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Style>
+            </viewmodels:MultiSelectTreeView.ItemContainerStyle>
+
+            <viewmodels:MultiSelectTreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type packfiletree:TreeNode}" ItemsSource="{Binding Children}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Image Grid.Column="0" Width="16" Height="16" Source="{Binding Path=., Converter={StaticResource ImageValueConverter}}" />
+                        <TextBlock Grid.Column="1" Margin="4,0,0,0" Text="{Binding Name}" />
+                    </Grid>
+                </HierarchicalDataTemplate>
+            </viewmodels:MultiSelectTreeView.ItemTemplate>
+        </viewmodels:MultiSelectTreeView>
+    </Grid>
+</UserControl>
