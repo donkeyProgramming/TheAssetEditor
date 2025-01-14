@@ -57,11 +57,11 @@ namespace Editors.AnimationMeta.Presentation
         private readonly ILogger _logger = Logging.Create<MetaDataEntry>();
         private readonly string _originalName;
 
-        public MetaDataEntry(BaseMetaEntry typedMetaItem)
+        public MetaDataEntry(BaseMetaEntry typedMetaItem, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _originalName = typedMetaItem.Name;
             DisplayName = typedMetaItem.DisplayName;
-            Description = MetaDataTagDeSerializer.GetDescriptionSafe(_originalName);
+            Description = metaDataTagDeSerializer.GetDescriptionSafe(_originalName);
             Version = typedMetaItem.Version;
 
             var orderedPropertiesList = typedMetaItem.GetType().GetProperties()

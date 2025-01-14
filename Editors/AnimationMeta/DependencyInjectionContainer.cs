@@ -1,7 +1,6 @@
 ﻿using AnimationEditor.Common.BaseControl;
 using Editors.AnimationMeta.MetaEditor.Commands;
 using Editors.AnimationMeta.Presentation;
-using Editors.AnimationMeta.Presentation.Commands;
 using Editors.AnimationMeta.Presentation.View;
 using Editors.AnimationMeta.SuperView;
 using Editors.AnimationMeta.Visualisation;
@@ -19,8 +18,7 @@ namespace Editors.AnimationMeta
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            MetaDataTagDeSerializer.EnsureMappingTableCreated();
-
+            serviceCollection.AddSingleton<MetaDataTagDeSerializer>();
             serviceCollection.AddTransient<MainEditorView>();
             serviceCollection.AddTransient<MetaDataEditorViewModel>();
 

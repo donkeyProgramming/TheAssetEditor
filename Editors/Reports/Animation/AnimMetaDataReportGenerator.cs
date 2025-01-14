@@ -31,16 +31,18 @@ namespace Editors.Reports.Animation
 
         private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
+        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
 
-        public AnimMetaDataReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService)
+        public AnimMetaDataReportGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _pfs = pfs;
             _settingsService = settingsService;
+            _metaDataTagDeSerializer = metaDataTagDeSerializer;
         }
 
-        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
-            var instance = new AnimMetaDataReportGenerator(pfs, settingsService);
+            var instance = new AnimMetaDataReportGenerator(pfs, settingsService, metaDataTagDeSerializer);
             instance.Create();
         }
 
@@ -75,7 +77,7 @@ namespace Editors.Reports.Animation
                         continue;
 
                     var parser = new MetaDataFileParser();
-                    var metaData = parser.ParseFile(data);
+                    var metaData = parser.ParseFile(data, _metaDataTagDeSerializer);
                     metaTable.Add((fileName, metaData));
 
                     var completedTags = 0;
@@ -89,7 +91,7 @@ namespace Editors.Reports.Animation
 
                         try
                         {
-                            var variables = MetaDataTagDeSerializer.DeSerializeToStrings(item, out var errorMessage);
+                            var variables = _metaDataTagDeSerializer.DeSerializeToStrings(item, out var errorMessage);
                             if (variables != null)
                             {
 

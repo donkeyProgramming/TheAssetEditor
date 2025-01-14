@@ -25,18 +25,20 @@ namespace Editors.Reports.Animation
         private readonly ILogger _logger = Logging.Create<AnimMetaDataJsonGenerator>();
         private readonly IPackFileService _pfs;
         private readonly ApplicationSettingsService _settingsService;
+        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
         private readonly JsonSerializerSettings _jsonOptions;
 
-        public AnimMetaDataJsonGenerator(IPackFileService pfs, ApplicationSettingsService settingsService)
+        public AnimMetaDataJsonGenerator(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _pfs = pfs;
             _settingsService = settingsService;
+            _metaDataTagDeSerializer = metaDataTagDeSerializer;
             _jsonOptions = new JsonSerializerSettings { Formatting = Formatting.Indented };
         }
 
-        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService)
+        public static void Generate(IPackFileService pfs, ApplicationSettingsService settingsService, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
-            var instance = new AnimMetaDataJsonGenerator(pfs, settingsService);
+            var instance = new AnimMetaDataJsonGenerator(pfs, settingsService, metaDataTagDeSerializer);
             instance.Create();
         }
 
@@ -62,7 +64,7 @@ namespace Editors.Reports.Animation
             var animPack = packFileContainer[0].FileList["animations\\database\\battle\\bin\\animation_tables.animpack"];
             var animPackFile = AnimationPackSerializer.Load(animPack, _pfs);
 
-            var converter = new AnimationBinWh3FileToXmlConverter(null);
+            var converter = new AnimationBinWh3FileToXmlConverter(null, _metaDataTagDeSerializer);
             foreach (var animFile in animPackFile.Files)
             {
                 if (animFile is AnimationBinWh3)
@@ -84,7 +86,7 @@ namespace Editors.Reports.Animation
                         continue;
 
                     var parser = new MetaDataFileParser();
-                    var metaData = parser.ParseFile(data);
+                    var metaData = parser.ParseFile(data, _metaDataTagDeSerializer);
                     DumpAsJson(gameOutputDir, fileName + ".json", metaData);
                 }
                 catch (Exception e)

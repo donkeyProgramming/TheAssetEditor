@@ -60,7 +60,8 @@ namespace Editors.Twui.Editor.Rendering
             device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
 
             _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);//, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone);
-            DrawHierarchy(Rectangle.Empty, twuiFile.Hierarchy.RootItems, twuiFile.Components, selectedComponent);
+
+            DrawHierarchy(Rectangle.Empty, twuiFile.Hierarchy.RootItems, twuiFile.Components, selectedComponent, 0);
             _spriteBatch.End();
 
             device.SetRenderTarget(null);
@@ -68,7 +69,7 @@ namespace Editors.Twui.Editor.Rendering
             return _renderTarget;
         }
 
-        void DrawHierarchy(Rectangle localSpace, IEnumerable<HierarchyItem> hierarchyItems, List<Component> componentList, Component? selectedComponent)
+        void DrawHierarchy(Rectangle localSpace, IEnumerable<HierarchyItem> hierarchyItems, List<Component> componentList, Component? selectedComponent, int depth)
         {
             foreach (var hierarchyItem in hierarchyItems)
             {
@@ -76,12 +77,26 @@ namespace Editors.Twui.Editor.Rendering
                 if (component == null)
                     continue;
 
-                var componentLocalSpace = DrawComponent(localSpace, component, selectedComponent);
-                DrawHierarchy(componentLocalSpace, hierarchyItem.Children, componentList, selectedComponent);
+                var componentLocalSpace = DrawComponent(localSpace, component, selectedComponent, depth);
+
+
+                int width = 0; int height = 0;
+                var currentStateId = component.Currentstate;
+                var currentState = component.States.FirstOrDefault(x => x.UniqueGuid == currentStateId);
+                if (currentState != null)
+                {
+                    width = (int)currentState.Width;
+                    height = (int)currentState.Height;
+                }
+                var spacing = new string('\t', depth);
+                Console.WriteLine($"{spacing}{component.Name}: Offset:{component.Offset}, Width:{width}, Height:{height}, Rect:{componentLocalSpace} -- DockingX:{component.DockingHorizontal}, DockingY:{component.DockingVertical}, DockOffset:{component.Dock_offset}, Acor:{component.Component_anchor_point}");
+
+
+                DrawHierarchy(componentLocalSpace, hierarchyItem.Children, componentList, selectedComponent, depth+1);
             }
         }
 
-        Rectangle DrawComponent(Rectangle localSpace, Component currentComponent, Component? selectedComponent)
+        Rectangle DrawComponent(Rectangle localSpace, Component currentComponent, Component? selectedComponent, int depth)
         {
             var invMaxLayerDepth = 1f/999999f;
 
@@ -89,7 +104,7 @@ namespace Editors.Twui.Editor.Rendering
             // Take into account colour
             // Take into account state
 
-            var compnentLocalSpace = ComponentCoordinateHelper.GetLocalCoordinateSpace(currentComponent, Rectangle.Empty);
+            var compnentLocalSpace = ComponentCoordinateHelper.GetLocalCoordinateSpace(currentComponent, localSpace, depth);
 
             foreach (var image in currentComponent.ComponentImages)
             {

@@ -84,6 +84,7 @@ namespace AssetEditor
 
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             mainWindow.DataContext = _serviceProvider.GetRequiredService<MainViewModel>();
+            mainWindow.Closed += OnMainWindowClosed;
             mainWindow.Show();
 
             // Ensure the window doesn't cover up the windows bar.
@@ -92,6 +93,13 @@ namespace AssetEditor
 
             if (applicationSettingsService.CurrentSettings.StartMaximised == true)
                 SystemCommands.MaximizeWindow(mainWindow);
+        }
+
+        private void OnMainWindowClosed(object sender, EventArgs e)
+        {
+            foreach (Window window in Current.Windows)
+                window.Close();
+            Shutdown();
         }
 
         void DispatcherUnhandledExceptionHandler(object sender, DispatcherUnhandledExceptionEventArgs args)

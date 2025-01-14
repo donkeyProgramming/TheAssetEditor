@@ -10,7 +10,7 @@ namespace Editors.Twui.Editor.Rendering
 {
     public static class ComponentCoordinateHelper
     {
-        public static Rectangle GetLocalCoordinateSpace(Component component, Rectangle parentComponentRect)
+        public static Rectangle GetLocalCoordinateSpace(Component component, Rectangle parentComponentRect, int depth)
         {
             var currentStateId = component.Currentstate;
             var currentState = component.States.FirstOrDefault(x => x.UniqueGuid == currentStateId);
@@ -20,9 +20,17 @@ namespace Editors.Twui.Editor.Rendering
                 //throw new Exception($"Current state {currentStateId} not found in {component.Name}[{component.Id}]");
             }
 
-            var localSpace = component.Offset;
+            if (component.Name == "holder_grudge_cycles")
+            { 
+            }
+
+            var localSpace = new Vector2(parentComponentRect.X, parentComponentRect.Y);
             var width = (int)currentState.Width;
             var height = (int)currentState.Height;
+
+
+
+
 
             if (component.DockingHorizontal != DockingHorizontal.None || component.DockingVertical != DockingVertical.None)
             {
@@ -56,7 +64,12 @@ namespace Editors.Twui.Editor.Rendering
                         break;
                 }
 
-                //localSpace += component.Dock_offset;
+            
+                localSpace += component.Dock_offset;
+
+               
+                var anchorOffset = new Vector2(width, height) * component.Component_anchor_point;
+                localSpace -= anchorOffset;
             }
 
 

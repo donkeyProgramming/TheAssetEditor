@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.AnimationMeta.SuperView
 {
@@ -17,6 +18,7 @@ namespace Editors.AnimationMeta.SuperView
         SceneObjectViewModel _asset;
 
         private readonly SceneObjectEditor _sceneObjectBuilder;
+        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
         private readonly IPackFileService _packFileService;
         private readonly IEventHub _eventHub;
         private readonly IUiCommandFactory _uiCommandFactory;
@@ -33,7 +35,8 @@ namespace Editors.AnimationMeta.SuperView
             IEventHub eventHub,
             IUiCommandFactory uiCommandFactory,
             SceneObjectEditor sceneObjectBuilder,
-            IEditorHostParameters editorHostParameters)
+            IEditorHostParameters editorHostParameters,
+            MetaDataTagDeSerializer metaDataTagDeSerializer)
             : base(editorHostParameters)
         {
             DisplayName = "Super view";
@@ -41,7 +44,7 @@ namespace Editors.AnimationMeta.SuperView
             _eventHub = eventHub;
             _uiCommandFactory = uiCommandFactory;
             _sceneObjectBuilder = sceneObjectBuilder;
-
+            _metaDataTagDeSerializer = metaDataTagDeSerializer;
             Initialize();
             eventHub.Register<ScopedFileSavedEvent>(this, OnFileSaved);
             eventHub.Register<SceneObjectUpdateEvent>(this, OnSceneObjectUpdated);
@@ -60,8 +63,8 @@ namespace Editors.AnimationMeta.SuperView
 
         void Initialize()
         {
-            PersistentMetaEditor = new MetaDataEditorViewModel(_uiCommandFactory);
-            MetaEditor = new MetaDataEditorViewModel(_uiCommandFactory);
+            PersistentMetaEditor = new MetaDataEditorViewModel(_uiCommandFactory, _metaDataTagDeSerializer);
+            MetaEditor = new MetaDataEditorViewModel(_uiCommandFactory, _metaDataTagDeSerializer);
             
             var assetViewModel = _sceneObjectViewModelBuilder.CreateAsset("SuperViewRoot", true, "Root", Color.Black,null, true);
             SceneObjects.Add(assetViewModel);

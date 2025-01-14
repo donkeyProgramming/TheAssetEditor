@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.GameFormats.AnimationMeta.Parsing;
 
 namespace Editors.Shared.Core.Common
 {
@@ -18,6 +19,7 @@ namespace Editors.Shared.Core.Common
         private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IStandardDialogs _packFileUiProvider;
+        private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
 
         public SceneObjectViewModelBuilder(
             AnimationPlayerViewModel animationPlayerViewModel, 
@@ -26,7 +28,8 @@ namespace Editors.Shared.Core.Common
             IPackFileService pfs, 
             SkeletonAnimationLookUpHelper skeletonHelper, 
             IUiCommandFactory uiCommandFactory,
-            IStandardDialogs packFileUiProvider)
+            IStandardDialogs packFileUiProvider,
+            MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _animationPlayerViewModel = animationPlayerViewModel;
             _metaDataFactory = metaDataFactory;
@@ -35,12 +38,13 @@ namespace Editors.Shared.Core.Common
             _skeletonHelper = skeletonHelper;
             _uiCommandFactory = uiCommandFactory;
             _packFileUiProvider = packFileUiProvider;
+            _metaDataTagDeSerializer = metaDataTagDeSerializer;
         }
 
         public SceneObjectViewModel CreateAsset(string uniqeId, bool createByDefault, string header, Color skeletonColour, AnimationToolInput input, bool allowMetaData = false)
         {
             var mainAsset = _sceneObjectEditor.CreateAsset(uniqeId, header, skeletonColour);
-            var returnObj = new SceneObjectViewModel(_uiCommandFactory, _metaDataFactory, _pfs, _packFileUiProvider, mainAsset, header + ":", _sceneObjectEditor, _skeletonHelper);
+            var returnObj = new SceneObjectViewModel(_uiCommandFactory, _metaDataFactory, _pfs, _packFileUiProvider, mainAsset, header + ":", _sceneObjectEditor, _skeletonHelper, _metaDataTagDeSerializer);
             returnObj.AllowMetaData = allowMetaData;
 
             if (createByDefault)
