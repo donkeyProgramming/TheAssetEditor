@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.ComponentModel.DataAnnotations;
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Twui.Editor.ComponentEditor;
 using Editors.Twui.Editor.Events;
@@ -12,6 +13,12 @@ using Shared.GameFormats.Twui.Data;
 
 namespace Editors.Twui.Editor
 {
+
+    public class Hi : ObservableObject
+    { 
+    }
+
+
     public partial class TwuiEditor : ObservableObject, IEditorInterface, ISaveableEditor, IFileEditor
     {
         private readonly IEventHub _eventHub;
@@ -50,8 +57,27 @@ namespace Editors.Twui.Editor
             ParsedTwuiFile = serializer.Load(file);
             DisplayName = "Twui Editor:" + Path.GetFileName(file.Name);
 
+
+            Hack_addVisualStuffForDebugging(ParsedTwuiFile.Components, ParsedTwuiFile.Hierarchy.RootItems);
+
             ComponentManager.SetFile(ParsedTwuiFile);
             _eventHub.Publish(new RedrawTwuiEvent(ParsedTwuiFile, null));
+
+
+
         }
+
+        void Hack_addVisualStuffForDebugging(List<Component> components, List<HierarchyItem> rootItems)
+        {
+            foreach (var item in rootItems)
+            {
+                var comp = components.FirstOrDefault(x => x.This == item.Id);
+                if(comp != null)
+                    item.Priority = " - " + comp.Priority;
+
+                Hack_addVisualStuffForDebugging(components, item.Children);
+            }
+        }
+
     }
 }

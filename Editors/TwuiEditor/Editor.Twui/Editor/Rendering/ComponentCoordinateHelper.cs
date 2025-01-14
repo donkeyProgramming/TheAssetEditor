@@ -2,6 +2,7 @@
 using Shared.GameFormats.Twui.Data;
 using Shared.GameFormats.Twui.Data.DataTypes;
 
+
 //https://github.com/Apostolique/Apos.Gui/blob/main/Source/Dock.cs
 
 
@@ -10,7 +11,7 @@ namespace Editors.Twui.Editor.Rendering
 {
     public static class ComponentCoordinateHelper
     {
-        public static Rectangle GetLocalCoordinateSpace(Component component, Rectangle parentComponentRect, int depth)
+        public static Rectangle GetComponentStateLocalCoordinateSpace(Component component, Rectangle parentComponentRect)
         {
             var currentStateId = component.Currentstate;
             var currentState = component.States.FirstOrDefault(x => x.UniqueGuid == currentStateId);
@@ -21,27 +22,54 @@ namespace Editors.Twui.Editor.Rendering
             }
 
             if (component.Name == "holder_grudge_cycles")
-            { 
+            {
+                //offset = new Vector2(-230, -15);
             }
 
-            var localSpace = new Vector2(parentComponentRect.X, parentComponentRect.Y);
-            var width = (int)currentState.Width;
-            var height = (int)currentState.Height;
+            var localSpace = ComputeLocalSpace(
+                parentComponentRect,
+                component.Offset,
+                currentState.Width, currentState.Height, 
+                component.DockingHorizontal, component.DockingVertical, 
+                component.Component_anchor_point, 
+                component.Dock_offset);
+
+            var localRect =  new Rectangle((int)localSpace.X, (int)localSpace.Y, (int)currentState.Width, (int)currentState.Height);
+            return localRect;
+        }
+
+        public static Rectangle GetComponentStateImageLocalCoordinateSpace(ComponentStateImage component, Rectangle parentComponentRect)
+        {
+            var localSpace = ComputeLocalSpace(
+                parentComponentRect,
+                component.Offset,
+                component.Width, component.Height,
+                component.DockingHorizontal, component.DockingVertical,
+                new Vector2(0.5f, 0.5f),
+                component.Dock_offset);
+
+            var localRect = new Rectangle((int)localSpace.X, (int)localSpace.Y, (int)component.Width, (int)component.Height);
+            return localRect;
+        }
 
 
 
 
 
-            if (component.DockingHorizontal != DockingHorizontal.None || component.DockingVertical != DockingVertical.None)
+        static Vector2 ComputeLocalSpace(Rectangle parentComponentRect, Vector2 offset, float width, float height, DockingHorizontal dockingHorizontal, DockingVertical dockingVertical, Vector2 anchorPoint, Vector2 docking_offset)
+        {
+            var localSpace = new Vector2(parentComponentRect.X, parentComponentRect.Y) + offset;
+
+            if (dockingHorizontal != DockingHorizontal.None || dockingVertical != DockingVertical.None)
             {
-                switch (component.DockingHorizontal)
+                switch (dockingHorizontal)
                 {
                     case DockingHorizontal.Left:
                         localSpace.X = parentComponentRect.X;
                         break;
 
                     case DockingHorizontal.Right:
-                        localSpace.X = parentComponentRect.Right - width;
+                        localSpace.X = parentComponentRect.Right;
                         break;
 
                     case DockingHorizontal.Center:
@@ -49,36 +77,61 @@ namespace Editors.Twui.Editor.Rendering
                         break;
                 }
 
-                switch (component.DockingVertical)
+                switch (dockingVertical)
                 {
                     case DockingVertical.Top:
                         localSpace.Y = parentComponentRect.Top;
                         break;
 
                     case DockingVertical.Bottom:
-                        localSpace.Y = parentComponentRect.Bottom - height;
+                        localSpace.Y = parentComponentRect.Bottom - height * 0.5f;
                         break;
 
                     case DockingVertical.Center:
-                        localSpace.Y = parentComponentRect.Top +(parentComponentRect.Height * 0.5f);
+                        localSpace.Y = parentComponentRect.Top + (parentComponentRect.Height * 0.5f);
                         break;
                 }
 
-            
-                localSpace += component.Dock_offset;
 
-               
-                var anchorOffset = new Vector2(width, height) * component.Component_anchor_point;
+                var anchorOffset = new Vector2(width, height) * anchorPoint;
                 localSpace -= anchorOffset;
+                localSpace += docking_offset;
             }
 
+            return localSpace;
 
-            return new Rectangle((int)localSpace.X, (int)localSpace.Y, width, height);
         }
 
 
     }
 }
+
+
+/*
+ <states>
+				<newstate
+					this="75CD9895-19E0-4928-A3586A1349D5DCA5"
+					name="NewState"
+					width="318"
+					height="37"
+					interactive="true"
+					uniqueguid="75CD9895-19E0-4928-A3586A1349D5DCA5">
+					<imagemetrics>
+						<image
+							this="B7B6DDE2-76D9-48E9-AD75B24A982B3052"
+							uniqueguid="B7B6DDE2-76D9-48E9-AD75B24A982B3052"
+							componentimage="E87F673A-3B49-44CF-967880690A161A8C"
+							offset="-230.00,-15.00"
+							width="778"
+							height="69"
+							tile="true"
+							dockpoint="Center"
+							dock_offset="0.00,1.00"
+							margin="0.00,230.00,0.00,230.00"/>
+					</imagemetrics>
+				</newstate>
+			</states>
+ */
 
 
 //docking = "Bottom Center"

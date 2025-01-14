@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Net.NetworkInformation;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Editors.Twui.Editor.Events;
 using Shared.Core.Events;
 using Shared.GameFormats.Twui.Data;
@@ -11,8 +13,8 @@ namespace Editors.Twui.Editor.ComponentEditor
         private readonly IEventHub _eventHub;
         TwuiFile? _currentFile;
 
-        [ObservableProperty]public partial HierarchyItem? SelectedHierarchyItem { get; set; }
-        [ObservableProperty]public partial Component? SelectedComponent { get; set; }
+        [ObservableProperty] public partial HierarchyItem? SelectedHierarchyItem { get; set; }
+        [ObservableProperty] public partial Component? SelectedComponent { get; set; }
         [ObservableProperty] public partial ComponentViewModel? SelectedComponentViewModel { get; set; }
         
 
@@ -25,6 +27,23 @@ namespace Editors.Twui.Editor.ComponentEditor
         {
             _currentFile = file;
         }
+
+        [RelayCommand]
+        private void ToggleSelected()
+        {
+            if (SelectedHierarchyItem == null)
+                return;
+
+            Toogle(SelectedHierarchyItem, !SelectedHierarchyItem.IsVisible);
+        }
+
+        void Toogle(HierarchyItem selectedHierarchyItem, bool value)
+        {
+            selectedHierarchyItem.IsVisible = value;
+            foreach(var item in selectedHierarchyItem.Children)
+                Toogle(item, value);
+        }
+
 
         partial void OnSelectedHierarchyItemChanged(HierarchyItem? value)
         {

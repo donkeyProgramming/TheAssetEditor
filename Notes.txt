@@ -5,6 +5,15 @@
 
 Fixes for v060
 
+
+	[Bugfix]: General: Close console window (and any other windows) on application close 
+	
+	
+	[Internal] Changed animationMetadDataParser to be a singlenton with lazy init - To speed up loading and testing when the class is not needed
+
+
+
+
 	[Feature] twui editor v0.1
 	FIX GameDb => SQL DB convrter v0.1
 
@@ -12,18 +21,23 @@ Fixes for v060
 		Consider movving all of material stuff out of rendering, as it would then make more sene to move wsmodel parsing and generations in there 
 		Hide basic shader behind material factory as well. It can also be a capability shader. 
 		
-	Twui editor v0
-
 	X General: Enums for wsmodel format and shaders, formats ++ in GameinformationFactory
 	
 	
-	Create ogre test 
+	Create ogre test
+	AnimBin test
+	WsModel saving test, not all wisible
+	Speed up system tests 
+	
 	Damping and root node handling 
 	"How to use" window - point to github?
 	Rendering window - disbale backface culling 
 	Superview - default scene content to be expanded. Allow select meshes
 	Move Editors.Shared.Core into shared? Maybe under UI?
 
+	ErrorFiles
+		Command history
+		Dump to file 
 	Change how metadata parsing is handled. need to be lazy! Slow slow
 	KitbashTOol Materiul - warning for not supported material! 
 

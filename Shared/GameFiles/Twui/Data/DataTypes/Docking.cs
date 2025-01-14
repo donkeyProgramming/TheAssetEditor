@@ -31,6 +31,8 @@ namespace Shared.GameFormats.Twui.Data.DataTypes
             var dockingNode = componentXml.Attribute("docking")?.Value;       // twui v141
             if (dockingNode == null)
                 dockingNode = componentXml.Attribute("dock_point")?.Value;    // twui v142
+            if (dockingNode == null)
+                dockingNode = componentXml.Attribute("dockpoint")?.Value;    // twui v142 imagemetrics
 
             if (dockingNode == null)
                 return;
@@ -41,13 +43,18 @@ namespace Shared.GameFormats.Twui.Data.DataTypes
             {
                 "center" => DockingVertical.Center,
                 "top" => DockingVertical.Top,
-                "bottom" => DockingVertical.Center,
+                "bottom" => DockingVertical.Bottom,
                 _ => throw new Exception($"Unknown {nameof(DockingVertical)} - {entries[0]}"),
             };
 
+            // Special case where only one attribute is given and its Center, then both should be center 
             if (entries.Length == 1)
+            {
+                if(vertical == DockingVertical.Center)
+                    horizontal = DockingHorizontal.Center;
                 return;
-
+            }
+              
             horizontal = entries[1].ToLower() switch
             {
                 "center" => DockingHorizontal.Center,
