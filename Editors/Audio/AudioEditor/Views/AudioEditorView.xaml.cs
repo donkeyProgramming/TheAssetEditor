@@ -19,7 +19,7 @@ namespace Editors.Audio.AudioEditor.Views
         private void AudioEditorView_Loaded(object sender, RoutedEventArgs e)
         {
             var dataGridTag = ViewModel?.AudioProjectEditorFullDataGridTag;
-            var dataGrid = GetDataGridByTag(dataGridTag);
+            var dataGrid = DataGridHelpers.GetDataGridByTag(dataGridTag);
             dataGrid.SelectionChanged += DataGrid_SelectionChanged;
         }
 

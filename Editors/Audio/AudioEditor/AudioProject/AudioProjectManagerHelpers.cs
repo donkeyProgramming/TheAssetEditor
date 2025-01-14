@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Controls;
+using Editors.Audio.AudioEditor.ViewModels;
+using Editors.Audio.Storage;
 using Microsoft.Win32;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 
@@ -11,11 +13,12 @@ namespace Editors.Audio.AudioEditor.AudioProject
 {
     public class AudioProjectManagerHelpers
     {
-        public static Dictionary<string, object> ExtractRowFromSingleRowDataGrid(Dictionary<string, Dictionary<string, string>> dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository, Dictionary<string, List<string>> stateGroupsWithStates, ObservableCollection<Dictionary<string, object>> dataGrid, object selectedAudioProjectTreeItem)
+
+        public static Dictionary<string, object> ExtractRowFromSingleRowDataGrid(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository)
         {
             var newRow = new Dictionary<string, object>();
 
-            foreach (var kvp in dataGrid[0])
+            foreach (var kvp in audioEditorViewModel.AudioProjectEditorSingleRowDataGrid[0])
             {
                 var columnName = kvp.Key;
                 var cellValue = kvp.Value;
@@ -26,10 +29,10 @@ namespace Editors.Audio.AudioEditor.AudioProject
                 }
                 else
                 {
-                    if (selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
+                    if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
                     {
-                        var stateGroup = GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, RemoveExtraUnderscoresFromString(columnName), dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository);
-                        var stateGroupsWithAnyState = stateGroupsWithStates
+                        var stateGroup = GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, RemoveExtraUnderscoresFromString(columnName), audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups);
+                        var stateGroupsWithAnyState = audioRepository.StateGroupsWithStates
                             .Where(kvp => kvp.Value.Contains("Any"))
                             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
@@ -48,14 +51,11 @@ namespace Editors.Audio.AudioEditor.AudioProject
 
         public static ActionEvent GetMatchingActionEvent(ObservableCollection<Dictionary<string, object>> audioProjectEditorFullDataGrid, Dictionary<string, object> dataGridRow, SoundBank actionEventSoundBank)
         {
-            foreach (var kvp in dataGridRow)
+            if (dataGridRow.TryGetValue("Event", out var eventName))
             {
-                var columnName = RemoveExtraUnderscoresFromString(kvp.Key);
-                var columnValue = kvp.Value;
-
-                foreach (var state in actionEventSoundBank.ActionEvents)
-                    if (actionEventSoundBank.Name == columnName && state.Name == columnValue)
-                        return state;
+                foreach (var actionEvent in actionEventSoundBank.ActionEvents)
+                    if (actionEvent.Name == eventName.ToString())
+                        return actionEvent;
             }
 
             return null;

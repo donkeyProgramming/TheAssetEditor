@@ -17,9 +17,9 @@ namespace Editors.Audio.AudioEditor
         public static string Name => "Dialogue Events";
     }
 
-    public class ModdedStatesTreeViewWrapper
+    public class StatesTreeViewWrapper
     {
-        public ObservableCollection<StateGroup> ModdedStates { get; set; }
+        public ObservableCollection<StateGroup> StateGroups { get; set; }
         public static string Name => "States";
     }
 
@@ -53,11 +53,11 @@ namespace Editors.Audio.AudioEditor
                 });
             }
 
-            if (audioProjectService.AudioProject.ModdedStates.Any())
+            if (audioProjectService.AudioProject.States.Any())
             {
-                audioProjectService.AudioProject.AudioProjectTreeViewItems.Add(new ModdedStatesTreeViewWrapper
+                audioProjectService.AudioProject.AudioProjectTreeViewItems.Add(new StatesTreeViewWrapper
                 {
-                    ModdedStates = audioProjectService.AudioProject.ModdedStates
+                    StateGroups = audioProjectService.AudioProject.States
                 });
             }
         }
@@ -92,11 +92,11 @@ namespace Editors.Audio.AudioEditor
                 });
             }
 
-            if (audioProjectService.AudioProject.ModdedStates.Any())
+            if (audioProjectService.AudioProject.States.Any())
             {
-                audioProjectService.AudioProject.AudioProjectTreeViewItems.Add(new ModdedStatesTreeViewWrapper
+                audioProjectService.AudioProject.AudioProjectTreeViewItems.Add(new StatesTreeViewWrapper
                 {
-                    ModdedStates = audioProjectService.AudioProject.ModdedStates
+                    StateGroups = audioProjectService.AudioProject.States
                 });
             }
         }

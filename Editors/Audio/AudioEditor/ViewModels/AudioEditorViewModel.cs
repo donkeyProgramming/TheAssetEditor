@@ -16,7 +16,7 @@ using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 using static Editors.Audio.AudioEditor.AudioProject.AudioProjectManager;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.CopyPasteHandler;
-using static Editors.Audio.AudioEditor.DataGrids.SingleRowDataGridConfiguration;
+using static Editors.Audio.AudioEditor.DataGrids.AudioProjectDataService;
 using static Editors.Audio.AudioEditor.DialogueEventFilter;
 using static Editors.Audio.AudioEditor.IntegrityChecker;
 using static Editors.Audio.AudioEditor.TreeViewItemLoader;
@@ -135,10 +135,17 @@ namespace Editors.Audio.AudioEditor.ViewModels
             if (_selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
                 // Clear the previous DataGrid Data
-                ClearDataGrid(AudioProjectEditorSingleRowDataGrid);
+                DataGridHelpers.ClearDataGridCollection(AudioProjectEditorSingleRowDataGrid);
 
-                ConfigureAudioProjectEditorSingleRowDataGridForDialogueEvent(this, _audioRepository, selectedDialogueEvent, _audioProjectService);
-                SetAudioProjectEditorSingleRowDataGridToDialogueEvent(AudioProjectEditorSingleRowDataGrid, _audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups, selectedDialogueEvent);
+                var parameters = new AudioProjectDataServiceParameters();
+                parameters.AudioEditorViewModel = this;
+                parameters.AudioProjectService = _audioProjectService;
+                parameters.AudioRepository = _audioRepository;
+                parameters.DialogueEvent = selectedDialogueEvent;
+
+                var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetService(selectedDialogueEvent);
+                audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
+                audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
             }
         }
 
@@ -206,8 +213,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
             dataGridRow["AudioFiles"] = audioFiles;
             dataGridRow["AudioFilesDisplay"] = fileNamesString;
 
-            var dataGrid = GetDataGridByTag(AudioProjectEditorSingleRowDataGridTag);
-            var textBox = FindVisualChild<TextBox>(dataGrid, "AudioFilesDisplay");
+            var dataGrid = DataGridHelpers.GetDataGridByTag(AudioProjectEditorSingleRowDataGridTag);
+            var textBox = DataGridHelpers.FindVisualChild<TextBox>(dataGrid, "AudioFilesDisplay");
             if (textBox != null)
             {
                 textBox.Text = fileNamesString;

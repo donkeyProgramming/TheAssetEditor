@@ -238,8 +238,8 @@
                                 </HierarchicalDataTemplate>
 
                                 <HierarchicalDataTemplate 
-                                    DataType="{x:Type audioeditor:ModdedStatesTreeViewWrapper}" 
-                                    ItemsSource="{Binding ModdedStates}">
+                                    DataType="{x:Type audioeditor:StatesTreeViewWrapper}" 
+                                    ItemsSource="{Binding StateGroups}">
                                     <TextBlock 
                                         Text="{Binding Name}" />
                                 </HierarchicalDataTemplate>

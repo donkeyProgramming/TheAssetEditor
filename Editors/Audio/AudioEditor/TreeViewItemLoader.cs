@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Editors.Audio.AudioEditor.AudioProject;
+﻿using Editors.Audio.AudioEditor.AudioProject;
 using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
 using Serilog;
@@ -10,8 +6,7 @@ using Shared.Core.ErrorHandling;
 using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.CopyPasteHandler;
-using static Editors.Audio.AudioEditor.DataGrids.FullDataGridConfiguration;
-using static Editors.Audio.AudioEditor.DataGrids.SingleRowDataGridConfiguration;
+using static Editors.Audio.AudioEditor.DataGrids.AudioProjectDataService;
 using static Editors.Audio.AudioEditor.DialogueEventFilter;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
@@ -43,10 +38,10 @@ namespace Editors.Audio.AudioEditor
             audioEditorViewModel.AudioSettingsViewModel.IsUsingMultipleAudioFiles = false;
 
             // Reset DataGrids
-            ClearDataGrid(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
-            ClearDataGrid(audioEditorViewModel.AudioProjectEditorFullDataGrid);
-            ClearDataGridColumns(audioEditorViewModel.AudioProjectEditorSingleRowDataGridTag);
-            ClearDataGridColumns(audioEditorViewModel.AudioProjectEditorFullDataGridTag);
+            DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
+            DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorFullDataGrid);
+            DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(audioEditorViewModel.AudioProjectEditorSingleRowDataGridTag));
+            DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(audioEditorViewModel.AudioProjectEditorFullDataGridTag));
 
             if (audioEditorViewModel._selectedAudioProjectTreeItem is SoundBank selectedSoundBank)
             {
@@ -57,11 +52,18 @@ namespace Editors.Audio.AudioEditor
 
                     AudioSettingsViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
-                    ConfigureAudioProjectEditorSingleRowDataGridForActionEventSoundBank(audioEditorViewModel, audioProjectService, audioRepository);
-                    SetAudioProjectEditorSingleRowDataGridToActionEventSoundBank(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
+                    var parameters = new AudioProjectDataServiceParameters
+                    {
+                        AudioEditorViewModel = audioEditorViewModel,
+                        AudioProjectService = audioProjectService,
+                        SoundBank = selectedSoundBank
+                    };
 
-                    ConfigureAudioProjectEditorFullDataGridForActionEventSoundBank(audioEditorViewModel, audioRepository, selectedSoundBank);
-                    SetAudioProjectEditorFullDataGridToActionEventSoundBank(audioEditorViewModel.AudioProjectEditorFullDataGrid, selectedSoundBank);
+                    var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetService(selectedSoundBank);
+                    audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
+                    audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
+                    audioProjectDataServiceInstance.ConfigureAudioProjectViewerDataGrid(parameters);
+                    audioProjectDataServiceInstance.SetAudioProjectViewerDataGridData(parameters);
 
                     s_logger.Here().Information($"Loaded Action Event SoundBank: {selectedSoundBank.Name}");
                 }
@@ -83,16 +85,24 @@ namespace Editors.Audio.AudioEditor
                 AudioSettingsViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
                 // Rebuild StateGroupsWithModdedStates in case any have been added since the Audio Project was initialised
-                audioProjectService.BuildStateGroupsWithModdedStatesRepository(audioProjectService.AudioProject.ModdedStates, audioProjectService.StateGroupsWithModdedStatesRepository);
+                audioProjectService.BuildStateGroupsWithModdedStatesRepository(audioProjectService.AudioProject.States, audioProjectService.StateGroupsWithModdedStatesRepository);
 
                 if (audioProjectService.StateGroupsWithModdedStatesRepository.Count > 0)
                     audioEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
 
-                ConfigureAudioProjectEditorSingleRowDataGridForDialogueEvent(audioEditorViewModel, audioRepository, selectedDialogueEvent, audioProjectService);
-                SetAudioProjectEditorSingleRowDataGridToDialogueEvent(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid, audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups, selectedDialogueEvent);
+                var parameters = new AudioProjectDataServiceParameters
+                {
+                    AudioEditorViewModel = audioEditorViewModel,
+                    AudioProjectService = audioProjectService,
+                    AudioRepository = audioRepository,
+                    DialogueEvent = selectedDialogueEvent
+                };
 
-                ConfigureAudioProjectEditorFullDataGridForDialogueEvent(audioEditorViewModel, audioRepository, audioProjectService, selectedDialogueEvent);
-                SetAudioProjectEditorFullDataGridToDialogueEvent(audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups, audioEditorViewModel.AudioProjectEditorFullDataGrid, selectedDialogueEvent);
+                var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetService(selectedDialogueEvent);
+                audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
+                audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
+                audioProjectDataServiceInstance.ConfigureAudioProjectViewerDataGrid(parameters);
+                audioProjectDataServiceInstance.SetAudioProjectViewerDataGridData(parameters);
 
                 s_logger.Here().Information($"Loaded DialogueEvent: {selectedDialogueEvent.Name}");
             }
@@ -101,99 +111,27 @@ namespace Editors.Audio.AudioEditor
                 audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
                 audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
 
-                ConfigureAudioProjectEditorSingleRowDataGridForModdedStates(audioEditorViewModel, audioProjectService, audioRepository, selectedModdedStateGroup.Name);
-                SetAudioProjectEditorSingleRowDataGridToModdedStateGroup(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid, selectedModdedStateGroup.Name);
+                var parameters = new AudioProjectDataServiceParameters
+                {
+                    AudioEditorViewModel = audioEditorViewModel,
+                    AudioRepository = audioRepository,
+                    AudioProjectService = audioProjectService,
+                    StateGroup = selectedModdedStateGroup
+                };
 
-                ConfigureAudioProjectEditorFullDataGridForModdedStates(audioEditorViewModel, selectedModdedStateGroup.Name);
-                SetAudioProjectEditorFullDataGridToModdedStateGroup(audioEditorViewModel.AudioProjectEditorFullDataGrid, selectedModdedStateGroup, selectedModdedStateGroup.Name);
+                var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetService(selectedModdedStateGroup);
+
+                audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
+                audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
+                audioProjectDataServiceInstance.ConfigureAudioProjectViewerDataGrid(parameters);
+                audioProjectDataServiceInstance.SetAudioProjectViewerDataGridData(parameters);
 
                 s_logger.Here().Information($"Loaded StateGroup: {selectedModdedStateGroup.Name}");
             }
 
             SetIsAddRowButtonEnabled(audioEditorViewModel, audioProjectService, audioRepository);
-            SetIsPasteEnabled(audioEditorViewModel, audioProjectService, audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups);
-        }
-
-        public static void SetAudioProjectEditorSingleRowDataGridToActionEventSoundBank(ObservableCollection<Dictionary<string, object>> audioProjectEditorSingleRowDataGrid)
-        {
-            var dataGridRow = new Dictionary<string, object> { };
-            dataGridRow["Event"] = string.Empty;
-            dataGridRow["AudioFiles"] = new List<string> { };
-            dataGridRow["AudioFilesDisplay"] = string.Empty;
-            dataGridRow["AudioSettings"] = new AudioProject.AudioSettings();
-            audioProjectEditorSingleRowDataGrid.Add(dataGridRow);
-        }
-
-        public static void SetAudioProjectEditorSingleRowDataGridToDialogueEvent(ObservableCollection<Dictionary<string, object>> audioProjectEditorSingleRowDataGrid, Dictionary<string, Dictionary<string, string>> dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository, DialogueEvent dialogueEvent)
-        {
-            var dataGridRow = new Dictionary<string, object>();
-            var stateGroupsWithQualifiers = dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository[dialogueEvent.Name];
-
-            foreach (var kvp in stateGroupsWithQualifiers)
-            {
-                var stateGroupWithQualifier = kvp.Key;
-                var columnHeader = AddExtraUnderscoresToString(stateGroupWithQualifier);
-                dataGridRow[columnHeader] = "";
-            }
-
-            dataGridRow["AudioFiles"] = new List<string> { };
-            dataGridRow["AudioFilesDisplay"] = string.Empty;
-            dataGridRow["AudioSettings"] = new AudioProject.AudioSettings();
-            audioProjectEditorSingleRowDataGrid.Add(dataGridRow);
-        }
-
-        public static void SetAudioProjectEditorSingleRowDataGridToModdedStateGroup(ObservableCollection<Dictionary<string, object>> audioProjectEditorSingleRowDataGrid, string moddedStateGroup)
-        {
-            var dataGridRow = new Dictionary<string, object> { };
-            dataGridRow[AddExtraUnderscoresToString(moddedStateGroup)] = string.Empty;
-            audioProjectEditorSingleRowDataGrid.Add(dataGridRow);
-        }
-
-        public static void SetAudioProjectEditorFullDataGridToModdedStateGroup(ObservableCollection<Dictionary<string, object>> audioProjectEditorFullDataGrid, StateGroup stateGroup, string moddedStateGroup)
-        {
-            foreach (var state in stateGroup.States)
-            {
-                var dataGridRow = new Dictionary<string, object>();
-                dataGridRow[AddExtraUnderscoresToString(moddedStateGroup)] = state.Name;
-                audioProjectEditorFullDataGrid.Add(dataGridRow);
-            }
-        }
-
-        public static void SetAudioProjectEditorFullDataGridToActionEventSoundBank(ObservableCollection<Dictionary<string, object>> audioProjectEditorFullDataGrid, SoundBank audioProjectItem)
-        {
-            foreach (var soundBankEvent in audioProjectItem.ActionEvents)
-            {
-                var dataGridRow = new Dictionary<string, object>();
-                dataGridRow["Event"] = soundBankEvent.Name;
-                dataGridRow["AudioFiles"] = soundBankEvent.AudioFiles;
-                dataGridRow["AudioFilesDisplay"] = soundBankEvent.AudioFilesDisplay;
-                audioProjectEditorFullDataGrid.Add(dataGridRow);
-            }
-        }
-
-        public static void SetAudioProjectEditorFullDataGridToDialogueEvent(Dictionary<string, Dictionary<string, string>> dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository, ObservableCollection<Dictionary<string, object>> audioProjectEditorFullDataGrid, DialogueEvent dialogueEvent)
-        {
-            foreach (var statePath in dialogueEvent.DecisionTree)
-            {
-                var dataGridRow = new Dictionary<string, object>();
-                dataGridRow["AudioFiles"] = statePath.AudioFiles;
-                dataGridRow["AudioFilesDisplay"] = statePath.AudioFilesDisplay;
-
-                var stateGroupsWithQualifiersList = dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository[dialogueEvent.Name].ToList();
-                foreach (var (node, kvp) in statePath.Nodes.Zip(stateGroupsWithQualifiersList, (node, kvp) => (node, kvp)))
-                {
-                    var stateGroupfromDialogueEvent = node.StateGroup.Name;
-                    var stateFromDialogueEvent = node.State.Name;
-
-                    var stateGroupWithQualifierKey = kvp.Key;
-                    var stateGroup = kvp.Value;
-
-                    if (stateGroupfromDialogueEvent == stateGroup)
-                        dataGridRow[AddExtraUnderscoresToString(stateGroupWithQualifierKey)] = stateFromDialogueEvent;
-                }
-
-                audioProjectEditorFullDataGrid.Add(dataGridRow);
-            }
+            SetIsCopyEnabled(audioEditorViewModel);
+            SetIsPasteEnabled(audioEditorViewModel, audioRepository, audioProjectService);
         }
     }
 }

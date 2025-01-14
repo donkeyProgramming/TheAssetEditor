@@ -92,7 +92,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
                 audioEditorViewModel.Initialise();
 
                 // Get the Modded States and prepare them for being added to the DataGrid ComboBoxes
-                BuildStateGroupsWithModdedStatesRepository(AudioProject.ModdedStates, StateGroupsWithModdedStatesRepository);
+                BuildStateGroupsWithModdedStatesRepository(AudioProject.States, StateGroupsWithModdedStatesRepository);
 
                 CheckAudioProjectDialogueEventIntegrity(audioRepository, this);
 
@@ -115,7 +115,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
 
             InitialiseSoundBanks(AudioProject);
 
-            InitialiseModdedStatesGroups(AudioProject.ModdedStates);
+            InitialiseModdedStatesGroups(AudioProject.States);
 
             AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.ShowEditedDialogueEventsOnly);
 

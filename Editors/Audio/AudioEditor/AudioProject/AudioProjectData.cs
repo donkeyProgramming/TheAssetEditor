@@ -10,7 +10,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
     {
         public string Language { get; set; }
         public ObservableCollection<SoundBank> SoundBanks { get; set; } = [];
-        public ObservableCollection<StateGroup> ModdedStates { get; set; } = [];
+        public ObservableCollection<StateGroup> States { get; set; } = [];
         [JsonIgnore] public ObservableCollection<object> AudioProjectTreeViewItems { get; set; } = [];
     }
 
