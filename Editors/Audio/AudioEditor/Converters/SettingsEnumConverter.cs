@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
-using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
+using static Editors.Audio.AudioEditor.AudioSettingsEditor.AudioSettings;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.Languages;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;

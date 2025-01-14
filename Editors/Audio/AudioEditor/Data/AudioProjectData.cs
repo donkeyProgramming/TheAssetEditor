@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
-using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
+using static Editors.Audio.AudioEditor.AudioSettingsEditor.AudioSettings;
 
-namespace Editors.Audio.AudioEditor.AudioProject
+namespace Editors.Audio.AudioEditor.Data
 {
     public class AudioProjectData
     {
@@ -40,7 +40,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
         public List<StatePath> DecisionTree { get; set; } = [];
     }
 
-    public class StateGroup : IAudioProjectItem 
+    public class StateGroup : IAudioProjectItem
     {
         public List<State> States { get; set; } = [];
     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using Editors.Audio.AudioEditor.AudioProject;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;

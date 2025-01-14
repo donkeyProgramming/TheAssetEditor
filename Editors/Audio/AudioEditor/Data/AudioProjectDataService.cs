@@ -1,18 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Windows.Controls;
-using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
-using Microsoft.Win32;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 
-namespace Editors.Audio.AudioEditor.AudioProject
+namespace Editors.Audio.AudioEditor.Data
 {
-    public class AudioProjectManagerHelpers
+    public interface IAudioProjectDataService
     {
+        void ConfigureAudioProjectEditorDataGrid(AudioProjectDataServiceParameters parameters);
+        void SetAudioProjectEditorDataGridData(AudioProjectDataServiceParameters parameters);
+        void ConfigureAudioProjectViewerDataGrid(AudioProjectDataServiceParameters parameters);
+        void SetAudioProjectViewerDataGridData(AudioProjectDataServiceParameters parameters);
+        void AddAudioProjectEditorDataGridDataToAudioProject(AudioProjectDataServiceParameters parameters);
+        void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioProjectDataServiceParameters parameters);
+    }
+
+    public class AudioProjectDataService : IAudioProjectDataService
+    {
+        public static class AudioProjectDataServiceFactory
+        {
+            public static IAudioProjectDataService GetService(object selectedItem)
+            {
+                return selectedItem switch
+                {
+                    SoundBank => new ActionEventDataService(),
+                    DialogueEvent => new DialogueEventDataService(),
+                    StateGroup => new StatesDataService(),
+                };
+            }
+        }
+
+        public class AudioProjectDataServiceParameters
+        {
+            public AudioEditorViewModel AudioEditorViewModel { get; set; }
+            public IAudioProjectService AudioProjectService { get; set; }
+            public IAudioRepository AudioRepository { get; set; }
+            public SoundBank SoundBank { get; set; }
+            public DialogueEvent DialogueEvent { get; set; }
+            public StateGroup StateGroup { get; set; }
+            public Dictionary<string, object> AudioProjectEditorRow { get; set; }
+        }
+
+        public static void AddAudioProjectViewerDataGridDataToAudioProjectEditor(AudioEditorViewModel audioEditorViewModel)
+        {
+            audioEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(audioEditorViewModel.SelectedDataGridRows[0]);
+        }
+
+        public static void AddAudioProjectEditorDataGridDataToAudioProjectViewer(AudioEditorViewModel audioEditorViewModel, Dictionary<string, object> audioProjectEditorRow)
+        {
+            InsertDataGridRowAlphabetically(audioEditorViewModel.AudioProjectEditorFullDataGrid, audioProjectEditorRow);
+        }
 
         public static Dictionary<string, object> ExtractRowFromSingleRowDataGrid(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository)
         {
@@ -31,7 +70,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
                 {
                     if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
                     {
-                        var stateGroup = GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, RemoveExtraUnderscoresFromString(columnName), audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups);
+                        var stateGroup = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, RemoveExtraUnderscoresFromString(columnName));
                         var stateGroupsWithAnyState = audioRepository.StateGroupsWithStates
                             .Where(kvp => kvp.Value.Contains("Any"))
                             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -61,11 +100,11 @@ namespace Editors.Audio.AudioEditor.AudioProject
             return null;
         }
 
-        public static StatePath GetStatePathFromDialogueEvent(Dictionary<string, object> dataGridRow, DialogueEvent selectedDialogueEvent, Dictionary<string, Dictionary<string, string>> dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository)
+        public static StatePath GetStatePathFromDialogueEvent(IAudioRepository audioRepository, Dictionary<string, object> dataGridRow, DialogueEvent selectedDialogueEvent)
         {
             var statePath = new StatePath();
 
-            var stateGroupsWithQualifiers = dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository[selectedDialogueEvent.Name];
+            var stateGroupsWithQualifiers = audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[selectedDialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers.Keys)
             {
                 if (dataGridRow.TryGetValue(AddExtraUnderscoresToString(stateGroupWithQualifier), out var cellValue))
@@ -77,7 +116,7 @@ namespace Editors.Audio.AudioEditor.AudioProject
                         StateGroup = new StateGroup(),
                         State = new State()
                     };
-                    statePathNode.StateGroup.Name = GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, stateGroupWithQualifier, dialogueEventsWithStateGroupsWithQualifiersAndStateGroupsRepository);
+                    statePathNode.StateGroup.Name = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, stateGroupWithQualifier);
                     statePathNode.State.Name = state.ToString();
                     statePath.Nodes.Add(statePathNode);
                 }
@@ -114,34 +153,6 @@ namespace Editors.Audio.AudioEditor.AudioProject
             }
 
             return null;
-        }
-
-        public static bool AddAudioFilesToAudioProjectEditorSingleRowDataGrid(Dictionary<string, object> dataGridRow, TextBox textBox)
-        {
-            var dialog = new OpenFileDialog()
-            {
-                Multiselect = true,
-                Filter = "WAV files (*.wav)|*.wav"
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                var filePaths = dialog.FileNames;
-                var fileNames = filePaths.Select(Path.GetFileName);
-                var fileNamesString = string.Join(", ", fileNames);
-                var filePathsString = string.Join(", ", filePaths.Select(filePath => $"\"{filePath}\""));
-
-                textBox.Text = fileNamesString;
-                textBox.ToolTip = filePathsString;
-
-                var audioFiles = new List<string>(filePaths);
-                dataGridRow["AudioFiles"] = audioFiles;
-                dataGridRow["AudioFilesDisplay"] = fileNamesString;
-
-                return true;
-            }
-            else 
-                return false;
         }
 
         public static void SortSoundBanksAlphabetically(ObservableCollection<SoundBank> audioProjectItems)
@@ -249,5 +260,23 @@ namespace Editors.Audio.AudioEditor.AudioProject
 
             states.Insert(insertIndex, newState);
         }
+
+        public static string AddExtraUnderscoresToString(string wtfWPF)
+        {
+            return wtfWPF.Replace("_", "__");
+        }
+
+        public static string RemoveExtraUnderscoresFromString(string wtfWPF)
+        {
+            return wtfWPF.Replace("__", "_");
+        }
+
+        // Not required
+        public void ConfigureAudioProjectEditorDataGrid(AudioProjectDataServiceParameters parameters) { }
+        public void SetAudioProjectEditorDataGridData(AudioProjectDataServiceParameters parameters) { }
+        public void ConfigureAudioProjectViewerDataGrid(AudioProjectDataServiceParameters parameters) { }
+        public void SetAudioProjectViewerDataGridData(AudioProjectDataServiceParameters parameters) { }
+        public void AddAudioProjectEditorDataGridDataToAudioProject(AudioProjectDataServiceParameters parameters) { }
+        public void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioProjectDataServiceParameters parameters) { }
     }
 }

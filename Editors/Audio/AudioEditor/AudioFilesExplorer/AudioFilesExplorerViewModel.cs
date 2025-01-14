@@ -4,14 +4,14 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Editors.Audio.AudioEditor.AudioProject;
+using Editors.Audio.AudioEditor.Data;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 
-namespace Editors.Audio.AudioEditor.ViewModels
+namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 {
     public enum NodeType
     {

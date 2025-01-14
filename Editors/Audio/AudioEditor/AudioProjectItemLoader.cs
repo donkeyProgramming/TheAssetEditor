@@ -1,20 +1,19 @@
-﻿using Editors.Audio.AudioEditor.AudioProject;
-using Editors.Audio.AudioEditor.ViewModels;
+﻿using Editors.Audio.AudioEditor.AudioSettingsEditor;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.CopyPasteHandler;
-using static Editors.Audio.AudioEditor.DataGrids.AudioProjectDataService;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using static Editors.Audio.AudioEditor.DialogueEventFilter;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor
 {
-    public class TreeViewItemLoader
+    public class AudioProjectItemLoader
     {
-        private static readonly ILogger s_logger = Logging.Create<TreeViewItemLoader>();
+        private static readonly ILogger s_logger = Logging.Create<AudioProjectItemLoader>();
 
         public static void HandleSelectedTreeViewItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
         {
@@ -50,7 +49,7 @@ namespace Editors.Audio.AudioEditor
                     audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {selectedSoundBank.Name}";
                     audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {selectedSoundBank.Name}";
 
-                    AudioSettingsViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
+                    AudioSettingsEditorViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
                     var parameters = new AudioProjectDataServiceParameters
                     {
@@ -82,7 +81,7 @@ namespace Editors.Audio.AudioEditor
                 audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
                 audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
 
-                AudioSettingsViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
+                AudioSettingsEditorViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
                 // Rebuild StateGroupsWithModdedStates in case any have been added since the Audio Project was initialised
                 audioProjectService.BuildStateGroupsWithModdedStatesRepository(audioProjectService.AudioProject.States, audioProjectService.StateGroupsWithModdedStatesRepository);
@@ -120,7 +119,6 @@ namespace Editors.Audio.AudioEditor
                 };
 
                 var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetService(selectedModdedStateGroup);
-
                 audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
                 audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
                 audioProjectDataServiceInstance.ConfigureAudioProjectViewerDataGrid(parameters);

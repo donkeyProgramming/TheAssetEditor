@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProject;
-using Editors.Audio.AudioEditor.ViewModels;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Storage;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
-using static Editors.Audio.AudioEditor.DataGrids.AudioProjectDataService;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 
 namespace Editors.Audio.AudioEditor
 {

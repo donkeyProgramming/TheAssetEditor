@@ -1,8 +1,8 @@
 ﻿using Audio.AudioExplorer;
 using Audio.Compiler;
-using Editors.Audio.AudioEditor.AudioProject;
-using Editors.Audio.AudioEditor.ViewModels;
-using Editors.Audio.AudioEditor.Views;
+using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.BnkCompiler;
 using Editors.Audio.BnkCompiler.ObjectGeneration;

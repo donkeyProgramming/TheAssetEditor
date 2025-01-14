@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProject;
-using Editors.Audio.AudioEditor.ViewModels;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
-using static Editors.Audio.AudioEditor.AudioProject.AudioProjectManagerHelpers;
-using static Editors.Audio.AudioEditor.DataGrids.AudioProjectDataService;
+using Editors.Audio.AudioEditor.AudioSettingsEditor;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
-namespace Editors.Audio.AudioEditor.DataGrids
+namespace Editors.Audio.AudioEditor.Data
 {
     public class DialogueEventDataService : IAudioProjectDataService
     {
@@ -39,7 +36,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             {
                 { "AudioFiles", new List<string>() },
                 { "AudioFilesDisplay", string.Empty },
-                { "AudioSettings", new AudioProject.AudioSettings() }
+                { "AudioSettings", new AudioSettings() }
             };
 
             var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
@@ -132,7 +129,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             }
 
             if (parameters.AudioProjectEditorRow.TryGetValue("AudioSettings", out var audioSettings))
-                statePath.AudioSettings = AudioSettingsViewModel.BuildAudioSettings(parameters.AudioEditorViewModel.AudioSettingsViewModel);
+                statePath.AudioSettings = AudioSettingsEditorViewModel.BuildAudioSettings(parameters.AudioEditorViewModel.AudioSettingsViewModel);
 
             InsertStatePathAlphabetically(parameters.DialogueEvent, statePath);
         }
@@ -143,7 +140,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             var dataGridRowsCopy = parameters.AudioEditorViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var statePath = GetStatePathFromDialogueEvent(dataGridRow, parameters.DialogueEvent, parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups);
+                var statePath = GetStatePathFromDialogueEvent(parameters.AudioRepository, dataGridRow, parameters.DialogueEvent);
                 var matchingStatePath = GetMatchingDecisionNode(statePath, parameters.DialogueEvent);
                 if (matchingStatePath != null)
                 {

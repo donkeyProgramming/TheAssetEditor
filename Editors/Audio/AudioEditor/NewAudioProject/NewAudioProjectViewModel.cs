@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProject;
+using Editors.Audio.AudioEditor.Data;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -11,7 +11,7 @@ using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.GameSettings.Warhammer3.Languages;
 
-namespace Editors.Audio.AudioEditor.ViewModels
+namespace Editors.Audio.AudioEditor.NewAudioProject
 {
     public partial class NewAudioProjectViewModel : ObservableObject, IEditorInterface
     {

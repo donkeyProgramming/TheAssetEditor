@@ -1,10 +1,9 @@
 ﻿using System.Windows;
-using Editors.Audio.AudioEditor.AudioProject;
-using Editors.Audio.AudioEditor.ViewModels;
+using Editors.Audio.AudioEditor.Data;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 
-namespace Editors.Audio.AudioEditor.Views
+namespace Editors.Audio.AudioEditor.NewAudioProject
 {
     public partial class NewAudioProjectWindow : Window
     {

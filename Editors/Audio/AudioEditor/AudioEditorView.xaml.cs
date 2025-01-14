@@ -1,9 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Editors.Audio.AudioEditor.ViewModels;
 
-namespace Editors.Audio.AudioEditor.Views
+namespace Editors.Audio.AudioEditor
 {
     public partial class AudioEditorView : UserControl
     {

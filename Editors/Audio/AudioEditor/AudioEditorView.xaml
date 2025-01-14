@@ -1,20 +1,20 @@
 ﻿<UserControl 
-    x:Class="Editors.Audio.AudioEditor.Views.AudioEditorView"
+    x:Class="Editors.Audio.AudioEditor.AudioEditorView"
     x:Name="AudioEditor"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:s="http://schemas.singulink.com/xaml" 
-    xmlns:views="clr-namespace:Editors.Audio.AudioEditor.Views"
-    xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
-    xmlns:audioproject="clr-namespace:Editors.Audio.AudioEditor.AudioProject"
-    xmlns:audioeditor="clr-namespace:Editors.Audio.AudioEditor"
-    xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters" 
     xmlns:sys="clr-namespace:System;assembly=netstandard"
+    xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+    xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters" 
     xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
-    xmlns:viewmodels="clr-namespace:Editors.Audio.AudioEditor.ViewModels" 
-    d:DataContext="{d:DesignInstance Type=viewmodels:AudioEditorViewModel}"
+    xmlns:data="clr-namespace:Editors.Audio.AudioEditor.Data"
+    xmlns:audioeditor="clr-namespace:Editors.Audio.AudioEditor"
+    xmlns:audiosettingseditor="clr-namespace:Editors.Audio.AudioEditor.AudioSettingsEditor" 
+    xmlns:audiofilesExplorer="clr-namespace:Editors.Audio.AudioEditor.AudioFilesExplorer"
+    d:DataContext="{d:DesignInstance Type=audioeditor:AudioEditorViewModel}"
     mc:Ignorable="d" 
     d:DesignWidth="1200" d:DesignHeight="700">
 
@@ -218,7 +218,7 @@
                                 </HierarchicalDataTemplate>
 
                                 <HierarchicalDataTemplate 
-                                    DataType="{x:Type audioproject:SoundBank}"
+                                    DataType="{x:Type data:SoundBank}"
                                     ItemsSource="{Binding SoundBankTreeViewItems}">
                                     <TextBlock>
                                         <TextBlock.Inlines>
@@ -232,7 +232,7 @@
                                 </HierarchicalDataTemplate>
 
                                 <HierarchicalDataTemplate 
-                                    DataType="{x:Type audioproject:DialogueEvent}">
+                                    DataType="{x:Type data:DialogueEvent}">
                                     <TextBlock 
                                         Text="{Binding Name}" />
                                 </HierarchicalDataTemplate>
@@ -245,7 +245,7 @@
                                 </HierarchicalDataTemplate>
 
                                 <HierarchicalDataTemplate 
-                                    DataType="{x:Type audioproject:StateGroup}">
+                                    DataType="{x:Type data:StateGroup}">
                                     <TextBlock 
                                         Text="{Binding Name}" />
                                 </HierarchicalDataTemplate>
@@ -262,7 +262,7 @@
                         ResizeBehavior="PreviousAndNext"
                         ResizeDirection="Rows"/>
 
-                    <views:AudioFilesExplorerView 
+                    <audiofilesExplorer:AudioFilesExplorerView 
                         Grid.Row="3"
                         Grid.Column="0"
                         DataContext="{Binding AudioFilesExplorerViewModel}"/>
@@ -421,10 +421,10 @@
                     Height="5" 
                     Background="{DynamicResource App.Border}"/>
                 
-                <views:AudioSettingsView 
+                <audiosettingseditor:AudioSettingsEditorView 
                     Grid.Row="4"
                     Grid.Column="0"
-                    DataContext="{Binding AudioSettingsViewModel}"/>
+                    DataContext="{Binding AudioSettingsEditorViewModel}"/>
 
                 <Border 
                     Grid.Row="5"

@@ -2,11 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProject;
-using Editors.Audio.AudioEditor.ViewModels;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Storage;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
-using static Editors.Audio.AudioEditor.AudioProject.AudioProjectManagerHelpers;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -42,7 +40,7 @@ namespace Editors.Audio.AudioEditor
 
                 if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent && (columnName != "AudioFilesDisplay" && columnName != "AudioSettings"))
                 {
-                    var stateGroup = GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, RemoveExtraUnderscoresFromString(columnName), audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups);
+                    var stateGroup = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, RemoveExtraUnderscoresFromString(columnName));
                     var stateGroupsWithAnyState = audioRepository.StateGroupsWithStates
                         .Where(kvp => kvp.Value.Contains("Any"))
                         .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);

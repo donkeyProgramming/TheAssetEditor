@@ -2,11 +2,11 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
+using static Editors.Audio.AudioEditor.AudioSettingsEditor.AudioSettings;
 
-namespace Editors.Audio.AudioEditor.ViewModels
+namespace Editors.Audio.AudioEditor.AudioSettingsEditor
 {
-    public partial class AudioSettingsViewModel : ObservableObject, IEditorInterface
+    public partial class AudioSettingsEditorViewModel : ObservableObject, IEditorInterface
     {
         //readonly ILogger _logger = Logging.Create<AudioSettingsViewModel>();
 
@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [ObservableProperty] private EndBehaviour _endBehaviour;
         [ObservableProperty] private ObservableCollection<EndBehaviour> _endBehaviours = new(Enum.GetValues<EndBehaviour>());
         [ObservableProperty] private bool _isEndBehaviourEnabled = false;
-        
+
         // Playlist Looping
         [ObservableProperty] private bool _enableLooping;
         [ObservableProperty] private bool _isEnableLoopingEnabled = false;
@@ -81,9 +81,9 @@ namespace Editors.Audio.AudioEditor.ViewModels
             SetAudioSettingsEnablement(this);
         }
 
-        public static AudioProject.AudioSettings BuildAudioSettings(AudioSettingsViewModel audioSettingsViewModel)
+        public static Data.AudioSettings BuildAudioSettings(AudioSettingsEditorViewModel audioSettingsViewModel)
         {
-            var audioSettings = new AudioProject.AudioSettings();
+            var audioSettings = new Data.AudioSettings();
 
             if (audioSettingsViewModel.InitialDelay > 0)
                 audioSettings.InitialDelay = audioSettingsViewModel.InitialDelay;
@@ -125,7 +125,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             return audioSettings;
         }
 
-        public static void SetAudioSettingsEnablement(AudioSettingsViewModel audioSettingsViewModel)
+        public static void SetAudioSettingsEnablement(AudioSettingsEditorViewModel audioSettingsViewModel)
         {
             audioSettingsViewModel.IsAudioSettingsVisible = true;
 
@@ -200,7 +200,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             }
         }
 
-        public static void UpdateLoopingEnablement(AudioSettingsViewModel audioSettingsViewModel)
+        public static void UpdateLoopingEnablement(AudioSettingsEditorViewModel audioSettingsViewModel)
         {
             if (audioSettingsViewModel.IsUsingMultipleAudioFiles)
             {

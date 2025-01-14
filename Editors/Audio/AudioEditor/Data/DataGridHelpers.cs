@@ -8,13 +8,11 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Editors.Audio.AudioEditor.AudioProject;
-using Editors.Audio.AudioEditor.ViewModels;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Storage;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.Converters.TooltipConverter;
-using static Editors.Audio.AudioEditor.DataGrids.AudioProjectDataService;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 
 namespace Editors.Audio.AudioEditor
 {

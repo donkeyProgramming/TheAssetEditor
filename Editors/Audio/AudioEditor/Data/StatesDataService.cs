@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProject;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
-using static Editors.Audio.AudioEditor.AudioProject.AudioProjectManagerHelpers;
-using static Editors.Audio.AudioEditor.DataGrids.AudioProjectDataService;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 
-namespace Editors.Audio.AudioEditor.DataGrids
+namespace Editors.Audio.AudioEditor.Data
 {
     public class StatesDataService : IAudioProjectDataService
     {
-        public void ConfigureAudioProjectEditorDataGrid(AudioProjectDataServiceParameters parameters) 
+        public void ConfigureAudioProjectEditorDataGrid(AudioProjectDataServiceParameters parameters)
         {
             var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorSingleRowDataGridTag);
             var stateGroupColumn = DataGridHelpers.CreateColumn(parameters, AddExtraUnderscoresToString(parameters.StateGroup.Name), 1.0, DataGridColumnType.EditableTextBox);

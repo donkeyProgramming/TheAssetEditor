@@ -6,25 +6,27 @@ using System.Linq;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProject;
-using Editors.Audio.AudioEditor.Views;
+using Editors.Audio.AudioEditor.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.AudioSettingsEditor;
+using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.AudioProject.AudioProjectManager;
+using static Editors.Audio.AudioEditor.AudioProjectManager;
+using static Editors.Audio.AudioEditor.AudioProjectItemLoader;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.CopyPasteHandler;
-using static Editors.Audio.AudioEditor.DataGrids.AudioProjectDataService;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using static Editors.Audio.AudioEditor.DialogueEventFilter;
 using static Editors.Audio.AudioEditor.IntegrityChecker;
-using static Editors.Audio.AudioEditor.TreeViewItemLoader;
 using static Editors.Audio.AudioEditor.TreeViewWrapper;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using static Editors.Audio.Utility.SoundPlayer;
 
-namespace Editors.Audio.AudioEditor.ViewModels
+namespace Editors.Audio.AudioEditor
 {
     public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {
@@ -33,7 +35,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         private readonly IAudioProjectService _audioProjectService;
         private readonly IStandardDialogs _packFileUiProvider;
 
-        public AudioSettingsViewModel AudioSettingsViewModel { get; set; } = new();
+        public AudioSettingsEditorViewModel AudioSettingsViewModel { get; set; } = new();
         public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
 
         public string DisplayName { get; set; } = "Audio Editor";
@@ -227,7 +229,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
             else
                 AudioSettingsViewModel.IsUsingMultipleAudioFiles = false;
 
-            AudioSettingsViewModel.SetAudioSettingsEnablement(AudioSettingsViewModel);
+            AudioSettingsEditorViewModel.SetAudioSettingsEnablement(AudioSettingsViewModel);
             SetIsAddRowButtonEnabled(this, _audioProjectService, _audioRepository);
         }
 

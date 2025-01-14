@@ -5,15 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using Editors.Audio.AudioEditor.ViewModels;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
-using static Editors.Audio.AudioEditor.AudioProject.AudioProjectManagerHelpers;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using static Editors.Audio.AudioEditor.DialogueEventFilter;
 using static Editors.Audio.AudioEditor.IntegrityChecker;
 using static Editors.Audio.AudioEditor.TreeViewWrapper;
@@ -21,7 +19,7 @@ using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
-namespace Editors.Audio.AudioEditor.AudioProject
+namespace Editors.Audio.AudioEditor.Data
 {
     public interface IAudioProjectService
     {

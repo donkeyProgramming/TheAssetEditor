@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Editors.Audio.AudioEditor.AudioSettings
+namespace Editors.Audio.AudioEditor.AudioSettingsEditor
 {
     public class AudioSettings
     {

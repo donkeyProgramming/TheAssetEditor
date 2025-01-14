@@ -8,7 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace Editors.Audio.AudioEditor.ViewModels
+namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 {
     public class MultiSelectTreeView : TreeView
     {
