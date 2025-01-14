@@ -437,7 +437,7 @@
                 
                 <!-- Setting CanUserAddRows to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF. -->
                 <DataGrid 
-                    Grid.Row="6"
+                    Grid.Row="7"
                     Margin="0, 0, 0, 0"
                     Tag="{Binding AudioProjectEditorFullDataGridTag}" 
                     AutoGenerateColumns="False" 
@@ -449,17 +449,6 @@
                     EnableColumnVirtualization="True"
                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
-                    <DataGrid.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem 
-                                Header="Copy" 
-                                Command="{Binding CopyRowsCommand}"/>
-                            <MenuItem 
-                                Header="Paste" 
-                                Command="{Binding PasteRowsCommand}" 
-                                IsEnabled="{Binding IsPasteEnabled}"/>
-                        </ContextMenu>
-                    </DataGrid.ContextMenu>
                 </DataGrid>
             </Grid>
         </Grid>

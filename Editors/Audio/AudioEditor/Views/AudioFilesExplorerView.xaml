@@ -40,7 +40,7 @@
         <viewmodels:MultiSelectTreeView
             Grid.Row="2"
             ItemsSource="{Binding TreeNodes}"
-            Background="Transparent"
+            Background="{DynamicResource TreeView.Static.Background}"
             BorderBrush="Transparent"
             SelectedItems="{Binding SelectedTreeNodes, Mode=TwoWay}"
             Style="{StaticResource {x:Type TreeView}}"

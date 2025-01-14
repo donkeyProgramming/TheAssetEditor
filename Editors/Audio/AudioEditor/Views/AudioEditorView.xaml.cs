@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Editors.Audio.AudioEditor.ViewModels;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 
 namespace Editors.Audio.AudioEditor.Views
 {
@@ -14,6 +14,7 @@ namespace Editors.Audio.AudioEditor.Views
             InitializeComponent();
 
             Loaded += AudioEditorView_Loaded;
+            PreviewKeyDown += AudioEditorView_PreviewKeyDown;
         }
 
         private void AudioEditorView_Loaded(object sender, RoutedEventArgs e)
@@ -36,5 +37,29 @@ namespace Editors.Audio.AudioEditor.Views
             if (e.NewValue != null)
                 ViewModel.OnSelectedAudioProjectTreeViewItemChanged(e.NewValue);
         }
+
+        private void AudioEditorView_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if (e.Key == Key.C)
+                {
+                    ViewModel?.CopyRows();
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.V)
+                {
+                    ViewModel?.PasteRows();
+                    e.Handled = true;
+                }
+            }
+
+            if (e.Key == Key.Delete)
+            {
+                ViewModel?.RemoveAudioProjectEditorFullDataGridRow();
+                e.Handled = true;
+            }
+        }
+
     }
 }

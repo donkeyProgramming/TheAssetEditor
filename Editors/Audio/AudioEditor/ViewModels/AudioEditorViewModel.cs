@@ -12,7 +12,6 @@ using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.AudioEditorHelpers;
 using static Editors.Audio.AudioEditor.AudioProject.AudioProjectManager;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.CopyPasteHandler;
@@ -71,7 +70,8 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [ObservableProperty] private bool _isAddAudioFilesButtonEnabled = false;
         [ObservableProperty] private bool _isPlayAudioButtonEnabled = false;
         [ObservableProperty] private bool _isShowModdedStatesCheckBoxEnabled = false;
-        [ObservableProperty] private bool _isPasteEnabled = true;
+        [ObservableProperty] private bool _isCopyEnabled = false;
+        [ObservableProperty] private bool _isPasteEnabled = false;
 
         public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
         {
@@ -90,6 +90,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         public void OnDataGridSelectionChanged(IList selectedItems)
         {
             SetButtonEnablement(this, _audioProjectService, selectedItems);
+            SetIsCopyEnabled(this);
         }
 
         partial void OnAudioProjectEditorFullDataGridChanged(ObservableCollection<Dictionary<string, object>> value)
@@ -109,7 +110,7 @@ namespace Editors.Audio.AudioEditor.ViewModels
         private void OnAudioProjectEditorFullDataGridChanged()
         {
             if (AudioProjectEditorFullDataGrid != null && AudioProjectEditorFullDataGrid.Count > 0)
-                SetIsPasteEnabled(this, _audioProjectService, _audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups);
+                SetIsPasteEnabled(this, _audioRepository, _audioProjectService);
         }
 
         partial void OnSelectedDialogueEventPresetChanged(string value)
@@ -245,13 +246,13 @@ namespace Editors.Audio.AudioEditor.ViewModels
         [RelayCommand] public void CopyRows()
         {
             if (_selectedAudioProjectTreeItem is DialogueEvent)
-                CopyDialogueEventRows(this, _audioProjectService, _audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups);
+                CopyDialogueEventRows(this, _audioRepository, _audioProjectService);
         }
 
         [RelayCommand] public void PasteRows()
         {
             if (IsPasteEnabled && _selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
-                PasteDialogueEventRows(this, _audioProjectService, selectedDialogueEvent, _audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups);
+                PasteDialogueEventRows(this, _audioRepository, _audioProjectService, selectedDialogueEvent);
         }
 
         [RelayCommand] public void AddRowFromAudioProjectEditorSingleRowDataGridToFullDataGrid()
