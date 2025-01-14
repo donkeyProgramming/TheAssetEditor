@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
@@ -21,7 +22,7 @@ namespace Editors.Audio.AudioEditor
                         selectedSoundBank.FilteredBy = $" (Filtered by {audioEditorViewModel.SelectedDialogueEventPreset} preset)";
 
                         var selectedDialogueEventPresetEnum = GetDialogueEventPreset(audioEditorViewModel.SelectedDialogueEventPreset);
-                        AddPresetDialogueEventsToSoundBankTreeViewItems(audioProjectService.AudioProject, selectedSoundBank.Name, selectedDialogueEventPresetEnum, audioEditorViewModel.ShowEditedDialogueEventsOnly);
+                        TreeViewBuilder.AddPresetDialogueEventsToSoundBankTreeViewItems(audioProjectService.AudioProject, selectedSoundBank.Name, selectedDialogueEventPresetEnum, audioEditorViewModel.ShowEditedDialogueEventsOnly);
                     }
                 }
             }
@@ -56,120 +57,6 @@ namespace Editors.Audio.AudioEditor
             selectedDialogueEventPreset = null;
             foreach (var soundBank in audioProjectService.AudioProject.SoundBanks)
                 soundBank.FilteredBy = null;
-        }
-
-        public static void AddAllDialogueEventsToSoundBankTreeViewItems(AudioProjectData audioProject, bool showEditedDialogueEventsOnly)
-        {
-            foreach (var soundBank in audioProject.SoundBanks)
-            {
-                soundBank.SoundBankTreeViewItems.Clear();
-
-                if (soundBank.DialogueEvents != null)
-                {
-                    if (showEditedDialogueEventsOnly == true)
-                    {
-                        var editedDialogueEvents = soundBank.DialogueEvents.Where(dialogueEvent => dialogueEvent.DecisionTree.Count > 0);
-                        foreach (var dialogueEvent in editedDialogueEvents)
-                            if (!soundBank.SoundBankTreeViewItems.Contains(dialogueEvent))
-                                soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
-                    }
-                    else
-                    {
-                        foreach (var dialogueEvent in soundBank.DialogueEvents)
-                            if (!soundBank.SoundBankTreeViewItems.Contains(dialogueEvent))
-                                soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
-                    }
-                }
-            }
-        }
-
-        public static void AddPresetDialogueEventsToSoundBankTreeViewItems(AudioProjectData audioProject, string targetSoundBank, DialogueEventPreset dialogueEventPresetEnum, bool showEditedDialogueEventsOnly)
-        {
-            foreach (var soundBank in audioProject.SoundBanks)
-            {
-                if (soundBank.Name == targetSoundBank)
-                {
-                    soundBank.SoundBankTreeViewItems.Clear();
-
-                    if (soundBank.DialogueEvents != null)
-                    {
-                        var presetDialogueEvents = DialogueEventData
-                            .Where(dialogueEvent => GetDisplayString(dialogueEvent.SoundBank) == targetSoundBank
-                                && dialogueEvent.DialogueEventPreset.Contains(dialogueEventPresetEnum))
-                            .Select(dialogueEvent => dialogueEvent.Name);
-
-                        if (showEditedDialogueEventsOnly == true)
-                        {
-                            var editedDialogueEvents = soundBank.DialogueEvents.Where(dialogueEvent => dialogueEvent.DecisionTree.Count > 0);
-                            foreach (var dialogueEvent in editedDialogueEvents)
-                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !(soundBank.SoundBankTreeViewItems.Contains(dialogueEvent)))
-                                    soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
-                        }
-                        else
-                        {
-                            foreach (var dialogueEvent in soundBank.DialogueEvents)
-                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !(soundBank.SoundBankTreeViewItems.Contains(dialogueEvent)))
-                                    soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
-                        }
-                    }
-                }
-            }
-        }
-
-        public static void AddEditedDialogueEventsToSoundBankTreeViewItems(AudioProjectData audioProject, Dictionary<string, string> dialogueEventFiltering, bool showEditedDialogueEventsOnly)
-        {
-            foreach (var soundBank in audioProject.SoundBanks)
-            {
-                soundBank.SoundBankTreeViewItems.Clear();
-
-                if (soundBank.DialogueEvents != null)
-                {
-                    if (showEditedDialogueEventsOnly == true)
-                    {
-                        var editedDialogueEvents = soundBank.DialogueEvents.Where(dialogueEvent => dialogueEvent.DecisionTree.Count > 0);
-
-                        if (dialogueEventFiltering.Keys.ToList().Contains(soundBank.Name))
-                        {
-                            var presetDialogueEvents = DialogueEventData
-                                .Where(dialogueEventData =>
-                                    dialogueEventFiltering.TryGetValue(GetDisplayString(dialogueEventData.SoundBank), out var dialogueEventPreset)
-                                    && dialogueEventData.DialogueEventPreset.Contains(GetDialogueEventPreset(dialogueEventPreset)))
-                                .Select(dialogueEventData => dialogueEventData.Name);
-
-                            foreach (var dialogueEvent in editedDialogueEvents)
-                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !(soundBank.SoundBankTreeViewItems.Contains(dialogueEvent)))
-                                    soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
-                        }
-                        else
-                        {
-                            foreach (var dialogueEvent in editedDialogueEvents)
-                                if (!soundBank.SoundBankTreeViewItems.Contains(dialogueEvent))
-                                    soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
-                        }
-                    }
-                    else
-                    {
-                        if (dialogueEventFiltering.Keys.ToList().Contains(soundBank.Name))
-                        {
-                            var presetDialogueEvents = DialogueEventData
-                                .Where(dialogueEventData =>
-                                    dialogueEventFiltering.TryGetValue(GetDisplayString(dialogueEventData.SoundBank), out var dialogueEventPreset)
-                                    && dialogueEventData.DialogueEventPreset.Contains(GetDialogueEventPreset(dialogueEventPreset)))
-                                .Select(dialogueEventData => dialogueEventData.Name);
-
-                            foreach (var dialogueEvent in soundBank.DialogueEvents)
-                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !(soundBank.SoundBankTreeViewItems.Contains(dialogueEvent)))
-                                    soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
-                        }
-                        else
-                        {
-                            foreach (var dialogueEvent in soundBank.DialogueEvents)
-                                if (!soundBank.SoundBankTreeViewItems.Contains(dialogueEvent))
-                                    soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
-                        }
-                    }
-                }
-            }
         }
     }
 }

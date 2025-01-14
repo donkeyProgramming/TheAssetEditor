@@ -11,30 +11,13 @@ using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
-using static Editors.Audio.AudioEditor.DialogueEventFilter;
 using static Editors.Audio.AudioEditor.IntegrityChecker;
-using static Editors.Audio.AudioEditor.TreeViewWrapper;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
-namespace Editors.Audio.AudioEditor.Data
+namespace Editors.Audio.AudioEditor.Data.AudioProjectService
 {
-    public interface IAudioProjectService
-    {
-        AudioProjectData AudioProject { get; set; }
-        Dictionary<string, List<string>> StateGroupsWithModdedStatesRepository { get; set; }
-        Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithIntegrityError { get; set; }
-        void SaveAudioProject(IPackFileService packFileService);
-        void LoadAudioProject(IPackFileService packFileService, IAudioRepository audioRepository, AudioEditorViewModel audioEditorViewModel, IStandardDialogs packFileUiProvider);
-        void InitialiseAudioProject(AudioEditorViewModel audioEditorViewModel, string fileName, string directory, string language);
-        void BuildStateGroupsWithModdedStatesRepository(ObservableCollection<StateGroup> moddedStateGroups, Dictionary<string, List<string>> stateGroupsWithModdedStatesRepository);
-        void ResetAudioProject();
-        string AudioProjectFileName { get; set; }
-        string AudioProjectDirectory { get; set; }
-    }
-
     public class AudioProjectService : IAudioProjectService
     {
         readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
@@ -75,7 +58,7 @@ namespace Editors.Audio.AudioEditor.Data
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
 
-                audioEditorViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {AddExtraUnderscoresToString(fileName)}";
+                audioEditorViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {AudioProjectHelpers.AddExtraUnderscoresToString(fileName)}";
 
                 // Reset data
                 audioEditorViewModel.ResetAudioEditorViewModelData();
@@ -94,10 +77,10 @@ namespace Editors.Audio.AudioEditor.Data
 
                 CheckAudioProjectDialogueEventIntegrity(audioRepository, this);
 
-                AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.ShowEditedDialogueEventsOnly);
+                TreeViewBuilder.AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.ShowEditedDialogueEventsOnly);
 
                 // Update AudioProjectTreeViewItems
-                AddAllSoundBanksToTreeViewItemsWrappers(this);
+                TreeViewBuilder.AddAllSoundBanksToTreeViewItemsWrappers(this);
 
                 _logger.Here().Information($"Loaded Audio Project: {fileName}");
             }
@@ -105,24 +88,24 @@ namespace Editors.Audio.AudioEditor.Data
 
         public void InitialiseAudioProject(AudioEditorViewModel audioEditorViewModel, string fileName, string directory, string language)
         {
-            audioEditorViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {AddExtraUnderscoresToString(fileName)}";
+            audioEditorViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {AudioProjectHelpers.AddExtraUnderscoresToString(fileName)}";
 
             AudioProjectFileName = fileName;
             AudioProjectDirectory = directory;
             AudioProject.Language = language;
 
-            InitialiseSoundBanks(AudioProject);
+            InitialiseSoundBanks();
 
-            InitialiseModdedStatesGroups(AudioProject.States);
+            InitialiseModdedStatesGroups();
 
-            AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.ShowEditedDialogueEventsOnly);
+            TreeViewBuilder.AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.ShowEditedDialogueEventsOnly);
 
-            SortSoundBanksAlphabetically(AudioProject.SoundBanks);
+            SortSoundBanksAlphabetically();
 
-            AddAllSoundBanksToTreeViewItemsWrappers(this);
+            TreeViewBuilder.AddAllSoundBanksToTreeViewItemsWrappers(this);
         }
 
-        private static void InitialiseSoundBanks(AudioProjectData audioProject)
+        private void InitialiseSoundBanks()
         {
             var soundBanks = Enum.GetValues<GameSoundBank>()
                 .Select(soundBank => new SoundBank
@@ -135,7 +118,7 @@ namespace Editors.Audio.AudioEditor.Data
 
             foreach (var soundBank in soundBanks)
             {
-                audioProject.SoundBanks.Add(soundBank);
+                AudioProject.SoundBanks.Add(soundBank);
 
                 var dialogueEvents = DialogueEventData.Where(dialogueEvent => dialogueEvent.SoundBank == GetSoundBank(soundBank.Name))
                     .Select(dialogueEvent => new DialogueEvent
@@ -148,13 +131,23 @@ namespace Editors.Audio.AudioEditor.Data
             }
         }
 
-        private static void InitialiseModdedStatesGroups(ObservableCollection<StateGroup> moddedStates)
+        private void InitialiseModdedStatesGroups()
         {
             foreach (var moddedStateGroup in ModdedStateGroups)
             {
                 var stateGroup = new StateGroup { Name = moddedStateGroup };
-                moddedStates.Add(stateGroup);
+                AudioProject.States.Add(stateGroup);
             }
+        }
+
+        public void SortSoundBanksAlphabetically()
+        {
+            var sortedSoundBanks = AudioProject.SoundBanks.OrderBy(soundBank => soundBank.Name).ToList();
+
+            AudioProject.SoundBanks.Clear();
+
+            foreach (var soundBank in sortedSoundBanks)
+                AudioProject.SoundBanks.Add(soundBank);
         }
 
         public void BuildStateGroupsWithModdedStatesRepository(ObservableCollection<StateGroup> moddedStateGroups, Dictionary<string, List<string>> stateGroupsWithModdedStatesRepository)

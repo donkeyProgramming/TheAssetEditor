@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 

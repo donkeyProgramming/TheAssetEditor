@@ -1,17 +1,17 @@
-﻿using Editors.Audio.AudioEditor.Data;
+﻿using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioEditor
+namespace Editors.Audio.AudioEditor.Data
 {
-    public class AudioProjectManager
+    public class AudioProjectDataManager
     {
         public static void HandleAddingRowData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
         {
-            var audioProjectEditorRow = ExtractRowFromSingleRowDataGrid(audioEditorViewModel, audioRepository);
-            AddAudioProjectEditorDataGridDataToAudioProjectViewer(audioEditorViewModel, audioProjectEditorRow);
+            var audioProjectEditorRow = AudioProjectHelpers.ExtractRowFromSingleRowDataGrid(audioEditorViewModel, audioRepository);
+            AudioProjectHelpers.AddAudioProjectEditorDataGridDataToAudioProjectViewer(audioEditorViewModel, audioProjectEditorRow);
 
             DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
 
@@ -69,7 +69,7 @@ namespace Editors.Audio.AudioEditor
                 if (soundBank.Type == GameSoundBankType.ActionEventSoundBank.ToString())
                 {
                     DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
-                    AddAudioProjectViewerDataGridDataToAudioProjectEditor(audioEditorViewModel);
+                    AudioProjectHelpers.AddAudioProjectViewerDataGridDataToAudioProjectEditor(audioEditorViewModel);
 
                     var parameters = new AudioProjectDataServiceParameters
                     {

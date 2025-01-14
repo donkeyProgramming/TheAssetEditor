@@ -2,10 +2,9 @@
 using System.IO;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioSettingsEditor;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
-namespace Editors.Audio.AudioEditor.Data
+namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 {
     public class DialogueEventDataService : IAudioProjectDataService
     {
@@ -20,7 +19,7 @@ namespace Editors.Audio.AudioEditor.Data
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var columnHeader = AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var columnHeader = AudioProjectHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
                 var states = GetStatesForColumn(parameters, stateGroupWithQualifier.Value);
                 var stateGroupColumn = DataGridHelpers.CreateColumn(parameters, columnHeader, columnWidth, DataGridColumnType.StateGroupEditableComboBox, states);
                 dataGrid.Columns.Add(stateGroupColumn);
@@ -42,7 +41,7 @@ namespace Editors.Audio.AudioEditor.Data
             var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var stateGroupColumnHeader = AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var stateGroupColumnHeader = AudioProjectHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
                 rowData[stateGroupColumnHeader] = string.Empty;
             }
 
@@ -61,7 +60,7 @@ namespace Editors.Audio.AudioEditor.Data
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var stateGroupColumnHeader = AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var stateGroupColumnHeader = AudioProjectHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
                 var states = GetStatesForColumn(parameters, stateGroupWithQualifier.Value);
                 var stateGroupColumn = DataGridHelpers.CreateColumn(parameters, stateGroupColumnHeader, columnWidth, DataGridColumnType.ReadOnlyTextBlock, states);
                 dataGrid.Columns.Add(stateGroupColumn);
@@ -86,7 +85,7 @@ namespace Editors.Audio.AudioEditor.Data
 
                 foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
                 {
-                    var stateGroupColumnHeader = AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                    var stateGroupColumnHeader = AudioProjectHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
                     var node = statePath.Nodes.FirstOrDefault(node => node.StateGroup.Name == stateGroupWithQualifier.Value);
                     if (node != null)
                         rowData[stateGroupColumnHeader] = node.State.Name;
@@ -105,7 +104,7 @@ namespace Editors.Audio.AudioEditor.Data
             var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers.Keys)
             {
-                if (parameters.AudioProjectEditorRow.TryGetValue(AddExtraUnderscoresToString(stateGroupWithQualifier), out var cellValue))
+                if (parameters.AudioProjectEditorRow.TryGetValue(AudioProjectHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier), out var cellValue))
                 {
                     var statePathNode = new StatePathNode
                     {
@@ -131,7 +130,7 @@ namespace Editors.Audio.AudioEditor.Data
             if (parameters.AudioProjectEditorRow.TryGetValue("AudioSettings", out var audioSettings))
                 statePath.AudioSettings = AudioSettingsEditorViewModel.BuildAudioSettings(parameters.AudioEditorViewModel.AudioSettingsViewModel);
 
-            InsertStatePathAlphabetically(parameters.DialogueEvent, statePath);
+            AudioProjectHelpers.InsertStatePathAlphabetically(parameters.DialogueEvent, statePath);
         }
 
         public void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioProjectDataServiceParameters parameters)
@@ -140,8 +139,8 @@ namespace Editors.Audio.AudioEditor.Data
             var dataGridRowsCopy = parameters.AudioEditorViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var statePath = GetStatePathFromDialogueEvent(parameters.AudioRepository, dataGridRow, parameters.DialogueEvent);
-                var matchingStatePath = GetMatchingDecisionNode(statePath, parameters.DialogueEvent);
+                var statePath = AudioProjectHelpers.GetStatePathFromDialogueEvent(parameters.AudioRepository, dataGridRow, parameters.DialogueEvent);
+                var matchingStatePath = AudioProjectHelpers.GetMatchingDecisionNode(statePath, parameters.DialogueEvent);
                 if (matchingStatePath != null)
                 {
                     parameters.DialogueEvent.DecisionTree.Remove(matchingStatePath);

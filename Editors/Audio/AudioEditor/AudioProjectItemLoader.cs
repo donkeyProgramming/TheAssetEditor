@@ -1,11 +1,12 @@
 ﻿using Editors.Audio.AudioEditor.AudioSettingsEditor;
 using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.CopyPasteHandler;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using static Editors.Audio.AudioEditor.DialogueEventFilter;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
@@ -78,8 +79,8 @@ namespace Editors.Audio.AudioEditor
             }
             else if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
-                audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
-                audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
+                audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
+                audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
 
                 AudioSettingsEditorViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
@@ -107,8 +108,8 @@ namespace Editors.Audio.AudioEditor
             }
             else if (audioEditorViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
             {
-                audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
-                audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
+                audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
+                audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
 
                 var parameters = new AudioProjectDataServiceParameters
                 {

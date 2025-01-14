@@ -2,9 +2,8 @@
 using System.IO;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioSettingsEditor;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 
-namespace Editors.Audio.AudioEditor.Data
+namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 {
     public class ActionEventDataService : IAudioProjectDataService
     {
@@ -84,7 +83,7 @@ namespace Editors.Audio.AudioEditor.Data
                 actionEvent.AudioSettings = AudioSettingsEditorViewModel.BuildAudioSettings(parameters.AudioEditorViewModel.AudioSettingsViewModel);
 
             var soundBank = parameters.SoundBank;
-            InsertActionEventAlphabetically(soundBank, actionEvent);
+            AudioProjectHelpers.InsertActionEventAlphabetically(soundBank, actionEvent);
         }
 
         public void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioProjectDataServiceParameters parameters)
@@ -95,7 +94,7 @@ namespace Editors.Audio.AudioEditor.Data
             var dataGridRowsCopy = parameters.AudioEditorViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var actionEvent = GetMatchingActionEvent(parameters.AudioEditorViewModel.AudioProjectEditorFullDataGrid, dataGridRow, soundBank);
+                var actionEvent = AudioProjectHelpers.GetMatchingActionEvent(parameters.AudioEditorViewModel.AudioProjectEditorFullDataGrid, dataGridRow, soundBank);
                 soundBank.ActionEvents.Remove(actionEvent);
                 parameters.AudioEditorViewModel.AudioProjectEditorFullDataGrid.Remove(dataGridRow);
             }

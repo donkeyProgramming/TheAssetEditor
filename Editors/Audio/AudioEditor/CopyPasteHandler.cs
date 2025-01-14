@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -64,7 +65,7 @@ namespace Editors.Audio.AudioEditor
             {
                 var dialogueEventStateGroups = audioRepository
                     .DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[selectedDialogueEvent.Name]
-                    .Select(kvp => AddExtraUnderscoresToString(kvp.Key))
+                    .Select(kvp => AudioProjectHelpers.AddExtraUnderscoresToString(kvp.Key))
                     .ToList();
 
                 var copiedDataGridRowStateGroups = audioEditorViewModel.CopiedDataGridRows[0]

@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -40,7 +40,7 @@ namespace Editors.Audio.AudioEditor
 
                 if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent && (columnName != "AudioFilesDisplay" && columnName != "AudioSettings"))
                 {
-                    var stateGroup = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, RemoveExtraUnderscoresFromString(columnName));
+                    var stateGroup = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, AudioProjectHelpers.RemoveExtraUnderscoresFromString(columnName));
                     var stateGroupsWithAnyState = audioRepository.StateGroupsWithStates
                         .Where(kvp => kvp.Value.Contains("Any"))
                         .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -59,7 +59,7 @@ namespace Editors.Audio.AudioEditor
             var audioProjectEditorSingleRowDataGridNullValues = audioEditorViewModel.AudioProjectEditorSingleRowDataGrid[0].Where(kvp => kvp.Value == null).ToList();
             if (audioProjectEditorSingleRowDataGridNullValues.Count == 0)
             {
-                var singleRowDataGridRow = ExtractRowFromSingleRowDataGrid(audioEditorViewModel, audioRepository);
+                var singleRowDataGridRow = AudioProjectHelpers.ExtractRowFromSingleRowDataGrid(audioEditorViewModel, audioRepository);
                 foreach (var dictionary in audioEditorViewModel.AudioProjectEditorFullDataGrid)
                 {
                     // Filter out "AudioFiles" and "AudioFilesDisplay" kvps so we just get the State Group with Qualifier and State

@@ -8,13 +8,13 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.Converters.TooltipConverter;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 
-namespace Editors.Audio.AudioEditor
+namespace Editors.Audio.AudioEditor.Data
 {
     public enum DataGridColumnType
     {

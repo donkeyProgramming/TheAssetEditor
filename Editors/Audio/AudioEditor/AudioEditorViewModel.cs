@@ -14,17 +14,19 @@ using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.AudioProjectManager;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataManager;
 using static Editors.Audio.AudioEditor.AudioProjectItemLoader;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.CopyPasteHandler;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataService;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataService.IAudioProjectDataService;
 using static Editors.Audio.AudioEditor.DialogueEventFilter;
 using static Editors.Audio.AudioEditor.IntegrityChecker;
-using static Editors.Audio.AudioEditor.TreeViewWrapper;
+using static Editors.Audio.AudioEditor.TreeViewBuilder;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using static Editors.Audio.Utility.SoundPlayer;
+using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
 
 namespace Editors.Audio.AudioEditor
 {
