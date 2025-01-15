@@ -34,7 +34,7 @@ namespace Editors.Audio.AudioEditor
                 }
                 else
                 {
-                    if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
+                    if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
                     {
                         var stateGroup = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, RemoveExtraUnderscoresFromString(columnName));
                         var stateGroupsWithAnyState = audioRepository.StateGroupsWithStates

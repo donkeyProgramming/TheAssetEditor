@@ -6,23 +6,23 @@ using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioEditor
+namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
     public class DialogueEventFilter
     {
         public static void ApplyDialogueEventPresetFiltering(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
         {
-            if (audioEditorViewModel._selectedAudioProjectTreeItem is SoundBank selectedSoundBank)
+            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is SoundBank selectedSoundBank)
             {
                 if (selectedSoundBank.Type == GameSoundBankType.DialogueEventSoundBank.ToString())
                 {
-                    if (audioEditorViewModel.SelectedDialogueEventPreset != null)
+                    if (audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset != null)
                     {
-                        StoreDialogueEventSoundBankFiltering(selectedSoundBank.Name, audioEditorViewModel.SelectedDialogueEventPreset, audioEditorViewModel.DialogueEventSoundBankFiltering);
-                        selectedSoundBank.FilteredBy = $" (Filtered by {audioEditorViewModel.SelectedDialogueEventPreset} preset)";
+                        StoreDialogueEventSoundBankFiltering(selectedSoundBank.Name, audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset, audioEditorViewModel.AudioProjectExplorerViewModel.DialogueEventSoundBankFiltering);
+                        selectedSoundBank.FilteredBy = $" (Filtered by {audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset} preset)";
 
-                        var selectedDialogueEventPresetEnum = GetDialogueEventPreset(audioEditorViewModel.SelectedDialogueEventPreset);
-                        TreeViewBuilder.AddPresetDialogueEventsToSoundBankTreeViewItems(audioProjectService.AudioProject, selectedSoundBank.Name, selectedDialogueEventPresetEnum, audioEditorViewModel.ShowEditedDialogueEventsOnly);
+                        var selectedDialogueEventPresetEnum = GetDialogueEventPreset(audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset);
+                        TreeViewBuilder.AddPresetDialogueEventsToSoundBankTreeViewItems(audioProjectService.AudioProject, selectedSoundBank.Name, selectedDialogueEventPresetEnum, audioEditorViewModel.AudioProjectExplorerViewModel.ShowEditedDialogueEventsOnly);
                     }
                 }
             }

@@ -7,26 +7,22 @@ using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioSettingsEditor;
 using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataManager;
-using static Editors.Audio.AudioEditor.AudioProjectItemLoader;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.CopyPasteHandler;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataService.IAudioProjectDataService;
-using static Editors.Audio.AudioEditor.DialogueEventFilter;
+using static Editors.Audio.AudioEditor.Data.AudioProjectDataManager;
 using static Editors.Audio.AudioEditor.IntegrityChecker;
-using static Editors.Audio.AudioEditor.TreeViewBuilder;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using static Editors.Audio.Utility.SoundPlayer;
-using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
-using Editors.Audio.AudioEditor.Data.AudioProjectService;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -37,8 +33,10 @@ namespace Editors.Audio.AudioEditor
         private readonly IAudioProjectService _audioProjectService;
         private readonly IStandardDialogs _packFileUiProvider;
 
-        public AudioSettingsEditorViewModel AudioSettingsViewModel { get; set; } = new();
+        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
         public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
+        public AudioSettingsEditorViewModel AudioSettingsViewModel { get; set; }
+
 
         public string DisplayName { get; set; } = "Audio Editor";
 
@@ -48,19 +46,6 @@ namespace Editors.Audio.AudioEditor
         [ObservableProperty] private ObservableCollection<Dictionary<string, object>> _selectedDataGridRows;
         [ObservableProperty] private ObservableCollection<Dictionary<string, object>> _copiedDataGridRows;
         [ObservableProperty] public ObservableCollection<SoundBank> _soundBanks;
-        [ObservableProperty] public ObservableCollection<object> _audioProjectTreeViewItems;
-
-        // Audio Project Explorer
-        [ObservableProperty] private string _audioProjectExplorerLabel = "Audio Project Explorer";
-        public object _selectedAudioProjectTreeItem;
-        public object _previousSelectedAudioProjectTreeItem;
-        [ObservableProperty] private string _selectedDialogueEventPreset;
-        [ObservableProperty] private bool _showEditedSoundBanksOnly;
-        [ObservableProperty] private bool _showEditedDialogueEventsOnly;
-        [ObservableProperty] private bool _isDialogueEventPresetFilterEnabled = false;
-        [ObservableProperty] private ObservableCollection<GameSoundBank> _dialogueEventSoundBanks = new(Enum.GetValues<GameSoundBank>().Where(soundBank => GetSoundBankType(soundBank) == GameSoundBankType.DialogueEventSoundBank));
-        [ObservableProperty] private ObservableCollection<string> _dialogueEventPresets;
-        public Dictionary<string, string> DialogueEventSoundBankFiltering { get; set; } = [];
 
         // Audio Project Editor
         [ObservableProperty] private string _audioProjectEditorLabel = "Audio Project Editor";
@@ -84,7 +69,10 @@ namespace Editors.Audio.AudioEditor
             _audioProjectService = audioProjectService;
             _packFileUiProvider = packFileUiProvider;
 
-            AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(_packFileService, this, _audioProjectService, _packFileUiProvider);
+            AudioProjectExplorerViewModel = new AudioProjectExplorerViewModel(this, _audioRepository, _audioProjectService);
+            AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(this, _packFileService);
+            AudioSettingsViewModel = new AudioSettingsEditorViewModel();
+
 
             Initialise();
 
@@ -117,27 +105,9 @@ namespace Editors.Audio.AudioEditor
                 SetIsPasteEnabled(this, _audioRepository, _audioProjectService);
         }
 
-        partial void OnSelectedDialogueEventPresetChanged(string value)
-        {
-            ApplyDialogueEventPresetFiltering(this, _audioProjectService);
-        }
-
-        partial void OnShowEditedSoundBanksOnlyChanged(bool value)
-        {
-            if (value == true)
-                AddEditedSoundBanksToAudioProjectTreeViewItemsWrappers(_audioProjectService);
-            else if (value == false)
-                AddAllSoundBanksToTreeViewItemsWrappers(_audioProjectService);
-        }
-
-        partial void OnShowEditedDialogueEventsOnlyChanged(bool value)
-        {
-            AddEditedDialogueEventsToSoundBankTreeViewItems(_audioProjectService.AudioProject, DialogueEventSoundBankFiltering, ShowEditedDialogueEventsOnly);
-        }
-
         partial void OnShowModdedStatesOnlyChanged(bool value)
         {
-            if (_selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
+            if (AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
                 // Clear the previous DataGrid Data
                 DataGridHelpers.ClearDataGridCollection(AudioProjectEditorSingleRowDataGrid);
@@ -154,16 +124,6 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        public void OnSelectedAudioProjectTreeViewItemChanged(object value)
-        {
-            // Store the previous selected item
-            if (_selectedAudioProjectTreeItem != null)
-                _previousSelectedAudioProjectTreeItem = _selectedAudioProjectTreeItem;
-            _selectedAudioProjectTreeItem = value;
-
-            HandleSelectedTreeViewItem(this, _audioProjectService, _audioRepository);
-        }
-
         [RelayCommand] public void NewAudioProject()
         {
             NewAudioProjectWindow.Show(_packFileService, this, _audioProjectService, _packFileUiProvider);
@@ -177,16 +137,6 @@ namespace Editors.Audio.AudioEditor
         [RelayCommand] public void LoadAudioProject()
         {
             _audioProjectService.LoadAudioProject(_packFileService, _audioRepository, this, _packFileUiProvider);
-        }
-
-        [RelayCommand] public void ResetFiltering()
-        {
-            // Workaround for using ref with the MVVM toolkit as you can't pass a property by ref, so instead pass a field that is set to the property by ref then assign the ref field to the property
-            var selectedDialogueEventPreset = SelectedDialogueEventPreset;
-            ResetDialogueEventFiltering(DialogueEventSoundBankFiltering, ref selectedDialogueEventPreset, _audioProjectService);
-            SelectedDialogueEventPreset = selectedDialogueEventPreset;
-
-            AddAllDialogueEventsToSoundBankTreeViewItems(_audioProjectService.AudioProject, ShowEditedDialogueEventsOnly);
         }
 
         [RelayCommand] public void UpdateAudioProjectEditorFullDataGridRow()
@@ -249,13 +199,13 @@ namespace Editors.Audio.AudioEditor
 
         [RelayCommand] public void CopyRows()
         {
-            if (_selectedAudioProjectTreeItem is DialogueEvent)
+            if (AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent)
                 CopyDialogueEventRows(this, _audioRepository, _audioProjectService);
         }
 
         [RelayCommand] public void PasteRows()
         {
-            if (IsPasteEnabled && _selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
+            if (IsPasteEnabled && AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
                 PasteDialogueEventRows(this, _audioRepository, _audioProjectService, selectedDialogueEvent);
         }
 
@@ -273,10 +223,10 @@ namespace Editors.Audio.AudioEditor
             AudioProjectEditorFullDataGrid = null;
             SelectedDataGridRows = null;
             CopiedDataGridRows = null;
-            _selectedAudioProjectTreeItem = null;
-            _previousSelectedAudioProjectTreeItem = null;
-            AudioProjectTreeViewItems.Clear();
-            DialogueEventSoundBankFiltering.Clear();
+            AudioProjectExplorerViewModel._selectedAudioProjectTreeItem = null;
+            AudioProjectExplorerViewModel._previousSelectedAudioProjectTreeItem = null;
+            AudioProjectExplorerViewModel.AudioProjectTreeViewItems.Clear();
+            AudioProjectExplorerViewModel.DialogueEventSoundBankFiltering.Clear();
         }
 
         public void Initialise()
@@ -285,8 +235,8 @@ namespace Editors.Audio.AudioEditor
             AudioProjectEditorFullDataGrid = [];
             SelectedDataGridRows = [];
             CopiedDataGridRows = [];
-            DialogueEventPresets = [];
-            AudioProjectTreeViewItems = _audioProjectService.AudioProject.AudioProjectTreeViewItems;
+            AudioProjectExplorerViewModel.DialogueEventPresets = [];
+            AudioProjectExplorerViewModel.AudioProjectTreeViewItems = _audioProjectService.AudioProject.AudioProjectTreeViewItems;
         }
 
         public void Close()

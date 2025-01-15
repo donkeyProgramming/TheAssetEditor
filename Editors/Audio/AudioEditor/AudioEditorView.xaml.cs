@@ -32,12 +32,6 @@ namespace Editors.Audio.AudioEditor
                 ViewModel.OnDataGridSelectionChanged(selectedItems);
         }
 
-        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            if (e.NewValue != null)
-                ViewModel.OnSelectedAudioProjectTreeViewItemChanged(e.NewValue);
-        }
-
         private void AudioEditorView_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.Modifiers == ModifierKeys.Control)

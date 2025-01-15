@@ -38,7 +38,7 @@ namespace Editors.Audio.AudioEditor
                     break;
                 }
 
-                if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent && (columnName != "AudioFilesDisplay" && columnName != "AudioSettings"))
+                if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent && (columnName != "AudioFilesDisplay" && columnName != "AudioSettings"))
                 {
                     var stateGroup = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, AudioProjectHelpers.RemoveExtraUnderscoresFromString(columnName));
                     var stateGroupsWithAnyState = audioRepository.StateGroupsWithStates

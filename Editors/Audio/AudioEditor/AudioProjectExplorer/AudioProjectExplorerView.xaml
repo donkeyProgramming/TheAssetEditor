@@ -1,0 +1,167 @@
+﻿<UserControl x:Class="Editors.Audio.AudioEditor.AudioProjectExplorer.AudioProjectExplorerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
+             xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer"
+             xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+             xmlns:data="clr-namespace:Editors.Audio.AudioEditor.Data"
+             xmlns:audioeditor="clr-namespace:Editors.Audio.AudioEditor" 
+             d:DataContext="{d:DesignInstance Type=audioprojectexplorer:AudioProjectExplorerViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <sys:Double 
+            x:Key="DefaultHeight">23</sys:Double>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="550"/>
+        </Grid.RowDefinitions>
+
+        <Grid 
+            Grid.Row="0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition 
+                    Height="Auto"/>
+                <RowDefinition 
+                    Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label 
+                 Grid.Row="0"
+                 Content="{Binding AudioProjectExplorerLabel}"/>
+
+            <Grid 
+                Grid.Row="1" 
+                Margin="0, 0, 0, 5">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition 
+                         Height="Auto"/>
+                    <RowDefinition 
+                        Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition 
+                        Width="*"/>
+                    <ColumnDefinition 
+                        Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <extendedwpftoolkit:WatermarkComboBox 
+                    Grid.Row="0" 
+                    Grid.Column="0" 
+                    VerticalAlignment="Center" 
+                    Margin="5, 0, 5, 0"
+                    Width="Auto"
+                    Height="{StaticResource DefaultHeight}" 
+                    ItemsSource="{Binding DialogueEventPresets}" 
+                    SelectedItem="{Binding SelectedDialogueEventPreset}"
+                    IsEnabled="{Binding IsDialogueEventPresetFilterEnabled}"
+                    Watermark="Select Dialogue Event Preset Filter" 
+                    ToolTip="PLACEHOLDER"/>
+
+                <Button 
+                    Grid.Row="0" 
+                    Grid.Column="1" 
+                    Content="Reset Dialogue Event Filtering"
+                    ToolTip="PLACEHOLDER" 
+                    Margin="5, 0, 0, 0" 
+                    VerticalAlignment="Center" 
+                    Width="180" 
+                    HorizontalAlignment="Left"
+                    Command="{Binding ResetFilteringCommand}"/>
+
+                <CheckBox 
+                    Grid.Row="1" 
+                    Grid.Column="0" 
+                    Content="Show Edited SoundBanks Only"
+                    ToolTip="PLACEHOLDER" 
+                    Margin="5, 5, 0, 0" 
+                    VerticalAlignment="Center" 
+                    IsChecked="{Binding ShowEditedSoundBanksOnly, Mode=TwoWay}" />
+
+                <CheckBox 
+                    Grid.Row="1" 
+                    Grid.Column="1" 
+                    Content="Show Edited Dialogue Events Only"
+                    ToolTip="PLACEHOLDER" 
+                    Margin="5, 5, 0, 0" 
+                    VerticalAlignment="Center" 
+                    IsChecked="{Binding ShowEditedDialogueEventsOnly, Mode=TwoWay}" />
+            </Grid>
+        </Grid>
+
+        <Grid 
+            Grid.Row="1" 
+            Margin="0, 5, 0, 0">
+
+            <TreeView 
+                Padding="2.5, 5, 2.5, 5"
+                ItemsSource="{Binding AudioProjectTreeViewItems}" 
+                SelectedItemChanged="TreeView_SelectedItemChanged"
+                VirtualizingPanel.IsVirtualizing="True"
+                VirtualizingPanel.VirtualizationMode="Recycling"
+                VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate 
+                        DataType="{x:Type audioeditor:ActionEventSoundBanksTreeViewWrapper}" 
+                        ItemsSource="{Binding ActionEventSoundBanks}">
+                        <TextBlock 
+                            Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+
+                    <HierarchicalDataTemplate 
+                        DataType="{x:Type audioeditor:DialogueEventSoundBanksTreeViewWrapper}" 
+                        ItemsSource="{Binding DialogueEventSoundBanks}">
+                        <TextBlock 
+                            Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+
+                    <HierarchicalDataTemplate 
+                        DataType="{x:Type data:SoundBank}"
+                        ItemsSource="{Binding SoundBankTreeViewItems}">
+                        <TextBlock>
+                            <TextBlock.Inlines>
+                                <Run 
+                                    Text="{Binding Name}" />
+                                <Run 
+                                    Text="{Binding FilteredBy}" 
+                                    Foreground="{DynamicResource ABrush.Foreground.Disabled}"/>
+                            </TextBlock.Inlines>
+                        </TextBlock>
+                    </HierarchicalDataTemplate>
+
+                    <HierarchicalDataTemplate 
+                        DataType="{x:Type data:DialogueEvent}">
+                        <TextBlock 
+                            Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+
+                    <HierarchicalDataTemplate 
+                        DataType="{x:Type audioeditor:StatesTreeViewWrapper}" 
+                        ItemsSource="{Binding StateGroups}">
+                        <TextBlock 
+                            Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+
+                    <HierarchicalDataTemplate 
+                        DataType="{x:Type data:StateGroup}">
+                        <TextBlock 
+                            Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+        </Grid>
+    </Grid>
+</UserControl>

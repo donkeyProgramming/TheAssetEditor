@@ -7,7 +7,7 @@ using Serilog;
 using Shared.Core.ErrorHandling;
 using static Editors.Audio.AudioEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.CopyPasteHandler;
-using static Editors.Audio.AudioEditor.DialogueEventFilter;
+using static Editors.Audio.AudioEditor.AudioProjectExplorer.DialogueEventFilter;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor
@@ -22,8 +22,8 @@ namespace Editors.Audio.AudioEditor
             audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer";
 
             // Set filtering properties
-            audioEditorViewModel.IsDialogueEventPresetFilterEnabled = false;
-            audioEditorViewModel.SelectedDialogueEventPreset = null;
+            audioEditorViewModel.AudioProjectExplorerViewModel.IsDialogueEventPresetFilterEnabled = false;
+            audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset = null;
 
             // Set button enablement
             audioEditorViewModel.IsAddRowButtonEnabled = false;
@@ -43,7 +43,7 @@ namespace Editors.Audio.AudioEditor
             DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(audioEditorViewModel.AudioProjectEditorSingleRowDataGridTag));
             DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(audioEditorViewModel.AudioProjectEditorFullDataGridTag));
 
-            if (audioEditorViewModel._selectedAudioProjectTreeItem is SoundBank selectedSoundBank)
+            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is SoundBank selectedSoundBank)
             {
                 if (selectedSoundBank.Type == GameSoundBankType.ActionEventSoundBank.ToString())
                 {
@@ -70,14 +70,14 @@ namespace Editors.Audio.AudioEditor
                 else if (selectedSoundBank.Type == GameSoundBankType.DialogueEventSoundBank.ToString())
                 {
                     // Workaround for using ref with the MVVM toolkit as you can't pass a property by ref, so instead pass a field that is set to the property by ref then assign the ref field to the property
-                    var isDialogueEventPresetFilterEnabled = audioEditorViewModel.IsDialogueEventPresetFilterEnabled;
-                    var dialogueEventPresets = audioEditorViewModel.DialogueEventPresets;
-                    HandleDialogueEventsPresetFilter(selectedSoundBank.Name, ref dialogueEventPresets, audioEditorViewModel.DialogueEventSoundBankFiltering, audioEditorViewModel.SelectedDialogueEventPreset, ref isDialogueEventPresetFilterEnabled);
-                    audioEditorViewModel.IsDialogueEventPresetFilterEnabled = isDialogueEventPresetFilterEnabled;
-                    audioEditorViewModel.DialogueEventPresets = dialogueEventPresets;
+                    var isDialogueEventPresetFilterEnabled = audioEditorViewModel.AudioProjectExplorerViewModel.IsDialogueEventPresetFilterEnabled;
+                    var dialogueEventPresets = audioEditorViewModel.AudioProjectExplorerViewModel.DialogueEventPresets;
+                    HandleDialogueEventsPresetFilter(selectedSoundBank.Name, ref dialogueEventPresets, audioEditorViewModel.AudioProjectExplorerViewModel.DialogueEventSoundBankFiltering, audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset, ref isDialogueEventPresetFilterEnabled);
+                    audioEditorViewModel.AudioProjectExplorerViewModel.IsDialogueEventPresetFilterEnabled = isDialogueEventPresetFilterEnabled;
+                    audioEditorViewModel.AudioProjectExplorerViewModel.DialogueEventPresets = dialogueEventPresets;
                 }
             }
-            else if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
+            else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
                 audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
                 audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
@@ -106,7 +106,7 @@ namespace Editors.Audio.AudioEditor
 
                 s_logger.Here().Information($"Loaded DialogueEvent: {selectedDialogueEvent.Name}");
             }
-            else if (audioEditorViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
+            else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
             {
                 audioEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
                 audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";

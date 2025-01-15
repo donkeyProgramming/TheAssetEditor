@@ -15,7 +15,7 @@ namespace Editors.Audio.AudioEditor.Data
 
             DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
 
-            if (audioEditorViewModel._selectedAudioProjectTreeItem is SoundBank soundBank)
+            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is SoundBank soundBank)
             {
                 if (soundBank.Type == GameSoundBankType.ActionEventSoundBank.ToString())
                 {
@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.Data
                     audioProjectDataServiceInstance.AddAudioProjectEditorDataGridDataToAudioProject(parameters);
                 }
             }
-            else if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
+            else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
                 var parameters = new AudioProjectDataServiceParameters
                 {
@@ -45,7 +45,7 @@ namespace Editors.Audio.AudioEditor.Data
                 audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
                 audioProjectDataServiceInstance.AddAudioProjectEditorDataGridDataToAudioProject(parameters);
             }
-            else if (audioEditorViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
+            else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
             {
                 var parameters = new AudioProjectDataServiceParameters
                 {
@@ -64,7 +64,7 @@ namespace Editors.Audio.AudioEditor.Data
 
         public static void HandleUpdatingRowData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
         {
-            if (audioEditorViewModel._selectedAudioProjectTreeItem is SoundBank soundBank)
+            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is SoundBank soundBank)
             {
                 if (soundBank.Type == GameSoundBankType.ActionEventSoundBank.ToString())
                 {
@@ -81,7 +81,7 @@ namespace Editors.Audio.AudioEditor.Data
                     audioProjectDataServiceInstance.RemoveAudioProjectEditorDataGridDataFromAudioProject(parameters);
                 }
             }
-            else if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
+            else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
                 DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
 
@@ -98,7 +98,7 @@ namespace Editors.Audio.AudioEditor.Data
                 audioProjectDataServiceInstance.RemoveAudioProjectEditorDataGridDataFromAudioProject(parameters);
 
             }
-            else if (audioEditorViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
+            else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
             {
                 DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
 
@@ -119,7 +119,7 @@ namespace Editors.Audio.AudioEditor.Data
 
         public static void HandleRemovingRowData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
         {
-            if (audioEditorViewModel._selectedAudioProjectTreeItem is SoundBank soundBank)
+            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is SoundBank soundBank)
             {
                 if (soundBank.Type == GameSoundBankType.ActionEventSoundBank.ToString())
                 {
@@ -133,7 +133,7 @@ namespace Editors.Audio.AudioEditor.Data
                     audioProjectDataServiceInstance.RemoveAudioProjectEditorDataGridDataFromAudioProject(parameters);
                 }
             }
-            else if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
+            else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
                 var parameters = new AudioProjectDataServiceParameters
                 {
@@ -146,7 +146,7 @@ namespace Editors.Audio.AudioEditor.Data
                 audioProjectDataServiceInstance.RemoveAudioProjectEditorDataGridDataFromAudioProject(parameters);
 
             }
-            else if (audioEditorViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
+            else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
             {
                 var parameters = new AudioProjectDataServiceParameters
                 {

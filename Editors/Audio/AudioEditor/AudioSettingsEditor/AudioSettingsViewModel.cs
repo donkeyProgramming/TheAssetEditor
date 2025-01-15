@@ -8,8 +8,6 @@ namespace Editors.Audio.AudioEditor.AudioSettingsEditor
 {
     public partial class AudioSettingsEditorViewModel : ObservableObject, IEditorInterface
     {
-        //readonly ILogger _logger = Logging.Create<AudioSettingsViewModel>();
-
         public string DisplayName { get; set; } = "Audio Settings";
         [ObservableProperty] private bool _isAudioSettingsVisible = false;
 

@@ -61,7 +61,7 @@ namespace Editors.Audio.AudioEditor
                 .Any(copiedRow => audioEditorViewModel.AudioProjectEditorFullDataGrid
                 .Any(dataGridRow => copiedRow.Count == dataGridRow.Count && !copiedRow.Except(dataGridRow).Any()));
 
-            if (audioEditorViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
+            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
                 var dialogueEventStateGroups = audioRepository
                     .DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[selectedDialogueEvent.Name]

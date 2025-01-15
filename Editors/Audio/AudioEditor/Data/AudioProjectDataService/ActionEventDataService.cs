@@ -88,7 +88,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
         public void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioProjectDataServiceParameters parameters)
         {
-            var soundBank = parameters.AudioEditorViewModel._selectedAudioProjectTreeItem as SoundBank;
+            var soundBank = parameters.AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem as SoundBank;
 
             // Create a copy to prevent an error where dataGridRows is modified while being iterated over
             var dataGridRowsCopy = parameters.AudioEditorViewModel.SelectedDataGridRows.ToList();

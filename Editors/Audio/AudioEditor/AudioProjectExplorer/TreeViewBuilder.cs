@@ -6,7 +6,7 @@ using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioEditor
+namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
     public class ActionEventSoundBanksTreeViewWrapper
     {
@@ -72,13 +72,13 @@ namespace Editors.Audio.AudioEditor
                         {
                             var editedDialogueEvents = soundBank.DialogueEvents.Where(dialogueEvent => dialogueEvent.DecisionTree.Count > 0);
                             foreach (var dialogueEvent in editedDialogueEvents)
-                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !(soundBank.SoundBankTreeViewItems.Contains(dialogueEvent)))
+                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !soundBank.SoundBankTreeViewItems.Contains(dialogueEvent))
                                     soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
                         }
                         else
                         {
                             foreach (var dialogueEvent in soundBank.DialogueEvents)
-                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !(soundBank.SoundBankTreeViewItems.Contains(dialogueEvent)))
+                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !soundBank.SoundBankTreeViewItems.Contains(dialogueEvent))
                                     soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
                         }
                     }
@@ -107,7 +107,7 @@ namespace Editors.Audio.AudioEditor
                                 .Select(dialogueEventData => dialogueEventData.Name);
 
                             foreach (var dialogueEvent in editedDialogueEvents)
-                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !(soundBank.SoundBankTreeViewItems.Contains(dialogueEvent)))
+                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !soundBank.SoundBankTreeViewItems.Contains(dialogueEvent))
                                     soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
                         }
                         else
@@ -128,7 +128,7 @@ namespace Editors.Audio.AudioEditor
                                 .Select(dialogueEventData => dialogueEventData.Name);
 
                             foreach (var dialogueEvent in soundBank.DialogueEvents)
-                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !(soundBank.SoundBankTreeViewItems.Contains(dialogueEvent)))
+                                if (presetDialogueEvents.Contains(dialogueEvent.Name) && !soundBank.SoundBankTreeViewItems.Contains(dialogueEvent))
                                     soundBank.SoundBankTreeViewItems.Add(dialogueEvent);
                         }
                         else

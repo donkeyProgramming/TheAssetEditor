@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -58,7 +59,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
 
-                audioEditorViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {AudioProjectHelpers.AddExtraUnderscoresToString(fileName)}";
+                audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {AudioProjectHelpers.AddExtraUnderscoresToString(fileName)}";
 
                 // Reset data
                 audioEditorViewModel.ResetAudioEditorViewModelData();
@@ -77,7 +78,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
 
                 CheckAudioProjectDialogueEventIntegrity(audioRepository, this);
 
-                TreeViewBuilder.AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.ShowEditedDialogueEventsOnly);
+                TreeViewBuilder.AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.AudioProjectExplorerViewModel.ShowEditedDialogueEventsOnly);
 
                 // Update AudioProjectTreeViewItems
                 TreeViewBuilder.AddAllSoundBanksToTreeViewItemsWrappers(this);
@@ -88,7 +89,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
 
         public void InitialiseAudioProject(AudioEditorViewModel audioEditorViewModel, string fileName, string directory, string language)
         {
-            audioEditorViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {AudioProjectHelpers.AddExtraUnderscoresToString(fileName)}";
+            audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {AudioProjectHelpers.AddExtraUnderscoresToString(fileName)}";
 
             AudioProjectFileName = fileName;
             AudioProjectDirectory = directory;
@@ -98,7 +99,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
 
             InitialiseModdedStatesGroups();
 
-            TreeViewBuilder.AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.ShowEditedDialogueEventsOnly);
+            TreeViewBuilder.AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.AudioProjectExplorerViewModel.ShowEditedDialogueEventsOnly);
 
             SortSoundBanksAlphabetically();
 

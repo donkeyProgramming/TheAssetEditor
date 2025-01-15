@@ -33,8 +33,6 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
     {
         private readonly IPackFileService _packFileService;
         private readonly AudioEditorViewModel _audioEditorViewModel;
-        private readonly IAudioProjectService _audioProjectService;
-        private readonly IStandardDialogs _packFileUiProvider;
 
         public string DisplayName { get; set; } = "Audio Project Explorer";
         [ObservableProperty] private string _audioFilesExplorerLabel = "Audio Project Explorer";
@@ -45,12 +43,10 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         public ObservableCollection<TreeNode> SelectedTreeNodes { get; set; } = new ObservableCollection<TreeNode>();
 
-        public AudioFilesExplorerViewModel(IPackFileService packFileService, AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
+        public AudioFilesExplorerViewModel(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService)
         {
-            _packFileService = packFileService;
             _audioEditorViewModel = audioEditorViewModel;
-            _audioProjectService = audioProjectService;
-            _packFileUiProvider = packFileUiProvider;
+            _packFileService = packFileService;
 
             SelectedTreeNodes.CollectionChanged += OnSelectedTreeNodesChanged;
 
