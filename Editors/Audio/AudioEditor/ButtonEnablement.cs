@@ -12,20 +12,20 @@ namespace Editors.Audio.AudioEditor
     {
         public static void SetIsAddRowButtonEnabled(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
         {
-            audioEditorViewModel.IsAddRowButtonEnabled = false;
+            audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
 
-            if (audioEditorViewModel.AudioProjectEditorSingleRowDataGrid.Count == 0)
+            if (audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid.Count == 0)
                 return;
 
             // Check if everything is filled in. Don't use AudioFiles as that's a list of files rather than a string and we're usding AudioFilesDisplay anyway which is the string representation
-            var emptyColumns = audioEditorViewModel.AudioProjectEditorSingleRowDataGrid[0].Where(kvp => kvp.Value == string.Empty && kvp.Key != "AudioFiles").ToList();
+            var emptyColumns = audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid[0].Where(kvp => kvp.Value == string.Empty && kvp.Key != "AudioFiles").ToList();
             if (emptyColumns.Count > 0)
-                audioEditorViewModel.IsAddRowButtonEnabled = false;
+                audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
             else
-                audioEditorViewModel.IsAddRowButtonEnabled = true;
+                audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = true;
 
             // Check if any of the State Groups are capable of being left empty i.e. if the State can be set to Any automatically by the AudioEditor
-            var singleRowDataGridStringValueColumns = audioEditorViewModel.AudioProjectEditorSingleRowDataGrid[0].Where(kvp => kvp.Key != "AudioFiles").ToDictionary();
+            var singleRowDataGridStringValueColumns = audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid[0].Where(kvp => kvp.Key != "AudioFiles").ToDictionary();
             foreach (var kvp in singleRowDataGridStringValueColumns)
             {
                 var columnName = kvp.Key;
@@ -34,7 +34,7 @@ namespace Editors.Audio.AudioEditor
                 // It's not okay for the AudioFiles display to be empty...
                 if (columnName == "AudioFilesDisplay" && columnValue == string.Empty)
                 {
-                    audioEditorViewModel.IsAddRowButtonEnabled = false;
+                    audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
                     break;
                 }
 
@@ -46,17 +46,17 @@ namespace Editors.Audio.AudioEditor
                         .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
                     if (stateGroupsWithAnyState.ContainsKey(stateGroup))
-                        audioEditorViewModel.IsAddRowButtonEnabled = true;
+                        audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = true;
                     else
                     {
-                        audioEditorViewModel.IsAddRowButtonEnabled = false;
+                        audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
                         return;
                     }
                 }
             }
 
             // Check if the row exists already
-            var audioProjectEditorSingleRowDataGridNullValues = audioEditorViewModel.AudioProjectEditorSingleRowDataGrid[0].Where(kvp => kvp.Value == null).ToList();
+            var audioProjectEditorSingleRowDataGridNullValues = audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid[0].Where(kvp => kvp.Value == null).ToList();
             if (audioProjectEditorSingleRowDataGridNullValues.Count == 0)
             {
                 var singleRowDataGridRow = AudioProjectHelpers.ExtractRowFromSingleRowDataGrid(audioEditorViewModel, audioRepository);
@@ -66,7 +66,7 @@ namespace Editors.Audio.AudioEditor
                     var filteredRow = singleRowDataGridRow.Where(kvp => kvp.Key != "AudioFiles" && kvp.Key != "AudioFilesDisplay");
                     var filteredDictionary = dictionary.Where(kvp => kvp.Key != "AudioFiles" && kvp.Key != "AudioFilesDisplay");
                     if (filteredRow.SequenceEqual(filteredDictionary))
-                        audioEditorViewModel.IsAddRowButtonEnabled = false;
+                        audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
                 }
             }
         }
@@ -74,11 +74,11 @@ namespace Editors.Audio.AudioEditor
         public static void SetButtonEnablement(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IList selectedItems)
         {
             // Reset button enablement
-            audioEditorViewModel.IsUpdateRowButtonEnabled = false;
-            audioEditorViewModel.IsRemoveRowButtonEnabled = false;
-            audioEditorViewModel.IsAddAudioFilesButtonEnabled = false;
-            audioEditorViewModel.IsPlayAudioButtonEnabled = false;
-            audioEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
+            audioEditorViewModel.AudioProjectEditorViewModel.IsUpdateRowButtonEnabled = false;
+            audioEditorViewModel.AudioProjectEditorViewModel.IsRemoveRowButtonEnabled = false;
+            audioEditorViewModel.AudioProjectEditorViewModel.IsAddAudioFilesButtonEnabled = false;
+            audioEditorViewModel.AudioProjectEditorViewModel.IsPlayAudioButtonEnabled = false;
+            audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
 
             var selectedDataGridRows = audioEditorViewModel.SelectedDataGridRows;
             selectedDataGridRows.Clear();
@@ -88,20 +88,20 @@ namespace Editors.Audio.AudioEditor
 
             if (selectedDataGridRows.Count == 1)
             {
-                audioEditorViewModel.IsUpdateRowButtonEnabled = true;
-                audioEditorViewModel.IsRemoveRowButtonEnabled = true;
+                audioEditorViewModel.AudioProjectEditorViewModel.IsUpdateRowButtonEnabled = true;
+                audioEditorViewModel.AudioProjectEditorViewModel.IsRemoveRowButtonEnabled = true;
 
                 if (selectedDataGridRows[0].ContainsKey("AudioFilesDisplay"))
-                    audioEditorViewModel.IsPlayAudioButtonEnabled = true;
+                    audioEditorViewModel.AudioProjectEditorViewModel.IsPlayAudioButtonEnabled = true;
             }
             else if (selectedDataGridRows.Count > 1)
-                audioEditorViewModel.IsRemoveRowButtonEnabled = true;
+                audioEditorViewModel.AudioProjectEditorViewModel.IsRemoveRowButtonEnabled = true;
 
             if (audioProjectService.StateGroupsWithModdedStatesRepository.Count > 0)
-                audioEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
+                audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
 
             if (audioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes.Count > 0)
-                audioEditorViewModel.IsAddAudioFilesButtonEnabled = true;
+                audioEditorViewModel.AudioProjectEditorViewModel.IsAddAudioFilesButtonEnabled = true;
         }
     }
 }

@@ -7,7 +7,6 @@
              xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer"
              xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
              xmlns:data="clr-namespace:Editors.Audio.AudioEditor.Data"
-             xmlns:audioeditor="clr-namespace:Editors.Audio.AudioEditor" 
              d:DataContext="{d:DesignInstance Type=audioprojectexplorer:AudioProjectExplorerViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="550" d:DesignWidth="800">
@@ -115,14 +114,14 @@
 
                 <TreeView.Resources>
                     <HierarchicalDataTemplate 
-                        DataType="{x:Type audioeditor:ActionEventSoundBanksTreeViewWrapper}" 
+                        DataType="{x:Type audioprojectexplorer:ActionEventSoundBanksTreeViewWrapper}" 
                         ItemsSource="{Binding ActionEventSoundBanks}">
                         <TextBlock 
                             Text="{Binding Name}" />
                     </HierarchicalDataTemplate>
 
                     <HierarchicalDataTemplate 
-                        DataType="{x:Type audioeditor:DialogueEventSoundBanksTreeViewWrapper}" 
+                        DataType="{x:Type audioprojectexplorer:DialogueEventSoundBanksTreeViewWrapper}" 
                         ItemsSource="{Binding DialogueEventSoundBanks}">
                         <TextBlock 
                             Text="{Binding Name}" />
@@ -149,7 +148,7 @@
                     </HierarchicalDataTemplate>
 
                     <HierarchicalDataTemplate 
-                        DataType="{x:Type audioeditor:StatesTreeViewWrapper}" 
+                        DataType="{x:Type audioprojectexplorer:StatesTreeViewWrapper}" 
                         ItemsSource="{Binding StateGroups}">
                         <TextBlock 
                             Text="{Binding Name}" />

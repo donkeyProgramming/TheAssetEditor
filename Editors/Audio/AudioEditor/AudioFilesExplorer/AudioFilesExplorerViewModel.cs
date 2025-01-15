@@ -4,10 +4,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
-using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 
 namespace Editors.Audio.AudioEditor.AudioFilesExplorer
@@ -76,7 +74,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 }
             }
 
-            _audioEditorViewModel.IsAddAudioFilesButtonEnabled = SelectedTreeNodes.Count > 0;
+            _audioEditorViewModel.AudioProjectEditorViewModel.IsAddAudioFilesButtonEnabled = SelectedTreeNodes.Count > 0;
         }
 
         partial void OnSearchQueryChanged(string value)
@@ -206,8 +204,6 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             return null;
         }
 
-        public void Close()
-        {
-        }
+        public void Close() {}
     }
 }

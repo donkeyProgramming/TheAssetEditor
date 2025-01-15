@@ -9,7 +9,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
     {
         public void ConfigureAudioProjectEditorDataGrid(AudioProjectDataServiceParameters parameters)
         {
-            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorSingleRowDataGridTag);
+            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
 
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
@@ -30,7 +30,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
                 { "AudioFilesDisplay", string.Empty },
                 { "AudioSettings", new AudioSettings() }
             };
-            parameters.AudioEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(rowData);
+            parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(rowData);
         }
 
         public void ConfigureAudioProjectViewerDataGrid(AudioProjectDataServiceParameters parameters)

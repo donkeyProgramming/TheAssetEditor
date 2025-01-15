@@ -13,7 +13,7 @@ namespace Editors.Audio.AudioEditor.Data
             var audioProjectEditorRow = AudioProjectHelpers.ExtractRowFromSingleRowDataGrid(audioEditorViewModel, audioRepository);
             AudioProjectHelpers.AddAudioProjectEditorDataGridDataToAudioProjectViewer(audioEditorViewModel, audioProjectEditorRow);
 
-            DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
+            DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid);
 
             if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is SoundBank soundBank)
             {
@@ -68,7 +68,7 @@ namespace Editors.Audio.AudioEditor.Data
             {
                 if (soundBank.Type == GameSoundBankType.ActionEventSoundBank.ToString())
                 {
-                    DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
+                    DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid);
                     AudioProjectHelpers.AddAudioProjectViewerDataGridDataToAudioProjectEditor(audioEditorViewModel);
 
                     var parameters = new AudioProjectDataServiceParameters
@@ -83,9 +83,9 @@ namespace Editors.Audio.AudioEditor.Data
             }
             else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
-                DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
+                DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid);
 
-                audioEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(audioEditorViewModel.SelectedDataGridRows[0]);
+                audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(audioEditorViewModel.SelectedDataGridRows[0]);
 
                 var parameters = new AudioProjectDataServiceParameters
                 {
@@ -100,9 +100,9 @@ namespace Editors.Audio.AudioEditor.Data
             }
             else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
             {
-                DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorSingleRowDataGrid);
+                DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid);
 
-                audioEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(audioEditorViewModel.SelectedDataGridRows[0]);
+                audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(audioEditorViewModel.SelectedDataGridRows[0]);
 
                 var parameters = new AudioProjectDataServiceParameters
                 {

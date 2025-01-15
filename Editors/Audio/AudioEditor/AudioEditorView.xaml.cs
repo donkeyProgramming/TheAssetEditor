@@ -50,7 +50,7 @@ namespace Editors.Audio.AudioEditor
 
             if (e.Key == Key.Delete)
             {
-                ViewModel?.RemoveAudioProjectEditorFullDataGridRow();
+                ViewModel?.AudioProjectEditorViewModel.RemoveAudioProjectEditorFullDataGridRow();
                 e.Handled = true;
             }
         }

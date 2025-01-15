@@ -7,7 +7,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
     {
         public void ConfigureAudioProjectEditorDataGrid(AudioProjectDataServiceParameters parameters)
         {
-            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorSingleRowDataGridTag);
+            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
             var stateGroupColumn = DataGridHelpers.CreateColumn(parameters, AudioProjectHelpers.AddExtraUnderscoresToString(parameters.StateGroup.Name), 1.0, DataGridColumnType.EditableTextBox);
             dataGrid.Columns.Add(stateGroupColumn);
         }
@@ -16,7 +16,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
         {
             var dataGridRow = new Dictionary<string, object> { };
             dataGridRow[AudioProjectHelpers.AddExtraUnderscoresToString(parameters.StateGroup.Name)] = string.Empty;
-            parameters.AudioEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(dataGridRow);
+            parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(dataGridRow);
         }
 
         public void ConfigureAudioProjectViewerDataGrid(AudioProjectDataServiceParameters parameters)

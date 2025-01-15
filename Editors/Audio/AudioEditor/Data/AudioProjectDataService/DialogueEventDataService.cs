@@ -10,7 +10,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
     {
         public void ConfigureAudioProjectEditorDataGrid(AudioProjectDataServiceParameters parameters)
         {
-            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorSingleRowDataGridTag);
+            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
 
             var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
 
@@ -45,7 +45,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
                 rowData[stateGroupColumnHeader] = string.Empty;
             }
 
-            parameters.AudioEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(rowData);
+            parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(rowData);
         }
 
         public void ConfigureAudioProjectViewerDataGrid(AudioProjectDataServiceParameters parameters)
@@ -156,7 +156,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
             var vanillaStates = parameters.AudioRepository.StateGroupsWithStates[stateGroup];
 
             // Display the required states in the ComboBox
-            if (parameters.AudioEditorViewModel.ShowModdedStatesOnly && ModdedStateGroups.Contains(stateGroup))
+            if (parameters.AudioEditorViewModel.AudioProjectEditorViewModel.ShowModdedStatesOnly && ModdedStateGroups.Contains(stateGroup))
                 states.AddRange(moddedStates);
             else
             {

@@ -14,6 +14,7 @@
     xmlns:audioeditor="clr-namespace:Editors.Audio.AudioEditor"
     xmlns:audiofilesExplorer="clr-namespace:Editors.Audio.AudioEditor.AudioFilesExplorer"
     xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer" 
+    xmlns:audioprojecteditor="clr-namespace:Editors.Audio.AudioEditor.AudioProjectEditor" 
     xmlns:audiosettingseditor="clr-namespace:Editors.Audio.AudioEditor.AudioSettingsEditor" 
     d:DataContext="{d:DesignInstance Type=audioeditor:AudioEditorViewModel}"
     mc:Ignorable="d" 
@@ -152,150 +153,36 @@
                     <RowDefinition 
                         Height="Auto"/>
                     <RowDefinition 
-                        Height="Auto"/>
-                    <RowDefinition 
-                        Height="Auto"/>
-                    <RowDefinition 
                         Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Label 
-                    Grid.Row="0" 
-                    Content="{Binding AudioProjectEditorLabel}"/>
+                <audioprojecteditor:AudioProjectEditorView
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    DataContext="{Binding AudioProjectEditorViewModel}"/>
 
-                <!-- Setting CanUserAddRows to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF. -->
-                <DataGrid 
-                    Grid.Row="1" 
-                    Tag="{Binding AudioProjectEditorSingleRowDataGridTag}" 
-                    Margin="0, 0, 0, 0"
-                    AutoGenerateColumns="False"
-                    CanUserAddRows="False" 
-                    ItemsSource="{Binding AudioProjectEditorSingleRowDataGrid}"
-                    EnableRowVirtualization="True" 
-                    EnableColumnVirtualization="True"
-                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
-
-                <Grid 
-                    Grid.Row="2" 
-                    MinHeight="25" 
-                    Margin="0, 5, 0, 0">
-
-                    <Grid.RowDefinitions>
-                        <RowDefinition 
-                            Height="Auto"/>
-                        <RowDefinition 
-                            Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition 
-                            Width="Auto"/>
-                        <ColumnDefinition 
-                            Width="Auto"/>
-                        <ColumnDefinition 
-                            Width="Auto"/>
-                        <ColumnDefinition 
-                            Width="Auto"/>
-                        <ColumnDefinition 
-                            Width="Auto"/>
-                        <ColumnDefinition 
-                            Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Button 
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Content="Add Row"
-                        ToolTip="PLACEHOLDER" 
-                        Command="{Binding AddRowFromAudioProjectEditorSingleRowDataGridToFullDataGridCommand}" 
-                        Margin="5, 0, 0, 0" 
-                        Width="100" 
-                        VerticalAlignment="Center" 
-                        HorizontalAlignment="Left"
-                        IsEnabled="{Binding IsAddRowButtonEnabled}"/>
-
-                    <Button 
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Content="Update Row" 
-                        ToolTip="PLACEHOLDER" 
-                        Command="{Binding UpdateAudioProjectEditorFullDataGridRowCommand}" 
-                        Margin="5, 0, 0, 0" 
-                        Width="100" 
-                        VerticalAlignment="Center" 
-                        HorizontalAlignment="Left"
-                        IsEnabled="{Binding IsUpdateRowButtonEnabled}"/>
-
-                    <Button 
-                        Grid.Row="0"
-                        Grid.Column="2"
-                        Content="Remove Row" 
-                        ToolTip="PLACEHOLDER" 
-                        Command="{Binding RemoveAudioProjectEditorFullDataGridRowCommand}" 
-                        Margin="5, 0, 0, 0" 
-                        Width="100" 
-                        VerticalAlignment="Center" 
-                        HorizontalAlignment="Left"
-                        IsEnabled="{Binding IsRemoveRowButtonEnabled}"/>
-
-                    <Button 
-                        Grid.Row="0"
-                        Grid.Column="3"
-                        Content="Add Audio Files" 
-                        ToolTip="Select the wav files from the Audio Files Explorer and add them with this button." 
-                        Command="{Binding AddSelectedAudioFilesCommand}" 
-                        Margin="5, 0, 0, 0" 
-                        Width="100" 
-                        VerticalAlignment="Center" 
-                        HorizontalAlignment="Left"
-                        IsEnabled="{Binding IsAddAudioFilesButtonEnabled}"/>
-                    
-                    <Button 
-                        Grid.Row="0"
-                        Grid.Column="4"
-                        Content="Play Audio" 
-                        ToolTip="Play a random audio file audio from the selected item." 
-                        Command="{Binding PlayRandomAudioFileCommand}" 
-                        Margin="5, 0, 0, 0" 
-                        Width="100" 
-                        VerticalAlignment="Center" 
-                        HorizontalAlignment="Left"
-                        IsEnabled="{Binding IsPlayAudioButtonEnabled}"/>
-
-                    <CheckBox 
-                        Grid.Row="0"
-                        Grid.Column="5"
-                        Content="Show Modded States Only"
-                        ToolTip="PLACEHOLDER" 
-                        Margin="5, 0, 0, 0" 
-                        VerticalAlignment="Center" 
-                        IsChecked="{Binding ShowModdedStatesOnly, Mode=TwoWay}" 
-                        HorizontalAlignment="Left" 
-                        IsEnabled="{Binding IsShowModdedStatesCheckBoxEnabled}"/>
-                </Grid>
+                <Border 
+                    Grid.Row="1"
+                    Height="5" 
+                    Background="{DynamicResource App.Border}"/>
+                
+                <audiosettingseditor:AudioSettingsEditorView 
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    DataContext="{Binding AudioSettingsEditorViewModel}"/>
 
                 <Border 
                     Grid.Row="3"
                     Height="5" 
                     Background="{DynamicResource App.Border}"/>
-                
-                <audiosettingseditor:AudioSettingsEditorView 
-                    Grid.Row="4"
-                    Grid.Column="0"
-                    DataContext="{Binding AudioSettingsEditorViewModel}"/>
-
-                <Border 
-                    Grid.Row="5"
-                    Height="5" 
-                    Background="{DynamicResource App.Border}"/>
 
                 <Label 
-                    Grid.Row="6"
+                    Grid.Row="4"
                     Content="{Binding AudioProjectViewerLabel}"/>
                 
                 <!-- Setting CanUserAddRows to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF. -->
                 <DataGrid 
-                    Grid.Row="7"
+                    Grid.Row="5"
                     Margin="0, 0, 0, 0"
                     Tag="{Binding AudioProjectEditorFullDataGridTag}" 
                     AutoGenerateColumns="False" 

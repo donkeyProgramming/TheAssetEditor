@@ -11,7 +11,7 @@ namespace Editors.Audio.AudioEditor
     {
         public static void AddAudioProjectViewerDataGridDataToAudioProjectEditor(AudioEditorViewModel audioEditorViewModel)
         {
-            audioEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(audioEditorViewModel.SelectedDataGridRows[0]);
+            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(audioEditorViewModel.SelectedDataGridRows[0]);
         }
 
         public static void AddAudioProjectEditorDataGridDataToAudioProjectViewer(AudioEditorViewModel audioEditorViewModel, Dictionary<string, object> audioProjectEditorRow)
@@ -23,7 +23,7 @@ namespace Editors.Audio.AudioEditor
         {
             var newRow = new Dictionary<string, object>();
 
-            foreach (var kvp in audioEditorViewModel.AudioProjectEditorSingleRowDataGrid[0])
+            foreach (var kvp in audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid[0])
             {
                 var columnName = kvp.Key;
                 var cellValue = kvp.Value;

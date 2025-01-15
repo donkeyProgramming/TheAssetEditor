@@ -224,8 +224,6 @@ namespace Editors.Audio.AudioEditor.AudioSettingsEditor
             }
         }
 
-        public void Close()
-        {
-        }
+        public void Close() {}
     }
 }
