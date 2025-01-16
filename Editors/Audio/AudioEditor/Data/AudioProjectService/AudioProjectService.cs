@@ -47,7 +47,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
             _logger.Here().Information($"Saved Audio Project file: {AudioProjectDirectory}\\{AudioProjectFileName}.aproj");
         }
 
-        public void LoadAudioProject(IPackFileService packFileService, IAudioRepository audioRepository, AudioEditorViewModel audioEditorViewModel, IStandardDialogs packFileUiProvider)
+        public void LoadAudioProject(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioRepository audioRepository, IStandardDialogs packFileUiProvider)
         {
             var result = packFileUiProvider.DisplayBrowseDialog([".aproj"]);
             if (result.Result)

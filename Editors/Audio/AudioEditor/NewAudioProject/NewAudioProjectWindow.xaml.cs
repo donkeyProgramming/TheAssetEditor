@@ -7,25 +7,25 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
 {
     public partial class NewAudioProjectWindow : Window
     {
-        private readonly IPackFileService _packFileService;
         private readonly AudioEditorViewModel _audioEditorViewModel;
+        private readonly IPackFileService _packFileService;
         private readonly IAudioProjectService _audioProjectService;
         private readonly IStandardDialogs _packFileUiProvider;
 
-        public NewAudioProjectWindow(IPackFileService packFileService, AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
+        public NewAudioProjectWindow(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
         {
-            _packFileService = packFileService;
             _audioEditorViewModel = audioEditorViewModel;
+            _packFileService = packFileService;
             _audioProjectService = audioProjectService;
             _packFileUiProvider = packFileUiProvider;
 
             InitializeComponent();
         }
 
-        public static void Show(IPackFileService packFileService, AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
+        public static void Show(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
         {
-            var window = new NewAudioProjectWindow(packFileService, audioEditorViewModel, audioProjectService, packFileUiProvider);
-            var newAudioProjectViewModel = new NewAudioProjectViewModel(packFileService, audioEditorViewModel, audioProjectService, packFileUiProvider);
+            var window = new NewAudioProjectWindow(audioEditorViewModel, packFileService, audioProjectService, packFileUiProvider);
+            var newAudioProjectViewModel = new NewAudioProjectViewModel(audioEditorViewModel, packFileService, audioProjectService, packFileUiProvider);
 
             // Set the close action for the ViewModel
             newAudioProjectViewModel.SetCloseAction(() =>

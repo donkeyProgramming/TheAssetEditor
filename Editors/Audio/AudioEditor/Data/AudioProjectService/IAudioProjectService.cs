@@ -14,7 +14,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
         Dictionary<string, List<string>> StateGroupsWithModdedStatesRepository { get; set; }
         Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithIntegrityError { get; set; }
         void SaveAudioProject(IPackFileService packFileService);
-        void LoadAudioProject(IPackFileService packFileService, IAudioRepository audioRepository, AudioEditorViewModel audioEditorViewModel, IStandardDialogs packFileUiProvider);
+        void LoadAudioProject(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioRepository audioRepository, IStandardDialogs packFileUiProvider);
         void InitialiseAudioProject(AudioEditorViewModel audioEditorViewModel, string fileName, string directory, string language);
         void BuildStateGroupsWithModdedStatesRepository(ObservableCollection<StateGroup> moddedStateGroups, Dictionary<string, List<string>> stateGroupsWithModdedStatesRepository);
         void ResetAudioProject();

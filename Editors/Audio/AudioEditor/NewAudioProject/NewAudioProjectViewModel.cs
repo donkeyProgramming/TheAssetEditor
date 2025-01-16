@@ -16,8 +16,9 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
     public partial class NewAudioProjectViewModel : ObservableObject, IEditorInterface
     {
         readonly ILogger _logger = Logging.Create<NewAudioProjectViewModel>();
-        private readonly IPackFileService _packFileService;
+
         private readonly AudioEditorViewModel _audioEditorViewModel;
+        private readonly IPackFileService _packFileService;
         private readonly IAudioProjectService _audioProjectService;
         private readonly IStandardDialogs _packFileUiProvider;
 
@@ -37,14 +38,13 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         [ObservableProperty] private bool _isLanguageSelected;
         [ObservableProperty] private bool _isOkButtonEnabled;
 
-        public NewAudioProjectViewModel(IPackFileService packFileService, AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
+        public NewAudioProjectViewModel(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
         {
-            _packFileService = packFileService;
             _audioEditorViewModel = audioEditorViewModel;
+            _packFileService = packFileService;
             _audioProjectService = audioProjectService;
             _packFileUiProvider = packFileUiProvider;
 
-            // Default values
             AudioProjectDirectory = "AudioProjects";
             SelectedLanguage = GameLanguage.EnglishUK;
         }

@@ -1,17 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.AudioEditorMenu;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioSettingsEditor;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
-using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.IntegrityChecker;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor
@@ -23,6 +21,7 @@ namespace Editors.Audio.AudioEditor
         private readonly IAudioProjectService _audioProjectService;
         private readonly IStandardDialogs _packFileUiProvider;
 
+        public AudioEditorMenuViewModel AudioEditorMenuViewModel { get; set; }
         public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
         public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
         public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; set; }
@@ -38,6 +37,7 @@ namespace Editors.Audio.AudioEditor
             _audioProjectService = audioProjectService;
             _packFileUiProvider = packFileUiProvider;
 
+            AudioEditorMenuViewModel = new AudioEditorMenuViewModel(this, _audioRepository, _packFileService, _audioProjectService, _packFileUiProvider);
             AudioProjectExplorerViewModel = new AudioProjectExplorerViewModel(this, _audioRepository, _audioProjectService);
             AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(this, _packFileService);
             AudioProjectEditorViewModel = new AudioProjectEditorViewModel(this, _audioRepository, _audioProjectService);
@@ -46,22 +46,7 @@ namespace Editors.Audio.AudioEditor
 
             Initialise();
 
-            CheckAudioEditorDialogueEventIntegrity(_audioRepository, DialogueEventData);
-        }
-
-        [RelayCommand] public void NewAudioProject()
-        {
-            NewAudioProjectWindow.Show(_packFileService, this, _audioProjectService, _packFileUiProvider);
-        }
-
-        [RelayCommand] public void SaveAudioProject()
-        {
-            _audioProjectService.SaveAudioProject(_packFileService);
-        }
-
-        [RelayCommand] public void LoadAudioProject()
-        {
-            _audioProjectService.LoadAudioProject(_packFileService, _audioRepository, this, _packFileUiProvider);
+            IntegrityChecker.CheckAudioEditorDialogueEventIntegrity(_audioRepository, DialogueEventData);
         }
 
         public void ResetAudioEditorViewModelData()
