@@ -5,12 +5,12 @@ using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using static Editors.Audio.AudioEditor.ButtonEnablement;
-using static Editors.Audio.AudioEditor.CopyPasteHandler;
 using static Editors.Audio.AudioEditor.AudioProjectExplorer.DialogueEventFilter;
+using static Editors.Audio.AudioEditor.AudioProjectEditor.ButtonEnablement;
+using static Editors.Audio.AudioEditor.AudioProjectViewer.CopyPasteHandler;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioEditor
+namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
     public class AudioProjectItemLoader
     {
@@ -19,7 +19,7 @@ namespace Editors.Audio.AudioEditor
         public static void HandleSelectedTreeViewItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
         {
             audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor";
-            audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer";
+            audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer";
 
             // Set filtering properties
             audioEditorViewModel.AudioProjectExplorerViewModel.IsDialogueEventPresetFilterEnabled = false;
@@ -39,16 +39,16 @@ namespace Editors.Audio.AudioEditor
 
             // Reset DataGrids
             DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid);
-            DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorFullDataGrid);
+            DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid);
             DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag));
-            DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(audioEditorViewModel.AudioProjectEditorFullDataGridTag));
+            DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGridTag));
 
             if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is SoundBank selectedSoundBank)
             {
                 if (selectedSoundBank.Type == GameSoundBankType.ActionEventSoundBank.ToString())
                 {
                     audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {selectedSoundBank.Name}";
-                    audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {selectedSoundBank.Name}";
+                    audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {selectedSoundBank.Name}";
 
                     AudioSettingsEditorViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
@@ -80,7 +80,7 @@ namespace Editors.Audio.AudioEditor
             else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
             {
                 audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
-                audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
+                audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
 
                 AudioSettingsEditorViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
 
@@ -109,7 +109,7 @@ namespace Editors.Audio.AudioEditor
             else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
             {
                 audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
-                audioEditorViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
+                audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
 
                 var parameters = new AudioProjectDataServiceParameters
                 {

@@ -3,9 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=netstandard" 
              xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
              xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters" 
-             xmlns:sys="clr-namespace:System;assembly=netstandard"
+             xmlns:audiosettingseditor="clr-namespace:Editors.Audio.AudioEditor.AudioSettingsEditor" 
+             d:DataContext="{d:DesignInstance Type=audiosettingseditor:AudioSettingsEditorViewModel}"
              mc:Ignorable="d" 
              d:DesignHeight="550" d:DesignWidth="960">
 

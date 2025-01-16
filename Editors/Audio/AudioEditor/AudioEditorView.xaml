@@ -6,33 +6,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:s="http://schemas.singulink.com/xaml" 
-    xmlns:sys="clr-namespace:System;assembly=netstandard"
-    xmlns:extendedwpftoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
-    xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters" 
-    xmlns:behaviors="clr-namespace:Shared.Ui.Common.Behaviors;assembly=Shared.Ui" 
-    xmlns:data="clr-namespace:Editors.Audio.AudioEditor.Data"
     xmlns:audioeditor="clr-namespace:Editors.Audio.AudioEditor"
+    xmlns:data="clr-namespace:Editors.Audio.AudioEditor.Data"
     xmlns:audiofilesExplorer="clr-namespace:Editors.Audio.AudioEditor.AudioFilesExplorer"
     xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer" 
     xmlns:audioprojecteditor="clr-namespace:Editors.Audio.AudioEditor.AudioProjectEditor" 
     xmlns:audiosettingseditor="clr-namespace:Editors.Audio.AudioEditor.AudioSettingsEditor" 
+    xmlns:audioprojectviewer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectViewer"
     d:DataContext="{d:DesignInstance Type=audioeditor:AudioEditorViewModel}"
     mc:Ignorable="d" 
     d:DesignWidth="1200" d:DesignHeight="700">
-
-    <UserControl.Resources>
-        <BooleanToVisibilityConverter 
-            x:Key="BoolToVisibilityConverter"/>
-        <converters:SettingsEnumConverter 
-            x:Key="SettingsEnumConverter"/>
-        <DataTemplate 
-            x:Key="EnumToStringTemplate">
-            <TextBlock 
-                Text="{Binding Converter={StaticResource SettingsEnumConverter}}"/>
-        </DataTemplate>
-        <sys:Double 
-            x:Key="DefaultHeight">23</sys:Double>
-    </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -176,25 +159,10 @@
                     Height="5" 
                     Background="{DynamicResource App.Border}"/>
 
-                <Label 
+                <audioprojectviewer:AudioProjectViewerView 
                     Grid.Row="4"
-                    Content="{Binding AudioProjectViewerLabel}"/>
-                
-                <!-- Setting CanUserAddRows to false ensures that data won't go missing from the last row when a new row is added. Wtf WPF. -->
-                <DataGrid 
-                    Grid.Row="5"
-                    Margin="0, 0, 0, 0"
-                    Tag="{Binding AudioProjectEditorFullDataGridTag}" 
-                    AutoGenerateColumns="False" 
-                    VerticalScrollBarVisibility="Auto" 
-                    SelectionChanged="DataGrid_SelectionChanged"
-                    CanUserAddRows="False"
-                    ItemsSource="{Binding AudioProjectEditorFullDataGrid}"
-                    EnableRowVirtualization="True" 
-                    EnableColumnVirtualization="True"
-                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-
-                </DataGrid>
+                    Grid.Column="0"
+                    DataContext="{Binding AudioProjectViewerViewModel}"/>
             </Grid>
         </Grid>
     </Grid>

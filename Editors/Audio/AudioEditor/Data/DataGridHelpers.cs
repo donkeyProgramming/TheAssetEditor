@@ -11,7 +11,7 @@ using System.Windows.Threading;
 using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
-using static Editors.Audio.AudioEditor.ButtonEnablement;
+using static Editors.Audio.AudioEditor.AudioProjectEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.Converters.TooltipConverter;
 
 namespace Editors.Audio.AudioEditor.Data
@@ -256,7 +256,7 @@ namespace Editors.Audio.AudioEditor.Data
             var copyMenuItem = new MenuItem
             {
                 Header = "Copy",
-                Command = parameters.AudioEditorViewModel.CopyRowsCommand
+                Command = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.CopyRowsCommand
             };
 
             BindingOperations.SetBinding(copyMenuItem, UIElement.IsEnabledProperty,
@@ -269,7 +269,7 @@ namespace Editors.Audio.AudioEditor.Data
             var pasteMenuItem = new MenuItem
             {
                 Header = "Paste",
-                Command = parameters.AudioEditorViewModel.PasteRowsCommand
+                Command = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.PasteRowsCommand
             };
 
             BindingOperations.SetBinding(pasteMenuItem, UIElement.IsEnabledProperty,

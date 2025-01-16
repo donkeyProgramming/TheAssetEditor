@@ -6,7 +6,7 @@ using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor
+namespace Editors.Audio.AudioEditor.AudioProjectEditor
 {
     public class ButtonEnablement
     {
@@ -38,7 +38,7 @@ namespace Editors.Audio.AudioEditor
                     break;
                 }
 
-                if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent && (columnName != "AudioFilesDisplay" && columnName != "AudioSettings"))
+                if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent && columnName != "AudioFilesDisplay" && columnName != "AudioSettings")
                 {
                     var stateGroup = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, AudioProjectHelpers.RemoveExtraUnderscoresFromString(columnName));
                     var stateGroupsWithAnyState = audioRepository.StateGroupsWithStates
@@ -60,7 +60,7 @@ namespace Editors.Audio.AudioEditor
             if (audioProjectEditorSingleRowDataGridNullValues.Count == 0)
             {
                 var singleRowDataGridRow = AudioProjectHelpers.ExtractRowFromSingleRowDataGrid(audioEditorViewModel, audioRepository);
-                foreach (var dictionary in audioEditorViewModel.AudioProjectEditorFullDataGrid)
+                foreach (var dictionary in audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid)
                 {
                     // Filter out "AudioFiles" and "AudioFilesDisplay" kvps so we just get the State Group with Qualifier and State
                     var filteredRow = singleRowDataGridRow.Where(kvp => kvp.Key != "AudioFiles" && kvp.Key != "AudioFilesDisplay");
@@ -80,7 +80,7 @@ namespace Editors.Audio.AudioEditor
             audioEditorViewModel.AudioProjectEditorViewModel.IsPlayAudioButtonEnabled = false;
             audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
 
-            var selectedDataGridRows = audioEditorViewModel.SelectedDataGridRows;
+            var selectedDataGridRows = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows;
             selectedDataGridRows.Clear();
 
             foreach (var item in selectedItems.OfType<Dictionary<string, object>>())

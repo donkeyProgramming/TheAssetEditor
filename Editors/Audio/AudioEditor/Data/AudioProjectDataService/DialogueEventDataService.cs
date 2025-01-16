@@ -50,7 +50,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
         public void ConfigureAudioProjectViewerDataGrid(AudioProjectDataServiceParameters parameters)
         {
-            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorFullDataGridTag);
+            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGridTag);
             DataGridHelpers.CreateContextMenu(parameters, dataGrid);
 
             var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
@@ -93,7 +93,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
                         rowData[stateGroupColumnHeader] = string.Empty;
                 }
 
-                parameters.AudioEditorViewModel.AudioProjectEditorFullDataGrid.Add(rowData);
+                parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid.Add(rowData);
             }
         }
 
@@ -136,7 +136,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
         public void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioProjectDataServiceParameters parameters)
         {
             // Create a copy to prevent an error where dataGridRows is modified while being iterated over
-            var dataGridRowsCopy = parameters.AudioEditorViewModel.SelectedDataGridRows.ToList();
+            var dataGridRowsCopy = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
                 var statePath = AudioProjectHelpers.GetStatePathFromDialogueEvent(parameters.AudioRepository, dataGridRow, parameters.DialogueEvent);
@@ -144,7 +144,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
                 if (matchingStatePath != null)
                 {
                     parameters.DialogueEvent.DecisionTree.Remove(matchingStatePath);
-                    parameters.AudioEditorViewModel.AudioProjectEditorFullDataGrid.Remove(dataGridRow);
+                    parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid.Remove(dataGridRow);
                 }
             }
         }

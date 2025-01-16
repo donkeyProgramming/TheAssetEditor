@@ -7,7 +7,6 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.AudioProjectItemLoader;
 using static Editors.Audio.AudioEditor.AudioProjectExplorer.DialogueEventFilter;
 using static Editors.Audio.AudioEditor.AudioProjectExplorer.TreeViewBuilder;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
@@ -50,7 +49,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 _previousSelectedAudioProjectTreeItem = _selectedAudioProjectTreeItem;
             _selectedAudioProjectTreeItem = value;
 
-            HandleSelectedTreeViewItem(_audioEditorViewModel, _audioProjectService, _audioRepository);
+            AudioProjectItemLoader.HandleSelectedTreeViewItem(_audioEditorViewModel, _audioProjectService, _audioRepository);
         }
 
         partial void OnSelectedDialogueEventPresetChanged(string value)

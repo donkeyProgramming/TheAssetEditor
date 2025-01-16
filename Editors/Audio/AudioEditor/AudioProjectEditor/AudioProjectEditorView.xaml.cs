@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor
 {
-    /// <summary>
-    /// Interaction logic for AudioProjectEditorView.xaml
-    /// </summary>
     public partial class AudioProjectEditorView : UserControl
     {
         public AudioProjectEditorView()

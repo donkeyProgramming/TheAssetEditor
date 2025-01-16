@@ -11,7 +11,7 @@ using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.ButtonEnablement;
+using static Editors.Audio.AudioEditor.AudioProjectEditor.ButtonEnablement;
 using static Editors.Audio.AudioEditor.Data.AudioProjectDataManager;
 using static Editors.Audio.Utility.SoundPlayer;
 
@@ -120,7 +120,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         // Maybe change this to play a file in the explorer
         [RelayCommand] public void PlayRandomAudioFile()
         {
-            if (_audioEditorViewModel.SelectedDataGridRows[0].TryGetValue("AudioFiles", out var audioFilesObj) && audioFilesObj is List<string> audioFiles && audioFiles.Count != 0)
+            if (_audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0].TryGetValue("AudioFiles", out var audioFilesObj) && audioFilesObj is List<string> audioFiles && audioFiles.Count != 0)
             {
                 var random = new Random();
                 var randomIndex = random.Next(audioFiles.Count);

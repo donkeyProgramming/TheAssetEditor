@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters" 
-             xmlns:audiofilesexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioFilesExplorer"
+             xmlns:audiofilesexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioFilesExplorer" 
+             d:DataContext="{d:DesignInstance Type=audiofilesexplorer:AudioFilesExplorerViewModel}"
              mc:Ignorable="d"
              d:DesignHeight="250" d:DesignWidth="500">
 
@@ -14,7 +15,6 @@
     </UserControl.Resources>
 
     <Grid>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
