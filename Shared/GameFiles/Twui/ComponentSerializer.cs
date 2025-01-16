@@ -43,7 +43,13 @@ namespace Shared.GameFormats.Twui
 
             DockingParser.ConvertFrom(componentNode, out var horizontal, out var vertical);
             output.DockingVertical = vertical;
-            output.DockingHorizontal = horizontal; 
+            output.DockingHorizontal = horizontal;
+
+            if (output.Name == "page_cycle")
+            { 
+            
+            }
+
 
             // States
             var states = componentNode.Element("states");
@@ -119,6 +125,22 @@ namespace Shared.GameFormats.Twui
                 stateImage.Height = AssignAttribute(stateImage.Height, xmlStateImage);
                 stateImage.Colour = AssignAttribute(stateImage.Colour, xmlStateImage);
 
+
+                DockingParser.ConvertFrom(xmlStateImage, out var horizontal, out var vertical);
+                stateImage.DockingVertical = vertical;
+                stateImage.DockingHorizontal = horizontal;
+
+                stateImage.Offset = AssignAttribute(stateImage.Offset, xmlStateImage);
+                stateImage.Dock_offset = AssignAttribute(stateImage.Dock_offset, xmlStateImage);
+                stateImage.Margin = AssignAttribute(stateImage.Margin, xmlStateImage);
+
+
+                if (stateImage.This == "0AEA8085-AA18-4BA8-B1A2045FAA47A0E8")
+                {
+                    //stateImage.Dock_offset = new Microsoft.Xna.Framework.Vector2(0, 0);
+                }
+
+
                 output.Add(stateImage);
             }
 
@@ -128,3 +150,11 @@ namespace Shared.GameFormats.Twui
 }
 
 
+
+//	offset="-230.00,-15.00"
+//width="778"
+//height="69"
+//tile="true"
+//dockpoint="Center"
+//dock_offset="0.00,1.00"
+//margin="0.00,230.00,0.00,230.00"/>

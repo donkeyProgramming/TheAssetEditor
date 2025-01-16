@@ -37,24 +37,30 @@ namespace Editors.Twui.Editor.Rendering
             _twuiPreviewBuilder.Initialize();
         }
 
+        TwuiFile? _temp_twuiFile;
+        Component? _temp_selectedComponent;
         public void Refresh(TwuiFile? twuiFile, Component? selectedComponent)
         {
             if (twuiFile == null)
                 return;
 
-            _twuiPreview = _twuiPreviewBuilder.UpdateTexture(twuiFile, selectedComponent);
+            _temp_twuiFile = twuiFile;
+            _temp_selectedComponent = selectedComponent;
+            _twuiPreview = _twuiPreviewBuilder.UpdateTexture(_temp_twuiFile, _temp_selectedComponent);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            _wpfGame.GraphicsDevice.Clear(Color.Black);
-
             _spriteBatch.Begin();
-            DrawCheckerboardBackground(50);
+             DrawCheckerboardBackground(50);
             _spriteBatch.End();
 
-            if (_twuiPreview == null)
+            if (_twuiPreview == null )
                 return;
+
+            var currentTarget = _wpfGame.GraphicsDevice.GetRenderTargets().FirstOrDefault();
+            Refresh(_temp_twuiFile, _temp_selectedComponent);
+            _wpfGame.GraphicsDevice.SetRenderTarget(currentTarget.RenderTarget as RenderTarget2D);
 
             _spriteBatch.Begin();
             var destinationRectangle = ComputeAspectCorrectDrawingRectangle();

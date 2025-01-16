@@ -10,6 +10,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0">
@@ -32,12 +33,16 @@
             <TreeView.ItemTemplate >
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}" >
                     <StackPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="{Binding Priority, UpdateSourceTrigger=PropertyChanged}"/>
 
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
+
+        <Button Grid.Row="2" Command="{Binding ComponentManager.ToggleSelectedCommand}" Content="Toggle selected" Height="30"/>
 
     </Grid>
   

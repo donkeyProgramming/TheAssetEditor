@@ -46,6 +46,21 @@ namespace Shared.GameFormats.Twui
             return new Vector2(v0, v1);
         }
 
+        protected static Vector4 AssignAttribute(Vector4 value, XElement xmlNode, [CallerArgumentExpression("value")] string variableName = null)
+        {
+            var attributeContent = GetAttributeContent(variableName, xmlNode);
+            if (attributeContent == null)
+                return value;
+            var str = attributeContent.Value;
+            var splitStr = str.Split(",");
+            var v0 = float.Parse(splitStr[0]);
+            var v1 = float.Parse(splitStr[1]);
+            var v2 = float.Parse(splitStr[2]);
+            var v3 = float.Parse(splitStr[3]);
+
+            return new Vector4(v0, v1, v2,v3);
+        }
+
         protected static XAttribute? GetAttributeContent(string variableName, XElement xmlNode)
         {
             var attributeName = variableName.Split(".").Last();

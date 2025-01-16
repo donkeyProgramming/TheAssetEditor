@@ -55,7 +55,7 @@ namespace Editors.Twui.Editor.Rendering
             var renderTarget = GetRenderTarget(width, height);
 
             var device = _wpfGame.GraphicsDevice;
-            device.SetRenderTarget(_renderTarget);
+            device.SetRenderTarget(renderTarget);
             device.Clear(Color.Transparent);
             device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
 
@@ -66,7 +66,7 @@ namespace Editors.Twui.Editor.Rendering
 
             device.SetRenderTarget(null);
 
-            return _renderTarget;
+            return renderTarget;
         }
 
         void DrawHierarchy(Rectangle localSpace, IEnumerable<HierarchyItem> hierarchyItems, List<Component> componentList, Component? selectedComponent, int depth)
@@ -77,7 +77,10 @@ namespace Editors.Twui.Editor.Rendering
                 if (component == null)
                     continue;
 
-                var componentLocalSpace = DrawComponent(localSpace, component, selectedComponent, depth);
+
+
+
+                var componentLocalSpace = DrawComponent(localSpace, component, selectedComponent, depth, hierarchyItem.IsVisible);
 
 
                 int width = 0; int height = 0;
@@ -88,48 +91,109 @@ namespace Editors.Twui.Editor.Rendering
                     width = (int)currentState.Width;
                     height = (int)currentState.Height;
                 }
-                var spacing = new string('\t', depth);
-                Console.WriteLine($"{spacing}{component.Name}: Offset:{component.Offset}, Width:{width}, Height:{height}, Rect:{componentLocalSpace} -- DockingX:{component.DockingHorizontal}, DockingY:{component.DockingVertical}, DockOffset:{component.Dock_offset}, Acor:{component.Component_anchor_point}");
 
+                //var spacing = new string('\t', depth);
+                //Console.WriteLine($"{spacing}{component.Name}: Offset:{component.Offset}, Width:{width}, Height:{height}, Rect:{componentLocalSpace} -- DockingX:{component.DockingHorizontal}, DockingY:{component.DockingVertical}, DockOffset:{component.Dock_offset}, Acor:{component.Component_anchor_point}");
 
                 DrawHierarchy(componentLocalSpace, hierarchyItem.Children, componentList, selectedComponent, depth+1);
             }
         }
 
-        Rectangle DrawComponent(Rectangle localSpace, Component currentComponent, Component? selectedComponent, int depth)
+        Rectangle DrawComponent(Rectangle localSpace, Component currentComponent, Component? selectedComponent, int depth, bool isVisible)
         {
+
+
+
             var invMaxLayerDepth = 1f/999999f;
 
             // Take into account docking
             // Take into account colour
             // Take into account state
 
-            var compnentLocalSpace = ComponentCoordinateHelper.GetLocalCoordinateSpace(currentComponent, localSpace, depth);
+            // Get the state 
 
-            foreach (var image in currentComponent.ComponentImages)
+            var compnentLocalSpace = ComponentCoordinateHelper.GetComponentStateLocalCoordinateSpace(currentComponent, localSpace);
+
+            if (currentComponent.Name == "page_cycle")
+            { 
+            }
+
+
+
+
+            var currentStateId = currentComponent.Currentstate;
+            var currentState = currentComponent.States.FirstOrDefault(x => x.UniqueGuid == currentStateId);
+            if (currentState != null)
             {
-                if (string.IsNullOrWhiteSpace(image.ImagePath))
-                    continue;
+                foreach (var stateImage in currentState.Images)
+                {
+                    var imageId = stateImage.Componentimage;
+                    var image = currentComponent.ComponentImages.FirstOrDefault(x=>x.This == imageId);
+                    if (image == null)
+                        continue;
 
-                var texture = _resourceLibrary.LoadTexture(image.ImagePath);
-                if (texture == null)
-                    continue;
 
-                var compnentWidth = texture.Width;
-                var compnentHeight = texture.Height;
-                var componentRect = new Rectangle((int)compnentLocalSpace.X, (int)compnentLocalSpace.Y, compnentWidth, compnentHeight);
+                    if (string.IsNullOrWhiteSpace(image.ImagePath))
+                        continue;
 
-                _spriteBatch.Draw(texture, componentRect, null, new Color(255, 255, 255, 255), 0, Vector2.Zero, SpriteEffects.None, currentComponent.Priority * invMaxLayerDepth);
+                    if (image.ImagePath.Contains("panel_back_tile.png"))
+                        continue;
+
+                    var texture = _resourceLibrary.LoadTexture(image.ImagePath);
+                    if (texture == null)
+                        continue;
+
+
+                    if (isVisible)
+                    {
+                        var imageLocalSpace = ComponentCoordinateHelper.GetComponentStateImageLocalCoordinateSpace(stateImage, compnentLocalSpace);
+                        var pri = currentComponent.Priority * invMaxLayerDepth;
+                        _spriteBatch.Draw(texture, imageLocalSpace, null, new Color(255, 255, 255, 255), 0, Vector2.Zero, SpriteEffects.None, pri);
+                    }
+                }
             }
 
             if (selectedComponent == currentComponent)
             {
                 var selectionOverlayColour = new Color(255, 0, 0, 50);
+                //_spriteBatch.Draw(_whiteSquareTexture, compnentLocalSpace, null, selectionOverlayColour, 0, Vector2.Zero, SpriteEffects.None, 1);
                 _spriteBatch.Draw(_whiteSquareTexture, compnentLocalSpace, null, selectionOverlayColour, 0, Vector2.Zero, SpriteEffects.None, 1);
+
                 // Draw ancor point
                 // Draw local space point
             }
 
+            //foreach (var image in currentComponent.ComponentImages)
+            //{
+            //
+            // 
+            //
+            //    if (string.IsNullOrWhiteSpace(image.ImagePath))
+            //        continue;
+            //
+            //    var texture = _resourceLibrary.LoadTexture(image.ImagePath);
+            //    if (texture == null)
+            //        continue;
+            //
+            //    var compnentWidth = texture.Width;
+            //    var compnentHeight = texture.Height;
+            //    var componentRect = new Rectangle((int)compnentLocalSpace.X, (int)compnentLocalSpace.Y, compnentWidth, compnentHeight);
+            //
+            //
+            //    // Give the component rect, modify with the imagemetrics/image attribuete for each image
+            //
+            //    var pri = currentComponent.Priority * invMaxLayerDepth;
+            //    _spriteBatch.Draw(texture, componentRect, null, new Color(255, 255, 255, 255), 0, Vector2.Zero, SpriteEffects.None, pri);
+            //
+            //
+            //
+            //
+            //    // Draw red line around componet
+            //    // Draw green line around images 
+            //}
+            //
+            //
+            //
             return compnentLocalSpace;
         }
 
