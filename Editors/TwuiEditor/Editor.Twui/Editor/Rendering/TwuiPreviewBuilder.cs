@@ -59,7 +59,8 @@ namespace Editors.Twui.Editor.Rendering
             device.Clear(Color.Transparent);
             device.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
 
-            _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);//, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone);
+            //_spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);//, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone);
+            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
             DrawHierarchy(Rectangle.Empty, twuiFile.Hierarchy.RootItems, twuiFile.Components, selectedComponent, 0);
             _spriteBatch.End();
@@ -71,19 +72,23 @@ namespace Editors.Twui.Editor.Rendering
 
         void DrawHierarchy(Rectangle localSpace, IEnumerable<HierarchyItem> hierarchyItems, List<Component> componentList, Component? selectedComponent, int depth)
         {
-            foreach (var hierarchyItem in hierarchyItems)
+            var hierarchyItems2 = hierarchyItems
+                .Select(x => (x, componentList.FirstOrDefault(y => x.Id == y.This)))
+                .Where(x=>x.Item2 != null)
+                .OrderByDescending(x => x.Item2.Priority)
+                .ToList();
+               
+            foreach (var hierarchyItem in hierarchyItems2)
             {
-                var component = componentList.FirstOrDefault(x => hierarchyItem.Id == x.This);
+                var component = componentList.FirstOrDefault(x => hierarchyItem.x.Id == x.This);
                 if (component == null)
                     continue;
 
 
+                var componentLocalSpace = DrawComponent(localSpace, component, selectedComponent, depth, hierarchyItem.x.IsVisible);
 
 
-                var componentLocalSpace = DrawComponent(localSpace, component, selectedComponent, depth, hierarchyItem.IsVisible);
-
-
-                int width = 0; int height = 0;
+                var width = 0; var height = 0;
                 var currentStateId = component.Currentstate;
                 var currentState = component.States.FirstOrDefault(x => x.UniqueGuid == currentStateId);
                 if (currentState != null)
@@ -95,7 +100,7 @@ namespace Editors.Twui.Editor.Rendering
                 //var spacing = new string('\t', depth);
                 //Console.WriteLine($"{spacing}{component.Name}: Offset:{component.Offset}, Width:{width}, Height:{height}, Rect:{componentLocalSpace} -- DockingX:{component.DockingHorizontal}, DockingY:{component.DockingVertical}, DockOffset:{component.Dock_offset}, Acor:{component.Component_anchor_point}");
 
-                DrawHierarchy(componentLocalSpace, hierarchyItem.Children, componentList, selectedComponent, depth+1);
+                DrawHierarchy(componentLocalSpace, hierarchyItem.x.Children, componentList, selectedComponent, depth+1);
             }
         }
 

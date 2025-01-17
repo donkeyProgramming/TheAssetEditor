@@ -59,12 +59,11 @@ namespace Editors.Twui.Editor
 
 
             Hack_addVisualStuffForDebugging(ParsedTwuiFile.Components, ParsedTwuiFile.Hierarchy.RootItems);
+            // var templateList = ResolveAllTemplateComponents
+            // Has ComponentCreator - layout
 
             ComponentManager.SetFile(ParsedTwuiFile);
             _eventHub.Publish(new RedrawTwuiEvent(ParsedTwuiFile, null));
-
-
-
         }
 
         void Hack_addVisualStuffForDebugging(List<Component> components, List<HierarchyItem> rootItems)
@@ -78,6 +77,9 @@ namespace Editors.Twui.Editor
                 Hack_addVisualStuffForDebugging(components, item.Children);
             }
         }
+
+        void ResolveAllTemplateComponents()
+        { }
 
     }
 }
