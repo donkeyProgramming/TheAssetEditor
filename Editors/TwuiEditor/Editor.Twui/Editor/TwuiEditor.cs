@@ -1,51 +1,44 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.IO;
+﻿using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Twui.Editor.ComponentEditor;
-using Editors.Twui.Editor.Events;
 using Editors.Twui.Editor.Rendering;
 using Shared.Core.Events;
+using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using Shared.GameFormats.Twui;
-using Shared.GameFormats.Twui.Data;
 
 namespace Editors.Twui.Editor
 {
-
-    public class Hi : ObservableObject
-    { 
-    }
-
-
     public partial class TwuiEditor : ObservableObject, IEditorInterface, ISaveableEditor, IFileEditor
     {
         private readonly IEventHub _eventHub;
+        private readonly TwuiRenderComponent _renderComponent;
 
         [ObservableProperty] string _displayName = "Twui Editor";
 
         public bool HasUnsavedChanges { get; set; } = false;
         public PackFile CurrentFile { get; set; }
 
-        [ObservableProperty] TwuiFile _parsedTwuiFile;
-   
+        [ObservableProperty] public partial TwuiContext? ParsedTwuiFile { get; set; }
         [ObservableProperty] ComponentManger _componentManager;
         [ObservableProperty] IWpfGame _scene;
+        private readonly IPackFileService _packFileService;
 
-        public TwuiEditor(IEventHub eventHub, ComponentManger componentEditor, TwuiRenderComponent previewBuilder, IWpfGame wpfGame)
+        public TwuiEditor(IEventHub eventHub, ComponentManger componentEditor, TwuiRenderComponent renderComponent, IWpfGame wpfGame, IPackFileService packFileService)
         {
             _eventHub = eventHub;
             _componentManager = componentEditor;
+            _renderComponent = renderComponent;
             _scene = wpfGame;
-
+            _packFileService = packFileService;
             wpfGame.ForceEnsureCreated();
-            previewBuilder.Initialize();
+            renderComponent.Initialize();
 
-            wpfGame.AddComponent(previewBuilder);
+            wpfGame.AddComponent(renderComponent);
         }
 
-        public bool Save() { return true; } 
+        public bool Save() { return true; }
         public void Close() { }
 
         public void LoadFile(PackFile file)
@@ -53,33 +46,13 @@ namespace Editors.Twui.Editor
             if (file == CurrentFile)
                 return;
 
-            var serializer = new TwuiSerializer();
-            ParsedTwuiFile = serializer.Load(file);
             DisplayName = "Twui Editor:" + Path.GetFileName(file.Name);
 
-
-            Hack_addVisualStuffForDebugging(ParsedTwuiFile.Components, ParsedTwuiFile.Hierarchy.RootItems);
-            // var templateList = ResolveAllTemplateComponents
-            // Has ComponentCreator - layout
+            var contextBuilder = new ContextBuilder(_packFileService);
+            ParsedTwuiFile = contextBuilder.Create(file);
 
             ComponentManager.SetFile(ParsedTwuiFile);
-            _eventHub.Publish(new RedrawTwuiEvent(ParsedTwuiFile, null));
+            _renderComponent.SetFile(ParsedTwuiFile);
         }
-
-        void Hack_addVisualStuffForDebugging(List<Component> components, List<HierarchyItem> rootItems)
-        {
-            foreach (var item in rootItems)
-            {
-                var comp = components.FirstOrDefault(x => x.This == item.Id);
-                if(comp != null)
-                    item.Priority = " - " + comp.Priority;
-
-                Hack_addVisualStuffForDebugging(components, item.Children);
-            }
-        }
-
-        void ResolveAllTemplateComponents()
-        { }
-
     }
 }

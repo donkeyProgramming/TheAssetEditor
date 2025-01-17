@@ -1,10 +1,8 @@
-﻿using Editors.Twui.Editor.Events;
-using GameWorld.Core.Components;
+﻿using GameWorld.Core.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Events;
 using Shared.Core.Services;
-using Shared.GameFormats.Twui.Data;
 
 //https://github.com/Apostolique/Apos.Gui/blob/main/Source/Dock.cs
 
@@ -14,7 +12,6 @@ namespace Editors.Twui.Editor.Rendering
     {
         private readonly IWpfGame _wpfGame;
         private readonly TwuiPreviewBuilder _twuiPreviewBuilder;
-        private readonly IEventHub _eventHub;
 
         Texture2D _twuiPreview;
         SpriteBatch _spriteBatch;
@@ -24,8 +21,13 @@ namespace Editors.Twui.Editor.Rendering
         {
             _wpfGame = wpfGame;
             _twuiPreviewBuilder = twuiPreviewBuilder;
-            _eventHub = eventHub;
-            _eventHub.Register<RedrawTwuiEvent>(this, x => Refresh(x.TwuiFile, x.SelectedComponent));
+        }
+
+        TwuiContext? _temp_twuiFile;
+        public void SetFile(TwuiContext twuiContext)
+        {
+            _temp_twuiFile = twuiContext;
+            _twuiPreview = _twuiPreviewBuilder.UpdateTexture(_temp_twuiFile);
         }
 
         public override void Initialize()
@@ -35,18 +37,6 @@ namespace Editors.Twui.Editor.Rendering
             _whiteSquareTexture.SetData([Color.White]);
 
             _twuiPreviewBuilder.Initialize();
-        }
-
-        TwuiFile? _temp_twuiFile;
-        Component? _temp_selectedComponent;
-        public void Refresh(TwuiFile? twuiFile, Component? selectedComponent)
-        {
-            if (twuiFile == null)
-                return;
-
-            _temp_twuiFile = twuiFile;
-            _temp_selectedComponent = selectedComponent;
-            _twuiPreview = _twuiPreviewBuilder.UpdateTexture(_temp_twuiFile, _temp_selectedComponent);
         }
 
         public override void Draw(GameTime gameTime)
@@ -59,7 +49,7 @@ namespace Editors.Twui.Editor.Rendering
                 return;
 
             var currentTarget = _wpfGame.GraphicsDevice.GetRenderTargets().FirstOrDefault();
-            Refresh(_temp_twuiFile, _temp_selectedComponent);
+            SetFile(_temp_twuiFile);    // Hack to trigger instant rendering for now
             _wpfGame.GraphicsDevice.SetRenderTarget(currentTarget.RenderTarget as RenderTarget2D);
 
             _spriteBatch.Begin();
@@ -114,5 +104,7 @@ namespace Editors.Twui.Editor.Rendering
             _whiteSquareTexture?.Dispose();
             _spriteBatch?.Dispose();
         }
+
+
     }
 }

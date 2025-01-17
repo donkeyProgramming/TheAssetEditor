@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Xna.Framework;
-using Shared.GameFormats.Twui.Data;
 using Shared.Ui.BaseDialogs.MathViews;
 
 namespace Editors.Twui.Editor.ComponentEditor
@@ -17,11 +16,8 @@ namespace Editors.Twui.Editor.ComponentEditor
     }
 
 
-
     public partial class ComponentViewModel : ObservableObject
     {
-        private readonly Component _selectedComponent;
-
         [ObservableProperty] public partial string Name { get; set; }
         [ObservableProperty] public partial string Id { get; set; }
         [ObservableProperty] public partial bool IsChildComponent { get; set; }
@@ -41,9 +37,9 @@ namespace Editors.Twui.Editor.ComponentEditor
         [ObservableProperty] public partial Vector2ViewModel TextVector2 { get; set; } = new Vector2ViewModel(11,21.3f);
 
 
-        public ComponentViewModel(Component selectedComponent)
+        public ComponentViewModel(TwuiComponent selectedComponent)
         {
-            _selectedComponent = selectedComponent;
+           // _selectedComponent = selectedComponent;
             TextVector2 = new Vector2ViewModel(11, 21.3f, OnChanged);
         }
 

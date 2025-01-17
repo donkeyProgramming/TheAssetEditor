@@ -29,6 +29,7 @@ namespace Shared.GameFormats.Twui
             output.Id = AssignAttribute(output.Id, componentNode);
             output.PartOfTemplate = AssignAttribute(output.PartOfTemplate, componentNode);
             output.Uniqueguid_in_template = AssignAttribute(output.Uniqueguid_in_template, componentNode);
+            output.Template_id = AssignAttribute(output.Template_id, componentNode);
             output.Uniqueguid = AssignAttribute(output.Uniqueguid, componentNode);
             output.Dimensions = AssignAttribute(output.Dimensions, componentNode);
             output.Tooltips_localised = AssignAttribute(output.Tooltips_localised, componentNode);

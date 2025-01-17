@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Services;
+﻿using System.ComponentModel.DataAnnotations;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Shared.Core.Services;
@@ -14,6 +15,7 @@ namespace Editors.Twui.Editor.Rendering
     {
         private readonly IWpfGame _wpfGame;
         private readonly IScopedResourceLibrary _resourceLibrary;
+        private readonly float _invMaxLayerDepth = 1f / 999999f;
 
         private RenderTarget2D _renderTarget;
         private SpriteBatch _spriteBatch;
@@ -47,7 +49,7 @@ namespace Editors.Twui.Editor.Rendering
             return _renderTarget!;
         }
 
-        public RenderTarget2D UpdateTexture(TwuiFile twuiFile, Component? selectedComponent)
+        public RenderTarget2D UpdateTexture(TwuiContext twuiContext)
         {
             // We should get this from the root component
             var width = 1600;
@@ -62,7 +64,13 @@ namespace Editors.Twui.Editor.Rendering
             //_spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);//, SamplerState.LinearClamp, DepthStencilState.Default, RasterizerState.CullNone);
             _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
-            DrawHierarchy(Rectangle.Empty, twuiFile.Hierarchy.RootItems, twuiFile.Components, selectedComponent, 0);
+            var debugData = new List<DebugData>();
+            DrawHierarchy(Rectangle.Empty, twuiContext.Componenets, 0, ref debugData);
+
+
+            foreach(var debug in debugData)
+                _spriteBatch.Draw(_whiteSquareTexture, debug.renderRect, null, debug.color, 0, Vector2.Zero, SpriteEffects.None, 1);
+
             _spriteBatch.End();
 
             device.SetRenderTarget(null);
@@ -70,142 +78,54 @@ namespace Editors.Twui.Editor.Rendering
             return renderTarget;
         }
 
-        void DrawHierarchy(Rectangle localSpace, IEnumerable<HierarchyItem> hierarchyItems, List<Component> componentList, Component? selectedComponent, int depth)
+        void DrawHierarchy(Rectangle localSpace, IEnumerable<TwuiComponent> components, int depth, ref List<DebugData> debugData)
         {
-            var hierarchyItems2 = hierarchyItems
-                .Select(x => (x, componentList.FirstOrDefault(y => x.Id == y.This)))
-                .Where(x=>x.Item2 != null)
-                .OrderByDescending(x => x.Item2.Priority)
-                .ToList();
-               
-            foreach (var hierarchyItem in hierarchyItems2)
+            var sortedComponents = components.OrderByDescending(x=>x.Priority).ToList();
+            foreach (var component in sortedComponents)
             {
-                var component = componentList.FirstOrDefault(x => hierarchyItem.x.Id == x.This);
-                if (component == null)
-                    continue;
-
-
-                var componentLocalSpace = DrawComponent(localSpace, component, selectedComponent, depth, hierarchyItem.x.IsVisible);
-
-
-                var width = 0; var height = 0;
-                var currentStateId = component.Currentstate;
-                var currentState = component.States.FirstOrDefault(x => x.UniqueGuid == currentStateId);
-                if (currentState != null)
-                {
-                    width = (int)currentState.Width;
-                    height = (int)currentState.Height;
-                }
-
-                //var spacing = new string('\t', depth);
-                //Console.WriteLine($"{spacing}{component.Name}: Offset:{component.Offset}, Width:{width}, Height:{height}, Rect:{componentLocalSpace} -- DockingX:{component.DockingHorizontal}, DockingY:{component.DockingVertical}, DockOffset:{component.Dock_offset}, Acor:{component.Component_anchor_point}");
-
-                DrawHierarchy(componentLocalSpace, hierarchyItem.x.Children, componentList, selectedComponent, depth+1);
+                var componentLocalSpace = DrawComponent(localSpace, component, depth, ref debugData);
+                DrawHierarchy(componentLocalSpace, component.Children, depth+1, ref debugData);
             }
         }
 
-        Rectangle DrawComponent(Rectangle localSpace, Component currentComponent, Component? selectedComponent, int depth, bool isVisible)
+        Rectangle DrawComponent(Rectangle localSpace, TwuiComponent component, int depth, ref List<DebugData> debugData)
         {
+            var compnentLocalSpace = ComponentCoordinateHelper.GetComponentStateLocalCoordinateSpace(component, localSpace);
 
-
-
-            var invMaxLayerDepth = 1f/999999f;
-
-            // Take into account docking
-            // Take into account colour
-            // Take into account state
-
-            // Get the state 
-
-            var compnentLocalSpace = ComponentCoordinateHelper.GetComponentStateLocalCoordinateSpace(currentComponent, localSpace);
-
-            if (currentComponent.Name == "page_cycle")
+            if (component.Name == "round_small_button")
             { 
             }
 
-
-
-
-            var currentStateId = currentComponent.Currentstate;
-            var currentState = currentComponent.States.FirstOrDefault(x => x.UniqueGuid == currentStateId);
+            var currentState = component.CurrentState;
             if (currentState != null)
             {
-                foreach (var stateImage in currentState.Images)
+                foreach (var image in currentState.ImageList)
                 {
-                    var imageId = stateImage.Componentimage;
-                    var image = currentComponent.ComponentImages.FirstOrDefault(x=>x.This == imageId);
-                    if (image == null)
+                    if (image == null || string.IsNullOrWhiteSpace(image.Path))
                         continue;
 
-
-                    if (string.IsNullOrWhiteSpace(image.ImagePath))
-                        continue;
-
-                    if (image.ImagePath.Contains("panel_back_tile.png"))
-                        continue;
-
-                    var texture = _resourceLibrary.LoadTexture(image.ImagePath);
+                    var texture = _resourceLibrary.LoadTexture(image.Path);
                     if (texture == null)
                         continue;
 
-
-                    if (isVisible)
+                    if (component.ShowInPreviewRenderer)
                     {
-                        var imageLocalSpace = ComponentCoordinateHelper.GetComponentStateImageLocalCoordinateSpace(stateImage, compnentLocalSpace);
-                        var pri = currentComponent.Priority * invMaxLayerDepth;
+                        var imageLocalSpace = ComponentCoordinateHelper.GetComponentStateImageLocalCoordinateSpace(image, compnentLocalSpace);
+                        var pri = component.Priority * _invMaxLayerDepth;
                         _spriteBatch.Draw(texture, imageLocalSpace, null, new Color(255, 255, 255, 255), 0, Vector2.Zero, SpriteEffects.None, pri);
                     }
                 }
             }
 
-            if (selectedComponent == currentComponent)
+            if (component.IsSelected)
             {
                 var selectionOverlayColour = new Color(255, 0, 0, 50);
-                //_spriteBatch.Draw(_whiteSquareTexture, compnentLocalSpace, null, selectionOverlayColour, 0, Vector2.Zero, SpriteEffects.None, 1);
-                _spriteBatch.Draw(_whiteSquareTexture, compnentLocalSpace, null, selectionOverlayColour, 0, Vector2.Zero, SpriteEffects.None, 1);
-
-                // Draw ancor point
-                // Draw local space point
+                debugData.Add(new DebugData(compnentLocalSpace, selectionOverlayColour));
             }
 
-            //foreach (var image in currentComponent.ComponentImages)
-            //{
-            //
-            // 
-            //
-            //    if (string.IsNullOrWhiteSpace(image.ImagePath))
-            //        continue;
-            //
-            //    var texture = _resourceLibrary.LoadTexture(image.ImagePath);
-            //    if (texture == null)
-            //        continue;
-            //
-            //    var compnentWidth = texture.Width;
-            //    var compnentHeight = texture.Height;
-            //    var componentRect = new Rectangle((int)compnentLocalSpace.X, (int)compnentLocalSpace.Y, compnentWidth, compnentHeight);
-            //
-            //
-            //    // Give the component rect, modify with the imagemetrics/image attribuete for each image
-            //
-            //    var pri = currentComponent.Priority * invMaxLayerDepth;
-            //    _spriteBatch.Draw(texture, componentRect, null, new Color(255, 255, 255, 255), 0, Vector2.Zero, SpriteEffects.None, pri);
-            //
-            //
-            //
-            //
-            //    // Draw red line around componet
-            //    // Draw green line around images 
-            //}
-            //
-            //
-            //
             return compnentLocalSpace;
         }
 
-        void DrawComponentSpaceOutline(Rectangle componentRectable)
-        { 
-        
-        }
-
+        record DebugData(Rectangle renderRect, Color color);
     }
 }
