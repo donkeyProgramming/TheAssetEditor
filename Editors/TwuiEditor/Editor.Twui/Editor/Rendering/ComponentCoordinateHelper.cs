@@ -24,6 +24,11 @@ namespace Editors.Twui.Editor.Rendering
                 //offset = new Vector2(-230, -15);
             }
 
+            if (component.Name == "holder_grudge_cycles")
+            {
+                //offset = new Vector2(-230, -15);
+            }
+
             var localSpace = ComputeLocalSpace(
                 parentComponentRect,
                 component.Location.Offset,
@@ -36,23 +41,27 @@ namespace Editors.Twui.Editor.Rendering
             return localRect;
         }
 
-        public static Rectangle GetComponentStateImageLocalCoordinateSpace(TwuiComponentImage image, Rectangle parentComponentRect)
+        public static Rectangle GetComponentStateImageLocalCoordinateSpace(TwuiComponentImage image, Rectangle parentComponentRect, Vector2 anchor)
         {
-            var localSpace = ComputeLocalSpace(
+
+
+            var localSpace = ComputeLocalSpace2(
                 parentComponentRect,
                 image.Location.Offset,
                 image.Location.Dimensions.X, image.Location.Dimensions.Y,
                 image.Location.DockingHorizontal, image.Location.DockingVertical,
-                new Vector2(0.5f, 0.5f),
+                new Vector2(0.0f, 0.0f),
                 image.Location.Dock_offset);
 
             var localRect = new Rectangle((int)localSpace.X, (int)localSpace.Y, (int)image.Location.Dimensions.X, (int)image.Location.Dimensions.Y);
             return localRect;
         }
 
-        static Vector2 ComputeLocalSpace(Rectangle parentComponentRect, Vector2 offset, float width, float height, DockingHorizontal dockingHorizontal, DockingVertical dockingVertical, Vector2 anchorPoint, Vector2 docking_offset)
+
+
+        static Vector2 ComputeLocalSpace2(Rectangle parentComponentRect, Vector2 offset, float width, float height, DockingHorizontal dockingHorizontal, DockingVertical dockingVertical, Vector2 anchorPoint, Vector2 docking_offset)
         {
-            var localSpace = new Vector2(parentComponentRect.X, parentComponentRect.Y) + offset;
+            var localSpace = new Vector2(parentComponentRect.X, parentComponentRect.Y);// + offset;
 
             if (dockingHorizontal != DockingHorizontal.None || dockingVertical != DockingVertical.None)
             {
@@ -63,7 +72,59 @@ namespace Editors.Twui.Editor.Rendering
                         break;
 
                     case DockingHorizontal.Right:
-                        localSpace.X = parentComponentRect.Right;// - width * .5f;
+                        localSpace.X = parentComponentRect.Right - width;
+                        break;
+
+                    case DockingHorizontal.Center:
+                        localSpace.X = parentComponentRect.Left + (parentComponentRect.Width * 0.5f) - (width*.5f);
+                        break;
+                }
+
+                switch (dockingVertical)
+                {
+                    case DockingVertical.Top:
+                        localSpace.Y = parentComponentRect.Top;
+                        break;
+
+                    case DockingVertical.Bottom:
+                        localSpace.Y = parentComponentRect.Bottom - height;
+                        break;
+
+                    case DockingVertical.Center:
+                        localSpace.Y = parentComponentRect.Top + (parentComponentRect.Height * 0.5f) - (height*.5f);
+                        break;
+                }
+
+
+                var anchorOffset = new Vector2(width, height) * anchorPoint;
+                localSpace -= anchorOffset;
+                localSpace += docking_offset;
+            }
+
+            return localSpace;
+
+        }
+
+
+
+
+
+
+        // We need a new fit for image, to correctly compute the acher points/docking?
+        static Vector2 ComputeLocalSpace(Rectangle parentComponentRect, Vector2 offset, float width, float height, DockingHorizontal dockingHorizontal, DockingVertical dockingVertical, Vector2 anchorPoint, Vector2 docking_offset)
+        {
+            var localSpace = new Vector2(parentComponentRect.X, parentComponentRect.Y);// + offset;
+
+            if (dockingHorizontal != DockingHorizontal.None || dockingVertical != DockingVertical.None)
+            {
+                switch (dockingHorizontal)
+                {
+                    case DockingHorizontal.Left:
+                        localSpace.X = parentComponentRect.X;
+                        break;
+
+                    case DockingHorizontal.Right:
+                        localSpace.X = parentComponentRect.Right;
                         break;
 
                     case DockingHorizontal.Center:
@@ -78,7 +139,7 @@ namespace Editors.Twui.Editor.Rendering
                         break;
 
                     case DockingVertical.Bottom:
-                        localSpace.Y = parentComponentRect.Bottom -height * 0.5f; ;
+                        localSpace.Y = parentComponentRect.Bottom;
                         break;
 
                     case DockingVertical.Center:

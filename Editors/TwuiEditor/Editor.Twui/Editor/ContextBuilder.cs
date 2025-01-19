@@ -124,14 +124,15 @@ namespace Editors.Twui.Editor
 
                         }
         
-                        // Skip the root node
+                        // Skip the root node and merge! 
+                      //  Todo!
                         var templateComponentsToAdd = templateContext.Componenets.FirstOrDefault();
                         if (templateComponentsToAdd != null)
                         {
                         
                             foreach (var templateChild in templateComponentsToAdd.Children)
                             {
-                                templateChild.Location = component.Location.Clone();
+                                templateChild.Location.Offset = new Vector2(0, 0);
                                 children.Add(templateChild);
                             }
                         }

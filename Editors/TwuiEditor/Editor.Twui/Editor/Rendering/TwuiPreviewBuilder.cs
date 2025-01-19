@@ -110,9 +110,14 @@ namespace Editors.Twui.Editor.Rendering
 
                     if (component.ShowInPreviewRenderer)
                     {
-                        var imageLocalSpace = ComponentCoordinateHelper.GetComponentStateImageLocalCoordinateSpace(image, compnentLocalSpace);
+                        var imageLocalSpace = ComponentCoordinateHelper.GetComponentStateImageLocalCoordinateSpace(image, compnentLocalSpace, component.Location.Component_anchor_point);
                         var pri = component.Priority * _invMaxLayerDepth;
                         _spriteBatch.Draw(texture, imageLocalSpace, null, new Color(255, 255, 255, 255), 0, Vector2.Zero, SpriteEffects.None, pri);
+                        if (component.IsSelected)
+                        {
+                            var selectionOverlayColour = new Color(0, 250, 0, 50);
+                            debugData.Add(new DebugData(imageLocalSpace, selectionOverlayColour));
+                        }
                     }
                 }
             }
