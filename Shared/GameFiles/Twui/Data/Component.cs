@@ -15,6 +15,7 @@ namespace Shared.GameFormats.Twui.Data
         public string Id { get; set; } = string.Empty;
         public bool PartOfTemplate { get; set; } = false;
         public string Uniqueguid_in_template { get; set; } = string.Empty;
+        public string Template_id{ get; set; } = string.Empty;
         public string Uniqueguid { get; set; } = string.Empty;
         public Vector2 Dimensions { get; set; } = new(0, 0);
         public DockingVertical DockingVertical { get; set; } = DockingVertical.None;

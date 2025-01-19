@@ -1,20 +1,15 @@
-﻿using System.Net.NetworkInformation;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Twui.Editor.Events;
 using Shared.Core.Events;
-using Shared.GameFormats.Twui.Data;
 
 namespace Editors.Twui.Editor.ComponentEditor
 {
-
     public partial class ComponentManger : ObservableObject
     {
         private readonly IEventHub _eventHub;
-        TwuiFile? _currentFile;
+        TwuiContext? _currentFile;
 
-        [ObservableProperty] public partial HierarchyItem? SelectedHierarchyItem { get; set; }
-        [ObservableProperty] public partial Component? SelectedComponent { get; set; }
+        [ObservableProperty] public partial TwuiComponent? SelectedComponent { get; set; }
         [ObservableProperty] public partial ComponentViewModel? SelectedComponentViewModel { get; set; }
         
 
@@ -23,7 +18,7 @@ namespace Editors.Twui.Editor.ComponentEditor
             _eventHub = eventHub;
         }
 
-        public void SetFile(TwuiFile file)
+        public void SetFile(TwuiContext file)
         {
             _currentFile = file;
         }
@@ -31,44 +26,28 @@ namespace Editors.Twui.Editor.ComponentEditor
         [RelayCommand]
         private void ToggleSelected()
         {
-            if (SelectedHierarchyItem == null)
+            if (SelectedComponent == null)
                 return;
-
-            Toogle(SelectedHierarchyItem, !SelectedHierarchyItem.IsVisible);
+            
+            Toogle(SelectedComponent, !SelectedComponent.ShowInPreviewRenderer);
         }
 
-        void Toogle(HierarchyItem selectedHierarchyItem, bool value)
+        void Toogle(TwuiComponent component, bool value)
         {
-            selectedHierarchyItem.IsVisible = value;
-            foreach(var item in selectedHierarchyItem.Children)
+            component.ShowInPreviewRenderer = value;
+            foreach(var item in component.Children)
                 Toogle(item, value);
         }
 
 
-        partial void OnSelectedHierarchyItemChanged(HierarchyItem? value)
+        partial void OnSelectedComponentChanged(TwuiComponent? oldValue, TwuiComponent? newValue)
         {
-            if (value == null)
-            {
-                SelectedComponent = null;
-                return;
-            }
+            if(oldValue != null)
+                oldValue.IsSelected = false;
+            if(newValue != null)
+                newValue.IsSelected = true;
 
-            if (_currentFile == null)
-                return;
-
-            var component = _currentFile.Components.FirstOrDefault(x => x.This == value.Id);    // Build a veiw model here! 
-            if(component != null)
-            {
-                SelectedComponent = component;
-                SelectedComponentViewModel = new ComponentViewModel(SelectedComponent);
-            }
-            else
-            {
-                SelectedComponent = null;
-                SelectedComponentViewModel = null;
-            }
-
-            _eventHub.Publish(new RedrawTwuiEvent(_currentFile, SelectedComponent));
         }
+        
     }
 }

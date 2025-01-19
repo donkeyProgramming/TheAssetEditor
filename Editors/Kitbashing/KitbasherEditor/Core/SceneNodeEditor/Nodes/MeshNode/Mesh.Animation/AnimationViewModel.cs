@@ -58,7 +58,9 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
             }
 
             var existingSkeletonMeshNode = _meshNode.GetParentModel();
-            var existingSkeltonName = existingSkeletonMeshNode.GetMeshNode(0,0).Geometry.SkeletonName;
+            var meshNodes = SceneNodeHelper.GetChildrenOfType<Rmv2MeshNode>(existingSkeletonMeshNode);
+            var existingSkeltonName = meshNodes.First().Geometry.SkeletonName;
+
             var existingSkeletonFile = _animLookUp.GetSkeletonFileFromName(existingSkeltonName);
             if (existingSkeletonFile != null)
                 AttachableBones.UpdatePossibleValues(AnimatedBoneHelper.CreateFlatSkeletonList(existingSkeletonFile), new AnimatedBone(-1, "none"));

@@ -18,7 +18,7 @@
             <TextBox DockPanel.Dock="Left">Search...</TextBox>
         </DockPanel>
 
-        <TreeView Grid.Row="1" ItemsSource="{Binding ParsedTwuiFile.Hierarchy.RootItems, UpdateSourceTrigger=PropertyChanged}">
+        <TreeView Grid.Row="1" ItemsSource="{Binding ParsedTwuiFile.Componenets, UpdateSourceTrigger=PropertyChanged}">
             
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
@@ -27,16 +27,16 @@
             </TreeView.ItemContainerStyle>
 
             <b:Interaction.Behaviors>
-                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding ComponentManager.SelectedHierarchyItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                <behaviors:BindableSelectedItemBehavior SelectedItem="{Binding ComponentManager.SelectedComponent, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </b:Interaction.Behaviors>
 
             <TreeView.ItemTemplate >
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}" >
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox  IsChecked="{Binding IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <CheckBox  IsChecked="{Binding ShowInPreviewRenderer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text=" - "/>
                         <TextBlock Text="{Binding Priority, UpdateSourceTrigger=PropertyChanged}"/>
-
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>

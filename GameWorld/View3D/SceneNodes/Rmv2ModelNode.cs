@@ -19,21 +19,6 @@ namespace GameWorld.Core.SceneNodes
                 .ToList();
         }
 
-        public Rmv2MeshNode GetMeshNode(int lod, int modelIndex)
-        {
-            var lods = GetLodNodes();
-            while (lods.Count <= lod)
-            {
-                Children.Add(new Rmv2LodNode("Test", 12));
-                lods = GetLodNodes();
-            }
-
-            if (lods[lod].Children.Count <= modelIndex)
-                return null;
-
-            return lods[lod].Children[modelIndex] as Rmv2MeshNode;
-        }
-
         public List<Rmv2MeshNode> GetMeshNodes(int lod)
         {
             var lodNodes = GetLodNodes();
