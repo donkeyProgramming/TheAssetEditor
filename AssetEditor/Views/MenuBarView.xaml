@@ -72,6 +72,10 @@
                 <MenuItem Header="_Exit" />
             </MenuItem>
 
+            <MenuItem Header="View" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True">
+                <MenuItem Header="Toggle Pack File Browser" Command="{Binding MenuBar.TogglePackFileExplorerCommand}"/>
+            </MenuItem>
+
             <MenuItem Header="Tools" BorderThickness="1.5" WindowChrome.IsHitTestVisibleInChrome="True" ItemsSource="{Binding MenuBar.Editors}">
 
                 <MenuItem.ItemContainerStyle>

@@ -30,6 +30,9 @@ namespace AssetEditor.ViewModels
         [ObservableProperty] private string _applicationTitle;
         [ObservableProperty] private string _currentGame;
         [ObservableProperty] private string _editablePackFile;
+        [ObservableProperty] private bool _isPackFileExplorerVisible = true;
+        [ObservableProperty] private GridLength _fileTreeColumnWidth = new GridLength(0.28, GridUnitType.Star);
+
 
         public MainViewModel(
                 IEditorManager editorManager,
