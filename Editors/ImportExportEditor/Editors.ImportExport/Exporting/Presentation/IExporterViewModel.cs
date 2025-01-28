@@ -1,4 +1,4 @@
-﻿using Editors.ImportExport.Misc;
+﻿using Editors.ImportExport.Common;
 using Shared.Core.PackFiles.Models;
 
 namespace Editors.ImportExport.Exporting.Exporters
@@ -10,6 +10,6 @@ namespace Editors.ImportExport.Exporting.Exporters
         string OutputExtension { get; }
 
         public void Execute(PackFile exportSource, string outputPath, bool generateImporter);
-        public ExportSupportEnum CanExportFile(PackFile file);
+        public ImportExportSupportEnum CanExportFile(PackFile file);
     }
 }

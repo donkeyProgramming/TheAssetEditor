@@ -2,8 +2,8 @@
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.ImportExport.Common;
 using Editors.ImportExport.Exporting.Exporters;
-using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
 
 namespace Editors.ImportExport.Exporting.Presentation
@@ -40,11 +40,11 @@ namespace Editors.ImportExport.Exporting.Presentation
             foreach (var viewModel in _exporterViewModels)
             {
                 var supported = viewModel.CanExportFile(packFile);
-                if (supported == ExportSupportEnum.NotSupported)
+                if (supported == ImportExportSupportEnum.NotSupported)
                     continue;
 
                 PossibleExporters.Add(viewModel);
-                if(supported == ExportSupportEnum.HighPriority)
+                if(supported == ImportExportSupportEnum.HighPriority)
                     SelectedExporter = viewModel;
             }
 

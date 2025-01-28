@@ -51,7 +51,7 @@ namespace Test.ImportExport.Importing.Importers.GltfImporterTest
 
     // Tests Full Import (Importer.Import())
     class GltfToRmv2ImporterTest
-    {     
+    {
         [Test]
         public void Test()
         {
@@ -59,22 +59,18 @@ namespace Test.ImportExport.Importing.Importers.GltfImporterTest
             var pfs = PackFileSerivceTestHelper.Create(TestData.InputPack);
 
             var meshBuilder = new GltfMeshBuilder();
-            var normalExporter = new Mock<IDdsToNormalPngExporter>();
-            var materialExporter = new Mock<IDdsToMaterialPngExporter>();
             var eventHub = new Mock<IGlobalEventHub>();
             var skeletontonLookupHelper = new SkeletonAnimationLookUpHelper(pfs, eventHub.Object);
             var skeletontonBuilder = new GltfSkeletonBuilder(pfs);
             var animationBuilder = new GltfAnimationBuilder(pfs);
-            var textureHandler = new GltfTextureHandler(normalExporter.Object, materialExporter.Object);
             var sceneSaver = new TestGltfSceneSaver();
             var standardDialog = new Mock<IStandardDialogs>();
-            var sceneLoader = new GltfSceneLoader(standardDialog.Object);            
-            var importer = new GltfImporter(pfs, standardDialog.Object, skeletontonLookupHelper);
-
+            var sceneLoader = new GltfSceneLoader(standardDialog.Object);
+            var materialBuilder = new RmvMaterialBuilder(pfs, standardDialog.Object);
+            var importer = new GltfImporter(pfs, standardDialog.Object, skeletontonLookupHelper, materialBuilder);
             var packFileContainer = new PackFileContainer("new");
-            var settings = new GltfImporterSettings(TestData.InputGtlfFile, "skeletons", packFileContainer, true, true, true);
+            var settings = new GltfImporterSettings(TestData.InputGtlfFile, "skeletons", packFileContainer, Shared.Core.Settings.GameTypeEnum.Warhammer3, true, true, true, true, true, 20.0f, true);
 
-            // Act
             // Do full import
             importer.Import(settings);
             var rmv2FileName = @$"skeletons\{Path.GetFileNameWithoutExtension(TestData.InputGtlfFile)}.rigid_model_v2".ToLower();
@@ -88,7 +84,7 @@ namespace Test.ImportExport.Importing.Importers.GltfImporterTest
 
     // Tests some Components of Importer pipeline
     class GltfToRmv2ImporterComponentTest
-    {       
+    {
 
         [Test]
         public void Test()
@@ -97,18 +93,16 @@ namespace Test.ImportExport.Importing.Importers.GltfImporterTest
             var pfs = PackFileSerivceTestHelper.Create(TestData.InputPack);
 
             var meshBuilder = new GltfMeshBuilder();
-            var normalExporter = new Mock<IDdsToNormalPngExporter>();
-            var materialExporter = new Mock<IDdsToMaterialPngExporter>();
             var eventHub = new Mock<IGlobalEventHub>();
             var standardDialog = new Mock<IStandardDialogs>();
             var skeletontonLookupHelper = new SkeletonAnimationLookUpHelper(pfs, eventHub.Object);
             var skeletontonBuilder = new GltfSkeletonBuilder(pfs);
             var animationBuilder = new GltfAnimationBuilder(pfs);
-            var textureHandler = new GltfTextureHandler(normalExporter.Object, materialExporter.Object);
+            var materialBuilder = new RmvMaterialBuilder(pfs, standardDialog.Object);
             var sceneLoader = new GltfSceneLoader(standardDialog.Object);
             var skeletonFile = skeletontonLookupHelper.GetSkeletonFileFromName(TestData.Rmv2Expected.skeletonName);
             var packFileContainer = new PackFileContainer("new");
-            var settings = new GltfImporterSettings(TestData.InputGtlfFile, "skeletons", packFileContainer, true, true, true);
+            var settings = new GltfImporterSettings(TestData.InputGtlfFile, "skeletons", packFileContainer, Shared.Core.Settings.GameTypeEnum.Warhammer3, true, true, true, true, true, 20.0f, true);
 
             // Act....          
             var modelRoot = sceneLoader.Load(settings);
@@ -126,9 +120,9 @@ namespace Test.ImportExport.Importing.Importers.GltfImporterTest
 
             // Assert
             // Test Importer code, check if Rmv2 file is created correctly
-           
+
             Assert.That(skeletonFile, Is.Not.Null);
-            var rmv2Mesh = RmvMeshBuilder.Build(settings, modelRoot, skeletonFile, TestData.Rmv2Expected.skeletonName);            
+            var rmv2Mesh = RmvMeshBuilder.Build(settings, modelRoot, skeletonFile, TestData.Rmv2Expected.skeletonName.ToLower());
             Assert.That(rmv2Mesh, Is.Not.Null);
             Assert.That(rmv2Mesh.Header.SkeletonName, Is.EqualTo(TestData.Rmv2Expected.skeletonName));
             Assert.That(rmv2Mesh.ModelList, Is.Not.Null);

@@ -1,56 +1,58 @@
 ﻿using System.Windows.Forms;
-using Editors.ImportExport.Importing.Importers.GltfToRmv;
 using Shared.Core.Events;
+using Shared.Core.PackFiles.Models;
 using TreeNode = Shared.Ui.BaseDialogs.PackFileTree.TreeNode;
+using Shared.Core.PackFiles;
+using Editors.ImportExport.Importing.Importers.GltfToRmv;
+using System.Windows.Forms.Design;
+using Shared.Core.Settings;
+using Shared.Core.Misc;
+using Editors.ImportExport.Importing.Presentation;
 
 namespace Editors.ImportExport.Importing
 {
     public class DisplayImportFileToolCommand : IUiCommand
-    {   
-        // TODO: ?
-   
-        private readonly GltfImporter _importer;     
+    {
+        private readonly IEnumerable<IImporterViewModel> _importerViewModels;
+        private readonly IAbstractFormFactory<ImportWindow> _importWindowFactory;
 
-
-        public DisplayImportFileToolCommand(GltfImporter importer)
-        {            
-            // TODO: ?
-            //_ImportWindowFactory = importWindowFactory;
-            _importer = importer;
+        public DisplayImportFileToolCommand(IAbstractFormFactory<ImportWindow> exportWindowFactory, IEnumerable<IImporterViewModel> exporterViewModels)
+        {
+            _importWindowFactory = exportWindowFactory;
+            _importerViewModels = exporterViewModels;
         }
 
-        public void Execute(TreeNode clickedNode)
+        public void Execute(PackFileContainer packFileContainer, string packPath)
         {
-            var glftFilePath = GetFileFromDiskDialog();
-            if (string.IsNullOrEmpty(glftFilePath))
+            var fileExtentionFilters = GetFileDialogFilters();
+
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog { Filter = fileExtentionFilters };
+            if (openFileDialog.ShowDialog() != true)
                 return;
 
-            var settings = new GltfImporterSettings(glftFilePath, clickedNode.GetFullPath(), clickedNode.FileOwner, true, true, true);
-            _importer.Import(settings);
+            var diskFilePath = openFileDialog.FileName;
+
+            var window = _importWindowFactory.Create();
+            window.Initialize(packFileContainer, packPath, diskFilePath);
+            window.ShowDialog();
         }
 
-        private static string GetFileFromDiskDialog()
+        /// <summary>
+        /// Makes a filter string for the file dialog ("Word Documents|*.doc|Excel Worksheets|*.xls" )
+        /// Searching all importer view models for their supported file extensions
+        /// </summary>        
+        private string GetFileDialogFilters()
         {
-            string filePath = "";
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            var fileExtentionFilters = "";
+            foreach (var importViewModel in _importerViewModels) // generate file dialog filters, of all support file formats
             {
-                openFileDialog.InitialDirectory = "c:\\";
-                openFileDialog.Filter = "All files (*.*)|*.*|GLTF model files (*.gltf)|*.gltf";
-                openFileDialog.FilterIndex = 2;
-                openFileDialog.RestoreDirectory = true;
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    // Get the path of specified file
-                    filePath = openFileDialog.FileName;
-                }
-                else
-                {
-                    filePath = "";
-                }
+                var tempFilter = $"*{String.Join(";*", importViewModel.InputExtensions)}";
+                fileExtentionFilters += $"{importViewModel.DisplayName} ({tempFilter}) |{tempFilter}|";
             }
 
-            return filePath;
+            fileExtentionFilters += "All files (*.*)|*.*";
+
+            return fileExtentionFilters;
         }
     }
 }

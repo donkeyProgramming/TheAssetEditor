@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.IO;
 using System.Numerics;
+using Editors.ImportExport.Common;
 using Editors.ImportExport.Misc;
 using MeshImportExport;
 using Shared.Core.PackFiles;
@@ -12,7 +13,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
     public interface IDdsToNormalPngExporter
     {
         public string Export(string filePath, string outputPath, bool convertToBlueNormalMap);
-        public ExportSupportEnum CanExportFile(PackFile file);
+        public ImportExportSupportEnum CanExportFile(PackFile file);
     }
 
     public class DdsToNormalPngExporter : IDdsToNormalPngExporter
@@ -26,13 +27,13 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToNormalPng
             _imageSaveHandler = imageSaveHandler;
         }
 
-        public ExportSupportEnum CanExportFile(PackFile file)
+        public ImportExportSupportEnum CanExportFile(PackFile file)
         {
             if (FileExtensionHelper.IsDdsMaterialFile(file.Name))
-                return ExportSupportEnum.HighPriority;
+                return ImportExportSupportEnum.HighPriority;
             else if (FileExtensionHelper.IsDdsFile(file.Name))
-                return ExportSupportEnum.Supported;
-            return ExportSupportEnum.NotSupported;
+                return ImportExportSupportEnum.Supported;
+            return ImportExportSupportEnum.NotSupported;
         }
 
         public string Export(string filePath, string outputPath, bool convertToBlueNormalMap)

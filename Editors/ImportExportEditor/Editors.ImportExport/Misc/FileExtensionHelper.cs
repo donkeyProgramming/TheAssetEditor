@@ -3,6 +3,11 @@ namespace Editors.ImportExport.Misc
 {
     public static class FileExtensionHelper
     {
+        public static bool IsGltfFile(string fileName)
+        {            
+            return fileName.EndsWith(".gltf", StringComparison.InvariantCultureIgnoreCase);
+        }
+
         public static bool IsDdsFile(string fileName)
         {
             var isDdsFile = fileName.Contains(".dds", StringComparison.InvariantCultureIgnoreCase);
