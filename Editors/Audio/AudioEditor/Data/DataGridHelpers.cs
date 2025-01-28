@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -82,6 +83,9 @@ namespace Editors.Audio.AudioEditor.Data
             {
                 if (sender is ComboBox comboBox)
                 {
+                    if (states.Contains("Any"))
+                        comboBox.SelectedItem = "Any";
+
                     if (comboBox.Template.FindName("PART_EditableTextBox", comboBox) is TextBox textBox)
                     {
                         var debounceTimer = new DispatcherTimer
@@ -104,7 +108,7 @@ namespace Editors.Audio.AudioEditor.Data
                                 }
                                 selectionMade = false;
 
-                                SetIsAddRowButtonEnabled(audioEditorViewModel, audioProjectService, audioRepository);
+                                SetAddRowButtonEnablement(audioEditorViewModel, audioProjectService, audioRepository);
                             }
                         };
 
@@ -230,7 +234,7 @@ namespace Editors.Audio.AudioEditor.Data
 
             factory.AddHandler(TextBoxBase.TextChangedEvent, new TextChangedEventHandler((s, e) =>
             {
-                SetIsAddRowButtonEnabled(audioEditorViewModel, audioProjectService, audioRepository);
+                SetAddRowButtonEnablement(audioEditorViewModel, audioProjectService, audioRepository);
             }));
 
             template.VisualTree = factory;
@@ -262,7 +266,7 @@ namespace Editors.Audio.AudioEditor.Data
             BindingOperations.SetBinding(copyMenuItem, UIElement.IsEnabledProperty,
                 new Binding("IsCopyEnabled")
                 {
-                    Source = parameters.AudioEditorViewModel,
+                    Source = parameters.AudioEditorViewModel.AudioProjectViewerViewModel,
                     Mode = BindingMode.OneWay
                 });
 
@@ -275,7 +279,7 @@ namespace Editors.Audio.AudioEditor.Data
             BindingOperations.SetBinding(pasteMenuItem, UIElement.IsEnabledProperty,
                 new Binding("IsPasteEnabled")
                 {
-                    Source = parameters.AudioEditorViewModel,
+                    Source = parameters.AudioEditorViewModel.AudioProjectViewerViewModel,
                     Mode = BindingMode.OneWay
                 });
 

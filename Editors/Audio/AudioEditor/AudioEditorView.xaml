@@ -6,13 +6,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:s="http://schemas.singulink.com/xaml" 
-    xmlns:audioeditormenu="clr-namespace:Editors.Audio.AudioEditor.AudioEditorMenu"
     xmlns:audioeditor="clr-namespace:Editors.Audio.AudioEditor"
-    xmlns:data="clr-namespace:Editors.Audio.AudioEditor.Data"
+    xmlns:audioeditormenu="clr-namespace:Editors.Audio.AudioEditor.AudioEditorMenu"
+    xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer"
     xmlns:audiofilesexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioFilesExplorer"
-    xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer" 
-    xmlns:audioprojecteditor="clr-namespace:Editors.Audio.AudioEditor.AudioProjectEditor" 
-    xmlns:audiosettingseditor="clr-namespace:Editors.Audio.AudioEditor.AudioSettingsEditor" 
+    xmlns:audioprojecteditor="clr-namespace:Editors.Audio.AudioEditor.AudioProjectEditor"
+    xmlns:audiosettingseditor="clr-namespace:Editors.Audio.AudioEditor.AudioSettingsEditor"
     xmlns:audioprojectviewer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectViewer"
     d:DataContext="{d:DesignInstance Type=audioeditor:AudioEditorViewModel}"
     mc:Ignorable="d" 
@@ -35,7 +34,7 @@
 
         <Border 
             Grid.Row="1" 
-            Height="5" 
+            Height="1" 
             Background="{DynamicResource App.Border}" 
             Margin="0, 5, 0, 0"/>
 
@@ -63,7 +62,7 @@
 
                     <Grid.RowDefinitions>
                         <RowDefinition 
-                            Height="Auto"/>
+                            Height="*"/>
                         <RowDefinition 
                             Height="Auto"/>
                         <RowDefinition 
@@ -111,8 +110,6 @@
                     <RowDefinition 
                         Height="Auto"/>
                     <RowDefinition 
-                        Height="Auto"/>
-                    <RowDefinition 
                         Height="*"/>
                 </Grid.RowDefinitions>
 
@@ -125,19 +122,14 @@
                     Grid.Row="1"
                     Height="5" 
                     Background="{DynamicResource App.Border}"/>
-                
+
                 <audiosettingseditor:AudioSettingsEditorView 
                     Grid.Row="2"
                     Grid.Column="0"
                     DataContext="{Binding AudioSettingsEditorViewModel}"/>
 
-                <Border 
-                    Grid.Row="3"
-                    Height="5" 
-                    Background="{DynamicResource App.Border}"/>
-
                 <audioprojectviewer:AudioProjectViewerView 
-                    Grid.Row="4"
+                    Grid.Row="3"
                     Grid.Column="0"
                     DataContext="{Binding AudioProjectViewerViewModel}"/>
             </Grid>

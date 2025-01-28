@@ -1,6 +1,6 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using Editors.Audio.AudioEditor.Data;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer
@@ -12,46 +12,26 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         public AudioProjectViewerView()
         {
             InitializeComponent();
-            Loaded += AudioEditorView_Loaded;
-            PreviewKeyDown += AudioEditorView_PreviewKeyDown;
+            Loaded += AudioProjectViewerView_Loaded;
         }
 
-        private void AudioEditorView_Loaded(object sender, RoutedEventArgs e)
+        private void AudioProjectViewerView_Loaded(object sender, RoutedEventArgs e)
         {
-            var dataGridTag = ViewModel?.AudioProjectEditorFullDataGridTag;
+            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+                return;
+
+            var dataGridTag = ViewModel?.AudioProjectViewerDataGridTag;
             var dataGrid = DataGridHelpers.GetDataGridByTag(dataGridTag);
-            dataGrid.SelectionChanged += DataGrid_SelectionChanged;
+            dataGrid.SelectionChanged += AudioEditorDataGrid_SelectionChanged;
         }
 
-        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        // Detects when a row in the DataGrid is selected
+        private void AudioEditorDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var dataGrid = sender as DataGrid;
             var selectedItems = dataGrid.SelectedItems;
             if (ViewModel != null && selectedItems != null)
                 ViewModel.OnDataGridSelectionChanged(selectedItems);
-        }
-
-        private void AudioEditorView_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (Keyboard.Modifiers == ModifierKeys.Control)
-            {
-                if (e.Key == Key.C)
-                {
-                    ViewModel?.CopyRows();
-                    e.Handled = true;
-                }
-                else if (e.Key == Key.V)
-                {
-                    ViewModel?.PasteRows();
-                    e.Handled = true;
-                }
-            }
-
-            if (e.Key == Key.Delete)
-            {
-                ViewModel?.RemoveAudioProjectEditorFullDataGridRow();
-                e.Handled = true;
-            }
         }
     }
 }

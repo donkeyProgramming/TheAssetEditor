@@ -30,12 +30,12 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
                 { "AudioFilesDisplay", string.Empty },
                 { "AudioSettings", new AudioSettings() }
             };
-            parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(rowData);
+            parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
         }
 
         public void ConfigureAudioProjectViewerDataGrid(AudioProjectDataServiceParameters parameters)
         {
-            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGridTag);
+            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
 
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
@@ -58,7 +58,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
                     { "AudioFilesDisplay", actionEvent.AudioFilesDisplay },
                     { "AudioSettings", actionEvent.AudioSettings }
                 };
-                parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid.Add(rowData);
+                parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(rowData);
             }
         }
 
@@ -80,7 +80,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
             }
 
             if (parameters.AudioProjectEditorRow.TryGetValue("AudioSettings", out var audioSettings))
-                actionEvent.AudioSettings = AudioSettingsEditorViewModel.BuildAudioSettings(parameters.AudioEditorViewModel.AudioSettingsViewModel);
+                actionEvent.AudioSettings = AudioSettingsEditorViewModel.BuildAudioSettings(parameters.AudioEditorViewModel.AudioSettingsEditorViewModel);
 
             var soundBank = parameters.SoundBank;
             AudioProjectHelpers.InsertActionEventAlphabetically(soundBank, actionEvent);
@@ -88,15 +88,15 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
         public void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioProjectDataServiceParameters parameters)
         {
-            var soundBank = parameters.AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem as SoundBank;
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(parameters.AudioProjectService, parameters.AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
 
             // Create a copy to prevent an error where dataGridRows is modified while being iterated over
             var dataGridRowsCopy = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var actionEvent = AudioProjectHelpers.GetMatchingActionEvent(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid, dataGridRow, soundBank);
+                var actionEvent = AudioProjectHelpers.GetActionEventMatchingWithDataGridRow(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid, dataGridRow, soundBank);
                 soundBank.ActionEvents.Remove(actionEvent);
-                parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid.Remove(dataGridRow);
+                parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 {
@@ -7,6 +8,11 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         public AudioFilesExplorerView()
         {
             InitializeComponent();
+        }
+
+        private void ClearButtonClick(object sender, RoutedEventArgs e)
+        {
+            FilterTextBoxItem.Focus();
         }
     }
 }

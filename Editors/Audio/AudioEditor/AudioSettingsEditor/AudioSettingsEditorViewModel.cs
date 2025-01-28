@@ -51,17 +51,17 @@ namespace Editors.Audio.AudioEditor.AudioSettingsEditor
 
         partial void OnPlaylistTypeChanged(PlaylistType oldValue, PlaylistType newValue)
         {
-            SetAudioSettingsEnablement(this);
+            SetAudioSettingsEnablementAndVisibility(this);
         }
 
         partial void OnPlaylistModeChanged(PlaylistMode oldValue, PlaylistMode newValue)
         {
-            SetAudioSettingsEnablement(this);
+            SetAudioSettingsEnablementAndVisibility(this);
         }
 
         partial void OnEnableLoopingChanged(bool oldValue, bool newValue)
         {
-            SetAudioSettingsEnablement(this);
+            SetAudioSettingsEnablementAndVisibility(this);
         }
 
         partial void OnLoopInfinitelyChanged(bool oldValue, bool newValue)
@@ -76,7 +76,7 @@ namespace Editors.Audio.AudioEditor.AudioSettingsEditor
 
         partial void OnEnableTransitionsChanged(bool oldValue, bool newValue)
         {
-            SetAudioSettingsEnablement(this);
+            SetAudioSettingsEnablementAndVisibility(this);
         }
 
         public static Data.AudioSettings BuildAudioSettings(AudioSettingsEditorViewModel audioSettingsViewModel)
@@ -123,7 +123,7 @@ namespace Editors.Audio.AudioEditor.AudioSettingsEditor
             return audioSettings;
         }
 
-        public static void SetAudioSettingsEnablement(AudioSettingsEditorViewModel audioSettingsViewModel)
+        public static void SetAudioSettingsEnablementAndVisibility(AudioSettingsEditorViewModel audioSettingsViewModel)
         {
             audioSettingsViewModel.IsAudioSettingsVisible = true;
 
@@ -222,6 +222,12 @@ namespace Editors.Audio.AudioEditor.AudioSettingsEditor
                     }
                 }
             }
+        }
+
+        public void ResetAudioSettingsVisibility()
+        {
+            IsAudioSettingsVisible = false;
+            IsUsingMultipleAudioFiles = false;
         }
 
         public void Close() {}

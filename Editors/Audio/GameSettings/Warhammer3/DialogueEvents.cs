@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents.DialogueEventPreset;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks.GameSoundBank;
+using static Editors.Audio.GameSettings.Warhammer3.SoundBanks.Wh3SoundBank;
 
 namespace Editors.Audio.GameSettings.Warhammer3
 {
@@ -57,7 +57,7 @@ namespace Editors.Audio.GameSettings.Warhammer3
         public const string SacrificesToSotekDisplayString = "Sacrifices To Sotek";
         public const string SummonTheElectorCountsDisplayString = "Summon The Elector Counts";
 
-        public static string GetDisplayString(DialogueEventPreset dialogueEventPreset)
+        public static string GetDialogueEventPresetDisplayString(DialogueEventPreset? dialogueEventPreset)
         {
             return dialogueEventPreset switch
             {
@@ -84,10 +84,11 @@ namespace Editors.Audio.GameSettings.Warhammer3
                 MonsterPens => MonsterPensDisplayString,
                 SacrificesToSotek => SacrificesToSotekDisplayString,
                 SummonTheElectorCounts => SummonTheElectorCountsDisplayString,
+                _ => null
             };
         }
 
-        public static DialogueEventPreset GetDialogueEventPreset(string dialogueEventPreset)
+        public static DialogueEventPreset GetDialogueEventPresetEnum(string dialogueEventPreset)
         {
             return dialogueEventPreset switch
             {
@@ -118,7 +119,7 @@ namespace Editors.Audio.GameSettings.Warhammer3
         }
 
         // Dialogue Event data has to be defined directly rather than dynamically from game data as it can only be determined by examining how CA uses each Dialogue Event in game
-        public static List<(string Name, SoundBanks.GameSoundBank SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> DialogueEventData { get; } =
+        public static List<(string Name, SoundBanks.Wh3SoundBank SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> DialogueEventData { get; } =
         [
             // Frontend VO
             ("frontend_vo_character_select", FrontendVO, [ShowAll, Lord], true),
@@ -139,7 +140,7 @@ namespace Editors.Audio.GameSettings.Warhammer3
             ("campaign_vo_diplomacy_positive", CampaignVO, [ShowAll, Lord], true),
             ("campaign_vo_diplomacy_selected", CampaignVO, [ShowAll, Lord], true),
             ("campaign_vo_level_up", CampaignVO, [ShowAll, Lord, Hero], true),
-            ("campaign_vo_mounted_creature", CampaignVO, [MountedCreature], true),
+            ("campaign_vo_mounted_creature", CampaignVO, [ShowAll, MountedCreature], true),
             ("campaign_vo_move", CampaignVO, [ShowAll, Lord, Hero], true),
             ("campaign_vo_move_garrisoning", CampaignVO, [ShowAll, Lord], true),
             ("campaign_vo_move_next_turn", CampaignVO, [ShowAll, Lord, Hero], true),

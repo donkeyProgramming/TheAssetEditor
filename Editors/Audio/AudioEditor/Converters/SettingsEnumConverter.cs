@@ -16,10 +16,10 @@ namespace Editors.Audio.AudioEditor.Converters
                 return value;
             else if (value is GameLanguage language)
                 return GameLanguageToStringMap[language];
-            else if (value is GameSoundBank soundbank)
-                return GetDisplayString(soundbank);
+            else if (value is Wh3SoundBank soundbank)
+                return GetSoundBankDisplayString(soundbank);
             else if (value is DialogueEventPreset dialogueEventSubtype)
-                return GetDisplayString(dialogueEventSubtype);
+                return GetDialogueEventPresetDisplayString(dialogueEventSubtype);
             else if (value is PlaylistType playlistType)
                 return PlaylistTypeToStringMap[playlistType];
             else if (value is PlaylistMode playlistMode)

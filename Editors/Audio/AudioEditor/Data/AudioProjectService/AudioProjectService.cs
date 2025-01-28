@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -23,11 +22,12 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
     {
         readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
 
-        public AudioProjectData AudioProject { get; set; } = new AudioProjectData();
+        public AudioProjectDataModel AudioProject { get; set; } = new AudioProjectDataModel();
         public string AudioProjectFileName { get; set; }
         public string AudioProjectDirectory { get; set; }
         public Dictionary<string, List<string>> StateGroupsWithModdedStatesRepository { get; set; } = [];
         public Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithIntegrityError { get; set; } = [];
+        public Dictionary<string, DialogueEventPreset?> DialogueEventSoundBankFiltering { get; set; } = [];
 
         public void SaveAudioProject(IPackFileService packFileService)
         {
@@ -66,7 +66,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                 ResetAudioProject();
 
                 // Set the AudioProject
-                AudioProject = JsonSerializer.Deserialize<AudioProjectData>(audioProjectJson);
+                AudioProject = JsonSerializer.Deserialize<AudioProjectDataModel>(audioProjectJson);
                 AudioProjectFileName = fileName.Replace(fileType, string.Empty);
                 AudioProjectDirectory = filePath.Replace($"\\{fileName}", string.Empty);
 
@@ -74,14 +74,11 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                 audioEditorViewModel.Initialise();
 
                 // Get the Modded States and prepare them for being added to the DataGrid ComboBoxes
-                BuildStateGroupsWithModdedStatesRepository(AudioProject.States, StateGroupsWithModdedStatesRepository);
+                BuildStateGroupsWithModdedStatesRepository(AudioProject.StateGroups, StateGroupsWithModdedStatesRepository);
 
                 CheckAudioProjectDialogueEventIntegrity(audioRepository, this);
 
-                TreeViewBuilder.AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.AudioProjectExplorerViewModel.ShowEditedDialogueEventsOnly);
-
-                // Update AudioProjectTreeViewItems
-                TreeViewBuilder.AddAllSoundBanksToTreeViewItemsWrappers(this);
+                audioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
 
                 _logger.Here().Information($"Loaded Audio Project: {fileName}");
             }
@@ -99,20 +96,18 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
 
             InitialiseModdedStatesGroups();
 
-            TreeViewBuilder.AddAllDialogueEventsToSoundBankTreeViewItems(AudioProject, audioEditorViewModel.AudioProjectExplorerViewModel.ShowEditedDialogueEventsOnly);
-
             SortSoundBanksAlphabetically();
 
-            TreeViewBuilder.AddAllSoundBanksToTreeViewItemsWrappers(this);
+            audioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
         }
 
         private void InitialiseSoundBanks()
         {
-            var soundBanks = Enum.GetValues<GameSoundBank>()
+            var soundBanks = Enum.GetValues<Wh3SoundBank>()
                 .Select(soundBank => new SoundBank
                 {
-                    Name = GetDisplayString(soundBank),
-                    Type = GetSoundBankType(soundBank).ToString(),
+                    Name = GetSoundBankDisplayString(soundBank),
+                    Type = GetSoundBankType(soundBank),
                     DialogueEvents = new ObservableCollection<DialogueEvent>()
                 })
                 .ToList();
@@ -121,7 +116,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
             {
                 AudioProject.SoundBanks.Add(soundBank);
 
-                var dialogueEvents = DialogueEventData.Where(dialogueEvent => dialogueEvent.SoundBank == GetSoundBank(soundBank.Name))
+                var dialogueEvents = DialogueEventData.Where(dialogueEvent => dialogueEvent.SoundBank == GetSoundBankEnum(soundBank.Name))
                     .Select(dialogueEvent => new DialogueEvent
                     {
                         Name = dialogueEvent.Name
@@ -137,7 +132,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
             foreach (var moddedStateGroup in ModdedStateGroups)
             {
                 var stateGroup = new StateGroup { Name = moddedStateGroup };
-                AudioProject.States.Add(stateGroup);
+                AudioProject.StateGroups.Add(stateGroup);
             }
         }
 
@@ -175,7 +170,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
 
         public void ResetAudioProject()
         {
-            AudioProject = new AudioProjectData();
+            AudioProject = new AudioProjectDataModel();
         }
     }
 }

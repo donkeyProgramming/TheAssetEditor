@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
@@ -14,8 +15,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e.NewValue != null)
-                ViewModel.OnSelectedAudioProjectTreeViewItemChanged(e.NewValue);
+            if (e.NewValue is AudioProjectTreeNode selectedNode)
+                ViewModel.OnSelectedAudioProjectTreeNodeChanged(selectedNode);
+        }
+
+        private void WatermarkComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DialogueEventFilterComboBox?.SelectedItem is DialogueEventPreset selectedPreset && selectedPreset == DialogueEventPreset.ShowAll)
+                ViewModel.ResetDialogueEventFilterComboBoxSelectedItem(DialogueEventFilterComboBox);
+        }
+
+        private void ClearButtonClick(object sender, RoutedEventArgs e)
+        {
+            FilterTextBoxItem.Focus();
         }
     }
 }

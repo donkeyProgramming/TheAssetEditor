@@ -21,14 +21,14 @@ namespace Editors.Audio.AudioEditor
         private readonly IAudioProjectService _audioProjectService;
         private readonly IStandardDialogs _packFileUiProvider;
 
+        public string DisplayName { get; set; } = "Audio Editor";
+
         public AudioEditorMenuViewModel AudioEditorMenuViewModel { get; set; }
         public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
         public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
         public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; set; }
         public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; set; }
-        public AudioSettingsEditorViewModel AudioSettingsViewModel { get; set; }
-
-        public string DisplayName { get; set; } = "Audio Editor";
+        public AudioSettingsEditorViewModel AudioSettingsEditorViewModel { get; set; }
 
         public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
         {
@@ -39,10 +39,10 @@ namespace Editors.Audio.AudioEditor
 
             AudioEditorMenuViewModel = new AudioEditorMenuViewModel(this, _audioRepository, _packFileService, _audioProjectService, _packFileUiProvider);
             AudioProjectExplorerViewModel = new AudioProjectExplorerViewModel(this, _audioRepository, _audioProjectService);
-            AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(this, _packFileService);
+            AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(this, _packFileService, _audioRepository, _audioProjectService);
             AudioProjectEditorViewModel = new AudioProjectEditorViewModel(this, _audioRepository, _audioProjectService);
             AudioProjectViewerViewModel = new AudioProjectViewerViewModel(this, _audioRepository, _audioProjectService);
-            AudioSettingsViewModel = new AudioSettingsEditorViewModel();
+            AudioSettingsEditorViewModel = new AudioSettingsEditorViewModel();
 
             Initialise();
 
@@ -51,24 +51,21 @@ namespace Editors.Audio.AudioEditor
 
         public void ResetAudioEditorViewModelData()
         {
-            AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid = null;
-            AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid = null;
+            AudioProjectEditorViewModel.AudioProjectEditorDataGrid = null;
+            AudioProjectViewerViewModel.AudioProjectViewerDataGrid = null;
             AudioProjectViewerViewModel.SelectedDataGridRows = null;
             AudioProjectViewerViewModel.CopiedDataGridRows = null;
-            AudioProjectExplorerViewModel._selectedAudioProjectTreeItem = null;
-            AudioProjectExplorerViewModel._previousSelectedAudioProjectTreeItem = null;
-            AudioProjectExplorerViewModel.AudioProjectTreeViewItems.Clear();
-            AudioProjectExplorerViewModel.DialogueEventSoundBankFiltering.Clear();
+            AudioProjectExplorerViewModel._selectedAudioProjectTreeNode = null;
+            AudioProjectExplorerViewModel.AudioProjectTree.Clear();
         }
 
         public void Initialise()
         {
-            AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid = [];
-            AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid = [];
+            AudioProjectEditorViewModel.AudioProjectEditorDataGrid = [];
+            AudioProjectViewerViewModel.AudioProjectViewerDataGrid = [];
             AudioProjectViewerViewModel.SelectedDataGridRows = [];
             AudioProjectViewerViewModel.CopiedDataGridRows = [];
             AudioProjectExplorerViewModel.DialogueEventPresets = [];
-            AudioProjectExplorerViewModel.AudioProjectTreeViewItems = _audioProjectService.AudioProject.AudioProjectTreeViewItems;
         }
 
         public void Close()

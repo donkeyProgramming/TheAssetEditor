@@ -39,7 +39,7 @@ namespace Editors.Audio.Utility
 
             _logger.Here().Information($"Trying to export sound '{fileNameWithoutExtension}' - {wemBytes.Length} bytes");
 
-            var exportResult = ExportFile(wemName, wemBytes);
+            var exportResult = SoundPlayer.ExportFile(wemName, wemBytes);
             if (exportResult.Failed)
                 return Result<string>.FromError(exportResult.LogItems);
 
@@ -81,22 +81,6 @@ namespace Editors.Audio.Utility
             {
                 _logger.Here().Error(e.Message);
                 return Result<string>.FromError("Convert error", e.Message);
-            }
-        }
-
-        private Result<bool> ExportFile(string filePath, byte[] bytes)
-        {
-            try
-            {
-                DirectoryHelper.EnsureFileFolderCreated(filePath);
-                File.WriteAllBytes(filePath, bytes);
-                _logger.Here().Information("All bytes written to file");
-                return Result<bool>.FromOk(true);
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error(e.Message);
-                return Result<bool>.FromError("Write error", e.Message);
             }
         }
 

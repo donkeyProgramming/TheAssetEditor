@@ -45,12 +45,12 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
                 rowData[stateGroupColumnHeader] = string.Empty;
             }
 
-            parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid.Add(rowData);
+            parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
         }
 
         public void ConfigureAudioProjectViewerDataGrid(AudioProjectDataServiceParameters parameters)
         {
-            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGridTag);
+            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
             DataGridHelpers.CreateContextMenu(parameters, dataGrid);
 
             var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
@@ -93,7 +93,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
                         rowData[stateGroupColumnHeader] = string.Empty;
                 }
 
-                parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid.Add(rowData);
+                parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(rowData);
             }
         }
 
@@ -128,7 +128,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
             }
 
             if (parameters.AudioProjectEditorRow.TryGetValue("AudioSettings", out var audioSettings))
-                statePath.AudioSettings = AudioSettingsEditorViewModel.BuildAudioSettings(parameters.AudioEditorViewModel.AudioSettingsViewModel);
+                statePath.AudioSettings = AudioSettingsEditorViewModel.BuildAudioSettings(parameters.AudioEditorViewModel.AudioSettingsEditorViewModel);
 
             AudioProjectHelpers.InsertStatePathAlphabetically(parameters.DialogueEvent, statePath);
         }
@@ -139,12 +139,11 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
             var dataGridRowsCopy = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var statePath = AudioProjectHelpers.GetStatePathFromDialogueEvent(parameters.AudioRepository, dataGridRow, parameters.DialogueEvent);
-                var matchingStatePath = AudioProjectHelpers.GetMatchingDecisionNode(statePath, parameters.DialogueEvent);
-                if (matchingStatePath != null)
+                var statePath = AudioProjectHelpers.GetStatePathMatchingWithDataGridRow(parameters.AudioRepository, dataGridRow, parameters.DialogueEvent);
+                if (statePath != null)
                 {
-                    parameters.DialogueEvent.DecisionTree.Remove(matchingStatePath);
-                    parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid.Remove(dataGridRow);
+                    parameters.DialogueEvent.DecisionTree.Remove(statePath);
+                    parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
                 }
             }
         }

@@ -1,8 +1,8 @@
 ﻿namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 {
-    public static class AudioProjectDataServiceFactory
+    public class AudioProjectDataServiceFactory
     {
-        public static IAudioProjectDataService GetService(object selectedItem)
+        public static IAudioProjectDataService GetDataService(object selectedItem)
         {
             return selectedItem switch
             {

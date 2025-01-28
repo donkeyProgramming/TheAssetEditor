@@ -5,10 +5,9 @@ using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
-using static Editors.Audio.AudioEditor.AudioProjectExplorer.DialogueEventFilter;
 using static Editors.Audio.AudioEditor.AudioProjectEditor.ButtonEnablement;
+using static Editors.Audio.AudioEditor.AudioProjectExplorer.DialogueEventFilter;
 using static Editors.Audio.AudioEditor.AudioProjectViewer.CopyPasteHandler;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
@@ -18,119 +17,123 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         public static void HandleSelectedTreeViewItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
         {
-            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor";
-            audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer";
+            audioEditorViewModel.AudioProjectExplorerViewModel.ResetDialogueEventPresetFilterEnablement();
 
-            // Set filtering properties
-            audioEditorViewModel.AudioProjectExplorerViewModel.IsDialogueEventPresetFilterEnabled = false;
-            audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset = null;
+            audioEditorViewModel.AudioProjectEditorViewModel.ResetAudioProjectEditorLabel();
+            audioEditorViewModel.AudioProjectEditorViewModel.ResetButtonEnablement();
+            audioEditorViewModel.AudioProjectEditorViewModel.ResetDataGrid();
 
-            // Set button enablement
-            audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
-            audioEditorViewModel.AudioProjectEditorViewModel.IsUpdateRowButtonEnabled = false;
-            audioEditorViewModel.AudioProjectEditorViewModel.IsRemoveRowButtonEnabled = false;
-            audioEditorViewModel.AudioProjectEditorViewModel.IsAddAudioFilesButtonEnabled = false;
-            audioEditorViewModel.AudioProjectEditorViewModel.IsPlayAudioButtonEnabled = false;
-            audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
+            audioEditorViewModel.AudioProjectViewerViewModel.ResetAudioProjectViewerLabel();
+            audioEditorViewModel.AudioProjectViewerViewModel.ResetButtonEnablement();
+            audioEditorViewModel.AudioProjectViewerViewModel.ResetDataGrid();
 
-            // Set AudioSettings visibility
-            audioEditorViewModel.AudioSettingsViewModel.IsAudioSettingsVisible = false;
-            audioEditorViewModel.AudioSettingsViewModel.IsUsingMultipleAudioFiles = false;
+            audioEditorViewModel.AudioSettingsEditorViewModel.ResetAudioSettingsVisibility();
 
-            // Reset DataGrids
-            DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorSingleRowDataGrid);
-            DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGrid);
-            DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag));
-            DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectEditorFullDataGridTag));
+            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.ActionEventSoundBank)
+                LoadActionEventSoundBank(audioEditorViewModel, audioProjectService);
 
-            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is SoundBank selectedSoundBank)
+
+            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEventSoundBank)
+                LoadDialogueEventSoundBank(audioEditorViewModel, audioProjectService);
+
+            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
+                LoadDialogueEvent(audioEditorViewModel, audioProjectService, audioRepository);
+
+
+            if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.StateGroup)
+                LoadStateGroup(audioEditorViewModel, audioProjectService, audioRepository);
+
+            SetAddRowButtonEnablement(audioEditorViewModel, audioProjectService, audioRepository);
+            SetShowModdedStatesOnlyButtonEnablementAndVisibility(audioEditorViewModel, audioProjectService);
+            SetCopyEnablement(audioEditorViewModel);
+            SetPasteEnablement(audioEditorViewModel, audioRepository, audioProjectService);
+        }
+
+        private static void LoadActionEventSoundBank(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
+        {
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
+
+            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {soundBank.Name}";
+            audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {soundBank.Name}";
+
+            AudioSettingsEditorViewModel.SetAudioSettingsEnablementAndVisibility(audioEditorViewModel.AudioSettingsEditorViewModel);
+
+            var parameters = new AudioProjectDataServiceParameters
             {
-                if (selectedSoundBank.Type == GameSoundBankType.ActionEventSoundBank.ToString())
-                {
-                    audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {selectedSoundBank.Name}";
-                    audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {selectedSoundBank.Name}";
+                AudioEditorViewModel = audioEditorViewModel,
+                AudioProjectService = audioProjectService,
+                SoundBank = soundBank
+            };
 
-                    AudioSettingsEditorViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
+            var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetDataService(soundBank);
+            audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
+            audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
+            audioProjectDataServiceInstance.ConfigureAudioProjectViewerDataGrid(parameters);
+            audioProjectDataServiceInstance.SetAudioProjectViewerDataGridData(parameters);
 
-                    var parameters = new AudioProjectDataServiceParameters
-                    {
-                        AudioEditorViewModel = audioEditorViewModel,
-                        AudioProjectService = audioProjectService,
-                        SoundBank = selectedSoundBank
-                    };
+            s_logger.Here().Information($"Loaded Action Event SoundBank: {soundBank.Name}");
+        }
 
-                    var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetService(selectedSoundBank);
-                    audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
-                    audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
-                    audioProjectDataServiceInstance.ConfigureAudioProjectViewerDataGrid(parameters);
-                    audioProjectDataServiceInstance.SetAudioProjectViewerDataGridData(parameters);
+        private static void LoadDialogueEventSoundBank(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
+        {
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
+            HandleDialogueEventsPresetFilter(audioEditorViewModel.AudioProjectExplorerViewModel, audioProjectService, soundBank.Name);
+        }
 
-                    s_logger.Here().Information($"Loaded Action Event SoundBank: {selectedSoundBank.Name}");
-                }
-                else if (selectedSoundBank.Type == GameSoundBankType.DialogueEventSoundBank.ToString())
-                {
-                    // Workaround for using ref with the MVVM toolkit as you can't pass a property by ref, so instead pass a field that is set to the property by ref then assign the ref field to the property
-                    var isDialogueEventPresetFilterEnabled = audioEditorViewModel.AudioProjectExplorerViewModel.IsDialogueEventPresetFilterEnabled;
-                    var dialogueEventPresets = audioEditorViewModel.AudioProjectExplorerViewModel.DialogueEventPresets;
-                    HandleDialogueEventsPresetFilter(selectedSoundBank.Name, ref dialogueEventPresets, audioEditorViewModel.AudioProjectExplorerViewModel.DialogueEventSoundBankFiltering, audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset, ref isDialogueEventPresetFilterEnabled);
-                    audioEditorViewModel.AudioProjectExplorerViewModel.IsDialogueEventPresetFilterEnabled = isDialogueEventPresetFilterEnabled;
-                    audioEditorViewModel.AudioProjectExplorerViewModel.DialogueEventPresets = dialogueEventPresets;
-                }
-            }
-            else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is DialogueEvent selectedDialogueEvent)
+        private static void LoadDialogueEvent(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
+        {
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
+
+            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AudioProjectHelpers.AddExtraUnderscoresToString(dialogueEvent.Name)}";
+            audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(dialogueEvent.Name)}";
+
+            AudioSettingsEditorViewModel.SetAudioSettingsEnablementAndVisibility(audioEditorViewModel.AudioSettingsEditorViewModel);
+
+            // Rebuild StateGroupsWithModdedStates in case any have been added since the Audio Project was initialised
+            audioProjectService.BuildStateGroupsWithModdedStatesRepository(audioProjectService.AudioProject.StateGroups, audioProjectService.StateGroupsWithModdedStatesRepository);
+
+            if (audioProjectService.StateGroupsWithModdedStatesRepository.Count > 0)
+                audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
+
+            var parameters = new AudioProjectDataServiceParameters
             {
-                audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
-                audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedDialogueEvent.Name)}";
+                AudioEditorViewModel = audioEditorViewModel,
+                AudioProjectService = audioProjectService,
+                AudioRepository = audioRepository,
+                DialogueEvent = dialogueEvent
+            };
 
-                AudioSettingsEditorViewModel.SetAudioSettingsEnablement(audioEditorViewModel.AudioSettingsViewModel);
+            var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetDataService(dialogueEvent);
+            audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
+            audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
+            audioProjectDataServiceInstance.ConfigureAudioProjectViewerDataGrid(parameters);
+            audioProjectDataServiceInstance.SetAudioProjectViewerDataGridData(parameters);
 
-                // Rebuild StateGroupsWithModdedStates in case any have been added since the Audio Project was initialised
-                audioProjectService.BuildStateGroupsWithModdedStatesRepository(audioProjectService.AudioProject.States, audioProjectService.StateGroupsWithModdedStatesRepository);
+            s_logger.Here().Information($"Loaded DialogueEvent: {dialogueEvent.Name}");
+        }
 
-                if (audioProjectService.StateGroupsWithModdedStatesRepository.Count > 0)
-                    audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
+        private static void LoadStateGroup(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
+        {
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
 
-                var parameters = new AudioProjectDataServiceParameters
-                {
-                    AudioEditorViewModel = audioEditorViewModel,
-                    AudioProjectService = audioProjectService,
-                    AudioRepository = audioRepository,
-                    DialogueEvent = selectedDialogueEvent
-                };
+            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AudioProjectHelpers.AddExtraUnderscoresToString(stateGroup.Name)}";
+            audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(stateGroup.Name)}";
 
-                var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetService(selectedDialogueEvent);
-                audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
-                audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
-                audioProjectDataServiceInstance.ConfigureAudioProjectViewerDataGrid(parameters);
-                audioProjectDataServiceInstance.SetAudioProjectViewerDataGridData(parameters);
-
-                s_logger.Here().Information($"Loaded DialogueEvent: {selectedDialogueEvent.Name}");
-            }
-            else if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeItem is StateGroup selectedModdedStateGroup)
+            var parameters = new AudioProjectDataServiceParameters
             {
-                audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
-                audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {AudioProjectHelpers.AddExtraUnderscoresToString(selectedModdedStateGroup.Name)}";
+                AudioEditorViewModel = audioEditorViewModel,
+                AudioRepository = audioRepository,
+                AudioProjectService = audioProjectService,
+                StateGroup = stateGroup
+            };
 
-                var parameters = new AudioProjectDataServiceParameters
-                {
-                    AudioEditorViewModel = audioEditorViewModel,
-                    AudioRepository = audioRepository,
-                    AudioProjectService = audioProjectService,
-                    StateGroup = selectedModdedStateGroup
-                };
+            var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetDataService(stateGroup);
+            audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
+            audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
+            audioProjectDataServiceInstance.ConfigureAudioProjectViewerDataGrid(parameters);
+            audioProjectDataServiceInstance.SetAudioProjectViewerDataGridData(parameters);
 
-                var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetService(selectedModdedStateGroup);
-                audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
-                audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
-                audioProjectDataServiceInstance.ConfigureAudioProjectViewerDataGrid(parameters);
-                audioProjectDataServiceInstance.SetAudioProjectViewerDataGridData(parameters);
-
-                s_logger.Here().Information($"Loaded StateGroup: {selectedModdedStateGroup.Name}");
-            }
-
-            SetIsAddRowButtonEnabled(audioEditorViewModel, audioProjectService, audioRepository);
-            SetIsCopyEnabled(audioEditorViewModel);
-            SetIsPasteEnabled(audioEditorViewModel, audioRepository, audioProjectService);
+            s_logger.Here().Information($"Loaded StateGroup: {stateGroup.Name}");
         }
     }
 }

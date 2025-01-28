@@ -3,49 +3,47 @@ using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using static Editors.Audio.AudioEditor.AudioSettingsEditor.AudioSettings;
+using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.Data
 {
-    public class AudioProjectData
+    public class AudioProjectDataModel
     {
         public string Language { get; set; }
         public ObservableCollection<SoundBank> SoundBanks { get; set; } = [];
-        public ObservableCollection<StateGroup> States { get; set; } = [];
-        [JsonIgnore] public ObservableCollection<object> AudioProjectTreeViewItems { get; set; } = [];
+        public ObservableCollection<StateGroup> StateGroups { get; set; } = [];
     }
 
-    public abstract class IAudioProjectItem : ObservableObject
+    public abstract class AudioProjectItem : ObservableObject
     {
         public string Name { get; set; }
     }
 
-    public partial class SoundBank : IAudioProjectItem
+    public partial class SoundBank : AudioProjectItem
     {
-        [ObservableProperty] public string _filteredBy;
-        public string Type { get; set; }
+        [JsonIgnore] public Wh3SoundBankType Type { get; set; }
         public ObservableCollection<ActionEvent> ActionEvents { get; set; } = [];
         public ObservableCollection<DialogueEvent> DialogueEvents { get; set; } = [];
-        [JsonIgnore] public ObservableCollection<object> SoundBankTreeViewItems { get; set; } = [];
     }
 
-    public class ActionEvent : IAudioProjectItem
+    public class ActionEvent : AudioProjectItem
     {
         public List<string> AudioFiles { get; set; } = [];
         public string AudioFilesDisplay { get; set; }
         public AudioSettings AudioSettings { get; set; }
     }
 
-    public class DialogueEvent : IAudioProjectItem
+    public class DialogueEvent : AudioProjectItem
     {
         public List<StatePath> DecisionTree { get; set; } = [];
     }
 
-    public class StateGroup : IAudioProjectItem
+    public class StateGroup : AudioProjectItem
     {
         public List<State> States { get; set; } = [];
     }
 
-    public class State : IAudioProjectItem { }
+    public class State : AudioProjectItem { }
 
     public class StatePath
     {

@@ -12,7 +12,7 @@ namespace Editors.Audio.AudioEditor
 {
     public class IntegrityChecker
     {
-        public static void CheckAudioEditorDialogueEventIntegrity(IAudioRepository audioRepository, List<(string Name, SoundBanks.GameSoundBank SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
+        public static void CheckAudioEditorDialogueEventIntegrity(IAudioRepository audioRepository, List<(string Name, SoundBanks.Wh3SoundBank SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
         {
             var gameDialogueEvents = audioRepository.DialogueEventsWithStateGroups.Keys.ToList();
             var audioEditorDialogueEvents = dialogueEventData.Select(data => data.Name).ToList();
@@ -49,7 +49,7 @@ namespace Editors.Audio.AudioEditor
 
             foreach (var soundBank in audioProjectService.AudioProject.SoundBanks)
             {
-                if (soundBank.Type == GameSoundBankType.DialogueEventSoundBank.ToString())
+                if (soundBank.Type == Wh3SoundBankType.DialogueEventSoundBank)
                     foreach (var dialogueEvent in soundBank.DialogueEvents)
                     {
                         var firstStatePath = dialogueEvent.DecisionTree.FirstOrDefault();
