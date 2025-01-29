@@ -129,6 +129,8 @@ namespace AssetEditor.ViewModels
             try { Directory.Delete(DirectoryHelper.ApplicationDirectory, true); } catch { }
         }
 
+        [RelayCommand] private void TogglePackFileExplorer() => _uiCommandFactory.Create<TogglePackFileExplorerCommand>().Execute();
+
         void CreateRecentPackFilesItems()
         {
             var settings = _settingsService.CurrentSettings;
