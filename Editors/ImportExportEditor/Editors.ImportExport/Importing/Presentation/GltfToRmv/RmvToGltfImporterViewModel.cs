@@ -34,11 +34,20 @@ namespace Editors.ImportImport.Importing.Presentation.RmvToGltf
 
         public ImportExportSupportEnum CanImportFile(PackFile file) => _Importer.CanImportFile(file);
 
-        public void Execute(PackFile ImportSource, string outputPath, PackFileContainer packFileContainer, GameTypeEnum gameType)
+        public void Execute(PackFile importSource, string outputPath, PackFileContainer packFileContainer, GameTypeEnum gameType)
         {
-            // TODO: fill in the rest of the parameters from the UI
-            // TODO: test each param on and off
-            var settings = new GltfImporterSettings(ImportSource.Name, outputPath, packFileContainer, gameType, true, true, true, true, true, 20.0f, true);
+            var settings = new GltfImporterSettings(
+                InputGltfFile: importSource.Name,
+                DestinationPackPath: outputPath,
+                DestinationPackFileContainer: packFileContainer,
+                SelectedGame: gameType,
+                ImportMeshes: this.ImportMeshes,
+                ImportMaterials: this.ImportMaterials,
+                ConvertMaterialFromBlenderType: this.ConvertFromBlenderMaterialMap,
+                ConvertNormalTextureFromBlueToOrangeType: this.ConvertNormalTextureToOrange,
+                ImportAnimations: this.ImportAnimations,
+                AnimationKeysPerSecond: this.AnimationKeysPerSecond,
+                MirrorMesh: true);
 
             _Importer.Import(settings);
         }

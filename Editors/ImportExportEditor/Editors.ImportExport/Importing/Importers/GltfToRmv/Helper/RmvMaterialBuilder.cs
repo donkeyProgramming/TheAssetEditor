@@ -15,6 +15,7 @@ using SharpDX.DirectWrite;
 using SharpGLTF.Schema2;
 using TextureType = Shared.GameFormats.RigidModel.Types.TextureType;
 using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
+using Microsoft.VisualBasic;
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
 {
@@ -48,8 +49,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
     public class RmvMaterialBuilder
     {
         private readonly IPackFileService _packFileService;
-        private readonly IStandardDialogs _exceptionService;
-        private readonly List<string> _addedFiles = new List<string>();
+        private readonly IStandardDialogs _exceptionService;        
 
         public RmvMaterialBuilder(IPackFileService packFileSerivce, IStandardDialogs exceptionService)
         {
@@ -77,7 +77,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
             rmvFile.RecalculateOffsets();
         }
 
-        private void BuildRmvModelMaterial(GltfImporterSettings settings, Mesh mesh, RmvModel? rmvModel)
+        private void BuildRmvModelMaterial(GltfImporterSettings settings, Mesh mesh, RmvModel rmvModel)
         {
             if (!ValidateInput_BuildRmvModelMaterial(mesh)) return;
 
@@ -94,36 +94,28 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
                     out var textureType,
                     out var postFixString)) continue; // gltf string id doesn't match any of the rmv texture types
 
-                // get game type (originally from global app settings)
-                var gameType = settings.GameType;                
+
+                
+
+                
+                var gameType = settings.SelectedGame;                
                 
                 var texturePackFolder = GetTexturePackFolder(settings, mesh.Name, postFixString);
+                var DEBUG___textureName = itText.Texture.PrimaryImage.Name;
 
                 // import texture PNG -> DDS
                 var ddsPackFile = PngToDdsImporter.Import(texPath, textureType, gameType, Path.GetFileName(texturePackFolder));
-                
-                AddTextureToRmvModel(mesh.Name, settings, postFixString, rmvModel, textureType);
 
-                var newFile = new NewPackFileEntry(Path.GetDirectoryName(texturePackFolder) ?? "", ddsPackFile);
-                _packFileService.AddFilesToPack(settings.DestinationPackFileContainer, [newFile]);
+                rmvModel.Material.SetTexture(textureType, texturePackFolder);
+
+                // make sure we don't add the same file to .pack more the once, as several meshes, may use the same texture, 
+                if (!settings.DestinationPackFileContainer.FileList.ContainsKey(texturePackFolder))
+                {
+                    var newFile = new NewPackFileEntry(Path.GetDirectoryName(texturePackFolder) ?? "", ddsPackFile);
+                    _packFileService.AddFilesToPack(settings.DestinationPackFileContainer, [newFile]);
+                }
+
             }
-        }
-
-        private void AddTextureToRmvModel(String meshName, GltfImporterSettings settings, string textureTypeString, RmvModel rmvModel, TextureType textureType)
-        {         
-            var textureFullPackPath = GetTexturePackFolder(settings, meshName, textureTypeString);
-
-            // make sure we don't add the same file more the once, 
-            // as several meshes may use the same texture
-            if (_addedFiles.Contains(textureFullPackPath.ToLower()))
-                return;
-
-            // set texture in RMVmodel
-            if (rmvModel != null)
-                rmvModel.Material.SetTexture(textureType, textureFullPackPath);
-
-
-            _addedFiles.Add(textureFullPackPath.ToLower());
         }
 
         private static string GetTexturePackFolder(GltfImporterSettings settings, string meshName, string postFixString)
