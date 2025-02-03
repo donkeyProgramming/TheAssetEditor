@@ -94,10 +94,6 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
                     out var textureType,
                     out var postFixString)) continue; // gltf string id doesn't match any of the rmv texture types
 
-
-                
-
-                
                 var gameType = settings.SelectedGame;                
                 
                 var texturePackFolder = GetTexturePackFolder(settings, mesh.Name, postFixString);
