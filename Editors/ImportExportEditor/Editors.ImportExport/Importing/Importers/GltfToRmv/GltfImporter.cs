@@ -147,13 +147,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             return (skeletonName, skeletonAnimFile);
         }
 
-        private static string GetImportedPackFileName(GltfImporterSettings settings)
-        {
-            var fileName = Path.GetFileNameWithoutExtension(settings.InputGltfFile);
-            string importedFileName = $@"{fileName}.rigid_model_v2";
-
-            return importedFileName;
-        }
+        private static string GetImportedPackFileName(GltfImporterSettings settings) => Path.GetFileNameWithoutExtension(settings.InputGltfFile) + ".rigid_model_v2";
 
         private static string FetchSkeletonIdStringFromScene(ModelRoot modelRoot)
         {
