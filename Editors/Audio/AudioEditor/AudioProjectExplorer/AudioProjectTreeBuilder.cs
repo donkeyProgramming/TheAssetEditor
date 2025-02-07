@@ -160,6 +160,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             if (!showEditedAudioProjectItemsOnly)
             {
                 var dialogueEventsNode = AudioProjectHelpers.GetAudioProjectTreeNodeFromName(audioProjectTree, "Dialogue Events");
+
+                if (dialogueEventsNode == null)
+                    return;
+
                 var dialogueEventSoundBanks = dialogueEventsNode.Children;
 
                 foreach (var soundBank in dialogueEventSoundBanks)

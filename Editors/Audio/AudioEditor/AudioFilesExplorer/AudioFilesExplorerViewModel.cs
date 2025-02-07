@@ -253,10 +253,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 textBox.ToolTip = filePathsString;
             }
 
-            if (audioFiles.Count > 1)
-                _audioEditorViewModel.AudioSettingsEditorViewModel.IsUsingMultipleAudioFiles = true;
-            else
-                _audioEditorViewModel.AudioSettingsEditorViewModel.IsUsingMultipleAudioFiles = false;
+            _audioEditorViewModel.AudioSettingsEditorViewModel.AudioFilesCount = audioFiles.Count;
 
             AudioSettingsEditorViewModel.SetAudioSettingsEnablementAndVisibility(_audioEditorViewModel.AudioSettingsEditorViewModel);
             ButtonEnablement.SetAddRowButtonEnablement(_audioEditorViewModel, _audioProjectService, _audioRepository);

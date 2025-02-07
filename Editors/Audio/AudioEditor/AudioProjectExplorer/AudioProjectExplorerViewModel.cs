@@ -51,6 +51,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         partial void OnSearchQueryChanged(string value)
         {
+            if (_unfilteredTree == null)
+                return;
+
             if (string.IsNullOrWhiteSpace(SearchQuery))
                 ResetTree();
             else

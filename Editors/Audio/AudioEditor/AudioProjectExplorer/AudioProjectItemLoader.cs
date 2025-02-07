@@ -27,18 +27,16 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             audioEditorViewModel.AudioProjectViewerViewModel.ResetButtonEnablement();
             audioEditorViewModel.AudioProjectViewerViewModel.ResetDataGrid();
 
-            audioEditorViewModel.AudioSettingsEditorViewModel.ResetAudioSettingsVisibility();
+            audioEditorViewModel.AudioSettingsEditorViewModel.ResetAudioSettingsView();
 
             if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.ActionEventSoundBank)
                 LoadActionEventSoundBank(audioEditorViewModel, audioProjectService);
-
 
             if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEventSoundBank)
                 LoadDialogueEventSoundBank(audioEditorViewModel, audioProjectService);
 
             if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
                 LoadDialogueEvent(audioEditorViewModel, audioProjectService, audioRepository);
-
 
             if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.StateGroup)
                 LoadStateGroup(audioEditorViewModel, audioProjectService, audioRepository);

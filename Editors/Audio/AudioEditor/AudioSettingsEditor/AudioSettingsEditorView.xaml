@@ -79,14 +79,17 @@
                     Margin="5, 0, 0, 5" 
                     Width="130" 
                     VerticalAlignment="Center" 
-                    HorizontalAlignment="Left"/>
+                    HorizontalAlignment="Left"
+                    Command="{Binding ResetAudioSettingsCommand}"/>
 
-                <CheckBox 
+                <Button 
                     Grid.Column="1"
                     ToolTip="PLACEHOLDER" 
+                    Width="200" 
                     Margin="5, 0, 0, 5" 
                     VerticalAlignment="Center"
-                    Content="Use Default Audio Settings"/>
+                    Content="Set Recommended Audio Settings"
+                    Command="{Binding SetRecommendedAudioSettingsCommand}"/>
             </Grid>
 
             <Border 
