@@ -69,6 +69,9 @@ namespace Editors.Audio.AudioEditor
                     audioProjectService.DialogueEventsWithStateGroupsWithIntegrityError[dialogueEvent.Key] = audioProjectDialogueEventStateGroups;
             }
 
+            if (audioProjectService.DialogueEventsWithStateGroupsWithIntegrityError.Count == 0)
+                return;
+
             var message = $"Dialogue Events State Groups integrity check failed." +
                 $"\n\nThis is likely due to a change in the State Groups by a recent update to the game or you've done something silly with the file." +
                 $"\n\nWhen browsing the affected Dialogue Events you will see the rows have been updated to accommodate for the new State Groups, and if any of the old State Groups are no longer used they will have been removed." +

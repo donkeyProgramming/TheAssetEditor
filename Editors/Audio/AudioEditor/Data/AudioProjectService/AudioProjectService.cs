@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -33,11 +34,12 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
         {
             var options = new JsonSerializerOptions
             {
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = true
             };
 
-            var fileJson = JsonSerializer.Serialize(AudioProject, options);
+            var audioProject = GetAudioProjectWithoutUnusedObjects();
+            var fileJson = JsonSerializer.Serialize(audioProject, options);
             var pack = packFileService.GetEditablePack();
             var fileName = $"{AudioProjectFileName}.aproj";
 
@@ -66,9 +68,13 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                 ResetAudioProject();
 
                 // Set the AudioProject
-                AudioProject = JsonSerializer.Deserialize<AudioProjectDataModel>(audioProjectJson);
+                var savedProject = JsonSerializer.Deserialize<AudioProjectDataModel>(audioProjectJson);
                 AudioProjectFileName = fileName.Replace(fileType, string.Empty);
                 AudioProjectDirectory = filePath.Replace($"\\{fileName}", string.Empty);
+
+                // Initialise a full Audio Project and merge the saved Audio Project with it
+                InitialiseAudioProject(audioEditorViewModel, AudioProjectFileName, AudioProjectDirectory, savedProject.Language);
+                MergeSavedAudioProjectIntoAudioProjectWithUnusedObjects(savedProject);
 
                 // Initialise data after AudioProject is set so it uses the correct instance
                 audioEditorViewModel.Initialise();
@@ -107,31 +113,51 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                 .Select(soundBank => new SoundBank
                 {
                     Name = GetSoundBankDisplayString(soundBank),
-                    Type = GetSoundBankType(soundBank),
-                    DialogueEvents = new ObservableCollection<DialogueEvent>()
+                    Type = GetSoundBankType(soundBank)
                 })
                 .ToList();
 
-            foreach (var soundBank in soundBanks)
+            AudioProject.SoundBanks = [];
+
+            foreach (var soundBankEnum in Enum.GetValues<Wh3SoundBank>())
             {
-                AudioProject.SoundBanks.Add(soundBank);
+                var soundBank = new SoundBank
+                {
+                    Name = GetSoundBankDisplayString(soundBankEnum),
+                    Type = GetSoundBankType(soundBankEnum)
+                };
 
-                var dialogueEvents = DialogueEventData.Where(dialogueEvent => dialogueEvent.SoundBank == GetSoundBankEnum(soundBank.Name))
-                    .Select(dialogueEvent => new DialogueEvent
+                if (soundBank.Type == Wh3SoundBankType.ActionEventSoundBank)
+                    soundBank.ActionEvents = [];
+                else
+                {
+                    soundBank.DialogueEvents = [];
+
+                    var filteredDialogueEvents = DialogueEventData
+                        .Where(dialogueEvent => dialogueEvent.SoundBank == GetSoundBankEnum(soundBank.Name));
+
+                    foreach (var dialogueData in filteredDialogueEvents)
                     {
-                        Name = dialogueEvent.Name
-                    });
+                        var dialogueEvent = new DialogueEvent
+                        {
+                            Name = dialogueData.Name,
+                            DecisionTree = []
+                        };
+                        soundBank.DialogueEvents.Add(dialogueEvent);
+                    }
+                }
 
-                foreach (var dialogueEvent in dialogueEvents)
-                    soundBank.DialogueEvents.Add(dialogueEvent);
+                AudioProject.SoundBanks.Add(soundBank);
             }
         }
 
         private void InitialiseModdedStatesGroups()
         {
+            AudioProject.StateGroups = [];
+
             foreach (var moddedStateGroup in ModdedStateGroups)
             {
-                var stateGroup = new StateGroup { Name = moddedStateGroup };
+                var stateGroup = new StateGroup { Name = moddedStateGroup, States = [] };
                 AudioProject.StateGroups.Add(stateGroup);
             }
         }
@@ -164,6 +190,115 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
 
                         stateGroupsWithModdedStatesRepository[stateGroup.Name].Add(state.Name);
                     }
+                }
+            }
+        }
+
+        private AudioProjectDataModel GetAudioProjectWithoutUnusedObjects()
+        {
+            var usedSoundBanksList = AudioProject.SoundBanks
+                .Where(soundBank => soundBank != null)
+                .Select(soundBank =>
+                {
+                    var dialogueEvents = (soundBank.DialogueEvents ?? Enumerable.Empty<DialogueEvent>())
+                        .Where(dialogueEvent => dialogueEvent.DecisionTree != null && dialogueEvent.DecisionTree.Count != 0)
+                        .ToList();
+
+                    var actionEvents = (soundBank.ActionEvents ?? Enumerable.Empty<ActionEvent>())
+                        .Where(actionEvent => actionEvent.AudioFiles != null && actionEvent.AudioFiles.Count != 0)
+                        .ToList();
+
+                    return new SoundBank
+                    {
+                        Name = soundBank.Name,
+                        Type = soundBank.Type,
+                        DialogueEvents = dialogueEvents.Count != 0
+                            ? new ObservableCollection<DialogueEvent>(dialogueEvents)
+                            : null,
+                        ActionEvents = actionEvents.Count != 0
+                            ? new ObservableCollection<ActionEvent>(actionEvents)
+                            : null
+                    };
+                })
+                .Where(soundBank => (soundBank.DialogueEvents != null && soundBank.DialogueEvents.Any()) || (soundBank.ActionEvents != null && soundBank.ActionEvents.Any()))
+                .ToList();
+
+            var soundBanksResult = usedSoundBanksList.Count != 0
+                ? new ObservableCollection<SoundBank>(usedSoundBanksList)
+                : null;
+
+            var usedStateGroupsList = (AudioProject.StateGroups ?? new ObservableCollection<StateGroup>())
+                .Where(stateGroup => stateGroup.States != null && stateGroup.States.Count != 0)
+                .ToList();
+
+            var stateGroupsResult = usedStateGroupsList.Count != 0
+                ? new ObservableCollection<StateGroup>(usedStateGroupsList)
+                : null;
+
+            return new AudioProjectDataModel
+            {
+                Language = AudioProject.Language,
+                SoundBanks = soundBanksResult,
+                StateGroups = stateGroupsResult
+            };
+        }
+
+        private void MergeSavedAudioProjectIntoAudioProjectWithUnusedObjects(AudioProjectDataModel savedProject)
+        {
+            if (savedProject == null)
+                return;
+
+            if (!string.IsNullOrEmpty(savedProject.Language))
+                AudioProject.Language = savedProject.Language;
+
+            if (savedProject.SoundBanks != null)
+            {
+                foreach (var savedSoundBank in savedProject.SoundBanks)
+                {
+                    var soundBank = AudioProject.SoundBanks.FirstOrDefault(soundBank => soundBank.Name == savedSoundBank.Name);
+                    if (soundBank != null)
+                    {
+                        if (savedSoundBank.DialogueEvents != null)
+                        {
+                            foreach (var savedDialogue in savedSoundBank.DialogueEvents)
+                            {
+                                var defaultDialogue = soundBank.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == savedDialogue.Name);
+                                if (defaultDialogue != null)
+                                    defaultDialogue.DecisionTree = savedDialogue.DecisionTree;
+                                else
+                                    soundBank.DialogueEvents.Add(savedDialogue);
+                            }
+                        }
+
+                        if (savedSoundBank.ActionEvents != null)
+                        {
+                            foreach (var savedAction in savedSoundBank.ActionEvents)
+                            {
+                                var defaultAction = soundBank.ActionEvents.FirstOrDefault(actionEvent => actionEvent.Name == savedAction.Name);
+                                if (defaultAction != null)
+                                    defaultAction.AudioFiles = savedAction.AudioFiles;
+                                else
+                                    soundBank.ActionEvents.Add(savedAction);
+                            }
+                        }
+                    }
+                    else
+                        AudioProject.SoundBanks.Add(savedSoundBank);
+                }
+            }
+
+            if (savedProject.StateGroups != null)
+            {
+                foreach (var savedStateGroup in savedProject.StateGroups)
+                {
+                    var stateGroup = AudioProject.StateGroups.FirstOrDefault(stateGroup => stateGroup.Name == savedStateGroup.Name);
+                    if (stateGroup != null)
+                    {
+                        if (savedStateGroup.States != null && savedStateGroup.States.Count != 0)
+                            stateGroup.States = savedStateGroup.States;
+                    }
+                    else
+                        AudioProject.StateGroups.Add(savedStateGroup);
                 }
             }
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
+using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.Data
 {
@@ -50,6 +51,7 @@ namespace Editors.Audio.AudioEditor.Data
         public static DialogueEvent GetDialogueEventFromName(IAudioProjectService audioProjectService, string dialogueEventName)
         {
             return audioProjectService.AudioProject.SoundBanks
+                .Where(soundBank => soundBank.Type == Wh3SoundBankType.DialogueEventSoundBank)
                 .SelectMany(soundBank => soundBank.DialogueEvents)
                 .FirstOrDefault(dialogueEvent => dialogueEvent.Name == dialogueEventName);
         }

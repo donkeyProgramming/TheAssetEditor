@@ -99,7 +99,10 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
         public void AddAudioProjectEditorDataGridDataToAudioProject(AudioProjectDataServiceParameters parameters)
         {
-            var statePath = new StatePath();
+            var statePath = new StatePath
+            {
+                Nodes = []
+            };
 
             var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers.Keys)

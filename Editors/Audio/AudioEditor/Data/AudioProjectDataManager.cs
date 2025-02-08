@@ -101,6 +101,7 @@ namespace Editors.Audio.AudioEditor.Data
 
                 var parameters = new AudioProjectDataServiceParameters
                 {
+                    AudioProjectService = audioProjectService,
                     AudioEditorViewModel = audioEditorViewModel,
                     SoundBank = soundBank
                 };
@@ -119,6 +120,7 @@ namespace Editors.Audio.AudioEditor.Data
 
             var parameters = new AudioProjectDataServiceParameters
             {
+                AudioProjectService = audioProjectService,
                 AudioEditorViewModel = audioEditorViewModel,
                 AudioRepository = audioRepository,
                 DialogueEvent = dialogueEvent
@@ -137,6 +139,7 @@ namespace Editors.Audio.AudioEditor.Data
 
             var parameters = new AudioProjectDataServiceParameters
             {
+                AudioProjectService = audioProjectService,
                 AudioEditorViewModel = audioEditorViewModel,
                 StateGroup = stateGroup
             };
@@ -166,6 +169,7 @@ namespace Editors.Audio.AudioEditor.Data
             {
                 var parameters = new AudioProjectDataServiceParameters
                 {
+                    AudioProjectService = audioProjectService,
                     AudioEditorViewModel = audioEditorViewModel,
                     SoundBank = soundBank
                 };
@@ -180,6 +184,7 @@ namespace Editors.Audio.AudioEditor.Data
             var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
             var parameters = new AudioProjectDataServiceParameters
             {
+                AudioProjectService = audioProjectService,
                 AudioEditorViewModel = audioEditorViewModel,
                 AudioRepository = audioRepository,
                 DialogueEvent = dialogueEvent
@@ -194,6 +199,7 @@ namespace Editors.Audio.AudioEditor.Data
             var stateGroup = AudioProjectHelpers.GetStateGroupFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
             var parameters = new AudioProjectDataServiceParameters
             {
+                AudioProjectService = audioProjectService,
                 AudioEditorViewModel = audioEditorViewModel,
                 StateGroup = stateGroup
             };

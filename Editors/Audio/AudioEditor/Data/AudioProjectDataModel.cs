@@ -10,8 +10,8 @@ namespace Editors.Audio.AudioEditor.Data
     public class AudioProjectDataModel
     {
         public string Language { get; set; }
-        public ObservableCollection<SoundBank> SoundBanks { get; set; } = [];
-        public ObservableCollection<StateGroup> StateGroups { get; set; } = [];
+        public ObservableCollection<SoundBank> SoundBanks { get; set; }
+        public ObservableCollection<StateGroup> StateGroups { get; set; }
     }
 
     public abstract class AudioProjectItem : ObservableObject
@@ -22,33 +22,33 @@ namespace Editors.Audio.AudioEditor.Data
     public partial class SoundBank : AudioProjectItem
     {
         [JsonIgnore] public Wh3SoundBankType Type { get; set; }
-        public ObservableCollection<ActionEvent> ActionEvents { get; set; } = [];
-        public ObservableCollection<DialogueEvent> DialogueEvents { get; set; } = [];
+        public ObservableCollection<ActionEvent> ActionEvents { get; set; }
+        public ObservableCollection<DialogueEvent> DialogueEvents { get; set; }
     }
 
     public class ActionEvent : AudioProjectItem
     {
-        public List<string> AudioFiles { get; set; } = [];
+        public List<string> AudioFiles { get; set; }
         public string AudioFilesDisplay { get; set; }
         public AudioSettings AudioSettings { get; set; }
     }
 
     public class DialogueEvent : AudioProjectItem
     {
-        public List<StatePath> DecisionTree { get; set; } = [];
+        public List<StatePath> DecisionTree { get; set; }
     }
 
     public class StateGroup : AudioProjectItem
     {
-        public List<State> States { get; set; } = [];
+        public List<State> States { get; set; }
     }
 
     public class State : AudioProjectItem { }
 
     public class StatePath
     {
-        public List<StatePathNode> Nodes { get; set; } = [];
-        public List<string> AudioFiles { get; set; } = [];
+        public List<StatePathNode> Nodes { get; set; }
+        public List<string> AudioFiles { get; set; }
         public string AudioFilesDisplay { get; set; }
         public AudioSettings AudioSettings { get; set; }
     }
