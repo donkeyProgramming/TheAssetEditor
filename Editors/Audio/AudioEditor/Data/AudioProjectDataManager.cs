@@ -2,7 +2,6 @@
 using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
-using static Editors.Audio.AudioEditor.AudioProjectEditor.ButtonEnablement;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.Data
@@ -25,10 +24,10 @@ namespace Editors.Audio.AudioEditor.Data
             if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.StateGroup)
                 AddStateGroupData(audioEditorViewModel, audioProjectService, audioProjectEditorRow);
 
-            SetAddRowButtonEnablement(audioEditorViewModel, audioProjectService, audioRepository);
+            audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
         }
 
-        private static void AddActionEventSoundBankData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, System.Collections.Generic.Dictionary<string, object> audioProjectEditorRow)
+        private static void AddActionEventSoundBankData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, System.Collections.Generic.Dictionary<string, string> audioProjectEditorRow)
         {
             var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
             if (soundBank.Type == Wh3SoundBankType.ActionEventSoundBank)
@@ -46,7 +45,7 @@ namespace Editors.Audio.AudioEditor.Data
             }
         }
 
-        private static void AddDialogueEventData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository, System.Collections.Generic.Dictionary<string, object> audioProjectEditorRow)
+        private static void AddDialogueEventData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository, System.Collections.Generic.Dictionary<string, string> audioProjectEditorRow)
         {
             var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
             var parameters = new AudioProjectDataServiceParameters
@@ -62,7 +61,7 @@ namespace Editors.Audio.AudioEditor.Data
             audioProjectDataServiceInstance.AddAudioProjectEditorDataGridDataToAudioProject(parameters);
         }
 
-        private static void AddStateGroupData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, System.Collections.Generic.Dictionary<string, object> audioProjectEditorRow)
+        private static void AddStateGroupData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, System.Collections.Generic.Dictionary<string, string> audioProjectEditorRow)
         {
             var stateGroup = AudioProjectHelpers.GetStateGroupFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
             var parameters = new AudioProjectDataServiceParameters
@@ -88,7 +87,7 @@ namespace Editors.Audio.AudioEditor.Data
             if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.StateGroup)
                 UpdateStateGroupData(audioEditorViewModel, audioProjectService);
 
-            SetAddRowButtonEnablement(audioEditorViewModel, audioProjectService, audioRepository);
+            audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
         }
 
         private static void UpdateActionEventSoundBankData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
@@ -159,7 +158,7 @@ namespace Editors.Audio.AudioEditor.Data
             if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.StateGroup)
                 RemoveStateGroupData(audioEditorViewModel, audioProjectService);
 
-            SetAddRowButtonEnablement(audioEditorViewModel, audioProjectService, audioRepository);
+            audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
         }
 
         private static void RemoveActionEventData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)

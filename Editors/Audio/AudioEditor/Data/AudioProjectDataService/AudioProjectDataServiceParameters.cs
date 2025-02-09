@@ -12,6 +12,6 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
         public SoundBank SoundBank { get; set; }
         public DialogueEvent DialogueEvent { get; set; }
         public StateGroup StateGroup { get; set; }
-        public Dictionary<string, object> AudioProjectEditorRow { get; set; }
+        public Dictionary<string, string> AudioProjectEditorRow { get; set; }
     }
 }

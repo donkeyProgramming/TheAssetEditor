@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProjectEditor;
-using Editors.Audio.AudioEditor.AudioSettingsEditor;
+using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
@@ -71,13 +69,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 }
             }
 
-            var audioProjectEditorDataGridCount = _audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Count;
-            if (audioProjectEditorDataGridCount > 0)
-                IsAddAudioFilesButtonEnabled = SelectedTreeNodes.Count > 0;
-            else
-                IsAddAudioFilesButtonEnabled = false;
-
-            IsPlayAudioButtonEnabled = SelectedTreeNodes.Count == 1;
+            SetButtonEnablement();
         }
 
         partial void OnSearchQueryChanged(string value)
@@ -228,35 +220,21 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         [RelayCommand] public void AddAudioFilesToAudioProjectEditor()
         {
-            var dataGridRow = _audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid[0];
+            var selectedWavFiles = _audioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes;
 
-            var selectedWavFilePaths = _audioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes
-                .Select(wavFile => wavFile.FilePath)
-                .ToList();
+            _audioEditorViewModel.AudioSettingsViewModel.AudioFiles.Clear();
 
-            var selectedWavFileNames = _audioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes
-                .Select(wavFile => wavFile.Name)
-                .ToList();
-
-            var fileNamesString = string.Join(", ", selectedWavFileNames);
-            var filePathsString = string.Join(", ", selectedWavFilePaths.Select(filePath => $"\"{filePath}\""));
-
-            var audioFiles = new List<string>(selectedWavFilePaths);
-            dataGridRow["AudioFiles"] = audioFiles;
-            dataGridRow["AudioFilesDisplay"] = fileNamesString;
-
-            var dataGrid = DataGridHelpers.GetDataGridByTag(_audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
-            var textBox = DataGridHelpers.FindVisualChild<TextBox>(dataGrid, "AudioFilesDisplay");
-            if (textBox != null)
+            foreach (var wavFile in selectedWavFiles)
             {
-                textBox.Text = fileNamesString;
-                textBox.ToolTip = filePathsString;
+                _audioEditorViewModel.AudioSettingsViewModel.AudioFiles.Add(new AudioFile
+                {
+                    FileName = wavFile.Name,
+                    FilePath = wavFile.FilePath
+                });
             }
 
-            _audioEditorViewModel.AudioSettingsEditorViewModel.AudioFilesCount = audioFiles.Count;
-
-            AudioSettingsEditorViewModel.SetAudioSettingsEnablementAndVisibility(_audioEditorViewModel.AudioSettingsEditorViewModel);
-            ButtonEnablement.SetAddRowButtonEnablement(_audioEditorViewModel, _audioProjectService, _audioRepository);
+            _audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsEnablementAndVisibility();
+            _audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
         }
 
         [RelayCommand] public void PlayWavFile()
@@ -271,6 +249,26 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         [RelayCommand] public void ClearText()
         {
             SearchQuery = "";
+        }
+
+        public void SetButtonEnablement()
+        {
+            var selectedAudioProjectTreeNodeType = _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType;
+
+            if (SelectedTreeNodes.Count > 0)
+            {
+                if (selectedAudioProjectTreeNodeType == AudioProjectExplorer.NodeType.ActionEventSoundBank || selectedAudioProjectTreeNodeType == AudioProjectExplorer.NodeType.DialogueEvent)
+                    IsAddAudioFilesButtonEnabled = true;
+            }
+            else
+                IsAddAudioFilesButtonEnabled = false;
+
+            IsPlayAudioButtonEnabled = SelectedTreeNodes.Count == 1;
+        }
+
+        public void ResetButtonEnablement()
+        {
+            IsAddAudioFilesButtonEnabled = false;
         }
 
         public void Close() {}

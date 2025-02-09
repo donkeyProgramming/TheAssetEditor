@@ -11,7 +11,7 @@
     xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer"
     xmlns:audiofilesexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioFilesExplorer"
     xmlns:audioprojecteditor="clr-namespace:Editors.Audio.AudioEditor.AudioProjectEditor"
-    xmlns:audiosettingseditor="clr-namespace:Editors.Audio.AudioEditor.AudioSettingsEditor"
+    xmlns:audiosettings="clr-namespace:Editors.Audio.AudioEditor.AudioSettings"
     xmlns:audioprojectviewer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectViewer"
     d:DataContext="{d:DesignInstance Type=audioeditor:AudioEditorViewModel}"
     mc:Ignorable="d" 
@@ -123,10 +123,10 @@
                     Height="5" 
                     Background="{DynamicResource App.Border}"/>
 
-                <audiosettingseditor:AudioSettingsEditorView 
+                <audiosettings:AudioSettingsView 
                     Grid.Row="2"
                     Grid.Column="0"
-                    DataContext="{Binding AudioSettingsEditorViewModel}"/>
+                    DataContext="{Binding AudioSettingsViewModel}"/>
 
                 <audioprojectviewer:AudioProjectViewerView 
                     Grid.Row="3"

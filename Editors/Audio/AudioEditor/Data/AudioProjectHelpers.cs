@@ -16,27 +16,20 @@ namespace Editors.Audio.AudioEditor.Data
             audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0]);
         }
 
-        public static void AddAudioProjectEditorDataGridDataToAudioProjectViewer(AudioEditorViewModel audioEditorViewModel, Dictionary<string, object> audioProjectEditorRow)
+        public static void AddAudioProjectEditorDataGridDataToAudioProjectViewer(AudioEditorViewModel audioEditorViewModel, Dictionary<string, string> audioProjectEditorRow)
         {
             InsertDataGridRowAlphabetically(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid, audioProjectEditorRow);
         }
 
-        public static Dictionary<string, object> ExtractRowFromSingleRowDataGrid(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        public static Dictionary<string, string> ExtractRowFromSingleRowDataGrid(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
         {
-            var newRow = new Dictionary<string, object>();
+            var newRow = new Dictionary<string, string>();
 
             foreach (var kvp in audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid[0])
             {
                 var columnName = kvp.Key;
                 var cellValue = kvp.Value;
-
-                if (columnName == "AudioFiles" && cellValue is List<string> stringList)
-                {
-                    var newList = new List<string>(stringList);
-                    newRow[columnName] = newList;
-                }
-                else
-                    newRow[columnName] = cellValue.ToString();
+                newRow[columnName] = cellValue.ToString();
             }
 
             return newRow;
@@ -77,59 +70,99 @@ namespace Editors.Audio.AudioEditor.Data
             return null;
         }
 
-        public static ActionEvent GetActionEventMatchingWithDataGridRow(ObservableCollection<Dictionary<string, object>> audioProjectViewerDataGrid, Dictionary<string, object> dataGridRow, SoundBank actionEventSoundBank)
+        public static ActionEvent GetActionEventFromDataGridRow(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> dataGridRow, SoundBank actionEventSoundBank)
         {
-            if (dataGridRow.TryGetValue("Event", out var eventName))
-            {
-                foreach (var actionEvent in actionEventSoundBank.ActionEvents)
-                    if (actionEvent.Name == eventName.ToString())
-                        return actionEvent;
+            var dataGridRowActionEvent = CreateActionEventFromDataGridRow(dataGridRow);
+
+            foreach (var actionEvent in actionEventSoundBank.ActionEvents)
+            {                    
+                if (actionEvent.Name == dataGridRowActionEvent.Name)
+                    return actionEvent;
             }
 
             return null;
         }
 
-        public static StatePath GetStatePathMatchingWithDataGridRow(IAudioRepository audioRepository, Dictionary<string, object> dataGridRow, DialogueEvent selectedDialogueEvent)
+        public static ActionEvent CreateActionEventFromDataGridRow(Dictionary<string, string> dataGridRow)
         {
-            var statePath = new StatePath();
+            var actionEvent = new ActionEvent();
 
-            var stateGroupsWithQualifiers = audioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[selectedDialogueEvent.Name];
-            foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers.Keys)
-            {
-                if (dataGridRow.TryGetValue(AddExtraUnderscoresToString(stateGroupWithQualifier), out var cellValue))
-                {
-                    var state = cellValue;
-
-                    var statePathNode = new StatePathNode
-                    {
-                        StateGroup = new StateGroup(),
-                        State = new State()
-                    };
-                    statePathNode.StateGroup.Name = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, stateGroupWithQualifier);
-                    statePathNode.State.Name = state.ToString();
-                    statePath.Nodes.Add(statePathNode);
-                }
-            }
-
-            return statePath;
+            if (dataGridRow.TryGetValue("Event", out var eventName))
+                actionEvent.Name = eventName.ToString();
+            return actionEvent;
         }
 
-        public static State GetStateMatchingWithDataGridRow(ObservableCollection<Dictionary<string, object>> audioProjectViewerDataGrid, Dictionary<string, object> dataGridRow, StateGroup moddedStateGroup)
+        public static StatePath GetStatePathFromDataGridRow(IAudioRepository audioRepository, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
         {
+            var dataGridRowStatePath = CreateStatePathFromDataGridRow(audioRepository, dataGridRow, selectedDialogueEvent);
+
+            foreach (var statePath in selectedDialogueEvent.DecisionTree)
+            {
+                if (statePath.Nodes.SequenceEqual(dataGridRowStatePath.Nodes, new StatePathNodeComparer()))
+                    return statePath;
+            }
+
+            return null;
+        }
+
+        public static StatePath CreateStatePathFromDataGridRow(IAudioRepository audioRepository, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
+        {
+            var dataGridRowStatePath = new StatePath();
             foreach (var kvp in dataGridRow)
             {
                 var columnName = RemoveExtraUnderscoresFromString(kvp.Key);
                 var columnValue = kvp.Value;
+                dataGridRowStatePath.Nodes.Add(new StatePathNode
+                {
+                    StateGroup = new StateGroup { Name = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, columnName) },
+                    State = new State { Name = columnValue }
+                });
 
-                foreach (var state in moddedStateGroup.States)
-                    if (moddedStateGroup.Name == columnName && state.Name == columnValue)
-                        return state;
+            }
+
+            return dataGridRowStatePath;
+        }
+
+        public class StatePathNodeComparer : IEqualityComparer<StatePathNode>
+        {
+            public bool Equals(StatePathNode x, StatePathNode y)
+            {
+                if (x == null && y == null)
+                    return true;
+                if (x == null || y == null)
+                    return false;
+
+                return string.Equals(x.StateGroup?.Name, y.StateGroup?.Name, StringComparison.Ordinal) &&
+                       string.Equals(x.State?.Name, y.State?.Name, StringComparison.Ordinal);
+            }
+
+            public int GetHashCode(StatePathNode obj)
+            {
+                return HashCode.Combine(obj.StateGroup?.Name, obj.State?.Name);
+            }
+        }
+
+        public static State GetStateFromDataGridRow(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> dataGridRow, StateGroup moddedStateGroup)
+        {
+            var dataGridRowState = CreateStateFromDataGridRow(dataGridRow);
+
+            foreach (var state in moddedStateGroup.States)
+            {                    
+                if (state.Name == dataGridRowState.Name)
+                    return state;
             }
 
             return null;
         }
 
-        public static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, object>> audioProjectViewerDataGrid, Dictionary<string, object> newRow)
+        public static State CreateStateFromDataGridRow(Dictionary<string, string> dataGridRow)
+        {
+            var state = new State();
+            state.Name = dataGridRow.First().Value.ToString();
+            return state;
+        }
+
+        public static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> newRow)
         {
             var insertIndex = 0;
             var newValue = newRow.First().Value.ToString();

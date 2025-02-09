@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioSettingsEditor;
+using Editors.Audio.AudioEditor.AudioSettings;
 
 namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 {
@@ -16,19 +16,13 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
             var eventColumn = DataGridHelpers.CreateColumn(parameters, "Event", columnWidth, DataGridColumnType.EditableTextBox);
             dataGrid.Columns.Add(eventColumn);
-
-            var audioFilesColumn = DataGridHelpers.CreateColumn(parameters, "Audio Files", columnWidth, DataGridColumnType.AudioFilesEditableTextBox);
-            dataGrid.Columns.Add(audioFilesColumn);
         }
 
         public void SetAudioProjectEditorDataGridData(AudioProjectDataServiceParameters parameters)
         {
-            var rowData = new Dictionary<string, object>
+            var rowData = new Dictionary<string, string>
             {
-                { "Event", string.Empty },
-                { "AudioFiles", new List<string>() },
-                { "AudioFilesDisplay", string.Empty },
-                { "AudioSettings", new AudioSettings() }
+                { "Event", string.Empty }
             };
             parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
         }
@@ -42,21 +36,15 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
             var eventColumn = DataGridHelpers.CreateColumn(parameters, "Event", columnWidth, DataGridColumnType.ReadOnlyTextBlock);
             dataGrid.Columns.Add(eventColumn);
-
-            var audioFilesColumn = DataGridHelpers.CreateColumn(parameters, "Audio Files", columnWidth, DataGridColumnType.AudioFilesReadOnlyTextBlock);
-            dataGrid.Columns.Add(audioFilesColumn);
         }
 
         public void SetAudioProjectViewerDataGridData(AudioProjectDataServiceParameters parameters)
         {
             foreach (var actionEvent in parameters.SoundBank.ActionEvents)
             {
-                var rowData = new Dictionary<string, object>
+                var rowData = new Dictionary<string, string>
                 {
-                    { "Event", actionEvent.Name },
-                    { "AudioFiles", actionEvent.AudioFiles },
-                    { "AudioFilesDisplay", actionEvent.AudioFilesDisplay },
-                    { "AudioSettings", actionEvent.AudioSettings }
+                    { "Event", actionEvent.Name }
                 };
                 parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(rowData);
             }
@@ -64,23 +52,8 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
         public void AddAudioProjectEditorDataGridDataToAudioProject(AudioProjectDataServiceParameters parameters)
         {
-            var actionEvent = new ActionEvent();
-
-            if (parameters.AudioProjectEditorRow.TryGetValue("Event", out var eventName))
-                actionEvent.Name = eventName.ToString();
-
-            if (parameters.AudioProjectEditorRow.TryGetValue("AudioFiles", out var audioFiles))
-            {
-                var filePaths = audioFiles as List<string>;
-                var fileNames = filePaths.Select(Path.GetFileName);
-                var fileNamesString = string.Join(", ", fileNames);
-
-                actionEvent.AudioFiles = filePaths;
-                actionEvent.AudioFilesDisplay = fileNamesString;
-            }
-
-            if (parameters.AudioProjectEditorRow.TryGetValue("AudioSettings", out var audioSettings))
-                actionEvent.AudioSettings = AudioSettingsEditorViewModel.BuildAudioSettings(parameters.AudioEditorViewModel.AudioSettingsEditorViewModel);
+            var actionEvent = AudioProjectHelpers.CreateActionEventFromDataGridRow(parameters.AudioProjectEditorRow);
+            actionEvent.AudioSettings = parameters.AudioEditorViewModel.AudioSettingsViewModel.BuildAudioSettings();
 
             var soundBank = parameters.SoundBank;
             AudioProjectHelpers.InsertActionEventAlphabetically(soundBank, actionEvent);
@@ -94,7 +67,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
             var dataGridRowsCopy = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var actionEvent = AudioProjectHelpers.GetActionEventMatchingWithDataGridRow(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid, dataGridRow, soundBank);
+                var actionEvent = AudioProjectHelpers.GetActionEventFromDataGridRow(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid, dataGridRow, soundBank);
                 soundBank.ActionEvents.Remove(actionEvent);
                 parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
             }

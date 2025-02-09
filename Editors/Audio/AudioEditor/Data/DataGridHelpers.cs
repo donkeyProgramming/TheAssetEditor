@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -12,8 +11,6 @@ using System.Windows.Threading;
 using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
-using static Editors.Audio.AudioEditor.AudioProjectEditor.ButtonEnablement;
-using static Editors.Audio.AudioEditor.Converters.TooltipConverter;
 
 namespace Editors.Audio.AudioEditor.Data
 {
@@ -21,9 +18,7 @@ namespace Editors.Audio.AudioEditor.Data
     {
         EditableTextBox,
         StateGroupEditableComboBox,
-        AudioFilesEditableTextBox,
-        ReadOnlyTextBlock,
-        AudioFilesReadOnlyTextBlock
+        ReadOnlyTextBlock
     }
 
     public class DataGridHelpers
@@ -42,19 +37,15 @@ namespace Editors.Audio.AudioEditor.Data
             {
                 Header = columnHeader,
                 Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
-                IsReadOnly = columnType == DataGridColumnType.ReadOnlyTextBlock || columnType == DataGridColumnType.AudioFilesReadOnlyTextBlock
+                IsReadOnly = columnType == DataGridColumnType.ReadOnlyTextBlock
             };
 
             if (columnType == DataGridColumnType.EditableTextBox)
                 column.CellTemplate = CreateEditableTextBoxTemplate(parameters.AudioEditorViewModel, parameters.AudioProjectService, parameters.AudioRepository, columnHeader);
             else if (columnType == DataGridColumnType.StateGroupEditableComboBox)
                 column.CellTemplate = CreateStatesComboBoxTemplate(parameters.AudioEditorViewModel, parameters.AudioProjectService, parameters.AudioRepository, columnHeader, states);
-            else if (columnType == DataGridColumnType.AudioFilesEditableTextBox)
-                column.CellTemplate = CreateEditableAudioFilesTextBoxTemplate();
             else if (columnType == DataGridColumnType.ReadOnlyTextBlock)
                 column.CellTemplate = CreateReadOnlyTextBlockTemplate(columnHeader);
-            else if (columnType == DataGridColumnType.AudioFilesReadOnlyTextBlock)
-                column.CellTemplate = CreateReadOnlyAudioFilesTextBoxTemplate();
             return column;
         }
 
@@ -83,9 +74,6 @@ namespace Editors.Audio.AudioEditor.Data
             {
                 if (sender is ComboBox comboBox)
                 {
-                    if (states.Contains("Any"))
-                        comboBox.SelectedItem = "Any";
-
                     if (comboBox.Template.FindName("PART_EditableTextBox", comboBox) is TextBox textBox)
                     {
                         var debounceTimer = new DispatcherTimer
@@ -108,7 +96,7 @@ namespace Editors.Audio.AudioEditor.Data
                                 }
                                 selectionMade = false;
 
-                                SetAddRowButtonEnablement(audioEditorViewModel, audioProjectService, audioRepository);
+                                audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
                             }
                         };
 
@@ -175,50 +163,6 @@ namespace Editors.Audio.AudioEditor.Data
             return template;
         }
 
-        public static DataTemplate CreateEditableAudioFilesTextBoxTemplate()
-        {
-            var template = new DataTemplate();
-            var factory = new FrameworkElementFactory(typeof(TextBox));
-
-            factory.SetBinding(TextBox.TextProperty, new Binding($"[AudioFilesDisplay]")
-            {
-                Mode = BindingMode.TwoWay,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            });
-
-            factory.SetValue(Control.PaddingProperty, new Thickness(5, 2.5, 5, 2.5));
-
-            var tooltipBinding = new Binding("[AudioFiles]")
-            {
-                Mode = BindingMode.TwoWay,
-                Converter = new ConvertTooltipCollectionToString()
-            };
-            factory.SetBinding(FrameworkElement.ToolTipProperty, tooltipBinding);
-
-            factory.SetValue(FrameworkElement.NameProperty, "AudioFilesDisplay");
-            factory.SetValue(TextBoxBase.IsReadOnlyProperty, true);
-            template.VisualTree = factory;
-            return template;
-        }
-
-        public static DataTemplate CreateReadOnlyAudioFilesTextBoxTemplate()
-        {
-            var template = new DataTemplate();
-            var factory = new FrameworkElementFactory(typeof(TextBlock));
-
-            factory.SetBinding(TextBlock.TextProperty, new Binding("[AudioFilesDisplay]"));
-
-            factory.SetValue(TextBlock.PaddingProperty, new Thickness(5, 3.5, 5, 3.5));
-
-            factory.SetBinding(FrameworkElement.ToolTipProperty, new Binding("[AudioFiles]")
-            {
-                Converter = new ConvertTooltipCollectionToString()
-            });
-
-            template.VisualTree = factory;
-            return template;
-        }
-
         public static DataTemplate CreateEditableTextBoxTemplate(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository, string columnHeader)
         {
             var template = new DataTemplate();
@@ -234,7 +178,7 @@ namespace Editors.Audio.AudioEditor.Data
 
             factory.AddHandler(TextBoxBase.TextChangedEvent, new TextChangedEventHandler((s, e) =>
             {
-                SetAddRowButtonEnablement(audioEditorViewModel, audioProjectService, audioRepository);
+                audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
             }));
 
             template.VisualTree = factory;
@@ -295,7 +239,7 @@ namespace Editors.Audio.AudioEditor.Data
             return FindVisualChild<DataGrid>(mainWindow, dataGridTag);
         }
 
-        public static void ClearDataGridCollection(ObservableCollection<Dictionary<string, object>> dataGrid)
+        public static void ClearDataGridCollection(ObservableCollection<Dictionary<string, string>> dataGrid)
         {
             dataGrid.Clear();
         }

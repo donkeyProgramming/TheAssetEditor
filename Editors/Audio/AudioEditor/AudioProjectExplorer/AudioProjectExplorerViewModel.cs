@@ -149,7 +149,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             SelectedDialogueEventPreset = null;
         }
 
-        public void ResetDialogueEventPresetFilterEnablement() => IsDialogueEventPresetFilterEnabled = false;
+        public void ResetButtonEnablement()
+        {
+            IsDialogueEventPresetFilterEnabled = false;
+        }
 
         public void Close() { }
     }

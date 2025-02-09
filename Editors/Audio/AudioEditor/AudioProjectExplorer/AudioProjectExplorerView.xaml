@@ -175,7 +175,8 @@
 
             <TreeView 
                 ItemsSource="{Binding AudioProjectTree}"
-                SelectedItemChanged="TreeView_SelectedItemChanged">
+                SelectedItemChanged="TreeView_SelectedItemChanged"
+                Padding="0, 5, 0, 5">
 
                 <TreeView.Resources>
                     <HierarchicalDataTemplate 

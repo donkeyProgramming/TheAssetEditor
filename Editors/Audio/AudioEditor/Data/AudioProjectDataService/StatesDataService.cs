@@ -14,7 +14,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
         public void SetAudioProjectEditorDataGridData(AudioProjectDataServiceParameters parameters)
         {
-            var dataGridRow = new Dictionary<string, object> { };
+            var dataGridRow = new Dictionary<string, string> { };
             dataGridRow[AudioProjectHelpers.AddExtraUnderscoresToString(parameters.StateGroup.Name)] = string.Empty;
             parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(dataGridRow);
         }
@@ -30,7 +30,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
         {
             foreach (var state in parameters.StateGroup.States)
             {
-                var dataGridRow = new Dictionary<string, object>();
+                var dataGridRow = new Dictionary<string, string>();
                 dataGridRow[AudioProjectHelpers.AddExtraUnderscoresToString(parameters.StateGroup.Name)] = state.Name;
                 parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(dataGridRow);
             }
@@ -38,9 +38,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
         public void AddAudioProjectEditorDataGridDataToAudioProject(AudioProjectDataServiceParameters parameters)
         {
-            var rowData = parameters.AudioProjectEditorRow.First();
-            var state = new State();
-            state.Name = rowData.Value.ToString();
+            var state = AudioProjectHelpers.CreateStateFromDataGridRow(parameters.AudioProjectEditorRow);
             AudioProjectHelpers.InsertStateAlphabetically(parameters.StateGroup, state);
         }
 
@@ -50,7 +48,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
             var dataGridRowsCopy = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var state = AudioProjectHelpers.GetStateMatchingWithDataGridRow(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid, dataGridRow, parameters.StateGroup);
+                var state = AudioProjectHelpers.GetStateFromDataGridRow(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid, dataGridRow, parameters.StateGroup);
                 parameters.StateGroup.States.Remove(state);
                 parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
             }

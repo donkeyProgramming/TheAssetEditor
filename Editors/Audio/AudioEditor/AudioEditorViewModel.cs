@@ -4,7 +4,7 @@ using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
-using Editors.Audio.AudioEditor.AudioSettingsEditor;
+using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
@@ -28,7 +28,7 @@ namespace Editors.Audio.AudioEditor
         public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
         public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; set; }
         public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; set; }
-        public AudioSettingsEditorViewModel AudioSettingsEditorViewModel { get; set; }
+        public AudioSettingsViewModel AudioSettingsViewModel { get; set; }
 
         public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
         {
@@ -42,7 +42,7 @@ namespace Editors.Audio.AudioEditor
             AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(this, _packFileService, _audioRepository, _audioProjectService);
             AudioProjectEditorViewModel = new AudioProjectEditorViewModel(this, _audioRepository, _audioProjectService);
             AudioProjectViewerViewModel = new AudioProjectViewerViewModel(this, _audioRepository, _audioProjectService);
-            AudioSettingsEditorViewModel = new AudioSettingsEditorViewModel();
+            AudioSettingsViewModel = new AudioSettingsViewModel();
 
             Initialise();
 

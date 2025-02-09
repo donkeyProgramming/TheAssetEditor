@@ -85,6 +85,12 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
 
         [RelayCommand] public void CreateAudioProject()
         {
+            if (_packFileService.GetEditablePack() == null)
+            {
+                CloseWindowAction();
+                return;
+            }
+
             // Reset and initialise data
             _audioEditorViewModel.ResetAudioEditorViewModelData();
             _audioProjectService.ResetAudioProject();

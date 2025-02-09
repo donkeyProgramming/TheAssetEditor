@@ -2,11 +2,14 @@
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
-using static Editors.Audio.AudioEditor.AudioSettingsEditor.AudioSettings;
+using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.Data
 {
+
+    // TODO: Move audio files into audio settings.
+
     public class AudioProjectDataModel
     {
         public string Language { get; set; }
@@ -47,7 +50,7 @@ namespace Editors.Audio.AudioEditor.Data
 
     public class StatePath
     {
-        public List<StatePathNode> Nodes { get; set; }
+        public List<StatePathNode> Nodes { get; set; } = [];
         public List<string> AudioFiles { get; set; }
         public string AudioFilesDisplay { get; set; }
         public AudioSettings AudioSettings { get; set; }
