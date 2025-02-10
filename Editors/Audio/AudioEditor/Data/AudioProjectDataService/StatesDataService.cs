@@ -48,7 +48,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
             var dataGridRowsCopy = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var state = AudioProjectHelpers.GetStateFromDataGridRow(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid, dataGridRow, parameters.StateGroup);
+                var state = AudioProjectHelpers.GetStateFromDataGridRow(dataGridRow, parameters.StateGroup);
                 parameters.StateGroup.States.Remove(state);
                 parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
             }

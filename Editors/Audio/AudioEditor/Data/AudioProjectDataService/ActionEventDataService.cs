@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioSettings;
 
 namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 {
@@ -67,7 +65,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
             var dataGridRowsCopy = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var actionEvent = AudioProjectHelpers.GetActionEventFromDataGridRow(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid, dataGridRow, soundBank);
+                var actionEvent = AudioProjectHelpers.GetActionEventFromDataGridRow(dataGridRow, soundBank);
                 soundBank.ActionEvents.Remove(actionEvent);
                 parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
             }

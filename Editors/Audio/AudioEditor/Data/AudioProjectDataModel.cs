@@ -7,9 +7,6 @@ using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.Data
 {
-
-    // TODO: Move audio files into audio settings.
-
     public class AudioProjectDataModel
     {
         public string Language { get; set; }
@@ -31,8 +28,6 @@ namespace Editors.Audio.AudioEditor.Data
 
     public class ActionEvent : AudioProjectItem
     {
-        public List<string> AudioFiles { get; set; }
-        public string AudioFilesDisplay { get; set; }
         public AudioSettings AudioSettings { get; set; }
     }
 
@@ -51,8 +46,6 @@ namespace Editors.Audio.AudioEditor.Data
     public class StatePath
     {
         public List<StatePathNode> Nodes { get; set; } = [];
-        public List<string> AudioFiles { get; set; }
-        public string AudioFilesDisplay { get; set; }
         public AudioSettings AudioSettings { get; set; }
     }
 
@@ -64,6 +57,7 @@ namespace Editors.Audio.AudioEditor.Data
 
     public class AudioSettings
     {
+        public List<string> AudioFiles { get; set; }
         public PlaylistType PlaylistType { get; set; }
         public decimal Volume { get; set; }
         public decimal InitialDelay { get; set; }
@@ -72,7 +66,7 @@ namespace Editors.Audio.AudioEditor.Data
         public uint RepetitionInterval { get; set; }
         public EndBehaviour EndBehaviour { get; set; }
         public bool EnableLooping { get; set; }
-        public bool ILoopInfinitely { get; set; }
+        public bool LoopInfinitely { get; set; }
         public uint NumberOfLoops { get; set; }
         public bool EnableTransitions { get; set; }
         public TransitionType Transition { get; set; }

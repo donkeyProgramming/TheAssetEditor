@@ -205,7 +205,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                         .ToList();
 
                     var actionEvents = (soundBank.ActionEvents ?? Enumerable.Empty<ActionEvent>())
-                        .Where(actionEvent => actionEvent.AudioFiles != null && actionEvent.AudioFiles.Count != 0)
+                        .Where(actionEvent => actionEvent.AudioSettings.AudioFiles != null && actionEvent.AudioSettings.AudioFiles.Count != 0)
                         .ToList();
 
                     return new SoundBank
@@ -276,7 +276,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                             {
                                 var defaultAction = soundBank.ActionEvents.FirstOrDefault(actionEvent => actionEvent.Name == savedAction.Name);
                                 if (defaultAction != null)
-                                    defaultAction.AudioFiles = savedAction.AudioFiles;
+                                    defaultAction.AudioSettings.AudioFiles = savedAction.AudioSettings.AudioFiles;
                                 else
                                     soundBank.ActionEvents.Add(savedAction);
                             }

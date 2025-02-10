@@ -253,11 +253,13 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         public void SetButtonEnablement()
         {
-            var selectedAudioProjectTreeNodeType = _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType;
+            var selectedAudioProjectTreeNode = _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
+            if (selectedAudioProjectTreeNode == null)
+                return;
 
             if (SelectedTreeNodes.Count > 0)
             {
-                if (selectedAudioProjectTreeNodeType == AudioProjectExplorer.NodeType.ActionEventSoundBank || selectedAudioProjectTreeNodeType == AudioProjectExplorer.NodeType.DialogueEvent)
+                if (selectedAudioProjectTreeNode.NodeType == AudioProjectExplorer.NodeType.ActionEventSoundBank || selectedAudioProjectTreeNode.NodeType == AudioProjectExplorer.NodeType.DialogueEvent)
                     IsAddAudioFilesButtonEnabled = true;
             }
             else

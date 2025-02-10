@@ -74,6 +74,10 @@ namespace Editors.Audio.AudioEditor.Data
             {
                 if (sender is ComboBox comboBox)
                 {
+                    // For some reason when the user selects anything other than "Any" when there's only one column and you reset the value it doesn't show the default value of "Any" due to some WPF quirk so we manually set it again here.
+                    if (states.Contains("Any"))
+                        comboBox.Text = "Any"; 
+
                     if (comboBox.Template.FindName("PART_EditableTextBox", comboBox) is TextBox textBox)
                     {
                         var debounceTimer = new DispatcherTimer

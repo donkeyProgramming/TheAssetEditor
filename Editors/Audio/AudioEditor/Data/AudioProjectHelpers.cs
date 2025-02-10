@@ -29,6 +29,10 @@ namespace Editors.Audio.AudioEditor.Data
             {
                 var columnName = kvp.Key;
                 var cellValue = kvp.Value;
+
+                if (cellValue == null)
+                    cellValue = string.Empty;
+
                 newRow[columnName] = cellValue.ToString();
             }
 
@@ -70,7 +74,7 @@ namespace Editors.Audio.AudioEditor.Data
             return null;
         }
 
-        public static ActionEvent GetActionEventFromDataGridRow(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> dataGridRow, SoundBank actionEventSoundBank)
+        public static ActionEvent GetActionEventFromDataGridRow(Dictionary<string, string> dataGridRow, SoundBank actionEventSoundBank)
         {
             var dataGridRowActionEvent = CreateActionEventFromDataGridRow(dataGridRow);
 
@@ -142,7 +146,7 @@ namespace Editors.Audio.AudioEditor.Data
             }
         }
 
-        public static State GetStateFromDataGridRow(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> dataGridRow, StateGroup moddedStateGroup)
+        public static State GetStateFromDataGridRow(Dictionary<string, string> dataGridRow, StateGroup moddedStateGroup)
         {
             var dataGridRowState = CreateStateFromDataGridRow(dataGridRow);
 
@@ -160,6 +164,24 @@ namespace Editors.Audio.AudioEditor.Data
             var state = new State();
             state.Name = dataGridRow.First().Value.ToString();
             return state;
+        }
+
+        public static AudioSettings GetAudioSettingsFromAudioProjectViewerActionEventItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
+        {
+            var audioProjectItem = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
+            var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
+            var soundBank = GetSoundBankFromName(audioProjectService, audioProjectItem.Name);
+            var actionEvent = GetActionEventFromDataGridRow(selectedAudioProjectViewerDataGridRow, soundBank);
+            return actionEvent.AudioSettings;
+        }
+
+        public static AudioSettings GetAudioSettingsFromAudioProjectViewerStatePathItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
+        {
+            var audioProjectItem = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
+            var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
+            var dialogueEvent = GetDialogueEventFromName(audioProjectService, audioProjectItem.Name);
+            var statePath = GetStatePathFromDataGridRow(audioRepository, selectedAudioProjectViewerDataGridRow, dialogueEvent);
+            return statePath.AudioSettings;
         }
 
         public static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> newRow)

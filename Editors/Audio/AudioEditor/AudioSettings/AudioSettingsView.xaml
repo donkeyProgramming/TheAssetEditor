@@ -10,10 +10,12 @@
     xmlns:audiosettings="clr-namespace:Editors.Audio.AudioEditor.AudioSettings"
     d:DataContext="{d:DesignInstance Type=audiosettings:AudioSettingsViewModel}"
     mc:Ignorable="d"
-    d:DesignHeight="550" d:DesignWidth="960">
+    d:DesignHeight="550"
+    d:DesignWidth="960">
 
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <BooleanToVisibilityConverter 
+            x:Key="BoolToVisibilityConverter"/>
         <converters:SettingsEnumConverter 
             x:Key="SettingsEnumConverter"/>
         <DataTemplate 
@@ -30,81 +32,97 @@
             <RowDefinition 
                 Height="Auto"/>
             <RowDefinition 
-                Height="*"/>
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
         </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="*"/>
+        </Grid.ColumnDefinitions>
 
         <Label 
             Grid.Row="0" 
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
             Content="Audio Settings"/>
 
         <Grid
             Grid.Row="1"
+            Grid.ColumnSpan="2"
+            Margin="0, 0, 0, 0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="Auto"/>
+                <ColumnDefinition
+                    Width="Auto"/>
+                <ColumnDefinition
+                    Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button 
+                Grid.Column="0"
+                Content="Reset Audio Settings" 
+                ToolTip="PLACEHOLDER"
+                Margin="5, 0, 0, 5" 
+                Width="130" 
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Left"
+                Command="{Binding ResetAudioSettingsCommand}"/>
+
+            <Button 
+                Grid.Column="1"
+                ToolTip="PLACEHOLDER" 
+                Width="200" 
+                Margin="5, 0, 0, 5" 
+                VerticalAlignment="Center"
+                Content="Set Recommended Audio Settings"
+                Command="{Binding SetRecommendedAudioSettingsCommand}"/>
+
+            <CheckBox 
+                Grid.Column="2"
+                Content="Show Settings from Audio Project Viewer"
+                ToolTip="PLACEHOLDER" 
+                Margin="5, 0, 0, 5" 
+                VerticalAlignment="Center" 
+                IsChecked="{Binding ShowSettingsFromAudioProjectViewer, Mode=TwoWay}" 
+                HorizontalAlignment="Left"/>
+        </Grid>
+
+        <Grid
+            Grid.Row="2"
+            Grid.Column="0"
             Margin="0, 0, 0, 0">
 
             <Grid.RowDefinitions>
-                <RowDefinition
+                <RowDefinition 
                     Height="Auto"/>
-                <RowDefinition
-                     Height="Auto"/>
-                <RowDefinition
+                <RowDefinition 
                     Height="Auto"/>
-                <RowDefinition
+                <RowDefinition 
                     Height="Auto"/>
-                <RowDefinition
+                <RowDefinition 
                     Height="Auto"/>
-                <RowDefinition
-                    Height="Auto"/>
-                <RowDefinition
+                <RowDefinition 
                     Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition 
-                    Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid
-                Grid.Row="0"
-                Margin="0, 0, 0, 0">
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="Auto"/>
-                    <ColumnDefinition
-                        Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <Button 
-                    Grid.Column="0"
-                    Content="Reset Audio Settings" 
-                    ToolTip="PLACEHOLDER"
-                    Margin="5, 0, 0, 5" 
-                    Width="130" 
-                    VerticalAlignment="Center" 
-                    HorizontalAlignment="Left"
-                    Command="{Binding ResetAudioSettingsCommand}"/>
-
-                <Button 
-                    Grid.Column="1"
-                    ToolTip="PLACEHOLDER" 
-                    Width="200" 
-                    Margin="5, 0, 0, 5" 
-                    VerticalAlignment="Center"
-                    Content="Set Recommended Audio Settings"
-                    Command="{Binding SetRecommendedAudioSettingsCommand}"/>
-            </Grid>
-
             <Border 
-                Grid.Row="1"
-                Grid.Column="0"
-                BorderBrush="{DynamicResource Button.Static.Border}">
+                Grid.Row="0"
+                Grid.Column="1"
+                BorderBrush="{DynamicResource Button.Static.Border}"
+                BorderThickness="0, 0, 0, 0">
 
                 <Expander 
+                    x:Name="ExpanderAudioFiles"
                     Style="{StaticResource ExpanderWithBorderBackground}"
                     IsExpanded="True"
-                    Margin="0"
                     Padding="0,0,0,0"
-                    BorderBrush="{DynamicResource Button.Static.Border}" >
+                    BorderBrush="{DynamicResource Button.Static.Border}">
 
                     <Expander.Header>
                         <DockPanel 
@@ -119,49 +137,42 @@
                         </DockPanel>
                     </Expander.Header>
 
-                    <Grid
-                        Grid.Row="1">
-
-                        <ListView
-                            x:Name="AudioFilesListView"
-                            ItemsSource="{Binding AudioFiles}">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn 
-                                        x:Name="FileNameColumn"
-                                        Header="File Name" 
-                                        DisplayMemberBinding="{Binding FileName}"
-                                        Width="Auto"/>
-                                    <GridViewColumn 
-                                        x:Name="FilePathColumn"
-                                        Header="File Path" 
-                                        DisplayMemberBinding="{Binding FilePath}"
-                                        Width="Auto"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-                    </Grid>
+                    <ListView
+                        ItemsSource="{Binding AudioFiles}"
+                        Height="205"
+                        MaxHeight="205">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn 
+                                    Header="File Name" 
+                                    DisplayMemberBinding="{Binding FileName}"
+                                    Width="Auto"/>
+                                <GridViewColumn 
+                                    Header="File Path" 
+                                    DisplayMemberBinding="{Binding FilePath}"
+                                    Width="Auto"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
                 </Expander>
             </Border>
-
+            
             <Border 
-                Grid.Row="2"
-                Grid.Column="0"
+                Grid.Row="1"
                 BorderBrush="{DynamicResource Button.Static.Border}">
 
                 <Expander 
                     Style="{StaticResource ExpanderWithBorderBackground}"
                     IsExpanded="False"
-                    Margin="0"
                     Padding="5,0,0,0"
-                    BorderBrush="{DynamicResource Button.Static.Border}" >
+                    BorderBrush="{DynamicResource Button.Static.Border}">
 
                     <Expander.Header>
                         <DockPanel 
                             VerticalAlignment="Center" 
                             LastChildFill="True" 
                             Margin="10, 5, 10, 5">
-                            
+
                             <TextBlock 
                                 Text="General"
                                 VerticalAlignment="Center"
@@ -181,7 +192,7 @@
                             <ColumnDefinition 
                                 Width="150"/>
                             <ColumnDefinition 
-                                Width="*"/>
+                                Width="200"/>
                         </Grid.ColumnDefinitions>
 
                         <TextBlock 
@@ -198,7 +209,8 @@
                             Maximum="200"
                             Increment="0.05"
                             ClipValueToMinMax="True"
-                            Value="{Binding Volume, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            Value="{Binding Volume, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsVolumeEnabled}"/>
 
                         <TextBlock 
                             Grid.Row="1"
@@ -214,20 +226,20 @@
                             Maximum="3600"
                             Increment="0.05"
                             ClipValueToMinMax="True"
-                            Value="{Binding InitialDelay, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            Value="{Binding InitialDelay, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            IsEnabled="{Binding IsInitialDelayEnabled}"/>
                     </Grid>
                 </Expander>
             </Border>
 
             <Border 
-                Grid.Row="3"
+                Grid.Row="2"
                 Grid.Column="0"
                 BorderBrush="{DynamicResource Button.Static.Border}">
 
                 <Expander 
                     Style="{StaticResource ExpanderWithBorderBackground}"
                     IsExpanded="False"
-                    Margin="0"
                     Padding="5,0,0,0"
                     BorderBrush="{DynamicResource Button.Static.Border}">
 
@@ -236,7 +248,7 @@
                             VerticalAlignment="Center"    
                             LastChildFill="True"      
                             Margin="10, 5, 10, 5">
-                            
+
                             <TextBlock 
                                 Text="Playlist"
                                 VerticalAlignment="Center"
@@ -262,7 +274,7 @@
                             <ColumnDefinition 
                                 Width="150"/>
                             <ColumnDefinition 
-                                Width="*"/>
+                                Width="200"/>
                         </Grid.ColumnDefinitions>
 
                         <TextBlock 
@@ -332,14 +344,14 @@
             </Border>
 
             <Border 
-                Grid.Row="4"
+                Grid.Row="3"
                 Grid.Column="0"
-                BorderBrush="{DynamicResource Button.Static.Border}">
+                BorderBrush="{DynamicResource Button.Static.Border}"
+                BorderThickness="0, 0, 0, 0">
 
                 <Expander 
                     Style="{StaticResource ExpanderWithBorderBackground}"
                     IsExpanded="False"
-                    Margin="0"
                     Padding="5,0,0,0"
                     BorderBrush="{DynamicResource Button.Static.Border}">
 
@@ -372,7 +384,7 @@
                             <ColumnDefinition 
                                 Width="150"/>
                             <ColumnDefinition 
-                                Width="*"/>
+                                Width="200"/>
                         </Grid.ColumnDefinitions>
 
                         <TextBlock 
@@ -421,7 +433,7 @@
             </Border>
 
             <Border 
-                Grid.Row="5"
+                Grid.Row="4"
                 Grid.Column="0"
                 BorderBrush="{DynamicResource Button.Static.Border}"
                 BorderThickness="0, 0, 0, 0">
@@ -461,7 +473,7 @@
                             <ColumnDefinition 
                                 Width="150"/>
                             <ColumnDefinition 
-                                Width="*"/>
+                                Width="200"/>
                         </Grid.ColumnDefinitions>
 
                         <TextBlock 
@@ -511,11 +523,12 @@
                     </Grid>
                 </Expander>
             </Border>
-
-            <Border 
-                Grid.Row="6"
-                Height="5" 
-                Background="{DynamicResource App.Border}"/>
         </Grid>
+
+        <Border 
+            Grid.Row="3"
+            Grid.ColumnSpan="2"
+            Height="5" 
+            Background="{DynamicResource App.Border}"/>
     </Grid>
 </UserControl>

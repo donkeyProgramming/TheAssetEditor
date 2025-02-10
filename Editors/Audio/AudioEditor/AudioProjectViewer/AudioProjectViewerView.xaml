@@ -40,7 +40,7 @@
                 Grid.Column="0"
                 Content="Edit Item" 
                 ToolTip="PLACEHOLDER" 
-                Command="{Binding UpdateAudioProjectViewerDataGridRowCommand}" 
+                Command="{Binding EditAudioProjectViewerDataGridRowCommand}" 
                 Margin="5, 0, 0, 0" 
                 Width="70" 
                 VerticalAlignment="Center" 

@@ -42,7 +42,7 @@ namespace Editors.Audio.AudioEditor
             AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(this, _packFileService, _audioRepository, _audioProjectService);
             AudioProjectEditorViewModel = new AudioProjectEditorViewModel(this, _audioRepository, _audioProjectService);
             AudioProjectViewerViewModel = new AudioProjectViewerViewModel(this, _audioRepository, _audioProjectService);
-            AudioSettingsViewModel = new AudioSettingsViewModel();
+            AudioSettingsViewModel = new AudioSettingsViewModel(this, _audioProjectService);
 
             Initialise();
 

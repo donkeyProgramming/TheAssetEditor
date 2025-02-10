@@ -42,6 +42,23 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         public void OnDataGridSelectionChanged(IList selectedItems)
         {
+            if (SelectedDataGridRows.Count == 0)
+                SetSelectedDataGridRows(selectedItems);
+
+            if (_audioEditorViewModel.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewer)
+            {
+                var audioSettings = new Data.AudioSettings();
+
+                var audioProjectItem = _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
+                if (audioProjectItem.NodeType == NodeType.ActionEventSoundBank)
+                    audioSettings = AudioProjectHelpers.GetAudioSettingsFromAudioProjectViewerActionEventItem(_audioEditorViewModel, _audioProjectService);
+                else if (audioProjectItem.NodeType == NodeType.DialogueEvent)
+                    audioSettings = AudioProjectHelpers.GetAudioSettingsFromAudioProjectViewerStatePathItem(_audioEditorViewModel, _audioProjectService, _audioRepository);
+
+                _audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsFromAudioProjectItem(audioSettings);
+                _audioEditorViewModel.AudioSettingsViewModel.DisableAllAudioSettings();
+            }
+
             SetSelectedDataGridRows(selectedItems);
             SetButtonEnablement();
             SetCopyEnablement();
@@ -111,14 +128,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             }
         }
 
-        [RelayCommand] public void UpdateAudioProjectViewerDataGridRow()
+        [RelayCommand] public void EditAudioProjectViewerDataGridRow()
         {
-            HandleUpdatingRowData(_audioEditorViewModel, _audioProjectService, _audioRepository);
+            HandleEditingAudioProjectViewerData(_audioEditorViewModel, _audioProjectService, _audioRepository);
         }
 
         [RelayCommand] public void RemoveAudioProjectViewerDataGridRow()
         {
-            HandleRemovingRowData(_audioEditorViewModel, _audioProjectService, _audioRepository);
+            HandleRemovingAudioProjectViewerData(_audioEditorViewModel, _audioProjectService, _audioRepository);
         }
 
         [RelayCommand] public void CopyRows()

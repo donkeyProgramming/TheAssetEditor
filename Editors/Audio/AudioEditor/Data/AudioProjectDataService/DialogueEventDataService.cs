@@ -1,9 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Windows.Controls;
-using Editors.Audio.AudioEditor.AudioSettings;
-using Editors.Audio.Storage;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
 namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
@@ -43,7 +39,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
                 var stateGroup = parameters.AudioRepository.GetStateGroupFromStateGroupWithQualifier(parameters.DialogueEvent.Name, AudioProjectHelpers.RemoveExtraUnderscoresFromString(columnName));
 
                 if (stateGroupsWithAnyState.ContainsKey(stateGroup))
-                    rowData[columnName] = "Any";
+                    rowData[columnName] = "Any"; // Set the cell value to Any as the default value
             }
 
             parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);

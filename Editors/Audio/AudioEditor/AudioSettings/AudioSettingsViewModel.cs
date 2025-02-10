@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 
@@ -9,11 +12,16 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 {
     public partial class AudioSettingsViewModel : ObservableObject, IEditorInterface
     {
+        private readonly AudioEditorViewModel _audioEditorViewModel;
+        private readonly IAudioProjectService _audioProjectService;
+
         public string DisplayName { get; set; } = "Audio Settings";
 
         // General
         [ObservableProperty] private decimal _volume;
+        [ObservableProperty] private bool _isVolumeEnabled = true;
         [ObservableProperty] private decimal _initialDelay = 0;
+        [ObservableProperty] private bool _isInitialDelayEnabled = true;
 
         // Playlist
         [ObservableProperty] private PlaylistType _playlistType;
@@ -48,9 +56,15 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         [ObservableProperty] private bool _isDurationEnabled = false;
 
         [ObservableProperty] private bool _isAudioSettingsVisible = false;
-        [ObservableProperty] private bool _useDefaultAudioSettings = false;
+        [ObservableProperty] private bool _showSettingsFromAudioProjectViewer = false;
 
         public ObservableCollection<AudioFile> AudioFiles { get; set; } = [];
+
+        public AudioSettingsViewModel(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
+        {
+            _audioEditorViewModel = audioEditorViewModel;
+            _audioProjectService = audioProjectService;
+        }
 
         partial void OnPlaylistTypeChanged(PlaylistType oldValue, PlaylistType newValue)
         {
@@ -84,7 +98,12 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
         public Data.AudioSettings BuildAudioSettings()
         {
-            var audioSettings = new Data.AudioSettings();
+            var audioSettings = new Data.AudioSettings
+            {
+                AudioFiles = AudioFiles
+                    .Select(audiofile => audiofile.FilePath)
+                    .ToList()
+            };
 
             if (InitialDelay > 0)
                 audioSettings.InitialDelay = InitialDelay;
@@ -92,7 +111,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             if (Volume > 0)
                 audioSettings.Volume = Volume;
 
-            if (AudioFiles.Count > 1)
+            if (AudioFiles.Count > 1) // This should prevent the recording of any settings stored but not in use e.g. from when the user has previously applied settings with multiple sounds set
             {
                 audioSettings.PlaylistType = PlaylistType;
                 audioSettings.PlaylistMode = PlaylistMode;
@@ -110,7 +129,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                 {
                     audioSettings.EnableLooping = EnableLooping;
                     if (LoopInfinitely)
-                        audioSettings.ILoopInfinitely = LoopInfinitely;
+                        audioSettings.LoopInfinitely = LoopInfinitely;
                     else
                         audioSettings.NumberOfLoops = NumberOfLoops;
                 }
@@ -126,9 +145,64 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             return audioSettings;
         }
 
+        public void SetAudioSettingsFromAudioProjectItem(Data.AudioSettings audioSettings)
+        {
+            AudioFiles.Clear();
+
+            foreach (var audioFile in audioSettings.AudioFiles)
+            {
+                AudioFiles.Add(new AudioFile
+                {
+                    FileName = Path.GetFileName(audioFile),
+                    FilePath = audioFile
+                });
+            }
+
+            if (audioSettings.InitialDelay > 0)
+                InitialDelay = audioSettings.InitialDelay;
+
+            if (audioSettings.Volume > 0)
+                Volume = audioSettings.Volume;
+
+            if (audioSettings.AudioFiles.Count > 1)
+            {
+                PlaylistType = audioSettings.PlaylistType;
+                PlaylistMode = audioSettings.PlaylistMode;
+
+                if (audioSettings.PlaylistType == PlaylistType.Sequence)
+                    EndBehaviour = audioSettings.EndBehaviour;
+                else
+                {
+                    EnableRepetitionInterval = audioSettings.EnableRepetitionInterval;
+                    if (EnableRepetitionInterval)
+                        RepetitionInterval = audioSettings.RepetitionInterval;
+                }
+
+                if (audioSettings.EnableLooping)
+                {
+                    EnableLooping = audioSettings.EnableLooping;
+                    if (LoopInfinitely)
+                        LoopInfinitely = audioSettings.LoopInfinitely;
+                    else
+                        NumberOfLoops = audioSettings.NumberOfLoops;
+                }
+
+                if (audioSettings.EnableTransitions)
+                {
+                    EnableTransitions = audioSettings.EnableTransitions;
+                    Transition = audioSettings.Transition;
+                    Duration = audioSettings.Duration;
+                }
+            }
+
+            SetAudioSettingsEnablementAndVisibility();
+        }
+
         public void SetAudioSettingsEnablementAndVisibility()
         {
             IsAudioSettingsVisible = true;
+            IsVolumeEnabled = true;
+            IsInitialDelayEnabled = true;
 
             if (AudioFiles.Count > 1)
             {
@@ -223,8 +297,6 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
         [RelayCommand] public void ResetAudioSettings()
         {
-            UseDefaultAudioSettings = false;
-
             Volume = 0;
             InitialDelay = 0;
 
@@ -267,6 +339,23 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                 Transition = TransitionType.XfadeAmp;
                 Duration = 0;
             }
+        }
+
+        public void DisableAllAudioSettings()
+        {
+            IsVolumeEnabled = false;
+            IsInitialDelayEnabled = false;
+            IsPlaylistTypeEnabled = false;
+            IsPlaylistModeEnabled = false;
+            IsEnableRepetitionIntervalEnabled = false;
+            IsRepetitionIntervalEnabled = false;
+            IsEndBehaviourEnabled = false;
+            IsEnableLoopingEnabled = false;
+            IsLoopInfinitelyEnabled = false;
+            IsNumberOfLoopsEnabled = false;
+            IsEnableTransitionsEnabled = false;
+            IsTransitionTypeEnabled = false;
+            IsDurationEnabled = false;
         }
 
         public void ResetAudioSettingsView()
