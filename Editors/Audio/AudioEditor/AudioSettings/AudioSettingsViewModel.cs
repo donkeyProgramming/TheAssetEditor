@@ -66,6 +66,12 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             _audioProjectService = audioProjectService;
         }
 
+        partial void OnShowSettingsFromAudioProjectViewerChanged(bool oldValue, bool newValue)
+        {
+            if (ShowSettingsFromAudioProjectViewer == false)
+                SetAudioSettingsEnablementAndVisibility();
+        }
+
         partial void OnPlaylistTypeChanged(PlaylistType oldValue, PlaylistType newValue)
         {
             SetAudioSettingsEnablementAndVisibility();
@@ -147,7 +153,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
         public void SetAudioSettingsFromAudioProjectItem(Data.AudioSettings audioSettings)
         {
-            AudioFiles.Clear();
+            ResetAudioSettings();
 
             foreach (var audioFile in audioSettings.AudioFiles)
             {
@@ -297,25 +303,45 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
         [RelayCommand] public void ResetAudioSettings()
         {
+            ResetAudioSettingsAudioFiles();
+            ResetAudioSettingsGeneral();
+            ResetAudioSettingsPlaylist();
+            ResetAudioSettingsPlaylistLooping();
+            ResetAudioSettingsTransitions();
+        }
+
+        private void ResetAudioSettingsAudioFiles()
+        {
+            AudioFiles.Clear();
+        }
+
+        private void ResetAudioSettingsGeneral()
+        {
             Volume = 0;
             InitialDelay = 0;
+        }
 
-            if (AudioFiles.Count > 1)
-            {
-                PlaylistType = PlaylistType.Random;
-                PlaylistMode = PlaylistMode.Step;
-                EnableRepetitionInterval = false;
-                RepetitionInterval = 1;
-                EndBehaviour = EndBehaviour.Restart;
+        private void ResetAudioSettingsPlaylist()
+        {
+            PlaylistType = PlaylistType.Random;
+            PlaylistMode = PlaylistMode.Step;
+            EnableRepetitionInterval = false;
+            RepetitionInterval = 1;
+            EndBehaviour = EndBehaviour.Restart;
+        }
 
-                EnableLooping = false;
-                LoopInfinitely = false;
-                NumberOfLoops = 0;
+        private void ResetAudioSettingsPlaylistLooping()
+        {
+            EnableLooping = false;
+            LoopInfinitely = false;
+            NumberOfLoops = 0;
+        }
 
-                EnableTransitions = false;
-                Transition = TransitionType.XfadeAmp;
-                Duration = 0;
-            }
+        private void ResetAudioSettingsTransitions()
+        {
+            EnableTransitions = false;
+            Transition = TransitionType.XfadeAmp;
+            Duration = 0;
         }
 
         [RelayCommand] public void SetRecommendedAudioSettings()

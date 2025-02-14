@@ -89,6 +89,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
             var uniqueDirectoryPaths = wavFilePaths
                 .Select(parts => string.Join("\\", parts.Take(parts.Length - 1)))
+                .Where(path => !string.IsNullOrWhiteSpace(path)) // remove the empty (pack) directory
                 .ToHashSet();
 
             var nodeDictionary = new Dictionary<string, AudioFilesTreeNode>();
@@ -98,7 +99,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 AddDirectoryToTree(rootNodes, directoryPath, nodeDictionary);
 
             foreach (var filePathParts in wavFilePaths)
-                AddFileToTree(filePathParts, nodeDictionary);
+                AddFileToTree(filePathParts, nodeDictionary, rootNodes);
 
             AudioFilesTree = rootNodes;
             _unfilteredTree = new ObservableCollection<AudioFilesTreeNode>(AudioFilesTree);
@@ -138,22 +139,33 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             }
         }
 
-        private static void AddFileToTree(string[] filePathParts, Dictionary<string, AudioFilesTreeNode> nodeDictionary)
+        private static void AddFileToTree(string[] filePathParts, Dictionary<string, AudioFilesTreeNode> nodeDictionary, ObservableCollection<AudioFilesTreeNode> rootNodes)
         {
-            var directoryPath = string.Join("\\", filePathParts.Take(filePathParts.Length - 1));
-            var fileName = filePathParts[^1];
-            var filePath = $"{directoryPath}\\{fileName}";
-            var directoryNode = nodeDictionary[directoryPath];
-
-            var fileNode = new AudioFilesTreeNode
+            if (filePathParts.Length == 1)
             {
-                Name = fileName,
-                NodeType = NodeType.WavFile,
-                FilePath = filePath
-            };
+                var fileNode = new AudioFilesTreeNode
+                {
+                    Name = filePathParts[0],
+                    NodeType = NodeType.WavFile,
+                    FilePath = filePathParts[0]
+                };
+                rootNodes.Add(fileNode);
+                nodeDictionary[filePathParts[0]] = fileNode;
+                return;
+            }
 
-            directoryNode.Children.Add(fileNode);
-            nodeDictionary[filePath] = fileNode;
+            var directoryPath = string.Join("\\", filePathParts.Take(filePathParts.Length - 1));
+            if (nodeDictionary.TryGetValue(directoryPath, out var directoryNode))
+            {
+                var fileNode = new AudioFilesTreeNode
+                {
+                    Name = filePathParts[^1],
+                    NodeType = NodeType.WavFile,
+                    FilePath = string.Join("\\", filePathParts)
+                };
+                directoryNode.Children.Add(fileNode);
+                nodeDictionary[fileNode.FilePath] = fileNode;
+            }
         }
 
         private void ResetTree()

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
@@ -54,17 +54,31 @@ namespace Editors.Audio.AudioEditor.Data
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(ComboBox));
 
-            var observableStates = new ObservableCollection<string>(states);
-            var collectionView = CollectionViewSource.GetDefaultView(observableStates);
+            factory.SetValue(ScrollViewer.CanContentScrollProperty, true);
+            factory.SetValue(VirtualizingStackPanel.IsVirtualizingProperty, true);
+            factory.SetValue(VirtualizingStackPanel.VirtualizationModeProperty, VirtualizationMode.Recycling);
 
-            var isFiltered = false;
-            var selectionMade = false;
+            var comboBoxStyle = Application.Current.TryFindResource(typeof(ComboBox)) as Style;
+            factory.SetValue(Control.StyleProperty, comboBoxStyle);
 
-            factory.SetValue(ItemsControl.ItemsSourceProperty, collectionView);
+            // Use a VirtualizingStackPanel for the drop-down items
+            var itemsPanelFactory = new FrameworkElementFactory(typeof(VirtualizingStackPanel));
+            factory.SetValue(ItemsControl.ItemsPanelProperty, new ItemsPanelTemplate(itemsPanelFactory));
+
+            // Initially, show the full list
+            var fullObservableStates = new ObservableCollection<string>(states);
+            factory.SetValue(ItemsControl.ItemsSourceProperty, fullObservableStates);
+
             factory.SetValue(ComboBox.IsEditableProperty, true);
             factory.SetValue(ItemsControl.IsTextSearchEnabledProperty, true);
 
+            // Setting the SelectedItem and Text bindings allows us to determine control them elsewhere, for example to show "Any" by default
             factory.SetBinding(Selector.SelectedItemProperty, new Binding($"[{stateGroupWithQualifierWithExtraUnderscores}]")
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
+            factory.SetBinding(ComboBox.TextProperty, new Binding($"[{stateGroupWithQualifierWithExtraUnderscores}]")
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
@@ -74,90 +88,46 @@ namespace Editors.Audio.AudioEditor.Data
             {
                 if (sender is ComboBox comboBox)
                 {
-                    // For some reason when the user selects anything other than "Any" when there's only one column and you reset the value it doesn't show the default value of "Any" due to some WPF quirk so we manually set it again here.
-                    if (states.Contains("Any"))
-                        comboBox.Text = "Any"; 
-
                     if (comboBox.Template.FindName("PART_EditableTextBox", comboBox) is TextBox textBox)
                     {
-                        var debounceTimer = new DispatcherTimer
+                        // When text changes, filter asynchronously
+                        textBox.TextChanged += async (s, e) =>
                         {
-                            Interval = TimeSpan.FromMilliseconds(200),
-                            IsEnabled = false
-                        };
+                            audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
 
-                        var lastFilterText = string.Empty;
-
-                        textBox.TextChanged += (s, e) =>
-                        {
-                            if (e.Changes.Count > 0 && !(Keyboard.IsKeyDown(Key.Up) || Keyboard.IsKeyDown(Key.Down)))
+                            var filterText = textBox.Text;
+                            var filteredItems = await Task.Run(() =>
                             {
-                                lastFilterText = textBox.Text;
-                                if (!selectionMade)
-                                {
-                                    debounceTimer.Stop();
-                                    debounceTimer.Start();
-                                }
-                                selectionMade = false;
+                                if (string.IsNullOrWhiteSpace(filterText))
+                                    return fullObservableStates.ToList();
+                                else
+                                    return fullObservableStates.Where(item => item.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
+                            });
 
-                                audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
-                            }
-                        };
+                            comboBox.ItemsSource = filteredItems;
 
-                        debounceTimer.Tick += (s, e) =>
-                        {
-                            debounceTimer.Stop();
-                            collectionView.Filter = item =>
-                            {
-                                if (item is string state)
-                                {
-                                    return state.Contains(lastFilterText, StringComparison.OrdinalIgnoreCase);
-                                }
-                                return false;
-                            };
-
-                            isFiltered = !string.IsNullOrEmpty(lastFilterText);
-
-                            if (!comboBox.IsDropDownOpen && !selectionMade)
-                            {
+                            // Open the drop down to display the results
+                            if (!comboBox.IsDropDownOpen)
                                 comboBox.IsDropDownOpen = true;
-                            }
                         };
 
+                        // When the user leaves the TextBox, validate the text
                         textBox.LostFocus += (s, e) =>
                         {
-                            var finalText = textBox.Text;
-
-                            if (!string.IsNullOrWhiteSpace(finalText) && !states.Contains(finalText))
+                            var match = fullObservableStates.FirstOrDefault(item => string.Equals(item, textBox.Text, StringComparison.OrdinalIgnoreCase));
+                            if (match == null)
                             {
-                                textBox.Text = string.Empty;
-                                comboBox.SelectedItem = null;
+                                if (states.Contains("Any"))
+                                {
+                                    comboBox.SelectedItem = "Any";
+                                    comboBox.Text = "Any";
+                                }
+                                else
+                                {
+                                    comboBox.SelectedItem = null;
+                                    comboBox.Text = string.Empty;
+                                }
                             }
-                        };
-
-                        comboBox.SelectionChanged += (s, e) =>
-                        {
-                            selectionMade = true;
-
-                            if (comboBox.IsDropDownOpen)
-                                comboBox.IsDropDownOpen = false;
-
-                            textBox.Select(0, 0);
-                            textBox.CaretIndex = textBox.Text.Length;
-                        };
-
-                        comboBox.DropDownOpened += (s, e) =>
-                        {
-                            if (string.IsNullOrEmpty(textBox.Text) && isFiltered)
-                            {
-                                collectionView.Filter = null;
-                                isFiltered = false;
-                            }
-                        };
-
-                        comboBox.DropDownClosed += (s, e) =>
-                        {
-                            debounceTimer.Stop();
                         };
                     }
                 }
