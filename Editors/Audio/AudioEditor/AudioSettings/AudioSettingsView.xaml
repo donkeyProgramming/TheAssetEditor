@@ -139,8 +139,8 @@
 
                     <ListView
                         ItemsSource="{Binding AudioFiles}"
-                        Height="205"
-                        MaxHeight="205">
+                        Height="135"
+                        MaxHeight="135">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn 
