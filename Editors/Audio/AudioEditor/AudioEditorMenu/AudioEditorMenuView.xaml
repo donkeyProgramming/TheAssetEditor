@@ -29,6 +29,9 @@
                 <MenuItem 
                     Header="Save Audio Project" 
                     Command="{Binding SaveAudioProjectCommand}"/>
+                <MenuItem 
+                    Header="Compile Audio Project" 
+                    Command="{Binding CompileAudioProjectCommand}"/>
             </MenuItem>
         </Menu>
     </Grid>

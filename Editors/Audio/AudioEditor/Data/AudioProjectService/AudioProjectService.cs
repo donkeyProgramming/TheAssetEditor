@@ -6,12 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Editors.Audio.AudioEditor.AudioProjectCompiler;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 using static Editors.Audio.AudioEditor.IntegrityChecker;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
@@ -105,6 +107,12 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
             SortSoundBanksAlphabetically();
 
             audioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
+        }
+
+        public void CompileAudioProject(ApplicationSettingsService applicationSettingsService)
+        {
+            var audioProject = GetAudioProjectWithoutUnusedObjects();
+            SoundBankGenerator.CompileSoundBanksFromAudioProject(audioProject, applicationSettingsService);
         }
 
         private void InitialiseSoundBanks()

@@ -9,6 +9,7 @@ using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
+using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
@@ -20,6 +21,7 @@ namespace Editors.Audio.AudioEditor
         private readonly IPackFileService _packFileService;
         private readonly IAudioProjectService _audioProjectService;
         private readonly IStandardDialogs _packFileUiProvider;
+        private readonly ApplicationSettingsService _applicationSettingsService;
 
         public string DisplayName { get; set; } = "Audio Editor";
 
@@ -30,14 +32,20 @@ namespace Editors.Audio.AudioEditor
         public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; set; }
         public AudioSettingsViewModel AudioSettingsViewModel { get; set; }
 
-        public AudioEditorViewModel(IAudioRepository audioRepository, IPackFileService packFileService, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
+        public AudioEditorViewModel(
+            IAudioRepository audioRepository,
+            IPackFileService packFileService,
+            IAudioProjectService audioProjectService,
+            IStandardDialogs packFileUiProvider,
+            ApplicationSettingsService applicationSettingsService)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;
             _audioProjectService = audioProjectService;
             _packFileUiProvider = packFileUiProvider;
+            _applicationSettingsService = applicationSettingsService;
 
-            AudioEditorMenuViewModel = new AudioEditorMenuViewModel(this, _audioRepository, _packFileService, _audioProjectService, _packFileUiProvider);
+            AudioEditorMenuViewModel = new AudioEditorMenuViewModel(this, _audioRepository, _packFileService, _audioProjectService, _packFileUiProvider, _applicationSettingsService);
             AudioProjectExplorerViewModel = new AudioProjectExplorerViewModel(this, _audioRepository, _audioProjectService);
             AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(this, _packFileService, _audioRepository, _audioProjectService);
             AudioProjectEditorViewModel = new AudioProjectEditorViewModel(this, _audioRepository, _audioProjectService);
