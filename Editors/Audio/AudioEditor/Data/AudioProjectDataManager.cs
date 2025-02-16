@@ -230,6 +230,8 @@ namespace Editors.Audio.AudioEditor.Data
 
         public static void HandleEditingAudioProjectViewerData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
         {
+            audioEditorViewModel.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewer = false;
+
             if (audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.ActionEventSoundBank)
                 EditActionEventSoundBankData(audioEditorViewModel, audioProjectService);
 
@@ -256,12 +258,11 @@ namespace Editors.Audio.AudioEditor.Data
                     AudioEditorViewModel = audioEditorViewModel,
                     SoundBank = soundBank
                 };
+
+                audioEditorViewModel.AudioProjectViewerViewModel.ShowSettingsFromAudioProjectViewerItem();
+
                 if (audioEditorViewModel.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewer)
-                {
-                    var actionEvent = AudioProjectHelpers.GetActionEventFromDataGridRow(audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0], soundBank);
-                    audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsFromAudioProjectItem(actionEvent.AudioSettings);
                     audioEditorViewModel.AudioSettingsViewModel.DisableAllAudioSettings();
-                }
 
                 var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetDataService(soundBank);
                 audioProjectDataServiceInstance.RemoveAudioProjectEditorDataGridDataFromAudioProject(parameters);
@@ -285,12 +286,10 @@ namespace Editors.Audio.AudioEditor.Data
                 DialogueEvent = dialogueEvent
             };
 
+            audioEditorViewModel.AudioProjectViewerViewModel.ShowSettingsFromAudioProjectViewerItem();
+
             if (audioEditorViewModel.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewer)
-            {
-                var statePath = AudioProjectHelpers.GetStatePathFromDataGridRow(audioRepository, audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0], dialogueEvent);
-                audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsFromAudioProjectItem(statePath.AudioSettings);
                 audioEditorViewModel.AudioSettingsViewModel.DisableAllAudioSettings();
-            }
 
             var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetDataService(dialogueEvent);
             audioProjectDataServiceInstance.RemoveAudioProjectEditorDataGridDataFromAudioProject(parameters);

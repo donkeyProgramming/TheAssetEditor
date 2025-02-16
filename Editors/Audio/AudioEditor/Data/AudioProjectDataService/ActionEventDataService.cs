@@ -50,9 +50,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
         public void AddAudioProjectEditorDataGridDataToAudioProject(AudioProjectDataServiceParameters parameters)
         {
-            var actionEvent = AudioProjectHelpers.CreateActionEventFromDataGridRow(parameters.AudioProjectEditorRow);
-            actionEvent.AudioSettings = parameters.AudioEditorViewModel.AudioSettingsViewModel.BuildAudioSettings();
-
+            var actionEvent = AudioProjectHelpers.CreateActionEvent(parameters.AudioEditorViewModel.AudioSettingsViewModel, parameters.AudioProjectEditorRow);
             var soundBank = parameters.SoundBank;
             AudioProjectHelpers.InsertActionEventAlphabetically(soundBank, actionEvent);
         }

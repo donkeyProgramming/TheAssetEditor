@@ -76,7 +76,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
 
                 // Initialise a full Audio Project and merge the saved Audio Project with it
                 InitialiseAudioProject(audioEditorViewModel, AudioProjectFileName, AudioProjectDirectory, savedProject.Language);
-                MergeSavedAudioProjectIntoAudioProjectWithUnusedObjects(savedProject);
+                MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(savedProject);
 
                 // Initialise data after AudioProject is set so it uses the correct instance
                 audioEditorViewModel.Initialise();
@@ -112,27 +112,27 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
         public void CompileAudioProject(ApplicationSettingsService applicationSettingsService)
         {
             var audioProject = GetAudioProjectWithoutUnusedObjects();
-            SoundBankGenerator.CompileSoundBanksFromAudioProject(audioProject, applicationSettingsService);
+            SoundBankGenerator.CompileSoundBanksFromAudioProject(applicationSettingsService, audioProject);
         }
 
         private void InitialiseSoundBanks()
         {
-            var soundBanks = Enum.GetValues<Wh3SoundBank>()
+            var soundBanks = Enum.GetValues<Wh3SoundBankSubType>()
                 .Select(soundBank => new SoundBank
                 {
-                    Name = GetSoundBankDisplayString(soundBank),
-                    Type = GetSoundBankType(soundBank)
+                    Name = GetSoundBankSubTypeDisplayString(soundBank),
+                    Type = GetSoundBankSubType(soundBank)
                 })
                 .ToList();
 
             AudioProject.SoundBanks = [];
 
-            foreach (var soundBankEnum in Enum.GetValues<Wh3SoundBank>())
+            foreach (var soundBankEnum in Enum.GetValues<Wh3SoundBankSubType>())
             {
                 var soundBank = new SoundBank
                 {
-                    Name = GetSoundBankDisplayString(soundBankEnum),
-                    Type = GetSoundBankType(soundBankEnum)
+                    Name = GetSoundBankSubTypeDisplayString(soundBankEnum),
+                    Type = GetSoundBankSubType(soundBankEnum)
                 };
 
                 if (soundBank.Type == Wh3SoundBankType.ActionEventSoundBank)
@@ -213,7 +213,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                         .ToList();
 
                     var actionEvents = (soundBank.ActionEvents ?? Enumerable.Empty<ActionEvent>())
-                        .Where(actionEvent => actionEvent.AudioSettings.AudioFiles != null && actionEvent.AudioSettings.AudioFiles.Count != 0)
+                        .Where(actionEvent => actionEvent.Sound != null || actionEvent.SoundContainer != null)
                         .ToList();
 
                     return new SoundBank
@@ -251,7 +251,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
             };
         }
 
-        private void MergeSavedAudioProjectIntoAudioProjectWithUnusedObjects(AudioProjectDataModel savedProject)
+        private void MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(AudioProjectDataModel savedProject)
         {
             if (savedProject == null)
                 return;
@@ -268,25 +268,30 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                     {
                         if (savedSoundBank.DialogueEvents != null)
                         {
-                            foreach (var savedDialogue in savedSoundBank.DialogueEvents)
+                            foreach (var savedDialogueEvent in savedSoundBank.DialogueEvents)
                             {
-                                var defaultDialogue = soundBank.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == savedDialogue.Name);
-                                if (defaultDialogue != null)
-                                    defaultDialogue.DecisionTree = savedDialogue.DecisionTree;
+                                var dialogueEvent = soundBank.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == savedDialogueEvent.Name);
+                                if (dialogueEvent != null)
+                                    dialogueEvent.DecisionTree = savedDialogueEvent.DecisionTree;
                                 else
-                                    soundBank.DialogueEvents.Add(savedDialogue);
+                                    soundBank.DialogueEvents.Add(savedDialogueEvent);
                             }
                         }
 
                         if (savedSoundBank.ActionEvents != null)
                         {
-                            foreach (var savedAction in savedSoundBank.ActionEvents)
+                            foreach (var savedActionEvent in savedSoundBank.ActionEvents)
                             {
-                                var defaultAction = soundBank.ActionEvents.FirstOrDefault(actionEvent => actionEvent.Name == savedAction.Name);
-                                if (defaultAction != null)
-                                    defaultAction.AudioSettings.AudioFiles = savedAction.AudioSettings.AudioFiles;
+                                var actionEvent = soundBank.ActionEvents.FirstOrDefault(actionEvent => actionEvent.Name == savedActionEvent.Name);
+                                if (actionEvent != null)
+                                {
+                                    if (actionEvent.Sound != null)
+                                        savedActionEvent.Sound = savedActionEvent.Sound;
+                                    else
+                                        actionEvent.SoundContainer = savedActionEvent.SoundContainer;
+                                }
                                 else
-                                    soundBank.ActionEvents.Add(savedAction);
+                                    soundBank.ActionEvents.Add(savedActionEvent);
                             }
                         }
                     }

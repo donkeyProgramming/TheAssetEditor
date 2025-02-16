@@ -1,20 +1,30 @@
 ﻿using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService;
 using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.Data.AudioProjectService;
+using Shared.Core.PackFiles;
 using Shared.Core.Settings;
 
 namespace Editors.Audio.AudioEditor.AudioProjectCompiler
 {
     public class SoundBankGenerator
     {
-        public static void CompileSoundBanksFromAudioProject(AudioProjectDataModel audioProject, ApplicationSettingsService applicationSettingsService)
+        private readonly IPackFileService _packFileService;
+        private readonly IAudioProjectService _audioProjectService;
+        private readonly ApplicationSettingsService _applicationSettingsService;
+
+        public SoundBankGenerator(IPackFileService packFileService, IAudioProjectService audioProjectService, ApplicationSettingsService applicationSettingsService)
         {
-            //var gameInformation = GameInformationDatabase.GetGameById(applicationSettingsService.CurrentSettings.CurrentGame);
+            _packFileService = packFileService;
+            _audioProjectService = audioProjectService;
+            _applicationSettingsService = applicationSettingsService;
+        }
 
+        public static void CompileSoundBanksFromAudioProject(ApplicationSettingsService applicationSettingsService, AudioProjectDataModel audioProject)
+        {
             var wwiseIDService = WwiseIDServiceFactory.GetWwiseIDService(applicationSettingsService.CurrentSettings.CurrentGame);
-            var test = wwiseIDService.ActorMixerIds;
+            var actorMixerIds = wwiseIDService.ActorMixerIds;
 
-
-            //ActorMixerIds
+            //SoundBanks.GetSoundBankEnum();
         }
     }
 }

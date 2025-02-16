@@ -137,7 +137,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         public static void AddFilteredDialogueEventsToSoundBankTreeViewItems(IAudioProjectService audioProjectService, AudioProjectExplorerViewModel audioProjectExplorerViewModel, string soundBankName, DialogueEventPreset? dialogueEventPreset)
         {
             var filteredDialogueEventNames = DialogueEventData
-                .Where(dialogueEvent => GetSoundBankDisplayString(dialogueEvent.SoundBank) == audioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name 
+                .Where(dialogueEvent => GetSoundBankSubTypeDisplayString(dialogueEvent.SoundBank) == audioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name 
                 && (!dialogueEventPreset.HasValue || dialogueEvent.DialogueEventPreset.Contains(dialogueEventPreset.Value)))
                 .Select(dialogueEvent => dialogueEvent.Name)
                 .ToHashSet();
@@ -171,7 +171,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                     if (soundBank.PresetFilter != null && soundBank.PresetFilter != DialogueEventPreset.ShowAll)
                     {
                         var filteredDialogueEventNames = DialogueEventData
-                            .Where(dialogueEvent => GetSoundBankDisplayString(dialogueEvent.SoundBank) == soundBank.Name
+                            .Where(dialogueEvent => GetSoundBankSubTypeDisplayString(dialogueEvent.SoundBank) == soundBank.Name
                             && (!soundBank.PresetFilter.HasValue || dialogueEvent.DialogueEventPreset.Contains(soundBank.PresetFilter.Value)))
                             .Select(dialogueEvent => dialogueEvent.Name)
                             .ToHashSet();

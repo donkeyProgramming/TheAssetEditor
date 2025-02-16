@@ -12,7 +12,7 @@ namespace Editors.Audio.AudioEditor
 {
     public class IntegrityChecker
     {
-        public static void CheckAudioEditorDialogueEventIntegrity(IAudioRepository audioRepository, List<(string Name, SoundBanks.Wh3SoundBank SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
+        public static void CheckAudioEditorDialogueEventIntegrity(IAudioRepository audioRepository, List<(string Name, SoundBanks.Wh3SoundBankSubType SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
         {
             var gameDialogueEvents = audioRepository.DialogueEventsWithStateGroups.Keys.ToList();
             var audioEditorDialogueEvents = dialogueEventData.Select(data => data.Name).ToList();

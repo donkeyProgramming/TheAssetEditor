@@ -88,8 +88,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
         public void AddAudioProjectEditorDataGridDataToAudioProject(AudioProjectDataServiceParameters parameters)
         {
-            var statePath = AudioProjectHelpers.CreateStatePathFromDataGridRow(parameters.AudioRepository, parameters.AudioProjectEditorRow, parameters.DialogueEvent);
-            statePath.AudioSettings = parameters.AudioEditorViewModel.AudioSettingsViewModel.BuildAudioSettings();
+            var statePath = AudioProjectHelpers.CreateStatePath(parameters.AudioRepository, parameters.AudioEditorViewModel.AudioSettingsViewModel, parameters.AudioProjectEditorRow, parameters.DialogueEvent);
             AudioProjectHelpers.InsertStatePathAlphabetically(parameters.DialogueEvent, statePath);
         }
 

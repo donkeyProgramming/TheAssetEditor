@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents.DialogueEventPreset;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks.Wh3SoundBank;
+using static Editors.Audio.GameSettings.Warhammer3.SoundBanks.Wh3SoundBankSubType;
 
 namespace Editors.Audio.GameSettings.Warhammer3
 {
@@ -119,7 +119,7 @@ namespace Editors.Audio.GameSettings.Warhammer3
         }
 
         // Dialogue Event data has to be defined directly rather than dynamically from game data as it can only be determined by examining how CA uses each Dialogue Event in game
-        public static List<(string Name, SoundBanks.Wh3SoundBank SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> DialogueEventData { get; } =
+        public static List<(string Name, SoundBanks.Wh3SoundBankSubType SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> DialogueEventData { get; } =
         [
             // Frontend VO
             ("frontend_vo_character_select", FrontendVO, [ShowAll, Lord], true),

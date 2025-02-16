@@ -15,31 +15,31 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService.Warhamme
         // Then extract the parent bnk to your PC, load it with Wwiser, then click Dump Bnk.
         // Open the Xml file that Dump Bnk created and ctrl+f for the mixer Id. Find the Actor Mixer object and look through its settings to see if there's any attenuation - if so then that's the attenuation Id.
 
-        public Dictionary<Wh3SoundBank, uint> ActorMixerIds { get; set; } = new()
+        public Dictionary<Wh3SoundBankSubType, uint> ActorMixerIds { get; set; } = new()
         {
-            {Wh3SoundBank.Abilities, 140075115},
-            {Wh3SoundBank.CampaignAdvisor, 517250292},
-            {Wh3SoundBank.DiplomacyLines, 54848735},
-            {Wh3SoundBank.EventNarration, 517250292},
-            {Wh3SoundBank.Magic, 140075115},
-            {Wh3SoundBank.Movies, 573597124},
-            {Wh3SoundBank.QuestBattles, 659413513},
-            {Wh3SoundBank.FrontendVO, 745637913},
-            {Wh3SoundBank.CampaignVO, 306196174},
-            {Wh3SoundBank.CampaignConversationalVO, 652491101},
-            {Wh3SoundBank.BattleVO, 1009314120},
-            {Wh3SoundBank.BattleConversationalVO, 600762068}
+            {Wh3SoundBankSubType.Abilities, 140075115},
+            {Wh3SoundBankSubType.CampaignAdvisor, 517250292},
+            {Wh3SoundBankSubType.DiplomacyLines, 54848735},
+            {Wh3SoundBankSubType.EventNarration, 517250292},
+            {Wh3SoundBankSubType.Magic, 140075115},
+            {Wh3SoundBankSubType.Movies, 573597124},
+            {Wh3SoundBankSubType.QuestBattles, 659413513},
+            {Wh3SoundBankSubType.FrontendVO, 745637913},
+            {Wh3SoundBankSubType.CampaignVO, 306196174},
+            {Wh3SoundBankSubType.CampaignConversationalVO, 652491101},
+            {Wh3SoundBankSubType.BattleVO, 1009314120},
+            {Wh3SoundBankSubType.BattleConversationalVO, 600762068}
         };
 
-        public Dictionary<Wh3SoundBank, uint> AttenuationIds { get; set; } = new()
+        public Dictionary<Wh3SoundBankSubType, uint> AttenuationIds { get; set; } = new()
         {
-            {Wh3SoundBank.Abilities, 588111330},
-            {Wh3SoundBank.Magic, 588111330},
-            {Wh3SoundBank.QuestBattles, 6016245},
-            {Wh3SoundBank.CampaignVO, 432982952},
-            {Wh3SoundBank.CampaignConversationalVO, 62329658},
-            {Wh3SoundBank.BattleVO, 803409642},
-            {Wh3SoundBank.BattleConversationalVO, 649943956},
+            {Wh3SoundBankSubType.Abilities, 588111330},
+            {Wh3SoundBankSubType.Magic, 588111330},
+            {Wh3SoundBankSubType.QuestBattles, 6016245},
+            {Wh3SoundBankSubType.CampaignVO, 432982952},
+            {Wh3SoundBankSubType.CampaignConversationalVO, 62329658},
+            {Wh3SoundBankSubType.BattleVO, 803409642},
+            {Wh3SoundBankSubType.BattleConversationalVO, 649943956},
         };
     }
 

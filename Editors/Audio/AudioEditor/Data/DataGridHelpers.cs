@@ -95,18 +95,29 @@ namespace Editors.Audio.AudioEditor.Data
                         {
                             audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
 
+                            if (audioEditorViewModel.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewer)
+                                audioEditorViewModel.AudioSettingsViewModel.ResetShowSettingsFromAudioProjectViewer();
+
                             var filterText = textBox.Text;
                             var filteredItems = await Task.Run(() =>
                             {
                                 if (string.IsNullOrWhiteSpace(filterText))
                                     return fullObservableStates.ToList();
                                 else
-                                    return fullObservableStates.Where(item => item.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
+                                    return fullObservableStates.Where(item =>
+                                        item.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
                             });
 
                             comboBox.ItemsSource = filteredItems;
 
-                            // Open the drop down to display the results
+                            // Clear selection after text change to prevent a bug where the first character was being overridden by the second if the first is highlighted
+                            _ = textBox.Dispatcher.BeginInvoke(() =>
+                            {
+                                textBox.SelectionStart = textBox.Text.Length;
+                                textBox.SelectionLength = 0;
+                            }, System.Windows.Threading.DispatcherPriority.Background);
+
+                            // Open the drop-down to display the results
                             if (!comboBox.IsDropDownOpen)
                                 comboBox.IsDropDownOpen = true;
                         };

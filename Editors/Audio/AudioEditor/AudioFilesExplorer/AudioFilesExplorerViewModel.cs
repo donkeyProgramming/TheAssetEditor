@@ -246,6 +246,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             }
 
             _audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsEnablementAndVisibility();
+            _audioEditorViewModel.AudioSettingsViewModel.ResetShowSettingsFromAudioProjectViewer();
             _audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
         }
 

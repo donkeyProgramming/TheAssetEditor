@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
@@ -66,55 +67,123 @@ namespace Editors.Audio.AudioEditor.Data
 
         public static ActionEvent GetActionEventFromDataGridRow(Dictionary<string, string> dataGridRow, SoundBank actionEventSoundBank)
         {
-            var dataGridRowActionEvent = CreateActionEventFromDataGridRow(dataGridRow);
+            var dataGridRowActionEventName = GetActionEventNameFromDataGridRow(dataGridRow);
 
             foreach (var actionEvent in actionEventSoundBank.ActionEvents)
             {                    
-                if (actionEvent.Name == dataGridRowActionEvent.Name)
+                if (actionEvent.Name == dataGridRowActionEventName)
                     return actionEvent;
             }
 
             return null;
         }
 
-        public static ActionEvent CreateActionEventFromDataGridRow(Dictionary<string, string> dataGridRow)
+        public static ActionEvent CreateActionEvent(AudioSettingsViewModel audioSettingsViewModel, Dictionary<string, string> dataGridRow)
         {
             var actionEvent = new ActionEvent();
 
             if (dataGridRow.TryGetValue("Event", out var eventName))
+            {
                 actionEvent.Name = eventName.ToString();
-            return actionEvent;
+
+                var audioFiles = audioSettingsViewModel.AudioFiles;
+                if (audioFiles.Count == 1)
+                    actionEvent.Sound = CreateSound(audioSettingsViewModel, audioFiles[0]);
+                else
+                {
+                    actionEvent.SoundContainer = new SoundContainer
+                    {
+                        Sounds = [],
+                        AudioSettings = audioSettingsViewModel.BuildAudioSettings()
+                    };
+
+                    foreach (var audioFile in audioFiles)
+                    {
+                        var sound = CreateSound(audioSettingsViewModel, audioFile);
+                        actionEvent.SoundContainer.Sounds.Add(sound);
+                    }
+                }
+
+                return actionEvent;
+            }
+
+            return null;
+        }
+
+        public static string GetActionEventNameFromDataGridRow(Dictionary<string, string> dataGridRow)
+        {
+            if (dataGridRow.TryGetValue("Event", out var eventName))
+                return eventName.ToString();
+            else
+                return string.Empty;
         }
 
         public static StatePath GetStatePathFromDataGridRow(IAudioRepository audioRepository, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
         {
-            var dataGridRowStatePath = CreateStatePathFromDataGridRow(audioRepository, dataGridRow, selectedDialogueEvent);
+            var dataGridRowStatePathNodes = GetStatePathNodes(audioRepository, dataGridRow, selectedDialogueEvent);
 
             foreach (var statePath in selectedDialogueEvent.DecisionTree)
             {
-                if (statePath.Nodes.SequenceEqual(dataGridRowStatePath.Nodes, new StatePathNodeComparer()))
+                if (statePath.Nodes.SequenceEqual(dataGridRowStatePathNodes, new StatePathNodeComparer()))
                     return statePath;
             }
 
             return null;
         }
 
-        public static StatePath CreateStatePathFromDataGridRow(IAudioRepository audioRepository, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
+        public static List<StatePathNode> GetStatePathNodes(IAudioRepository audioRepository, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
         {
-            var dataGridRowStatePath = new StatePath();
+            var statePath = new StatePath();
             foreach (var kvp in dataGridRow)
             {
                 var columnName = RemoveExtraUnderscoresFromString(kvp.Key);
                 var columnValue = kvp.Value;
-                dataGridRowStatePath.Nodes.Add(new StatePathNode
+                statePath.Nodes.Add(new StatePathNode
+                {
+                    StateGroup = new StateGroup { Name = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, columnName) },
+                    State = new State { Name = columnValue }
+                });
+            }
+
+            return statePath.Nodes;
+        }
+
+        public static StatePath CreateStatePath(IAudioRepository audioRepository, AudioSettingsViewModel audioSettingsViewModel, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
+        {
+            var statePath = new StatePath();
+            foreach (var kvp in dataGridRow)
+            {
+                var columnName = RemoveExtraUnderscoresFromString(kvp.Key);
+                var columnValue = kvp.Value;
+                statePath.Nodes.Add(new StatePathNode
                 {
                     StateGroup = new StateGroup { Name = audioRepository.GetStateGroupFromStateGroupWithQualifier(selectedDialogueEvent.Name, columnName) },
                     State = new State { Name = columnValue }
                 });
 
+                var audioFiles = audioSettingsViewModel.AudioFiles;
+                if (audioFiles.Count == 1)
+                {
+                    statePath.Sound = CreateSound(audioSettingsViewModel, audioFiles[0]);
+                    statePath.Sound.AudioSettings = audioSettingsViewModel.BuildAudioSettings();
+                }
+                else
+                {
+                    statePath.SoundContainer = new SoundContainer
+                    {
+                        Sounds = [],
+                        AudioSettings = audioSettingsViewModel.BuildAudioSettings()
+                    };
+
+                    foreach (var audioFile in audioFiles)
+                    {
+                        var sound = CreateSound(audioSettingsViewModel, audioFile);
+                        statePath.SoundContainer.Sounds.Add(sound);
+                    }
+                }
             }
 
-            return dataGridRowStatePath;
+            return statePath;
         }
 
         public class StatePathNodeComparer : IEqualityComparer<StatePathNode>
@@ -134,6 +203,18 @@ namespace Editors.Audio.AudioEditor.Data
             {
                 return HashCode.Combine(obj.StateGroup?.Name, obj.State?.Name);
             }
+        }
+
+        private static Sound CreateSound(AudioSettingsViewModel audioSettingsViewModel, AudioFile audioFile, bool isSoundInSoundContainer = false)
+        {
+            var sound = new Sound()
+            {
+                AudioSettings = isSoundInSoundContainer ? audioSettingsViewModel.BuildAudioSettings() : null,
+                FileName = audioFile.FileName,
+                FilePath = audioFile.FilePath,
+            };
+
+            return sound;
         }
 
         public static State GetStateFromDataGridRow(Dictionary<string, string> dataGridRow, StateGroup moddedStateGroup)
@@ -162,7 +243,11 @@ namespace Editors.Audio.AudioEditor.Data
             var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
             var soundBank = GetSoundBankFromName(audioProjectService, audioProjectItem.Name);
             var actionEvent = GetActionEventFromDataGridRow(selectedAudioProjectViewerDataGridRow, soundBank);
-            return actionEvent.AudioSettings;
+            
+            if (actionEvent.Sound != null)
+                return actionEvent.Sound.AudioSettings;
+            else
+                return actionEvent.SoundContainer.AudioSettings;
         }
 
         public static AudioSettings GetAudioSettingsFromAudioProjectViewerStatePathItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
@@ -171,7 +256,11 @@ namespace Editors.Audio.AudioEditor.Data
             var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
             var dialogueEvent = GetDialogueEventFromName(audioProjectService, audioProjectItem.Name);
             var statePath = GetStatePathFromDataGridRow(audioRepository, selectedAudioProjectViewerDataGridRow, dialogueEvent);
-            return statePath.AudioSettings;
+
+            if (statePath.Sound != null)
+                return statePath.Sound.AudioSettings;
+            else
+                return statePath.SoundContainer.AudioSettings;
         }
 
         public static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> newRow)

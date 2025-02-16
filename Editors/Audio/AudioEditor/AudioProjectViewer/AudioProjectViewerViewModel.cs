@@ -5,6 +5,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
 using Editors.Audio.AudioEditor.Data.AudioProjectService;
@@ -47,21 +48,80 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
             if (_audioEditorViewModel.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewer)
             {
-                var audioSettings = new Data.AudioSettings();
-
-                var audioProjectItem = _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
-                if (audioProjectItem.NodeType == NodeType.ActionEventSoundBank)
-                    audioSettings = AudioProjectHelpers.GetAudioSettingsFromAudioProjectViewerActionEventItem(_audioEditorViewModel, _audioProjectService);
-                else if (audioProjectItem.NodeType == NodeType.DialogueEvent)
-                    audioSettings = AudioProjectHelpers.GetAudioSettingsFromAudioProjectViewerStatePathItem(_audioEditorViewModel, _audioProjectService, _audioRepository);
-
-                _audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsFromAudioProjectItem(audioSettings);
+                ShowSettingsFromAudioProjectViewerItem();
                 _audioEditorViewModel.AudioSettingsViewModel.DisableAllAudioSettings();
             }
 
             SetSelectedDataGridRows(selectedItems);
             SetButtonEnablement();
             SetCopyEnablement();
+        }
+
+        public void ShowSettingsFromAudioProjectViewerItem()
+        {
+            var audioSettings = new Data.AudioSettings();
+            var audioFiles = new List<AudioFile>();
+
+            var audioProjectItem = _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
+            if (audioProjectItem.NodeType == NodeType.ActionEventSoundBank)
+            {
+                audioSettings = AudioProjectHelpers.GetAudioSettingsFromAudioProjectViewerActionEventItem(_audioEditorViewModel, _audioProjectService);
+
+                var selectedAudioProjectViewerDataGridRow = _audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
+                var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioProjectService, audioProjectItem.Name);
+                var actionEvent = AudioProjectHelpers.GetActionEventFromDataGridRow(selectedAudioProjectViewerDataGridRow, soundBank);
+
+                if (actionEvent.Sound != null)
+                {
+                    audioFiles.Add(new AudioFile()
+                    {
+                        FileName = actionEvent.Sound.FileName,
+                        FilePath = actionEvent.Sound.FilePath,
+                    });
+                }
+                else
+                {
+                    foreach (var sound in actionEvent.SoundContainer.Sounds)
+                    {
+                        audioFiles.Add(new AudioFile()
+                        {
+                            FileName = sound.FileName,
+                            FilePath = sound.FilePath,
+                        });
+                    }
+                }
+            }
+            else if (audioProjectItem.NodeType == NodeType.DialogueEvent)
+            {
+                audioSettings = AudioProjectHelpers.GetAudioSettingsFromAudioProjectViewerStatePathItem(_audioEditorViewModel, _audioProjectService, _audioRepository);
+
+                var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioProjectService, _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
+                var statePath = AudioProjectHelpers.GetStatePathFromDataGridRow(_audioRepository, _audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0], dialogueEvent);
+
+                if (statePath.Sound != null)
+                {
+                    audioFiles.Add(new AudioFile()
+                    {
+                        FileName = statePath.Sound.FileName,
+                        FilePath = statePath.Sound.FilePath,
+                    });
+                }
+                else
+                {
+                    foreach (var sound in statePath.SoundContainer.Sounds)
+                    {
+                        audioFiles.Add(new AudioFile()
+                        {
+                            FileName = sound.FileName,
+                            FilePath = sound.FilePath,
+                        });
+                    }
+                }
+
+            }
+
+            _audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsFromAudioProjectItemAudioSettings(audioSettings, audioFiles.Count);
+            _audioEditorViewModel.AudioSettingsViewModel.SetAudioFiles(audioFiles);
         }
 
         private void SetSelectedDataGridRows(IList selectedItems)

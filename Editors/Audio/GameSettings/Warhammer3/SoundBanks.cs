@@ -2,7 +2,7 @@
 {
     public class SoundBanks
     {
-        public enum Wh3SoundBank
+        public enum Wh3SoundBankSubType
         {
             Abilities,
             CampaignAdvisor,
@@ -32,30 +32,30 @@
             DialogueEventSoundBank
         }
 
-        public static Wh3SoundBankType GetSoundBankType(Wh3SoundBank soundbank)
+        public static Wh3SoundBankType GetSoundBankSubType(Wh3SoundBankSubType soundbank)
         {
             return soundbank switch
             {
-                Wh3SoundBank.Abilities => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.CampaignAdvisor => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.DiplomacyLines => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.EventNarration => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.Magic => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.Movies => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.QuestBattles => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.Rituals => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.UI => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.Vocalisation => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.FrontendMusic => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.CampaignMusic => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.BattleMusic => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.LoadingScreenMusic => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBank.FrontendVO => Wh3SoundBankType.DialogueEventSoundBank,
-                Wh3SoundBank.CampaignVO => Wh3SoundBankType.DialogueEventSoundBank,
-                Wh3SoundBank.CampaignConversationalVO => Wh3SoundBankType.DialogueEventSoundBank,
-                Wh3SoundBank.BattleVO => Wh3SoundBankType.DialogueEventSoundBank,
-                Wh3SoundBank.BattleConversationalVO => Wh3SoundBankType.DialogueEventSoundBank,
-                Wh3SoundBank.BattleIndividualMelee => Wh3SoundBankType.DialogueEventSoundBank
+                Wh3SoundBankSubType.Abilities => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.CampaignAdvisor => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.DiplomacyLines => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.EventNarration => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.Magic => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.Movies => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.QuestBattles => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.Rituals => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.UI => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.Vocalisation => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.FrontendMusic => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.CampaignMusic => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.BattleMusic => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.LoadingScreenMusic => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubType.FrontendVO => Wh3SoundBankType.DialogueEventSoundBank,
+                Wh3SoundBankSubType.CampaignVO => Wh3SoundBankType.DialogueEventSoundBank,
+                Wh3SoundBankSubType.CampaignConversationalVO => Wh3SoundBankType.DialogueEventSoundBank,
+                Wh3SoundBankSubType.BattleVO => Wh3SoundBankType.DialogueEventSoundBank,
+                Wh3SoundBankSubType.BattleConversationalVO => Wh3SoundBankType.DialogueEventSoundBank,
+                Wh3SoundBankSubType.BattleIndividualMelee => Wh3SoundBankType.DialogueEventSoundBank
             };
         }
 
@@ -80,57 +80,57 @@
         public const string BattleConversationalVODisplayString = "Battle Conversational VO";
         public const string BattleIndividualMeleeDisplayString = "Battle Individual Melee";
 
-        public static string GetSoundBankDisplayString(Wh3SoundBank soundbank)
+        public static string GetSoundBankSubTypeDisplayString(Wh3SoundBankSubType soundbank)
         {
             return soundbank switch
             {
-                Wh3SoundBank.Abilities => AbilitiesDisplayString,
-                Wh3SoundBank.CampaignAdvisor => CampaignAdvisorDisplayString,
-                Wh3SoundBank.DiplomacyLines => DiplomacyLinesDisplayString,
-                Wh3SoundBank.EventNarration => EventNarrationDisplayString,
-                Wh3SoundBank.Magic => MagicDisplayString,
-                Wh3SoundBank.Movies => MoviesDisplayString,
-                Wh3SoundBank.QuestBattles => QuestBattlesDisplayString,
-                Wh3SoundBank.Rituals => RitualsDisplayString,
-                Wh3SoundBank.UI => UIDisplayString,
-                Wh3SoundBank.Vocalisation => VocalisationDisplayString,
-                Wh3SoundBank.FrontendMusic => FrontendMusicDisplayString,
-                Wh3SoundBank.CampaignMusic => CampaignMusicDisplayString,
-                Wh3SoundBank.BattleMusic => BattleMusicDisplayString,
-                Wh3SoundBank.LoadingScreenMusic => LoadingScreenMusicDisplayString,
-                Wh3SoundBank.FrontendVO => FrontendVODisplayString,
-                Wh3SoundBank.CampaignVO => CampaignVODisplayString,
-                Wh3SoundBank.CampaignConversationalVO => CampaignConversationalVODisplayString,
-                Wh3SoundBank.BattleVO => BattleVODisplayString,
-                Wh3SoundBank.BattleConversationalVO => BattleConversationalVODisplayString,
-                Wh3SoundBank.BattleIndividualMelee => BattleIndividualMeleeDisplayString,
+                Wh3SoundBankSubType.Abilities => AbilitiesDisplayString,
+                Wh3SoundBankSubType.CampaignAdvisor => CampaignAdvisorDisplayString,
+                Wh3SoundBankSubType.DiplomacyLines => DiplomacyLinesDisplayString,
+                Wh3SoundBankSubType.EventNarration => EventNarrationDisplayString,
+                Wh3SoundBankSubType.Magic => MagicDisplayString,
+                Wh3SoundBankSubType.Movies => MoviesDisplayString,
+                Wh3SoundBankSubType.QuestBattles => QuestBattlesDisplayString,
+                Wh3SoundBankSubType.Rituals => RitualsDisplayString,
+                Wh3SoundBankSubType.UI => UIDisplayString,
+                Wh3SoundBankSubType.Vocalisation => VocalisationDisplayString,
+                Wh3SoundBankSubType.FrontendMusic => FrontendMusicDisplayString,
+                Wh3SoundBankSubType.CampaignMusic => CampaignMusicDisplayString,
+                Wh3SoundBankSubType.BattleMusic => BattleMusicDisplayString,
+                Wh3SoundBankSubType.LoadingScreenMusic => LoadingScreenMusicDisplayString,
+                Wh3SoundBankSubType.FrontendVO => FrontendVODisplayString,
+                Wh3SoundBankSubType.CampaignVO => CampaignVODisplayString,
+                Wh3SoundBankSubType.CampaignConversationalVO => CampaignConversationalVODisplayString,
+                Wh3SoundBankSubType.BattleVO => BattleVODisplayString,
+                Wh3SoundBankSubType.BattleConversationalVO => BattleConversationalVODisplayString,
+                Wh3SoundBankSubType.BattleIndividualMelee => BattleIndividualMeleeDisplayString,
             };
         }
 
-        public static Wh3SoundBank GetSoundBankEnum(string soundBankString)
+        public static Wh3SoundBankSubType GetSoundBankEnum(string soundBankString)
         {
             return soundBankString switch
             {
-                AbilitiesDisplayString => Wh3SoundBank.Abilities,
-                CampaignAdvisorDisplayString => Wh3SoundBank.CampaignAdvisor,
-                DiplomacyLinesDisplayString => Wh3SoundBank.DiplomacyLines,
-                EventNarrationDisplayString => Wh3SoundBank.EventNarration,
-                MagicDisplayString => Wh3SoundBank.Magic,
-                MoviesDisplayString => Wh3SoundBank.Movies,
-                QuestBattlesDisplayString => Wh3SoundBank.QuestBattles,
-                RitualsDisplayString => Wh3SoundBank.Rituals,
-                UIDisplayString => Wh3SoundBank.UI,
-                VocalisationDisplayString => Wh3SoundBank.Vocalisation,
-                FrontendMusicDisplayString => Wh3SoundBank.FrontendMusic,
-                CampaignMusicDisplayString => Wh3SoundBank.CampaignMusic,
-                BattleMusicDisplayString => Wh3SoundBank.BattleMusic,
-                LoadingScreenMusicDisplayString => Wh3SoundBank.LoadingScreenMusic,
-                FrontendVODisplayString => Wh3SoundBank.FrontendVO,
-                CampaignVODisplayString => Wh3SoundBank.CampaignVO,
-                CampaignConversationalVODisplayString => Wh3SoundBank.CampaignConversationalVO,
-                BattleVODisplayString => Wh3SoundBank.BattleVO,
-                BattleConversationalVODisplayString => Wh3SoundBank.BattleConversationalVO,
-                BattleIndividualMeleeDisplayString => Wh3SoundBank.BattleIndividualMelee,
+                AbilitiesDisplayString => Wh3SoundBankSubType.Abilities,
+                CampaignAdvisorDisplayString => Wh3SoundBankSubType.CampaignAdvisor,
+                DiplomacyLinesDisplayString => Wh3SoundBankSubType.DiplomacyLines,
+                EventNarrationDisplayString => Wh3SoundBankSubType.EventNarration,
+                MagicDisplayString => Wh3SoundBankSubType.Magic,
+                MoviesDisplayString => Wh3SoundBankSubType.Movies,
+                QuestBattlesDisplayString => Wh3SoundBankSubType.QuestBattles,
+                RitualsDisplayString => Wh3SoundBankSubType.Rituals,
+                UIDisplayString => Wh3SoundBankSubType.UI,
+                VocalisationDisplayString => Wh3SoundBankSubType.Vocalisation,
+                FrontendMusicDisplayString => Wh3SoundBankSubType.FrontendMusic,
+                CampaignMusicDisplayString => Wh3SoundBankSubType.CampaignMusic,
+                BattleMusicDisplayString => Wh3SoundBankSubType.BattleMusic,
+                LoadingScreenMusicDisplayString => Wh3SoundBankSubType.LoadingScreenMusic,
+                FrontendVODisplayString => Wh3SoundBankSubType.FrontendVO,
+                CampaignVODisplayString => Wh3SoundBankSubType.CampaignVO,
+                CampaignConversationalVODisplayString => Wh3SoundBankSubType.CampaignConversationalVO,
+                BattleVODisplayString => Wh3SoundBankSubType.BattleVO,
+                BattleConversationalVODisplayString => Wh3SoundBankSubType.BattleConversationalVO,
+                BattleIndividualMeleeDisplayString => Wh3SoundBankSubType.BattleIndividualMelee,
             };
         }
     }
