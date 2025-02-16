@@ -174,7 +174,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             {
                 var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioProjectService, _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
                 var dialogueEventStateGroups = _audioRepository
-                    .DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[dialogueEvent.Name]
+                    .QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name]
                     .Select(kvp => AudioProjectHelpers.AddExtraUnderscoresToString(kvp.Key))
                     .ToList();
 

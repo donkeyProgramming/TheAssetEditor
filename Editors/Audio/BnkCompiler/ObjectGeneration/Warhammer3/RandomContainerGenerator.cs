@@ -26,7 +26,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public static CAkRanSeqCntr_V136 ConvertToWwise(RandomContainer inputContainer, CompilerData project)
         {
             var wwiseRandomContainer = new CAkRanSeqCntr_V136();
-            wwiseRandomContainer.Id = inputContainer.Id;
+            wwiseRandomContainer.ID = inputContainer.Id;
             wwiseRandomContainer.HircType = AkBkHircType.SequenceContainer;
             wwiseRandomContainer.NodeBaseParams = CreateBaseNodeParams();
             wwiseRandomContainer.BitVector = 0x12;

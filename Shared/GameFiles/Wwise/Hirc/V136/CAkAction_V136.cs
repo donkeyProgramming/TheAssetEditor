@@ -53,7 +53,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(Id);
+            var idSize = ByteHelper.GetPropertyTypeSize(ID);
             var actionTypeSize = ByteHelper.GetPropertyTypeSize(ActionType);
             var idExtSize = ByteHelper.GetPropertyTypeSize(IdExt);
             var idExt4Size = ByteHelper.GetPropertyTypeSize(IdExt4);
@@ -70,8 +70,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         }
 
         public AkActionType GetActionType() => ActionType;
-        public uint GetChildId() => IdExt;
-        public uint GetStateGroupId() => StateActionParams!.StateGroupId;
+        public uint GetChildID() => IdExt;
+        public uint GetStateGroupID() => StateActionParams!.StateGroupId;
 
         public class PlayActionParams_V136
         {

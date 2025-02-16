@@ -109,10 +109,11 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
             audioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
         }
 
-        public void CompileAudioProject(ApplicationSettingsService applicationSettingsService)
+        public void CompileAudioProject(IPackFileService packFileService, IAudioRepository audioRepository, ApplicationSettingsService applicationSettingsService)
         {
+            var soundBankGenerator = new SoundBankGenerator(packFileService, audioRepository, this, applicationSettingsService);
             var audioProject = GetAudioProjectWithoutUnusedObjects();
-            SoundBankGenerator.CompileSoundBanksFromAudioProject(applicationSettingsService, audioProject);
+            soundBankGenerator.CompileSoundBanksFromAudioProject(audioProject);
         }
 
         private void InitialiseSoundBanks()

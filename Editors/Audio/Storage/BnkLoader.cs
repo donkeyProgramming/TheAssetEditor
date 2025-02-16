@@ -17,9 +17,12 @@ namespace Editors.Audio.Storage
     {
         public class LoadResult
         {
-            public Dictionary<uint, List<HircItem>> HircList { get; internal set; } = [];
-            public Dictionary<uint, List<DidxAudio>> DidxAudioList { get; internal set; } = [];
-            public Dictionary<string, PackFile> PackFileMap { get; internal set; } = [];
+            public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageByID { get; internal set; } = [];
+            public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageBySourceID { get; internal set; } = [];
+            public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageByID { get; internal set; } = [];
+            public Dictionary<uint, List<HircItem>> HircLookupByID { get; internal set; } = [];
+            public Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; internal set; } = [];
+            public Dictionary<string, PackFile> BnkPackFileLookupByName { get; internal set; } = [];
         }
 
         private readonly IPackFileService _packFileService;
@@ -40,14 +43,12 @@ namespace Editors.Audio.Storage
             return soundDb;
         }
 
-        public LoadResult LoadBnkFiles(bool onlyEnglish = true)
+        public LoadResult LoadBnkFiles()
         {
             var bankFiles = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_packFileService, ".bnk");
             var bankFilesAsDictionary = bankFiles.GroupBy(f => f.FileName).ToDictionary(g => g.Key, g => g.Last().Pack);
-            var removeFilter = new List<string>() { "media", "init.bnk", "animation_blood_data.bnk" };
-            if (onlyEnglish)
-                removeFilter.AddRange(new List<string>() { "chinese", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" });
 
+            var removeFilter = new List<string>() { "media", "init.bnk", "animation_blood_data.bnk" };
             var wantedBnkFiles = PackFileUtil.FilterUnvantedFiles(bankFilesAsDictionary, removeFilter.ToArray(), out var removedFiles); ;
             _logger.Here().Information($"Parsing game sounds. {bankFiles.Count} bnk files found. {wantedBnkFiles.Count} after filtering");
 
@@ -65,7 +66,7 @@ namespace Editors.Audio.Storage
                 var file = bnkFile.Value;
                 var filePack = _packFileService.GetPackFileContainer(file);
                 _logger.Here().Information($"{counter++}/{wantedBnkFiles.Count} - {name}");
-                output.PackFileMap.Add(file.Name, file);
+                output.BnkPackFileLookupByName.TryAdd(file.Name, file);
 
                 try
                 {
@@ -84,30 +85,31 @@ namespace Editors.Audio.Storage
             // Combine the data
             foreach (var parsedBnk in parsedBnkList)
             {
-                // Build Audio Hirc Items from DIDX and DATA
+                // Build DIDX Audio Items from DIDX and DATA
                 if (parsedBnk.DataChunk is not null && parsedBnk.DidxChunk is not null)
                 {
                     foreach (var didx in parsedBnk.DidxChunk.MediaList)
                     {
                         var didxAudio = new DidxAudio()
                         {
-                            Id = didx.Id,
+                            ID = didx.ID,
                             ByteArray = parsedBnk.DataChunk.GetBytesFromBuffer((int)didx.Offset, (int)didx.Size),
-                            OwnerFile = parsedBnk.BkhdChunk.OwnerFile,
+                            OwnerFilePath = parsedBnk.BkhdChunk.OwnerFilePath,
+                            LanguageID = parsedBnk.BkhdChunk.AkBankHeader.LanguageID
                         };
 
-                        if (output.DidxAudioList.ContainsKey(didx.Id) is false)
-                            output.DidxAudioList[didx.Id] = new List<DidxAudio>();
-                        output.DidxAudioList[didx.Id].Add(didxAudio);
+                        if (output.DidxAudioLookupByID.ContainsKey(didx.ID) is false)
+                            output.DidxAudioLookupByID[didx.ID] = new List<DidxAudio>();
+                        output.DidxAudioLookupByID[didx.ID].Add(didxAudio);
                     }
                 }
 
                 foreach (var item in parsedBnk.HircChunk.HircItems)
                 {
-                    if (output.HircList.ContainsKey(item.Id) == false)
-                        output.HircList[item.Id] = new List<HircItem>();
+                    if (output.HircLookupByID.ContainsKey(item.ID) == false)
+                        output.HircLookupByID[item.ID] = new List<HircItem>();
 
-                    output.HircList[item.Id].Add(item);
+                    output.HircLookupByID[item.ID].Add(item);
                 }
             }
 
@@ -118,6 +120,48 @@ namespace Editors.Audio.Storage
             if (failedBnks.Count != 0)
                 _logger.Here().Error($"{failedBnks.Count} banks failed: {string.Join("\n", failedBnks)}");
 
+            // Construct language based Hirc Item data
+            output.HircLookupByLanguageByID = output.HircLookupByID
+                .SelectMany(kvp => kvp.Value)
+                .GroupBy(item => item.LanguageID)
+                .ToDictionary(
+                    langGroup => langGroup.Key,
+                    langGroup => langGroup
+                        .GroupBy(item => item.ID)
+                        .ToDictionary(
+                            idGroup => idGroup.Key,
+                            idGroup => idGroup.ToList()
+                        )
+                );
+
+            // Construct language Sound Source ID data
+            output.SoundHircLookupByLanguageBySourceID = output.HircLookupByLanguageByID.ToDictionary(
+                language => language.Key,
+                language => language.Value.Values
+                    .SelectMany(itemList => itemList)
+                    .Where(hircItem => hircItem is ICAkSound)
+                    .Cast<ICAkSound>()
+                    .GroupBy(sound => sound.GetSourceID())
+                    .ToDictionary(
+                        sourceGroup => sourceGroup.Key,
+                        sourceGroup => sourceGroup.ToList()
+                    )
+            );
+
+            // Construct language DIDX Audio ID
+            output.DidxAudioLookupByLanguageByID = output.DidxAudioLookupByID
+                .SelectMany(kvp => kvp.Value)
+                .GroupBy(item => item.LanguageID)
+                .ToDictionary(
+                    langGroup => langGroup.Key,
+                    langGroup => langGroup
+                        .GroupBy(item => item.ID)
+                        .ToDictionary(
+                            idGroup => idGroup.Key,
+                            idGroup => idGroup.ToList()
+                        )
+                );
+
             return output;
         }
 
@@ -127,19 +171,19 @@ namespace Editors.Audio.Storage
             stringBuilder.AppendLine($"\n Result: {header}");
             var unknownHirc = hircItems.Where(hircItem => hircItem is UnknownHirc).Count();
             var errorHirc = hircItems.Where(hircItem => hircItem.HasError).Count();
-            stringBuilder.AppendLine($"\t Total HircObjects: {hircItems.Count()} Unknown: {unknownHirc} Decoding Errors:{errorHirc}");
+            stringBuilder.AppendLine($"\t Total Hirc Items: {hircItems.Count()} Unknown: {unknownHirc} Decoding Errors:{errorHirc}");
 
             var grouped = hircItems.GroupBy(hircItem => hircItem.HircType);
             var groupedWithError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is UnknownHirc == true || y.HasError));
             var groupedWithoutError = grouped.Where(groupedHircItems => groupedHircItems.Any(y => y is UnknownHirc == false && y.HasError == false));
 
-            stringBuilder.AppendLine("\t\t Correct:");
+            stringBuilder.AppendLine("\t\t Succeeded:");
             foreach (var group in groupedWithoutError)
                 stringBuilder.AppendLine($"\t\t\t {group.Key}: Count: {group.Count()}");
 
             if (groupedWithError.Any())
             {
-                stringBuilder.AppendLine("\t\t Error:");
+                stringBuilder.AppendLine("\t\t Failed:");
                 foreach (var group in groupedWithError)
                     stringBuilder.AppendLine($"\t\t\t {group.Key}: {group.Where(x => x is UnknownHirc == true || x.HasError).Count()}/{group.Count()} Failed");
             }

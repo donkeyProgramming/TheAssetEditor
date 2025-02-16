@@ -35,10 +35,10 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         {
             var wwiseDialogueEvent = new CAkDialogueEvent_V136();
             wwiseDialogueEvent.Arguments = new List<AkGameSync_V136>();
-            wwiseDialogueEvent.Id = inputDialogueEvent.Id;
+            wwiseDialogueEvent.ID = inputDialogueEvent.Id;
             wwiseDialogueEvent.HircType = AkBkHircType.Dialogue_Event;
 
-            var extractedDialogueEvents = _audioRepository.DialogueEventsWithStateGroups;
+            var extractedDialogueEvents = _audioRepository.StateGroupsLookupByDialogueEvent;
             foreach (var stateGroup in extractedDialogueEvents[inputDialogueEvent.Name])
             {
                 var argument = new AkGameSync_V136

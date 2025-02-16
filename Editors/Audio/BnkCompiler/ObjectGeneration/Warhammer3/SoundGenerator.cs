@@ -42,7 +42,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
             var wwiseSound = new CAkSound_V136()
             {
-                Id = inputSound.Id,
+                ID = inputSound.Id,
                 HircType = AkBkHircType.Sound,
                 AkBankSourceData = new AkBankSourceData_V136()
                 {

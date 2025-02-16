@@ -32,7 +32,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public override void UpdateSectionSize() => throw new NotSupportedException("Users probably don't need this complexity.");
 
         public List<uint> GetChildren() => Children.ChildIds;
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
+        public uint GetDirectParentID() => NodeBaseParams.DirectParentId;
 
         public class CAkLayer_V136
         {

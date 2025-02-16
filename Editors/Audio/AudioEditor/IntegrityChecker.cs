@@ -14,7 +14,7 @@ namespace Editors.Audio.AudioEditor
     {
         public static void CheckAudioEditorDialogueEventIntegrity(IAudioRepository audioRepository, List<(string Name, SoundBanks.Wh3SoundBankSubType SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
         {
-            var gameDialogueEvents = audioRepository.DialogueEventsWithStateGroups.Keys.ToList();
+            var gameDialogueEvents = audioRepository.StateGroupsLookupByDialogueEvent.Keys.ToList();
             var audioEditorDialogueEvents = dialogueEventData.Select(data => data.Name).ToList();
 
             var areGameAndAudioEditorDialogueEventsMatching = new HashSet<string>(gameDialogueEvents).SetEquals(audioEditorDialogueEvents);
@@ -63,7 +63,7 @@ namespace Editors.Audio.AudioEditor
 
             foreach (var dialogueEvent in audioProjectDialogueEventsWithStateGroups)
             {
-                var gameDialogueEventStateGroups = audioRepository.DialogueEventsWithStateGroups[dialogueEvent.Key];
+                var gameDialogueEventStateGroups = audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Key];
                 var audioProjectDialogueEventStateGroups = dialogueEvent.Value;
                 if (!gameDialogueEventStateGroups.SequenceEqual(audioProjectDialogueEventStateGroups))
                     audioProjectService.DialogueEventsWithStateGroupsWithIntegrityError[dialogueEvent.Key] = audioProjectDialogueEventStateGroups;
@@ -86,7 +86,7 @@ namespace Editors.Audio.AudioEditor
                 var audioProjectDialogueEventStateGroupsText = string.Join("-->", audioProjectDialogueEventStateGroups);
                 message += $"\n\nOld State Groups: {audioProjectDialogueEventStateGroupsText}";
 
-                var gameDialogueEventStateGroups = audioRepository.DialogueEventsWithStateGroups[dialogueEvent.Key];
+                var gameDialogueEventStateGroups = audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Key];
                 var gameDialogueEventStateGroupsText = string.Join("-->", gameDialogueEventStateGroups);
                 message += $"\n\nNew State Groups: {gameDialogueEventStateGroupsText}";
             }

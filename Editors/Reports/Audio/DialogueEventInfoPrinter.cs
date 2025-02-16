@@ -34,8 +34,7 @@ namespace Editors.Reports.Audio
 
         public void PrintDialogEventInfo()
         {
-            var allHircItems = _audioRepository.GetAllOfType<HircItem>();
-            var dialogueEvents = allHircItems.OfType<ICAkDialogueEvent>();
+            var dialogueEvents = _audioRepository.GetHircItemsByType<ICAkDialogueEvent>();
             foreach (var dialogueEvent in dialogueEvents)
                 PrintDialogEventInfo(dialogueEvent);
         }
@@ -58,7 +57,7 @@ namespace Editors.Reports.Audio
             var formattedPaths = "[" + string.Join(", ", splitPaths) + "]";
 
             // Format the information with quotes around the dialog event and the modified path string.
-            var info = $"\"{_audioRepository.GetNameFromHash(hircItem.Id)}\" : {formattedPaths}";
+            var info = $"\"{_audioRepository.GetNameFromID(hircItem.ID)}\" : {formattedPaths}";
 
             Console.WriteLine(info);
             var filePath = $"{DirectoryHelper.ReportsDirectory}\\dialogue_event_info.txt";

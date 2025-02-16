@@ -25,7 +25,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         {
             var wwiseAction = new CAkAction_V136
             {
-                Id = inputAction.Id,
+                ID = inputAction.Id,
                 HircType = AkBkHircType.Action,
                 ActionType = AkActionType.Play,
                 IdExt = inputAction.ChildId,

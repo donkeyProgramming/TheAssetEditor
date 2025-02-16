@@ -60,7 +60,7 @@ namespace Editors.Audio.Utility
                 var currentPath = new DecisionPath() { ChildNodeId = path.Item2 };
                 foreach (var item in path.Item1.Skip(1))
                 {
-                    var name = _audioRepository.GetNameFromHash(item.Key);
+                    var name = _audioRepository.GetNameFromID(item.Key);
                     if (item.Key == 0)
                         name = "Any";
                     currentPath.Items.Add(new DecisionPathItem() { DisplayName = name, Value = (uint)item.Key });
@@ -72,7 +72,7 @@ namespace Editors.Audio.Utility
             var arguments = argumentsList
                 .Select(x =>
                 {
-                    var name = _audioRepository.GetNameFromHash(x.GroupId);
+                    var name = _audioRepository.GetNameFromID(x.GroupId);
                     return new { Name = name, x.GroupId };
                 }).ToList();
 
@@ -94,7 +94,7 @@ namespace Editors.Audio.Utility
                 var currentPath = new DecisionPath() { ChildNodeId = path.Item2 };
                 foreach (var item in path.Item1.Skip(1))
                 {
-                    var name = _audioRepository.GetNameFromHash(item.Key);
+                    var name = _audioRepository.GetNameFromID(item.Key);
                     if (item.Key == 0)
                         name = "Any";
                     currentPath.Items.Add(new DecisionPathItem() { DisplayName = name, Value = (uint)item.Key });
@@ -106,7 +106,7 @@ namespace Editors.Audio.Utility
             var arguments = argumentsList
                 .Select(x =>
                 {
-                    var name = _audioRepository.GetNameFromHash(x.GroupId);
+                    var name = _audioRepository.GetNameFromID(x.GroupId);
                     return new { Name = name, x.GroupId };
                 }).ToList();
 

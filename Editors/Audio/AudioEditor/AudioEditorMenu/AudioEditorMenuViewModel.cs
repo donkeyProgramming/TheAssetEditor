@@ -50,7 +50,7 @@ namespace Editors.Audio.AudioEditor.AudioEditorMenu
 
         [RelayCommand] public void CompileAudioProject()
         {
-            _audioProjectService.CompileAudioProject(_applicationSettingsService);
+            _audioProjectService.CompileAudioProject(_packFileService, _audioRepository, _applicationSettingsService);
         }
     }
 }

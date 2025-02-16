@@ -25,7 +25,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         public static CAkActorMixer_V136 ConvertToWwise(ActorMixer actorMixer, CompilerData project)
         {
             var wwiseActorMixer = new CAkActorMixer_V136();
-            wwiseActorMixer.Id = actorMixer.Id;
+            wwiseActorMixer.ID = actorMixer.Id;
             wwiseActorMixer.HircType = AkBkHircType.ActorMixer;
             wwiseActorMixer.NodeBaseParams = CreateBaseNodeParams();
             wwiseActorMixer.NodeBaseParams.DirectParentId = actorMixer.DirectParentId;

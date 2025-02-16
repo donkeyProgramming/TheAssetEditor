@@ -14,11 +14,11 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration
 
             var akBankHeader = new AkBankHeader()
             {
-                DwBankGeneratorVersion = 0x80000088,
-                DwSoundBankId = soundBankId,
-                DwLanguageId = language,
-                BFeedbackInBank = 0x10,
-                DwProjectId = 2361,
+                BankGeneratorVersion = 0x80000088,
+                SoundBankID = soundBankId,
+                LanguageID = language,
+                FeedbackInBank = 0x10,
+                ProjectID = 2361,
                 Padding = BitConverter.GetBytes(0x04)
             };
 

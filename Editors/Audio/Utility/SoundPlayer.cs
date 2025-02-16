@@ -61,7 +61,7 @@ namespace Editors.Audio.Utility
 
         public bool ConvertWemToWav(IAudioRepository audioRepository, uint sourceId, uint dataSoundbankId, int fileOffset, int byteCount)
         {
-            var dataSoundbankNameWithoutExtension = audioRepository.GetNameFromHash(dataSoundbankId, out bool found);
+            var dataSoundbankNameWithoutExtension = audioRepository.GetNameFromID(dataSoundbankId, out bool found);
             if (!found)
             {
                 s_logger.Here().Warning($"Unable to find a name from hash '{dataSoundbankId}'.");
@@ -69,7 +69,7 @@ namespace Editors.Audio.Utility
             }
 
             var dataSoundbankFileName = $"{dataSoundbankNameWithoutExtension}.bnk";
-            var packFile = audioRepository.PackFileMap[dataSoundbankFileName];
+            var packFile = audioRepository.BnkPackFileLookupByName[dataSoundbankFileName];
             if (packFile == null)
             {
                 s_logger.Here().Warning($"Unable to find packfile with name '{dataSoundbankFileName}'.");

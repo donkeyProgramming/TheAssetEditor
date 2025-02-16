@@ -69,7 +69,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(Id);
+            var idSize = ByteHelper.GetPropertyTypeSize(ID);
             var probabilitySize = ByteHelper.GetPropertyTypeSize(Probability);
             var treeDepthSize = ByteHelper.GetPropertyTypeSize(TreeDepth);
             

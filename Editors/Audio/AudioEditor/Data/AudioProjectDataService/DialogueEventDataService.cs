@@ -10,9 +10,9 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
         {
             var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
 
-            var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
+            var stateGroupsWithQualifiers = parameters.AudioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[parameters.DialogueEvent.Name];
 
-            var stateGroupsCount = parameters.AudioRepository.DialogueEventsWithStateGroups[parameters.DialogueEvent.Name].Count;
+            var stateGroupsCount = parameters.AudioRepository.StateGroupsLookupByDialogueEvent[parameters.DialogueEvent.Name].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
@@ -28,11 +28,11 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
         {
             var rowData = new Dictionary<string, string>();
 
-            var stateGroupsWithAnyState = parameters.AudioRepository.StateGroupsWithStates
+            var stateGroupsWithAnyState = parameters.AudioRepository.StatesLookupByStateGroup
                 .Where(stateGroupColumn => stateGroupColumn.Value.Contains("Any"))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             
-            var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
+            var stateGroupsWithQualifiers = parameters.AudioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[parameters.DialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var columnName = AudioProjectHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
@@ -50,9 +50,9 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
             var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
             DataGridHelpers.CreateContextMenu(parameters, dataGrid);
 
-            var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
+            var stateGroupsWithQualifiers = parameters.AudioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[parameters.DialogueEvent.Name];
 
-            var stateGroupsCount = parameters.AudioRepository.DialogueEventsWithStateGroups[parameters.DialogueEvent.Name].Count;
+            var stateGroupsCount = parameters.AudioRepository.StateGroupsLookupByDialogueEvent[parameters.DialogueEvent.Name].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
@@ -66,7 +66,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
 
         public void SetAudioProjectViewerDataGridData(AudioProjectDataServiceParameters parameters)
         {
-            var stateGroupsWithQualifiers = parameters.AudioRepository.DialogueEventsWithStateGroupsWithQualifiersAndStateGroups[parameters.DialogueEvent.Name];
+            var stateGroupsWithQualifiers = parameters.AudioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[parameters.DialogueEvent.Name];
 
             foreach (var statePath in parameters.DialogueEvent.DecisionTree)
             {
@@ -111,7 +111,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
         {
             var states = new List<string>();
             var moddedStates = GetModdedStates(parameters, stateGroup);
-            var vanillaStates = parameters.AudioRepository.StateGroupsWithStates[stateGroup];
+            var vanillaStates = parameters.AudioRepository.StatesLookupByStateGroup[stateGroup];
 
             // Display the required states in the ComboBox
             if (parameters.AudioEditorViewModel.AudioProjectEditorViewModel.ShowModdedStatesOnly && ModdedStateGroups.Contains(stateGroup))
