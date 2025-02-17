@@ -17,7 +17,7 @@ namespace GameWorld.Core.Rendering.Materials.Shaders
         MetalRoughPbr_Emissive,
 
         SpecGlossPbr_Default,
-        SpecGlossPbr_DirtAndDecal,
+        SpecGlossPbr_Advanced,
     }
 
     public abstract class CapabilityMaterial : IShader

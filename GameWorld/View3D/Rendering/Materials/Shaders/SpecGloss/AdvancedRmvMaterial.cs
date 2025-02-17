@@ -4,22 +4,22 @@ using GameWorld.Core.Services;
 
 namespace GameWorld.Core.Rendering.Materials.Shaders.SpecGloss
 {
-    public class DecalAndDirtMaterial : CapabilityMaterial
+    public class AdvancedRmvMaterial : CapabilityMaterial
     {
-        public DecalAndDirtMaterial(IScopedResourceLibrary resourceLibrary)
-            : base(CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal, ShaderTypes.Pbr_SpecGloss, resourceLibrary)
+        public AdvancedRmvMaterial(IScopedResourceLibrary resourceLibrary)
+            : base(CapabilityMaterialsEnum.SpecGlossPbr_Advanced, ShaderTypes.Pbr_SpecGloss, resourceLibrary)
         {
             Capabilities =
             [
                 new CommonShaderParametersCapability(),
                 new SpecGlossCapability(),
                 new AnimationCapability(),
-                new DirtAndDecalCapability(),
+                new AdvancedMaterialCapability(),
             ];
 
             _renderingTechniqueMap[RenderingTechnique.Normal] = "BasicColorDrawing";
         }
 
-        protected override CapabilityMaterial CreateCloneInstance() => new DecalAndDirtMaterial(_resourceLibrary);
+        protected override CapabilityMaterial CreateCloneInstance() => new AdvancedRmvMaterial(_resourceLibrary);
     }
 }

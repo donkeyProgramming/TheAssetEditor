@@ -44,6 +44,8 @@ namespace Editors.Reports.Geometry
             {
                 var meshFile = fileList[i];
                 var path = _pfs.GetFullPath(meshFile);
+                if (path.Contains("terrain\\tiles"))
+                    continue;
                 var rmvData = meshFile.DataSource.ReadData();
                 try
                 {

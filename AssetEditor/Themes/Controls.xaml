@@ -5156,8 +5156,8 @@
                                 <VisualState x:Name="Normal"/>
                                 <VisualState x:Name="MouseOver">
                                     <Storyboard>
-                                        <ColorAnimation Duration="0" Storyboard.TargetName="ContentElement" To="Green" Storyboard.TargetProperty="(App.BorderBrush).(SolidColorBrush.Color)"/>
-                                        <ColorAnimation Duration="0" Storyboard.TargetName="watermark_decorator" To="{DynamicResource AColour.Tone5.Border.MouseOver}" Storyboard.TargetProperty="(App.BorderBrush).(SolidColorBrush.Color)"/>
+                                        <ColorAnimation Duration="0" Storyboard.TargetName="ContentElement" To="Green" Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"/>
+                                        <ColorAnimation Duration="0" Storyboard.TargetName="watermark_decorator" To="{DynamicResource AColour.Tone5.Border.MouseOver}" Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"/>
                                     </Storyboard>
                                 </VisualState>
                             </VisualStateGroup>

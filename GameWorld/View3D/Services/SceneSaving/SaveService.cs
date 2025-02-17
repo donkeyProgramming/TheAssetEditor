@@ -7,9 +7,12 @@ using GameWorld.Core.Services.SceneSaving.Material;
 using Shared.Core.Events;
 using Shared.Core.Events.Scoped;
 using Shared.Core.PackFiles;
+using Shared.GameFormats.RigidModel;
 
 namespace GameWorld.Core.Services.SceneSaving
 {
+    public record SaveResult(bool Status, string? GeneratedMeshPath, RmvFile? GeneratedMesh, string? GeneratedMaterialPath, string? GeneratedMaterialContent);
+
     public class SaveService
     {
         private readonly IPackFileService _packFileService;
@@ -31,21 +34,22 @@ namespace GameWorld.Core.Services.SceneSaving
             _materialStrategyProvider = materialStrategyProvider;
         }
 
-        public void Save(MainEditableNode mainNode, GeometrySaveSettings settings)
+        public SaveResult Save(MainEditableNode mainNode, GeometrySaveSettings settings)
         {
             if (_packFileService.GetEditablePack() == null)
             {
                 MessageBox.Show("No editable pack selected", "error");
-                return;
+                return new SaveResult(false, null, null, null, null);
             }
 
             var outputPath = settings.OutputName;
-
             _lodStrategyProvider.GetStrategy(settings.LodGenerationMethod).Generate(mainNode, settings.LodSettingsPerLod);
-            _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, settings);
-            _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, settings.OnlySaveVisible);
+            var generatedRmvFile = _geometryStrategyProvider.GetStrategy(settings.GeometryOutputType).Generate(mainNode, settings);
+            var materialResult = _materialStrategyProvider.GetStrategy(settings.MaterialOutputType).Generate(mainNode, outputPath, settings.OnlySaveVisible);
 
             _eventHub.Publish(new ScopedFileSavedEvent() { NewPath = outputPath });
+
+            return new SaveResult(true, outputPath, generatedRmvFile, materialResult.GeneratedFilePath, materialResult.Content);
         }
 
         public List<GeometryStrategyInformation> GetGeometryStrategies() => _geometryStrategyProvider.GetStrategies();

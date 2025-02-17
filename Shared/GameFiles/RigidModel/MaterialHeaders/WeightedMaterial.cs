@@ -12,14 +12,16 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
     {
         public enum MaterialHintEnum
         {
-            None,
+            Unknown,
             Decal,
             Dirt,
-            DecalAndDirt,
+            Decal_Dirt,
+            Skin,
+            Skin_Dirt,
         }
 
         public UiVertexFormat ToolVertexFormat { get; set; }
-        public MaterialHintEnum MaterialHint { get; set; } = MaterialHintEnum.None;
+        public MaterialHintEnum MaterialHint { get; set; } = MaterialHintEnum.Unknown;
 
         // Actual attributes found in the rmv material
         public VertexFormat BinaryVertexFormat { get; set; } = VertexFormat.Unknown;
@@ -49,6 +51,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 MatrixIndex = MatrixIndex,
                 ParentMatrixIndex = ParentMatrixIndex,
                 MaterialId = MaterialId,
+                MaterialHint = MaterialHint,
 
                 ModelName = ModelName,
                 ToolVertexFormat = ToolVertexFormat,
@@ -149,36 +152,64 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 _ => throw new Exception($"Unknown vertex type - {uiVertexFormat}"),
             };
 
-            //var hasDirt = IntParams.TryGet(WeightedParamterIds.IntParams_Dirt_index, out var dirtValue);
-            //var hasDecal = IntParams.TryGet(WeightedParamterIds.IntParams_Dirt_index, out var decalValue);
-            var isDirt = MaterialHint == MaterialHintEnum.Dirt || MaterialHint == MaterialHintEnum.DecalAndDirt;
-            var isDecal = MaterialHint == MaterialHintEnum.Decal || MaterialHint == MaterialHintEnum.DecalAndDirt;
-
             // Overwrite the material type for static meshes
             MaterialId = ModelMaterialEnum.Unkown;
             if (BinaryVertexFormat == VertexFormat.Static)
             {
                 MaterialId = ModelMaterialEnum.default_type;
-                if(isDirt)
+                if(MaterialHint == MaterialHintEnum.Dirt)
                     MaterialId = ModelMaterialEnum.dirtmap;
-                if (isDecal)
+                if (MaterialHint == MaterialHintEnum.Decal)
                     MaterialId = ModelMaterialEnum.decal;
-                if (isDirt && isDecal)
+                if (MaterialHint == MaterialHintEnum.Decal_Dirt)
                     MaterialId = ModelMaterialEnum.decal_dirtmap;   
             }
             else
             {
                 MaterialId = ModelMaterialEnum.weighted;
-                if (isDirt)
+                if (MaterialHint == MaterialHintEnum.Dirt)
                     MaterialId = ModelMaterialEnum.weighted_dirtmap;
-                if (isDecal)
+                if (MaterialHint == MaterialHintEnum.Decal)
                     MaterialId = ModelMaterialEnum.weighted_decal;
-                if (isDirt && isDecal)
+                if (MaterialHint == MaterialHintEnum.Decal_Dirt)
                     MaterialId = ModelMaterialEnum.weighted_decal_dirtmap;
+                if (MaterialHint == MaterialHintEnum.Skin)
+                    MaterialId = ModelMaterialEnum.weighted_skin;
+                if (MaterialHint == MaterialHintEnum.Skin_Dirt)
+                    MaterialId = ModelMaterialEnum.weighted_skin_decal;
             }
 
             if (MaterialId == ModelMaterialEnum.Unkown)
                 throw new Exception("Unable to determine vertex format.");
+        }
+
+        internal void DetermineMaterial()
+        {
+            switch (MaterialId)
+            {
+                case ModelMaterialEnum.decal:
+                case ModelMaterialEnum.weighted_decal:
+                    MaterialHint = MaterialHintEnum.Decal;
+                    break;
+
+                case ModelMaterialEnum.dirtmap:
+                case ModelMaterialEnum.weighted_dirtmap:
+                    MaterialHint = MaterialHintEnum.Dirt;
+                    break;
+
+                case ModelMaterialEnum.decal_dirtmap:
+                case ModelMaterialEnum.weighted_decal_dirtmap:
+                    MaterialHint = MaterialHintEnum.Decal_Dirt;
+                    break;
+
+                case ModelMaterialEnum.weighted_skin_dirtmap:
+                    MaterialHint = MaterialHintEnum.Skin_Dirt;
+                    break;
+
+                case ModelMaterialEnum.weighted_skin:
+                    MaterialHint = MaterialHintEnum.Skin;
+                    break;
+            }
         }
 
         public void EnrichDataBeforeSaving(string[] boneNames)
@@ -195,6 +226,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 AttachmentPointParams.Add(newPoint);
             }
         }
+
+
     }
 
     public class WeighterMaterialCreator : IMaterialCreator
@@ -222,6 +255,8 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 TextureDirectory = StringSanitizer.FixedString(Encoding.ASCII.GetString(header._textureDir)),
                 OriginalTransform = header.Transform,
             };
+
+            material.DetermineMaterial();
 
             return material;
         }

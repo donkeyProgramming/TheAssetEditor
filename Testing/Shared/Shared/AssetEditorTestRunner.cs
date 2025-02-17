@@ -27,7 +27,7 @@ namespace Test.TestingUtility.Shared
 
         public AssetEditorTestRunner(GameTypeEnum gameEnum = GameTypeEnum.Warhammer3, bool forceValidateServiceScopes = false)
         {
-            _serviceProvider = new DependencyInjectionConfig().Build(forceValidateServiceScopes, MockServices);
+            _serviceProvider = new DependencyInjectionConfig(false).Build(forceValidateServiceScopes, MockServices);
   
             var settings = ServiceProvider.GetRequiredService<ApplicationSettingsService>();
             settings.CurrentSettings.CurrentGame = gameEnum;

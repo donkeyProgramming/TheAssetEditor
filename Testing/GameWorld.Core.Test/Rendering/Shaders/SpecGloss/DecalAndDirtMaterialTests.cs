@@ -31,12 +31,12 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             var material = materialFactory.Create(rmvFile.ModelList[0][0].Material, null);
 
             // Assert
-            Assert.That(material.Type, Is.EqualTo(CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal));
+            Assert.That(material.Type, Is.EqualTo(CapabilityMaterialsEnum.SpecGlossPbr_Advanced));
 
-            var typedMaterial = material as DecalAndDirtMaterial;
+            var typedMaterial = material as AdvancedRmvMaterial;
             Assert.That(typedMaterial, Is.Not.Null);
 
-            var capability = typedMaterial.GetCapability<DirtAndDecalCapability>();
+            var capability = typedMaterial.GetCapability<AdvancedMaterialCapability>();
             Assert.That(capability.UvScale, Is.EqualTo(new Vector2(2, 2)));
             Assert.That(capability.TextureTransform, Is.EqualTo(new Vector4(0.03337255f, 0.23629414f, 0.39431375f, 0.95299995f)));
 
@@ -60,12 +60,12 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             var material = materialFactory.Create(rmvFile.ModelList[0][0].Material, null);
 
             // Assert
-            Assert.That(material.Type, Is.EqualTo(CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal));
+            Assert.That(material.Type, Is.EqualTo(CapabilityMaterialsEnum.SpecGlossPbr_Advanced));
 
-            var typedMaterial = material as DecalAndDirtMaterial;
+            var typedMaterial = material as AdvancedRmvMaterial;
             Assert.That(typedMaterial, Is.Not.Null);
 
-            var capability = typedMaterial.GetCapability<DirtAndDecalCapability>();
+            var capability = typedMaterial.GetCapability<AdvancedMaterialCapability>();
             Assert.That(capability.UvScale, Is.EqualTo(new Vector2(2, 2)));
             Assert.That(capability.TextureTransform, Is.EqualTo(new Vector4(0, 0, 0, 0)));
 
@@ -86,9 +86,9 @@ namespace GameWorld.Core.Test.Rendering.Shaders.SpecGloss
             var materialFactory = new CapabilityMaterialFactory(settings, null);
             var material = materialFactory.Create(rmvFile.ModelList[0][0].Material, null);
             material.GetCapability<SpecGlossCapability>().UseAlpha = false;
-            material.GetCapability<DirtAndDecalCapability>().UvScale = new Vector2(2.5f, 3);
-            material.GetCapability<DirtAndDecalCapability>().UseDecal = true;
-            material.GetCapability<DirtAndDecalCapability>().UseDirt = true;
+            material.GetCapability<AdvancedMaterialCapability>().UvScale = new Vector2(2.5f, 3);
+            material.GetCapability<AdvancedMaterialCapability>().UseDecal = true;
+            material.GetCapability<AdvancedMaterialCapability>().UseDirt = true;
 
             // Act
             var serializer = new MaterialToRmvSerializer();

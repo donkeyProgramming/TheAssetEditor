@@ -8,7 +8,10 @@
              xmlns:mathviews="clr-namespace:CommonControls.MathViews;assembly=Shared.Ui"
              xmlns:blood="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Blood" 
              xmlns:tint="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Tint" 
-             xmlns:emissive="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive" xmlns:metalrough="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.MetalRough" xmlns:specgloss="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.SpecGloss" xmlns:dirtanddecal="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.DirtAndDecal"
+             xmlns:emissive="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.Emissive" 
+             xmlns:metalrough="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.MetalRough" 
+             xmlns:specgloss="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.SpecGloss" 
+             xmlns:dirtanddecal="clr-namespace:Editors.KitbasherEditor.ViewModels.SceneNodeEditor.Nodes.MeshNode.Mesh.WsMaterial.DirtAndDecal"
              mc:Ignorable="d" 
              d:DesignHeight="1200" d:DesignWidth="800">
     <UserControl.Resources>
@@ -36,7 +39,7 @@
 
             <metalrough:MetalRoughView DockPanel.Dock="Top" DataContext="{Binding MetalRough}" Visibility="{Binding  Converter={StaticResource NullToVisibilityConverter}}" />
             <specgloss:SpecGlossView DockPanel.Dock="Top" DataContext="{Binding SpecGloss}" Visibility="{Binding  Converter={StaticResource NullToVisibilityConverter}}" />
-            <dirtanddecal:DirtAndDecalView DockPanel.Dock="Top" DataContext="{Binding DecalAndDirt}" Visibility="{Binding  Converter={StaticResource NullToVisibilityConverter}}" />
+            <dirtanddecal:AdvancedRmvMaterialView DockPanel.Dock="Top" DataContext="{Binding AdvanceRvmMaterial}" Visibility="{Binding  Converter={StaticResource NullToVisibilityConverter}}" />
             <blood:BloodView DockPanel.Dock="Top" DataContext="{Binding Blood}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
             <tint:TintView DockPanel.Dock="Top" DataContext="{Binding Tint}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />
             <emissive:EmissiveView DockPanel.Dock="Top" DataContext="{Binding Emissive}" Visibility="{Binding Converter={StaticResource NullToVisibilityConverter}}" />

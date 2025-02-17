@@ -145,12 +145,12 @@ namespace GameWorld.Core.Test.Rendering.Materials
             var abstractMaterialFactory = new CapabilityMaterialFactory(appSettings, null);
             var material = abstractMaterialFactory.Create(rmvMaterial, null);
             
-            Assert.That(material, Is.TypeOf<Core.Rendering.Materials.Shaders.SpecGloss.DecalAndDirtMaterial>());
+            Assert.That(material, Is.TypeOf<Core.Rendering.Materials.Shaders.SpecGloss.AdvancedRmvMaterial>());
             
             var specGlossCap = material.TryGetCapability<SpecGlossCapability>();
             Assert.That(specGlossCap, Is.Not.Null);
             
-            var dirtCap = material.TryGetCapability<DirtAndDecalCapability>();
+            var dirtCap = material.TryGetCapability<AdvancedMaterialCapability>();
             Assert.That(dirtCap, Is.Not.Null);
         }
     }

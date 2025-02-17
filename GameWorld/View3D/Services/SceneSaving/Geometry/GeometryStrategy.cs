@@ -1,4 +1,5 @@
 ﻿using GameWorld.Core.SceneNodes;
+using Shared.GameFormats.RigidModel;
 
 namespace GameWorld.Core.Services.SceneSaving.Geometry
 {
@@ -16,6 +17,6 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
         public string Description { get; }
         public bool IsAvailable { get; }
         public GeometryStrategy StrategyId { get; }
-        public void Generate(MainEditableNode mainNode, GeometrySaveSettings saveSettings);
+        public RmvFile? Generate(MainEditableNode mainNode, GeometrySaveSettings saveSettings);
     }
 }

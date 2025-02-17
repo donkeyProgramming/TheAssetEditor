@@ -111,6 +111,16 @@ namespace GameWorld.Core.Components.Selection
             }
         }
 
+        public void SelectFromIndex(int index)
+        {
+            var selectable = _sceneManger.GetByIndex(index);
+            if (selectable == null)
+                return;
+
+            //_selectionManager.CreateSelectionSate(GeometrySelectionMode.Object, selectable, true);
+            _commandFactory.Create<ObjectSelectionCommand>().Configure(x => x.Configure([selectable], false, true)).BuildAndExecute();
+        }
+
         void SelectFromRectangle(Rectangle screenRect, bool isSelectionModification, bool removeSelection)
         {
             var unprojectedSelectionRect = _camera.UnprojectRectangle(screenRect);

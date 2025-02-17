@@ -14,6 +14,8 @@ using Shared.GameFormats.RigidModel;
 
 namespace GameWorld.Core.Services.SceneSaving.Material
 {
+    public record WsMaterialResult(bool Result, string? Content, string? GeneratedFilePath);
+
     public class WsModelGeneratorService
     {
         private readonly ILogger _logger = Logging.Create<WsModelGeneratorService>();
@@ -26,14 +28,14 @@ namespace GameWorld.Core.Services.SceneSaving.Material
             _packFileSaveService = packFileSaveService;
         }
 
-        public (bool Status, string? CreatedFilePath) GenerateWsModel(IMaterialToWsMaterialSerializer wsMaterialGenerator, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
+        public WsMaterialResult GenerateWsModel(IMaterialToWsMaterialSerializer wsMaterialGenerator, string modelFilePath, List<WsModelGeneratorInput> meshInformation)
         {
             try
             {
                 if (_packFileService.GetEditablePack() == null)
                 {
                     MessageBox.Show("No editable pack selected", "error");
-                    return (false, null);
+                    return new WsMaterialResult(false, null, null); 
                 }
                
                 var wsModelData = CreateWsModel(wsMaterialGenerator, modelFilePath, meshInformation);
@@ -41,14 +43,14 @@ namespace GameWorld.Core.Services.SceneSaving.Material
                 var wsModelPath = Path.ChangeExtension(modelFilePath, ".wsmodel");
                 var existingWsModelFile = _packFileService.FindFile(wsModelPath, _packFileService.GetEditablePack());
                 _packFileSaveService.Save(wsModelPath, Encoding.UTF8.GetBytes(wsModelData), false);
-
-                return (true, wsModelPath);
+              
+                return new WsMaterialResult(false, wsModelPath, wsModelData);
             }
             catch (Exception e)
             {
                 _logger.Here().Error("Error generating ws model - " + e.Message);
                 MessageBox.Show("Generation failed!");
-                return (false, null);
+                return new WsMaterialResult(false, null, null);
             }
         }
 

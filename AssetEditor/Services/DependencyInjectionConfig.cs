@@ -40,6 +40,8 @@ namespace AssetEditor.Services
             ];
         }
 
+        
+
         public IServiceProvider Build(bool forceValidateServiceScopes, Action<IServiceCollection> replaceServices = null)
         {
             var option = new ServiceProviderOptions()

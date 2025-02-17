@@ -54,6 +54,7 @@ namespace GameWorld.Core.Components.Selection
             base.Initialize();
         }
 
+
         public ISelectionState CreateSelectionSate(GeometrySelectionMode mode, ISelectable selectedObj, bool sendEvent = true)
         {
             if (_currentState != null)

@@ -19,10 +19,11 @@ namespace GameWorld.Core.Services.SceneSaving.Material.Strategies
             _wsMaterialGeneratorFactory = wsMaterialGeneratorFactory;
         }
 
-        public void Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
+        public WsMaterialResult Generate(MainEditableNode mainNode, string outputPath, bool onlyVisibleNodes)
         {
             var input = WsModelGeneratorInputHelper.Create(mainNode, onlyVisibleNodes);
-            _wsModelGeneratorService.GenerateWsModel(_wsMaterialGeneratorFactory.CreateInstance(GameTypeEnum.Pharaoh), outputPath, input);
+            var res = _wsModelGeneratorService.GenerateWsModel(_wsMaterialGeneratorFactory.CreateInstance(GameTypeEnum.Pharaoh), outputPath, input);
+            return res;
         }
     }
 }

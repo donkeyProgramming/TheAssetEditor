@@ -18,8 +18,8 @@ namespace Test.TestingUtility.Shared
 
             var Parameters = new PresentationParameters()
             {
-                BackBufferWidth = 1280,
-                BackBufferHeight = 720,
+                BackBufferWidth = 20,
+                BackBufferHeight = 20,
                 DeviceWindowHandle = HiddenForm.Handle,
                 PresentationInterval = PresentInterval.Immediate,
                 IsFullScreen = false

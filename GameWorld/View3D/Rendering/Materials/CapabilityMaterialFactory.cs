@@ -102,9 +102,10 @@ namespace GameWorld.Core.Rendering.Materials
             {
                 var isDecal = RmvMaterialUtil.IsDecal(material);
                 var isDirt = RmvMaterialUtil.IsDirt(material);
+                var isSkin = RmvMaterialUtil.IsSkin(material);
 
-                if (isDecal || isDirt)
-                    preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal;
+                if (isDecal || isDirt || isSkin)
+                    preferredMaterial = CapabilityMaterialsEnum.SpecGlossPbr_Advanced;
             }
         }
 
@@ -122,7 +123,7 @@ namespace GameWorld.Core.Rendering.Materials
                 CapabilityMaterialsEnum.MetalRoughPbr_Default => new Shaders.MetalRough.DefaultMaterial(_resourceLibrary),
                 CapabilityMaterialsEnum.MetalRoughPbr_Emissive => new Shaders.MetalRough.EmissiveMaterial(_resourceLibrary),
                 CapabilityMaterialsEnum.SpecGlossPbr_Default => new Shaders.SpecGloss.DefaultMaterial(_resourceLibrary),
-                CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal => new Shaders.SpecGloss.DecalAndDirtMaterial(_resourceLibrary),
+                CapabilityMaterialsEnum.SpecGlossPbr_Advanced => new Shaders.SpecGloss.AdvancedRmvMaterial(_resourceLibrary),
 
                 _ => throw new Exception($"Material of type {type} is not supported by {nameof(CapabilityMaterialFactory)}"),
             };
@@ -146,7 +147,7 @@ namespace GameWorld.Core.Rendering.Materials
                 case GameTypeEnum.ThronesOfBritannia:
                 case GameTypeEnum.Warhammer:
                 case GameTypeEnum.Warhammer2:
-                    return [CapabilityMaterialsEnum.SpecGlossPbr_Default, CapabilityMaterialsEnum.SpecGlossPbr_DirtAndDecal];
+                    return [CapabilityMaterialsEnum.SpecGlossPbr_Default, CapabilityMaterialsEnum.SpecGlossPbr_Advanced];
 
                 case GameTypeEnum.Warhammer3:
                 case GameTypeEnum.ThreeKingdoms:

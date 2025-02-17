@@ -1,17 +1,23 @@
 
-
-
+ogre_contracts
+ui\campaign ui\cathay_compass.twui.xml
+ui\campaign ui\character_information.twui.xml
+ui\campaign ui\dlc25_nurgle_plagues.twui.xml
+ui\campaign ui\elector_counts.twui.xml
+ui\campaign ui\ikit_workshop.twui.xml
+ui\campaign ui\hud_campaign.twui.xml
 
 
 Fixes for v060
-
-
 	[Bugfix]: General: Close console window (and any other windows) on application close 
 	
 	
 	[Internal] Changed animationMetadDataParser to be a singlenton with lazy init - To speed up loading and testing when the class is not needed
 
-
+	ErrorFiles
+		Command history
+		Dump to file  
+	Fix skeleton tool https://github.com/donkeyProgramming/TheAssetEditor/issues/166
 
 
 	[Feature] twui editor v0.1
@@ -35,9 +41,7 @@ Fixes for v060
 	Superview - default scene content to be expanded. Allow select meshes
 	Move Editors.Shared.Core into shared? Maybe under UI?
 
-	ErrorFiles
-		Command history
-		Dump to file 
+
 	Change how metadata parsing is handled. need to be lazy! Slow slow
 	KitbashTOol Materiul - warning for not supported material! 
 
@@ -47,6 +51,8 @@ Unit test:
 	Create unit test for SuperView
 		
 Bugs:
+	General: right click packfile and "expor to system folder" does not work on packfile, just sub folders
+
 	KitbashTool: Manual vertex editor for weights (new editor or reuse debug view)
 	KitbashTool: Reduce icon size?
 	KitbashTool: when loading material - if not supported show message
