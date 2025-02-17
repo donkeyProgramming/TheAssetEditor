@@ -27,6 +27,7 @@ namespace AssetEditor
             serviceCollection.AddTransient<OpenWebpageCommand>();
             serviceCollection.AddTransient<PrintScopesCommand>();
             serviceCollection.AddTransient<OpenEditorCommand>();
+            serviceCollection.AddTransient<TogglePackFileExplorerCommand>();
 
             serviceCollection.AddTransient<SettingsWindow>();
             serviceCollection.AddScoped<SettingsViewModel>();
