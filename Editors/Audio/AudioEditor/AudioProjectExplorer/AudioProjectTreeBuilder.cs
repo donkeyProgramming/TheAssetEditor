@@ -251,14 +251,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 if (gameSoundBankType == Wh3SoundBankType.ActionEventSoundBank)
                 {
                     return audioProjectService.AudioProject.SoundBanks
-                        .Where(soundBank => soundBank.Type == Wh3SoundBankType.ActionEventSoundBank
+                        .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank
                         && soundBank.ActionEvents.Count > 0)
                         .ToList();
                 }
                 else
                 {
                     return audioProjectService.AudioProject.SoundBanks
-                        .Where(soundBank => soundBank.Type == Wh3SoundBankType.DialogueEventSoundBank
+                        .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank
                         && soundBank.DialogueEvents.Any(dialogueEvent => dialogueEvent.DecisionTree.Count > 0))
                         .ToList();
                 }
@@ -268,13 +268,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 if (gameSoundBankType == Wh3SoundBankType.ActionEventSoundBank)
                 {
                     return audioProjectService.AudioProject.SoundBanks
-                        .Where(soundBank => soundBank.Type == Wh3SoundBankType.ActionEventSoundBank)
+                        .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
                         .ToList();
                 }
                 else
                 {
                     return audioProjectService.AudioProject.SoundBanks
-                        .Where(soundBank => soundBank.Type == Wh3SoundBankType.DialogueEventSoundBank)
+                        .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
                         .ToList();
                 }
             }

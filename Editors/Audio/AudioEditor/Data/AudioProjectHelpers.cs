@@ -39,7 +39,7 @@ namespace Editors.Audio.AudioEditor.Data
         public static DialogueEvent GetDialogueEventFromName(IAudioProjectService audioProjectService, string dialogueEventName)
         {
             return audioProjectService.AudioProject.SoundBanks
-                .Where(soundBank => soundBank.Type == Wh3SoundBankType.DialogueEventSoundBank)
+                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
                 .SelectMany(soundBank => soundBank.DialogueEvents)
                 .FirstOrDefault(dialogueEvent => dialogueEvent.Name == dialogueEventName);
         }

@@ -49,7 +49,7 @@ namespace Editors.Audio.AudioEditor
 
             foreach (var soundBank in audioProjectService.AudioProject.SoundBanks)
             {
-                if (soundBank.Type == Wh3SoundBankType.DialogueEventSoundBank)
+                if (soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
                     foreach (var dialogueEvent in soundBank.DialogueEvents)
                     {
                         var firstStatePath = dialogueEvent.DecisionTree.FirstOrDefault();

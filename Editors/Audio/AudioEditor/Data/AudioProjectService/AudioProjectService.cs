@@ -109,9 +109,9 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
             audioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
         }
 
-        public void CompileAudioProject(IPackFileService packFileService, IAudioRepository audioRepository, ApplicationSettingsService applicationSettingsService)
+        public void CompileAudioProject(IPackFileService packFileService, IAudioRepository audioRepository, ApplicationSettingsService applicationSettingsService, IFileSaveService fileSaveService)
         {
-            var soundBankGenerator = new SoundBankGenerator(packFileService, audioRepository, this, applicationSettingsService);
+            var soundBankGenerator = new SoundBankGenerator(packFileService, audioRepository, this, applicationSettingsService, fileSaveService);
             var audioProject = GetAudioProjectWithoutUnusedObjects();
             soundBankGenerator.CompileSoundBanksFromAudioProject(audioProject);
         }
@@ -122,7 +122,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                 .Select(soundBank => new SoundBank
                 {
                     Name = GetSoundBankSubTypeDisplayString(soundBank),
-                    Type = GetSoundBankSubType(soundBank)
+                    SoundBankType = GetSoundBankSubType(soundBank)
                 })
                 .ToList();
 
@@ -133,10 +133,10 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                 var soundBank = new SoundBank
                 {
                     Name = GetSoundBankSubTypeDisplayString(soundBankEnum),
-                    Type = GetSoundBankSubType(soundBankEnum)
+                    SoundBankType = GetSoundBankSubType(soundBankEnum)
                 };
 
-                if (soundBank.Type == Wh3SoundBankType.ActionEventSoundBank)
+                if (soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
                     soundBank.ActionEvents = [];
                 else
                 {
@@ -181,7 +181,7 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                 AudioProject.SoundBanks.Add(soundBank);
         }
 
-        public void BuildStateGroupsWithModdedStatesRepository(ObservableCollection<StateGroup> moddedStateGroups, Dictionary<string, List<string>> stateGroupsWithModdedStatesRepository)
+        public void BuildStateGroupsWithModdedStatesRepository(List<StateGroup> moddedStateGroups, Dictionary<string, List<string>> stateGroupsWithModdedStatesRepository)
         {
             if (stateGroupsWithModdedStatesRepository == null)
                 stateGroupsWithModdedStatesRepository = new Dictionary<string, List<string>>();
@@ -220,12 +220,12 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                     return new SoundBank
                     {
                         Name = soundBank.Name,
-                        Type = soundBank.Type,
+                        SoundBankType = soundBank.SoundBankType,
                         DialogueEvents = dialogueEvents.Count != 0
-                            ? new ObservableCollection<DialogueEvent>(dialogueEvents)
+                            ? new List<DialogueEvent>(dialogueEvents)
                             : null,
                         ActionEvents = actionEvents.Count != 0
-                            ? new ObservableCollection<ActionEvent>(actionEvents)
+                            ? new List<ActionEvent>(actionEvents)
                             : null
                     };
                 })
@@ -233,15 +233,15 @@ namespace Editors.Audio.AudioEditor.Data.AudioProjectService
                 .ToList();
 
             var soundBanksResult = usedSoundBanksList.Count != 0
-                ? new ObservableCollection<SoundBank>(usedSoundBanksList)
+                ? new List<SoundBank>(usedSoundBanksList)
                 : null;
 
-            var usedStateGroupsList = (AudioProject.StateGroups ?? new ObservableCollection<StateGroup>())
+            var usedStateGroupsList = (AudioProject.StateGroups ?? new List<StateGroup>())
                 .Where(stateGroup => stateGroup.States != null && stateGroup.States.Count != 0)
                 .ToList();
 
             var stateGroupsResult = usedStateGroupsList.Count != 0
-                ? new ObservableCollection<StateGroup>(usedStateGroupsList)
+                ? new List<StateGroup>(usedStateGroupsList)
                 : null;
 
             return new AudioProjectDataModel

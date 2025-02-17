@@ -22,6 +22,7 @@ namespace Editors.Audio.AudioEditor
         private readonly IAudioProjectService _audioProjectService;
         private readonly IStandardDialogs _packFileUiProvider;
         private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly IFileSaveService _fileSaveService;
 
         public string DisplayName { get; set; } = "Audio Editor";
 
@@ -37,15 +38,17 @@ namespace Editors.Audio.AudioEditor
             IPackFileService packFileService,
             IAudioProjectService audioProjectService,
             IStandardDialogs packFileUiProvider,
-            ApplicationSettingsService applicationSettingsService)
+            ApplicationSettingsService applicationSettingsService,
+            IFileSaveService fileSaveService)
         {
             _audioRepository = audioRepository;
             _packFileService = packFileService;
             _audioProjectService = audioProjectService;
             _packFileUiProvider = packFileUiProvider;
             _applicationSettingsService = applicationSettingsService;
+            _fileSaveService = fileSaveService;
 
-            AudioEditorMenuViewModel = new AudioEditorMenuViewModel(this, _audioRepository, _packFileService, _audioProjectService, _packFileUiProvider, _applicationSettingsService);
+            AudioEditorMenuViewModel = new AudioEditorMenuViewModel(this, _audioRepository, _packFileService, _audioProjectService, _packFileUiProvider, _applicationSettingsService, _fileSaveService);
             AudioProjectExplorerViewModel = new AudioProjectExplorerViewModel(this, _audioRepository, _audioProjectService);
             AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(this, _packFileService, _audioRepository, _audioProjectService);
             AudioProjectEditorViewModel = new AudioProjectEditorViewModel(this, _audioRepository, _audioProjectService);

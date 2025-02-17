@@ -35,7 +35,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
 
         private static CAkEvent_V136.Action_V136 CreateActionFromInputEvent(uint actionId, CompilerData project)
         {
-            return new CAkEvent_V136.Action_V136() { ActionId = actionId };
+            return new CAkEvent_V136.Action_V136() { ActionID = actionId };
         }
     }
 }

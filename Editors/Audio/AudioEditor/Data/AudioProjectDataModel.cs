@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using Shared.GameFormats.Wwise.Enums;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
@@ -8,8 +8,8 @@ namespace Editors.Audio.AudioEditor.Data
     public class AudioProjectDataModel
     {
         public string Language { get; set; }
-        public ObservableCollection<SoundBank> SoundBanks { get; set; }
-        public ObservableCollection<StateGroup> StateGroups { get; set; }
+        public List<SoundBank> SoundBanks { get; set; }
+        public List<StateGroup> StateGroups { get; set; }
     }
 
     public abstract class AudioProjectItem
@@ -18,29 +18,37 @@ namespace Editors.Audio.AudioEditor.Data
         public uint ID { get; set; }
     }
 
-    public partial class SoundBank : AudioProjectItem
+    public abstract class AudioProjectHircItem : AudioProjectItem
     {
-        public Wh3SoundBankType Type { get; set; }
-        public Wh3SoundBankSubType SubType { get; set; }
-        public ObservableCollection<ActionEvent> ActionEvents { get; set; }
-        public ObservableCollection<DialogueEvent> DialogueEvents { get; set; }
+        public abstract AkBkHircType HircType { get; }
     }
 
-    public class ActionEvent : AudioProjectItem
+    public partial class SoundBank : AudioProjectItem
     {
+        public Wh3SoundBankType SoundBankType { get; set; }
+        public Wh3SoundBankSubType SoundBankSubType { get; set; }
+        public List<ActionEvent> ActionEvents { get; set; }
+        public List<DialogueEvent> DialogueEvents { get; set; }
+    }
+
+    public class ActionEvent : AudioProjectHircItem
+    {
+        public override AkBkHircType HircType { get; } = AkBkHircType.Event;
         public List<Action> Actions { get; set; }
         public SoundContainer SoundContainer { get; set; }
         public Sound Sound { get; set; }
     }
 
-    public class Action : AudioProjectItem
+    public class Action : AudioProjectHircItem
     {
-        public uint ChildID { get; set; }
-        public string Type { get; set; }
+        public override AkBkHircType HircType { get; } = AkBkHircType.Action;
+        public AkActionType ActionType { get; set; } = AkActionType.Play;
+        public uint IDExt { get; set; }
     }
 
-    public class DialogueEvent : AudioProjectItem
+    public class DialogueEvent : AudioProjectHircItem
     {
+        public override AkBkHircType HircType { get; } = AkBkHircType.Dialogue_Event;
         public List<StatePath> DecisionTree { get; set; }
     }
 
@@ -64,17 +72,20 @@ namespace Editors.Audio.AudioEditor.Data
         public State State { get; set; }
     }
 
-    public class SoundContainer : AudioProjectItem
+    public class SoundContainer : AudioProjectHircItem
     {
+        public override AkBkHircType HircType { get; } = AkBkHircType.SequenceContainer;
         public uint DirectParentID { get; set; }
         public AudioSettings AudioSettings { get; set; }
         public List<Sound> Sounds { get; set; }
     }
 
-    public class Sound : AudioProjectItem
+    public class Sound : AudioProjectHircItem
     {
+        public override AkBkHircType HircType { get; } = AkBkHircType.Sound;
         public uint DirectParentID { get; set; }
         public uint AttenuationID { get; set; }
+        public uint SourceID { get; set; }
         public AudioSettings AudioSettings { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }

@@ -43,30 +43,30 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             SectionSize = idSize + actionListSizeSize + actionListSize;
         }
 
-        public List<uint> GetActionIds() => Actions.Select(x => x.ActionId).ToList();
+        public List<uint> GetActionIds() => Actions.Select(x => x.ActionID).ToList();
 
         public class Action_V136
         {
-            public uint ActionId { get; set; }
+            public uint ActionID { get; set; }
             
             public static Action_V136 ReadData(ByteChunk chunk)
             {
                 return new Action_V136()
                 {
-                    ActionId = chunk.ReadUInt32()
+                    ActionID = chunk.ReadUInt32()
                 };
             }
 
             public byte[] WriteData()
             {
                 using var memStream = new MemoryStream();
-                memStream.Write(ByteParsers.UInt32.EncodeValue(ActionId, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(ActionID, out _));
                 return memStream.ToArray();
             }
 
             public uint GetSize()
             {
-                var actionIdSize = ByteHelper.GetPropertyTypeSize(ActionId);
+                var actionIdSize = ByteHelper.GetPropertyTypeSize(ActionID);
                 return actionIdSize;
             }
         }

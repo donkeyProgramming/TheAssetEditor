@@ -1,0 +1,38 @@
+﻿using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService;
+using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.Utility;
+using Shared.GameFormats.Wwise.Enums;
+using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Hirc.V136;
+
+namespace Editors.Audio.AudioEditor.AudioProjectCompiler.Wwise.Hirc.V136
+{
+    public class ActionHircGenerator_V136 : IWwiseHircGeneratorService
+    {
+        public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank)
+        {
+            var audioProjectActionEvent = audioProjectItem as Action;
+
+            var wwiseAction = new CAkAction_V136
+            {
+                ID = audioProjectActionEvent.ID,
+                HircType = audioProjectActionEvent.HircType,
+                ActionType = audioProjectActionEvent.ActionType,
+                IdExt = audioProjectActionEvent.IDExt
+            };
+
+            if (audioProjectActionEvent.ActionType == AkActionType.Play)
+            {
+                wwiseAction.PlayActionParams = new CAkAction_V136.PlayActionParams_V136
+                {
+                    BitVector = 0x04,
+                    BankId = WwiseHash.Compute(soundBank.Name)
+                };
+            }
+
+            wwiseAction.UpdateSectionSize();
+
+            return wwiseAction;
+        }
+    }
+}

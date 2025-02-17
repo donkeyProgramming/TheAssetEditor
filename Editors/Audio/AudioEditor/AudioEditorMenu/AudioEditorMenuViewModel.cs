@@ -16,6 +16,7 @@ namespace Editors.Audio.AudioEditor.AudioEditorMenu
         private readonly IAudioProjectService _audioProjectService;
         private readonly IStandardDialogs _packFileUiProvider;
         private readonly ApplicationSettingsService _applicationSettingsService;
+        private readonly IFileSaveService _fileSaveService;
 
         public AudioEditorMenuViewModel(
             AudioEditorViewModel audioEditorViewModel,
@@ -23,7 +24,8 @@ namespace Editors.Audio.AudioEditor.AudioEditorMenu
             IPackFileService packFileService,
             IAudioProjectService audioProjectService,
             IStandardDialogs packFileUiProvider,
-            ApplicationSettingsService applicationSettingsService)
+            ApplicationSettingsService applicationSettingsService,
+            IFileSaveService fileSaveService)
         {
             _audioEditorViewModel = audioEditorViewModel;
             _audioRepository = audioRepository;
@@ -31,6 +33,7 @@ namespace Editors.Audio.AudioEditor.AudioEditorMenu
             _audioProjectService = audioProjectService;
             _packFileUiProvider = packFileUiProvider;
             _applicationSettingsService = applicationSettingsService;
+            _fileSaveService = fileSaveService;
         }
 
         [RelayCommand] public void NewAudioProject()
@@ -50,7 +53,7 @@ namespace Editors.Audio.AudioEditor.AudioEditorMenu
 
         [RelayCommand] public void CompileAudioProject()
         {
-            _audioProjectService.CompileAudioProject(_packFileService, _audioRepository, _applicationSettingsService);
+            _audioProjectService.CompileAudioProject(_packFileService, _audioRepository, _applicationSettingsService, _fileSaveService);
         }
     }
 }

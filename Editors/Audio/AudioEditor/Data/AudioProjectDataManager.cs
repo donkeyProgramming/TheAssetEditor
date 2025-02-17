@@ -176,7 +176,7 @@ namespace Editors.Audio.AudioEditor.Data
         private static void AddActionEventSoundBankData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, System.Collections.Generic.Dictionary<string, string> audioProjectEditorRow)
         {
             var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
-            if (soundBank.Type == Wh3SoundBankType.ActionEventSoundBank)
+            if (soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
             {
                 var parameters = new AudioProjectDataServiceParameters
                 {
@@ -247,7 +247,7 @@ namespace Editors.Audio.AudioEditor.Data
         private static void EditActionEventSoundBankData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
         {
             var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
-            if (soundBank.Type == Wh3SoundBankType.ActionEventSoundBank)
+            if (soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
             {
                 DataGridHelpers.ClearDataGridCollection(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid);
                 AddAudioProjectViewerDataGridDataToAudioProjectEditor(audioEditorViewModel);
@@ -334,7 +334,7 @@ namespace Editors.Audio.AudioEditor.Data
         private static void RemoveActionEventData(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
         {
             var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
-            if (soundBank.Type == Wh3SoundBankType.ActionEventSoundBank)
+            if (soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
             {
                 var parameters = new AudioProjectDataServiceParameters
                 {
