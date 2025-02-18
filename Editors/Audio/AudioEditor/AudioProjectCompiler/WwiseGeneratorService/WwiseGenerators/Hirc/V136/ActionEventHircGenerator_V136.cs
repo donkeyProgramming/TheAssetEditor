@@ -1,10 +1,9 @@
 ﻿using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler.Wwise.Hirc.V136
+namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
 {
     public class ActionEventHircGenerator_V136 : IWwiseHircGeneratorService
     {

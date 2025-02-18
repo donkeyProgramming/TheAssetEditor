@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Editors.Audio.AudioEditor.Data.AudioProjectService;
+using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
+namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
 {
     public class AudioProjectDataServiceParameters
     {

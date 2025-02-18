@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise.Enums;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioEditor.Data
+namespace Editors.Audio.AudioEditor.AudioProjectData
 {
     public class AudioProjectDataModel
     {
@@ -34,7 +34,9 @@ namespace Editors.Audio.AudioEditor.Data
     public class ActionEvent : AudioProjectHircItem
     {
         public override AkBkHircType HircType { get; } = AkBkHircType.Event;
-        public List<Action> Actions { get; set; }
+
+        // Technically we should make each action contain the SoundContainer / Sound but making multiple actions for an event isn't supported as the user probably doesn't need to.
+        public List<Action> Actions { get; set; } 
         public SoundContainer SoundContainer { get; set; }
         public Sound Sound { get; set; }
     }

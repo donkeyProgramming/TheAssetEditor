@@ -1,7 +1,7 @@
 ﻿using Audio.AudioExplorer;
 using Audio.Compiler;
 using Editors.Audio.AudioEditor;
-using Editors.Audio.AudioEditor.Data.AudioProjectService;
+using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.BnkCompiler;

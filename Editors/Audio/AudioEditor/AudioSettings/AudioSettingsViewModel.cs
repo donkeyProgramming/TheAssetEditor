@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 
@@ -115,9 +114,9 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                 AudioFiles.Add(audioFile);
         }
 
-        public Data.AudioSettings BuildAudioSettings()
+        public AudioProjectData.AudioSettings BuildAudioSettings()
         {
-            var audioSettings = new Data.AudioSettings();
+            var audioSettings = new AudioProjectData.AudioSettings();
 
             audioSettings.InitialDelay = InitialDelay;
             audioSettings.Volume = Volume;
@@ -156,7 +155,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             return audioSettings;
         }
 
-        public void SetAudioSettingsFromAudioProjectItemAudioSettings(Data.AudioSettings audioSettings, int audioFilesCount)
+        public void SetAudioSettingsFromAudioProjectItemAudioSettings(AudioProjectData.AudioSettings audioSettings, int audioFilesCount)
         {
             ResetAudioSettingsGeneral();
             ResetAudioSettingsPlaylist();

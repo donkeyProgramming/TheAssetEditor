@@ -1,4 +1,4 @@
-﻿namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
+﻿namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
 {
     public class AudioProjectDataServiceFactory
     {

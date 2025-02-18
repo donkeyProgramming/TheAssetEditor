@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Editors.Audio.AudioEditor.AudioProjectCompiler.Wwise.Hirc.V136;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService
 {
-    public class WwiseHircGeneratorFactory
+    public class WwiseHircGeneratorServiceFactory
     {
         private readonly Dictionary<AkBkHircType, Func<IWwiseHircGeneratorService>> _hircGenerators = new();
 
@@ -36,7 +36,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService
             return generator.GenerateHirc(audioProjectHircItem, soundBank);
         }
 
-        public static WwiseHircGeneratorFactory CreateFactory(uint bankGeneratorVersion)
+        public static WwiseHircGeneratorServiceFactory CreateFactory(uint bankGeneratorVersion)
         {
             switch (bankGeneratorVersion)
             {
@@ -46,9 +46,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService
             throw new Exception($"Unknown Bank Generator Version: {bankGeneratorVersion}");
         }
 
-        private static WwiseHircGeneratorFactory CreateFactory_v136()
+        private static WwiseHircGeneratorServiceFactory CreateFactory_v136()
         {
-            var instance = new WwiseHircGeneratorFactory();
+            var instance = new WwiseHircGeneratorServiceFactory();
             instance.RegisterGenerator(AkBkHircType.Event, () => new ActionEventHircGenerator_V136());
             instance.RegisterGenerator(AkBkHircType.Action, () => new ActionHircGenerator_V136());
             return instance;

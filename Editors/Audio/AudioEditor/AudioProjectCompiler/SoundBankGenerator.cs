@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectCompiler.Wwise.Bkhd;
 using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService;
+using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Bkhd;
 using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService;
-using Editors.Audio.AudioEditor.Data;
-using Editors.Audio.AudioEditor.Data.AudioProjectService;
+using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
@@ -16,6 +16,7 @@ using Shared.Core.Settings;
 using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Bkhd;
 using Shared.GameFormats.Wwise.Hirc;
+using Action = Editors.Audio.AudioEditor.AudioProjectData.Action;
 
 namespace Editors.Audio.AudioEditor.AudioProjectCompiler
 {
@@ -55,23 +56,31 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
         {
             _audioProjectService.SaveAudioProject(_packFileService);
 
+            var soundBanks = PrepareDataForSoundBankGenerators(audioProject);
+
+            var bankGeneratorVersion = (uint)GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame).BankGeneratorVersion;
+            var wwiseHircGeneratorFactory = WwiseHircGeneratorServiceFactory.CreateFactory(bankGeneratorVersion);
+
+            GenerateSoundBanks(audioProject, soundBanks, bankGeneratorVersion, wwiseHircGeneratorFactory);
+        }
+
+        private List<SoundBank> PrepareDataForSoundBankGenerators(AudioProjectDataModel audioProject)
+        {
             var wwiseIDService = WwiseIDServiceFactory.GetWwiseIDService(_applicationSettingsService.CurrentSettings.CurrentGame);
 
             var soundBanks = audioProject.SoundBanks;
             foreach (var soundBank in soundBanks)
             {
-                SetSoundBankData(soundBank);
-                SetActionEventData(soundBank);
                 SetSoundOrSoundContainerData(wwiseIDService, soundBank);
+                SetActionData(soundBank);
+                SetActionEventData(soundBank);
+                SetSoundBankData(soundBank);
             }
 
-            var bankGeneratorVersion = (uint)GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame).BankGeneratorVersion;
-            var wwiseHircGeneratorFactory = WwiseHircGeneratorFactory.CreateFactory(bankGeneratorVersion);
-
-            GenerateSoundBanks(audioProject, soundBanks, bankGeneratorVersion, wwiseHircGeneratorFactory);
+            return soundBanks;
         }
 
-        private void GenerateSoundBanks(AudioProjectDataModel audioProject, List<SoundBank> soundBanks, uint bankGeneratorVersion, WwiseHircGeneratorFactory wwiseHircGeneratorFactory)
+        private void GenerateSoundBanks(AudioProjectDataModel audioProject, List<SoundBank> soundBanks, uint bankGeneratorVersion, WwiseHircGeneratorServiceFactory wwiseHircGeneratorServiceFactory)
         {
             foreach (var soundBank in soundBanks)
             {
@@ -80,7 +89,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
                 var hircItems = new List<HircItem>();
 
                 if (soundBank.ActionEvents != null)
-                    GenerateActionEventSoundBanks(wwiseHircGeneratorFactory, soundBank, hircItems);
+                    GenerateActionEventSoundBanks(wwiseHircGeneratorServiceFactory, soundBank, hircItems);
 
                 var hircChunk = new HircChunk();
                 hircChunk.WriteData(hircItems);
@@ -106,65 +115,23 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
             }
         }
 
-        private static void GenerateActionEventSoundBanks(WwiseHircGeneratorFactory wwiseHircGeneratorFactory, SoundBank soundBank, List<HircItem> hircItems)
+        private static void GenerateActionEventSoundBanks(WwiseHircGeneratorServiceFactory wwiseHircGeneratorServiceFactory, SoundBank soundBank, List<HircItem> hircItems)
         {
             foreach (var actionEvent in soundBank.ActionEvents)
             {
-                var actionEventHirc = wwiseHircGeneratorFactory.GenerateHirc(actionEvent, soundBank);
+                var actionEventHirc = wwiseHircGeneratorServiceFactory.GenerateHirc(actionEvent, soundBank);
                 hircItems.Add(actionEventHirc);
 
                 foreach (var action in actionEvent.Actions)
                 {
-                    var actionHirc = wwiseHircGeneratorFactory.GenerateHirc(action, soundBank);
+                    var actionHirc = wwiseHircGeneratorServiceFactory.GenerateHirc(action, soundBank);
                     hircItems.Add(actionHirc);
                 }
             }
         }
 
-        private static void SetSoundBankData(SoundBank soundBank)
-        {
-            soundBank.ID = WwiseHash.Compute(soundBank.Name);
-            soundBank.SoundBankSubType = SoundBanks.GetSoundBankEnum(soundBank.Name);
-        }
-
-        private void SetActionEventData(SoundBank soundBank)
-        {
-            var actionEvents = soundBank.ActionEvents;
-            foreach (var actionEvent in actionEvents)
-            {
-                actionEvent.ID = GenerateUnusedHircID();
-                SetActionData(soundBank);
-            }
-
-            // Sort the action events in ascending order so they're processed correctly later on.
-            soundBank.ActionEvents = soundBank.ActionEvents
-                .OrderBy(actionEvent => actionEvent.ID)
-                .ToList();
-        }
-
-        private void SetActionData(SoundBank soundBank)
-        {
-            var actionEvents = soundBank.ActionEvents;
-            foreach (var actionEvent in actionEvents)
-            {
-                var action = new Data.Action
-                {
-                    ID = GenerateUnusedHircID()
-                };
-
-                actionEvent.Actions = [action];
-                actionEvent.Actions = actionEvent.Actions
-                    .OrderBy(action => action.ID)
-                    .ToList();
-            }
-        }
-
         private void SetSoundOrSoundContainerData(IWwiseIDService wwiseIDService, SoundBank soundBank)
         {
-            var actorMixerIds = wwiseIDService.ActorMixerIds;
-
-            //var soundContainers = new List<SoundContainer>();
-
             var actionEvents = soundBank.ActionEvents;
             foreach (var actionEvent in actionEvents)
             {
@@ -172,13 +139,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
                 {
                     actionEvent.Sound.ID = GenerateUnusedHircID();
                     actionEvent.Sound.SourceID = GenerateUnusedWemID();
+                    actionEvent.Sound.DirectParentID = wwiseIDService.ActorMixerIds[soundBank.SoundBankSubType];
                 }
                 else
                 {
-                    //soundContainers.Add(actionEvent.SoundContainer);
-
                     actionEvent.SoundContainer.ID = GenerateUnusedHircID();
-                    actionEvent.SoundContainer.DirectParentID = actorMixerIds[soundBank.SoundBankSubType];
+                    actionEvent.SoundContainer.DirectParentID = wwiseIDService.ActorMixerIds[soundBank.SoundBankSubType];
 
                     foreach (var sound in actionEvent.SoundContainer.Sounds)
                     {
@@ -191,10 +157,59 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
                         .ToList();
                 }
             }
+        }
 
-            //soundContainers = soundContainers
-            //.OrderBy(soundContainer => soundContainer.ID)
-            //.ToList();
+        private void SetActionData(SoundBank soundBank)
+        {
+            var actionEvents = soundBank.ActionEvents;
+            foreach (var actionEvent in actionEvents)
+            {
+                if (actionEvent.Actions.Count > 1)
+                    throw new NotSupportedException("We're not set up to handle multiple actions.");
+
+                if (actionEvent.Sound != null)
+                {
+                    var action = new Action
+                    {
+                        ID = GenerateUnusedHircID(),
+                        IDExt = actionEvent.Sound.ID
+                    };
+
+                    actionEvent.Actions = [action];
+                }
+                else
+                {
+                    var action = new Action
+                    {
+                        ID = GenerateUnusedHircID(),
+                        IDExt = actionEvent.SoundContainer.ID
+                    };
+
+                    actionEvent.Actions = [action];
+                }
+
+                actionEvent.Actions = actionEvent.Actions
+                    .OrderBy(action => action.ID)
+                    .ToList();
+            }
+        }
+
+        private void SetActionEventData(SoundBank soundBank)
+        {
+            var actionEvents = soundBank.ActionEvents;
+            foreach (var actionEvent in actionEvents)
+                actionEvent.ID = GenerateUnusedHircID();
+
+            // Sort the action events in ascending order so they're processed correctly later on.
+            soundBank.ActionEvents = soundBank.ActionEvents
+                .OrderBy(actionEvent => actionEvent.ID)
+                .ToList();
+        }
+
+        private static void SetSoundBankData(SoundBank soundBank)
+        {
+            soundBank.ID = WwiseHash.Compute(soundBank.Name);
+            soundBank.SoundBankSubType = SoundBanks.GetSoundBankEnum(soundBank.Name);
         }
 
         private uint GenerateUnusedHircID()

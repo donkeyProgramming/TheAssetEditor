@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
+namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
 {
     public class ActionEventDataService : IAudioProjectDataService
     {

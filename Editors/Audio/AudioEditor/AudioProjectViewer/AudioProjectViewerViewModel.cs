@@ -4,14 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService;
+using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioSettings;
-using Editors.Audio.AudioEditor.Data;
-using Editors.Audio.AudioEditor.Data.AudioProjectDataService;
-using Editors.Audio.AudioEditor.Data.AudioProjectService;
 using Editors.Audio.Storage;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.Data.AudioProjectDataManager;
+using static Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataManager;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer
 {
@@ -59,7 +59,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         public void ShowSettingsFromAudioProjectViewerItem()
         {
-            var audioSettings = new Data.AudioSettings();
+            var audioSettings = new AudioProjectData.AudioSettings();
             var audioFiles = new List<AudioFile>();
 
             var audioProjectItem = _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;

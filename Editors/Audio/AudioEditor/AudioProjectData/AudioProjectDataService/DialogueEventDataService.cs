@@ -2,7 +2,7 @@
 using System.Linq;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
-namespace Editors.Audio.AudioEditor.Data.AudioProjectDataService
+namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
 {
     public class DialogueEventDataService : IAudioProjectDataService
     {

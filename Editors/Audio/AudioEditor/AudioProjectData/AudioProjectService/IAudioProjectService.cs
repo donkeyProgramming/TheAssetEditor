@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.Settings;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
-namespace Editors.Audio.AudioEditor.Data.AudioProjectService
+namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
 {
     public interface IAudioProjectService
     {
