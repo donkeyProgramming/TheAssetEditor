@@ -1,18 +1,34 @@
 
+Lazy load tabs - selection delay is boring!
+
 ogre_contracts
 ui\campaign ui\cathay_compass.twui.xml
 ui\campaign ui\character_information.twui.xml
 ui\campaign ui\dlc25_nurgle_plagues.twui.xml
 ui\campaign ui\elector_counts.twui.xml
 ui\campaign ui\ikit_workshop.twui.xml
-ui\campaign ui\hud_campaign.twui.xml
+ui\campaign ui\hud_campaign.twui.xml  
+
+
+
+
 
 
 Fixes for v060
 	[Bugfix]: General: Close console window (and any other windows) on application close 
+	[BugFix]: KitbashTool: Incorrect matrix and attachmentpoint for static meshes, caused props to animate incorrectly in game 
+	[BugFix]: KitbashTool: Fixed and improved decal, dirt and skin material handling for older games 
 	
-	
-	[Internal] Changed animationMetadDataParser to be a singlenton with lazy init - To speed up loading and testing when the class is not needed
+	[Internal] Changed animationMetadDataParser to be a singlenton with lazy init - To speed up loa ding and testing when the class is not needed
+
+
+Must do:
+	Messagebox for duplicate files on load 
+	Geometry matrix test 
+	WsModel saving test, not all wisible
+	Num lods not prefillled for shield! 
+
+----
 
 	ErrorFiles
 		Command history
@@ -32,7 +48,7 @@ Fixes for v060
 	
 	Create ogre test
 	AnimBin test
-	WsModel saving test, not all wisible
+	
 	Speed up system tests 
 	
 	Damping and root node handling 
@@ -40,9 +56,8 @@ Fixes for v060
 	Rendering window - disbale backface culling 
 	Superview - default scene content to be expanded. Allow select meshes
 	Move Editors.Shared.Core into shared? Maybe under UI?
+	Create a save/load component! Returns a object of some type 
 
-
-	Change how metadata parsing is handled. need to be lazy! Slow slow
 	KitbashTOol Materiul - warning for not supported material! 
 
 Unit test:

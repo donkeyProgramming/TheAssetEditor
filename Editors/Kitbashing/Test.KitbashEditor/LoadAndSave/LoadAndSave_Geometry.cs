@@ -20,6 +20,10 @@ namespace Test.KitbashEditor.LoadAndSave
         // rmv8
         // Rmv7
         // Rmv6
+        // Validate pivot and matrix shit
+
+
+
 
         [Test]
         public void Warhammer3_SaveKarl_Default()

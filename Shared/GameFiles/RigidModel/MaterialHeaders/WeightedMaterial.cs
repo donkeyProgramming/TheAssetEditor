@@ -31,10 +31,10 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         public string ModelName { get; set; } = "";
         public string TextureDirectory { get; set; } = "";
         public string Filters { get; set; } = "";
-        public RmvTransform OriginalTransform { get; set; }
+        public RmvTransform OriginalTransform { get; set; } = RmvTransform.CreateIdentity();
 
-        public int MatrixIndex { get; set; }
-        public int ParentMatrixIndex { get; set; }
+        public int MatrixIndex { get; set; } = -1;
+        public int ParentMatrixIndex { get; set; } = -1;
 
         public List<RmvAttachmentPoint> AttachmentPointParams { get; set; } = [];
         public List<RmvTexture> TexturesParams { get; set; } = [];

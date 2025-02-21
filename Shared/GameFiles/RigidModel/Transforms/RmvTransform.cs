@@ -1,4 +1,5 @@
-﻿namespace Shared.GameFormats.RigidModel.Transforms
+﻿
+namespace Shared.GameFormats.RigidModel.Transforms
 {
     [Serializable]
     public struct RmvTransform
@@ -29,5 +30,16 @@
             return true;
         }
 
+        internal static RmvTransform CreateIdentity()
+        {
+            var newTransform = new RmvTransform()
+            {
+                Pivot = new RmvVector3(0, 0, 0),
+                Matrix0 = RmvMatrix3x4.Identity(),
+                Matrix1 = RmvMatrix3x4.Identity(),
+                Matrix2 = RmvMatrix3x4.Identity(),
+            };
+            return newTransform;
+        }
     }
 }

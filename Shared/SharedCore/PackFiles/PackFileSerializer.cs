@@ -95,7 +95,6 @@ namespace Shared.Core.PackFiles
                         output.FileList.Add(fullPackedFileName, fileContent);
                     }
 
-
                     offset += size;
                 }
 
