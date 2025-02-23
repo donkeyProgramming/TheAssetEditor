@@ -19,7 +19,7 @@
         Sound = 0x02,
         Action = 0x03,
         Event = 0x04,
-        SequenceContainer = 0x05,
+        RandomSequenceContainer = 0x05,
         SwitchContainer = 0x06,
         ActorMixer = 0x07,
         Audio_Bus = 0x08,

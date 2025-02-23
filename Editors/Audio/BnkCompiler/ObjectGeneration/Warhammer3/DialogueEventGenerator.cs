@@ -60,7 +60,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             };
             wwiseDialogueEvent.AkPropBundle1 = new AkPropBundleMinMax_V136()
             {
-                Values = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>()
+                PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>()
             };
             wwiseDialogueEvent.UpdateSectionSize();
             return wwiseDialogueEvent;

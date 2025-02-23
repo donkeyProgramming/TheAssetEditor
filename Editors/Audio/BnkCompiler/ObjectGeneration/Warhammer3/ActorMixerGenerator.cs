@@ -28,7 +28,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             wwiseActorMixer.ID = actorMixer.Id;
             wwiseActorMixer.HircType = AkBkHircType.ActorMixer;
             wwiseActorMixer.NodeBaseParams = CreateBaseNodeParams();
-            wwiseActorMixer.NodeBaseParams.DirectParentId = actorMixer.DirectParentId;
+            wwiseActorMixer.NodeBaseParams.DirectParentID = actorMixer.DirectParentId;
 
             var allChildIds = actorMixer.Children.ToList();
 
@@ -52,8 +52,8 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 BitsFxBypass = 0,
             };
             instance.OverrideAttachmentParams = 0;
-            instance.OverrideBusId = 0;
-            instance.DirectParentId = 0;
+            instance.OverrideBusID = 0;
+            instance.DirectParentID = 0;
             instance.BitVector = 0;
             instance.NodeInitialParams = new NodeInitialParams_V136()
             {
@@ -68,7 +68,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 },
                 AkPropBundle1 = new AkPropBundleMinMax_V136()
                 {
-                    Values = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>()
+                    PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>()
                 }
             };
             instance.PositioningParams = new PositioningParams_V136()

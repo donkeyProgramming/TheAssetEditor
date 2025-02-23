@@ -27,11 +27,11 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
         {
             var wwiseRandomContainer = new CAkRanSeqCntr_V136();
             wwiseRandomContainer.ID = inputContainer.Id;
-            wwiseRandomContainer.HircType = AkBkHircType.SequenceContainer;
+            wwiseRandomContainer.HircType = AkBkHircType.RandomSequenceContainer;
             wwiseRandomContainer.NodeBaseParams = CreateBaseNodeParams();
             wwiseRandomContainer.BitVector = 0x12;
             wwiseRandomContainer.TransitionTime = 1000;
-            wwiseRandomContainer.NodeBaseParams.DirectParentId = inputContainer.DirectParentId;
+            wwiseRandomContainer.NodeBaseParams.DirectParentID = inputContainer.DirectParentId;
             wwiseRandomContainer.LoopCount = 1;
             wwiseRandomContainer.AvoidRepeatCount = 2;
 
@@ -71,8 +71,8 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 BitsFxBypass = 0,
             };
             instance.OverrideAttachmentParams = 0;
-            instance.OverrideBusId = 0;
-            instance.DirectParentId = 0;
+            instance.OverrideBusID = 0;
+            instance.DirectParentID = 0;
             instance.BitVector = 0x02;
             instance.NodeInitialParams = new NodeInitialParams_V136()
             {
@@ -84,7 +84,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 },
                 AkPropBundle1 = new AkPropBundleMinMax_V136()
                 {
-                    Values = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>()
+                    PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>()
                 }
             };
 

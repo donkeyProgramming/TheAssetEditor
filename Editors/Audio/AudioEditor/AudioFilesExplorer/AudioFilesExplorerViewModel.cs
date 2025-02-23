@@ -22,6 +22,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         private readonly IPackFileService _packFileService;
         private readonly IAudioRepository _audioRepository;
         private readonly IAudioProjectService _audioProjectService;
+        private readonly SoundPlayer _soundPlayer;
 
         public string DisplayName { get; set; } = "Audio Project Explorer";
 
@@ -34,12 +35,13 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         public ObservableCollection<AudioFilesTreeNode> SelectedTreeNodes { get; set; } = new ObservableCollection<AudioFilesTreeNode>();
 
-        public AudioFilesExplorerViewModel(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        public AudioFilesExplorerViewModel(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioRepository audioRepository, IAudioProjectService audioProjectService, SoundPlayer soundPlayer)
         {
             _audioEditorViewModel = audioEditorViewModel;
             _packFileService = packFileService;
             _audioRepository = audioRepository;
             _audioProjectService = audioProjectService;
+            _soundPlayer = soundPlayer;
 
             SelectedTreeNodes.CollectionChanged += OnSelectedTreeNodesChanged;
 
@@ -256,7 +258,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 return;
 
             var selectedWavFile = _audioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes[0];
-            SoundPlayer.PlayWavFileFromPack(_packFileService, selectedWavFile);
+            _soundPlayer.PlayWavFileFromPack(selectedWavFile);
         }
 
         [RelayCommand] public void ClearText()

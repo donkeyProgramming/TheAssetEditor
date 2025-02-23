@@ -12,26 +12,34 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.W
         {
             var audioProjectActionEvent = audioProjectItem as Action;
 
-            var wwiseAction = new CAkAction_V136
+            var actionHirc = CreateAction(audioProjectActionEvent);
+
+            if (audioProjectActionEvent.ActionType == AkActionType.Play)
+                actionHirc.PlayActionParams = CreatePlayActionParams(soundBank);
+
+            actionHirc.UpdateSectionSize();
+
+            return actionHirc;
+        }
+
+        private static CAkAction_V136 CreateAction(Action audioProjectActionEvent)
+        {
+            return new CAkAction_V136
             {
                 ID = audioProjectActionEvent.ID,
                 HircType = audioProjectActionEvent.HircType,
                 ActionType = audioProjectActionEvent.ActionType,
                 IdExt = audioProjectActionEvent.IDExt
             };
+        }
 
-            if (audioProjectActionEvent.ActionType == AkActionType.Play)
+        private static CAkAction_V136.PlayActionParams_V136 CreatePlayActionParams(SoundBank soundBank)
+        {
+            return new CAkAction_V136.PlayActionParams_V136
             {
-                wwiseAction.PlayActionParams = new CAkAction_V136.PlayActionParams_V136
-                {
-                    BitVector = 0x04,
-                    BankId = WwiseHash.Compute(soundBank.Name)
-                };
-            }
-
-            wwiseAction.UpdateSectionSize();
-
-            return wwiseAction;
+                BitVector = 0x04,
+                BankId = WwiseHash.Compute(soundBank.Name)
+            };
         }
     }
 }

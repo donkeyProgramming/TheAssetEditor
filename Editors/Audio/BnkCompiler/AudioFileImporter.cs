@@ -2,42 +2,40 @@
 using System.IO;
 using System.Linq;
 using Editors.Audio.Utility;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Misc;
+using Shared.Core.PackFiles;
 
 namespace Editors.Audio.BnkCompiler
 {
-    using Microsoft.Xna.Framework.Media;
-    using Shared.Core.ErrorHandling;
-    using Shared.Core.Misc;
-    using Shared.Core.PackFiles;
-    using static Editors.Audio.Utility.WwiseWavToWem;
-
     public class AudioFileImporter
     {
-        private readonly IPackFileService _pfs;
+        private readonly IPackFileService _packFileService;
         private readonly VgStreamWrapper _vgStreamWrapper;
 
         public AudioFileImporter(IPackFileService pfs, VgStreamWrapper vgStreamWrapper)
         {
-            _pfs = pfs;
+            _packFileService = pfs;
             _vgStreamWrapper = vgStreamWrapper;
         }
 
+        /*
         public Result<bool> ImportAudio(CompilerData compilerData)
         {
             InitialiseWwiseProject();
 
-            var wavFiles = new List<string>();
+            var wavFilesNames = new List<string>();
             var wavFilePaths = new List<string>();
 
             foreach (var sound in compilerData.Sounds)
             {
-                var wavFile = Path.GetFileName(sound.FilePath);
-                wavFiles.Add(wavFile);
+                var wavFileName = Path.GetFileName(sound.FilePath);
+                wavFilesNames.Add(wavFileName);
                 wavFilePaths.Add(sound.FilePath);
             }
 
-            var wavToWem = new WwiseWavToWem();
-            wavToWem.WavToWem(wavFiles, wavFilePaths);
+            var wavToWem = new WemGenerator();
+            wavToWem.ConvertWavsToWems(wavFilesNames, wavFilePaths);
 
             foreach (var sound in compilerData.Sounds)
             {
@@ -47,6 +45,7 @@ namespace Editors.Audio.BnkCompiler
             }
             return Result<bool>.FromOk(true);
         }
+        */
 
         private Result<bool> ImportFromDisk(CompilerData compilerData, Sound sound)
         {
@@ -65,8 +64,8 @@ namespace Editors.Audio.BnkCompiler
             var hashName = WwiseHash.Compute(wavFileName);
 
             // Load
-            var createdFiles = PackFileUtil.LoadFilesFromDisk(_pfs, new PackFileUtil.FileRef(wemPath, GetExpectedFolder(compilerData), $"{hashName}.wem"));
-            sound.FilePath = _pfs.GetFullPath(createdFiles.First());
+            var createdFiles = PackFileUtil.LoadFileFromDisk(_packFileService, new PackFileUtil.FileRef(wemPath, GetExpectedFolder(compilerData), $"{hashName}.wem"));
+            sound.FilePath = _packFileService.GetFullPath(createdFiles.First());
 
             return Result<bool>.FromOk(true);
         }

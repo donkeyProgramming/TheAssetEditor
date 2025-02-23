@@ -16,7 +16,7 @@ namespace Editors.Audio.Utility
             _hircProcessChildMap.Add(AkBkHircType.Action, ProcessAction);
             _hircProcessChildMap.Add(AkBkHircType.SwitchContainer, ProcessSwitchControl);
             _hircProcessChildMap.Add(AkBkHircType.LayerContainer, ProcessLayerContainer);
-            _hircProcessChildMap.Add(AkBkHircType.SequenceContainer, ProcessSequenceContainer);
+            _hircProcessChildMap.Add(AkBkHircType.RandomSequenceContainer, ProcessSequenceContainer);
             _hircProcessChildMap.Add(AkBkHircType.Sound, ProcessSound);
             _hircProcessChildMap.Add(AkBkHircType.ActorMixer, ProcessActorMixer);
             _hircProcessChildMap.Add(AkBkHircType.Dialogue_Event, ProcessDialogueEvent);

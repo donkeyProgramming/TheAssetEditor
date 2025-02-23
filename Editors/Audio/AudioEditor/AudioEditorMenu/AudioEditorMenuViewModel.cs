@@ -2,6 +2,7 @@
 using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.Storage;
+using Editors.Audio.Utility;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -17,6 +18,8 @@ namespace Editors.Audio.AudioEditor.AudioEditorMenu
         private readonly IStandardDialogs _packFileUiProvider;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IFileSaveService _fileSaveService;
+        private readonly SoundPlayer _soundPlayer;
+        private readonly WemGenerator _wemGenerator;
 
         public AudioEditorMenuViewModel(
             AudioEditorViewModel audioEditorViewModel,
@@ -25,7 +28,9 @@ namespace Editors.Audio.AudioEditor.AudioEditorMenu
             IAudioProjectService audioProjectService,
             IStandardDialogs packFileUiProvider,
             ApplicationSettingsService applicationSettingsService,
-            IFileSaveService fileSaveService)
+            IFileSaveService fileSaveService,
+            SoundPlayer soundPlayer,
+            WemGenerator wemGenerator)
         {
             _audioEditorViewModel = audioEditorViewModel;
             _audioRepository = audioRepository;
@@ -34,6 +39,8 @@ namespace Editors.Audio.AudioEditor.AudioEditorMenu
             _packFileUiProvider = packFileUiProvider;
             _applicationSettingsService = applicationSettingsService;
             _fileSaveService = fileSaveService;
+            _soundPlayer = soundPlayer;
+            _wemGenerator = wemGenerator;
         }
 
         [RelayCommand] public void NewAudioProject()
@@ -53,7 +60,7 @@ namespace Editors.Audio.AudioEditor.AudioEditorMenu
 
         [RelayCommand] public void CompileAudioProject()
         {
-            _audioProjectService.CompileAudioProject(_packFileService, _audioRepository, _applicationSettingsService, _fileSaveService);
+            _audioProjectService.CompileAudioProject(_packFileService, _audioRepository, _applicationSettingsService, _fileSaveService, _soundPlayer, _wemGenerator);
         }
     }
 }

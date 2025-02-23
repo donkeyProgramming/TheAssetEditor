@@ -345,7 +345,7 @@ namespace Editors.Audio.GameSettings.Warhammer3
             ("battle_vo_conversation_storm_of_magic", BattleConversationalVO, [ShowAll], true),
 
             // Battle Individual Melee
-            ("Battle_Individual_Melee_Weapon_Hit", BattleIndividualMelee, [ShowAll], true),
+            //("Battle_Individual_Melee_Weapon_Hit", BattleIndividualMelee, [ShowAll], true),
         ];
     }
 }

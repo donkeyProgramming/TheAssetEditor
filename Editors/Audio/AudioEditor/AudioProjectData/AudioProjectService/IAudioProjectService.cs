@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Editors.Audio.Storage;
+using Editors.Audio.Utility;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.Settings;
@@ -18,7 +19,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
         void SaveAudioProject(IPackFileService packFileService);
         void LoadAudioProject(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioRepository audioRepository, IStandardDialogs packFileUiProvider);
         void InitialiseAudioProject(AudioEditorViewModel audioEditorViewModel, string fileName, string directory, string language);
-        void CompileAudioProject(IPackFileService packFileService, IAudioRepository audioRepository, ApplicationSettingsService applicationSettingsService, IFileSaveService fileSaveService);
+        void CompileAudioProject(IPackFileService packFileService, IAudioRepository audioRepository, ApplicationSettingsService applicationSettingsService, IFileSaveService fileSaveService, SoundPlayer soundplayer, WemGenerator wemGenerator);
         void BuildStateGroupsWithModdedStatesRepository(List<StateGroup> moddedStateGroups, Dictionary<string, List<string>> stateGroupsWithModdedStatesRepository);
         void ResetAudioProject();
     }

@@ -17,7 +17,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         public List<ICAkSwitchPackage> SwitchList { get; set; } = [];
         public uint NumSwitchParams { get; set; }
         public List<AkSwitchNodeParams_V136> Parameters { get; set; } = [];
-        public uint GetDirectParentID() => NodeBaseParams.DirectParentId;
+        public uint GetDirectParentID() => NodeBaseParams.DirectParentID;
 
         protected override void ReadData(ByteChunk chunk)
         {

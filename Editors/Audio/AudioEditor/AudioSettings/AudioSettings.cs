@@ -52,8 +52,27 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             { EndBehaviour.PlayInReverseOrder, PlayInReverseOrder}
         };
 
+        public enum LoopingType
+        {
+            Disabled,
+            FiniteLooping,
+            InfiniteLooping,
+        }
+
+        public const string LoopingTypeDisabled = "Disabled";
+        public const string FiniteLooping = "Finite Looping";
+        public const string InfiniteLooping = "Infinite Looping";
+
+        public static readonly Dictionary<LoopingType, string> LoopingTypeToStringMap = new()
+        {
+            { LoopingType.Disabled, LoopingTypeDisabled },
+            { LoopingType.FiniteLooping, FiniteLooping },
+            { LoopingType.InfiniteLooping, InfiniteLooping }
+        };
+
         public enum TransitionType
         {
+            Disabled,
             XfadeAmp,
             XfadePower,
             Delay,
@@ -61,14 +80,16 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             TriggerRate
         }
 
+        public const string TransitionTypeDisabled = "Disabled";
         public const string XfadeAmp = "Xfade (amp)";
         public const string XfadePower = "Xfade (power)";
         public const string Delay = "Delay";
         public const string SampleAccurate = "Sample Accurate";
         public const string TriggerRate = "Trigger Rate";
 
-        public static readonly Dictionary<TransitionType, string> TransitionToStringMap = new()
+        public static readonly Dictionary<TransitionType, string> TransitionTypeToStringMap = new()
         {
+            { TransitionType.Disabled, TransitionTypeDisabled },
             { TransitionType.XfadeAmp, XfadeAmp },
             { TransitionType.XfadePower, XfadePower },
             { TransitionType.Delay, Delay },

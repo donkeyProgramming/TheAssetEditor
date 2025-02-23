@@ -12,7 +12,7 @@ namespace Editors.Audio.Utility
         {
             _hircProcessChildMap.Add(AkBkHircType.SwitchContainer, FindParentSwitchControl);
             _hircProcessChildMap.Add(AkBkHircType.LayerContainer, FindParentLayerContainer);
-            _hircProcessChildMap.Add(AkBkHircType.SequenceContainer, FindParentRandContainer);
+            _hircProcessChildMap.Add(AkBkHircType.RandomSequenceContainer, FindParentRandContainer);
             _hircProcessChildMap.Add(AkBkHircType.Sound, FindParentSound);
             _hircProcessChildMap.Add(AkBkHircType.ActorMixer, FindParentActorMixer);
             _hircProcessChildMap.Add(AkBkHircType.FxCustom, FindParentFxCustom);
@@ -38,9 +38,9 @@ namespace Editors.Audio.Utility
         private void FindParentRandContainer(HircItem item, HircTreeItem parent)
         {
             var sqtContainer = GetAsType<ICAkRanSeqCnt>(item);
-            var node = new HircTreeItem() { DisplayName = $"Rand Container {GetDisplayId(item.ID, item.OwnerFilePath, false)} {GetParentInfo(sqtContainer.GetParentID())}", Item = item };
+            var node = new HircTreeItem() { DisplayName = $"Rand Container {GetDisplayId(item.ID, item.OwnerFilePath, false)} {GetParentInfo(sqtContainer.GetDirectParentID())}", Item = item };
             parent.Children.Add(node);
-            ProcessNext(sqtContainer.GetParentID(), node);
+            ProcessNext(sqtContainer.GetDirectParentID(), node);
         }
 
         private void FindParentActorMixer(HircItem item, HircTreeItem parent)

@@ -35,8 +35,8 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             SectionSize = idSize + AkBankSourceData.GetSize() + NodeBaseParams.GetSize();
         }
 
-        public uint GetDirectParentID() => NodeBaseParams.DirectParentId;
-        public uint GetSourceID() => AkBankSourceData.AkMediaInformation.SourceId;
+        public uint GetDirectParentID() => NodeBaseParams.DirectParentID;
+        public uint GetSourceID() => AkBankSourceData.AkMediaInformation.SourceID;
         public AKBKSourceType GetStreamType() => AkBankSourceData.StreamType;
     }
 }

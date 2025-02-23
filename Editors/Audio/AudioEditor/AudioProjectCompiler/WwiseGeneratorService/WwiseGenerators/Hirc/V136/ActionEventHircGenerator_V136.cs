@@ -10,17 +10,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.W
         public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank)
         {
             var audioProjectActionEvent = audioProjectItem as ActionEvent;
+            var actionEventHirc = CreateActionEvent(audioProjectActionEvent);
+            actionEventHirc.UpdateSectionSize();
+            return actionEventHirc;
+        }
 
-            var actionEventHirc = new CAkEvent_V136()
+        private static CAkEvent_V136 CreateActionEvent(ActionEvent audioProjectActionEvent)
+        {
+            return new CAkEvent_V136()
             {
                 ID = audioProjectActionEvent.ID,
                 HircType = audioProjectActionEvent.HircType,
                 Actions = audioProjectActionEvent.Actions.Select(action => CreateAction(action.ID)).OrderBy(action => action.ActionID).ToList()
             };
-            
-            actionEventHirc.UpdateSectionSize();
-
-            return actionEventHirc;
         }
 
         private static CAkEvent_V136.Action_V136 CreateAction(uint actionId)

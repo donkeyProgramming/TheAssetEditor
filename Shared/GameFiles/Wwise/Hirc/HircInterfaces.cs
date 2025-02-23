@@ -61,7 +61,7 @@ namespace Shared.GameFormats.Wwise.Hirc
 
     public interface ICAkRanSeqCnt
     {
-        public uint GetParentID();
+        public uint GetDirectParentID();
         public List<uint> GetChildren();
     }
 }

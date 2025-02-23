@@ -14,7 +14,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
             // Read all the Ids first
             for (byte i = 0; i < Props; i++)
-                PropsList.Add(new PropBundleInstance_V136() { Id = (AkPropId_V136)chunk.ReadByte() });
+                PropsList.Add(new PropBundleInstance_V136() { ID = (AkPropId_V136)chunk.ReadByte() });
 
             // Then write all the values
             for (byte i = 0; i < Props; i++)
@@ -28,7 +28,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
             // Write all the Ids first
             foreach (var akProp in PropsList)
-                memStream.Write(ByteParsers.Byte.EncodeValue((byte)akProp.Id, out _));
+                memStream.Write(ByteParsers.Byte.EncodeValue((byte)akProp.ID, out _));
 
             // Then write all the values
             foreach (var akProp in PropsList)
@@ -50,12 +50,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V136.Shared
 
         public class PropBundleInstance_V136
         {
-            public AkPropId_V136 Id { get; set; }
+            public AkPropId_V136 ID { get; set; }
             public uint Value { get; set; }
 
             public uint GetSize()
             {
-                var idSize = ByteHelper.GetPropertyTypeSize(Id);
+                var idSize = ByteHelper.GetPropertyTypeSize(ID);
                 var valueSize = ByteHelper.GetPropertyTypeSize(Value);
                 return idSize + valueSize;
             }

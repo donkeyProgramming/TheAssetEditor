@@ -5,6 +5,7 @@ using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Storage
 {
+    // TODO: maybe get rid of provider
     public interface RepositoryProvider
     {
         void LoadBnkData(AudioData audioData);
@@ -13,9 +14,9 @@ namespace Editors.Audio.Storage
 
     public class AudioData
     {
-        public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageByID { get; internal set; }
-        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageBySourceID { get; internal set; }
-        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageByID { get; internal set; }
+        public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; internal set; }
+        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; internal set; }
+        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; internal set; }
         public Dictionary<uint, List<HircItem>> HircLookupByID { get; internal set; }
         public Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; internal set; }
         public Dictionary<string, PackFile> BnkPackFileLookupByName { get; internal set; }
@@ -48,9 +49,9 @@ namespace Editors.Audio.Storage
         public void LoadBnkData(AudioData audioData)
         {
             var loadResult = _bnkLoader.LoadBnkFiles();
-            audioData.HircLookupByLanguageByID = loadResult.HircLookupByLanguageByID;
-            audioData.SoundHircLookupByLanguageBySourceID = loadResult.SoundHircLookupByLanguageBySourceID;
-            audioData.DidxAudioLookupByLanguageByID = loadResult.DidxAudioLookupByLanguageByID;
+            audioData.HircLookupByLanguageIDByID = loadResult.HircLookupByLanguageIDByID;
+            audioData.SoundHircLookupByLanguageIDBySourceID = loadResult.SoundHircLookupByLanguageIDBySourceID;
+            audioData.DidxAudioLookupByLanguageIDByID = loadResult.DidxAudioLookupByLanguageIDByID;
             audioData.HircLookupByID = loadResult.HircLookupByID;
             audioData.DidxAudioLookupByID = loadResult.DidxAudioLookupByID;
             audioData.BnkPackFileLookupByName = loadResult.BnkPackFileLookupByName;

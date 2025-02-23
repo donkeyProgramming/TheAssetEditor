@@ -1,6 +1,7 @@
 ﻿using Audio.AudioExplorer;
 using Audio.Compiler;
 using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.AudioProjectCompiler;
 using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioExplorer;
@@ -22,8 +23,6 @@ namespace Editors.Audio
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-            serviceCollection.AddSingleton<VgStreamWrapper>();
-
             serviceCollection.AddScoped<AudioExplorerView>();
             serviceCollection.AddScoped<AudioExplorerViewModel>();
 
@@ -41,6 +40,12 @@ namespace Editors.Audio
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
 
+
+
+            serviceCollection.AddTransient<AudioProjectCompiler>();
+
+            serviceCollection.AddTransient<VgStreamWrapper>();
+            serviceCollection.AddTransient<WemGenerator>();
             serviceCollection.AddTransient<BnkLoader>();
             serviceCollection.AddTransient<DatLoader>();
             serviceCollection.AddTransient<BnkParser>();
@@ -52,6 +57,7 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IWwiseHircGenerator, ActorMixerGenerator>();
             serviceCollection.AddScoped<IWwiseHircGenerator, RandomContainerGenerator>();
             serviceCollection.AddScoped<IWwiseHircGenerator, DialogueEventGenerator>();
+
             serviceCollection.AddScoped<HircBuilder>();
             serviceCollection.AddScoped<BnkHeaderBuilder>();
             serviceCollection.AddScoped<CompilerService>();

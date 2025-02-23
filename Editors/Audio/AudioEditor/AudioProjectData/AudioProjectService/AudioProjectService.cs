@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Editors.Audio.AudioEditor.AudioProjectCompiler;
 using Editors.Audio.Storage;
+using Editors.Audio.Utility;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -108,11 +109,17 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
             audioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
         }
 
-        public void CompileAudioProject(IPackFileService packFileService, IAudioRepository audioRepository, ApplicationSettingsService applicationSettingsService, IFileSaveService fileSaveService)
+        public void CompileAudioProject(
+            IPackFileService packFileService,
+            IAudioRepository audioRepository,
+            ApplicationSettingsService applicationSettingsService,
+            IFileSaveService fileSaveService,
+            SoundPlayer soundPlayer,
+            WemGenerator wemGenerator)
         {
-            var soundBankGenerator = new SoundBankGenerator(packFileService, audioRepository, this, applicationSettingsService, fileSaveService);
+            var audioProjectCompiler = new AudioProjectCompiler.AudioProjectCompiler(packFileService, audioRepository, this, applicationSettingsService, fileSaveService, soundPlayer, wemGenerator);
             var audioProject = GetAudioProjectWithoutUnusedObjects();
-            soundBankGenerator.CompileSoundBanksFromAudioProject(audioProject);
+            audioProjectCompiler.CompileAudioProject(audioProject);
         }
 
         private void InitialiseSoundBanks()
@@ -213,7 +220,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
                         .ToList();
 
                     var actionEvents = (soundBank.ActionEvents ?? Enumerable.Empty<ActionEvent>())
-                        .Where(actionEvent => actionEvent.Sound != null || actionEvent.SoundContainer != null)
+                        .Where(actionEvent => actionEvent.Sound != null || actionEvent.RandomSequenceContainer != null)
                         .ToList();
 
                     return new SoundBank
@@ -288,7 +295,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
                                     if (actionEvent.Sound != null)
                                         savedActionEvent.Sound = savedActionEvent.Sound;
                                     else
-                                        actionEvent.SoundContainer = savedActionEvent.SoundContainer;
+                                        actionEvent.RandomSequenceContainer = savedActionEvent.RandomSequenceContainer;
                                 }
                                 else
                                     soundBank.ActionEvents.Add(savedActionEvent);

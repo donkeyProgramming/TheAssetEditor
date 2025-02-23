@@ -42,7 +42,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             instance.RegisterHirc(AkBkHircType.Event, () => new V112.CAkEvent_V112());
             instance.RegisterHirc(AkBkHircType.Action, () => new V112.CAkAction_V112());
             instance.RegisterHirc(AkBkHircType.SwitchContainer, () => new V112.CAkSwitchCntr_V112());
-            instance.RegisterHirc(AkBkHircType.SequenceContainer, () => new V112.CAkRanSeqCnt_V112());
+            instance.RegisterHirc(AkBkHircType.RandomSequenceContainer, () => new V112.CAkRanSeqCntr_V112());
             instance.RegisterHirc(AkBkHircType.LayerContainer, () => new V112.CAkLayerCntr_V112());
             instance.RegisterHirc(AkBkHircType.Dialogue_Event, () => new V112.CAkDialogueEvent_V112());
             return instance;
@@ -56,7 +56,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             instance.RegisterHirc(AkBkHircType.Event, () => new V136.CAkEvent_V136());
             instance.RegisterHirc(AkBkHircType.Action, () => new V136.CAkAction_V136());
             instance.RegisterHirc(AkBkHircType.SwitchContainer, () => new V136.CAkSwitchCntr_V136());
-            instance.RegisterHirc(AkBkHircType.SequenceContainer, () => new V136.CAkRanSeqCntr_V136());
+            instance.RegisterHirc(AkBkHircType.RandomSequenceContainer, () => new V136.CAkRanSeqCntr_V136());
             instance.RegisterHirc(AkBkHircType.LayerContainer, () => new V136.CAkLayerCntr_V136());
             instance.RegisterHirc(AkBkHircType.Dialogue_Event, () => new V136.CAkDialogueEvent_V136());
             instance.RegisterHirc(AkBkHircType.Music_Track, () => new V136.CAkMusicTrack_V136());

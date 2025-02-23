@@ -1,4 +1,6 @@
-﻿namespace Editors.Audio.GameSettings.Warhammer3
+﻿using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
+
+namespace Editors.Audio.GameSettings.Warhammer3
 {
     public class SoundBanks
     {
@@ -11,19 +13,19 @@
             Magic,
             Movies,
             QuestBattles,
-            Rituals,
-            UI,
-            Vocalisation,
-            FrontendMusic,
-            CampaignMusic,
-            BattleMusic,
-            LoadingScreenMusic,
+            //Rituals,
+            //UI,
+            //Vocalisation,
+            //FrontendMusic,
+            //CampaignMusic,
+            //BattleMusic,
+            //LoadingScreenMusic,
             FrontendVO,
             CampaignVO,
             CampaignConversationalVO,
             BattleVO,
             BattleConversationalVO,
-            BattleIndividualMelee
+            //BattleIndividualMelee
         }
 
         public enum Wh3SoundBankType
@@ -43,19 +45,19 @@
                 Wh3SoundBankSubType.Magic => Wh3SoundBankType.ActionEventSoundBank,
                 Wh3SoundBankSubType.Movies => Wh3SoundBankType.ActionEventSoundBank,
                 Wh3SoundBankSubType.QuestBattles => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBankSubType.Rituals => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBankSubType.UI => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBankSubType.Vocalisation => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBankSubType.FrontendMusic => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBankSubType.CampaignMusic => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBankSubType.BattleMusic => Wh3SoundBankType.ActionEventSoundBank,
-                Wh3SoundBankSubType.LoadingScreenMusic => Wh3SoundBankType.ActionEventSoundBank,
+                //Wh3SoundBankSubType.Rituals => Wh3SoundBankType.ActionEventSoundBank,
+                //Wh3SoundBankSubType.UI => Wh3SoundBankType.ActionEventSoundBank,
+                //Wh3SoundBankSubType.Vocalisation => Wh3SoundBankType.ActionEventSoundBank,
+                //Wh3SoundBankSubType.FrontendMusic => Wh3SoundBankType.ActionEventSoundBank,
+                //Wh3SoundBankSubType.CampaignMusic => Wh3SoundBankType.ActionEventSoundBank,
+                //Wh3SoundBankSubType.BattleMusic => Wh3SoundBankType.ActionEventSoundBank,
+                //Wh3SoundBankSubType.LoadingScreenMusic => Wh3SoundBankType.ActionEventSoundBank,
                 Wh3SoundBankSubType.FrontendVO => Wh3SoundBankType.DialogueEventSoundBank,
                 Wh3SoundBankSubType.CampaignVO => Wh3SoundBankType.DialogueEventSoundBank,
                 Wh3SoundBankSubType.CampaignConversationalVO => Wh3SoundBankType.DialogueEventSoundBank,
                 Wh3SoundBankSubType.BattleVO => Wh3SoundBankType.DialogueEventSoundBank,
                 Wh3SoundBankSubType.BattleConversationalVO => Wh3SoundBankType.DialogueEventSoundBank,
-                Wh3SoundBankSubType.BattleIndividualMelee => Wh3SoundBankType.DialogueEventSoundBank
+                //Wh3SoundBankSubType.BattleIndividualMelee => Wh3SoundBankType.DialogueEventSoundBank
             };
         }
 
@@ -91,19 +93,19 @@
                 Wh3SoundBankSubType.Magic => MagicDisplayString,
                 Wh3SoundBankSubType.Movies => MoviesDisplayString,
                 Wh3SoundBankSubType.QuestBattles => QuestBattlesDisplayString,
-                Wh3SoundBankSubType.Rituals => RitualsDisplayString,
-                Wh3SoundBankSubType.UI => UIDisplayString,
-                Wh3SoundBankSubType.Vocalisation => VocalisationDisplayString,
-                Wh3SoundBankSubType.FrontendMusic => FrontendMusicDisplayString,
-                Wh3SoundBankSubType.CampaignMusic => CampaignMusicDisplayString,
-                Wh3SoundBankSubType.BattleMusic => BattleMusicDisplayString,
-                Wh3SoundBankSubType.LoadingScreenMusic => LoadingScreenMusicDisplayString,
+                //Wh3SoundBankSubType.Rituals => RitualsDisplayString,
+                //Wh3SoundBankSubType.UI => UIDisplayString,
+                //Wh3SoundBankSubType.Vocalisation => VocalisationDisplayString,
+                //Wh3SoundBankSubType.FrontendMusic => FrontendMusicDisplayString,
+                //Wh3SoundBankSubType.CampaignMusic => CampaignMusicDisplayString,
+                //Wh3SoundBankSubType.BattleMusic => BattleMusicDisplayString,
+                //Wh3SoundBankSubType.LoadingScreenMusic => LoadingScreenMusicDisplayString,
                 Wh3SoundBankSubType.FrontendVO => FrontendVODisplayString,
                 Wh3SoundBankSubType.CampaignVO => CampaignVODisplayString,
                 Wh3SoundBankSubType.CampaignConversationalVO => CampaignConversationalVODisplayString,
                 Wh3SoundBankSubType.BattleVO => BattleVODisplayString,
                 Wh3SoundBankSubType.BattleConversationalVO => BattleConversationalVODisplayString,
-                Wh3SoundBankSubType.BattleIndividualMelee => BattleIndividualMeleeDisplayString,
+                //Wh3SoundBankSubType.BattleIndividualMelee => BattleIndividualMeleeDisplayString,
             };
         }
 
@@ -118,19 +120,19 @@
                 MagicDisplayString => Wh3SoundBankSubType.Magic,
                 MoviesDisplayString => Wh3SoundBankSubType.Movies,
                 QuestBattlesDisplayString => Wh3SoundBankSubType.QuestBattles,
-                RitualsDisplayString => Wh3SoundBankSubType.Rituals,
-                UIDisplayString => Wh3SoundBankSubType.UI,
-                VocalisationDisplayString => Wh3SoundBankSubType.Vocalisation,
-                FrontendMusicDisplayString => Wh3SoundBankSubType.FrontendMusic,
-                CampaignMusicDisplayString => Wh3SoundBankSubType.CampaignMusic,
-                BattleMusicDisplayString => Wh3SoundBankSubType.BattleMusic,
-                LoadingScreenMusicDisplayString => Wh3SoundBankSubType.LoadingScreenMusic,
+                //RitualsDisplayString => Wh3SoundBankSubType.Rituals,
+                //UIDisplayString => Wh3SoundBankSubType.UI,
+                //VocalisationDisplayString => Wh3SoundBankSubType.Vocalisation,
+                //FrontendMusicDisplayString => Wh3SoundBankSubType.FrontendMusic,
+                //CampaignMusicDisplayString => Wh3SoundBankSubType.CampaignMusic,
+                //BattleMusicDisplayString => Wh3SoundBankSubType.BattleMusic,
+                //LoadingScreenMusicDisplayString => Wh3SoundBankSubType.LoadingScreenMusic,
                 FrontendVODisplayString => Wh3SoundBankSubType.FrontendVO,
                 CampaignVODisplayString => Wh3SoundBankSubType.CampaignVO,
                 CampaignConversationalVODisplayString => Wh3SoundBankSubType.CampaignConversationalVO,
                 BattleVODisplayString => Wh3SoundBankSubType.BattleVO,
                 BattleConversationalVODisplayString => Wh3SoundBankSubType.BattleConversationalVO,
-                BattleIndividualMeleeDisplayString => Wh3SoundBankSubType.BattleIndividualMelee,
+                //BattleIndividualMeleeDisplayString => Wh3SoundBankSubType.BattleIndividualMelee,
             };
         }
     }

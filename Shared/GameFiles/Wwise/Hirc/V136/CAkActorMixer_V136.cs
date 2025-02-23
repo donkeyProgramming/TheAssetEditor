@@ -35,6 +35,6 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         }
 
         public List<uint> GetChildren() => Children.ChildIds;
-        public uint GetDirectParentID() => NodeBaseParams.DirectParentId;
+        public uint GetDirectParentID() => NodeBaseParams.DirectParentID;
     }
 }

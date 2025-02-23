@@ -86,7 +86,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
                 transitionTimeModMaxSize + avoidRepeatCountSize + transitionModeSize + randomModeSize + modeSize + bitVectorSize + childrenSize + playListSize;
         }
 
-        public uint GetParentID() => NodeBaseParams.DirectParentId;
+        public uint GetDirectParentID() => NodeBaseParams.DirectParentID;
         public List<uint> GetChildren() => CAkPlayList.Playlist.Select(x => x.PlayId).ToList();
 
         public class CAkPlayList_V136

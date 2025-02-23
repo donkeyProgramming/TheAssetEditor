@@ -51,6 +51,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService
             var instance = new WwiseHircGeneratorServiceFactory();
             instance.RegisterGenerator(AkBkHircType.Event, () => new ActionEventHircGenerator_V136());
             instance.RegisterGenerator(AkBkHircType.Action, () => new ActionHircGenerator_V136());
+            instance.RegisterGenerator(AkBkHircType.Sound, () => new SoundHircGenerator_V136());
+            instance.RegisterGenerator(AkBkHircType.RandomSequenceContainer, () => new RanSeqCntrHircGenerator_V136());
             return instance;
         }
     }

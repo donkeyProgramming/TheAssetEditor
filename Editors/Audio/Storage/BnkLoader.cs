@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Editors.Audio.GameSettings.Warhammer3;
+using Editors.Audio.Utility;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
@@ -13,13 +15,14 @@ using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.Storage
 {
+    // TODO: Add a bnk file hirc lookup
     public class BnkLoader
     {
         public class LoadResult
         {
-            public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageByID { get; internal set; } = [];
-            public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageBySourceID { get; internal set; } = [];
-            public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageByID { get; internal set; } = [];
+            public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; internal set; } = [];
+            public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; internal set; } = [];
+            public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; internal set; } = [];
             public Dictionary<uint, List<HircItem>> HircLookupByID { get; internal set; } = [];
             public Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; internal set; } = [];
             public Dictionary<string, PackFile> BnkPackFileLookupByName { get; internal set; } = [];
@@ -49,6 +52,9 @@ namespace Editors.Audio.Storage
             var bankFilesAsDictionary = bankFiles.GroupBy(f => f.FileName).ToDictionary(g => g.Key, g => g.Last().Pack);
 
             var removeFilter = new List<string>() { "media", "init.bnk", "animation_blood_data.bnk" };
+            var languages = new List<string>() { "chinese", "french(france)", "german", "italian", "polish", "russian", "spanish(spain)" };
+            //removeFilter.AddRange(languages);
+
             var wantedBnkFiles = PackFileUtil.FilterUnvantedFiles(bankFilesAsDictionary, removeFilter.ToArray(), out var removedFiles); ;
             _logger.Here().Information($"Parsing game sounds. {bankFiles.Count} bnk files found. {wantedBnkFiles.Count} after filtering");
 
@@ -121,7 +127,7 @@ namespace Editors.Audio.Storage
                 _logger.Here().Error($"{failedBnks.Count} banks failed: {string.Join("\n", failedBnks)}");
 
             // Construct language based Hirc Item data
-            output.HircLookupByLanguageByID = output.HircLookupByID
+            output.HircLookupByLanguageIDByID = output.HircLookupByID
                 .SelectMany(kvp => kvp.Value)
                 .GroupBy(item => item.LanguageID)
                 .ToDictionary(
@@ -135,7 +141,7 @@ namespace Editors.Audio.Storage
                 );
 
             // Construct language Sound Source ID data
-            output.SoundHircLookupByLanguageBySourceID = output.HircLookupByLanguageByID.ToDictionary(
+            output.SoundHircLookupByLanguageIDBySourceID = output.HircLookupByLanguageIDByID.ToDictionary(
                 language => language.Key,
                 language => language.Value.Values
                     .SelectMany(itemList => itemList)
@@ -149,7 +155,7 @@ namespace Editors.Audio.Storage
             );
 
             // Construct language DIDX Audio ID
-            output.DidxAudioLookupByLanguageByID = output.DidxAudioLookupByID
+            output.DidxAudioLookupByLanguageIDByID = output.DidxAudioLookupByID
                 .SelectMany(kvp => kvp.Value)
                 .GroupBy(item => item.LanguageID)
                 .ToDictionary(
@@ -161,6 +167,10 @@ namespace Editors.Audio.Storage
                             idGroup => idGroup.ToList()
                         )
                 );
+
+            // TODO: Temporary solution to limit what the Audio Explorer uses to english language stuff before I rework the audio explorer
+            foreach (var id in output.HircLookupByID)
+                id.Value.RemoveAll(item => languages.Any(language => item.OwnerFilePath.Contains(language)));
 
             return output;
         }

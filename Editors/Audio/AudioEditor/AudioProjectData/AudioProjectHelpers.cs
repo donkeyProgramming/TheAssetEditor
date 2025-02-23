@@ -91,7 +91,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                     actionEvent.Sound = CreateSound(audioSettingsViewModel, audioFiles[0]);
                 else
                 {
-                    actionEvent.SoundContainer = new SoundContainer
+                    actionEvent.RandomSequenceContainer = new RandomSequenceContainer
                     {
                         Sounds = [],
                         AudioSettings = audioSettingsViewModel.BuildAudioSettings()
@@ -100,7 +100,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                     foreach (var audioFile in audioFiles)
                     {
                         var sound = CreateSound(audioSettingsViewModel, audioFile);
-                        actionEvent.SoundContainer.Sounds.Add(sound);
+                        actionEvent.RandomSequenceContainer.Sounds.Add(sound);
                     }
                 }
 
@@ -163,13 +163,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
                 var audioFiles = audioSettingsViewModel.AudioFiles;
                 if (audioFiles.Count == 1)
-                {
                     statePath.Sound = CreateSound(audioSettingsViewModel, audioFiles[0]);
-                    statePath.Sound.AudioSettings = audioSettingsViewModel.BuildAudioSettings();
-                }
                 else
                 {
-                    statePath.SoundContainer = new SoundContainer
+                    statePath.SoundContainer = new RandomSequenceContainer
                     {
                         Sounds = [],
                         AudioSettings = audioSettingsViewModel.BuildAudioSettings()
@@ -209,9 +206,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
         {
             var sound = new Sound()
             {
-                AudioSettings = isSoundInSoundContainer ? audioSettingsViewModel.BuildAudioSettings() : null,
-                FileName = audioFile.FileName,
-                FilePath = audioFile.FilePath,
+                WavFileName = audioFile.FileName,
+                WavFilePath = audioFile.FilePath,
             };
 
             return sound;
@@ -243,11 +239,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
             var soundBank = GetSoundBankFromName(audioProjectService, audioProjectItem.Name);
             var actionEvent = GetActionEventFromDataGridRow(selectedAudioProjectViewerDataGridRow, soundBank);
-            
-            if (actionEvent.Sound != null)
-                return actionEvent.Sound.AudioSettings;
-            else
-                return actionEvent.SoundContainer.AudioSettings;
+            return actionEvent.RandomSequenceContainer.AudioSettings;
         }
 
         public static AudioSettings GetAudioSettingsFromAudioProjectViewerStatePathItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
@@ -256,11 +248,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
             var dialogueEvent = GetDialogueEventFromName(audioProjectService, audioProjectItem.Name);
             var statePath = GetStatePathFromDataGridRow(audioRepository, selectedAudioProjectViewerDataGridRow, dialogueEvent);
-
-            if (statePath.Sound != null)
-                return statePath.Sound.AudioSettings;
-            else
-                return statePath.SoundContainer.AudioSettings;
+            return statePath.SoundContainer.AudioSettings;
         }
 
         public static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> newRow)

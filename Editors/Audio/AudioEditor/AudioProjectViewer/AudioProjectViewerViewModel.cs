@@ -75,18 +75,18 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
                 {
                     audioFiles.Add(new AudioFile()
                     {
-                        FileName = actionEvent.Sound.FileName,
-                        FilePath = actionEvent.Sound.FilePath,
+                        FileName = actionEvent.Sound.WavFileName,
+                        FilePath = actionEvent.Sound.WavFilePath,
                     });
                 }
                 else
                 {
-                    foreach (var sound in actionEvent.SoundContainer.Sounds)
+                    foreach (var sound in actionEvent.RandomSequenceContainer.Sounds)
                     {
                         audioFiles.Add(new AudioFile()
                         {
-                            FileName = sound.FileName,
-                            FilePath = sound.FilePath,
+                            FileName = sound.WavFileName,
+                            FilePath = sound.WavFilePath,
                         });
                     }
                 }
@@ -102,8 +102,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
                 {
                     audioFiles.Add(new AudioFile()
                     {
-                        FileName = statePath.Sound.FileName,
-                        FilePath = statePath.Sound.FilePath,
+                        FileName = statePath.Sound.WavFileName,
+                        FilePath = statePath.Sound.WavFilePath,
                     });
                 }
                 else
@@ -112,8 +112,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
                     {
                         audioFiles.Add(new AudioFile()
                         {
-                            FileName = sound.FileName,
-                            FilePath = sound.FilePath,
+                            FileName = sound.WavFileName,
+                            FilePath = sound.WavFilePath,
                         });
                     }
                 }

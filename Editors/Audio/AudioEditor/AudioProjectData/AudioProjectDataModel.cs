@@ -29,6 +29,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
         public Wh3SoundBankSubType SoundBankSubType { get; set; }
         public List<ActionEvent> ActionEvents { get; set; }
         public List<DialogueEvent> DialogueEvents { get; set; }
+        public string Language { get; set; } // TODO: Need to use this
     }
 
     public class ActionEvent : AudioProjectHircItem
@@ -37,7 +38,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
         // Technically we should make each action contain the SoundContainer / Sound but making multiple actions for an event isn't supported as the user probably doesn't need to.
         public List<Action> Actions { get; set; } 
-        public SoundContainer SoundContainer { get; set; }
+        public RandomSequenceContainer RandomSequenceContainer { get; set; }
         public Sound Sound { get; set; }
     }
 
@@ -64,7 +65,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
     public class StatePath
     {
         public List<StatePathNode> Nodes { get; set; } = [];
-        public SoundContainer SoundContainer { get; set; }
+        public RandomSequenceContainer SoundContainer { get; set; }
         public Sound Sound { get; set; }
     }
 
@@ -74,39 +75,41 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
         public State State { get; set; }
     }
 
-    public class SoundContainer : AudioProjectHircItem
+    public class RandomSequenceContainer : AudioProjectHircItem
     {
-        public override AkBkHircType HircType { get; } = AkBkHircType.SequenceContainer;
+        public override AkBkHircType HircType { get; } = AkBkHircType.RandomSequenceContainer;
         public uint DirectParentID { get; set; }
         public AudioSettings AudioSettings { get; set; }
         public List<Sound> Sounds { get; set; }
+        public string Language { get; set; }
     }
 
     public class Sound : AudioProjectHircItem
     {
         public override AkBkHircType HircType { get; } = AkBkHircType.Sound;
         public uint DirectParentID { get; set; }
-        public uint AttenuationID { get; set; }
         public uint SourceID { get; set; }
-        public AudioSettings AudioSettings { get; set; }
-        public string FileName { get; set; }
-        public string FilePath { get; set; }
+        public string WavFileName { get; set; }
+        public string WavFilePath { get; set; }
+        public string WemFileName { get; set; }
+        public string WemFilePath { get; set; }
+        public string WemDiskFilePath { get; set; }
+        public long InMemoryMediaSize { get; set; }
+        public string Language { get; set; }
+        public uint AttenuationID { get; set; }
     }
 
     public class AudioSettings
     {
-        public decimal? Volume { get; set; }
-        public decimal? InitialDelay { get; set; }
-        public PlaylistType? PlaylistType { get; set; }
-        public PlaylistMode? PlaylistMode { get; set; }
-        public bool? EnableRepetitionInterval { get; set; }
+        public PlaylistType PlaylistType { get; set; }
+        public bool EnableRepetitionInterval { get; set; }
         public uint? RepetitionInterval { get; set; }
         public EndBehaviour? EndBehaviour { get; set; }
-        public bool? EnableLooping { get; set; }
-        public bool? LoopInfinitely { get; set; }
+        public bool AlwaysResetPlaylist { get; set; }
+        public PlaylistMode PlaylistMode { get; set; }
+        public LoopingType LoopingType { get; set; }
         public uint? NumberOfLoops { get; set; }
-        public bool? EnableTransitions { get; set; }
-        public TransitionType? Transition { get; set; }
-        public decimal? Duration { get; set; }
+        public TransitionType TransitionType { get; set; }
+        public decimal? TransitionDuration { get; set; }
     }
 }

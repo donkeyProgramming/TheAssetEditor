@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise.Hirc.V112.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V112
 {
-    public class CAkRanSeqCnt_V112 : HircItem, ICAkRanSeqCnt
+    public class CAkRanSeqCntr_V112 : HircItem, ICAkRanSeqCnt
     {
         public NodeBaseParams_V112 NodeBaseParams { get; set; } = new NodeBaseParams_V112();
         public ushort LoopCount { get; set; }
@@ -58,7 +58,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
             var byteArray = memStream.ToArray();
 
             // Reload the object to ensure sanity
-            var sanityReload = new CAkRanSeqCnt_V112();
+            var sanityReload = new CAkRanSeqCntr_V112();
             sanityReload.Parse(new ByteChunk(byteArray));
 
             return byteArray;
@@ -86,7 +86,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
                 transitionTimeModMaxSize + avoidRepeatCountSize + transitionModeSize + randomModeSize + modeSize + bitVectorSize + childrenSize + playListSize;
         }
 
-        public uint GetParentID() => NodeBaseParams.DirectParentId;
+        public uint GetDirectParentID() => NodeBaseParams.DirectParentId;
         public List<uint> GetChildren() => CAkPlayList.Playlist.Select(x => x.PlayId).ToList();
 
         public class CAkPlayList_V112

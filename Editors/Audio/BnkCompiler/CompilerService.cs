@@ -40,9 +40,9 @@ namespace Editors.Audio.BnkCompiler
             if (project.IsSuccess == false)
                 return Result<bool>.FromError(project.LogItems);
 
-            var importResult = _audioFileImporter.ImportAudio(project.Item);
-            if (importResult.IsSuccess == false)
-                return Result<bool>.FromError(importResult.LogItems);
+            //var importResult = _audioFileImporter.ImportAudio(project.Item);
+            //if (importResult.IsSuccess == false)
+                //return Result<bool>.FromError(importResult.LogItems);
 
             var compilerOutput = _compiler.CompileProject(project.Item, _applicationSettingsService);
             if (compilerOutput.IsSuccess == false)

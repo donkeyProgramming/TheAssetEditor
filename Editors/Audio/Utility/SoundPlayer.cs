@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.Storage;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -113,24 +114,18 @@ namespace Editors.Audio.Utility
             return audioFile;
         }
 
-        public static void PlayWavFileFromPack(IPackFileService packFileService, AudioFilesTreeNode wavFile)
+        public void PlayWavFileFromPack(AudioFilesTreeNode wavFileNode)
         {
-            s_logger.Here().Information($"Playing: {wavFile}");
+            s_logger.Here().Information($"Playing: {wavFileNode.Name}");
 
-            var audioFile = FindWavFile(packFileService, wavFile.FilePath);
-            if (audioFile == null)
-                s_logger.Here().Error($"Unable to find wem file '{wavFile}'.");
+            var wavFile = _packFileService.FindFile(wavFileNode.FilePath);
+            if (wavFile == null)
+                s_logger.Here().Error($"Unable to find wem file '{wavFileNode.FilePath}'.");
 
-            var wavDiskPath = $"{AudioFolderName}\\{wavFile.Name}";
-            ExportFile(wavDiskPath, audioFile.DataSource.ReadData());
+            var wavDiskPath = $"{AudioFolderName}\\{wavFileNode.Name}";
+            ExportFile(wavDiskPath, wavFile.DataSource.ReadData());
 
             PlayWavFileFromDisk(wavDiskPath);
-        }
-
-        public static PackFile FindWavFile(IPackFileService packFileService, string wavFile)
-        {
-            var audioFile = packFileService.FindFile(wavFile);
-            return audioFile;
         }
 
         public static Result<bool> ExportFile(string filePath, byte[] bytes)
@@ -139,7 +134,7 @@ namespace Editors.Audio.Utility
             {
                 DirectoryHelper.EnsureFileFolderCreated(filePath);
                 File.WriteAllBytes(filePath, bytes);
-                s_logger.Here().Information("All bytes written to file");
+                s_logger.Here().Information($"All bytes written to file at {filePath}");
                 return Result<bool>.FromOk(true);
             }
             catch (Exception e)
@@ -147,6 +142,16 @@ namespace Editors.Audio.Utility
                 s_logger.Here().Error(e.Message);
                 return Result<bool>.FromError("Write error", e.Message);
             }
+        }
+
+        public void ExportWavFileWithWemID(Sound audioProjectSound)
+        {
+            var wavFile = _packFileService.FindFile(audioProjectSound.WavFilePath);
+            if (wavFile == null)
+                throw new Exception($"Unable to find wav file '{audioProjectSound.WavFilePath}' in pack.");
+
+            var wavDiskPath = $"{AudioFolderName}\\{audioProjectSound.SourceID}.wav";
+            ExportFile(wavDiskPath, wavFile.DataSource.ReadData());
         }
     }
 }

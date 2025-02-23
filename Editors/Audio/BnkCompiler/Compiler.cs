@@ -91,7 +91,7 @@ namespace Editors.Audio.BnkCompiler
             var outputName = $"event_data__{projectFile.ProjectSettings.BnkName}.dat";
             var datFile = new SoundDatFile();
 
-            foreach (var wwiseEvent in projectFile.StatesDat)
+            foreach (var wwiseEvent in projectFile.EventsDat)
                 datFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { EventName = wwiseEvent, Value = 400 });
 
             var bytes = DatFileParser.WriteData(datFile);

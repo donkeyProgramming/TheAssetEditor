@@ -50,7 +50,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                     StreamType = AKBKSourceType.Streaming,
                     AkMediaInformation = new AkMediaInformation_V136()
                     {
-                        SourceId = uint.Parse(wavFileName),
+                        SourceID = uint.Parse(wavFileName),
                         InMemoryMediaSize = (uint)file.DataSource.Size,
                         SourceBits = 0x01,
                     }
@@ -58,7 +58,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 NodeBaseParams = nodeBaseParams
             };
 
-            wwiseSound.NodeBaseParams.DirectParentId = inputSound.DirectParentId;
+            wwiseSound.NodeBaseParams.DirectParentID = inputSound.DirectParentId;
 
             // Applying attenuation directly to sounds is necessary as they don't appear to use the vanilla mixer's attenuation even though they're being routed through it.
             var attenuationId = inputSound.Attenuation;
@@ -69,7 +69,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 {
                     PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>()
                     {
-                        new(){Id = AkPropId_V136.AttenuationID, Value = attenuationId}
+                        new(){ID = AkPropId_V136.AttenuationID, Value = attenuationId}
                     }
                 };
             }
@@ -94,8 +94,8 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 BitsFxBypass = 0,
             };
             instance.OverrideAttachmentParams = 0;
-            instance.OverrideBusId = 0;
-            instance.DirectParentId = 0;
+            instance.OverrideBusID = 0;
+            instance.DirectParentID = 0;
             instance.BitVector = 0;
             instance.NodeInitialParams = new NodeInitialParams_V136()
             {
@@ -110,7 +110,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
                 },
                 AkPropBundle1 = new AkPropBundleMinMax_V136()
                 {
-                    Values = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>()
+                    PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>()
                 }
             };
             instance.PositioningParams = new PositioningParams_V136()

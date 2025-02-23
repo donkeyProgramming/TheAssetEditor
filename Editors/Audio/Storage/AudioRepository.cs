@@ -7,14 +7,16 @@ using Shared.Core.Settings;
 using Shared.GameFormats.Wwise.Didx;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
+using Shared.GameFormats.Wwise.Hirc.V136;
+using SharpDX.DXGI;
 
 namespace Editors.Audio.Storage
 {
     public interface IAudioRepository
     {
-        Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageByID { get; }
-        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageBySourceID { get; }
-        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageByID { get; }
+        Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; }
+        Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; }
+        Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; }
         Dictionary<uint, List<HircItem>> HircLookupByID { get; }
         Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; }
         Dictionary<string, PackFile> BnkPackFileLookupByName { get; }
@@ -36,9 +38,9 @@ namespace Editors.Audio.Storage
 
     public class AudioRepository : IAudioRepository
     {
-        public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageByID { get; private set; }
-        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageBySourceID { get; private set; }
-        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageByID { get; private set; }
+        public Dictionary<uint, Dictionary<uint, List<HircItem>>> HircLookupByLanguageIDByID { get; private set; }
+        public Dictionary<uint, Dictionary<uint, List<ICAkSound>>> SoundHircLookupByLanguageIDBySourceID { get; private set; }
+        public Dictionary<uint, Dictionary<uint, List<DidxAudio>>> DidxAudioLookupByLanguageIDByID { get; private set; }
         public Dictionary<uint, List<HircItem>> HircLookupByID { get; private set; }
         public Dictionary<uint, List<DidxAudio>> DidxAudioLookupByID { get; private set; }
         public Dictionary<string, PackFile> BnkPackFileLookupByName { get; private set; }
@@ -59,9 +61,9 @@ namespace Editors.Audio.Storage
                 provider.LoadBnkData(audioData);
             }
 
-            HircLookupByLanguageByID = audioData.HircLookupByLanguageByID ?? [];
-            SoundHircLookupByLanguageBySourceID = audioData.SoundHircLookupByLanguageBySourceID ?? [];
-            DidxAudioLookupByLanguageByID = audioData.DidxAudioLookupByLanguageByID ?? [];
+            HircLookupByLanguageIDByID = audioData.HircLookupByLanguageIDByID ?? [];
+            SoundHircLookupByLanguageIDBySourceID = audioData.SoundHircLookupByLanguageIDBySourceID ?? [];
+            DidxAudioLookupByLanguageIDByID = audioData.DidxAudioLookupByLanguageIDByID ?? [];
             HircLookupByID = audioData.HircLookupByID ?? [];
             DidxAudioLookupByID = audioData.DidxAudioLookupByID ?? [];
             BnkPackFileLookupByName = audioData.BnkPackFileLookupByName ?? [];
