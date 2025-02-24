@@ -19,6 +19,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration
             sourceMesh.Normals = original.VertexArray.Select(x => new MeshDecimator.Math.Vector3(x.Normal.X, x.Normal.Y, x.Normal.Z)).ToArray();
             sourceMesh.Tangents = original.VertexArray.Select(x => new MeshDecimator.Math.Vector4(x.Tangent.X, x.Tangent.Y, x.Tangent.Z, 0)).ToArray(); // Should last 0 be 1?
             sourceMesh.SetUVs(0, original.VertexArray.Select(x => new MeshDecimator.Math.Vector2(x.TextureCoordinate.X, x.TextureCoordinate.Y)).ToArray());
+            sourceMesh.SetUVs(1, original.VertexArray.Select(x => new MeshDecimator.Math.Vector2(x.TextureCoordinate1.X, x.TextureCoordinate1.Y)).ToArray());
 
             if (original.WeightCount == 4)
             {
@@ -58,6 +59,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration
                 var norm = destMesh.Normals[i];
                 var tangents = destMesh.Tangents[i];
                 var uv = destMesh.UV1[i];
+                var uv1 = destMesh.UV2[i];
                 var boneWeight = destMesh.BoneWeights[i];
 
                 var normal = new Vector3(norm.x, norm.y, norm.z);
@@ -70,6 +72,7 @@ namespace GameWorld.Core.Services.SceneSaving.Lod.MeshDecimatorIntegration
                 vert.Tangent = new Vector3(tangents.x, tangents.y, tangents.z);
                 vert.BiNormal = new Vector3(binormal.X, binormal.Y, binormal.Z);
                 vert.TextureCoordinate = new Vector2(uv.x, uv.y);
+                vert.TextureCoordinate1 = new Vector2(uv1.x, uv1.y);
 
                 if (original.WeightCount == 4)
                 {

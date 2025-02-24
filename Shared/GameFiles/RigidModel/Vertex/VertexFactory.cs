@@ -19,6 +19,7 @@ namespace Shared.GameFormats.RigidModel.Vertex
         public Vector3 BiNormal { get; set; }
         public Vector3 Tangent { get; set; }
         public Vector2 Uv { get; set; }
+        public Vector2 Uv1 { get; set; }
         public Vector4 Colour { get; set; }
 
         public byte[] BoneIndex;

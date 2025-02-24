@@ -34,6 +34,7 @@ namespace GameWorld.Core.Services
                 mesh.VertexArray[i].BiNormal = vertex.BiNormal;
                 mesh.VertexArray[i].Tangent = vertex.Tangent;
                 mesh.VertexArray[i].TextureCoordinate = vertex.Uv;
+                mesh.VertexArray[i].TextureCoordinate1 = vertex.Uv1;
 
                 if (mesh.VertexFormat == UiVertexFormat.Static)
                 {
@@ -82,6 +83,7 @@ namespace GameWorld.Core.Services
 
                     Colour = new Vector4(0, 0, 0, 1),
                     Uv = x.TextureCoordinate,
+                    Uv1 = x.TextureCoordinate1,
 
                     BoneIndex = x.GetBoneIndexs().Take(geometry.WeightCount).Select(x => (byte)x).ToArray(),
                     BoneWeight = x.GetBoneWeights().Take(geometry.WeightCount).ToArray(),

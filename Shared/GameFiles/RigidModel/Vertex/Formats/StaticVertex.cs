@@ -25,6 +25,7 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
                 BiNormal = SwapXZ(VertexLoadHelper.CreatVector4Byte(vertexData.biNormal).ToVector3()),
 
                 Uv = VertexLoadHelper.CreatVector2HalfFloat(vertexData.uv).ToVector2(),
+                Uv1 = VertexLoadHelper.CreatVector2HalfFloat(vertexData.uvExtra).ToVector2(),
 
                 Colour = VertexLoadHelper.CreatVector4Byte(vertexData.RGBA).ToVector4(),
 
@@ -40,41 +41,26 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
             if (vertex.WeightCount != 0 || vertex.BoneIndex.Length != 0 || vertex.BoneWeight.Length != 0)
                 throw new Exception($"Unexpected vertex weights for {Type}");
 
-            if (rmvVersion != RmvVersionEnum.RMV2_V8)
-            {
-                var typedVert = new Data()
-                {
-                    position = VertexLoadHelper.CreatePositionVector4ExtraPrecision(vertex.Position),
-                    normal = VertexLoadHelper.CreateNormalVector3(SwapXZ(vertex.Normal)),
-
-                    uv = VertexLoadHelper.CreatePositionVector2(vertex.Uv),
-                    uvExtra = VertexLoadHelper.CreatePositionVector2(new Vector2(0, 0)),
-
-                    tangent = VertexLoadHelper.CreateNormalVector3(SwapXZ(vertex.Tangent)),
-                    biNormal = VertexLoadHelper.CreateNormalVector3(SwapXZ(vertex.BiNormal)),
-
-                    RGBA = VertexLoadHelper.CreatePositionVector4(vertex.Position),
-                };
-                return ByteHelper.GetBytes(typedVert);
-            }
+            byte[] position;
+            if(rmvVersion != RmvVersionEnum.RMV2_V8)
+                position = VertexLoadHelper.CreatePositionVector4ExtraPrecision(vertex.Position);
             else
-            {
+                position = VertexLoadHelper.CreatePositionVector4(vertex.Position);
+
             var typedVert = new Data()
             {
-                position = VertexLoadHelper.CreatePositionVector4(vertex.Position),
+                position = position,
                 normal = VertexLoadHelper.CreateNormalVector3(SwapXZ(vertex.Normal)),
 
                 uv = VertexLoadHelper.CreatePositionVector2(vertex.Uv),
-                uvExtra = VertexLoadHelper.CreatePositionVector2(new Vector2(0, 0)),
+                uvExtra = VertexLoadHelper.CreatePositionVector2(vertex.Uv1),
 
                 tangent = VertexLoadHelper.CreateNormalVector3(SwapXZ(vertex.Tangent)),
                 biNormal = VertexLoadHelper.CreateNormalVector3(SwapXZ(vertex.BiNormal)),
 
                 RGBA = VertexLoadHelper.CreatePositionVector4(vertex.Position),
             };
-
             return ByteHelper.GetBytes(typedVert);
-        }
         }
 
         private static Vector3 SwapXZ(Vector3 v) => new Vector3(v.Z, v.Y, v.X);
