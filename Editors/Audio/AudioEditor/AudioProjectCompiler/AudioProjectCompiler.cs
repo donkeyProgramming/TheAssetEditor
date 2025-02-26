@@ -10,7 +10,6 @@ using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
-using Octokit;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -336,24 +335,32 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
 
         private static void GenerateActionEventSoundBanks(WwiseHircGeneratorServiceFactory wwiseHircGeneratorServiceFactory, SoundBank soundBank, List<HircItem> hircItems)
         {
+            var sourceHircs = new Dictionary<HircItem, List<HircItem>>();
+
             foreach (var actionEvent in soundBank.ActionEvents)
             {
                 if (actionEvent.Sound != null)
                 {
                     var soundHirc = wwiseHircGeneratorServiceFactory.GenerateHirc(actionEvent.Sound, soundBank);
-                    hircItems.Add(soundHirc);
+                    sourceHircs.Add(soundHirc, []);
                 }
                 else
                 {
-                    foreach (var sound in actionEvent.RandomSequenceContainer.Sounds)
-                    {
-                        var soundHirc = wwiseHircGeneratorServiceFactory.GenerateHirc(sound, soundBank);
-                        hircItems.Add(soundHirc);
-                    }
+                    var soundHircs = actionEvent.RandomSequenceContainer.Sounds
+                        .Select(sound => wwiseHircGeneratorServiceFactory.GenerateHirc(sound, soundBank))
+                        .ToList();
 
                     var randomSequenceContainerHirc = wwiseHircGeneratorServiceFactory.GenerateHirc(actionEvent.RandomSequenceContainer, soundBank);
-                    hircItems.Add(randomSequenceContainerHirc);
+                    sourceHircs.Add(randomSequenceContainerHirc, soundHircs);
                 }
+            }
+
+            foreach (var sourceHirc in sourceHircs.OrderBy(sourceHirc => sourceHirc.Key.ID))
+            {
+                foreach (var soundHirc in sourceHirc.Value)
+                    hircItems.Add(soundHirc);
+
+                hircItems.Add(sourceHirc.Key);
             }
 
             foreach (var actionEvent in soundBank.ActionEvents)
