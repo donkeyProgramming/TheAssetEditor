@@ -53,7 +53,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
             // TODO: implement game version into this check
             foreach (var soundBank in audioProject.SoundBanks)
             {
-                //if (soundBank.SoundBankSubType == SoundBanks.Wh3SoundBankSubType.BattleIndividualMelee) // TODO: This isn't necessarily the right subtype, get the right ones
+                //if (soundBank.SoundBankSubType == SoundBanks.Wh3SoundBankSubtype.BattleIndividualMelee) // TODO: This isn't necessarily the right subtype, get the right ones
                     //return Languages.Sfx;
             }
 

@@ -15,21 +15,21 @@ namespace Editors.Audio.AudioEditor.Converters
             if (value == null)
                 return value;
             else if (value is GameLanguage language)
-                return GameLanguageToStringMap[language];
-            else if (value is Wh3SoundBankSubType soundbank)
-                return GetSoundBankSubTypeDisplayString(soundbank);
+                return GameLanguageStringLookup[language];
+            else if (value is Wh3SoundBankSubtype soundBank)
+                return GetSoundBankSubTypeString(soundBank);
             else if (value is DialogueEventPreset dialogueEventSubtype)
                 return GetDialogueEventPresetDisplayString(dialogueEventSubtype);
             else if (value is PlaylistType playlistType)
-                return PlaylistTypeToStringMap[playlistType];
+                return PlaylistTypeStringLookup[playlistType];
             else if (value is PlaylistMode playlistMode)
-                return PlaylistModeToStringMap[playlistMode];
+                return PlaylistModeStringLookup[playlistMode];
             else if (value is EndBehaviour endBehaviour)
-                return EndBehaviourToStringMap[endBehaviour];
+                return EndBehaviourStringLookup[endBehaviour];
             else if (value is LoopingType loopingType)
-                return LoopingTypeToStringMap[loopingType];
+                return LoopingTypeStringLookup[loopingType];
             else if (value is TransitionType transitionType)
-                return TransitionTypeToStringMap[transitionType];
+                return TransitionTypeStringLookup[transitionType];
             else
                 return null;
         }

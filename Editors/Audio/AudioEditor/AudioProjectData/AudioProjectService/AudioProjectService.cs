@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Editors.Audio.AudioEditor.AudioProjectCompiler;
+using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Serilog;
@@ -16,7 +16,6 @@ using Shared.Core.Services;
 using Shared.Core.Settings;
 using static Editors.Audio.AudioEditor.IntegrityChecker;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
 namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
@@ -86,8 +85,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
 
                 CheckAudioProjectDialogueEventIntegrity(audioRepository, this);
 
-                audioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
-
                 _logger.Here().Information($"Loaded Audio Project: {fileName}");
             }
         }
@@ -124,32 +121,32 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
 
         private void InitialiseSoundBanks()
         {
-            var soundBanks = Enum.GetValues<Wh3SoundBankSubType>()
-                .Select(soundBank => new SoundBank
+            var soundBanks = Enum.GetValues<SoundBanks.Wh3SoundBankSubtype>()
+                .Select(soundBankSubtype => new SoundBank
                 {
-                    Name = GetSoundBankSubTypeDisplayString(soundBank),
-                    SoundBankType = GetSoundBankSubType(soundBank)
+                    Name = SoundBanks.GetSoundBankSubTypeString(soundBankSubtype),
+                    SoundBankType = SoundBanks.GetSoundBankSubType(soundBankSubtype)
                 })
                 .ToList();
 
             AudioProject.SoundBanks = [];
 
-            foreach (var soundBankEnum in Enum.GetValues<Wh3SoundBankSubType>())
+            foreach (var soundBankSubtype in Enum.GetValues<SoundBanks.Wh3SoundBankSubtype>())
             {
                 var soundBank = new SoundBank
                 {
-                    Name = GetSoundBankSubTypeDisplayString(soundBankEnum),
-                    SoundBankType = GetSoundBankSubType(soundBankEnum)
+                    Name = SoundBanks.GetSoundBankSubTypeString(soundBankSubtype),
+                    SoundBankType = SoundBanks.GetSoundBankSubType(soundBankSubtype)
                 };
 
-                if (soundBank.SoundBankType == Wh3SoundBankType.ActionEventSoundBank)
+                if (soundBank.SoundBankType == SoundBanks.Wh3SoundBankType.ActionEventSoundBank)
                     soundBank.ActionEvents = [];
                 else
                 {
                     soundBank.DialogueEvents = [];
 
                     var filteredDialogueEvents = DialogueEventData
-                        .Where(dialogueEvent => dialogueEvent.SoundBank == GetSoundBankEnum(soundBank.Name));
+                        .Where(dialogueEvent => dialogueEvent.SoundBank == SoundBanks.GetSoundBankSubtype(soundBank.Name));
 
                     foreach (var dialogueData in filteredDialogueEvents)
                     {

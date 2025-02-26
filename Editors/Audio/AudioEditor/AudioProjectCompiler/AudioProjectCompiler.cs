@@ -10,10 +10,12 @@ using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
+using Octokit;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
+using Shared.GameFormats.Dat;
 using Shared.GameFormats.Wwise;
 using Shared.GameFormats.Wwise.Bkhd;
 using Shared.GameFormats.Wwise.Hirc;
@@ -84,6 +86,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
             AddWemsToPack(audioProject);
 
             GenerateSoundBanks(audioProject);
+
+            GenerateEventDatFiles(audioProject);
         }
 
         private void SetSoundBankData(AudioProjectDataModel audioProject)
@@ -91,8 +95,17 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 soundBank.ID = WwiseHash.Compute(soundBank.Name);
-                soundBank.SoundBankSubType = SoundBanks.GetSoundBankEnum(soundBank.Name);
+                soundBank.SoundBankSubtype = SoundBanks.GetSoundBankSubtype(soundBank.Name);
                 soundBank.Language = AudioProjectCompilerHelpers.GetCorrectSoundBankLanguage(audioProject);
+
+                var audioProjectFileName = _audioProjectService.AudioProjectFileName.Replace(" ", "_");
+                soundBank.SoundBankFileName = $"{SoundBanks.GetSoundBankName(soundBank.SoundBankSubtype)}_{audioProjectFileName}.bnk";
+
+                var basePath = $"audio\\wwise";
+                if (soundBank.Language == Languages.Sfx)
+                    soundBank.SoundBankFilePath = $"{basePath}\\{soundBank.SoundBankFileName}";
+                else
+                    soundBank.SoundBankFilePath = $"{basePath}\\{soundBank.Language}\\{soundBank.SoundBankFileName}";
             }
         }
 
@@ -110,10 +123,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
                         actionEvent.Sound.Language = soundBank.Language;
                         actionEvent.Sound.ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, actionEvent.Sound.Language);
 
-                        if (wwiseIDService.ActorMixerIds.TryGetValue(soundBank.SoundBankSubType, out var actorMixerID))
+                        if (wwiseIDService.ActorMixerIds.TryGetValue(soundBank.SoundBankSubtype, out var actorMixerID))
                             actionEvent.Sound.DirectParentID = actorMixerID;
 
-                        if (wwiseIDService.AttenuationIds.TryGetValue(soundBank.SoundBankSubType, out var attenuationID))
+                        if (wwiseIDService.AttenuationIds.TryGetValue(soundBank.SoundBankSubtype, out var attenuationID))
                             actionEvent.Sound.AttenuationID = attenuationID;
 
                         if (sourceIDByWavFilePathLookup.TryGetValue(actionEvent.Sound.WavFilePath, out var sourceId))
@@ -130,7 +143,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
                         actionEvent.RandomSequenceContainer.Language = soundBank.Language;
                         actionEvent.RandomSequenceContainer.ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, actionEvent.RandomSequenceContainer.Language);
 
-                        if (wwiseIDService.ActorMixerIds.TryGetValue(soundBank.SoundBankSubType, out var actorMixerID))
+                        if (wwiseIDService.ActorMixerIds.TryGetValue(soundBank.SoundBankSubtype, out var actorMixerID))
                             actionEvent.RandomSequenceContainer.DirectParentID = actorMixerID;
 
                         foreach (var sound in actionEvent.RandomSequenceContainer.Sounds)
@@ -139,7 +152,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
                             sound.ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, sound.Language);
                             sound.DirectParentID = actionEvent.RandomSequenceContainer.ID;
 
-                            if (wwiseIDService.AttenuationIds.TryGetValue(soundBank.SoundBankSubType, out var attenuationID))
+                            if (wwiseIDService.AttenuationIds.TryGetValue(soundBank.SoundBankSubtype, out var attenuationID))
                                 sound.AttenuationID = attenuationID;
                             
                             sound.Language = soundBank.Language;
@@ -206,7 +219,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
             {
                 var actionEvents = soundBank.ActionEvents;
                 foreach (var actionEvent in actionEvents)
-                    actionEvent.ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, soundBank.Language);
+                {
+                    actionEvent.ID = WwiseHash.Compute(actionEvent.Name);
+
+                    if (UsedHircIdsByLanguageIDLookup[WwiseHash.Compute(soundBank.Language)].Contains(actionEvent.ID))
+                        throw new NotSupportedException ($"Action Event ID {actionEvent.ID} for {actionEvent.Name} in {soundBank.Language} is already in use, the Event needs a different name.");
+                }
 
                 soundBank.ActionEvents = soundBank.ActionEvents
                     .OrderBy(actionEvent => actionEvent.ID)
@@ -216,6 +234,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
 
         private void GenerateWems(AudioProjectDataModel audioProject)
         {
+            DeleteAudioFilesInTempAudioFolder();
+
             var soundsWithUniqueSourceIds = audioProject.SoundBanks
                 .SelectMany(soundBank => soundBank.ActionEvents)
                 .SelectMany<ActionEvent, Sound>(actionEvent => actionEvent.Sound != null ? new[] { actionEvent.Sound } : actionEvent.RandomSequenceContainer.Sounds)
@@ -226,6 +246,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
                 _soundPlayer.ExportWavFileWithWemID(sound);
 
             _wemGenerator.GenerateWems(soundsWithUniqueSourceIds);
+        }
+
+        private static void DeleteAudioFilesInTempAudioFolder()
+        {
+            var audioFolder = $"{DirectoryHelper.Temp}\\Audio";
+            if (Directory.Exists(audioFolder))
+            {
+                foreach (var file in Directory.GetFiles(audioFolder, "*.wav"))
+                    File.Delete(file);
+
+                foreach (var file in Directory.GetFiles(audioFolder, "*.wem"))
+                    File.Delete(file);
+            }
         }
 
         private static void SetRemainingSourceData(AudioProjectDataModel audioProject)
@@ -283,7 +316,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
                 var hircChunk = new HircChunk();
                 hircChunk.WriteData(hircItems);
 
-                var outputName = $"{soundBank.Name}.bnk";
                 var headerBytes = BkhdParser.WriteData(bkhdChunk);
                 var hircBytes = new HircParser().WriteData(hircChunk, bankGeneratorVersion);
 
@@ -294,13 +326,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
                 var bytes = memStream.ToArray();
 
                 // Convert to output and parse for sanity
-                var bnkPackFile = new PackFile(outputName, new MemorySource(bytes));
+                var bnkPackFile = new PackFile(soundBank.SoundBankFileName, new MemorySource(bytes));
                 var parser = new BnkParser();
                 var reparsedSanityFile = parser.Parse(bnkPackFile, "test\\fakefilename.bnk", true);
 
-                var language = audioProject.Language;
-                var bnkOutputPath = string.IsNullOrWhiteSpace(language) ? $"audio\\wwise\\{outputName}" : $"audio\\wwise\\{language}\\{outputName}";
-                _fileSaveService.Save(bnkOutputPath, bnkPackFile.DataSource.ReadData(), true);
+                _fileSaveService.Save(soundBank.SoundBankFilePath, bnkPackFile.DataSource.ReadData(), true);
             }
         }
 
@@ -336,6 +366,27 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
 
                 var actionEventHirc = wwiseHircGeneratorServiceFactory.GenerateHirc(actionEvent, soundBank);
                 hircItems.Add(actionEventHirc);
+            }
+        }
+
+        private void GenerateEventDatFiles(AudioProjectDataModel audioProject)
+        {
+            foreach (var soundBank in audioProject.SoundBanks)
+            {
+                // TODO: Need to impelement something so it only makes dat files for the soundbanks that need it, so far I think that's at least movies.
+                var datFile = new SoundDatFile();
+
+                foreach (var actionEvent in soundBank.ActionEvents)
+                    datFile.EventWithStateGroup.Add(new SoundDatFile.DatEventWithStateGroup() { EventName = actionEvent.Name, Value = 400 });
+
+                var datFileName = $"event_data__{soundBank.SoundBankFileName.Replace(".bnk", ".dat")}";
+                var datFilePath = $"audio\\wwise\\{datFileName}";
+
+                var bytes = DatFileParser.WriteData(datFile);
+                var packFile = new PackFile(datFileName, new MemorySource(bytes));
+                var reparsedSanityFile = DatFileParser.Parse(packFile, false);
+
+                _fileSaveService.Save(datFilePath, packFile.DataSource.ReadData(), true);
             }
         }
     }

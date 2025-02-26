@@ -15,7 +15,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         public const string RandomExhaustive = "Random Exhaustive";
         public const string Sequence = "Sequence";
 
-        public static readonly Dictionary<PlaylistType, string> PlaylistTypeToStringMap = new()
+        public static Dictionary<PlaylistType, string> PlaylistTypeStringLookup { get; } = new()
         {
             { PlaylistType.Random, Random },
             { PlaylistType.RandomExhaustive, RandomExhaustive },
@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         public const string Step = "Step";
         public const string Continous = "Continuous";
 
-        public static readonly Dictionary<PlaylistMode, string> PlaylistModeToStringMap = new()
+        public static Dictionary<PlaylistMode, string> PlaylistModeStringLookup { get; } = new()
         {
             { PlaylistMode.Continuous, Continous },
             { PlaylistMode.Step, Step }
@@ -46,7 +46,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         public const string Restart = "Restart";
         public const string PlayInReverseOrder = "Play In Reverse Order";
 
-        public static readonly Dictionary<EndBehaviour, string> EndBehaviourToStringMap = new()
+        public static Dictionary<EndBehaviour, string> EndBehaviourStringLookup { get; } = new()
         {
             { EndBehaviour.Restart, Restart },
             { EndBehaviour.PlayInReverseOrder, PlayInReverseOrder}
@@ -63,7 +63,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         public const string FiniteLooping = "Finite Looping";
         public const string InfiniteLooping = "Infinite Looping";
 
-        public static readonly Dictionary<LoopingType, string> LoopingTypeToStringMap = new()
+        public static Dictionary<LoopingType, string> LoopingTypeStringLookup { get; } = new()
         {
             { LoopingType.Disabled, LoopingTypeDisabled },
             { LoopingType.FiniteLooping, FiniteLooping },
@@ -87,7 +87,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         public const string SampleAccurate = "Sample Accurate";
         public const string TriggerRate = "Trigger Rate";
 
-        public static readonly Dictionary<TransitionType, string> TransitionTypeToStringMap = new()
+        public static Dictionary<TransitionType, string> TransitionTypeStringLookup { get; } = new()
         {
             { TransitionType.Disabled, TransitionTypeDisabled },
             { TransitionType.XfadeAmp, XfadeAmp },

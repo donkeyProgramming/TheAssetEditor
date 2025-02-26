@@ -37,7 +37,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.W
         {
             return new CAkAction_V136.PlayActionParams_V136
             {
-                BitVector = 0x04,
+                BitVector = 4,
                 BankId = WwiseHash.Compute(soundBank.Name)
             };
         }

@@ -13,7 +13,7 @@ namespace Editors.Audio.AudioEditor
     // TODO: Probably need something to check all audio files in the project are where they say they are
     public class IntegrityChecker
     {
-        public static void CheckAudioEditorDialogueEventIntegrity(IAudioRepository audioRepository, List<(string Name, SoundBanks.Wh3SoundBankSubType SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
+        public static void CheckAudioEditorDialogueEventIntegrity(IAudioRepository audioRepository, List<(string Name, SoundBanks.Wh3SoundBankSubtype SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
         {
             var gameDialogueEvents = audioRepository.StateGroupsLookupByDialogueEvent.Keys.ToList();
             var audioEditorDialogueEvents = dialogueEventData.Select(data => data.Name).ToList();

@@ -27,7 +27,7 @@ namespace Editors.Audio.GameSettings.Warhammer3
             SpanishSpain
         }
 
-        public static readonly Dictionary<GameLanguage, string> GameLanguageToStringMap = new()
+        public static Dictionary<GameLanguage, string> GameLanguageStringLookup { get; } = new()
         {
             { GameLanguage.Chinese, Chinese },
             { GameLanguage.EnglishUK, EnglishUK },

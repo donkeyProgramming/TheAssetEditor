@@ -2,8 +2,8 @@
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
+using Editors.Audio.GameSettings.Warhammer3;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
@@ -43,10 +43,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         private static void SetDialogueEventPresets(AudioProjectExplorerViewModel audioProjectExplorerViewModel, string soundBankName)
         {
-            var soundBank = GetSoundBankEnum(soundBankName);
+            var soundBankSubtype = SoundBanks.GetSoundBankSubtype(soundBankName);
 
             var dialogueEventPresets = new ObservableCollection<DialogueEventPreset>(DialogueEventData
-                .Where(dialogueEvent => dialogueEvent.SoundBank == soundBank)
+                .Where(dialogueEvent => dialogueEvent.SoundBank == soundBankSubtype)
                 .SelectMany(dialogueEvent => dialogueEvent.DialogueEventPreset)
                 .Distinct());
 

@@ -26,10 +26,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
     public partial class SoundBank : AudioProjectItem
     {
         public Wh3SoundBankType SoundBankType { get; set; }
-        public Wh3SoundBankSubType SoundBankSubType { get; set; }
+        public Wh3SoundBankSubtype SoundBankSubtype { get; set; }
         public List<ActionEvent> ActionEvents { get; set; }
         public List<DialogueEvent> DialogueEvents { get; set; }
         public string Language { get; set; } // TODO: Need to use this
+        public string SoundBankFileName { get; set; }
+        public string SoundBankFilePath { get; set; }
     }
 
     public class ActionEvent : AudioProjectHircItem

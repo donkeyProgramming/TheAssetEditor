@@ -103,7 +103,7 @@ namespace Editors.Audio.Utility
 
             foreach (var languageEnum in Enum.GetValues<GameLanguage>().Cast<GameLanguage>())
             {
-                var language = GameLanguageToStringMap[languageEnum];
+                var language = GameLanguageStringLookup[languageEnum];
 
                 if (audioFile == null)
                     audioFile = packFileService.FindFile($"audio\\wwise\\{language}\\{soundId}.wem");
