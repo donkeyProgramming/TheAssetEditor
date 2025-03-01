@@ -108,7 +108,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
                 }
                 else
                 {
-                    foreach (var sound in statePath.SoundContainer.Sounds)
+                    foreach (var sound in statePath.RandomSequenceContainer.Sounds)
                     {
                         audioFiles.Add(new AudioFile()
                         {

@@ -19,9 +19,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService
         public IWwiseHircGeneratorService CreateInstance(AkBkHircType type)
         {
             if (_hircGenerators.TryGetValue(type, out var creator))
-            {
                 return creator();
-            }
 
             return null;
         }
@@ -30,9 +28,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService
         {
             var generator = CreateInstance(audioProjectHircItem.HircType);
             if (generator == null)
-            {
                 throw new Exception($"No Hirc generator registered for type {audioProjectHircItem.HircType}");
-            }
             return generator.GenerateHirc(audioProjectHircItem, soundBank);
         }
 
@@ -49,10 +45,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService
         private static WwiseHircGeneratorServiceFactory CreateFactory_v136()
         {
             var instance = new WwiseHircGeneratorServiceFactory();
-            instance.RegisterGenerator(AkBkHircType.Event, () => new ActionEventHircGenerator_V136());
-            instance.RegisterGenerator(AkBkHircType.Action, () => new ActionHircGenerator_V136());
             instance.RegisterGenerator(AkBkHircType.Sound, () => new SoundHircGenerator_V136());
             instance.RegisterGenerator(AkBkHircType.RandomSequenceContainer, () => new RanSeqCntrHircGenerator_V136());
+            instance.RegisterGenerator(AkBkHircType.Action, () => new ActionHircGenerator_V136());
+            instance.RegisterGenerator(AkBkHircType.Event, () => new ActionEventHircGenerator_V136());
+            instance.RegisterGenerator(AkBkHircType.Dialogue_Event, () => new DialogueEventHircGenerator_V136());
             return instance;
         }
     }

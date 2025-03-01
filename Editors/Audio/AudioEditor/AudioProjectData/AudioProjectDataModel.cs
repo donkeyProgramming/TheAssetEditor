@@ -54,7 +54,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
     public class DialogueEvent : AudioProjectHircItem
     {
         public override AkBkHircType HircType { get; } = AkBkHircType.Dialogue_Event;
-        public List<StatePath> DecisionTree { get; set; }
+        public List<StatePath> StatePaths { get; set; }
     }
 
     public class StateGroup : AudioProjectItem
@@ -67,7 +67,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
     public class StatePath
     {
         public List<StatePathNode> Nodes { get; set; } = [];
-        public RandomSequenceContainer SoundContainer { get; set; }
+        public RandomSequenceContainer RandomSequenceContainer { get; set; }
         public Sound Sound { get; set; }
     }
 
@@ -98,7 +98,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
         public string WemDiskFilePath { get; set; }
         public long InMemoryMediaSize { get; set; }
         public string Language { get; set; }
-        public uint AttenuationID { get; set; }
     }
 
     public class AudioSettings

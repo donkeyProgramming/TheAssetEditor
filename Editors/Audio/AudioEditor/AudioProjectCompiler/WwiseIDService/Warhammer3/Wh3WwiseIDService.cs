@@ -9,12 +9,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService.Warhamme
     {
         // Finding Actor Mixer IDs:
         // Click on a sound in the Audio Explorer and refer to the lowest ActorMixer in the Graph Structure of a given sound (top level mixer).
-
-        // Finding Attenuation IDs:
-        // Click on a sound in the Audio Explorer to find the parent bnk and the top level mixer. 
-        // Then extract the parent bnk to your PC, load it with Wwiser, then click Dump Bnk.
-        // Open the Xml file that Dump Bnk created and ctrl+f for the mixer Id. Find the Actor Mixer object and look through its settings to see if there's any attenuation - if so then that's the attenuation Id.
-
         public Dictionary<Wh3SoundBankSubtype, uint> ActorMixerIds { get; } = new()
         {
             //{Wh3SoundBankSubtype.Abilities, 140075115},
@@ -29,17 +23,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService.Warhamme
             {Wh3SoundBankSubtype.CampaignConversationalVO, 652491101},
             {Wh3SoundBankSubtype.BattleVO, 1009314120},
             {Wh3SoundBankSubtype.BattleConversationalVO, 600762068}
-        };
-
-        public Dictionary<Wh3SoundBankSubtype, uint> AttenuationIds { get; } = new()
-        {
-            //{Wh3SoundBankSubtype.Abilities, 588111330},
-            //{Wh3SoundBankSubtype.Magic, 588111330},
-            //{Wh3SoundBankSubtype.QuestBattles, 6016245},
-            {Wh3SoundBankSubtype.CampaignVO, 432982952},
-            {Wh3SoundBankSubtype.CampaignConversationalVO, 62329658},
-            {Wh3SoundBankSubtype.BattleVO, 803409642},
-            {Wh3SoundBankSubtype.BattleConversationalVO, 649943956},
         };
     }
 }

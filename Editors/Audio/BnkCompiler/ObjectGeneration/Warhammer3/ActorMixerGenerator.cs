@@ -74,7 +74,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             instance.PositioningParams = new PositioningParams_V136()
             {
                 BitsPositioning = 0x03,
-                Bits3d = 0x08
+                Bits3D = 0x08
             };
             instance.AuxParams = new AuxParams_V136()
             {

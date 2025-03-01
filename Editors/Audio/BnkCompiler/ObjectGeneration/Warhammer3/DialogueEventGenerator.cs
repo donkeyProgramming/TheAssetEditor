@@ -43,7 +43,7 @@ namespace Editors.Audio.BnkCompiler.ObjectGeneration.Warhammer3
             {
                 var argument = new AkGameSync_V136
                 {
-                    GroupId = WwiseHash.Compute(stateGroup),
+                    GroupID = WwiseHash.Compute(stateGroup),
                     GroupType = AkGroupType.State
                 };
                 wwiseDialogueEvent.Arguments.Add(argument);

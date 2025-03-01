@@ -361,7 +361,7 @@ namespace Editors.Audio.BnkCompiler
             return new AkDecisionTree_V136.Node_V136
             {
                 Key = key,
-                AudioNodeId = audioNodeId,
+                AudioNodeID = audioNodeId,
                 ChildrenIdx = childrenUIdx,
                 ChildrenCount = childrenUCount,
                 Weight = uWeight,
@@ -425,7 +425,7 @@ namespace Editors.Audio.BnkCompiler
             var indentation = new string(' ', depth * 4);
             Console.WriteLine($"======================= PRINTING CUSTOM DECISION TREE GRAPH =======================");
             Console.WriteLine($"{indentation}Key: {node.Key}");
-            Console.WriteLine($"{indentation}AudioNodeId: {node.AudioNodeId}");
+            Console.WriteLine($"{indentation}AudioNodeId: {node.AudioNodeID}");
             Console.WriteLine($"{indentation}ChildrenIdx: {node.ChildrenIdx}");
             Console.WriteLine($"{indentation}ChildrenCount: {node.ChildrenCount}");
             Console.WriteLine($"{indentation}Weight: {node.Weight}");

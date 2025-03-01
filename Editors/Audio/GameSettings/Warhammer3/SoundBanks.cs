@@ -48,10 +48,15 @@
         //public const string BattleMusicDisplayString = "Battle Music";
         //public const string LoadingScreenMusicDisplayString = "Loading Screen Music";
         public const string FrontendVODisplayString = "Frontend VO";
+        public const string FrontendVOSoundBankName = "frontend_vo";
         public const string CampaignVODisplayString = "Campaign VO";
+        public const string CampaignVOSoundBankName = "campaign_vo";
         public const string CampaignConversationalVODisplayString = "Campaign Conversational VO";
+        public const string CampaignConversationalVOSoundBankName = "campaign_conversational_vo";
         public const string BattleVODisplayString = "Battle VO";
+        public const string BattleVOSoundBankName = "battle_vo_orders";
         public const string BattleConversationalVODisplayString = "Battle Conversational VO";
+        public const string BattleConversationalVOSoundBankName = "battle_vo_conversational";
         //public const string BattleIndividualMeleeDisplayString = "Battle Individual Melee";
 
         public static Wh3SoundBankType GetSoundBankSubType(Wh3SoundBankSubtype soundbank)
@@ -141,6 +146,11 @@
             return soundbank switch
             {
                 Wh3SoundBankSubtype.DiplomacyLines => DiplomacyLinesSoundBankName,
+                Wh3SoundBankSubtype.FrontendVO => FrontendVOSoundBankName,
+                Wh3SoundBankSubtype.CampaignVO => CampaignVOSoundBankName,
+                Wh3SoundBankSubtype.CampaignConversationalVO => CampaignConversationalVOSoundBankName,
+                Wh3SoundBankSubtype.BattleVO => BattleVOSoundBankName,
+                Wh3SoundBankSubtype.BattleConversationalVO => BattleConversationalVOSoundBankName,
             };
         }
     }

@@ -13,13 +13,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.W
         public HircItem GenerateHirc(AudioProjectItem audioProjectItem, SoundBank soundBank)
         {
             var audioProjectSound = audioProjectItem as Sound;
-
             var soundHirc = CreateSoundHirc(audioProjectSound);
             soundHirc.AkBankSourceData = CreateAkBankSourceData(audioProjectSound);
             soundHirc.NodeBaseParams = CreateNodeBaseParams(audioProjectSound);
-
             soundHirc.UpdateSectionSize();
-
             return soundHirc;
         }
 
@@ -64,19 +61,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.W
                 AkPropBundle0 = new AkPropBundle_V136() { PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>() },
                 AkPropBundle1 = new AkPropBundleMinMax_V136() { PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>() }
             };
-
-            if (audioProjectSound.AttenuationID != 0)
-            { 
-                nodeBaseParams.NodeInitialParams.AkPropBundle0.PropsList.Add(new AkPropBundle_V136.PropBundleInstance_V136() 
-                { 
-                    ID = AkPropId_V136.AttenuationID, 
-                    Value = audioProjectSound.AttenuationID 
-                });
-            }
-
             nodeBaseParams.PositioningParams = new PositioningParams_V136()
             {
-                BitsPositioning = 0x00,
+                BitsPositioning = 0x00
             };
             nodeBaseParams.AuxParams = new AuxParams_V136()
             {

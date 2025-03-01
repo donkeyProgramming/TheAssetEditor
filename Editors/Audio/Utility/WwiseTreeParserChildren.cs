@@ -75,7 +75,7 @@ namespace Editors.Audio.Utility
 
                 foreach (var musicSwitch in musicSwitches)
                 {
-                    var allArgs = musicSwitch.Arguments.Select(x => x.GroupId).ToList();
+                    var allArgs = musicSwitch.Arguments.Select(x => x.GroupID).ToList();
                     if (allArgs.Contains(stateGroupId))
                         ProcessNext(musicSwitch.ID, actionTreeNode);
                 }

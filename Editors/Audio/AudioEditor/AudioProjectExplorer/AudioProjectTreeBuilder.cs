@@ -101,7 +101,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private static void AddDialogueEventNodes(bool showEditedAudioProjectItemsOnly, SoundBank soundBank, AudioProjectTreeNode soundBankNode)
         {
             var dialogueEvents = showEditedAudioProjectItemsOnly
-                ? soundBank.DialogueEvents.Where(dialogueEvent => dialogueEvent.DecisionTree.Count > 0)
+                ? soundBank.DialogueEvents.Where(dialogueEvent => dialogueEvent.StatePaths.Count > 0)
                 : soundBank.DialogueEvents;
 
             foreach (var dialogueEvent in dialogueEvents)
@@ -222,7 +222,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                         break;
 
                     case NodeType.DialogueEventSoundBank:
-                        childNode.IsVisible = audioProjectService.AudioProject.SoundBanks.Any(soundBank => soundBank.Name == childNode.Name && soundBank.DialogueEvents.Any(dialogueEvent => dialogueEvent.DecisionTree.Count > 0));
+                        childNode.IsVisible = audioProjectService.AudioProject.SoundBanks.Any(soundBank => soundBank.Name == childNode.Name && soundBank.DialogueEvents.Any(dialogueEvent => dialogueEvent.StatePaths.Count > 0));
                         break;
 
                     case NodeType.StateGroup:
@@ -259,7 +259,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 {
                     return audioProjectService.AudioProject.SoundBanks
                         .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank
-                        && soundBank.DialogueEvents.Any(dialogueEvent => dialogueEvent.DecisionTree.Count > 0))
+                        && soundBank.DialogueEvents.Any(dialogueEvent => dialogueEvent.StatePaths.Count > 0))
                         .ToList();
                 }
             }

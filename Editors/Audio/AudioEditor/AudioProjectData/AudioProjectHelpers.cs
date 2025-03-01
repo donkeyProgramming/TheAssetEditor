@@ -122,7 +122,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
         {
             var dataGridRowStatePathNodes = GetStatePathNodes(audioRepository, dataGridRow, selectedDialogueEvent);
 
-            foreach (var statePath in selectedDialogueEvent.DecisionTree)
+            foreach (var statePath in selectedDialogueEvent.StatePaths)
             {
                 if (statePath.Nodes.SequenceEqual(dataGridRowStatePathNodes, new StatePathNodeComparer()))
                     return statePath;
@@ -166,7 +166,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                     statePath.Sound = CreateSound(audioSettingsViewModel, audioFiles[0]);
                 else
                 {
-                    statePath.SoundContainer = new RandomSequenceContainer
+                    statePath.RandomSequenceContainer = new RandomSequenceContainer
                     {
                         Sounds = [],
                         AudioSettings = audioSettingsViewModel.BuildAudioSettings()
@@ -175,7 +175,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                     foreach (var audioFile in audioFiles)
                     {
                         var sound = CreateSound(audioSettingsViewModel, audioFile);
-                        statePath.SoundContainer.Sounds.Add(sound);
+                        statePath.RandomSequenceContainer.Sounds.Add(sound);
                     }
                 }
             }
@@ -248,7 +248,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
             var dialogueEvent = GetDialogueEventFromName(audioProjectService, audioProjectItem.Name);
             var statePath = GetStatePathFromDataGridRow(audioRepository, selectedAudioProjectViewerDataGridRow, dialogueEvent);
-            return statePath.SoundContainer.AudioSettings;
+            return statePath.RandomSequenceContainer.AudioSettings;
         }
 
         public static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> newRow)
@@ -277,7 +277,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
         public static void InsertStatePathAlphabetically(DialogueEvent selectedDialogueEvent, StatePath statePath)
         {
             var newStateName = statePath.Nodes.First().State.Name;
-            var decisionTree = selectedDialogueEvent.DecisionTree;
+            var decisionTree = selectedDialogueEvent.StatePaths;
             var insertIndex = 0;
 
             for (var i = 0; i < decisionTree.Count; i++)

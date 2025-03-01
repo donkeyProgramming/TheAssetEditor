@@ -68,7 +68,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
         {
             var stateGroupsWithQualifiers = parameters.AudioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[parameters.DialogueEvent.Name];
 
-            foreach (var statePath in parameters.DialogueEvent.DecisionTree)
+            foreach (var statePath in parameters.DialogueEvent.StatePaths)
             {
                 var rowData = new Dictionary<string, string>();
 
@@ -101,7 +101,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
                 var statePath = AudioProjectHelpers.GetStatePathFromDataGridRow(parameters.AudioRepository, dataGridRow, parameters.DialogueEvent);
                 if (statePath != null)
                 {
-                    parameters.DialogueEvent.DecisionTree.Remove(statePath);
+                    parameters.DialogueEvent.StatePaths.Remove(statePath);
                     parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
                 }
             }
@@ -115,13 +115,17 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
 
             // Display the required states in the ComboBox
             if (parameters.AudioEditorViewModel.AudioProjectEditorViewModel.ShowModdedStatesOnly && ModdedStateGroups.Contains(stateGroup))
+            {
+                moddedStates.Add("Any"); // We still want the "Any" state to show so add it in manually.
                 states.AddRange(moddedStates);
+            }
             else
             {
-                if (moddedStates.Count > 0)
-                    states.AddRange(moddedStates);
-
-                states.AddRange(vanillaStates);
+                states = moddedStates
+                    .Concat(vanillaStates)
+                        .Where(state => state != "Any")
+                        .OrderBy(state => state)
+                    .ToList();
             }
 
             return states;
@@ -133,7 +137,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
 
             if (parameters.AudioProjectService.StateGroupsWithModdedStatesRepository.TryGetValue(stateGroup, out var audioProjectModdedStates))
             {
-                moddedStates.Add("Any"); // The Any State is in AudioRepository.StateGroupsWithStates but not in moddedStates so just add it in manually
                 moddedStates.AddRange(audioProjectModdedStates);
                 return moddedStates;
             }

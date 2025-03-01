@@ -6,6 +6,5 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService
     public interface IWwiseIDService
     {
         Dictionary<Wh3SoundBankSubtype, uint> ActorMixerIds { get; }
-        Dictionary<Wh3SoundBankSubtype, uint> AttenuationIds { get; }
     }
 }

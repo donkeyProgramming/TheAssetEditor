@@ -53,7 +53,7 @@ namespace Editors.Audio.AudioEditor
                 if (soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
                     foreach (var dialogueEvent in soundBank.DialogueEvents)
                     {
-                        var firstStatePath = dialogueEvent.DecisionTree.FirstOrDefault();
+                        var firstStatePath = dialogueEvent.StatePaths.FirstOrDefault();
                         if (firstStatePath != null)
                         {
                             var stateGroups = firstStatePath.Nodes.Select(node => node.StateGroup.Name).ToList();

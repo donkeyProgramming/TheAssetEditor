@@ -61,6 +61,14 @@ namespace Shared.Core.ByteParsing
 
         public static uint GetPropertyTypeSize<T>(T property)
         {
+            if (property == null)
+            {
+                var type = typeof(T);
+                if (Nullable.GetUnderlyingType(type) != null)
+                    type = Nullable.GetUnderlyingType(type);
+                return (uint)Marshal.SizeOf(type);
+            }
+
             if (property is IList)
                 return (uint)Marshal.SizeOf(typeof(T).GetGenericArguments()[0]);
 
@@ -69,5 +77,6 @@ namespace Shared.Core.ByteParsing
 
             return (uint)Marshal.SizeOf(property);
         }
+
     }
 }

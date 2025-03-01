@@ -153,7 +153,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
                         var dialogueEvent = new DialogueEvent
                         {
                             Name = dialogueData.Name,
-                            DecisionTree = []
+                            StatePaths = []
                         };
                         soundBank.DialogueEvents.Add(dialogueEvent);
                     }
@@ -213,7 +213,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
                 .Select(soundBank =>
                 {
                     var dialogueEvents = (soundBank.DialogueEvents ?? Enumerable.Empty<DialogueEvent>())
-                        .Where(dialogueEvent => dialogueEvent.DecisionTree != null && dialogueEvent.DecisionTree.Count != 0)
+                        .Where(dialogueEvent => dialogueEvent.StatePaths != null && dialogueEvent.StatePaths.Count != 0)
                         .ToList();
 
                     var actionEvents = (soundBank.ActionEvents ?? Enumerable.Empty<ActionEvent>())
@@ -276,7 +276,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
                             {
                                 var dialogueEvent = soundBank.DialogueEvents.FirstOrDefault(dialogueEvent => dialogueEvent.Name == savedDialogueEvent.Name);
                                 if (dialogueEvent != null)
-                                    dialogueEvent.DecisionTree = savedDialogueEvent.DecisionTree;
+                                    dialogueEvent.StatePaths = savedDialogueEvent.StatePaths;
                                 else
                                     soundBank.DialogueEvents.Add(savedDialogueEvent);
                             }
