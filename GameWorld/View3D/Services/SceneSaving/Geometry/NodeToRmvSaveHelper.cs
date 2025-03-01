@@ -80,7 +80,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
                 for (var meshIndex = 0; meshIndex < meshes.Count; meshIndex++)
                 {
                     var modelname = meshes[meshIndex].Name;
-                    rmvFile.ModelList[lodIndex][meshIndex] = CreateRmvModel(modelname, meshes[meshIndex].PivotPoint, meshes[meshIndex].Material, meshes[meshIndex].Geometry, skeleton, saveSettings.AttachmentPoints);
+                    rmvFile.ModelList[lodIndex][meshIndex] = CreateRmvModel(modelname, meshes[meshIndex].PivotPoint, meshes[meshIndex].Material, meshes[meshIndex].Geometry, skeleton, saveSettings.AttachmentPoints, meshes[meshIndex].AnimationMatrixOverride);
                 }
             }
 
@@ -90,7 +90,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             return rmvFile;
         }
 
-        RmvModel CreateRmvModel(string modelName, Vector3 pivotPoint, CapabilityMaterial capabilityMaterial, MeshObject geometry, GameSkeleton? skeleton, List<RmvAttachmentPoint> attachmentPoints)
+        RmvModel CreateRmvModel(string modelName, Vector3 pivotPoint, CapabilityMaterial capabilityMaterial, MeshObject geometry, GameSkeleton? skeleton, List<RmvAttachmentPoint> attachmentPoints, int animationMatrixOverride)
         {
             var newRmvMaterial = new MaterialToRmvSerializer().CreateMaterialFromCapabilityMaterial(capabilityMaterial);
             newRmvMaterial.UpdateInternalState(geometry.VertexFormat);
@@ -108,7 +108,7 @@ namespace GameWorld.Core.Services.SceneSaving.Geometry
             newModel.UpdateModelTypeFlag(newModel.Material.MaterialId);
 
      
-            newModel.Material.EnrichDataBeforeSaving(attachmentPoints);
+            newModel.Material.EnrichDataBeforeSaving(attachmentPoints, animationMatrixOverride);
             
 
             return newModel;

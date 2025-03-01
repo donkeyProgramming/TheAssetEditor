@@ -58,14 +58,23 @@
             <DockPanel DockPanel.Dock="Top" >
                 <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Attach To"/>
                 <Label>:</Label>
-                <ComboBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" 
+                <ComboBox
                           IsEditable="True"
                           IsTextSearchEnabled="false"
                           DisplayMemberPath="Name.Value"
                           Text="{Binding Animation.AttachableBones.Filter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                           ItemsSource="{Binding Animation.AttachableBones.Values}" 
                           SelectedItem="{Binding Animation.AttachableBones.SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
+               
             </DockPanel>
+
+            <DockPanel DockPanel.Dock="Top"  >
+                <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Animation Matrix "/>
+                <Label>:</Label>
+                <TextBox DockPanel.Dock="Top" Margin="0,2,0,2"  Text="{Binding Animation.AnimationMatrixOverride, UpdateSourceTrigger=LostFocus}" MaxLength="8"  VerticalContentAlignment="Center" Width="100" HorizontalAlignment="Left" HorizontalContentAlignment="Right"/>
+            </DockPanel>
+            
         </DockPanel>
     </Expander>
 </UserControl>

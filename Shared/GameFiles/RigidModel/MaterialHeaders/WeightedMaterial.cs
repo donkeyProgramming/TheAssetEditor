@@ -212,10 +212,12 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             }
         }
 
-        public void EnrichDataBeforeSaving(List<RmvAttachmentPoint> attachmentPoints)
+        public void EnrichDataBeforeSaving(List<RmvAttachmentPoint> attachmentPoints, int matrixOverride)
         {
             AttachmentPointParams.Clear();
             AttachmentPointParams.AddRange(attachmentPoints);
+
+            MatrixIndex = matrixOverride;
         }
     }
 

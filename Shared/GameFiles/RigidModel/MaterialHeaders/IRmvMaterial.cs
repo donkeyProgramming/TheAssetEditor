@@ -18,7 +18,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         void SetTexture(TextureType texureType, string path);
 
         void UpdateInternalState(UiVertexFormat uiVertexFormat);
-        void EnrichDataBeforeSaving(List<RmvAttachmentPoint> attachmentPoints);
+        void EnrichDataBeforeSaving(List<RmvAttachmentPoint> attachmentPoints, int matrixOverride);
     }
 
     public interface IMaterialCreator

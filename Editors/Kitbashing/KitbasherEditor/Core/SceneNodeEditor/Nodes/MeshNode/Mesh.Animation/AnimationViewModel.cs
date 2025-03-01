@@ -13,11 +13,12 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
     {
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly SkeletonAnimationLookUpHelper _animLookUp;
-        Rmv2MeshNode _meshNode;
+        Rmv2MeshNode? _meshNode;
 
-        [ObservableProperty] string _skeletonName = string.Empty;
-        [ObservableProperty] List<AnimatedBone> _animatedBones;
-        [ObservableProperty] FilterCollection<AnimatedBone> _attachableBones = new(null);
+        [ObservableProperty] public partial string SkeletonName { get; set; } = string.Empty;
+        [ObservableProperty] public partial List<AnimatedBone> AnimatedBones  { get; set; }
+        [ObservableProperty] public partial FilterCollection<AnimatedBone> AttachableBones { get; set; } = new(null);
+        [ObservableProperty] public partial int AnimationMatrixOverride { get; set; } = -1;
 
         public AnimationViewModel(KitbasherRootScene kitbasherRootScene, SkeletonAnimationLookUpHelper animLookUp)
         {
@@ -29,6 +30,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
         {
             _meshNode = meshNode;
 
+            AnimationMatrixOverride = _meshNode.AnimationMatrixOverride;
             SkeletonName = _meshNode.Geometry.SkeletonName;
 
             var skeletonFile = _animLookUp.GetSkeletonFileFromName(SkeletonName);
@@ -87,6 +89,13 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes.Rmv2
                 _meshNode.AttachmentPointName = null;
                 _meshNode.AttachmentBoneResolver = null;
             }
+        }
+
+        partial void OnAnimationMatrixOverrideChanged(int value)
+        {
+            if(_meshNode==null) 
+                return;
+            _meshNode.AnimationMatrixOverride = value;
         }
 
         public void Dispose()

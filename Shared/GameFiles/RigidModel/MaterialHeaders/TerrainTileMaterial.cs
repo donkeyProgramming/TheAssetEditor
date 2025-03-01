@@ -67,7 +67,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             throw new NotImplementedException();
         }
 
-        public void EnrichDataBeforeSaving(List<RmvAttachmentPoint> attachmentPoints)
+        public void EnrichDataBeforeSaving(List<RmvAttachmentPoint> attachmentPoints, int matrixOverride)
         {
             throw new NotImplementedException();
         }

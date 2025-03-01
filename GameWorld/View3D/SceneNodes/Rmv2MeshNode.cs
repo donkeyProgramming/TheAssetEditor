@@ -33,7 +33,8 @@ namespace GameWorld.Core.SceneNodes
         public Vector3 PivotPoint { get; set; }
 
         public string AttachmentPointName { get; set; } = "";
-     
+        public int AnimationMatrixOverride { get; set; } = -1;
+
         public bool DisplayBoundingBox { get; set; } = false;
         public bool DisplayPivotPoint { get; set; } = false;
         public bool ReduceMeshOnLodGeneration { get; set; } = true;
@@ -58,6 +59,9 @@ namespace GameWorld.Core.SceneNodes
 
             Name = material.ModelName;
             PivotPoint = material.PivotPoint;
+
+            if(material != null && material is WeightedMaterial weightedMaterial)
+                AnimationMatrixOverride = weightedMaterial.MatrixIndex;
         }
 
         private Rmv2MeshNode() { }
@@ -138,6 +142,7 @@ namespace GameWorld.Core.SceneNodes
             typedTarget.PivotPoint = PivotPoint;
 
             typedTarget.RmvMaterial = RmvMaterial.Clone();
+            typedTarget.AnimationMatrixOverride = AnimationMatrixOverride;
             typedTarget.Geometry = Geometry.Clone();
             typedTarget.Material = Material.Clone();
            

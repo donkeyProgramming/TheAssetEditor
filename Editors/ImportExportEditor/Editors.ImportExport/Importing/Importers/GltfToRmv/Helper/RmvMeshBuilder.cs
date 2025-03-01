@@ -202,7 +202,7 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
             {
                 var boneNames = animSkeletonFile.Bones.Select(x => x.Name).ToList();
                 var attachmentPoints = AttachmentPointHelper.CreateFromBoneList(boneNames);
-                newModel.Material.EnrichDataBeforeSaving(attachmentPoints);
+                newModel.Material.EnrichDataBeforeSaving(attachmentPoints, -1);
             }
 
             return newModel;
