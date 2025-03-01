@@ -16,7 +16,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
     public partial class SaveDialogViewModel : ObservableObject 
     {
         private readonly SceneManager _sceneManager;
-        private readonly GameWorld.Core.Services.SceneSaving.SaveService _saveService;
+        private readonly SaveService _saveService;
         private readonly IPackFileService _pfs;
         private readonly IStandardDialogs _packFileUiProvider;
         private GeometrySaveSettings? _saveSettings;
@@ -25,7 +25,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         [ObservableProperty] List<ComboBoxItem<GeometryStrategy>> _meshStrategies;
         [ObservableProperty] List<ComboBoxItem<MaterialStrategy>> _wsStrategies;
         [ObservableProperty] List<ComboBoxItem<LodStrategy>> _lodStrategies;
-        [ObservableProperty] List<int> _possibleLodNumbers  = [1,4,5];
+        [ObservableProperty] List<int> _possibleLodNumbers  = [1,2,3,4,5];
 
         [ObservableProperty] string _outputPath;
         [ObservableProperty] ComboBoxItem<GeometryStrategy> _selectedMeshStrategy;
@@ -34,7 +34,7 @@ namespace KitbasherEditor.ViewModels.SaveDialog
         [ObservableProperty] bool _onlySaveVisible = false;
         [ObservableProperty] int _numberOfLodsToGenerate;
 
-        public SaveDialogViewModel(SceneManager sceneManager, GameWorld.Core.Services.SceneSaving.SaveService saveService, IPackFileService pfs, IStandardDialogs packFileUiProvider)
+        public SaveDialogViewModel(SceneManager sceneManager, SaveService saveService, IPackFileService pfs, IStandardDialogs packFileUiProvider)
         {
             _sceneManager = sceneManager;
             _saveService = saveService;

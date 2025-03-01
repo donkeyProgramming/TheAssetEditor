@@ -16,19 +16,27 @@ ui\campaign ui\hud_campaign.twui.xml
 
 Fixes for v060
 	[Bugfix]: General: Close console window (and any other windows) on application close 
+	[Bugfix]: General: Improved the error handling when loading game files without manifest file with custom mods in the same folder. (Please dont do this!)
 	[BugFix]: KitbashTool: Incorrect matrix and attachmentpoint for static meshes, caused props to animate incorrectly in game 
 	[BugFix]: KitbashTool: Fixed and improved decal, dirt and skin material handling for older games 
+	[BugFix]: KitbashTool: Allowed 2 and 3 number of lods 
+	
+	[Feature]: KitbashTool: Second UV channel correctly handled for static meshes 
 	
 	[Internal] Changed animationMetadDataParser to be a singlenton with lazy init - To speed up loa ding and testing when the class is not needed
 
 
 Must do:
-	Messagebox for duplicate files on load 
+	https://discord.com/channels/373745291289034763/795235087352201226/1343171986695782490 => Bugfix 
 	Geometry matrix test 
 	WsModel saving test, not all wisible
 	Num lods not prefillled for shield! 
+	Allow lod0 to be redusced 
+
 
 ----
+
+ public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize) => Reading vertex 1 by 1 is dumb. Read them all
 
 	ErrorFiles
 		Command history
