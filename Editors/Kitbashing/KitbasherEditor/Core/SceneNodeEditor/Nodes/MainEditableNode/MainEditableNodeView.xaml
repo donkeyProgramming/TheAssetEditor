@@ -42,6 +42,34 @@
                     <ComboBox SelectedValue="None" VerticalAlignment="Center" Visibility="Collapsed"/>
                 </DockPanel>
 
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                    <Label Width ="{StaticResource labelWidth}" DockPanel.Dock="Left" Content="Attachment points"/>
+                    <Label>:</Label>
+
+                    <Expander>
+                        <Expander.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Count = "/>
+                                <TextBlock Text="{Binding AttachmentPointList.Count, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </Expander.Header>
+                        <StackPanel>
+                        <ListView ItemsSource="{Binding AttachmentPointList, UpdateSourceTrigger=PropertyChanged}">
+                                
+                            <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Bone Id" DisplayMemberBinding="{Binding BoneIndex}" Width="auto"/>
+                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="auto"/>
+                                        <GridViewColumn Header="Use Bone Orientation" DisplayMemberBinding="{Binding IsIdentiy}" Width="auto"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+
+                            <Button Content="Create AttachmentPoints from Skeleton" Margin="2" Height="25" Command="{Binding ResetAttachmentPointListCommand }"/>
+                        </StackPanel>
+
+                    </Expander>
+                </StackPanel>
             </DockPanel>
         </Expander>
 

@@ -6,8 +6,10 @@ using GameWorld.Core.SceneNodes;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.GameFormats.Animation;
+using Shared.GameFormats.RigidModel.Transforms;
+using Shared.GameFormats.RigidModel.Types;
 
-namespace Editors.KitbasherEditor.ViewModels
+namespace Editors.KitbasherEditor.Core
 {
     public class KitbasherRootScene : ISkeletonProvider
     {
@@ -17,7 +19,7 @@ namespace Editors.KitbasherEditor.ViewModels
 
         public GameSkeleton Skeleton { get; private set; }
         public AnimationPlayer Player { get; private set; }
-
+     
         public KitbasherRootScene(AnimationsContainerComponent animationsContainerComponent, IPackFileService packFileService, IEventHub eventHub)
         {
             _animationsContainerComponent = animationsContainerComponent;

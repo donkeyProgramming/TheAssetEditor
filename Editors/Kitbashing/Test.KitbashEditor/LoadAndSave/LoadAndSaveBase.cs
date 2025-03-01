@@ -1,4 +1,5 @@
-﻿using Editors.KitbasherEditor.UiCommands;
+﻿using System;
+using Editors.KitbasherEditor.UiCommands;
 using Editors.KitbasherEditor.ViewModels;
 using GameWorld.Core.Rendering.Materials.Capabilities;
 using GameWorld.Core.Rendering.Materials.Shaders.SpecGloss;
@@ -26,6 +27,7 @@ namespace Test.KitbashEditor.LoadAndSave
         public static readonly string RomePack_MeshDirt = "variantmeshes/variantmeshes/_variantmodels/man/bosses/att_celts_large_curved_flat_boss_for_medium_shield.rigid_model_v2";
         public static readonly string RomePack_MeshSkin = "variantmeshes/variantmeshes/_variantmodels/man/skin/att_bel_vandal_cine_cut_2.rigid_model_v2";
         public static readonly string RomePack_MeshSkinDirt = "variantmeshes/variantmeshes/_variantmodels/man/skin/att_celts_germanic_01_skin02_woad_cut_3.rigid_model_v2";
+        public static readonly string RomePack_MeshHelmet = "variantmeshes/_variantmodels/man/helmets/carthaginian_pylos.rigid_model_v2";
 
         public static readonly string RmvFilePathKarl = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.rigid_model_v2";
         public static readonly string WsFilePathKarl = @"variantmeshes\wh_variantmodels\hu1\emp\emp_karl_franz\emp_karl_franz.wsmodel";
@@ -58,6 +60,13 @@ namespace Test.KitbashEditor.LoadAndSave
             var advCap = meshMaterial.GetCapability<AdvancedMaterialCapability>();
 
             return (mainCap, advCap, meshNode.Geometry.VertexFormat);
+        }
+
+        public MainEditableNode GetMainNode(KitbasherViewModel editor)
+        {
+            var sceneManager = editor!.SceneExplorer.SceneManager;
+            var mainNode = SceneNodeHelper.GetChildrenOfType<MainEditableNode>(sceneManager.RootNode).First();
+            return mainNode;
         }
 
         public WeightedMaterial SaveAndGetMaterial(AssetEditorTestRunner runner)

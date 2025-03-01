@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Editors.KitbasherEditor.Core;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Utility;

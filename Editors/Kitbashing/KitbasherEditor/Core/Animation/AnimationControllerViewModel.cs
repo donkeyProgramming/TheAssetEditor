@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Input;
+using Editors.KitbasherEditor.Core;
 using Editors.KitbasherEditor.Events;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;

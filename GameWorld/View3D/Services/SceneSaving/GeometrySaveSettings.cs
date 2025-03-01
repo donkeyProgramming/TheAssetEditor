@@ -6,6 +6,7 @@ using GameWorld.Core.Services.SceneSaving.Material;
 using Microsoft.Xna.Framework;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel.LodHeader;
+using Shared.GameFormats.RigidModel.Types;
 
 namespace GameWorld.Core.Services.SceneSaving
 {
@@ -21,6 +22,7 @@ namespace GameWorld.Core.Services.SceneSaving
         public List<LodGenerationSettings> LodSettingsPerLod { get; set; } = [];
         public bool OnlySaveVisible { get; set; } = true;
         public int NumberOfLodsToGenerate { get; set; } = 4;
+        public List<RmvAttachmentPoint> AttachmentPoints { get; set; } = [];
 
         public GeometrySaveSettings(ApplicationSettingsService applicationSettingsService)
         {

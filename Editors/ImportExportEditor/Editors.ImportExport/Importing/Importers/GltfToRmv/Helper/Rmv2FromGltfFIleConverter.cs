@@ -25,6 +25,7 @@ using Shared;
 using SharpDX.MediaFoundation;
 using Editors.ImportExport.Common;
 using Pfim;
+using Shared.GameFormats.RigidModel.Types;
 
 namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
 {
@@ -153,8 +154,9 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
 
             if (addBonesAsAttachmentPoints && skeleton != null)
             {
-                var boneNames = skeleton.BoneNames.Select(x => x.Replace("bn_", "")).ToArray();
-                newModel.Material.EnrichDataBeforeSaving(boneNames);
+                var boneNames = skeleton.BoneNames;
+                var attachmentPoints = AttachmentPointHelper.CreateFromBoneList(boneNames);
+                newModel.Material.EnrichDataBeforeSaving(attachmentPoints);
             }
 
             return newModel;

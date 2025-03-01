@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Editors.KitbasherEditor.ViewModels;
+using Editors.KitbasherEditor.Core;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
 using GameWorld.Core.Services;
@@ -11,6 +11,8 @@ using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.GameFormats.RigidModel;
+using Shared.GameFormats.RigidModel.MaterialHeaders;
+using Shared.GameFormats.RigidModel.Types;
 using Shared.GameFormats.WsModel;
 
 namespace Editors.KitbasherEditor.Services
@@ -78,9 +80,10 @@ namespace Editors.KitbasherEditor.Services
             foreach(var lodNode in lodNodes)
                 mainNode.AddObject(lodNode);
 
-
-
             _kitbasherRootScene.SetSkeletonFromName(rmv.Header.SkeletonName);
+
+            var attachmentPointList = GetAttachmentPointsFromFirstModel(rmv);
+            mainNode.SetAttachmentPoints(attachmentPointList, true);
 
             var fullPath = _packFileService.GetFullPath(file);
             var dirPath = Path.GetDirectoryName(fullPath);
@@ -88,6 +91,18 @@ namespace Editors.KitbasherEditor.Services
                 _saveSettings.OutputName = dirPath + "\\";
             _saveSettings.OutputName+= Path.GetFileNameWithoutExtension(fullPath) + ".rigid_model_v2";
             _saveSettings.InitializeLodSettings(rmv.LodHeaders);
+        }
+
+        List<RmvAttachmentPoint> GetAttachmentPointsFromFirstModel(RmvFile file)
+        {
+            var firstMesh = file.ModelList.FirstOrDefault()?.FirstOrDefault();
+            if (firstMesh == null)
+                return [];
+
+            if (firstMesh.Material is not WeightedMaterial material)
+                return [];
+
+            return material.AttachmentPointParams;
         }
 
         public void LoadReference(PackFile file)

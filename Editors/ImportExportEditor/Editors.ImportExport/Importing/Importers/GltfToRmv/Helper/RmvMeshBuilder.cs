@@ -199,10 +199,10 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv.Helper
             CalculateBoundBox(newModel);
 
             if (addBonesAsAttachmentPoints && animSkeletonFile != null)
-            {                
-                var boneNames = animSkeletonFile.Bones.Select(x => x.Name).ToArray();
-                var correctedBoneNames = boneNames.Select(x => x.Replace("bn_", "")).ToArray(); 
-                newModel.Material.EnrichDataBeforeSaving(correctedBoneNames);
+            {
+                var boneNames = animSkeletonFile.Bones.Select(x => x.Name).ToList();
+                var attachmentPoints = AttachmentPointHelper.CreateFromBoneList(boneNames);
+                newModel.Material.EnrichDataBeforeSaving(attachmentPoints);
             }
 
             return newModel;

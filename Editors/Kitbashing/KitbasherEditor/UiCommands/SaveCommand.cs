@@ -1,4 +1,5 @@
-﻿using Editors.KitbasherEditor.Core.MenuBarViews;
+﻿using System.Runtime;
+using Editors.KitbasherEditor.Core.MenuBarViews;
 using Editors.KitbasherEditor.ViewModels.SaveDialog;
 using GameWorld.Core.Components;
 using GameWorld.Core.SceneNodes;
@@ -34,7 +35,9 @@ namespace Editors.KitbasherEditor.UiCommands
                     return null;
             }
 
+
             var mainNode = _sceneManager.GetNodeByName<MainEditableNode>(SpecialNodes.EditableModel);
+            _settings.AttachmentPoints = mainNode.AttachmentPoints; // Bit of a hack, clean up at some point
             var res = _saveService.Save(mainNode, _settings);
             return res;
         }

@@ -18,7 +18,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
         void SetTexture(TextureType texureType, string path);
 
         void UpdateInternalState(UiVertexFormat uiVertexFormat);
-        void EnrichDataBeforeSaving(string[] boneNames);
+        void EnrichDataBeforeSaving(List<RmvAttachmentPoint> attachmentPoints);
     }
 
     public interface IMaterialCreator

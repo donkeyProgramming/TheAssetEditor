@@ -212,22 +212,11 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
             }
         }
 
-        public void EnrichDataBeforeSaving(string[] boneNames)
+        public void EnrichDataBeforeSaving(List<RmvAttachmentPoint> attachmentPoints)
         {
             AttachmentPointParams.Clear();
-            for (var i = 0; i < boneNames.Length; i++)
-            {
-                var newPoint = new RmvAttachmentPoint
-                {
-                    BoneIndex = i,
-                    Name = boneNames[i],
-                    Matrix = RmvMatrix3x4.Identity()
-                };
-                AttachmentPointParams.Add(newPoint);
-            }
+            AttachmentPointParams.AddRange(attachmentPoints);
         }
-
-
     }
 
     public class WeighterMaterialCreator : IMaterialCreator

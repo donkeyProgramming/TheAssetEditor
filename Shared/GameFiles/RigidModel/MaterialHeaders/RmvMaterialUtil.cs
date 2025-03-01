@@ -41,7 +41,7 @@
             {
                 if (useDirt)
                     return WeightedMaterial.MaterialHintEnum.Skin_Dirt;
-                return WeightedMaterial.MaterialHintEnum.Skin_Dirt;
+                return WeightedMaterial.MaterialHintEnum.Skin;
             }
 
             if (useDecal)
