@@ -25,7 +25,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             // First read all the group ids
             for (var i = 0; i < TreeDepth; i++)
-                Arguments[i].GroupId = chunk.ReadUInt32();
+                Arguments[i].GroupID = chunk.ReadUInt32();
 
             // Then read all the group types
             for (var i = 0; i < TreeDepth; i++)
@@ -46,7 +46,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
             // Write all the Ids first
             for (var i = 0; i < TreeDepth; i++)
-                memStream.Write(ByteParsers.UInt32.EncodeValue(Arguments[i].GroupId, out _));
+                memStream.Write(ByteParsers.UInt32.EncodeValue(Arguments[i].GroupID, out _));
 
             // Then write all the values
             for (var i = 0; i < TreeDepth; i++)
@@ -69,7 +69,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(Id);
+            var idSize = ByteHelper.GetPropertyTypeSize(ID);
             var probabilitySize = ByteHelper.GetPropertyTypeSize(Probability);
             var treeDepthSize = ByteHelper.GetPropertyTypeSize(TreeDepth);
             

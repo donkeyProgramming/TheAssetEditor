@@ -1,0 +1,212 @@
+﻿<UserControl 
+    x:Class="Editors.Audio.AudioEditor.AudioFilesExplorer.AudioFilesExplorerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:converters="clr-namespace:Editors.Audio.AudioEditor.Converters"
+    xmlns:audiofilesexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioFilesExplorer"
+    d:DataContext="{d:DesignInstance Type=audiofilesexplorer:AudioFilesExplorerViewModel}"
+    mc:Ignorable="d"
+    d:DesignHeight="250" d:DesignWidth="500">
+
+    <UserControl.Resources>
+        <converters:ImageConverter 
+            x:Key="ImageValueConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition 
+                Height="Auto"/>
+            <RowDefinition
+                Height="Auto"/>
+            <RowDefinition 
+                Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Label 
+            Grid.Row="0"
+            Grid.ColumnSpan="2"
+            Content="{Binding AudioFilesExplorerLabel}"/>
+
+        <Grid
+            Grid.Row="1">
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition 
+                    Width="Auto"/>
+                <ColumnDefinition 
+                    Width="Auto"/>
+                <ColumnDefinition 
+                    Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button 
+                Grid.Column="0"
+                Margin="5, 0, 0, 0" 
+                Width="180" 
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Left"
+                Content="Toggle Collapse / Expand Tree" 
+                ToolTip="Collapse / expand the file tree." 
+                Command="{Binding CollapseOrExpandAudioFilesTreeCommand}"/>
+
+            <Button 
+                Grid.Column="1"
+                Margin="5, 0, 0, 0" 
+                Width="75" 
+                Content="Play Audio" 
+                ToolTip="Play the selected audio file." 
+                Command="{Binding PlayWavFileCommand}" 
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Left"
+                IsEnabled="{Binding IsPlayAudioButtonEnabled}"/>
+
+            <Button 
+                Grid.Column="2"
+                Margin="5, 0, 0, 0" 
+                Width="105" 
+                Content="Set Audio Files" 
+                ToolTip="Set the selected audio file(s) as the audio file(s) for the item in the Audio Project Editor." 
+                Command="{Binding AddAudioFilesToAudioProjectEditorCommand}" 
+                VerticalAlignment="Center" 
+                HorizontalAlignment="Left"
+                IsEnabled="{Binding IsAddAudioFilesButtonEnabled}"/>
+        </Grid>
+
+        <!-- Search and Clear Button -->
+        <Grid 
+            Grid.Row="2"
+            Margin="5, 5, 5, 0">
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition 
+                    Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border 
+                SnapsToDevicePixels="True" 
+                BorderBrush="{DynamicResource TextBox.Static.Border}" 
+                BorderThickness="1">
+                
+                <Grid>
+                    <TextBox 
+                        x:Name="FilterTextBoxItem" 
+                        Style="{StaticResource HintedTextBox}" 
+                        KeyboardNavigation.TabIndex="0" 
+                        FontSize="12" 
+                        BorderThickness="0"
+                        KeyboardNavigation.IsTabStop="True"
+                        HorizontalAlignment="Stretch" Padding="2.5, 0, 0, 0"  Height="24" VerticalContentAlignment="Center" 
+                        Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Delay=350}"
+                        Tag="Search Audio Files Explorer">
+                    </TextBox>
+
+                    <Button 
+                        Padding="2" 
+                        Width="24" 
+                        Height="24" 
+                        HorizontalAlignment="Right"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        VerticalAlignment="Center"
+                        Click="ClearButtonClick" 
+                        Command="{Binding ClearTextCommand}">
+                        
+                        <Button.Template>
+                            <ControlTemplate 
+                                TargetType="Button">
+                                
+                                <Grid 
+                                    SnapsToDevicePixels="true" 
+                                    Background="{DynamicResource TextBox.Static.Background}">
+                                    
+                                    <Path 
+                                        Data="M0,0 L8,8 M8,0 L0,8" 
+                                        StrokeThickness="1.5" 
+                                        VerticalAlignment="Center" 
+                                        HorizontalAlignment="Center">
+                                        
+                                        <Path.Style>
+                                            <Style 
+                                                TargetType="{x:Type Path}">
+                                                
+                                                <Style.Triggers>
+                                                    <Trigger 
+                                                        Property="IsMouseOver" 
+                                                        Value="False">
+                                                        <Setter
+                                                            Property="Stroke" 
+                                                            Value="{DynamicResource Button.Disabled.Foreground}" />
+                                                    </Trigger>
+
+                                                    <Trigger 
+                                                        Property="IsMouseOver" 
+                                                        Value="True">
+                                                        <Setter 
+                                                            Property="Stroke" 
+                                                            Value="{DynamicResource Button.Static.Foreground}" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Path.Style>
+                                    </Path>
+                                </Grid>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <audiofilesexplorer:MultiSelectTreeView
+            Grid.Row="3"
+            Grid.ColumnSpan="2"
+            Margin="0, 5, 0, 0"
+            Padding="0, 5, 0, 5"
+            ItemsSource="{Binding AudioFilesTree}"
+            Background="{DynamicResource TreeView.Static.Background}"
+            BorderBrush="Transparent"
+            SelectedItems="{Binding SelectedTreeNodes, Mode=TwoWay}"
+            Style="{StaticResource {x:Type TreeView}}">
+
+            <audiofilesexplorer:MultiSelectTreeView.ItemContainerStyle>
+                <Style 
+                    TargetType="{x:Type TreeViewItem}" 
+                    BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                    <Setter 
+                        Property="IsExpanded" 
+                        Value="{Binding IsNodeExpanded, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Style>
+            </audiofilesexplorer:MultiSelectTreeView.ItemContainerStyle>
+
+            <audiofilesexplorer:MultiSelectTreeView.ItemTemplate>
+                <HierarchicalDataTemplate 
+                    DataType="{x:Type audiofilesexplorer:AudioFilesTreeNode}" 
+                    ItemsSource="{Binding Children}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition 
+                                Width="Auto" />
+                            <ColumnDefinition 
+                                Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Image 
+                            Grid.Column="0" 
+                            Width="16" 
+                            Height="16" 
+                            Source="{Binding Path=., Converter={StaticResource ImageValueConverter}}" />
+                        <TextBlock 
+                            Grid.Column="1" 
+                            Margin="4,0,0,0" 
+                            Text="{Binding Name}" />
+                    </Grid>
+                </HierarchicalDataTemplate>
+            </audiofilesexplorer:MultiSelectTreeView.ItemTemplate>
+        </audiofilesexplorer:MultiSelectTreeView>
+    </Grid>
+</UserControl>

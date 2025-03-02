@@ -31,14 +31,14 @@ namespace Shared.GameFormats.Wwise.Hirc.V112
 
         public override void UpdateSectionSize()
         {
-            var idSize = ByteHelper.GetPropertyTypeSize(Id);
+            var idSize = ByteHelper.GetPropertyTypeSize(ID);
             var akBankSourceDataSize = AkBankSourceData.GetSize();
             var nodeBaseParamsSize = NodeBaseParams.GetSize();
             SectionSize = idSize + akBankSourceDataSize + nodeBaseParamsSize;
         }
 
-        public uint GetDirectParentId() => NodeBaseParams.DirectParentId;
-        public uint GetSourceId() => AkBankSourceData.AkMediaInformation.SourceId;
+        public uint GetDirectParentID() => NodeBaseParams.DirectParentId;
+        public uint GetSourceID() => AkBankSourceData.AkMediaInformation.SourceId;
         public AKBKSourceType GetStreamType() => AkBankSourceData.StreamType;
     }
 }

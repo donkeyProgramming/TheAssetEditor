@@ -14,7 +14,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             return HircFactory.CreateFactory(bnkVersion);
         }
 
-        public HircChunk Parse(string fileName, ByteChunk chunk, uint bnkVersion, bool isCaHircItem)
+        public HircChunk Parse(string filePath, ByteChunk chunk, uint bnkVersion, uint languageID, bool isCaHircItem)
         {
             var hircChunk = new HircChunk
             {
@@ -35,7 +35,8 @@ namespace Shared.GameFormats.Wwise.Hirc
                     var hircItem = factory.CreateInstance(hircType);
                     hircItem.IndexInFile = itemIndex;
                     hircItem.ByteIndexInFile = itemIndex;
-                    hircItem.OwnerFile = fileName;
+                    hircItem.OwnerFilePath = filePath;
+                    hircItem.LanguageID = languageID;
                     hircItem.IsCaHircItem = isCaHircItem;
                     hircItem.Parse(chunk);
                     hircChunk.HircItems.Add(hircItem);
@@ -45,7 +46,7 @@ namespace Shared.GameFormats.Wwise.Hirc
                     failedItems.Add(itemIndex);
                     chunk.Index = start;
 
-                    var unkInstance = new UnknownHirc() { ErrorMsg = e.Message, ByteIndexInFile = itemIndex, OwnerFile = fileName };
+                    var unkInstance = new UnknownHirc() { ErrorMsg = e.Message, ByteIndexInFile = itemIndex, OwnerFilePath = filePath };
                     unkInstance.Parse(chunk);
                     hircChunk.HircItems.Add(unkInstance);
                 }
@@ -69,7 +70,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             var byteArray = memStream.ToArray();
 
             // For sanity, read back
-            Parse("name", new ByteChunk(byteArray), gameBankGeneratorVersion, true);
+            Parse("name", new ByteChunk(byteArray), gameBankGeneratorVersion, 0, true);
 
             return byteArray;
         }

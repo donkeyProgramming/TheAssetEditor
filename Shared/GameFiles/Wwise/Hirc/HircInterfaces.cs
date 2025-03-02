@@ -9,16 +9,16 @@ namespace Shared.GameFormats.Wwise.Hirc
 
     public interface ICAkSound
     {
-        public uint GetDirectParentId();
-        public uint GetSourceId();
+        public uint GetDirectParentID();
+        public uint GetSourceID();
         public AKBKSourceType GetStreamType();
     }
 
     public interface ICAkAction
     {
         public AkActionType GetActionType();
-        public uint GetChildId();
-        public uint GetStateGroupId();
+        public uint GetChildID();
+        public uint GetStateGroupID();
     }
 
     public interface ICAkDialogueEvent
@@ -30,7 +30,7 @@ namespace Shared.GameFormats.Wwise.Hirc
     public interface ICAkActorMixer
     {
         public List<uint> GetChildren();
-        public uint GetDirectParentId();
+        public uint GetDirectParentID();
     }
 
     public interface ICAkSwitchCntr
@@ -45,7 +45,7 @@ namespace Shared.GameFormats.Wwise.Hirc
             List<uint> NodeIdList { get; }
         }
 
-        public uint GetDirectParentId();
+        public uint GetDirectParentID();
     }
 
     public interface ICAkMusicTrack
@@ -56,12 +56,12 @@ namespace Shared.GameFormats.Wwise.Hirc
     public interface ICAkLayerCntr
     {
         public List<uint> GetChildren();
-        public uint GetDirectParentId();
+        public uint GetDirectParentID();
     }
 
     public interface ICAkRanSeqCnt
     {
-        public uint GetParentId();
+        public uint GetDirectParentID();
         public List<uint> GetChildren();
     }
 }

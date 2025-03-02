@@ -39,14 +39,14 @@ namespace Editors.Audio.Utility
 
             _logger.Here().Information($"Trying to export sound '{fileNameWithoutExtension}' - {wemBytes.Length} bytes");
 
-            var exportResult = ExportFile(wemName, wemBytes);
+            var exportResult = SoundPlayer.ExportFile(wemName, wemBytes);
             if (exportResult.Failed)
                 return Result<string>.FromError(exportResult.LogItems);
 
-            return ConvertFileUsingVgSteam(wemName, wavName);
+            return ConvertFileUsingVgStream(wemName, wavName);
         }
 
-        private Result<string> ConvertFileUsingVgSteam(string sourceFileName, string targetFileName)
+        private Result<string> ConvertFileUsingVgStream(string sourceFileName, string targetFileName)
         {
             try
             {
@@ -57,17 +57,17 @@ namespace Editors.Audio.Utility
                 var arguments = $"-o \"{targetFileName}\" \"{sourceFileName}\"";
                 _logger.Here().Information($"{cliPath} {arguments}");
 
-                using var pProcess = new System.Diagnostics.Process();
-                pProcess.StartInfo.FileName = cliPath;
-                pProcess.StartInfo.Arguments = arguments;
-                pProcess.StartInfo.UseShellExecute = false;
-                pProcess.StartInfo.RedirectStandardOutput = true;
-                pProcess.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-                pProcess.StartInfo.CreateNoWindow = false;
-                pProcess.Start();
-                var output = pProcess.StandardOutput.ReadToEnd();
+                using var process = new System.Diagnostics.Process();
+                process.StartInfo.FileName = cliPath;
+                process.StartInfo.Arguments = arguments;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+                process.StartInfo.CreateNoWindow = false;
+                process.Start();
+                var output = process.StandardOutput.ReadToEnd();
                 _logger.Here().Information(output);
-                pProcess.WaitForExit();
+                process.WaitForExit();
 
                 var outputSoundFilePath = targetFileName;
                 var doesFileExist = File.Exists(outputSoundFilePath);
@@ -81,22 +81,6 @@ namespace Editors.Audio.Utility
             {
                 _logger.Here().Error(e.Message);
                 return Result<string>.FromError("Convert error", e.Message);
-            }
-        }
-
-        private Result<bool> ExportFile(string filePath, byte[] bytes)
-        {
-            try
-            {
-                DirectoryHelper.EnsureFileFolderCreated(filePath);
-                File.WriteAllBytes(filePath, bytes);
-                _logger.Here().Information("All bytes written to file");
-                return Result<bool>.FromOk(true);
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error(e.Message);
-                return Result<bool>.FromError("Write error", e.Message);
             }
         }
 

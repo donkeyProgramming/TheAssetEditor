@@ -56,6 +56,8 @@ namespace Shared.EmbeddedResources
 
         [AllowNull] public static BitmapSource InformationIcon { get; private set; }
 
+        [AllowNull] public static BitmapImage WavFileIcon { get; private set; }
+
         public static void Load()
         {
             FolderIcon = BitmapToImageSource("icons8-folder-48.png");
@@ -105,6 +107,9 @@ namespace Shared.EmbeddedResources
             VertexDebuggerIcon = BitmapToImageSource(@"icons8-question-mark-48.png");
 
             InformationIcon = BitmapToImageSource(SystemIcons.Information);
+
+            WavFileIcon = BitmapToImageSource("Wav-File.png");
+
         }
 
         static BitmapImage BitmapToImageSource(string path)
