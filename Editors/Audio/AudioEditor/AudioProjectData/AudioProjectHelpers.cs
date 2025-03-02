@@ -239,7 +239,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
             var soundBank = GetSoundBankFromName(audioProjectService, audioProjectItem.Name);
             var actionEvent = GetActionEventFromDataGridRow(selectedAudioProjectViewerDataGridRow, soundBank);
-            return actionEvent.RandomSequenceContainer.AudioSettings;
+
+            // We could just not run this function unless we know the object has a random sequence container but we'll keep it as this as we may introduce more containers or enable settings for sounds in future.
+            if (actionEvent.RandomSequenceContainer != null)
+                return actionEvent.RandomSequenceContainer.AudioSettings;
+            else
+                return null;
         }
 
         public static AudioSettings GetAudioSettingsFromAudioProjectViewerStatePathItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
@@ -248,7 +253,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
             var dialogueEvent = GetDialogueEventFromName(audioProjectService, audioProjectItem.Name);
             var statePath = GetStatePathFromDataGridRow(audioRepository, selectedAudioProjectViewerDataGridRow, dialogueEvent);
-            return statePath.RandomSequenceContainer.AudioSettings;
+
+            // We could just not run this function unless we know the object has a random sequence container but we'll keep it as this as we may introduce more containers or enable settings for sounds in future.
+            if (statePath.RandomSequenceContainer != null)
+                return statePath.RandomSequenceContainer.AudioSettings;
+            else
+                return null;
         }
 
         public static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> newRow)

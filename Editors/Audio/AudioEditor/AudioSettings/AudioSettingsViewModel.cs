@@ -95,7 +95,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         {
             var audioSettings = new AudioProjectData.AudioSettings();
 
-            if (AudioFiles.Count > 1) // This should prevent the recording of any settings stored but not in use e.g. from when the user has previously applied settings with multiple sounds set
+            if (AudioFiles.Count > 1)
             {
                 audioSettings.PlaylistType = PlaylistType;
 

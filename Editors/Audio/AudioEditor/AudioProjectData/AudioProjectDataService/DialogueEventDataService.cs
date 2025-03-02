@@ -123,8 +123,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
             {
                 states = moddedStates
                     .Concat(vanillaStates)
-                        .Where(state => state != "Any")
-                        .OrderBy(state => state)
+                    .OrderByDescending(state => state == "Any") // "Any" becomes true and sorts first
+                    .ThenBy(state => state) // Then sort the rest alphabetically
                     .ToList();
             }
 

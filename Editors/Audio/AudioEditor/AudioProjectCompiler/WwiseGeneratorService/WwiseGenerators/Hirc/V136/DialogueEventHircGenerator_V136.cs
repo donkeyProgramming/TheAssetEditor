@@ -43,7 +43,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.W
             {
                 var argument = new AkGameSync_V136
                 {
-                    GroupID = WwiseHash.Compute(statePathNode.StateGroup.Name),
+                    GroupID = statePathNode.StateGroup.ID,
                     GroupType = AkGroupType.State
                 };
                 arguments.Add(argument);
@@ -60,11 +60,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.W
                 for (var i = 0; i < statePath.Nodes.Count; i++)
                 {
                     var statePathNode = statePath.Nodes[i];
-                    uint stateKey;
-                    if (statePathNode.State.Name.Equals("Any", StringComparison.OrdinalIgnoreCase))
-                        stateKey = 0u;
-                    else
-                        stateKey = WwiseHash.Compute(statePathNode.State.Name);
+                    var stateKey = statePathNode.State.ID;
 
                     var existingChild = currentNode.Nodes.FirstOrDefault(n => n.Key == stateKey);
                     if (existingChild != null)

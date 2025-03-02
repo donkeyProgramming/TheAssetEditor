@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService;
 using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Bkhd;
 using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService;
@@ -87,17 +89,22 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
             }
 
             if (audioProject.SoundBanks.Any(soundBank => soundBank.DialogueEvents != null))
+            {
+                SetStatesData(audioProject);
                 SetDialogueEventData(audioProject);
+            }
 
             GenerateWems(audioProject);
 
             SetRemainingSourceData(audioProject);
 
-            AddWemsToPack(audioProject);
+            SaveWemsToPack(audioProject);
 
             GenerateSoundBanks(audioProject);
 
             GenerateEventDatFiles(audioProject);
+
+            SaveGeneratedAudioProjectToPack(audioProject);
         }
 
         private void SetSoundBankData(AudioProjectDataModel audioProject)
@@ -243,6 +250,22 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
             }
         }
 
+        private static void SetStatesData(AudioProjectDataModel audioProject)
+        {
+            foreach (var stateGroup in audioProject.StateGroups)
+            {
+                stateGroup.ID = WwiseHash.Compute(stateGroup.Name);
+
+                foreach (var state in stateGroup.States)
+                {
+                    if (state.Name == "Any")
+                        state.ID = 0;
+                    else
+                        state.ID = WwiseHash.Compute(state.Name);
+                }
+            }
+        }
+
         private static void SetDialogueEventData(AudioProjectDataModel audioProject)
         {
             foreach (var soundBank in audioProject.SoundBanks)
@@ -304,7 +327,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
             }
         }
 
-        private void AddWemsToPack(AudioProjectDataModel audioProject)
+        private void SaveWemsToPack(AudioProjectDataModel audioProject)
         {
             var soundsWithUniqueSourceIds = GetAllUniqueSounds(audioProject);
             foreach (var sound in soundsWithUniqueSourceIds)
@@ -454,7 +477,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
 
             var datFileName = $"event_data__{soundBank.SoundBankFileName.Replace(".bnk", ".dat")}";
             var datFilePath = $"audio\\wwise\\{datFileName}";
-            AddDatFileToPack(soundDatFile, datFileName, datFilePath);
+            SaveDatFileToPack(soundDatFile, datFileName, datFilePath);
         }
 
         private void GenerateStatesDatFile(AudioProjectDataModel audioProject)
@@ -470,15 +493,29 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
             var audioProjectFileName = _audioProjectService.AudioProjectFileName.Replace(" ", "_");
             var datFileName = $"states_data__{audioProjectFileName}.dat";
             var datFilePath = $"audio\\wwise\\{datFileName}";
-            AddDatFileToPack(stateDatFile, datFileName, datFilePath);
+            SaveDatFileToPack(stateDatFile, datFileName, datFilePath);
         }
 
-        private void AddDatFileToPack(SoundDatFile datFile, string datFileName, string datFilePath)
+        private void SaveDatFileToPack(SoundDatFile datFile, string datFileName, string datFilePath)
         {
             var bytes = DatFileParser.WriteData(datFile);
             var packFile = new PackFile(datFileName, new MemorySource(bytes));
             var reparsedSanityFile = DatFileParser.Parse(packFile, false);
             _fileSaveService.Save(datFilePath, packFile.DataSource.ReadData(), true);
+        }
+
+        private void SaveGeneratedAudioProjectToPack(AudioProjectDataModel audioProject)
+        {
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                WriteIndented = true
+            };
+            var audioProjectJson = JsonSerializer.Serialize(audioProject, options);
+            var audioProjectFileName = $"{_audioProjectService.AudioProjectFileName}_generated.aproj";
+            var audioProjectFilePath = $"{_audioProjectService.AudioProjectDirectory}\\{audioProjectFileName}";
+            var packFile = PackFile.CreateFromASCII(audioProjectFileName, audioProjectJson);
+            _fileSaveService.Save(audioProjectFilePath, packFile.DataSource.ReadData(), true);
         }
 
         public static List<Sound> GetAllUniqueSounds(AudioProjectDataModel audioProject)

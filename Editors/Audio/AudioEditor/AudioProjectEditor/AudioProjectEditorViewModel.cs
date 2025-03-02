@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -8,6 +10,8 @@ using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService;
 using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.Storage;
+using Shared.Core.PackFiles;
+using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataManager;
 
@@ -18,6 +22,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         private readonly AudioEditorViewModel _audioEditorViewModel;
         private readonly IAudioRepository _audioRepository;
         private readonly IAudioProjectService _audioProjectService;
+        private readonly IPackFileService _packFileService;
+        private readonly IStandardDialogs _standardDialogs;
 
         public string DisplayName { get; set; } = "Audio Project Editor";
 
@@ -29,11 +35,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         [ObservableProperty] private bool _isShowModdedStatesCheckBoxEnabled = false;
         [ObservableProperty] private bool _isShowModdedStatesCheckBoxVisible = false;
 
-        public AudioProjectEditorViewModel (AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        public AudioProjectEditorViewModel (AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService, IPackFileService packFileService, IStandardDialogs standardDialogs)
         {
             _audioEditorViewModel = audioEditorViewModel;
             _audioRepository = audioRepository;
             _audioProjectService = audioProjectService;
+            _packFileService = packFileService;
+            _standardDialogs = standardDialogs;
         }
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
@@ -135,6 +143,33 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             else
                 return false;
         }
+
+        public void SelectMovieFile()
+        {
+            var result = _standardDialogs.DisplayBrowseDialog([".ca_vp8" ]);
+            if (result.Result)
+            {
+                var movieFilePath = _packFileService.GetFullPath(result.File);
+                if (AudioProjectEditorDataGrid[0].ContainsKey("Event"))
+                {
+                    AudioProjectEditorDataGrid.Clear();
+                    var rowData = new Dictionary<string, string>
+                    {
+                        { "Event", ConvertMovieFilePath(movieFilePath) }
+                    };
+                    AudioProjectEditorDataGrid.Add(rowData);
+                }
+            }
+        }
+
+        public static string ConvertMovieFilePath(string filePath)
+        {
+            filePath = filePath.Replace("movies\\", string.Empty);
+            filePath = filePath.Replace(Path.GetExtension(filePath), string.Empty);
+            filePath = filePath.Replace("\\", "_");
+            return "Play_Movie_" + filePath;
+        }
+
 
         public void ResetAudioProjectEditorLabel() => AudioProjectEditorLabel = $"Audio Project Editor";
 

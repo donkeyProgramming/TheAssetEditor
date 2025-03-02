@@ -15,7 +15,7 @@
             //UI,
             //Vocalisation,
             //FrontendMusic,
-            //CampaignMusic,
+            CampaignMusic,
             //BattleMusic,
             //LoadingScreenMusic,
             FrontendVO,
@@ -45,7 +45,8 @@
         //public const string UIDisplayString = "UI";
         //public const string VocalisationDisplayString = "Vocalisation";
         //public const string FrontendMusicDisplayString = "Frontend Music";
-        //public const string CampaignMusicDisplayString = "Campaign Music";
+        public const string CampaignMusicDisplayString = "Campaign Music";
+        public const string CampaignMusicSoundBankName = "campaign_music";
         //public const string BattleMusicDisplayString = "Battle Music";
         //public const string LoadingScreenMusicDisplayString = "Loading Screen Music";
         public const string FrontendVODisplayString = "Frontend VO";
@@ -75,7 +76,7 @@
                 //Wh3SoundBankSubtype.UI => Wh3SoundBankType.ActionEventSoundBank,
                 //Wh3SoundBankSubtype.Vocalisation => Wh3SoundBankType.ActionEventSoundBank,
                 //Wh3SoundBankSubtype.FrontendMusic => Wh3SoundBankType.ActionEventSoundBank,
-                //Wh3SoundBankSubtype.CampaignMusic => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubtype.CampaignMusic => Wh3SoundBankType.ActionEventSoundBank,
                 //Wh3SoundBankSubtype.BattleMusic => Wh3SoundBankType.ActionEventSoundBank,
                 //Wh3SoundBankSubtype.LoadingScreenMusic => Wh3SoundBankType.ActionEventSoundBank,
                 Wh3SoundBankSubtype.FrontendVO => Wh3SoundBankType.DialogueEventSoundBank,
@@ -102,7 +103,7 @@
                 //Wh3SoundBankSubtype.UI => UIDisplayString,
                 //Wh3SoundBankSubtype.Vocalisation => VocalisationDisplayString,
                 //Wh3SoundBankSubtype.FrontendMusic => FrontendMusicDisplayString,
-                //Wh3SoundBankSubtype.CampaignMusic => CampaignMusicDisplayString,
+                Wh3SoundBankSubtype.CampaignMusic => CampaignMusicDisplayString,
                 //Wh3SoundBankSubtype.BattleMusic => BattleMusicDisplayString,
                 //Wh3SoundBankSubtype.LoadingScreenMusic => LoadingScreenMusicDisplayString,
                 Wh3SoundBankSubtype.FrontendVO => FrontendVODisplayString,
@@ -129,7 +130,7 @@
                 //UIDisplayString => Wh3SoundBankSubtype.UI,
                 //VocalisationDisplayString => Wh3SoundBankSubtype.Vocalisation,
                 //FrontendMusicDisplayString => Wh3SoundBankSubtype.FrontendMusic,
-                //CampaignMusicDisplayString => Wh3SoundBankSubtype.CampaignMusic,
+                CampaignMusicDisplayString => Wh3SoundBankSubtype.CampaignMusic,
                 //BattleMusicDisplayString => Wh3SoundBankSubtype.BattleMusic,
                 //LoadingScreenMusicDisplayString => Wh3SoundBankSubtype.LoadingScreenMusic,
                 FrontendVODisplayString => Wh3SoundBankSubtype.FrontendVO,
@@ -148,6 +149,8 @@
             {
                 Wh3SoundBankSubtype.DiplomacyLines => DiplomacyLinesSoundBankName,
                 Wh3SoundBankSubtype.Movies => MoviesSoundBankName,
+
+                Wh3SoundBankSubtype.CampaignMusic => CampaignMusicSoundBankName,
 
                 Wh3SoundBankSubtype.FrontendVO => FrontendVOSoundBankName,
                 Wh3SoundBankSubtype.CampaignVO => CampaignVOSoundBankName,
