@@ -13,7 +13,6 @@ namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
         private readonly IAbstractFormFactory<VertexDebuggerWindow> _windowFactory;
         private Window? _windowInstance;
 
-
         public OpenVertexDebuggerCommand(IAbstractFormFactory<VertexDebuggerWindow> windowFactory)
         {
             _windowFactory = windowFactory;

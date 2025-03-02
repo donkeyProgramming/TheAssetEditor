@@ -26,6 +26,11 @@ namespace Editors.KitbasherEditor.ChildEditors.VertexDebugger
         {
             _game.RemoveComponent(_viewModel);
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.ShowStatistics();
+        }
     }
 }
 

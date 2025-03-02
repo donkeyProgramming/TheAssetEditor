@@ -163,6 +163,11 @@ New features:
 Interesting links:
 	https://github.com/kikipoulet/SukiUI/blob/main/SukiUI/Controls/PropertyGrid/InstanceViewModel.cs	-> Auto generate views for property gird. Also good docking in same lib 
 
+
+Fixes for v062
+	[Bugfix]: KitbashTool: Fixed incorrect saving of meshes with only skin attribute set 
+	[Bugfix]: KitbashTool: Fixed issues in the vertex info tool and added a statistics button
+	
 Fixes for v061
 	[Bugfix]: KitbashTool: Fixed incorrect saving of meshes with only skin attribute set 
 	[Feature]: KitbashTool: Custom attachmentpoints are kept and saved. 

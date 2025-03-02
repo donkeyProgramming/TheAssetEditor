@@ -25,13 +25,22 @@
                     <behaviors:TextBoxInputBehavior InputMode="DecimalInput"/>
                 </b:Interaction.Behaviors>
             </TextBox>
+
+            <Button Content="Show Statistics" Margin="2" Click="Button_Click"/>
         </StackPanel>
 
         <DataGrid Grid.Row="1" 
                  ItemsSource="{Binding VertexList, UpdateSourceTrigger=PropertyChanged}" 
                  SelectedItem="{Binding SelectedVertex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                  IsReadOnly="True" 
-                 RowBackground="white" 
-                 AlternatingRowBackground="LightBlue"/>
+                 AlternationCount="2"
+               
+                 AlternatingRowBackground="Gray" Foreground="White">
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                   
+                </Style>
+            </DataGrid.CellStyle>
+        </DataGrid>
     </Grid>
 </windowhandling:AssetEditorWindow>
