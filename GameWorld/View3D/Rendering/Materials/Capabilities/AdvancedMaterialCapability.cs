@@ -110,6 +110,7 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                     break;
 
                 case WeightedMaterial.MaterialHintEnum.Skin:
+                    rmvMaterial.SetTexture(SkinMask.Type, SkinMask.TexturePath);
                     break;
 
                 case WeightedMaterial.MaterialHintEnum.Skin_Dirt:
