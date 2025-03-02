@@ -6,11 +6,6 @@ using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioSettings;
-using Editors.Audio.Storage;
-using Editors.Audio.Utility;
-using Shared.Core.PackFiles;
-using Shared.Core.Services;
-using Shared.Core.Settings;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
@@ -18,53 +13,51 @@ namespace Editors.Audio.AudioEditor
 {
     public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {
-        private readonly IAudioRepository _audioRepository;
-        private readonly IPackFileService _packFileService;
+        public AudioEditorMenuViewModel AudioEditorMenuViewModel { get; }
+        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; }
+        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; }
+        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; }
+        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; }
+        public AudioSettingsViewModel AudioSettingsViewModel { get; }
+
         private readonly IAudioProjectService _audioProjectService;
-        private readonly IStandardDialogs _standardDialogs;
-        private readonly ApplicationSettingsService _applicationSettingsService;
-        private readonly IFileSaveService _fileSaveService;
-        private readonly SoundPlayer _soundPlayer;
-        private readonly WemGenerator _wemGenerator;
+        private readonly IntegrityChecker _integrityChecker;
 
         public string DisplayName { get; set; } = "Audio Editor";
 
-        public AudioEditorMenuViewModel AudioEditorMenuViewModel { get; set; }
-        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
-        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
-        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; set; }
-        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; set; }
-        public AudioSettingsViewModel AudioSettingsViewModel { get; set; }
-
         public AudioEditorViewModel(
-            IAudioRepository audioRepository,
-            IPackFileService packFileService,
+            AudioEditorMenuViewModel audioEditorMenuViewModel,
+            AudioProjectExplorerViewModel audioProjectExplorerViewModel,
+            AudioFilesExplorerViewModel audioFilesExplorerViewModel,
+            AudioProjectEditorViewModel audioProjectEditorViewModel,
+            AudioProjectViewerViewModel audioProjectViewerViewModel,
+            AudioSettingsViewModel audioSettingsViewModel,
             IAudioProjectService audioProjectService,
-            IStandardDialogs packFileUiProvider,
-            ApplicationSettingsService applicationSettingsService,
-            IFileSaveService fileSaveService,
-            SoundPlayer soundPlayer,
-            WemGenerator wemGenerator)
+            IntegrityChecker integrityChecker)
         {
-            _audioRepository = audioRepository;
-            _packFileService = packFileService;
-            _audioProjectService = audioProjectService;
-            _standardDialogs = packFileUiProvider;
-            _applicationSettingsService = applicationSettingsService;
-            _fileSaveService = fileSaveService;
-            _soundPlayer = soundPlayer;
-            _wemGenerator = wemGenerator;
+            AudioEditorMenuViewModel = audioEditorMenuViewModel;
+            AudioEditorMenuViewModel.AudioEditorViewModel = this;
 
-            AudioEditorMenuViewModel = new AudioEditorMenuViewModel(this, _audioRepository, _packFileService, _audioProjectService, _standardDialogs, _applicationSettingsService, _fileSaveService, _soundPlayer, _wemGenerator);
-            AudioProjectExplorerViewModel = new AudioProjectExplorerViewModel(this, _audioRepository, _audioProjectService);
-            AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(this, _packFileService, _audioRepository, _audioProjectService, _soundPlayer);
-            AudioProjectEditorViewModel = new AudioProjectEditorViewModel(this, _audioRepository, _audioProjectService, _packFileService, _standardDialogs);
-            AudioProjectViewerViewModel = new AudioProjectViewerViewModel(this, _audioRepository, _audioProjectService);
-            AudioSettingsViewModel = new AudioSettingsViewModel();
+            AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
+            AudioProjectExplorerViewModel.AudioEditorViewModel = this;
+
+            AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
+            AudioFilesExplorerViewModel.AudioEditorViewModel = this;
+
+            AudioProjectEditorViewModel = audioProjectEditorViewModel;
+            AudioProjectEditorViewModel.AudioEditorViewModel = this;
+
+            AudioProjectViewerViewModel = audioProjectViewerViewModel;
+            AudioProjectViewerViewModel.AudioEditorViewModel = this;
+
+            AudioSettingsViewModel = audioSettingsViewModel;
+
+            _audioProjectService = audioProjectService;
+            _integrityChecker = integrityChecker;
 
             Initialise();
 
-            IntegrityChecker.CheckAudioEditorDialogueEventIntegrity(_audioRepository, DialogueEventData);
+            _integrityChecker.CheckAudioEditorDialogueEventIntegrity(DialogueEventData);
         }
 
         public void ResetAudioEditorViewModelData()

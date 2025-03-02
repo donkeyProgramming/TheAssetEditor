@@ -100,7 +100,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             _audioProjectService.InitialiseAudioProject(_audioEditorViewModel, AudioProjectFileName, AudioProjectDirectory, GameLanguageStringLookup[SelectedLanguage]);
 
             // Add the Audio Project to the PackFile
-            _audioProjectService.SaveAudioProject(_packFileService);
+            _audioProjectService.SaveAudioProject();
 
             CloseWindowAction();
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
-using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
@@ -13,9 +12,16 @@ namespace Editors.Audio.AudioEditor
     // TODO: Probably need something to check all audio files in the project are where they say they are
     public class IntegrityChecker
     {
-        public static void CheckAudioEditorDialogueEventIntegrity(IAudioRepository audioRepository, List<(string Name, SoundBanks.Wh3SoundBankSubtype SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
+        private readonly IAudioRepository _audioRepository;
+
+        public IntegrityChecker(IAudioRepository audioRepository)
         {
-            var gameDialogueEvents = audioRepository.StateGroupsLookupByDialogueEvent.Keys.ToList();
+            _audioRepository = audioRepository;
+        }
+
+        public void CheckAudioEditorDialogueEventIntegrity(List<(string Name, Wh3SoundBankSubtype SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
+        {
+            var gameDialogueEvents = _audioRepository.StateGroupsLookupByDialogueEvent.Keys.ToList();
             var audioEditorDialogueEvents = dialogueEventData.Select(data => data.Name).ToList();
 
             var areGameAndAudioEditorDialogueEventsMatching = new HashSet<string>(gameDialogueEvents).SetEquals(audioEditorDialogueEvents);
@@ -44,7 +50,7 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        public static void CheckAudioProjectDialogueEventIntegrity(IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        public void CheckAudioProjectDialogueEventIntegrity(IAudioProjectService audioProjectService)
         {
             var audioProjectDialogueEventsWithStateGroups = new Dictionary<string, List<string>>();
 
@@ -64,7 +70,7 @@ namespace Editors.Audio.AudioEditor
 
             foreach (var dialogueEvent in audioProjectDialogueEventsWithStateGroups)
             {
-                var gameDialogueEventStateGroups = audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Key];
+                var gameDialogueEventStateGroups = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Key];
                 var audioProjectDialogueEventStateGroups = dialogueEvent.Value;
                 if (!gameDialogueEventStateGroups.SequenceEqual(audioProjectDialogueEventStateGroups))
                     audioProjectService.DialogueEventsWithStateGroupsWithIntegrityError[dialogueEvent.Key] = audioProjectDialogueEventStateGroups;
@@ -87,7 +93,7 @@ namespace Editors.Audio.AudioEditor
                 var audioProjectDialogueEventStateGroupsText = string.Join("-->", audioProjectDialogueEventStateGroups);
                 message += $"\n\nOld State Groups: {audioProjectDialogueEventStateGroupsText}";
 
-                var gameDialogueEventStateGroups = audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Key];
+                var gameDialogueEventStateGroups = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Key];
                 var gameDialogueEventStateGroupsText = string.Join("-->", gameDialogueEventStateGroups);
                 message += $"\n\nNew State Groups: {gameDialogueEventStateGroupsText}";
             }

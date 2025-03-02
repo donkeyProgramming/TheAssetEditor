@@ -29,11 +29,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
     {
         private readonly IPackFileService _packFileService;
         private readonly IAudioRepository _audioRepository;
-        private readonly IAudioProjectService _audioProjectService;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IFileSaveService _fileSaveService;
         private readonly SoundPlayer _soundPlayer;
         private readonly WemGenerator _wemGenerator;
+
+        private IAudioProjectService _audioProjectService;
 
         private Dictionary<uint, List<uint>> UsedHircIdsByLanguageIDLookup { get; set; } = [];
         private Dictionary<uint, List<uint>> UsedSourceIdsByLanguageIDLookup { get; set; } = [];
@@ -41,7 +42,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
         public AudioProjectCompiler(
             IPackFileService packFileService,
             IAudioRepository audioRepository,
-            IAudioProjectService audioProjectService,
             ApplicationSettingsService applicationSettingsService,
             IFileSaveService fileSaveService,
             SoundPlayer soundPlayer,
@@ -49,7 +49,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
         {
             _packFileService = packFileService;
             _audioRepository = audioRepository;
-            _audioProjectService = audioProjectService;
             _applicationSettingsService = applicationSettingsService;
             _fileSaveService = fileSaveService;
             _soundPlayer = soundPlayer;
@@ -68,10 +67,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler
                 );
         }
 
-        // TODO: should proabably just make it generate for all languages
-        public void CompileAudioProject(AudioProjectDataModel audioProject)
+        // TODO: should proabably just make it generate for all languages?
+        public void CompileAudioProject(IAudioProjectService audioProjectService, AudioProjectDataModel audioProject)
         {
-            _audioProjectService.SaveAudioProject(_packFileService);
+            _audioProjectService = audioProjectService;
+            _audioProjectService.SaveAudioProject();
 
             if (audioProject.SoundBanks == null)
                 return;

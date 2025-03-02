@@ -1,7 +1,13 @@
 ﻿using Audio.AudioExplorer;
 using Editors.Audio.AudioEditor;
+using Editors.Audio.AudioEditor.AudioEditorMenu;
+using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectCompiler;
 using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
+using Editors.Audio.AudioEditor.AudioProjectEditor;
+using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.AudioProjectViewer;
+using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.Storage;
@@ -22,22 +28,27 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioExplorerViewModel>();
 
             serviceCollection.AddScoped<AudioEditorViewModel>();
-            serviceCollection.AddScoped<AudioEditorView>();
+            serviceCollection.AddScoped<AudioEditorMenuViewModel>();
+            serviceCollection.AddScoped<AudioProjectExplorerViewModel>();
+            serviceCollection.AddScoped<AudioFilesExplorerViewModel>();
+            serviceCollection.AddScoped<AudioProjectEditorViewModel>();
+            serviceCollection.AddScoped<AudioProjectViewerViewModel>();
+            serviceCollection.AddScoped<AudioSettingsViewModel>();
             serviceCollection.AddScoped<NewAudioProjectViewModel>();
-            serviceCollection.AddTransient<NewAudioProjectWindow>();
-            serviceCollection.AddTransient<AudioProjectCompiler>();
+            serviceCollection.AddScoped<NewAudioProjectWindow>();
 
             serviceCollection.AddScoped<IAudioProjectService, AudioProjectService>();
+            serviceCollection.AddScoped<IntegrityChecker>();
+            serviceCollection.AddScoped<AudioProjectCompiler>();
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
-
-            serviceCollection.AddTransient<VgStreamWrapper>();
-            serviceCollection.AddTransient<WemGenerator>();
-            serviceCollection.AddTransient<BnkLoader>();
-            serviceCollection.AddTransient<DatLoader>();
-            serviceCollection.AddTransient<BnkParser>();
-            serviceCollection.AddTransient<SoundPlayer>();
+            serviceCollection.AddScoped<VgStreamWrapper>();
+            serviceCollection.AddScoped<WemGenerator>();
+            serviceCollection.AddScoped<BnkLoader>();
+            serviceCollection.AddScoped<DatLoader>();
+            serviceCollection.AddScoped<BnkParser>();
+            serviceCollection.AddScoped<SoundPlayer>();
 
             RegisterAllAsInterface<IDeveloperConfiguration>(serviceCollection, ServiceLifetime.Transient);
         }

@@ -6,15 +6,11 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Editors.Audio.GameSettings.Warhammer3;
-using Editors.Audio.Storage;
-using Editors.Audio.Utility;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
-using Shared.Core.Settings;
-using static Editors.Audio.AudioEditor.IntegrityChecker;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
@@ -22,7 +18,27 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
 {
     public class AudioProjectService : IAudioProjectService
     {
-        readonly ILogger _logger = Logging.Create<AudioEditorViewModel>();
+        readonly ILogger _logger = Logging.Create<AudioProjectService>();
+
+        private readonly IPackFileService _packFileService;
+        private readonly IFileSaveService _fileSaveService;
+        private readonly IStandardDialogs _standardDialogs;
+        private readonly IntegrityChecker _integrityChecker;
+        private readonly AudioProjectCompiler.AudioProjectCompiler _audioProjectCompiler;
+
+        public AudioProjectService(
+            IPackFileService packFileService,
+            IFileSaveService fileSaveService,
+            IStandardDialogs standardDialogs,
+            IntegrityChecker integrityChecker,
+            AudioProjectCompiler.AudioProjectCompiler audioProjectCompiler)
+        {
+            _packFileService = packFileService;
+            _fileSaveService = fileSaveService;
+            _standardDialogs = standardDialogs;
+            _integrityChecker = integrityChecker;
+            _audioProjectCompiler = audioProjectCompiler;
+        }
 
         public AudioProjectDataModel AudioProject { get; set; } = new AudioProjectDataModel();
         public string AudioProjectFileName { get; set; }
@@ -31,34 +47,33 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
         public Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithIntegrityError { get; set; } = [];
         public Dictionary<string, DialogueEventPreset?> DialogueEventSoundBankFiltering { get; set; } = [];
 
-        public void SaveAudioProject(IPackFileService packFileService)
+        public void SaveAudioProject()
         {
+            var audioProject = GetAudioProjectWithoutUnusedObjects();
+
             var options = new JsonSerializerOptions
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = true
             };
-
-            var audioProject = GetAudioProjectWithoutUnusedObjects();
-            var fileJson = JsonSerializer.Serialize(audioProject, options);
-            var pack = packFileService.GetEditablePack();
-            var fileName = $"{AudioProjectFileName}.aproj";
-
-            var fileEntry = new NewPackFileEntry(AudioProjectDirectory, PackFile.CreateFromASCII(fileName, fileJson));
-            packFileService.AddFilesToPack(pack, [fileEntry]);
+            var audioProjectJson = JsonSerializer.Serialize(audioProject, options);
+            var audioProjectFileName = $"{AudioProjectFileName}.aproj";
+            var audioProjectFilePath = $"{AudioProjectDirectory}\\{audioProjectFileName}";
+            var packFile = PackFile.CreateFromASCII(audioProjectFileName, audioProjectJson);
+            _fileSaveService.Save(audioProjectFilePath, packFile.DataSource.ReadData(), true);
 
             _logger.Here().Information($"Saved Audio Project file: {AudioProjectDirectory}\\{AudioProjectFileName}.aproj");
         }
 
-        public void LoadAudioProject(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioRepository audioRepository, IStandardDialogs packFileUiProvider)
+        public void LoadAudioProject(AudioEditorViewModel audioEditorViewModel)
         {
-            var result = packFileUiProvider.DisplayBrowseDialog([".aproj"]);
+            var result = _standardDialogs.DisplayBrowseDialog([".aproj"]);
             if (result.Result)
             {
-                var filePath = packFileService.GetFullPath(result.File);
+                var filePath = _packFileService.GetFullPath(result.File);
                 var fileName = Path.GetFileName(filePath);
                 var fileType = Path.GetExtension(filePath);
-                var file = packFileService.FindFile(filePath);
+                var file = _packFileService.FindFile(filePath);
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
 
@@ -83,7 +98,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
                 // Get the Modded States and prepare them for being added to the DataGrid ComboBoxes
                 BuildStateGroupsWithModdedStatesRepository(AudioProject.StateGroups, StateGroupsWithModdedStatesRepository);
 
-                CheckAudioProjectDialogueEventIntegrity(audioRepository, this);
+                _integrityChecker.CheckAudioProjectDialogueEventIntegrity(this);
 
                 _logger.Here().Information($"Loaded Audio Project: {fileName}");
             }
@@ -106,17 +121,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
             audioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
         }
 
-        public void CompileAudioProject(
-            IPackFileService packFileService,
-            IAudioRepository audioRepository,
-            ApplicationSettingsService applicationSettingsService,
-            IFileSaveService fileSaveService,
-            SoundPlayer soundPlayer,
-            WemGenerator wemGenerator)
+        public void CompileAudioProject()
         {
-            var audioProjectCompiler = new AudioProjectCompiler.AudioProjectCompiler(packFileService, audioRepository, this, applicationSettingsService, fileSaveService, soundPlayer, wemGenerator);
             var audioProject = GetAudioProjectWithoutUnusedObjects();
-            audioProjectCompiler.CompileAudioProject(audioProject);
+            _audioProjectCompiler.CompileAudioProject(this, audioProject);
         }
 
         private void InitialiseSoundBanks()

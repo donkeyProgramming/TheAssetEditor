@@ -15,7 +15,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
     public partial class AudioProjectExplorerViewModel : ObservableObject, IEditorInterface
     {
-        private readonly AudioEditorViewModel _audioEditorViewModel;
+        public AudioEditorViewModel AudioEditorViewModel { get; set; }
         private readonly IAudioRepository _audioRepository;
         private readonly IAudioProjectService _audioProjectService;
 
@@ -31,9 +31,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private ObservableCollection<AudioProjectTreeNode> _unfilteredTree;
         public AudioProjectTreeNode _selectedAudioProjectTreeNode;
 
-        public AudioProjectExplorerViewModel(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        public AudioProjectExplorerViewModel(IAudioRepository audioRepository, IAudioProjectService audioProjectService)
         {
-            _audioEditorViewModel = audioEditorViewModel;
             _audioRepository = audioRepository;
             _audioProjectService = audioProjectService;
         }
@@ -42,12 +41,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         {
             _selectedAudioProjectTreeNode = value;
 
-            AudioProjectDataManager.HandleLoadingSelectedAudioProjectItem(_audioEditorViewModel, _audioProjectService, _audioRepository);
+            AudioProjectDataManager.HandleLoadingSelectedAudioProjectItem(AudioEditorViewModel, _audioProjectService, _audioRepository);
         }
         
         partial void OnSelectedDialogueEventPresetChanged(DialogueEventPreset? value)
         {
-            ApplyDialogueEventPresetFiltering(_audioEditorViewModel, _audioProjectService);
+            ApplyDialogueEventPresetFiltering(AudioEditorViewModel, _audioProjectService);
         }
 
         partial void OnSearchQueryChanged(string value)

@@ -19,7 +19,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 {
     public partial class AudioProjectEditorViewModel : ObservableObject, IEditorInterface
     {
-        private readonly AudioEditorViewModel _audioEditorViewModel;
+        public AudioEditorViewModel AudioEditorViewModel { get; set; }
         private readonly IAudioRepository _audioRepository;
         private readonly IAudioProjectService _audioProjectService;
         private readonly IPackFileService _packFileService;
@@ -35,9 +35,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         [ObservableProperty] private bool _isShowModdedStatesCheckBoxEnabled = false;
         [ObservableProperty] private bool _isShowModdedStatesCheckBoxVisible = false;
 
-        public AudioProjectEditorViewModel (AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService, IPackFileService packFileService, IStandardDialogs standardDialogs)
+        public AudioProjectEditorViewModel (IAudioRepository audioRepository, IAudioProjectService audioProjectService, IPackFileService packFileService, IStandardDialogs standardDialogs)
         {
-            _audioEditorViewModel = audioEditorViewModel;
             _audioRepository = audioRepository;
             _audioProjectService = audioProjectService;
             _packFileService = packFileService;
@@ -46,15 +45,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
         {
-            if (_audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
+            if (AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
             {
-                var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioProjectService, _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
+                var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioProjectService, AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
 
                 // Clear the previous DataGrid Data
                 DataGridHelpers.ClearDataGridCollection(AudioProjectEditorDataGrid);
 
                 var parameters = new AudioProjectDataServiceParameters();
-                parameters.AudioEditorViewModel = _audioEditorViewModel;
+                parameters.AudioEditorViewModel = AudioEditorViewModel;
                 parameters.AudioProjectService = _audioProjectService;
                 parameters.AudioRepository = _audioRepository;
                 parameters.DialogueEvent = dialogueEvent;
@@ -70,55 +69,55 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             if (AudioProjectEditorDataGrid.Count == 0)
                 return;
 
-            HandleAddingRowData(_audioEditorViewModel, _audioProjectService, _audioRepository);
+            HandleAddingRowData(AudioEditorViewModel, _audioProjectService, _audioRepository);
         }
 
         public void SetAddRowButtonEnablement()
         {
-            _audioEditorViewModel.AudioProjectEditorViewModel.ResetAddRowButtonEnablement();
+            AudioEditorViewModel.AudioProjectEditorViewModel.ResetAddRowButtonEnablement();
 
-            if (_audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Count == 0)
+            if (AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Count == 0)
                 return;
 
-            if (_audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType != NodeType.StateGroup)
+            if (AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType != NodeType.StateGroup)
             {
-                if (_audioEditorViewModel.AudioSettingsViewModel.AudioFiles.Count == 0)
+                if (AudioEditorViewModel.AudioSettingsViewModel.AudioFiles.Count == 0)
                     return;
             }
 
-            var rowExistsCheckResult = CheckIfAudioProjectViewerRowExists(_audioEditorViewModel, _audioRepository, _audioProjectService);
+            var rowExistsCheckResult = CheckIfAudioProjectViewerRowExists(AudioEditorViewModel, _audioRepository, _audioProjectService);
             if (rowExistsCheckResult)
             {
-                _audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
+                AudioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
                 return;
             }
 
-            var emptyCellsCheckResult = CheckIfAnyEmptyCells(_audioEditorViewModel, _audioRepository);
+            var emptyCellsCheckResult = CheckIfAnyEmptyCells(AudioEditorViewModel, _audioRepository);
             if (emptyCellsCheckResult)
             {
-                _audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
+                AudioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
                 return;
             }
             else
             {
-                _audioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = true;
+                AudioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = true;
                 return;
             }
         }
 
         public void SetShowModdedStatesOnlyButtonEnablementAndVisibility()
         {
-            if (_audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
+            if (AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
             {
-                _audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxVisible = true;
+                AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxVisible = true;
 
                 if (_audioProjectService.StateGroupsWithModdedStatesRepository.Count > 0)
-                    _audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
+                    AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
                 else if (_audioProjectService.StateGroupsWithModdedStatesRepository.Count == 0)
-                    _audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
+                    AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
             }
             else
-                _audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxVisible = false;
+                AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxVisible = false;
         }
 
         private static bool CheckIfAudioProjectViewerRowExists(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)

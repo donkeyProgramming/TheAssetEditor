@@ -18,10 +18,8 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 {
     public partial class AudioFilesExplorerViewModel : ObservableObject, IEditorInterface
     {
-        private readonly AudioEditorViewModel _audioEditorViewModel;
+        public AudioEditorViewModel AudioEditorViewModel { get; set; }
         private readonly IPackFileService _packFileService;
-        private readonly IAudioRepository _audioRepository;
-        private readonly IAudioProjectService _audioProjectService;
         private readonly SoundPlayer _soundPlayer;
 
         public string DisplayName { get; set; } = "Audio Project Explorer";
@@ -35,12 +33,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         public ObservableCollection<AudioFilesTreeNode> SelectedTreeNodes { get; set; } = new ObservableCollection<AudioFilesTreeNode>();
 
-        public AudioFilesExplorerViewModel(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioRepository audioRepository, IAudioProjectService audioProjectService, SoundPlayer soundPlayer)
+        public AudioFilesExplorerViewModel(IPackFileService packFileService, SoundPlayer soundPlayer)
         {
-            _audioEditorViewModel = audioEditorViewModel;
             _packFileService = packFileService;
-            _audioRepository = audioRepository;
-            _audioProjectService = audioProjectService;
             _soundPlayer = soundPlayer;
 
             SelectedTreeNodes.CollectionChanged += OnSelectedTreeNodesChanged;
@@ -234,22 +229,22 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         [RelayCommand] public void AddAudioFilesToAudioProjectEditor()
         {
-            var selectedWavFiles = _audioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes;
+            var selectedWavFiles = AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes;
 
-            _audioEditorViewModel.AudioSettingsViewModel.AudioFiles.Clear();
+            AudioEditorViewModel.AudioSettingsViewModel.AudioFiles.Clear();
 
             foreach (var wavFile in selectedWavFiles)
             {
-                _audioEditorViewModel.AudioSettingsViewModel.AudioFiles.Add(new AudioFile
+                AudioEditorViewModel.AudioSettingsViewModel.AudioFiles.Add(new AudioFile
                 {
                     FileName = wavFile.Name,
                     FilePath = wavFile.FilePath
                 });
             }
 
-            _audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsEnablementAndVisibility();
-            _audioEditorViewModel.AudioSettingsViewModel.ResetShowSettingsFromAudioProjectViewer();
-            _audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
+            AudioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsEnablementAndVisibility();
+            AudioEditorViewModel.AudioSettingsViewModel.ResetShowSettingsFromAudioProjectViewer();
+            AudioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
         }
 
         [RelayCommand] public void PlayWavFile()
@@ -257,7 +252,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             if (!IsPlayAudioButtonEnabled)
                 return;
 
-            var selectedWavFile = _audioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes[0];
+            var selectedWavFile = AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes[0];
             _soundPlayer.PlayWavFileFromPack(selectedWavFile);
         }
 
@@ -268,7 +263,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         public void SetButtonEnablement()
         {
-            var selectedAudioProjectTreeNode = _audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
+            var selectedAudioProjectTreeNode = AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
             if (selectedAudioProjectTreeNode == null)
                 return;
 
