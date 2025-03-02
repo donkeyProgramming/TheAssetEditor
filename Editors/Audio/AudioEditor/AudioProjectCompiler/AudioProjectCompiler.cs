@@ -25,6 +25,7 @@ using Action = Editors.Audio.AudioEditor.AudioProjectData.Action;
 
 namespace Editors.Audio.AudioEditor.AudioProjectCompiler
 {
+    // TODO: encapsulate audio project compiler into appropriate classes
     public class AudioProjectCompiler
     {
         private readonly IPackFileService _packFileService;

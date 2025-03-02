@@ -116,7 +116,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
             // Display the required states in the ComboBox
             if (parameters.AudioEditorViewModel.AudioProjectEditorViewModel.ShowModdedStatesOnly && ModdedStateGroups.Contains(stateGroup))
             {
-                moddedStates.Add("Any"); // We still want the "Any" state to show so add it in manually.
+                states.Add("Any"); // We still want the "Any" state to show so add it in manually.
                 states.AddRange(moddedStates);
             }
             else

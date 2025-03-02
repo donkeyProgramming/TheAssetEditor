@@ -118,6 +118,7 @@ namespace Editors.Audio.GameSettings.Warhammer3
             };
         }
 
+        // TODO: Need to finish the filtering presets in these.
         // Dialogue Event data has to be defined directly rather than dynamically from game data as it can only be determined by examining how CA uses each Dialogue Event in game
         public static List<(string Name, SoundBanks.Wh3SoundBankSubtype SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> DialogueEventData { get; } =
         [

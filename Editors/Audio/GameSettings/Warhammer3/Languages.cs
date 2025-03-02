@@ -2,7 +2,7 @@
 
 namespace Editors.Audio.GameSettings.Warhammer3
 {
-    // TODO: need abstraction for selected game
+    // TODO: need game-level abstraction for all these game settings (not just languages)
     public class Languages
     {
         public static string Chinese { get; } = "chinese";

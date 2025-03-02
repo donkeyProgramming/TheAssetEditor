@@ -53,6 +53,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return column;
         }
 
+        // TODO: Add ctrl + v and ctrl + c shortcuts for the combo boxes.
         public static DataTemplate CreateStatesComboBoxTemplate(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository, string stateGroupWithQualifierWithExtraUnderscores, List<string> states)
         {
             var template = new DataTemplate();
@@ -74,7 +75,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             factory.SetValue(ItemsControl.ItemsSourceProperty, fullObservableStates);
 
             factory.SetValue(ComboBox.IsEditableProperty, true);
-            factory.SetValue(ItemsControl.IsTextSearchEnabledProperty, true);
+            // Changed to false to disable the built-in text search so filtering works correctly
+            factory.SetValue(ItemsControl.IsTextSearchEnabledProperty, false);
 
             // Setting the SelectedItem and Text bindings allows us to determine control them elsewhere, for example to show "Any" by default
             factory.SetBinding(Selector.SelectedItemProperty, new Binding($"[{stateGroupWithQualifierWithExtraUnderscores}]")
@@ -88,6 +90,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             });
 
+            // Add SelectionChanged handler to set a flag that will suppress refiltering when an item is selected
+            var suppressTextChanged = false;
+            factory.AddHandler(Selector.SelectionChangedEvent, new SelectionChangedEventHandler((sender, e) =>
+            {
+                suppressTextChanged = true;
+            }));
+
             factory.AddHandler(FrameworkElement.LoadedEvent, new RoutedEventHandler((sender, args) =>
             {
                 if (sender is ComboBox comboBox)
@@ -97,6 +106,18 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                         // When text changes, filter asynchronously
                         textBox.TextChanged += async (s, e) =>
                         {
+                            if (suppressTextChanged)
+                            {
+                                // Clear selection after an item is selected so text isn't highlighted
+                                _ = textBox.Dispatcher.BeginInvoke(() =>
+                                {
+                                    textBox.SelectionStart = textBox.Text.Length;
+                                    textBox.SelectionLength = 0;
+                                }, System.Windows.Threading.DispatcherPriority.Background);
+                                suppressTextChanged = false;
+                                return;
+                            }
+
                             audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
 
                             if (audioEditorViewModel.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewer)
@@ -121,9 +142,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                                 textBox.SelectionLength = 0;
                             }, System.Windows.Threading.DispatcherPriority.Background);
 
-                            // Open the drop-down to display the results
-                            if (!comboBox.IsDropDownOpen)
-                                comboBox.IsDropDownOpen = true;
+                            // Open the drop-down to display the results if the text does not exactly match the selected item
+                            if (comboBox.SelectedItem == null ||
+                                !string.Equals(comboBox.SelectedItem.ToString(), textBox.Text, StringComparison.Ordinal))
+                            {
+                                if (!comboBox.IsDropDownOpen)
+                                    comboBox.IsDropDownOpen = true;
+                            }
                         };
 
                         // When the user leaves the TextBox, validate the text

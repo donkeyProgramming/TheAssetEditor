@@ -16,7 +16,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService.Warhamme
             //{Wh3SoundBankSubtype.EventNarration, 517250292},
             //{Wh3SoundBankSubtype.Magic, 140075115},
             {Wh3SoundBankSubtype.Movies, 573597124},                        // Reference: Play_Movie_warhammer3_belakor_1
-            //{Wh3SoundBankSubtype.QuestBattles, 659413513},
+            {Wh3SoundBankSubtype.QuestBattles, 659413513},                  // Reference: Play_EMP_KF_GS_Qbattle_silver_seal_pt_01
             {Wh3SoundBankSubtype.FrontendVO, 745637913},                    // Reference: frontend_vo_character_select
             {Wh3SoundBankSubtype.CampaignVO, 306196174},                    // Reference: campaign_vo_attack
             {Wh3SoundBankSubtype.CampaignConversationalVO, 652491101},      // Reference: campaign_vo_cs_proximity
