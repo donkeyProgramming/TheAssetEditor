@@ -18,7 +18,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
     {
         EditableTextBox,
         StateGroupEditableComboBox,
-        ReadOnlyTextBlock
+        ReadOnlyTextBlock,
+        FileSelectButton
     }
 
     public class DataGridHelpers
@@ -31,12 +32,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return dataGrid;
         }
 
-        public static DataGridTemplateColumn CreateColumn(AudioProjectDataServiceParameters parameters, string columnHeader, double columnWidth, DataGridColumnType columnType, List<string> states = null)
+        public static DataGridTemplateColumn CreateColumn(AudioProjectDataServiceParameters parameters, string columnHeader, double columnWidth, DataGridColumnType columnType, List<string> states = null, bool useAbsoluteWidth = false)
         {
+            var width = useAbsoluteWidth ? DataGridLengthUnitType.Pixel : DataGridLengthUnitType.Star;
             var column = new DataGridTemplateColumn
             {
                 Header = columnHeader,
-                Width = new DataGridLength(columnWidth, DataGridLengthUnitType.Star),
+                Width = new DataGridLength(columnWidth, width),
                 IsReadOnly = columnType == DataGridColumnType.ReadOnlyTextBlock
             };
 
@@ -46,6 +48,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 column.CellTemplate = CreateStatesComboBoxTemplate(parameters.AudioEditorViewModel, parameters.AudioProjectService, parameters.AudioRepository, columnHeader, states);
             else if (columnType == DataGridColumnType.ReadOnlyTextBlock)
                 column.CellTemplate = CreateReadOnlyTextBlockTemplate(columnHeader);
+            else if (columnType == DataGridColumnType.FileSelectButton)
+                column.CellTemplate = CreateFileSelectButtonTemplate(parameters);
             return column;
         }
 
@@ -177,6 +181,22 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
             factory.SetBinding(TextBlock.TextProperty, new Binding($"[{columnHeader}]"));
             factory.SetValue(TextBlock.PaddingProperty, new Thickness(5, 3.5, 5, 3.5));
+
+            template.VisualTree = factory;
+            return template;
+        }
+
+        public static DataTemplate CreateFileSelectButtonTemplate(AudioProjectDataServiceParameters parameters)
+        {
+            var template = new DataTemplate();
+            var factory = new FrameworkElementFactory(typeof(Button));
+
+            factory.SetValue(Button.ContentProperty, "...");
+
+            factory.AddHandler(Button.ClickEvent, new RoutedEventHandler((sender, args) =>
+            {
+                parameters.AudioEditorViewModel.AudioProjectEditorViewModel.SelectMovieFile();
+            }));
 
             template.VisualTree = factory;
             return template;

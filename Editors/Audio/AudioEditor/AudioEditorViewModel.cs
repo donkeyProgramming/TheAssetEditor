@@ -21,7 +21,7 @@ namespace Editors.Audio.AudioEditor
         private readonly IAudioRepository _audioRepository;
         private readonly IPackFileService _packFileService;
         private readonly IAudioProjectService _audioProjectService;
-        private readonly IStandardDialogs _packFileUiProvider;
+        private readonly IStandardDialogs _standardDialogs;
         private readonly ApplicationSettingsService _applicationSettingsService;
         private readonly IFileSaveService _fileSaveService;
         private readonly SoundPlayer _soundPlayer;
@@ -49,16 +49,16 @@ namespace Editors.Audio.AudioEditor
             _audioRepository = audioRepository;
             _packFileService = packFileService;
             _audioProjectService = audioProjectService;
-            _packFileUiProvider = packFileUiProvider;
+            _standardDialogs = packFileUiProvider;
             _applicationSettingsService = applicationSettingsService;
             _fileSaveService = fileSaveService;
             _soundPlayer = soundPlayer;
             _wemGenerator = wemGenerator;
 
-            AudioEditorMenuViewModel = new AudioEditorMenuViewModel(this, _audioRepository, _packFileService, _audioProjectService, _packFileUiProvider, _applicationSettingsService, _fileSaveService, _soundPlayer, _wemGenerator);
+            AudioEditorMenuViewModel = new AudioEditorMenuViewModel(this, _audioRepository, _packFileService, _audioProjectService, _standardDialogs, _applicationSettingsService, _fileSaveService, _soundPlayer, _wemGenerator);
             AudioProjectExplorerViewModel = new AudioProjectExplorerViewModel(this, _audioRepository, _audioProjectService);
             AudioFilesExplorerViewModel = new AudioFilesExplorerViewModel(this, _packFileService, _audioRepository, _audioProjectService, _soundPlayer);
-            AudioProjectEditorViewModel = new AudioProjectEditorViewModel(this, _audioRepository, _audioProjectService);
+            AudioProjectEditorViewModel = new AudioProjectEditorViewModel(this, _audioRepository, _audioProjectService, _packFileService, _standardDialogs);
             AudioProjectViewerViewModel = new AudioProjectViewerViewModel(this, _audioRepository, _audioProjectService);
             AudioSettingsViewModel = new AudioSettingsViewModel();
 

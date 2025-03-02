@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Editors.Audio.GameSettings.Warhammer3;
 
 namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
 {
@@ -12,8 +13,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
 
-            var eventColumn = DataGridHelpers.CreateColumn(parameters, "Event", columnWidth, DataGridColumnType.EditableTextBox);
-            dataGrid.Columns.Add(eventColumn);
+            if (parameters.SoundBank.Name == SoundBanks.MoviesDisplayString)
+            {
+                var eventColumn = DataGridHelpers.CreateColumn(parameters, "Event", columnWidth, DataGridColumnType.ReadOnlyTextBlock);
+                dataGrid.Columns.Add(eventColumn);
+
+                var fileSelectColumn = DataGridHelpers.CreateColumn(parameters, string.Empty, 25, DataGridColumnType.FileSelectButton, useAbsoluteWidth: true);
+                dataGrid.Columns.Add(fileSelectColumn);
+            }
+            else
+            {
+                var eventColumn = DataGridHelpers.CreateColumn(parameters, "Event", columnWidth, DataGridColumnType.EditableTextBox);
+                dataGrid.Columns.Add(eventColumn);
+            }
         }
 
         public void SetAudioProjectEditorDataGridData(AudioProjectDataServiceParameters parameters)

@@ -9,7 +9,7 @@
             DiplomacyLines,
             //EventNarration,
             //Magic,
-            //Movies,
+            Movies,
             //QuestBattles,
             //Rituals,
             //UI,
@@ -38,7 +38,8 @@
         public const string DiplomacyLinesSoundBankName = "campaign_diplomacy";
         //public const string EventNarrationDisplayString = "Event Narration";
         //public const string MagicDisplayString = "Magic";
-        //public const string MoviesDisplayString = "Movies";
+        public const string MoviesDisplayString = "Movies";
+        public const string MoviesSoundBankName = "global_movies";
         //public const string QuestBattlesDisplayString = "Quest Battles";
         //public const string RitualsDisplayString = "Rituals";
         //public const string UIDisplayString = "UI";
@@ -68,7 +69,7 @@
                 Wh3SoundBankSubtype.DiplomacyLines => Wh3SoundBankType.ActionEventSoundBank,
                 //Wh3SoundBankSubtype.EventNarration => Wh3SoundBankType.ActionEventSoundBank,
                 //Wh3SoundBankSubtype.Magic => Wh3SoundBankType.ActionEventSoundBank,
-                //Wh3SoundBankSubtype.Movies => Wh3SoundBankType.ActionEventSoundBank,
+                Wh3SoundBankSubtype.Movies => Wh3SoundBankType.ActionEventSoundBank,
                 //Wh3SoundBankSubtype.QuestBattles => Wh3SoundBankType.ActionEventSoundBank,
                 //Wh3SoundBankSubtype.Rituals => Wh3SoundBankType.ActionEventSoundBank,
                 //Wh3SoundBankSubtype.UI => Wh3SoundBankType.ActionEventSoundBank,
@@ -95,7 +96,7 @@
                 Wh3SoundBankSubtype.DiplomacyLines => DiplomacyLinesDisplayString,
                 //Wh3SoundBankSubtype.EventNarration => EventNarrationDisplayString,
                 //Wh3SoundBankSubtype.Magic => MagicDisplayString,
-                //Wh3SoundBankSubtype.Movies => MoviesDisplayString,
+                Wh3SoundBankSubtype.Movies => MoviesDisplayString,
                 //Wh3SoundBankSubtype.QuestBattles => QuestBattlesDisplayString,
                 //Wh3SoundBankSubtype.Rituals => RitualsDisplayString,
                 //Wh3SoundBankSubtype.UI => UIDisplayString,
@@ -122,7 +123,7 @@
                 DiplomacyLinesDisplayString => Wh3SoundBankSubtype.DiplomacyLines,
                 //EventNarrationDisplayString => Wh3SoundBankSubtype.EventNarration,
                 //MagicDisplayString => Wh3SoundBankSubtype.Magic,
-                //MoviesDisplayString => Wh3SoundBankSubtype.Movies,
+                MoviesDisplayString => Wh3SoundBankSubtype.Movies,
                 //QuestBattlesDisplayString => Wh3SoundBankSubtype.QuestBattles,
                 //RitualsDisplayString => Wh3SoundBankSubtype.Rituals,
                 //UIDisplayString => Wh3SoundBankSubtype.UI,
@@ -146,6 +147,8 @@
             return soundbank switch
             {
                 Wh3SoundBankSubtype.DiplomacyLines => DiplomacyLinesSoundBankName,
+                Wh3SoundBankSubtype.Movies => MoviesSoundBankName,
+
                 Wh3SoundBankSubtype.FrontendVO => FrontendVOSoundBankName,
                 Wh3SoundBankSubtype.CampaignVO => CampaignVOSoundBankName,
                 Wh3SoundBankSubtype.CampaignConversationalVO => CampaignConversationalVOSoundBankName,

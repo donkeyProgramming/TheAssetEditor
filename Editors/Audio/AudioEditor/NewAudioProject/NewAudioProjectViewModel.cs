@@ -20,7 +20,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         private readonly AudioEditorViewModel _audioEditorViewModel;
         private readonly IPackFileService _packFileService;
         private readonly IAudioProjectService _audioProjectService;
-        private readonly IStandardDialogs _packFileUiProvider;
+        private readonly IStandardDialogs _standardDialogs;
 
         private Action _closeAction;
 
@@ -38,12 +38,12 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         [ObservableProperty] private bool _isLanguageSelected;
         [ObservableProperty] private bool _isOkButtonEnabled;
 
-        public NewAudioProjectViewModel(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioProjectService audioProjectService, IStandardDialogs packFileUiProvider)
+        public NewAudioProjectViewModel(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioProjectService audioProjectService, IStandardDialogs standardDialogs)
         {
             _audioEditorViewModel = audioEditorViewModel;
             _packFileService = packFileService;
             _audioProjectService = audioProjectService;
-            _packFileUiProvider = packFileUiProvider;
+            _standardDialogs = standardDialogs;
 
             AudioProjectDirectory = "AudioProjects";
             SelectedLanguage = GameLanguage.EnglishUK;
@@ -74,7 +74,7 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
 
         [RelayCommand] public void SetNewFileLocation()
         {
-            var result = _packFileUiProvider.DisplayBrowseFolderDialog();
+            var result = _standardDialogs.DisplayBrowseFolderDialog();
             if (result.Result)
             {
                 var filePath = result.Folder;
