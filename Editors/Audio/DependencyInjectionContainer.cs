@@ -1,6 +1,5 @@
 ﻿using Audio.AudioExplorer;
 using Editors.Audio.AudioEditor;
-using Editors.Audio.AudioEditor.AudioEditorMenu;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectCompiler;
 using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
@@ -28,7 +27,6 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioExplorerViewModel>();
 
             serviceCollection.AddScoped<AudioEditorViewModel>();
-            serviceCollection.AddScoped<AudioEditorMenuViewModel>();
             serviceCollection.AddScoped<AudioProjectExplorerViewModel>();
             serviceCollection.AddScoped<AudioFilesExplorerViewModel>();
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();

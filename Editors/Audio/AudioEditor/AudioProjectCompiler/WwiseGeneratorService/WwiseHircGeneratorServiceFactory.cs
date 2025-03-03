@@ -9,7 +9,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService
 {
     public class WwiseHircGeneratorServiceFactory
     {
-        private readonly Dictionary<AkBkHircType, Func<IWwiseHircGeneratorService>> _hircGenerators = new();
+        private readonly Dictionary<AkBkHircType, Func<IWwiseHircGeneratorService>> _hircGenerators = [];
 
         public void RegisterGenerator(AkBkHircType type, Func<IWwiseHircGeneratorService> creator)
         {
@@ -36,13 +36,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService
         {
             switch (bankGeneratorVersion)
             {
-                case 2147483784: return CreateFactory_v136();
+                case 2147483784: return CreateFactory_V136();
             }
 
             throw new Exception($"Unknown Bank Generator Version: {bankGeneratorVersion}");
         }
 
-        private static WwiseHircGeneratorServiceFactory CreateFactory_v136()
+        private static WwiseHircGeneratorServiceFactory CreateFactory_V136()
         {
             var instance = new WwiseHircGeneratorServiceFactory();
             instance.RegisterGenerator(AkBkHircType.Sound, () => new SoundHircGenerator_V136());

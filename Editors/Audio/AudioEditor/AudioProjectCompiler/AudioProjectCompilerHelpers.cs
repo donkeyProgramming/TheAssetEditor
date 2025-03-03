@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Editors.Audio.AudioEditor.AudioProjectData;
-using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Utility;
 
 namespace Editors.Audio.AudioEditor.AudioProjectCompiler
