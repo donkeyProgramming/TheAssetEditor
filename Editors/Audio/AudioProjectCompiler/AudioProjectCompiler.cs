@@ -289,7 +289,11 @@ namespace Editors.Audio.AudioProjectCompiler
 
             var soundsWithUniqueSourceIds = GetAllUniqueSounds(audioProject);
             foreach (var sound in soundsWithUniqueSourceIds)
-                _soundPlayer.ExportWavFileWithWemID(sound);
+            {
+                var wavFile = _packFileService.FindFile(sound.WavFilePath);
+                var wavFileName = $"{sound.SourceID}.wav";
+                _soundPlayer.ExportFileToAEFolder(wavFileName, wavFile.DataSource.ReadData());
+            }
 
             _wemGenerator.GenerateWems(soundsWithUniqueSourceIds);
         }

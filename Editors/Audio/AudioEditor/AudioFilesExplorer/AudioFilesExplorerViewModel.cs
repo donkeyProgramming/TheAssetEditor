@@ -250,8 +250,11 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             if (!IsPlayAudioButtonEnabled)
                 return;
 
-            var selectedWavFile = AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes[0];
-            _soundPlayer.PlayWavFileFromPack(selectedWavFile);
+            var wavFileNode = AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes[0];
+            var wavFile = _packFileService.FindFile(wavFileNode.FilePath);
+            var wavFileDiskPath = $"{wavFileNode.Name}";
+            _soundPlayer.ExportFileToAEFolder(wavFileDiskPath, wavFile.DataSource.ReadData());
+            _soundPlayer.PlayWav(wavFileDiskPath);
         }
 
         [RelayCommand] public void ClearText()
