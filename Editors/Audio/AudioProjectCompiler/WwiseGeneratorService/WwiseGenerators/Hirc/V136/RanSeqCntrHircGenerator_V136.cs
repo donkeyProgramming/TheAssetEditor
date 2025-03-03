@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
@@ -8,7 +9,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 using static Shared.GameFormats.Wwise.Hirc.V136.CAkRanSeqCntr_V136.CAkPlayList_V136;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
+namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
 {
     public class RanSeqCntrHircGenerator_V136 : IWwiseHircGeneratorService
     {
@@ -71,10 +72,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.W
             var isGlobal = 1;
 
             randomSequenceContainerHirc.BitVector = (byte)(
-                (isGlobal << 4) |
-                (isContinous << 3) |
-                (isRestartBackwards << 2) |
-                (resetPlaylistAtEachPlay << 1) |
+                isGlobal << 4 |
+                isContinous << 3 |
+                isRestartBackwards << 2 |
+                resetPlaylistAtEachPlay << 1 |
                 isUsingWeight);
 
 

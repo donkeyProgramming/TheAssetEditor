@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 using static Shared.GameFormats.Wwise.Hirc.V136.Shared.AkBankSourceData_V136;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
+namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
 {
     public class SoundHircGenerator_V136 : IWwiseHircGeneratorService
     {

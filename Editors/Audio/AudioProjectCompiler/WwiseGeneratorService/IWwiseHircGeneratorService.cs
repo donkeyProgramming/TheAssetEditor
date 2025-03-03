@@ -1,7 +1,7 @@
 ﻿using Editors.Audio.AudioEditor.AudioProjectData;
 using Shared.GameFormats.Wwise.Hirc;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService
+namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService
 {
     public interface IWwiseHircGeneratorService
     {

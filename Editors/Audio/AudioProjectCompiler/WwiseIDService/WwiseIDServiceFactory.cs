@@ -1,7 +1,7 @@
-﻿using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService.Warhammer3;
+﻿using Editors.Audio.AudioProjectCompiler.WwiseIDService.Warhammer3;
 using Shared.Core.Settings;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService
+namespace Editors.Audio.AudioProjectCompiler.WwiseIDService
 {
     public class WwiseIDServiceFactory
     {

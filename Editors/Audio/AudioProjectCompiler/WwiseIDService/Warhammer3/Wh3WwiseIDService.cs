@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService.Warhammer3
+namespace Editors.Audio.AudioProjectCompiler.WwiseIDService.Warhammer3
 {
     // TODO: Add missing IDs
     public class Wh3WwiseIDService : IWwiseIDService

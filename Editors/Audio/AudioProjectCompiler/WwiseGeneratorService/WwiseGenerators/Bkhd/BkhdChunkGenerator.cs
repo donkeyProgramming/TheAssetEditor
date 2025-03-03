@@ -3,7 +3,7 @@ using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise.Bkhd;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Bkhd
+namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Bkhd
 {
     class BkhdChunkGenerator
     {

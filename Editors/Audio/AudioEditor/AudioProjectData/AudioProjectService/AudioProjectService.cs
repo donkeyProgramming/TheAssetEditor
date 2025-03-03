@@ -24,14 +24,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
         private readonly IFileSaveService _fileSaveService;
         private readonly IStandardDialogs _standardDialogs;
         private readonly IntegrityChecker _integrityChecker;
-        private readonly AudioProjectCompiler.AudioProjectCompiler _audioProjectCompiler;
+        private readonly Audio.AudioProjectCompiler.AudioProjectCompiler _audioProjectCompiler;
 
         public AudioProjectService(
             IPackFileService packFileService,
             IFileSaveService fileSaveService,
             IStandardDialogs standardDialogs,
             IntegrityChecker integrityChecker,
-            AudioProjectCompiler.AudioProjectCompiler audioProjectCompiler)
+            Audio.AudioProjectCompiler.AudioProjectCompiler audioProjectCompiler)
         {
             _packFileService = packFileService;
             _fileSaveService = fileSaveService;

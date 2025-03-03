@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService;
-using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Bkhd;
-using Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
+using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService;
+using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Bkhd;
+using Editors.Audio.AudioProjectCompiler.WwiseIDService;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
@@ -23,7 +23,7 @@ using Shared.GameFormats.Wwise.Hirc;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using Action = Editors.Audio.AudioEditor.AudioProjectData.Action;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler
+namespace Editors.Audio.AudioProjectCompiler
 {
     // TODO: encapsulate audio project compiler into appropriate classes
     public class AudioProjectCompiler

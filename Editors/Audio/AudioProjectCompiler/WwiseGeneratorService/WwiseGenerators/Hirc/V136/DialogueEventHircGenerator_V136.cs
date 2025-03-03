@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService;
 using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
+namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
 {
     public class DialogueEventHircGenerator_V136 : IWwiseHircGeneratorService
     {
@@ -68,7 +69,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseGeneratorService.W
                     else
                     {
                         uint audioNodeId;
-                        if ((i == statePath.Nodes.Count - 1))
+                        if (i == statePath.Nodes.Count - 1)
                             audioNodeId = statePath.RandomSequenceContainer.ID;
                         else
                             audioNodeId = 0;

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler.WwiseIDService
+namespace Editors.Audio.AudioProjectCompiler.WwiseIDService
 {
     public interface IWwiseIDService
     {

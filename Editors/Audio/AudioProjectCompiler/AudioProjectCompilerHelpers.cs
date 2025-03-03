@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.Utility;
 
-namespace Editors.Audio.AudioEditor.AudioProjectCompiler
+namespace Editors.Audio.AudioProjectCompiler
 {
     public static class AudioProjectCompilerHelpers
     {
