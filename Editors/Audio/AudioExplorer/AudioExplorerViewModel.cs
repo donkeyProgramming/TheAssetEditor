@@ -125,7 +125,7 @@ namespace Editors.Audio.AudioExplorer
                     }
                 }
                 else
-                    _soundPlayer.ConvertStreamedWemToWav(sound.GetSourceID().ToString());
+                    _soundPlayer.PlayStreamedWem(sound.GetSourceID().ToString());
             }
             else if (_selectedNode.Item is ICAkMusicTrack musicTrack)
             {

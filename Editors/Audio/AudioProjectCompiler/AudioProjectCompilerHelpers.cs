@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.Utility;
+using Shared.Core.Misc;
 
 namespace Editors.Audio.AudioProjectCompiler
 {
@@ -57,6 +60,48 @@ namespace Editors.Audio.AudioProjectCompiler
             }
 
             return audioProject.Language;
+        }
+
+        public static List<Sound> GetAllUniqueSounds(AudioProjectDataModel audioProject)
+        {
+            // Extract sounds from ActionEvents if available.
+            var actionSounds = audioProject.SoundBanks
+                .SelectMany(soundBank => soundBank.ActionEvents ?? Enumerable.Empty<ActionEvent>())
+                .SelectMany(actionEvent =>
+                    actionEvent.Sound != null
+                        ? [actionEvent.Sound]
+                        : actionEvent.RandomSequenceContainer?.Sounds ?? Enumerable.Empty<Sound>());
+
+            // Extract sounds from DialogueEvents if available.
+            var dialogueSounds = audioProject.SoundBanks
+                .SelectMany(soundBank => soundBank.DialogueEvents ?? Enumerable.Empty<DialogueEvent>())
+                .SelectMany(dialogueEvent =>
+                    dialogueEvent.StatePaths?.SelectMany(statePath =>
+                        statePath.Sound != null
+                            ? [statePath.Sound]
+                            : statePath.RandomSequenceContainer?.Sounds ?? Enumerable.Empty<Sound>())
+                    ?? Enumerable.Empty<Sound>());
+
+            // Combine both lists and filter unique sounds based on SourceID.
+            var allUniqueSounds = actionSounds
+                .Concat(dialogueSounds)
+                .DistinctBy(sound => sound.SourceID)
+                .ToList();
+
+            return allUniqueSounds;
+        }
+
+        public static void DeleteAudioFilesInTempAudioFolder()
+        {
+            var audioFolder = $"{DirectoryHelper.Temp}\\Audio";
+            if (Directory.Exists(audioFolder))
+            {
+                foreach (var file in Directory.GetFiles(audioFolder, "*.wav"))
+                    File.Delete(file);
+
+                foreach (var file in Directory.GetFiles(audioFolder, "*.wem"))
+                    File.Delete(file);
+            }
         }
     }
 }

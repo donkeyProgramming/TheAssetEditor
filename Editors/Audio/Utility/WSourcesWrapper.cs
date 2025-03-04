@@ -6,48 +6,28 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
-using Editors.Audio.AudioEditor.AudioProjectData;
 using Shared.Core.Misc;
 using Shared.Core.Settings;
 
 namespace Editors.Audio.Utility
 {
-    public class WemGenerator
+    public class WSourcesWrapper
     {
         private readonly ApplicationSettingsService _applicationSettingsService;
 
         private readonly string _wavToWemFolderPath = $"{DirectoryHelper.Temp}\\WavToWem";
         private readonly string _audioFolderPath = $"{DirectoryHelper.Temp}\\Audio";
         private readonly string _excessFilesFolderPath = $"{DirectoryHelper.Temp}\\Audio\\Windows";
-        private readonly string _wprojPath = $"{DirectoryHelper.Temp}\\WavToWem\\WavToWemWwiseProject\\WavToWemWwiseProject.wproj";
         private readonly string _wsourcesPath = $"{DirectoryHelper.Temp}\\WavToWem\\wav_to_wem.wsources";
         private readonly string _wwiseCliPath;
 
-        public WemGenerator(ApplicationSettingsService applicationSettingsService)
+        public WSourcesWrapper(ApplicationSettingsService applicationSettingsService)
         {
             _applicationSettingsService = applicationSettingsService;
             _wwiseCliPath = _applicationSettingsService.CurrentSettings.WwisePath;
         }
 
-        public void GenerateWems(List<Sound> audioProjectSounds)
-        {
-            InitialiseWwiseProject();
-
-            var wavFileNames = audioProjectSounds
-                .Select(sound => $"{sound.SourceID}.wav")
-                .ToList();
-
-            DirectoryHelper.EnsureCreated(_wavToWemFolderPath);
-
-            CreateWsourcesFile(wavFileNames);
-
-            var arguments = $"\"{_wprojPath}\" -ConvertExternalSources \"{_wsourcesPath}\" -ExternalSourcesOutput \"{_audioFolderPath}\"";
-
-            RunExternalCommand(arguments);
-            DeleteExcessStuff();
-        }
-
-        private void CreateWsourcesFile(List<string> wavFilesNames)
+        public void CreateWsourcesFile(List<string> wavFilesNames)
         {
             var sources = from wavFileName in wavFilesNames
                           select new XElement("Source",
@@ -66,7 +46,7 @@ namespace Editors.Audio.Utility
             Console.WriteLine($"Saved WSources file to {_wsourcesPath}");
         }
 
-        private void RunExternalCommand(string arguments)
+        public void RunExternalCommand(string arguments)
         {
             try
             {
@@ -98,7 +78,7 @@ namespace Editors.Audio.Utility
             }
         }
 
-        private void DeleteExcessStuff()
+        public void DeleteExcessStuff()
         {
             if (Directory.Exists(_excessFilesFolderPath))
             {
@@ -167,6 +147,5 @@ namespace Editors.Audio.Utility
             ZipFile.ExtractToDirectory(tempZipPath, _wavToWemFolderPath, overwriteFiles: true);
             File.Delete(tempZipPath);
         }
-
     }
 }

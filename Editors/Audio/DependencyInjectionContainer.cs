@@ -8,6 +8,7 @@ using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioExplorer;
+using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,12 +37,17 @@ namespace Editors.Audio
 
             serviceCollection.AddScoped<IAudioProjectService, AudioProjectService>();
             serviceCollection.AddScoped<IntegrityChecker>();
+
             serviceCollection.AddScoped<AudioProjectCompiler.AudioProjectCompiler>();
+            serviceCollection.AddScoped<CompilerDataProcessor>();
+            serviceCollection.AddScoped<SoundBankGenerator>();
+            serviceCollection.AddScoped<WemGenerator>();
+            serviceCollection.AddScoped<DatGenerator>();
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
             serviceCollection.AddScoped<VgStreamWrapper>();
-            serviceCollection.AddScoped<WemGenerator>();
+            serviceCollection.AddScoped<WSourcesWrapper>();
             serviceCollection.AddScoped<BnkLoader>();
             serviceCollection.AddScoped<DatLoader>();
             serviceCollection.AddScoped<BnkParser>();

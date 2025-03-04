@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.GameSettings.Warhammer3;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -24,20 +25,29 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
         private readonly IFileSaveService _fileSaveService;
         private readonly IStandardDialogs _standardDialogs;
         private readonly IntegrityChecker _integrityChecker;
-        private readonly Audio.AudioProjectCompiler.AudioProjectCompiler _audioProjectCompiler;
+        private readonly CompilerDataProcessor _compilerDataProcessor;
+        private readonly SoundBankGenerator _soundBankGenerator;
+        private readonly WemGenerator _wemGenerator;
+        private readonly DatGenerator _datGenerator;
 
         public AudioProjectService(
             IPackFileService packFileService,
             IFileSaveService fileSaveService,
             IStandardDialogs standardDialogs,
             IntegrityChecker integrityChecker,
-            Audio.AudioProjectCompiler.AudioProjectCompiler audioProjectCompiler)
+            CompilerDataProcessor compilerDataProcessor,
+            SoundBankGenerator soundBankGenerator,
+            WemGenerator wemGenerator,
+            DatGenerator datGenerator)
         {
             _packFileService = packFileService;
             _fileSaveService = fileSaveService;
             _standardDialogs = standardDialogs;
             _integrityChecker = integrityChecker;
-            _audioProjectCompiler = audioProjectCompiler;
+            _compilerDataProcessor = compilerDataProcessor;
+            _soundBankGenerator = soundBankGenerator;
+            _wemGenerator = wemGenerator;
+            _datGenerator = datGenerator;
         }
 
         public AudioProjectDataModel AudioProject { get; set; } = new AudioProjectDataModel();
@@ -124,7 +134,42 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
         public void CompileAudioProject()
         {
             var audioProject = GetAudioProjectWithoutUnusedObjects();
-            _audioProjectCompiler.CompileAudioProject(this, audioProject);
+
+            SaveAudioProject();
+
+            if (audioProject.SoundBanks == null)
+                return;
+
+            var audioProjectFileName = AudioProjectFileName.Replace(" ", "_");
+            _compilerDataProcessor.SetSoundBankData(audioProject, audioProjectFileName);
+
+            // We set the data from the bottom up, so Sounds, then Actions, then Events to ensure that IDs are generated before they're referenced.
+            // For example IDs set in Sounds / Sound Containers are used in Actions, and IDs set in Actions are used in Events.
+            _compilerDataProcessor.SetInitialSourceData(audioProject);
+
+            if (audioProject.SoundBanks.Any(soundBank => soundBank.ActionEvents != null))
+            {
+                _compilerDataProcessor.SetActionData(audioProject);
+                _compilerDataProcessor.SetActionEventData(audioProject);
+            }
+
+            if (audioProject.SoundBanks.Any(soundBank => soundBank.DialogueEvents != null))
+            {
+                _compilerDataProcessor.SetStatesData(audioProject);
+                _compilerDataProcessor.SetDialogueEventData(audioProject);
+            }
+
+            _wemGenerator.GenerateWems(audioProject);
+
+            _compilerDataProcessor.SetRemainingSourceData(audioProject);
+
+            _wemGenerator.SaveWemsToPack(audioProject);
+
+            _soundBankGenerator.GenerateSoundBanks(audioProject);
+
+            _datGenerator.GenerateDatFiles(audioProject, audioProjectFileName);
+
+            SaveGeneratedAudioProjectToPack(audioProject);
         }
 
         private void InitialiseSoundBanks()
@@ -326,6 +371,20 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
                         AudioProject.StateGroups.Add(savedStateGroup);
                 }
             }
+        }
+
+        private void SaveGeneratedAudioProjectToPack(AudioProjectDataModel audioProject)
+        {
+            var options = new JsonSerializerOptions
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                WriteIndented = true
+            };
+            var audioProjectJson = JsonSerializer.Serialize(audioProject, options);
+            var audioProjectFileName = $"{AudioProjectFileName}_generated.aproj";
+            var audioProjectFilePath = $"{AudioProjectDirectory}\\{audioProjectFileName}";
+            var packFile = PackFile.CreateFromASCII(audioProjectFileName, audioProjectJson);
+            _fileSaveService.Save(audioProjectFilePath, packFile.DataSource.ReadData(), true);
         }
 
         public void ResetAudioProject()
