@@ -2,11 +2,9 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
-using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.GameSettings.Warhammer3.Languages;
@@ -126,12 +124,6 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             _closeAction = closeAction;
         }
 
-        public void Close()
-        {
-        }
-
-        public PackFile MainFile { get; set; }
-
-        public bool HasUnsavedChanges { get; set; } = false;
+        public void Close() { }
     }
 }
