@@ -1,4 +1,5 @@
-﻿using Audio.AudioExplorer;
+﻿using System.Diagnostics;
+using Audio.AudioExplorer;
 using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.AudioEditorMenu;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
@@ -60,9 +61,13 @@ namespace Editors.Audio
                 .AddToToolbar("Audio Explorer")
                 .Build(factory);
 
+
+            var enableAudioEditor = false;
+            if(Debugger.IsAttached)
+                enableAudioEditor = true;
             EditorInfoBuilder
                 .Create<AudioEditorViewModel, AudioEditorView>(EditorEnums.Audio_Editor)
-                .AddToToolbar("Audio Editor")
+                .AddToToolbar("Audio Editor", enableAudioEditor)
                 .Build(factory);
         }
     }
