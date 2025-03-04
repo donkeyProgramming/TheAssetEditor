@@ -26,9 +26,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         [ObservableProperty] private DialogueEventPreset? _selectedDialogueEventPreset;
         [ObservableProperty] private ObservableCollection<DialogueEventPreset> _dialogueEventPresets;
         [ObservableProperty] private string _searchQuery;
-        [ObservableProperty] public ObservableCollection<AudioProjectTreeNode> _audioProjectTree = [];
-        private ObservableCollection<AudioProjectTreeNode> _unfilteredTree;
-        public AudioProjectTreeNode _selectedAudioProjectTreeNode;
+        [ObservableProperty] public ObservableCollection<TreeNode> _audioProjectTree = [];
+        private ObservableCollection<TreeNode> _unfilteredTree;
+        public TreeNode _selectedAudioProjectTreeNode;
 
         public AudioProjectExplorerViewModel(IAudioRepository audioRepository, IAudioProjectService audioProjectService)
         {
@@ -36,7 +36,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             _audioProjectService = audioProjectService;
         }
 
-        public void OnSelectedAudioProjectTreeNodeChanged(AudioProjectTreeNode value)
+        public void OnSelectedAudioProjectTreeNodeChanged(TreeNode value)
         {
             _selectedAudioProjectTreeNode = value;
 
@@ -61,12 +61,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         private void ResetTree()
         {
-            AudioProjectTree = new ObservableCollection<AudioProjectTreeNode>(_unfilteredTree);
+            AudioProjectTree = new ObservableCollection<TreeNode>(_unfilteredTree);
         }
 
-        private ObservableCollection<AudioProjectTreeNode> FilterFileTree(string query)
+        private ObservableCollection<TreeNode> FilterFileTree(string query)
         {
-            var filteredTree = new ObservableCollection<AudioProjectTreeNode>();
+            var filteredTree = new ObservableCollection<TreeNode>();
 
             foreach (var treeNode in _unfilteredTree)
             {
@@ -78,7 +78,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             return filteredTree;
         }
 
-        private static AudioProjectTreeNode FilterTreeNode(AudioProjectTreeNode node, string query)
+        private static TreeNode FilterTreeNode(TreeNode node, string query)
         {
             var matchesQuery = node.Name.Contains(query, StringComparison.OrdinalIgnoreCase);
             var filteredChildren = node.Children
@@ -88,12 +88,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
             if (matchesQuery || filteredChildren.Count != 0)
             {
-                var filteredNode = new AudioProjectTreeNode
+                var filteredNode = new TreeNode
                 {
                     Name = node.Name,
                     NodeType = node.NodeType,
                     Parent = node.Parent,
-                    Children = new ObservableCollection<AudioProjectTreeNode>(filteredChildren),
+                    Children = new ObservableCollection<TreeNode>(filteredChildren),
                     IsNodeExpanded = true
                 };
                 return filteredNode;
@@ -104,13 +104,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         partial void OnShowEditedAudioProjectItemsOnlyChanged(bool value)
         {
-            AudioProjectTreeBuilder.FilterEditedAudioProjectItems(_audioProjectService, this, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
+            TreeBuilder.FilterEditedAudioProjectItems(_audioProjectService, this, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
         }
 
         public void CreateAudioProjectTree()
         {
-            AudioProjectTreeBuilder.CreateAudioProjectTree(_audioProjectService, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
-            _unfilteredTree = new ObservableCollection<AudioProjectTreeNode>(AudioProjectTree);
+            TreeBuilder.CreateAudioProjectTree(_audioProjectService, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
+            _unfilteredTree = new ObservableCollection<TreeNode>(AudioProjectTree);
 
         }
 
@@ -128,7 +128,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             }
         }
 
-        public static void CollapseAndExpandNodesInner(AudioProjectTreeNode parentNode)
+        public static void CollapseAndExpandNodesInner(TreeNode parentNode)
         {
             foreach (var node in parentNode.Children)
             {

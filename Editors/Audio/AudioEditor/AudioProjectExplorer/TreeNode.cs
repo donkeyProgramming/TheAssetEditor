@@ -15,12 +15,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         StateGroup
     }
 
-    public partial class AudioProjectTreeNode : ObservableObject
+    public partial class TreeNode : ObservableObject
     {
         public string Name { get; set; }
         [ObservableProperty] public NodeType _nodeType;
-        [ObservableProperty] public AudioProjectTreeNode _parent;
-        [ObservableProperty] public ObservableCollection<AudioProjectTreeNode> _children = [];
+        [ObservableProperty] public TreeNode _parent;
+        [ObservableProperty] public ObservableCollection<TreeNode> _children = [];
         [ObservableProperty] bool _isNodeExpanded = false;
         [ObservableProperty] bool _isVisible = true;
         [ObservableProperty] public string _presetFilterDisplayText;

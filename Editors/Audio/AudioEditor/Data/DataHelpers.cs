@@ -49,7 +49,7 @@ namespace Editors.Audio.AudioEditor.Data
                 .FirstOrDefault(stateGroup => stateGroup.Name == stateGroupName);
         }
 
-        public static AudioProjectTreeNode GetAudioProjectTreeNodeFromName(ObservableCollection<AudioProjectTreeNode> audioProjecTree, string nodeName)
+        public static TreeNode GetAudioProjectTreeNodeFromName(ObservableCollection<TreeNode> audioProjecTree, string nodeName)
         {
             foreach (var node in audioProjecTree)
             {

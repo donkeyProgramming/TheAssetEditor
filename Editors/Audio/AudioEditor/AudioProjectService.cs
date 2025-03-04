@@ -51,7 +51,7 @@ namespace Editors.Audio.AudioEditor
             _datGenerator = datGenerator;
         }
 
-        public AudioProject AudioProject { get; set; } = new AudioProject();
+        public AudioProject AudioProject { get; set; }
         public string AudioProjectFileName { get; set; }
         public string AudioProjectDirectory { get; set; }
         public Dictionary<string, List<string>> StateGroupsWithModdedStatesRepository { get; set; } = [];
@@ -170,7 +170,7 @@ namespace Editors.Audio.AudioEditor
 
             _datGenerator.GenerateDatFiles(audioProject, audioProjectFileName);
 
-            SaveGeneratedAudioProjectToPack(audioProject);
+            SaveCompiledAudioProjectToPack(audioProject);
         }
 
         private void InitialiseSoundBanks()
@@ -374,7 +374,7 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        private void SaveGeneratedAudioProjectToPack(AudioProject audioProject)
+        private void SaveCompiledAudioProjectToPack(AudioProject audioProject)
         {
             var options = new JsonSerializerOptions
             {
@@ -382,7 +382,7 @@ namespace Editors.Audio.AudioEditor
                 WriteIndented = true
             };
             var audioProjectJson = JsonSerializer.Serialize(audioProject, options);
-            var audioProjectFileName = $"{AudioProjectFileName}_generated.aproj";
+            var audioProjectFileName = $"{AudioProjectFileName}_compiled.aproj";
             var audioProjectFilePath = $"{AudioProjectDirectory}\\{audioProjectFileName}";
             var packFile = PackFile.CreateFromASCII(audioProjectFileName, audioProjectJson);
             _fileSaveService.Save(audioProjectFilePath, packFile.DataSource.ReadData(), true);

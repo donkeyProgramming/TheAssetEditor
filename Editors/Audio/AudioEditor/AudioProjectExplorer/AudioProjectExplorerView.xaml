@@ -180,7 +180,7 @@
 
                 <TreeView.Resources>
                     <HierarchicalDataTemplate 
-                        DataType="{x:Type audioprojectexplorer:AudioProjectTreeNode}" 
+                        DataType="{x:Type audioprojectexplorer:TreeNode}" 
                         ItemsSource="{Binding Children}">
                         <TextBlock>
                             <TextBlock.Inlines>

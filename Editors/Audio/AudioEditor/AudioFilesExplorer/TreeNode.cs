@@ -9,14 +9,14 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         WavFile
     }
 
-    public partial class AudioFilesTreeNode : ObservableObject
+    public partial class TreeNode : ObservableObject
     {
         public string Name { get; set; }
         public NodeType NodeType { get; set; }
-        public AudioFilesTreeNode Parent { get; set; }
+        public TreeNode Parent { get; set; }
         public string FilePath { get; set; }
 
         [ObservableProperty] bool _isNodeExpanded = false;
-        [ObservableProperty] ObservableCollection<AudioFilesTreeNode> _children = [];
+        [ObservableProperty] ObservableCollection<TreeNode> _children = [];
     }
 }

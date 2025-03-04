@@ -27,7 +27,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                         audioProjectTreeNode.PresetFilterDisplayText = null;
                 }
 
-                AudioProjectTreeBuilder.AddFilteredDialogueEventsToSoundBankTreeViewItems(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel, soundBank.Name, presetFilter);
+                TreeBuilder.AddFilteredDialogueEventsToSoundBankTreeViewItems(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel, soundBank.Name, presetFilter);
             }
         }
 

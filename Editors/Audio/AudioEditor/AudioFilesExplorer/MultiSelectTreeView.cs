@@ -15,7 +15,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.Register("SelectedItems", typeof(IList), typeof(MultiSelectTreeView), new PropertyMetadata(new ArrayList(), OnSelectedItemsChanged));
         public static readonly DependencyProperty IsMultiSelectedProperty = DependencyProperty.RegisterAttached("IsMultiSelected", typeof(bool), typeof(MultiSelectTreeView), new PropertyMetadata(false));
 
-        private AudioFilesTreeNode _anchorItem;
+        private TreeNode _anchorItem;
 
         public IList SelectedItems
         {
@@ -57,7 +57,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
             {
                 var clickedItem = GetTreeViewItemUnderMouse(e);
-                if (clickedItem?.DataContext is AudioFilesTreeNode clickedNode)
+                if (clickedItem?.DataContext is TreeNode clickedNode)
                 {
                     if (SelectedItems.Contains(clickedNode))
                     {
@@ -85,7 +85,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             base.OnSelectedItemChanged(e);
 
-            if (e.NewValue is AudioFilesTreeNode currentSelectedItem)
+            if (e.NewValue is TreeNode currentSelectedItem)
             {
                 SelectedItems ??= new ArrayList();
 
@@ -111,9 +111,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             }
         }
 
-        private void SelectRangeFromAnchor(AudioFilesTreeNode anchor, AudioFilesTreeNode target)
+        private void SelectRangeFromAnchor(TreeNode anchor, TreeNode target)
         {
-            var items = GetTreeViewItems(this).Where(item => item.DataContext is AudioFilesTreeNode).ToList();
+            var items = GetTreeViewItems(this).Where(item => item.DataContext is TreeNode).ToList();
             var anchorIndex = items.FindIndex(item => item.DataContext == anchor);
             var targetIndex = items.FindIndex(item => item.DataContext == target);
 
@@ -125,7 +125,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
             for (var i = 0; i < items.Count; i++)
             {
-                var node = (AudioFilesTreeNode)items[i].DataContext;
+                var node = (TreeNode)items[i].DataContext;
 
                 if (i < startIndex || i > endIndex)
                     SelectedItems.Remove(node);
@@ -138,7 +138,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             foreach (var item in GetTreeViewItems(this))
             {
-                if (item.DataContext is AudioFilesTreeNode node)
+                if (item.DataContext is TreeNode node)
                 {
                     var isSelected = SelectedItems.Contains(node);
                     SetIsMultiSelected(item, isSelected);

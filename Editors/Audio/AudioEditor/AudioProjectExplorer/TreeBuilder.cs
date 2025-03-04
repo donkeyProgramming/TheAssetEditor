@@ -8,9 +8,9 @@ using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
-    public class AudioProjectTreeBuilder
+    public class TreeBuilder
     {
-        public static void CreateAudioProjectTree(IAudioProjectService audioProjectService, ObservableCollection<AudioProjectTreeNode> audioProjectTree, bool showEditedAudioProjectItemsOnly)
+        public static void CreateAudioProjectTree(IAudioProjectService audioProjectService, ObservableCollection<TreeNode> audioProjectTree, bool showEditedAudioProjectItemsOnly)
         {
             audioProjectTree.Clear();
             AddActionEvents(audioProjectService, audioProjectTree, showEditedAudioProjectItemsOnly);
@@ -18,53 +18,53 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             AddStateGroups(audioProjectService, audioProjectTree, showEditedAudioProjectItemsOnly);
         }
 
-        private static void AddActionEvents(IAudioProjectService audioProjectService, ObservableCollection<AudioProjectTreeNode> audioProjectTree, bool showEditedAudioProjectItemsOnly)
+        private static void AddActionEvents(IAudioProjectService audioProjectService, ObservableCollection<TreeNode> audioProjectTree, bool showEditedAudioProjectItemsOnly)
         {
-            var soundBanksNode = new AudioProjectTreeNode
+            var soundBanksNode = new TreeNode
             {
                 Name = "Action Events",
                 NodeType = NodeType.ActionEvents,
-                Children = new ObservableCollection<AudioProjectTreeNode>()
+                Children = new ObservableCollection<TreeNode>()
             };
             audioProjectTree.Add(soundBanksNode);
 
             AddActionEventSoundBankNodes(audioProjectService, soundBanksNode, showEditedAudioProjectItemsOnly);
         }
 
-        private static void AddDialogueEvents(IAudioProjectService audioProjectService, ObservableCollection<AudioProjectTreeNode> audioProjectTree, bool showEditedAudioProjectItemsOnly)
+        private static void AddDialogueEvents(IAudioProjectService audioProjectService, ObservableCollection<TreeNode> audioProjectTree, bool showEditedAudioProjectItemsOnly)
         {
-            var dialogueEventsNode = new AudioProjectTreeNode
+            var dialogueEventsNode = new TreeNode
             {
                 Name = "Dialogue Events",
                 NodeType = NodeType.DialogueEvents,
-                Children = new ObservableCollection<AudioProjectTreeNode>()
+                Children = new ObservableCollection<TreeNode>()
             };
             audioProjectTree.Add(dialogueEventsNode);
 
             AddDialogueEventSoundBankNodes(audioProjectService, dialogueEventsNode, showEditedAudioProjectItemsOnly);
         }
 
-        private static void AddStateGroups(IAudioProjectService audioProjectService, ObservableCollection<AudioProjectTreeNode> audioProjectTree, bool showEditedAudioProjectItemsOnly)
+        private static void AddStateGroups(IAudioProjectService audioProjectService, ObservableCollection<TreeNode> audioProjectTree, bool showEditedAudioProjectItemsOnly)
         {
-            var stateGroupsNode = new AudioProjectTreeNode
+            var stateGroupsNode = new TreeNode
             {
                 Name = "State Groups",
                 NodeType = NodeType.StateGroups,
-                Children = new ObservableCollection<AudioProjectTreeNode>()
+                Children = new ObservableCollection<TreeNode>()
             };
             audioProjectTree.Add(stateGroupsNode);
 
             AddStateGroupNodes(audioProjectService, stateGroupsNode, showEditedAudioProjectItemsOnly);
         }
 
-        private static void AddActionEventSoundBankNodes(IAudioProjectService audioProjectService, AudioProjectTreeNode soundBanksNode, bool showEditedAudioProjectItemsOnly)
+        private static void AddActionEventSoundBankNodes(IAudioProjectService audioProjectService, TreeNode soundBanksNode, bool showEditedAudioProjectItemsOnly)
         {
             var actionEventSoundBanks = GetSoundBanks(audioProjectService, showEditedAudioProjectItemsOnly, Wh3SoundBankType.ActionEventSoundBank);
             if (actionEventSoundBanks.Count > 0)
             {
                 foreach (var soundBank in actionEventSoundBanks)
                 {
-                    var soundBankNode = new AudioProjectTreeNode
+                    var soundBankNode = new TreeNode
                     {
                         Name = soundBank.Name,
                         NodeType = NodeType.ActionEventSoundBank,
@@ -75,19 +75,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             }
         }
 
-        private static void AddDialogueEventSoundBankNodes(IAudioProjectService audioProjectService, AudioProjectTreeNode soundBanksNode, bool showEditedAudioProjectItemsOnly)
+        private static void AddDialogueEventSoundBankNodes(IAudioProjectService audioProjectService, TreeNode soundBanksNode, bool showEditedAudioProjectItemsOnly)
         {
             var dialogueEventSoundBanks = GetSoundBanks(audioProjectService, showEditedAudioProjectItemsOnly, Wh3SoundBankType.DialogueEventSoundBank);
             if (dialogueEventSoundBanks.Count > 0)
             {
                 foreach (var soundBank in  dialogueEventSoundBanks)
                 {
-                    var soundBankNode = new AudioProjectTreeNode
+                    var soundBankNode = new TreeNode
                     {
                         Name = soundBank.Name,
                         NodeType = NodeType.DialogueEventSoundBank,
                         Parent = soundBanksNode,
-                        Children = new ObservableCollection<AudioProjectTreeNode>()
+                        Children = new ObservableCollection<TreeNode>()
                     };
 
                     AddDialogueEventNodes(showEditedAudioProjectItemsOnly, soundBank, soundBankNode);
@@ -97,7 +97,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             }
         }
 
-        private static void AddDialogueEventNodes(bool showEditedAudioProjectItemsOnly, SoundBank soundBank, AudioProjectTreeNode soundBankNode)
+        private static void AddDialogueEventNodes(bool showEditedAudioProjectItemsOnly, SoundBank soundBank, TreeNode soundBankNode)
         {
             var dialogueEvents = showEditedAudioProjectItemsOnly
                 ? soundBank.DialogueEvents.Where(dialogueEvent => dialogueEvent.StatePaths.Count > 0)
@@ -105,7 +105,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
             foreach (var dialogueEvent in dialogueEvents)
             {
-                var dialogueEventNode = new AudioProjectTreeNode
+                var dialogueEventNode = new TreeNode
                 {
                     Name = dialogueEvent.Name,
                     NodeType = NodeType.DialogueEvent,
@@ -115,14 +115,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             }
         }
 
-        private static void AddStateGroupNodes(IAudioProjectService audioProjectService, AudioProjectTreeNode stateGroupsNode, bool showEditedAudioProjectItemsOnly)
+        private static void AddStateGroupNodes(IAudioProjectService audioProjectService, TreeNode stateGroupsNode, bool showEditedAudioProjectItemsOnly)
         {
             var stateGroups = GetStates(audioProjectService, showEditedAudioProjectItemsOnly);
             if (stateGroups.Count > 0)
             {
                 foreach (var stateGroup in stateGroups)
                 {
-                    var stateGroupNode = new AudioProjectTreeNode
+                    var stateGroupNode = new TreeNode
                     {
                         Name = stateGroup.Name,
                         NodeType = NodeType.StateGroup,
@@ -152,7 +152,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             }
         }
 
-        public static void FilterEditedAudioProjectItems(IAudioProjectService audioProjectService, AudioProjectExplorerViewModel audioProjectExplorerViewModel, ObservableCollection<AudioProjectTreeNode> audioProjectTree, bool showEditedAudioProjectItemsOnly)
+        public static void FilterEditedAudioProjectItems(IAudioProjectService audioProjectService, AudioProjectExplorerViewModel audioProjectExplorerViewModel, ObservableCollection<TreeNode> audioProjectTree, bool showEditedAudioProjectItemsOnly)
         {
             FilterEditedAudioProjectItemsInner(audioProjectService, audioProjectExplorerViewModel, audioProjectTree, showEditedAudioProjectItemsOnly);
 
@@ -187,7 +187,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             }
         }
 
-        public static void FilterEditedAudioProjectItemsInner(IAudioProjectService audioProjectService, AudioProjectExplorerViewModel audioProjectExplorerViewModel, ObservableCollection<AudioProjectTreeNode> node, bool showEditedAudioProjectItemsOnly)
+        public static void FilterEditedAudioProjectItemsInner(IAudioProjectService audioProjectService, AudioProjectExplorerViewModel audioProjectExplorerViewModel, ObservableCollection<TreeNode> node, bool showEditedAudioProjectItemsOnly)
         {
             foreach (var childNode in node)
             {
