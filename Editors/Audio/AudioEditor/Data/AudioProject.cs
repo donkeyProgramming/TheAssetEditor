@@ -3,9 +3,9 @@ using Shared.GameFormats.Wwise.Enums;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioEditor.AudioProjectData
+namespace Editors.Audio.AudioEditor.Data
 {
-    public class AudioProjectDataModel
+    public class AudioProject
     {
         public string Language { get; set; }
         public List<SoundBank> SoundBanks { get; set; }

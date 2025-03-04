@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService;
 using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Bkhd;
 using Shared.Core.PackFiles;
@@ -26,7 +26,7 @@ namespace Editors.Audio.AudioProjectCompiler
             _fileSaveService = fileSaveService;
         }
 
-        public void GenerateSoundBanks(AudioProjectDataModel audioProject)
+        public void GenerateSoundBanks(AudioProject audioProject)
         {
             var bankGeneratorVersion = (uint)GameInformationDatabase.GetGameById(_applicationSettingsService.CurrentSettings.CurrentGame).BankGeneratorVersion;
             var wwiseHircGeneratorServiceFactory = WwiseHircGeneratorServiceFactory.CreateFactory(bankGeneratorVersion);

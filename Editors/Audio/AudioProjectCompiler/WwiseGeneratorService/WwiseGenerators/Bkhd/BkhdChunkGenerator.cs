@@ -1,5 +1,5 @@
 ﻿using System;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise.Bkhd;
 
@@ -7,7 +7,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 {
     class BkhdChunkGenerator
     {
-        public static BkhdChunk GenerateBkhdChunk(AudioProjectDataModel audioProject, uint bankGeneratorVersion, SoundBank soundBank)
+        public static BkhdChunk GenerateBkhdChunk(AudioProject audioProject, uint bankGeneratorVersion, SoundBank soundBank)
         {
             var bkhdChunk = new BkhdChunk();
             var akBankHeader = new AkBankHeader()

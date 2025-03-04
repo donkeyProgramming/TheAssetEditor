@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor
 {
     public interface IAudioProjectService
     {
-        AudioProjectDataModel AudioProject { get; set; }
+        AudioProject AudioProject { get; set; }
         string AudioProjectFileName { get; set; }
         string AudioProjectDirectory { get; set; }
         Dictionary<string, List<string>> StateGroupsWithModdedStatesRepository { get; set; }

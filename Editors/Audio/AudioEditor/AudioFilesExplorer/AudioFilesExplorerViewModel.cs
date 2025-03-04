@@ -5,8 +5,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Utility;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -48,7 +48,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             if (editablePack == null)
                 return;
 
-            AudioFilesExplorerLabel = $"Audio Files Explorer - {AudioProjectHelpers.AddExtraUnderscoresToString(editablePack.Name)}";
+            AudioFilesExplorerLabel = $"Audio Files Explorer - {DataHelpers.AddExtraUnderscoresToString(editablePack.Name)}";
 
             CreateAudioFilesTree(editablePack);
         }

@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.Dat;
@@ -15,7 +15,7 @@ namespace Editors.Audio.AudioProjectCompiler
             _fileSaveService = fileSaveService;
         }
 
-        public void GenerateDatFiles(AudioProjectDataModel audioProject, string audioProjectFileName)
+        public void GenerateDatFiles(AudioProject audioProject, string audioProjectFileName)
         {
             if (audioProject.SoundBanks.Any(soundBank => soundBank.ActionEvents != null))
             {
@@ -40,7 +40,7 @@ namespace Editors.Audio.AudioProjectCompiler
             SaveDatFileToPack(soundDatFile, datFileName, datFilePath);
         }
 
-        private void GenerateStatesDatFile(AudioProjectDataModel audioProject, string audioProjectFileName)
+        private void GenerateStatesDatFile(AudioProject audioProject, string audioProjectFileName)
         {
             var stateDatFile = new SoundDatFile();
 

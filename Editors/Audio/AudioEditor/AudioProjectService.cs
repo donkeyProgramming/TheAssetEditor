@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.GameSettings.Warhammer3;
 using Serilog;
@@ -51,7 +51,7 @@ namespace Editors.Audio.AudioEditor
             _datGenerator = datGenerator;
         }
 
-        public AudioProjectDataModel AudioProject { get; set; } = new AudioProjectDataModel();
+        public AudioProject AudioProject { get; set; } = new AudioProject();
         public string AudioProjectFileName { get; set; }
         public string AudioProjectDirectory { get; set; }
         public Dictionary<string, List<string>> StateGroupsWithModdedStatesRepository { get; set; } = [];
@@ -88,14 +88,14 @@ namespace Editors.Audio.AudioEditor
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
 
-                audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {AudioProjectHelpers.AddExtraUnderscoresToString(fileName)}";
+                audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataHelpers.AddExtraUnderscoresToString(fileName)}";
 
                 // Reset data
                 audioEditorViewModel.ResetAudioEditorViewModelData();
                 ResetAudioProject();
 
                 // Set the AudioProject
-                var savedProject = JsonSerializer.Deserialize<AudioProjectDataModel>(audioProjectJson);
+                var savedProject = JsonSerializer.Deserialize<AudioProject>(audioProjectJson);
                 AudioProjectFileName = fileName.Replace(fileType, string.Empty);
                 AudioProjectDirectory = filePath.Replace($"\\{fileName}", string.Empty);
 
@@ -117,7 +117,7 @@ namespace Editors.Audio.AudioEditor
 
         public void InitialiseAudioProject(AudioEditorViewModel audioEditorViewModel, string fileName, string directory, string language)
         {
-            audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {AudioProjectHelpers.AddExtraUnderscoresToString(fileName)}";
+            audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataHelpers.AddExtraUnderscoresToString(fileName)}";
 
             AudioProjectFileName = fileName;
             AudioProjectDirectory = directory;
@@ -260,7 +260,7 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        private AudioProjectDataModel GetAudioProjectWithoutUnusedObjects()
+        private AudioProject GetAudioProjectWithoutUnusedObjects()
         {
             var usedSoundBanksList = AudioProject.SoundBanks
                 .Where(soundBank => soundBank != null)
@@ -301,7 +301,7 @@ namespace Editors.Audio.AudioEditor
                 ? new List<StateGroup>(usedStateGroupsList)
                 : null;
 
-            return new AudioProjectDataModel
+            return new AudioProject
             {
                 Language = AudioProject.Language,
                 SoundBanks = soundBanksResult,
@@ -309,7 +309,7 @@ namespace Editors.Audio.AudioEditor
             };
         }
 
-        private void MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(AudioProjectDataModel savedProject)
+        private void MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(AudioProject savedProject)
         {
             if (savedProject == null)
                 return;
@@ -374,7 +374,7 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        private void SaveGeneratedAudioProjectToPack(AudioProjectDataModel audioProject)
+        private void SaveGeneratedAudioProjectToPack(AudioProject audioProject)
         {
             var options = new JsonSerializerOptions
             {
@@ -390,7 +390,7 @@ namespace Editors.Audio.AudioEditor
 
         public void ResetAudioProject()
         {
-            AudioProject = new AudioProjectDataModel();
+            AudioProject = new AudioProject();
         }
     }
 }

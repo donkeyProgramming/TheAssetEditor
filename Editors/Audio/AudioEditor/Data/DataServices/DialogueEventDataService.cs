@@ -2,11 +2,11 @@
 using System.Linq;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
-namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
+namespace Editors.Audio.AudioEditor.Data.DataServices
 {
-    public class DialogueEventDataService : IAudioProjectDataService
+    public class DialogueEventDataService : IDataService
     {
-        public void ConfigureAudioProjectEditorDataGrid(AudioProjectDataServiceParameters parameters)
+        public void ConfigureAudioProjectEditorDataGrid(DataServiceParameters parameters)
         {
             var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
 
@@ -17,14 +17,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var columnHeader = AudioProjectHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var columnHeader = DataHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
                 var states = GetStatesForColumn(parameters, stateGroupWithQualifier.Value);
                 var stateGroupColumn = DataGridHelpers.CreateColumn(parameters, columnHeader, columnWidth, DataGridColumnType.StateGroupEditableComboBox, states);
                 dataGrid.Columns.Add(stateGroupColumn);
             }
         }
 
-        public void SetAudioProjectEditorDataGridData(AudioProjectDataServiceParameters parameters)
+        public void SetAudioProjectEditorDataGridData(DataServiceParameters parameters)
         {
             var rowData = new Dictionary<string, string>();
 
@@ -35,8 +35,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
             var stateGroupsWithQualifiers = parameters.AudioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[parameters.DialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var columnName = AudioProjectHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
-                var stateGroup = parameters.AudioRepository.GetStateGroupFromStateGroupWithQualifier(parameters.DialogueEvent.Name, AudioProjectHelpers.RemoveExtraUnderscoresFromString(columnName));
+                var columnName = DataHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var stateGroup = parameters.AudioRepository.GetStateGroupFromStateGroupWithQualifier(parameters.DialogueEvent.Name, DataHelpers.RemoveExtraUnderscoresFromString(columnName));
 
                 if (stateGroupsWithAnyState.ContainsKey(stateGroup))
                     rowData[columnName] = "Any"; // Set the cell value to Any as the default value
@@ -45,7 +45,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
             parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
         }
 
-        public void ConfigureAudioProjectViewerDataGrid(AudioProjectDataServiceParameters parameters)
+        public void ConfigureAudioProjectViewerDataGrid(DataServiceParameters parameters)
         {
             var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
             DataGridHelpers.CreateContextMenu(parameters, dataGrid);
@@ -57,14 +57,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var stateGroupColumnHeader = AudioProjectHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var stateGroupColumnHeader = DataHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
                 var states = GetStatesForColumn(parameters, stateGroupWithQualifier.Value);
                 var stateGroupColumn = DataGridHelpers.CreateColumn(parameters, stateGroupColumnHeader, columnWidth, DataGridColumnType.ReadOnlyTextBlock, states);
                 dataGrid.Columns.Add(stateGroupColumn);
             }
         }
 
-        public void SetAudioProjectViewerDataGridData(AudioProjectDataServiceParameters parameters)
+        public void SetAudioProjectViewerDataGridData(DataServiceParameters parameters)
         {
             var stateGroupsWithQualifiers = parameters.AudioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[parameters.DialogueEvent.Name];
 
@@ -74,7 +74,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
 
                 foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
                 {
-                    var stateGroupColumnHeader = AudioProjectHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                    var stateGroupColumnHeader = DataHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
                     var node = statePath.Nodes.FirstOrDefault(node => node.StateGroup.Name == stateGroupWithQualifier.Value);
                     if (node != null)
                         rowData[stateGroupColumnHeader] = node.State.Name;
@@ -86,19 +86,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
             }
         }
 
-        public void AddAudioProjectEditorDataGridDataToAudioProject(AudioProjectDataServiceParameters parameters)
+        public void AddAudioProjectEditorDataGridDataToAudioProject(DataServiceParameters parameters)
         {
-            var statePath = AudioProjectHelpers.CreateStatePath(parameters.AudioRepository, parameters.AudioEditorViewModel.AudioSettingsViewModel, parameters.AudioProjectEditorRow, parameters.DialogueEvent);
-            AudioProjectHelpers.InsertStatePathAlphabetically(parameters.DialogueEvent, statePath);
+            var statePath = DataHelpers.CreateStatePath(parameters.AudioRepository, parameters.AudioEditorViewModel.AudioSettingsViewModel, parameters.AudioProjectEditorRow, parameters.DialogueEvent);
+            DataHelpers.InsertStatePathAlphabetically(parameters.DialogueEvent, statePath);
         }
 
-        public void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioProjectDataServiceParameters parameters)
+        public void RemoveAudioProjectEditorDataGridDataFromAudioProject(DataServiceParameters parameters)
         {
             // Create a copy to prevent an error where dataGridRows is modified while being iterated over
             var dataGridRowsCopy = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList();
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var statePath = AudioProjectHelpers.GetStatePathFromDataGridRow(parameters.AudioRepository, dataGridRow, parameters.DialogueEvent);
+                var statePath = DataHelpers.GetStatePathFromDataGridRow(parameters.AudioRepository, dataGridRow, parameters.DialogueEvent);
                 if (statePath != null)
                 {
                     parameters.DialogueEvent.StatePaths.Remove(statePath);
@@ -107,7 +107,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
             }
         }
 
-        private static List<string> GetStatesForColumn(AudioProjectDataServiceParameters parameters, string stateGroup)
+        private static List<string> GetStatesForColumn(DataServiceParameters parameters, string stateGroup)
         {
             var states = new List<string>();
             var moddedStates = GetModdedStates(parameters, stateGroup);
@@ -131,7 +131,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService
             return states;
         }
 
-        private static List<string> GetModdedStates(AudioProjectDataServiceParameters parameters, string stateGroup)
+        private static List<string> GetModdedStates(DataServiceParameters parameters, string stateGroup)
         {
             var moddedStates = new List<string>();
 

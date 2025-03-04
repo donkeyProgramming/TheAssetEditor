@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -28,7 +28,7 @@ namespace Editors.Audio.AudioProjectCompiler
         private readonly string _wprojPath = $"{DirectoryHelper.Temp}\\WavToWem\\WavToWemWwiseProject\\WavToWemWwiseProject.wproj";
         private readonly string _wsourcesPath = $"{DirectoryHelper.Temp}\\WavToWem\\wav_to_wem.wsources";
 
-        public void GenerateWems(AudioProjectDataModel audioProject)
+        public void GenerateWems(AudioProject audioProject)
         {
             AudioProjectCompilerHelpers.DeleteAudioFilesInTempAudioFolder();
 
@@ -56,7 +56,7 @@ namespace Editors.Audio.AudioProjectCompiler
             _wSourcesWrapper.DeleteExcessStuff();
         }
 
-        public void SaveWemsToPack(AudioProjectDataModel audioProject)
+        public void SaveWemsToPack(AudioProject audioProject)
         {
             var soundsWithUniqueSourceIds = AudioProjectCompilerHelpers.GetAllUniqueSounds(audioProject);
             foreach (var sound in soundsWithUniqueSourceIds)

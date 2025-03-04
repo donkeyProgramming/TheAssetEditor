@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Storage;
 using Shared.Core.ToolCreation;
 using Xceed.Wpf.Toolkit;
@@ -40,7 +40,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         {
             _selectedAudioProjectTreeNode = value;
 
-            AudioProjectDataManager.HandleLoadingSelectedAudioProjectItem(AudioEditorViewModel, _audioProjectService, _audioRepository);
+            DataManager.HandleLoadingSelectedAudioProjectItem(AudioEditorViewModel, _audioProjectService, _audioRepository);
         }
         
         partial void OnSelectedDialogueEventPresetChanged(DialogueEventPreset? value)

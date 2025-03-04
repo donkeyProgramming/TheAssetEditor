@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 
@@ -50,7 +50,7 @@ namespace Editors.Audio.AudioProjectCompiler
             throw new InvalidOperationException("Houston we have a problem - no unused IDs available.");
         }
 
-        public static string GetCorrectSoundBankLanguage(AudioProjectDataModel audioProject)
+        public static string GetCorrectSoundBankLanguage(AudioProject audioProject)
         {
             // TODO: implement game version into this check
             foreach (var soundBank in audioProject.SoundBanks)
@@ -62,7 +62,7 @@ namespace Editors.Audio.AudioProjectCompiler
             return audioProject.Language;
         }
 
-        public static List<Sound> GetAllUniqueSounds(AudioProjectDataModel audioProject)
+        public static List<Sound> GetAllUniqueSounds(AudioProject audioProject)
         {
             // Extract sounds from ActionEvents if available.
             var actionSounds = audioProject.SoundBanks

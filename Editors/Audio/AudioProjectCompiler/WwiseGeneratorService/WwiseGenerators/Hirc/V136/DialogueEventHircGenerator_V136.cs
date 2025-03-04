@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService;
 using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise.Enums;

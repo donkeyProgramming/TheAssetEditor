@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioProjectCompiler.WwiseIDService;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
@@ -10,7 +10,7 @@ using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.Settings;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
-using Action = Editors.Audio.AudioEditor.AudioProjectData.Action;
+using Action = Editors.Audio.AudioEditor.Data.Action;
 
 namespace Editors.Audio.AudioProjectCompiler
 {
@@ -42,7 +42,7 @@ namespace Editors.Audio.AudioProjectCompiler
                 );
         }
 
-        public void SetSoundBankData(AudioProjectDataModel audioProject, string audioProjectFileName)
+        public void SetSoundBankData(AudioProject audioProject, string audioProjectFileName)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
@@ -61,7 +61,7 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        public void SetInitialSourceData(AudioProjectDataModel audioProject)
+        public void SetInitialSourceData(AudioProject audioProject)
         {
             var wwiseIDService = WwiseIDServiceFactory.GetWwiseIDService(_applicationSettingsService.CurrentSettings.CurrentGame);
             var sourceIDByWavFilePathLookup = new Dictionary<string, uint>();
@@ -95,7 +95,7 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        public void SetRemainingSourceData(AudioProjectDataModel audioProject)
+        public void SetRemainingSourceData(AudioProject audioProject)
         {
             var soundsWithUniqueSourceIds = AudioProjectCompilerHelpers.GetAllUniqueSounds(audioProject);
             foreach (var sound in soundsWithUniqueSourceIds)
@@ -150,7 +150,7 @@ namespace Editors.Audio.AudioProjectCompiler
         }
 
 
-        public void SetActionData(AudioProjectDataModel audioProject)
+        public void SetActionData(AudioProject audioProject)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
@@ -187,7 +187,7 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        public void SetActionEventData(AudioProjectDataModel audioProject)
+        public void SetActionEventData(AudioProject audioProject)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
@@ -205,7 +205,7 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        public void SetStatesData(AudioProjectDataModel audioProject)
+        public void SetStatesData(AudioProject audioProject)
         {
             foreach (var stateGroup in audioProject.StateGroups)
             {
@@ -221,7 +221,7 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        public void SetDialogueEventData(AudioProjectDataModel audioProject)
+        public void SetDialogueEventData(AudioProject audioProject)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {

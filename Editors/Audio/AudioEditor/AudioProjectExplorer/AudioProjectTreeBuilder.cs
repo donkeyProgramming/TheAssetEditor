@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.Data;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
@@ -141,7 +141,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                 .Select(dialogueEvent => dialogueEvent.Name)
                 .ToHashSet();
 
-            var soundBank = AudioProjectHelpers.GetAudioProjectTreeNodeFromName(audioProjectExplorerViewModel.AudioProjectTree, soundBankName);
+            var soundBank = DataHelpers.GetAudioProjectTreeNodeFromName(audioProjectExplorerViewModel.AudioProjectTree, soundBankName);
 
             foreach (var dialogueEvent in soundBank.Children)
             {
@@ -158,7 +158,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
             if (!showEditedAudioProjectItemsOnly)
             {
-                var dialogueEventsNode = AudioProjectHelpers.GetAudioProjectTreeNodeFromName(audioProjectTree, "Dialogue Events");
+                var dialogueEventsNode = DataHelpers.GetAudioProjectTreeNodeFromName(audioProjectTree, "Dialogue Events");
 
                 if (dialogueEventsNode == null)
                     return;

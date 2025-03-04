@@ -8,10 +8,10 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
-using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService;
+using Editors.Audio.AudioEditor.Data.DataServices;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor.AudioProjectData
+namespace Editors.Audio.AudioEditor.Data
 {
     public enum DataGridColumnType
     {
@@ -31,7 +31,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return dataGrid;
         }
 
-        public static DataGridTemplateColumn CreateColumn(AudioProjectDataServiceParameters parameters, string columnHeader, double columnWidth, DataGridColumnType columnType, List<string> states = null, bool useAbsoluteWidth = false)
+        public static DataGridTemplateColumn CreateColumn(DataServiceParameters parameters, string columnHeader, double columnWidth, DataGridColumnType columnType, List<string> states = null, bool useAbsoluteWidth = false)
         {
             var width = useAbsoluteWidth ? DataGridLengthUnitType.Pixel : DataGridLengthUnitType.Star;
             var column = new DataGridTemplateColumn
@@ -63,7 +63,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             factory.SetValue(VirtualizingStackPanel.VirtualizationModeProperty, VirtualizationMode.Recycling);
 
             var comboBoxStyle = Application.Current.TryFindResource(typeof(ComboBox)) as Style;
-            factory.SetValue(Control.StyleProperty, comboBoxStyle);
+            factory.SetValue(FrameworkElement.StyleProperty, comboBoxStyle);
 
             // Use a VirtualizingStackPanel for the drop-down items
             var itemsPanelFactory = new FrameworkElementFactory(typeof(VirtualizingStackPanel));
@@ -210,14 +210,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return template;
         }
 
-        public static DataTemplate CreateFileSelectButtonTemplate(AudioProjectDataServiceParameters parameters)
+        public static DataTemplate CreateFileSelectButtonTemplate(DataServiceParameters parameters)
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(Button));
 
-            factory.SetValue(Button.ContentProperty, "...");
+            factory.SetValue(ContentControl.ContentProperty, "...");
 
-            factory.AddHandler(Button.ClickEvent, new RoutedEventHandler((sender, args) =>
+            factory.AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler((sender, args) =>
             {
                 parameters.AudioEditorViewModel.AudioProjectEditorViewModel.SelectMovieFile();
             }));
@@ -226,7 +226,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return template;
         }
 
-        public static void CreateContextMenu(AudioProjectDataServiceParameters parameters, DataGrid dataGrid)
+        public static void CreateContextMenu(DataServiceParameters parameters, DataGrid dataGrid)
         {
             var contextMenu = new ContextMenu();
 

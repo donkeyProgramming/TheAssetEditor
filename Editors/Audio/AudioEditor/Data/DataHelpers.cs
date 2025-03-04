@@ -7,9 +7,9 @@ using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.Storage;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioEditor.AudioProjectData
+namespace Editors.Audio.AudioEditor.Data
 {
-    public class AudioProjectHelpers
+    public class DataHelpers
     {
         public static Dictionary<string, string> ExtractRowFromSingleRowDataGrid(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
         {
