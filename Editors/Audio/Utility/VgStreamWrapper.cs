@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using CommunityToolkit.Diagnostics;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
@@ -29,24 +28,7 @@ namespace Editors.Audio.Utility
             }
         }
 
-        public Result<string> ConvertWemToWav(string fileNameWithoutExtension, byte[] wemBytes)
-        {
-            Guard.IsNotNull(wemBytes);
-            Guard.IsNotNullOrEmpty(fileNameWithoutExtension);
-
-            var wemName = $"{AudioFolderName}\\{fileNameWithoutExtension}.wem";
-            var wavName = $"{AudioFolderName}\\{fileNameWithoutExtension}.wav";
-
-            _logger.Here().Information($"Trying to export sound '{fileNameWithoutExtension}' - {wemBytes.Length} bytes");
-
-            var exportResult = SoundPlayer.ExportFile(wemName, wemBytes);
-            if (exportResult.Failed)
-                return Result<string>.FromError(exportResult.LogItems);
-
-            return ConvertFileUsingVgStream(wemName, wavName);
-        }
-
-        private Result<string> ConvertFileUsingVgStream(string sourceFileName, string targetFileName)
+        public Result<string> ConvertFileUsingVgStream(string sourceFileName, string targetFileName)
         {
             try
             {

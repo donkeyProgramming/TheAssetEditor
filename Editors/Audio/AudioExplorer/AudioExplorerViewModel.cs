@@ -116,27 +116,22 @@ namespace Editors.Audio.AudioExplorer
 
                     if (cakSound_V112 != null)
                     {
-                        _soundPlayer.ConvertWemToWav(
-                            _audioRepository,
+                        _soundPlayer.PlayDataWem(
                             cakSound_V112.AkBankSourceData.AkMediaInformation.SourceId,
                             cakSound_V112.AkBankSourceData.AkMediaInformation.FileId,
                             (int)cakSound_V112.AkBankSourceData.AkMediaInformation.FileOffset,
                             (int)cakSound_V112.AkBankSourceData.AkMediaInformation.InMemoryMediaSize
                         );
-
-                        return;
                     }
                 }
-
-                _soundPlayer.ConvertWemToWav(sound.GetSourceID().ToString());
-                return;
+                else
+                    _soundPlayer.PlayStreamedWem(sound.GetSourceID().ToString());
             }
-
-            if (_selectedNode.Item is ICAkMusicTrack musicTrack)
+            else if (_selectedNode.Item is ICAkMusicTrack musicTrack)
             {
                 // Only seems to have one child in practice 
                 var musicTrackID = musicTrack.GetChildren().FirstOrDefault(); 
-                _soundPlayer.ConvertWemToWav(musicTrackID.ToString());
+                _soundPlayer.PlayStreamedWem(musicTrackID.ToString());
             }
         }
 

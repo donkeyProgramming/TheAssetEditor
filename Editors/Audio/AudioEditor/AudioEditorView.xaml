@@ -7,7 +7,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:s="http://schemas.singulink.com/xaml" 
     xmlns:audioeditor="clr-namespace:Editors.Audio.AudioEditor"
-    xmlns:audioeditormenu="clr-namespace:Editors.Audio.AudioEditor.AudioEditorMenu"
     xmlns:audioprojectexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioProjectExplorer"
     xmlns:audiofilesexplorer="clr-namespace:Editors.Audio.AudioEditor.AudioFilesExplorer"
     xmlns:audioprojecteditor="clr-namespace:Editors.Audio.AudioEditor.AudioProjectEditor"
@@ -27,10 +26,36 @@
                 Height="*"/>
         </Grid.RowDefinitions>
 
-        <audioeditormenu:AudioEditorMenuView
+        <Grid
             Grid.Row="0"
-            Grid.Column="0"
-            DataContext="{Binding AudioEditorMenuViewModel}"/>
+            Grid.Column="0">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition 
+                    Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Menu 
+                Grid.Row="0" 
+                Margin="0, 5, 5, 0">
+                <MenuItem 
+                    Header="_File" 
+                    HorizontalAlignment="Left">
+                    <MenuItem 
+                        Header="New Audio Project" 
+                        Command="{Binding NewAudioProjectCommand}"/>
+                    <MenuItem 
+                        Header="Open Audio Project" 
+                        Command="{Binding LoadAudioProjectCommand}"/>
+                    <MenuItem 
+                        Header="Save Audio Project" 
+                        Command="{Binding SaveAudioProjectCommand}"/>
+                    <MenuItem 
+                        Header="Compile Audio Project" 
+                        Command="{Binding CompileAudioProjectCommand}"/>
+                </MenuItem>
+            </Menu>
+        </Grid>
 
         <Border 
             Grid.Row="1" 

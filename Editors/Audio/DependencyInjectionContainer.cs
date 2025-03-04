@@ -1,15 +1,13 @@
 ﻿using Audio.AudioExplorer;
 using Editors.Audio.AudioEditor;
-using Editors.Audio.AudioEditor.AudioEditorMenu;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
-using Editors.Audio.AudioEditor.AudioProjectCompiler;
-using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioExplorer;
+using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +26,6 @@ namespace Editors.Audio
             serviceCollection.AddScoped<AudioExplorerViewModel>();
 
             serviceCollection.AddScoped<AudioEditorViewModel>();
-            serviceCollection.AddScoped<AudioEditorMenuViewModel>();
             serviceCollection.AddScoped<AudioProjectExplorerViewModel>();
             serviceCollection.AddScoped<AudioFilesExplorerViewModel>();
             serviceCollection.AddScoped<AudioProjectEditorViewModel>();
@@ -39,12 +36,16 @@ namespace Editors.Audio
 
             serviceCollection.AddScoped<IAudioProjectService, AudioProjectService>();
             serviceCollection.AddScoped<IntegrityChecker>();
-            serviceCollection.AddScoped<AudioProjectCompiler>();
+
+            serviceCollection.AddScoped<CompilerDataProcessor>();
+            serviceCollection.AddScoped<SoundBankGenerator>();
+            serviceCollection.AddScoped<WemGenerator>();
+            serviceCollection.AddScoped<DatGenerator>();
 
             serviceCollection.AddScoped<RepositoryProvider, CreateRepositoryFromAllPackFiles>();
             serviceCollection.AddScoped<IAudioRepository, AudioRepository>();
             serviceCollection.AddScoped<VgStreamWrapper>();
-            serviceCollection.AddScoped<WemGenerator>();
+            serviceCollection.AddScoped<WSourcesWrapper>();
             serviceCollection.AddScoped<BnkLoader>();
             serviceCollection.AddScoped<DatLoader>();
             serviceCollection.AddScoped<BnkParser>();

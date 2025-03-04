@@ -185,7 +185,7 @@
 
             <audiofilesexplorer:MultiSelectTreeView.ItemTemplate>
                 <HierarchicalDataTemplate 
-                    DataType="{x:Type audiofilesexplorer:AudioFilesTreeNode}" 
+                    DataType="{x:Type audiofilesexplorer:TreeNode}" 
                     ItemsSource="{Binding Children}">
                     <Grid>
                         <Grid.ColumnDefinitions>

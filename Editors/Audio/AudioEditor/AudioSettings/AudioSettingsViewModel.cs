@@ -91,9 +91,9 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                 AudioFiles.Add(audioFile);
         }
 
-        public AudioProjectData.AudioSettings BuildAudioSettings()
+        public Data.AudioSettings BuildAudioSettings()
         {
-            var audioSettings = new AudioProjectData.AudioSettings();
+            var audioSettings = new Data.AudioSettings();
 
             if (AudioFiles.Count > 1)
             {
@@ -127,7 +127,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             return audioSettings;
         }
 
-        public void SetAudioSettingsFromAudioProjectItemAudioSettings(AudioProjectData.AudioSettings audioSettings, int audioFilesCount)
+        public void SetAudioSettingsFromAudioProjectItemAudioSettings(Data.AudioSettings audioSettings, int audioFilesCount)
         {
             ResetAudioFiles();
             ResetAudioSettingsPlaylistType();

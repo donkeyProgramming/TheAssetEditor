@@ -5,11 +5,10 @@ using System.Collections.Specialized;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProjectData;
-using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.AudioEditor.AudioSettings;
-using Editors.Audio.Storage;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Utility;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
@@ -28,10 +27,10 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         [ObservableProperty] private bool _isAddAudioFilesButtonEnabled = false;
         [ObservableProperty] private bool _isPlayAudioButtonEnabled = false;
         [ObservableProperty] private string _searchQuery;
-        [ObservableProperty] private ObservableCollection<AudioFilesTreeNode> _audioFilesTree;
-        private ObservableCollection<AudioFilesTreeNode> _unfilteredTree;
+        [ObservableProperty] private ObservableCollection<TreeNode> _audioFilesTree;
+        private ObservableCollection<TreeNode> _unfilteredTree;
 
-        public ObservableCollection<AudioFilesTreeNode> SelectedTreeNodes { get; set; } = new ObservableCollection<AudioFilesTreeNode>();
+        public ObservableCollection<TreeNode> SelectedTreeNodes { get; set; } = new ObservableCollection<TreeNode>();
 
         public AudioFilesExplorerViewModel(IPackFileService packFileService, SoundPlayer soundPlayer)
         {
@@ -50,7 +49,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             if (editablePack == null)
                 return;
 
-            AudioFilesExplorerLabel = $"Audio Files Explorer - {AudioProjectHelpers.AddExtraUnderscoresToString(editablePack.Name)}";
+            AudioFilesExplorerLabel = $"Audio Files Explorer - {DataHelpers.AddExtraUnderscoresToString(editablePack.Name)}";
 
             CreateAudioFilesTree(editablePack);
         }
@@ -59,7 +58,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (AudioFilesTreeNode addedNode in e.NewItems)
+                foreach (TreeNode addedNode in e.NewItems)
                 {
                     if (addedNode.NodeType != NodeType.WavFile)
                         SelectedTreeNodes.Remove(addedNode);
@@ -89,8 +88,8 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 .Where(path => !string.IsNullOrWhiteSpace(path)) // remove the empty (pack) directory
                 .ToHashSet();
 
-            var nodeDictionary = new Dictionary<string, AudioFilesTreeNode>();
-            var rootNodes = new ObservableCollection<AudioFilesTreeNode>();
+            var nodeDictionary = new Dictionary<string, TreeNode>();
+            var rootNodes = new ObservableCollection<TreeNode>();
 
             foreach (var directoryPath in uniqueDirectoryPaths)
                 AddDirectoryToTree(rootNodes, directoryPath, nodeDictionary);
@@ -99,13 +98,13 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 AddFileToTree(filePathParts, nodeDictionary, rootNodes);
 
             AudioFilesTree = rootNodes;
-            _unfilteredTree = new ObservableCollection<AudioFilesTreeNode>(AudioFilesTree);
+            _unfilteredTree = new ObservableCollection<TreeNode>(AudioFilesTree);
         }
 
-        private static void AddDirectoryToTree(ObservableCollection<AudioFilesTreeNode> rootNodes, string directoryPath, Dictionary<string, AudioFilesTreeNode> nodeDictionary)
+        private static void AddDirectoryToTree(ObservableCollection<TreeNode> rootNodes, string directoryPath, Dictionary<string, TreeNode> nodeDictionary)
         {
             var currentPath = string.Empty;
-            AudioFilesTreeNode currentNode = null;
+            TreeNode currentNode = null;
 
             foreach (var directory in directoryPath.Split('\\'))
             {
@@ -116,12 +115,12 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
                 if (!nodeDictionary.TryGetValue(currentPath, out var directoryNode))
                 {
-                    directoryNode = new AudioFilesTreeNode
+                    directoryNode = new TreeNode
                     {
                         Name = directory,
                         NodeType = NodeType.Directory,
                         FilePath = currentPath,
-                        Children = new ObservableCollection<AudioFilesTreeNode>()
+                        Children = new ObservableCollection<TreeNode>()
                     };
 
                     if (currentNode == null)
@@ -136,11 +135,11 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             }
         }
 
-        private static void AddFileToTree(string[] filePathParts, Dictionary<string, AudioFilesTreeNode> nodeDictionary, ObservableCollection<AudioFilesTreeNode> rootNodes)
+        private static void AddFileToTree(string[] filePathParts, Dictionary<string, TreeNode> nodeDictionary, ObservableCollection<TreeNode> rootNodes)
         {
             if (filePathParts.Length == 1)
             {
-                var fileNode = new AudioFilesTreeNode
+                var fileNode = new TreeNode
                 {
                     Name = filePathParts[0],
                     NodeType = NodeType.WavFile,
@@ -154,7 +153,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             var directoryPath = string.Join("\\", filePathParts.Take(filePathParts.Length - 1));
             if (nodeDictionary.TryGetValue(directoryPath, out var directoryNode))
             {
-                var fileNode = new AudioFilesTreeNode
+                var fileNode = new TreeNode
                 {
                     Name = filePathParts[^1],
                     NodeType = NodeType.WavFile,
@@ -167,12 +166,12 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         private void ResetTree()
         {
-            AudioFilesTree = new ObservableCollection<AudioFilesTreeNode>(_unfilteredTree);
+            AudioFilesTree = new ObservableCollection<TreeNode>(_unfilteredTree);
         }
 
-        private ObservableCollection<AudioFilesTreeNode> FilterFileTree(string query)
+        private ObservableCollection<TreeNode> FilterFileTree(string query)
         {
-            var filteredTree = new ObservableCollection<AudioFilesTreeNode>();
+            var filteredTree = new ObservableCollection<TreeNode>();
 
             foreach (var treeNode in _unfilteredTree)
             {
@@ -184,7 +183,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             return filteredTree;
         }
 
-        private static AudioFilesTreeNode FilterTreeNode(AudioFilesTreeNode node, string query)
+        private static TreeNode FilterTreeNode(TreeNode node, string query)
         {
             var matchesQuery = node.Name.Contains(query, StringComparison.OrdinalIgnoreCase);
             var filteredChildren = node.Children
@@ -194,12 +193,12 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
             if (matchesQuery || filteredChildren.Count != 0)
             {
-                var filteredNode = new AudioFilesTreeNode
+                var filteredNode = new TreeNode
                 {
                     Name = node.Name,
                     NodeType = node.NodeType,
                     Parent = node.Parent,
-                    Children = new ObservableCollection<AudioFilesTreeNode>(filteredChildren),
+                    Children = new ObservableCollection<TreeNode>(filteredChildren),
                     IsNodeExpanded = true
                 };
                 return filteredNode;
@@ -219,7 +218,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
                 ToggleNodeExpansion(rootNode, !isExpanded);
         }
 
-        private static void ToggleNodeExpansion(AudioFilesTreeNode node, bool shouldExpand)
+        private static void ToggleNodeExpansion(TreeNode node, bool shouldExpand)
         {
             node.IsNodeExpanded = shouldExpand;
 
@@ -252,8 +251,16 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             if (!IsPlayAudioButtonEnabled)
                 return;
 
-            var selectedWavFile = AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes[0];
-            _soundPlayer.PlayWavFileFromPack(selectedWavFile);
+            var wavFileNode = AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes[0];
+            var wavFile = _packFileService.FindFile(wavFileNode.FilePath);
+            var wavFileName = $"{wavFileNode.Name}";
+
+            _soundPlayer.ExportFileToAEFolder(wavFileName, wavFile.DataSource.ReadData());
+
+            var audioFolderName = $"{DirectoryHelper.Temp}\\Audio";
+            var wavFilePath = $"{audioFolderName}\\{wavFileName}";
+
+            _soundPlayer.PlayWav(wavFilePath);
         }
 
         [RelayCommand] public void ClearText()

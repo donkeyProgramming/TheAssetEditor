@@ -5,15 +5,14 @@ using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProjectData;
-using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService;
-using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.Data.DataServices;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataManager;
+using static Editors.Audio.AudioEditor.Data.DataManager;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor
 {
@@ -47,12 +46,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         {
             if (AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
             {
-                var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioProjectService, AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
+                var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
 
                 // Clear the previous DataGrid Data
                 DataGridHelpers.ClearDataGridCollection(AudioProjectEditorDataGrid);
 
-                var parameters = new AudioProjectDataServiceParameters();
+                var parameters = new DataServiceParameters();
                 parameters.AudioEditorViewModel = AudioEditorViewModel;
                 parameters.AudioProjectService = _audioProjectService;
                 parameters.AudioRepository = _audioRepository;
@@ -122,7 +121,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         private static bool CheckIfAudioProjectViewerRowExists(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
         {
-            var audioProjectEditorData = AudioProjectHelpers.ExtractRowFromSingleRowDataGrid(audioEditorViewModel, audioRepository, audioProjectService)
+            var audioProjectEditorData = DataHelpers.ExtractRowFromSingleRowDataGrid(audioEditorViewModel, audioRepository, audioProjectService)
                 .ToList();
 
             var rowExists = audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid
