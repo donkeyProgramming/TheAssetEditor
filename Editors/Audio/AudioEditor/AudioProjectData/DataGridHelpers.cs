@@ -9,7 +9,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectDataService;
-using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.Storage;
 
 namespace Editors.Audio.AudioEditor.AudioProjectData

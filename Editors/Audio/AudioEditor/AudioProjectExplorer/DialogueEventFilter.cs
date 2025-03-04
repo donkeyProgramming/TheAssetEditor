@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectData;
-using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.GameSettings.Warhammer3;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 

@@ -1,7 +1,6 @@
 ﻿using Audio.AudioExplorer;
 using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
-using Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
@@ -38,7 +37,6 @@ namespace Editors.Audio
             serviceCollection.AddScoped<IAudioProjectService, AudioProjectService>();
             serviceCollection.AddScoped<IntegrityChecker>();
 
-            serviceCollection.AddScoped<AudioProjectCompiler.AudioProjectCompiler>();
             serviceCollection.AddScoped<CompilerDataProcessor>();
             serviceCollection.AddScoped<SoundBankGenerator>();
             serviceCollection.AddScoped<WemGenerator>();

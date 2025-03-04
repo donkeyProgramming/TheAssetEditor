@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
-namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
+namespace Editors.Audio.AudioEditor
 {
     public interface IAudioProjectService
     {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.GameSettings.Warhammer3;
 using Serilog;
@@ -15,7 +16,7 @@ using Shared.Core.Services;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
-namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
+namespace Editors.Audio.AudioEditor
 {
     public class AudioProjectService : IAudioProjectService
     {
@@ -285,7 +286,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData.AudioProjectService
                             : null
                     };
                 })
-                .Where(soundBank => (soundBank.DialogueEvents != null && soundBank.DialogueEvents.Any()) || (soundBank.ActionEvents != null && soundBank.ActionEvents.Any()))
+                .Where(soundBank => soundBank.DialogueEvents != null && soundBank.DialogueEvents.Any() || soundBank.ActionEvents != null && soundBank.ActionEvents.Any())
                 .ToList();
 
             var soundBanksResult = usedSoundBanksList.Count != 0
