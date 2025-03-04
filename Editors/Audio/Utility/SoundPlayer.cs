@@ -110,11 +110,11 @@ namespace Editors.Audio.Utility
             return wemFile;
         }
 
-        public void ExportFileToAEFolder(string filePath, byte[] bytes)
+        public void ExportFileToAEFolder(string fileName, byte[] bytes)
         {
             try
             {
-                var wemFilePath = $"{AudioFolderName}\\{filePath}";
+                var wemFilePath = $"{AudioFolderName}\\{fileName}";
                 DirectoryHelper.EnsureFileFolderCreated(wemFilePath);
                 File.WriteAllBytes(wemFilePath, bytes);
                 _logger.Here().Information($"All bytes written to file at {wemFilePath}");

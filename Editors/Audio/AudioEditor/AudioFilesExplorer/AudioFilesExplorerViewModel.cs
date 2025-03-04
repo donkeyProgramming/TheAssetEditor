@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.Utility;
+using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.ToolCreation;
@@ -252,9 +253,14 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
             var wavFileNode = AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes[0];
             var wavFile = _packFileService.FindFile(wavFileNode.FilePath);
-            var wavFileDiskPath = $"{wavFileNode.Name}";
-            _soundPlayer.ExportFileToAEFolder(wavFileDiskPath, wavFile.DataSource.ReadData());
-            _soundPlayer.PlayWav(wavFileDiskPath);
+            var wavFileName = $"{wavFileNode.Name}";
+
+            _soundPlayer.ExportFileToAEFolder(wavFileName, wavFile.DataSource.ReadData());
+
+            var audioFolderName = $"{DirectoryHelper.Temp}\\Audio";
+            var wavFilePath = $"{audioFolderName}\\{wavFileName}";
+
+            _soundPlayer.PlayWav(wavFilePath);
         }
 
         [RelayCommand] public void ClearText()
