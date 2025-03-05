@@ -37,7 +37,14 @@ namespace Editors.Audio.Utility
             if (audioFile == null)
                 _logger.Here().Error($"Unable to find wem file '{wemFileName}'.");
 
-            ConvertWemToWav(wemFileName, audioFile.DataSource.ReadData());
+            var result = ConvertWemToWav(wemFileName, audioFile.DataSource.ReadData());
+            if (result.IsSuccess)
+            {
+                _logger.Here().Information($"Playing wav file.");
+                PlayWav(result.Item);
+            }
+            else
+                _logger.Here().Error("Unable to play wav file.");
         }
 
         public void PlayDataWem(uint sourceId, uint dataSoundbankId, int fileOffset, int byteCount)
