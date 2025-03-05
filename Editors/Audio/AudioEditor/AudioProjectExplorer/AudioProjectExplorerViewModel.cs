@@ -39,8 +39,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         public void OnSelectedAudioProjectTreeNodeChanged(TreeNode value)
         {
             _selectedAudioProjectTreeNode = value;
-
-            DataManager.HandleLoadingSelectedAudioProjectItem(AudioEditorViewModel, _audioProjectService, _audioRepository);
+            NodeLoader.HandleLoadingSelectedAudioProjectItem(AudioEditorViewModel, _audioProjectService, _audioRepository);
         }
         
         partial void OnSelectedDialogueEventPresetChanged(DialogueEventPreset? value)
