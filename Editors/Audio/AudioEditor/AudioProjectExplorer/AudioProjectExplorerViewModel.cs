@@ -17,6 +17,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
         private readonly IAudioRepository _audioRepository;
         private readonly IAudioProjectService _audioProjectService;
+        private readonly NodeLoader _nodeLoader;
 
         public string DisplayName { get; set; } = "Audio Project Explorer";
 
@@ -30,16 +31,17 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private ObservableCollection<TreeNode> _unfilteredTree;
         public TreeNode _selectedAudioProjectTreeNode;
 
-        public AudioProjectExplorerViewModel(IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        public AudioProjectExplorerViewModel(IAudioRepository audioRepository, IAudioProjectService audioProjectService, NodeLoader nodeLoader)
         {
             _audioRepository = audioRepository;
             _audioProjectService = audioProjectService;
+            _nodeLoader = nodeLoader;
         }
 
         public void OnSelectedAudioProjectTreeNodeChanged(TreeNode value)
         {
             _selectedAudioProjectTreeNode = value;
-            NodeLoader.HandleLoadingSelectedAudioProjectItem(AudioEditorViewModel, _audioProjectService, _audioRepository);
+            _nodeLoader.LoadNode(AudioEditorViewModel);
         }
         
         partial void OnSelectedDialogueEventPresetChanged(DialogueEventPreset? value)

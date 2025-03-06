@@ -3,9 +3,11 @@ using Audio.AudioExplorer;
 using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
+using Editors.Audio.AudioEditor.AudioProjectEditor.DataGridService;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioEditor.NewAudioProject;
 using Editors.Audio.AudioExplorer;
 using Editors.Audio.AudioProjectCompiler;
@@ -37,6 +39,18 @@ namespace Editors.Audio
 
             serviceCollection.AddScoped<IAudioProjectService, AudioProjectService>();
             serviceCollection.AddScoped<IntegrityChecker>();
+
+
+
+
+
+            serviceCollection.AddScoped<NodeLoader>();
+            serviceCollection.AddScoped<AudioProjectEditorDataGridServiceFactory>();
+
+
+
+
+
 
             serviceCollection.AddScoped<CompilerDataProcessor>();
             serviceCollection.AddScoped<SoundBankGenerator>();

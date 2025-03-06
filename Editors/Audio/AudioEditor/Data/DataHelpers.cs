@@ -4,8 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.Data.DataServices;
 using Editors.Audio.Storage;
-using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
+using Editors.Audio.GameSettings.Warhammer3;
 
 namespace Editors.Audio.AudioEditor.Data
 {
@@ -38,7 +39,7 @@ namespace Editors.Audio.AudioEditor.Data
         public static DialogueEvent GetDialogueEventFromName(IAudioProjectService audioProjectService, string dialogueEventName)
         {
             return audioProjectService.AudioProject.SoundBanks
-                .Where(soundBank => soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
+                .Where(soundBank => soundBank.SoundBankType == SoundBanks.Wh3SoundBankType.DialogueEventSoundBank)
                 .SelectMany(soundBank => soundBank.DialogueEvents)
                 .FirstOrDefault(dialogueEvent => dialogueEvent.Name == dialogueEventName);
         }
@@ -364,6 +365,43 @@ namespace Editors.Audio.AudioEditor.Data
         public static string RemoveExtraUnderscoresFromString(string wtfWPF)
         {
             return wtfWPF.Replace("__", "_");
+        }
+
+        public static List<string> GetStatesForStateGroupColumn(DataServiceParameters parameters, string stateGroup)
+        {
+            var states = new List<string>();
+            var moddedStates = GetModdedStates(parameters, stateGroup);
+            var vanillaStates = parameters.AudioRepository.StatesLookupByStateGroup[stateGroup];
+
+            // Display the required states in the ComboBox
+            if (parameters.AudioEditorViewModel.AudioProjectEditorViewModel.ShowModdedStatesOnly && StateGroups.ModdedStateGroups.Contains(stateGroup))
+            {
+                states.Add("Any"); // We still want the "Any" state to show so add it in manually.
+                states.AddRange(moddedStates);
+            }
+            else
+            {
+                states = moddedStates
+                    .Concat(vanillaStates)
+                    .OrderByDescending(state => state == "Any") // "Any" becomes true and sorts first
+                    .ThenBy(state => state) // Then sort the rest alphabetically
+                    .ToList();
+            }
+
+            return states;
+        }
+
+        public static List<string> GetModdedStates(DataServiceParameters parameters, string stateGroup)
+        {
+            var moddedStates = new List<string>();
+
+            if (parameters.AudioProjectService.StateGroupsWithModdedStatesRepository.TryGetValue(stateGroup, out var audioProjectModdedStates))
+            {
+                moddedStates.AddRange(audioProjectModdedStates);
+                return moddedStates;
+            }
+
+            return moddedStates;
         }
     }
 }
