@@ -22,7 +22,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         public string DisplayName { get; set; } = "Audio Project Viewer";
 
-        [ObservableProperty] private string _audioProjectViewerLabel = "Audio Project Viewer";
+        [ObservableProperty] private string _audioProjectViewerLabel;
         [ObservableProperty] private string _audioProjectViewerDataGridTag = "AudioProjectViewerDataGrid";
         [ObservableProperty] private ObservableCollection<Dictionary<string, string>> _audioProjectViewerDataGrid;
         [ObservableProperty] private ObservableCollection<Dictionary<string, string>> _selectedDataGridRows;
@@ -37,6 +37,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         {
             _audioRepository = audioRepository;
             _audioProjectService = audioProjectService;
+
+            _audioProjectViewerLabel = $"{DisplayName}";
         }
 
         public void OnDataGridSelectionChanged(IList selectedItems)
@@ -254,7 +256,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
                 IsRemoveRowButtonEnabled = true;
         }
 
-        public void ResetAudioProjectViewerLabel() => AudioProjectViewerLabel = $"Audio Project Viewer";
+        public void SetAudioProjectViewerLabel(string label)
+        {
+            AudioProjectViewerLabel = label;
+        }
+
+        public void ResetAudioProjectViewerLabel()
+        {
+            AudioProjectViewerLabel = $"Audio Project Viewer";
+        }
         
         public void ResetButtonEnablement()
         {

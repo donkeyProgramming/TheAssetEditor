@@ -1,4 +1,4 @@
-﻿using Editors.Audio.AudioEditor.AudioProjectEditor.DataGridService;
+﻿using Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Data.DataServices;
 using Editors.Audio.Storage;
@@ -46,8 +46,8 @@ namespace Editors.Audio.AudioEditor.Data
         {
             var soundBank = DataHelpers.GetSoundBankFromName(_audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
 
-            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {soundBank.Name}";
-            audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {soundBank.Name}";
+            audioEditorViewModel.AudioProjectEditorViewModel.SetAudioProjectEditorLabel($"Audio Project Editor - {soundBank.Name}");
+            audioEditorViewModel.AudioProjectViewerViewModel.SetAudioProjectViewerLabel($"Audio Project Viewer - {soundBank.Name}");
 
             audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsEnablementAndVisibility();
 
@@ -72,8 +72,8 @@ namespace Editors.Audio.AudioEditor.Data
         {
             var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
 
-            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {DataHelpers.AddExtraUnderscoresToString(dialogueEvent.Name)}";
-            audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {DataHelpers.AddExtraUnderscoresToString(dialogueEvent.Name)}";
+            audioEditorViewModel.AudioProjectEditorViewModel.SetAudioProjectEditorLabel($"Audio Project Editor - {DataHelpers.AddExtraUnderscoresToString(dialogueEvent.Name)}");
+            audioEditorViewModel.AudioProjectViewerViewModel.SetAudioProjectViewerLabel($"Audio Project Viewer - {DataHelpers.AddExtraUnderscoresToString(dialogueEvent.Name)}");
 
             audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsEnablementAndVisibility();
 
@@ -113,8 +113,8 @@ namespace Editors.Audio.AudioEditor.Data
         {
             var stateGroup = DataHelpers.GetStateGroupFromName(_audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
 
-            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorLabel = $"Audio Project Editor - {DataHelpers.AddExtraUnderscoresToString(stateGroup.Name)}";
-            audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerLabel = $"Audio Project Viewer - {DataHelpers.AddExtraUnderscoresToString(stateGroup.Name)}";
+            audioEditorViewModel.AudioProjectEditorViewModel.SetAudioProjectEditorLabel($"Audio Project Editor - {DataHelpers.AddExtraUnderscoresToString(stateGroup.Name)}");
+            audioEditorViewModel.AudioProjectViewerViewModel.SetAudioProjectViewerLabel($"Audio Project Viewer - {DataHelpers.AddExtraUnderscoresToString(stateGroup.Name)}");
 
             var parameters = new DataServiceParameters
             {

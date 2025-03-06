@@ -10,6 +10,7 @@ using Editors.Audio.GameSettings.Warhammer3;
 
 namespace Editors.Audio.AudioEditor.Data
 {
+    // TODO: Sort out which functions belong here and which belong in other helpers.
     public class DataHelpers
     {
         public static Dictionary<string, string> ExtractRowFromSingleRowDataGrid(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
@@ -357,14 +358,14 @@ namespace Editors.Audio.AudioEditor.Data
             states.Insert(insertIndex, newState);
         }
 
-        public static string AddExtraUnderscoresToString(string wtfWPF)
+        public static string AddExtraUnderscoresToString(string wtfWpf)
         {
-            return wtfWPF.Replace("_", "__");
+            return wtfWpf.Replace("_", "__");
         }
 
-        public static string RemoveExtraUnderscoresFromString(string wtfWPF)
+        public static string RemoveExtraUnderscoresFromString(string wtfWpf)
         {
-            return wtfWPF.Replace("__", "_");
+            return wtfWpf.Replace("__", "_");
         }
 
         public static List<string> GetStatesForStateGroupColumn(DataServiceParameters parameters, string stateGroup)

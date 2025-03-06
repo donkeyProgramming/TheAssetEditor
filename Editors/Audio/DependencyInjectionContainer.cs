@@ -3,7 +3,7 @@ using Audio.AudioExplorer;
 using Editors.Audio.AudioEditor;
 using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectEditor;
-using Editors.Audio.AudioEditor.AudioProjectEditor.DataGridService;
+using Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.AudioSettings;

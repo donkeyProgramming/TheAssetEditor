@@ -5,7 +5,7 @@ using Editors.Audio.GameSettings.Warhammer3;
 using Serilog;
 using Shared.Core.ErrorHandling;
 
-namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridService
+namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
 {
     public class ActionEventDataGridService : IAudioProjectEditorDataGridService
     {

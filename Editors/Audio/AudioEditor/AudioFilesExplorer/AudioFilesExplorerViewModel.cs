@@ -21,7 +21,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         private readonly IPackFileService _packFileService;
         private readonly SoundPlayer _soundPlayer;
 
-        public string DisplayName { get; set; } = "Audio Project Explorer";
+        public string DisplayName { get; set; } = "Audio Files Explorer";
 
         [ObservableProperty] private string _audioFilesExplorerLabel = "Audio Project Explorer";
         [ObservableProperty] private bool _isAddAudioFilesButtonEnabled = false;
@@ -49,7 +49,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             if (editablePack == null)
                 return;
 
-            AudioFilesExplorerLabel = $"Audio Files Explorer - {DataHelpers.AddExtraUnderscoresToString(editablePack.Name)}";
+            AudioFilesExplorerLabel = $"{DisplayName} - {DataHelpers.AddExtraUnderscoresToString(editablePack.Name)}";
 
             CreateAudioFilesTree(editablePack);
         }
@@ -270,6 +270,8 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         public void SetButtonEnablement()
         {
+            IsPlayAudioButtonEnabled = SelectedTreeNodes.Count == 1;
+
             var selectedAudioProjectTreeNode = AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
             if (selectedAudioProjectTreeNode == null)
                 return;
@@ -281,8 +283,6 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             }
             else
                 IsAddAudioFilesButtonEnabled = false;
-
-            IsPlayAudioButtonEnabled = SelectedTreeNodes.Count == 1;
         }
 
         public void ResetButtonEnablement()

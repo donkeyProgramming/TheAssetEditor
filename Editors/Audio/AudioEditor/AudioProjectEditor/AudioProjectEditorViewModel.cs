@@ -26,7 +26,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         public string DisplayName { get; set; } = "Audio Project Editor";
 
-        [ObservableProperty] private string _audioProjectEditorLabel = "Audio Project Editor";
+        [ObservableProperty] private string _audioProjectEditorLabel;
         [ObservableProperty] private string _audioProjectEditorDataGridTag = "AudioProjectEditorDataGrid";
         [ObservableProperty] private ObservableCollection<Dictionary<string, string>> _audioProjectEditorDataGrid;
         [ObservableProperty] private bool _isAddRowButtonEnabled = false;
@@ -40,6 +40,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             _audioProjectService = audioProjectService;
             _packFileService = packFileService;
             _standardDialogs = standardDialogs;
+
+            _audioProjectEditorLabel = $"{DisplayName}";
         }
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
@@ -168,8 +170,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             return "Play_Movie_" + filePath;
         }
 
+        public void SetAudioProjectEditorLabel(string label)
+        {
+            AudioProjectEditorLabel = label;
+        }
 
-        public void ResetAudioProjectEditorLabel() => AudioProjectEditorLabel = $"Audio Project Editor";
+        public void ResetAudioProjectEditorLabel()
+        {
+            AudioProjectEditorLabel = $"Audio Project Editor";
+        }
 
         public void ResetButtonEnablement()
         {
@@ -177,9 +186,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             ResetShowModdedStatesCheckBoxEnablement();
         }
 
-        public void ResetAddRowButtonEnablement() => IsAddRowButtonEnabled = false;
+        public void ResetAddRowButtonEnablement()
+        {
+            IsAddRowButtonEnabled = false;
+        }
 
-        public void ResetShowModdedStatesCheckBoxEnablement() => IsShowModdedStatesCheckBoxEnabled = false;
+        public void ResetShowModdedStatesCheckBoxEnablement()
+        {
+            IsShowModdedStatesCheckBoxEnabled = false;
+        }
 
         public void ResetDataGrid()
         {

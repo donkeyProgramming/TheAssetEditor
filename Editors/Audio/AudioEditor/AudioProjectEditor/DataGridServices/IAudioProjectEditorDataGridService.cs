@@ -1,6 +1,6 @@
 ﻿using Editors.Audio.AudioEditor.Data.DataServices;
 
-namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridService
+namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
 {
     public interface IAudioProjectEditorDataGridService
     {

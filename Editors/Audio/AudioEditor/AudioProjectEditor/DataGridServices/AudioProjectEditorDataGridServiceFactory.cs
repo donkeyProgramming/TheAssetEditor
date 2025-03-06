@@ -1,7 +1,7 @@
 ﻿using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridService
+namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
 {
     public class AudioProjectEditorDataGridServiceFactory
     {

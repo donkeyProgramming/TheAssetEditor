@@ -21,7 +21,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         public string DisplayName { get; set; } = "Audio Project Explorer";
 
-        [ObservableProperty] private string _audioProjectExplorerLabel = "Audio Project Explorer";
+        [ObservableProperty] private string _audioProjectExplorerLabel;
         [ObservableProperty] private bool _showEditedAudioProjectItemsOnly;
         [ObservableProperty] private bool _isDialogueEventPresetFilterEnabled = false;
         [ObservableProperty] private DialogueEventPreset? _selectedDialogueEventPreset;
@@ -36,6 +36,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             _audioRepository = audioRepository;
             _audioProjectService = audioProjectService;
             _nodeLoader = nodeLoader;
+
+            _audioProjectExplorerLabel= $"{DisplayName}";
         }
 
         public void OnSelectedAudioProjectTreeNodeChanged(TreeNode value)
