@@ -6,6 +6,7 @@ using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer;
+using Editors.Audio.AudioEditor.AudioProjectViewer.DataGridServices;
 using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioEditor.NewAudioProject;
@@ -46,6 +47,7 @@ namespace Editors.Audio
 
             serviceCollection.AddScoped<NodeLoader>();
             serviceCollection.AddScoped<AudioProjectEditorDataGridServiceFactory>();
+            serviceCollection.AddScoped<AudioProjectViewerDataGridServiceFactory>();
 
 
 

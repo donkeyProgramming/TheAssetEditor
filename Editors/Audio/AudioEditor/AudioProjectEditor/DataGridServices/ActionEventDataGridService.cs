@@ -2,16 +2,12 @@
 using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioEditor.Data.DataServices;
 using Editors.Audio.GameSettings.Warhammer3;
-using Serilog;
-using Shared.Core.ErrorHandling;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
 {
     public class ActionEventDataGridService : IAudioProjectEditorDataGridService
     {
         private readonly IAudioProjectService _audioProjectService;
-
-        private readonly ILogger _logger = Logging.Create<ActionEventDataGridService>();
 
         public ActionEventDataGridService(IAudioProjectService audioProjectService)
         {
@@ -31,8 +27,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
 
             ConfigureDataGrid(parameters);
             SetDataGridData(parameters);
-
-            _logger.Here().Information($"Loaded Action Event {soundBank.Name} in Audio Project Editor");
         }
 
         public void ConfigureDataGrid(DataServiceParameters parameters)

@@ -3,9 +3,9 @@ using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioEditor.Data.DataServices;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
+namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGridServices
 {
-    public class StateGroupDataGridService : IAudioProjectEditorDataGridService
+    public class StateGroupDataGridService : IAudioProjectViewerDataGridService
     {
         private readonly IAudioProjectService _audioProjectService;
         private readonly IAudioRepository _audioRepository;
@@ -23,8 +23,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
             var parameters = new DataServiceParameters
             {
                 AudioEditorViewModel = audioEditorViewModel,
-                AudioProjectService = _audioProjectService,
                 AudioRepository = _audioRepository,
+                AudioProjectService = _audioProjectService,
                 StateGroup = stateGroup
             };
 
@@ -34,16 +34,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
 
         public void ConfigureDataGrid(DataServiceParameters parameters)
         {
-            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
-            var stateGroupColumn = DataGridHelpers.CreateColumn(parameters, DataHelpers.AddExtraUnderscoresToString(parameters.StateGroup.Name), 1.0, DataGridColumnType.EditableTextBox);
+            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
+            var stateGroupColumn = DataGridHelpers.CreateColumn(parameters, DataHelpers.AddExtraUnderscoresToString(parameters.StateGroup.Name), 1.0, DataGridColumnType.ReadOnlyTextBlock);
             dataGrid.Columns.Add(stateGroupColumn);
         }
 
         public void SetDataGridData(DataServiceParameters parameters)
         {
-            var dataGridRow = new Dictionary<string, string> { };
-            dataGridRow[DataHelpers.AddExtraUnderscoresToString(parameters.StateGroup.Name)] = string.Empty;
-            parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(dataGridRow);
+            foreach (var state in parameters.StateGroup.States)
+            {
+                var dataGridRow = new Dictionary<string, string>();
+                dataGridRow[DataHelpers.AddExtraUnderscoresToString(parameters.StateGroup.Name)] = state.Name;
+                parameters.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(dataGridRow);
+            }
         }
     }
 }
