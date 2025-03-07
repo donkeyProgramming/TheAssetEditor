@@ -272,13 +272,14 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             IsPlayAudioButtonEnabled = SelectedTreeNodes.Count == 1;
 
-            var selectedAudioProjectTreeNode = AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
-            if (selectedAudioProjectTreeNode == null)
+            var selectedAudioProjectNode = AudioEditorViewModel.GetSelectedAudioProjectNode();
+            if (selectedAudioProjectNode == null)
                 return;
 
             if (SelectedTreeNodes.Count > 0)
             {
-                if (selectedAudioProjectTreeNode.NodeType == AudioProjectExplorer.NodeType.ActionEventSoundBank || selectedAudioProjectTreeNode.NodeType == AudioProjectExplorer.NodeType.DialogueEvent)
+                var selectedAudioProjectNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
+                if (selectedAudioProjectNodeType == AudioProjectExplorer.NodeType.ActionEventSoundBank || selectedAudioProjectNodeType == AudioProjectExplorer.NodeType.DialogueEvent)
                     IsAddAudioFilesButtonEnabled = true;
             }
             else

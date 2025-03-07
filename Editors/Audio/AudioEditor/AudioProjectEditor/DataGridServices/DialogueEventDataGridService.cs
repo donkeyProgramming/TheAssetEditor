@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.AudioEditor.Data;
-using Editors.Audio.AudioEditor.Data.DataServices;
 using Editors.Audio.Storage;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
@@ -19,60 +18,53 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
 
         public void LoadDataGrid(AudioEditorViewModel audioEditorViewModel)
         {
-            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
-
             if (_audioProjectService.StateGroupsWithModdedStatesRepository.Count > 0)
                 audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
 
-            var parameters = new DataServiceParameters
-            {
-                AudioEditorViewModel = audioEditorViewModel,
-                AudioProjectService = _audioProjectService,
-                AudioRepository = _audioRepository,
-                DialogueEvent = dialogueEvent
-            };
-
-            ConfigureDataGrid(parameters);
-            SetDataGridData(parameters);
+            ConfigureDataGrid(audioEditorViewModel);
+            SetDataGridData(audioEditorViewModel);
         }
 
-        public void ConfigureDataGrid(DataServiceParameters parameters)
+        public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel)
         {
-            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
+            var dataGrid = DataGridHelpers.InitialiseDataGrid(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
 
-            var stateGroupsWithQualifiers = parameters.AudioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[parameters.DialogueEvent.Name];
+            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
 
-            var stateGroupsCount = parameters.AudioRepository.StateGroupsLookupByDialogueEvent[parameters.DialogueEvent.Name].Count;
+            var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
 
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var columnHeader = DataHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
-                var states = DataHelpers.GetStatesForStateGroupColumn(parameters, stateGroupWithQualifier.Value);
-                var stateGroupColumn = DataGridHelpers.CreateColumn(parameters, columnHeader, columnWidth, DataGridColumnType.StateGroupEditableComboBox, states);
+                var states = DataHelpers.GetStatesForStateGroupColumn(audioEditorViewModel, _audioRepository, _audioProjectService, stateGroupWithQualifier.Value);
+                var stateGroupColumn = DataGridHelpers.CreateColumn(audioEditorViewModel, columnHeader, columnWidth, DataGridColumnType.StateGroupEditableComboBox, states);
                 dataGrid.Columns.Add(stateGroupColumn);
             }
         }
 
-        public void SetDataGridData(DataServiceParameters parameters)
+        public void SetDataGridData(AudioEditorViewModel audioEditorViewModel)
         {
             var rowData = new Dictionary<string, string>();
 
-            var stateGroupsWithAnyState = parameters.AudioRepository.StatesLookupByStateGroup
+            var stateGroupsWithAnyState = _audioRepository.StatesLookupByStateGroup
                 .Where(stateGroupColumn => stateGroupColumn.Value.Contains("Any"))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            var stateGroupsWithQualifiers = parameters.AudioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[parameters.DialogueEvent.Name];
+            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+
+            var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var columnName = DataHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
-                var stateGroup = parameters.AudioRepository.GetStateGroupFromStateGroupWithQualifier(parameters.DialogueEvent.Name, DataHelpers.RemoveExtraUnderscoresFromString(columnName));
+                var stateGroup = _audioRepository.GetStateGroupFromStateGroupWithQualifier(dialogueEvent.Name, DataHelpers.RemoveExtraUnderscoresFromString(columnName));
 
                 if (stateGroupsWithAnyState.ContainsKey(stateGroup))
                     rowData[columnName] = "Any"; // Set the cell value to Any as the default value
             }
 
-            parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
+            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
         }
     }
 }

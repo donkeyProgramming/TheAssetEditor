@@ -4,16 +4,15 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioSettings;
-using Editors.Audio.AudioEditor.Data.DataServices;
-using Editors.Audio.Storage;
 using Editors.Audio.GameSettings.Warhammer3;
+using Editors.Audio.Storage;
 
 namespace Editors.Audio.AudioEditor.Data
 {
     // TODO: Sort out which functions belong here and which belong in other helpers.
     public class DataHelpers
     {
-        public static Dictionary<string, string> ExtractRowFromSingleRowDataGrid(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        public static Dictionary<string, string> GetAudioProjectEditorDataGridRow(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
         {
             var newRow = new Dictionary<string, string>();
 
@@ -368,14 +367,14 @@ namespace Editors.Audio.AudioEditor.Data
             return wtfWpf.Replace("__", "_");
         }
 
-        public static List<string> GetStatesForStateGroupColumn(DataServiceParameters parameters, string stateGroup)
+        public static List<string> GetStatesForStateGroupColumn(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService, string stateGroup)
         {
             var states = new List<string>();
-            var moddedStates = GetModdedStates(parameters, stateGroup);
-            var vanillaStates = parameters.AudioRepository.StatesLookupByStateGroup[stateGroup];
+            var moddedStates = GetModdedStates(audioProjectService, stateGroup);
+            var vanillaStates = audioRepository.StatesLookupByStateGroup[stateGroup];
 
             // Display the required states in the ComboBox
-            if (parameters.AudioEditorViewModel.AudioProjectEditorViewModel.ShowModdedStatesOnly && StateGroups.ModdedStateGroups.Contains(stateGroup))
+            if (audioEditorViewModel.AudioProjectEditorViewModel.ShowModdedStatesOnly && StateGroups.ModdedStateGroups.Contains(stateGroup))
             {
                 states.Add("Any"); // We still want the "Any" state to show so add it in manually.
                 states.AddRange(moddedStates);
@@ -392,11 +391,12 @@ namespace Editors.Audio.AudioEditor.Data
             return states;
         }
 
-        public static List<string> GetModdedStates(DataServiceParameters parameters, string stateGroup)
+        // TODO Maybe add to AudioProjectService 
+        public static List<string> GetModdedStates(IAudioProjectService audioProjectService, string stateGroup)
         {
             var moddedStates = new List<string>();
 
-            if (parameters.AudioProjectService.StateGroupsWithModdedStatesRepository.TryGetValue(stateGroup, out var audioProjectModdedStates))
+            if (audioProjectService.StateGroupsWithModdedStatesRepository.TryGetValue(stateGroup, out var audioProjectModdedStates))
             {
                 moddedStates.AddRange(audioProjectModdedStates);
                 return moddedStates;

@@ -10,6 +10,8 @@ using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
+using NodeType = Editors.Audio.AudioEditor.AudioProjectExplorer.NodeType;
+using TreeNode = Editors.Audio.AudioEditor.AudioProjectExplorer.TreeNode;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -83,14 +85,19 @@ namespace Editors.Audio.AudioEditor
             _audioProjectService.CompileAudioProject();
         }
 
-        public void ResetAudioEditorViewModelData()
+        public TreeNode GetSelectedAudioProjectNode()
         {
-            AudioProjectEditorViewModel.AudioProjectEditorDataGrid = null;
-            AudioProjectViewerViewModel.AudioProjectViewerDataGrid = null;
-            AudioProjectViewerViewModel.SelectedDataGridRows = null;
-            AudioProjectViewerViewModel.CopiedDataGridRows = null;
-            AudioProjectExplorerViewModel._selectedAudioProjectTreeNode = null;
-            AudioProjectExplorerViewModel.AudioProjectTree.Clear();
+            return AudioProjectExplorerViewModel.GetSelectedAudioProjectNode();
+        }
+
+        public string GetSelectedAudioProjectNodeName()
+        {
+            return AudioProjectExplorerViewModel.GetSelectedAudioProjectNodeName();
+        }
+
+        public NodeType GetSelectedAudioProjectNodeType()
+        {
+            return AudioProjectExplorerViewModel.GetSelectedAudioProjectNodeType();
         }
 
         public void Initialise()
@@ -100,6 +107,16 @@ namespace Editors.Audio.AudioEditor
             AudioProjectViewerViewModel.SelectedDataGridRows = [];
             AudioProjectViewerViewModel.CopiedDataGridRows = [];
             AudioProjectExplorerViewModel.DialogueEventPresets = [];
+        }
+
+        public void ResetAudioEditorViewModelData()
+        {
+            AudioProjectEditorViewModel.AudioProjectEditorDataGrid = null;
+            AudioProjectViewerViewModel.AudioProjectViewerDataGrid = null;
+            AudioProjectViewerViewModel.SelectedDataGridRows = null;
+            AudioProjectViewerViewModel.CopiedDataGridRows = null;
+            AudioProjectExplorerViewModel._selectedAudioProjectTreeNode = null;
+            AudioProjectExplorerViewModel.AudioProjectTree.Clear();
         }
 
         public void Close()

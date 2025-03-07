@@ -10,7 +10,6 @@ using Editors.Audio.AudioEditor.Data;
 using Editors.Audio.AudioEditor.Data.DataServices;
 using Editors.Audio.Storage;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.Data.DataManager;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer
 {
@@ -19,6 +18,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
         private readonly IAudioRepository _audioRepository;
         private readonly IAudioProjectService _audioProjectService;
+        private readonly DataManager _dataManager;
+        private readonly AudioProjectDataServiceFactory _audioProjectDataServiceFactory;
 
         public string DisplayName { get; set; } = "Audio Project Viewer";
 
@@ -33,10 +34,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         [ObservableProperty] private bool _isCopyEnabled = false;
         [ObservableProperty] private bool _isPasteEnabled = false;
 
-        public AudioProjectViewerViewModel(IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        public AudioProjectViewerViewModel(IAudioRepository audioRepository, IAudioProjectService audioProjectService, DataManager dataManager, AudioProjectDataServiceFactory audioProjectDataServiceFactory)
         {
             _audioRepository = audioRepository;
             _audioProjectService = audioProjectService;
+            _dataManager = dataManager;
+            _audioProjectDataServiceFactory = audioProjectDataServiceFactory;
 
             _audioProjectViewerLabel = $"{DisplayName}";
         }
@@ -95,7 +98,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             {
                 audioSettings = DataHelpers.GetAudioSettingsFromAudioProjectViewerStatePathItem(AudioEditorViewModel, _audioProjectService, _audioRepository);
 
-                var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
+                var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, AudioEditorViewModel.GetSelectedAudioProjectNodeName());
                 var statePath = DataHelpers.GetStatePathFromDataGridRow(_audioRepository, AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0], dialogueEvent);
 
                 if (statePath.Sound != null)
@@ -170,9 +173,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
                 .Any(copiedRow => AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid
                 .Any(dataGridRow => copiedRow.Count == dataGridRow.Count && !copiedRow.Except(dataGridRow).Any()));
 
-            if (AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
+            var selectedNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
+            if (selectedNodeType == NodeType.DialogueEvent)
             {
-                var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
+                var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, AudioEditorViewModel.GetSelectedAudioProjectNodeName());
                 var dialogueEventStateGroups = _audioRepository
                     .QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name]
                     .Select(kvp => DataHelpers.AddExtraUnderscoresToString(kvp.Key))
@@ -190,17 +194,18 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         [RelayCommand] public void EditAudioProjectViewerDataGridRow()
         {
-            HandleEditingAudioProjectViewerData(AudioEditorViewModel, _audioProjectService, _audioRepository);
+            _dataManager.HandleEditingAudioProjectViewerData(AudioEditorViewModel);
         }
 
         [RelayCommand] public void RemoveAudioProjectViewerDataGridRow()
         {
-            HandleRemovingAudioProjectViewerData(AudioEditorViewModel, _audioProjectService, _audioRepository);
+            _dataManager.HandleRemovingAudioProjectViewerData(AudioEditorViewModel);
         }
 
         [RelayCommand] public void CopyRows()
         {
-            if (AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
+            var selectedNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
+            if (selectedNodeType == NodeType.DialogueEvent)
                 CopyDialogueEventRows();
         }
 
@@ -216,28 +221,19 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         [RelayCommand]  public void PasteRows()
         {
-            if (AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
+            var selectedNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
+            if (selectedNodeType == NodeType.DialogueEvent)
                 PasteDialogueEventRows();
         }
 
         public void PasteDialogueEventRows()
         {
-            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
-
             foreach (var copiedDataGridRow in AudioEditorViewModel.AudioProjectViewerViewModel.CopiedDataGridRows)
             {
                 AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(copiedDataGridRow);
 
-                var parameters = new DataServiceParameters
-                {
-                    AudioEditorViewModel = AudioEditorViewModel,
-                    AudioProjectEditorRow = copiedDataGridRow,
-                    AudioRepository = _audioRepository,
-                    DialogueEvent = dialogueEvent
-                };
-
-                var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetDataService(dialogueEvent);
-                audioProjectDataServiceInstance.AddAudioProjectEditorDataGridDataToAudioProject(parameters);
+                var dialogueEventDataService = _audioProjectDataServiceFactory.GetService(NodeType.DialogueEvent);
+                dialogueEventDataService.AddAudioProjectEditorDataGridDataToAudioProject(AudioEditorViewModel);
             }
 
             SetPasteEnablement();

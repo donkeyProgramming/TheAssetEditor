@@ -1,49 +1,37 @@
 ﻿using System.Collections.Generic;
 using Editors.Audio.AudioEditor.Data;
-using Editors.Audio.AudioEditor.Data.DataServices;
-using Editors.Audio.Storage;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
 {
     public class StateGroupDataGridService : IAudioProjectEditorDataGridService
     {
         private readonly IAudioProjectService _audioProjectService;
-        private readonly IAudioRepository _audioRepository;
 
-        public StateGroupDataGridService(IAudioProjectService audioProjectService, IAudioRepository audioRepository)
+        public StateGroupDataGridService(IAudioProjectService audioProjectService)
         {
             _audioProjectService = audioProjectService;
-            _audioRepository = audioRepository;
         }
 
         public void LoadDataGrid(AudioEditorViewModel audioEditorViewModel)
         {
-            var stateGroup = DataHelpers.GetStateGroupFromName(_audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
-
-            var parameters = new DataServiceParameters
-            {
-                AudioEditorViewModel = audioEditorViewModel,
-                AudioProjectService = _audioProjectService,
-                AudioRepository = _audioRepository,
-                StateGroup = stateGroup
-            };
-
-            ConfigureDataGrid(parameters);
-            SetDataGridData(parameters);
+            ConfigureDataGrid(audioEditorViewModel);
+            SetDataGridData(audioEditorViewModel);
         }
 
-        public void ConfigureDataGrid(DataServiceParameters parameters)
+        public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel)
         {
-            var dataGrid = DataGridHelpers.InitialiseDataGrid(parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
-            var stateGroupColumn = DataGridHelpers.CreateColumn(parameters, DataHelpers.AddExtraUnderscoresToString(parameters.StateGroup.Name), 1.0, DataGridColumnType.EditableTextBox);
+            var stateGroup = DataHelpers.GetStateGroupFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var dataGrid = DataGridHelpers.InitialiseDataGrid(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
+            var stateGroupColumn = DataGridHelpers.CreateColumn(audioEditorViewModel, DataHelpers.AddExtraUnderscoresToString(stateGroup.Name), 1.0, DataGridColumnType.EditableTextBox);
             dataGrid.Columns.Add(stateGroupColumn);
         }
 
-        public void SetDataGridData(DataServiceParameters parameters)
+        public void SetDataGridData(AudioEditorViewModel audioEditorViewModel)
         {
             var dataGridRow = new Dictionary<string, string> { };
-            dataGridRow[DataHelpers.AddExtraUnderscoresToString(parameters.StateGroup.Name)] = string.Empty;
-            parameters.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(dataGridRow);
+            var stateGroup = DataHelpers.GetStateGroupFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            dataGridRow[DataHelpers.AddExtraUnderscoresToString(stateGroup.Name)] = string.Empty;
+            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(dataGridRow);
         }
     }
 }

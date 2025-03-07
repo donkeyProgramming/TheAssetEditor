@@ -8,8 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
-using Editors.Audio.AudioEditor.Data.DataServices;
-using Editors.Audio.Storage;
 
 namespace Editors.Audio.AudioEditor.Data
 {
@@ -31,7 +29,7 @@ namespace Editors.Audio.AudioEditor.Data
             return dataGrid;
         }
 
-        public static DataGridTemplateColumn CreateColumn(DataServiceParameters parameters, string columnHeader, double columnWidth, DataGridColumnType columnType, List<string> states = null, bool useAbsoluteWidth = false)
+        public static DataGridTemplateColumn CreateColumn(AudioEditorViewModel audioEditorViewModel, string columnHeader, double columnWidth, DataGridColumnType columnType, List<string> states = null, bool useAbsoluteWidth = false)
         {
             var width = useAbsoluteWidth ? DataGridLengthUnitType.Pixel : DataGridLengthUnitType.Star;
             var column = new DataGridTemplateColumn
@@ -42,18 +40,18 @@ namespace Editors.Audio.AudioEditor.Data
             };
 
             if (columnType == DataGridColumnType.EditableTextBox)
-                column.CellTemplate = CreateEditableTextBoxTemplate(parameters.AudioEditorViewModel, parameters.AudioProjectService, parameters.AudioRepository, columnHeader);
+                column.CellTemplate = CreateEditableTextBoxTemplate(audioEditorViewModel, columnHeader);
             else if (columnType == DataGridColumnType.StateGroupEditableComboBox)
-                column.CellTemplate = CreateStatesComboBoxTemplate(parameters.AudioEditorViewModel, parameters.AudioProjectService, parameters.AudioRepository, columnHeader, states);
+                column.CellTemplate = CreateStatesComboBoxTemplate(audioEditorViewModel, columnHeader, states);
             else if (columnType == DataGridColumnType.ReadOnlyTextBlock)
                 column.CellTemplate = CreateReadOnlyTextBlockTemplate(columnHeader);
             else if (columnType == DataGridColumnType.FileSelectButton)
-                column.CellTemplate = CreateFileSelectButtonTemplate(parameters);
+                column.CellTemplate = CreateFileSelectButtonTemplate(audioEditorViewModel);
             return column;
         }
 
         // TODO: Add ctrl + v and ctrl + c shortcuts for the combo boxes.
-        public static DataTemplate CreateStatesComboBoxTemplate(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository, string stateGroupWithQualifierWithExtraUnderscores, List<string> states)
+        public static DataTemplate CreateStatesComboBoxTemplate(AudioEditorViewModel audioEditorViewModel, string stateGroupWithQualifierWithExtraUnderscores, List<string> states)
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(ComboBox));
@@ -176,7 +174,7 @@ namespace Editors.Audio.AudioEditor.Data
             return template;
         }
 
-        public static DataTemplate CreateEditableTextBoxTemplate(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository, string columnHeader)
+        public static DataTemplate CreateEditableTextBoxTemplate(AudioEditorViewModel audioEditorViewModel, string columnHeader)
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(TextBox));
@@ -210,7 +208,7 @@ namespace Editors.Audio.AudioEditor.Data
             return template;
         }
 
-        public static DataTemplate CreateFileSelectButtonTemplate(DataServiceParameters parameters)
+        public static DataTemplate CreateFileSelectButtonTemplate(AudioEditorViewModel audioEditorViewModel)
         {
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(Button));
@@ -219,40 +217,40 @@ namespace Editors.Audio.AudioEditor.Data
 
             factory.AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler((sender, args) =>
             {
-                parameters.AudioEditorViewModel.AudioProjectEditorViewModel.SelectMovieFile();
+                audioEditorViewModel.AudioProjectEditorViewModel.SelectMovieFile();
             }));
 
             template.VisualTree = factory;
             return template;
         }
 
-        public static void CreateContextMenu(DataServiceParameters parameters, DataGrid dataGrid)
+        public static void CreateContextMenu(AudioEditorViewModel audioEditorViewModel, DataGrid dataGrid)
         {
             var contextMenu = new ContextMenu();
 
             var copyMenuItem = new MenuItem
             {
                 Header = "Copy",
-                Command = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.CopyRowsCommand
+                Command = audioEditorViewModel.AudioProjectViewerViewModel.CopyRowsCommand
             };
 
             BindingOperations.SetBinding(copyMenuItem, UIElement.IsEnabledProperty,
                 new Binding("IsCopyEnabled")
                 {
-                    Source = parameters.AudioEditorViewModel.AudioProjectViewerViewModel,
+                    Source = audioEditorViewModel.AudioProjectViewerViewModel,
                     Mode = BindingMode.OneWay
                 });
 
             var pasteMenuItem = new MenuItem
             {
                 Header = "Paste",
-                Command = parameters.AudioEditorViewModel.AudioProjectViewerViewModel.PasteRowsCommand
+                Command = audioEditorViewModel.AudioProjectViewerViewModel.PasteRowsCommand
             };
 
             BindingOperations.SetBinding(pasteMenuItem, UIElement.IsEnabledProperty,
                 new Binding("IsPasteEnabled")
                 {
-                    Source = parameters.AudioEditorViewModel.AudioProjectViewerViewModel,
+                    Source = audioEditorViewModel.AudioProjectViewerViewModel,
                     Mode = BindingMode.OneWay
                 });
 

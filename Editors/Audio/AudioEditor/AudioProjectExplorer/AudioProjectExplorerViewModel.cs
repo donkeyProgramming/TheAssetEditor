@@ -145,6 +145,21 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             SearchQuery = "";
         }
 
+        public TreeNode GetSelectedAudioProjectNode()
+        {
+            return _selectedAudioProjectTreeNode;
+        }
+
+        public string GetSelectedAudioProjectNodeName()
+        {
+            return _selectedAudioProjectTreeNode.Name;
+        }
+
+        public NodeType GetSelectedAudioProjectNodeType()
+        {
+            return _selectedAudioProjectTreeNode.NodeType;
+        }
+
         public void ResetDialogueEventFilterComboBoxSelectedItem(WatermarkComboBox watermarkComboBox)
         {
             watermarkComboBox.SelectedItem = null;

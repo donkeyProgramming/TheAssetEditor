@@ -5,14 +5,13 @@ using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Data;
-using Editors.Audio.AudioEditor.Data.DataServices;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
-using static Editors.Audio.AudioEditor.Data.DataManager;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor
 {
@@ -23,6 +22,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         private readonly IAudioProjectService _audioProjectService;
         private readonly IPackFileService _packFileService;
         private readonly IStandardDialogs _standardDialogs;
+        private readonly DataManager _dataManager;
+        private readonly AudioProjectEditorDataGridServiceFactory _audioProjectEditorDataGridServiceFactory;
 
         public string DisplayName { get; set; } = "Audio Project Editor";
 
@@ -34,34 +35,34 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         [ObservableProperty] private bool _isShowModdedStatesCheckBoxEnabled = false;
         [ObservableProperty] private bool _isShowModdedStatesCheckBoxVisible = false;
 
-        public AudioProjectEditorViewModel (IAudioRepository audioRepository, IAudioProjectService audioProjectService, IPackFileService packFileService, IStandardDialogs standardDialogs)
+        public AudioProjectEditorViewModel (
+            IAudioRepository audioRepository,
+            IAudioProjectService audioProjectService,
+            IPackFileService packFileService,
+            IStandardDialogs standardDialogs,
+            DataManager dataManager,
+            AudioProjectEditorDataGridServiceFactory audioProjectEditorDataGridServiceFactory)
         {
             _audioRepository = audioRepository;
             _audioProjectService = audioProjectService;
             _packFileService = packFileService;
             _standardDialogs = standardDialogs;
+            _dataManager = dataManager;
+            _audioProjectEditorDataGridServiceFactory = audioProjectEditorDataGridServiceFactory;
 
             _audioProjectEditorLabel = $"{DisplayName}";
         }
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
         {
-            if (AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
+            var selectedNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
+            if (selectedNodeType == NodeType.DialogueEvent)
             {
-                var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
-
                 // Clear the previous DataGrid Data
                 DataGridHelpers.ClearDataGridCollection(AudioProjectEditorDataGrid);
 
-                var parameters = new DataServiceParameters();
-                parameters.AudioEditorViewModel = AudioEditorViewModel;
-                parameters.AudioProjectService = _audioProjectService;
-                parameters.AudioRepository = _audioRepository;
-                parameters.DialogueEvent = dialogueEvent;
-
-                var audioProjectDataServiceInstance = AudioProjectDataServiceFactory.GetDataService(dialogueEvent);
-                audioProjectDataServiceInstance.ConfigureAudioProjectEditorDataGrid(parameters);
-                audioProjectDataServiceInstance.SetAudioProjectEditorDataGridData(parameters);
+                var audioProjectEditorDataGridService = _audioProjectEditorDataGridServiceFactory.GetService(NodeType.DialogueEvent);
+                audioProjectEditorDataGridService.LoadDataGrid(AudioEditorViewModel);
             }
         }
 
@@ -70,7 +71,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             if (AudioProjectEditorDataGrid.Count == 0)
                 return;
 
-            HandleAddingRowData(AudioEditorViewModel, _audioProjectService, _audioRepository);
+            _dataManager.HandleAddingRowData(AudioEditorViewModel);
         }
 
         public void SetAddRowButtonEnablement()
@@ -80,7 +81,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             if (AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Count == 0)
                 return;
 
-            if (AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType != NodeType.StateGroup)
+            var selectedNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
+            if (selectedNodeType != NodeType.StateGroup)
             {
                 if (AudioEditorViewModel.AudioSettingsViewModel.AudioFiles.Count == 0)
                     return;
@@ -108,7 +110,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         public void SetShowModdedStatesOnlyButtonEnablementAndVisibility()
         {
-            if (AudioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEvent)
+            var selectedNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
+            if (selectedNodeType == NodeType.DialogueEvent)
             {
                 AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxVisible = true;
 
@@ -123,7 +126,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         private static bool CheckIfAudioProjectViewerRowExists(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
         {
-            var audioProjectEditorData = DataHelpers.ExtractRowFromSingleRowDataGrid(audioEditorViewModel, audioRepository, audioProjectService)
+            var audioProjectEditorData = DataHelpers.GetAudioProjectEditorDataGridRow(audioEditorViewModel, audioRepository, audioProjectService)
                 .ToList();
 
             var rowExists = audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid

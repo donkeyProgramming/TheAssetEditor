@@ -14,13 +14,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices
             _audioRepository = audioRepositry;
         }
 
-        public IAudioProjectEditorDataGridService GetDataGridService(NodeType nodeType)
+        public IAudioProjectEditorDataGridService GetService(NodeType nodeType)
         {
             return nodeType switch
             {
                 NodeType.ActionEventSoundBank => new ActionEventDataGridService(_audioProjectService),
                 NodeType.DialogueEvent => new DialogueEventDataGridService(_audioProjectService, _audioRepository),
-                NodeType.StateGroup => new StateGroupDataGridService(_audioProjectService, _audioRepository),
+                NodeType.StateGroup => new StateGroupDataGridService(_audioProjectService),
                 _ => throw new System.NotImplementedException($"No service defined for node type {nodeType}")
             };
         }
