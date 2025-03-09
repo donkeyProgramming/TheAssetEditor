@@ -25,7 +25,7 @@ namespace Editors.Audio.AudioEditor
 
         private readonly IPackFileService _packFileService;
         private readonly IStandardDialogs _standardDialogs;
-        private readonly IAudioProjectService _audioProjectService;
+        private readonly IAudioEditorService _audioEditorService;
         private readonly IntegrityChecker _integrityChecker;
 
         public string DisplayName { get; set; } = "Audio Editor";
@@ -38,7 +38,7 @@ namespace Editors.Audio.AudioEditor
             AudioSettingsViewModel audioSettingsViewModel,
             IPackFileService packFileService,
             IStandardDialogs standardDialogs,
-            IAudioProjectService audioProjectService,
+            IAudioEditorService audioEditorService,
             IntegrityChecker integrityChecker)
         {
             AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
@@ -57,7 +57,7 @@ namespace Editors.Audio.AudioEditor
 
             _packFileService = packFileService;
             _standardDialogs = standardDialogs;
-            _audioProjectService = audioProjectService;
+            _audioEditorService = audioEditorService;
             _integrityChecker = integrityChecker;
 
             Initialise();
@@ -67,22 +67,22 @@ namespace Editors.Audio.AudioEditor
 
         [RelayCommand] public void NewAudioProject()
         {
-            NewAudioProjectWindow.Show(this, _packFileService, _audioProjectService, _standardDialogs);
+            NewAudioProjectWindow.Show(this, _packFileService, _audioEditorService, _standardDialogs);
         }
 
         [RelayCommand] public void SaveAudioProject()
         {
-            _audioProjectService.SaveAudioProject();
+            _audioEditorService.SaveAudioProject();
         }
 
         [RelayCommand] public void LoadAudioProject()
         {
-            _audioProjectService.LoadAudioProject(this);
+            _audioEditorService.LoadAudioProject(this);
         }
 
         [RelayCommand] public void CompileAudioProject()
         {
-            _audioProjectService.CompileAudioProject();
+            _audioEditorService.CompileAudioProject();
         }
 
         public TreeNode GetSelectedAudioProjectNode()
@@ -122,7 +122,7 @@ namespace Editors.Audio.AudioEditor
         public void Close()
         {
             ResetAudioEditorViewModelData();
-            _audioProjectService.ResetAudioProject();
+            _audioEditorService.ResetAudioProject();
         }
     }
 }

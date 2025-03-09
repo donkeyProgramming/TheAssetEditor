@@ -5,9 +5,10 @@ using System.IO;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices;
+using Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -19,7 +20,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
     {
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
         private readonly IAudioRepository _audioRepository;
-        private readonly IAudioProjectService _audioProjectService;
+        private readonly IAudioEditorService _audioEditorService;
         private readonly IPackFileService _packFileService;
         private readonly IStandardDialogs _standardDialogs;
         private readonly DataManager _dataManager;
@@ -37,14 +38,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         public AudioProjectEditorViewModel (
             IAudioRepository audioRepository,
-            IAudioProjectService audioProjectService,
+            IAudioEditorService audioEditorService,
             IPackFileService packFileService,
             IStandardDialogs standardDialogs,
             DataManager dataManager,
             AudioProjectEditorDataGridServiceFactory audioProjectEditorDataGridServiceFactory)
         {
             _audioRepository = audioRepository;
-            _audioProjectService = audioProjectService;
+            _audioEditorService = audioEditorService;
             _packFileService = packFileService;
             _standardDialogs = standardDialogs;
             _dataManager = dataManager;
@@ -58,7 +59,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             var selectedNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
             if (selectedNodeType == NodeType.DialogueEvent)
             {
-                // Clear the previous DataGrid Data
                 DataGridHelpers.ClearDataGridCollection(AudioProjectEditorDataGrid);
 
                 var audioProjectEditorDataGridService = _audioProjectEditorDataGridServiceFactory.GetService(NodeType.DialogueEvent);
@@ -88,7 +88,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                     return;
             }
 
-            var rowExistsCheckResult = CheckIfAudioProjectViewerRowExists(AudioEditorViewModel, _audioRepository, _audioProjectService);
+            var rowExistsCheckResult = CheckIfAudioProjectViewerRowExists(AudioEditorViewModel, _audioRepository, _audioEditorService);
             if (rowExistsCheckResult)
             {
                 AudioEditorViewModel.AudioProjectEditorViewModel.IsAddRowButtonEnabled = false;
@@ -115,18 +115,18 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             {
                 AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxVisible = true;
 
-                if (_audioProjectService.StateGroupsWithModdedStatesRepository.Count > 0)
+                if (_audioEditorService.StateGroupsWithModdedStatesRepository.Count > 0)
                     AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
-                else if (_audioProjectService.StateGroupsWithModdedStatesRepository.Count == 0)
+                else if (_audioEditorService.StateGroupsWithModdedStatesRepository.Count == 0)
                     AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
             }
             else
                 AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxVisible = false;
         }
 
-        private static bool CheckIfAudioProjectViewerRowExists(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        private static bool CheckIfAudioProjectViewerRowExists(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioEditorService audioEditorService)
         {
-            var audioProjectEditorData = DataHelpers.GetAudioProjectEditorDataGridRow(audioEditorViewModel, audioRepository, audioProjectService)
+            var audioProjectEditorData = DataGridHelpers.GetAudioProjectEditorDataGridRow(audioEditorViewModel, audioRepository, audioEditorService)
                 .ToList();
 
             var rowExists = audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid

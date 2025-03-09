@@ -7,9 +7,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Media;
 
-namespace Editors.Audio.AudioEditor.Data
+namespace Editors.Audio.AudioEditor.DataGrids
 {
     public enum DataGridColumnType
     {
@@ -19,13 +18,13 @@ namespace Editors.Audio.AudioEditor.Data
         FileSelectButton
     }
 
-    public class DataGridHelpers
+    public class DataGridConfiguration
     {
         public static DataGrid InitialiseDataGrid(string dataGridTag)
         {
-            var dataGrid = GetDataGridByTag(dataGridTag);
-            ClearDataGridColumns(dataGrid);
-            ClearDataGridContextMenu(dataGrid);
+            var dataGrid = DataGridHelpers.GetDataGridByTag(dataGridTag);
+            DataGridHelpers.ClearDataGridColumns(dataGrid);
+            DataGridHelpers.ClearDataGridContextMenu(dataGrid);
             return dataGrid;
         }
 
@@ -258,48 +257,6 @@ namespace Editors.Audio.AudioEditor.Data
             contextMenu.Items.Add(pasteMenuItem);
 
             dataGrid.ContextMenu = contextMenu;
-        }
-
-        public static DataGrid GetDataGridByTag(string dataGridTag)
-        {
-            var mainWindow = Application.Current.MainWindow;
-            return FindVisualChild<DataGrid>(mainWindow, dataGridTag);
-        }
-
-        public static void ClearDataGridCollection(ObservableCollection<Dictionary<string, string>> dataGrid)
-        {
-            dataGrid.Clear();
-        }
-
-        public static void ClearDataGridColumns(DataGrid dataGrid)
-        {
-            dataGrid.Columns.Clear();
-        }
-
-        public static void ClearDataGridContextMenu(DataGrid dataGrid)
-        {
-            if (dataGrid.ContextMenu != null)
-                dataGrid.ContextMenu.Items.Clear();
-        }
-
-        public static T FindVisualChild<T>(DependencyObject parent, string identifier) where T : DependencyObject
-        {
-            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-            {
-                var child = VisualTreeHelper.GetChild(parent, i);
-
-                if (child is T typedChild && child is FrameworkElement element)
-                {
-                    // Check both Name and Tag because DataGrids use Tag as Name can't be set via a binding for some reason...
-                    if (element.Name == identifier || element.Tag?.ToString() == identifier)
-                        return typedChild;
-                }
-
-                var foundChild = FindVisualChild<T>(child, identifier);
-                if (foundChild != null)
-                    return foundChild;
-            }
-            return null;
         }
     }
 }

@@ -1,68 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioSettings;
+using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 
 namespace Editors.Audio.AudioEditor.Data
 {
-    // TODO: Sort out which functions belong here and which belong in other helpers.
     public class DataHelpers
     {
-        public static Dictionary<string, string> GetAudioProjectEditorDataGridRow(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        public static SoundBank GetSoundBankFromName(IAudioEditorService audioEditorService, string soundBankName)
         {
-            var newRow = new Dictionary<string, string>();
-
-            foreach (var kvp in audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid[0])
-            {
-                var columnName = kvp.Key;
-                var cellValue = kvp.Value;
-
-                if (cellValue == null)
-                    cellValue = string.Empty;
-
-                newRow[columnName] = cellValue.ToString();
-            }
-
-            return newRow;
-        }
-
-        public static SoundBank GetSoundBankFromName(IAudioProjectService audioProjectService, string soundBankName)
-        {
-            return audioProjectService.AudioProject.SoundBanks
+            return audioEditorService.AudioProject.SoundBanks
                 .FirstOrDefault(soundBank => soundBank.Name == soundBankName);
         }
 
-        public static DialogueEvent GetDialogueEventFromName(IAudioProjectService audioProjectService, string dialogueEventName)
+        public static DialogueEvent GetDialogueEventFromName(IAudioEditorService audioEditorService, string dialogueEventName)
         {
-            return audioProjectService.AudioProject.SoundBanks
+            return audioEditorService.AudioProject.SoundBanks
                 .Where(soundBank => soundBank.SoundBankType == SoundBanks.Wh3SoundBankType.DialogueEventSoundBank)
                 .SelectMany(soundBank => soundBank.DialogueEvents)
                 .FirstOrDefault(dialogueEvent => dialogueEvent.Name == dialogueEventName);
         }
 
-        public static StateGroup GetStateGroupFromName(IAudioProjectService audioProjectService, string stateGroupName)
+        public static StateGroup GetStateGroupFromName(IAudioEditorService audioEditorService, string stateGroupName)
         {
-            return audioProjectService.AudioProject.StateGroups
+            return audioEditorService.AudioProject.StateGroups
                 .FirstOrDefault(stateGroup => stateGroup.Name == stateGroupName);
-        }
-
-        public static TreeNode GetAudioProjectTreeNodeFromName(ObservableCollection<TreeNode> audioProjecTree, string nodeName)
-        {
-            foreach (var node in audioProjecTree)
-            {
-                if (node.Name == nodeName)
-                    return node;
-
-                var childNode = GetAudioProjectTreeNodeFromName(node.Children, nodeName);
-                if (childNode != null)
-                    return childNode;
-            }
-
-            return null;
         }
 
         public static ActionEvent GetActionEventFromDataGridRow(Dictionary<string, string> dataGridRow, SoundBank actionEventSoundBank)
@@ -78,7 +43,7 @@ namespace Editors.Audio.AudioEditor.Data
             return null;
         }
 
-        public static ActionEvent CreateActionEvent(AudioSettingsViewModel audioSettingsViewModel, Dictionary<string, string> dataGridRow)
+        public static ActionEvent CreateActionEventFromDataGridRow(AudioSettingsViewModel audioSettingsViewModel, Dictionary<string, string> dataGridRow)
         {
             var actionEvent = new ActionEvent();
 
@@ -136,7 +101,7 @@ namespace Editors.Audio.AudioEditor.Data
             var statePath = new StatePath();
             foreach (var kvp in dataGridRow)
             {
-                var columnName = RemoveExtraUnderscoresFromString(kvp.Key);
+                var columnName = DataGridHelpers.RemoveExtraUnderscoresFromString(kvp.Key);
                 var columnValue = kvp.Value;
                 statePath.Nodes.Add(new StatePathNode
                 {
@@ -148,12 +113,12 @@ namespace Editors.Audio.AudioEditor.Data
             return statePath.Nodes;
         }
 
-        public static StatePath CreateStatePath(IAudioRepository audioRepository, AudioSettingsViewModel audioSettingsViewModel, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
+        public static StatePath CreateStatePathFromDataGridRow(IAudioRepository audioRepository, AudioSettingsViewModel audioSettingsViewModel, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)
         {
             var statePath = new StatePath();
             foreach (var kvp in dataGridRow)
             {
-                var columnName = RemoveExtraUnderscoresFromString(kvp.Key);
+                var columnName = DataGridHelpers.RemoveExtraUnderscoresFromString(kvp.Key);
                 var columnValue = kvp.Value;
                 statePath.Nodes.Add(new StatePathNode
                 {
@@ -233,11 +198,11 @@ namespace Editors.Audio.AudioEditor.Data
             return state;
         }
 
-        public static AudioSettings GetAudioSettingsFromAudioProjectViewerActionEventItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
+        public static AudioSettings GetAudioSettingsFromAudioProjectViewerActionEvent(AudioEditorViewModel audioEditorViewModel, IAudioEditorService audioEditorService)
         {
             var audioProjectItem = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
             var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
-            var soundBank = GetSoundBankFromName(audioProjectService, audioProjectItem.Name);
+            var soundBank = GetSoundBankFromName(audioEditorService, audioProjectItem.Name);
             var actionEvent = GetActionEventFromDataGridRow(selectedAudioProjectViewerDataGridRow, soundBank);
 
             // We could just not run this function unless we know the object has a random sequence container but we'll keep it as this as we may introduce more containers or enable settings for sounds in future.
@@ -247,11 +212,11 @@ namespace Editors.Audio.AudioEditor.Data
                 return null;
         }
 
-        public static AudioSettings GetAudioSettingsFromAudioProjectViewerStatePathItem(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService, IAudioRepository audioRepository)
+        public static AudioSettings GetAudioSettingsFromAudioProjectViewerStatePath(AudioEditorViewModel audioEditorViewModel, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {
             var audioProjectItem = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
             var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
-            var dialogueEvent = GetDialogueEventFromName(audioProjectService, audioProjectItem.Name);
+            var dialogueEvent = GetDialogueEventFromName(audioEditorService, audioProjectItem.Name);
             var statePath = GetStatePathFromDataGridRow(audioRepository, selectedAudioProjectViewerDataGridRow, dialogueEvent);
 
             // We could just not run this function unless we know the object has a random sequence container but we'll keep it as this as we may introduce more containers or enable settings for sounds in future.
@@ -259,29 +224,6 @@ namespace Editors.Audio.AudioEditor.Data
                 return statePath.RandomSequenceContainer.AudioSettings;
             else
                 return null;
-        }
-
-        public static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> newRow)
-        {
-            var insertIndex = 0;
-            var newValue = newRow.First().Value.ToString();
-
-            for (var i = 0; i < audioProjectViewerDataGrid.Count; i++)
-            {
-                var currentValue = audioProjectViewerDataGrid[i].First().Value.ToString();
-                var comparison = string.Compare(newValue, currentValue, StringComparison.Ordinal);
-                if (comparison < 0)
-                {
-                    insertIndex = i;
-                    break;
-                }
-                else if (comparison == 0)
-                    insertIndex = i + 1;
-                else
-                    insertIndex = i + 1;
-            }
-
-            audioProjectViewerDataGrid.Insert(insertIndex, newRow);
         }
 
         public static void InsertStatePathAlphabetically(DialogueEvent selectedDialogueEvent, StatePath statePath)
@@ -355,54 +297,6 @@ namespace Editors.Audio.AudioEditor.Data
             }
 
             states.Insert(insertIndex, newState);
-        }
-
-        public static string AddExtraUnderscoresToString(string wtfWpf)
-        {
-            return wtfWpf.Replace("_", "__");
-        }
-
-        public static string RemoveExtraUnderscoresFromString(string wtfWpf)
-        {
-            return wtfWpf.Replace("__", "_");
-        }
-
-        public static List<string> GetStatesForStateGroupColumn(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioProjectService audioProjectService, string stateGroup)
-        {
-            var states = new List<string>();
-            var moddedStates = GetModdedStates(audioProjectService, stateGroup);
-            var vanillaStates = audioRepository.StatesLookupByStateGroup[stateGroup];
-
-            // Display the required states in the ComboBox
-            if (audioEditorViewModel.AudioProjectEditorViewModel.ShowModdedStatesOnly && StateGroups.ModdedStateGroups.Contains(stateGroup))
-            {
-                states.Add("Any"); // We still want the "Any" state to show so add it in manually.
-                states.AddRange(moddedStates);
-            }
-            else
-            {
-                states = moddedStates
-                    .Concat(vanillaStates)
-                    .OrderByDescending(state => state == "Any") // "Any" becomes true and sorts first
-                    .ThenBy(state => state) // Then sort the rest alphabetically
-                    .ToList();
-            }
-
-            return states;
-        }
-
-        // TODO Maybe add to AudioProjectService 
-        public static List<string> GetModdedStates(IAudioProjectService audioProjectService, string stateGroup)
-        {
-            var moddedStates = new List<string>();
-
-            if (audioProjectService.StateGroupsWithModdedStatesRepository.TryGetValue(stateGroup, out var audioProjectModdedStates))
-            {
-                moddedStates.AddRange(audioProjectModdedStates);
-                return moddedStates;
-            }
-
-            return moddedStates;
         }
     }
 }

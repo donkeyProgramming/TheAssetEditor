@@ -1,6 +1,6 @@
-﻿namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGridServices
+﻿namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
 {
-    public interface IAudioProjectViewerDataGridService
+    public interface IAudioProjectEditorDataGridService
     {
         public void LoadDataGrid(AudioEditorViewModel audioEditorViewModel);
         public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel);

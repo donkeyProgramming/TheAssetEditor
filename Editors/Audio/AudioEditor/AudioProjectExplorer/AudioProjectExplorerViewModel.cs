@@ -16,7 +16,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
     {
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
         private readonly IAudioRepository _audioRepository;
-        private readonly IAudioProjectService _audioProjectService;
+        private readonly IAudioEditorService _audioEditorService;
         private readonly NodeLoader _nodeLoader;
 
         public string DisplayName { get; set; } = "Audio Project Explorer";
@@ -31,10 +31,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private ObservableCollection<TreeNode> _unfilteredTree;
         public TreeNode _selectedAudioProjectTreeNode;
 
-        public AudioProjectExplorerViewModel(IAudioRepository audioRepository, IAudioProjectService audioProjectService, NodeLoader nodeLoader)
+        public AudioProjectExplorerViewModel(IAudioRepository audioRepository, IAudioEditorService audioEditorService, NodeLoader nodeLoader)
         {
             _audioRepository = audioRepository;
-            _audioProjectService = audioProjectService;
+            _audioEditorService = audioEditorService;
             _nodeLoader = nodeLoader;
 
             _audioProjectExplorerLabel= $"{DisplayName}";
@@ -48,7 +48,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         
         partial void OnSelectedDialogueEventPresetChanged(DialogueEventPreset? value)
         {
-            ApplyDialogueEventPresetFiltering(AudioEditorViewModel, _audioProjectService);
+            ApplyDialogueEventPresetFiltering(AudioEditorViewModel, _audioEditorService);
         }
 
         partial void OnSearchQueryChanged(string value)
@@ -107,12 +107,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         partial void OnShowEditedAudioProjectItemsOnlyChanged(bool value)
         {
-            TreeBuilder.FilterEditedAudioProjectItems(_audioProjectService, this, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
+            TreeBuilder.FilterEditedAudioProjectItems(_audioEditorService, this, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
         }
 
         public void CreateAudioProjectTree()
         {
-            TreeBuilder.CreateAudioProjectTree(_audioProjectService, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
+            TreeBuilder.CreateAudioProjectTree(_audioEditorService, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
             _unfilteredTree = new ObservableCollection<TreeNode>(AudioProjectTree);
 
         }

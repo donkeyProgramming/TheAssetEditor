@@ -1,30 +1,31 @@
 ﻿using System.Linq;
+using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor.Data.DataServices
+namespace Editors.Audio.AudioEditor.Data
 {
     public class StateGroupDataService : IAudioProjectDataService
     {
-        private readonly IAudioProjectService _audioProjectService;
+        private readonly IAudioEditorService _audioEditorService;
         private readonly IAudioRepository _audioRepository;
 
-        public StateGroupDataService(IAudioProjectService audioProjectService, IAudioRepository audioRepository)
+        public StateGroupDataService(IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {
-            _audioProjectService = audioProjectService;
+            _audioEditorService = audioEditorService;
             _audioRepository = audioRepository;
         }
 
         public void AddAudioProjectEditorDataGridDataToAudioProject(AudioEditorViewModel audioEditorViewModel)
         {
-            var audioProjectEditorRow = DataHelpers.GetAudioProjectEditorDataGridRow(audioEditorViewModel, _audioRepository, _audioProjectService);
+            var audioProjectEditorRow = DataGridHelpers.GetAudioProjectEditorDataGridRow(audioEditorViewModel, _audioRepository, _audioEditorService);
             var state = DataHelpers.CreateStateFromDataGridRow(audioProjectEditorRow);
-            var stateGroup = DataHelpers.GetStateGroupFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var stateGroup = DataHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
             DataHelpers.InsertStateAlphabetically(stateGroup, state);
         }
 
         public void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioEditorViewModel audioEditorViewModel)
         {
-            var stateGroup = DataHelpers.GetStateGroupFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var stateGroup = DataHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
             var dataGridRowsCopy = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList(); // Create a copy to prevent an error where dataGridRows is modified while being iterated over
             foreach (var dataGridRow in dataGridRowsCopy)
             {

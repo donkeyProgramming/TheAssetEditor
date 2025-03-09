@@ -49,11 +49,11 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        public void CheckAudioProjectDialogueEventIntegrity(IAudioProjectService audioProjectService)
+        public void CheckAudioProjectDialogueEventIntegrity(IAudioEditorService audioEditorService)
         {
             var audioProjectDialogueEventsWithStateGroups = new Dictionary<string, List<string>>();
 
-            foreach (var soundBank in audioProjectService.AudioProject.SoundBanks)
+            foreach (var soundBank in audioEditorService.AudioProject.SoundBanks)
             {
                 if (soundBank.SoundBankType == Wh3SoundBankType.DialogueEventSoundBank)
                     foreach (var dialogueEvent in soundBank.DialogueEvents)
@@ -72,10 +72,10 @@ namespace Editors.Audio.AudioEditor
                 var gameDialogueEventStateGroups = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Key];
                 var audioProjectDialogueEventStateGroups = dialogueEvent.Value;
                 if (!gameDialogueEventStateGroups.SequenceEqual(audioProjectDialogueEventStateGroups))
-                    audioProjectService.DialogueEventsWithStateGroupsWithIntegrityError[dialogueEvent.Key] = audioProjectDialogueEventStateGroups;
+                    audioEditorService.DialogueEventsWithStateGroupsWithIntegrityError[dialogueEvent.Key] = audioProjectDialogueEventStateGroups;
             }
 
-            if (audioProjectService.DialogueEventsWithStateGroupsWithIntegrityError.Count == 0)
+            if (audioEditorService.DialogueEventsWithStateGroupsWithIntegrityError.Count == 0)
                 return;
 
             var message = $"Dialogue Events State Groups integrity check failed." +
@@ -84,7 +84,7 @@ namespace Editors.Audio.AudioEditor
                 $" The new State Group(s) will have no State set in them so you need to click Update Row and add the State(s). " +
                 $"\n\nAffected Dialogue Events:";
 
-            foreach (var dialogueEvent in audioProjectService.DialogueEventsWithStateGroupsWithIntegrityError)
+            foreach (var dialogueEvent in audioEditorService.DialogueEventsWithStateGroupsWithIntegrityError)
             {
                 message += $"\n\nDialogue Event: {dialogueEvent.Key}";
 

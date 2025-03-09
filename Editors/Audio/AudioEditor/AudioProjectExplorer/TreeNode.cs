@@ -25,5 +25,20 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         [ObservableProperty] bool _isVisible = true;
         [ObservableProperty] public string _presetFilterDisplayText;
         [ObservableProperty] public DialogueEventPreset? _presetFilter = DialogueEventPreset.ShowAll;
+
+        public static TreeNode GetAudioProjectTreeNodeFromName(ObservableCollection<TreeNode> audioProjectTree, string nodeName)
+        {
+            foreach (var node in audioProjectTree)
+            {
+                if (node.Name == nodeName)
+                    return node;
+
+                var childNode = GetAudioProjectTreeNodeFromName(node.Children, nodeName);
+                if (childNode != null)
+                    return childNode;
+            }
+
+            return null;
+        }
     }
 }

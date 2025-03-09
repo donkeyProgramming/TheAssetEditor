@@ -1,6 +1,7 @@
-﻿using Editors.Audio.AudioEditor.AudioProjectEditor.DataGridServices;
+﻿using Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
-using Editors.Audio.AudioEditor.AudioProjectViewer.DataGridServices;
+using Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid;
+using Editors.Audio.AudioEditor.DataGrids;
 using Serilog;
 using Shared.Core.ErrorHandling;
 
@@ -8,18 +9,18 @@ namespace Editors.Audio.AudioEditor.Data
 {
     public class NodeLoader
     {
-        private readonly IAudioProjectService _audioProjectService;
+        private readonly IAudioEditorService _audioEditorService;
         private readonly AudioProjectEditorDataGridServiceFactory _audioProjectEditorDataGridServiceFactory;
         private readonly AudioProjectViewerDataGridServiceFactory _audioProjectViewerDataGridServiceFactory;
 
         private readonly ILogger _logger = Logging.Create<NodeLoader>();
 
         public NodeLoader(
-            IAudioProjectService audioProjectService,
+            IAudioEditorService audioEditorService,
             AudioProjectEditorDataGridServiceFactory audioProjectEditorDataGridServiceFactory,
             AudioProjectViewerDataGridServiceFactory audioProjectViewerDataGridServiceFactory)
         {
-            _audioProjectService = audioProjectService;
+            _audioEditorService = audioEditorService;
             _audioProjectEditorDataGridServiceFactory = audioProjectEditorDataGridServiceFactory;
             _audioProjectViewerDataGridServiceFactory = audioProjectViewerDataGridServiceFactory;
         }
@@ -43,7 +44,7 @@ namespace Editors.Audio.AudioEditor.Data
 
         private void LoadActionEventSoundBank(AudioEditorViewModel audioEditorViewModel)
         {
-            var soundBank = DataHelpers.GetSoundBankFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var soundBank = DataHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
 
             audioEditorViewModel.AudioProjectEditorViewModel.SetAudioProjectEditorLabel($"Audio Project Editor - {soundBank.Name}");
             audioEditorViewModel.AudioProjectViewerViewModel.SetAudioProjectViewerLabel($"Audio Project Viewer - {soundBank.Name}");
@@ -61,17 +62,17 @@ namespace Editors.Audio.AudioEditor.Data
 
         private void LoadDialogueEvent(AudioEditorViewModel audioEditorViewModel)
         {
-            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
 
-            audioEditorViewModel.AudioProjectEditorViewModel.SetAudioProjectEditorLabel($"Audio Project Editor - {DataHelpers.AddExtraUnderscoresToString(dialogueEvent.Name)}");
-            audioEditorViewModel.AudioProjectViewerViewModel.SetAudioProjectViewerLabel($"Audio Project Viewer - {DataHelpers.AddExtraUnderscoresToString(dialogueEvent.Name)}");
+            audioEditorViewModel.AudioProjectEditorViewModel.SetAudioProjectEditorLabel($"Audio Project Editor - {DataGridHelpers.AddExtraUnderscoresToString(dialogueEvent.Name)}");
+            audioEditorViewModel.AudioProjectViewerViewModel.SetAudioProjectViewerLabel($"Audio Project Viewer - {DataGridHelpers.AddExtraUnderscoresToString(dialogueEvent.Name)}");
 
             audioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsEnablementAndVisibility();
 
             // Rebuild StateGroupsWithModdedStates in case any have been added since the Audio Project was initialised
-            _audioProjectService.BuildStateGroupsWithModdedStatesRepository(_audioProjectService.AudioProject.StateGroups, _audioProjectService.StateGroupsWithModdedStatesRepository);
+            _audioEditorService.BuildStateGroupsWithModdedStatesRepository(_audioEditorService.AudioProject.StateGroups, _audioEditorService.StateGroupsWithModdedStatesRepository);
 
-            if (_audioProjectService.StateGroupsWithModdedStatesRepository.Count > 0)
+            if (_audioEditorService.StateGroupsWithModdedStatesRepository.Count > 0)
                 audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
 
             var audioProjectEditorDataGridService = _audioProjectEditorDataGridServiceFactory.GetService(NodeType.DialogueEvent);
@@ -85,18 +86,18 @@ namespace Editors.Audio.AudioEditor.Data
 
         private void LoadDialogueEventSoundBank(AudioEditorViewModel audioEditorViewModel)
         {
-            var soundBank = DataHelpers.GetSoundBankFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
-            DialogueEventFilter.HandleDialogueEventsPresetFilter(audioEditorViewModel.AudioProjectExplorerViewModel, _audioProjectService, soundBank.Name);
+            var soundBank = DataHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            DialogueEventFilter.HandleDialogueEventsPresetFilter(audioEditorViewModel.AudioProjectExplorerViewModel, _audioEditorService, soundBank.Name);
 
             _logger.Here().Information($"Loaded Dialogue Event SoundBank: {soundBank.Name}");
         }
 
         private void LoadStateGroup(AudioEditorViewModel audioEditorViewModel)
         {
-            var stateGroup = DataHelpers.GetStateGroupFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var stateGroup = DataHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
 
-            audioEditorViewModel.AudioProjectEditorViewModel.SetAudioProjectEditorLabel($"Audio Project Editor - {DataHelpers.AddExtraUnderscoresToString(stateGroup.Name)}");
-            audioEditorViewModel.AudioProjectViewerViewModel.SetAudioProjectViewerLabel($"Audio Project Viewer - {DataHelpers.AddExtraUnderscoresToString(stateGroup.Name)}");
+            audioEditorViewModel.AudioProjectEditorViewModel.SetAudioProjectEditorLabel($"Audio Project Editor - {DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name)}");
+            audioEditorViewModel.AudioProjectViewerViewModel.SetAudioProjectViewerLabel($"Audio Project Viewer - {DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name)}");
 
             var audioProjectEditorDataGridService = _audioProjectEditorDataGridServiceFactory.GetService(NodeType.StateGroup);
             audioProjectEditorDataGridService.LoadDataGrid(audioEditorViewModel);

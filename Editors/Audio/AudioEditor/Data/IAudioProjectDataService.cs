@@ -1,4 +1,4 @@
-﻿namespace Editors.Audio.AudioEditor.Data.DataServices
+﻿namespace Editors.Audio.AudioEditor.Data
 {
     public interface IAudioProjectDataService
     {

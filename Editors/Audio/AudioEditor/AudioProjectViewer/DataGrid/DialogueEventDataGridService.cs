@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGridServices
+namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
 {
     public class DialogueEventDataGridService : IAudioProjectViewerDataGridService
     {
-        private readonly IAudioProjectService _audioProjectService;
+        private readonly IAudioEditorService _audioEditorService;
         private readonly IAudioRepository _audioRepository;
 
-        public DialogueEventDataGridService(IAudioProjectService audioProjectService, IAudioRepository audioRepository)
+        public DialogueEventDataGridService(IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {
-            _audioProjectService = audioProjectService;
+            _audioEditorService = audioEditorService;
             _audioRepository = audioRepository;
         }
 
@@ -24,10 +25,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGridServices
 
         public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel)
         {
-            var dataGrid = DataGridHelpers.InitialiseDataGrid(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
-            DataGridHelpers.CreateContextMenu(audioEditorViewModel, dataGrid);
+            var dataGrid = DataGridConfiguration.InitialiseDataGrid(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
+            DataGridConfiguration.CreateContextMenu(audioEditorViewModel, dataGrid);
 
-            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
 
             var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
@@ -35,17 +36,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGridServices
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var stateGroupColumnHeader = DataHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
-                var states = DataHelpers.GetStatesForStateGroupColumn(audioEditorViewModel, _audioRepository, _audioProjectService, stateGroupWithQualifier.Value);
-
-                var stateGroupColumn = DataGridHelpers.CreateColumn(audioEditorViewModel, stateGroupColumnHeader, columnWidth, DataGridColumnType.ReadOnlyTextBlock, states);
+                var stateGroupColumnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var stateGroupColumn = DataGridConfiguration.CreateColumn(audioEditorViewModel, stateGroupColumnHeader, columnWidth, DataGridColumnType.ReadOnlyTextBlock);
                 dataGrid.Columns.Add(stateGroupColumn);
             }
         }
 
         public void SetDataGridData(AudioEditorViewModel audioEditorViewModel)
         {
-            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioProjectService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
 
             foreach (var statePath in dialogueEvent.StatePaths)
@@ -58,7 +57,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGridServices
 
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
-                var stateGroupColumnHeader = DataHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
+                var stateGroupColumnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
                 var node = statePath.Nodes.FirstOrDefault(node => node.StateGroup.Name == stateGroupWithQualifier.Value);
                 if (node != null)
                     rowData[stateGroupColumnHeader] = node.State.Name;

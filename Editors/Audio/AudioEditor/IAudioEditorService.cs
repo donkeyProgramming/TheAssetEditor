@@ -4,7 +4,7 @@ using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor
 {
-    public interface IAudioProjectService
+    public interface IAudioEditorService
     {
         AudioProject AudioProject { get; set; }
         string AudioProjectFileName { get; set; }

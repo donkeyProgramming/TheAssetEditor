@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.GameSettings.Warhammer3;
 using Serilog;
@@ -18,9 +19,9 @@ using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
 
 namespace Editors.Audio.AudioEditor
 {
-    public class AudioProjectService : IAudioProjectService
+    public class AudioEditorService : IAudioEditorService
     {
-        readonly ILogger _logger = Logging.Create<AudioProjectService>();
+        readonly ILogger _logger = Logging.Create<AudioEditorService>();
 
         private readonly IPackFileService _packFileService;
         private readonly IFileSaveService _fileSaveService;
@@ -31,7 +32,7 @@ namespace Editors.Audio.AudioEditor
         private readonly WemGenerator _wemGenerator;
         private readonly DatGenerator _datGenerator;
 
-        public AudioProjectService(
+        public AudioEditorService(
             IPackFileService packFileService,
             IFileSaveService fileSaveService,
             IStandardDialogs standardDialogs,
@@ -88,7 +89,7 @@ namespace Editors.Audio.AudioEditor
                 var bytes = file.DataSource.ReadData();
                 var audioProjectJson = Encoding.UTF8.GetString(bytes);
 
-                audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataHelpers.AddExtraUnderscoresToString(fileName)}";
+                audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataGridHelpers.AddExtraUnderscoresToString(fileName)}";
 
                 // Reset data
                 audioEditorViewModel.ResetAudioEditorViewModelData();
@@ -117,7 +118,7 @@ namespace Editors.Audio.AudioEditor
 
         public void InitialiseAudioProject(AudioEditorViewModel audioEditorViewModel, string fileName, string directory, string language)
         {
-            audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataHelpers.AddExtraUnderscoresToString(fileName)}";
+            audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataGridHelpers.AddExtraUnderscoresToString(fileName)}";
 
             AudioProjectFileName = fileName;
             AudioProjectDirectory = directory;
