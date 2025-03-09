@@ -2,7 +2,7 @@
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor.Data
+namespace Editors.Audio.AudioEditor.AudioProjectData
 {
     public class ActionEventDataService : IAudioProjectDataService
     {
@@ -15,21 +15,21 @@ namespace Editors.Audio.AudioEditor.Data
             _audioRepository = audioRepository;
         }
 
-        public void AddAudioProjectEditorDataGridDataToAudioProject(AudioEditorViewModel audioEditorViewModel)
+        public void AddToAudioProject(AudioEditorViewModel audioEditorViewModel)
         {
             var audioProjectEditorRow = DataGridHelpers.GetAudioProjectEditorDataGridRow(audioEditorViewModel, _audioRepository, _audioEditorService);
-            var actionEvent = DataHelpers.CreateActionEventFromDataGridRow(audioEditorViewModel.AudioSettingsViewModel, audioProjectEditorRow);
-            var soundBank = DataHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
-            DataHelpers.InsertActionEventAlphabetically(soundBank, actionEvent);
+            var actionEvent = AudioProjectHelpers.CreateActionEventFromDataGridRow(audioEditorViewModel.AudioSettingsViewModel, audioProjectEditorRow);
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            AudioProjectHelpers.InsertActionEventAlphabetically(soundBank, actionEvent);
         }
 
-        public void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioEditorViewModel audioEditorViewModel)
+        public void RemoveFromAudioProject(AudioEditorViewModel audioEditorViewModel)
         {
-            var soundBank = DataHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
             var dataGridRowsCopy = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList(); // Create a copy to prevent an error where dataGridRows is modified while being iterated over
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var actionEvent = DataHelpers.GetActionEventFromDataGridRow(dataGridRow, soundBank);
+                var actionEvent = AudioProjectHelpers.GetActionEventFromDataGridRow(dataGridRow, soundBank);
                 soundBank.ActionEvents.Remove(actionEvent);
                 audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
             }

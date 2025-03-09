@@ -18,7 +18,7 @@ namespace Editors.Audio.AudioEditor
             _audioRepository = audioRepository;
         }
 
-        public void CheckAudioEditorDialogueEventIntegrity(List<(string Name, Wh3SoundBankSubtype SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
+        public void CheckDialogueEventIntegrity(List<(string Name, Wh3SoundBankSubtype SoundBank, DialogueEventPreset[] DialogueEventPreset, bool Recommended)> dialogueEventData)
         {
             var gameDialogueEvents = _audioRepository.StateGroupsLookupByDialogueEvent.Keys.ToList();
             var audioEditorDialogueEvents = dialogueEventData.Select(data => data.Name).ToList();

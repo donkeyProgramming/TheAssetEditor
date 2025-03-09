@@ -23,7 +23,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         public string DisplayName { get; set; } = "Audio Files Explorer";
 
-        [ObservableProperty] private string _audioFilesExplorerLabel = "Audio Project Explorer";
+        [ObservableProperty] private string _audioFilesExplorerLabel;
         [ObservableProperty] private bool _isAddAudioFilesButtonEnabled = false;
         [ObservableProperty] private bool _isPlayAudioButtonEnabled = false;
         [ObservableProperty] private string _searchQuery;
@@ -38,6 +38,8 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             _soundPlayer = soundPlayer;
 
             SelectedTreeNodes.CollectionChanged += OnSelectedTreeNodesChanged;
+
+            AudioFilesExplorerLabel = $"{DisplayName}";
 
             Initialise();
         }

@@ -12,7 +12,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
 {
     internal static class DataGridHelpers
     {
-        public static void ClearDataGridCollection(ObservableCollection<Dictionary<string, string>> dataGrid)
+        public static void ClearDataGrid(ObservableCollection<Dictionary<string, string>> dataGrid)
         {
             dataGrid.Clear();
         }
@@ -72,7 +72,17 @@ namespace Editors.Audio.AudioEditor.DataGrids
             return newRow;
         }
 
-        public static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> newRow)
+        public static void AddAudioProjectViewerDataGridDataToAudioProjectEditor(AudioEditorViewModel audioEditorViewModel)
+        {
+            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0]);
+        }
+
+        public static void AddAudioProjectEditorDataGridDataToAudioProjectViewer(AudioEditorViewModel audioEditorViewModel, Dictionary<string, string> audioProjectEditorRow)
+        {
+            InsertDataGridRowAlphabetically(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid, audioProjectEditorRow);
+        }
+
+        private static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> newRow)
         {
             var insertIndex = 0;
             var newValue = newRow.First().Value.ToString();
@@ -123,7 +133,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
         {
             var moddedStates = new List<string>();
 
-            if (audioEditorService.StateGroupsWithModdedStatesRepository.TryGetValue(stateGroup, out var audioProjectModdedStates))
+            if (audioEditorService.ModdedStatesByStateGroupLookup.TryGetValue(stateGroup, out var audioProjectModdedStates))
             {
                 moddedStates.AddRange(audioProjectModdedStates);
                 return moddedStates;

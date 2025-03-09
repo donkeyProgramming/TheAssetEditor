@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.GameSettings.Warhammer3;
 
@@ -28,7 +27,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
 
-            var soundBank = DataHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
             if (soundBank.Name == SoundBanks.MoviesDisplayString)
             {
                 var eventColumn = DataGridConfiguration.CreateColumn(audioEditorViewModel, "Event", columnWidth, DataGridColumnType.ReadOnlyTextBlock);

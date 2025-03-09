@@ -7,7 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectViewer;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.Storage;
 using Shared.Core.PackFiles;
@@ -51,7 +51,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             _dataManager = dataManager;
             _audioProjectEditorDataGridServiceFactory = audioProjectEditorDataGridServiceFactory;
 
-            _audioProjectEditorLabel = $"{DisplayName}";
+            AudioProjectEditorLabel = $"{DisplayName}";
         }
 
         partial void OnShowModdedStatesOnlyChanged(bool value)
@@ -59,7 +59,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             var selectedNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
             if (selectedNodeType == NodeType.DialogueEvent)
             {
-                DataGridHelpers.ClearDataGridCollection(AudioProjectEditorDataGrid);
+                DataGridHelpers.ClearDataGrid(AudioProjectEditorDataGrid);
 
                 var audioProjectEditorDataGridService = _audioProjectEditorDataGridServiceFactory.GetService(NodeType.DialogueEvent);
                 audioProjectEditorDataGridService.LoadDataGrid(AudioEditorViewModel);
@@ -71,7 +71,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             if (AudioProjectEditorDataGrid.Count == 0)
                 return;
 
-            _dataManager.HandleAddingRowData(AudioEditorViewModel);
+            _dataManager.HandleAddingData(AudioEditorViewModel);
         }
 
         public void SetAddRowButtonEnablement()
@@ -115,9 +115,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             {
                 AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxVisible = true;
 
-                if (_audioEditorService.StateGroupsWithModdedStatesRepository.Count > 0)
+                if (_audioEditorService.ModdedStatesByStateGroupLookup.Count > 0)
                     AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
-                else if (_audioEditorService.StateGroupsWithModdedStatesRepository.Count == 0)
+                else if (_audioEditorService.ModdedStatesByStateGroupLookup.Count == 0)
                     AudioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = false;
             }
             else
@@ -201,7 +201,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         public void ResetDataGrid()
         {
-            DataGridHelpers.ClearDataGridCollection(AudioProjectEditorDataGrid);
+            DataGridHelpers.ClearDataGrid(AudioProjectEditorDataGrid);
             DataGridHelpers.ClearDataGridColumns(DataGridHelpers.GetDataGridByTag(AudioProjectEditorDataGridTag));
         }
 

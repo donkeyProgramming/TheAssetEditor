@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 
@@ -11,6 +13,8 @@ namespace Editors.Audio.AudioEditor.AudioSettings
     // TODO: Add visibility to all settings.
     public partial class AudioSettingsViewModel : ObservableObject, IEditorInterface
     {
+        public AudioEditorViewModel AudioEditorViewModel { get; set; }
+
         public string DisplayName { get; set; } = "Audio Settings";
 
         // Playlist Type
@@ -91,9 +95,9 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                 AudioFiles.Add(audioFile);
         }
 
-        public Data.AudioSettings BuildAudioSettings()
+        public AudioProjectData.AudioSettings BuildAudioSettings()
         {
-            var audioSettings = new Data.AudioSettings();
+            var audioSettings = new AudioProjectData.AudioSettings();
 
             if (AudioFiles.Count > 1)
             {
@@ -127,7 +131,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
             return audioSettings;
         }
 
-        public void SetAudioSettingsFromAudioProjectItemAudioSettings(Data.AudioSettings audioSettings, int audioFilesCount)
+        public void SetAudioSettingsFromAudioProjectItemAudioSettings(AudioProjectData.AudioSettings audioSettings, int audioFilesCount)
         {
             ResetAudioFiles();
             ResetAudioSettingsPlaylistType();
@@ -180,6 +184,11 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
         public void SetAudioSettingsEnablementAndVisibility()
         {
+            // We only want to show the settings for these nodes
+            var selectedNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
+            if (selectedNodeType != NodeType.ActionEventSoundBank && selectedNodeType != NodeType.DialogueEvent)
+                return;
+
             IsAudioSettingsVisible = true;
 
             if (AudioFiles.Count > 1)

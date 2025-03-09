@@ -2,7 +2,7 @@
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor.Data
+namespace Editors.Audio.AudioEditor.AudioProjectData
 {
     public class StateGroupDataService : IAudioProjectDataService
     {
@@ -15,21 +15,21 @@ namespace Editors.Audio.AudioEditor.Data
             _audioRepository = audioRepository;
         }
 
-        public void AddAudioProjectEditorDataGridDataToAudioProject(AudioEditorViewModel audioEditorViewModel)
+        public void AddToAudioProject(AudioEditorViewModel audioEditorViewModel)
         {
             var audioProjectEditorRow = DataGridHelpers.GetAudioProjectEditorDataGridRow(audioEditorViewModel, _audioRepository, _audioEditorService);
-            var state = DataHelpers.CreateStateFromDataGridRow(audioProjectEditorRow);
-            var stateGroup = DataHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
-            DataHelpers.InsertStateAlphabetically(stateGroup, state);
+            var state = AudioProjectHelpers.CreateStateFromDataGridRow(audioProjectEditorRow);
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            AudioProjectHelpers.InsertStateAlphabetically(stateGroup, state);
         }
 
-        public void RemoveAudioProjectEditorDataGridDataFromAudioProject(AudioEditorViewModel audioEditorViewModel)
+        public void RemoveFromAudioProject(AudioEditorViewModel audioEditorViewModel)
         {
-            var stateGroup = DataHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
             var dataGridRowsCopy = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList(); // Create a copy to prevent an error where dataGridRows is modified while being iterated over
             foreach (var dataGridRow in dataGridRowsCopy)
             {
-                var state = DataHelpers.GetStateFromDataGridRow(dataGridRow, stateGroup);
+                var state = AudioProjectHelpers.GetStateFromDataGridRow(dataGridRow, stateGroup);
                 stateGroup.States.Remove(state);
                 audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
             }

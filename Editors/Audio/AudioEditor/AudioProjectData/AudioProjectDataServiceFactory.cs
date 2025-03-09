@@ -1,8 +1,7 @@
 ﻿using Editors.Audio.AudioEditor.AudioProjectExplorer;
-using Editors.Audio.AudioEditor.Data.DataServices;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor.Data
+namespace Editors.Audio.AudioEditor.AudioProjectData
 {
     public class AudioProjectDataServiceFactory
     {

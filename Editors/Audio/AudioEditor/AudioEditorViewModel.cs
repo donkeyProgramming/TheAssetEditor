@@ -54,6 +54,7 @@ namespace Editors.Audio.AudioEditor
             AudioProjectViewerViewModel.AudioEditorViewModel = this;
 
             AudioSettingsViewModel = audioSettingsViewModel;
+            AudioSettingsViewModel.AudioEditorViewModel = this;
 
             _packFileService = packFileService;
             _standardDialogs = standardDialogs;
@@ -62,7 +63,7 @@ namespace Editors.Audio.AudioEditor
 
             Initialise();
 
-            _integrityChecker.CheckAudioEditorDialogueEventIntegrity(DialogueEventData);
+            _integrityChecker.CheckDialogueEventIntegrity(DialogueEventData);
         }
 
         [RelayCommand] public void NewAudioProject()

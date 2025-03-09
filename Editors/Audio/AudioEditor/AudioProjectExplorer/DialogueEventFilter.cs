@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.GameSettings.Warhammer3;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
@@ -13,7 +13,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             var audioProjectTreeNode = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
             if (audioProjectTreeNode.NodeType == NodeType.DialogueEventSoundBank)
             {
-                var soundBank = DataHelpers.GetSoundBankFromName(audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+                var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
 
                 var presetFilter = audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset;
 

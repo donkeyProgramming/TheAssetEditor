@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.DataGrids;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
@@ -21,7 +21,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
 
         public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel)
         {
-            var stateGroup = DataHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
             var dataGrid = DataGridConfiguration.InitialiseDataGrid(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
             var stateGroupColumn = DataGridConfiguration.CreateColumn(audioEditorViewModel, DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name), 1.0, DataGridColumnType.EditableTextBox);
             dataGrid.Columns.Add(stateGroupColumn);
@@ -30,7 +30,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
         public void SetDataGridData(AudioEditorViewModel audioEditorViewModel)
         {
             var dataGridRow = new Dictionary<string, string> { };
-            var stateGroup = DataHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
             dataGridRow[DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name)] = string.Empty;
             audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(dataGridRow);
         }

@@ -3,8 +3,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Data;
-using Editors.Audio.Storage;
 using Shared.Core.ToolCreation;
 using Xceed.Wpf.Toolkit;
 using static Editors.Audio.AudioEditor.AudioProjectExplorer.DialogueEventFilter;
@@ -15,7 +13,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
     public partial class AudioProjectExplorerViewModel : ObservableObject, IEditorInterface
     {
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
-        private readonly IAudioRepository _audioRepository;
         private readonly IAudioEditorService _audioEditorService;
         private readonly NodeLoader _nodeLoader;
 
@@ -31,19 +28,18 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private ObservableCollection<TreeNode> _unfilteredTree;
         public TreeNode _selectedAudioProjectTreeNode;
 
-        public AudioProjectExplorerViewModel(IAudioRepository audioRepository, IAudioEditorService audioEditorService, NodeLoader nodeLoader)
+        public AudioProjectExplorerViewModel(IAudioEditorService audioEditorService, NodeLoader nodeLoader)
         {
-            _audioRepository = audioRepository;
             _audioEditorService = audioEditorService;
             _nodeLoader = nodeLoader;
 
-            _audioProjectExplorerLabel= $"{DisplayName}";
+            AudioProjectExplorerLabel= $"{DisplayName}";
         }
 
         public void OnSelectedAudioProjectTreeNodeChanged(TreeNode value)
         {
             _selectedAudioProjectTreeNode = value;
-            _nodeLoader.LoadNode(AudioEditorViewModel);
+            _nodeLoader.HandleLoadingNode(AudioEditorViewModel);
         }
         
         partial void OnSelectedDialogueEventPresetChanged(DialogueEventPreset? value)
@@ -114,7 +110,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         {
             TreeBuilder.CreateAudioProjectTree(_audioEditorService, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
             _unfilteredTree = new ObservableCollection<TreeNode>(AudioProjectTree);
-
         }
 
         [RelayCommand] public void CollapseOrExpandAudioProjectTree() 

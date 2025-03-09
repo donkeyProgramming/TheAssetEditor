@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.GameSettings.Warhammer3;
@@ -55,7 +55,7 @@ namespace Editors.Audio.AudioEditor
         public AudioProject AudioProject { get; set; }
         public string AudioProjectFileName { get; set; }
         public string AudioProjectDirectory { get; set; }
-        public Dictionary<string, List<string>> StateGroupsWithModdedStatesRepository { get; set; } = [];
+        public Dictionary<string, List<string>> ModdedStatesByStateGroupLookup { get; set; } = [];
         public Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithIntegrityError { get; set; } = [];
         public Dictionary<string, DialogueEventPreset?> DialogueEventSoundBankFiltering { get; set; } = [];
 
@@ -108,7 +108,7 @@ namespace Editors.Audio.AudioEditor
                 audioEditorViewModel.Initialise();
 
                 // Get the Modded States and prepare them for being added to the DataGrid ComboBoxes
-                BuildStateGroupsWithModdedStatesRepository(AudioProject.StateGroups, StateGroupsWithModdedStatesRepository);
+                BuildModdedStatesByStateGroupLookup(AudioProject.StateGroups, ModdedStatesByStateGroupLookup);
 
                 _integrityChecker.CheckAudioProjectDialogueEventIntegrity(this);
 
@@ -239,12 +239,12 @@ namespace Editors.Audio.AudioEditor
                 AudioProject.SoundBanks.Add(soundBank);
         }
 
-        public void BuildStateGroupsWithModdedStatesRepository(List<StateGroup> moddedStateGroups, Dictionary<string, List<string>> stateGroupsWithModdedStatesRepository)
+        public void BuildModdedStatesByStateGroupLookup(List<StateGroup> moddedStateGroups, Dictionary<string, List<string>> moddedStatesByStateGroupLookup)
         {
-            if (stateGroupsWithModdedStatesRepository == null)
-                stateGroupsWithModdedStatesRepository = new Dictionary<string, List<string>>();
+            if (moddedStatesByStateGroupLookup == null)
+                moddedStatesByStateGroupLookup = new Dictionary<string, List<string>>();
             else
-                stateGroupsWithModdedStatesRepository.Clear();
+                moddedStatesByStateGroupLookup.Clear();
 
             foreach (var stateGroup in moddedStateGroups)
             {
@@ -252,10 +252,10 @@ namespace Editors.Audio.AudioEditor
                 {
                     foreach (var state in stateGroup.States)
                     {
-                        if (!stateGroupsWithModdedStatesRepository.ContainsKey(stateGroup.Name))
-                            stateGroupsWithModdedStatesRepository[stateGroup.Name] = new List<string>();
+                        if (!moddedStatesByStateGroupLookup.ContainsKey(stateGroup.Name))
+                            moddedStatesByStateGroupLookup[stateGroup.Name] = new List<string>();
 
-                        stateGroupsWithModdedStatesRepository[stateGroup.Name].Add(state.Name);
+                        moddedStatesByStateGroupLookup[stateGroup.Name].Add(state.Name);
                     }
                 }
             }

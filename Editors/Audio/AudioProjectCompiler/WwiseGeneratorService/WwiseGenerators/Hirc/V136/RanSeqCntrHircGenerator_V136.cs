@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Editors.Audio.AudioEditor.Data;
-using Editors.Audio.AudioProjectCompiler.WwiseGeneratorService;
-using Shared.GameFormats.Wwise.Enums;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.DataGrids;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
@@ -32,7 +32,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
 
         public void SetDataGridData(AudioEditorViewModel audioEditorViewModel)
         {
-            var soundBank = DataHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
             foreach (var actionEvent in soundBank.ActionEvents)
             {
                 var rowData = new Dictionary<string, string>

@@ -6,9 +6,9 @@ using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
 
-namespace Editors.Audio.AudioEditor.Data
+namespace Editors.Audio.AudioEditor.AudioProjectData
 {
-    public class DataHelpers
+    public class AudioProjectHelpers
     {
         public static SoundBank GetSoundBankFromName(IAudioEditorService audioEditorService, string soundBankName)
         {

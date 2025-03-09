@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.Storage;
 
@@ -20,9 +19,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
 
         public void LoadDataGrid(AudioEditorViewModel audioEditorViewModel)
         {
-            if (_audioEditorService.StateGroupsWithModdedStatesRepository.Count > 0)
-                audioEditorViewModel.AudioProjectEditorViewModel.IsShowModdedStatesCheckBoxEnabled = true;
-
             ConfigureDataGrid(audioEditorViewModel);
             SetDataGridData(audioEditorViewModel);
         }
@@ -31,7 +27,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
         {
             var dataGrid = DataGridConfiguration.InitialiseDataGrid(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
 
-            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
 
             var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
@@ -54,7 +50,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
                 .Where(stateGroupColumn => stateGroupColumn.Value.Contains("Any"))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            var dialogueEvent = DataHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
 
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
