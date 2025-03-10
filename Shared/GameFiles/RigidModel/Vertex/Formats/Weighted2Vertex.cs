@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Shared.Core.ByteParsing;
+using Shared.GameFormats.RigidModel.Transforms;
 
 namespace Shared.GameFormats.RigidModel.Vertex.Formats
 {
@@ -16,49 +17,74 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
         }
         public bool ForceComputeNormals => false;
 
-        public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
+        public CommonVertex[] ReadArray(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize, int vertexCount)
         {
             if (rmvVersion == RmvVersionEnum.RMV2_V8)
             {
-                var vertexData = ByteHelper.ByteArrayToStructure<DataWithColour>(buffer, offset);
-
-                var vertex = new CommonVertex()
-                {
-                    Position = VertexLoadHelper.CreatVector4HalfFloat(vertexData.position).ToVector4(1),
-                    Normal = VertexLoadHelper.CreatVector4Byte(vertexData.normal).ToVector3(),
-                    BiNormal = VertexLoadHelper.CreatVector4Byte(vertexData.biNormal).ToVector3(),
-                    Tangent = VertexLoadHelper.CreatVector4Byte(vertexData.tangent).ToVector3(),
-
-                    Uv = VertexLoadHelper.CreatVector2HalfFloat(vertexData.uv).ToVector2(),
-                    Colour = VertexLoadHelper.CreatVector4Byte(vertexData.colour).ToVector4(),
-
-                    BoneIndex = new byte[] { vertexData.boneIndex[0], vertexData.boneIndex[1] },
-                    BoneWeight = new float[] { vertexData.boneWeight[0] / 255.0f, vertexData.boneWeight[1] / 255.0f },
-                    WeightCount = 2
-                };
-                return vertex;
+                var verts = ByteHelper.LoadArray<RmvWeighted2ColourVertex>(buffer, offset, vertexSize * vertexCount);
+                var processedVerts = ProcessVertexColourList(verts, rmvVersion);
+                return processedVerts;
             }
             else
             {
-                var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
+                var verts = ByteHelper.LoadArray<RmvWeighted2Vertex>(buffer, offset, vertexSize * vertexCount);
+                var processedVerts = ProcessVertexList(verts, rmvVersion);
+                return processedVerts;
+            }
+        }
 
-                var vertex = new CommonVertex()
+        static CommonVertex[] ProcessVertexColourList(ReadOnlySpan<RmvWeighted2ColourVertex> rawData, RmvVersionEnum rmvVersion)
+        {
+            var count = rawData.Length;
+            var output = new CommonVertex[count];
+
+            for (var i = 0; i < count; i++)
+            {
+                var item = rawData[i];
+                output[i] = new CommonVertex()
                 {
-                    Position = VertexLoadHelper.CreatVector4HalfFloat(vertexData.position).ToVector4(1),
-                    Normal = VertexLoadHelper.CreatVector4Byte(vertexData.normal).ToVector3(),
-                    BiNormal = VertexLoadHelper.CreatVector4Byte(vertexData.biNormal).ToVector3(),
-                    Tangent = VertexLoadHelper.CreatVector4Byte(vertexData.tangent).ToVector3(),
+                    Position = VertexLoadHelper.CreatVector4HalfFloat2(item.Position.X, item.Position.Y, item.Position.Z, item.Position.W),
 
-                    Uv = VertexLoadHelper.CreatVector2HalfFloat(vertexData.uv).ToVector2(),
+                    Normal = VertexLoadHelper.CreatVector3_FromByte(item.Normal),
+                    BiNormal = VertexLoadHelper.CreatVector3_FromByte(item.BiNormal),
+                    Tangent = VertexLoadHelper.CreatVector3_FromByte(item.Tangent),
+                    Uv = new Vector2(item.Uv.X, item.Uv.Y),
+                    Colour = VertexLoadHelper.CreatVector4_FromByte(item.Colour),
 
-                    Colour = new Vector4(0, 0, 0, 1),
-
-                    BoneIndex = new byte[] { vertexData.boneIndex[0], vertexData.boneIndex[1] },
-                    BoneWeight = new float[] { vertexData.boneWeight[0] / 255.0f, vertexData.boneWeight[1] / 255.0f },
+                    BoneIndex = [item.BoneIndex.X, item.BoneIndex.Y],
+                    BoneWeight = [item.BoneWeight.X / 255.0f, item.BoneWeight.Y / 255.0f],
                     WeightCount = 2
                 };
-                return vertex;
             }
+
+            return output;
+        }
+
+        static CommonVertex[] ProcessVertexList(ReadOnlySpan<RmvWeighted2Vertex> rawData, RmvVersionEnum rmvVersion)
+        {
+            var count = rawData.Length;
+            var output = new CommonVertex[count];
+
+            for (var i = 0; i < count; i++)
+            {
+                var item = rawData[i];
+                output[i] = new CommonVertex()
+                {
+                    Position = VertexLoadHelper.CreatVector4HalfFloat2(item.Position.X, item.Position.Y, item.Position.Z, item.Position.W),
+
+                    Normal = VertexLoadHelper.CreatVector3_FromByte(item.Normal),
+                    BiNormal = VertexLoadHelper.CreatVector3_FromByte(item.BiNormal),
+                    Tangent = VertexLoadHelper.CreatVector3_FromByte(item.Tangent),
+                    Uv = new Vector2(item.Uv.X, item.Uv.Y),
+                    Colour = new Vector4(0, 0, 0, 1),
+
+                    BoneIndex = [item.BoneIndex.X, item.BoneIndex.Y],
+                    BoneWeight = [item.BoneWeight.X / 255.0f, item.BoneWeight.Y / 255.0f],
+                    WeightCount = 2
+                };
+            }
+
+            return output;
         }
 
         public byte[] Write(RmvVersionEnum rmvVersion, CommonVertex vertex)
@@ -150,6 +176,29 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
 
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
             public byte[] colour;     // 4 x 1
+        }
+
+        public struct RmvWeighted2ColourVertex
+        {
+            public HalfVector4 Position { get; set; }
+            public ByteVector2 BoneIndex { get; set; }
+            public ByteVector2 BoneWeight { get; set; }
+            public ByteVector4 Normal { get; set; }
+            public HalfVector2 Uv { get; set; }
+            public ByteVector4 BiNormal { get; set; }
+            public ByteVector4 Tangent { get; set; }
+            public ByteVector4 Colour { get; set; }
+        }
+
+        public struct RmvWeighted2Vertex
+        {
+            public HalfVector4 Position { get; set; }
+            public ByteVector2 BoneIndex { get; set; }
+            public ByteVector2 BoneWeight { get; set; }
+            public ByteVector4 Normal { get; set; }
+            public HalfVector2 Uv { get; set; }
+            public ByteVector4 BiNormal { get; set; }
+            public ByteVector4 Tangent { get; set; }
         }
 
 
