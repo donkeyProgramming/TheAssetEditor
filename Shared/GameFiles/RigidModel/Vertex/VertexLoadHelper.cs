@@ -299,6 +299,18 @@ namespace Shared.GameFormats.RigidModel.Vertex
             return output;
         }
 
+        static public HalfVector4 CreatePositionVector4ExtraPrecision_v2(Microsoft.Xna.Framework.Vector4 vector)
+        {
+            var v = ConvertertVertexToHalfExtraPrecision(vector);
+            return new HalfVector4()
+            {
+                X = v.X,
+                Y = v.Y,
+                Z = v.Z,
+                W = v.W,
+            };
+        }
+
         static public byte[] CreatePositionVector2(Microsoft.Xna.Framework.Vector2 vector)
         {
             var output = new byte[4];
@@ -323,6 +335,17 @@ namespace Shared.GameFormats.RigidModel.Vertex
             return output;
         }
 
+        static public ByteVector4 CreateNormalVector3_v2(Microsoft.Xna.Framework.Vector3 vector)
+        {
+            return new ByteVector4()
+            {
+                X = NormalToByte(vector.X),
+                Y = NormalToByte(vector.Y),
+                Z = NormalToByte(vector.Z),
+                W = NormalToByte(-1),
+            };
+        }
+
 
         static public byte[] Create4BytesFromVector4(Microsoft.Xna.Framework.Vector4 vector)
         {
@@ -332,6 +355,17 @@ namespace Shared.GameFormats.RigidModel.Vertex
             output[2] = NormalToByte(vector.Z);
             output[3] = NormalToByte(vector.W);
             return output;            
+        }
+
+        static public ByteVector4 Create4BytesFromVector4_v2(Microsoft.Xna.Framework.Vector4 vector)
+        {
+            return new ByteVector4()
+            {
+                X = NormalToByte(vector.X),
+                Y = NormalToByte(vector.Y),
+                Z = NormalToByte(vector.Z),
+                W = NormalToByte(vector.W),
+            };
         }
     }
 }
