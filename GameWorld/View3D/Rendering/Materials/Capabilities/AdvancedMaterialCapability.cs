@@ -117,6 +117,9 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                     weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Dirt_index, 1);
                     weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Decal_index, 1);
 
+                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleX, UvScale.X);
+                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleY, UvScale.Y);
+
                     rmvMaterial.SetTexture(DirtMap.Type, DirtMap.TexturePath);
                     rmvMaterial.SetTexture(DirtMask.Type, DirtMask.TexturePath);
                     rmvMaterial.SetTexture(SkinMask.Type, SkinMask.TexturePath);
