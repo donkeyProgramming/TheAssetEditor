@@ -144,24 +144,26 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
         [RelayCommand] protected virtual void OnDoubleClick(TreeNode node)
         {
-            if (SelectedItem != null)
-            {
-                if (SelectedItem.GetNodeType() == NodeType.File)
-                {
-                    FileOpen?.Invoke(SelectedItem.Item);
-                }
-                else if (SelectedItem.GetNodeType() == NodeType.Directory && Keyboard.IsKeyDown(Key.LeftCtrl))
-                {
-                    SelectedItem.ExpandIfVisible(true);
-                }
-                else if (SelectedItem.GetNodeType() == NodeType.Directory || SelectedItem.GetNodeType() == NodeType.Root)
-                {
-                    SelectedItem.IsNodeExpanded = !SelectedItem.IsNodeExpanded;
+            if (SelectedItem == null)
+                return;
 
-                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
+            var maxExpandCount = 200;
+            if (SelectedItem.NodeType == NodeType.File)
+            {
+                FileOpen?.Invoke(SelectedItem.Item!);
+            }
+            else if (SelectedItem.NodeType == NodeType.Directory || SelectedItem.NodeType == NodeType.Root)
+            {
+                SelectedItem.IsNodeExpanded = !SelectedItem.IsNodeExpanded;
+
+                if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                {
+                    var numChildren = SelectedItem.GetAllChildFileNodes().Count;
+                    if (numChildren < maxExpandCount)
                         SelectedItem.ExpandIfVisible(true);
                 }
             }
+            
         }
 
         private void ContainerUpdated(PackFileContainerSetAsMainEditableEvent e)

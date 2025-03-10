@@ -23,7 +23,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
         void SaveSelfAndChildren(TreeNode node, string outputDirectory, string rootPath, ref int fileCounter)
         {
-            if (node.GetNodeType() == NodeType.Directory)
+            if (node.NodeType == NodeType.Directory)
             {
                 foreach (var item in node.Children)
                     SaveSelfAndChildren(item, outputDirectory, rootPath, ref fileCounter);

@@ -18,16 +18,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
     {
         public PackFileContainer FileOwner { get; set; }
         public PackFile? Item { get; set; }
-        public TreeNode Parent { get; set; }
+        public TreeNode? Parent { get; set; }
 
         [ObservableProperty] ObservableCollection<TreeNode> _children = [];
-        [ObservableProperty] bool _unsavedChanged;
-        [ObservableProperty] bool _isMainEditabelPack;
-        [ObservableProperty] bool _isVisible = true;
-        [ObservableProperty] string _name = "";
-        [ObservableProperty] bool _isNodeExpanded = false;
-
-        [ObservableProperty] NodeType _nodeType;
+        [ObservableProperty] public partial bool UnsavedChanged { get; set; }
+        [ObservableProperty] public partial bool IsMainEditabelPack { get; set; }
+        [ObservableProperty] public partial bool IsVisible { get; set; } = true;
+        [ObservableProperty] public partial string Name { get; set; } = "";
+        [ObservableProperty] public partial bool IsNodeExpanded { get; set; } = false;
+        [ObservableProperty] public partial NodeType NodeType { get; private set; }
 
         public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode parent, PackFile? packFile = null)
         {
@@ -41,18 +40,17 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
         }
 
-        public NodeType GetNodeType() => NodeType;
 
         public string GetFullPath()
         {
-            if (GetNodeType() == NodeType.Root)
+            if (NodeType == NodeType.Root)
                 return "";
 
             var currentParent = Parent;
             var path = Name;
             while (currentParent != null)
             {
-                if (currentParent.GetNodeType() == NodeType.Root)
+                if (currentParent.NodeType == NodeType.Root)
                     break;
 
                 path = currentParent.Name + "\\" + path;
@@ -72,7 +70,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             while (nodes.Any())
             {
                 var node = nodes.Pop();
-                if (node.GetNodeType() == NodeType.File)
+                if (node.NodeType == NodeType.File)
                     output.Add(node);
 
                 foreach (var n in node.Children)

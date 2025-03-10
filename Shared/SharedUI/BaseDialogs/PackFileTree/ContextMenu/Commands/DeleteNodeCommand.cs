@@ -18,9 +18,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
 
             if (MessageBox.Show("Are you sure you want to delete the file?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                if (_selectedNode.GetNodeType() == NodeType.File)
+                if (_selectedNode.NodeType == NodeType.File)
                     packFileService.DeleteFile(_selectedNode.FileOwner, _selectedNode.Item);
-                else if (_selectedNode.GetNodeType() == NodeType.Directory)
+                else if (_selectedNode.NodeType == NodeType.Directory)
                     packFileService.DeleteFolder(_selectedNode.FileOwner, _selectedNode.GetFullPath());
             }
         }

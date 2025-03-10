@@ -3,6 +3,7 @@
 		<TargetFramework>net9.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
         <Nullable>enable</Nullable>
+        <LangVersion>preview</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Material.Icons.WPF" Version="2.1.10" />
