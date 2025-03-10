@@ -147,11 +147,20 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (SelectedItem != null)
             {
                 if (SelectedItem.GetNodeType() == NodeType.File)
+                {
                     FileOpen?.Invoke(SelectedItem.Item);
+                }
                 else if (SelectedItem.GetNodeType() == NodeType.Directory && Keyboard.IsKeyDown(Key.LeftCtrl))
+                {
                     SelectedItem.ExpandIfVisible(true);
+                }
                 else if (SelectedItem.GetNodeType() == NodeType.Directory || SelectedItem.GetNodeType() == NodeType.Root)
+                {
                     SelectedItem.IsNodeExpanded = !SelectedItem.IsNodeExpanded;
+
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                        SelectedItem.ExpandIfVisible(true);
+                }
             }
         }
 

@@ -26,6 +26,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         [ObservableProperty] bool _isVisible = true;
         [ObservableProperty] string _name = "";
         [ObservableProperty] bool _isNodeExpanded = false;
+
         [ObservableProperty] NodeType _nodeType;
 
         public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode parent, PackFile? packFile = null)
