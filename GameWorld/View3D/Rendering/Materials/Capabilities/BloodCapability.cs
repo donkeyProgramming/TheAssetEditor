@@ -31,19 +31,8 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             };
         }
 
-        public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
-        {
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, BloodMask, "commontextures/bloodmap.dds");
-            UseBlood = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Blood_Use, 0) == 1;
-            UvScale = CapabilityHelper.GetParameterVector2(wsModelMaterial, WsModelParamters.Blood_Scale, Vector2.One);
-        }
-
-        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
-        {
-            templateHandler.AddAttribute(WsModelParamters.Texture_Blood.TemplateName, BloodMask);                                             
-            templateHandler.AddAttribute(WsModelParamters.Blood_Scale.TemplateName, UvScale);
-            templateHandler.AddAttribute(WsModelParamters.Blood_Use.TemplateName, UseBlood);
-        }
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial) => BloodCapabilitySerialize.Initialize(this, wsModelMaterial, rmvMaterial);
+        public void SerializeToWsModel(WsMaterialTemplateEditor templateHandler) => BloodCapabilitySerialize.SerializeToWsModel(this, templateHandler);
 
         public (bool Result, string Message) AreEqual(ICapability otherCap)
         {
@@ -63,4 +52,24 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             return (true, "");
         }
     }
+
+
+    public static class BloodCapabilitySerialize
+    {
+        public static void Initialize(BloodCapability output, WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
+        {
+
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.BloodMask, "commontextures/bloodmap.dds");
+            output.UseBlood = CapabilityHelper.GetParameterFloat(wsModelMaterial, WsModelParamters.Blood_Use, 0) == 1;
+            output.UvScale = CapabilityHelper.GetParameterVector2(wsModelMaterial, WsModelParamters.Blood_Scale, Vector2.One);
+        }
+
+        public static void SerializeToWsModel(BloodCapability typedCap, WsMaterialTemplateEditor templateHandler)
+        {
+            templateHandler.AddAttribute(WsModelParamters.Texture_Blood.TemplateName, typedCap.BloodMask);
+            templateHandler.AddAttribute(WsModelParamters.Blood_Scale.TemplateName, typedCap.UvScale);
+            templateHandler.AddAttribute(WsModelParamters.Blood_Use.TemplateName, typedCap.UseBlood);
+        }
+    }
+
 }

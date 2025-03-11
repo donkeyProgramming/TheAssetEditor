@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
@@ -46,86 +45,8 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             };
         }
 
-        public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
-        {
-            if (rmvMaterial is not WeightedMaterial weightedMateial)
-                throw new Exception($"Input material '{rmvMaterial.GetType()} - {rmvMaterial.MaterialId}' is not {nameof(WeightedMaterial)}, and can not used to create a {nameof(AdvancedMaterialCapability)}");
-
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, null, DirtMap);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, null, DirtMask);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, null, DecalMask);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, null, SkinMask);
-
-            UseDirt = RmvMaterialUtil.IsDirt(rmvMaterial);
-            UseDecal= RmvMaterialUtil.IsDecal(rmvMaterial);
-            UseSkin = RmvMaterialUtil.IsSkin(rmvMaterial);
-
-            if (UseDirt)
-            {
-                var uvScaleX = weightedMateial.FloatParams.Get(WeightedParamterIds.FloatParams_UvScaleX);
-                var uvScaleY = weightedMateial.FloatParams.Get(WeightedParamterIds.FloatParams_UvScaleX);
-                UvScale = new Vector2(uvScaleX, uvScaleY);
-            }
-
-            if (UseDecal)
-                TextureTransform = weightedMateial.Vec4Params.Get(WeightedParamterIds.Vec4Params_TextureDecalTransform).ToVector4(); 
-        }
-
-        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
-        {
-            if (rmvMaterial is not WeightedMaterial weightedMateial)
-                throw new Exception($"Input material '{rmvMaterial.GetType()}' is not {nameof(WeightedMaterial)}, and can not used to create a {nameof(AdvancedMaterialCapability)}");
-
-            weightedMateial.MaterialHint = RmvMaterialUtil.GetMaterialHint(UseDirt, UseDecal, UseSkin);
-            switch (weightedMateial.MaterialHint)
-            {
-                case WeightedMaterial.MaterialHintEnum.Dirt:
-                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Dirt_index, 1);
-                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Decal_index, 1);
-
-                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleX, UvScale.X);
-                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleY, UvScale.Y);
-
-                    rmvMaterial.SetTexture(DirtMap.Type, DirtMap.TexturePath);
-                    rmvMaterial.SetTexture(DirtMask.Type, DirtMask.TexturePath);
-                    break;
-
-                case WeightedMaterial.MaterialHintEnum.Decal_Dirt:
-                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Dirt_index, 1);
-                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Decal_index, 1);
-
-                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleX, UvScale.X);
-                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleY, UvScale.Y);
-
-                    weightedMateial.Vec4Params.Set(WeightedParamterIds.Vec4Params_TextureDecalTransform, new RmvVector4(TextureTransform.X, TextureTransform.Y, TextureTransform.Z, TextureTransform.W));
-
-                    rmvMaterial.SetTexture(DirtMap.Type, DirtMap.TexturePath);
-                    rmvMaterial.SetTexture(DirtMask.Type, DirtMask.TexturePath);
-                    rmvMaterial.SetTexture(DecalMask.Type, DecalMask.TexturePath);
-                    break;
-    
-                case WeightedMaterial.MaterialHintEnum.Decal:
-                    weightedMateial.Vec4Params.Set(WeightedParamterIds.Vec4Params_TextureDecalTransform, new RmvVector4(TextureTransform.X, TextureTransform.Y, TextureTransform.Z, TextureTransform.W));
-                    rmvMaterial.SetTexture(DecalMask.Type, DecalMask.TexturePath);
-                    break;
-
-                case WeightedMaterial.MaterialHintEnum.Skin:
-                    rmvMaterial.SetTexture(SkinMask.Type, SkinMask.TexturePath);
-                    break;
-
-                case WeightedMaterial.MaterialHintEnum.Skin_Dirt:
-                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Dirt_index, 1);
-                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Decal_index, 1);
-
-                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleX, UvScale.X);
-                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleY, UvScale.Y);
-
-                    rmvMaterial.SetTexture(DirtMap.Type, DirtMap.TexturePath);
-                    rmvMaterial.SetTexture(DirtMask.Type, DirtMask.TexturePath);
-                    rmvMaterial.SetTexture(SkinMask.Type, SkinMask.TexturePath);
-                    break;
-            }
-        }
+        public void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial) => AdvancedMaterialCapabilitySerializer.Initialize(this, wsModelMaterial, rmvMaterial);  
+        public void SerializeToRmvMaterial(IRmvMaterial rmvMaterial) => AdvancedMaterialCapabilitySerializer.SerializeToRmvMaterial(this, rmvMaterial);
 
         public (bool Result, string Message) AreEqual(ICapability otherCap)
         {
@@ -160,6 +81,91 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                 return res7;
 
             return (true, "");
+        }
+    }
+
+
+    public static class AdvancedMaterialCapabilitySerializer 
+    {
+        public static void Initialize(AdvancedMaterialCapability output, WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
+        {
+            if (rmvMaterial is not WeightedMaterial weightedMateial)
+                throw new Exception($"Input material '{rmvMaterial.GetType()} - {rmvMaterial.MaterialId}' is not {nameof(WeightedMaterial)}, and can not used to create a {nameof(AdvancedMaterialCapability)}");
+
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, null, output.DirtMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, null, output.DirtMask);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, null, output.DecalMask);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, null, output.SkinMask);
+
+            output.UseDirt = RmvMaterialUtil.IsDirt(rmvMaterial);
+            output.UseDecal = RmvMaterialUtil.IsDecal(rmvMaterial);
+            output.UseSkin = RmvMaterialUtil.IsSkin(rmvMaterial);
+
+            if (output.UseDirt)
+            {
+                var uvScaleX = weightedMateial.FloatParams.Get(WeightedParamterIds.FloatParams_UvScaleX);
+                var uvScaleY = weightedMateial.FloatParams.Get(WeightedParamterIds.FloatParams_UvScaleX);
+                output.UvScale = new Vector2(uvScaleX, uvScaleY);
+            }
+
+            if (output.UseDecal)
+                output.TextureTransform = weightedMateial.Vec4Params.Get(WeightedParamterIds.Vec4Params_TextureDecalTransform).ToVector4();
+        }
+
+        public static void SerializeToRmvMaterial(AdvancedMaterialCapability typedCap, IRmvMaterial rmvMaterial)
+        {
+            if (rmvMaterial is not WeightedMaterial weightedMateial)
+                throw new Exception($"Input material '{rmvMaterial.GetType()}' is not {nameof(WeightedMaterial)} - Unable to serialize to rmv");
+
+            weightedMateial.MaterialHint = RmvMaterialUtil.GetMaterialHint(typedCap.UseDirt, typedCap.UseDecal, typedCap.UseSkin);
+            switch (weightedMateial.MaterialHint)
+            {
+                case WeightedMaterial.MaterialHintEnum.Dirt:
+                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Dirt_index, 1);
+                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Decal_index, 1);
+
+                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleX, typedCap.UvScale.X);
+                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleY, typedCap.UvScale.Y);
+
+                    rmvMaterial.SetTexture(typedCap.DirtMap.Type, typedCap.DirtMap.TexturePath);
+                    rmvMaterial.SetTexture(typedCap.DirtMask.Type, typedCap.DirtMask.TexturePath);
+                    break;
+
+                case WeightedMaterial.MaterialHintEnum.Decal_Dirt:
+                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Dirt_index, 1);
+                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Decal_index, 1);
+
+                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleX, typedCap.UvScale.X);
+                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleY, typedCap.UvScale.Y);
+
+                    weightedMateial.Vec4Params.Set(WeightedParamterIds.Vec4Params_TextureDecalTransform, new RmvVector4(typedCap.TextureTransform.X, typedCap.TextureTransform.Y, typedCap.TextureTransform.Z, typedCap.TextureTransform.W));
+
+                    rmvMaterial.SetTexture(typedCap.DirtMap.Type, typedCap.DirtMap.TexturePath);
+                    rmvMaterial.SetTexture(typedCap.DirtMask.Type, typedCap.DirtMask.TexturePath);
+                    rmvMaterial.SetTexture(typedCap.DecalMask.Type, typedCap.DecalMask.TexturePath);
+                    break;
+
+                case WeightedMaterial.MaterialHintEnum.Decal:
+                    weightedMateial.Vec4Params.Set(WeightedParamterIds.Vec4Params_TextureDecalTransform, new RmvVector4(typedCap.TextureTransform.X, typedCap.TextureTransform.Y, typedCap.TextureTransform.Z, typedCap.TextureTransform.W));
+                    rmvMaterial.SetTexture(typedCap.DecalMask.Type, typedCap.DecalMask.TexturePath);
+                    break;
+
+                case WeightedMaterial.MaterialHintEnum.Skin:
+                    rmvMaterial.SetTexture(typedCap.SkinMask.Type, typedCap.SkinMask.TexturePath);
+                    break;
+
+                case WeightedMaterial.MaterialHintEnum.Skin_Dirt:
+                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Dirt_index, 1);
+                    weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Decal_index, 1);
+
+                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleX, typedCap.UvScale.X);
+                    weightedMateial.FloatParams.Set(WeightedParamterIds.FloatParams_UvScaleY, typedCap.UvScale.Y);
+
+                    rmvMaterial.SetTexture(typedCap.DirtMap.Type, typedCap.DirtMap.TexturePath);
+                    rmvMaterial.SetTexture(typedCap.DirtMask.Type, typedCap.DirtMask.TexturePath);
+                    rmvMaterial.SetTexture(typedCap.SkinMask.Type, typedCap.SkinMask.TexturePath);
+                    break;
+            }
         }
     }
 }

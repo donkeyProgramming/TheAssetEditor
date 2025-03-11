@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Windows.Documents;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,7 +13,6 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.Common;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
 {
