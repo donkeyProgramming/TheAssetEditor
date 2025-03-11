@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Documents;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -13,6 +14,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.Ui.BaseDialogs.PackFileTree.ContextMenu;
 using Shared.Ui.Common;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Shared.Ui.BaseDialogs.PackFileTree
 {
@@ -46,7 +48,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             ShowFoldersOnly = showFoldersOnly;
 
-            _eventHub?.Register<PackFileContainerSetAsMainEditableEvent>(this, ContainerUpdated);
+            _eventHub?.Register<PackFileContainerSetAsMainEditableEvent>(this, MainEditablePackChanged);
             _eventHub?.Register<PackFileContainerRemovedEvent>(this, PackFileContainerRemoved);
             _eventHub?.Register<PackFileContainerAddedEvent>(this, x => ReloadTree(x.Container));
             _eventHub?.Register<PackFileContainerFilesUpdatedEvent>(this, Database_PackFilesUpdated);
@@ -166,7 +168,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             
         }
 
-        private void ContainerUpdated(PackFileContainerSetAsMainEditableEvent e)
+        private void MainEditablePackChanged(PackFileContainerSetAsMainEditableEvent e)
         {
             foreach (var item in Files)
                 item.IsMainEditabelPack = false;
@@ -324,63 +326,76 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
             var root = new TreeNode(container.Name, NodeType.Root, container, null);
             root.IsMainEditabelPack = _packFileService.GetEditablePack() == container;
-            var directoryMap = new Dictionary<string, TreeNode>();
+            var directoryMap_new = new Dictionary<string, TreeNode>(container.FileList.Count);
 
+            Stack<(string FolderName, string FullFolderPath)> stackFileNames = new(10);
             foreach (var item in container.FileList)
             {
-                // Should we skip adding the file? 
+                ReadOnlySpan<char> pathSpan = item.Key;
+                var lastTreeNode = root;
+
                 if (container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false)
                 {
-                    var isWemFile = item.Key.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase);
+                    var isWemFile = pathSpan.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase);
                     if (isWemFile)
                         continue;
                 }
 
-                var fullPath = item.Key;
-                var pathParts = fullPath.Split(Path.DirectorySeparatorChar);
-
-                if (pathParts.Length == 1)
+                stackFileNames.Clear();
+                var end = pathSpan.Length - 1;
+                string? fileName = null;
+                while (end >= 0)
                 {
-                    root.Children.Add(new TreeNode(pathParts[0], NodeType.File, container, root, item.Value));
-                }
-                else
-                {
-                    var directoryEnd = fullPath.LastIndexOf(Path.DirectorySeparatorChar);
-                    var directory = fullPath.Substring(0, directoryEnd);
-                    var numSeperators = pathParts.Length - 1;
-
-                    var directoryLookupResult = directoryMap.ContainsKey(directory);
-                    if (!directoryLookupResult)
+                    var index = pathSpan.Slice(0, end + 1).LastIndexOf(Path.DirectorySeparatorChar);
+                    if (index == -1 )
                     {
-                        var currentIndexComputed = 0;
+                        // If filename is not set, and there are no folder marksers, the whole string is a filename
+                        if (fileName == null)
+                            fileName = pathSpan.Slice(0, end).ToString();
 
-                        var lastNode = root;
-                        for (var i = 0; i < numSeperators; i++)
-                        {
-                            currentIndexComputed += pathParts[i].Length + 1;
-                            var subDirString = fullPath.Substring(0, currentIndexComputed - 1);
-
-                            if (directoryMap.TryGetValue(subDirString, out var lookUpNode) == false)
-                            {
-                                var folderNodeName = pathParts[i];
-                                var currentNode = new TreeNode(folderNodeName, NodeType.Directory, container, lastNode);
-                                lastNode.Children.Add(currentNode);
-                                lastNode = currentNode;
-
-                                directoryMap.Add(subDirString, currentNode);
-                            }
-                            else
-                            {
-                                lastNode = lookUpNode;
-                            }
-                        }
+                        break;
                     }
 
-                    var fileName = pathParts.Last();
-                    var treeNode = new TreeNode(fileName, NodeType.File, container, directoryMap[directory], item.Value);
-                    directoryMap[directory].Children.Add(treeNode);
+                    // Only happens on the first run through the loop, as the last folder marker,
+                    // also indicates the start of the filename
+                    if(fileName == null)
+                        fileName = pathSpan.Slice(index+1, end - index).ToString();
+  
+                    var subDirString = pathSpan.Slice(0, index).ToString();
+                    if (directoryMap_new.TryGetValue(subDirString, out var lookUpNode))
+                    {
+                        lastTreeNode = lookUpNode;
+                        break;
+                    }
+                    else
+                    {
+                        var subFolderIndex = subDirString.LastIndexOf(Path.DirectorySeparatorChar);
+                        var fullPath = subDirString;
+                        if (subFolderIndex != -1)
+                            subDirString = subDirString.Substring(subFolderIndex + 1, subDirString.Length - 1 - subFolderIndex);
+                        stackFileNames.Push((subDirString, fullPath));
+                    }
+
+                    // Move end position backward to continue search
+                    end = index - 1;
                 }
+
+                // Pop the stack and build the folder structure
+                while (stackFileNames.TryPop(out var currentInstance))
+                {
+                    var currentNode = new TreeNode(currentInstance.FolderName, NodeType.Directory, container, lastTreeNode);
+
+                    lastTreeNode.Children.Add(currentNode);
+                    lastTreeNode = currentNode;
+
+                    directoryMap_new.Add(currentInstance.FullFolderPath, currentNode);
+                }
+
+                // Add
+                var treeNode = new TreeNode(fileName!, NodeType.File, container, lastTreeNode, item.Value);
+                lastTreeNode.Children.Add(treeNode);
             }
+
             Files.Add(root);
         }
 

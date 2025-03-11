@@ -16,15 +16,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
     public partial class TreeNode : ObservableObject
     {
-        public PackFileContainer FileOwner { get; set; }
+        public PackFileContainer FileOwner { get; private set; }
         public PackFile? Item { get; set; }
         public TreeNode? Parent { get; set; }
 
-        [ObservableProperty] ObservableCollection<TreeNode> _children = [];
+        [ObservableProperty] public partial ObservableCollection<TreeNode> Children { get; set; } = [];
         [ObservableProperty] public partial bool UnsavedChanged { get; set; }
         [ObservableProperty] public partial bool IsMainEditabelPack { get; set; }
         [ObservableProperty] public partial bool IsVisible { get; set; } = true;
-        [ObservableProperty] public partial string Name { get; set; } = "";
+        [ObservableProperty] public partial string Name { get; set; }
         [ObservableProperty] public partial bool IsNodeExpanded { get; set; } = false;
         [ObservableProperty] public partial NodeType NodeType { get; private set; }
 
@@ -39,7 +39,6 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             if (string.IsNullOrWhiteSpace(name))
                 throw new Exception($"Packfile name or folder is empty '{GetFullPath()}', this is not allowed! Please report as a bug if it happens outside of packfile loading! If it happens while loading clean up the packfile in RPFM");
         }
-
 
         public string GetFullPath()
         {
