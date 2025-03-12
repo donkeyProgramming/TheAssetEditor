@@ -40,7 +40,6 @@ namespace Editors.Audio
 
             serviceCollection.AddScoped<IAudioEditorService, AudioEditorService>();
             serviceCollection.AddScoped<IntegrityChecker>();
-            serviceCollection.AddScoped<NodeLoader>();
             serviceCollection.AddScoped<DataManager>();
             serviceCollection.AddScoped<AudioProjectEditorDataGridServiceFactory>();
             serviceCollection.AddScoped<AudioProjectViewerDataGridServiceFactory>();

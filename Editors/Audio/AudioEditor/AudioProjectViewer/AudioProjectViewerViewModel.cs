@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -6,9 +7,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid;
 using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.DataGrids;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.Storage;
+using Serilog;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer
@@ -16,10 +22,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
     public partial class AudioProjectViewerViewModel : ObservableObject, IEditorInterface
     {
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
+        private readonly IEventHub _eventHub;
         private readonly IAudioRepository _audioRepository;
         private readonly IAudioEditorService _audioEditorService;
         private readonly DataManager _dataManager;
+        private readonly AudioProjectViewerDataGridServiceFactory _audioProjectViewerDataGridServiceFactory;
         private readonly AudioProjectDataServiceFactory _audioProjectDataServiceFactory;
+
+        private readonly ILogger _logger = Logging.Create<AudioProjectViewerViewModel>();
 
         public string DisplayName { get; set; } = "Audio Project Viewer";
 
@@ -34,14 +44,24 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         [ObservableProperty] private bool _isCopyEnabled = false;
         [ObservableProperty] private bool _isPasteEnabled = false;
 
-        public AudioProjectViewerViewModel(IAudioRepository audioRepository, IAudioEditorService audioEditorService, DataManager dataManager, AudioProjectDataServiceFactory audioProjectDataServiceFactory)
+        public AudioProjectViewerViewModel(
+            IEventHub eventHub,
+            IAudioRepository audioRepository,
+            IAudioEditorService audioEditorService,
+            DataManager dataManager,
+            AudioProjectViewerDataGridServiceFactory audioProjectViewerDataGridServiceFactory,
+            AudioProjectDataServiceFactory audioProjectDataServiceFactory)
         {
+            _eventHub = eventHub;
             _audioRepository = audioRepository;
             _audioEditorService = audioEditorService;
             _dataManager = dataManager;
+            _audioProjectViewerDataGridServiceFactory = audioProjectViewerDataGridServiceFactory;
             _audioProjectDataServiceFactory = audioProjectDataServiceFactory;
 
             AudioProjectViewerLabel = $"{DisplayName}";
+
+            _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
         }
 
         public void OnDataGridSelectionChanged(IList selectedItems)
@@ -58,6 +78,48 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             SetSelectedDataGridRows(selectedItems);
             SetButtonEnablement();
             SetCopyEnablement();
+        }
+
+        public void OnSelectedNodeChanged(NodeSelectedEvent nodeSelectedEvent)
+        {
+            ResetAudioProjectViewerLabel();
+            ResetButtonEnablement();
+            ResetDataGrid();
+
+            var selectedNode = nodeSelectedEvent.SelectedNode;
+            if (selectedNode.NodeType == NodeType.ActionEventSoundBank)
+            {
+                SetAudioProjectViewerLabel(selectedNode.Name);
+
+                var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(selectedNode.NodeType);
+                dataGridService.LoadDataGrid(AudioEditorViewModel);
+
+                _logger.Here().Information($"Loaded Action Event SoundBank: {selectedNode.Name}");
+            }
+            else if (selectedNode.NodeType == NodeType.DialogueEvent)
+            {
+                SetAudioProjectViewerLabel(DataGridHelpers.AddExtraUnderscoresToString(selectedNode.Name));
+
+                // Rebuild StateGroupsWithModdedStates in case any have been added since the Audio Project was initialised
+                _audioEditorService.BuildModdedStatesByStateGroupLookup(_audioEditorService.AudioProject.StateGroups, _audioEditorService.ModdedStatesByStateGroupLookup);
+
+                var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(selectedNode.NodeType);
+                dataGridService.LoadDataGrid(AudioEditorViewModel);
+
+                _logger.Here().Information($"Loaded Dialogue Event: {selectedNode.Name}");
+            }
+            else if (selectedNode.NodeType == NodeType.StateGroup)
+            {
+                SetAudioProjectViewerLabel(DataGridHelpers.AddExtraUnderscoresToString(selectedNode.Name));
+
+                var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(selectedNode.NodeType);
+                dataGridService.LoadDataGrid(AudioEditorViewModel);
+
+                _logger.Here().Information($"Loaded State Group: {selectedNode.Name}");
+            }
+
+            SetCopyEnablement();
+            SetPasteEnablement();
         }
 
         public void ShowSettingsFromAudioProjectViewerItem()
@@ -254,7 +316,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         public void SetAudioProjectViewerLabel(string label)
         {
-            AudioProjectViewerLabel = label;
+            AudioProjectViewerLabel = $"Audio Project Editor {label}";
         }
 
         public void ResetAudioProjectViewerLabel()

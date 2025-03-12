@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.Events;
+using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 
@@ -14,6 +15,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
     public partial class AudioSettingsViewModel : ObservableObject, IEditorInterface
     {
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
+        private readonly IEventHub _eventHub;
 
         public string DisplayName { get; set; } = "Audio Settings";
 
@@ -50,9 +52,19 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
         public ObservableCollection<AudioFile> AudioFiles { get; set; } = [];
 
-        public AudioSettingsViewModel()
+        public AudioSettingsViewModel(IEventHub eventHub)
         {
+            _eventHub = eventHub;
+
             SetInitialAudioSettings();
+
+            _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
+        }
+
+        public void OnSelectedNodeChanged(NodeSelectedEvent nodeSelectedEvent)
+        {
+            ResetAudioSettingsView();
+            SetAudioSettingsEnablementAndVisibility();
         }
 
         partial void OnShowSettingsFromAudioProjectViewerChanged(bool oldValue, bool newValue)

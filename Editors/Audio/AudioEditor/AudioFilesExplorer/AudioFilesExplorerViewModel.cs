@@ -7,7 +7,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.DataGrids;
+using Editors.Audio.AudioEditor.Events;
 using Editors.Audio.Utility;
+using Shared.Core.Events;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -18,6 +20,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
     public partial class AudioFilesExplorerViewModel : ObservableObject, IEditorInterface
     {
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
+        private readonly IEventHub _eventHub;
         private readonly IPackFileService _packFileService;
         private readonly SoundPlayer _soundPlayer;
 
@@ -32,8 +35,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         public ObservableCollection<TreeNode> SelectedTreeNodes { get; set; } = new ObservableCollection<TreeNode>();
 
-        public AudioFilesExplorerViewModel(IPackFileService packFileService, SoundPlayer soundPlayer)
+        public AudioFilesExplorerViewModel(IEventHub eventHub, IPackFileService packFileService, SoundPlayer soundPlayer)
         {
+            _eventHub = eventHub;
             _packFileService = packFileService;
             _soundPlayer = soundPlayer;
 
@@ -42,6 +46,8 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             AudioFilesExplorerLabel = $"{DisplayName}";
 
             Initialise();
+
+            _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
         }
 
         private void Initialise()
@@ -54,6 +60,12 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             AudioFilesExplorerLabel = $"{DisplayName} - {DataGridHelpers.AddExtraUnderscoresToString(editablePack.Name)}";
 
             CreateAudioFilesTree(editablePack);
+        }
+
+        public void OnSelectedNodeChanged(NodeSelectedEvent nodeSelectedEvent)
+        {
+            ResetButtonEnablement();
+            SetButtonEnablement();
         }
 
         private void OnSelectedTreeNodesChanged(object sender, NotifyCollectionChangedEventArgs e)
