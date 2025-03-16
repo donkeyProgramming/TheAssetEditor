@@ -1,9 +1,9 @@
 ﻿using Editors.KitbasherEditor.ChildEditors.MeshFitter;
 using Editors.KitbasherEditor.Core;
 using Editors.KitbasherEditor.Core.MenuBarViews;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;

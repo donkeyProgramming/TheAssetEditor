@@ -8,7 +8,6 @@ using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Common.ReferenceModel;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Bone;

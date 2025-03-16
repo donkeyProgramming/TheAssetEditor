@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;

@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
+using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;

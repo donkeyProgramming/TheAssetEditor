@@ -7,7 +7,6 @@ using AnimationEditor.AnimationKeyframeEditor;
 using System.Windows.Forms;
 using AnimationEditor.MountAnimationCreator.Services;
 using AnimationEditor.MountAnimationCreator.ViewModels;
-using Editors.Shared.Core.Services;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Shared.Core.Misc;
@@ -26,6 +25,7 @@ using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.ReferenceModel;
 using Editors.AnimationVisualEditors.MountAnimationCreator.Services;
+using GameWorld.Core.Services;
 
 
 namespace AnimationEditor.MountAnimationCreator

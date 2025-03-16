@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Settings;

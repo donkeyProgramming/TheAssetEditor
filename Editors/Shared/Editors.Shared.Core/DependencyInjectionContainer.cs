@@ -4,7 +4,6 @@ using CommonControls.Editors.TextEditor;
 using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
-using Editors.Shared.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Core.DependencyInjection;
 using Shared.Core.ToolCreation;
@@ -18,7 +17,6 @@ namespace Editors.Shared.Core
     {
         public override void Register(IServiceCollection serviceCollection)
         {
-
             serviceCollection.AddTransient<VariantMeshToXmlConverter>();
             serviceCollection.AddTransient<TextEditorViewModel<VariantMeshToXmlConverter>>();
 
@@ -38,8 +36,6 @@ namespace Editors.Shared.Core
 
             serviceCollection.AddScoped<IEditorHostParameters, EditorHostParameters>();
 
-
-            serviceCollection.AddSingleton<ISkeletonAnimationLookUpHelper, SkeletonAnimationLookUpHelper>();;
         }
 
         public override void RegisterTools(IEditorDatabase factory)

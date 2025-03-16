@@ -2,7 +2,7 @@
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using CommonControls.Editors.AnimationPack.Converters;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;

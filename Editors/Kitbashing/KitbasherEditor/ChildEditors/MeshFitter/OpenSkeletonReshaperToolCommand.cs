@@ -1,9 +1,9 @@
 ﻿using System.Windows;
 using Editors.KitbasherEditor.Core.MenuBarViews;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;

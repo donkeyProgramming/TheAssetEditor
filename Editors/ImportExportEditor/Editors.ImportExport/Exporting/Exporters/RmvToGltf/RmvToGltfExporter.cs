@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using Editors.ImportExport.Misc;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;

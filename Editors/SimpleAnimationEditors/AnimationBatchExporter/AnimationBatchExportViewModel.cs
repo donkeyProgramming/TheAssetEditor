@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;

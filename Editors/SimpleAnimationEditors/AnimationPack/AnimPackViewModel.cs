@@ -6,7 +6,7 @@ using CommonControls.BaseDialogs;
 using CommonControls.Editors.AnimationPack.Converters;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimationTextEditors.AnimationPack.Converters;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;

@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimatioReTarget.Editor.BoneHandling.Presentation;
 using Editors.Shared.Core.Common;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.Services;
 using Shared.GameFormats.Animation;

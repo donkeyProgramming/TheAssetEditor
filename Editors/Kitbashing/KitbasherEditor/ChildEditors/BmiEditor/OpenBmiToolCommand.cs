@@ -1,6 +1,6 @@
 ﻿using Editors.KitbasherEditor.Core.MenuBarViews;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Components.Selection;
+using GameWorld.Core.Services;
 using Shared.Core.PackFiles;
 using Shared.Ui.Common.MenuSystem;
 

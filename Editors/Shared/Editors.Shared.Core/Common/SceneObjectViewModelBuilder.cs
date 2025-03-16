@@ -2,6 +2,7 @@
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Common.ReferenceModel;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Microsoft.Xna.Framework;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
