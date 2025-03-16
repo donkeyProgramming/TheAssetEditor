@@ -13,10 +13,10 @@ namespace Editors.KitbasherEditor.UiCommands
         public Hotkey? HotKey { get; } = null;
 
         private readonly IPackFileService _packFileService;
-        private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly SelectionManager _selectionManager;
 
-        public OpenBmiToolCommand(IPackFileService packFileService, SkeletonAnimationLookUpHelper skeletonHelper, SelectionManager selectionManager)
+        public OpenBmiToolCommand(IPackFileService packFileService, ISkeletonAnimationLookUpHelper skeletonHelper, SelectionManager selectionManager)
         {
             _packFileService = packFileService;
             _skeletonHelper = skeletonHelper;

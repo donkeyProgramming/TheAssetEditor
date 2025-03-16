@@ -32,7 +32,7 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
         private readonly RenderEngineComponent _renderEngineComponent;
         private readonly IUiCommandFactory _uiCommandFactory;
         private readonly IStandardDialogs _standardDialogs;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         MainEditableNode? _mainNode;
 
@@ -40,8 +40,8 @@ namespace Editors.KitbasherEditor.ViewModels.SceneExplorer.Nodes
         [ObservableProperty] public partial ObservableCollection<AttachmentPoint> AttachmentPointList { get; set; } = [];
         [ObservableProperty] public partial string? SkeletonName { get; set; }
 
-        public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene, 
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+        public MainEditableNodeViewModel(KitbasherRootScene kitbasherRootScene,
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             RenderEngineComponent renderEngineComponent, 
             IUiCommandFactory uiCommandFactory,
             IStandardDialogs standardDialogs)

@@ -24,7 +24,7 @@ namespace CommonControls.Editors.AnimationPack
     public class AnimPackViewModel : NotifyPropertyChangedImpl, IEditorInterface, ISaveableEditor, IFileEditor
     {
         private readonly IPackFileService _pfs;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private ITextConverter _activeConverter;
         private readonly ApplicationSettingsService _appSettings;
         private readonly IFileSaveService _packFileSaveService;
@@ -44,7 +44,7 @@ namespace CommonControls.Editors.AnimationPack
         public ICommand RenameCommand { get; set; }
         public ICommand CopyFullPathCommand { get; set; }
 
-        public AnimPackViewModel(IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings, IFileSaveService packFileSaveService, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public AnimPackViewModel(IPackFileService pfs, ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, ApplicationSettingsService appSettings, IFileSaveService packFileSaveService, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;

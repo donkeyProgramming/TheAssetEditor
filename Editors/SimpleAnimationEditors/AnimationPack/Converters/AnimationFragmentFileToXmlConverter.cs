@@ -16,10 +16,10 @@ namespace CommonControls.Editors.AnimationPack.Converters
     public class AnimationFragmentFileToXmlConverter
         : BaseAnimConverter<AnimationFragmentFileToXmlConverter.Animation, AnimationFragmentFile>
     {
-        private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         GameTypeEnum _preferedGame;
 
-        public AnimationFragmentFileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, GameTypeEnum preferedGame)
+        public AnimationFragmentFileToXmlConverter(ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, GameTypeEnum preferedGame)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _preferedGame = preferedGame;

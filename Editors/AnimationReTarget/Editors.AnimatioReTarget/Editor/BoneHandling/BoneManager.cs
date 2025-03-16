@@ -17,7 +17,7 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
 
         private readonly IStandardDialogs _standardDialogs;
         private readonly IAbstractFormFactory<BoneMappingWindow> _boneMappingWindowFactory;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         private ISkeletonBoneHighlighter? _skeletonBoneHighlighter;
         private RemappedAnimatedBoneConfiguration? _activeConfig;
@@ -30,7 +30,7 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
         public BoneManager(
             IStandardDialogs standardDialogs, 
             IAbstractFormFactory<BoneMappingWindow> boneMappingWindowFactory,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _standardDialogs = standardDialogs;
             _boneMappingWindowFactory = boneMappingWindowFactory;

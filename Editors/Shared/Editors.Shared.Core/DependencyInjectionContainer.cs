@@ -39,7 +39,7 @@ namespace Editors.Shared.Core
             serviceCollection.AddScoped<IEditorHostParameters, EditorHostParameters>();
 
 
-            serviceCollection.AddSingleton<SkeletonAnimationLookUpHelper>();;
+            serviceCollection.AddSingleton<ISkeletonAnimationLookUpHelper, SkeletonAnimationLookUpHelper>();;
         }
 
         public override void RegisterTools(IEditorDatabase factory)

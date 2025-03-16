@@ -5,7 +5,6 @@ using GameWorld.Core.SceneNodes;
 using Microsoft.Xna.Framework;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles.Models;
-using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace Editors.Shared.Core.Common
 {

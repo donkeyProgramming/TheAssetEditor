@@ -17,13 +17,13 @@ namespace Editors.AnimationTextEditors.AnimationPack.Converters
 {
     public class AnimationBinWh3FileToXmlConverter : BaseAnimConverter<AnimationBinWh3FileToXmlConverter.XmlFormat, AnimationBinWh3>
     {
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly MetaDataTagDeSerializer _metaDataTagDeSerializer;
 
         private string _animationPersistanceMetaFileName = "";
         private readonly Dictionary<string, uint> _animationsVersionFoundInPersistenceMeta = [];
 
-        public AnimationBinWh3FileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, MetaDataTagDeSerializer metaDataTagDeSerializer)
+        public AnimationBinWh3FileToXmlConverter(ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _metaDataTagDeSerializer = metaDataTagDeSerializer;

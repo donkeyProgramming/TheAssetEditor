@@ -35,7 +35,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             SceneObject data,
             string headerName,
             SceneObjectEditor sceneObjectBuilder,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _metaDataFactory = metaDataFactory;
