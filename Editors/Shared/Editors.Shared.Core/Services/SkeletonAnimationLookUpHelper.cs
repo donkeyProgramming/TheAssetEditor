@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using GameWorld.Core.SceneNodes;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Events;
@@ -11,7 +12,24 @@ using Shared.GameFormats.Animation;
 
 namespace Editors.Shared.Core.Services
 {
-    public class SkeletonAnimationLookUpHelper : IDisposable
+    public interface ISkeletonAnimationLookUpHelper
+    {
+        void Dispose();
+        SkeletonAnimationLookUpHelper.AnimationReference? FindAnimationRefFromPackFile(PackFile animation);
+        ObservableCollection<string> GetAllSkeletonFileNames();
+        ObservableCollection<SkeletonAnimationLookUpHelper.AnimationReference> GetAnimationsForSkeleton(string skeletonName);
+        AnimationFile? GetSkeletonFileFromName(string skeletonName);
+    }
+
+    // Make an interface
+    // Move to gameworld
+    // Start the processing, but dont wait!, wait beofre it can be accessed! Woho, supersmart!
+
+
+
+
+
+    public class SkeletonAnimationLookUpHelper : IDisposable, ISkeletonAnimationLookUpHelper
     {
         private readonly ILogger _logger = Logging.Create<SkeletonAnimationLookUpHelper>();
         private readonly object _threadLock = new object();
@@ -30,14 +48,14 @@ namespace Editors.Shared.Core.Services
             _globalEventHub.Register<PackFileContainerAddedEvent>(this, x => PackfileContainerRefresh(x.Container));
             _globalEventHub.Register<PackFileContainerFilesAddedEvent>(this, x => PackfileContainerRefresh(x.Container));
             _globalEventHub.Register<PackFileContainerFolderRenamedEvent>(this, x => PackfileContainerRefresh(x.Container));
-           
+
             _globalEventHub.Register<PackFileContainerRemovedEvent>(this, x => PackfileContainerRemove(x.Container));
             _globalEventHub.Register<PackFileContainerFilesRemovedEvent>(this, x => PackfileContainerRemove(x.Container));
             _globalEventHub.Register<PackFileContainerFolderRemovedEvent>(this, x => PackfileContainerRemove(x.Container));
 
             // Initialize
             var containers = packFileService.GetAllPackfileContainers();
-            foreach(var container in containers)
+            foreach (var container in containers)
                 LoadFromPackFileContainer(container);
         }
 
@@ -48,13 +66,13 @@ namespace Editors.Shared.Core.Services
 
         void PackfileContainerRefresh(PackFileContainer packFileContainer)
         {
-            UnloadAnimationFromContainer( packFileContainer);
-            LoadFromPackFileContainer( packFileContainer);
+            UnloadAnimationFromContainer(packFileContainer);
+            LoadFromPackFileContainer(packFileContainer);
         }
 
         void PackfileContainerRemove(PackFileContainer packFileContainer)
         {
-            UnloadAnimationFromContainer( packFileContainer);
+            UnloadAnimationFromContainer(packFileContainer);
         }
 
         void LoadFromPackFileContainer(PackFileContainer packFileContainer)
@@ -65,6 +83,8 @@ namespace Editors.Shared.Core.Services
             var allAnimations = PackFileServiceUtility.FindAllWithExtentionIncludePaths(_packFileService, ".anim", packFileContainer);
 
             // Split animations in to two categories.
+            // One for packfiles which are saved to disk, and one for in memory. 
+            // Disk is the slow version, so we handle them specially 
             var allAnimsInSavedPackedFiles = new List<(string FullPath, PackedFileSource DataSource)>();
             var allAnimsOtherFiles = new List<(string FullPath, IDataSource DataSource)>();
             for (var i = 0; i < allAnimations.Count; i++)
@@ -98,88 +118,62 @@ namespace Editors.Shared.Core.Services
                 }
             });
 
-            // Handle all others
+            // Handle all in memory files 
             Parallel.For(0, allAnimsOtherFiles.Count, index =>
             {
                 var animation = allAnimations[index];
-                FileDiscovered(animation.Pack, packFileContainer, animation.FileName, ref skeletonFileNameList, ref animationList);
+                FileDiscovered(animation.Pack.DataSource.ReadData(100), packFileContainer, animation.FileName, ref skeletonFileNameList, ref animationList);
             });
 
-            foreach(var skeleton in  skeletonFileNameList)
+            foreach (var skeleton in skeletonFileNameList)
                 _skeletonFileNames.Add(skeleton);
 
             foreach (var animation in animationList)
             {
                 if (_skeletonNameToAnimationMap.ContainsKey(animation.Key) == false)
                     _skeletonNameToAnimationMap[animation.Key] = [];
-                foreach(var animationReference in animation.Value)
-                    _skeletonNameToAnimationMap[animation.Key].Add(animationReference);   
-            }
-        }
-
-        void FileDiscovered(PackFile file, PackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
-        {
-            if(IsKnownBrokenAnimation(fullPath))
-                return;
-
-            try
-            {
-                var animationSkeletonName = AnimationFile.GetAnimationHeader(file).SkeletonName;
-                AddAnimation(animationSkeletonName, fullPath, container, ref skeletonFileNameList, ref animationList);
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
+                foreach (var animationReference in animation.Value)
+                    _skeletonNameToAnimationMap[animation.Key].Add(animationReference);
             }
         }
 
         void FileDiscovered(byte[] byteChunk, PackFileContainer container, string fullPath, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
         {
-            if (IsKnownBrokenAnimation(fullPath))
-                return;
-
-            try
-            {
-                var animationSkeletonName = AnimationFile.GetAnimationName(byteChunk);
-                AddAnimation(animationSkeletonName, fullPath, container, ref skeletonFileNameList, ref animationList);
-            }
-            catch (Exception e)
-            {
-                _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
-            }
-        }
-
-        bool IsKnownBrokenAnimation(string fullPath)
-        {
+            // Skip broken animations, as the errors are annoying when the debuger is attached.
             if (Debugger.IsAttached)
             {
-                var brokenAnims = new string[] 
-                { 
+                var brokenAnims = new string[]
+                {
                     "rigidmodels\\buildings\\roman_aqueduct_straight\\roman_aqueduct_straight_piece01_destruct01_anim.anim",
                     "animations\\battle\\raptor02\\subset\\colossal_squig\\deaths\\rp2_colossalsquig_death_01.anim"
                 };
                 if (brokenAnims.Contains(fullPath))
                 {
                     _logger.Here().Warning("Skipping loading of known broken file - " + fullPath);
-                    return true;
+                    return;
                 }
             }
-            return false;
-        }
 
-        void AddAnimation(string skeletonName, string fullPath, PackFileContainer container, ref List<string> skeletonFileNameList, ref Dictionary<string, List<AnimationReference>> animationList)
-        {
-            lock (_threadLock)
+            try
             {
-               var newEntry = new ObservableCollection<AnimationReference>() { new AnimationReference(fullPath, container) };
-               if (animationList.ContainsKey(skeletonName) == false)
-                   animationList[skeletonName] = [];
-               animationList[skeletonName].Add(new AnimationReference(fullPath, container));
+                var animationSkeletonName = AnimationFile.GetAnimationName(byteChunk);
 
-                if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
-                    skeletonFileNameList.Add(fullPath);
-                else if (fullPath.Contains("tech", StringComparison.InvariantCultureIgnoreCase))
-                    skeletonFileNameList.Add(fullPath);
+                lock (_threadLock)
+                {
+                    var newEntry = new ObservableCollection<AnimationReference>() { new AnimationReference(fullPath, container) };
+                    if (animationList.ContainsKey(animationSkeletonName) == false)
+                        animationList[animationSkeletonName] = [];
+                    animationList[animationSkeletonName].Add(new AnimationReference(fullPath, container));
+
+                    if (fullPath.Contains("animations\\skeletons", StringComparison.InvariantCultureIgnoreCase))
+                        skeletonFileNameList.Add(fullPath);
+                    else if (fullPath.Contains("tech", StringComparison.InvariantCultureIgnoreCase))
+                        skeletonFileNameList.Add(fullPath);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.Here().Error("Parsing failed for " + fullPath + "\n" + e.ToString());
             }
         }
 

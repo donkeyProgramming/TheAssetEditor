@@ -28,7 +28,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
         [ObservableProperty] public partial bool IsNodeExpanded { get; set; } = false;
         [ObservableProperty] public partial NodeType NodeType { get; private set; }
 
-        public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode parent, PackFile? packFile = null)
+        public TreeNode(string name, NodeType type, PackFileContainer ower, TreeNode? parent, PackFile? packFile = null)
         {
             Name = name;
             Item = packFile;

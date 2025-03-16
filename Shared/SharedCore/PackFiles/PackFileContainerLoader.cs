@@ -108,6 +108,8 @@ namespace Shared.Core.PackFiles
                 }
 
                 var packList = new List<PackFileContainer>();
+                
+                //foreach(var packFilePath in allCaPackFiles)
                 Parallel.ForEach(allCaPackFiles, packFilePath =>
                 {
                     var path = gameDataFolder + "\\" + packFilePath;
@@ -123,7 +125,8 @@ namespace Shared.Core.PackFiles
                     {
                         _logger.Here().Warning($"{gameName} pack file '{path}' not found, loading skipped");
                     }
-                });
+                }
+                );
 
                 var caPackFileContainer = new PackFileContainer($"All Game Packs - {gameName}");
                 caPackFileContainer.IsCaPackFile = true;

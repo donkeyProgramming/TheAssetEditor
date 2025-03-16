@@ -137,12 +137,14 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             }
         }
 
-        [RelayCommand] protected virtual void OnClearText()
+        [RelayCommand]
+        protected virtual void OnClearText()
         {
             Filter.FilterText = "";
         }
 
-        [RelayCommand] protected virtual void OnDoubleClick(TreeNode node)
+        [RelayCommand]
+        protected virtual void OnDoubleClick(TreeNode node)
         {
             if (SelectedItem == null)
                 return;
@@ -163,7 +165,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                         SelectedItem.ExpandIfVisible(true);
                 }
             }
-            
+
         }
 
         private void MainEditablePackChanged(PackFileContainerSetAsMainEditableEvent e)
@@ -325,14 +327,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
             var root = new TreeNode(container.Name, NodeType.Root, container, null);
             root.IsMainEditabelPack = _packFileService.GetEditablePack() == container;
             var directoryMap_new = new Dictionary<string, TreeNode>(container.FileList.Count);
+            var skipWemFiles = container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false;
 
-            Stack<(string FolderName, string FullFolderPath)> stackFileNames = new(10);
+            List<(string FolderName, string FullFolderPath)> stackFileNames = new(10);
             foreach (var item in container.FileList)
             {
                 ReadOnlySpan<char> pathSpan = item.Key;
                 var lastTreeNode = root;
 
-                if (container.IsCaPackFile && _applicationSettingsService.CurrentSettings.ShowCAWemFiles == false)
+                if (skipWemFiles)
                 {
                     var isWemFile = pathSpan.EndsWith(".wem", StringComparison.InvariantCultureIgnoreCase);
                     if (isWemFile)
@@ -341,25 +344,15 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
 
                 stackFileNames.Clear();
                 var end = pathSpan.Length - 1;
-                string? fileName = null;
                 while (end >= 0)
                 {
                     var index = pathSpan.Slice(0, end + 1).LastIndexOf(Path.DirectorySeparatorChar);
-                    if (index == -1 )
-                    {
-                        // If filename is not set, and there are no folder marksers, the whole string is a filename
-                        if (fileName == null)
-                            fileName = pathSpan.Slice(0, end).ToString();
-
+                    if (index == -1)
                         break;
-                    }
 
-                    // Only happens on the first run through the loop, as the last folder marker,
-                    // also indicates the start of the filename
-                    if(fileName == null)
-                        fileName = pathSpan.Slice(index+1, end - index).ToString();
-  
-                    var subDirString = pathSpan.Slice(0, index).ToString();
+                    var subDirStringSpan = pathSpan.Slice(0, index);
+                    var subDirString = subDirStringSpan.ToString();
+
                     if (directoryMap_new.TryGetValue(subDirString, out var lookUpNode))
                     {
                         lastTreeNode = lookUpNode;
@@ -371,7 +364,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                         var fullPath = subDirString;
                         if (subFolderIndex != -1)
                             subDirString = subDirString.Substring(subFolderIndex + 1, subDirString.Length - 1 - subFolderIndex);
-                        stackFileNames.Push((subDirString, fullPath));
+                        stackFileNames.Add((subDirString, fullPath));
                     }
 
                     // Move end position backward to continue search
@@ -379,8 +372,9 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 }
 
                 // Pop the stack and build the folder structure
-                while (stackFileNames.TryPop(out var currentInstance))
+                for (int i = stackFileNames.Count - 1; i >= 0; i--)
                 {
+                    var currentInstance = stackFileNames[i];
                     var currentNode = new TreeNode(currentInstance.FolderName, NodeType.Directory, container, lastTreeNode);
 
                     lastTreeNode.Children.Add(currentNode);
@@ -390,7 +384,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree
                 }
 
                 // Add
-                var treeNode = new TreeNode(fileName!, NodeType.File, container, lastTreeNode, item.Value);
+                var treeNode = new TreeNode(item.Value.Name, NodeType.File, container, lastTreeNode, item.Value);
                 lastTreeNode.Children.Add(treeNode);
             }
 
