@@ -29,47 +29,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             _audioProjectDataServiceFactory = audioProjectDataServiceFactory;
         }
 
-        public void HandleAddingData(AudioEditorViewModel audioEditorViewModel)
-        {
-            var selectedNodeType = audioEditorViewModel.GetSelectedAudioProjectNodeType();
-            if (selectedNodeType == NodeType.ActionEventSoundBank)
-            {
-                AddData(audioEditorViewModel, NodeType.ActionEventSoundBank);
-                var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
-                _logger.Here().Information($"Added Action Event data to SoundBank: {soundBank.Name}");
-            }
-            else if (selectedNodeType == NodeType.DialogueEvent)
-            {
-                AddData(audioEditorViewModel, NodeType.DialogueEvent);
-                var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
-                _logger.Here().Information($"Added Dialogue Event data to Dialogue Event: {dialogueEvent.Name}");
-            }
-            else if (selectedNodeType == NodeType.StateGroup)
-            {
-                AddData(audioEditorViewModel, NodeType.StateGroup);
-                var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
-                _logger.Here().Information($"Added State Group data to State Group: {stateGroup.Name}");
-            }
-
-            audioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
-        }
-
-        private void AddData(AudioEditorViewModel audioEditorViewModel, NodeType nodeType)
-        {
-            var audioProjectEditorRow = DataGridHelpers.GetAudioProjectEditorDataGridRow(audioEditorViewModel, _audioRepository, _audioEditorService);
-            DataGridHelpers.AddAudioProjectEditorDataGridDataToAudioProjectViewer(audioEditorViewModel, audioProjectEditorRow);
-
-            var actionEventDataService = _audioProjectDataServiceFactory.GetService(nodeType);
-            actionEventDataService.AddToAudioProject(audioEditorViewModel);
-
-            // Clear data grid to ensure there's only one row in the editor
-            DataGridHelpers.ClearDataGrid(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid);
-
-            // Reset the editor data grid row
-            var audioProjectEditorDataGridService = _audioProjectEditorDataGridServiceFactory.GetService(nodeType);
-            audioProjectEditorDataGridService.ResetDataGridData(audioEditorViewModel);
-        }
-
         public void HandleEditingData(AudioEditorViewModel audioEditorViewModel)
         {
             var selectedNodeType = audioEditorViewModel.GetSelectedAudioProjectNodeType();

@@ -6,6 +6,7 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid;
 using Editors.Audio.AudioEditor.AudioSettings;
@@ -62,6 +63,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             AudioProjectViewerLabel = $"{DisplayName}";
 
             _eventHub.Register<NodeSelectedEvent>(this, OnSelectedNodeChanged);
+            _eventHub.Register<SaveDataGridEvent>(this, SaveDataGrid);
+            _eventHub.Register<ItemAddedEvent>(this, OnItemAdded);
         }
 
         public void OnDataGridSelectionChanged(IList selectedItems)
@@ -86,40 +89,68 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             ResetButtonEnablement();
             ResetDataGrid();
 
-            var selectedNode = nodeSelectedEvent.SelectedNode;
+            var selectedNode = _audioEditorService.SelectedAudioProjectTreeNode;
             if (selectedNode.NodeType == NodeType.ActionEventSoundBank)
             {
                 SetAudioProjectViewerLabel(selectedNode.Name);
-
-                var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(selectedNode.NodeType);
-                dataGridService.LoadDataGrid(AudioEditorViewModel);
+                LoadDataGrid(selectedNode.NodeType);
 
                 _logger.Here().Information($"Loaded Action Event SoundBank: {selectedNode.Name}");
             }
             else if (selectedNode.NodeType == NodeType.DialogueEvent)
             {
-                SetAudioProjectViewerLabel(DataGridHelpers.AddExtraUnderscoresToString(selectedNode.Name));
-
                 // Rebuild StateGroupsWithModdedStates in case any have been added since the Audio Project was initialised
                 _audioEditorService.BuildModdedStatesByStateGroupLookup(_audioEditorService.AudioProject.StateGroups, _audioEditorService.ModdedStatesByStateGroupLookup);
-
-                var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(selectedNode.NodeType);
-                dataGridService.LoadDataGrid(AudioEditorViewModel);
+                
+                SetAudioProjectViewerLabel(DataGridHelpers.AddExtraUnderscoresToString(selectedNode.Name));
+                LoadDataGrid(selectedNode.NodeType);
 
                 _logger.Here().Information($"Loaded Dialogue Event: {selectedNode.Name}");
             }
             else if (selectedNode.NodeType == NodeType.StateGroup)
             {
                 SetAudioProjectViewerLabel(DataGridHelpers.AddExtraUnderscoresToString(selectedNode.Name));
-
-                var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(selectedNode.NodeType);
-                dataGridService.LoadDataGrid(AudioEditorViewModel);
+                LoadDataGrid(selectedNode.NodeType);
 
                 _logger.Here().Information($"Loaded State Group: {selectedNode.Name}");
             }
 
             SetCopyEnablement();
             SetPasteEnablement();
+        }
+
+        private void LoadDataGrid(NodeType selectedNodeType)
+        {
+            var dataGridService = _audioProjectViewerDataGridServiceFactory.GetService(selectedNodeType);
+            dataGridService.LoadDataGrid(AudioEditorViewModel);
+        }
+
+        public void OnItemAdded(ItemAddedEvent itemAddedEvent)
+        {
+            var selectedNode = _audioEditorService.SelectedAudioProjectTreeNode;
+            if (selectedNode.NodeType == NodeType.ActionEventSoundBank)
+            {
+                AddData(AudioEditorViewModel, selectedNode.NodeType);
+
+                _logger.Here().Information($"Added Action Event data to SoundBank: {selectedNode.Name}");
+            }
+            else if (selectedNode.NodeType == NodeType.DialogueEvent)
+            {
+                AddData(AudioEditorViewModel, selectedNode.NodeType);
+
+                _logger.Here().Information($"Added Dialogue Event data to Dialogue Event: {selectedNode.Name}");
+            }
+            else if (selectedNode.NodeType == NodeType.StateGroup)
+            {
+                AddData(AudioEditorViewModel, selectedNode.NodeType);
+
+                _logger.Here().Information($"Added State Group data to State Group: {selectedNode.Name}");
+            }
+        }
+
+        public void AddData(AudioEditorViewModel audioEditorViewModel, NodeType nodeType)
+        {
+            DataGridHelpers.AddRowToAudioProjectViewer(_audioEditorService.AudioProjectViewerDataGrid, _audioEditorService.AudioProjectEditorDataGrid[0]);
         }
 
         public void ShowSettingsFromAudioProjectViewerItem()
@@ -323,7 +354,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         {
             AudioProjectViewerLabel = $"Audio Project Viewer";
         }
-        
+
+        public void SaveDataGrid(SaveDataGridEvent saveDataGridEvent)
+        {
+            _audioEditorService.AudioProjectViewerDataGrid = AudioProjectViewerDataGrid;
+        }
+
         public void ResetButtonEnablement()
         {
             IsUpdateRowButtonEnabled = false;

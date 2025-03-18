@@ -45,8 +45,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         {
             _selectedAudioProjectTreeNode = value;
 
-            var nodeSelectedEvent = new NodeSelectedEvent(_selectedAudioProjectTreeNode);
-            _eventHub.Publish(nodeSelectedEvent);
+            _audioEditorService.SelectedAudioProjectTreeNode = _selectedAudioProjectTreeNode;
+
+            _eventHub.Publish(new NodeSelectedEvent());
 
             ResetButtonEnablement();
 

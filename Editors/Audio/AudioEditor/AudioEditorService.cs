@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.GameSettings.Warhammer3;
@@ -53,6 +55,9 @@ namespace Editors.Audio.AudioEditor
         }
 
         public AudioProject AudioProject { get; set; }
+        public TreeNode SelectedAudioProjectTreeNode { get; set; }
+        public ObservableCollection<Dictionary<string, string>> AudioProjectEditorDataGrid { get; set; }
+        public ObservableCollection<Dictionary<string, string>> AudioProjectViewerDataGrid { get; set; }
         public string AudioProjectFileName { get; set; }
         public string AudioProjectDirectory { get; set; }
         public Dictionary<string, List<string>> ModdedStatesByStateGroupLookup { get; set; } = [];

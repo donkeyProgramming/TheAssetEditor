@@ -77,15 +77,10 @@ namespace Editors.Audio.AudioEditor.DataGrids
             audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0]);
         }
 
-        public static void AddAudioProjectEditorDataGridDataToAudioProjectViewer(AudioEditorViewModel audioEditorViewModel, Dictionary<string, string> audioProjectEditorRow)
-        {
-            InsertDataGridRowAlphabetically(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid, audioProjectEditorRow);
-        }
-
-        private static void InsertDataGridRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> newRow)
+        public static void AddRowToAudioProjectViewer(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> audioProjectEditorRow)
         {
             var insertIndex = 0;
-            var newValue = newRow.First().Value.ToString();
+            var newValue = audioProjectEditorRow.First().Value.ToString();
 
             for (var i = 0; i < audioProjectViewerDataGrid.Count; i++)
             {
@@ -102,7 +97,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
                     insertIndex = i + 1;
             }
 
-            audioProjectViewerDataGrid.Insert(insertIndex, newRow);
+            audioProjectViewerDataGrid.Insert(insertIndex, audioProjectEditorRow);
         }
 
         public static List<string> GetStatesForStateGroupColumn(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioEditorService audioEditorService, string stateGroup)
