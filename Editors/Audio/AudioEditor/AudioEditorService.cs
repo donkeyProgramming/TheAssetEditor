@@ -55,11 +55,12 @@ namespace Editors.Audio.AudioEditor
         }
 
         public AudioProject AudioProject { get; set; }
+        public string AudioProjectFileName { get; set; }
+        public string AudioProjectDirectory { get; set; }
+        public AudioEditorViewModel AudioEditorViewModel { get; set; }
         public TreeNode SelectedAudioProjectTreeNode { get; set; }
         public ObservableCollection<Dictionary<string, string>> AudioProjectEditorDataGrid { get; set; }
         public ObservableCollection<Dictionary<string, string>> AudioProjectViewerDataGrid { get; set; }
-        public string AudioProjectFileName { get; set; }
-        public string AudioProjectDirectory { get; set; }
         public Dictionary<string, List<string>> ModdedStatesByStateGroupLookup { get; set; } = [];
         public Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithIntegrityError { get; set; } = [];
         public Dictionary<string, DialogueEventPreset?> DialogueEventSoundBankFiltering { get; set; } = [];
@@ -106,7 +107,7 @@ namespace Editors.Audio.AudioEditor
                 AudioProjectDirectory = filePath.Replace($"\\{fileName}", string.Empty);
 
                 // Initialise a full Audio Project and merge the saved Audio Project with it
-                InitialiseAudioProject(audioEditorViewModel, AudioProjectFileName, AudioProjectDirectory, savedProject.Language);
+                InitialiseAudioProject(AudioProjectFileName, AudioProjectDirectory, savedProject.Language);
                 MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(savedProject);
 
                 // Initialise data after AudioProject is set so it uses the correct instance
@@ -121,9 +122,9 @@ namespace Editors.Audio.AudioEditor
             }
         }
 
-        public void InitialiseAudioProject(AudioEditorViewModel audioEditorViewModel, string fileName, string directory, string language)
+        public void InitialiseAudioProject(string fileName, string directory, string language)
         {
-            audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataGridHelpers.AddExtraUnderscoresToString(fileName)}";
+            AudioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataGridHelpers.AddExtraUnderscoresToString(fileName)}";
 
             AudioProjectFileName = fileName;
             AudioProjectDirectory = directory;
@@ -135,7 +136,7 @@ namespace Editors.Audio.AudioEditor
 
             SortSoundBanksAlphabetically();
 
-            audioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
+            AudioEditorViewModel.AudioProjectExplorerViewModel.CreateAudioProjectTree();
         }
 
         public void CompileAudioProject()

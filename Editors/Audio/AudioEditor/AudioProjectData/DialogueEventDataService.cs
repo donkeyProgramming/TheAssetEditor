@@ -15,25 +15,25 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             _audioRepository = audioRepository;
         }
 
-        public void AddToAudioProject(AudioEditorViewModel audioEditorViewModel)
+        public void AddToAudioProject()
         {
-            var audioProjectEditorRow = DataGridHelpers.GetAudioProjectEditorDataGridRow(audioEditorViewModel, _audioRepository, _audioEditorService);
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
-            var statePath = AudioProjectHelpers.CreateStatePathFromDataGridRow(_audioRepository, audioEditorViewModel.AudioSettingsViewModel, audioProjectEditorRow, dialogueEvent);
+            var audioProjectEditorRow = DataGridHelpers.GetAudioProjectEditorDataGridRow(_audioEditorService.AudioEditorViewModel, _audioRepository, _audioEditorService);
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.SelectedAudioProjectTreeNode.Name);
+            var statePath = AudioProjectHelpers.CreateStatePathFromDataGridRow(_audioRepository, _audioEditorService.AudioEditorViewModel.AudioSettingsViewModel, audioProjectEditorRow, dialogueEvent);
             AudioProjectHelpers.InsertStatePathAlphabetically(dialogueEvent, statePath);
         }
 
-        public void RemoveFromAudioProject(AudioEditorViewModel audioEditorViewModel)
+        public void RemoveFromAudioProject()
         {
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
-            var dataGridRowsCopy = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList(); // Create a copy to prevent an error where dataGridRows is modified while being iterated over
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.SelectedAudioProjectTreeNode.Name);
+            var dataGridRowsCopy = _audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList(); // Create a copy to prevent an error where dataGridRows is modified while being iterated over
             foreach (var dataGridRow in dataGridRowsCopy)
             {
                 var statePath = AudioProjectHelpers.GetStatePathFromDataGridRow(_audioRepository, dataGridRow, dialogueEvent);
                 if (statePath != null)
                 {
                     dialogueEvent.StatePaths.Remove(statePath);
-                    audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
+                    _audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
                 }
             }
         }

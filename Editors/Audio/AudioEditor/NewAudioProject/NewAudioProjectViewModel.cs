@@ -15,7 +15,6 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
     {
         readonly ILogger _logger = Logging.Create<NewAudioProjectViewModel>();
 
-        private readonly AudioEditorViewModel _audioEditorViewModel;
         private readonly IPackFileService _packFileService;
         private readonly IAudioEditorService _audioEditorService;
         private readonly IStandardDialogs _standardDialogs;
@@ -36,9 +35,8 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
         [ObservableProperty] private bool _isLanguageSelected;
         [ObservableProperty] private bool _isOkButtonEnabled;
 
-        public NewAudioProjectViewModel(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioEditorService audioEditorService, IStandardDialogs standardDialogs)
+        public NewAudioProjectViewModel(IPackFileService packFileService, IAudioEditorService audioEditorService, IStandardDialogs standardDialogs)
         {
-            _audioEditorViewModel = audioEditorViewModel;
             _packFileService = packFileService;
             _audioEditorService = audioEditorService;
             _standardDialogs = standardDialogs;
@@ -90,12 +88,12 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             }
 
             // Reset and initialise data
-            _audioEditorViewModel.ResetAudioEditorViewModelData();
+            _audioEditorService.AudioEditorViewModel.ResetAudioEditorViewModelData();
             _audioEditorService.ResetAudioProject();
-            _audioEditorViewModel.Initialise();
+            _audioEditorService.AudioEditorViewModel.Initialise();
 
             // Initialise AudioProject according to the Audio Project settings selected
-            _audioEditorService.InitialiseAudioProject(_audioEditorViewModel, AudioProjectFileName, AudioProjectDirectory, GameLanguageStringLookup[SelectedLanguage]);
+            _audioEditorService.InitialiseAudioProject(AudioProjectFileName, AudioProjectDirectory, GameLanguageStringLookup[SelectedLanguage]);
 
             // Add the Audio Project to the PackFile
             _audioEditorService.SaveAudioProject();

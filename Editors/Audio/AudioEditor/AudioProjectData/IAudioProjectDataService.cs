@@ -2,7 +2,7 @@
 {
     public interface IAudioProjectDataService
     {
-        public void AddToAudioProject(AudioEditorViewModel audioEditorViewModel);
-        public void RemoveFromAudioProject(AudioEditorViewModel audioEditorViewModel);
+        public void AddToAudioProject();
+        public void RemoveFromAudioProject();
     }
 }

@@ -13,28 +13,28 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
             _audioEditorService = audioEditorService;
         }
 
-        public void LoadDataGrid(AudioEditorViewModel audioEditorViewModel)
+        public void LoadDataGrid()
         {
-            ConfigureDataGrid(audioEditorViewModel);
-            SetDataGridData(audioEditorViewModel);
+            ConfigureDataGrid();
+            SetDataGridData();
         }
 
-        public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel)
+        public void ConfigureDataGrid()
         {
-            var dataGrid = DataGridConfiguration.InitialiseDataGrid(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
-            var stateGroupColumn = DataGridConfiguration.CreateColumn(audioEditorViewModel, DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name), 1.0, DataGridColumnType.ReadOnlyTextBlock);
+            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var stateGroupColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name), 1.0, DataGridColumnType.ReadOnlyTextBlock);
             dataGrid.Columns.Add(stateGroupColumn);
         }
 
-        public void SetDataGridData(AudioEditorViewModel audioEditorViewModel)
+        public void SetDataGridData()
         {
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNodeName());
             foreach (var state in stateGroup.States)
             {
                 var dataGridRow = new Dictionary<string, string>();
                 dataGridRow[DataGridHelpers.AddExtraUnderscoresToString(stateGroup.Name)] = state.Name;
-                audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(dataGridRow);
+                _audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(dataGridRow);
             }
         }
     }

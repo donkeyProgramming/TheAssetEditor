@@ -11,10 +11,10 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             InitializeComponent();
         }
 
-        public static void Show(AudioEditorViewModel audioEditorViewModel, IPackFileService packFileService, IAudioEditorService audioEditorService, IStandardDialogs packFileUiProvider)
+        public static void Show(IPackFileService packFileService, IAudioEditorService audioEditorService, IStandardDialogs packFileUiProvider)
         {
             var window = new NewAudioProjectWindow();
-            var newAudioProjectViewModel = new NewAudioProjectViewModel(audioEditorViewModel, packFileService, audioEditorService, packFileUiProvider);
+            var newAudioProjectViewModel = new NewAudioProjectViewModel(packFileService, audioEditorService, packFileUiProvider);
 
             // Set the close action for the ViewModel
             newAudioProjectViewModel.SetCloseAction(() =>

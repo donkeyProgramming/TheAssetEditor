@@ -17,17 +17,17 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
             _audioRepository = audioRepository;
         }
 
-        public void LoadDataGrid(AudioEditorViewModel audioEditorViewModel)
+        public void LoadDataGrid()
         {
-            ConfigureDataGrid(audioEditorViewModel);
-            SetDataGridData(audioEditorViewModel);
+            ConfigureDataGrid();
+            SetDataGridData();
         }
 
-        public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel)
+        public void ConfigureDataGrid()
         {
-            var dataGrid = DataGridConfiguration.InitialiseDataGrid(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
+            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
 
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNodeName());
 
             var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
@@ -36,13 +36,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
             {
                 var columnHeader = DataGridHelpers.AddExtraUnderscoresToString(stateGroupWithQualifier.Key);
-                var states = DataGridHelpers.GetStatesForStateGroupColumn(audioEditorViewModel, _audioRepository, _audioEditorService, stateGroupWithQualifier.Value);
-                var stateGroupColumn = DataGridConfiguration.CreateColumn(audioEditorViewModel, columnHeader, columnWidth, DataGridColumnType.StateGroupEditableComboBox, states);
+                var states = DataGridHelpers.GetStatesForStateGroupColumn(_audioEditorService.AudioEditorViewModel, _audioRepository, _audioEditorService, stateGroupWithQualifier.Value);
+                var stateGroupColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, columnHeader, columnWidth, DataGridColumnType.StateGroupEditableComboBox, states);
                 dataGrid.Columns.Add(stateGroupColumn);
             }
         }
 
-        public void SetDataGridData(AudioEditorViewModel audioEditorViewModel)
+        public void SetDataGridData()
         {
             var rowData = new Dictionary<string, string>();
 
@@ -50,7 +50,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
                 .Where(stateGroupColumn => stateGroupColumn.Value.Contains("Any"))
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNodeName());
 
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
             foreach (var stateGroupWithQualifier in stateGroupsWithQualifiers)
@@ -62,7 +62,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
                     rowData[columnName] = "Any"; // Set the cell value to Any as the default value
             }
 
-            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
+            _audioEditorService.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
         }
     }
 }

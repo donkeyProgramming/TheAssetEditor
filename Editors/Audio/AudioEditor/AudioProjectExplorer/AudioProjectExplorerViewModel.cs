@@ -15,7 +15,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
     public partial class AudioProjectExplorerViewModel : ObservableObject, IEditorInterface
     {
-        public AudioEditorViewModel AudioEditorViewModel { get; set; }
         private readonly IEventHub _eventHub;
         private readonly IAudioEditorService _audioEditorService;
 
@@ -61,7 +60,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         partial void OnSelectedDialogueEventPresetChanged(DialogueEventPreset? value)
         {
-            DialogueEventFilter.ApplyDialogueEventPresetFiltering(AudioEditorViewModel, _audioEditorService);
+            DialogueEventFilter.ApplyDialogueEventPresetFiltering(_audioEditorService.AudioEditorViewModel, _audioEditorService);
         }
 
         partial void OnSearchQueryChanged(string value)

@@ -19,9 +19,9 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 {
     public partial class AudioFilesExplorerViewModel : ObservableObject, IEditorInterface
     {
-        public AudioEditorViewModel AudioEditorViewModel { get; set; }
         private readonly IEventHub _eventHub;
         private readonly IPackFileService _packFileService;
+        private readonly IAudioEditorService _audioEditorService;
         private readonly SoundPlayer _soundPlayer;
 
         public string DisplayName { get; set; } = "Audio Files Explorer";
@@ -35,10 +35,11 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         public ObservableCollection<TreeNode> SelectedTreeNodes { get; set; } = new ObservableCollection<TreeNode>();
 
-        public AudioFilesExplorerViewModel(IEventHub eventHub, IPackFileService packFileService, SoundPlayer soundPlayer)
+        public AudioFilesExplorerViewModel(IEventHub eventHub, IPackFileService packFileService, IAudioEditorService audioEditorService, SoundPlayer soundPlayer)
         {
             _eventHub = eventHub;
             _packFileService = packFileService;
+            _audioEditorService = audioEditorService;
             _soundPlayer = soundPlayer;
 
             SelectedTreeNodes.CollectionChanged += OnSelectedTreeNodesChanged;
@@ -242,22 +243,22 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
 
         [RelayCommand] public void AddAudioFilesToAudioProjectEditor()
         {
-            var selectedWavFiles = AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes;
+            var selectedWavFiles = _audioEditorService.AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes;
 
-            AudioEditorViewModel.AudioSettingsViewModel.AudioFiles.Clear();
+            _audioEditorService.AudioEditorViewModel.AudioSettingsViewModel.AudioFiles.Clear();
 
             foreach (var wavFile in selectedWavFiles)
             {
-                AudioEditorViewModel.AudioSettingsViewModel.AudioFiles.Add(new AudioFile
+                _audioEditorService.AudioEditorViewModel.AudioSettingsViewModel.AudioFiles.Add(new AudioFile
                 {
                     FileName = wavFile.Name,
                     FilePath = wavFile.FilePath
                 });
             }
 
-            AudioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsEnablementAndVisibility();
-            AudioEditorViewModel.AudioSettingsViewModel.ResetShowSettingsFromAudioProjectViewer();
-            AudioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
+            _audioEditorService.AudioEditorViewModel.AudioSettingsViewModel.SetAudioSettingsEnablementAndVisibility();
+            _audioEditorService.AudioEditorViewModel.AudioSettingsViewModel.ResetShowSettingsFromAudioProjectViewer();
+            _audioEditorService.AudioEditorViewModel.AudioProjectEditorViewModel.SetAddRowButtonEnablement();
         }
 
         [RelayCommand] public void PlayWavFile()
@@ -265,7 +266,7 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
             if (!IsPlayAudioButtonEnabled)
                 return;
 
-            var wavFileNode = AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes[0];
+            var wavFileNode = _audioEditorService.AudioEditorViewModel.AudioFilesExplorerViewModel.SelectedTreeNodes[0];
             var wavFile = _packFileService.FindFile(wavFileNode.FilePath);
             var wavFileName = $"{wavFileNode.Name}";
 
@@ -286,14 +287,14 @@ namespace Editors.Audio.AudioEditor.AudioFilesExplorer
         {
             IsPlayAudioButtonEnabled = SelectedTreeNodes.Count == 1;
 
-            var selectedAudioProjectNode = AudioEditorViewModel.GetSelectedAudioProjectNode();
+            var selectedAudioProjectNode = _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNode();
             if (selectedAudioProjectNode == null)
                 return;
 
             if (SelectedTreeNodes.Count > 0)
             {
-                var selectedAudioProjectNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
-                if (selectedAudioProjectNodeType == AudioProjectExplorer.NodeType.ActionEventSoundBank || selectedAudioProjectNodeType == AudioProjectExplorer.NodeType.DialogueEvent)
+                var selectedNode = _audioEditorService.SelectedAudioProjectTreeNode;
+                if (selectedNode.NodeType == AudioProjectExplorer.NodeType.ActionEventSoundBank || selectedNode.NodeType == AudioProjectExplorer.NodeType.DialogueEvent)
                     IsAddAudioFilesButtonEnabled = true;
             }
             else

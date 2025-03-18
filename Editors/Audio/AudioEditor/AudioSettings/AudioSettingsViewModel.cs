@@ -14,8 +14,8 @@ namespace Editors.Audio.AudioEditor.AudioSettings
     // TODO: Add visibility to all settings.
     public partial class AudioSettingsViewModel : ObservableObject, IEditorInterface
     {
-        public AudioEditorViewModel AudioEditorViewModel { get; set; }
         private readonly IEventHub _eventHub;
+        private readonly IAudioEditorService _audioEditorService;
 
         public string DisplayName { get; set; } = "Audio Settings";
 
@@ -52,9 +52,10 @@ namespace Editors.Audio.AudioEditor.AudioSettings
 
         public ObservableCollection<AudioFile> AudioFiles { get; set; } = [];
 
-        public AudioSettingsViewModel(IEventHub eventHub)
+        public AudioSettingsViewModel(IEventHub eventHub, IAudioEditorService audioEditorService)
         {
             _eventHub = eventHub;
+            _audioEditorService = audioEditorService;
 
             SetInitialAudioSettings();
 
@@ -197,8 +198,8 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         public void SetAudioSettingsEnablementAndVisibility()
         {
             // We only want to show the settings for these nodes
-            var selectedNodeType = AudioEditorViewModel.GetSelectedAudioProjectNodeType();
-            if (selectedNodeType != NodeType.ActionEventSoundBank && selectedNodeType != NodeType.DialogueEvent)
+            var selectedNode = _audioEditorService.SelectedAudioProjectTreeNode;
+            if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent)
                 return;
 
             IsAudioSettingsVisible = true;

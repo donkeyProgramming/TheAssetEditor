@@ -2,9 +2,9 @@
 {
     public interface IAudioProjectEditorDataGridService
     {
-        public void LoadDataGrid(AudioEditorViewModel audioEditorViewModel);
-        public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel);
-        public void SetDataGridData(AudioEditorViewModel audioEditorViewModel);
-        public void ResetDataGridData(AudioEditorViewModel audioEditorViewModel) => SetDataGridData(audioEditorViewModel);
+        public void LoadDataGrid();
+        public void ConfigureDataGrid();
+        public void SetDataGridData();
+        public void ResetDataGridData() => SetDataGridData();
     }
 }

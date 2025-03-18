@@ -13,33 +13,33 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
             _audioEditorService = audioEditorService;
         }
 
-        public void LoadDataGrid(AudioEditorViewModel audioEditorViewModel)
+        public void LoadDataGrid()
         {
-            ConfigureDataGrid(audioEditorViewModel);
-            SetDataGridData(audioEditorViewModel);
+            ConfigureDataGrid();
+            SetDataGridData();
         }
 
-        public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel)
+        public void ConfigureDataGrid()
         {
-            var dataGrid = DataGridConfiguration.InitialiseDataGrid(audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
+            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
 
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
 
-            var eventColumn = DataGridConfiguration.CreateColumn(audioEditorViewModel, "Event", columnWidth, DataGridColumnType.ReadOnlyTextBlock);
+            var eventColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, "Event", columnWidth, DataGridColumnType.ReadOnlyTextBlock);
             dataGrid.Columns.Add(eventColumn);
         }
 
-        public void SetDataGridData(AudioEditorViewModel audioEditorViewModel)
+        public void SetDataGridData()
         {
-            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNodeName());
             foreach (var actionEvent in soundBank.ActionEvents)
             {
                 var rowData = new Dictionary<string, string>
                 {
                     { "Event", actionEvent.Name }
                 };
-                audioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(rowData);
+                _audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(rowData);
             }
         }
     }

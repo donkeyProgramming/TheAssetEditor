@@ -15,6 +15,7 @@ using TreeNode = Editors.Audio.AudioEditor.AudioProjectExplorer.TreeNode;
 
 namespace Editors.Audio.AudioEditor
 {
+    // TODO: Refactor references to AudioEditorViewModel to in AudioEditorService so it references the individual components rather than the whole view model
     public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {
         public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; }
@@ -41,25 +42,18 @@ namespace Editors.Audio.AudioEditor
             IAudioEditorService audioEditorService,
             IntegrityChecker integrityChecker)
         {
-            AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
-            AudioProjectExplorerViewModel.AudioEditorViewModel = this;
-
-            AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
-            AudioFilesExplorerViewModel.AudioEditorViewModel = this;
-
-            AudioProjectEditorViewModel = audioProjectEditorViewModel;
-            AudioProjectEditorViewModel.AudioEditorViewModel = this;
-
-            AudioProjectViewerViewModel = audioProjectViewerViewModel;
-            AudioProjectViewerViewModel.AudioEditorViewModel = this;
-
-            AudioSettingsViewModel = audioSettingsViewModel;
-            AudioSettingsViewModel.AudioEditorViewModel = this;
-
             _packFileService = packFileService;
             _standardDialogs = standardDialogs;
             _audioEditorService = audioEditorService;
             _integrityChecker = integrityChecker;
+
+            AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
+            AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
+            AudioProjectEditorViewModel = audioProjectEditorViewModel;
+            AudioProjectViewerViewModel = audioProjectViewerViewModel;
+            AudioSettingsViewModel = audioSettingsViewModel;
+
+            _audioEditorService.AudioEditorViewModel = this;
 
             Initialise();
 
@@ -68,7 +62,7 @@ namespace Editors.Audio.AudioEditor
 
         [RelayCommand] public void NewAudioProject()
         {
-            NewAudioProjectWindow.Show(this, _packFileService, _audioEditorService, _standardDialogs);
+            NewAudioProjectWindow.Show(_packFileService, _audioEditorService, _standardDialogs);
         }
 
         [RelayCommand] public void SaveAudioProject()

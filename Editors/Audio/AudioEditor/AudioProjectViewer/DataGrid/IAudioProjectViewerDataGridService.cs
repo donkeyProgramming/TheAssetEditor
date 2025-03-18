@@ -2,8 +2,8 @@
 {
     public interface IAudioProjectViewerDataGridService
     {
-        public void LoadDataGrid(AudioEditorViewModel audioEditorViewModel);
-        public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel);
-        public void SetDataGridData(AudioEditorViewModel audioEditorViewModel);
+        public void LoadDataGrid();
+        public void ConfigureDataGrid();
+        public void SetDataGridData();
     }
 }

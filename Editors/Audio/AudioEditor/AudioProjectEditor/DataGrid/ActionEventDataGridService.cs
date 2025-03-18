@@ -14,42 +14,42 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
             _audioEditorService = audioEditorService;
         }
 
-        public void LoadDataGrid(AudioEditorViewModel audioEditorViewModel)
+        public void LoadDataGrid()
         {
-            ConfigureDataGrid(audioEditorViewModel);
-            SetDataGridData(audioEditorViewModel);
+            ConfigureDataGrid();
+            SetDataGridData();
         }
 
-        public void ConfigureDataGrid(AudioEditorViewModel audioEditorViewModel)
+        public void ConfigureDataGrid()
         {
-            var dataGrid = DataGridConfiguration.InitialiseDataGrid(audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
+            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
 
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
 
-            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, audioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNodeName());
             if (soundBank.Name == SoundBanks.MoviesDisplayString)
             {
-                var eventColumn = DataGridConfiguration.CreateColumn(audioEditorViewModel, "Event", columnWidth, DataGridColumnType.ReadOnlyTextBlock);
+                var eventColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, "Event", columnWidth, DataGridColumnType.ReadOnlyTextBlock);
                 dataGrid.Columns.Add(eventColumn);
 
-                var fileSelectColumn = DataGridConfiguration.CreateColumn(audioEditorViewModel, string.Empty, 25, DataGridColumnType.FileSelectButton, useAbsoluteWidth: true);
+                var fileSelectColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, string.Empty, 25, DataGridColumnType.FileSelectButton, useAbsoluteWidth: true);
                 dataGrid.Columns.Add(fileSelectColumn);
             }
             else
             {
-                var eventColumn = DataGridConfiguration.CreateColumn(audioEditorViewModel, "Event", columnWidth, DataGridColumnType.EditableTextBox);
+                var eventColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, "Event", columnWidth, DataGridColumnType.EditableTextBox);
                 dataGrid.Columns.Add(eventColumn);
             }
         }
 
-        public void SetDataGridData(AudioEditorViewModel audioEditorViewModel)
+        public void SetDataGridData()
         {
             var rowData = new Dictionary<string, string>
             {
                 { "Event", string.Empty }
             };
-            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
+            _audioEditorService.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
         }
     }
 }
