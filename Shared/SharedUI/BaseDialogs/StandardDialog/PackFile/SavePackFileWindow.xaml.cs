@@ -76,7 +76,7 @@ namespace Shared.Ui.BaseDialogs.StandardDialog.PackFile
                     path = "";
                 }
                 else
-                if (_selectedNode.GetNodeType() == NodeType.File)
+                if (_selectedNode.NodeType == NodeType.File)
                 {
                     var fullPath = _selectedNode.GetFullPath();
                     path = System.IO.Path.GetDirectoryName(fullPath) + "\\";

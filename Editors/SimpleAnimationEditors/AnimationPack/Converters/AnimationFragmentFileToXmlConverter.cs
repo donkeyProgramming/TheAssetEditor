@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using System.Xml.Serialization;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.Settings;
@@ -16,10 +16,10 @@ namespace CommonControls.Editors.AnimationPack.Converters
     public class AnimationFragmentFileToXmlConverter
         : BaseAnimConverter<AnimationFragmentFileToXmlConverter.Animation, AnimationFragmentFile>
     {
-        private SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         GameTypeEnum _preferedGame;
 
-        public AnimationFragmentFileToXmlConverter(SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, GameTypeEnum preferedGame)
+        public AnimationFragmentFileToXmlConverter(ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, GameTypeEnum preferedGame)
         {
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;
             _preferedGame = preferedGame;

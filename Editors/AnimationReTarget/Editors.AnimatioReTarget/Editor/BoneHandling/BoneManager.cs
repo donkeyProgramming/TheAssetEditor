@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimatioReTarget.Editor.BoneHandling.Presentation;
 using Editors.Shared.Core.Common;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.Services;
 using Shared.GameFormats.Animation;
@@ -17,7 +17,7 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
 
         private readonly IStandardDialogs _standardDialogs;
         private readonly IAbstractFormFactory<BoneMappingWindow> _boneMappingWindowFactory;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
         private ISkeletonBoneHighlighter? _skeletonBoneHighlighter;
         private RemappedAnimatedBoneConfiguration? _activeConfig;
@@ -30,7 +30,7 @@ namespace Editors.AnimatioReTarget.Editor.BoneHandling
         public BoneManager(
             IStandardDialogs standardDialogs, 
             IAbstractFormFactory<BoneMappingWindow> boneMappingWindowFactory,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _standardDialogs = standardDialogs;
             _boneMappingWindowFactory = boneMappingWindowFactory;

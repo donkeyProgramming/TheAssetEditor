@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Editors.AnimatioReTarget.Editor.BoneHandling;
 using Editors.Shared.Core.Common;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -17,7 +17,7 @@ namespace Editors.AnimatioReTarget.Editor.Saving
     {
         //private readonly ILogger _logger = Logging.Create<SaveViewModel>();
 
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IPackFileService _pfs;
         private readonly IFileSaveService _saveService;
         private readonly IStandardDialogs _standardDialogs;
@@ -28,8 +28,8 @@ namespace Editors.AnimatioReTarget.Editor.Saving
         SceneObject _source;
         SceneObject _target;
 
-        public SaveManager(BoneManager boneManager, 
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
+        public SaveManager(BoneManager boneManager,
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, 
             IPackFileService pfs,
             SaveSettings saveSettings,
             IFileSaveService saveService,

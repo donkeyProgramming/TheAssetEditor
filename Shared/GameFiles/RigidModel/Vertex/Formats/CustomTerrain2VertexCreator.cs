@@ -14,7 +14,15 @@ namespace Shared.GameFormats.RigidModel.Vertex.Formats
         }
         public bool ForceComputeNormals => true;
 
-        public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
+        public CommonVertex[] ReadArray(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize, int vertexCount)
+        {
+            var vertexList = new CommonVertex[vertexCount];
+            for (var i = 0; i < vertexCount; i++)
+                vertexList[i] = Read(rmvVersion, buffer, offset + i * vertexSize, vertexSize);
+            return vertexList;
+        }
+
+        CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize)
         {
             var vertexData = ByteHelper.ByteArrayToStructure<Data>(buffer, offset);
 

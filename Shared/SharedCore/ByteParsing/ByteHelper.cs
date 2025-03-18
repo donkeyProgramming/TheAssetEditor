@@ -28,6 +28,14 @@ namespace Shared.Core.ByteParsing
             }
         }
 
+
+        public static ReadOnlySpan<T> LoadArray<T>(byte[] bytes, int offset, int totalBytesToRead) where T:struct
+        {
+            var span = bytes.AsSpan(offset, totalBytesToRead);
+            var structSpan = MemoryMarshal.Cast<byte, T>(span);
+            return structSpan;
+        }
+
         public static byte[] GetBytes<T>(T data) where T : struct
         {
             var size = Marshal.SizeOf(data);

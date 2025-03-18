@@ -1,9 +1,9 @@
 ﻿using System.Windows;
 using Editors.KitbasherEditor.Core.MenuBarViews;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Components;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Ui.Common.MenuSystem;
 using Shared.Ui.Editors.BoneMapping;
@@ -17,13 +17,13 @@ namespace Editors.KitbasherEditor.ChildEditors.MeshFitter
         public Hotkey? HotKey { get; } = null;
 
         private readonly SelectionManager _selectionManager;
-        private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IAbstractFormFactory<MeshFitterWindow> _formFactory;
         private readonly SceneManager _sceneManager;
 
         MeshFitterWindow? _windowHandle;
 
-        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager)
+        public OpenSkeletonReshaperToolCommand(SelectionManager selectionManager, ISkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<MeshFitterWindow> formFactory, SceneManager sceneManager)
         {
             _selectionManager = selectionManager;
             _skeletonHelper = skeletonHelper;

@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+﻿using System;
+using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework.Graphics;
@@ -41,41 +42,9 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             };
         }
 
-
-        public override void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
-        {
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, SpecularMap);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, GlossMap);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, DiffuseMap);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, NormalMap);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Mask);
-
-            base.Initialize(wsModelMaterial, rmvMaterial);
-        }
-
-        public override void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
-        {
-            
-            templateHandler.AddAttribute(WsModelParamters.Texture_Specular.TemplateName, SpecularMap);
-            if (templateHandler.GameHint != GameTypeEnum.Pharaoh)
-                templateHandler.AddAttribute(WsModelParamters.Texture_Gloss.TemplateName, GlossMap);
-            templateHandler.AddAttribute(WsModelParamters.Texture_Diffse.TemplateName, DiffuseMap);
-            templateHandler.AddAttribute(WsModelParamters.Texture_Normal.TemplateName, NormalMap);
-            templateHandler.AddAttribute(WsModelParamters.Texture_Mask.TemplateName, Mask);
-
-            base.SerializeToWsModel(templateHandler);
-        }
-
-        public override void SerializeToRmvMaterial(IRmvMaterial rmvMaterial)
-        {
-            rmvMaterial.SetTexture(SpecularMap.Type, SpecularMap.TexturePath);
-            rmvMaterial.SetTexture(GlossMap.Type, GlossMap.TexturePath);
-            rmvMaterial.SetTexture(DiffuseMap.Type, DiffuseMap.TexturePath);
-            rmvMaterial.SetTexture(NormalMap.Type, NormalMap.TexturePath);
-            rmvMaterial.SetTexture(Mask.Type, Mask.TexturePath);
-
-            base.SerializeToRmvMaterial (rmvMaterial);
-        }
+        public override void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)=> SpecGlossCapabilitySerializer.Initialize(this, wsModelMaterial, rmvMaterial);
+        public override void SerializeToWsModel(WsMaterialTemplateEditor templateHandler) => SpecGlossCapabilitySerializer.SerializeToWsModel(this, templateHandler);
+        public override void SerializeToRmvMaterial(IRmvMaterial rmvMaterial) => SpecGlossCapabilitySerializer.SerializeToRmvMaterial(this, rmvMaterial);
 
         public override (bool Result, string Message) AreEqual(ICapability otherCap)
         {
@@ -95,6 +64,58 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                 return res4;
 
             return base.AreEqual(otherCap);
+        }
+    }
+
+    public static class SpecGlossCapabilitySerializer
+    {
+        public static void Initialize(SpecGlossCapability output, WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
+        {
+            if (wsModelMaterial != null)
+            {
+                output.UseAlpha = wsModelMaterial.Alpha;
+            }
+            else
+            {
+                if (rmvMaterial is WeightedMaterial weightedMaterial == false)
+                    throw new Exception($"Unable to convert material of type {rmvMaterial?.MaterialId} into {nameof(WeightedMaterial)}");
+
+                weightedMaterial.IntParams.TryGet(WeightedParamterIds.IntParams_Alpha_index, out var useAlpha);
+                output.UseAlpha = useAlpha == 1;
+            }
+
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.SpecularMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.GlossMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.DiffuseMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.NormalMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.Mask);
+
+   
+        }
+
+        public static void SerializeToWsModel(SpecGlossCapability typedCap, WsMaterialTemplateEditor templateHandler)
+        {
+
+
+            templateHandler.AddAttribute(WsModelParamters.Texture_Specular.TemplateName, typedCap.SpecularMap);
+            if (templateHandler.GameHint != GameTypeEnum.Pharaoh)
+                templateHandler.AddAttribute(WsModelParamters.Texture_Gloss.TemplateName, typedCap.GlossMap);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Diffse.TemplateName, typedCap.DiffuseMap);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Normal.TemplateName, typedCap.NormalMap);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Mask.TemplateName, typedCap.Mask);
+        }
+
+        public static void SerializeToRmvMaterial(SpecGlossCapability typedCap, IRmvMaterial rmvMaterial)
+        {
+            if (rmvMaterial is not WeightedMaterial weightedMateial)
+                throw new Exception($"Input material '{rmvMaterial.GetType()}' is not {nameof(WeightedMaterial)} - Unable to serialize to rmv");
+            rmvMaterial.SetTexture(typedCap.SpecularMap.Type, typedCap.SpecularMap.TexturePath);
+            rmvMaterial.SetTexture(typedCap.GlossMap.Type, typedCap.GlossMap.TexturePath);
+            rmvMaterial.SetTexture(typedCap.DiffuseMap.Type, typedCap.DiffuseMap.TexturePath);
+            rmvMaterial.SetTexture(typedCap.NormalMap.Type, typedCap.NormalMap.TexturePath);
+            rmvMaterial.SetTexture(typedCap.Mask.Type, typedCap.Mask.TexturePath);
+
+            weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Alpha_index, typedCap.UseAlpha ? 1 : 0);
         }
     }
 }

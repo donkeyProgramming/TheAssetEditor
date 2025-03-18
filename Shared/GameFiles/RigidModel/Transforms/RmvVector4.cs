@@ -2,6 +2,49 @@
 
 namespace Shared.GameFormats.RigidModel.Transforms
 {
+
+    public struct ByteVector2
+    {
+        public byte X { get; set; }
+        public byte Y { get; set; }
+    }
+
+    public struct ByteVector3
+    {
+        public byte X { get; set; }
+        public byte Y { get; set; }
+        public byte Z { get; set; }
+    }
+
+    public struct ByteVector4
+    {
+        public byte X { get; set; }
+        public byte Y { get; set; }
+        public byte Z { get; set; }
+        public byte W { get; set; }
+    }
+
+
+    public struct HalfVector4
+    {
+        public SharpDX.Half X { get; set; }     // 4 x 2
+        public SharpDX.Half Y { get; set; }     // 4 x 2
+        public SharpDX.Half Z { get; set; }     // 4 x 2
+        public SharpDX.Half W { get; set; }     // 4 x 2
+    }
+
+    public struct HalfVector2
+    {
+        public SharpDX.Half X { get; set; }     // 4 x 2
+        public SharpDX.Half Y { get; set; }     // 4 x 2
+    }
+
+
+
+
+
+
+
     [Serializable]
     public struct RmvVector4
     {

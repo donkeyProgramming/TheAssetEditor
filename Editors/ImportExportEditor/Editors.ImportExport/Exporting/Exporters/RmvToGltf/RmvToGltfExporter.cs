@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using Editors.ImportExport.Exporting.Exporters.RmvToGltf.Helpers;
 using Editors.ImportExport.Misc;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles.Models;
@@ -21,9 +21,9 @@ namespace Editors.ImportExport.Exporting.Exporters.RmvToGltf
         private readonly IGltfTextureHandler _gltfTextureHandler;
         private readonly GltfSkeletonBuilder _gltfSkeletonBuilder;
         private readonly GltfAnimationBuilder _gltfAnimationBuilder;
-        private readonly SkeletonAnimationLookUpHelper _skeletonLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonLookUpHelper;
 
-        public RmvToGltfExporter(IGltfSceneSaver gltfSaver, GltfMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler, GltfSkeletonBuilder gltfSkeletonsBuilder, GltfAnimationBuilder gltfAnimationCreator, SkeletonAnimationLookUpHelper skeletonLookUpHelper)
+        public RmvToGltfExporter(IGltfSceneSaver gltfSaver, GltfMeshBuilder gltfMeshBuilder, IGltfTextureHandler gltfTextureHandler, GltfSkeletonBuilder gltfSkeletonsBuilder, GltfAnimationBuilder gltfAnimationCreator, ISkeletonAnimationLookUpHelper skeletonLookUpHelper)
         {
             _gltfSaver = gltfSaver;
             _gltfMeshBuilder = gltfMeshBuilder;

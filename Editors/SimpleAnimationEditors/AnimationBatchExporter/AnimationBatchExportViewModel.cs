@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Serilog;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
@@ -18,10 +18,10 @@ namespace CommonControls.Editors.AnimationBatchExporter
     {
         private readonly ILogger _logger = Logging.Create<AnimationBatchExportViewModel>();
         private readonly IPackFileService _pfs;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
 
-        public ObservableCollection<PackFileListItem> PackfileList { get; set; } = new ObservableCollection<PackFileListItem>();
-        public ObservableCollection<uint> PossibleOutputFormats { get; set; } = new ObservableCollection<uint>() { 5, 6, 7 };
+        public ObservableCollection<PackFileListItem> PackfileList { get; set; } = [];
+        public ObservableCollection<uint> PossibleOutputFormats { get; set; } = [5, 6, 7];
         public NotifyAttr<uint> SelectedOutputFormat { get; set; } = new NotifyAttr<uint>(7);
 
 
@@ -29,7 +29,7 @@ namespace CommonControls.Editors.AnimationBatchExporter
 
      
 
-        public AnimationBatchExportViewModel(IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
+        public AnimationBatchExportViewModel(IPackFileService pfs, ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper)
         {
             _pfs = pfs;
             _skeletonAnimationLookUpHelper = skeletonAnimationLookUpHelper;

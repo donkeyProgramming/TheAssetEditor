@@ -1,9 +1,11 @@
-﻿using Serilog;
+﻿using System.Runtime.InteropServices;
+using Serilog;
 using Shared.Core.ByteParsing;
 using Shared.Core.ErrorHandling;
 using Shared.GameFormats.RigidModel.LodHeader;
 using Shared.GameFormats.RigidModel.MaterialHeaders;
 using Shared.GameFormats.RigidModel.Vertex;
+using SharpDX.MediaFoundation;
 
 namespace Shared.GameFormats.RigidModel
 {
@@ -91,18 +93,19 @@ namespace Shared.GameFormats.RigidModel
 
             var vertexList = vertexFactory.CreateVertexFromBytes(rmvVersionEnum, binaryVertexFormat, dataArray, (int)commonHeader.VertexCount, (int)vertexStart, (int)expectedVertexSize);
 
+            // Read the indeces
             var faceStart = commonHeader.IndexOffset + modelStartOffset;
-            var IndexList = new ushort[commonHeader.IndexCount];
-            for (var i = 0; i < commonHeader.IndexCount; i++)
-                IndexList[i] = BitConverter.ToUInt16(dataArray, (int)faceStart + sizeof(ushort) * i);
+            var span = dataArray.AsSpan((int)faceStart, (int)(sizeof(ushort) * commonHeader.IndexCount));
+            var ushortSpan = MemoryMarshal.Cast<byte, ushort>(span);
+            var indexList = ushortSpan.ToArray();
 
             var mesh = new RmvMesh()
             {
                 VertexList = vertexList,
-                IndexList = IndexList
+                IndexList = indexList
             };
 
-            vertexFactory.ReComputeNormals(binaryVertexFormat, ref vertexList, ref IndexList);
+            vertexFactory.ReComputeNormals(binaryVertexFormat, ref vertexList, ref indexList);
 
             return mesh;
         }

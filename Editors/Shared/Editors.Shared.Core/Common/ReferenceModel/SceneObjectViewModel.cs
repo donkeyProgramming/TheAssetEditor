@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.Services;
@@ -35,7 +36,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
             SceneObject data,
             string headerName,
             SceneObjectEditor sceneObjectBuilder,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             MetaDataTagDeSerializer metaDataTagDeSerializer)
         {
             _metaDataFactory = metaDataFactory;

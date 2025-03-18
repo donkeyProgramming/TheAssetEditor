@@ -18,7 +18,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 return;
             }
 
-            if (_selectedNode.GetNodeType() == NodeType.Directory)
+            if (_selectedNode.NodeType == NodeType.Directory)
             {
                 var newFolderName = EditFileNameDialog.ShowDialog(_selectedNode.Parent, _selectedNode.Name);
                 if (newFolderName.Any())
@@ -28,7 +28,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu.Commands
                 }
 
             }
-            else if (_selectedNode.GetNodeType() == NodeType.File)
+            else if (_selectedNode.NodeType == NodeType.File)
             {
                 var newFileName = EditFileNameDialog.ShowDialog(_selectedNode.Parent, _selectedNode.Name);
                 if (newFileName.Any())
