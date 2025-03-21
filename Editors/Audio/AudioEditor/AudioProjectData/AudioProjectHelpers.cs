@@ -32,55 +32,69 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
         public static ActionEvent GetActionEventFromDataGridRow(Dictionary<string, string> dataGridRow, SoundBank actionEventSoundBank)
         {
-            var dataGridRowActionEventName = GetActionEventNameFromDataGridRow(dataGridRow);
+            var eventName = GetActionEventNameWithoutActionTypeFromDataGridRow(dataGridRow);
 
             foreach (var actionEvent in actionEventSoundBank.ActionEvents)
             {                    
-                if (actionEvent.Name == dataGridRowActionEventName)
+                if (actionEvent.Name == eventName)
                     return actionEvent;
             }
 
             return null;
         }
 
+        public static string GetActionEventNameWithoutActionTypeFromDataGridRow(Dictionary<string, string> dataGridRow)
+        {
+            if (dataGridRow.TryGetValue(DataGridConfiguration.EventNameColumn, out var eventName))
+                return eventName.ToString();
+            else
+                return string.Empty;
+        }
+
+        public static string GetActionTypeFromDataGridRow(Dictionary<string, string> dataGridRow)
+        {
+            if (dataGridRow.TryGetValue(DataGridConfiguration.ActionTypeColumn, out var actionType))
+                return actionType.ToString();
+            else
+                return string.Empty;
+        }
+
+        public static string GetActionEventName(string actionType, string eventName)
+        {
+            return $"{actionType}_{eventName}";
+        }
+
         public static ActionEvent CreateActionEventFromDataGridRow(AudioSettingsViewModel audioSettingsViewModel, Dictionary<string, string> dataGridRow)
         {
             var actionEvent = new ActionEvent();
 
-            if (dataGridRow.TryGetValue("Event", out var eventName))
+            var eventNameWithoutActionType = GetActionEventNameWithoutActionTypeFromDataGridRow(dataGridRow);
+            var actionType = GetActionTypeFromDataGridRow(dataGridRow);
+
+            if (eventNameWithoutActionType == string.Empty || actionType == string.Empty)
+                return null;
+
+            actionEvent.Name = GetActionEventName(actionType, eventNameWithoutActionType);
+
+            var audioFiles = audioSettingsViewModel.AudioFiles;
+            if (audioFiles.Count == 1)
+                actionEvent.Sound = CreateSound(audioSettingsViewModel, audioFiles[0]);
+            else
             {
-                actionEvent.Name = eventName.ToString();
-
-                var audioFiles = audioSettingsViewModel.AudioFiles;
-                if (audioFiles.Count == 1)
-                    actionEvent.Sound = CreateSound(audioSettingsViewModel, audioFiles[0]);
-                else
+                actionEvent.RandomSequenceContainer = new RandomSequenceContainer
                 {
-                    actionEvent.RandomSequenceContainer = new RandomSequenceContainer
-                    {
-                        Sounds = [],
-                        AudioSettings = audioSettingsViewModel.BuildAudioSettings()
-                    };
+                    Sounds = [],
+                    AudioSettings = audioSettingsViewModel.BuildAudioSettings()
+                };
 
-                    foreach (var audioFile in audioFiles)
-                    {
-                        var sound = CreateSound(audioSettingsViewModel, audioFile);
-                        actionEvent.RandomSequenceContainer.Sounds.Add(sound);
-                    }
+                foreach (var audioFile in audioFiles)
+                {
+                    var sound = CreateSound(audioSettingsViewModel, audioFile);
+                    actionEvent.RandomSequenceContainer.Sounds.Add(sound);
                 }
-
-                return actionEvent;
             }
 
-            return null;
-        }
-
-        public static string GetActionEventNameFromDataGridRow(Dictionary<string, string> dataGridRow)
-        {
-            if (dataGridRow.TryGetValue("Event", out var eventName))
-                return eventName.ToString();
-            else
-                return string.Empty;
+            return actionEvent;
         }
 
         public static StatePath GetStatePathFromDataGridRow(IAudioRepository audioRepository, Dictionary<string, string> dataGridRow, DialogueEvent selectedDialogueEvent)

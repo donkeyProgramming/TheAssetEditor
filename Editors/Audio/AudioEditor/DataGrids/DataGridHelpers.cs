@@ -72,12 +72,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             return newRow;
         }
 
-        public static void AddAudioProjectViewerDataGridDataToAudioProjectEditor(IAudioEditorService audioEditorService)
-        {
-            audioEditorService.GetEditorDataGrid().Add(audioEditorService.GetSelectedViewerRows()[0]);
-        }
-
-        public static void AddRowToAudioProjectViewer(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> audioProjectEditorRow)
+        public static void InsertRowAlphabetically(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> audioProjectEditorRow)
         {
             var insertIndex = 0;
             var newValue = audioProjectEditorRow.First().Value.ToString();

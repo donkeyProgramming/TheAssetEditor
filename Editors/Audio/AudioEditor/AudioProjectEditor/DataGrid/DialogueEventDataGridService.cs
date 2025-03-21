@@ -20,7 +20,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
         public void LoadDataGrid()
         {
             ConfigureDataGrid();
-            SetDataGridData();
+            InitialiseDataGridData();
         }
 
         public void ConfigureDataGrid()
@@ -42,7 +42,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
             }
         }
 
-        public void SetDataGridData()
+        public void InitialiseDataGridData()
         {
             var rowData = new Dictionary<string, string>();
 
@@ -63,6 +63,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
             }
 
             _audioEditorService.GetEditorDataGrid().Add(rowData);
+        }
+
+        public void SetDataGridData()
+        {
+            _audioEditorService.GetEditorDataGrid().Add(_audioEditorService.GetSelectedViewerRows()[0]);
         }
     }
 }

@@ -14,12 +14,17 @@ namespace Editors.Audio.AudioEditor.DataGrids
     {
         EditableTextBox,
         StateGroupEditableComboBox,
+        ReadOnlyComboBox,
         ReadOnlyTextBlock,
         FileSelectButton
     }
 
     public class DataGridConfiguration
     {
+        public static string EventNameColumn { get; } = "Event Name";
+        public static string ActionTypeColumn { get; } = "Action Type";
+        public static string BrowseMovieColumn { get; } = "Browse Movie";
+
         public static DataGrid InitialiseDataGrid(string dataGridTag)
         {
             var dataGrid = DataGridHelpers.GetDataGridByTag(dataGridTag);
@@ -28,7 +33,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             return dataGrid;
         }
 
-        public static DataGridTemplateColumn CreateColumn(AudioEditorViewModel audioEditorViewModel, string columnHeader, double columnWidth, DataGridColumnType columnType, List<string> states = null, bool useAbsoluteWidth = false)
+        public static DataGridTemplateColumn CreateColumn(AudioEditorViewModel audioEditorViewModel, string columnHeader, double columnWidth, DataGridColumnType columnType, List<string> comboBoxValues = null, bool useAbsoluteWidth = false)
         {
             var width = useAbsoluteWidth ? DataGridLengthUnitType.Pixel : DataGridLengthUnitType.Star;
             var column = new DataGridTemplateColumn
@@ -41,7 +46,9 @@ namespace Editors.Audio.AudioEditor.DataGrids
             if (columnType == DataGridColumnType.EditableTextBox)
                 column.CellTemplate = CreateEditableTextBoxTemplate(audioEditorViewModel, columnHeader);
             else if (columnType == DataGridColumnType.StateGroupEditableComboBox)
-                column.CellTemplate = CreateStatesComboBoxTemplate(audioEditorViewModel, columnHeader, states);
+                column.CellTemplate = CreateStatesComboBoxTemplate(audioEditorViewModel, columnHeader, comboBoxValues);
+            else if (columnType == DataGridColumnType.ReadOnlyComboBox)
+                column.CellTemplate = CreateReadOnlyComboBoxTemplate(audioEditorViewModel, columnHeader, comboBoxValues);
             else if (columnType == DataGridColumnType.ReadOnlyTextBlock)
                 column.CellTemplate = CreateReadOnlyTextBlockTemplate(columnHeader);
             else if (columnType == DataGridColumnType.FileSelectButton)
@@ -173,6 +180,37 @@ namespace Editors.Audio.AudioEditor.DataGrids
             return template;
         }
 
+        public static DataTemplate CreateReadOnlyComboBoxTemplate(AudioEditorViewModel audioEditorViewModel, string columnHeader, List<string> values)
+        {
+            var template = new DataTemplate();
+            var factory = new FrameworkElementFactory(typeof(ComboBox));
+
+            factory.SetValue(ScrollViewer.CanContentScrollProperty, true);
+            factory.SetValue(VirtualizingStackPanel.IsVirtualizingProperty, true);
+            factory.SetValue(VirtualizingStackPanel.VirtualizationModeProperty, VirtualizationMode.Recycling);
+
+            var comboBoxStyle = Application.Current.TryFindResource(typeof(ComboBox)) as Style;
+            factory.SetValue(FrameworkElement.StyleProperty, comboBoxStyle);
+
+            var itemsPanelFactory = new FrameworkElementFactory(typeof(VirtualizingStackPanel));
+            factory.SetValue(ItemsControl.ItemsPanelProperty, new ItemsPanelTemplate(itemsPanelFactory));
+
+            var observableValues = new ObservableCollection<string>(values);
+            factory.SetValue(ItemsControl.ItemsSourceProperty, observableValues);
+
+            factory.SetValue(ComboBox.IsEditableProperty, false);
+            factory.SetValue(ItemsControl.IsTextSearchEnabledProperty, true);
+
+            factory.SetBinding(Selector.SelectedItemProperty, new Binding($"[{columnHeader}]")
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            });
+
+            template.VisualTree = factory;
+            return template;
+        }
+
         public static DataTemplate CreateEditableTextBoxTemplate(AudioEditorViewModel audioEditorViewModel, string columnHeader)
         {
             var template = new DataTemplate();
@@ -212,7 +250,7 @@ namespace Editors.Audio.AudioEditor.DataGrids
             var template = new DataTemplate();
             var factory = new FrameworkElementFactory(typeof(Button));
 
-            factory.SetValue(ContentControl.ContentProperty, "...");
+            factory.SetValue(ContentControl.ContentProperty, ". . .");
 
             factory.AddHandler(ButtonBase.ClickEvent, new RoutedEventHandler((sender, args) =>
             {

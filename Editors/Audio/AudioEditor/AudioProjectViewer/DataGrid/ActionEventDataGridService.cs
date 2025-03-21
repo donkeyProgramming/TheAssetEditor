@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Windows.Controls;
 using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioEditor.DataGrids;
 
@@ -26,7 +27,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
 
-            var eventColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, "Event", columnWidth, DataGridColumnType.ReadOnlyTextBlock);
+            var eventColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, DataGridConfiguration.EventNameColumn, columnWidth, DataGridColumnType.ReadOnlyTextBlock);
             dataGrid.Columns.Add(eventColumn);
         }
 
@@ -37,10 +38,25 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
             {
                 var rowData = new Dictionary<string, string>
                 {
-                    { "Event", actionEvent.Name }
+                    { DataGridConfiguration.EventNameColumn, actionEvent.Name }
                 };
                 _audioEditorService.GetViewerDataGrid().Add(rowData);
             }
+        }
+
+        public void InsertDataGridRow()
+        {
+            var editorRow = _audioEditorService.GetEditorDataGrid()[0];
+            var eventNameWithoutActionType = AudioProjectHelpers.GetActionEventNameWithoutActionTypeFromDataGridRow(editorRow);
+            var actionType = AudioProjectHelpers.GetActionTypeFromDataGridRow(editorRow);
+            var acitonEventName = AudioProjectHelpers.GetActionEventName(actionType, eventNameWithoutActionType);
+
+            var rowData = new Dictionary<string, string>
+            {
+                { DataGridConfiguration.EventNameColumn, acitonEventName }
+            };
+
+            DataGridHelpers.InsertRowAlphabetically(_audioEditorService.GetViewerDataGrid(), rowData);
         }
     }
 }

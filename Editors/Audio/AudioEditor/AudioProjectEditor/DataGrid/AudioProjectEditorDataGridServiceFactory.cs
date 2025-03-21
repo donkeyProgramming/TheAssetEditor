@@ -1,5 +1,4 @@
-﻿using Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid;
-using Editors.Audio.AudioEditor.AudioProjectExplorer;
+﻿using Editors.Audio.AudioEditor.AudioProjectExplorer;
 using Editors.Audio.Storage;
 
 namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
