@@ -198,11 +198,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return state;
         }
 
-        public static AudioSettings GetAudioSettingsFromAudioProjectViewerActionEvent(AudioEditorViewModel audioEditorViewModel, IAudioEditorService audioEditorService)
+        public static AudioSettings GetAudioSettingsFromAudioProjectViewerActionEvent(IAudioEditorService audioEditorService)
         {
-            var audioProjectItem = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
-            var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
-            var soundBank = GetSoundBankFromName(audioEditorService, audioProjectItem.Name);
+            var selectedNode = audioEditorService.GetSelectedExplorerNode();
+            var selectedAudioProjectViewerDataGridRow = audioEditorService.GetSelectedViewerRows()[0];
+            var soundBank = GetSoundBankFromName(audioEditorService, selectedNode.Name);
             var actionEvent = GetActionEventFromDataGridRow(selectedAudioProjectViewerDataGridRow, soundBank);
 
             // We could just not run this function unless we know the object has a random sequence container but we'll keep it as this as we may introduce more containers or enable settings for sounds in future.
@@ -215,7 +215,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
         public static AudioSettings GetAudioSettingsFromAudioProjectViewerStatePath(AudioEditorViewModel audioEditorViewModel, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {
             var audioProjectItem = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
-            var selectedAudioProjectViewerDataGridRow = audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0];
+            var selectedAudioProjectViewerDataGridRow = audioEditorService.GetSelectedViewerRows()[0];
             var dialogueEvent = GetDialogueEventFromName(audioEditorService, audioProjectItem.Name);
             var statePath = GetStatePathFromDataGridRow(audioRepository, selectedAudioProjectViewerDataGridRow, dialogueEvent);
 

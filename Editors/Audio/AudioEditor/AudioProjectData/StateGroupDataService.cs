@@ -17,21 +17,21 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
         public void AddToAudioProject()
         {
-            var audioProjectEditorRow = DataGridHelpers.GetAudioProjectEditorDataGridRow(_audioEditorService.AudioEditorViewModel, _audioRepository, _audioEditorService);
+            var audioProjectEditorRow = DataGridHelpers.GetAudioProjectEditorDataGridRow(_audioEditorService);
             var state = AudioProjectHelpers.CreateStateFromDataGridRow(audioProjectEditorRow);
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.SelectedAudioProjectTreeNode.Name);
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
             AudioProjectHelpers.InsertStateAlphabetically(stateGroup, state);
         }
 
         public void RemoveFromAudioProject()
         {
-            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.SelectedAudioProjectTreeNode.Name);
-            var dataGridRowsCopy = _audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows.ToList(); // Create a copy to prevent an error where dataGridRows is modified while being iterated over
+            var stateGroup = AudioProjectHelpers.GetStateGroupFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
+            var dataGridRowsCopy = _audioEditorService.GetSelectedViewerRows().ToList(); // Create a copy to prevent an error where dataGridRows is modified while being iterated over
             foreach (var dataGridRow in dataGridRowsCopy)
             {
                 var state = AudioProjectHelpers.GetStateFromDataGridRow(dataGridRow, stateGroup);
                 stateGroup.States.Remove(state);
-                _audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Remove(dataGridRow);
+                _audioEditorService.GetViewerDataGrid().Remove(dataGridRow);
             }
         }
     }

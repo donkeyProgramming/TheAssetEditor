@@ -136,7 +136,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         public static void AddFilteredDialogueEventsToSoundBankTreeViewItems(IAudioEditorService audioEditorService, AudioProjectExplorerViewModel audioProjectExplorerViewModel, string soundBankName, DialogueEventPreset? dialogueEventPreset)
         {
             var filteredDialogueEventNames = DialogueEventData
-                .Where(dialogueEvent => GetSoundBankSubTypeString(dialogueEvent.SoundBank) == audioProjectExplorerViewModel.GetSelectedAudioProjectNodeName()
+                .Where(dialogueEvent => GetSoundBankSubTypeString(dialogueEvent.SoundBank) == audioEditorService.GetSelectedExplorerNode().Name
                 && (!dialogueEventPreset.HasValue || dialogueEvent.DialogueEventPreset.Contains(dialogueEventPreset.Value)))
                 .Select(dialogueEvent => dialogueEvent.Name)
                 .ToHashSet();

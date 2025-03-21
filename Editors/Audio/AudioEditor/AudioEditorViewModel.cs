@@ -10,12 +10,9 @@ using Shared.Core.PackFiles;
 using Shared.Core.Services;
 using Shared.Core.ToolCreation;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
-using NodeType = Editors.Audio.AudioEditor.AudioProjectExplorer.NodeType;
-using TreeNode = Editors.Audio.AudioEditor.AudioProjectExplorer.TreeNode;
 
 namespace Editors.Audio.AudioEditor
 {
-    // TODO: Refactor references to AudioEditorViewModel to in AudioEditorService so it references the individual components rather than the whole view model
     public partial class AudioEditorViewModel : ObservableObject, IEditorInterface
     {
         public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; }
@@ -53,9 +50,9 @@ namespace Editors.Audio.AudioEditor
             AudioProjectViewerViewModel = audioProjectViewerViewModel;
             AudioSettingsViewModel = audioSettingsViewModel;
 
-            _audioEditorService.AudioEditorViewModel = this;
+            InitialiseAudioEditorData();
 
-            Initialise();
+            InitialiseAudioEditorService();
 
             _integrityChecker.CheckDialogueEventIntegrity(DialogueEventData);
         }
@@ -80,22 +77,7 @@ namespace Editors.Audio.AudioEditor
             _audioEditorService.CompileAudioProject();
         }
 
-        public TreeNode GetSelectedAudioProjectNode()
-        {
-            return AudioProjectExplorerViewModel.GetSelectedAudioProjectNode();
-        }
-
-        public string GetSelectedAudioProjectNodeName()
-        {
-            return AudioProjectExplorerViewModel.GetSelectedAudioProjectNodeName();
-        }
-
-        public NodeType GetSelectedAudioProjectNodeType()
-        {
-            return AudioProjectExplorerViewModel.GetSelectedAudioProjectNodeType();
-        }
-
-        public void Initialise()
+        public void InitialiseAudioEditorData()
         {
             AudioProjectEditorViewModel.AudioProjectEditorDataGrid = [];
             AudioProjectViewerViewModel.AudioProjectViewerDataGrid = [];
@@ -103,8 +85,16 @@ namespace Editors.Audio.AudioEditor
             AudioProjectViewerViewModel.CopiedDataGridRows = [];
             AudioProjectExplorerViewModel.DialogueEventPresets = [];
         }
-
-        public void ResetAudioEditorViewModelData()
+        private void InitialiseAudioEditorService()
+        {
+            _audioEditorService.AudioEditorViewModel = this;
+            _audioEditorService.AudioProjectExplorerViewModel = AudioProjectExplorerViewModel;
+            _audioEditorService.AudioFilesExplorerViewModel = AudioFilesExplorerViewModel;
+            _audioEditorService.AudioProjectEditorViewModel = AudioProjectEditorViewModel;
+            _audioEditorService.AudioProjectViewerViewModel = AudioProjectViewerViewModel;
+            _audioEditorService.AudioSettingsViewModel = AudioSettingsViewModel;
+        }
+        public void ResetAudioEditorData()
         {
             AudioProjectEditorViewModel.AudioProjectEditorDataGrid = null;
             AudioProjectViewerViewModel.AudioProjectViewerDataGrid = null;
@@ -116,7 +106,7 @@ namespace Editors.Audio.AudioEditor
 
         public void Close()
         {
-            ResetAudioEditorViewModelData();
+            ResetAudioEditorData();
             _audioEditorService.ResetAudioProject();
         }
     }

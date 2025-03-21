@@ -44,17 +44,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         {
             _selectedAudioProjectTreeNode = value;
 
-            _audioEditorService.SelectedAudioProjectTreeNode = _selectedAudioProjectTreeNode;
-
             _eventHub.Publish(new NodeSelectedEvent());
 
             ResetButtonEnablement();
 
-            if (_selectedAudioProjectTreeNode.NodeType == NodeType.DialogueEventSoundBank)
+            if (_audioEditorService.GetSelectedExplorerNode().NodeType == NodeType.DialogueEventSoundBank)
             {
-                DialogueEventFilter.HandleDialogueEventsPresetFilter(this, _audioEditorService, _selectedAudioProjectTreeNode.Name);
+                DialogueEventFilter.HandleDialogueEventsPresetFilter(this, _audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
 
-                _logger.Here().Information($"Loaded Dialogue Event SoundBank: {_selectedAudioProjectTreeNode.Name}");
+                _logger.Here().Information($"Loaded Dialogue Event SoundBank: {_audioEditorService.GetSelectedExplorerNode().Name}");
             }
         }
 
@@ -154,21 +152,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         [RelayCommand] public void ClearText()
         {
             SearchQuery = "";
-        }
-
-        public TreeNode GetSelectedAudioProjectNode()
-        {
-            return _selectedAudioProjectTreeNode;
-        }
-
-        public string GetSelectedAudioProjectNodeName()
-        {
-            return _selectedAudioProjectTreeNode.Name;
-        }
-
-        public NodeType GetSelectedAudioProjectNodeType()
-        {
-            return _selectedAudioProjectTreeNode.NodeType;
         }
 
         public void ResetDialogueEventFilterComboBoxSelectedItem(WatermarkComboBox watermarkComboBox)

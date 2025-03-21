@@ -88,9 +88,9 @@ namespace Editors.Audio.AudioEditor.NewAudioProject
             }
 
             // Reset and initialise data
-            _audioEditorService.AudioEditorViewModel.ResetAudioEditorViewModelData();
+            _audioEditorService.AudioEditorViewModel.ResetAudioEditorData();
             _audioEditorService.ResetAudioProject();
-            _audioEditorService.AudioEditorViewModel.Initialise();
+            _audioEditorService.AudioEditorViewModel.InitialiseAudioEditorData();
 
             // Initialise AudioProject according to the Audio Project settings selected
             _audioEditorService.InitialiseAudioProject(AudioProjectFileName, AudioProjectDirectory, GameLanguageStringLookup[SelectedLanguage]);

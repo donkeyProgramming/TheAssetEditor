@@ -158,7 +158,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
                     EndBehaviour = (EndBehaviour)audioSettings.EndBehaviour;
                 else
                 {
-                    EnableRepetitionInterval = (bool)audioSettings.EnableRepetitionInterval;
+                    EnableRepetitionInterval = audioSettings.EnableRepetitionInterval;
 
                     if (EnableRepetitionInterval)
                         RepetitionInterval = audioSettings.RepetitionInterval;
@@ -198,7 +198,7 @@ namespace Editors.Audio.AudioEditor.AudioSettings
         public void SetAudioSettingsEnablementAndVisibility()
         {
             // We only want to show the settings for these nodes
-            var selectedNode = _audioEditorService.SelectedAudioProjectTreeNode;
+            var selectedNode = _audioEditorService.GetSelectedExplorerNode();
             if (selectedNode.NodeType != NodeType.ActionEventSoundBank && selectedNode.NodeType != NodeType.DialogueEvent)
                 return;
 

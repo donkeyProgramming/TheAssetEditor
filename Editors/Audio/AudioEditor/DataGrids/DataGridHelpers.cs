@@ -54,11 +54,11 @@ namespace Editors.Audio.AudioEditor.DataGrids
             return FindVisualChild<DataGrid>(mainWindow, dataGridTag);
         }
 
-        public static Dictionary<string, string> GetAudioProjectEditorDataGridRow(AudioEditorViewModel audioEditorViewModel, IAudioRepository audioRepository, IAudioEditorService audioEditorService)
+        public static Dictionary<string, string> GetAudioProjectEditorDataGridRow(IAudioEditorService audioEditorService)
         {
             var newRow = new Dictionary<string, string>();
 
-            foreach (var kvp in audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid[0])
+            foreach (var kvp in audioEditorService.GetEditorDataGrid()[0])
             {
                 var columnName = kvp.Key;
                 var cellValue = kvp.Value;
@@ -72,9 +72,9 @@ namespace Editors.Audio.AudioEditor.DataGrids
             return newRow;
         }
 
-        public static void AddAudioProjectViewerDataGridDataToAudioProjectEditor(AudioEditorViewModel audioEditorViewModel)
+        public static void AddAudioProjectViewerDataGridDataToAudioProjectEditor(IAudioEditorService audioEditorService)
         {
-            audioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(audioEditorViewModel.AudioProjectViewerViewModel.SelectedDataGridRows[0]);
+            audioEditorService.GetEditorDataGrid().Add(audioEditorService.GetSelectedViewerRows()[0]);
         }
 
         public static void AddRowToAudioProjectViewer(ObservableCollection<Dictionary<string, string>> audioProjectViewerDataGrid, Dictionary<string, string> audioProjectEditorRow)

@@ -6,8 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Editors.Audio.AudioEditor.AudioFilesExplorer;
 using Editors.Audio.AudioEditor.AudioProjectData;
+using Editors.Audio.AudioEditor.AudioProjectEditor;
 using Editors.Audio.AudioEditor.AudioProjectExplorer;
+using Editors.Audio.AudioEditor.AudioProjectViewer;
+using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.AudioProjectCompiler;
 using Editors.Audio.GameSettings.Warhammer3;
@@ -18,6 +22,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Services;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 using static Editors.Audio.GameSettings.Warhammer3.StateGroups;
+using TreeNode = Editors.Audio.AudioEditor.AudioProjectExplorer.TreeNode;
 
 namespace Editors.Audio.AudioEditor
 {
@@ -58,12 +63,14 @@ namespace Editors.Audio.AudioEditor
         public string AudioProjectFileName { get; set; }
         public string AudioProjectDirectory { get; set; }
         public AudioEditorViewModel AudioEditorViewModel { get; set; }
-        public TreeNode SelectedAudioProjectTreeNode { get; set; }
-        public ObservableCollection<Dictionary<string, string>> AudioProjectEditorDataGrid { get; set; }
-        public ObservableCollection<Dictionary<string, string>> AudioProjectViewerDataGrid { get; set; }
+        public AudioProjectExplorerViewModel AudioProjectExplorerViewModel { get; set; }
+        public AudioFilesExplorerViewModel AudioFilesExplorerViewModel { get; set; }
+        public AudioProjectEditorViewModel AudioProjectEditorViewModel { get; set; }
+        public AudioProjectViewerViewModel AudioProjectViewerViewModel { get; set; }
+        public AudioSettingsViewModel AudioSettingsViewModel { get; set; }
         public Dictionary<string, List<string>> ModdedStatesByStateGroupLookup { get; set; } = [];
         public Dictionary<string, List<string>> DialogueEventsWithStateGroupsWithIntegrityError { get; set; } = [];
-        public Dictionary<string, DialogueEventPreset?> DialogueEventSoundBankFiltering { get; set; } = [];
+        public Dictionary<string, DialogueEventPreset?> DialogueEventSoundBankFiltering { get; set; } = []; // TODO: Check if unused? Also check for other unused functions.
 
         public void SaveAudioProject()
         {
@@ -98,7 +105,7 @@ namespace Editors.Audio.AudioEditor
                 audioEditorViewModel.AudioProjectExplorerViewModel.AudioProjectExplorerLabel = $"Audio Project Explorer - {DataGridHelpers.AddExtraUnderscoresToString(fileName)}";
 
                 // Reset data
-                audioEditorViewModel.ResetAudioEditorViewModelData();
+                audioEditorViewModel.ResetAudioEditorData();
                 ResetAudioProject();
 
                 // Set the AudioProject
@@ -111,7 +118,7 @@ namespace Editors.Audio.AudioEditor
                 MergeSavedAudioProjectIntoAudioProjectWithUnusedItems(savedProject);
 
                 // Initialise data after AudioProject is set so it uses the correct instance
-                audioEditorViewModel.Initialise();
+                audioEditorViewModel.InitialiseAudioEditorData();
 
                 // Get the Modded States and prepare them for being added to the DataGrid ComboBoxes
                 BuildModdedStatesByStateGroupLookup(AudioProject.StateGroups, ModdedStatesByStateGroupLookup);
@@ -398,6 +405,26 @@ namespace Editors.Audio.AudioEditor
         public void ResetAudioProject()
         {
             AudioProject = new AudioProject();
+        }
+
+        public TreeNode GetSelectedExplorerNode()
+        {
+            return AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
+        }
+
+        public ObservableCollection<Dictionary<string, string>> GetEditorDataGrid()
+        {
+            return AudioProjectEditorViewModel.AudioProjectEditorDataGrid;
+        }
+
+        public ObservableCollection<Dictionary<string, string>> GetViewerDataGrid()
+        {
+            return AudioProjectViewerViewModel.AudioProjectViewerDataGrid;
+        }
+
+        public ObservableCollection<Dictionary<string, string>> GetSelectedViewerRows()
+        {
+            return AudioProjectViewerViewModel.SelectedDataGridRows;
         }
     }
 }

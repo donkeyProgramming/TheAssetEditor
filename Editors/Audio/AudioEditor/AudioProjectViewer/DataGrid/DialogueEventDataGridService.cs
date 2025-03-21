@@ -25,10 +25,10 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
 
         public void ConfigureDataGrid()
         {
-            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
+            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
             DataGridConfiguration.CreateContextMenu(_audioEditorService.AudioEditorViewModel, dataGrid);
 
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
 
             var stateGroupsCount = _audioRepository.StateGroupsLookupByDialogueEvent[dialogueEvent.Name].Count;
             var columnWidth = 1.0 / (1 + stateGroupsCount);
@@ -44,7 +44,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
 
         public void SetDataGridData()
         {
-            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var dialogueEvent = AudioProjectHelpers.GetDialogueEventFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
             var stateGroupsWithQualifiers = _audioRepository.QualifiedStateGroupLookupByStateGroupByDialogueEvent[dialogueEvent.Name];
 
             foreach (var statePath in dialogueEvent.StatePaths)
@@ -65,7 +65,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
                     rowData[stateGroupColumnHeader] = string.Empty;
             }
 
-            _audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(rowData);
+            _audioEditorService.GetViewerDataGrid().Add(rowData);
         }
     }
 }

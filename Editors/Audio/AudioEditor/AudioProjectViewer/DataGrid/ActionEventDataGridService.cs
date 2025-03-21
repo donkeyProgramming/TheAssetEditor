@@ -21,7 +21,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
 
         public void ConfigureDataGrid()
         {
-            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
+            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioProjectViewerViewModel.AudioProjectViewerDataGridTag);
 
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
@@ -32,14 +32,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
 
         public void SetDataGridData()
         {
-            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
             foreach (var actionEvent in soundBank.ActionEvents)
             {
                 var rowData = new Dictionary<string, string>
                 {
                     { "Event", actionEvent.Name }
                 };
-                _audioEditorService.AudioEditorViewModel.AudioProjectViewerViewModel.AudioProjectViewerDataGrid.Add(rowData);
+                _audioEditorService.GetViewerDataGrid().Add(rowData);
             }
         }
     }

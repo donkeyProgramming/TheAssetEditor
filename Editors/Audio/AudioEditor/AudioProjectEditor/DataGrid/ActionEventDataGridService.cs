@@ -22,12 +22,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
 
         public void ConfigureDataGrid()
         {
-            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
+            var dataGrid = DataGridConfiguration.InitialiseDataGrid(_audioEditorService.AudioProjectEditorViewModel.AudioProjectEditorDataGridTag);
 
             var columnsCount = 2;
             var columnWidth = 1.0 / columnsCount;
 
-            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, _audioEditorService.AudioEditorViewModel.GetSelectedAudioProjectNodeName());
+            var soundBank = AudioProjectHelpers.GetSoundBankFromName(_audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
             if (soundBank.Name == SoundBanks.MoviesDisplayString)
             {
                 var eventColumn = DataGridConfiguration.CreateColumn(_audioEditorService.AudioEditorViewModel, "Event", columnWidth, DataGridColumnType.ReadOnlyTextBlock);
@@ -49,7 +49,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor.DataGrid
             {
                 { "Event", string.Empty }
             };
-            _audioEditorService.AudioEditorViewModel.AudioProjectEditorViewModel.AudioProjectEditorDataGrid.Add(rowData);
+            _audioEditorService.GetEditorDataGrid().Add(rowData);
         }
     }
 }
