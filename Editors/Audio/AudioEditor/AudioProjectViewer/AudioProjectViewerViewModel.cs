@@ -66,7 +66,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
             if (SelectedDataGridRows.Count == 0)
                 SetSelectedDataGridRows(selectedItems);
 
-            // TODO: Should really add an event for this.
+            // TODO: Should probably add an event for this.
             if (_audioEditorService.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewer)
             {
                 _audioEditorService.AudioSettingsViewModel.ShowSettingsFromAudioProjectViewerItem();
@@ -275,7 +275,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
 
         public void SetAudioProjectViewerLabel(string label)
         {
-            AudioProjectViewerLabel = $"Audio Project Editor {label}";
+            AudioProjectViewerLabel = $"Audio Project Viewer {label}";
         }
 
         public void ResetAudioProjectViewerLabel()

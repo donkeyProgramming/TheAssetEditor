@@ -139,8 +139,6 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             var dataService = _audioProjectDataServiceFactory.GetService(selectedNode.NodeType);
             dataService.AddToAudioProject();
 
-            SetAddRowButtonEnablement();
-
             _eventHub.Publish(new ItemAddedEvent()); // Publish after the data is added to the AudioProject so it can be loaded when the data grid loading functions are called
 
             // Clear data grid to ensure there's only one row in the editor
@@ -150,12 +148,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
             var dataGridService = _audioProjectEditorDataGridServiceFactory.GetService(selectedNode.NodeType);
             dataGridService.InitialiseDataGridData();
 
+            SetAddRowButtonEnablement(); // Handle this last because the row needs to be cleared before being checked
+
             _logger.Here().Information($"Added {selectedNode.NodeType} item in: {selectedNode.Name}");
         }
 
         public void SetAddRowButtonEnablement()
         {
-            _audioEditorService.AudioProjectEditorViewModel.ResetAddRowButtonEnablement();
+            ResetAddRowButtonEnablement();
 
             if (_audioEditorService.GetEditorDataGrid().Count == 0)
                 return;
@@ -216,8 +216,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
 
         private bool CheckIfAnyEmptyCells()
         {
-            var emptyColumns = _audioEditorService.GetEditorDataGrid()[0]
-                .Where(kvp => kvp.Value is string value && string.IsNullOrEmpty(value))
+            var dataGridRow = _audioEditorService.GetEditorDataGrid()[0];
+            var emptyColumns = dataGridRow
+                .Where(kvp => kvp.Key != DataGridConfiguration.ActionTypeColumn && kvp.Value is string value && string.IsNullOrEmpty(value))
                 .ToList();
 
             if (emptyColumns.Count > 0)

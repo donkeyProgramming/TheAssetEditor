@@ -28,7 +28,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             randomSequenceContainerHirc.LoopModMin = 0;
             randomSequenceContainerHirc.LoopModMax = 0;
 
-            if (audioProjectRandomSequenceContainer.AudioSettings.TransitionDuration != null)
+            if (audioProjectRandomSequenceContainer.AudioSettings.TransitionDuration != 1)
                 randomSequenceContainerHirc.TransitionTime = (ushort)audioProjectRandomSequenceContainer.AudioSettings.TransitionDuration * 1000;
             else
                 randomSequenceContainerHirc.TransitionTime = 1 * 1000;
@@ -36,7 +36,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             randomSequenceContainerHirc.TransitionTimeModMin = 0;
             randomSequenceContainerHirc.TransitionTimeModMax = 0;
 
-            if (audioProjectRandomSequenceContainer.AudioSettings.RepetitionInterval != null)
+            if (audioProjectRandomSequenceContainer.AudioSettings.RepetitionInterval != 1)
                 randomSequenceContainerHirc.AvoidRepeatCount = (ushort)audioProjectRandomSequenceContainer.AudioSettings.RepetitionInterval;
             else
                 randomSequenceContainerHirc.AvoidRepeatCount = 1;
@@ -69,13 +69,14 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 
             var isGlobal = 1;
 
-            randomSequenceContainerHirc.BitVector = (byte)(
+            randomSequenceContainerHirc.BitVector = (byte)
+            (
                 isGlobal << 4 |
                 isContinous << 3 |
                 isRestartBackwards << 2 |
                 resetPlaylistAtEachPlay << 1 |
-                isUsingWeight);
-
+                isUsingWeight
+            );
 
             randomSequenceContainerHirc.Children = CreateChildrenList(audioProjectRandomSequenceContainer.Sounds);
             randomSequenceContainerHirc.CAkPlayList.Playlist = CreateAkPlaylistItem(audioProjectRandomSequenceContainer.Sounds);

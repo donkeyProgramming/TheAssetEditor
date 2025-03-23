@@ -156,9 +156,10 @@
             <Border 
                 Grid.Row="1"
                 Grid.Column="0"
-                BorderBrush="{DynamicResource Button.Static.Border}">
+                BorderBrush="{DynamicResource Button.Static.Border}"
+                Visibility="{Binding IsPlaylistTypeSectionVisible, Converter={StaticResource BoolToVisibilityConverter}}">
 
-                <Expander 
+            <Expander 
                     Style="{StaticResource ExpanderWithBorderBackground}"
                     IsExpanded="True"
                     Padding="5,0,0,0"
@@ -177,7 +178,9 @@
                         </DockPanel>
                     </Expander.Header>
 
-                    <Grid>
+                    <Grid
+                        Margin="0, 5, 0, 0">
+                        
                         <Grid.RowDefinitions>
                             <RowDefinition 
                                 Height="Auto"/>
@@ -197,17 +200,19 @@
                         <TextBlock 
                             Grid.Row="0"
                             Grid.Column="0"
-                            Margin="10, 5, 5, 5"
-                            Text="Playlist Type"/>
+                            Margin="10, 0, 5, 5"
+                            Text="Playlist Type"
+                            Visibility="{Binding IsPlaylistTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ComboBox
                             Grid.Row="0"
                             Grid.Column="1"
-                            Margin="10, 5, 5, 5"
+                            Margin="10, 0, 5, 5"
                             ItemsSource="{Binding PlaylistTypes}" 
                             SelectedItem="{Binding PlaylistType}" 
                             ItemTemplate="{StaticResource EnumToStringTemplate}"
-                            IsEnabled="{Binding IsPlaylistTypeEnabled}"/>
+                            IsEnabled="{Binding IsPlaylistTypeEnabled}"
+                            Visibility="{Binding IsPlaylistTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <CheckBox
                             Grid.Row="1"
@@ -215,7 +220,8 @@
                             Margin="10, 0, 5, 5"
                             Content="Repetition Interval"
                             IsChecked="{Binding EnableRepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            IsEnabled="{Binding IsEnableRepetitionIntervalEnabled}"/>
+                            IsEnabled="{Binding IsEnableRepetitionIntervalEnabled}"
+                            Visibility="{Binding IsRepetitionIntervalVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <extendedwpftoolkit:IntegerUpDown 
                             Grid.Row="1"
@@ -225,13 +231,15 @@
                             ClipValueToMinMax="True"
                             Margin="10, 0, 5, 5"
                             Value="{Binding RepetitionInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            IsEnabled="{Binding EnableRepetitionInterval}"/>
+                            IsEnabled="{Binding EnableRepetitionInterval}"
+                            Visibility="{Binding IsRepetitionIntervalVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
                             Grid.Row="2"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
-                            Text="Playlist End Behaviour"/>
+                            Text="Playlist End Behaviour"
+                            Visibility="{Binding IsEndBehaviourVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ComboBox
                             Grid.Row="2"
@@ -240,7 +248,8 @@
                             ItemsSource="{Binding EndBehaviours}" 
                             SelectedItem="{Binding EndBehaviour}" 
                             ItemTemplate="{StaticResource EnumToStringTemplate}"
-                            IsEnabled="{Binding IsEndBehaviourEnabled}"/>
+                            IsEnabled="{Binding IsEndBehaviourEnabled}"
+                            Visibility="{Binding IsEndBehaviourVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </Grid>
                 </Expander>
             </Border>
@@ -249,7 +258,8 @@
                 Grid.Row="2"
                 Grid.Column="0"
                 BorderBrush="{DynamicResource Button.Static.Border}"
-                BorderThickness="0, 0, 0, 0">
+                BorderThickness="0, 0, 0, 0"
+                Visibility="{Binding IsPlaylistModeSectionVisible, Converter={StaticResource BoolToVisibilityConverter}}">
 
                 <Expander 
                     Style="{StaticResource ExpanderWithBorderBackground}"
@@ -270,7 +280,9 @@
                         </DockPanel>
                     </Expander.Header>
 
-                    <Grid>
+                    <Grid
+                        Margin="0, 5, 0, 0">
+                        
                         <Grid.RowDefinitions>
                             <RowDefinition 
                                 Height="Auto"/>
@@ -296,36 +308,41 @@
                         <TextBlock 
                             Grid.Row="0"
                             Grid.Column="0"
-                            Margin="10, 5, 5, 5"
-                            Text="Playlist Mode"/>
+                            Margin="10, 0, 5, 5"
+                            Text="Playlist Mode"
+                            Visibility="{Binding IsPlaylistModeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ComboBox
                             Grid.Row="0"
                             Grid.Column="1"
-                            Margin="10, 5, 5, 5"
+                            Margin="10, 0, 5, 5"
                             ItemsSource="{Binding PlaylistModes}" 
                             SelectedItem="{Binding PlaylistMode}" 
                             ItemTemplate="{StaticResource EnumToStringTemplate}"
-                            IsEnabled="{Binding IsPlaylistModeEnabled}"/>
+                            IsEnabled="{Binding IsPlaylistModeEnabled}"
+                            Visibility="{Binding IsPlaylistModeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
                             Grid.Row="1"
                             Grid.Column="0"
                             Margin="10, 0, 5, 5"
-                            Text="Always Reset Playlist"/>
+                            Text="Always Reset Playlist"
+                            Visibility="{Binding IsAlwaysResetPlaylistVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <CheckBox
                             Grid.Row="1"
                             Grid.Column="1"
                             Margin="10, 0, 5, 5"
                             IsChecked="{Binding AlwaysResetPlaylist, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            IsEnabled="{Binding IsAlwaysResetPlaylistEnabled}"/>
+                            IsEnabled="{Binding IsAlwaysResetPlaylistEnabled}"
+                            Visibility="{Binding IsAlwaysResetPlaylistVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
                             Grid.Row="2"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
-                            Text="Looping Type"/>
+                            Text="Looping Type"
+                            Visibility="{Binding IsLoopingTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ComboBox
                             Grid.Row="2"
@@ -334,13 +351,15 @@
                             ItemsSource="{Binding LoopingTypes}" 
                             SelectedItem="{Binding LoopingType}" 
                             ItemTemplate="{StaticResource EnumToStringTemplate}"
-                            IsEnabled="{Binding IsLoopingTypeEnabled}"/>
+                            IsEnabled="{Binding IsLoopingTypeEnabled}"
+                            Visibility="{Binding IsLoopingTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
                             Grid.Row="3"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
-                            Text="Number of Loops"/>
+                            Text="Number of Loops"
+                            Visibility="{Binding IsNumberOfLoopsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <extendedwpftoolkit:IntegerUpDown
                             Grid.Row="3"
@@ -350,13 +369,15 @@
                             Maximum="32767"
                             ClipValueToMinMax="True"
                             Value="{Binding NumberOfLoops, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            IsEnabled="{Binding IsNumberOfLoopsEnabled}"/>
+                            IsEnabled="{Binding IsNumberOfLoopsEnabled}"
+                            Visibility="{Binding IsNumberOfLoopsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
                             Grid.Row="4"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
-                            Text="Transition Type"/>
+                            Text="Transition Type"
+                            Visibility="{Binding IsTransitionTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <ComboBox
                             Grid.Row="4"
@@ -365,13 +386,15 @@
                             ItemsSource="{Binding TransitionTypes}" 
                             SelectedItem="{Binding TransitionType}" 
                             ItemTemplate="{StaticResource EnumToStringTemplate}"
-                            IsEnabled="{Binding IsTransitionTypeEnabled}"/>
+                            IsEnabled="{Binding IsTransitionTypeEnabled}"
+                            Visibility="{Binding IsTransitionTypeVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <TextBlock 
                             Grid.Row="5"
                             Grid.Column="0"
                             Margin="10, 1, 5, 5"
-                            Text="Transition Duration"/>
+                            Text="Transition Duration"
+                            Visibility="{Binding IsTransitionDurationVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
                         <extendedwpftoolkit:DecimalUpDown  
                             Grid.Row="5"
@@ -382,7 +405,8 @@
                             Increment="0.05"
                             ClipValueToMinMax="True"
                             Value="{Binding TransitionDuration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                            IsEnabled="{Binding IsTransitionDurationEnabled}"/>
+                            IsEnabled="{Binding IsTransitionDurationEnabled}"
+                            Visibility="{Binding IsTransitionDurationVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </Grid>
                 </Expander>
             </Border>

@@ -5,6 +5,7 @@ using Editors.Audio.AudioEditor.AudioSettings;
 using Editors.Audio.AudioEditor.DataGrids;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
+using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 
 namespace Editors.Audio.AudioEditor.AudioProjectData
 {
@@ -78,13 +79,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
             var audioFiles = audioSettingsViewModel.AudioFiles;
             if (audioFiles.Count == 1)
-                actionEvent.Sound = CreateSound(audioSettingsViewModel, audioFiles[0]);
+                actionEvent.Sound = CreateSound(audioSettingsViewModel, audioFiles[0], isInContainer: false);
             else
             {
                 actionEvent.RandomSequenceContainer = new RandomSequenceContainer
                 {
                     Sounds = [],
-                    AudioSettings = audioSettingsViewModel.BuildAudioSettings()
+                    AudioSettings = BuildRanSeqContainerSettings(audioSettingsViewModel)
                 };
 
                 foreach (var audioFile in audioFiles)
@@ -142,13 +143,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
                 var audioFiles = audioSettingsViewModel.AudioFiles;
                 if (audioFiles.Count == 1)
-                    statePath.Sound = CreateSound(audioSettingsViewModel, audioFiles[0]);
+                    statePath.Sound = CreateSound(audioSettingsViewModel, audioFiles[0], isInContainer: false);
                 else
                 {
                     statePath.RandomSequenceContainer = new RandomSequenceContainer
                     {
                         Sounds = [],
-                        AudioSettings = audioSettingsViewModel.BuildAudioSettings()
+                        AudioSettings = BuildRanSeqContainerSettings(audioSettingsViewModel)
                     };
 
                     foreach (var audioFile in audioFiles)
@@ -181,13 +182,16 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             }
         }
 
-        private static Sound CreateSound(AudioSettingsViewModel audioSettingsViewModel, AudioFile audioFile, bool isSoundInSoundContainer = false)
+        private static Sound CreateSound(AudioSettingsViewModel audioSettingsViewModel, AudioFile audioFile, bool isInContainer = true)
         {
             var sound = new Sound()
             {
                 WavFileName = audioFile.FileName,
                 WavFilePath = audioFile.FilePath,
             };
+
+            if (!isInContainer)
+                sound.AudioSettings = BuildSoundSettings(audioSettingsViewModel);
 
             return sound;
         }
@@ -212,32 +216,30 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return state;
         }
 
-        public static AudioSettings GetAudioSettingsFromAudioProjectViewerActionEvent(IAudioEditorService audioEditorService)
+        public static IAudioSettings GetAudioSettingsFromAudioProjectViewerActionEvent(IAudioEditorService audioEditorService)
         {
             var selectedNode = audioEditorService.GetSelectedExplorerNode();
             var selectedAudioProjectViewerDataGridRow = audioEditorService.GetSelectedViewerRows()[0];
             var soundBank = GetSoundBankFromName(audioEditorService, selectedNode.Name);
             var actionEvent = GetActionEventFromDataGridRow(selectedAudioProjectViewerDataGridRow, soundBank);
 
-            // We could just not run this function unless we know the object has a random sequence container but we'll keep it as this as we may introduce more containers or enable settings for sounds in future.
             if (actionEvent.RandomSequenceContainer != null)
                 return actionEvent.RandomSequenceContainer.AudioSettings;
             else
-                return null;
+                return actionEvent.Sound.AudioSettings;
         }
 
-        public static AudioSettings GetAudioSettingsFromAudioProjectViewerStatePath(AudioEditorViewModel audioEditorViewModel, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
+        public static IAudioSettings GetAudioSettingsFromAudioProjectViewerStatePath(AudioEditorViewModel audioEditorViewModel, IAudioEditorService audioEditorService, IAudioRepository audioRepository)
         {
             var audioProjectItem = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
             var selectedAudioProjectViewerDataGridRow = audioEditorService.GetSelectedViewerRows()[0];
             var dialogueEvent = GetDialogueEventFromName(audioEditorService, audioProjectItem.Name);
             var statePath = GetStatePathFromDataGridRow(audioRepository, selectedAudioProjectViewerDataGridRow, dialogueEvent);
 
-            // We could just not run this function unless we know the object has a random sequence container but we'll keep it as this as we may introduce more containers or enable settings for sounds in future.
             if (statePath.RandomSequenceContainer != null)
                 return statePath.RandomSequenceContainer.AudioSettings;
             else
-                return null;
+                return statePath.Sound.AudioSettings;
         }
 
         public static void InsertStatePathAlphabetically(DialogueEvent selectedDialogueEvent, StatePath statePath)
@@ -311,6 +313,53 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             }
 
             states.Insert(insertIndex, newState);
+        }
+
+        public static RanSeqContainerSettings BuildRanSeqContainerSettings(AudioSettingsViewModel audioSettingsViewModel)
+        {
+            var audioSettings = new RanSeqContainerSettings();
+
+            if (audioSettingsViewModel.AudioFiles.Count > 1)
+            {
+                audioSettings.PlaylistType = audioSettingsViewModel.PlaylistType;
+
+                if (audioSettingsViewModel.PlaylistType == PlaylistType.Sequence)
+                    audioSettings.EndBehaviour = audioSettingsViewModel.EndBehaviour;
+                else
+                {
+                    audioSettings.EnableRepetitionInterval = audioSettingsViewModel.EnableRepetitionInterval;
+
+                    if (audioSettingsViewModel.EnableRepetitionInterval)
+                        audioSettings.RepetitionInterval = audioSettingsViewModel.RepetitionInterval;
+                }
+
+                audioSettings.AlwaysResetPlaylist = audioSettingsViewModel.AlwaysResetPlaylist;
+
+                audioSettings.PlaylistMode = audioSettingsViewModel.PlaylistMode;
+                audioSettings.LoopingType = audioSettingsViewModel.LoopingType;
+
+                if (audioSettingsViewModel.LoopingType == LoopingType.FiniteLooping)
+                    audioSettings.NumberOfLoops = audioSettingsViewModel.NumberOfLoops;
+
+                if (audioSettingsViewModel.TransitionType != TransitionType.Disabled)
+                {
+                    audioSettings.TransitionType = audioSettingsViewModel.TransitionType;
+                    audioSettings.TransitionDuration = audioSettingsViewModel.TransitionDuration;
+                }
+            }
+
+            return audioSettings;
+        }
+
+        public static SoundSettings BuildSoundSettings(AudioSettingsViewModel audioSettingsViewModel)
+        {
+            var audioSettings = new SoundSettings();
+
+            audioSettings.LoopingType = audioSettingsViewModel.LoopingType;
+            if (audioSettingsViewModel.LoopingType == LoopingType.FiniteLooping)
+                audioSettings.NumberOfLoops = audioSettingsViewModel.NumberOfLoops;
+
+            return audioSettings;
         }
     }
 }

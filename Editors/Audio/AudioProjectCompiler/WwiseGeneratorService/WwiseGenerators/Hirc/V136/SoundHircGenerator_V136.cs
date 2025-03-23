@@ -4,6 +4,7 @@ using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
+using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 using static Shared.GameFormats.Wwise.Hirc.V136.Shared.AkBankSourceData_V136;
 
 namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
@@ -56,11 +57,40 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             nodeBaseParams.OverrideBusID = 0;
             nodeBaseParams.DirectParentID = audioProjectSound.DirectParentID;
             nodeBaseParams.BitVector = 0;
-            nodeBaseParams.NodeInitialParams = new NodeInitialParams_V136()
+            nodeBaseParams.NodeInitialParams = new NodeInitialParams_V136();
+
+            if (audioProjectSound.AudioSettings.LoopingType == LoopingType.FiniteLooping)
             {
-                AkPropBundle0 = new AkPropBundle_V136() { PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>() },
-                AkPropBundle1 = new AkPropBundleMinMax_V136() { PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>() }
-            };
+                nodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle_V136()
+                {
+                    PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>
+                    {
+                        new AkPropBundle_V136.PropBundleInstance_V136
+                        {
+                            ID = AkPropId_V136.Loop,
+                            Value = audioProjectSound.AudioSettings.NumberOfLoops
+                        }
+                    }
+                };
+            }
+            else if (audioProjectSound.AudioSettings.LoopingType == LoopingType.InfiniteLooping)
+            {
+                nodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle_V136()
+                {
+                    PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>
+                    {
+                        new AkPropBundle_V136.PropBundleInstance_V136
+                        {
+                            ID = AkPropId_V136.Loop,
+                            Value = 0
+                        }
+                    }
+                };
+            }
+            else
+                nodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle_V136() { PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>() };
+            nodeBaseParams.NodeInitialParams.AkPropBundle1 = new AkPropBundleMinMax_V136() { PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>() };
+
             nodeBaseParams.PositioningParams = new PositioningParams_V136()
             {
                 BitsPositioning = 0x00
