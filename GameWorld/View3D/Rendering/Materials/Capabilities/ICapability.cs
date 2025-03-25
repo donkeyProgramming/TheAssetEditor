@@ -17,5 +17,4 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
 
         (bool Result, string Message) AreEqual(ICapability otherCap);
     }
-
 }

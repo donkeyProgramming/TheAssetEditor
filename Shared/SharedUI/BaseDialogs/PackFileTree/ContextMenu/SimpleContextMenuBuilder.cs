@@ -11,7 +11,7 @@ namespace Shared.Ui.BaseDialogs.PackFileTree.ContextMenu
 
         protected override void Create(ContextMenuItem2 rootNode, TreeNode selectedNode)
         {
-            var nodeType = selectedNode.GetNodeType();
+            var nodeType = selectedNode.NodeType;
             if (nodeType == NodeType.File)
                 return;
 

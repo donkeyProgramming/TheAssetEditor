@@ -176,7 +176,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
                 if (MaterialHint == MaterialHintEnum.Skin)
                     MaterialId = ModelMaterialEnum.weighted_skin;
                 if (MaterialHint == MaterialHintEnum.Skin_Dirt)
-                    MaterialId = ModelMaterialEnum.weighted_skin_decal;
+                    MaterialId = ModelMaterialEnum.weighted_skin_dirtmap;
             }
 
             if (MaterialId == ModelMaterialEnum.Unkown)
@@ -323,7 +323,7 @@ namespace Shared.GameFormats.RigidModel.MaterialHeaders
 
             for (var floatIndex = 0; floatIndex < typedMaterial.FloatParams.Values.Count; floatIndex++)
             {
-                var param = typedMaterial.IntParams.Values[floatIndex];
+                var param = typedMaterial.FloatParams.Values[floatIndex];
                 writer.Write(ByteParsers.Int32.EncodeValue(param.Index, out _));
                 writer.Write(ByteParsers.Single.EncodeValue(param.Value, out _));
             }

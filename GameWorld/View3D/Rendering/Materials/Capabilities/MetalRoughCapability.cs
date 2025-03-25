@@ -1,4 +1,5 @@
-﻿using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
+﻿using System;
+using GameWorld.Core.Rendering.Materials.Capabilities.Utility;
 using GameWorld.Core.Rendering.Materials.Serialization;
 using GameWorld.Core.Services;
 using Microsoft.Xna.Framework.Graphics;
@@ -42,39 +43,11 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
             };
         }
 
-        public override void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
-        {
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, BaseColour);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, MaterialMap);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, NormalMap);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Mask);
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, Distortion, "commontextures/winds_of_magic_specular.dds");
-            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, DistortionNoise, "commontextures/winds_of_magic_noise.dds");
+        public override void Initialize(WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial) => MetalRoughCapabilitySerializer.Initialize(this, wsModelMaterial, rmvMaterial);
 
-            base.Initialize(wsModelMaterial, rmvMaterial);
-        }
+        public override void SerializeToWsModel(WsMaterialTemplateEditor templateHandler) => MetalRoughCapabilitySerializer.SerializeToWsModel(this, templateHandler);
 
-        public override void SerializeToWsModel(WsMaterialTemplateEditor templateHandler)
-        {
-            templateHandler.AddAttribute(WsModelParamters.Texture_BaseColour.TemplateName, BaseColour);
-            templateHandler.AddAttribute(WsModelParamters.Texture_Mask.TemplateName, Mask);
-            templateHandler.AddAttribute(WsModelParamters.Texture_MaterialMap.TemplateName, MaterialMap);
-            templateHandler.AddAttribute(WsModelParamters.Texture_Normal.TemplateName, NormalMap);
-            templateHandler.AddAttribute(WsModelParamters.Texture_Distortion.TemplateName, Distortion);
-            templateHandler.AddAttribute(WsModelParamters.Texture_DistortionNoise.TemplateName, DistortionNoise);
-
-            base.SerializeToWsModel(templateHandler);
-        }
-
-        public override void SerializeToRmvMaterial(IRmvMaterial rmvMaterial) 
-        {
-            rmvMaterial.SetTexture(BaseColour.Type, BaseColour.TexturePath);
-            rmvMaterial.SetTexture(MaterialMap.Type, MaterialMap.TexturePath);
-            rmvMaterial.SetTexture(NormalMap.Type, NormalMap.TexturePath);
-            rmvMaterial.SetTexture(Mask.Type, Mask.TexturePath);
-
-            base.SerializeToRmvMaterial(rmvMaterial);
-        }
+        public override void SerializeToRmvMaterial(IRmvMaterial rmvMaterial) => MetalRoughCapabilitySerializer.SerializeToRmvMaterial(this, rmvMaterial);
 
         public override (bool Result, string Message) AreEqual(ICapability otherCap)
         {
@@ -91,6 +64,60 @@ namespace GameWorld.Core.Rendering.Materials.Capabilities
                 return res3;
 
             return base.AreEqual(otherCap);
+        }
+    }
+
+    public static class MetalRoughCapabilitySerializer
+    {
+        public static void Initialize(MetalRoughCapability output, WsModelMaterialFile? wsModelMaterial, IRmvMaterial rmvMaterial)
+        {
+
+            if (wsModelMaterial != null)
+            {
+                output.UseAlpha = wsModelMaterial.Alpha;
+            }
+            else
+            {
+                if (rmvMaterial is WeightedMaterial weightedMaterial == false)
+                    throw new Exception($"Unable to convert material of type {rmvMaterial?.MaterialId} into {nameof(WeightedMaterial)}");
+
+                weightedMaterial.IntParams.TryGet(WeightedParamterIds.IntParams_Alpha_index, out var useAlpha);
+                output.UseAlpha = useAlpha == 1;
+            }
+
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.BaseColour);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.MaterialMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.NormalMap);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.Mask);
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.Distortion, "commontextures/winds_of_magic_specular.dds");
+            CapabilityHelper.SetTextureFromModel(rmvMaterial, wsModelMaterial, output.DistortionNoise, "commontextures/winds_of_magic_noise.dds");
+
+       
+        }
+
+        public static void SerializeToWsModel(MetalRoughCapability typedCap, WsMaterialTemplateEditor templateHandler)
+        {
+
+
+            templateHandler.AddAttribute(WsModelParamters.Texture_BaseColour.TemplateName, typedCap.BaseColour);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Mask.TemplateName, typedCap.Mask);
+            templateHandler.AddAttribute(WsModelParamters.Texture_MaterialMap.TemplateName, typedCap.MaterialMap);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Normal.TemplateName, typedCap.NormalMap);
+            templateHandler.AddAttribute(WsModelParamters.Texture_Distortion.TemplateName, typedCap.Distortion);
+            templateHandler.AddAttribute(WsModelParamters.Texture_DistortionNoise.TemplateName, typedCap.DistortionNoise);
+        }
+
+        public static void SerializeToRmvMaterial(MetalRoughCapability typedCap, IRmvMaterial rmvMaterial)
+        {
+            if (rmvMaterial is not WeightedMaterial weightedMateial)
+                throw new Exception($"Input material '{rmvMaterial.GetType()}' is not {nameof(WeightedMaterial)} - Unable to serialize to rmv");
+
+            rmvMaterial.SetTexture(typedCap.BaseColour.Type, typedCap.BaseColour.TexturePath);
+            rmvMaterial.SetTexture(typedCap.MaterialMap.Type, typedCap.MaterialMap.TexturePath);
+            rmvMaterial.SetTexture(typedCap.NormalMap.Type, typedCap.NormalMap.TexturePath);
+            rmvMaterial.SetTexture(typedCap.Mask.Type, typedCap.Mask.TexturePath);
+
+            weightedMateial.IntParams.Set(WeightedParamterIds.IntParams_Alpha_index, typedCap.UseAlpha ? 1 : 0);
         }
     }
 }

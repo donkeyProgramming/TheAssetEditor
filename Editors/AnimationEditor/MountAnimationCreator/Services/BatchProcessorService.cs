@@ -4,8 +4,8 @@ using System.Linq;
 using AnimationEditor.MountAnimationCreator;
 using AnimationEditor.MountAnimationCreator.Services;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
+using GameWorld.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.Misc;
 using Shared.Core.PackFiles;
@@ -21,7 +21,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
         IPackFileService _pfs;
         GameSkeleton _riderSkeleton;
         GameSkeleton _mountSkeleton;
-        SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         MountAnimationGeneratorService _animationGenerator;
         BatchProcessOptions _batchProcessOptions;
         private readonly IFileSaveService _packFileSaveService;
@@ -38,7 +38,7 @@ namespace Editors.AnimationVisualEditors.MountAnimationCreator.Services
 
         public BatchProcessorService(
             IPackFileService pfs,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             MountAnimationGeneratorService animationGenerator,
             BatchProcessOptions batchProcessOptions,
             IFileSaveService packFileSaveService,

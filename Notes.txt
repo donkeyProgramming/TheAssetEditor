@@ -1,7 +1,14 @@
+Move capability serializers to own files 
+Move SkeletonAnimationLookUpHelper behind interface 
+Move SkeletonAnimationLookUpHelper to gameWorld
+Move saving/loading to own project, with tests and what not.
 
 
+Keep expanders open in node editor when selecting different 
+Fix skeleton tool https://github.com/donkeyProgramming/TheAssetEditor/issues/166
+Allow lod0 to be reduced 
 
-
+---
 Lazy load tabs - selection delay is boring!
 
 ogre_contracts
@@ -14,9 +21,13 @@ ui\campaign ui\hud_campaign.twui.xml
 
 
 
+public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize) => Reading vertex 1 by 1 is dumb. Read them all
+
+KitbashTool: Manual vertex editor for weights (new editor or reuse debug view)
+Keep expanders open in node editor when selecting different 
 
 
-
+Create a file database 
 
 
 
@@ -30,12 +41,12 @@ Must do:
 
 ----
 
- public CommonVertex Read(RmvVersionEnum rmvVersion, byte[] buffer, int offset, int vertexSize) => Reading vertex 1 by 1 is dumb. Read them all
+ 
 
 	ErrorFiles
 		Command history
 		Dump to file  
-	Fix skeleton tool https://github.com/donkeyProgramming/TheAssetEditor/issues/166
+
 
 
 	[Feature] twui editor v0.1
@@ -162,7 +173,15 @@ New features:
 	
 Interesting links:
 	https://github.com/kikipoulet/SukiUI/blob/main/SukiUI/Controls/PropertyGrid/InstanceViewModel.cs	-> Auto generate views for property gird. Also good docking in same lib 
-
+	https://www.youtube.com/watch?v=7cmBlwGXELs Moonbreaker painting
+	Silk.Net.Assimp
+	https://doc.stride3d.net/latest/en/releasenotes/
+	
+	
+Fixes for v063:
+	[Bugfix]: KitbashTool: Skin_dirt mesh issue reported by Cemmen
+	
+	[Feature]: KitbashTool: Decreased loading times for meshes 
 
 Fixes for v062
 	[Bugfix]: KitbashTool: Fixed incorrect saving of meshes with only skin attribute set 

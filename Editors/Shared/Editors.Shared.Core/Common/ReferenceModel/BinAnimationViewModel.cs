@@ -1,15 +1,14 @@
 ﻿using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
+using GameWorld.Core.Services;
 using Shared.Core.Events;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
 using Shared.GameFormats.AnimationPack;
 using Shared.Ui.Common;
 using Shared.Ui.Events.UiCommands;
-using static Editors.Shared.Core.Services.SkeletonAnimationLookUpHelper;
 
 namespace Editors.Shared.Core.Common.ReferenceModel
 {
@@ -18,7 +17,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         private readonly SceneObject _sceneObject;
         private readonly SceneObjectEditor _sceneObjectEditor;
         private readonly IPackFileService _pfs;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private readonly IUiCommandFactory _uiCommandFactory;
 
         [ObservableProperty] FilterCollection<IAnimationBinGenericFormat> _fragmentList;
@@ -27,7 +26,7 @@ namespace Editors.Shared.Core.Common.ReferenceModel
         [ObservableProperty] string? _metaDataPersistName;
         [ObservableProperty] string? _animationFileName;
 
-        public BinAnimationViewModel(SceneObjectEditor sceneObjectEditor, IPackFileService pfs, SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject sceneObject, IUiCommandFactory uiCommandFactory)
+        public BinAnimationViewModel(SceneObjectEditor sceneObjectEditor, IPackFileService pfs, ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper, SceneObject sceneObject, IUiCommandFactory uiCommandFactory)
         {
             _sceneObjectEditor = sceneObjectEditor;
             _pfs = pfs;

@@ -1,9 +1,9 @@
 ﻿using Editors.KitbasherEditor.ChildEditors.MeshFitter;
 using Editors.KitbasherEditor.Core;
 using Editors.KitbasherEditor.Core.MenuBarViews;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Components.Selection;
 using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using Shared.Core.Misc;
 using Shared.Core.Services;
 using Shared.GameFormats.RigidModel;
@@ -22,12 +22,12 @@ namespace Editors.KitbasherEditor.ChildEditors.ReRiggingTool
         private readonly KitbasherRootScene _kitbasherRootScene;
         private readonly SelectionManager _selectionManager;
 
-        private readonly SkeletonAnimationLookUpHelper _skeletonHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonHelper;
         private readonly IAbstractFormFactory<ReRiggingWindow> _formFactory;
 
         ReRiggingWindow? _windowHandle;
 
-        public OpenReriggingToolCommand(IStandardDialogs standardDialogs, KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, SkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<ReRiggingWindow> formFactory)
+        public OpenReriggingToolCommand(IStandardDialogs standardDialogs, KitbasherRootScene kitbasherRootScene, SelectionManager selectionManager, ISkeletonAnimationLookUpHelper skeletonHelper, IAbstractFormFactory<ReRiggingWindow> formFactory)
         {
             _standardDialogs = standardDialogs;
             _kitbasherRootScene = kitbasherRootScene;

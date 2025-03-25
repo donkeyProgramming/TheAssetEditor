@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using CommonControls.BaseDialogs.ErrorListDialog;
 using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
-using Editors.Shared.Core.Services;
+using GameWorld.Core.Services;
 using Shared.Core.ErrorHandling;
 using Shared.Core.PackFiles;
 using Shared.Core.PackFiles.Models;
@@ -17,9 +17,9 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
     {
         private readonly IPackFileService _packFileService;
         private readonly IStandardDialogs _exceptionService;
-        private readonly SkeletonAnimationLookUpHelper _skeletonLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonLookUpHelper;
 
-        public GltfImporter(IPackFileService packFileSerivce, IStandardDialogs exceptionService, SkeletonAnimationLookUpHelper skeletonLookUpHelper)
+        public GltfImporter(IPackFileService packFileSerivce, IStandardDialogs exceptionService, ISkeletonAnimationLookUpHelper skeletonLookUpHelper)
         {
             _packFileService = packFileSerivce;
             _exceptionService = exceptionService;

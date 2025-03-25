@@ -8,7 +8,6 @@ using Editors.Shared.Core.Common;
 using Editors.Shared.Core.Common.AnimationPlayer;
 using Editors.Shared.Core.Common.BaseControl;
 using Editors.Shared.Core.Common.ReferenceModel;
-using Editors.Shared.Core.Services;
 using GameWorld.Core.Animation;
 using GameWorld.Core.Commands;
 using GameWorld.Core.Commands.Bone;
@@ -32,7 +31,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         private readonly AnimationPlayerViewModel _animationPlayerViewModel;
         private readonly SceneObjectEditor _sceneObjectBuilder;
         private readonly IPackFileService _pfs;
-        private readonly SkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonAnimationLookUpHelper;
         private GizmoToolbox _gizmoToolbox;
         private CopyPastePose _copyPastePose;
         private CopyPasteFromClipboardPose _copyPasteClipboardPose;
@@ -160,7 +159,7 @@ namespace Editors.AnimationVisualEditors.AnimationKeyframeEditor
         public FilterCollection<IAnimationBinGenericFormat> ActiveOutputFragment { get; set; }
 
         public AnimationKeyframeEditorViewModel(IPackFileService pfs,
-            SkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
+            ISkeletonAnimationLookUpHelper skeletonAnimationLookUpHelper,
             SelectionComponent selectionComponent,
             SceneObjectViewModelBuilder sceneObjectViewModelBuilder,
             AnimationPlayerViewModel animationPlayerViewModel,
