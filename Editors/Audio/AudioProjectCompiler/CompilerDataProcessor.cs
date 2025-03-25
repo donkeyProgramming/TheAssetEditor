@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.AudioProjectCompiler.WwiseIDService;
 using Editors.Audio.GameSettings.Warhammer3;
 using Editors.Audio.Storage;
@@ -10,7 +10,7 @@ using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.Settings;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
-using Action = Editors.Audio.AudioEditor.Data.Action;
+using Action = Editors.Audio.AudioEditor.AudioProjectData.Action;
 
 namespace Editors.Audio.AudioProjectCompiler
 {

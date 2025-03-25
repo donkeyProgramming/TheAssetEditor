@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.AudioProjectData;
 using Editors.Audio.GameSettings.Warhammer3;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
@@ -8,12 +8,12 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
     public class DialogueEventFilter
     {
-        public static void ApplyDialogueEventPresetFiltering(AudioEditorViewModel audioEditorViewModel, IAudioProjectService audioProjectService)
+        public static void ApplyDialogueEventPresetFiltering(AudioEditorViewModel audioEditorViewModel, IAudioEditorService audioEditorService)
         {
             var audioProjectTreeNode = audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode;
             if (audioProjectTreeNode.NodeType == NodeType.DialogueEventSoundBank)
             {
-                var soundBank = DataHelpers.GetSoundBankFromName(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
+                var soundBank = AudioProjectHelpers.GetSoundBankFromName(audioEditorService, audioEditorService.GetSelectedExplorerNode().Name);
 
                 var presetFilter = audioEditorViewModel.AudioProjectExplorerViewModel.SelectedDialogueEventPreset;
 
@@ -27,15 +27,15 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
                         audioProjectTreeNode.PresetFilterDisplayText = null;
                 }
 
-                TreeBuilder.AddFilteredDialogueEventsToSoundBankTreeViewItems(audioProjectService, audioEditorViewModel.AudioProjectExplorerViewModel, soundBank.Name, presetFilter);
+                TreeBuilder.AddFilteredDialogueEventsToSoundBankTreeViewItems(audioEditorService, audioEditorViewModel.AudioProjectExplorerViewModel, soundBank.Name, presetFilter);
             }
         }
 
-        public static void HandleDialogueEventsPresetFilter(AudioProjectExplorerViewModel audioProjectExplorerViewModel, IAudioProjectService audioProjectService, string soundBankName)
+        public static void HandleDialogueEventsPresetFilter(AudioProjectExplorerViewModel audioProjectExplorerViewModel, IAudioEditorService audioEditorService, string soundBankName)
         {
             SetDialogueEventPresets(audioProjectExplorerViewModel, soundBankName);
 
-            SetSelectedDialogueEventPreset(audioProjectExplorerViewModel, audioProjectService);
+            SetSelectedDialogueEventPreset(audioProjectExplorerViewModel, audioEditorService);
 
             audioProjectExplorerViewModel.IsDialogueEventPresetFilterEnabled = true;
         }
@@ -52,9 +52,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
             audioProjectExplorerViewModel.DialogueEventPresets = dialogueEventPresets;
         }
 
-        private static void SetSelectedDialogueEventPreset(AudioProjectExplorerViewModel audioProjectExplorerViewModel, IAudioProjectService audioProjectService)
+        private static void SetSelectedDialogueEventPreset(AudioProjectExplorerViewModel audioProjectExplorerViewModel, IAudioEditorService audioEditorService)
         {
-            var soundBank = DataHelpers.GetAudioProjectTreeNodeFromName(audioProjectExplorerViewModel.AudioProjectTree, audioProjectExplorerViewModel._selectedAudioProjectTreeNode.Name);
+            var soundBank = TreeNode.GetAudioProjectTreeNodeFromName(audioProjectExplorerViewModel.AudioProjectTree, audioEditorService.GetSelectedExplorerNode().Name);
             if (soundBank.PresetFilter != DialogueEventPreset.ShowAll && soundBank.PresetFilter != null)
                 audioProjectExplorerViewModel.SelectedDialogueEventPreset = soundBank.PresetFilter;
             else

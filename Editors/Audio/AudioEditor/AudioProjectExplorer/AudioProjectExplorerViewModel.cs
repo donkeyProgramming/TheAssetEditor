@@ -3,24 +3,26 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.Audio.AudioEditor.Data;
-using Editors.Audio.Storage;
+using Editors.Audio.AudioEditor.Events;
+using Serilog;
+using Shared.Core.ErrorHandling;
+using Shared.Core.Events;
 using Shared.Core.ToolCreation;
 using Xceed.Wpf.Toolkit;
-using static Editors.Audio.AudioEditor.AudioProjectExplorer.DialogueEventFilter;
 using static Editors.Audio.GameSettings.Warhammer3.DialogueEvents;
 
 namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 {
     public partial class AudioProjectExplorerViewModel : ObservableObject, IEditorInterface
     {
-        public AudioEditorViewModel AudioEditorViewModel { get; set; }
-        private readonly IAudioRepository _audioRepository;
-        private readonly IAudioProjectService _audioProjectService;
+        private readonly IEventHub _eventHub;
+        private readonly IAudioEditorService _audioEditorService;
+
+        private readonly ILogger _logger = Logging.Create<AudioProjectExplorerViewModel>();
 
         public string DisplayName { get; set; } = "Audio Project Explorer";
 
-        [ObservableProperty] private string _audioProjectExplorerLabel = "Audio Project Explorer";
+        [ObservableProperty] private string _audioProjectExplorerLabel;
         [ObservableProperty] private bool _showEditedAudioProjectItemsOnly;
         [ObservableProperty] private bool _isDialogueEventPresetFilterEnabled = false;
         [ObservableProperty] private DialogueEventPreset? _selectedDialogueEventPreset;
@@ -30,22 +32,33 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
         private ObservableCollection<TreeNode> _unfilteredTree;
         public TreeNode _selectedAudioProjectTreeNode;
 
-        public AudioProjectExplorerViewModel(IAudioRepository audioRepository, IAudioProjectService audioProjectService)
+        public AudioProjectExplorerViewModel(IEventHub eventHub, IAudioEditorService audioEditorService)
         {
-            _audioRepository = audioRepository;
-            _audioProjectService = audioProjectService;
+            _eventHub = eventHub;
+            _audioEditorService = audioEditorService;
+
+            AudioProjectExplorerLabel = $"{DisplayName}";
         }
 
-        public void OnSelectedAudioProjectTreeNodeChanged(TreeNode value)
+        public void OnSelectedNodeChanged(TreeNode value)
         {
             _selectedAudioProjectTreeNode = value;
 
-            DataManager.HandleLoadingSelectedAudioProjectItem(AudioEditorViewModel, _audioProjectService, _audioRepository);
+            _eventHub.Publish(new NodeSelectedEvent());
+
+            ResetButtonEnablement();
+
+            if (_audioEditorService.GetSelectedExplorerNode().NodeType == NodeType.DialogueEventSoundBank)
+            {
+                DialogueEventFilter.HandleDialogueEventsPresetFilter(this, _audioEditorService, _audioEditorService.GetSelectedExplorerNode().Name);
+
+                _logger.Here().Information($"Loaded Dialogue Event SoundBank: {_audioEditorService.GetSelectedExplorerNode().Name}");
+            }
         }
-        
+
         partial void OnSelectedDialogueEventPresetChanged(DialogueEventPreset? value)
         {
-            ApplyDialogueEventPresetFiltering(AudioEditorViewModel, _audioProjectService);
+            DialogueEventFilter.ApplyDialogueEventPresetFiltering(_audioEditorService.AudioEditorViewModel, _audioEditorService);
         }
 
         partial void OnSearchQueryChanged(string value)
@@ -104,14 +117,13 @@ namespace Editors.Audio.AudioEditor.AudioProjectExplorer
 
         partial void OnShowEditedAudioProjectItemsOnlyChanged(bool value)
         {
-            TreeBuilder.FilterEditedAudioProjectItems(_audioProjectService, this, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
+            TreeBuilder.FilterEditedAudioProjectItems(_audioEditorService, this, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
         }
 
         public void CreateAudioProjectTree()
         {
-            TreeBuilder.CreateAudioProjectTree(_audioProjectService, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
+            TreeBuilder.CreateAudioProjectTree(_audioEditorService, AudioProjectTree, ShowEditedAudioProjectItemsOnly);
             _unfilteredTree = new ObservableCollection<TreeNode>(AudioProjectTree);
-
         }
 
         [RelayCommand] public void CollapseOrExpandAudioProjectTree() 
