@@ -23,7 +23,7 @@ namespace Editors.Audio.AudioEditor
 
         private readonly IPackFileService _packFileService;
         private readonly IStandardDialogs _standardDialogs;
-        private readonly IAudioProjectService _audioProjectService;
+        private readonly IAudioEditorService _audioEditorService;
         private readonly IntegrityChecker _integrityChecker;
 
         public string DisplayName { get; set; } = "Audio Editor";
@@ -36,54 +36,65 @@ namespace Editors.Audio.AudioEditor
             AudioSettingsViewModel audioSettingsViewModel,
             IPackFileService packFileService,
             IStandardDialogs standardDialogs,
-            IAudioProjectService audioProjectService,
+            IAudioEditorService audioEditorService,
             IntegrityChecker integrityChecker)
         {
-            AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
-            AudioProjectExplorerViewModel.AudioEditorViewModel = this;
-
-            AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
-            AudioFilesExplorerViewModel.AudioEditorViewModel = this;
-
-            AudioProjectEditorViewModel = audioProjectEditorViewModel;
-            AudioProjectEditorViewModel.AudioEditorViewModel = this;
-
-            AudioProjectViewerViewModel = audioProjectViewerViewModel;
-            AudioProjectViewerViewModel.AudioEditorViewModel = this;
-
-            AudioSettingsViewModel = audioSettingsViewModel;
-
             _packFileService = packFileService;
             _standardDialogs = standardDialogs;
-            _audioProjectService = audioProjectService;
+            _audioEditorService = audioEditorService;
             _integrityChecker = integrityChecker;
 
-            Initialise();
+            AudioProjectExplorerViewModel = audioProjectExplorerViewModel;
+            AudioFilesExplorerViewModel = audioFilesExplorerViewModel;
+            AudioProjectEditorViewModel = audioProjectEditorViewModel;
+            AudioProjectViewerViewModel = audioProjectViewerViewModel;
+            AudioSettingsViewModel = audioSettingsViewModel;
 
-            _integrityChecker.CheckAudioEditorDialogueEventIntegrity(DialogueEventData);
+            InitialiseAudioEditorData();
+
+            InitialiseAudioEditorService();
+
+            _integrityChecker.CheckDialogueEventIntegrity(DialogueEventData);
         }
 
         [RelayCommand] public void NewAudioProject()
         {
-            NewAudioProjectWindow.Show(this, _packFileService, _audioProjectService, _standardDialogs);
+            NewAudioProjectWindow.Show(_packFileService, _audioEditorService, _standardDialogs);
         }
 
         [RelayCommand] public void SaveAudioProject()
         {
-            _audioProjectService.SaveAudioProject();
+            _audioEditorService.SaveAudioProject();
         }
 
         [RelayCommand] public void LoadAudioProject()
         {
-            _audioProjectService.LoadAudioProject(this);
+            _audioEditorService.LoadAudioProject(this);
         }
 
         [RelayCommand] public void CompileAudioProject()
         {
-            _audioProjectService.CompileAudioProject();
+            _audioEditorService.CompileAudioProject();
         }
 
-        public void ResetAudioEditorViewModelData()
+        public void InitialiseAudioEditorData()
+        {
+            AudioProjectEditorViewModel.AudioProjectEditorDataGrid = [];
+            AudioProjectViewerViewModel.AudioProjectViewerDataGrid = [];
+            AudioProjectViewerViewModel.SelectedDataGridRows = [];
+            AudioProjectViewerViewModel.CopiedDataGridRows = [];
+            AudioProjectExplorerViewModel.DialogueEventPresets = [];
+        }
+        private void InitialiseAudioEditorService()
+        {
+            _audioEditorService.AudioEditorViewModel = this;
+            _audioEditorService.AudioProjectExplorerViewModel = AudioProjectExplorerViewModel;
+            _audioEditorService.AudioFilesExplorerViewModel = AudioFilesExplorerViewModel;
+            _audioEditorService.AudioProjectEditorViewModel = AudioProjectEditorViewModel;
+            _audioEditorService.AudioProjectViewerViewModel = AudioProjectViewerViewModel;
+            _audioEditorService.AudioSettingsViewModel = AudioSettingsViewModel;
+        }
+        public void ResetAudioEditorData()
         {
             AudioProjectEditorViewModel.AudioProjectEditorDataGrid = null;
             AudioProjectViewerViewModel.AudioProjectViewerDataGrid = null;
@@ -93,19 +104,10 @@ namespace Editors.Audio.AudioEditor
             AudioProjectExplorerViewModel.AudioProjectTree.Clear();
         }
 
-        public void Initialise()
-        {
-            AudioProjectEditorViewModel.AudioProjectEditorDataGrid = [];
-            AudioProjectViewerViewModel.AudioProjectViewerDataGrid = [];
-            AudioProjectViewerViewModel.SelectedDataGridRows = [];
-            AudioProjectViewerViewModel.CopiedDataGridRows = [];
-            AudioProjectExplorerViewModel.DialogueEventPresets = [];
-        }
-
         public void Close()
         {
-            ResetAudioEditorViewModelData();
-            _audioProjectService.ResetAudioProject();
+            ResetAudioEditorData();
+            _audioEditorService.ResetAudioProject();
         }
     }
 }

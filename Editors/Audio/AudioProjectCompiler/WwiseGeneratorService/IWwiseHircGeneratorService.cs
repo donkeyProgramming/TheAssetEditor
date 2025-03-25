@@ -1,4 +1,4 @@
-﻿using Editors.Audio.AudioEditor.Data;
+﻿using Editors.Audio.AudioEditor.AudioProjectData;
 using Shared.GameFormats.Wwise.Hirc;
 
 namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService

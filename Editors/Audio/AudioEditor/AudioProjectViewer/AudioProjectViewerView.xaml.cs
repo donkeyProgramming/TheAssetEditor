@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using Editors.Audio.AudioEditor.Data;
+using Editors.Audio.AudioEditor.DataGrids;
 
 namespace Editors.Audio.AudioEditor.AudioProjectViewer
 {
@@ -28,7 +28,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer
         // Detects when a row in the DataGrid is selected
         private void AudioEditorDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var dataGrid = sender as DataGrid;
+            var dataGrid = sender as System.Windows.Controls.DataGrid;
             var selectedItems = dataGrid.SelectedItems;
             if (ViewModel != null && selectedItems != null)
                 ViewModel.OnDataGridSelectionChanged(selectedItems);

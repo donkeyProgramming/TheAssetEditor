@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise.Enums;
 using static Editors.Audio.AudioEditor.AudioSettings.AudioSettings;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 
-namespace Editors.Audio.AudioEditor.Data
+namespace Editors.Audio.AudioEditor.AudioProjectData
 {
     public class AudioProject
     {
@@ -81,7 +81,7 @@ namespace Editors.Audio.AudioEditor.Data
     {
         public override AkBkHircType HircType { get; } = AkBkHircType.RandomSequenceContainer;
         public uint DirectParentID { get; set; }
-        public AudioSettings AudioSettings { get; set; }
+        public RanSeqContainerSettings AudioSettings { get; set; }
         public List<Sound> Sounds { get; set; }
         public string Language { get; set; }
     }
@@ -98,19 +98,28 @@ namespace Editors.Audio.AudioEditor.Data
         public string WemDiskFilePath { get; set; }
         public long InMemoryMediaSize { get; set; }
         public string Language { get; set; }
+        public SoundSettings AudioSettings { get; set; }
     }
 
-    public class AudioSettings
+    public interface IAudioSettings { }
+
+    public class RanSeqContainerSettings : IAudioSettings
     {
         public PlaylistType PlaylistType { get; set; }
         public bool EnableRepetitionInterval { get; set; }
-        public uint? RepetitionInterval { get; set; }
-        public EndBehaviour? EndBehaviour { get; set; }
+        public uint RepetitionInterval { get; set; }
+        public EndBehaviour EndBehaviour { get; set; }
         public bool AlwaysResetPlaylist { get; set; }
         public PlaylistMode PlaylistMode { get; set; }
         public LoopingType LoopingType { get; set; }
-        public uint? NumberOfLoops { get; set; }
+        public uint NumberOfLoops { get; set; }
         public TransitionType TransitionType { get; set; }
-        public decimal? TransitionDuration { get; set; }
+        public decimal TransitionDuration { get; set; }
+    }
+
+    public class SoundSettings : IAudioSettings
+    {
+        public LoopingType LoopingType { get; set; }
+        public uint NumberOfLoops { get; set; }
     }
 }
