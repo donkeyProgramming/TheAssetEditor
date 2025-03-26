@@ -218,7 +218,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
         {
             var dataGridRow = _audioEditorService.GetEditorDataGrid()[0];
             var emptyColumns = dataGridRow
-                .Where(kvp => kvp.Key != DataGridConfiguration.ActionTypeColumn && kvp.Value is string value && string.IsNullOrEmpty(value))
+                .Where(kvp => kvp.Value is string value && string.IsNullOrEmpty(value))
                 .ToList();
 
             if (emptyColumns.Count > 0)
@@ -235,11 +235,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectEditor
                 var movieFilePath = _packFileService.GetFullPath(result.File);
 
                 var editorRow = _audioEditorService.GetEditorDataGrid()[0];
-                var actionType = AudioProjectHelpers.GetActionTypeFromDataGridRow(editorRow);
 
                 var rowData = new Dictionary<string, string>
                 {
-                    { DataGridConfiguration.ActionTypeColumn, actionType },
                     { DataGridConfiguration.EventNameColumn, ConvertMovieFilePath(movieFilePath) }
                 };
 

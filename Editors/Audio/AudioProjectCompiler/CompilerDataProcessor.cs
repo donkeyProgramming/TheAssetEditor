@@ -9,6 +9,7 @@ using Editors.Audio.Storage;
 using Editors.Audio.Utility;
 using Shared.Core.Misc;
 using Shared.Core.Settings;
+using Shared.GameFormats.Wwise.Enums;
 using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
 using Action = Editors.Audio.AudioEditor.AudioProjectData.Action;
 
@@ -47,7 +48,7 @@ namespace Editors.Audio.AudioProjectCompiler
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 soundBank.SoundBankSubtype = GetSoundBankSubtype(soundBank.Name);
-                soundBank.Language = AudioProjectCompilerHelpers.GetCorrectSoundBankLanguage(audioProject);
+                soundBank.Language = AudioProjectCompilerHelpers.GetCorrectSoundBankLanguage(audioProject); // TODO: Music should be SFX.
 
                 soundBank.SoundBankFileName = $"{GetSoundBankName(soundBank.SoundBankSubtype)}_{audioProjectFileName}.bnk";
 
@@ -121,6 +122,11 @@ namespace Editors.Audio.AudioProjectCompiler
             sound.Language = language;
             sound.ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, language);
 
+            if (wwiseIDService.OverrideBusIds.TryGetValue(soundBankSubtype, out var overrideBusID))
+                sound.OverrideBusID = overrideBusID;
+            else
+                sound.OverrideBusID = 0;
+
             if (wwiseIDService.ActorMixerIds.TryGetValue(soundBankSubtype, out var actorMixerID))
                 sound.DirectParentID = actorMixerID;
 
@@ -137,6 +143,11 @@ namespace Editors.Audio.AudioProjectCompiler
             container.Language = language;
             container.ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, language);
 
+            if (wwiseIDService.OverrideBusIds.TryGetValue(soundBankSubtype, out var overrideBusID))
+                container.OverrideBusID = overrideBusID;
+            else
+                container.OverrideBusID = 0;
+
             if (wwiseIDService.ActorMixerIds.TryGetValue(soundBankSubtype, out var actorMixerID))
                 container.DirectParentID = actorMixerID;
 
@@ -149,33 +160,51 @@ namespace Editors.Audio.AudioProjectCompiler
             container.Sounds = container.Sounds.OrderBy(sound => sound.ID).ToList();
         }
 
+        public void CreateStopActionEvents(AudioProject audioProject)
+        {
+            foreach (var soundBank in audioProject.SoundBanks)
+            {
+                if (soundBank.SoundBankSubtype == Wh3SoundBankSubtype.FrontendMusic)
+                {
+                    for (var i = 0; i < soundBank.ActionEvents.Count; i++)
+                    {
+                        var actionEvent = soundBank.ActionEvents[i];
 
+                        var stopEventName = string.Concat("Stop_", actionEvent.Name.AsSpan("Play_".Length));
+                        var stopEvent = new ActionEvent
+                        {
+                            Name = stopEventName,
+                            ID = WwiseHash.Compute(stopEventName),
+                            HircType = actionEvent.HircType,
+                            RandomSequenceContainer = actionEvent.RandomSequenceContainer,
+                            Sound = actionEvent.Sound
+                        };
+
+                        soundBank.ActionEvents.Insert(i + 1, stopEvent);
+                        i++;
+                    }
+                }
+            }
+        }
+
+        // TODO: Need some way to handle play and stop actions so that they reference the same sound if they used the same sound and the rest of the event name is the same
         public void SetActionData(AudioProject audioProject)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 foreach (var actionEvent in soundBank.ActionEvents)
                 {
+                    var action = new Action { ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, actionEvent.Sound.Language) };
+
+                    if (actionEvent.Name.StartsWith("Stop_"))
+                        action.ActionType = AkActionType.Stop_E_O;
+
                     if (actionEvent.Sound != null)
-                    {
-                        var action = new Action
-                        {
-                            ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, actionEvent.Sound.Language),
-                            IDExt = actionEvent.Sound.ID
-                        };
-
-                        actionEvent.Actions = [action];
-                    }
+                        action.IDExt = actionEvent.Sound.ID;
                     else
-                    {
-                        var action = new Action
-                        {
-                            ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, actionEvent.RandomSequenceContainer.Language),
-                            IDExt = actionEvent.RandomSequenceContainer.ID
-                        };
+                        action.IDExt = actionEvent.RandomSequenceContainer.ID;
 
-                        actionEvent.Actions = [action];
-                    }
+                    actionEvent.Actions = [action];
 
                     if (actionEvent.Actions.Count > 1)
                         throw new NotSupportedException("We're not set up to handle multiple actions.");

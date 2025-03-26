@@ -73,7 +73,8 @@ namespace Editors.Audio.AudioProjectCompiler
                 if (actionEvent.Sound != null)
                 {
                     var soundHirc = wwiseHircGeneratorServiceFactory.GenerateHirc(actionEvent.Sound, soundBank);
-                    sourceHircs.Add(soundHirc, []);
+                    if (!sourceHircs.Keys.Any(sourceHirc => sourceHirc.ID == soundHirc.ID))
+                        sourceHircs.Add(soundHirc, []);
                 }
                 else
                 {
@@ -82,7 +83,8 @@ namespace Editors.Audio.AudioProjectCompiler
                         .ToList();
 
                     var randomSequenceContainerHirc = wwiseHircGeneratorServiceFactory.GenerateHirc(actionEvent.RandomSequenceContainer, soundBank);
-                    sourceHircs.Add(randomSequenceContainerHirc, soundHircs);
+                    if (!sourceHircs.Keys.Any(sourceHirc => sourceHirc.ID == randomSequenceContainerHirc.ID))
+                        sourceHircs.Add(randomSequenceContainerHirc, soundHircs);
                 }
             }
 

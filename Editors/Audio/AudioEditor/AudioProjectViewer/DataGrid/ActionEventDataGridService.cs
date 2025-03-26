@@ -47,13 +47,9 @@ namespace Editors.Audio.AudioEditor.AudioProjectViewer.DataGrid
         public void InsertDataGridRow()
         {
             var editorRow = _audioEditorService.GetEditorDataGrid()[0];
-            var eventNameWithoutActionType = AudioProjectHelpers.GetActionEventNameWithoutActionTypeFromDataGridRow(editorRow);
-            var actionType = AudioProjectHelpers.GetActionTypeFromDataGridRow(editorRow);
-            var acitonEventName = AudioProjectHelpers.GetActionEventName(actionType, eventNameWithoutActionType);
-
             var rowData = new Dictionary<string, string>
             {
-                { DataGridConfiguration.EventNameColumn, acitonEventName }
+                { DataGridConfiguration.EventNameColumn, AudioProjectHelpers.GetActionEventName(editorRow) }
             };
 
             DataGridHelpers.InsertRowAlphabetically(_audioEditorService.GetViewerDataGrid(), rowData);
