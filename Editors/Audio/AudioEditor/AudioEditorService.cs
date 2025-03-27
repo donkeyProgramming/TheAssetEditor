@@ -164,6 +164,7 @@ namespace Editors.Audio.AudioEditor
 
             if (audioProject.SoundBanks.Any(soundBank => soundBank.ActionEvents != null))
             {
+                _compilerDataProcessor.CreateStopActionEvents(audioProject);
                 _compilerDataProcessor.SetActionData(audioProject);
                 _compilerDataProcessor.SetActionEventData(audioProject);
             }
@@ -396,7 +397,7 @@ namespace Editors.Audio.AudioEditor
                 WriteIndented = true
             };
             var audioProjectJson = JsonSerializer.Serialize(audioProject, options);
-            var audioProjectFileName = $"{AudioProjectFileName}_compiled.aproj";
+            var audioProjectFileName = $"{AudioProjectFileName}_compiled.json";
             var audioProjectFilePath = $"{AudioProjectDirectory}\\{audioProjectFileName}";
             var packFile = PackFile.CreateFromASCII(audioProjectFileName, audioProjectJson);
             _fileSaveService.Save(audioProjectFilePath, packFile.DataSource.ReadData(), true);

@@ -20,7 +20,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
     public abstract class AudioProjectHircItem : AudioProjectItem
     {
-        public abstract AkBkHircType HircType { get; }
+        public abstract AkBkHircType HircType { get; set; }
     }
 
     public partial class SoundBank : AudioProjectItem
@@ -36,7 +36,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
     public class ActionEvent : AudioProjectHircItem
     {
-        public override AkBkHircType HircType { get; } = AkBkHircType.Event;
+        public override AkBkHircType HircType { get; set; } = AkBkHircType.Event;
 
         // Technically we should make each action contain the SoundContainer / Sound but making multiple actions for an event isn't supported as the user probably doesn't need to.
         public List<Action> Actions { get; set; } 
@@ -46,14 +46,14 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
     public class Action : AudioProjectHircItem
     {
-        public override AkBkHircType HircType { get; } = AkBkHircType.Action;
+        public override AkBkHircType HircType { get; set; } = AkBkHircType.Action;
         public AkActionType ActionType { get; set; } = AkActionType.Play;
         public uint IDExt { get; set; }
     }
 
     public class DialogueEvent : AudioProjectHircItem
     {
-        public override AkBkHircType HircType { get; } = AkBkHircType.Dialogue_Event;
+        public override AkBkHircType HircType { get; set; } = AkBkHircType.Dialogue_Event;
         public List<StatePath> StatePaths { get; set; }
     }
 
@@ -79,7 +79,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
     public class RandomSequenceContainer : AudioProjectHircItem
     {
-        public override AkBkHircType HircType { get; } = AkBkHircType.RandomSequenceContainer;
+        public override AkBkHircType HircType { get; set; } = AkBkHircType.RandomSequenceContainer;
+        public uint OverrideBusID { get; set; }
         public uint DirectParentID { get; set; }
         public RanSeqContainerSettings AudioSettings { get; set; }
         public List<Sound> Sounds { get; set; }
@@ -88,7 +89,8 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
     public class Sound : AudioProjectHircItem
     {
-        public override AkBkHircType HircType { get; } = AkBkHircType.Sound;
+        public override AkBkHircType HircType { get; set; } = AkBkHircType.Sound;
+        public uint OverrideBusID { get; set; }
         public uint DirectParentID { get; set; }
         public uint SourceID { get; set; }
         public string WavFileName { get; set; }

@@ -3,6 +3,8 @@ using Editors.Audio.Utility;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc;
 using Shared.GameFormats.Wwise.Hirc.V136;
+using static Editors.Audio.GameSettings.Warhammer3.SoundBanks;
+using static Shared.GameFormats.Wwise.Hirc.V136.Shared.AkPropBundle_V136;
 
 namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerators.Hirc.V136
 {
@@ -12,25 +14,38 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
         {
             var audioProjectActionEvent = audioProjectItem as Action;
 
-            var actionHirc = CreateAction(audioProjectActionEvent);
+            var actionHirc = CreateAction(audioProjectActionEvent, soundBank.SoundBankSubtype);
 
             if (audioProjectActionEvent.ActionType == AkActionType.Play)
                 actionHirc.PlayActionParams = CreatePlayActionParams(soundBank);
+            else if (audioProjectActionEvent.ActionType == AkActionType.Stop_E_O)
+                actionHirc.ActiveActionParams = CreateStopActionParams(soundBank);
 
             actionHirc.UpdateSectionSize();
 
             return actionHirc;
         }
 
-        private static CAkAction_V136 CreateAction(Action audioProjectActionEvent)
+        private static CAkAction_V136 CreateAction(Action audioProjectActionEvent, Wh3SoundBankSubtype soundBankSubType)
         {
-            return new CAkAction_V136
+            var action = new CAkAction_V136
             {
                 ID = audioProjectActionEvent.ID,
                 HircType = audioProjectActionEvent.HircType,
                 ActionType = audioProjectActionEvent.ActionType,
                 IdExt = audioProjectActionEvent.IDExt
             };
+
+            if (soundBankSubType == Wh3SoundBankSubtype.FrontendMusic)
+            {
+                action.AkPropBundle0.PropsList.Add(new PropBundleInstance_V136
+                {
+                    ID = AkPropId_V136.TransitionTime,
+                    Value = 1000
+                });
+            }
+
+            return action;
         }
 
         private static CAkAction_V136.PlayActionParams_V136 CreatePlayActionParams(SoundBank soundBank)
@@ -38,7 +53,23 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             return new CAkAction_V136.PlayActionParams_V136
             {
                 BitVector = 4,
-                BankId = WwiseHash.Compute(soundBank.Name)
+                BankId = soundBank.ID
+            };
+        }
+
+        private static CAkAction_V136.ActiveActionParams_V136 CreateStopActionParams(SoundBank soundBank)
+        {
+            return new CAkAction_V136.ActiveActionParams_V136
+            {
+                BitVector = 4,
+                StopActionSpecificParams = new CAkAction_V136.ActiveActionParams_V136.StopActionSpecificParams_V136
+                {
+                    BitVector = 6
+                },
+                ExceptParams = new CAkAction_V136.ActiveActionParams_V136.ExceptParams_V136
+                {
+                    ExceptionListSize = 0
+                }
             };
         }
     }

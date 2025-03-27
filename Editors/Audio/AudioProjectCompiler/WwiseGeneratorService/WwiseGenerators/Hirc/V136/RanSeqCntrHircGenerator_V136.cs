@@ -104,7 +104,7 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 NumFx = 0,
             };
             nodeBaseParams.OverrideAttachmentParams = 0;
-            nodeBaseParams.OverrideBusID = 0;
+            nodeBaseParams.OverrideBusID = audioProjectRandomSequenceContainer.OverrideBusID;
             nodeBaseParams.DirectParentID = audioProjectRandomSequenceContainer.DirectParentID;
             nodeBaseParams.BitVector = 0;
             nodeBaseParams.NodeInitialParams = new NodeInitialParams_V136()

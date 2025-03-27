@@ -33,7 +33,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
 
         public static ActionEvent GetActionEventFromDataGridRow(Dictionary<string, string> dataGridRow, SoundBank actionEventSoundBank)
         {
-            var eventName = GetActionEventNameWithoutActionTypeFromDataGridRow(dataGridRow);
+            var eventName = GetActionEventName(dataGridRow);
 
             foreach (var actionEvent in actionEventSoundBank.ActionEvents)
             {                    
@@ -44,7 +44,7 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
             return null;
         }
 
-        public static string GetActionEventNameWithoutActionTypeFromDataGridRow(Dictionary<string, string> dataGridRow)
+        public static string GetActionEventName(Dictionary<string, string> dataGridRow)
         {
             if (dataGridRow.TryGetValue(DataGridConfiguration.EventNameColumn, out var eventName))
                 return eventName.ToString();
@@ -52,30 +52,11 @@ namespace Editors.Audio.AudioEditor.AudioProjectData
                 return string.Empty;
         }
 
-        public static string GetActionTypeFromDataGridRow(Dictionary<string, string> dataGridRow)
-        {
-            if (dataGridRow.TryGetValue(DataGridConfiguration.ActionTypeColumn, out var actionType))
-                return actionType.ToString();
-            else
-                return string.Empty;
-        }
-
-        public static string GetActionEventName(string actionType, string eventName)
-        {
-            return $"{actionType}_{eventName}";
-        }
-
         public static ActionEvent CreateActionEventFromDataGridRow(AudioSettingsViewModel audioSettingsViewModel, Dictionary<string, string> dataGridRow)
         {
             var actionEvent = new ActionEvent();
 
-            var eventNameWithoutActionType = GetActionEventNameWithoutActionTypeFromDataGridRow(dataGridRow);
-            var actionType = GetActionTypeFromDataGridRow(dataGridRow);
-
-            if (eventNameWithoutActionType == string.Empty || actionType == string.Empty)
-                return null;
-
-            actionEvent.Name = GetActionEventName(actionType, eventNameWithoutActionType);
+            actionEvent.Name = GetActionEventName(dataGridRow);
 
             var audioFiles = audioSettingsViewModel.AudioFiles;
             if (audioFiles.Count == 1)

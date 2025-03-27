@@ -21,7 +21,12 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseIDService.Warhammer3
             {Wh3SoundBankSubtype.CampaignVO, 306196174},                    // Reference: campaign_vo_attack
             {Wh3SoundBankSubtype.CampaignConversationalVO, 652491101},      // Reference: campaign_vo_cs_proximity
             {Wh3SoundBankSubtype.BattleVO, 1009314120},                     // Reference: battle_vo_orders_attack
-            {Wh3SoundBankSubtype.BattleConversationalVO, 600762068}         // Reference: battle_vo_conversation_clash
+            {Wh3SoundBankSubtype.BattleConversationalVO, 600762068},        // Reference: battle_vo_conversation_clash
+        };
+
+        public Dictionary<Wh3SoundBankSubtype, uint> OverrideBusIds { get; } = new()
+        {
+            {Wh3SoundBankSubtype.FrontendMusic, 3356399930} // 3356399930, which is the second from top bus, works. 3267614108 which is the top level bus doesn't work and neither does 4042387584.
         };
     }
 }
