@@ -26,7 +26,6 @@ namespace Editors.Audio.Utility
             _hircProcessChildMap.Add(AkBkHircType.Music_Random_Sequence, ProcessRandMusicContainer);
         }
 
-
         private void ProcessDialogueEvent(HircItem item, HircTreeItem parent)
         {
             var hirc = GetAsType<ICAkDialogueEvent>(item);
@@ -34,21 +33,21 @@ namespace Editors.Audio.Utility
             var helper = new DecisionPathHelper(_repository);
             var paths = helper.GetDecisionPaths(hirc);
 
-            var dialogueEventNode = new HircTreeItem() { DisplayName = $"Dialog_Event {_repository.GetNameFromID(item.ID)} - [{paths.Header.GetAsString()}]", Item = item };
+            var dialogueEventNode = new HircTreeItem() { DisplayName = $"Dialogue Event {_repository.GetNameFromID(item.ID)} - [{paths.Header.GetAsString()}]", Item = item };
             parent.Children.Add(dialogueEventNode);
 
             foreach (var path in paths.Paths)
             {
                 var pathNode = new HircTreeItem() { DisplayName = path.GetAsString(), Item = item, IsExpanded = false };
                 dialogueEventNode.Children.Add(pathNode);
-                ProcessNext(path.ChildNodeId, pathNode);
+                ProcessNext(path.ChildNodeID, pathNode);
             }
         }
 
         void ProcessEvent(HircItem item, HircTreeItem parent)
         {
             var actionHirc = GetAsType<ICAkEvent>(item);
-            var actionTreeNode = new HircTreeItem() { DisplayName = $"Event {_repository.GetNameFromID(item.ID)}", Item = item };
+            var actionTreeNode = new HircTreeItem() { DisplayName = $"Action Event {_repository.GetNameFromID(item.ID)}", Item = item };
             parent.Children.Add(actionTreeNode);
 
             var actions = actionHirc.GetActionIds();
@@ -88,7 +87,7 @@ namespace Editors.Audio.Utility
                    .ToList();
 
                 foreach (var normalSwitch in normalSwitches)
-                    if (normalSwitch.GroupId == stateGroupId)
+                    if (normalSwitch.GroupID == stateGroupId)
                         ProcessNext(normalSwitch.ID, actionTreeNode);
             }
             else ProcessNext(childId, actionTreeNode);
@@ -118,14 +117,14 @@ namespace Editors.Audio.Utility
         void ProcessSwitchControl(HircItem item, HircTreeItem parent)
         {
             var switchControl = GetAsType<ICAkSwitchCntr>(item);
-            var switchType = _repository.GetNameFromID(switchControl.GroupId);
+            var switchType = _repository.GetNameFromID(switchControl.GroupID);
             var defaultValue = _repository.GetNameFromID(switchControl.DefaultSwitch);
             var switchControlNode = new HircTreeItem() { DisplayName = $"Switch {switchType} DefaultValue: {defaultValue}", Item = item };
             parent.Children.Add(switchControlNode);
 
             foreach (var switchCase in switchControl.SwitchList)
             {
-                var switchValue = _repository.GetNameFromID(switchCase.SwitchId);
+                var switchValue = _repository.GetNameFromID(switchCase.SwitchID);
                 var switchValueNode = new HircTreeItem() { DisplayName = $"SwitchValue: {switchValue}", Item = item, IsMetaNode = true };
                 switchControlNode.Children.Add(switchValueNode);
 
@@ -145,7 +144,7 @@ namespace Editors.Audio.Utility
 
         private void ProcessSequenceContainer(HircItem item, HircTreeItem parent)
         {
-            var layerContainer = GetAsType<ICAkRanSeqCnt>(item);
+            var layerContainer = GetAsType<ICAkRanSeqCntr>(item);
             var layerNode = new HircTreeItem() { DisplayName = $"Rand Container", Item = item };
             parent.Children.Add(layerNode);
 
@@ -187,7 +186,7 @@ namespace Editors.Audio.Utility
             {
                 var pathNode = new HircTreeItem() { DisplayName = path.GetAsString(), Item = hirc, IsExpanded = false };
                 dialogueEventNode.Children.Add(pathNode);
-                ProcessNext(path.ChildNodeId, pathNode);
+                ProcessNext(path.ChildNodeID, pathNode);
             }
         }
 

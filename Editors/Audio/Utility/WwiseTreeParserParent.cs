@@ -37,7 +37,7 @@ namespace Editors.Audio.Utility
 
         private void FindParentRandContainer(HircItem item, HircTreeItem parent)
         {
-            var sqtContainer = GetAsType<ICAkRanSeqCnt>(item);
+            var sqtContainer = GetAsType<ICAkRanSeqCntr>(item);
             var node = new HircTreeItem() { DisplayName = $"Rand Container {GetDisplayId(item.ID, item.OwnerFilePath, false)} {GetParentInfo(sqtContainer.GetDirectParentID())}", Item = item };
             parent.Children.Add(node);
             ProcessNext(sqtContainer.GetDirectParentID(), node);

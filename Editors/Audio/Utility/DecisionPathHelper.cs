@@ -25,7 +25,7 @@ namespace Editors.Audio.Utility
         public class DecisionPath
         {
             public List<DecisionPathItem> Items { get; set; } = new List<DecisionPathItem>();
-            public uint ChildNodeId { get; set; }
+            public uint ChildNodeID { get; set; }
 
             public string GetAsString(string separator = ".") => string.Join(separator, Items.Select(x => x.DisplayName));
         }
@@ -44,8 +44,8 @@ namespace Editors.Audio.Utility
         public DecisionPathCollection GetDecisionPaths(ICAkDialogueEvent dialogueEvent) =>
             dialogueEvent switch
             {
-                CAkDialogueEvent_V136 event136 => GetDecisionPaths(event136.AkDecisionTree, event136.Arguments),
-                CAkDialogueEvent_V112 event112 => GetDecisionPaths(event112.AkDecisionTree, event112.Arguments),
+                CAkDialogueEvent_V136 event136 => GetDecisionPaths((AkDecisionTree_V136)event136.AkDecisionTree, event136.Arguments.Cast<AkGameSync_V136>().ToList()),
+                CAkDialogueEvent_V112 event112 => GetDecisionPaths((AkDecisionTree_V112)event112.AkDecisionTree, event112.Arguments.Cast<AkGameSync_V112>().ToList()),
                 _ => throw new NotImplementedException(),
             };
 
@@ -57,7 +57,7 @@ namespace Editors.Audio.Utility
             var decisionPath = new List<DecisionPath>();
             foreach (var path in paths)
             {
-                var currentPath = new DecisionPath() { ChildNodeId = path.Item2 };
+                var currentPath = new DecisionPath() { ChildNodeID = path.Item2 };
                 foreach (var item in path.Item1.Skip(1))
                 {
                     var name = _audioRepository.GetNameFromID(item.Key);
@@ -91,7 +91,7 @@ namespace Editors.Audio.Utility
             var decisionPath = new List<DecisionPath>();
             foreach (var path in paths)
             {
-                var currentPath = new DecisionPath() { ChildNodeId = path.Item2 };
+                var currentPath = new DecisionPath() { ChildNodeID = path.Item2 };
                 foreach (var item in path.Item1.Skip(1))
                 {
                     var name = _audioRepository.GetNameFromID(item.Key);
@@ -106,13 +106,13 @@ namespace Editors.Audio.Utility
             var arguments = argumentsList
                 .Select(x =>
                 {
-                    var name = _audioRepository.GetNameFromID(x.GroupId);
-                    return new { Name = name, x.GroupId };
+                    var name = _audioRepository.GetNameFromID(x.GroupID);
+                    return new { Name = name, x.GroupID };
                 }).ToList();
 
             var decisionPathCollection = new DecisionPathCollection()
             {
-                Header = new DecisionPath() { Items = arguments.Select(x => new DecisionPathItem() { DisplayName = x.Name, Value = x.GroupId }).ToList() },
+                Header = new DecisionPath() { Items = arguments.Select(x => new DecisionPathItem() { DisplayName = x.Name, Value = x.GroupID }).ToList() },
                 Paths = decisionPath
             };
 

@@ -3,7 +3,7 @@ using Shared.GameFormats.Wwise.Hirc.V136.Shared;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
-    public class CAkRanSeqCntr_V136 : HircItem, ICAkRanSeqCnt
+    public class CAkRanSeqCntr_V136 : HircItem, ICAkRanSeqCntr
     {
         public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
         public ushort LoopCount { get; set; }

@@ -1,4 +1,5 @@
-﻿using Shared.GameFormats.Wwise.Enums;
+﻿using Shared.Core.ByteParsing;
+using Shared.GameFormats.Wwise.Enums;
 
 namespace Shared.GameFormats.Wwise.Hirc
 {
@@ -23,8 +24,21 @@ namespace Shared.GameFormats.Wwise.Hirc
 
     public interface ICAkDialogueEvent
     {
-        List<object> Arguments { get; }
-        object AkDecisionTree { get; }
+        public List<IAkGameSync> Arguments { get; }
+        IAkDecisionTree AkDecisionTree { get; }
+
+        public interface IAkGameSync
+        {
+            public uint GroupID { get; set;  }
+            public AkGroupType GroupType { get; set; }
+            public uint GetSize();
+        }
+
+        public interface IAkDecisionTree
+        {
+            void ReadData(ByteChunk chunk, uint treeDataSize, uint treeDepth);
+            byte[] WriteData();
+        }
     }
 
     public interface ICAkActorMixer
@@ -35,14 +49,14 @@ namespace Shared.GameFormats.Wwise.Hirc
 
     public interface ICAkSwitchCntr
     {
-        uint GroupId { get; }
-        uint DefaultSwitch { get; }
+        public uint GroupID { get; }
+        public uint DefaultSwitch { get; }
         public List<ICAkSwitchPackage> SwitchList { get; }
 
         public interface ICAkSwitchPackage
         {
-            uint SwitchId { get; }
-            List<uint> NodeIdList { get; }
+            public uint SwitchID { get; }
+            public List<uint> NodeIdList { get; }
         }
 
         public uint GetDirectParentID();
@@ -59,7 +73,7 @@ namespace Shared.GameFormats.Wwise.Hirc
         public uint GetDirectParentID();
     }
 
-    public interface ICAkRanSeqCnt
+    public interface ICAkRanSeqCntr
     {
         public uint GetDirectParentID();
         public List<uint> GetChildren();

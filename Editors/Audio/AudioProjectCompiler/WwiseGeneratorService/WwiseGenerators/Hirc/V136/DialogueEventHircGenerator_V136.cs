@@ -26,17 +26,20 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
             dialogueEventHirc.Probability = 100;
             dialogueEventHirc.Arguments = CreateArguments(audioProjectDialogueEvent, dialogueEventHirc);
             dialogueEventHirc.TreeDepth = (uint)dialogueEventHirc.Arguments.Count;
-            dialogueEventHirc.AkDecisionTree = CreateDecisionTree(audioProjectDialogueEvent);
-            dialogueEventHirc.TreeDataSize = (uint)dialogueEventHirc.AkDecisionTree.Nodes.Count * new AkDecisionTree_V136.Node_V136().GetSize();
+
+            var decisionTree = CreateDecisionTree(audioProjectDialogueEvent);
+            dialogueEventHirc.AkDecisionTree = decisionTree;
+            dialogueEventHirc.TreeDataSize = (uint)decisionTree.Nodes.Count * new AkDecisionTree_V136.Node_V136().GetSize();
+
             dialogueEventHirc.Mode = (byte)AkMode.BestMatch;
             dialogueEventHirc.AkPropBundle0 = new AkPropBundle_V136() { PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>() };
             dialogueEventHirc.AkPropBundle1 = new AkPropBundleMinMax_V136() { PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>() };
             return dialogueEventHirc;
         }
 
-        private static List<AkGameSync_V136> CreateArguments(DialogueEvent audioProjectDialogueEvent, CAkDialogueEvent_V136 dialogueEventHirc)
+        private static List<ICAkDialogueEvent.IAkGameSync> CreateArguments(DialogueEvent audioProjectDialogueEvent, CAkDialogueEvent_V136 dialogueEventHirc)
         {
-            var arguments = new List<AkGameSync_V136>();
+            var arguments = new List<ICAkDialogueEvent.IAkGameSync>();
             foreach (var statePathNode in audioProjectDialogueEvent.StatePaths[0].Nodes)
             {
                 var argument = new AkGameSync_V136

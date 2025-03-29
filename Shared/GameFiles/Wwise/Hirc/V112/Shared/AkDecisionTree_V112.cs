@@ -1,8 +1,9 @@
 ﻿using Shared.Core.ByteParsing;
+using static Shared.GameFormats.Wwise.Hirc.ICAkDialogueEvent;
 
 namespace Shared.GameFormats.Wwise.Hirc.V112.Shared
 {
-    public class AkDecisionTree_V112
+    public class AkDecisionTree_V112 : IAkDecisionTree
     {
         public Node_V112 DecisionTree { get; set; } = new Node_V112(); // Root node of the decision tree in hierarchical form
         public List<Node_V112> Nodes { get; set; } = []; // Flattened list of all nodes in the decision tree in sequential order  for read / write

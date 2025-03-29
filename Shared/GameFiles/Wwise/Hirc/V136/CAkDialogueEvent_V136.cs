@@ -1,6 +1,7 @@
 ﻿using Shared.Core.ByteParsing;
 using Shared.GameFormats.Wwise.Enums;
 using Shared.GameFormats.Wwise.Hirc.V136.Shared;
+using static Shared.GameFormats.Wwise.Hirc.ICAkDialogueEvent;
 
 namespace Shared.GameFormats.Wwise.Hirc.V136
 {
@@ -8,10 +9,10 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
     {
         public byte Probability { get; set; }
         public uint TreeDepth { get; set; }
-        public List<AkGameSync_V136> Arguments { get; set; } = [];
+        public List<IAkGameSync> Arguments { get; set; } = [];
         public uint TreeDataSize { get; set; }
         public byte Mode { get; set; }
-        public AkDecisionTree_V136 AkDecisionTree { get; set; } = new AkDecisionTree_V136();
+        public IAkDecisionTree AkDecisionTree { get; set; } = new AkDecisionTree_V136();
         public AkPropBundle_V136 AkPropBundle0 { get; set; } = new AkPropBundle_V136();
         public AkPropBundleMinMax_V136 AkPropBundle1 { get; set; } = new AkPropBundleMinMax_V136();
 
@@ -81,8 +82,5 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
             var modeSize = ByteHelper.GetPropertyTypeSize(Mode);
             SectionSize = idSize + probabilitySize + treeDepthSize + arugumentsSize + treeDataSizeSize + modeSize + TreeDataSize + AkPropBundle0.GetSize() + AkPropBundle1.GetSize();
         }
-
-        List<object> ICAkDialogueEvent.Arguments => Arguments.Cast<object>().ToList();
-        object ICAkDialogueEvent.AkDecisionTree => AkDecisionTree;
     }
 }

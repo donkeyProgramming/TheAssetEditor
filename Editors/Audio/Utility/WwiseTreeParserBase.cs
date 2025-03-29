@@ -74,7 +74,6 @@ namespace Editors.Audio.Utility
             }
         }
 
-
         protected void ProcessNext(uint hircId, HircTreeItem parent)
         {
             if (hircId == 0)

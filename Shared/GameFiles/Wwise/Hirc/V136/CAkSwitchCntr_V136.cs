@@ -9,7 +9,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
     {
         public NodeBaseParams_V136 NodeBaseParams { get; set; } = new NodeBaseParams_V136();
         public AkGroupType EGroupType { get; set; }
-        public uint GroupId { get; set; }
+        public uint GroupID { get; set; }
         public uint DefaultSwitch { get; set; }
         public byte BIsContinuousValidation { get; set; }
         public Children_V136 Children { get; set; } = new Children_V136();
@@ -23,7 +23,7 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
         {
             NodeBaseParams.ReadData(chunk);
             EGroupType = (AkGroupType)chunk.ReadByte();
-            GroupId = chunk.ReadUInt32();
+            GroupID = chunk.ReadUInt32();
             DefaultSwitch = chunk.ReadUInt32();
             BIsContinuousValidation = chunk.ReadByte();
             Children.ReadData(chunk);
@@ -50,12 +50,12 @@ namespace Shared.GameFormats.Wwise.Hirc.V136
 
         public class CAkSwitchPackage_V136 : ICAkSwitchPackage
         {
-            public uint SwitchId { get; set; }
+            public uint SwitchID { get; set; }
             public List<uint> NodeIdList { get; set; } = [];
 
             public void ReadData(ByteChunk chunk)
             {
-                SwitchId = chunk.ReadUInt32();
+                SwitchID = chunk.ReadUInt32();
                 var numChildren = chunk.ReadUInt32();
                 for (var i = 0; i < numChildren; i++)
                     NodeIdList.Add(chunk.ReadUInt32());
