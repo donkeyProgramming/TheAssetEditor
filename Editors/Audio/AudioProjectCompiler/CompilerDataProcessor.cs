@@ -187,22 +187,27 @@ namespace Editors.Audio.AudioProjectCompiler
             }
         }
 
-        // TODO: Need some way to handle play and stop actions so that they reference the same sound if they used the same sound and the rest of the event name is the same
         public void SetActionData(AudioProject audioProject)
         {
             foreach (var soundBank in audioProject.SoundBanks)
             {
                 foreach (var actionEvent in soundBank.ActionEvents)
                 {
-                    var action = new Action { ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, actionEvent.Sound.Language) };
+                    var action = new Action();
 
                     if (actionEvent.Name.StartsWith("Stop_"))
                         action.ActionType = AkActionType.Stop_E_O;
 
                     if (actionEvent.Sound != null)
+                    {
+                        action.ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, actionEvent.Sound.Language);
                         action.IDExt = actionEvent.Sound.ID;
+                    } 
                     else
+                    {
+                        action.ID = AudioProjectCompilerHelpers.GenerateUnusedHircID(UsedHircIdsByLanguageIDLookup, actionEvent.RandomSequenceContainer.Language);
                         action.IDExt = actionEvent.RandomSequenceContainer.ID;
+                    }
 
                     actionEvent.Actions = [action];
 

@@ -47,6 +47,9 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
 
         private static NodeBaseParams_V136 CreateNodeBaseParams(Sound audioProjectSound)
         {
+            // A workaround for figuring out whether the Action Event / Dialogue Event involved is targetting a single sound or a container.
+            var soundIsTarget = audioProjectSound.AudioSettings != null;
+
             var nodeBaseParams = new NodeBaseParams_V136();
             nodeBaseParams.NodeInitialFxParams = new NodeInitialFxParams_V136()
             {
@@ -54,43 +57,43 @@ namespace Editors.Audio.AudioProjectCompiler.WwiseGeneratorService.WwiseGenerato
                 NumFx = 0,
             };
             nodeBaseParams.OverrideAttachmentParams = 0;
-            nodeBaseParams.OverrideBusID = audioProjectSound.OverrideBusID;
+            nodeBaseParams.OverrideBusID = soundIsTarget ? audioProjectSound.OverrideBusID : 0;
             nodeBaseParams.DirectParentID = audioProjectSound.DirectParentID;
             nodeBaseParams.BitVector = 0;
             nodeBaseParams.NodeInitialParams = new NodeInitialParams_V136();
 
-            if (audioProjectSound.AudioSettings.LoopingType == LoopingType.FiniteLooping)
+            if (soundIsTarget && audioProjectSound.AudioSettings.LoopingType == LoopingType.FiniteLooping)
             {
                 nodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle_V136()
                 {
                     PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>
+                {
+                    new AkPropBundle_V136.PropBundleInstance_V136
                     {
-                        new AkPropBundle_V136.PropBundleInstance_V136
-                        {
-                            ID = AkPropId_V136.Loop,
-                            Value = audioProjectSound.AudioSettings.NumberOfLoops
-                        }
+                        ID = AkPropId_V136.Loop,
+                        Value = audioProjectSound.AudioSettings.NumberOfLoops
                     }
+                }
                 };
             }
-            else if (audioProjectSound.AudioSettings.LoopingType == LoopingType.InfiniteLooping)
+            else if (soundIsTarget && audioProjectSound.AudioSettings.LoopingType == LoopingType.InfiniteLooping)
             {
                 nodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle_V136()
                 {
                     PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>
+                {
+                    new AkPropBundle_V136.PropBundleInstance_V136
                     {
-                        new AkPropBundle_V136.PropBundleInstance_V136
-                        {
-                            ID = AkPropId_V136.Loop,
-                            Value = 0
-                        }
+                        ID = AkPropId_V136.Loop,
+                        Value = 0
                     }
+                }
                 };
             }
             else
                 nodeBaseParams.NodeInitialParams.AkPropBundle0 = new AkPropBundle_V136() { PropsList = new List<AkPropBundle_V136.PropBundleInstance_V136>() };
-            nodeBaseParams.NodeInitialParams.AkPropBundle1 = new AkPropBundleMinMax_V136() { PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>() };
 
+            nodeBaseParams.NodeInitialParams.AkPropBundle1 = new AkPropBundleMinMax_V136() { PropsList = new List<AkPropBundleMinMax_V136.AkPropBundleInstance_V136>() };
             nodeBaseParams.PositioningParams = new PositioningParams_V136()
             {
                 BitsPositioning = 0x00
