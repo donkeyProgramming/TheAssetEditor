@@ -8,7 +8,7 @@ using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 using Shared.Ui.Common.DataTemplates;
 using Editors.ImportExport.Importing.Presentation.RmvToGltf;
-using Editors.ImportExport.Common;
+using Editors.ImportExport.Misc;
 
 namespace Editors.ImportImport.Importing.Presentation.RmvToGltf
 {
@@ -32,7 +32,7 @@ namespace Editors.ImportImport.Importing.Presentation.RmvToGltf
             _Importer = Importer;
         }
 
-        public ImportExportSupportEnum CanImportFile(PackFile file) => _Importer.CanImportFile(file);
+        public ImportSupportEnum CanImportFile(PackFile file) => _Importer.CanImportFile(file);
 
         public void Execute(PackFile importSource, string outputPath, PackFileContainer packFileContainer, GameTypeEnum gameType)
         {

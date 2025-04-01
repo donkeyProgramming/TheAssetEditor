@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Editors.ImportExport.Common;
 using Editors.ImportExport.Misc;
 using MeshImportExport;
 using Shared.Core.PackFiles;
@@ -17,11 +16,11 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToPng
             _packFileService = pfs;
             _imageSaveHandler = imageSaveHandler;
         }
-        internal ImportExportSupportEnum CanExportFile(PackFile file)
+        internal ExportSupportEnum CanExportFile(PackFile file)
         {
             if (FileExtensionHelper.IsDdsFile(file.Name))
-                return ImportExportSupportEnum.Supported;
-            return ImportExportSupportEnum.NotSupported;
+                return ExportSupportEnum.Supported;
+            return ExportSupportEnum.NotSupported;
         }
 
         public void Export(string outputPath, PackFile file)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Editors.ImportExport.Common;
+using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 
@@ -14,7 +14,7 @@ namespace Editors.ImportExport.Importing.Presentation
         string OutputExtension { get; }
         string[] InputExtensions { get; } // ADDed THIS!
         public void Execute(PackFile exportSource, string outputPath, PackFileContainer packFileContainer, GameTypeEnum gameType);
-        public ImportExportSupportEnum CanImportFile(PackFile file);
+        public ImportSupportEnum CanImportFile(PackFile file);
 
     }
 }

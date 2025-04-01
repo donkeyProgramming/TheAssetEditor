@@ -2,7 +2,7 @@
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Editors.ImportExport.Common;
+using Editors.ImportExport.Misc;
 using Shared.Core.PackFiles.Models;
 using Shared.Core.Settings;
 
@@ -61,12 +61,12 @@ namespace Editors.ImportExport.Importing.Presentation
             foreach (var viewModel in _exporterViewModels)
             {
                 var supported = viewModel.CanImportFile(_inputFile);
-                if (supported == ImportExportSupportEnum.NotSupported)
+                if (supported == ImportSupportEnum.NotSupported)
                     continue;
 
                 PossibleImporters.Add(viewModel);                
 
-                if (supported == ImportExportSupportEnum.HighPriority)
+                if (supported == ImportSupportEnum.HighPriority)
                     SelectedImporter = viewModel;
             }
 

@@ -1,4 +1,4 @@
-﻿using Editors.ImportExport.Common;
+﻿using Editors.ImportExport.Misc;
 using Editors.ImportExport.Exporting.Exporters;
 using Shared.Core.Events;
 using Shared.Core.PackFiles.Models;
@@ -27,7 +27,7 @@ namespace Editors.ImportExport.Exporting
 
             foreach (var exporter in _exporterViewModels)
             {
-                if (exporter.CanExportFile(packFile) != ImportExportSupportEnum.NotSupported)
+                if (exporter.CanExportFile(packFile) != ExportSupportEnum.NotSupported)
                     return true;
             }
             return false;

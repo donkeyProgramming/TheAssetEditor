@@ -1,10 +1,10 @@
 ﻿using System.IO;
 using CommonControls.BaseDialogs.ErrorListDialog;
-using Editors.ImportExport.Common;
 using Editors.ImportExport.Importing.Importers.GltfToRmv.Helper;
 using Editors.ImportExport.Misc;
 using Editors.Shared.Core.Services;
 using GameWorld.Core.SceneNodes;
+using GameWorld.Core.Services;
 using Octokit;
 using Serilog;
 using Shared.Core.ErrorHandling;
@@ -24,10 +24,10 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
         private readonly IPackFileService _packFileService;
         private readonly IStandardDialogs _exceptionService;
         private readonly ILogger _logger = Logging.Create<GltfImporter>();
-        private readonly SkeletonAnimationLookUpHelper _skeletonLookUpHelper;
+        private readonly ISkeletonAnimationLookUpHelper _skeletonLookUpHelper;
         private readonly RmvMaterialBuilder _materialBuilder;
 
-        public GltfImporter(IPackFileService packFileSerivce, IStandardDialogs exceptionService, SkeletonAnimationLookUpHelper skeletonLookUpHelper, RmvMaterialBuilder materialBuilder)
+        public GltfImporter(IPackFileService packFileSerivce, IStandardDialogs exceptionService, ISkeletonAnimationLookUpHelper skeletonLookUpHelper, RmvMaterialBuilder materialBuilder)
         {
             _packFileService = packFileSerivce;
             _exceptionService = exceptionService;
@@ -35,12 +35,12 @@ namespace Editors.ImportExport.Importing.Importers.GltfToRmv
             _materialBuilder = materialBuilder;
         }
 
-        public ImportExportSupportEnum CanImportFile(PackFile file)
+        public ImportSupportEnum CanImportFile(PackFile file)
         {
             if (FileExtensionHelper.IsGltfFile(file.Name))
-                return ImportExportSupportEnum.HighPriority;
+                return ImportSupportEnum.HighPriority;
 
-            return ImportExportSupportEnum.NotSupported;
+            return ImportSupportEnum.NotSupported;
         }
 
         private RmvFile? ImportMeshes(GltfImporterSettings settings, ModelRoot modelRoot, AnimationFile? skeletonAnimFile, string skeletonName)

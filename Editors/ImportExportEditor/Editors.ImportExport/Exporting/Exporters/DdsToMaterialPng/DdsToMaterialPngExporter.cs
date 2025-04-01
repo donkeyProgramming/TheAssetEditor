@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.IO;
-using Editors.ImportExport.Common;
 using Editors.ImportExport.Misc;
 using MeshImportExport;
 using Shared.Core.PackFiles;
@@ -12,7 +11,7 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
     public interface IDdsToMaterialPngExporter
     {
         public string Export(string filePath, string outputPath, bool convertToBlenderFormat);
-        public ImportExportSupportEnum CanExportFile(PackFile file);
+        public ExportSupportEnum CanExportFile(PackFile file);
     }
 
     public class DdsToMaterialPngExporter : IDdsToMaterialPngExporter
@@ -53,13 +52,13 @@ namespace Editors.ImportExport.Exporting.Exporters.DdsToMaterialPng
             return outFilePath;
         }
 
-        public ImportExportSupportEnum CanExportFile(PackFile file)
+        public ExportSupportEnum CanExportFile(PackFile file)
         {
             if (FileExtensionHelper.IsDdsMaterialFile(file.Name))
-                return ImportExportSupportEnum.HighPriority;
+                return ExportSupportEnum.HighPriority;
             else if (FileExtensionHelper.IsDdsFile(file.Name))
-                return ImportExportSupportEnum.Supported;
-            return ImportExportSupportEnum.NotSupported;
+                return ExportSupportEnum.Supported;
+            return ExportSupportEnum.NotSupported;
         }
 
         byte[] ConvertToBlenderFormat(byte[] imgBytes, string outputPath, string fileDirectory)
